@@ -6699,6 +6699,7 @@ created_at: Instant
 version: PositiveInt
 overpaid_minor?: Money
 payments?: P03PaymentView[]
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6754,6 +6755,7 @@ state: LeadState
 last_contact: (Instant | null)
 due_followup: (Instant | null)
 version: PositiveInt
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7124,6 +7126,7 @@ version: PositiveInt
 participant_cancellation?: (ParticipantCancellationBasis | null)
 package_eligible?: (boolean | null)
 package_eligible_at_attendance?: (boolean | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it.
@@ -7156,6 +7159,7 @@ currency: Currency
 performed: (Bool | null)
 version: PositiveInt
 verified_at: (Instant | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11443,6 +11447,7 @@ lead_id: (string | null)
 assigned_to: (string | null)
 kind: FollowupKind
 due_at: Instant
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16554,6 +16559,7 @@ remaining_minor: Money
 credited_minor: Money
 student_credit_available_minor: Money
 terms: EventTerms
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16732,6 +16738,7 @@ valid: AgreementValidity
 supersedes_id: (string | null)
 terms: PayTerms
 published_at: (Instant | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21834,6 +21841,7 @@ person_id: string
 version: PositiveInt
 delegation_allowed: Bool
 center_grants: SettlementCenterGrantView[]
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

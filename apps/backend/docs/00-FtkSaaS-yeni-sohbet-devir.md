@@ -1,5 +1,16 @@
 # Güncel kaynak ve kabul
 
+
+## A03–S15 aktif backend kabul paketi
+
+6 Kasım 2026 başlangıç main `bb21a7274f2db8e56cf15709819e05ef736e7404` (PR230). [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42264137912) ve [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42264137900) completed/success doğrulandı. Başlangıç gözleminde development teslimi çalışıyor, Vercel bekliyordu; bu gözlem deploy başarısı sayılmadı. Yeni çalışma dalı `feature/backend-a03-s15-close`.
+
+S05 envanterindeki sekiz eksik üst-plan DTO ve dokuz gerçek SQL projeksiyon yolu için migration117 eklendi. İsteğe bağlı nullable `subscriber_number`, mevcut org/canonical alias çözücüsünü kullanır; yeni numara tahsis etmez, UUID komutları veya mevcut yetki/plan/pagination filtresini değiştirmez. CRM'nin normal öğrenci takibi ve otomasyon takibi iki ayrı üretici olduğundan ikisi de değiştirildi. Eski migration'lar ve önceden üretilmiş dosyalar korunur.
+
+Yeni sözleşme testi önce EarningView eksik alanında kırmızı, sekiz eklemeyle yeşil oldu. Güncel hosted fonksiyon tanımları salt okunur alındı; izole PostgreSQL kontrolünde dokuz anchor uygulandı, lead numarası/null/alias/başka org/no-allocation ve tekrar uygulamada anchor-drift reddi geçti. Bu kontrol native Auth/API veya hosted deployment kabulü değildir. Mevcut gerçek API testlerine anlaşma/hakediş/etkinlik ödeme hazırlığı/kayıt/görev/CRM normal ve otomasyon takibi/hesaplaşma yetkisi numara kontrolleri eklendi. Test envanterinin değişmeyen bütün satırları önceki shard sahibinde kaldı; yalnız eklenen satırların range/hash izi güncellendi. Native testler yeni aday CI'da çalıştırılacak; bu aşama henüz kapanmadı.
+
+S11'in hosted boşluğu yeni veri üretmeden aşağıdaki B04 gerçek dosya/worker/indir/yetki kaybı kanıtına bağlandı. S12'nin P01 limit bağı ve S09'un XREQ-021 native/hosted eski bekleyen notu tamamlanan kanıtla uzlaştırıldı. S10'da P14/P15 yeniden açık gösterilmiyor; 69 grubun tam tüketici eşlemesi hâlâ ayrı iş. A03.2/A03.3, S08, S12/S13 gerçek hosted kabulü ve S14/S15 gerçek widget/host/route sınırları bu paketin sonraki adımlarıdır. Görev işaretlerinin sahibi [remaining-work](remaining-work.md); frontend adına kabul verilmedi.
+
 ## Business B01–B04 — 6 Kasım devam kontrol noktası
 
 PR227 main `0343942689ba8de7785eb92dc6fe41ddc0c64a84` ile birleşti. [Aday42245369783](https://github.com/SXQHex/FtkSaaS/actions/runs/42245369783), [main42249587908](https://github.com/SXQHex/FtkSaaS/actions/runs/42249587908), [development42249663421](https://github.com/SXQHex/FtkSaaS/actions/runs/42249663421) ve [Vercel42249663613](https://github.com/SXQHex/FtkSaaS/actions/runs/42249663613) başarılıdır. Aday head `9d835d9197a2fe2df8e0b68500bb68fe677947d9`, base `86a77dc49cca498b2d2d9eeee0c074de04639a4b`, tested merge `fa075e10619777445f6813c7a86c6c4ce3041e5e`; birleşen ağaç `e564244207f07f45d78aee72b67d221136bf3a5f`. P14/P15/P16 tekrar edilmedi. Belge tesliminin güncel tabanı `b16f944f553752d60e92279d584977475653c919` (PR228); [main42256764715](https://github.com/SXQHex/FtkSaaS/actions/runs/42256764715) ve [development42256850513](https://github.com/SXQHex/FtkSaaS/actions/runs/42256850513) başarılıdır. PR227 sonrası bu tabana backend/API sözleşmesi farkı sıfırdır. Aktif devam dalı `feature/backend-business-live-close`.
@@ -481,7 +492,7 @@ PR190 host head `b023bf975638b7c673c00a353d5dcb1c0483907c` için [41949795209](h
 
 ## Devam noktası
 
-A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt ve boşluk uzlaştırması açık. S01.4 backend teslimi tamamlandı. S01.5/XREQ-009, S01.7/XREQ-012 ve S05’in Starter operasyon projeksiyonları teslim edildi; PR150 ve PR152 backend kabul paketleri teslim edildi; S14–S16 kaynak paketi aday/main/development ile teslim edildi; XREQ-013 incelemesinin açık native/consumer adımı P04 altında; P01/P02 ve P12/P13 backend teslimleri tamamlandı; P05/P06 ve XREQ-016 backend teslimi kapalı; PR188 P07 backend adaptörü teslim edildi; aktif kaynak paketi P08–P11; S11–S13 gerçek hosted/tüketici kabulü açık kalır; S07 özgün XREQ-004 kabulü işlendi, genişletilmiş tüketici negatifleri açık; görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
+Aktif kaynak ve son doğrulanmış adım [A03–S15 kontrol noktasında](#a03s15-aktif-backend-kabul-paketi), görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 
@@ -494,8 +505,8 @@ A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt
 | Worker/export | PR83 bounded report backlog/retry/kesinti/rebind ve export expiry dilimi kayıtlıdır; genel beş lane, privacy purge ve tam restore bundan çıkarılamaz. |
 | Restore | PR84 guard/sicil/callback araçları mevcut; gerçek hosted loader, fiziksel imha ve DB/Auth/Storage restore tamamlığı değildir. |
 | Public/ICS | Backend kaynakları mevcut; gerçek widget/action/hostname ve gerçek takvim host’u/route kabulü ayrıca gerekir. |
-| Bildirim | Mevcut support projeksiyonu in_app hazır, email/push ve timing/quiet-hours/digest unavailable gösterir. Son ürün kararları bu çalışma sırasında runtime’ı değiştirmedi. |
-| Limit/CRM/Pratik | P01 ve P12/P13 backend teslimi tamamlandı; etkinlik kapasitesi ve kredi tüketmeyen katılım kanıtı [P12/P13 kaydındadır](#p12p13-etkinlik-kaynak-paketi). CRM temel dilimi P05 açıktır; frontend ekran kabulü kendi alanında izlenir. |
+| Bildirim | P14/P15 backend e-posta, hatırlatma/zamanlama ve sessiz saat kaynak/canlı kabulü kendi kapanış bölümlerinde doğrulandı; Starter ve opsiyonel kanal izinleri korunur. Push ve diğer doğrulanmamış kanallar tamamlandı sayılmaz. |
+| Limit/CRM/Pratik | P01 ve P12/P13 backend teslimi tamamlandı; etkinlik kapasitesi ve kredi tüketmeyen katılım kanıtı [P12/P13 kaydındadır](#p12p13-etkinlik-kaynak-paketi). P05/P06 backend teslimi tamamlandı; P07 gerçek site/form kabulü ve frontend ekran kabulü kendi alanlarında izlenir. |
 | CI kapanış teşhisi | Önceki timeout düzeltmesi ve başarılı rerun sinyali gönderen süreç/host kaynağının kanıtı değildir. Yeni olay olmadan kök neden ilan edilmez; mevcut başarılı kaynak kabulü keyfî geri açılmaz. |
 
 ## CRM karar aktarımı

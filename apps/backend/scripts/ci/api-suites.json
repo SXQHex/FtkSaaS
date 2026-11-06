@@ -109,7 +109,7 @@
     },
     {
       "path": "apps/backend/tests/cross-center-settlement.test.mjs",
-      "sha256": "4140c76d4711516b903640ae00266e43d7dad210392079f6f76b5156b0870826",
+      "sha256": "a68b8b36ae0d959eca4d62ae70001bcca0ee95a928d43275107019d7a05623a9",
       "shared": [
         [
           1,
@@ -122,7 +122,7 @@
           "ranges": [
             [
               103,
-              225
+              226
             ]
           ]
         },
@@ -130,8 +130,8 @@
           "id": "cross-center-deficit-sources",
           "ranges": [
             [
-              226,
-              246
+              227,
+              247
             ]
           ]
         },
@@ -139,8 +139,8 @@
           "id": "cross-center-no-transfer",
           "ranges": [
             [
-              247,
-              268
+              248,
+              269
             ]
           ]
         },
@@ -148,8 +148,8 @@
           "id": "cross-center-rounding",
           "ranges": [
             [
-              269,
-              285
+              270,
+              286
             ]
           ]
         },
@@ -157,8 +157,8 @@
           "id": "cross-center-source-scope",
           "ranges": [
             [
-              286,
-              311
+              287,
+              312
             ]
           ]
         },
@@ -166,8 +166,8 @@
           "id": "cross-center-authority",
           "ranges": [
             [
-              312,
-              392
+              313,
+              393
             ]
           ]
         },
@@ -175,8 +175,8 @@
           "id": "cross-center-atomic",
           "ranges": [
             [
-              393,
-              444
+              394,
+              445
             ]
           ]
         }
@@ -282,15 +282,15 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "056fa86fe2b9e758b58f7d7dc20fa918ec630c36ecabfdbb9298fbca3d80aa3f",
+      "sha256": "f87c9b3de2f84f9734cc1cb4a760e3cbf101df064c40a5606d457ecfccddacc3",
       "shared": [
         [
           3,
           46
         ],
         [
-          228,
-          229
+          235,
+          236
         ]
       ],
       "parts": [
@@ -299,11 +299,11 @@
           "ranges": [
             [
               47,
-              86
+              93
             ],
             [
-              230,
-              230
+              237,
+              237
             ]
           ]
         },
@@ -311,12 +311,12 @@
           "id": "event-paid-capacity",
           "ranges": [
             [
-              87,
-              131
+              94,
+              138
             ],
             [
-              231,
-              231
+              238,
+              238
             ]
           ]
         },
@@ -324,12 +324,12 @@
           "id": "event-financial-cancellation",
           "ranges": [
             [
-              132,
-              183
+              139,
+              190
             ],
             [
-              232,
-              232
+              239,
+              239
             ]
           ]
         },
@@ -337,12 +337,12 @@
           "id": "event-payment-authority",
           "ranges": [
             [
-              184,
-              227
+              191,
+              234
             ],
             [
-              233,
-              233
+              240,
+              240
             ]
           ]
         },
@@ -350,8 +350,8 @@
           "id": "event-payment-root-2",
           "ranges": [
             [
-              234,
-              409
+              241,
+              416
             ]
           ]
         }
@@ -372,15 +372,15 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "697b07b8f3a64100f875c2ccac30162dd52792140ffa6d2370079e3c03d2d0c1",
+      "sha256": "293da01552f8712f4cd6f13c3d729963204d769ad9f1bf7179eb7c553b1eb80f",
       "shared": [
         [
           2,
           69
         ],
         [
-          350,
-          351
+          352,
+          353
         ]
       ],
       "parts": [
@@ -389,33 +389,7 @@
           "ranges": [
             [
               70,
-              102
-            ],
-            [
-              352,
-              352
-            ]
-          ]
-        },
-        {
-          "id": "earnings-packages-corrections",
-          "ranges": [
-            [
-              103,
-              164
-            ],
-            [
-              353,
-              353
-            ]
-          ]
-        },
-        {
-          "id": "earnings-valuation-closure",
-          "ranges": [
-            [
-              165,
-              217
+              103
             ],
             [
               354,
@@ -424,11 +398,11 @@
           ]
         },
         {
-          "id": "earnings-occurrence-authority",
+          "id": "earnings-packages-corrections",
           "ranges": [
             [
-              218,
-              317
+              104,
+              166
             ],
             [
               355,
@@ -437,15 +411,41 @@
           ]
         },
         {
-          "id": "earnings-pilot",
+          "id": "earnings-valuation-closure",
           "ranges": [
             [
-              318,
-              349
+              167,
+              219
             ],
             [
               356,
               356
+            ]
+          ]
+        },
+        {
+          "id": "earnings-occurrence-authority",
+          "ranges": [
+            [
+              220,
+              319
+            ],
+            [
+              357,
+              357
+            ]
+          ]
+        },
+        {
+          "id": "earnings-pilot",
+          "ranges": [
+            [
+              320,
+              351
+            ],
+            [
+              358,
+              358
             ]
           ]
         }
@@ -571,7 +571,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/subscriber-number-acceptance.mjs",
-          "sha256": "d4d99e4915601dc82dcaf4732e8dba9bc012ee44a43efdb85d4554bc00db21dc"
+          "sha256": "acacec64c1ad9c3568f52286210a681ecbe2caf85c09125f64d73b7ace97d5e4"
         },
         {
           "line": 2,
@@ -611,7 +611,7 @@
         {
           "line": 356,
           "path": "apps/backend/tests/crm-followup-projections-acceptance.mjs",
-          "sha256": "c7293d6927028bb7a9d4cd0f1c72fb62b09cc25cd3c2576c877283d562f6882d"
+          "sha256": "49d763d43cfb80f93cd92d2c612b349713335939e16b02b95a0344d40b263aae"
         },
         {
           "line": 357,
@@ -621,7 +621,7 @@
         {
           "line": 358,
           "path": "apps/backend/tests/crm-followup-acceptance.mjs",
-          "sha256": "63e4c6bae19e1f648016489c187fd1bab3bf62506982cd60863d2ad6af301923"
+          "sha256": "8e2ccfed55fe4fab9d3e1d789825aac0f4934ad26fa9d9caa1d2db28154882e8"
         }
       ],
       "estimated_seconds": 651.01

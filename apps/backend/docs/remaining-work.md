@@ -164,11 +164,11 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulama alt adımları:**
 
-- [ ] S05.1 — Kişi referansı kullanan mevcut arama/liste/rapor/export projeksiyonlarını envanterden tara; Abone No gereken yüzeyleri ve mevcut izin kapsamlarını belirle.
+- [x] S05.1 — Kişi referansı kullanan mevcut arama/liste/rapor/export projeksiyonlarını envanterden tara; Abone No gereken yüzeyleri ve mevcut izin kapsamlarını belirle.
 - [ ] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
 - [ ] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
 
-**İncelenen yüzeyler:** PersonSummary/PersonView ile ReportRow ve yeni CSV kaynakları teslim edildi. ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView PR139 ile teslim edildi; [aday/main/development kabulü](00-FtkSaaS-yeni-sohbet-devir.md#s05-operasyon-projeksiyonları-kabulü) tamamlandı. ClassAssignmentView, ProtectedObligationView ve LessonRequestView kalan Starter yüzeyleri olarak PR145 ile teslim edildi; üst-plan RoleView/SeatOfferView/WaitlistEntryView de aynı nullable projeksiyonu taşır. Genel rol listesi ve F12 Starter’da kapalı kalır; [PR145 kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#temizlik-ve-starter-kişi-projeksiyonları-kabulü). EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, AgreementVersionView, SettlementAuthorityView ve CrmFollowupView üst-plan dilimlerinde mevcut plan/izin sınırlarıyla ele alınacak. Starter projeksiyon alt teslimi kapalıdır; üst-plan yüzeyleri ve genel S05 kabulü açık kalır.
+**İncelenen yüzeyler:** Starter ve üst-plan kişi/liste/rapor/export envanteri tarandı. Önceki PersonSummary/PersonView, ReportRow/CSV, ReservationView, AttendanceEntryView, EntitlementView, FinanceView, NegativeLimitsView, RoleView, ClassAssignmentView, ProtectedObligationView, LessonRequestView, SeatOfferView ve WaitlistEntryView teslimleri korunur. Kalan EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, AgreementVersionView, SettlementAuthorityView ve CrmFollowupView için isteğe bağlı nullable Abone No eklendi; otomasyon takipleri ayrı kaynakta aynı alanı taşır. UUID girdileri, plan/izin filtreleri ve tahsis davranışı değişmez. Yeni kaynak ve native CI bekleyen aşama [devirde](00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi). S05.2/S05.3 ve genel S05, yeni kaynağın native/main/development doğrulaması tamamlanana kadar açıktır; frontend ekran kabulü ayrı kalır.
 
 **Dilim kabulü:** Aynı kişi izinli operasyon yüzeylerinde tutarlı numarayla görünür. Numara kişisel/finans verisine ek erişim sağlamaz; yeni export mevcut yetkiyi uygular. Önceden üretilmiş dış belge değişmez; frontend'in ekran uyarlaması/kabulü backend adına kapatılmaz.
 
@@ -215,7 +215,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s09"></a>
 ### S09 — Starter günlük ders ve hak akışı
 
-**Ek talep — XREQ-021:** Dar katalog main/development teslim edildi. Bağlı öğrencinin katalog öncesi people_list zaman aşımı, ölçülmüş alias/yetki taraması kaynağına bağlıdır. İndeksli self keşfi/alias bileşeni ve10k kişi regresyonu yeni adayda; native/main/development ve hosted tekrar açık. [Tüketim devri](../../../docs/requests.md#xreq-021), [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md).
+**Ek talep — XREQ-021:** Dar katalog main/development teslim edildi. Bağlı öğrencinin katalog öncesi people_list zaman aşımı, ölçülmüş alias/yetki taraması kaynağına bağlıdır. İndeksli self keşfi/alias bileşeni ve 10k kişi regresyonu PR221 native/main/development ve hosted tekrarında doğrulandı; bu backend düzeltmesi kapalıdır. [Tüketim devri](../../../docs/requests.md#xreq-021), [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md).
 
 - [x] **Tür:** D · **Plan:** Starter ve miras alanlar · **Özellik:** F02,F08,F09,F10,F11,F13,F14,F15,F16,F19
 - **Bağımlılık:** S02,S03
@@ -238,19 +238,19 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Owner/merkez/personel/self ve plan kapıları; değişiklik→yeniden okuma→etkilenen işlem; Pro bildirim alanları P14/P15 ile kapanır. Hatırlatma/quiet-hours hedefi P15, mevcut availability okuması kaynakta mevcuttur.
 - **Kaynak alanı:** docs/settings.md; typed settings/management SQL; ilgili test
 
-**İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 67 typed alan aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun, gerçek frontend/hosted davranışının veya Pro bildirim/zamanlama kabulünün kapandığı sonucu çıkarılmaz; P14/P15 ve gerekli ortam kabulleri açık kalır. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
+**İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 67 typed alan aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun veya gerçek frontend/hosted davranışının kapandığı sonucu çıkarılmaz. P14/P15 backend kaynak ve canlı bildirim/zamanlama kabulü tamamlandı; kalan S10 işi bütün 69 grubun tüketici/varsayılan/miras/yetki eşlemesidir. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
 
 <a id="s11"></a>
 ### S11 — Rapor ve güvenli indirme
 
-- [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F28
+- [x] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F28
 - **Bağımlılık:** S05
 - **Kabul:** Yetkili kullanıcı rapor üretir, işi takip eder, gerçek dosyayı indirir.
 - **Sınır/olumsuz durum:** Kaynak toplamlarıyla mutabakat, scope ve expiry; boş worker başarı sayılmaz.
 - **Doğrulama senaryosu:** Gerçek payload/filtre/tarih/No, yetki kaybı/eski URL; PR83 değişmeyen kanıtı tekrar üretme.
 - **Kaynak alanı:** p06 rapor worker/projeksiyon; mevcut p06 acceptance
 
-**Backend dilimi:** Mevcut gerçek Starter worker→rapor→authenticated CSV ve No/filtre/toplam kabulü korunur. Süresi dolan descriptor’ın aynı gerçek HTTP download yolunda da ret verdiği eklendi; içerik dönmez. PR83’ün değişmeyen lease/retention kanıtı yeniden üretilmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted dosya/ekran tüketicisi kabulü açık kaldığından genel S11 kapanmadı.
+**Backend dilimi:** Mevcut gerçek Starter worker→rapor→authenticated CSV ve No/filtre/toplam kabulü korunur. Süresi dolan descriptor’ın aynı gerçek HTTP download yolunda da ret verdiği eklendi; içerik dönmez. PR83’ün değişmeyen lease/retention kanıtı yeniden üretilmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). B04 canlı kabulünde yetkili Owner ve sınırlı CM gerçek dolu raporu cron worker ile üretti, işi takip edip authenticated CSV baytlarını indirdi; kaynak/toplam/merkez mutabakatı ve yetki geri alındıktan sonra dosya, job-status ve aynı anahtarla export replay reddi doğrulandı. Böylece S11 backend hosted kabulü kapalıdır; ekran/tarayıcı kabulü bu işin kapanışına dahil değildir. [Canlı kanıt](00-FtkSaaS-yeni-sohbet-devir.md#b03b04-gerçek-hesaplaşma-ve-rapor-kapanışı--6-kasım-2026).
 
 <a id="s12"></a>
 ### S12 — Öğrenci/kredi/borç importu
@@ -262,7 +262,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Kısmi hata, yinelenen dosya, kota sınırı ve kaynak-sonuç mutabakatı; gerçek iş çıktısı.
 - **Kaynak alanı:** p06 import kaynakları; mevcut acceptance
 
-**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted import tüketicisi ve Pro/Business limit kabulü açık kalır; genel S12 kapanmadı.
+**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Pro/Business limit kabulü P01 ile tamamlandı. Gerçek hosted dosya yükleme→preview→apply→worker→sonuç kabulü açık kalır; genel S12 kapanmadı.
 
 <a id="s13"></a>
 ### S13 — Sürümlü belge ve onay akışı

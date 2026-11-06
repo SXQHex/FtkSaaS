@@ -15,6 +15,7 @@ test('P11 Pro worker keeps event dedupe and live disable feature and LOGIN scope
  assert(selected,'Pro worker must claim its eligible automation');
  const result=await invoke(selected);assert.equal(result.ok,true,JSON.stringify(result));assert.deepEqual(await invoke(selected),result);
  const followups=await api('crm_followup_list_v1',{kind:'automation_followup',page:{}});assert.equal(followups.items.filter(x=>x.person_id===target).length,1);assert(!followups.items.some(x=>x.person_id===excluded));
+ assert.equal(followups.items.find(x=>x.person_id===target).subscriber_number,(await db.query('select private.subscriber_number($1,$2) n',[org,target])).rows[0].n);
  const activityCount=async()=>Number((await db.query('select count(*) n from private.p05_automation_activities where automation_id=$1',[automation])).rows[0].n);
  assert.equal(await activityCount(),1);
  for(let round=0;round<4;round++){const jobs=await claim();if(!jobs.length)break;for(const job of jobs)assert.equal((await invoke(job)).ok,true);}
