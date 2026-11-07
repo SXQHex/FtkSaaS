@@ -1827,7 +1827,8 @@
     "refundRights": "Source rights: {available} available, {reserved} reserved, {consumed} consumed.",
     "reviewSaleRefund": "Review sale refund",
     "invalidFinancePreview": "Finance preview could not be verified. Request a new review of the source and effects.",
-    "financeEffects": "Finance and entitlement effects"
+    "financeEffects": "Finance and entitlement effects",
+    "report": "Compare with collections and debts report"
   },
   "attendance": {
     "title": "Attendance",
@@ -2187,5 +2188,23 @@
       "event_fee": "Event fee",
       "lesson_agreement": "Lesson agreement"
     }
+  },
+  "financeReport": {
+    "title": "Collections and debts report",
+    "hint": "Collections and cash refunds use transaction dates; outstanding debts use due dates. This period report may differ from the current full balance. Totals cover the entire query and are not added across pages.",
+    "date": "Report date",
+    "range": "Date range",
+    "day": "Day",
+    "week": "Week",
+    "reload": "Refresh report",
+    "loading": "Loading…",
+    "asOf": "Read at:",
+    "empty": "No records in this interval.",
+    "count": "Records: {count}",
+    "totals": "Query totals",
+    "next": "Next report rows",
+    "collections": "Collections",
+    "refunds": "Cash refunds",
+    "outstanding_debt": "Outstanding debt due in interval"
   }
 }

@@ -1827,7 +1827,8 @@
     "refundRights": "Kaynak haklar: kullanılabilir {available}, ayrılmış {reserved}, kullanılmış {consumed}.",
     "reviewSaleRefund": "Satış iadesini incele",
     "invalidFinancePreview": "Finans önizlemesi doğrulanamadı. Kaynak ve etkiler için yeni inceleme alın.",
-    "financeEffects": "Finans ve hak etkileri"
+    "financeEffects": "Finans ve hak etkileri",
+    "report": "Tahsilat ve borç raporuyla karşılaştır"
   },
   "attendance": {
     "title": "Yoklama",
@@ -2187,5 +2188,23 @@
       "event_fee": "Etkinlik ücreti",
       "lesson_agreement": "Ders anlaşması"
     }
+  },
+  "financeReport": {
+    "title": "Tahsilat ve borç raporu",
+    "hint": "Tahsilatlar ve nakit iadeleri işlem tarihine, açık borçlar vade tarihine göre filtrelenir. Bu dönem raporu bütün güncel bakiyeyi temsil etmeyebilir. Toplamlar tüm sorguya aittir; sayfalar arasında toplanmaz.",
+    "date": "Rapor tarihi",
+    "range": "Tarih aralığı",
+    "day": "Gün",
+    "week": "Hafta",
+    "reload": "Raporu yenile",
+    "loading": "Yükleniyor…",
+    "asOf": "Okuma zamanı:",
+    "empty": "Bu aralıkta kayıt yok.",
+    "count": "Kayıt: {count}",
+    "totals": "Sorgunun toplamları",
+    "next": "Sonraki rapor satırları",
+    "collections": "Tahsilatlar",
+    "refunds": "Nakit iadeleri",
+    "outstanding_debt": "Vadesi aralıkta olan açık borç"
   }
 }
