@@ -1,3 +1,5 @@
+import { paymentWrites } from "./instructor-payment-command";
+import { waitlistWrites } from "./waitlist-command";
 import { lifecycleWrites } from "./sale-lifecycle-command";
 import { attendanceWrites } from "./attendance-command";
 import { balanceOperations } from "./finance-actions";
@@ -23,6 +25,7 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
   settings: ["settings_update_v1", "settings_reset_apply_v1", "negcredit_valuation_set_v1"],
   agreements: ["instructor_agreement_publish_v1"],
   finance: [
+    ...paymentWrites,
     "collection_record_v1",
     "collection_correct_apply_v1",
     "sale_refund_apply_v1",
@@ -30,7 +33,10 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
   ],
   sale: ["sale_apply_v1", "sale_renew_apply_v1", ...lifecycleWrites],
   rights: rightsOperations,
-  reservation: bookingWrites.filter((operation) => operation.startsWith("reservation_")),
+  reservation: [
+    ...bookingWrites.filter((operation) => operation.startsWith("reservation_")),
+    ...waitlistWrites,
+  ],
   request: bookingWrites.filter((operation) => operation.startsWith("lesson_request_")),
 };
 function slotKind(slot: string): PendingOperation["kind"] | null {
@@ -53,6 +59,8 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
     case "credit-offset":
     case "debt-adjust":
     case "collection-correct":
+    case "earnings":
+    case "instructor-payment":
     case "finance":
       return "finance";
     case "sale-lifecycle":
@@ -60,6 +68,9 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
       return "sale";
     case "rights":
       return "rights";
+    case "waitlist-person":
+    case "waitlist-entry":
+    case "waitlist-offer":
     case "bookings":
       return "reservation";
     default:

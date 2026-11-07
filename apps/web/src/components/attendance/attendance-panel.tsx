@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import type { SessionView } from "@ftksaas/api-contracts";
@@ -10,6 +11,9 @@ import { AttendanceRoster } from "./attendance-roster";
 import { AttendanceRights } from "./attendance-rights";
 import { AttendanceError } from "./attendance-error";
 
+const AttendanceEarnings = dynamic(() =>
+  import("./attendance-earnings").then((m) => m.AttendanceEarnings),
+);
 export function AttendancePanel({
   scope: initialScope,
   sessionId,
@@ -98,6 +102,12 @@ export function AttendancePanel({
               · {timeZone}
             </p>
             <p className="text-sm text-muted-foreground">{t("draftHint")}</p>
+            <AttendanceEarnings
+              key={`earnings:${revision}`}
+              scope={scope}
+              session={current.data.session}
+              timeZone={timeZone}
+            />
             <AttendanceRoster
               key={revision}
               scope={scope}

@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { v7 } from "uuid";
@@ -17,6 +18,7 @@ import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { PersonChooser } from "./person-chooser";
 import { ConfirmWrite, FlowError, flowError } from "./flow-controls";
 import { ContextDocuments } from "../documents/context-documents";
+const WaitlistPanel = dynamic(() => import("./waitlist-panel").then((m) => m.WaitlistPanel));
 export function SessionBookings({
   scope,
   session,
@@ -58,6 +60,7 @@ function BookingConnection({
     [fresh, setFresh] = useState(session),
     [readRevision, setReadRevision] = useState(0),
     [sessionError, setSessionError] = useState(""),
+    [waitlistError, setWaitlistError] = useState(""),
     [sessionAttempt, setSessionAttempt] = useState(0);
   useEffect(() => {
     if (!revision) return;
@@ -121,6 +124,7 @@ function BookingConnection({
       >
         {t(open ? "hide" : "openBookings")}
       </Button>
+      {waitlistError && <FlowError code={waitlistError} />}
       {sessionError && (
         <>
           <FlowError code={sessionError} />
@@ -135,15 +139,32 @@ function BookingConnection({
       )}
       {open && readRevision !== revision && !sessionError && <output>{t("loading")}</output>}
       {open && readRevision === revision && (
-        <BookingPanel
-          key={revision}
-          scope={scope}
-          session={fresh}
-          api={api}
-          command={command}
-          initialPerson={chosen}
-          onPerson={setChosen}
-        />
+        <>
+          <BookingPanel
+            key={revision}
+            scope={scope}
+            session={fresh}
+            api={api}
+            command={command}
+            initialPerson={chosen}
+            onPerson={(person) => {
+              setChosen(person);
+              setWaitlistError("");
+            }}
+          />
+          {chosen && fresh.state === "planned" && (
+            <WaitlistPanel
+              scope={scope}
+              sessionId={session.id}
+              personId={chosen.id}
+              categories={fresh.capacity.categories}
+              onChanged={(code) => {
+                setWaitlistError(code ?? "");
+                setRevision((n) => n + 1);
+              }}
+            />
+          )}
+        </>
       )}
     </section>
   );
@@ -289,6 +310,7 @@ export function BookingPanel({
               setDraft(null);
             }}
           />
+
           {person && (
             <BookingForm
               key={person.id}
@@ -387,6 +409,10 @@ function BookingForm({
         onSubmit={(event) => {
           event.preventDefault();
           if (disabled || !rows || error || !sale) return;
+          if (session.capacity.categories && !category) {
+            setError("invalidForm");
+            return;
+          }
           const selected = rows.find((row) => row.sale_id === sale);
           if (sale !== "automatic" && (!selected || !selected.available_at_session)) return;
           const input = {
@@ -453,17 +479,22 @@ function BookingForm({
               </select>
             </>
           )}
-          <Label htmlFor={`${id}-category`}>{t("category")}</Label>
-          <select
-            id={`${id}-category`}
-            className="min-h-11 w-full rounded-md border bg-background px-3"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            <option value="">{t("noCategory")}</option>
-            <option value="male">{t("male")}</option>
-            <option value="female">{t("female")}</option>
-          </select>
+          {session.capacity.categories && (
+            <>
+              <Label htmlFor={`${id}-category`}>{t("category")}</Label>
+              <select
+                id={`${id}-category`}
+                required
+                className="min-h-11 w-full rounded-md border bg-background px-3"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              >
+                <option value="">{t("noCategory")}</option>
+                <option value="male">{t("male")}</option>
+                <option value="female">{t("female")}</option>
+              </select>
+            </>
+          )}
           {canOverride && (
             <label className="flex min-h-11 items-center gap-3">
               <input
