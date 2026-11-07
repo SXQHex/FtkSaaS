@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {project,unchangedEdge,unchangedResendWebhook,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
+import {project,unchangedEdge,unchangedResendWebhook,unchangedCalendarGateway,missingCalendarConfiguration,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment,trustedDeliveryRun,filterSupabaseDelivery,resolveDeployment,previousReceipt} from '../scripts/ci/deployment-source.mjs';
 import fs,{mkdtempSync,rmSync} from 'node:fs';
 import {backendUnchanged} from '../scripts/ci/source.mjs';
@@ -127,6 +127,17 @@ test('Resend deployment reuse requires its own source/version receipt and dedica
  const previous={success:true,project,resend_webhook_version:3,resend_webhook_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:false};
  assert(unchangedResendWebhook(previous,edge,'hash'));
  for(const [p,e,h] of [[null,edge,'hash'],[previous,undefined,'hash'],[{...previous,success:false},edge,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:true},'hash'],[previous,{...edge,status:'FAILED'},'hash'],[previous,edge,'changed']])assert(!unchangedResendWebhook(p,e,h));
+});
+test('calendar transport has independent exact-source proof and initializes only absent configuration',()=>{
+ const previous={success:true,project,calendar_gateway_version:3,calendar_gateway_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:false};
+ assert(unchangedCalendarGateway(previous,edge,'hash'));
+ for(const [p,e,h] of [[null,edge,'hash'],[previous,undefined,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:true},'hash'],[previous,edge,'changed']])assert(!unchangedCalendarGateway(p,e,h));
+ const secrets=missingCalendarConfiguration([]);assert.equal(secrets.length,3);
+ assert.match(secrets.find(s=>s.name==='FTK_CALENDAR_SIGNING_KEY').value,/^[a-f0-9]{64}$/);
+ assert.deepEqual(missingCalendarConfiguration(secrets.map(s=>({name:s.name,value:'existing-hash'}))),[]);
+ const one=missingCalendarConfiguration(secrets.filter(s=>s.name!=='FTK_CALENDAR_ORIGIN'));
+ assert.deepEqual(one,[{name:'FTK_CALENDAR_ORIGIN',value:'https://'+project+'.supabase.co/functions/v1/personal-calendar'}]);
+ assert.throws(()=>missingCalendarConfiguration({}),/Invalid calendar configuration inventory/);
 });
 
 test('hosted webhook smoke rejects the JWT gateway failure and accepts only provider signature rejection without credentials',async()=>{

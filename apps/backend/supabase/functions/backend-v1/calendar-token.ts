@@ -10,8 +10,8 @@ export async function calendarTokenHash(token:string):Promise<string> {
 export function calendarOrigin(value:string|undefined):string {
  if(!value||/[\u0000-\u0020\u007f]/.test(value))throw Error('CALENDAR_NOT_CONFIGURED');
  let url:URL;try{url=new URL(value);}catch{throw Error('CALENDAR_NOT_CONFIGURED');}
- if(url.username||url.password||url.search||url.hash||url.pathname!=='/'||!(url.protocol==='https:'||url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)))throw Error('CALENDAR_NOT_CONFIGURED');
- return url.origin;
+ if(url.username||url.password||url.search||url.hash||!['/','/functions/v1/personal-calendar','/functions/v1/personal-calendar/'].includes(url.pathname)||!(url.protocol==='https:'||url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)))throw Error('CALENDAR_NOT_CONFIGURED');
+ return url.origin+(url.pathname==='/'?'':'/functions/v1/personal-calendar');
 }
 export async function calendarToken(secret:string|undefined,authId:string,orgId:string,operation:string,operationKey:string):Promise<{token:string;hash:string}> {
  if(!secret||!hex.test(secret))throw Error('CALENDAR_NOT_CONFIGURED');

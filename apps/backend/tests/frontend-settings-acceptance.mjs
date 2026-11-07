@@ -68,6 +68,37 @@ test('User settings concurrency, reset and history',async t=>{
    const after=await read(owner,{scope:'user'});assert.equal(after.values.theme,'system');assert.equal(after.values.ad_measurement,false);assert.equal(after.values.honorific,'Changed after preview');
    await fail('VALIDATION_FAILED',owner,'settings_reset_preview_v1',{scope:'user',fields:['debt','theme']});
   });
+  await t.test('history reapply is scoped, explicit, versioned and cannot reopen withdrawn privacy',async()=>{
+   const q={scope:'user'};let v=await read(owner,q);await write(owner,q,{theme:'dark',ad_measurement:true},v.version);
+   const source=(await must(owner,'settings_history_get_v1',q)).items[0];v=await read(owner,q);await write(owner,q,{theme:'light',ad_measurement:false},v.version);
+   v=await read(owner,q);const body={...q,patch:{},history_source:{id:source.id,fields:['theme','ad_measurement']},expected_version:v.version},k=key();
+   const saved=await must(owner,'settings_update_v1',body,k);assert.equal(saved.version,v.version+1);assert.equal((await must(owner,'settings_update_v1',body,k)).replayed,true);
+   const after=await read(owner,q);assert.equal(after.values.theme,'dark');assert.equal(after.values.ad_measurement,false);
+   await fail('VERSION_CONFLICT',owner,'settings_update_v1',body,key());
+   await fail('NOT_FOUND',other,'settings_update_v1',{...body,expected_version:(await read(other,q)).version},key());
+   await fail('VALIDATION_FAILED',owner,'settings_update_v1',{...body,patch:{theme:'system'},expected_version:after.version},key());
+   const member={scope:'member',org_id:org};v=await read(owner,member);await write(owner,member,{history_recommendations:true},v.version);
+   const old=(await must(owner,'settings_history_get_v1',member)).items[0];v=await read(owner,member);await write(owner,member,{history_recommendations:false},v.version);v=await read(owner,member);
+   await must(owner,'settings_update_v1',{...member,patch:{},history_source:{id:old.id,fields:['history_recommendations']},expected_version:v.version},key());
+   assert.equal((await read(owner,member)).values.history_recommendations,false);
+  });
+  await t.test('organization regional defaults are typed and do not overwrite personal or center timezones',async()=>{
+   const q={scope:'organization',org_id:org};let v=await read(owner,q);const before=(await read(owner,{scope:'user'})).values;
+   assert.equal((await db.query("select count(*)::int n from private.frontend_settings where scope_key=$1",['organization:'+org])).rows[0].n,0);
+   const cq={scope:'center',org_id:org,center_id:center},cv=await read(owner,cq);
+   await must(owner,'settings_update_v1',{...cq,expected_version:cv.version,patch:{},inherit_fields:['permission_templates']},key());
+   const inherited=await read(owner,cq),oldReset=await must(owner,'settings_reset_preview_v1',{...cq,fields:['permission_templates']});
+   const region={...v.values.regional_defaults,application_language:'en',public_language:'en',new_center_timezone:'Europe/London'};
+   const template={key:'first',name:'First organization template',grants:[{permission:'attendance.draft',enabled:true}]};
+   await write(owner,q,{regional_defaults:region,permission_templates:[template]},v.version);assert.deepEqual((await read(owner,q)).values.regional_defaults,region);
+   assert((await read(owner,cq)).version>inherited.version);assert.deepEqual((await read(owner,cq)).values.permission_templates,[template]);
+   await fail('VERSION_CONFLICT',owner,'settings_reset_apply_v1',{...cq,expected_version:oldReset.version,preview:{id:oldReset.id,token:oldReset.token}},key());
+   assert.deepEqual((await must(owner,'organizations_list_v1',{page:{}})).items.find(x=>x.id===org).regional_defaults,region);
+   assert.deepEqual((await read(owner,{scope:'user'})).values,before);
+   assert.equal((await db.query('select timezone from core.centers where id=$1',[center])).rows[0].timezone,'UTC');
+   v=await read(owner,q);
+   for(const patch of [{...region,fallback_language:'xx'},{...region,new_center_timezone:'Invalid/Zone'}])await fail('VALIDATION_FAILED',owner,'settings_update_v1',{...q,patch:{regional_defaults:patch},expected_version:v.version},key());
+  });
   await t.test('history pagination is stable, complete and bound to the current actor and scope',async()=>{
    const ids=Array.from({length:55},key);
    await db.query(`insert into core.operation_receipts(id,actor_account_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at)

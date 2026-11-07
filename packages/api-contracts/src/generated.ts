@@ -1447,94 +1447,118 @@ proposal: SettlementProposal
 export type SettingsVersion = number
 /**
  * @minItems 1
- * @maxItems 7
+ * @maxItems 8
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PermissionPreparationGrants".
  */
 export type PermissionPreparationGrants = [{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]|[{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]|[{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]|[{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]|[{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]|[{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]|[{
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }, {
-permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect" | "reservation.capacity_override")
 enabled: boolean
 }]
 /**
@@ -1550,6 +1574,24 @@ overridden_fields: unknown
 program_duration_source?: unknown
 logo?: unknown
 preparation_sources?: unknown
+inherited_fields?: {
+report_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+import_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+agreement_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+permission_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+}
 } & SettingsView1)
 export type SettingsView1 = ({
 scope: "user"
@@ -1583,6 +1625,24 @@ kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
 }
 preparation_sources?: PreparationSources
+inherited_fields?: {
+report_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+import_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+agreement_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+permission_templates?: {
+kind: "organization_inherited"
+organization_version: SettingsVersion
+}
+}
 } | {
 scope: "organization"
 version: SettingsVersion
@@ -1591,7 +1651,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates")[]
+overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1615,14 +1675,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 14
+catalog_version: 16
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -1693,23 +1753,23 @@ center_id: string
 export type SettingsCatalog1 = ({
 scope: "user"
 defaults: UserSettingsValues
-catalog_version: 14
+catalog_version: 16
 } | {
 scope: "member"
 defaults: MemberSettingsValues
-catalog_version: 14
+catalog_version: 16
 } | {
 scope: "center"
 defaults: CenterSettingsValues
-catalog_version: 14
+catalog_version: 16
 } | {
 scope: "organization"
 defaults: OrganizationSettingsValues
-catalog_version: 14
+catalog_version: 16
 } | {
 scope: "platform"
 defaults: PlatformSettingsValues
-catalog_version: 14
+catalog_version: 16
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1863,13 +1923,29 @@ expected_version: SettingsVersion
 reason?: string
 patch: unknown
 logo_image?: unknown
+history_source?: SettingsHistorySource
+/**
+ * @minItems 1
+ * @maxItems 4
+ */
+inherit_fields?: [("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]
 } & RequestSettingsUpdate2)
 export type RequestSettingsUpdate1 = ({
 patch?: {
 [k: string]: unknown
 }
 } | {
+logo_image: unknown
+} | {
+patch?: {
 [k: string]: unknown
+}
+history_source: unknown
+} | {
+patch?: {
+[k: string]: unknown
+}
+inherit_fields: unknown
 })
 export type RequestSettingsUpdate2 = ({
 client_api_version: unknown
@@ -1879,6 +1955,7 @@ operation_key: unknown
 expected_version: unknown
 reason?: unknown
 patch: UserSettingsValues
+history_source?: SettingsHistorySource
 } | {
 client_api_version: unknown
 request_id: unknown
@@ -1891,6 +1968,7 @@ operation_key: unknown
 expected_version: unknown
 reason?: unknown
 patch: MemberSettingsValues
+history_source?: SettingsHistorySource
 } | {
 client_api_version: unknown
 request_id: unknown
@@ -1907,6 +1985,12 @@ operation_key: unknown
 expected_version: unknown
 reason?: unknown
 patch: CenterSettingsValues
+history_source?: SettingsHistorySource
+/**
+ * @minItems 1
+ * @maxItems 4
+ */
+inherit_fields?: [("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates")]
 } | {
 client_api_version: unknown
 request_id: unknown
@@ -1920,6 +2004,7 @@ expected_version: unknown
 reason?: unknown
 patch: OrganizationSettingsValues
 logo_image?: (SettingsImageUpload | null)
+history_source?: SettingsHistorySource
 } | {
 client_api_version: unknown
 request_id: unknown
@@ -1928,6 +2013,7 @@ operation_key: unknown
 expected_version: unknown
 reason?: unknown
 patch: PlatformSettingsValues
+history_source?: SettingsHistorySource
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2037,7 +2123,7 @@ export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationSettingsFieldKey".
  */
-export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates")
+export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlatformSettingsFieldKey".
@@ -3792,6 +3878,11 @@ PermissionPreparationTemplate?: PermissionPreparationTemplate
 PermissionPreparationGrants?: PermissionPreparationGrants
 SubscriptionDowngradeOption?: SubscriptionDowngradeOption
 SaleChangeInventoryRecord?: SaleChangeInventoryRecord
+AccountSelfCenterScope?: AccountSelfCenterScope
+AccountSelfContext?: AccountSelfContext
+OrganizationRegionalDefaults?: OrganizationRegionalDefaults
+SettingsHistorySource?: SettingsHistorySource
+PublicRegionalContext?: PublicRegionalContext
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6240,6 +6331,49 @@ state: OrganizationState
 access_mode: ("bootstrap" | "normal" | "grace" | "closed")
 version: PositiveInt
 logo?: (SettingsMediaAsset | null)
+self_context?: (AccountSelfContext | null)
+regional_defaults?: OrganizationRegionalDefaults
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccountSelfContext".
+ */
+export interface AccountSelfContext {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+subscriber_number: (SubscriberNumber | null)
+centers: AccountSelfCenterScope[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccountSelfCenterScope".
+ */
+export interface AccountSelfCenterScope {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+student: boolean
+instructor: boolean
+assistant: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "OrganizationRegionalDefaults".
+ */
+export interface OrganizationRegionalDefaults {
+application_language: ("tr" | "en")
+public_language: ("tr" | "en")
+document_language: ("tr" | "en")
+notification_language: ("tr" | "en")
+date_format: "dd.MM.yyyy"
+time_format: ("12" | "24")
+number_format: ("tr-TR" | "en-US")
+week_start: ("monday" | "sunday")
+fallback_language: "tr"
+new_center_timezone: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7542,6 +7676,7 @@ next_cursor?: (OpaqueToken | null)
 as_of: Instant
 organization_profile?: (PublicBusinessProfile | null)
 center_profile?: (PublicBusinessProfile | null)
+regional_defaults?: PublicRegionalContext
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7578,6 +7713,18 @@ logo?: (SettingsMediaContent | null)
 export interface SettingsMediaContent {
 asset: SettingsMediaAsset
 data_base64: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicRegionalContext".
+ */
+export interface PublicRegionalContext {
+language: ("tr" | "en")
+date_format: "dd.MM.yyyy"
+time_format: ("12" | "24")
+number_format: ("tr-TR" | "en-US")
+week_start: ("monday" | "sunday")
+fallback_language: "tr"
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22635,6 +22782,7 @@ terms: PayTerms
  * @maxItems 100
  */
 permission_templates?: PermissionPreparationTemplate[]
+regional_defaults?: OrganizationRegionalDefaults
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22723,7 +22871,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: SettingsFieldKey
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context")
 writable: boolean
 }
 /**
@@ -22978,6 +23126,21 @@ data: SettingsView
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsHistorySource".
+ */
+export interface SettingsHistorySource {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * @minItems 1
+ * @maxItems 50
+ */
+fields: [SettingsFieldKey, ...(SettingsFieldKey)[]]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
