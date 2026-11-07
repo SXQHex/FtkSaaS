@@ -27,6 +27,25 @@ export function cliFailure(result){
  return {category,exit_code:Number.isInteger(result.status)&&result.status>=0&&result.status<=255?result.status:null,http_status,
   signal:['SIGTERM','SIGKILL','SIGINT'].includes(result.signal)?result.signal:null,spawn_error};
 }
+// Retain only fixed diagnostic labels, never provider messages or secret payloads.
+export async function managementRequest(route,{method='GET',body}={},send=fetch){
+ const response=await send('https://api.supabase.com/v1/projects/'+project+route,{method,headers:{Authorization:'Bearer '+process.env.SUPABASE_ACCESS_TOKEN,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
+ if(!response.ok){
+  const reader=response.body?.getReader();let text='';
+  if(reader)try{while(text.length<8192){const {done,value}=await reader.read();if(done)break;text+=new TextDecoder().decode(value).slice(0,8192-text.length);}}finally{await reader.cancel();}
+  let reason='unclassified';
+  if(/insufficient[_ ](?:scope|permission|privilege)|do not have (?:the )?(?:necessary )?(?:permission|privilege)|not have (?:the )?(?:necessary )?(?:permission|privilege)|missing (?:required )?(?:scope|permission)/i.test(text))reason='insufficient_permissions';
+  else if(/invalid[_ ](?:access[_ ])?token|expired[_ ]token|invalid authentication/i.test(text))reason='invalid_token';
+  else if(/cloudflare|cf-chl-|attention required/i.test(text))reason='edge_firewall';
+  else if(/request (?:entity |body )?too large|payload too large/i.test(text))reason='request_size';
+  else if(/organization.{0,40}(?:restrict|policy)|ip.{0,20}(?:allowlist|allow list|restrict)/i.test(text))reason='access_policy';
+  const resource=['/secrets','/database/query','/functions','/functions/backend-v1','/functions/resend-webhook','/functions/personal-calendar','/advisors/security','/advisors/performance','/config/auth','/api-keys'].includes(route)?route:'other';
+  const diagnostic={method:['GET','POST','PATCH','DELETE'].includes(method)?method:'other',resource,http_status:response.status,provider_reason:reason};
+  const requestId=response.headers.get('sb-request-id');if(/^[a-f0-9-]{36}$/i.test(requestId??''))diagnostic.request_id=requestId;
+  const error=new Error('Supabase Management API '+diagnostic.method+' '+resource+' HTTP '+response.status+' ('+reason+')');error.management_failure=diagnostic;throw error;
+ }
+ return response.status===204?null:response.json();
+}
 export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
 export function unchangedResendWebhook(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.resend_webhook_source_sha256===hash&&previous.resend_webhook_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
 export function unchangedCalendarGateway(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.calendar_gateway_source_sha256===hash&&previous.calendar_gateway_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
@@ -167,10 +186,7 @@ export async function deliver(){
  const receipt={project,environment:'development/test (Supabase production branch)',source:process.env.ACCEPTED_SHA,expected_main:process.env.EXPECTED_MAIN_SHA,acceptance_run_id:process.env.ACCEPTANCE_RUN_ID,acceptance_attempt:Number(process.env.ACCEPTANCE_ATTEMPT),checks:[],success:false};
  const record=(name,passed)=>{receipt.checks.push({name,passed:!!passed});if(!passed)throw Error('Verification failed: '+name);};
  let stage='configuration',temp;
- const api=async(route,{method='GET',body}={})=>{
-  const r=await fetch('https://api.supabase.com/v1/projects/'+project+route,{method,headers:{Authorization:'Bearer '+process.env.SUPABASE_ACCESS_TOKEN,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
-  if(!r.ok)throw Error('Supabase Management API HTTP '+r.status);return r.status===204?null:r.json();
- };
+ const api=managementRequest;
  const sql=query=>api('/database/query',{method:'POST',body:{query}});
  const gh=async route=>{
   const r=await fetch('https://api.github.com/repos/SXQHex/FtkSaaS/'+route,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
@@ -243,10 +259,11 @@ export async function deliver(){
   const calendarEdge=await api('/functions/personal-calendar');
   record('calendar_gateway_active_bearer_url_only',calendarEdge.status==='ACTIVE'&&calendarEdge.verify_jwt===false);
   receipt.calendar_gateway_version=calendarEdge.version;receipt.calendar_gateway_bundle_sha256=calendarEdge.ezbr_sha256??null;
-  stage='calendar configuration';
+  stage='calendar secret inventory';
   const missingCalendar=missingCalendarConfiguration(await api('/secrets'));
-  if(missingCalendar.length)await api('/secrets',{method:'POST',body:missingCalendar});
+  if(missingCalendar.length){stage='calendar secret creation';await api('/secrets',{method:'POST',body:missingCalendar});}
   receipt.calendar_configuration_created=missingCalendar.map(s=>s.name);
+  stage='calendar gateway smoke';
   const invalidCalendar=await fetch('https://'+project+'.supabase.co/functions/v1/personal-calendar/calendar/invalid.ics',{signal:AbortSignal.timeout(15000)});
   await invalidCalendar.arrayBuffer();record('calendar_gateway_invalid_credential_rejected',invalidCalendar.status===404);
   stage='database permissions';
@@ -256,7 +273,7 @@ export async function deliver(){
   stage='advisors';receipt.advisors={};
   for(const type of ['security','performance']){const data=await api('/advisors/'+type),lints=data.lints;if(!Array.isArray(lints))throw Error('Unknown advisors response');receipt.advisors[type]=lints.reduce((out,l)=>{out[l.level]=(out[l.level]??0)+1;return out;},{});record(type+'_advisors_no_errors',!lints.some(l=>l.level==='ERROR'));}
   await current();receipt.success=true;
- }catch(e){receipt.failed_stage=stage;receipt.error=e.message;throw e;}
+ }catch(e){receipt.failed_stage=stage;receipt.error=e.message;if(e.management_failure)receipt.management_failure=e.management_failure;throw e;}
  finally{
   if(temp)fs.rmSync(temp,{recursive:true,force:true});
   fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('development-delivery.json'),JSON.stringify(receipt,null,2)+'\n');
