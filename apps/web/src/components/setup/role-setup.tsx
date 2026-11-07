@@ -392,7 +392,9 @@ function AgreementDetails({
       >
         {t("title")}
       </Button>
-      {open && <InstructorAgreements scope={scope} personId={personId} timeZone={timeZone} />}
+      {open && (
+        <InstructorAgreements scope={scope} personId={personId} timeZone={timeZone} withEarnings />
+      )}
     </section>
   );
 }

@@ -14,6 +14,9 @@ import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { FlowError, flowError } from "../bookings/flow-controls";
 import { PayTermsSummary } from "./pay-terms-summary";
 const AgreementForm = dynamic(() => import("./agreement-form").then((m) => m.AgreementForm));
+const EarningsPanel = dynamic(() =>
+  import("../earnings/earnings-panel").then((m) => m.EarningsPanel),
+);
 type Props = {
   scope: SetupScope;
   personId: string;
@@ -23,6 +26,7 @@ type Props = {
   onPublished?: () => void;
   onUseVersion?: (row: AgreementVersionView, duty: Duty) => void;
   targetDuties?: Duty[];
+  withEarnings?: boolean;
 };
 export function InstructorAgreements(props: Props) {
   return (
@@ -41,6 +45,7 @@ function AgreementHistory({
   onPublished,
   onUseVersion,
   targetDuties = [],
+  withEarnings = false,
 }: Props) {
   const [scope] = useState(initialScope),
     t = useTranslations("agreements"),
@@ -103,6 +108,9 @@ function AgreementHistory({
       ) : (
         result.page && (
           <>
+            {withEarnings && (
+              <EarningsPanel scope={scope} personId={personId} timeZone={timeZone} management />
+            )}
             <p>{t("pageCount", { count: result.page.items.length })}</p>
             {!result.page.items.length && <p>{t("empty")}</p>}
             <ul className="space-y-4">
