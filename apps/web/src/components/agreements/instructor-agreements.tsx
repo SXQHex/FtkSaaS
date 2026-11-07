@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import type {
+  Duty,
   AgreementVersionView,
   ScheduleConfigurationRequirement,
 } from "@ftksaas/api-contracts";
@@ -20,6 +21,8 @@ type Props = {
   requirement?: ScheduleConfigurationRequirement;
   api?: AgreementApi;
   onPublished?: () => void;
+  onUseVersion?: (row: AgreementVersionView, duty: Duty) => void;
+  targetDuties?: Duty[];
 };
 export function InstructorAgreements(props: Props) {
   return (
@@ -36,9 +39,12 @@ function AgreementHistory({
   requirement,
   api = agreementApi,
   onPublished,
+  onUseVersion,
+  targetDuties = [],
 }: Props) {
   const [scope] = useState(initialScope),
     t = useTranslations("agreements"),
+    dutyLabel = useTranslations("program"),
     format = useFormatter(),
     notify = useRef(false);
   const [lastError, setLastError] = useState(""),
@@ -122,6 +128,25 @@ function AgreementHistory({
                     · {timeZone}
                   </p>
                   <PayTermsSummary terms={row.terms} />
+                  {onUseVersion &&
+                    requirement &&
+                    row.person_id === personId &&
+                    row.center_id === scope.centerId &&
+                    row.discipline_id === requirement.discipline_id &&
+                    row.format === requirement.format &&
+                    Date.parse(row.valid.starts_at) <= Date.parse(requirement.starts_at) &&
+                    (row.valid.ends_at === null ||
+                      Date.parse(requirement.starts_at) < Date.parse(row.valid.ends_at)) &&
+                    targetDuties.map((duty) => (
+                      <Button
+                        key={duty}
+                        variant="outline"
+                        disabled={recovery.busy || !!recovery.pending || !!editing}
+                        onClick={() => onUseVersion(row, duty)}
+                      >
+                        {t("useForDuty", { version: row.version })} · {dutyLabel(duty)}
+                      </Button>
+                    ))}
                   {(!requirement ||
                     (requirement.discipline_id === row.discipline_id &&
                       requirement.format === row.format)) && (

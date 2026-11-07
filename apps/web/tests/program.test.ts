@@ -57,3 +57,41 @@ test("inherited duties send no explicit instructor and preserve category limits"
     buildProgram({ ...input, local_start: "12:00", person_id: "" }, "Europe/Istanbul", {}),
   ).toThrow("invalidForm");
 });
+test("explicit programs retain every chosen instructor/assistant while inherited duties stay separate", () => {
+  const extras = [
+    { person_id: "assistant", duty: "assistant" as const },
+    { person_id: "second", duty: "instructor" as const },
+  ];
+  const result = buildProgram(
+    { ...input, local_start: "12:00", extra_assignments: extras },
+    "Europe/Istanbul",
+    {},
+  );
+  expect(result.assignments).toEqual([
+    { person_id: input.person_id, duty: "instructor" },
+    ...extras,
+  ]);
+  expect(
+    buildProgram(
+      {
+        ...input,
+        local_start: "12:00",
+        inherit_class_assignments: true,
+        extra_assignments: extras,
+      },
+      "Europe/Istanbul",
+      {},
+    ).assignments,
+  ).toEqual([]);
+  expect(() =>
+    buildProgram(
+      {
+        ...input,
+        local_start: "12:00",
+        extra_assignments: [{ person_id: input.person_id, duty: "instructor" }],
+      },
+      "Europe/Istanbul",
+      {},
+    ),
+  ).toThrow("invalidForm");
+});

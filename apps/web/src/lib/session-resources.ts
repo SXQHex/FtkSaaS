@@ -1,6 +1,9 @@
-import type { SessionPatch, SessionView } from "@ftksaas/api-contracts";
+import type { DutyInput, SessionPatch, SessionView } from "@ftksaas/api-contracts";
 import { localTimeChoices } from "./session-change";
 export type ResourceDraft = {
+  assignments?: DutyInput[];
+  assignmentReferences?: DutyInput[];
+  dutyNames?: Record<string, string>;
   roomId?: string;
   instructorId?: string;
   roomName?: string;
@@ -21,6 +24,17 @@ export function resourcePatch(session: SessionView, draft: ResourceDraft): Sessi
       ...session.assignments.filter((a) => a.duty !== "instructor"),
       previous ?? { person_id: draft.instructorId, duty: "instructor" },
     ];
+  }
+  if (draft.assignments !== undefined) {
+    if (draft.instructorId !== undefined) throw Error("invalidForm");
+    const keys = new Set<string>();
+    for (const item of draft.assignments) {
+      const key = `${item.person_id}:${item.duty}`;
+      if (!item.person_id || !["instructor", "assistant"].includes(item.duty) || keys.has(key))
+        throw Error("invalidForm");
+      keys.add(key);
+    }
+    patch.assignments = draft.assignments;
   }
   return patch;
 }

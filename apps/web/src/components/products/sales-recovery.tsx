@@ -1,4 +1,5 @@
 "use client";
+import { lifecycleWrites } from "../../lib/sale-lifecycle";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { validate } from "uuid";
@@ -7,19 +8,25 @@ import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 
 function pendingSales(scope: SetupScope, personId?: string) {
   try {
-    const prefix = setupStorageKey(scope, "sale-renew:");
+    const prefixes = ["sale-renew:", "sale-lifecycle:"].map((family) => ({
+      family,
+      prefix: setupStorageKey(scope, family),
+    }));
     const slots: string[] = [];
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
-      if (!key?.startsWith(prefix)) continue;
-      const target = key.slice(prefix.length);
+      const match = prefixes.find((p) => key?.startsWith(p.prefix));
+      if (!key || !match) continue;
+      const target = key.slice(match.prefix.length);
       if (!validate(target) || (personId && target !== personId)) continue;
-      const slot = `sale-renew:${target}`;
+      const slot = `${match.family}${target}`;
       const record = recoverSetup(scope, slot);
       if (
         record &&
         (record === "invalid" ||
-          ["sale_apply_v1", "sale_renew_apply_v1"].includes(record.command.operation))
+          ["sale_apply_v1", "sale_renew_apply_v1", ...lifecycleWrites].includes(
+            record.command.operation,
+          ))
       )
         slots.push(slot);
     }

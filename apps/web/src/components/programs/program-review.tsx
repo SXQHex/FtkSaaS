@@ -59,7 +59,7 @@ export function ProgramReview({
         disabled={disabled}
         preview={preview}
         timeZone={timeZone}
-        people={catalog?.instructors}
+        people={catalog?.duties ?? catalog?.instructors}
         disciplines={catalog?.disciplines}
       />
       <ul className="max-h-72 space-y-2 overflow-y-auto text-sm" aria-label={t("sessions")}>
@@ -73,6 +73,26 @@ export function ProgramReview({
             —{" "}
             {format.dateTime(new Date(session.interval.ends_at), { timeZone, timeStyle: "short" })}{" "}
             · {t("places", { count: session.capacity.total })}
+            <ul className="mt-2 space-y-1" aria-label={t("previewResources")}>
+              {session.resources.map((resource) => (
+                <li key={`${resource.kind}:${resource.id}`}>
+                  {t(resource.kind === "room" ? "room" : "assignedPerson")}:{" "}
+                  {catalog?.[resource.kind === "room" ? "rooms" : "duties"]?.find(
+                    (row) => row.id === resource.id,
+                  )?.name ?? resource.id}
+                </li>
+              ))}
+              {session.assignments.map((assignment) => (
+                <li key={`${assignment.person_id}:${assignment.duty}`}>
+                  {t(assignment.duty)}:{" "}
+                  {catalog?.duties?.find(
+                    (row) => row.id === assignment.person_id && row.duty === assignment.duty,
+                  )?.name ??
+                    catalog?.instructors.find((row) => row.id === assignment.person_id)?.name ??
+                    assignment.person_id}
+                </li>
+              ))}
+            </ul>
             {session.capacity.categories && (
               <p className="mt-1 text-muted-foreground">
                 {t("male")}: {session.capacity.categories.male} · {t("female")}:{" "}

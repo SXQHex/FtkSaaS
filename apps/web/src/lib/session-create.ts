@@ -1,4 +1,4 @@
-import type { Duty, ManagementStateView, SessionCapacity } from "@ftksaas/api-contracts";
+import type { Duty, DutyInput, ManagementStateView, SessionCapacity } from "@ftksaas/api-contracts";
 import { localTimeChoices } from "./session-change";
 export function sessionCapacity(
   total: number,
@@ -60,4 +60,16 @@ export function assignmentVersion(
   )
     throw Error("unreadableAssignment");
   return { state: item.state as "active" | "inactive", version };
+}
+
+export function sessionAssignments(personId: string, extra: DutyInput[] = []): DutyInput[] {
+  const assignments: DutyInput[] = [{ person_id: personId, duty: "instructor" }, ...extra];
+  const keys = new Set<string>();
+  for (const item of assignments) {
+    const key = `${item.person_id}:${item.duty}`;
+    if (!item.person_id || !["instructor", "assistant"].includes(item.duty) || keys.has(key))
+      throw Error("invalidForm");
+    keys.add(key);
+  }
+  return assignments;
 }

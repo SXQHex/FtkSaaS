@@ -1,3 +1,4 @@
+import { settingsCatalogVersion } from "./mocks/settings-catalog";
 import { beforeEach, expect, test, vi } from "vitest";
 import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -18,7 +19,7 @@ const id = "019a2b3c-4d5e-7000-8000-000000000001",
 const source = {
   catalog: {
     scope: "organization" as const,
-    catalog_version: 13 as const,
+    catalog_version: settingsCatalogVersion,
     fields: [
       {
         key: "program_duration_minutes" as const,

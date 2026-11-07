@@ -1,3 +1,4 @@
+import { lifecycleWrites } from "./sale-lifecycle-command";
 import { attendanceWrites } from "./attendance-command";
 import { balanceOperations } from "./finance-actions";
 import { validate } from "uuid";
@@ -19,7 +20,7 @@ export type PendingOperation = {
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
   attendance: attendanceWrites,
-  settings: ["settings_update_v1", "settings_reset_apply_v1"],
+  settings: ["settings_update_v1", "settings_reset_apply_v1", "negcredit_valuation_set_v1"],
   agreements: ["instructor_agreement_publish_v1"],
   finance: [
     "collection_record_v1",
@@ -27,7 +28,7 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
     "sale_refund_apply_v1",
     ...balanceOperations,
   ],
-  sale: ["sale_apply_v1", "sale_renew_apply_v1"],
+  sale: ["sale_apply_v1", "sale_renew_apply_v1", ...lifecycleWrites],
   rights: rightsOperations,
   reservation: bookingWrites.filter((operation) => operation.startsWith("reservation_")),
   request: bookingWrites.filter((operation) => operation.startsWith("lesson_request_")),
@@ -39,6 +40,9 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "valuation-group":
+    case "valuation-private":
+      return "settings";
     case "agreements":
       return "agreements";
     case "attendance":
@@ -51,6 +55,7 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
     case "collection-correct":
     case "finance":
       return "finance";
+    case "sale-lifecycle":
     case "sale-renew":
       return "sale";
     case "rights":

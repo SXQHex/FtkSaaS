@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ProductView } from "@ftksaas/api-contracts";
@@ -8,6 +9,9 @@ import type { SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { ProductSummary } from "./product-summary";
 import { ProductPublication } from "./product-publication";
+const NegativeValuation = dynamic(() =>
+  import("./negative-valuation").then((m) => m.NegativeValuation),
+);
 type Reads = { list?: typeof listProducts; disciplines?: typeof productDisciplines };
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 export function ProductManager({ scope, ...reads }: { scope: SetupScope } & Reads) {
@@ -26,6 +30,7 @@ export function ProductCatalog({
 }: { scope: SetupScope; command: ReturnType<typeof useSetupCommand> } & Reads) {
   const t = useTranslations("products"),
     heading = useRef<HTMLHeadingElement>(null);
+  const [valuation, setValuation] = useState(false);
   const [page, setPage] = useState<Awaited<ReturnType<typeof listProducts>> | null>(null),
     [error, setError] = useState(false),
     [retry, setRetry] = useState(0),
@@ -60,6 +65,17 @@ export function ProductCatalog({
       </div>
       <p className="text-sm text-muted-foreground">{t("catalogHint")}</p>
       <SetupFeedback command={command} />
+      <Button
+        className={buttonClass}
+        type="button"
+        variant="outline"
+        disabled={disabled}
+        aria-expanded={valuation}
+        onClick={() => setValuation((v) => !v)}
+      >
+        {t("valuation")}
+      </Button>
+      {valuation && <NegativeValuation scope={scope} />}
       {form && (
         <>
           <ProductPublication

@@ -48,7 +48,36 @@ export function ProductSummary({ terms }: { terms: ProductTerms }) {
       </div>
       <div>
         <dt className="text-muted-foreground">{t("scopeCount")}</dt>
-        <dd>{terms.scopes.length}</dd>
+        <dd>
+          <ul className="space-y-1">
+            {terms.scopes.map((scope, i) => (
+              <li key={i} className="wrap-anywhere">
+                {scope.scope_kind === "center_all_disciplines"
+                  ? t("allDisciplinesScope")
+                  : scope.discipline_id}{" "}
+                ·{" "}
+                {scope.usage_targets
+                  .map((target) => (target === "lesson" ? t("lessonTarget") : t("eventTarget")))
+                  .join(", ")}
+                {scope.class_id ? ` · ${scope.class_id}` : ""}
+                {scope.event_id ? ` · ${scope.event_id}` : ""}
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+      <div>
+        <dt className="text-muted-foreground">{t("freezeSummary")}</dt>
+        <dd>
+          {t(terms.freeze.enabled ? "freezeOn" : "freezeOff")}
+          {terms.freeze.enabled && (
+            <>
+              {" "}
+              · {t(terms.freeze.extends_validity ? "extendsValidity" : "noExtension")}
+              {terms.freeze.max_days != null ? ` · ${terms.freeze.max_days}` : ""}
+            </>
+          )}
+        </dd>
       </div>
     </dl>
   );

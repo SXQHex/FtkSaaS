@@ -141,3 +141,47 @@ test("session creation recovers the same command when current catalogs are forbi
   await waitFor(() => expect(mocks.saved).toHaveBeenCalledOnce());
   expect(mocks.send.mock.calls[0][0]).toEqual(pending.command);
 });
+test("single session keeps multiple explicit duties in the scoped recovery command", async () => {
+  mocks.send.mockRejectedValue(new TypeError("lost"));
+  render(
+    <SingleSessionForm
+      scope={scope}
+      timeZone="Europe/Istanbul"
+      catalog={{
+        ...catalog,
+        duties: [
+          { id: "person", name: "Test Eğitmen", duty: "instructor" },
+          { id: "second", name: "İkinci eğitmen", duty: "instructor" },
+          { id: "helper", name: "Destek", duty: "assistant" },
+        ],
+      }}
+      classes={[]}
+      onSaved={mocks.saved}
+    />,
+  );
+  const user = userEvent.setup();
+  await user.selectOptions(screen.getByLabelText("Disiplin"), "discipline");
+  await user.selectOptions(screen.getByLabelText("Seans türü"), "group");
+  await user.type(screen.getByLabelText("Seans başlangıcı"), "2030-01-07T19:30");
+  await user.type(screen.getByLabelText("Seans bitişi"), "2030-01-07T20:30");
+  await user.selectOptions(screen.getByLabelText("Oda"), "room");
+  await user.selectOptions(screen.getByLabelText("Eğitmen"), "person");
+  await user.click(screen.getByLabelText(/İkinci eğitmen/));
+  await user.click(screen.getByLabelText(/Destek/));
+  await user.type(screen.getByLabelText("Kontenjan"), "20");
+  await user.click(screen.getByRole("button", { name: "Seansı oluştur" }));
+  await screen.findByRole("button", { name: "Aynı işlemi yeniden gönder" });
+  const original = mocks.send.mock.calls[0][0];
+  expect(original.input).toMatchObject({
+    inherit_class_assignments: false,
+    assignments: [
+      { person_id: "person", duty: "instructor" },
+      { person_id: "second", duty: "instructor" },
+      { person_id: "helper", duty: "assistant" },
+    ],
+  });
+  mocks.send.mockResolvedValue({});
+  await user.click(screen.getByRole("button", { name: "Aynı işlemi yeniden gönder" }));
+  await waitFor(() => expect(mocks.send).toHaveBeenCalledTimes(2));
+  expect(mocks.send.mock.calls[1][0]).toEqual(original);
+});

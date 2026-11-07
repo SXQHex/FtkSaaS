@@ -24,3 +24,36 @@ test("DST days use their real 23/25-hour interval and a week spans both offsets"
     ends_at: "2026-10-25T23:00:00.000Z",
   });
 });
+test("calendar projections retain native resources and session/event discipline scope", async () => {
+  const { calendarEntry, matchesCalendarFilters } = await import("../src/lib/schedule");
+  const entry = calendarEntry({
+    id: "lesson",
+    type: "session",
+    center_id: "center",
+    title: "Tango",
+    starts_at: "2027-01-01T10:00:00Z",
+    ends_at: "2027-01-01T11:00:00Z",
+    discipline_id: "tango",
+    resources: [
+      { kind: "room", id: "r1" },
+      { kind: "person", id: "i1" },
+    ],
+  });
+  expect(
+    matchesCalendarFilters(entry, { roomId: "r1", instructorId: "i1", disciplineId: "tango" }),
+  ).toBe(true);
+  expect(matchesCalendarFilters(entry, { roomId: "r2", instructorId: "i1" })).toBe(false);
+  expect(matchesCalendarFilters(entry, { disciplineId: "salsa" })).toBe(false);
+  const event = calendarEntry({
+    id: "event",
+    type: "event",
+    center_id: "center",
+    title: "Workshop",
+    starts_at: entry.startsAt,
+    ends_at: entry.endsAt,
+    discipline_ids: ["tango", "salsa"],
+  });
+  expect(matchesCalendarFilters(event, { disciplineId: "salsa" })).toBe(true);
+  expect(matchesCalendarFilters(event, { instructorId: "i1" })).toBe(false);
+  expect(matchesCalendarFilters(event, {})).toBe(true);
+});
