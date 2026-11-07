@@ -13,7 +13,7 @@ function totp(secret){
 
 test('Native TOTP enrollment, proof, stale-token rejection, mandatory security history and removal',async t=>{
  const guard=resources(t),user=await authUser('native-totp'),other=await authUser('native-totp-other');await must(user,'account_get_v1');await must(other,'account_get_v1');const {env}=context();
- const db=await guard.connect(env.DB_URL);const previousConfig=(await db.query('select * from private.p07_lifecycle_config')).rows;let factor;let strong=user;
+ const db=await guard.connect(env.DB_URL);const previousConfig=(await db.query('select * from private.p07_lifecycle_config')).rows;let factor,backup,backupSecret,backupCounter;let strong=user;
  const native=async(path,method,body,u=user)=>{const response=await fetch(env.API_URL+'/auth/v1'+path,{method,headers:{apikey:env.ANON_KEY,authorization:'Bearer '+u.jwt,'content-type':'application/json'},...(body!==undefined?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(60000)});const text=await response.text();return {response,data:text?JSON.parse(text):null};};
  const fail=async(code,u,op,body={},k)=>{const r=await call(u,op,body,k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
  try{
@@ -25,6 +25,14 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    const challenge=await native('/factors/'+factor+'/challenge','POST',{});assert(challenge.response.ok);const verified=await native('/factors/'+factor+'/verify','POST',{challenge_id:challenge.data.id,code:totp(enrolled.data.totp.secret)});assert(verified.response.ok,'correct TOTP verification');
    const claims=JSON.parse(Buffer.from(verified.data.access_token.split('.')[1],'base64url'));assert.equal(claims.aal,'aal2');strong={...user,jwt:verified.data.access_token,session_id:claims.session_id};
    const history=await must(strong,'account_security_history_get_v1');assert.equal(history.items.filter(e=>e.action==='totp_enabled').length,1);assert(!JSON.stringify(history).includes(enrolled.data.totp.secret));
+  });
+  await t.test('a separately enrolled backup authenticator is verified before device loss',async()=>{
+   const enrolled=await native('/factors','POST',{factor_type:'totp',friendly_name:'Independent backup authenticator',issuer:'FtkSaaS'},strong);
+   assert(enrolled.response.ok);backup=enrolled.data.id;backupSecret=enrolled.data.totp.secret;backupCounter=Math.floor(Date.now()/30000);
+   const challenge=await native('/factors/'+backup+'/challenge','POST',{},strong);assert(challenge.response.ok);
+   const proof=await native('/factors/'+backup+'/verify','POST',{challenge_id:challenge.data.id,code:totp(backupSecret)},strong);assert(proof.response.ok);backupCounter=Math.floor(Date.now()/30000);
+   strong={...strong,jwt:proof.data.access_token,session_id:JSON.parse(Buffer.from(proof.data.access_token.split('.')[1],'base64url')).session_id};
+   assert.equal((await db.query("select count(*)::int n from auth.mfa_factors where user_id=$1 and status::text='verified'",[user.id])).rows[0].n,2);
   });
   await t.test('a previously issued aal1 token is not upgraded by the session database row',async()=>{
    await fail('AUTH_REQUIRED',user,'account_get_v1');await fail('AUTH_REQUIRED',user,'settings_get_v1',{scope:'user'});await fail('AUTH_REQUIRED',user,'account_sessions_list_v1');
@@ -51,7 +59,26 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    assert.deepEqual((await db.query('select status::text from auth.mfa_factors where id=$1 and user_id=$2',[factor,user.id])).rows,[{status:'verified'}]);
    const directStrong=await native('/factors/'+factor,'DELETE',undefined,strong);assert.equal(directStrong.response.ok,true,'native AAL2 removal needs no application approval');factor=null;
    await must(strong,'account_get_v1');const history=await must(strong,'account_security_history_get_v1');assert.equal(history.items.filter(e=>e.action==='totp_disabled').length,1);assert(history.items.every(e=>!('secret' in e)&&!('code' in e)));
+   assert.equal((await db.query("select count(*)::int n from auth.mfa_factors where user_id=$1 and status::text='verified'",[user.id])).rows[0].n,1);
+   // Loss/removal of the primary device does not let a fresh password session
+   // bypass MFA. The separately verified backup supplies the actual proof.
+   const fresh=await native('/token?grant_type=password','POST',{email:user.email,password:user.password});assert(fresh.response.ok);
+   const weak={...user,jwt:fresh.data.access_token,session_id:JSON.parse(Buffer.from(fresh.data.access_token.split('.')[1],'base64url')).session_id};
+   await fail('AUTH_REQUIRED',weak,'account_get_v1');
+   if(Math.floor(Date.now()/30000)===backupCounter)await new Promise(resolve=>setTimeout(resolve,31000-Date.now()%30000));
+   const challenge=await native('/factors/'+backup+'/challenge','POST',{},weak);assert(challenge.response.ok);
+   const proof=await native('/factors/'+backup+'/verify','POST',{challenge_id:challenge.data.id,code:totp(backupSecret)},weak);assert(proof.response.ok);
+   strong={...weak,jwt:proof.data.access_token};assert.equal(JSON.parse(Buffer.from(strong.jwt.split('.')[1],'base64url')).aal,'aal2');await must(strong,'account_get_v1');
+   const removed=await native('/factors/'+backup,'DELETE',undefined,strong);assert(removed.response.ok);backup=null;backupSecret=null;
    assert.equal((await db.query("select count(*)::int n from auth.mfa_factors where user_id=$1 and status::text='verified'",[user.id])).rows[0].n,0);
   });
- }finally{if(factor){try{await native('/factors/'+factor,'DELETE',undefined,strong);}catch{}}if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');await db.end();}
+ }finally{
+  let cleanupFailed=false;
+  for(const id of [backup,factor].filter(Boolean)){
+   try{const removed=await native('/factors/'+id,'DELETE',undefined,strong);if(!removed.response.ok)cleanupFailed=true;}catch{cleanupFailed=true;}
+  }
+  try{if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');}
+  finally{await db.end();}
+  if(cleanupFailed)throw Error('Native MFA fixture cleanup requires inspection');
+ }
 });

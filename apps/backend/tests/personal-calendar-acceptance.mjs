@@ -33,6 +33,12 @@ test('ST-03 personal calendar real HTTP GET, native Auth, live SQL scope and cre
    const actual=await feed(ownerLink);assert.equal(actual.status,200);assert.match(actual.headers.get('content-type'),/^text\/calendar/);assert.match(actual.headers.get('cache-control'),/no-store/);const unfolded=actual.text.replace(/\r\n[ \t]/g,'');assert.equal((unfolded.match(/BEGIN:VEVENT/g)||[]).length,1);assert(unfolded.includes('Yoga'));assert(unfolded.includes('Calendar room'));assert(unfolded.includes(session));for(const hidden of [student.email,studentPerson,'ATTENDEE:','12345','debt','phone'])assert(!unfolded.includes(hidden));
    const head=await fetch(ownerLink.subscription_url,{method:'HEAD',signal:AbortSignal.timeout(35000)});
    assert.equal(head.status,200);assert.equal(await head.text(),'');assert.equal(head.headers.get('content-length'),String(Buffer.byteLength(actual.text)));assert.match(head.headers.get('cache-control'),/no-store/);
+   const gatewayUrl=env.API_URL+'/functions/v1/personal-calendar'+new URL(ownerLink.subscription_url).pathname;
+   for(const method of ['GET','HEAD']){
+    const direct=await fetch(gatewayUrl,{method,signal:AbortSignal.timeout(35000)});
+    assert.equal(direct.status,200,'Native calendar gateway must accept calendar clients without Auth headers');
+    const body=await direct.text();assert.equal(body,method==='GET'?actual.text:'');assert.match(direct.headers.get('cache-control'),/no-store/);
+   }
    const token=new URL(ownerLink.subscription_url).pathname.split('/').at(-1).slice(0,-4),stored=await rows("select result from core.operation_receipts where actor_account_id=$1 and operation like 'calendar_link_%'",[account.id]);assert(!JSON.stringify(stored).includes(token));assert(!JSON.stringify(stored).includes('subscription_url'));assert(!JSON.stringify(await rows('select * from private.personal_calendar_history where account_id=$1',[account.id])).includes(token));
    await denied(student,'calendar_link_revoke_v1',{link_id:ownerLink.link.id,expected_version:ownerLink.link.version},'NOT_FOUND');await denied(owner,'calendar_link_create_v1',{organization_scope:{org_id:org},kinds:['events']},'VALIDATION_FAILED');
   });

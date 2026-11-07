@@ -39,6 +39,35 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('XREQ032 self context is canonical UUID identity with closed live center scope, never account authority',()=>{
+ const context={person_id:id,subscriber_number:null,centers:[{center_id:id,student:true,instructor:false,assistant:false}]};
+ assert(valid('AccountSelfContext',context));
+ for(const change of [{...context,person_id:'1001'},{...context,account_id:id},{...context,centers:[{...context.centers[0],allowed:true}]}])assert(!valid('AccountSelfContext',change));
+ const organization={id,name:'Own organization',state:'active',access_mode:'normal',version:1};
+ for(const self_context of [null,context])assert(valid('OrganizationView',{...organization,self_context}));
+ assert(valid('OrganizationView',organization));
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_account_self_context.sql'));
+ assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),fs.readFileSync('database/account-self-context.sql','utf8'));
+});
+test('settings source commands stay explicit and regional defaults do not introduce arbitrary languages or timezone effects',()=>{
+ const base={client_api_version:1,request_id:id,operation_key:id,scope:'center',org_id:id,center_id:id,expected_version:0,patch:{}};
+ assert(valid('Request_settings_update',{...base,inherit_fields:['permission_templates']}));
+ for(const field of ['address','program_duration_minutes','package_templates','timezone'])assert(!valid('Request_settings_update',{...base,inherit_fields:[field]}));
+ assert(valid('Request_settings_update',{...base,history_source:{id,fields:['description']}}));
+ assert(!valid('Request_settings_update',{...base,history_source:{id,fields:[]}}));
+ const region=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.find(f=>f.key==='regional_defaults').default;
+ assert(valid('OrganizationRegionalDefaults',region));
+ for(const patch of [{fallback_language:'xx'},{application_language:'invented'},{currency:'USD'}])assert(!valid('OrganizationRegionalDefaults',{...region,...patch}));
+ const implementation=fs.readFileSync('database/settings-sources-history-region.sql','utf8');
+ const schema=JSON.parse(implementation.split("$schema$select '")[1].split("'::jsonb$schema$")[0]);assert.deepEqual(schema,p.$defs.OrganizationRegionalDefaults);
+ const catalog=fs.readFileSync('database/settings-catalog-v16.sql','utf8');
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_settings_sources_history_region.sql'));
+ assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),catalog.replace('commit;\n',()=>implementation.replace('begin;\n','')));
+ for(const name of ['permission_preparation_capacity','settings_template_inheritance']){
+  const file=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_'+name+'.sql'));
+  assert.equal(fs.readFileSync('supabase/migrations/'+file,'utf8'),fs.readFileSync('database/'+name.replaceAll('_','-')+'.sql','utf8'));
+ }
+});
 test('XREQ026/027 expose stored override state and genuine downgrade target terms without command authority',async()=>{
  const generated=await import('../supabase/functions/backend-v1/validators.js');
  assert(generated.request_management_state_get_v1({client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:id,permission:'attendance.draft'}}}));
@@ -81,11 +110,14 @@ test('permission preparations contain only explicit delegable proposals and no t
  const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_permission_preparations.sql'));assert(migration);
  const catalog=fs.readFileSync('database/settings-catalog-v14.sql','utf8'),implementation=fs.readFileSync('database/permission-preparations.sql','utf8');
  assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),catalog.replace('commit;\n',()=>implementation.replace('begin;\n','')));
- const sqlTemplate=JSON.parse(implementation.split("$schema$select '")[1].split("'::jsonb$schema$")[0].replaceAll("''","'"));
+ const sqlTemplate=JSON.parse(fs.readFileSync('database/permission-preparation-capacity.sql','utf8').split("$schema$select '")[1].split("'::jsonb$schema$")[0].replaceAll("''","'"));
  assert.deepEqual(sqlTemplate,{...p.$defs.PermissionPreparationTemplate,properties:{...p.$defs.PermissionPreparationTemplate.properties,grants:p.$defs.PermissionPreparationGrants}});
  const oldCatalog=JSON.parse(fs.readFileSync('database/settings-catalog-v13.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
- const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ const config={fields:JSON.parse(fs.readFileSync('database/settings-catalog-v14.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"))};
  assert.deepEqual(config.fields.filter(x=>x.key!=='permission_templates'),oldCatalog);
+ const currentConfig=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ assert.deepEqual(currentConfig.fields.filter(x=>x.key!=='regional_defaults'),config.fields);
+
  for(const scope of ['organization','center']){
   const f=config.fields.find(x=>x.scope===scope&&x.key==='permission_templates');assert(f);
   assert.equal(f.group,scope==='organization'?'O03':'M05');assert.deepEqual(f.default,[]);
@@ -211,7 +243,7 @@ test('subscriber numbers are lossless decimal identifiers on person and report p
  assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
 });
 test('settings catalogue groups isolate calendar display, reminders and package preparation without changing stored fields',()=>{
- const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>f.key!=='agreement_templates'&&f.key!=='permission_templates');
+ const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>!['agreement_templates','permission_templates','regional_defaults'].includes(f.key));
  for(const f of fields){
   if(f.consumer==='reminder_settings')assert.equal(f.group,{organization:'O07',center:'M14',member:'S13'}[f.scope],f.scope+'.'+f.key);
   if(f.consumer==='reminder_quiet_until')assert.equal(f.group,'S13',f.key);

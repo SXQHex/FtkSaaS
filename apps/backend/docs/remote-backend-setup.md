@@ -15,6 +15,12 @@ node scripts/acceptance/s07-s15-browser.mjs
 
 Playwright ayrı kurulumdan yüklenir; gerekirse FTK_PLAYWRIGHT_MODULE modül yolu ve FTK_PLAYWRIGHT_CHROMIUM kurulu headless Chromium executable'ı belirtilir. Kullanıcı Chrome profili veya eklentisi kullanılmaz. Ortam HTTPS_PROXY kullanıyorsa browser da kullanır; CODEX_PROXY_CERT varsa yalnız bu CA'nın SPKI fingerprint'i eklenir, genel ignoreHTTPSErrors açılmaz. Credential/provider payload/HTML/browser storage raporlanmaz; screenshot/trace/video alınmaz.
 
+## Native TOTP ve takvim kabulü
+
+`node scripts/acceptance/s08-native-mfa.mjs` yalnız FTK_ACCEPTANCE_EMAIL/PASSWORD/APIKEY özel ortam girdilerini kullanır. Önceden verified MFA faktörü olan hesapta değişiklik yapmadan durur. Primary+bağımsız backup enroll/verify, weak-session reddi, primary kaldırma ve backup AAL2/backend erişimini gerçek native HTTP ile sınar; oluşturduğu faktörleri finally'de kaldırır. TOTP secret/code/JWT/kişisel payload rapora yazılmaz. Mevcut Google veya recovery/24saat nonce kabulünü ikame etmez.
+
+Development CD, kaynak kabulünden sonra personal-calendar dedicated Edge gateway'ini kurar. Sadece bu bearer URL transport'unda verify_jwt=false; backend-v1 hosted verify_jwt=true kalır. FTK_CALENDAR_ORIGIN varsayılan teknik hedefi `https://gwyprhenabtpkbojephw.supabase.co/functions/v1/personal-calendar`, FTK_CALENDAR_SESSION_URL_TEMPLATE mevcut `/organizasyon/{org_id}/seans/{session_id}` web route'udur. FTK_CALENDAR_SIGNING_KEY yalnız eksikse kriptografik32byte üretilir; var olan değer/anahtar/değiştirilmiş host korunur. Secret değerleri delivery receipt'e yazılmaz; gateway exact-source/version kanıtı ayrıdır. Yanlış URL404 smoke gerçek feed/rota/rotate/revoke kabulü değildir; bu yaşam döngüsü deploy sonrasında kendi native kullanıcı URL'siyle sınanır. Ortak Vercel/domain/production kurulumu bu adımda değiştirilmez.
+
 ## Native parola güvenliği (XREQ-002)
 
 Native Auth'ın mevcut parola kontrolü ve güvenlik e-postası [tek tüketici sözleşmesine](../../../docs/settings.md#parola-değişimi-ve-güvenlik-bildirimi) göre yapılandırılır. Kaynak [auth-password-security.mjs](../scripts/auth-password-security.mjs), ileti [native şablondur](../supabase/templates/password_changed_notification.html). Yalnız mevcut development projesi desteklenir. Kabul edilmiş kaynakta, backend dizininden:

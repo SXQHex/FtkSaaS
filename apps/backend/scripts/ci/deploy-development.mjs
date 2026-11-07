@@ -29,6 +29,15 @@ export function cliFailure(result){
 }
 export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
 export function unchangedResendWebhook(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.resend_webhook_source_sha256===hash&&previous.resend_webhook_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
+export function unchangedCalendarGateway(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.calendar_gateway_source_sha256===hash&&previous.calendar_gateway_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
+export function missingCalendarConfiguration(secrets){
+ if(!Array.isArray(secrets)||secrets.some(s=>typeof s?.name!=='string'))throw Error('Invalid calendar configuration inventory');
+ const names=new Set(secrets.map(s=>s.name));
+ const defaults={FTK_CALENDAR_ORIGIN:'https://'+project+'.supabase.co/functions/v1/personal-calendar',FTK_CALENDAR_SESSION_URL_TEMPLATE:'https://ftksaas-web.vercel.app/organizasyon/{org_id}/seans/{session_id}'};
+ const missing=Object.entries(defaults).filter(([name])=>!names.has(name)).map(([name,value])=>({name,value}));
+ if(!names.has('FTK_CALENDAR_SIGNING_KEY'))missing.push({name:'FTK_CALENDAR_SIGNING_KEY',value:randomBytes(32).toString('hex')});
+ return missing;
+}
 export async function resendWebhookSmoke(record,send=fetch){
  const response=await send('https://'+project+'.supabase.co/functions/v1/resend-webhook',{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
  await response.arrayBuffer();
@@ -206,7 +215,7 @@ export async function deliver(){
   const fn=path.join(temp,'supabase/functions/backend-v1');fs.mkdirSync(fn,{recursive:true});
   const bundle=fs.readFileSync('supabase/functions/backend-v1/index.ts');receipt.edge_source_sha256=sha256(bundle);
   fs.writeFileSync(path.join(fn,'index.ts'),bundle);
-  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n[functions.resend-webhook]\nverify_jwt = false\n');
+  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n[functions.resend-webhook]\nverify_jwt = false\n[functions.personal-calendar]\nverify_jwt = false\n');
   const previous=fs.existsSync(ciFile('previous-development-delivery.json'))?JSON.parse(fs.readFileSync(ciFile('previous-development-delivery.json'))):null;
   const before=await api('/functions/backend-v1');
   receipt.edge_unchanged=unchangedEdge(previous,before,receipt.edge_source_sha256);
@@ -225,6 +234,21 @@ export async function deliver(){
   record('resend_webhook_active_provider_signature_required',webhookEdge.status==='ACTIVE'&&webhookEdge.verify_jwt===false);
   receipt.resend_webhook_version=webhookEdge.version;receipt.resend_webhook_bundle_sha256=webhookEdge.ezbr_sha256??null;
   stage='Resend webhook smoke';await resendWebhookSmoke(record);
+  await current();stage='calendar gateway deployment';
+  const calendar=path.join(temp,'supabase/functions/personal-calendar');fs.mkdirSync(calendar,{recursive:true});
+  const calendarBundle=fs.readFileSync('supabase/functions/personal-calendar/index.ts');receipt.calendar_gateway_source_sha256=sha256(calendarBundle);
+  fs.writeFileSync(path.join(calendar,'index.ts'),calendarBundle);
+  receipt.calendar_gateway_unchanged=unchangedCalendarGateway(previous,functions.find(f=>f.slug==='personal-calendar'),receipt.calendar_gateway_source_sha256);
+  if(!receipt.calendar_gateway_unchanged)cli(['functions','deploy','personal-calendar','--use-api','--workdir',temp,'--output-format','json','--yes','--remote='+project]);
+  const calendarEdge=await api('/functions/personal-calendar');
+  record('calendar_gateway_active_bearer_url_only',calendarEdge.status==='ACTIVE'&&calendarEdge.verify_jwt===false);
+  receipt.calendar_gateway_version=calendarEdge.version;receipt.calendar_gateway_bundle_sha256=calendarEdge.ezbr_sha256??null;
+  stage='calendar configuration';
+  const missingCalendar=missingCalendarConfiguration(await api('/secrets'));
+  if(missingCalendar.length)await api('/secrets',{method:'POST',body:missingCalendar});
+  receipt.calendar_configuration_created=missingCalendar.map(s=>s.name);
+  const invalidCalendar=await fetch('https://'+project+'.supabase.co/functions/v1/personal-calendar/calendar/invalid.ics',{signal:AbortSignal.timeout(15000)});
+  await invalidCalendar.arrayBuffer();record('calendar_gateway_invalid_credential_rejected',invalidCalendar.status===404);
   stage='database permissions';
   const [permissions]=await sql("select (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r') as core_tables, (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r' and not c.relrowsecurity) as missing_rls, (select count(*)::int from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api_v1' and (has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE'))) as exposed_rpc");
   record('core_rls_and_direct_rpc_denied',permissions.core_tables>0&&permissions.missing_rls===0&&permissions.exposed_rpc===0);receipt.permissions=permissions;
