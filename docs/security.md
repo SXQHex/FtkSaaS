@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e00a42ced98e6defbfdb22804ae75f3e2040e88a1e3c555f33a6025cd0a59558`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9ec6d76ca1adf8906a008e0a456b9fb0770c909c088ef734043a448dccf93a41`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
