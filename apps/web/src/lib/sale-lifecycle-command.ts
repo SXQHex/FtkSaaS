@@ -2,6 +2,7 @@ import { v7, validate } from "uuid";
 import type { Preview } from "@ftksaas/api-contracts";
 import type { SetupScope } from "./studio-setup";
 export const lifecycleWrites = [
+  "sale_change_apply_v1",
   "freeze_apply_v1",
   "freeze_end_apply_v1",
   "sale_terminate_apply_v1",

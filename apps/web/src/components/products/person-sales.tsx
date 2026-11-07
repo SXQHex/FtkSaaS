@@ -12,6 +12,7 @@ import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { FlowError, flowError } from "../bookings/flow-controls";
 import { effectMoney } from "../../lib/effect-money";
 import { SaleForm } from "./sale-form";
+const SaleChange = dynamic(() => import("./sale-change").then((m) => m.SaleChange));
 const SaleLifecycle = dynamic(() => import("./sale-lifecycle").then((m) => m.SaleLifecycle));
 export function PersonSales({
   scope,
@@ -108,6 +109,16 @@ function SaleConnection({
         >
           {t("packageLifecycle")}
         </Button>
+      )}
+      {open && (
+        <SaleChange
+          scope={scope}
+          personId={personId}
+          onSaved={() => {
+            setRevision((v) => v + 1);
+            onSaved?.();
+          }}
+        />
       )}
       {open && lifecycle && (
         <SaleLifecycle

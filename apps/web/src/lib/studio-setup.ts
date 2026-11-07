@@ -1,3 +1,4 @@
+import { eventWrites, eventFields, validEventCommand } from "./event-command";
 import { proAccessWrites, proAccessFields, validProAccessCommand } from "./pro-access-command";
 import { crmWrites, crmFields, validCrmCommand } from "./crm-command";
 import { paymentWrites, paymentFields, validPaymentCommand } from "./instructor-payment-command";
@@ -39,6 +40,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  ...eventWrites,
   ...proAccessWrites,
   ...crmWrites,
   ...paymentWrites,
@@ -88,6 +90,12 @@ type SetupRead =
   | "crm_followup_list_v1"
   | "earnings_list_v1"
   | "report_get_v1"
+  | "event_list_v1"
+  | "event_get_v1"
+  | "event_cancel_preview_v1"
+  | "event_registration_preview_v1"
+  | "event_payment_get_v1"
+  | "sale_change_preview_v1"
   | "freeze_preview_v1"
   | "freeze_end_preview_v1"
   | "sale_terminate_preview_v1"
@@ -148,6 +156,10 @@ export async function setupCall<K extends SetupWrite | SetupRead | SetupUpload>(
   return result.data as Operations[K]["response"]["data"];
 }
 export async function sendSetupCommand(command: SetupCommand) {
+  if (command.operation === "event_payment_prepare_v1") {
+    const p = await setupCall(command.operation, command.input);
+    return { primary_id: p.id };
+  }
   return setupCall(command.operation, command.input);
 }
 export type SetupScope = { actorId: string; orgId: string; centerId?: string };
@@ -157,6 +169,8 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...eventFields,
+  sale_change_apply_v1: ["preview"],
   ...proAccessFields,
   ...crmFields,
   ...paymentFields,
@@ -281,6 +295,41 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
     )
       return "invalid";
+    if (slot.startsWith("self-requests:") || slot.startsWith("self-bookings:")) {
+      const parts = slot.split(":");
+      const person = parts.at(-1);
+      if (
+        !person ||
+        !validate(person) ||
+        !bookingWrites.some((op) => op === command.operation) ||
+        (input.person_id !== undefined && input.person_id !== person)
+      )
+        return "invalid";
+      if (
+        slot.startsWith("self-requests:") &&
+        (parts.length !== 2 || !command.operation.startsWith("lesson_request_"))
+      )
+        return "invalid";
+      if (
+        slot.startsWith("self-bookings:") &&
+        (parts.length !== 3 ||
+          !validate(parts[1]!) ||
+          !command.operation.startsWith("reservation_") ||
+          (input.session_id !== undefined && input.session_id !== parts[1]))
+      )
+        return "invalid";
+    }
+    if (
+      (slot.startsWith("event:") ||
+        slot.startsWith("event-create:") ||
+        slot.startsWith("event-register:") ||
+        slot.startsWith("event-payment:") ||
+        slot.startsWith("event-registration:") ||
+        slot.startsWith("event-duty:") ||
+        eventWrites.some((op) => op === command.operation)) &&
+      !validEventCommand(command.operation, input, scope.centerId, slot)
+    )
+      return "invalid";
     if (
       (slot.startsWith("permission:") ||
         slot.startsWith("subscription-") ||
@@ -348,11 +397,12 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       return "invalid";
     if (
       (slot.startsWith("sale-lifecycle:") ||
+        slot.startsWith("sale-change:") ||
         lifecycleWrites.some((op) => op === command.operation)) &&
       (!lifecycleWrites.some((op) => op === command.operation) ||
         !validCorrection(input, scope.centerId) ||
-        !/^sale-lifecycle:[^:]+$/.test(slot) ||
-        !validate(slot.slice("sale-lifecycle:".length)))
+        !/^sale-(?:lifecycle|change):[^:]+$/.test(slot) ||
+        !validate(slot.split(":")[1]!))
     )
       return "invalid";
     if (slot.startsWith("sale-refund:") && command.operation !== "sale_refund_apply_v1")

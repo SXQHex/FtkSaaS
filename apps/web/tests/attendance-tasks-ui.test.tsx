@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { beforeEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
@@ -26,10 +26,15 @@ const row = {
 };
 const page = { items: [row], next_cursor: "next", as_of: row.starts_at };
 beforeEach(() => {
+  // Keep the initial Istanbul day distinct from the explicit November 8 selection.
+  // Fake only Date so user-event, request delivery and waitFor retain real timers.
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-11-07T12:00:00Z"));
   sessionStorage.clear();
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.example.invalid");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "synthetic");
 });
+afterEach(() => vi.useRealTimers());
 test("task cards read the native attendance only on selection and remove it when paginating", async () => {
   const user = userEvent.setup(),
     list = vi
