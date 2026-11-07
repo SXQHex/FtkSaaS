@@ -74,6 +74,7 @@ export function ProProductFields({
         <>
           <FlowError code={result.error} />
           <Button
+            className="h-auto min-h-11 max-w-full whitespace-normal"
             type="button"
             variant="outline"
             onClick={() => {

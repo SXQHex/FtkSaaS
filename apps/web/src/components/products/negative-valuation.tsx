@@ -42,6 +42,7 @@ export function NegativeValuation({ scope }: { scope: SetupScope }) {
         <>
           <FlowError code={error} />
           <Button
+            className="h-auto min-h-11 max-w-full whitespace-normal"
             type="button"
             variant="outline"
             onClick={() => {
@@ -159,6 +160,7 @@ function ValuationEditor({
       <SetupFeedback command={command} />
       {error && <FlowError code={error} />}
       <Button
+        className="h-auto min-h-11 max-w-full whitespace-normal"
         type="button"
         variant="outline"
         disabled={locked}
@@ -254,7 +256,9 @@ function ValuationEditor({
                 }}
               />
               <p className="text-sm">{timeZone}</p>
-              <Button type="submit">{t("review")}</Button>
+              <Button className="h-auto min-h-11 max-w-full whitespace-normal" type="submit">
+                {t("review")}
+              </Button>
             </fieldset>
           </form>
           {review && review.operation === "negcredit_valuation_set_v1" && (
@@ -276,7 +280,11 @@ function ValuationEditor({
                 />
                 {t("confirm")}
               </label>
-              <Button disabled={locked || !confirmed} onClick={() => void command.run(review)}>
+              <Button
+                className="h-auto min-h-11 max-w-full whitespace-normal"
+                disabled={locked || !confirmed}
+                onClick={() => void command.run(review)}
+              >
                 {t("apply")}
               </Button>
             </section>

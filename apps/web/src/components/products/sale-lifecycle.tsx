@@ -120,6 +120,7 @@ function LifecycleConnection({
       {!result && <output aria-live="polite">{t("loading")}</output>}
       {result?.error && <FlowError code={result.error} />}
       <Button
+        className="h-auto min-h-11 max-w-full whitespace-normal"
         type="button"
         variant="outline"
         disabled={disabled}
@@ -178,6 +179,7 @@ function LifecycleConnection({
                   <div className="flex flex-wrap gap-2">
                     {(["freeze", "freeze_end", "terminate"] as LifecycleKind[]).map((value) => (
                       <Button
+                        className="h-auto min-h-11 max-w-full whitespace-normal"
                         key={value}
                         type="button"
                         variant={kind === value ? "default" : "outline"}
@@ -287,7 +289,12 @@ function LifecycleConnection({
                             onChange={(e) => setReason(e.target.value)}
                           />
                         </label>
-                        <Button type="submit">{t("preview")}</Button>
+                        <Button
+                          className="h-auto min-h-11 max-w-full whitespace-normal"
+                          type="submit"
+                        >
+                          {t("preview")}
+                        </Button>
                       </fieldset>
                     </form>
                   )}

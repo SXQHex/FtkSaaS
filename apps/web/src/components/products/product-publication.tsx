@@ -179,6 +179,7 @@ export function ProductPublicationForm({
       {product && <p className="text-sm">{t("versionTarget", { name: product.terms.name })}</p>}
       <p className="text-sm text-muted-foreground">{t("publicationHint")}</p>
       <Button
+        className={buttonClass}
         type="button"
         variant="outline"
         disabled={commandLocked}

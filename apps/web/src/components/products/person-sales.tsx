@@ -99,6 +99,7 @@ function SaleConnection({
       )}
       {open && (
         <Button
+          className="h-auto min-h-11 max-w-full whitespace-normal"
           type="button"
           variant="outline"
           disabled={command.busy || !!command.pending}

@@ -66,6 +66,7 @@ export function ProductCatalog({
       <p className="text-sm text-muted-foreground">{t("catalogHint")}</p>
       <SetupFeedback command={command} />
       <Button
+        className={buttonClass}
         type="button"
         variant="outline"
         disabled={disabled}
