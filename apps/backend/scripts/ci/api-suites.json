@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "48c6bbe5698ff8a2a580690169983b9a498b36e3d4b9265a3067d6ddad557f70",
+      "sha256": "9b621d2cd6c4ad2e873fc91e747052c17340228b84fd54af7e7b85b9c35c0247",
       "shared": [
         [
           8,
@@ -1059,6 +1059,16 @@
           "line": 157,
           "path": "apps/backend/tests/agreement-preparation-acceptance.mjs",
           "sha256": "695fca4333215afd1b0a3824f3e5ce1e6f31d6717a6aaab13f149d89c1400e51"
+        },
+        {
+          "path": "apps/backend/tests/permission-preparation-acceptance.mjs",
+          "sha256": "2ff17f7146a5fed2255f6dfea7dc2c3726ffe79699c223c41674c2dc17bf6f34",
+          "line": 158
+        },
+        {
+          "line": 159,
+          "path": "apps/backend/tests/plan-target-discovery-acceptance.mjs",
+          "sha256": "5d99f97d5038586d6ba1d7a4684f1afb569fef680e70de51e8feea19a4e9c7b5"
         }
       ],
       "estimated_seconds": 1356.24

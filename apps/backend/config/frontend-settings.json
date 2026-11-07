@@ -1,5 +1,5 @@
 {
-  "version": 13,
+  "version": 14,
   "fields": [
     {
       "scope": "user",
@@ -2453,6 +2453,34 @@
       },
       "default": [],
       "group": "M12",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "permission_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "$ref": "#/$defs/PermissionPreparationTemplate"
+        }
+      },
+      "default": [],
+      "group": "O03",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "permission_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "$ref": "#/$defs/PermissionPreparationTemplate"
+        }
+      },
+      "default": [],
+      "group": "M05",
       "consumer": "domain_preparation_resolve"
     }
   ]

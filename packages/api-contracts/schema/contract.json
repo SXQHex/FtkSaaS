@@ -32255,6 +32255,9 @@
             },
             "enabled": {
               "$ref": "#/$defs/Bool"
+            },
+            "override_exists": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -44634,6 +44637,13 @@
             ],
             "additionalProperties": false
           }
+        },
+        "permission_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/PermissionPreparationTemplate"
+          }
         }
       },
       "required": [],
@@ -45345,6 +45355,13 @@
             ],
             "additionalProperties": false
           }
+        },
+        "permission_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/PermissionPreparationTemplate"
+          }
         }
       },
       "required": [],
@@ -45558,7 +45575,8 @@
                   "package_reminder_days",
                   "payment_reminders_enabled",
                   "payment_reminder_days",
-                  "agreement_templates"
+                  "agreement_templates",
+                  "permission_templates"
                 ]
               },
               "uniqueItems": true,
@@ -45644,7 +45662,8 @@
                   "payment_reminders_enabled",
                   "payment_reminder_days",
                   "reminder_center_overrides_enabled",
-                  "agreement_templates"
+                  "agreement_templates",
+                  "permission_templates"
                 ]
               },
               "uniqueItems": true,
@@ -45953,7 +45972,7 @@
           ]
         },
         "catalog_version": {
-          "const": 13
+          "const": 14
         },
         "fields": {
           "type": "array",
@@ -46001,11 +46020,11 @@
             "scope": {
               "const": "user"
             },
-            "catalog_version": {
-              "const": 13
-            },
             "defaults": {
               "$ref": "#/$defs/UserSettingsValues"
+            },
+            "catalog_version": {
+              "const": 14
             }
           },
           "required": [
@@ -46019,11 +46038,11 @@
             "scope": {
               "const": "member"
             },
-            "catalog_version": {
-              "const": 13
-            },
             "defaults": {
               "$ref": "#/$defs/MemberSettingsValues"
+            },
+            "catalog_version": {
+              "const": 14
             }
           },
           "required": [
@@ -46037,11 +46056,11 @@
             "scope": {
               "const": "center"
             },
-            "catalog_version": {
-              "const": 13
-            },
             "defaults": {
               "$ref": "#/$defs/CenterSettingsValues"
+            },
+            "catalog_version": {
+              "const": 14
             }
           },
           "required": [
@@ -46055,11 +46074,11 @@
             "scope": {
               "const": "organization"
             },
-            "catalog_version": {
-              "const": 13
-            },
             "defaults": {
               "$ref": "#/$defs/OrganizationSettingsValues"
+            },
+            "catalog_version": {
+              "const": 14
             }
           },
           "required": [
@@ -46073,11 +46092,11 @@
             "scope": {
               "const": "platform"
             },
-            "catalog_version": {
-              "const": 13
-            },
             "defaults": {
               "$ref": "#/$defs/PlatformSettingsValues"
+            },
+            "catalog_version": {
+              "const": 14
             }
           },
           "required": [
@@ -46403,14 +46422,25 @@
     "Request_settings_update": {
       "type": "object",
       "properties": {
-        "client_api_version": {},
-        "request_id": {},
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
         "scope": {},
         "org_id": {},
         "center_id": {},
-        "operation_key": {},
-        "expected_version": {},
-        "reason": {},
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 1000
+        },
         "patch": {},
         "logo_image": {}
       },
@@ -46427,25 +46457,14 @@
         {
           "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
+            "client_api_version": {},
+            "request_id": {},
             "scope": {
               "const": "user"
             },
-            "operation_key": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "expected_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            },
-            "reason": {
-              "type": "string",
-              "maxLength": 1000
-            },
+            "operation_key": {},
+            "expected_version": {},
+            "reason": {},
             "patch": {
               "$ref": "#/$defs/UserSettingsValues"
             }
@@ -46463,28 +46482,17 @@
         {
           "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
+            "client_api_version": {},
+            "request_id": {},
             "scope": {
               "const": "member"
             },
             "org_id": {
               "$ref": "#/$defs/FtkUuid"
             },
-            "operation_key": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "expected_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            },
-            "reason": {
-              "type": "string",
-              "maxLength": 1000
-            },
+            "operation_key": {},
+            "expected_version": {},
+            "reason": {},
             "patch": {
               "$ref": "#/$defs/MemberSettingsValues"
             }
@@ -46503,12 +46511,8 @@
         {
           "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
+            "client_api_version": {},
+            "request_id": {},
             "scope": {
               "const": "center"
             },
@@ -46518,16 +46522,9 @@
             "center_id": {
               "$ref": "#/$defs/FtkUuid"
             },
-            "operation_key": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "expected_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            },
-            "reason": {
-              "type": "string",
-              "maxLength": 1000
-            },
+            "operation_key": {},
+            "expected_version": {},
+            "reason": {},
             "patch": {
               "$ref": "#/$defs/CenterSettingsValues"
             }
@@ -46547,28 +46544,17 @@
         {
           "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
+            "client_api_version": {},
+            "request_id": {},
             "scope": {
               "const": "organization"
             },
             "org_id": {
               "$ref": "#/$defs/FtkUuid"
             },
-            "operation_key": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "expected_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            },
-            "reason": {
-              "type": "string",
-              "maxLength": 1000
-            },
+            "operation_key": {},
+            "expected_version": {},
+            "reason": {},
             "patch": {
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
@@ -46597,25 +46583,14 @@
         {
           "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
+            "client_api_version": {},
+            "request_id": {},
             "scope": {
               "const": "platform"
             },
-            "operation_key": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "expected_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            },
-            "reason": {
-              "type": "string",
-              "maxLength": 1000
-            },
+            "operation_key": {},
+            "expected_version": {},
+            "reason": {},
             "patch": {
               "$ref": "#/$defs/PlatformSettingsValues"
             }
@@ -50136,6 +50111,26 @@
             ],
             "additionalProperties": false
           }
+        },
+        "permissions": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/PermissionPreparationTemplate"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
@@ -50165,7 +50160,8 @@
           "enum": [
             "availability",
             "package",
-            "agreement"
+            "agreement",
+            "permission"
           ]
         },
         "source": {
@@ -50191,110 +50187,42 @@
       "additionalProperties": false,
       "oneOf": [
         {
-          "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "org_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "center_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
             "kind": {
               "const": "availability"
             },
-            "source": {
-              "$ref": "#/$defs/PreparationSourceReference"
-            },
-            "resource": {
-              "$ref": "#/$defs/ResourceRef"
-            },
-            "rule_index": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 99
-            }
+            "resource": {},
+            "rule_index": {}
           },
           "required": [
-            "client_api_version",
-            "request_id",
-            "org_id",
-            "center_id",
-            "kind",
-            "source",
             "resource",
             "rule_index"
-          ],
-          "additionalProperties": false
+          ]
         },
         {
-          "type": "object",
           "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "org_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "center_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
             "kind": {
-              "const": "package"
-            },
-            "source": {
-              "$ref": "#/$defs/PreparationSourceReference"
+              "enum": [
+                "package",
+                "agreement",
+                "permission"
+              ]
             }
           },
-          "required": [
-            "client_api_version",
-            "request_id",
-            "org_id",
-            "center_id",
-            "kind",
-            "source"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "client_api_version": {
-              "const": 1
-            },
-            "request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "org_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "center_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "kind": {
-              "const": "agreement"
-            },
-            "source": {
-              "$ref": "#/$defs/PreparationSourceReference"
-            }
-          },
-          "required": [
-            "client_api_version",
-            "request_id",
-            "org_id",
-            "center_id",
-            "kind",
-            "source"
-          ],
-          "additionalProperties": false
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "resource"
+                ]
+              },
+              {
+                "required": [
+                  "rule_index"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -50413,6 +50341,26 @@
             "kind",
             "source",
             "agreement_request"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "permission"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "permission_requests": {
+              "$ref": "#/$defs/PermissionPreparationGrants"
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "permission_requests"
           ],
           "additionalProperties": false
         }
@@ -51041,6 +50989,12 @@
               "type": "null"
             }
           ]
+        },
+        "downgrade_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SubscriptionDowngradeOption"
+          }
         }
       },
       "required": [
@@ -52474,7 +52428,8 @@
         "package_reminder_days",
         "payment_reminders_enabled",
         "payment_reminder_days",
-        "agreement_templates"
+        "agreement_templates",
+        "permission_templates"
       ]
     },
     "OrganizationSettingsFieldKey": {
@@ -52507,7 +52462,8 @@
         "payment_reminders_enabled",
         "payment_reminder_days",
         "reminder_center_overrides_enabled",
-        "agreement_templates"
+        "agreement_templates",
+        "permission_templates"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -52586,7 +52542,8 @@
         "quiet_hours_weekdays",
         "quiet_hours_start",
         "quiet_hours_end",
-        "agreement_templates"
+        "agreement_templates",
+        "permission_templates"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -52641,6 +52598,84 @@
         "discipline_id",
         "format",
         "terms"
+      ],
+      "additionalProperties": false
+    },
+    "PermissionPreparationTemplate": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "grants": {
+          "$ref": "#/$defs/PermissionPreparationGrants"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "grants"
+      ],
+      "additionalProperties": false
+    },
+    "PermissionPreparationGrants": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "permission": {
+            "type": "string",
+            "enum": [
+              "person.manage",
+              "person.activate",
+              "invite.student",
+              "reservation.write",
+              "attendance.draft",
+              "sale.write",
+              "finance.collect"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "permission",
+          "enabled"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "SubscriptionDowngradeOption": {
+      "type": "object",
+      "properties": {
+        "plan": {
+          "$ref": "#/$defs/Plan"
+        },
+        "target": {
+          "$ref": "#/$defs/SubscriptionPlanTerms"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "kept_center_required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "plan",
+        "target",
+        "effective_at",
+        "kept_center_required"
       ],
       "additionalProperties": false
     }
@@ -57293,7 +57328,7 @@
           "target_entity": "people",
           "version_mode": "row_version",
           "version_field": "person_id",
-          "read_operation": "person_get_v1",
+          "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "permission_overrides",
             "people.permission_aggregate_version"
@@ -69236,7 +69271,9 @@
         "runtime_rpc": "api_v1.subscription_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/subscription_get_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "billing.downgrade_options returns Owner-only effective lower-rank positive-price plan versions with same period/currency; current active paid boundary and no pending period change. No quote, schedule or plan change is created."
+        ],
         "required_features": [
           "F32"
         ],
@@ -76413,7 +76450,8 @@
           "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval.",
           "role_assign_v1 selector supports instructor only, explicit matching center/scope and live center manager authority; optional person_id discovers active/inactive assignment IDs and row versions. No account link IDs or general F05 personnel listing.",
           "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window.",
-          "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass."
+          "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
+          "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -76475,7 +76513,8 @@
           "student_credit_refund_v1",
           "student_credit_offset_v1",
           "debt_adjust_v1",
-          "sale_refund_preview_v1"
+          "sale_refund_preview_v1",
+          "permission_set_v1"
         ]
       },
       {
@@ -80357,7 +80396,8 @@
           "F02",
           "F15",
           "F16",
-          "F20"
+          "F20",
+          "F05"
         ],
         "permission": "preparation.resolve",
         "actor_source": "server_verified",
@@ -80396,7 +80436,7 @@
           "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
-        "transaction_guarantee": "Resolve one explicit versioned availability/package/agreement preparation under live domain authority. No publication, job, business write or receipt; execution rechecks the original writer authority.",
+        "transaction_guarantee": "Resolve one explicit versioned availability/package/agreement/permission preparation under live domain authority. No publication, job, business write or receipt; execution rechecks the original writer authority.",
         "transition": {
           "effect": "read_or_preview_only",
           "from": [],
@@ -80431,7 +80471,7 @@
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/settings_preparation_resolve_v1",
         "runtime_limits": [
-          "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale, agreement, earning or job.",
+          "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale, agreement, earning or job. Permission proposals have no target, role or version; each explicit permission_set command rechecks live center, F05, target role and actual person version.",
           "New centers copy only existing availability/package preparation arrays once. Agreement sources are chosen explicitly; existing business snapshots never live-inherit.",
           "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
         ],
@@ -80456,6 +80496,11 @@
           {
             "feature": "F20",
             "when": "agreement_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F05",
+            "when": "permission_preparation",
             "mode": "required_if_selected"
           }
         ],
@@ -95117,37 +95162,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_update/oneOf/0/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/0/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/1/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_settings_update/oneOf/1/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/1/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/2/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -95165,37 +95180,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_update/oneOf/2/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/3/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_settings_update/oneOf/3/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/3/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/4/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/oneOf/4/properties/operation_key",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -96065,42 +96050,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/0/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/0/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/0/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/1/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/1/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/1/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Success_settings_preparation_resolve/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -96377,24 +96326,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/2/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/2/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/2/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/ResolvedDomainPreparation/oneOf/2/properties/agreement_request/properties/discipline_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -96414,6 +96345,18 @@
       },
       {
         "path": "#/$defs/OrganizationSettingsValues/properties/agreement_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_update/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_update/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -96868,7 +96811,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 120,
+      "migration_count": 122,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -97902,7 +97845,8 @@
           "roles_list_v1",
           "role_assign_v1",
           "role_revoke_v1",
-          "permission_set_v1"
+          "permission_set_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -97914,7 +97858,8 @@
           "roles_list_v1",
           "role_assign_v1",
           "role_revoke_v1",
-          "permission_set_v1"
+          "permission_set_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

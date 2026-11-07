@@ -39,6 +39,59 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('XREQ026/027 expose stored override state and genuine downgrade target terms without command authority',async()=>{
+ const generated=await import('../supabase/functions/backend-v1/validators.js');
+ assert(generated.request_management_state_get_v1({client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:id,permission:'attendance.draft'}}}));
+ const projection={operation:'permission_set_v1',values:{person_id:id,permission:'attendance.draft',override_exists:false}};
+ assert(valid('ManagementProjection_permission_set_v1',projection));
+ assert(valid('ManagementProjection_permission_set_v1',{...projection,values:{...projection.values,override_exists:true,enabled:false}}));
+ assert(!valid('ManagementProjection_permission_set_v1',{...projection,values:{...projection.values,override_exists:'false'}}));
+ assert(!valid('ManagementProjection_permission_set_v1',{...projection,values:{...projection.values,effective_enabled:true}}));
+ const target={id,period:'monthly',amount_minor:'1000',currency:'TRY'},option={plan:'starter',target,effective_at:'2030-01-01T00:00:00Z',kept_center_required:true};
+ assert(valid('SubscriptionDowngradeOption',option));
+ for(const mutation of [{...option,target:{...target,id:'fake'}},{...option,plan:'invented'},{...option,approved:true}])assert(!valid('SubscriptionDowngradeOption',mutation));
+ const billing={current:target,period_change_options:[],pending_period_change:null,downgrade_options:[option]};
+ assert(valid('SubscriptionBillingView',billing));
+ const reader=p['x-contract'].operations.find(o=>o.name==='management_state_get_v1');assert(reader.runtime_selectors.includes('permission_set_v1'));
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_permission_and_plan_discovery.sql'));assert(migration);
+ assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),fs.readFileSync('database/permission-and-plan-discovery.sql','utf8'));
+});
+test('permission preparations contain only explicit delegable proposals and no target or authority',async()=>{
+ const grants=[{permission:'attendance.draft',enabled:true},{permission:'sale.write',enabled:false}];
+ const template={key:'desk',name:'Explicit desk permissions',grants};
+ for(const scope of ['Organization','Center']){
+  assert(valid(scope+'SettingsValues',{permission_templates:[template]}));
+  for(const permission of ['center.manage','platform.admin','settlement.collect'])assert(!valid(scope+'SettingsValues',{permission_templates:[{...template,grants:[{permission,enabled:true}]}]}));
+  for(const extra of [{person_id:id},{role:'center_manager'},{center_id:id},{auto_apply:true}])assert(!valid(scope+'SettingsValues',{permission_templates:[{...template,...extra}]}));
+ }
+ const source={scope:'organization',key:'desk',version:2};
+ const request={client_api_version:1,request_id:id,org_id:id,center_id:id,kind:'permission',source};
+ assert(valid('Request_settings_preparation_resolve',request));
+ for(const extra of [{person_id:id},{resource:{kind:'room',id}},{rule_index:0}])assert(!valid('Request_settings_preparation_resolve',{...request,...extra}));
+ const result={kind:'permission',source,permission_requests:grants};
+ assert(valid('ResolvedDomainPreparation',result));
+ const generated=await import('../supabase/functions/backend-v1/validators.js');
+ assert(generated.request_settings_preparation_resolve_v1(request));
+ assert(generated.success_settings_preparation_resolve_v1({ok:true,data:result,trace_id:id}));
+ for(const grant of grants){
+  const write={client_api_version:1,request_id:id,org_id:id,operation_key:id,...grant};
+  assert(!valid('Request_permission_set',write));
+  assert(valid('Request_permission_set',{...write,center_id:id,person_id:id,expected_version:1}));
+ }
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_permission_preparations.sql'));assert(migration);
+ const catalog=fs.readFileSync('database/settings-catalog-v14.sql','utf8'),implementation=fs.readFileSync('database/permission-preparations.sql','utf8');
+ assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),catalog.replace('commit;\n',()=>implementation.replace('begin;\n','')));
+ const sqlTemplate=JSON.parse(implementation.split("$schema$select '")[1].split("'::jsonb$schema$")[0].replaceAll("''","'"));
+ assert.deepEqual(sqlTemplate,{...p.$defs.PermissionPreparationTemplate,properties:{...p.$defs.PermissionPreparationTemplate.properties,grants:p.$defs.PermissionPreparationGrants}});
+ const oldCatalog=JSON.parse(fs.readFileSync('database/settings-catalog-v13.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
+ const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ assert.deepEqual(config.fields.filter(x=>x.key!=='permission_templates'),oldCatalog);
+ for(const scope of ['organization','center']){
+  const f=config.fields.find(x=>x.scope===scope&&x.key==='permission_templates');assert(f);
+  assert.equal(f.group,scope==='organization'?'O03':'M05');assert.deepEqual(f.default,[]);
+  assert.deepEqual(f.schema.items,{$ref:'#/$defs/PermissionPreparationTemplate'});
+ }
+});
 test('agreement preparations are typed proposals without instructor, dates or publication authority',async()=>{
  const terms={model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'25000'}],room_fee:{kind:'free',order:'after_instructor_share'}};
  const template={key:'fixed',name:'Explicit fixed fee',discipline_id:id,format:'group',terms};
@@ -158,7 +211,7 @@ test('subscriber numbers are lossless decimal identifiers on person and report p
  assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
 });
 test('settings catalogue groups isolate calendar display, reminders and package preparation without changing stored fields',()=>{
- const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>f.key!=='agreement_templates');
+ const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>f.key!=='agreement_templates'&&f.key!=='permission_templates');
  for(const f of fields){
   if(f.consumer==='reminder_settings')assert.equal(f.group,{organization:'O07',center:'M14',member:'S13'}[f.scope],f.scope+'.'+f.key);
   if(f.consumer==='reminder_quiet_until')assert.equal(f.group,'S13',f.key);

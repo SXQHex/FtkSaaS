@@ -1446,6 +1446,98 @@ proposal: SettlementProposal
  */
 export type SettingsVersion = number
 /**
+ * @minItems 1
+ * @maxItems 7
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PermissionPreparationGrants".
+ */
+export type PermissionPreparationGrants = [{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]|[{
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}, {
+permission: ("person.manage" | "person.activate" | "invite.student" | "reservation.write" | "attendance.draft" | "sale.write" | "finance.collect")
+enabled: boolean
+}]
+/**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsView".
  */
@@ -1485,7 +1577,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -1499,7 +1591,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates")[]
+overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1523,14 +1615,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 13
+catalog_version: 14
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -1600,24 +1692,24 @@ center_id: string
 })
 export type SettingsCatalog1 = ({
 scope: "user"
-catalog_version: 13
 defaults: UserSettingsValues
+catalog_version: 14
 } | {
 scope: "member"
-catalog_version: 13
 defaults: MemberSettingsValues
+catalog_version: 14
 } | {
 scope: "center"
-catalog_version: 13
 defaults: CenterSettingsValues
+catalog_version: 14
 } | {
 scope: "organization"
-catalog_version: 13
 defaults: OrganizationSettingsValues
+catalog_version: 14
 } | {
 scope: "platform"
-catalog_version: 13
 defaults: PlatformSettingsValues
+catalog_version: 14
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1755,14 +1847,20 @@ scope: "platform"
  * via the `definition` "Request_settings_update".
  */
 export type RequestSettingsUpdate = (RequestSettingsUpdate1 & {
-client_api_version: unknown
-request_id: unknown
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
 scope: unknown
 org_id?: unknown
 center_id?: unknown
-operation_key: unknown
-expected_version: unknown
-reason?: unknown
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version: SettingsVersion
+reason?: string
 patch: unknown
 logo_image?: unknown
 } & RequestSettingsUpdate2)
@@ -1774,43 +1872,28 @@ patch?: {
 [k: string]: unknown
 })
 export type RequestSettingsUpdate2 = ({
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
+client_api_version: unknown
+request_id: unknown
 scope: "user"
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: SettingsVersion
-reason?: string
+operation_key: unknown
+expected_version: unknown
+reason?: unknown
 patch: UserSettingsValues
 } | {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
+client_api_version: unknown
+request_id: unknown
 scope: "member"
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: SettingsVersion
-reason?: string
+operation_key: unknown
+expected_version: unknown
+reason?: unknown
 patch: MemberSettingsValues
 } | {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
+client_api_version: unknown
+request_id: unknown
 scope: "center"
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -1820,45 +1903,30 @@ org_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: SettingsVersion
-reason?: string
+operation_key: unknown
+expected_version: unknown
+reason?: unknown
 patch: CenterSettingsValues
 } | {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
+client_api_version: unknown
+request_id: unknown
 scope: "organization"
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: SettingsVersion
-reason?: string
+operation_key: unknown
+expected_version: unknown
+reason?: unknown
 patch: OrganizationSettingsValues
 logo_image?: (SettingsImageUpload | null)
 } | {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
+client_api_version: unknown
+request_id: unknown
 scope: "platform"
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: SettingsVersion
-reason?: string
+operation_key: unknown
+expected_version: unknown
+reason?: unknown
 patch: PlatformSettingsValues
 })
 /**
@@ -1964,12 +2032,12 @@ export type MemberSettingsFieldKey = ("profile_visible" | "photo_visible" | "ema
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CenterSettingsFieldKey".
  */
-export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates")
+export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationSettingsFieldKey".
  */
-export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates")
+export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlatformSettingsFieldKey".
@@ -2363,61 +2431,17 @@ org_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id: string
-kind: ("availability" | "package" | "agreement")
+kind: ("availability" | "package" | "agreement" | "permission")
 source: PreparationSourceReference
 resource?: ResourceRef
 rule_index?: number
 } & RequestSettingsPreparationResolve1)
 export type RequestSettingsPreparationResolve1 = ({
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-center_id: string
-kind: "availability"
-source: PreparationSourceReference
-resource: ResourceRef
-rule_index: number
+kind?: "availability"
+resource: unknown
+rule_index: unknown
 } | {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-center_id: string
-kind: "package"
-source: PreparationSourceReference
-} | {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-center_id: string
-kind: "agreement"
-source: PreparationSourceReference
+kind?: ("package" | "agreement" | "permission")
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2451,6 +2475,10 @@ discipline_id: string
 format: SessionFormat
 terms: PayTerms
 }
+} | {
+kind: "permission"
+source: PreparationSourceReference
+permission_requests: PermissionPreparationGrants
 })
 /**
  * Server-only normalized provider delivery; native receiver scope is mandatory. No human operation or HTTP acknowledgement.
@@ -3760,6 +3788,9 @@ PlatformSettingsFieldKey?: PlatformSettingsFieldKey
 SettingsFieldKey?: SettingsFieldKey
 NotificationEmailPreferenceView?: NotificationEmailPreferenceView
 AgreementPreparationTemplate?: AgreementPreparationTemplate
+PermissionPreparationTemplate?: PermissionPreparationTemplate
+PermissionPreparationGrants?: PermissionPreparationGrants
+SubscriptionDowngradeOption?: SubscriptionDowngradeOption
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7035,6 +7066,7 @@ export interface SubscriptionBillingView {
 current: SubscriptionPlanTerms
 period_change_options: SubscriptionPlanTerms[]
 pending_period_change: (SubscriptionPeriodChange | null)
+downgrade_options?: SubscriptionDowngradeOption[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7061,6 +7093,16 @@ id: string
 version: PositiveInt
 target: SubscriptionPlanTerms
 effective_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SubscriptionDowngradeOption".
+ */
+export interface SubscriptionDowngradeOption {
+plan: Plan
+target: SubscriptionPlanTerms
+effective_at: Instant
+kept_center_required: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16989,6 +17031,7 @@ values: {
 person_id?: string
 permission?: Permission
 enabled?: Bool
+override_exists?: boolean
 }
 }
 /**
@@ -22385,6 +22428,19 @@ discipline_id: string
 format: ("group" | "private")
 terms: PayTerms
 }[]
+/**
+ * @maxItems 100
+ */
+permission_templates?: PermissionPreparationTemplate[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PermissionPreparationTemplate".
+ */
+export interface PermissionPreparationTemplate {
+key: string
+name: string
+grants: PermissionPreparationGrants
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22556,6 +22612,10 @@ discipline_id: string
 format: ("group" | "private")
 terms: PayTerms
 }[]
+/**
+ * @maxItems 100
+ */
+permission_templates?: PermissionPreparationTemplate[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22723,6 +22783,13 @@ package_currency_suggestion: "TRY"
 agreements?: {
 source: PreparationSourceReference
 template: AgreementPreparationTemplate
+}[]
+/**
+ * @maxItems 200
+ */
+permissions?: {
+source: PreparationSourceReference
+template: PermissionPreparationTemplate
 }[]
 }
 /**

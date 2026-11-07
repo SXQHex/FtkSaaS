@@ -445,6 +445,10 @@ R02'de kişi ilişkisi, hesap bağı, rol ve tekil işlem izni ayrıdır. `permi
 
 **İstenen sonuç:** Mevcut desteklenen normal reader gösterilsin veya bu selector tamamlanıp tüketim devri verilsin. Saklanmış override var/yok ve enabled değeri, kullanılacak gerçek entity/sürüm, rol varsayılanı ile override ayrımı açık olsun. CM/plan/F05 ve hedef rol sınırı korunmalı; staff/instructor ile tek başına assistant uygunluğu backend tarafından belirlenmeli. `permission_set_v1` komutundaki person.manage/person.activate/invite.student/reservation.write/attendance.draft/sale.write/finance.collect beyaz listesi frontend tarafından genişletilmez. Rol, kişi adı veya finans okumasından izin türetilmez. Grant/revoke ve açık oturumda yetki kaybı frontend kabulü bu teslimi bekler; çalışan normal rol/kaynak/ayar işleri sürer. Frontend durum/kabul sahibi [R02](../apps/web/docs/todo.md#pro-kaynak-ve-ekip).
 
+### Backend kaynak değerlendirmesi — 6 Kasım 2026
+
+Talep yerindedir: `person_get_v1` kişi sürümünü zaten verir; typed permission selector'ın normal runtime yolu ve saklanmış override projeksiyonu eksiktir. Aday kaynak `management_state_get_v1(operation:permission_set_v1,selector.key:{person_id,permission})` yolunu mevcut writer preflight'ı ve F05/canlı CM ile uygular. `people` entity/gerçek kişi sürümü, `override_exists` ve yalnız saklanmış seçim varsa `enabled` döner; rolün bağlamsal yetkisi uydurulmaz. Hedef staff/instructor; tek başına assistant uygun değildir. Kesin sıra ve retler [WF02](workflows.md#wf02), kaynak/native/main/development aşaması [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-026027-normal-okuyucu-kaynağı) sahibindedir. Kaynak hazır; yeni native CI/main/development/hosted ve frontend ekran kabulü henüz tamamlanmadı.
+
 <a id="xreq-027"></a>
 ## XREQ-027 Plan daralması hedefi için gerçek plan sürümü keşfi
 
@@ -455,3 +459,17 @@ R02'de kişi ilişkisi, hesap bağı, rol ve tekil işlem izni ayrıdır. `permi
 R01 plan daralmasında tutulacak merkez/oda/disiplin/eğitmen/öğrenci seçimini S13 tam ekranını beklemeden ele almayı ister. Mevcut `subscription_downgrade_request_v1` gerçek `target_plan_id`, isteğe bağlı `kept_center_id/kept_scope/expected_version` alır. `subscription_get_v1` mevcut plan/limit/kullanımı ve starter_scope/pending_starter_scope/required bilgisini verir; billing period_change_options aynı planın dönem seçenekleridir. Buradan başka planın sürüm UUID'si, fiyatı veya izinli hedefi türetilemez. Kaynaklarda normal planlar arası hedef kataloğu/devir yolu bulunamadı; canlı deneme yapılmadı.
 
 **İstenen sonuç:** Çalışan mevcut normal keşif yolu ve tüketim biçimi gösterilsin; eksikse gerçek izinli hedef plan sürümlerinin kapsamı/sürümü, gerekirse koşul ve preview bağları teslim edilsin. Sabit UUID, iç tablo/service erişimi veya aynı plan dönem seçeneğini downgrade hedefi sayma talep edilmiyor. Gerçek hedef olmadan çalışmayan downgrade düğmesi yayınlanmaz. Mevcut limit/kullanım ve erişim kaybı tüketimi devam eder; kalan frontend seçim/kabul sahibi [R01](../apps/web/docs/todo.md#ortak-kapsam-erisimi).
+
+### Backend kaynak değerlendirmesi — 6 Kasım 2026
+
+Talep yerindedir: aynı planın dönem seçenekleri başka planın sürüm kimliğini vermez. Aday kaynak `subscription_get_v1.billing.downgrade_options` ile Owner'a aynı dönem/para birimindeki yürürlükte, pozitif fiyatlı gerçek alt plan sürümlerini ve mevcut dönem sonunu sunar. Liste okuması quote/talep oluşturmaz; mevcut selector/yazma/kept_scope/sürüm kapıları yeniden uygulanır. Non-Owner ve uygun olmayan abonelik/dönem bağlamında seçenekler boştur. Kesin tüketim [WF13](workflows.md#wf13), kaynak/native/main/development aşaması [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-026027-normal-okuyucu-kaynağı) sahibindedir. Kaynak hazır; yeni native CI/main/development/hosted ve frontend ekran kabulü henüz tamamlanmadı.
+
+
+<a id="xreq-028"></a>
+## XREQ-028 Katalogv14 frontend test fixture uyumu
+
+### Backend tüketim devri — 6 Kasım 2026
+
+S10.3b izin hazırlığı katalogv14,91 alan/28 grup ve aynı teslimde shared DTO/validator üretir. Önceki89 alanın schema/default/consumer değerleri korunur; yeni alanlar opsiyoneldir. PR239 main ile birleşmiş kaynağın salt okunur `pnpm --filter @ftksaas/web typecheck` kontrolünde yalnız `apps/web/tests/operating-settings-ui.test.tsx:50` ve `:100` fixture'ları `catalog_version:13` literal'i nedeniyle yeni typed14 ile uyuşmadı. Bu bir canlı UI/hosted kabulü veya genel API uyumsuzluğu kanıtı değildir; tam frontend typecheck şu anda başarısızdır.
+
+**İstenen uyarlama:** İlgili operating-settings fixture'larını yayımlanan gerçek katalog sürümüyle eşleştir; mümkünse sonraki katalog artışında yeniden sabit sayı düzeltmesi istemeyen tek fixture kaynağı kullan. Var olan writable=false, sürüm/reset/onay ve rol/izin ayrımı assertion'ları korunmalı. Frontend kodu bu backend tesliminde değiştirilmedi. XREQ-026/027 backend kaynaklarıyla birlikte ilgili request/response tüketimi typecheck/test ile frontend sahibince doğrulanmalı; backend CI/main/development ve frontend ekran kabulü ayrı kalır. Kaynak/test aşaması [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s103b-izin-hazırlık-kaynağı) sahibindedir.
