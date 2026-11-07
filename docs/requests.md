@@ -525,6 +525,11 @@ Native e-posta değişikliği, parola, Google, mevcut TOTP enrollment/challenge/
 
 Backend bu tur eklenen hosted testOTP kurulumunu ve Playwright telefon modunu kaldırdı; hosted SMS ayarı uygulanmamıştı. Backend kaynak/kabul sınırı [devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026), güncel tüketici kuralı [telefon bölümündedir](settings.md#native-telefon-doğrulama-tüketicisi). Bu talep frontend teslimi veya talep kapanışı değildir.
 
+### Backend kalite değerlendirmesi — XREQ-031, 7 Kasım 2026
+
+Kullanıcının PR251 içindeki talebi çözme talimatıyla `cd412717bb55dc7aaad2c1a2d5c4dbe8e991a418` kaynağı incelendi. Kaldırılmış SMS update/reissue/OTP beklentileri, telefon denetimi ve native çağrı yokluğu ile e-posta-only callback regresyonlarına dönüştürülmüş; doğrulanmamış profil telefonu/E.164, e-posta resend, parola ve TOTP güvenceleri korunmuştur. Bağımsız inceleme aynı 10 bulguyu ve sekiz benzersiz dosya/kural/parmak izini doğruladı. Yalnız bu sekiz kesin bulgu için `apps/backend/scripts/ci/floor-exceptions.json` içinde SXQHex sorumluluğunda 30 Kasım 2026 bitişli dar kayıt eklendi. Checker/eşik veya genel dosya muafiyeti değiştirilmedi; frontend koduna yazılmadı. Bu karar kaynak incelemesi ve dar kalite çözümüdür; PR251'in kendi CI, merge veya canlı kabulü değildir. Frontend güncel backend teslimini alıp kendi adayında kaliteyi yeniden doğrulamalıdır.
+
+
 <a id="xreq-032"></a>
 ## XREQ-032 Oturumdaki hesabın organizasyondaki kendi kişi kaydını keşfetme
 

@@ -35,9 +35,19 @@ test('ST-03 personal calendar real HTTP GET, native Auth, live SQL scope and cre
    assert.equal(head.status,200);assert.equal(await head.text(),'');assert.equal(head.headers.get('content-length'),String(Buffer.byteLength(actual.text)));assert.match(head.headers.get('cache-control'),/no-store/);
    const gatewayUrl=env.API_URL+'/functions/v1/personal-calendar'+new URL(ownerLink.subscription_url).pathname;
    for(const method of ['GET','HEAD']){
-    const direct=await fetch(gatewayUrl,{method,signal:AbortSignal.timeout(35000)});
+    const requestedAt=Date.now(),direct=await fetch(gatewayUrl,{method,signal:AbortSignal.timeout(35000)});
     assert.equal(direct.status,200,'Native calendar gateway must accept calendar clients without Auth headers');
-    const body=await direct.text();assert.equal(body,method==='GET'?actual.text:'');assert.match(direct.headers.get('cache-control'),/no-store/);
+    const body=await direct.text();
+    if(method==='GET'){
+     // Separate HTTP requests have separate generation instants. Every event's
+     // DTSTAMP must be fresh; all other bytes must still match exactly.
+     const stamps=[...body.matchAll(/^DTSTAMP:(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z\r$/gm)];
+     assert.equal(stamps.length,(body.match(/BEGIN:VEVENT/g)||[]).length);assert(stamps.length>0);
+     for(const [,y,m,d,h,min,sec] of stamps){const at=Date.UTC(+y,+m-1,+d,+h,+min,+sec);assert(at>=requestedAt-2000&&at<=Date.now()+2000,'DTSTAMP must reflect this feed request');}
+     const stable=text=>text.replace(/^DTSTAMP:\d{8}T\d{6}Z\r$/gm,'DTSTAMP:<request-time>\r');
+     assert.equal(stable(body),stable(actual.text));
+    }else assert.equal(body,'');
+    assert.match(direct.headers.get('cache-control'),/no-store/);
    }
    const token=new URL(ownerLink.subscription_url).pathname.split('/').at(-1).slice(0,-4),stored=await rows("select result from core.operation_receipts where actor_account_id=$1 and operation like 'calendar_link_%'",[account.id]);assert(!JSON.stringify(stored).includes(token));assert(!JSON.stringify(stored).includes('subscription_url'));assert(!JSON.stringify(await rows('select * from private.personal_calendar_history where account_id=$1',[account.id])).includes(token));
    await denied(student,'calendar_link_revoke_v1',{link_id:ownerLink.link.id,expected_version:ownerLink.link.version},'NOT_FOUND');await denied(owner,'calendar_link_create_v1',{organization_scope:{org_id:org},kinds:['events']},'VALIDATION_FAILED');

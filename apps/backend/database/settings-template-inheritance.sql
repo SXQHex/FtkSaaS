@@ -60,7 +60,7 @@ $branch$||a);
   if r?'inherit_fields' then
    for field in select jsonb_array_elements_text(r->'inherit_fields') loop
     local:=local-field;
-    insert into private.settings_template_inheritance(scope_key,field,org_id) values(skey,field,org) on conflict(scope_key,field) do nothing;
+    insert into private.settings_template_inheritance(scope_key,field,org_id) values(skey,field,org) on conflict on constraint settings_template_inheritance_pkey do nothing;
    end loop;
   end if;
 $branch$);

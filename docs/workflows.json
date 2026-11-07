@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "30cce09e6e4ad552ac3a5fe15dade6169fecea5231e6c1df579e6dd925594361",
-        "reason": "Standalone validator upload excludes only annotations and unused message strings; schema constraints, closed source alternatives and wire error envelopes remain. Ajv equivalence and existing upload/source gates reviewed."
+        "fingerprint": "308c14259fa3503d1e201c8405b45590cff62e1fde1ff86edcb284f9df1c5258",
+        "reason": "XREQ031: reviewed PR251 cd412717 removed-SMS source and preserved email/profile/password/TOTP regressions; ten findings match eight exact expiring exceptions, independent source review found no required issue. Checker, thresholds and source proof rules unchanged. Calendar suite inventory only shifts reviewed source bytes within existing root."
       }
     },
     {
@@ -1055,8 +1055,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "fb8a630bf7f44f8c24bebd6933867351373f64a61ed6999e8310d1570fd19b93",
-        "reason": "Reviewed bounded public-JWT-only GET/HEAD native calendar transport, exact prefix and no redirects, live feed authority and separate deployment source proof. Public submit provider gates unchanged."
+        "fingerprint": "1f54d1fd9cca7b5d0ed61bcf74fd6e252f49bbc2f70e2dd55c12d4f9523b1cac",
+        "reason": "CI api7: reviewed native GET and HEAD request boundary; per-event DTSTAMP is fresh for its own request while every other calendar byte still matches the reference feed. No privacy, revoke, live access or HEAD assertion removed."
       }
     },
     {
@@ -1223,8 +1223,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "4f07abe7ad6392997e23617d3ae5aa31133add28c334e2ca2ecdb62e0ab00735",
-        "reason": "Reviewed positive staff-only eighth permission using separate fixture, retained original two-grant assertions, regional enum/context, same-scope safe history and live template consumers with initial org insert invalidation."
+        "fingerprint": "70186389046d8bcbe6c408ef924c5d333cae038d0a9f336982bc3f54610ca7e1",
+        "reason": "CI api5/api12: reproduced SQLSTATE42P10 under real writer variable_conflict use_variable; inheritance inserts now target the exact primary-key constraint. Effective values, live authority, version invalidation and replay behavior unchanged."
       }
     },
     {
