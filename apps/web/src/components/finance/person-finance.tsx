@@ -13,6 +13,9 @@ import { FinanceLedger } from "./finance-ledger";
 const FinanceManagement = dynamic(() =>
   import("./finance-management").then((module) => module.FinanceManagement),
 );
+const FinanceReport = dynamic(() =>
+  import("./finance-report").then((module) => module.FinanceReport),
+);
 export function PersonFinance(props: {
   scope: SetupScope;
   personId: string;
@@ -43,6 +46,7 @@ function FinanceConnection({
   const t = useTranslations("finance"),
     id = useId();
   const [open, setOpen] = useState(false),
+    [reportOpen, setReportOpen] = useState(false),
     [currency, setCurrency] = useState(""),
     [query, setQuery] = useState(""),
     [cursor, setCursor] = useState<string>(),
@@ -123,6 +127,26 @@ function FinanceConnection({
               {current?.view && (
                 <>
                   <FinanceLedger view={current.view} />
+                  {management && (
+                    <>
+                      <Button
+                        variant="outline"
+                        aria-expanded={reportOpen}
+                        onClick={() => setReportOpen((v) => !v)}
+                      >
+                        {t("report")}
+                      </Button>
+                      {reportOpen && (
+                        <FinanceReport
+                          key={key}
+                          scope={scope}
+                          personId={personId}
+                          currency={query}
+                          timeZone={timeZone}
+                        />
+                      )}
+                    </>
+                  )}
                   {management && (
                     <FinanceManagement
                       key={key}

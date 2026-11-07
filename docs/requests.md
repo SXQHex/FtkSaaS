@@ -494,3 +494,15 @@ Frontend bu keşif olmadan tahminî paket değişimi düğmesi/apply zinciri aç
 ### Backend kaynak değerlendirmesi — XREQ-029, 7 Kasım 2026
 
 Talep yerindedir: mevcut rezervasyon listesi kaynak satış bağı vermediği için tam keep/cancel kümesi çıkarılamıyordu. Mevcut `management_state_get_v1` sale_change_preview selector'ı kaynak `sale_id` ile gerçek aktif gelecek rezervasyon/etkinlik envanterini sunacak biçimde tamamlandı; yeni endpoint veya tahminî UUID yolu yoktur. Sayfalama, kaynak/sürüm/context, hata sonrası yeniden okuma ve ayrı etkinlik iptalinin kesin tüketim sahibi [WF05](workflows.md#wf05), test/CI/main/development ve açık hosted aşamasının sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-029-kaynak-satış-envanteri) kaydıdır. Backend kaynak teslimi frontend kabulü veya talep kapanışı değildir.
+
+
+<a id="xreq-030"></a>
+## XREQ-030 Tahsilat düzeltmesi için çalışır yetki keşfi
+
+### Frontend talebi — 7 Kasım 2026
+
+Yerel Playwright Chromium ile mevcut native yetkili hesapla gerçek öğrenci finansı açıldı. Normal `finance_get_v1` ve XREQ-024 kapsamındaki diğer finans eylem okuyucuları çalışıyor; `management_state_get_v1(operation:collection_correct_preview_v1, selector:{operation:collection_correct_preview_v1,key:{cash_movement_id}})` aynı org/merkezdeki gerçek kök tahsilat için `POLICY_NOT_CONFIGURED` döndü: trace `01a1b3ac-8842-70dc-a2a1-a75856391a3b`. Buna karşılık aynı aktör/merkez/kök tahsilatla gerçek 100 minor TRY artırma farkı, açık zaman ve gerekçeli normal `collection_correct_preview_v1` başarılı ve blockers boş döndü: trace `01a1b3ad-6a9a-75ee-88b6-f7332fa3a70d`. Apply gönderilmedi. Para hareketi/bakiye değişmedi.
+
+Kaynak incelemesinde `20261106183023_action_management_discovery.sql` XREQ-024'ün beş finans selector’ünü uygular; tahsilat düzeltme selector’ü bu dispatch listesinde değildir. Önceki frontend “ayrı mevcut izin okuyucusu” varsayımı hosted kanıt değildir. Bu bulgu XREQ-024 kapsamındaki beş teslimi geri açmaz.
+
+**İstenen sonuç:** Tahsilat düzeltmesi için gerçekten çalışan normal reader/selector yolu kesinleştirilsin veya mevcut selector tamamlanarak kök cash_movement kaynağı, gerçek entity/version/scope ve native finance.refund yetkisiyle teslim edilsin. Self, dar collector, yanlış kişi/merkez, rol kaybı ve canonical kişi sınırları korunsun. Mevcut native preview tek desteklenen keşif yoluysa backend bu tüketim sınırını açıkça devretsin; frontend buna göre form/preview akışını uyarlasın. Finans okumasından correction yetkisi, boş başarı veya sahte allowed=true türetilmez. Backend kaynağı değiştirilmedi. Tam akış ve kabulün sahibi [R08](../apps/web/docs/todo.md#pro-finans-kabulu).
