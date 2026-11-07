@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "308c14259fa3503d1e201c8405b45590cff62e1fde1ff86edcb284f9df1c5258",
-        "reason": "XREQ031: reviewed PR251 cd412717 removed-SMS source and preserved email/profile/password/TOTP regressions; ten findings match eight exact expiring exceptions, independent source review found no required issue. Checker, thresholds and source proof rules unchanged. Calendar suite inventory only shifts reviewed source bytes within existing root."
+        "fingerprint": "6fb4b176f6dbb6869045fbd22d6e122f717a9ee42da61ce53c5f6515228dbec3",
+        "reason": "Reviewed bounded Management API diagnostics and four regression cases: exact read/write method/resource/status, safe provider-evidence labels, no raw response/token/payload retention, no retry/bypass; normal JSON/204 preserved. No workflow, permission, exception or quality policy changed."
       }
     },
     {
@@ -1056,7 +1056,7 @@
       ],
       "review": {
         "fingerprint": "1f54d1fd9cca7b5d0ed61bcf74fd6e252f49bbc2f70e2dd55c12d4f9523b1cac",
-        "reason": "CI api7: reviewed native GET and HEAD request boundary; per-event DTSTAMP is fresh for its own request while every other calendar byte still matches the reference feed. No privacy, revoke, live access or HEAD assertion removed."
+        "reason": "Calendar deployment retains exact-source and bearer credential gates; secret inventory, creation and gateway smoke now have distinct stages. Old deployed calendar v1 evidence is separate from incomplete configuration and unknown provider 403 reason."
       }
     },
     {
