@@ -487,32 +487,23 @@ test.each([
   },
 );
 
-test("identity phone change normalizes a local Turkey number before native verification", async () => {
-  mocks.update.mockResolvedValue({ error: null });
-  const user = userEvent.setup();
+test("identity section cannot initiate native phone verification", () => {
   render(
     <IdentityForm
       account={{ id: actor, state: "active", display_name: "Synthetic" }}
       onSaved={mocks.saved}
     />,
   );
-  await user.type(screen.getByLabelText("Yeni telefon"), "0555 123 45 67");
-  await user.click(
-    within(screen.getByLabelText("Yeni telefon").closest("form")!).getByRole("button"),
-  );
-  expect(mocks.update).toHaveBeenCalledWith({ phone: "+905551234567" }, undefined);
+  expect(screen.queryByLabelText("Yeni telefon")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("SMS doğrulama kodu")).not.toBeInTheDocument();
+  expect(mocks.update).not.toHaveBeenCalled();
 });
-test("invalid phone stays inline and never starts native verification", async () => {
+test("profile phone validation remains separate from native identity verification", async () => {
   const user = userEvent.setup();
-  render(
-    <IdentityForm
-      account={{ id: actor, state: "active", display_name: "Synthetic" }}
-      onSaved={mocks.saved}
-    />,
-  );
-  const field = screen.getByLabelText("Yeni telefon");
+  renderProfilePhone();
+  const field = screen.getByLabelText("Doğrulanmamış telefon");
   await user.type(field, "+901111111111");
-  await user.click(within(field.closest("form")!).getByRole("button"));
+  await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
   expect(field).toHaveAccessibleDescription("Geçerli bir telefon numarası gir.");
   expect(field).toHaveFocus();
   expect(mocks.update).not.toHaveBeenCalled();

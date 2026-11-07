@@ -13,6 +13,9 @@ import { getSetupRoles } from "../../lib/instructor-setup";
 import { RevokeInstructor } from "./revoke-instructor";
 import { AvailabilityEditor } from "./availability-editor";
 
+const PersonnelDirectory = dynamic(() =>
+  import("./personnel-permissions").then((m) => m.PersonnelDirectory),
+);
 const InstructorAgreements = dynamic(() =>
   import("../agreements/instructor-agreements").then((m) => m.InstructorAgreements),
 );
@@ -324,6 +327,7 @@ export function RoleSetup({
       <Button type="button" variant="outline" onClick={() => setRetry((n) => n + 1)}>
         {t("refresh")}
       </Button>
+      <PersonnelDirectory scope={scope} />
       {error && <p role="alert">{t(error)}</p>}
       {!roles && !error && (
         <output className="block" aria-live="polite">

@@ -18,6 +18,9 @@ import { RoomSetup } from "./room-setup";
 import { RoleSetup } from "./role-setup";
 import { errorKey } from "./setup-command";
 
+const PlanDowngrade = dynamic(() =>
+  import("../subscription/plan-downgrade").then((m) => m.PlanDowngrade),
+);
 const OperatingSettings = dynamic(() =>
   import("../settings/operating-settings").then((m) => m.OperatingSettings),
 );
@@ -319,6 +322,7 @@ function OrganizationSetup({
       </Button>
       {error && <p role="alert">{t(error)}</p>}
       <PlanSummary key={`${initial.id}:${retry}`} orgId={initial.id} />
+      <PlanDowngrade key={`downgrade:${initial.id}:${retry}`} scope={scope} />
       {!org && !error && (
         <output className="block" aria-live="polite">
           {t("loading")}
