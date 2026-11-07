@@ -24,6 +24,13 @@ import {
 import { accessibleCenters } from "../../lib/context";
 import { browserClient } from "../../lib/supabase/client";
 
+const CrmWorkspace = dynamic(() => import("../crm/crm-workspace").then((m) => m.CrmWorkspace), {
+  loading: WorkspaceLoading,
+});
+const CalendarLinks = dynamic(
+  () => import("../personal-calendar/calendar-links").then((m) => m.CalendarLinks),
+  { loading: WorkspaceLoading },
+);
 const ScheduleWorkspace = dynamic(
   () => import("../calendar/schedule-workspace").then((module) => module.ScheduleWorkspace),
   { loading: WorkspaceLoading },
@@ -411,6 +418,15 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       {snapshot && section === "students" && (
         <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
       )}
+      {snapshot && section === "crm" && (
+        <CrmWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+      )}
+      {snapshot && section === "personal" && (
+        <CalendarLinks
+          actorId={snapshot.account.id}
+          organizations={snapshot.studios.map((s) => s.organization)}
+        />
+      )}
       {snapshot && section === "attendance" && (
         <AttendanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
       )}
@@ -441,6 +457,8 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
           "packages",
           "finance",
           "attendance",
+          "crm",
+          "personal",
         ].includes(section) && (
           <Card className="shadow-none">
             <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">

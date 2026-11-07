@@ -1,3 +1,4 @@
+import { crmWrites } from "./crm-command";
 import { paymentWrites } from "./instructor-payment-command";
 import { waitlistWrites } from "./waitlist-command";
 import { lifecycleWrites } from "./sale-lifecycle-command";
@@ -11,6 +12,7 @@ export type PendingOperation = {
   scope: SetupScope;
   slot: string;
   kind:
+    | "crm"
     | "settings"
     | "agreements"
     | "attendance"
@@ -21,6 +23,7 @@ export type PendingOperation = {
     | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
+  crm: crmWrites,
   attendance: attendanceWrites,
   settings: ["settings_update_v1", "settings_reset_apply_v1", "negcredit_valuation_set_v1"],
   agreements: ["instructor_agreement_publish_v1"],
@@ -46,6 +49,13 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "crm-person":
+    case "crm-lead":
+    case "crm-activity":
+    case "crm-offer":
+    case "crm-application":
+    case "publication":
+      return "crm";
     case "valuation-group":
     case "valuation-private":
       return "settings";
@@ -96,7 +106,12 @@ export function discoverPendingOperations(actorId: string): PendingOperation[] |
       const slot = parts.join(":"),
         kind = slotKind(slot);
       if (!kind) continue;
-      if (centerId === "organization" && slot !== "operating-settings:organization") continue;
+      if (
+        centerId === "organization" &&
+        slot !== "operating-settings:organization" &&
+        !slot.startsWith("crm-application:")
+      )
+        continue;
       const scope = { actorId, orgId, ...(centerId === "organization" ? {} : { centerId }) };
       const pending = recoverSetup(scope, slot);
       if (

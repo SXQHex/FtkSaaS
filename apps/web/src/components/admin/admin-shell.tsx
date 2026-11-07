@@ -43,6 +43,8 @@ export const sections = [
   "overview",
   "schedule",
   "attendance",
+  "personal",
+  "crm",
   "students",
   "packages",
   "finance",
@@ -57,6 +59,8 @@ const icons = {
   overview: LayoutDashboard,
   schedule: CalendarDays,
   attendance: ClipboardCheck,
+  personal: CalendarDays,
+  crm: Users,
   students: Users,
   packages: Package,
   finance: CreditCard,
@@ -67,8 +71,8 @@ const icons = {
   documents: FileText,
 };
 const groups: AdminSection[][] = [
-  ["overview", "schedule", "attendance", "students"],
-  ["packages", "finance", "reports"],
+  ["overview", "schedule", "personal", "attendance", "students"],
+  ["crm", "packages", "finance", "reports"],
   ["studio", "documents", "settings"],
 ];
 

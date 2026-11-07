@@ -506,3 +506,14 @@ Yerel Playwright Chromium ile mevcut native yetkili hesapla gerçek öğrenci fi
 Kaynak incelemesinde `20261106183023_action_management_discovery.sql` XREQ-024'ün beş finans selector’ünü uygular; tahsilat düzeltme selector’ü bu dispatch listesinde değildir. Önceki frontend “ayrı mevcut izin okuyucusu” varsayımı hosted kanıt değildir. Bu bulgu XREQ-024 kapsamındaki beş teslimi geri açmaz.
 
 **İstenen sonuç:** Tahsilat düzeltmesi için gerçekten çalışan normal reader/selector yolu kesinleştirilsin veya mevcut selector tamamlanarak kök cash_movement kaynağı, gerçek entity/version/scope ve native finance.refund yetkisiyle teslim edilsin. Self, dar collector, yanlış kişi/merkez, rol kaybı ve canonical kişi sınırları korunsun. Mevcut native preview tek desteklenen keşif yoluysa backend bu tüketim sınırını açıkça devretsin; frontend buna göre form/preview akışını uyarlasın. Finans okumasından correction yetkisi, boş başarı veya sahte allowed=true türetilmez. Backend kaynağı değiştirilmedi. Tam akış ve kabulün sahibi [R08](../apps/web/docs/todo.md#pro-finans-kabulu).
+
+<a id="xreq-031"></a>
+## XREQ-031 Oturumdaki hesabın organizasyondaki kendi kişi kaydını keşfetme
+
+### Frontend talebi — 7 Kasım 2026
+
+R09 öğrenci/eğitmen günlük panelinde gerçek self `person_id` gerekir. Güncel `AccountView` ve `OrganizationView` bu bağı vermiyor; `RoleView` hesap veya `is_self` alanı taşımıyor. `person_get_v1` zaten kişi UUID’si istiyor. `linked_person_ids` hesabın organizasyon kişi bağlantısı değil, hedef kişinin birleştirme üyeleridir (`20261022153421_p07_account_profile_auth_merge.sql`). Filtresiz `reservation_list_v1` eğitmen/yöneticiye başka katılımcılar da döndürebilir ve henüz rezervasyonu olmayan kişide boş olabilir; self kaynağı olarak kullanılamaz (`20261017043309_schedule_reads.sql`). Bağımsız kaynak incelemesi aynı eksikliği doğruladı. Backend kodu değiştirilmedi, bu bulgu hosted çağrı kabulü değildir.
+
+**İstenen sonuç:** Mevcut çalışan normal tüketim yolu devredilsin veya native hesabın açık seçilmiş organizasyondaki canonical kişi bağlantısı normal kullanıcı okuyucusuyla teslim edilsin. Gerçek `person_id`, varsa nullable Abone No ve ilgili erişilebilir merkez/öğrenci/eğitmen kapsamı ayırt edilebilsin; bağlantı yokluğu boş/güvenli durum olsun. Hesap/Auth UUID’si, isim/e-posta benzerliği, Abone No veya rezervasyon satırlarından kişi türetilmesin. Abone No görüntüleme/arama kimliğidir; yetki ve komut UUID’si değildir. Yanlış organizasyon/başka hesap, birleştirme sonrası canonical kişi, bağlantı kaldırma ve rol/üyelik kaybı korunmalı. Yeni endpoint adı dayatılmıyor; varsa mevcut desteklenen yolun kesin devri yeterlidir.
+
+Bu kaynak gelmeden öğrenci/eğitmen kişisel ana ekranı tamamlandı sayılmaz. Kendi hesap takvim bağlantıları, izinli seans katılımcı paylaşımı, public takvim ve CRM bağımsız kaynak dilimleri ilerler. Frontend kapsam/kabul sahibi [R09](../apps/web/docs/todo.md#web-s09).
