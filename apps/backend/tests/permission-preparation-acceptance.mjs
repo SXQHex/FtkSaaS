@@ -72,10 +72,7 @@ test('S10 permission templates require explicit per-target grants and preserve l
  assert.deepEqual((await read('center')).values.permission_templates,[]);assert.deepEqual(await applied(),grants);
  const liveRequest={kind:'permission',source:(await catalog()).preparation_templates.permissions.find(x=>x.source.scope==='organization').source};
  await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);assert.equal((await api('settings_preparation_resolve_v1',liveRequest)).permission_requests.length,2);
- const otherCenter=(await api('center_create_v1',{name:'Synthetic unrelated role center',timezone:'UTC'})).primary_id;
- await api('center_manager_assign_v1',{center_id:otherCenter,person_id:person});
- await denied('ACCOUNT_LINK_REQUIRED','management_state_get_v1',{center_id:otherCenter,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:target,permission:'attendance.draft'}}});
- assert.deepEqual((await api('settings_get_v1',{scope:'center',center_id:otherCenter})).values.permission_templates,[]);
+ assert.equal((await db.query("select count(*)::int n from core.centers where org_id=$1 and state='active'",[org])).rows[0].n,1);
  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
  await denied('PLAN_FEATURE_UNAVAILABLE','settings_preparation_resolve_v1',liveRequest);
  await denied('PLAN_FEATURE_UNAVAILABLE','management_state_get_v1',{operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:target,permission:'attendance.draft'}}});
@@ -89,4 +86,11 @@ test('S10 permission templates require explicit per-target grants and preserve l
  await denied('FORBIDDEN','settings_preparation_resolve_v1',liveRequest);
  await denied('FORBIDDEN','management_state_get_v1',{operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:target,permission:'attendance.draft'}}});
  await denied('FORBIDDEN','permission_set_v1',lastCommand,owner,lastCommandKey);assert.deepEqual(await applied(),grants);
+ // Keep the multi-center scenario after single-center Starter and live-CM-loss checks.
+ await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
+ const otherCenter=(await api('center_create_v1',{name:'Synthetic unrelated role center',timezone:'UTC'})).primary_id;
+ await api('center_manager_assign_v1',{center_id:otherCenter,person_id:person});
+ await denied('ACCOUNT_LINK_REQUIRED','management_state_get_v1',{center_id:otherCenter,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:target,permission:'attendance.draft'}}});
+ assert.deepEqual((await api('settings_get_v1',{scope:'center',center_id:otherCenter})).values.permission_templates,[]);
+ assert.deepEqual(await applied(),grants);
 });
