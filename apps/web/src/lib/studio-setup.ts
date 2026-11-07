@@ -1,3 +1,4 @@
+import { proAccessWrites, proAccessFields, validProAccessCommand } from "./pro-access-command";
 import { crmWrites, crmFields, validCrmCommand } from "./crm-command";
 import { paymentWrites, paymentFields, validPaymentCommand } from "./instructor-payment-command";
 import { waitlistWrites, waitlistFields, validWaitlistCommand } from "./waitlist-command";
@@ -38,6 +39,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  ...proAccessWrites,
   ...crmWrites,
   ...paymentWrites,
   ...waitlistWrites,
@@ -155,6 +157,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...proAccessFields,
   ...crmFields,
   ...paymentFields,
   ...waitlistFields,
@@ -276,6 +279,13 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (input.center_id !== undefined && (input.center_id ?? undefined) !== scope.centerId) ||
       !keyPattern.test(input.operation_key) ||
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
+    )
+      return "invalid";
+    if (
+      (slot.startsWith("permission:") ||
+        slot.startsWith("subscription-") ||
+        proAccessWrites.some((op) => op === command.operation)) &&
+      !validProAccessCommand(command.operation, input, scope.centerId, slot)
     )
       return "invalid";
     if (

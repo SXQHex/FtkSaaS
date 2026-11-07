@@ -440,7 +440,7 @@ A03–S15 kaynak paketi; WF04'teki mevcut Abone No tüketiminin aynı isteğe ba
 
 ### Frontend talebi — 6 Kasım 2026
 
-**Güncel frontend takibi:** PR242 yeni main `00372abc5f2380a0c27e6fb0b8d4e54e4ed78146` ile backend normal okuyucu kaynağını teslim etti; PR243 senkronizasyonuna alındı. İlk talepteki eksik runtime yolu artık backend kaynak değerlendirmesinin konusudur. Frontend grant/revoke tüketimi, kaynak/test ve gerçek ekran kabulü hâlâ açıktır; backend teslimi frontend onayı sayılmaz.
+**Güncel frontend takibi:** PR242 normal reader kaynağı tüketildi. Aday frontend, Owner-only billing okumasından bağımsız merkez `roles_list → person_get → permission selector → açık allow/deny → ayrı onay → permission_set → selector yeniden oku` sırasını uygular. Kayıtlı override yokluğu rol varsayılanına çevrilmez; gerçek kişi sürümü, person/permission/center journal scope ve kayıp yanıtta aynı key ile kurtarma korunur. Kaynak/otomatik regresyon ve aday CI/main/dağıtım ayrı aşamalardır; gerçek izin kaybı ve ekran kabulü açıktır.
 
 R02'de kişi ilişkisi, hesap bağı, rol ve tekil işlem izni ayrıdır. `permission_set_v1` kişi sürümü, açık merkez, `permission` ve `enabled` ister. Typed `management_state_get_v1(operation:permission_set_v1,selector:{operation:permission_set_v1,key:{person_id,permission}})` ve projection tanımı vardır; bu selector'ın çalışan runtime/normal tüketim devri bulunamadı. Bu kaynak incelemesidir; canlı çağrı/ret gözlemi değildir.
 
@@ -455,7 +455,7 @@ Talep yerindedir: `person_get_v1` kişi sürümünü zaten verir; typed permissi
 
 ### Frontend talebi — 6 Kasım 2026
 
-**Güncel frontend takibi:** PR242 yeni main `00372abc5f2380a0c27e6fb0b8d4e54e4ed78146` ile gerçek downgrade seçeneklerinin backend kaynağını teslim etti; PR243 senkronizasyonuna alındı. Frontend hedef seçimi/kept_scope tüketimi ve gerçek ekran kabulü açıktır; aynı plan dönem seçeneklerinden hedef türetilmez.
+**Güncel frontend takibi:** PR242 gerçek downgrade hedef kaynağı aday frontend’de tüketildi: native seçenek/fiyat/dönem → açık merkez/kaynak/öğrenci seçimi → aynı subscription_version ile exact target selector → ayrı onay → downgrade → subscription yeniden oku. Seçim değişince onay düşer; öğrenci seçimi sayfa/Abone No aramasında korunur, sıfır öğrenci açık seçim ister. Pending iptali kendi change entity/sürümünü kullanır. Gerçek ekran kabulü ve aşağıdaki Owner keşif açığı açıktır; aynı plan dönem seçeneklerinden hedef türetilmez.
 
 R01 plan daralmasında tutulacak merkez/oda/disiplin/eğitmen/öğrenci seçimini S13 tam ekranını beklemeden ele almayı ister. Mevcut `subscription_downgrade_request_v1` gerçek `target_plan_id`, isteğe bağlı `kept_center_id/kept_scope/expected_version` alır. `subscription_get_v1` mevcut plan/limit/kullanımı ve starter_scope/pending_starter_scope/required bilgisini verir; billing period_change_options aynı planın dönem seçenekleridir. Buradan başka planın sürüm UUID'si, fiyatı veya izinli hedefi türetilemez. Kaynaklarda normal planlar arası hedef kataloğu/devir yolu bulunamadı; canlı deneme yapılmadı.
 
@@ -464,6 +464,13 @@ R01 plan daralmasında tutulacak merkez/oda/disiplin/eğitmen/öğrenci seçimin
 ### Backend kaynak değerlendirmesi — 6 Kasım 2026
 
 Talep yerindedir: aynı planın dönem seçenekleri başka planın sürüm kimliğini vermez. Aday kaynak `subscription_get_v1.billing.downgrade_options` ile Owner'a aynı dönem/para birimindeki yürürlükte, pozitif fiyatlı gerçek alt plan sürümlerini ve mevcut dönem sonunu sunar. Liste okuması quote/talep oluşturmaz; mevcut selector/yazma/kept_scope/sürüm kapıları yeniden uygulanır. Abonelik okuyucusu mevcut Owner-only yetkisini korur; uygun olmayan abonelik/dönem bağlamında seçenekler boştur. Kesin tüketim [WF13](workflows.md#wf13), kaynak/native/main/development aşaması [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-026027-normal-okuyucu-kaynağı) sahibindedir. PR242 kaynak/native CI/main/development teslimi doğrulandı; hosted okuyucu ve frontend ekran kabulü ayrı açıktır.
+
+
+### Frontend ek keşif ihtiyacı — 7 Kasım 2026
+
+Kaynak incelemesinde Owner-only abonelik akışı ile tutulacak kaynak kataloglarının yetkisi ayrıştı: `room_save_v1` ve `center_discipline_set_v1` management okuyucuları gerçek CM ister (WF02); Owner otomatik CM değildir. Owner olup tutulacak merkezde CM olmayan kullanıcı, WF13 downgrade yazmasına yetkiliyken geçerli `kept_scope` seçmek için oda/merkez-disiplin/eğitmen/aktif öğrenci keşfini tamamlayamaz. Aday frontend ret gösterir; ilk kaynağı otomatik seçmez, doğrudan tablo/service erişimi veya sahte katalog kullanmaz. Owner+CM kaynak seçimi uygulanmıştır; bütün Owner’lar için R01 kapanışı verilmez.
+
+**İstenen sonuç:** Owner’ın yalnız downgrade için tutulacak merkezde geçerli kaynakları/öğrencileri normal ve dar okuma ile keşfedebileceği desteklenen yol gösterilsin veya sağlansın. Genel CM yazma yetkisi verilmesi istenmez. Backend kendi kaynak/yetki kapsamını değerlendirir; bu frontend değerlendirmesi backend onayı değildir.
 
 
 <a id="xreq-028"></a>
@@ -524,6 +531,26 @@ Kullanıcı telefon/SMS doğrulamasını V1 kapsamından çıkardı. `apps/web/s
 Native e-posta değişikliği, parola, Google, mevcut TOTP enrollment/challenge/unenroll ve AAL2 güvenlik akışı korunur. Mevcut identity DTO alanları geriye uyumluluk için silinmez; eski doğrulanmış değerler veya hesap bağları topluca değiştirilmez. TOTP zorunluluğu/rol/plan politikası bu temizleme talebiyle değişmez. Kabul: hesap ekranında yeni SMS doğrulama/yeniden gönderim denetimi kalmaması; telefon profil kaydının çalışması; e-posta/parola/TOTP akışlarının korunması; native telefon doğrulama isteği oluşmaması. İlgili testler yeni kullanıcı kararına göre frontend sahibi tarafından uyarlanır.
 
 Backend bu tur eklenen hosted testOTP kurulumunu ve Playwright telefon modunu kaldırdı; hosted SMS ayarı uygulanmamıştı. Backend kaynak/kabul sınırı [devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026), güncel tüketici kuralı [telefon bölümündedir](settings.md#native-telefon-doğrulama-tüketicisi). Bu talep frontend teslimi veya talep kapanışı değildir.
+
+
+### Frontend uygulaması ve kalite sahibi talebi — 7 Kasım 2026
+
+Adayda native telefon güncelleme/kod doğrulama/yeniden gönderme alanları kaldırıldı. Eski verified phone salt okunur kalır; pending phone yeni doğrulama eylemi üretmez. E-posta update/resend redirect’i, doğrulanmamış profil telefonu/E.164, parola/Google/TOTP değişmedi. Eski pozitif SMS testleri, artık SMS kontrolü ve native phone çağrısı oluşmadığını sınayan regresyonlarla değiştirildi; e-posta ve profil/parola/TOTP regresyonları korunur. Testler atlanmadı veya silinmedi.
+
+Ortak floor guard bu kabul edilmiş özellik kaldırmasındaki assertion değişimlerini inceleme bulgusu sayıyor. Frontend backend-owned checker/istisna dosyasını değiştirmedi. **Backend/ortak kalite sahibinden**, son kaynak ve aşağıdaki kesin bulguların bağımsız incelemesi; uygun görülürse yalnız bu dosya/kural/parmak izlerine, gerekçe/sorumlu/süreyle dar istisna istenir (önerilen bitiş 30 Kasım 2026). Genel dosya/kategori muafiyeti veya eşik düşürme istenmez. Talep kendi kendine onay değildir; ortak kalite kapısı açıkken teslim yeşil sayılmaz.
+
+`account-flows` eski native `updateUser({phone})` çağrısı beklentisini yeni telefon denetimi ve native çağrı yokluğu ile değiştirir. `identity-phone` eski reissue success/cooldown ve `verifyOtp(phone_change)` olumlu/olumsuz kod sonuçlarını, kaldırılan akışın artık erişilememesi ve e-posta-only update/native callback ile değiştirir. Legacy verified phone, e-posta resend ve profil normalizasyonu doğrulanmaya devam eder.
+
+| Dosya | Kural / kesin parmak izi |
+|---|---|
+| `apps/web/tests/account-flows.test.tsx` | `assertion-changed` / `89dd88ae259c87a53194c77cc9f16a29a382474b741936f7f8c7da8c8b9120ee` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `25cf08c28f275945cf730a9223803656e2d39a54110ebb9058090f5b12f25268` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `c81a37033982160f4ca28c7a3f5ae3236d7bc4c063fdebe77fa73fc92869a470` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `eae6a02910fded5954760634d2874b5e1a00ed7f5240ab9ab76be6a357af23a7` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `b55728def7d23a5df7c9a2d4a887ebff5df0dc4f28130ba21d353f21f3b4647e` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `d9422f44bc27be82dd320b7fcb98c347a8eeff4932c3f7bb115a5597bf5edb88` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `05088c5eea1406fe49517aa37edd88cc785906987e7c0c42ec7e3ea0e3a7b13f` |
+| `apps/web/tests/identity-phone.test.tsx` | `assertion-changed` / `02bfd81b57e984cbc27bdfb312fdf5642a624bd481de6a66b29c706b3b4656ea` |
 
 <a id="xreq-032"></a>
 ## XREQ-032 Oturumdaki hesabın organizasyondaki kendi kişi kaydını keşfetme

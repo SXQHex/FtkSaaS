@@ -1,3 +1,8 @@
+import {
+  proAccessWrites,
+  personnelPermissions,
+  type PersonnelPermission,
+} from "./pro-access-command";
 import { crmWrites } from "./crm-command";
 import { paymentWrites } from "./instructor-payment-command";
 import { waitlistWrites } from "./waitlist-command";
@@ -12,6 +17,7 @@ export type PendingOperation = {
   scope: SetupScope;
   slot: string;
   kind:
+    | "access"
     | "crm"
     | "settings"
     | "agreements"
@@ -23,6 +29,7 @@ export type PendingOperation = {
     | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
+  access: proAccessWrites,
   crm: crmWrites,
   attendance: attendanceWrites,
   settings: ["settings_update_v1", "settings_reset_apply_v1", "negcredit_valuation_set_v1"],
@@ -45,10 +52,22 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
 function slotKind(slot: string): PendingOperation["kind"] | null {
   if (slot === "operating-settings:organization" || slot === "operating-settings:center")
     return "settings";
+  if (slot.startsWith("permission:")) {
+    const [, person, permission, ...extra] = slot.split(":");
+    return person &&
+      validate(person) &&
+      !extra.length &&
+      personnelPermissions.includes(permission as PersonnelPermission)
+      ? "access"
+      : null;
+  }
   if (slot === "lesson-requests") return "request";
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "subscription-downgrade":
+    case "subscription-cancel":
+      return "access";
     case "crm-person":
     case "crm-lead":
     case "crm-activity":
@@ -109,7 +128,8 @@ export function discoverPendingOperations(actorId: string): PendingOperation[] |
       if (
         centerId === "organization" &&
         slot !== "operating-settings:organization" &&
-        !slot.startsWith("crm-application:")
+        !slot.startsWith("crm-application:") &&
+        !slot.startsWith("subscription-")
       )
         continue;
       const scope = { actorId, orgId, ...(centerId === "organization" ? {} : { centerId }) };

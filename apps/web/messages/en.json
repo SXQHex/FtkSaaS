@@ -1685,7 +1685,9 @@
       "invalidEarnings": "Invalid earnings/payment source or selection. Reload current records.",
       "OPERATION_FAILED": "The operation definitively failed. Reload current sources and create a new review.",
       "invalidCrm": "The CRM source could not be validated. Refresh the data.",
-      "invalidCalendarLinks": "The calendar link source could not be validated."
+      "invalidCalendarLinks": "The calendar link source could not be validated.",
+      "invalidPermission": "Permission source could not be verified. Refresh it.",
+      "invalidPlanChange": "Subscription or resource selection could not be verified. Refresh it."
     },
     "financeCurrency": "Sale currency for the financial summary",
     "rightsReloaded": "Purchased rights reloaded.",
@@ -1722,7 +1724,8 @@
     "attendance": "attendance",
     "agreements": "Instructor agreement",
     "settings": "Operating settings",
-    "crm": "CRM / publication operation"
+    "crm": "CRM / publication operation",
+    "access": "Permission / subscription operation"
   },
   "finance": {
     "title": "Student finances",
@@ -2389,5 +2392,79 @@
     "retry": "Resubmit same application",
     "submit": "Submit application",
     "businessProfile": "Studio information"
+  },
+  "personnelPermissions": {
+    "title": "Operation permissions",
+    "hint": "This override applies in this center. Role defaults and other access requirements are checked separately.",
+    "permission": "Operation",
+    "choose": "Make an explicit choice",
+    "reload": "Refresh permission",
+    "loading": "Loading…",
+    "allowed": "Stored override: allow.",
+    "denied": "Stored override: deny.",
+    "noOverride": "No stored override for this operation.",
+    "choice": "New permission override",
+    "allow": "Allow",
+    "deny": "Deny",
+    "review": "Review permission change",
+    "permissions": {
+      "person": {
+        "manage": "Manage people",
+        "activate": "Activate students"
+      },
+      "invite": {
+        "student": "Invite students"
+      },
+      "reservation": {
+        "write": "Create reservations"
+      },
+      "attendance": {
+        "draft": "Draft attendance"
+      },
+      "sale": {
+        "write": "Sell packages"
+      },
+      "finance": {
+        "collect": "Record collections"
+      }
+    },
+    "directory": "Manage personnel permissions",
+    "empty": "No active staff or instructors in this center."
+  },
+  "planChange": {
+    "title": "Downgrade plan",
+    "hint": "Lower plan options come from the current subscription. A request does not change the plan immediately; the server checks its date and terms again.",
+    "reload": "Refresh subscription",
+    "loading": "Loading…",
+    "target": "Target plan and period price",
+    "choose": "Make an explicit choice",
+    "noTargets": "No eligible lower plans are currently available.",
+    "starter": "Starter",
+    "pro": "Pro",
+    "month": "Monthly",
+    "year": "Yearly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "effective": "Effective at:",
+    "center": "Retained center",
+    "retention": "Resources retained after downgrade",
+    "retentionHint": "Explicitly choose resources and up to 100 active students. Unselected records and history are retained; access follows the new plan limits.",
+    "rooms": "Room",
+    "disciplines": "Discipline",
+    "instructors": "Instructor",
+    "none": "No active resource of this kind",
+    "students": "Retained students",
+    "selectedCount": "Selected students: {count} / 100",
+    "searchStudents": "Search students by name or subscriber number",
+    "search": "Search",
+    "remove": "Remove {name} from selection",
+    "empty": "No active students on this page.",
+    "next": "Next students",
+    "review": "Review downgrade request",
+    "pending": "A subscription change is pending.",
+    "cancel": "Review cancellation of pending change",
+    "cancelHint": "The selected pending subscription change will be cancelled. The current period and history are retained.",
+    "noStudents": "I choose to retain no students; other students will lose access at the period boundary.",
+    "replaceHint": "This request replaces any currently scheduled plan downgrade request."
   }
 }

@@ -1685,7 +1685,9 @@
       "invalidEarnings": "Hakediş/ödeme kaynağı veya seçim geçersiz. Güncel kayıtları yeniden okuyun.",
       "OPERATION_FAILED": "İşlem kesin olarak başarısız oldu. Güncel kaynakları yeniden okuyup yeni bir inceleme oluşturun.",
       "invalidCrm": "CRM kaynağı doğrulanamadı. Güncel verileri yenile.",
-      "invalidCalendarLinks": "Takvim bağlantısı kaynağı doğrulanamadı."
+      "invalidCalendarLinks": "Takvim bağlantısı kaynağı doğrulanamadı.",
+      "invalidPermission": "İzin kaynağı doğrulanamadı. Yeniden oku.",
+      "invalidPlanChange": "Abonelik veya kaynak seçimi doğrulanamadı. Yeniden oku."
     },
     "financeCurrency": "Finans özeti için satışın para birimi",
     "rightsReloaded": "Satın alınmış haklar yeniden okundu.",
@@ -1722,7 +1724,8 @@
     "attendance": "yoklama",
     "agreements": "Eğitmen anlaşması",
     "settings": "İşletim ayarı",
-    "crm": "CRM / yayın işlemi"
+    "crm": "CRM / yayın işlemi",
+    "access": "İzin / abonelik işlemi"
   },
   "finance": {
     "title": "Öğrenci finansı",
@@ -2389,5 +2392,79 @@
     "retry": "Aynı başvuruyu yeniden gönder",
     "submit": "Başvuruyu gönder",
     "businessProfile": "İşletme bilgileri"
+  },
+  "personnelPermissions": {
+    "title": "İşlem izinleri",
+    "hint": "Özel izin seçimi bu merkezde uygulanır. Rol varsayımları ve işlemin diğer erişim koşulları ayrıca denetlenir.",
+    "permission": "İşlem",
+    "choose": "Açık seçim yap",
+    "reload": "İzni yeniden oku",
+    "loading": "Yükleniyor…",
+    "allowed": "Kayıtlı özel seçim: izin ver.",
+    "denied": "Kayıtlı özel seçim: izin verme.",
+    "noOverride": "Bu işlem için kayıtlı özel izin seçimi yok.",
+    "choice": "Yeni özel izin seçimi",
+    "allow": "İzin ver",
+    "deny": "İzin verme",
+    "review": "İzin değişikliğini incele",
+    "permissions": {
+      "person": {
+        "manage": "Kişi bilgilerini yönet",
+        "activate": "Öğrenciliği etkinleştir"
+      },
+      "invite": {
+        "student": "Öğrenci davet et"
+      },
+      "reservation": {
+        "write": "Rezervasyon oluştur"
+      },
+      "attendance": {
+        "draft": "Yoklama taslağı işle"
+      },
+      "sale": {
+        "write": "Paket satışı yap"
+      },
+      "finance": {
+        "collect": "Tahsilat kaydet"
+      }
+    },
+    "directory": "Personel izinlerini yönet",
+    "empty": "Bu merkezde etkin personel veya eğitmen bulunamadı."
+  },
+  "planChange": {
+    "title": "Plan daraltma",
+    "hint": "Daha alt plan seçenekleri mevcut abonelikten okunur. Talep hemen planı değiştirmez; yürürlük tarihi ve şartlar sunucuda yeniden denetlenir.",
+    "reload": "Aboneliği yeniden oku",
+    "loading": "Yükleniyor…",
+    "target": "Hedef plan ve dönem fiyatı",
+    "choose": "Açık seçim yap",
+    "noTargets": "Şu anda seçilebilir alt plan bulunmuyor.",
+    "starter": "Starter",
+    "pro": "Pro",
+    "month": "Aylık",
+    "year": "Yıllık",
+    "monthly": "Aylık",
+    "yearly": "Yıllık",
+    "effective": "Yürürlük tarihi:",
+    "center": "Tutulacak merkez",
+    "retention": "Daraltma sonrası tutulacak kaynaklar",
+    "retentionHint": "Kaynakları ve en fazla 100 aktif öğrenciyi açıkça seç. Seçilmeyen kayıtlar ve geçmiş silinmez; yeni planın erişim sınırları uygulanır.",
+    "rooms": "Oda",
+    "disciplines": "Disiplin",
+    "instructors": "Eğitmen",
+    "none": "Bu türde aktif kaynak yok",
+    "students": "Tutulacak öğrenciler",
+    "selectedCount": "Seçilen öğrenci: {count} / 100",
+    "searchStudents": "Ad veya Abone No ile öğrenci ara",
+    "search": "Ara",
+    "remove": "{name} seçimini kaldır",
+    "empty": "Bu sayfada aktif öğrenci yok.",
+    "next": "Sonraki öğrenciler",
+    "review": "Daraltma talebini incele",
+    "pending": "Bekleyen abonelik değişikliği var.",
+    "cancel": "Bekleyen talebin iptalini incele",
+    "cancelHint": "Seçilen bekleyen abonelik değişikliği iptal edilecek. Mevcut dönem ve geçmiş silinmez.",
+    "noStudents": "Hiç öğrenci tutmamayı seçiyorum; dönem sonunda diğer öğrencilerin erişimi daralacak.",
+    "replaceHint": "Varsa mevcut planlanmış plan daraltma talebi bu taleple değiştirilir."
   }
 }
