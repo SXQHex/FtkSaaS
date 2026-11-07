@@ -27,8 +27,28 @@ export function cliFailure(result){
  return {category,exit_code:Number.isInteger(result.status)&&result.status>=0&&result.status<=255?result.status:null,http_status,
   signal:['SIGTERM','SIGKILL','SIGINT'].includes(result.signal)?result.signal:null,spawn_error};
 }
+// Retain only fixed diagnostic labels, never provider messages or secret payloads.
+export async function managementRequest(route,{method='GET',body}={},send=fetch){
+ const response=await send('https://api.supabase.com/v1/projects/'+project+route,{method,headers:{Authorization:'Bearer '+process.env.SUPABASE_ACCESS_TOKEN,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
+ if(!response.ok){
+  const reader=response.body?.getReader();let text='';
+  if(reader)try{while(text.length<8192){const {done,value}=await reader.read();if(done)break;text+=new TextDecoder().decode(value).slice(0,8192-text.length);}}finally{await reader.cancel();}
+  let reason='unclassified';
+  if(/insufficient[_ ](?:scope|permission|privilege)|do not have (?:the )?(?:necessary )?(?:permission|privilege)|not have (?:the )?(?:necessary )?(?:permission|privilege)|missing (?:required )?(?:scope|permission)/i.test(text))reason='insufficient_permissions';
+  else if(/invalid[_ ](?:access[_ ])?token|expired[_ ]token|invalid authentication/i.test(text))reason='invalid_token';
+  else if(/cloudflare|cf-chl-|attention required/i.test(text))reason='edge_firewall';
+  else if(/request (?:entity |body )?too large|payload too large/i.test(text))reason='request_size';
+  else if(/organization.{0,40}(?:restrict|policy)|ip.{0,20}(?:allowlist|allow list|restrict)/i.test(text))reason='access_policy';
+  const resource=['/secrets','/database/query','/functions','/functions/backend-v1','/functions/resend-webhook','/functions/personal-calendar','/advisors/security','/advisors/performance','/config/auth','/api-keys'].includes(route)?route:'other';
+  const diagnostic={method:['GET','POST','PATCH','DELETE'].includes(method)?method:'other',resource,http_status:response.status,provider_reason:reason};
+  const requestId=response.headers.get('sb-request-id');if(/^[a-f0-9-]{36}$/i.test(requestId??''))diagnostic.request_id=requestId;
+  const error=new Error('Supabase Management API '+diagnostic.method+' '+resource+' HTTP '+response.status+' ('+reason+')');error.management_failure=diagnostic;throw error;
+ }
+ return response.status===204?null:response.json();
+}
 export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
 export function unchangedResendWebhook(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.resend_webhook_source_sha256===hash&&previous.resend_webhook_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
+export function unchangedCalendarGateway(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.calendar_gateway_source_sha256===hash&&previous.calendar_gateway_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
 export async function resendWebhookSmoke(record,send=fetch){
  const response=await send('https://'+project+'.supabase.co/functions/v1/resend-webhook',{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
  await response.arrayBuffer();
@@ -158,10 +178,7 @@ export async function deliver(){
  const receipt={project,environment:'development/test (Supabase production branch)',source:process.env.ACCEPTED_SHA,expected_main:process.env.EXPECTED_MAIN_SHA,acceptance_run_id:process.env.ACCEPTANCE_RUN_ID,acceptance_attempt:Number(process.env.ACCEPTANCE_ATTEMPT),checks:[],success:false};
  const record=(name,passed)=>{receipt.checks.push({name,passed:!!passed});if(!passed)throw Error('Verification failed: '+name);};
  let stage='configuration',temp;
- const api=async(route,{method='GET',body}={})=>{
-  const r=await fetch('https://api.supabase.com/v1/projects/'+project+route,{method,headers:{Authorization:'Bearer '+process.env.SUPABASE_ACCESS_TOKEN,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
-  if(!r.ok)throw Error('Supabase Management API HTTP '+r.status);return r.status===204?null:r.json();
- };
+ const api=managementRequest;
  const sql=query=>api('/database/query',{method:'POST',body:{query}});
  const gh=async route=>{
   const r=await fetch('https://api.github.com/repos/SXQHex/FtkSaaS/'+route,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
@@ -206,7 +223,7 @@ export async function deliver(){
   const fn=path.join(temp,'supabase/functions/backend-v1');fs.mkdirSync(fn,{recursive:true});
   const bundle=fs.readFileSync('supabase/functions/backend-v1/index.ts');receipt.edge_source_sha256=sha256(bundle);
   fs.writeFileSync(path.join(fn,'index.ts'),bundle);
-  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n[functions.resend-webhook]\nverify_jwt = false\n');
+  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n[functions.resend-webhook]\nverify_jwt = false\n[functions.personal-calendar]\nverify_jwt = false\n');
   const previous=fs.existsSync(ciFile('previous-development-delivery.json'))?JSON.parse(fs.readFileSync(ciFile('previous-development-delivery.json'))):null;
   const before=await api('/functions/backend-v1');
   receipt.edge_unchanged=unchangedEdge(previous,before,receipt.edge_source_sha256);
@@ -225,6 +242,18 @@ export async function deliver(){
   record('resend_webhook_active_provider_signature_required',webhookEdge.status==='ACTIVE'&&webhookEdge.verify_jwt===false);
   receipt.resend_webhook_version=webhookEdge.version;receipt.resend_webhook_bundle_sha256=webhookEdge.ezbr_sha256??null;
   stage='Resend webhook smoke';await resendWebhookSmoke(record);
+  await current();stage='calendar gateway deployment';
+  const calendar=path.join(temp,'supabase/functions/personal-calendar');fs.mkdirSync(calendar,{recursive:true});
+  const calendarBundle=fs.readFileSync('supabase/functions/personal-calendar/index.ts');receipt.calendar_gateway_source_sha256=sha256(calendarBundle);
+  fs.writeFileSync(path.join(calendar,'index.ts'),calendarBundle);
+  receipt.calendar_gateway_unchanged=unchangedCalendarGateway(previous,functions.find(f=>f.slug==='personal-calendar'),receipt.calendar_gateway_source_sha256);
+  if(!receipt.calendar_gateway_unchanged)cli(['functions','deploy','personal-calendar','--use-api','--workdir',temp,'--output-format','json','--yes','--remote='+project]);
+  const calendarEdge=await api('/functions/personal-calendar');
+  record('calendar_gateway_active_bearer_url_only',calendarEdge.status==='ACTIVE'&&calendarEdge.verify_jwt===false);
+  receipt.calendar_gateway_version=calendarEdge.version;receipt.calendar_gateway_bundle_sha256=calendarEdge.ezbr_sha256??null;
+  stage='calendar gateway smoke';
+  const invalidCalendar=await fetch('https://'+project+'.supabase.co/functions/v1/personal-calendar/calendar/invalid.ics',{signal:AbortSignal.timeout(15000)});
+  await invalidCalendar.arrayBuffer();record('calendar_gateway_invalid_credential_rejected',invalidCalendar.status===404);
   stage='database permissions';
   const [permissions]=await sql("select (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r') as core_tables, (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r' and not c.relrowsecurity) as missing_rls, (select count(*)::int from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api_v1' and (has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE'))) as exposed_rpc");
   record('core_rls_and_direct_rpc_denied',permissions.core_tables>0&&permissions.missing_rls===0&&permissions.exposed_rpc===0);receipt.permissions=permissions;
@@ -232,7 +261,7 @@ export async function deliver(){
   stage='advisors';receipt.advisors={};
   for(const type of ['security','performance']){const data=await api('/advisors/'+type),lints=data.lints;if(!Array.isArray(lints))throw Error('Unknown advisors response');receipt.advisors[type]=lints.reduce((out,l)=>{out[l.level]=(out[l.level]??0)+1;return out;},{});record(type+'_advisors_no_errors',!lints.some(l=>l.level==='ERROR'));}
   await current();receipt.success=true;
- }catch(e){receipt.failed_stage=stage;receipt.error=e.message;throw e;}
+ }catch(e){receipt.failed_stage=stage;receipt.error=e.message;if(e.management_failure)receipt.management_failure=e.management_failure;throw e;}
  finally{
   if(temp)fs.rmSync(temp,{recursive:true,force:true});
   fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('development-delivery.json'),JSON.stringify(receipt,null,2)+'\n');
@@ -270,6 +299,7 @@ export async function hostedSmoke(api,sql,record){
   record('real_auth_login',session.status===200&&!!token&&session.data.user?.id===authId);
   const account=await edge('account_get_v1');record('auth_edge_rpc_account',account.status===200&&account.data.ok===true);
   const orgs=await edge('organizations_list_v1',{page:{}});record('organizations_read',orgs.status===200&&orgs.data.ok===true);
+  const calendar=await edge('calendar_links_get_v1',{page:{}});record('calendar_configuration_ready',calendar.status===200&&calendar.data.ok===true&&calendar.data.data?.service_ready===true);
   const finance=await edge('finance_get_v1',{org_id:uuid(),center_id:uuid(),person_id:uuid(),currency:'TRY',page:{}});record('nonexistent_finance_resource_rejected',finance.status===200&&finance.data.ok===false&&finance.data.error?.code==='NOT_FOUND');
   const direct=await http('/rest/v1/rpc/finance_get_v1',{token,headers:{'Content-Profile':'api_v1'},body:{p_request:{},p_actor_auth_id:authId,p_session_id:uuid(),p_ids:[],p_aux:null}});record('direct_rpc_rejected',direct.status===403&&direct.data.code==='42501');
   const invalid=await http('/functions/v1/backend-v1/account_get_v1',{token:'invalid-jwt',body:{client_api_version:1,request_id:uuid()}});record('invalid_jwt_rejected',invalid.status===401);

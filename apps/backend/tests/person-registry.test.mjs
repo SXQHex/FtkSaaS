@@ -34,6 +34,24 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
  const instructorPerson=await create('Instructor'),{user:instructor,grant:instructorGrant}=await loginPerson('instructor',instructorPerson,'instructor');
  const outsider=await authUser('people-outsider');
  const get=(u,id,c=center)=>must(u,'person_get_v1',{org_id:org,center_id:c,person_id:id});
+ await t.test('native account discovers canonical own person and live scope without reservations',async()=>{
+  const own=async u=>(await must(u,'organizations_list_v1',{page:{}})).items.find(x=>x.id===org)?.self_context;
+  const self=await own(student);assert.equal(self.person_id,p);assert.equal(self.subscriber_number,(await get(student,p)).subscriber_number);
+  assert.deepEqual(self.centers,[{center_id:center,student:true,instructor:false,assistant:false}]);
+  assert.equal((await own(instructor)).person_id,instructorPerson);assert.equal((await own(instructor)).centers.find(x=>x.center_id===center).instructor,true);
+  assert.equal(await own(outsider),undefined);
+  const a=await must(student,'account_get_v1'),alias=key();
+  await db.query("insert into core.people(id,org_id,display_name,state,merged_into_id) values($1,$2,'Historical self alias','merged',$3)",[alias,org,p]);
+  await db.query('update core.account_links set person_id=$1 where org_id=$2 and account_id=$3',[alias,org,a.id]);
+  try{assert.equal((await own(student)).person_id,p);}finally{await db.query('update core.account_links set person_id=$1 where org_id=$2 and account_id=$3',[p,org,a.id]);}
+  await db.query('update core.account_links set verified_at=null where org_id=$1 and account_id=$2',[org,a.id]);
+  try{assert.equal(await own(student),null);}finally{await db.query('update core.account_links set verified_at=now() where org_id=$1 and account_id=$2',[org,a.id]);}
+  await db.query("update core.account_links set state='revoked' where org_id=$1 and account_id=$2",[org,a.id]);
+  try{assert.equal(await own(student),undefined);}finally{await db.query("update core.account_links set state='active' where org_id=$1 and account_id=$2",[org,a.id]);}
+  await db.query("update core.role_assignments set state='inactive' where id=$1",[instructorGrant.primary_id]);
+  try{const current=await own(instructor);assert.equal(current.person_id,instructorPerson);assert.equal(current.centers.find(x=>x.center_id===center).student,true);assert.equal(current.centers.find(x=>x.center_id===center).instructor,false);}
+  finally{await db.query("update core.role_assignments set state='active' where id=$1",[instructorGrant.primary_id]);}
+ });
  await t.test('current manager scope, self scope and organization read scope are distinct',async()=>{
   assert.equal((await get(cm,p)).contacts[0].value,'Student one@ftksaas.invalid');
   const unassigned=(await mutate('person_create_v1',{center_id:other,display_name:'Unassigned',contacts:[]})).primary_id;

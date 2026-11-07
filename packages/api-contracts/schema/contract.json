@@ -3391,6 +3391,19 @@
               "type": "null"
             }
           ]
+        },
+        "self_context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AccountSelfContext"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "regional_defaults": {
+          "$ref": "#/$defs/OrganizationRegionalDefaults"
         }
       },
       "required": [
@@ -6318,6 +6331,9 @@
               "type": "null"
             }
           ]
+        },
+        "regional_defaults": {
+          "$ref": "#/$defs/PublicRegionalContext"
         }
       },
       "required": [
@@ -45369,6 +45385,9 @@
           "items": {
             "$ref": "#/$defs/PermissionPreparationTemplate"
           }
+        },
+        "regional_defaults": {
+          "$ref": "#/$defs/OrganizationRegionalDefaults"
         }
       },
       "required": [],
@@ -45425,7 +45444,77 @@
         "overridden_fields": {},
         "program_duration_source": {},
         "logo": {},
-        "preparation_sources": {}
+        "preparation_sources": {},
+        "inherited_fields": {
+          "type": "object",
+          "properties": {
+            "report_templates": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "organization_inherited"
+                },
+                "organization_version": {
+                  "$ref": "#/$defs/SettingsVersion"
+                }
+              },
+              "required": [
+                "kind",
+                "organization_version"
+              ],
+              "additionalProperties": false
+            },
+            "import_templates": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "organization_inherited"
+                },
+                "organization_version": {
+                  "$ref": "#/$defs/SettingsVersion"
+                }
+              },
+              "required": [
+                "kind",
+                "organization_version"
+              ],
+              "additionalProperties": false
+            },
+            "agreement_templates": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "organization_inherited"
+                },
+                "organization_version": {
+                  "$ref": "#/$defs/SettingsVersion"
+                }
+              },
+              "required": [
+                "kind",
+                "organization_version"
+              ],
+              "additionalProperties": false
+            },
+            "permission_templates": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "organization_inherited"
+                },
+                "organization_version": {
+                  "$ref": "#/$defs/SettingsVersion"
+                }
+              },
+              "required": [
+                "kind",
+                "organization_version"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
       },
       "required": [
         "scope",
@@ -45611,6 +45700,76 @@
             },
             "preparation_sources": {
               "$ref": "#/$defs/PreparationSources"
+            },
+            "inherited_fields": {
+              "type": "object",
+              "properties": {
+                "report_templates": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "organization_inherited"
+                    },
+                    "organization_version": {
+                      "$ref": "#/$defs/SettingsVersion"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_version"
+                  ],
+                  "additionalProperties": false
+                },
+                "import_templates": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "organization_inherited"
+                    },
+                    "organization_version": {
+                      "$ref": "#/$defs/SettingsVersion"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_version"
+                  ],
+                  "additionalProperties": false
+                },
+                "agreement_templates": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "organization_inherited"
+                    },
+                    "organization_version": {
+                      "$ref": "#/$defs/SettingsVersion"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_version"
+                  ],
+                  "additionalProperties": false
+                },
+                "permission_templates": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "organization_inherited"
+                    },
+                    "organization_version": {
+                      "$ref": "#/$defs/SettingsVersion"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_version"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -45670,7 +45829,8 @@
                   "payment_reminder_days",
                   "reminder_center_overrides_enabled",
                   "agreement_templates",
-                  "permission_templates"
+                  "permission_templates",
+                  "regional_defaults"
                 ]
               },
               "uniqueItems": true,
@@ -45950,7 +46110,8 @@
             "domain_preparation_resolve",
             "schedule_calendar_preferences",
             "reminder_settings",
-            "reminder_quiet_until"
+            "reminder_quiet_until",
+            "organization_regional_context"
           ]
         },
         "writable": {
@@ -45979,7 +46140,7 @@
           ]
         },
         "catalog_version": {
-          "const": 14
+          "const": 16
         },
         "fields": {
           "type": "array",
@@ -46031,7 +46192,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 14
+              "const": 16
             }
           },
           "required": [
@@ -46049,7 +46210,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 14
+              "const": 16
             }
           },
           "required": [
@@ -46067,7 +46228,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 14
+              "const": 16
             }
           },
           "required": [
@@ -46085,7 +46246,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 14
+              "const": 16
             }
           },
           "required": [
@@ -46103,7 +46264,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 14
+              "const": 16
             }
           },
           "required": [
@@ -46449,7 +46610,25 @@
           "maxLength": 1000
         },
         "patch": {},
-        "logo_image": {}
+        "logo_image": {},
+        "history_source": {
+          "$ref": "#/$defs/SettingsHistorySource"
+        },
+        "inherit_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "report_templates",
+              "import_templates",
+              "agreement_templates",
+              "permission_templates"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true
+        }
       },
       "required": [
         "client_api_version",
@@ -46474,6 +46653,9 @@
             "reason": {},
             "patch": {
               "$ref": "#/$defs/UserSettingsValues"
+            },
+            "history_source": {
+              "$ref": "#/$defs/SettingsHistorySource"
             }
           },
           "required": [
@@ -46502,6 +46684,9 @@
             "reason": {},
             "patch": {
               "$ref": "#/$defs/MemberSettingsValues"
+            },
+            "history_source": {
+              "$ref": "#/$defs/SettingsHistorySource"
             }
           },
           "required": [
@@ -46534,6 +46719,24 @@
             "reason": {},
             "patch": {
               "$ref": "#/$defs/CenterSettingsValues"
+            },
+            "history_source": {
+              "$ref": "#/$defs/SettingsHistorySource"
+            },
+            "inherit_fields": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "report_templates",
+                  "import_templates",
+                  "agreement_templates",
+                  "permission_templates"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 4,
+              "uniqueItems": true
             }
           },
           "required": [
@@ -46574,6 +46777,9 @@
                   "type": "null"
                 }
               ]
+            },
+            "history_source": {
+              "$ref": "#/$defs/SettingsHistorySource"
             }
           },
           "required": [
@@ -46600,6 +46806,9 @@
             "reason": {},
             "patch": {
               "$ref": "#/$defs/PlatformSettingsValues"
+            },
+            "history_source": {
+              "$ref": "#/$defs/SettingsHistorySource"
             }
           },
           "required": [
@@ -46624,7 +46833,62 @@
         {
           "required": [
             "logo_image"
-          ]
+          ],
+          "properties": {
+            "logo_image": {}
+          }
+        },
+        {
+          "required": [
+            "history_source"
+          ],
+          "properties": {
+            "patch": {
+              "maxProperties": 0
+            },
+            "history_source": {}
+          }
+        },
+        {
+          "required": [
+            "inherit_fields"
+          ],
+          "properties": {
+            "patch": {
+              "maxProperties": 0
+            },
+            "inherit_fields": {}
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "history_source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "patch": {
+                "maxProperties": 0
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "inherit_fields"
+                  ]
+                },
+                {
+                  "required": [
+                    "logo_image"
+                  ]
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -52470,7 +52734,8 @@
         "payment_reminder_days",
         "reminder_center_overrides_enabled",
         "agreement_templates",
-        "permission_templates"
+        "permission_templates",
+        "regional_defaults"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -52550,7 +52815,9 @@
         "quiet_hours_start",
         "quiet_hours_end",
         "agreement_templates",
-        "permission_templates"
+        "permission_templates",
+        "regional_defaults",
+        "regional_defaults"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -52634,7 +52901,7 @@
     "PermissionPreparationGrants": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 7,
+      "maxItems": 8,
       "uniqueItems": true,
       "items": {
         "type": "object",
@@ -52648,7 +52915,8 @@
               "reservation.write",
               "attendance.draft",
               "sale.write",
-              "finance.collect"
+              "finance.collect",
+              "reservation.capacity_override"
             ]
           },
           "enabled": {
@@ -52707,6 +52975,220 @@
         "center_id",
         "parent",
         "starts_at"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSelfCenterScope": {
+      "type": "object",
+      "properties": {
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "student": {
+          "type": "boolean"
+        },
+        "instructor": {
+          "type": "boolean"
+        },
+        "assistant": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "center_id",
+        "student",
+        "instructor",
+        "assistant"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSelfContext": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "centers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AccountSelfCenterScope"
+          }
+        }
+      },
+      "required": [
+        "person_id",
+        "subscriber_number",
+        "centers"
+      ],
+      "additionalProperties": false
+    },
+    "OrganizationRegionalDefaults": {
+      "type": "object",
+      "properties": {
+        "application_language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "public_language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "document_language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "notification_language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "date_format": {
+          "type": "string",
+          "enum": [
+            "dd.MM.yyyy"
+          ]
+        },
+        "time_format": {
+          "type": "string",
+          "enum": [
+            "12",
+            "24"
+          ]
+        },
+        "number_format": {
+          "type": "string",
+          "enum": [
+            "tr-TR",
+            "en-US"
+          ]
+        },
+        "week_start": {
+          "type": "string",
+          "enum": [
+            "monday",
+            "sunday"
+          ]
+        },
+        "fallback_language": {
+          "type": "string",
+          "enum": [
+            "tr"
+          ]
+        },
+        "new_center_timezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "application_language",
+        "public_language",
+        "document_language",
+        "notification_language",
+        "date_format",
+        "time_format",
+        "number_format",
+        "week_start",
+        "fallback_language",
+        "new_center_timezone"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsHistorySource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/SettingsFieldKey"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "PublicRegionalContext": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": [
+            "tr",
+            "en"
+          ]
+        },
+        "date_format": {
+          "type": "string",
+          "enum": [
+            "dd.MM.yyyy"
+          ]
+        },
+        "time_format": {
+          "type": "string",
+          "enum": [
+            "12",
+            "24"
+          ]
+        },
+        "number_format": {
+          "type": "string",
+          "enum": [
+            "tr-TR",
+            "en-US"
+          ]
+        },
+        "week_start": {
+          "type": "string",
+          "enum": [
+            "monday",
+            "sunday"
+          ]
+        },
+        "fallback_language": {
+          "type": "string",
+          "enum": [
+            "tr"
+          ]
+        }
+      },
+      "required": [
+        "language",
+        "date_format",
+        "time_format",
+        "number_format",
+        "week_start",
+        "fallback_language"
       ],
       "additionalProperties": false
     }
@@ -96404,6 +96886,24 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AccountSelfCenterScope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AccountSelfContext/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettingsHistorySource/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -96855,7 +97355,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 124,
+      "migration_count": 128,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

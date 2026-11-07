@@ -34,6 +34,8 @@ Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıl
 
 ## WF02
 
+**Kendi kişi bağını keşfetme (XREQ-032):** Native girişten sonra `organizations_list_v1` içinden açık seçilen org öğesinin `self_context` alanı kullanılır. Doğrulanmış canlı bağ yoksa null; org listede yoksa erişim yoktur. Dönen canonical person_id, nullable Abone No ve canlı centers/student/instructor/assistant kapsamı UUID türetme veya rezervasyon arama ihtiyacını kaldırır. Üyelik/rol kaybında yeniden okunur; bu snapshot sonraki writer'ın canlı yetki kontrolünün yerine geçmez. Hesap kimliği kişi kimliği değildir.
+
 **Amaç/aktör:** Yetkili kullanıcı stüdyo ve işlem yetkisini kurar. Owner/OM ile CM kapsamı ayrıdır.
 
 **Sıra:** `organizations_list_v1` → `organization_get_v1`/`centers_list_v1` → gerekliyse organizasyon ve merkez oluştur → `disciplines_list_v1` ve disiplin tanımı/merkez ilişkisi → `management_state_get_v1` oda keşfi/ayrıntısı → oda tanımı → kişi ve eğitmen yetkisi (WF04) → canlı rol okumaları/izinli atamalar. Güncel Starter sınırları backend tarafından uygulanır: bir aktif merkez/oda/disiplin/eğitmen ve100 aktif öğrenci. Süreçte ikinci aktif kaynak oluşturma istemci gizlemesiyle değil backend reddiyle sonuçlanır.
@@ -168,6 +170,8 @@ Yetkili sonuç tek `items` satırında gerçek entity/state/version ve `current:
 
 ## WF09
 
+**Native ICS HTTP sunumu:** Takvim istemcisi dönen bearer URL'ye Auth başlığı olmadan GET/HEAD yapar. Dedicated `personal-calendar` gateway yalnız tam calendar/token.ics yolunu alır ve public anon JWT ile mevcut backend-v1 feed okuyucusuna aktarır. Backend-v1 hosted JWT kapısı korunur. Yanlış/iptal edilmiş credential404, kullanılamayan backend503; cache private/no-store. Eski Node proxy aynı Fetch adaptörünü kullanır. Key/URL audit veya uygulama loguna yazılmaz; ICS'deki seans route'u native kullanıcı oturumu ister.
+
 **Amaç/aktör:** Yetkili yayın yöneticisi dersleri duyurur; anonim başvuru sahibi gerçek public transport'u, hesap sahibi kendi takvim bağlantısını kullanır.
 
 **Sıra:** `publication_set_v1` → `public_calendar_get_v1` → gerçek widget/hostname/action/gateway ile `public_application_submit_v1` → yetkili `public_application_review_v1`. Public bağlam native kullanıcı JWT'si taklit edilerek oluşturulmaz. Kişisel takvimde `calendar_links_get_v1` → `calendar_link_create_v1` → dönen URL'yi güvenli göster; rotate/revoke ayrı komutlardır. Feed, GET/HEAD adapter'ı üzerinden `calendar_feed_get_v1` tüketir; kullanıcı oturumu gerektiren yönetim API'siyle aynı transport değildir.
@@ -219,6 +223,8 @@ Pro/Business işlemsel email için önce katalog availability ve `notifications_
 Bildirim opt-in default ve miras kuralları [ayar sözleşmesinden](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti), gerçek kanal tüketimi [ayar rehberinden](settings.md) okunur. Native Auth SMTP kurulumu uygulama daveti/pazarlama/push sağlayıcısının teslim kabulü değildir.
 
 ## WF12
+
+**Ayar kaynağı:** Normal scope read → açık yerel patch, izinli şablon inherit_fields veya aynı-scope history_source → güncel expected_version ile update → etkilenen view/katalog yeniden okuma. Miras/reset ve geçmiş kaynaklarının kesin wire/yetki sınırı [ayar tüketicisindedir](settings.md#açık-şablon-mirası-ve-geçmişten-yeni-sürüm). Organization regional_defaults kişi tercihini, iş zamanını veya eski çıktıyı değiştirmez.
 
 **Amaç/aktör:** Kullanıcı kendi, yetkili yönetici organizasyon/merkez kapsamındaki desteklenen ayarları yönetir.
 

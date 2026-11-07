@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** Kullanıcı S07–S15 kapanışını, eklentisiz yerel Playwright ile istedi; sonrasında telefon/SMS doğrulamasını kapsamdan çıkardı. [Son doğrulanmış kabul ve ortam engelleri](00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026) devirdedir. S10 kalan ayar alt alanları ve S07/S08/S14/S15 gerçek ortam/tüketici sınırları kendi backlog ölçütleriyle kapanır. XREQ-029 önceki kaynak teslimidir; hazır okuyucu yeniden kurulmaz. S05/S06/S09/S11/S12/S13 kapalı backend teslimleri yeniden kurulmaz; gerçek ekran/sağlayıcı kabulü kaynak testinden çıkarılmaz. Genel ileri yayın veya toplu izin apply motoru eklenmez.
+**Aktif paket:** Kullanıcının backend-owned XREQ ve S08/S10/S14/S15 kapanış talebi: XREQ-032 canonical self → gerçek sekizinci izin → regional/history/miras consumer'ları → native takvim gateway/config → güncel kaynak kabulü. PR248/XREQ-030 main/development ve hosted reader kabulü tamamdır; yeniden geliştirilmez. S08 yedek TOTP kabulü, S14 provider/ortak host sınırı ve S15 deploy sonrası gerçek credential kabulü [tek durum kaydında](00-FtkSaaS-yeni-sohbet-devir.md#hesap-ayar-ve-takvim-kabul-paketi). S10 kalan69 alt alan kapsamı daraltılmaz; büyük teslim aynı akış PR'ında ilerler. Frontend koduna yazılmaz.
 
 ## Uygulama sırası
 

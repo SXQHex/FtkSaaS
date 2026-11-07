@@ -536,15 +536,15 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "96b32a33946792e7e8d7b2df889a9eaf16c30995c4f5c275f80fa78598f5e8a9",
+      "sha256": "dfeb3e1ba7e5c2901d4c0939995d0b4bdfc4bbbbd54c37e3c4ee1012cbe8c765",
       "shared": [
         [
           7,
           13
         ],
         [
-          115,
-          115
+          133,
+          133
         ]
       ],
       "parts": [
@@ -553,7 +553,7 @@
           "ranges": [
             [
               14,
-              114
+              132
             ]
           ]
         },
@@ -561,8 +561,8 @@
           "id": "person-registry-root-2",
           "ranges": [
             [
-              116,
-              353
+              134,
+              371
             ]
           ]
         }
@@ -591,7 +591,7 @@
         {
           "line": 5,
           "path": "apps/backend/tests/account-mfa-acceptance.mjs",
-          "sha256": "9b5471a8601c0ec13ec5e01164e15e28d7b33e564438edef417bae7fa87c7bf0"
+          "sha256": "c0d15055107819778ca19806412457252fecb60f3b5ea1bf30a87f3d73846437"
         },
         {
           "line": 6,
@@ -599,27 +599,27 @@
           "sha256": "e19ed9722521850b3a35b97117f342cda93b1fab8a75ab794451fa7335913e81"
         },
         {
-          "line": 354,
+          "line": 372,
           "path": "apps/backend/tests/crm-lifecycle-authority-acceptance.mjs",
           "sha256": "e247768f315e48ac05aafa019c357cfd78d1a323cae722670af3f23152fbd04c"
         },
         {
-          "line": 355,
+          "line": 373,
           "path": "apps/backend/tests/crm-lifecycle-acceptance.mjs",
           "sha256": "8cbaf2228d6aaa2bbb185959acb11ae298312225ead78c23bb3849cc21e5c03f"
         },
         {
-          "line": 356,
+          "line": 374,
           "path": "apps/backend/tests/crm-followup-projections-acceptance.mjs",
           "sha256": "49d763d43cfb80f93cd92d2c612b349713335939e16b02b95a0344d40b263aae"
         },
         {
-          "line": 357,
+          "line": 375,
           "path": "apps/backend/tests/crm-segment-worker-acceptance.mjs",
           "sha256": "84dce9fe217f6a786876721b4765c282100d6bc5840f8d15328082497d52fe23"
         },
         {
-          "line": 358,
+          "line": 376,
           "path": "apps/backend/tests/crm-followup-acceptance.mjs",
           "sha256": "8e2ccfed55fe4fab9d3e1d789825aac0f4934ad26fa9d9caa1d2db28154882e8"
         }
@@ -751,27 +751,27 @@
         {
           "line": 7,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "ee92915cf502b17cfdabdc7e2c43f656765f715d8f82ba197442429d3c69a472",
+          "sha256": "0a6d4730d5dbe4a684d7d9c0a6e83cdc07cc4cbd8ae9fffb49aba3d83fcd50a3",
           "shared": [
             [
               1,
               28
             ],
             [
-              85,
-              85
+              116,
+              116
             ],
             [
-              143,
-              143
+              174,
+              174
             ],
             [
-              176,
-              177
+              207,
+              208
             ],
             [
-              218,
-              219
+              249,
+              250
             ]
           ],
           "parts": [
@@ -780,7 +780,7 @@
               "ranges": [
                 [
                   29,
-                  84
+                  115
                 ]
               ]
             },
@@ -788,12 +788,12 @@
               "id": "settings-tenant-authority",
               "ranges": [
                 [
-                  86,
-                  142
+                  117,
+                  173
                 ],
                 [
-                  144,
-                  175
+                  175,
+                  206
                 ]
               ]
             },
@@ -801,8 +801,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  178,
-                  217
+                  209,
+                  248
                 ]
               ]
             },
@@ -810,8 +810,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  220,
-                  256
+                  251,
+                  287
                 ]
               ]
             }
@@ -1062,7 +1062,7 @@
         },
         {
           "path": "apps/backend/tests/permission-preparation-acceptance.mjs",
-          "sha256": "2ff17f7146a5fed2255f6dfea7dc2c3726ffe79699c223c41674c2dc17bf6f34",
+          "sha256": "b091a76b3ea4729d2c31f8b9f710607b9e42bdd4cdbcf12abaf4eb0b8c4fef1f",
           "line": 158
         },
         {
@@ -1136,7 +1136,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/personal-calendar-acceptance.mjs",
-          "sha256": "8c78b25b4b03d8fcc03e96d1541e0797c7f00edec3dadfcf9a87a90f1d0f1061"
+          "sha256": "9b134d7e67a39d9de82dd2bcfe7c550d35874285109ab70664bd1d42b689c566"
         }
       ],
       "estimated_seconds": 537.08

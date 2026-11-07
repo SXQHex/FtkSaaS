@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3bd813e89c1f64b208924012683974b9fecd94e80e10dbd11e975afd8ab990e2",
-        "reason": "Migration124 ve kapalı selector invariantları, validator/schema üretimi ve mevcut action kabul modülünün tek source hash yenilemesi incelendi; test kökleri/shard/weights/politika değişmedi."
+        "fingerprint": "d2286a336134e8af7afefce65e2b755d3eebb965088cc448f1ab7556d44a0494",
+        "reason": "Removed CI secret inventory/create calls; reviewed same-source deployment and existing Auth/cleanup gates. Hosted smoke now enforces actual calendar_links_get service_ready and negative case retains exact fixture cleanup. Missing-only plan assertions preserved in operator module, no quality exception or token scope expansion."
       }
     },
     {
@@ -351,7 +351,8 @@
         "apps/backend/supabase/templates/password_changed_notification.html",
         "apps/backend/transports/account-signup-gateway.mjs",
         "docs/settings.md",
-        "apps/backend/scripts/acceptance/s07-s15-browser.mjs"
+        "apps/backend/scripts/acceptance/s07-s15-browser.mjs",
+        "apps/backend/scripts/acceptance/s08-native-mfa.mjs"
       ],
       "operations": [
         "account_get_v1",
@@ -363,8 +364,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "783ec335d49ac5acf252cb9b776fae6e1867f237b5b5f0fa0c1ec63f983831ad",
-        "reason": "Kullanıcı telefon SMS doğrulamasını V1 kapsamından çıkardı. Yeni testOTP kurulum/test/modu kaldırıldı; native eposta, parola, Google ve mevcut TOTP korunur. DTO/legacy projeksiyon uyumluluğu korunur; frontend kaldırma XREQ-030."
+        "fingerprint": "36a8851db5b33c57c38c086afc799021200e58411d760f37bef69c2db37d8723",
+        "reason": "Reviewed actual independent native backup TOTP and AAL1 denial; hosted runner verifies created-factor removal and backend denial after local logout. Native recovery boundaries remain."
       }
     },
     {
@@ -439,7 +440,9 @@
         "apps/backend/database/event-capacity-practice.sql",
         "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
         "apps/backend/database/permission-and-plan-discovery.sql",
-        "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql"
+        "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql",
+        "apps/backend/database/account-self-context.sql",
+        "apps/backend/supabase/migrations/20261107093756_account_self_context.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -465,8 +468,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "bdd04427f0b45a426732a5a46d9f991db7dfb5da64ccfa4bb1e0214c92b3445d",
-        "reason": "Management reader runtime_selectors kaydına yalnız sale_change eklendi; satış envanterinin domain/kaynak/test sahibi WF05, diğer selector ve rol davranışı değişmez"
+        "fingerprint": "2e9911ebda9109288a1db3a7407bdb29058d3402bde0610929116178b6981468",
+        "reason": "Reviewed verified canonical self context, live accessible center/role membership, nullable subscriber identity and independent command authority."
       }
     },
     {
@@ -652,8 +655,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "74cbd0cd3bf7709793b088dc8f2843e9129ee59c9fe40442a03120abacc6a2de",
-        "reason": "Registry harness yalnız yeni bağımsız source-sale kabul kökünü import eder; kişi/rol/merge davranışları ve mevcut assertionlar değişmedi"
+        "fingerprint": "7cbef87b95c7aaf73b6a350fa7217eff5f70afd186b810f1badf0f96a47e5580",
+        "reason": "Shared person-registry root adds self discovery isolation and live role tests; existing person lifecycle, contacts, merge and subscriber assignment behavior remains unchanged."
       }
     },
     {
@@ -1035,7 +1038,11 @@
         "apps/backend/supabase/migrations/20261105055000_crm_provider_health.sql",
         "apps/backend/transports/crm-provider-host.mjs",
         "apps/backend/transports/crm-provider-host-db.mjs",
-        "apps/backend/config/crm-provider-host.service"
+        "apps/backend/config/crm-provider-host.service",
+        "apps/backend/transports/calendar-gateway.mjs",
+        "apps/backend/supabase/functions/personal-calendar/handler.ts",
+        "apps/backend/supabase/functions/personal-calendar/index.ts",
+        "apps/backend/scripts/calendar-configuration-plan.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1049,8 +1056,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "30be02a669aa0f5739799d9905b4bd61a485ad9c3907a06d76bd9bb05955b35e",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF09 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "4f88453d0e89db2489f6bd2ac46dbd006ca77f926213914aeabcf29d26b85e48",
+        "reason": "Reviewed one-time operator-only calendar setup and no-network redacted plan, no production CI import. Dedicated gateway and invalid-credential smoke preserved; real authenticated service_ready is mandatory. Operator signing-key setup remains unsaved pending user entry."
       }
     },
     {
@@ -1195,7 +1202,14 @@
         "apps/backend/database/permission-preparations.sql",
         "apps/backend/database/settings-catalog-v14.sql",
         "apps/backend/supabase/migrations/20261106222039_permission_preparations.sql",
-        "apps/backend/scripts/acceptance/s10-hosted-preparations.mjs"
+        "apps/backend/scripts/acceptance/s10-hosted-preparations.mjs",
+        "apps/backend/database/permission-preparation-capacity.sql",
+        "apps/backend/database/settings-sources-history-region.sql",
+        "apps/backend/database/settings-template-inheritance.sql",
+        "apps/backend/database/settings-catalog-v16.sql",
+        "apps/backend/supabase/migrations/20261107093853_permission_preparation_capacity.sql",
+        "apps/backend/supabase/migrations/20261107094244_settings_sources_history_region.sql",
+        "apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1210,8 +1224,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "0ce4258add668f1ce7ee94209ac7f984b244e8b6f4606c34019e7265b53c554d",
-        "reason": "Ayar tüketici rehberindeki aktif telefon OTP yönlendirmesi kullanıcı kararıyla kaldırıldı; doğrulanmamış telefon kaydı ve geriye uyumlu DTO korunur. Hosted hazırlık önerisi kabulleri aynı."
+        "fingerprint": "70186389046d8bcbe6c408ef924c5d333cae038d0a9f336982bc3f54610ca7e1",
+        "reason": "CI api5/api12: reproduced SQLSTATE42P10 under real writer variable_conflict use_variable; inheritance inserts now target the exact primary-key constraint. Effective values, live authority, version invalidation and replay behavior unchanged."
       }
     },
     {
@@ -1455,8 +1469,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "ca9bb53405e664fb43dfcb64a572652cd8808ab7461d83f5e3bcd3e1035d478e",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "ba818d729fdafc038bae0195e108fdd2e10462fe72bd1cc6a3b32cf697c7a952",
+        "reason": "Shared registry/imported preparation acceptance changed; existing CRM routing, consent, trial, worker and plan scope remain unchanged after source and guide review."
       }
     },
     {

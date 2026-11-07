@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 16,
   "fields": [
     {
       "scope": "user",
@@ -2482,6 +2482,27 @@
       "default": [],
       "group": "M05",
       "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "regional_defaults",
+      "schema": {
+        "$ref": "#/$defs/OrganizationRegionalDefaults"
+      },
+      "default": {
+        "application_language": "tr",
+        "public_language": "tr",
+        "document_language": "tr",
+        "notification_language": "tr",
+        "date_format": "dd.MM.yyyy",
+        "time_format": "24",
+        "number_format": "tr-TR",
+        "week_start": "monday",
+        "fallback_language": "tr",
+        "new_center_timezone": "Europe/Istanbul"
+      },
+      "group": "O06",
+      "consumer": "organization_regional_context"
     }
   ]
 }

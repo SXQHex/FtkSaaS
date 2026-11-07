@@ -25,6 +25,24 @@ test('calendar token material is bound to account, organization, command and ope
  assert.equal(calendarSubscriptionUrl('http://127.0.0.1:1234',first.token),'http://127.0.0.1:1234/calendar/'+first.token+'.ics');await assert.rejects(calendarToken(undefined,auth,org,'calendar_link_create_v1',key),/CALENDAR_NOT_CONFIGURED/);await assert.rejects(calendarToken(secret,auth,org,'settings_update_v1',key),/INVALID_CALENDAR_TOKEN_CONTEXT/);
 });
 const {calendarProxy}=await import('../transports/calendar-proxy.mjs');
+test('native calendar gateway uses its exact prefix, anonymous public JWT and ordinary GET/HEAD semantics',async()=>{
+ const token='ab'.repeat(32),ics=Buffer.from(encode([item]));let requests=0;
+ const origin='https://project.supabase.invalid/functions/v1/personal-calendar';
+ assert.equal(calendarOrigin(origin+'/'),origin);assert.equal(calendarSubscriptionUrl(origin,token),origin+'/calendar/'+token+'.ics');
+ for(const pathPrefix of ['/personal-calendar','/functions/v1/personal-calendar']){
+  const handle=calendarProxy({supabaseUrl:'https://project.supabase.invalid',anonKey:'public-only',pathPrefix,fetcher:async(url,options)=>{
+   requests++;assert.equal(options.headers.authorization,'Bearer public-only');assert.equal(options.headers.cookie,undefined);assert.equal(options.redirect,'error');
+   return Response.json({ok:true,data:{ics_base64:ics.toString('base64')}});
+  }});
+  for(const method of ['GET','HEAD']){
+   const response=await handle(new Request('https://project.supabase.invalid'+pathPrefix+'/calendar/'+token+'.ics',{method,headers:{authorization:'Bearer caller-secret',cookie:'private=value'}}));
+   assert.equal(response.status,200);assert.equal(response.headers.get('content-length'),String(ics.length));assert.match(response.headers.get('cache-control'),/no-store/);
+   assert.equal((await response.arrayBuffer()).byteLength,method==='GET'?ics.length:0);
+  }
+  for(const path of ['/calendar/'+token+'.ics',pathPrefix+'/calendar/'+token+'.ics?apikey=caller',pathPrefix+'extra/calendar/'+token+'.ics'])assert.equal((await handle(new Request('https://project.supabase.invalid'+path))).status,404);
+ }
+ assert.equal(requests,4);
+});
 test('calendar HTTP adapter supplies only the public JWT and closes invalid, revoked or oversized feeds',async()=>{
  const token='ab'.repeat(32),ics=Buffer.from(encode([item]));let calls=0;
  const handle=calendarProxy({supabaseUrl:'http://127.0.0.1:54321',anonKey:'synthetic-public-anon-jwt',fetcher:async(url,options)=>{calls++;assert.equal(url,'http://127.0.0.1:54321/functions/v1/backend-v1/calendar_feed_get_v1');assert.equal(options.headers.authorization,'Bearer synthetic-public-anon-jwt');const body=JSON.parse(options.body);assert.equal(body.token,token);assert.deepEqual(Object.keys(body).sort(),['client_api_version','request_id','token']);return Response.json({ok:true,data:{ics_base64:ics.toString('base64')}});}});
