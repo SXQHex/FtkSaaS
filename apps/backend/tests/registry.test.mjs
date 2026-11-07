@@ -157,3 +157,4 @@ import './people-self-scale-acceptance.mjs';
 import './agreement-preparation-acceptance.mjs';
 import './permission-preparation-acceptance.mjs';
 import './plan-target-discovery-acceptance.mjs';
+import './sale-change-inventory-acceptance.mjs';

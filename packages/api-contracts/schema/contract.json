@@ -25870,6 +25870,9 @@
           "enum": [
             "instructor_required"
           ]
+        },
+        "sale_change_record": {
+          "$ref": "#/$defs/SaleChangeInventoryRecord"
         }
       },
       "required": [
@@ -38574,8 +38577,7 @@
             }
           },
           "required": [
-            "sale_id",
-            "new_product_version_id"
+            "sale_id"
           ],
           "additionalProperties": false
         }
@@ -41039,6 +41041,9 @@
         },
         "as_of": {
           "$ref": "#/$defs/Instant"
+        },
+        "sale_change_context": {
+          "$ref": "#/$defs/EntityVersion"
         }
       },
       "required": [
@@ -52676,6 +52681,30 @@
         "target",
         "effective_at",
         "kept_center_required"
+      ],
+      "additionalProperties": false
+    },
+    "SaleChangeInventoryRecord": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "parent": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "person_id",
+        "center_id",
+        "parent",
+        "starts_at"
       ],
       "additionalProperties": false
     }
@@ -76514,7 +76543,8 @@
           "student_credit_offset_v1",
           "debt_adjust_v1",
           "sale_refund_preview_v1",
-          "permission_set_v1"
+          "permission_set_v1",
+          "sale_change_preview_v1"
         ]
       },
       {
@@ -96360,6 +96390,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleChangeInventoryRecord/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleChangeInventoryRecord/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -96811,7 +96853,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 122,
+      "migration_count": 123,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
