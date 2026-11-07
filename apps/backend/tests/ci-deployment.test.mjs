@@ -1,6 +1,7 @@
+import {missingCalendarConfiguration} from '../scripts/calendar-configuration-plan.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {project,unchangedEdge,unchangedResendWebhook,unchangedCalendarGateway,missingCalendarConfiguration,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
+import {project,unchangedEdge,unchangedResendWebhook,unchangedCalendarGateway,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment,trustedDeliveryRun,filterSupabaseDelivery,resolveDeployment,previousReceipt} from '../scripts/ci/deployment-source.mjs';
 import fs,{mkdtempSync,rmSync} from 'node:fs';
 import {backendUnchanged} from '../scripts/ci/source.mjs';
@@ -155,7 +156,7 @@ test('hosted webhook smoke rejects the JWT gateway failure and accepts only prov
 
 test('hosted smoke checks real request sequence and cleans its exact UUID even on a failed assertion',async()=>{
  const original=globalThis.fetch;
- const expected=['synthetic_user_created','public_invalid_login_rejected','trusted_invalid_password_rejected','real_auth_login','auth_edge_rpc_account','organizations_read','nonexistent_finance_resource_rejected','direct_rpc_rejected','invalid_jwt_rejected','logout','revoked_session_rejected'];
+ const expected=['synthetic_user_created','public_invalid_login_rejected','trusted_invalid_password_rejected','real_auth_login','auth_edge_rpc_account','organizations_read','calendar_configuration_ready','nonexistent_finance_resource_rejected','direct_rpc_rejected','invalid_jwt_rejected','logout','revoked_session_rejected'];
  try{for(const captchaEnabled of [false,true])for(const failure of [null,...expected]){
   let id,password,deleted=false,loggedOut=false,accountRemoved=false;const checks=[];
   globalThis.fetch=async(url,options)=>{
@@ -180,6 +181,7 @@ test('hosted smoke checks real request sequence and cleans its exact UUID even o
     return loggedOut?response('revoked_session_rejected',401,{ok:false,error:{code:'AUTH_REQUIRED'}}):response('auth_edge_rpc_account',200,{ok:true,data:{id:'synthetic-account'}});
    }
    if(url.endsWith('/organizations_list_v1'))return response('organizations_read',200,{ok:true});
+   if(url.endsWith('/calendar_links_get_v1'))return response('calendar_configuration_ready',200,{ok:true,data:{service_ready:true}});
    if(url.endsWith('/finance_get_v1'))return response('nonexistent_finance_resource_rejected',200,{ok:false,error:{code:'NOT_FOUND'}});
    throw Error('Unexpected hosted request');
   };
@@ -409,4 +411,23 @@ test('Supabase source skips CI-only accepted main and preserves pending changes 
   assert.equal(await previousReceipt(github,context),undefined);
   await resolveDeployment(github,context,core);assert.equal(output.deploy,'true');
  }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+
+test('deployment never lists or writes Edge secrets and rejects missing calendar configuration',async()=>{
+ const source=fs.readFileSync(new URL('../scripts/ci/deploy-development.mjs',import.meta.url),'utf8');
+ assert(!source.includes("api('/secrets'"));assert(!source.includes('missingCalendarConfiguration'));
+ const original=globalThis.fetch;let deleted=false,accountRemoved=false,authId;
+ globalThis.fetch=async(url,options)=>{
+  const response=(status,data)=>({status,text:async()=>JSON.stringify(data)});
+  if(url.endsWith('/auth/v1/admin/users')){authId=JSON.parse(options.body).id;return response(200,{id:authId});}
+  if(url.includes('/auth/v1/admin/users/')){deleted=true;return response(200,{});}
+  if(url.includes('/auth/v1/token?'))return JSON.parse(options.body).password.endsWith('-wrong')?response(400,{error_code:'invalid_credentials'}):response(200,{access_token:'synthetic-jwt',user:{id:authId}});
+  if(url.endsWith('/account_get_v1')||url.endsWith('/organizations_list_v1'))return response(200,{ok:true});
+  if(url.endsWith('/calendar_links_get_v1'))return response(200,{ok:true,data:{service_ready:false}});
+  throw Error('Unexpected request after missing calendar configuration');
+ };
+ const api=async()=>[{type:'publishable',api_key:'public'},{name:'service_role',api_key:'admin'}];
+ const sql=async query=>{if(query.startsWith('do $ftk_smoke_cleanup$')){accountRemoved=true;return [];}return [{accounts:0,users:0}];};
+ try{await assert.rejects(hostedSmoke(api,sql,(name,passed)=>{assert(passed,name);}),/calendar_configuration_ready/);assert(deleted&&accountRemoved);}finally{globalThis.fetch=original;}
 });

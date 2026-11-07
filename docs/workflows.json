@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6fb4b176f6dbb6869045fbd22d6e122f717a9ee42da61ce53c5f6515228dbec3",
-        "reason": "Reviewed bounded Management API diagnostics and four regression cases: exact read/write method/resource/status, safe provider-evidence labels, no raw response/token/payload retention, no retry/bypass; normal JSON/204 preserved. No workflow, permission, exception or quality policy changed."
+        "fingerprint": "d2286a336134e8af7afefce65e2b755d3eebb965088cc448f1ab7556d44a0494",
+        "reason": "Removed CI secret inventory/create calls; reviewed same-source deployment and existing Auth/cleanup gates. Hosted smoke now enforces actual calendar_links_get service_ready and negative case retains exact fixture cleanup. Missing-only plan assertions preserved in operator module, no quality exception or token scope expansion."
       }
     },
     {
@@ -1041,7 +1041,8 @@
         "apps/backend/config/crm-provider-host.service",
         "apps/backend/transports/calendar-gateway.mjs",
         "apps/backend/supabase/functions/personal-calendar/handler.ts",
-        "apps/backend/supabase/functions/personal-calendar/index.ts"
+        "apps/backend/supabase/functions/personal-calendar/index.ts",
+        "apps/backend/scripts/calendar-configuration-plan.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1055,8 +1056,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "1f54d1fd9cca7b5d0ed61bcf74fd6e252f49bbc2f70e2dd55c12d4f9523b1cac",
-        "reason": "Calendar deployment retains exact-source and bearer credential gates; secret inventory, creation and gateway smoke now have distinct stages. Old deployed calendar v1 evidence is separate from incomplete configuration and unknown provider 403 reason."
+        "fingerprint": "4f88453d0e89db2489f6bd2ac46dbd006ca77f926213914aeabcf29d26b85e48",
+        "reason": "Reviewed one-time operator-only calendar setup and no-network redacted plan, no production CI import. Dedicated gateway and invalid-credential smoke preserved; real authenticated service_ready is mandatory. Operator signing-key setup remains unsaved pending user entry."
       }
     },
     {

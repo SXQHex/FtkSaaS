@@ -49,14 +49,6 @@ export async function managementRequest(route,{method='GET',body}={},send=fetch)
 export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
 export function unchangedResendWebhook(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.resend_webhook_source_sha256===hash&&previous.resend_webhook_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
 export function unchangedCalendarGateway(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.calendar_gateway_source_sha256===hash&&previous.calendar_gateway_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
-export function missingCalendarConfiguration(secrets){
- if(!Array.isArray(secrets)||secrets.some(s=>typeof s?.name!=='string'))throw Error('Invalid calendar configuration inventory');
- const names=new Set(secrets.map(s=>s.name));
- const defaults={FTK_CALENDAR_ORIGIN:'https://'+project+'.supabase.co/functions/v1/personal-calendar',FTK_CALENDAR_SESSION_URL_TEMPLATE:'https://ftksaas-web.vercel.app/organizasyon/{org_id}/seans/{session_id}'};
- const missing=Object.entries(defaults).filter(([name])=>!names.has(name)).map(([name,value])=>({name,value}));
- if(!names.has('FTK_CALENDAR_SIGNING_KEY'))missing.push({name:'FTK_CALENDAR_SIGNING_KEY',value:randomBytes(32).toString('hex')});
- return missing;
-}
 export async function resendWebhookSmoke(record,send=fetch){
  const response=await send('https://'+project+'.supabase.co/functions/v1/resend-webhook',{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
  await response.arrayBuffer();
@@ -259,10 +251,6 @@ export async function deliver(){
   const calendarEdge=await api('/functions/personal-calendar');
   record('calendar_gateway_active_bearer_url_only',calendarEdge.status==='ACTIVE'&&calendarEdge.verify_jwt===false);
   receipt.calendar_gateway_version=calendarEdge.version;receipt.calendar_gateway_bundle_sha256=calendarEdge.ezbr_sha256??null;
-  stage='calendar secret inventory';
-  const missingCalendar=missingCalendarConfiguration(await api('/secrets'));
-  if(missingCalendar.length){stage='calendar secret creation';await api('/secrets',{method:'POST',body:missingCalendar});}
-  receipt.calendar_configuration_created=missingCalendar.map(s=>s.name);
   stage='calendar gateway smoke';
   const invalidCalendar=await fetch('https://'+project+'.supabase.co/functions/v1/personal-calendar/calendar/invalid.ics',{signal:AbortSignal.timeout(15000)});
   await invalidCalendar.arrayBuffer();record('calendar_gateway_invalid_credential_rejected',invalidCalendar.status===404);
@@ -311,6 +299,7 @@ export async function hostedSmoke(api,sql,record){
   record('real_auth_login',session.status===200&&!!token&&session.data.user?.id===authId);
   const account=await edge('account_get_v1');record('auth_edge_rpc_account',account.status===200&&account.data.ok===true);
   const orgs=await edge('organizations_list_v1',{page:{}});record('organizations_read',orgs.status===200&&orgs.data.ok===true);
+  const calendar=await edge('calendar_links_get_v1',{page:{}});record('calendar_configuration_ready',calendar.status===200&&calendar.data.ok===true&&calendar.data.data?.service_ready===true);
   const finance=await edge('finance_get_v1',{org_id:uuid(),center_id:uuid(),person_id:uuid(),currency:'TRY',page:{}});record('nonexistent_finance_resource_rejected',finance.status===200&&finance.data.ok===false&&finance.data.error?.code==='NOT_FOUND');
   const direct=await http('/rest/v1/rpc/finance_get_v1',{token,headers:{'Content-Profile':'api_v1'},body:{p_request:{},p_actor_auth_id:authId,p_session_id:uuid(),p_ids:[],p_aux:null}});record('direct_rpc_rejected',direct.status===403&&direct.data.code==='42501');
   const invalid=await http('/functions/v1/backend-v1/account_get_v1',{token:'invalid-jwt',body:{client_api_version:1,request_id:uuid()}});record('invalid_jwt_rejected',invalid.status===401);
