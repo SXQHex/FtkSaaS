@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "ece88899fedfff3e1072bcc41bfb04e4a833cc15236bcc610a4a3201db28d201",
-        "reason": "İki yeni response kişi/merkez UUID alanı mevcut UUID haritasına sınıflandı;123migration ve kapalı DTO/validator, yeni native kök ve schema eşliği incelendi"
+        "fingerprint": "3bd813e89c1f64b208924012683974b9fecd94e80e10dbd11e975afd8ab990e2",
+        "reason": "Migration124 ve kapalı selector invariantları, validator/schema üretimi ve mevcut action kabul modülünün tek source hash yenilemesi incelendi; test kökleri/shard/weights/politika değişmedi."
       }
     },
     {
@@ -350,7 +350,8 @@
         "apps/backend/supabase/migrations/20261031074421_native_auth_signup_check.sql",
         "apps/backend/supabase/templates/password_changed_notification.html",
         "apps/backend/transports/account-signup-gateway.mjs",
-        "docs/settings.md"
+        "docs/settings.md",
+        "apps/backend/scripts/acceptance/s07-s15-browser.mjs"
       ],
       "operations": [
         "account_get_v1",
@@ -362,8 +363,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "5a09b1441a87580981009bd4f5529f67aae479862603fbef279c5153edda5ebc",
-        "reason": "Reviewed config addition: only standalone Resend provider function added; existing local Auth/provider/session settings and hosted backend-v1 JWT unchanged."
+        "fingerprint": "783ec335d49ac5acf252cb9b776fae6e1867f237b5b5f0fa0c1ec63f983831ad",
+        "reason": "Kullanıcı telefon SMS doğrulamasını V1 kapsamından çıkardı. Yeni testOTP kurulum/test/modu kaldırıldı; native eposta, parola, Google ve mevcut TOTP korunur. DTO/legacy projeksiyon uyumluluğu korunur; frontend kaldırma XREQ-030."
       }
     },
     {
@@ -835,8 +836,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "4a8ebf7b4353c75a5e1068d1fe550d3a5e6aca3e405af5f566ebaaabb8a77912",
-        "reason": "Reviewed PR234 native fixture failure: flexible reservation writer requires reservation_window before capacity_check. Added explicit missing-policy rejection then normal policy publication; preserved physical CAPACITY_FULL assertion and all original behavior."
+        "fingerprint": "b9843c9fe270aaf872682c85d5f38b1a8a915c9c339900eee4870782ae439ba5",
+        "reason": "Paylaşılan action native köküne finans correction testleri eklendi; mevcut kapasite/oda/atanmış eğitmen/Business cross-center ve kayıp rol assertionları korunuyor, WF06 runtime davranışı değişmedi."
       }
     },
     {
@@ -949,7 +950,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/action-management-discovery.sql",
-        "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql"
+        "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql",
+        "apps/backend/database/collection-correction-discovery.sql",
+        "apps/backend/supabase/migrations/20261107022552_collection_correction_discovery.sql"
       ],
       "operations": [
         "finance_get_v1",
@@ -961,8 +964,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "e0d2176b32358e55acc8366b3d999a70869286e575d1acf351ad1b07b847d98c",
-        "reason": "Reviewed PR234 native fixture failure: flexible reservation writer requires reservation_window before capacity_check. Added explicit missing-policy rejection then normal policy publication; preserved physical CAPACITY_FULL assertion and all original behavior."
+        "fingerprint": "58a7b98e6c7b4eef8aa5f2bc428f704453fc6d9830a6d2a454972dfc0bcbde85",
+        "reason": "XREQ-030 gerçek kök collection reader/projeksiyon/dispatch migrationı ve native subtestler incelendi; aynı finance.refund preflight, yan etkisiz okuma, açık preview/apply, child/refund/foreign-tenant/legacy-person sınırları."
       }
     },
     {
@@ -1191,7 +1194,8 @@
         "apps/backend/supabase/migrations/20261106211933_agreement_preparations.sql",
         "apps/backend/database/permission-preparations.sql",
         "apps/backend/database/settings-catalog-v14.sql",
-        "apps/backend/supabase/migrations/20261106222039_permission_preparations.sql"
+        "apps/backend/supabase/migrations/20261106222039_permission_preparations.sql",
+        "apps/backend/scripts/acceptance/s10-hosted-preparations.mjs"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1206,8 +1210,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "259df4a49453c49adaf90261ea2195f1a6847546905605620a8884fec5f2def6",
-        "reason": "Starter izin şablonu reddi tek aktif merkezle sınanır; scope_required kota hatası ile F05 alan reddi karıştırılmaz; ayar ve replay kapıları değişmez"
+        "fingerprint": "0ce4258add668f1ce7ee94209ac7f984b244e8b6f4606c34019e7265b53c554d",
+        "reason": "Ayar tüketici rehberindeki aktif telefon OTP yönlendirmesi kullanıcı kararıyla kaldırıldı; doğrulanmamış telefon kaydı ve geriye uyumlu DTO korunur. Hosted hazırlık önerisi kabulleri aynı."
       }
     },
     {

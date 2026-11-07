@@ -229,3 +229,5 @@ assert next(Path('supabase/migrations').glob('*_people_registry_scaling.sql')).r
 assert next(Path('supabase/migrations').glob('*_upper_plan_subscriber_projections.sql')).read_bytes()==Path('database/upper-plan-subscriber-projections.sql').read_bytes(),'Upper-plan subscriber source drift'
 
 assert next(Path('supabase/migrations').glob('*_action_management_discovery.sql')).read_bytes()==Path('database/action-management-discovery.sql').read_bytes(),'Action management source drift'
+
+assert next(Path('supabase/migrations').glob('*_collection_correction_discovery.sql')).read_bytes()==Path('database/collection-correction-discovery.sql').read_bytes(),'Collection correction discovery source drift'
