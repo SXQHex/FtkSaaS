@@ -71,8 +71,13 @@ export function useSetupCommand(
       const result = await sendSetupCommand(record.command);
       if (!mounted.current) return;
       if (!clear(record)) return;
-      setMessage("saved");
-      onSaved(result?.primary_id);
+      if ("outcome" in result && result.outcome === "capacity_closed") {
+        setMessage("CAPACITY_FULL");
+        onRejected?.("CAPACITY_FULL");
+      } else {
+        setMessage("saved");
+        onSaved("primary_id" in result ? result.primary_id : undefined);
+      }
     } catch (cause) {
       if (!mounted.current) return;
       if (sent && !ownsRecord(record)) return;
@@ -126,6 +131,18 @@ export function useSetupCommand(
         return;
       }
       if (result.status === "succeeded") {
+        if (pending.command.operation === "event_register_v1") {
+          if (result.result_reference?.type === "event_payment_preparations") {
+            if (!clear(pending)) return;
+            setMessage("CAPACITY_FULL");
+            onRejected?.("CAPACITY_FULL");
+            return;
+          }
+          if (result.result_reference?.type !== "event_registrations") {
+            setMessage("uncertain");
+            return;
+          }
+        }
         if (!clear(pending)) return;
         setMessage("saved");
         onSaved(result.result_reference?.id);

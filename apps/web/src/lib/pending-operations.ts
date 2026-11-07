@@ -1,3 +1,4 @@
+import { eventWrites } from "./event-command";
 import {
   proAccessWrites,
   personnelPermissions,
@@ -17,6 +18,7 @@ export type PendingOperation = {
   scope: SetupScope;
   slot: string;
   kind:
+    | "event"
     | "access"
     | "crm"
     | "settings"
@@ -29,6 +31,7 @@ export type PendingOperation = {
     | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
+  event: eventWrites,
   access: proAccessWrites,
   crm: crmWrites,
   attendance: attendanceWrites,
@@ -61,10 +64,25 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
       ? "access"
       : null;
   }
+  if (/^event-(?:register|payment):[^:]+:[^:]+$/.test(slot)) {
+    const [, event, person] = slot.split(":");
+    return event && person && validate(event) && validate(person) ? "event" : null;
+  }
+  if (/^self-bookings:[^:]+:[^:]+$/.test(slot)) {
+    const [, session, person] = slot.split(":");
+    return session && person && validate(session) && validate(person) ? "reservation" : null;
+  }
   if (slot === "lesson-requests") return "request";
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "self-requests":
+      return "request";
+    case "event-registration":
+    case "event-duty":
+    case "event":
+    case "event-create":
+      return "event";
     case "subscription-downgrade":
     case "subscription-cancel":
       return "access";
@@ -92,6 +110,7 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
     case "instructor-payment":
     case "finance":
       return "finance";
+    case "sale-change":
     case "sale-lifecycle":
     case "sale-renew":
       return "sale";

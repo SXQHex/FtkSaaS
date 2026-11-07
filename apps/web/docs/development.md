@@ -89,6 +89,8 @@ pnpm --filter @ftksaas/web test:e2e:live
 
 Bu komut mevcut hesabın native girişi→Edge account/organization/center okumaları→çıkış akışını test eder. Yeni hesap/kuruluş oluşturmaz; reset/seed yapmaz. Trace, video ve ekran görüntüsü canlı testte kapalıdır. TOTP ve Google'ın gerçek sağlayıcı dönüşü yetkili hesapla ayrıca tarayıcıda doğrulanır. Bu kabul gerçekleşmeden mock/public testleri gerçek giriş kanıtı sayılmaz.
 
+Yerel Linux ortamında varsayılan browser CDN arşivi indirilemiyorsa kurulu `playwright-core/browsers.json` içindeki **aynı** browserVersion için resmî Chrome for Testing Google storage kaynağı denenebilir: `https://storage.googleapis.com/chrome-for-testing-public/{browserVersion}/linux64/chrome-headless-shell-linux64.zip`. ZIP doğrulanır ve geçici dizine açılır; yerel Playwright config’inde yalnız bu executablePath kullanılır. Tam Chrome’un profile Unix socket gereksinimi kısıtlı ortamda çalışmayabilir; aynı sürüm headless-shell ayrı desteklenen dağıtımdır. Kalıcı config/CI/browser pinini veya güvenlik kapısını bu yerel çözüm için değiştirme. Dört CI projesinin kabulü ve gerçek Auth/provider/browser ekran kabulü ayrı kalır; son koşu kanıtı todo sahibindedir.
+
 ## Paket ve CI ayrımı
 
 Frontend komutları yalnız @ftksaas/web, @ftksaas/ui ve gerekli ortak tip kontrollerini seçer. test:backend yalnız backend paketini seçer. Mevcut genel pnpm test tüm workspace testlerini manuel çalıştırabilir; frontend CI bunu kullanmaz. verify-isolation.mjs gerçek Turbo dry-run grafiğinde iki yönlü ayrımı kontrol eder, backend testini çalıştırmaz.

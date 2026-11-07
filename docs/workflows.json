@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "378a54f12a4f2d3b519c8eb29ec120ddceffaf2c524c83894d1d73a08218f4d3",
-        "reason": "Üretilmiş selector validator/Edge ve UUID haritası son kaynakta incelendi; yeni public RPC/izin yok"
+        "fingerprint": "6e7302f09f5da1e09b55f6564b41c1b7da11b2a96622fb3c7d5c831918145e60",
+        "reason": "Reviewed additional closed Owner selector tests and combined 130 migration inventory; no existing validation or authority relaxed."
       }
     },
     {
@@ -1152,8 +1152,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "7ad260c669ac38fe7aa55a6cd42ccfc2ea879c55272de55451fccf691a4262c3",
-        "reason": "Reviewed reminder email native regression: parse PostgreSQL bigint attempts without changing zero-attempt assertion, live preferences or quiet-hour authorization."
+        "fingerprint": "8cd978bf142ca1375f3f0f6bc68b69eab124748f264304e497567e212efd125c",
+        "reason": "New notification language native regression preserves inbox/document authority and opt-in behavior."
       }
     },
     {
@@ -1214,7 +1214,9 @@
         "apps/backend/supabase/migrations/20261107093853_permission_preparation_capacity.sql",
         "apps/backend/supabase/migrations/20261107094244_settings_sources_history_region.sql",
         "apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql",
-        "apps/backend/scripts/acceptance/s10-hosted-sources.mjs"
+        "apps/backend/scripts/acceptance/s10-hosted-sources.mjs",
+        "apps/backend/database/notification-language-rendering.sql",
+        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1229,8 +1231,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "03416a5a5c376156244b02e077bb6cda03ef410355809a4893be05d8dce0ebb7",
-        "reason": "Reviewed hosted source acceptance with forward and cleanup writes bound to captured/guarded versions. Reset preview version/before and inherited/local/default source are validated, concurrency regressions reject overwrite; real regional/eight permission/inheritance/history and restored readback passed."
+        "fingerprint": "bf69fc7b7105422e4e0943be5e4e7a9ac383f293622211308c0eee966ac2472a",
+        "reason": "Organization regional language consumed by closed email renderer; current settings source/version history unchanged."
       }
     },
     {
@@ -1303,8 +1305,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "84876b15fc13426d4bf602c2b7ca2afe9bbb2e7f63beb3b827c5179f30807a99",
-        "reason": "Dört dar aile, Owner CM kaybı, aktif öğrenci/Abone No ve değişen envanter-sürüm retleri; mevcut writer ile ayrı Starter seçimi"
+        "fingerprint": "a34d1c9d320d66d642b91db3bf9cb1f5ace74ab1150a5a90febf5ebc863ac6ab",
+        "reason": "Owner without CM uses centers_list then four version-bound resource families; native tests reject CM writes, empty filters and changed cursor scope before explicit downgrade."
       }
     },
     {
@@ -1683,7 +1685,9 @@
         "apps/backend/supabase/migrations/20261105150000_email_delivery_events.sql",
         "apps/backend/supabase/migrations/20261105150001_transactional_notification_email.sql",
         "apps/backend/supabase/migrations/20261106084130_p15_p16_reminders_automation.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/notification-language-rendering.sql",
+        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1698,8 +1702,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "9f3d12adc50c287a64de123bbba19688054fc51564247f6165d6cd328e63f2d9",
-        "reason": "Reviewed worker fixture identity cast after 42P08 reproduction; no domain, worker permission, lease, timing or delivery behavior changes."
+        "fingerprint": "180506dd66c27d9487485b04aef526ff5f36cb727c0f816c53128c81492be47f",
+        "reason": "Email claim uses current organization language once and retains the existing frozen retry payload fence."
       }
     }
   ]

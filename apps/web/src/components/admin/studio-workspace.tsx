@@ -27,6 +27,13 @@ import { browserClient } from "../../lib/supabase/client";
 const CrmWorkspace = dynamic(() => import("../crm/crm-workspace").then((m) => m.CrmWorkspace), {
   loading: WorkspaceLoading,
 });
+const EventsWorkspace = dynamic(
+  () => import("../events/events-workspace").then((m) => m.EventsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const SelfDashboard = dynamic(() => import("../self/self-dashboard").then((m) => m.SelfDashboard), {
+  loading: WorkspaceLoading,
+});
 const CalendarLinks = dynamic(
   () => import("../personal-calendar/calendar-links").then((m) => m.CalendarLinks),
   { loading: WorkspaceLoading },
@@ -418,14 +425,20 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       {snapshot && section === "students" && (
         <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
       )}
+      {snapshot && section === "events" && (
+        <EventsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+      )}
       {snapshot && section === "crm" && (
         <CrmWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
       )}
       {snapshot && section === "personal" && (
-        <CalendarLinks
-          actorId={snapshot.account.id}
-          organizations={snapshot.studios.map((s) => s.organization)}
-        />
+        <>
+          <SelfDashboard actorId={snapshot.account.id} studios={snapshot.studios} />
+          <CalendarLinks
+            actorId={snapshot.account.id}
+            organizations={snapshot.studios.map((s) => s.organization)}
+          />
+        </>
       )}
       {snapshot && section === "attendance" && (
         <AttendanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
@@ -458,6 +471,7 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
           "finance",
           "attendance",
           "crm",
+          "events",
           "personal",
         ].includes(section) && (
           <Card className="shadow-none">

@@ -2,12 +2,13 @@ import { validate } from "uuid";
 import type { Interval } from "@ftksaas/api-contracts";
 import { setupCall, type SetupScope } from "./studio-setup";
 export const attendanceTasksApi = {
-  list: async (scope: SetupScope, interval: Interval, cursor?: string) => {
+  list: async (scope: SetupScope, interval: Interval, cursor?: string, selfPersonId?: string) => {
     if (!scope.centerId) throw Error("invalidAttendance");
     const page = await setupCall("calendar_get_v1", {
       org_id: scope.orgId,
       center_id: scope.centerId,
       interval,
+      ...(selfPersonId ? { resource: { kind: "person" as const, id: selfPersonId } } : {}),
       page: { limit: 25, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
     });
     const ids = new Set<string>();
@@ -17,6 +18,8 @@ export const attendanceTasksApi = {
         end = Date.parse(row.ends_at);
       if (
         !validate(row.id) ||
+        (selfPersonId &&
+          !row.resources?.some((r) => r.kind === "person" && r.id === selfPersonId)) ||
         row.center_id !== scope.centerId ||
         ids.has(key) ||
         !Number.isFinite(start) ||

@@ -322,6 +322,12 @@ Mevcut ortak başvuru API'si üzerinden contact/kayit sunucu adaptörü hazırla
 
 **Backend durumu:** Adaptör kaynağı ve küçük hedefli eşleme/gateway testleri hazır; aday kanıtı [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p07-web-formu-adaptörü). Canlı handler/config/widget ve inbox kabulü doğrulanmış değildir. Site/frontend kendi kabul alanını ayrıca doldurur; backend karşı alan adına kapanış vermez.
 
+### Frontend kapsam değerlendirmesi — 7 Kasım 2026
+
+Kullanıcı gerçek Meta/Google form bağlantıları ve dış site adaptörlerinin tamamlanmasını bu sürüm için iptal etti. XREQ-018 contact/kayit site adaptörlerinin canlı handler/config/widget ve gerçek form kabulü bu sürümün frontend/Pro teslim koşulu olmaktan çıkarıldı. Mevcut backend kaynak teslimi veya tarihsel kanıt silinmez; iptal, yapılmış entegrasyon ya da başarılı kabul değildir. Gelecek sürüme otomatik taahhüt verilmez. Manuel aday, ortak CRM kutusu ve uygulamanın kendi public başvuru akışları kapsamda kalır.
+
+Frontend plan/kabul sahibi güncellendi. Backend/site sahipleri kendi yaşayan kapsam ve teslim koşullarını bu açık kullanıcı kararına göre uzlaştırmalıdır; frontend karşı alanın belgelerini veya ortak ürün sözleşmesini kendi adına değiştirmedi.
+
 <a id="xreq-019"></a>
 ## XREQ-019 Davet gönderiminden gerçek teslim durumunu ayırma
 
@@ -473,9 +479,9 @@ Kaynak incelemesinde Owner-only abonelik akışı ile tutulacak kaynak katalogla
 **İstenen sonuç:** Owner’ın yalnız downgrade için tutulacak merkezde geçerli kaynakları/öğrencileri normal ve dar okuma ile keşfedebileceği desteklenen yol gösterilsin veya sağlansın. Genel CM yazma yetkisi verilmesi istenmez. Backend kendi kaynak/yetki kapsamını değerlendirir; bu frontend değerlendirmesi backend onayı değildir.
 
 
-### Backend ek kaynak değerlendirmesi — 7 Kasım 2026
+### Backend ek kaynak değerlendirmesi — 8 Kasım 2026
 
-Ek talep yerindedir. Aday kaynak mevcut Owner-only `management_state_get_v1` abonelik selector'ında `resources:rooms|disciplines|instructors|students`, gerçek izinli Starter hedefi/merkez ve beklenen abonelik sürümüyle dar katalog verir. Her item `retained_resource` kimlik/ad/Abone No ve abonelik entity/sürümünü taşır; öğrenciler sayfalı ve Abone No tam eşleşmelidir. CM okuma/yazma yetkisi genişlemez; iletişim/finans alanı sunulmaz. Değişen kaynak/abonelik eski cursor'ı reddeder. Seçim tamamlanınca resources alanı olmadan exact selector, ayrı onay ve mevcut downgrade writer kullanılır. [Normal tüketim WF13](workflows.md#wf13), kaynak/native CI/main/development/hosted aşamalarının tek sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi). Karşı alan adına kabul verilmez.
+Ek talep yerindedir. Tutulacak merkez mevcut `centers_list_v1` Owner okumasından seçilir; CM olma şartı yoktur. Aday kaynak mevcut Owner-only `management_state_get_v1` abonelik selector'ında `resources:rooms|disciplines|instructors|students`, gerçek izinli Starter hedefi/merkez ve beklenen abonelik sürümüyle dar katalog verir. Her item `retained_resource` kimlik/ad/Abone No ve abonelik entity/sürümünü taşır; öğrenciler sayfalı ve Abone No tam eşleşmelidir. CM okuma/yazma yetkisi genişlemez; iletişim/finans alanı sunulmaz. Değişen kaynak/abonelik eski cursor'ı reddeder. Seçim tamamlanınca resources alanı olmadan exact selector, ayrı onay ve mevcut downgrade writer kullanılır. [Normal tüketim WF13](workflows.md#wf13), kaynak/native CI/main/development/hosted aşamalarının tek sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi). Karşı alan adına kabul verilmez.
 
 
 <a id="xreq-028"></a>
@@ -502,6 +508,10 @@ Operating settings ve bildirim tercihi fixture'ları katalog sürümünü `@ftks
 **İstenen sonuç:** Çalışan normal tüketim yolu gösterilsin veya seçilen org/merkez/satış için kaynak satışla doğrulanmış aktif gelecek rezervasyon ve etkinlik kayıtlarının keşfi teslim edilsin. Gerçek person/sale/session/record kimliği, durum ve gerekli sürüm; geleceğin değerlendirme zamanı ve tüm sayfaların tamamlanma sınırı açık olmalı. Yetkisiz kişi/merkez/satış reddi, cursor kapsamı, aynı kişinin farklı satışlarının ayrılığı ve değişen envanterde yeni preview gereği korunmalı. Kullanıcı her kaydı keep/cancel diye açıkça ayırabilsin; etkinlik engeli desteklenen ayrı iptal akışına bağlanabilsin. Yeni endpoint adı dayatılmıyor; varsa mevcut çalışan yolun devri yeterlidir. Doğrudan tablo/service erişimi, UUID elle girişi, reservation sayısından kaynak tahmini veya ilgisiz refund preview ile keşif istenmiyor.
 
 Frontend bu keşif olmadan tahminî paket değişimi düğmesi/apply zinciri açmaz. Desteklenen dondurma/bitirme, yenileme ve sonlandırma aynı R05 paketinde sürer; kaynak/kabul sahibi [Pro paket yaşam döngüsüdür](../apps/web/docs/todo.md#pro-paket-yasam-dongusu). Backend teslimi sonrası gerçek okuyucu→eksiksiz açık keep/cancel→yeni ürün/satış kapsamı→native preview→ayrı apply→hak/borç/rezervasyon yeniden okuma kabulü gerekir.
+
+### Frontend tüketimi — XREQ-029, 7 Kasım 2026
+
+R05–R11 adayında native kaynak satış bağlamı ve tüm cursor sayfaları tüketildi. Gerçek kişi/entity/parent/satış sürümü, tekrar ve drift denetlenir; kısmi envanter onaya dönmez. Gelecek etkinlik kaydı gerçek merkez/etkinlik/tarih hedefiyle R11 iptaline gider; yeniden okuma zorunludur. Dersler eksiksiz açık keep/cancel → gerçek hedef/tarih → yeni preview → ayrı onay → apply ve hak/finans readback sırasını kullanır. Native refund borç indirimi/öğrenci alacağı/mahsup gösterilir, nakit sonucu uydurulmaz. Kaynak ve otomatik test aday CI/main/canlı kabulünden ayrıdır; frontend ilgili gerçek kabulü açık tutar.
 
 ### Backend kaynak değerlendirmesi — XREQ-029, 7 Kasım 2026
 

@@ -565,3 +565,25 @@ test('XREQ-029 discovers sale change records without requiring a replacement pro
  for(const key of Object.keys(record)){const bad={...record};delete bad[key];assert(!valid('SaleChangeInventoryRecord',bad));}
  assert(!valid('SaleChangeInventoryRecord',{...record,extra:true}));
 });
+
+
+test('notification language migration preserves its reviewed source and private renderer boundary',()=>{
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_notification_language_rendering.sql'));
+ const sql=fs.readFileSync('database/notification-language-rendering.sql','utf8');
+ assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),sql);
+ assert(sql.includes('security invoker set search_path='));
+ assert(sql.includes('from public,anon,authenticated;'));
+});
+
+
+test('XREQ027 resource selectors require an explicit version and keep discovery fields outside the writer',async()=>{
+ const selector={operation:'subscription_downgrade_request_v1',key:{target_plan_id:id,kept_center_id:id,expected_version:1},resources:'students',subscriber_number:'12345'};
+ assert(valid('ManagementSelector_subscription_downgrade_request_v1',selector));
+ const missing=structuredClone(selector);delete missing.key.expected_version;assert(!valid('ManagementSelector_subscription_downgrade_request_v1',missing));
+ for(const change of [{...selector,resources:'rooms'},{...selector,resources:'arbitrary'},{...selector,resources:undefined}])assert(!valid('ManagementSelector_subscription_downgrade_request_v1',change));
+ const request={client_api_version:1,request_id:id,org_id:id,operation:'subscription_downgrade_request_v1',selector};
+ const generated=await import('../supabase/functions/backend-v1/validators.js');assert(generated.request_management_state_get_v1(request));
+ assert(!valid('Request_subscription_downgrade_request',{client_api_version:1,request_id:id,org_id:id,operation_key:id,...selector.key,resources:'students'}));
+ const resource={kind:'students',id,display_name:'Synthetic candidate',subscriber_number:'12345'};assert(valid('DowngradeRetainedResource',resource));
+ assert(!valid('DowngradeRetainedResource',{...resource,email:'unrequested@example.invalid'}));
+});

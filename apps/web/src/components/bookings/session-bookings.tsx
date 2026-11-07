@@ -13,7 +13,7 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { bookingApi, type BookingApi } from "../../lib/bookings";
-import type { SetupScope, SetupCommand } from "../../lib/studio-setup";
+import { setupCall, type SetupScope, type SetupCommand } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { PersonChooser } from "./person-chooser";
 import { ConfirmWrite, FlowError, flowError } from "./flow-controls";
@@ -23,12 +23,14 @@ export function SessionBookings({
   scope,
   session,
   onChanged,
+  fixedPerson,
   api = bookingApi,
 }: {
   scope: SetupScope;
   session: SessionView;
   onChanged?: (session: SessionView) => void;
   api?: BookingApi;
+  fixedPerson?: PersonSummary;
 }) {
   return (
     <BookingConnection
@@ -37,6 +39,7 @@ export function SessionBookings({
       session={session}
       api={api}
       onChanged={onChanged}
+      fixedPerson={fixedPerson}
     />
   );
 }
@@ -45,10 +48,12 @@ function BookingConnection({
   session,
   api,
   onChanged,
+  fixedPerson,
 }: {
   scope: SetupScope;
   session: SessionView;
   api: BookingApi;
+  fixedPerson?: PersonSummary;
   onChanged?: (session: SessionView) => void;
 }) {
   const [scope] = useState(initialScope);
@@ -56,7 +61,7 @@ function BookingConnection({
     [open, setOpen] = useState(false),
     heading = useRef<HTMLHeadingElement>(null),
     t = useTranslations("flows");
-  const [chosen, setChosen] = useState<PersonSummary | null>(null),
+  const [chosen, setChosen] = useState<PersonSummary | null>(fixedPerson ?? null),
     [fresh, setFresh] = useState(session),
     [readRevision, setReadRevision] = useState(0),
     [sessionError, setSessionError] = useState(""),
@@ -85,7 +90,7 @@ function BookingConnection({
   }, [api, scope, session.id, revision, sessionAttempt, onChanged]);
   const command = useSetupCommand(
     scope,
-    `bookings:${session.id}`,
+    fixedPerson ? `self-bookings:${session.id}:${fixedPerson.id}` : `bookings:${session.id}`,
     () => {
       setOpen(true);
       setRevision((n) => n + 1);
@@ -147,6 +152,7 @@ function BookingConnection({
             api={api}
             command={command}
             initialPerson={chosen}
+            fixedPerson={fixedPerson}
             onPerson={(person) => {
               setChosen(person);
               setWaitlistError("");
@@ -175,11 +181,13 @@ export function BookingPanel({
   api,
   command,
   initialPerson,
+  fixedPerson,
   onPerson,
 }: {
   scope: SetupScope;
   session: SessionView;
   api: BookingApi;
+  fixedPerson?: PersonSummary;
   command: ReturnType<typeof useSetupCommand>;
   initialPerson: PersonSummary | null;
   onPerson: (person: PersonSummary | null) => void;
@@ -196,10 +204,25 @@ export function BookingPanel({
   const disabled = command.busy || !!command.pending;
   useEffect(() => {
     let active = true;
-    void api
-      .reservations(scope, session.id, cursor)
+    void (
+      fixedPerson
+        ? setupCall("reservation_list_v1", {
+            org_id: scope.orgId,
+            center_id: scope.centerId,
+            person_id: fixedPerson.id,
+            session_id: session.id,
+            page: { limit: 25, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+          })
+        : api.reservations(scope, session.id, cursor)
+    )
       .then((result) => {
-        if (result.items.some((row) => row.session_id !== session.id)) throw Error("invalidForm");
+        if (
+          result.items.some(
+            (row) =>
+              row.session_id !== session.id || (fixedPerson && row.person_id !== fixedPerson.id),
+          )
+        )
+          throw Error("invalidForm");
         if (active) setPage(result);
       })
       .catch((cause) => {
@@ -208,7 +231,7 @@ export function BookingPanel({
     return () => {
       active = false;
     };
-  }, [scope, session.id, api, cursor, attempt]);
+  }, [scope, session.id, api, cursor, attempt, fixedPerson]);
   return (
     <div className="space-y-5">
       <p>
@@ -300,16 +323,18 @@ export function BookingPanel({
       </Button>
       {session.state === "planned" && (
         <>
-          <PersonChooser
-            scope={scope}
-            disabled={disabled}
-            read={api.people}
-            onSelect={(value) => {
-              setPerson(value);
-              onPerson(value);
-              setDraft(null);
-            }}
-          />
+          {!fixedPerson && (
+            <PersonChooser
+              scope={scope}
+              disabled={disabled}
+              read={api.people}
+              onSelect={(value) => {
+                setPerson(value);
+                onPerson(value);
+                setDraft(null);
+              }}
+            />
+          )}
 
           {person && (
             <BookingForm
@@ -348,6 +373,7 @@ function BookingForm({
   person: PersonSummary;
   session: SessionView;
   api: BookingApi;
+  fixedPerson?: PersonSummary;
   command: ReturnType<typeof useSetupCommand>;
 }) {
   const t = useTranslations("flows"),

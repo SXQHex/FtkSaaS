@@ -731,7 +731,7 @@
         {
           "line": 3,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
-          "sha256": "56443df8d603e8bef87729768cd4f3ca93f55a9b6a3ca12640dbf9ef2447be32"
+          "sha256": "7087d82524678c3638199cf18439212bb4a1eae03bc1f8d3756aabbee4ca9611"
         },
         {
           "line": 4,
@@ -1068,7 +1068,7 @@
         {
           "line": 159,
           "path": "apps/backend/tests/plan-target-discovery-acceptance.mjs",
-          "sha256": "49dd90ec415aad11d92f957f6fd491933d8dfc438a05a07c9d4671ddab182ed5"
+          "sha256": "7058a76b3e273ca4fa3bd8f81050b8500a8e6847210406645a61576f9557b73d"
         },
         {
           "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",

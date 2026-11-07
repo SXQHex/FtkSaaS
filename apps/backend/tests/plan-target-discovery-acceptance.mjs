@@ -37,6 +37,8 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  await api('role_assign_v1',{center_id:center,person_id:f.person,role:'instructor',scope:{center_id:center}});
  await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='center_manager' and state='active'",[org,f.person]);
  await denied('FORBIDDEN','management_state_get_v1',{center_id:center,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}}});
+ assert((await api('centers_list_v1')).items.some(x=>x.id===center));
+ await denied('FORBIDDEN','room_save_v1',{center_id:center,name:'Owner cannot create this room',capacity:10});
  const catalog=(resources,extra={})=>({operation:'subscription_downgrade_request_v1',selector:{operation:'subscription_downgrade_request_v1',key:{target_plan_id:starter,kept_center_id:center,expected_version:snapshot.subscription_version},resources,...extra}});
  const discoveryEffects=await effects();
  for(const [family,id] of [['rooms',room],['disciplines',discipline],['instructors',f.person]]){const page=await api('management_state_get_v1',catalog(family));assert.deepEqual(page.items.map(x=>x.retained_resource.id),[id]);assert.equal(page.items[0].versions[0].version,snapshot.subscription_version);assert.equal(page.items[0].current.values.resources,undefined);}
@@ -44,7 +46,10 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  const second=await api('management_state_get_v1',{...request,page:{limit:1,cursor:first.next_cursor}});assert.equal(second.items.length,1);assert.notEqual(first.items[0].retained_resource.id,second.items[0].retained_resource.id);
  const number=first.items[0].retained_resource.subscriber_number;assert(number);
  assert.deepEqual((await api('management_state_get_v1',catalog('students',{subscriber_number:number}))).items.map(x=>x.retained_resource.id),[first.items[0].retained_resource.id]);
+ assert.deepEqual((await api('management_state_get_v1',catalog('students',{subscriber_number:'999999999'}))).items,[]);
+ for(const item of first.items)assert.deepEqual(Object.keys(item.retained_resource).sort(),['display_name','id','kind','subscriber_number']);
  await denied('VALIDATION_FAILED','management_state_get_v1',{...catalog('rooms'),page:{limit:1,cursor:first.next_cursor}});
+ await denied('VALIDATION_FAILED','management_state_get_v1',{...catalog('students',{subscriber_number:number}),page:{limit:1,cursor:first.next_cursor}});
  await denied('FORBIDDEN','management_state_get_v1',request,manager);
  await denied('NOT_FOUND','management_state_get_v1',request,outsider);
  await denied('NOT_FOUND','management_state_get_v1',{...request,selector:{...request.selector,key:{...request.selector.key,kept_center_id:key()}}});

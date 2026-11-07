@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6894d333635b775551778e22fd2e7b6f0a6e5d5f129e9abc8ab15b42b79d8882`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6d3a9869f830a2291a7eecc4b8d7d35c942cdc6a9d65558f9d3d9fee90341ad9`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 129. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 130. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -137,3 +137,4 @@ Sıralı migration: 129. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261107094244_settings_sources_history_region.sql](../apps/backend/supabase/migrations/20261107094244_settings_sources_history_region.sql) | `a29c069e1894df824d920c0e567c0aba13176b023f27ae96b483214cfcfc7004` |
 | [20261107095157_settings_template_inheritance.sql](../apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql) | `5579bea5781fef7eab09c86c9a466ab41f7ccabc05b3a79905b25397df421bd6` |
 | [20261107225730_owner_downgrade_resource_discovery.sql](../apps/backend/supabase/migrations/20261107225730_owner_downgrade_resource_discovery.sql) | `e0dbfcedcb24217d5ccdd25d1d3d671bbf612c68843d4ed83d37337045a42a9a` |
+| [20261107231323_notification_language_rendering.sql](../apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql) | `bb9c33f28dabb30b6484ce93a26c8e616f8db53cf11a873cfece2c164234da2d` |
