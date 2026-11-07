@@ -29,6 +29,12 @@ Development CD, kaynak kabulünden sonra personal-calendar dedicated Edge gatewa
 
 `node scripts/calendar-configuration-plan.mjs` ağ çağrısı yapmadan public adresleri ve anahtar üretme talimatını gösterir; signing key/token/secret değeri yazdırmaz. Bu operatör aracıdır; CD import etmez. Secret değerleri kaynak/CI değişkeni/receipt/sohbet içine girmez. CI gerçek oturumla `calendar_links_get_v1.service_ready=true` kontrolünü zorunlu tutar; eksik veya geçersiz ayarda başarısız olur. Gateway source/version ve yanlış URL404 smoke ayrıca korunur. Bu kontroller gerçek feed/rota/rotate/revoke kabulü değildir; yaşam döngüsü kendi native kullanıcı URL'siyle sınanır. Ortak Vercel/domain/production kurulumu değiştirilmez.
 
+### Gerçek ayar kaynağı ve takvim tekrar kabulü
+
+Mevcut test hesabı ve org/center girdileriyle `node scripts/acceptance/s10-hosted-sources.mjs` çalışır. Temporary regional/template/theme değerleri normal sürümlü komutlarla denenir; sonunda önceki değer ve inherited/local/default kaynak geri yüklenir. Başka writer değişiminde zorla restore yoktur; güvenli temizlik hatası inceleme gerektirir.
+
+`node scripts/acceptance/s15-hosted-calendar.mjs` yalnız kendi oluşturduğu linkleri kullanır/iptal eder. FTK_PLAYWRIGHT_CHROMIUM ve gerekirse FTK_PLAYWRIGHT_MODULE/HTTPS_PROXY/CODEX_PROXY_CERT verilirse ICS içindeki gerçek seans URL'si yerel headless browser'da native giriş ve çıkışla doğrulanır. Route olmadan HTTP alt kabulü, `coverage.route=false` olarak kalır. Canlı access-loss denemesi dış yönetici fixture callback'i `exerciseAccessLoss(checkUnavailable)` ile ayrıca yapılır; callback kontrollü erişim kaybını kurar ve finally'de önceki erişimi yeni sürümle geri yükler. Olmayan hook `coverage.access_loss=false` verir. Bu fixture normal hesap-bağı kaldırma writer'ının kabulü değildir. Token/bearer URL, storageState veya sağlayıcı cevabı kaydedilmez. Timeout/response loss aynı key ile recover edilir; mevcut kullanıcı abonelikleri iptal edilmez.
+
 ## Native parola güvenliği (XREQ-002)
 
 Native Auth'ın mevcut parola kontrolü ve güvenlik e-postası [tek tüketici sözleşmesine](../../../docs/settings.md#parola-değişimi-ve-güvenlik-bildirimi) göre yapılandırılır. Kaynak [auth-password-security.mjs](../scripts/auth-password-security.mjs), ileti [native şablondur](../supabase/templates/password_changed_notification.html). Yalnız mevcut development projesi desteklenir. Kabul edilmiş kaynakta, backend dizininden:

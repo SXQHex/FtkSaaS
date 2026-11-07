@@ -250,7 +250,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **S10.2 — Grup envanteri ve katalog düzeltmesi:**69 grubun mevcut typed/native/domain tüketicisi ve açık sınırı karşılaştırıldı; [kaynak denetimi](00-FtkSaaS-yeni-sohbet-devir.md#69-grubun-tüketici-ve-açık-sınır-envanteri) envanter sahibidir.22 yanlış group eşlemesi katalogv12/migration119 ile düzeltildi; kayıtlı değer/default/yetki değişmedi. PR238 kaynak/native/main/development teslimi ve salt okunur hosted katalog eşliği doğrulandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s102-kaynakhosted-katalog-karşılaştırması). Bu SQL karşılaştırması gerçek beş-scope HTTP/ekran kabulü değildir.
 
-**S10.3 — Kalan gerçek ayar alt alanları:** O06 regional bağlamı, gerçek sekizinci izin, aynı-scope history reapply ve izinli dört şablonun canlı miras/kaynak/sürüm tüketicileri aktif kaynakta tamamlanır; native/main/deploy aşaması [devirde](00-FtkSaaS-yeni-sohbet-devir.md#hesap-ayar-ve-takvim-kabul-paketi) ayrıdır. Bütün69 grubun kalan alt alanları hâlâ backend işidir: program/etkinlik/finans/CRM/otomasyon default/şablonları, rol MFA/reauth tercihleri ve gerçek belge/bildirim dil-fallback tüketimi. Var olan domain komutu bu ayar desteği sayılmaz. Genel tercih kayıt anında; ileri yürürlük mevcut belge/politika domain akışında kalır. Teknik platform işletim ayarlarının kabul edilmiş ertelemesi korunur. Bu kaynak paketi S10'un tamamını kapatmaz.
+**S10.3 — Kalan gerçek ayar alt alanları:** O06 regional bağlamı, gerçek sekizinci izin, aynı-scope history reapply ve izinli dört şablonun canlı miras/kaynak/sürüm tüketicileri main/development kaynağında tamamlandı; gerçek HTTP kaynak kabulü ve kalan sınırlar [devirde](00-FtkSaaS-yeni-sohbet-devir.md#hesap-ayar-ve-takvim-kabul-paketi) ayrıdır. Bütün69 grubun kalan alt alanları hâlâ backend işidir: program/etkinlik/finans/CRM/otomasyon default/şablonları, rol MFA/reauth tercihleri ve gerçek belge/bildirim dil-fallback tüketimi. Var olan domain komutu bu ayar desteği sayılmaz. Genel tercih kayıt anında; ileri yürürlük mevcut belge/politika domain akışında kalır. Teknik platform işletim ayarlarının kabul edilmiş ertelemesi korunur. Bu kaynak paketi S10'un tamamını kapatmaz.
 
 **S10.3a — M12/O19 anlaşma hazırlığı:** Organization/center kapalı `agreement_templates`, gerçek kaynak/sürümle `settings_preparation_resolve_v1(kind:agreement)` ve mevcut writer'a açık yayın devri uygulanır. Starter F20 reddi, mevcut canlı merkez yayın yetkisi, gerçek disiplin/ürün ve immutable geçmiş korunur. [Kaynak/doğrulama](00-FtkSaaS-yeni-sohbet-devir.md#s10-anlaşma-hazırlık-kaynağı--7-kasım-2026). PR240 native aday/main/development kabulü doğrulandı; hosted anlaşma hazırlık akışı açık kalır. Bu alt dilim bütün S10.3'ü veya M12/O19'un her normatif alt alanını kapatmaz.
 
@@ -309,16 +309,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s15"></a>
 ### S15 — Gerçek takvim aboneliği
 
-- [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F08,F25
+- [x] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F08,F25
 - **Bağımlılık:** S02
 - **Kabul:** Gerçek GET/HEAD host üzerinden ICS ve yetkili seans route çalışır.
 - **Sınır/olumsuz durum:** Rotate/revoke ve erişim kaybında eski credential kapanır.
 - **Doğrulama senaryosu:** Abonelik URL→ICS→gerçek seans ekranı; sentetik template/login yönlendirmesi yeterli değil; ST-03 bağı.
 - **Kaynak alanı:** transports/calendar-proxy.mjs; calendar kaynak/test; config
 
-**Backend kaynak dilimi:** Mevcut gerçek HTTP GET kabulüne native HEAD boş gövde/content-length/no-store kontrolü eklendi; rotate/revoke ve canlı erişim kaybı mevcut testte korundu. Loopback proxy ve sentetik route template’i gerçek takvim host’u/seans ekranı kabulünü kapatmaz; S15 açık. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
-
-**7 Kasım hosted ayrımı:** Native GET/HEAD gateway ve yalnız eksik değerleri kuran development kaynağı [aktif pakettedir](00-FtkSaaS-yeni-sohbet-devir.md#hesap-ayar-ve-takvim-kabul-paketi). Gerçek yetkili seans ekranı bağımsız Playwright'ta yüklendi; hosted calendar reader service_ready=false verdi. ICS'den çıkan URL ile zincir henüz sınanmadığı için GET/HEAD/credential yaşam döngüsü ve S15 açık kalır. [Kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026).
+**Backend kapanışı:** Gerçek hosted anonim GET/HEAD→ICS→yerel Chromium'da native oturumla gerçek seans route'u; create/rotate/revoke replay, eski URL404, stale sürüm reddi ve canlı erişim kaybı404/restore200 geçti. Oluşturulan abonelikler iptal edildi; test link kalıntısı0. Yönetici fixture access-loss sınırı, exact main/deploy/hosted kanıtı ve tekrar aracının coverage ayrımı [tek durum kaydındadır](00-FtkSaaS-yeni-sohbet-devir.md#s15-gerçek-hosted-kapanışı--7-kasım-2026). Backend S15 kapalı; karşı alanın bütün ürün/ekran kabulü değildir.
 
 <a id="s16"></a>
 ### S16 — SaaS aylık-yıllık bekleyen talep
@@ -331,6 +329,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Kaynak alanı:** p07 subscription SQL; contract.json; subscription acceptance
 
 **Uygulanan kaynak:** Tek `subscription_period_change_request_v1` owner komutu, `subscription_get_v1.billing` dönem/fiyat/seçenek/talep okuması ve gerçek abonelik sürümlü dar management selector eklendi. Mevcut `saas_change_requests` ve fon tahsis yolu kullanılır; aynı plan içinde geçiş ödenmiş dönem sonunda yeterli doğrulanmış fonla uygulanır. Yetersiz fonda normal grace, erken ödeme, iptal/değiştirme ve yarış/replay korumaları sürer. Güncel API sırası [WF13](../../../docs/workflows.md#wf13), yerel gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. PR156 aday/main/development kabulü doğrulandı; S16 backend teslimi kapalıdır. Genel Starter ve S14/S15 gerçek hosted/tüketici kabulü bundan çıkarılmaz.
+
+**XREQ-027 ek backend keşif açığı:** CM olmayan Owner'ın plan daraltırken tutulacak merkezde oda/disiplin/eğitmen/aktif öğrenci seçimi için dar normal keşif kaynağı gereklidir. Mevcut CM writer kapıları korunur; önceki dönem değişimi teslimi geri açılmaz. Ek talep kendi normal okuyucu/kaynak/sürüm ve Owner-only negatif kabulüyle ayrıca tamamlanmalıdır; [ortak talep](../../../docs/requests.md#xreq-027) sahibindedir.
 
 ## Pro işlevleri
 
