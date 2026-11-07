@@ -2,6 +2,19 @@
 
 Bu belge kurulum, dağıtım, worker ve restore prosedürünün sahibidir. Kaynak/ortam kabulü [güncel kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md), açık işler [backlog’da](remaining-work.md), ürün davranışı [ortak iş akışlarında](../../../docs/workflows.md) tutulur. Geçmiş denemeler canlı talimat olarak burada yinelenmez.
 
+## Eklentisiz hosted kabul komutları
+
+Komutlar backend dizininden mevcut development projesi ve yetkili test hesaplarıyla çalışır. Sonuçlar ve açık kabul sınırları [güncel kayıttadır](00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026). Telefon/SMS doğrulaması V1 kapsamından çıkarılmıştır; hosted test OTP veya SMS sağlayıcı kurulumu yapılmaz.
+
+Özel ortamda FTK_ACCEPTANCE_EMAIL, FTK_ACCEPTANCE_PASSWORD, publishable FTK_ACCEPTANCE_APIKEY ve gerçek FTK_ACCEPTANCE_ORG, FTK_ACCEPTANCE_CENTER, FTK_ACCEPTANCE_DISCIPLINE, FTK_ACCEPTANCE_SESSION girdileri sağlanır. Pro hazırlık testi iki organization şablon alanına geçici öneri ekler ve önceki değerleri yeni sürümle geri yükler; immutable test geçmişi kalır. Concurrent yazara karşı zorla geri alma yapılmaz. Grant veya anlaşma yayını oluşturmaz.
+
+```sh
+node scripts/acceptance/s10-hosted-preparations.mjs
+node scripts/acceptance/s07-s15-browser.mjs
+```
+
+Playwright ayrı kurulumdan yüklenir; gerekirse FTK_PLAYWRIGHT_MODULE modül yolu ve FTK_PLAYWRIGHT_CHROMIUM kurulu headless Chromium executable'ı belirtilir. Kullanıcı Chrome profili veya eklentisi kullanılmaz. Ortam HTTPS_PROXY kullanıyorsa browser da kullanır; CODEX_PROXY_CERT varsa yalnız bu CA'nın SPKI fingerprint'i eklenir, genel ignoreHTTPSErrors açılmaz. Credential/provider payload/HTML/browser storage raporlanmaz; screenshot/trace/video alınmaz.
+
 ## Native parola güvenliği (XREQ-002)
 
 Native Auth'ın mevcut parola kontrolü ve güvenlik e-postası [tek tüketici sözleşmesine](../../../docs/settings.md#parola-değişimi-ve-güvenlik-bildirimi) göre yapılandırılır. Kaynak [auth-password-security.mjs](../scripts/auth-password-security.mjs), ileti [native şablondur](../supabase/templates/password_changed_notification.html). Yalnız mevcut development projesi desteklenir. Kabul edilmiş kaynakta, backend dizininden:
