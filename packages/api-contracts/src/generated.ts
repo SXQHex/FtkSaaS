@@ -3791,6 +3791,7 @@ AgreementPreparationTemplate?: AgreementPreparationTemplate
 PermissionPreparationTemplate?: PermissionPreparationTemplate
 PermissionPreparationGrants?: PermissionPreparationGrants
 SubscriptionDowngradeOption?: SubscriptionDowngradeOption
+SaleChangeInventoryRecord?: SaleChangeInventoryRecord
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16807,6 +16808,7 @@ request_detail?: LessonRequestView
 waitlist_detail?: WaitlistEntryView
 session_detail?: SessionView
 management_attention?: "instructor_required"
+sale_change_record?: SaleChangeInventoryRecord
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19230,6 +19232,22 @@ subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SaleChangeInventoryRecord".
+ */
+export interface SaleChangeInventoryRecord {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+parent: EntityRef
+starts_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionPreview".
  */
 export interface ReservationProtectionPreview {
@@ -20438,7 +20456,7 @@ sale_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-new_product_version_id: string
+new_product_version_id?: string
 }
 }
 /**
@@ -21524,6 +21542,7 @@ export interface ManagementStatePage {
 items: ManagementStateView[]
 next_cursor: (OpaqueToken | null)
 as_of: Instant
+sale_change_context?: EntityVersion
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

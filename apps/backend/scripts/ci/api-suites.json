@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "9b621d2cd6c4ad2e873fc91e747052c17340228b84fd54af7e7b85b9c35c0247",
+      "sha256": "db4f1cf2abbf6563a35d46c91d88e2b8e78cc3f3cd9b8e2f1c8b37119224dea9",
       "shared": [
         [
           8,
@@ -1069,6 +1069,11 @@
           "line": 159,
           "path": "apps/backend/tests/plan-target-discovery-acceptance.mjs",
           "sha256": "5d99f97d5038586d6ba1d7a4684f1afb569fef680e70de51e8feea19a4e9c7b5"
+        },
+        {
+          "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",
+          "sha256": "0016d13081cb630639c56e450d95d318191b88b9684e1e65344473fc1bb4b5cf",
+          "line": 160
         }
       ],
       "estimated_seconds": 1356.24

@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b0854d66bcc934af7f384d905494bb2d84c5777391fcd88b069b40194a180b42",
-        "reason": "Yalnız izin native kökünün hash kaydı yenilendi; bütün assertionlar ve test kökü sahipliği korunur"
+        "fingerprint": "ece88899fedfff3e1072bcc41bfb04e4a833cc15236bcc610a4a3201db28d201",
+        "reason": "İki yeni response kişi/merkez UUID alanı mevcut UUID haritasına sınıflandı;123migration ve kapalı DTO/validator, yeni native kök ve schema eşliği incelendi"
       }
     },
     {
@@ -464,8 +464,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "9dc5fde685dc3fa2cd153c291b5934e1c93b7b9b5b05f52a4463738c6cbd78f0",
-        "reason": "İkinci merkez negatif senaryosu korunarak Starter ve CM-kaybı sınamalarından sonra Business kapsamında kurulur; Owner merkez kurma ve CM atama yetkisi değişmez"
+        "fingerprint": "bdd04427f0b45a426732a5a46d9f991db7dfb5da64ccfa4bb1e0214c92b3445d",
+        "reason": "Management reader runtime_selectors kaydına yalnız sale_change eklendi; satış envanterinin domain/kaynak/test sahibi WF05, diğer selector ve rol davranışı değişmez"
       }
     },
     {
@@ -651,8 +651,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "585431f9d1c39b952341c92a9f6b91e601c8820fb4253d06ce3021983388e03c",
-        "reason": "Registry adds only two isolated roots for permission preparation/state and actual downgrade source discovery; previous person/registry assertions and ranges preserved."
+        "fingerprint": "74cbd0cd3bf7709793b088dc8f2843e9129ee59c9fe40442a03120abacc6a2de",
+        "reason": "Registry harness yalnız yeni bağımsız source-sale kabul kökünü import eder; kişi/rol/merge davranışları ve mevcut assertionlar değişmedi"
       }
     },
     {
@@ -669,7 +669,8 @@
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/sale-preview-impact-acceptance.mjs"
+        "apps/backend/tests/sale-preview-impact-acceptance.mjs",
+        "apps/backend/tests/sale-change-inventory-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -720,7 +721,9 @@
         "apps/backend/database/event-capacity-practice.sql",
         "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
         "apps/backend/database/sale-preview-impact.sql",
-        "apps/backend/supabase/migrations/20261105153000_sale_preview_impact.sql"
+        "apps/backend/supabase/migrations/20261105153000_sale_preview_impact.sql",
+        "apps/backend/database/sale-change-inventory.sql",
+        "apps/backend/supabase/migrations/20261107003633_sale_change_inventory.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -748,8 +751,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "21d491aa83fb6f58e95ca8d6a4cde32832fa20f8718a6a906d5b2621833de565",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "d11f5bb9323cd44ebcbb55b027f5f8d8ac50f7d92fc92557a43f524d99a27243",
+        "reason": "Kaynak satış aktif gelecek ders/event allocation kümesi writer ile eşlendi; original preflight ve bütün merkez yetkisi korunur, stable cursor yalnız source state/version'a bağlıdır; yeni native geçiş kökü incelendi"
       }
     },
     {
