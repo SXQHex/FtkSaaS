@@ -19,7 +19,15 @@ Playwright ayrı kurulumdan yüklenir; gerekirse FTK_PLAYWRIGHT_MODULE modül yo
 
 `node scripts/acceptance/s08-native-mfa.mjs` yalnız FTK_ACCEPTANCE_EMAIL/PASSWORD/APIKEY özel ortam girdilerini kullanır. Önceden verified MFA faktörü olan hesapta değişiklik yapmadan durur. Primary+bağımsız backup enroll/verify, weak-session reddi, primary kaldırma ve backup AAL2/backend erişimini gerçek native HTTP ile sınar; oluşturduğu faktörleri finally'de kaldırır. TOTP secret/code/JWT/kişisel payload rapora yazılmaz. Mevcut Google veya recovery/24saat nonce kabulünü ikame etmez.
 
-Development CD, kaynak kabulünden sonra personal-calendar dedicated Edge gateway'ini kurar. Sadece bu bearer URL transport'unda verify_jwt=false; backend-v1 hosted verify_jwt=true kalır. FTK_CALENDAR_ORIGIN varsayılan teknik hedefi `https://gwyprhenabtpkbojephw.supabase.co/functions/v1/personal-calendar`, FTK_CALENDAR_SESSION_URL_TEMPLATE mevcut `/organizasyon/{org_id}/seans/{session_id}` web route'udur. FTK_CALENDAR_SIGNING_KEY yalnız eksikse kriptografik32byte üretilir; var olan değer/anahtar/değiştirilmiş host korunur. Secret değerleri delivery receipt'e yazılmaz; gateway exact-source/version kanıtı ayrıdır. Yanlış URL404 smoke gerçek feed/rota/rotate/revoke kabulü değildir; bu yaşam döngüsü deploy sonrasında kendi native kullanıcı URL'siyle sınanır. Ortak Vercel/domain/production kurulumu bu adımda değiştirilmez.
+Development CD, kaynak kabulünden sonra personal-calendar dedicated Edge gateway'ini kurar. Sadece bu bearer URL transport'unda verify_jwt=false; backend-v1 hosted verify_jwt=true kalır. CI Edge Function Secrets API'sini listelemez veya yazmaz; CI token'ına bu amaçla Read/Read-write verilmez. Ayarlar operatörün Supabase projesi → Edge Functions → Secrets ekranında bir kez kurulur. Mevcut değerler/anahtarlar körlemesine değiştirilmez; imza anahtarı rotasyonu mevcut abonelikler için ayrı planlanır.
+
+| Ad | Tek seferlik değer |
+|---|---|
+| FTK_CALENDAR_ORIGIN | `https://gwyprhenabtpkbojephw.supabase.co/functions/v1/personal-calendar` |
+| FTK_CALENDAR_SESSION_URL_TEMPLATE | `https://ftksaas-web.vercel.app/organizasyon/{org_id}/seans/{session_id}` |
+| FTK_CALENDAR_SIGNING_KEY | Kriptografik32byte;64 küçük harf hex. Yerelde `openssl rand -hex 32` ile üretip yalnız Supabase'e gir. |
+
+`node scripts/calendar-configuration-plan.mjs` ağ çağrısı yapmadan public adresleri ve anahtar üretme talimatını gösterir; signing key/token/secret değeri yazdırmaz. Bu operatör aracıdır; CD import etmez. Secret değerleri kaynak/CI değişkeni/receipt/sohbet içine girmez. CI gerçek oturumla `calendar_links_get_v1.service_ready=true` kontrolünü zorunlu tutar; eksik veya geçersiz ayarda başarısız olur. Gateway source/version ve yanlış URL404 smoke ayrıca korunur. Bu kontroller gerçek feed/rota/rotate/revoke kabulü değildir; yaşam döngüsü kendi native kullanıcı URL'siyle sınanır. Ortak Vercel/domain/production kurulumu değiştirilmez.
 
 ## Native parola güvenliği (XREQ-002)
 
