@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "a0a3db58cbbcc7022833cf2a3dff33aab80756e43c182335326fd0eb210823d3",
-        "reason": "Schema-sharing regression fixture yeni root ortak alanlarını korur; beş gerçek katalog scope kontrol girdisi eklendi. Mevcut assertionlar ve kapsam aynı/artan."
+        "fingerprint": "b0854d66bcc934af7f384d905494bb2d84c5777391fcd88b069b40194a180b42",
+        "reason": "Yalnız izin native kökünün hash kaydı yenilendi; bütün assertionlar ve test kökü sahipliği korunur"
       }
     },
     {
@@ -380,7 +380,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-instructor-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/permission-preparation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -435,7 +436,9 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/database/permission-and-plan-discovery.sql",
+        "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -461,8 +464,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "140bb38f60dc4077783f5e828a3c2da818e7cd5ed507d66fbf64a7088e2f70f5",
-        "reason": "Registry yalnız yeni bağımsız anlaşma hazırlık kökünü import eder; mevcut kuruluş/rol/plan davranışı ve eski assertionlar korunur."
+        "fingerprint": "9dc5fde685dc3fa2cd153c291b5934e1c93b7b9b5b05f52a4463738c6cbd78f0",
+        "reason": "İkinci merkez negatif senaryosu korunarak Starter ve CM-kaybı sınamalarından sonra Business kapsamında kurulur; Owner merkez kurma ve CM atama yetkisi değişmez"
       }
     },
     {
@@ -648,8 +651,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "782c387832c001f8e3b49da6e453e42de1acf370fc6dd2995e8a40da6cd1a1c7",
-        "reason": "Kişi/öğrencilik ve davet kaynakları değişmedi; ortak registry harnessine yalnız yeni bağımsız anlaşma hazırlık importu eklendi, WF04 işlem/rehber sınırı korunur."
+        "fingerprint": "585431f9d1c39b952341c92a9f6b91e601c8820fb4253d06ce3021983388e03c",
+        "reason": "Registry adds only two isolated roots for permission preparation/state and actual downgrade source discovery; previous person/registry assertions and ranges preserved."
       }
     },
     {
@@ -1150,7 +1153,8 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/starter-preparation-acceptance.mjs",
         "apps/backend/tests/starter-preparation-fixture.mjs",
-        "apps/backend/tests/agreement-preparation-acceptance.mjs"
+        "apps/backend/tests/agreement-preparation-acceptance.mjs",
+        "apps/backend/tests/permission-preparation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1181,7 +1185,10 @@
         "apps/backend/supabase/migrations/20261106201122_settings_behavior_groups.sql",
         "apps/backend/database/agreement-preparations.sql",
         "apps/backend/database/settings-catalog-v13.sql",
-        "apps/backend/supabase/migrations/20261106211933_agreement_preparations.sql"
+        "apps/backend/supabase/migrations/20261106211933_agreement_preparations.sql",
+        "apps/backend/database/permission-preparations.sql",
+        "apps/backend/database/settings-catalog-v14.sql",
+        "apps/backend/supabase/migrations/20261106222039_permission_preparations.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1196,8 +1203,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "d0dd0610cad0e20a7b6142d77abea39b7e0524bc922af62e26917392d82e7458",
-        "reason": "Katalog root ortak alan eşliği ve beş scope pozitif/negatif kontrolü; P15 fixture branchte olmayan ortak alanı boş anyOf yapmaz, constraint korunur."
+        "fingerprint": "259df4a49453c49adaf90261ea2195f1a6847546905605620a8884fec5f2def6",
+        "reason": "Starter izin şablonu reddi tek aktif merkezle sınanır; scope_required kota hatası ile F05 alan reddi karıştırılmaz; ayar ve replay kapıları değişmez"
       }
     },
     {
@@ -1212,7 +1219,8 @@
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
         "apps/backend/tests/subscription-period-acceptance.mjs",
-        "apps/backend/tests/commercial-plan-acceptance.mjs"
+        "apps/backend/tests/commercial-plan-acceptance.mjs",
+        "apps/backend/tests/plan-target-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1253,7 +1261,9 @@
         "apps/backend/database/subscription-period-change.sql",
         "apps/backend/supabase/migrations/20261103101412_subscription_period_change.sql",
         "apps/backend/database/commercial-plan-limits.sql",
-        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql"
+        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
+        "apps/backend/database/permission-and-plan-discovery.sql",
+        "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1265,8 +1275,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "0a6e3edea827a9117847f0341bfc1a9c13fcf89230a623ff61409a5f8bcafc7d",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF13 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "0195749a999bbb3393815cb5198dc579fe213a5abf111a7c4647e448ad3a2a01",
+        "reason": "Owner-only ret ve non-owner boş katalog korunur; expiry core ve billing scope başlangıcı birlikte hizalanır, API dönem sırası sınanır"
       }
     },
     {
