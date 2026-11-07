@@ -330,7 +330,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulanan kaynak:** Tek `subscription_period_change_request_v1` owner komutu, `subscription_get_v1.billing` dönem/fiyat/seçenek/talep okuması ve gerçek abonelik sürümlü dar management selector eklendi. Mevcut `saas_change_requests` ve fon tahsis yolu kullanılır; aynı plan içinde geçiş ödenmiş dönem sonunda yeterli doğrulanmış fonla uygulanır. Yetersiz fonda normal grace, erken ödeme, iptal/değiştirme ve yarış/replay korumaları sürer. Güncel API sırası [WF13](../../../docs/workflows.md#wf13), yerel gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. PR156 aday/main/development kabulü doğrulandı; S16 backend teslimi kapalıdır. Genel Starter ve S14/S15 gerçek hosted/tüketici kabulü bundan çıkarılmaz.
 
-**XREQ-027 ek backend keşif açığı:** CM olmayan Owner'ın plan daraltırken tutulacak merkezde oda/disiplin/eğitmen/aktif öğrenci seçimi için dar normal keşif kaynağı gereklidir. Mevcut CM writer kapıları korunur; önceki dönem değişimi teslimi geri açılmaz. Ek talep kendi normal okuyucu/kaynak/sürüm ve Owner-only negatif kabulüyle ayrıca tamamlanmalıdır; [ortak talep](../../../docs/requests.md#xreq-027) sahibindedir.
+**XREQ-027 ek backend keşif açığı:** CM olmayan Owner için mevcut abonelik selector'ında dört kaynak ailesi, aktif öğrenci sayfalama/Abone No ve aynı subscription sürümü ile dar keşif aday kaynakta tamamlandı. Genel CM writer kapıları korunur. Native aday CI, main/deploy ve gerçek hosted kabul açık kalır; [kaynak/doğrulama](00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi) tek durum sahibidir. Önceki dönem değişimi teslimi geri açılmaz; [ortak talep](../../../docs/requests.md#xreq-027).
 
 ## Pro işlevleri
 

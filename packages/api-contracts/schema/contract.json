@@ -25889,6 +25889,9 @@
         },
         "sale_change_record": {
           "$ref": "#/$defs/SaleChangeInventoryRecord"
+        },
+        "retained_resource": {
+          "$ref": "#/$defs/DowngradeRetainedResource"
         }
       },
       "required": [
@@ -39389,13 +39392,62 @@
             "target_plan_id"
           ],
           "additionalProperties": false
+        },
+        "resources": {
+          "type": "string",
+          "enum": [
+            "rooms",
+            "disciplines",
+            "instructors",
+            "students"
+          ]
+        },
+        "subscriber_number": {
+          "$ref": "#/$defs/SubscriberNumber"
         }
       },
       "required": [
         "operation",
         "key"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "resources requests an Owner-only Starter downgrade catalog at key.kept_center_id for a live billing.downgrade_options target. subscriber_number is an exact active student filter, not a permission or writer value. Omit resources for the existing exact command context.",
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "subscriber_number"
+            ]
+          },
+          "then": {
+            "required": [
+              "resources"
+            ],
+            "properties": {
+              "resources": {
+                "const": "students"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "resources"
+            ]
+          },
+          "then": {
+            "properties": {
+              "key": {
+                "required": [
+                  "kept_center_id",
+                  "expected_version"
+                ]
+              }
+            }
+          }
+        }
+      ]
     },
     "ManagementSelector_subscription_change_cancel_v1": {
       "type": "object",
@@ -53189,6 +53241,43 @@
         "number_format",
         "week_start",
         "fallback_language"
+      ],
+      "additionalProperties": false
+    },
+    "DowngradeRetainedResource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "rooms",
+            "disciplines",
+            "instructors",
+            "students"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "display_name",
+        "subscriber_number"
       ],
       "additionalProperties": false
     }
@@ -96904,6 +96993,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DowngradeRetainedResource/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -97355,7 +97450,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 128,
+      "migration_count": 129,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

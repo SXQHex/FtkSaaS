@@ -473,6 +473,11 @@ Kaynak incelemesinde Owner-only abonelik akışı ile tutulacak kaynak katalogla
 **İstenen sonuç:** Owner’ın yalnız downgrade için tutulacak merkezde geçerli kaynakları/öğrencileri normal ve dar okuma ile keşfedebileceği desteklenen yol gösterilsin veya sağlansın. Genel CM yazma yetkisi verilmesi istenmez. Backend kendi kaynak/yetki kapsamını değerlendirir; bu frontend değerlendirmesi backend onayı değildir.
 
 
+### Backend ek kaynak değerlendirmesi — 7 Kasım 2026
+
+Ek talep yerindedir. Aday kaynak mevcut Owner-only `management_state_get_v1` abonelik selector'ında `resources:rooms|disciplines|instructors|students`, gerçek izinli Starter hedefi/merkez ve beklenen abonelik sürümüyle dar katalog verir. Her item `retained_resource` kimlik/ad/Abone No ve abonelik entity/sürümünü taşır; öğrenciler sayfalı ve Abone No tam eşleşmelidir. CM okuma/yazma yetkisi genişlemez; iletişim/finans alanı sunulmaz. Değişen kaynak/abonelik eski cursor'ı reddeder. Seçim tamamlanınca resources alanı olmadan exact selector, ayrı onay ve mevcut downgrade writer kullanılır. [Normal tüketim WF13](workflows.md#wf13), kaynak/native CI/main/development/hosted aşamalarının tek sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi). Karşı alan adına kabul verilmez.
+
+
 <a id="xreq-028"></a>
 ## XREQ-028 Katalogv14 frontend test fixture uyumu
 

@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4dfd216e539aaf658f3e2c444280a0699cf78f7a44937be0430a13983f689c88",
-        "reason": "Reviewed exact removal of eight XREQ031 exceptions now obsolete after PR251 is in main; no checker/threshold or other exception change. Seven runner cleanup regressions use existing contract root; version/source guards and exact operation-key recovery retained."
+        "fingerprint": "378a54f12a4f2d3b519c8eb29ec120ddceffaf2c524c83894d1d73a08218f4d3",
+        "reason": "Üretilmiş selector validator/Edge ve UUID haritası son kaynakta incelendi; yeni public RPC/izin yok"
       }
     },
     {
@@ -1289,7 +1289,9 @@
         "apps/backend/database/commercial-plan-limits.sql",
         "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
         "apps/backend/database/permission-and-plan-discovery.sql",
-        "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql"
+        "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql",
+        "apps/backend/database/owner-downgrade-resource-discovery.sql",
+        "apps/backend/supabase/migrations/20261107225730_owner_downgrade_resource_discovery.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1301,8 +1303,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "0195749a999bbb3393815cb5198dc579fe213a5abf111a7c4647e448ad3a2a01",
-        "reason": "Owner-only ret ve non-owner boş katalog korunur; expiry core ve billing scope başlangıcı birlikte hizalanır, API dönem sırası sınanır"
+        "fingerprint": "84876b15fc13426d4bf602c2b7ca2afe9bbb2e7f63beb3b827c5179f30807a99",
+        "reason": "Dört dar aile, Owner CM kaybı, aktif öğrenci/Abone No ve değişen envanter-sürüm retleri; mevcut writer ile ayrı Starter seçimi"
       }
     },
     {
