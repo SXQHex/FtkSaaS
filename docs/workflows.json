@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6e7302f09f5da1e09b55f6564b41c1b7da11b2a96622fb3c7d5c831918145e60",
-        "reason": "Reviewed additional closed Owner selector tests and combined 130 migration inventory; no existing validation or authority relaxed."
+        "fingerprint": "5e60de9a1b247175e3e9cecff6a4a460564523ce06adc79659cb27b25ff54b94",
+        "reason": "Only plan-target native fixture source hash changed after required page fix; original unit/shard inventory and all checks remain unchanged."
       }
     },
     {
@@ -1305,8 +1305,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "a34d1c9d320d66d642b91db3bf9cb1f5ace74ab1150a5a90febf5ebc863ac6ab",
-        "reason": "Owner without CM uses centers_list then four version-bound resource families; native tests reject CM writes, empty filters and changed cursor scope before explicit downgrade."
+        "fingerprint": "4929872bf1835af25da5210b805e735c1baa6a54107afd0879827ee8fffcbde0",
+        "reason": "CI api-10 rejected centers_list fixture without required page; explicit valid pagination preserves Owner discovery and every original assertion."
       }
     },
     {

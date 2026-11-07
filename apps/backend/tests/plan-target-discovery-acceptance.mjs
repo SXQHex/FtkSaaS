@@ -37,7 +37,7 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  await api('role_assign_v1',{center_id:center,person_id:f.person,role:'instructor',scope:{center_id:center}});
  await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='center_manager' and state='active'",[org,f.person]);
  await denied('FORBIDDEN','management_state_get_v1',{center_id:center,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}}});
- assert((await api('centers_list_v1')).items.some(x=>x.id===center));
+ assert((await api('centers_list_v1',{page:{limit:200,sort:'created_at_asc'}})).items.some(x=>x.id===center));
  await denied('FORBIDDEN','room_save_v1',{center_id:center,name:'Owner cannot create this room',capacity:10});
  const catalog=(resources,extra={})=>({operation:'subscription_downgrade_request_v1',selector:{operation:'subscription_downgrade_request_v1',key:{target_plan_id:starter,kept_center_id:center,expected_version:snapshot.subscription_version},resources,...extra}});
  const discoveryEffects=await effects();
