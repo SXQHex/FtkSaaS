@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d2286a336134e8af7afefce65e2b755d3eebb965088cc448f1ab7556d44a0494",
-        "reason": "Removed CI secret inventory/create calls; reviewed same-source deployment and existing Auth/cleanup gates. Hosted smoke now enforces actual calendar_links_get service_ready and negative case retains exact fixture cleanup. Missing-only plan assertions preserved in operator module, no quality exception or token scope expansion."
+        "fingerprint": "4dfd216e539aaf658f3e2c444280a0699cf78f7a44937be0430a13983f689c88",
+        "reason": "Reviewed exact removal of eight XREQ031 exceptions now obsolete after PR251 is in main; no checker/threshold or other exception change. Seven runner cleanup regressions use existing contract root; version/source guards and exact operation-key recovery retained."
       }
     },
     {
@@ -1000,7 +1000,8 @@
         "apps/backend/tests/crm-meta-queue-authority-acceptance.mjs",
         "apps/backend/tests/crm-provider-host-unit.mjs",
         "apps/backend/tests/crm-provider-host-db-unit.mjs",
-        "apps/backend/tests/crm-provider-host-acceptance.mjs"
+        "apps/backend/tests/crm-provider-host-acceptance.mjs",
+        "apps/backend/tests/hosted-calendar-runner-unit.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1042,7 +1043,9 @@
         "apps/backend/transports/calendar-gateway.mjs",
         "apps/backend/supabase/functions/personal-calendar/handler.ts",
         "apps/backend/supabase/functions/personal-calendar/index.ts",
-        "apps/backend/scripts/calendar-configuration-plan.mjs"
+        "apps/backend/scripts/calendar-configuration-plan.mjs",
+        "apps/backend/scripts/acceptance/s15-hosted-calendar.mjs",
+        "apps/backend/scripts/acceptance/s15-calendar-browser-route.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1056,8 +1059,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "4f88453d0e89db2489f6bd2ac46dbd006ca77f926213914aeabcf29d26b85e48",
-        "reason": "Reviewed one-time operator-only calendar setup and no-network redacted plan, no production CI import. Dedicated gateway and invalid-credential smoke preserved; real authenticated service_ready is mandatory. Operator signing-key setup remains unsaved pending user entry."
+        "fingerprint": "4dac8ff2d303a32b63c98f046c3da3a0c84f5f4be67d5165be0e618818d7f9d3",
+        "reason": "Reviewed real hosted calendar GET/HEAD and local pinned-CA headless Chromium login-to-ICS-session-route/logout, rotation/revoke/replay/stale checks, optional admin fixture access-loss hook and explicit coverage. Owned-link pending writes recovered and unrelated subscriptions preserved."
       }
     },
     {
@@ -1167,7 +1170,8 @@
         "apps/backend/tests/starter-preparation-acceptance.mjs",
         "apps/backend/tests/starter-preparation-fixture.mjs",
         "apps/backend/tests/agreement-preparation-acceptance.mjs",
-        "apps/backend/tests/permission-preparation-acceptance.mjs"
+        "apps/backend/tests/permission-preparation-acceptance.mjs",
+        "apps/backend/tests/hosted-settings-restore-unit.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1209,7 +1213,8 @@
         "apps/backend/database/settings-catalog-v16.sql",
         "apps/backend/supabase/migrations/20261107093853_permission_preparation_capacity.sql",
         "apps/backend/supabase/migrations/20261107094244_settings_sources_history_region.sql",
-        "apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql"
+        "apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql",
+        "apps/backend/scripts/acceptance/s10-hosted-sources.mjs"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1224,8 +1229,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "70186389046d8bcbe6c408ef924c5d333cae038d0a9f336982bc3f54610ca7e1",
-        "reason": "CI api5/api12: reproduced SQLSTATE42P10 under real writer variable_conflict use_variable; inheritance inserts now target the exact primary-key constraint. Effective values, live authority, version invalidation and replay behavior unchanged."
+        "fingerprint": "03416a5a5c376156244b02e077bb6cda03ef410355809a4893be05d8dce0ebb7",
+        "reason": "Reviewed hosted source acceptance with forward and cleanup writes bound to captured/guarded versions. Reset preview version/before and inherited/local/default source are validated, concurrency regressions reject overwrite; real regional/eight permission/inheritance/history and restored readback passed."
       }
     },
     {
