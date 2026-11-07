@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `699608c17a3132c61a27cb81c107d7d52c379cbeb4a806eea4bacafc425f9e20`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c35203f2c2c3bfa7747b909a168ad8d86eacb1cb7da4d9ccc93304eeea49809f`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 123. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 124. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -131,3 +131,4 @@ Sıralı migration: 123. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261106222039_permission_preparations.sql](../apps/backend/supabase/migrations/20261106222039_permission_preparations.sql) | `a6b3d8bd7ebd5deb9dc76cc5a792e25a205116a22087e5127717f712cb021905` |
 | [20261106223659_permission_and_plan_discovery.sql](../apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql) | `b6e1b7c9ce82bfe0e4da9f6674eb1af3482d2b3599cb4ded75ec6470889fe5c3` |
 | [20261107003633_sale_change_inventory.sql](../apps/backend/supabase/migrations/20261107003633_sale_change_inventory.sql) | `0985f3a2ddc067265966ad61dd2144578f5605a50a8f10393e642faf4cf1f8c2` |
+| [20261107022552_collection_correction_discovery.sql](../apps/backend/supabase/migrations/20261107022552_collection_correction_discovery.sql) | `9ab1cb68986728724b8c1a9e43468fd847430aa3a9fa8f67f65fdf5faae37432` |

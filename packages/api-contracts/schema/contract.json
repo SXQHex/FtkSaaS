@@ -33943,7 +33943,8 @@
         "operation",
         "values"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "values contains only cash_movement_id; immutable ledger state is null. Re-read and create an explicit new correction preview."
     },
     "ManagementProjection_collection_correct_apply_v1": {
       "type": "object",
@@ -38715,7 +38716,8 @@
         "operation",
         "key"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Read-only live finance.refund discovery for a root collection; returns cash_movements identity/version, no correction."
     },
     "ManagementSelector_collection_correct_apply_v1": {
       "type": "object",
@@ -96853,7 +96855,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 123,
+      "migration_count": 124,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

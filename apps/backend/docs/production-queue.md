@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** S10.3a/b anlaşma/izin hazırlıkları ile XREQ-026/027 normal okuyucuları PR240/PR242 kaynak/native/main/development kabulüyle teslim edildi; [güncel kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s103b-izin-hazırlık-kaynağı). Frontend R05 bağımlılığı XREQ-029 kaynak satış envanteri aynı mevcut management yolu üzerinden öncelikle tamamlanır; [kaynak ve açık kabul](00-FtkSaaS-yeni-sohbet-devir.md#xreq-029-kaynak-satış-envanteri). Ardından S10 kalan ayar alt alanları → S07/S08/S14/S15 gerçek ortam/tüketici sınırları sırası korunur. S05/S06/S09/S11/S12/S13 kapalı backend teslimleri yeniden kurulmaz; gerçek ekran/sağlayıcı kabulü kaynak testinden çıkarılmaz. Genel ileri yayın veya toplu izin apply motoru eklenmez.
+**Aktif paket:** Kullanıcı S07–S15 kapanışını, eklentisiz yerel Playwright ile istedi; sonrasında telefon/SMS doğrulamasını kapsamdan çıkardı. [Son doğrulanmış kabul ve ortam engelleri](00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026) devirdedir. S10 kalan ayar alt alanları ve S07/S08/S14/S15 gerçek ortam/tüketici sınırları kendi backlog ölçütleriyle kapanır. XREQ-029 önceki kaynak teslimidir; hazır okuyucu yeniden kurulmaz. S05/S06/S09/S11/S12/S13 kapalı backend teslimleri yeniden kurulmaz; gerçek ekran/sağlayıcı kabulü kaynak testinden çıkarılmaz. Genel ileri yayın veya toplu izin apply motoru eklenmez.
 
 ## Uygulama sırası
 
