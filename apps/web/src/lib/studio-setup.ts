@@ -1,3 +1,4 @@
+import { crmWrites, crmFields, validCrmCommand } from "./crm-command";
 import { paymentWrites, paymentFields, validPaymentCommand } from "./instructor-payment-command";
 import { waitlistWrites, waitlistFields, validWaitlistCommand } from "./waitlist-command";
 import { validValuationCommand } from "./negative-valuation";
@@ -37,6 +38,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  ...crmWrites,
   ...paymentWrites,
   ...waitlistWrites,
   "negcredit_valuation_set_v1",
@@ -80,6 +82,8 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "leads_list_v1"
+  | "crm_followup_list_v1"
   | "earnings_list_v1"
   | "report_get_v1"
   | "freeze_preview_v1"
@@ -151,6 +155,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...crmFields,
   ...paymentFields,
   ...waitlistFields,
   negcredit_valuation_set_v1: [
@@ -268,9 +273,16 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       !setupWrites.includes(command?.operation) ||
       !input ||
       input.org_id !== scope.orgId ||
-      (input.center_id !== undefined && input.center_id !== scope.centerId) ||
+      (input.center_id !== undefined && (input.center_id ?? undefined) !== scope.centerId) ||
       !keyPattern.test(input.operation_key) ||
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
+    )
+      return "invalid";
+    if (
+      (slot.startsWith("crm-") ||
+        slot.startsWith("publication:") ||
+        crmWrites.some((op) => op === command.operation)) &&
+      !validCrmCommand(command.operation, input, scope.centerId, slot)
     )
       return "invalid";
     if (

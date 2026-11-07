@@ -263,3 +263,15 @@ Ana kabukta merkez keşfi her organizasyonda bağımsızdır. Merkez hatası org
 WF12 org/center işletim editörü `settings_catalog_get_v1` ile `settings_get_v1` okumalarını paralel yapar. Yalnız desteklenen typed alanı, katalogdaki writable ve gerçek version ile tek alan patch'i olarak gönderir. Gösterilmeyen alan patch'e girmez. Org formu center_id taşımaz; center formu kendi merkezini korur. Selected reset gerçek alan/scope/version/before/after/token/expiry ile ayrı onaylanır. Edit/refresh/alan değişimi ve süre aşımı eski incelemeyi kaldırır. Varsayılan, local override ve program süresinin creation-copy kaynağı karıştırılmaz; reset mevcut programları değiştirmez. Ayar geçmişi native cursor ile istekte okunur. `operating-settings` günlüğü eski member notification-preference patch'ini genişletmeden ayrı doğrulanır; org sentinel'i genel kurtarmada yalnız tam org ayar slotunu kabul eder.
 
 WF01/WF04 kişi adresi native login/MFA dönüşünden sonra account_get ile gerçek core aktörünü çözer ve mevcut StudentDetail normal API akışlarını kullanır. URL org/center/person taşır; tarayıcıdaki ilk merkezden hedef türetilmez. Kabuk ve doğrudan kişi sayfası görünürlük/focus dönüşünde eski görünümü kaldırıp güncel erişimi yeniden okur; eşzamanlı okuma kilidi ve AbortController geç cevapları düşürür. Genel hash kabuğu göçü yapılmadı. Kaynak/bağımlılık/kabulün sahibi [R01/R02 planı](todo.md#7-bölüm-bölüm-teslim-tek-aktif-bölüm).
+
+### Public takvim ve dar başvuru transport’u
+
+WF09 frontend sunucu yolları `/api/public/calendar` ve `/api/public/application`; paylaşım adresi `/p/[org-id]`, açık merkez profili için `?center=[center-id]`. Public işletme profili yalnız backend’in izin verdiği projeksiyondan gelir. Ziyaretçinin native kullanıcı oturumu gerekmez.
+
+- `FTK_PUBLIC_ANON_KEY`: sunucuda kalan Supabase legacy anon JWT; `role=anon` gerekir. Publishable key bu anonymous bearer yerine varsayılmaz; service-role key reddedilir.
+- `FTK_PUBLIC_BACKEND_ORIGIN`: isteğe bağlı HTTPS backend origin; yoksa mevcut `NEXT_PUBLIC_SUPABASE_URL` kullanılır.
+- `FTK_PUBLIC_APPLICATION_HOSTNAME`: başvurunun güvenilen tam hostname’i. Vercel origin kontrolü ve platformun üzerine yazdığı tek `x-vercel-forwarded-for` IP’si zorunludur; yerel/başka host gerçek submit’i servis hazır değil sonucuyla kapatır.
+- `FTK_PUBLIC_INGRESS_SECRET`: Edge’dekiyle aynı WF09 sunucu HMAC anahtarı, en az32 UTF-8 byte. İstemci bundle’ına verilmez. `FTK_PUBLIC_HASH_SECRET` Edge’de kalır.
+- `FTK_PUBLIC_TURNSTILE_SITE_KEY`: yalnız public widget site key; `public_application` action ve gerçek hostname sağlayıcı/Edge hazırlığıyla eşleşmelidir. Bu public anahtar secret değildir; eksikse form açılmaz.
+
+Transport API’ye caller bearer/header taşımadan kendi request UUID’sini üretir; contact/publication/business retry key korunur, bot proof her denemede yenilenir ve saklanmaz. React Turnstile adaptörü `@marsidev/react-turnstile`1.6.3 (MIT; <https://github.com/marsidev/react-turnstile>) kullanılır. Widget/mock testi gerçek Turnstile/ingress kabulü değildir. Native Auth signup transport’u mevcut ayrı hattını korur.

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
@@ -25,6 +26,11 @@ import { sessionPath } from "../../lib/session-route";
 import { AttendanceAccess } from "../attendance/attendance-access";
 import { SessionBookings } from "../bookings/session-bookings";
 import { SessionSummary, SessionFacts } from "./session-summary";
+
+const SharedParticipants = dynamic(() =>
+  import("./shared-participants").then((m) => m.SharedParticipants),
+);
+const Publication = dynamic(() => import("../crm/publication").then((m) => m.Publication));
 
 export function SessionDetail({
   entry,
@@ -147,6 +153,17 @@ function LiveSessionDetail({
       returnTo.current = null;
     }
   }, [editing, attempt, result]);
+  useEffect(() => {
+    function refreshShared() {
+      if (!editing && document.visibilityState === "visible") setAttempt((n) => n + 1);
+    }
+    window.addEventListener("focus", refreshShared);
+    document.addEventListener("visibilitychange", refreshShared);
+    return () => {
+      window.removeEventListener("focus", refreshShared);
+      document.removeEventListener("visibilitychange", refreshShared);
+    };
+  }, [editing]);
   function refresh() {
     returnTo.current = editing;
     setEditing(null);
@@ -268,6 +285,13 @@ function LiveSessionDetail({
   return (
     <>
       <SessionSummary session={result.session} timeZone={timeZone} />
+      {result.session.shared_participants && (
+        <SharedParticipants
+          orgId={scope.orgId}
+          sessionId={result.session.id}
+          participants={result.session.shared_participants}
+        />
+      )}
       {commandScope && (
         <SessionBookings scope={commandScope} session={result.session} onChanged={bookingChanged} />
       )}
@@ -278,6 +302,9 @@ function LiveSessionDetail({
           timeZone={timeZone}
           onChanged={bookingChanged}
         />
+      )}
+      {commandScope && result.session.state === "planned" && (
+        <Publication scope={commandScope} sessionId={result.session.id} onSaved={() => saved()} />
       )}
       {replacementId && (
         <Button asChild variant="outline">

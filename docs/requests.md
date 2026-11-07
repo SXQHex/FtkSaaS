@@ -524,3 +524,14 @@ Kullanıcı telefon/SMS doğrulamasını V1 kapsamından çıkardı. `apps/web/s
 Native e-posta değişikliği, parola, Google, mevcut TOTP enrollment/challenge/unenroll ve AAL2 güvenlik akışı korunur. Mevcut identity DTO alanları geriye uyumluluk için silinmez; eski doğrulanmış değerler veya hesap bağları topluca değiştirilmez. TOTP zorunluluğu/rol/plan politikası bu temizleme talebiyle değişmez. Kabul: hesap ekranında yeni SMS doğrulama/yeniden gönderim denetimi kalmaması; telefon profil kaydının çalışması; e-posta/parola/TOTP akışlarının korunması; native telefon doğrulama isteği oluşmaması. İlgili testler yeni kullanıcı kararına göre frontend sahibi tarafından uyarlanır.
 
 Backend bu tur eklenen hosted testOTP kurulumunu ve Playwright telefon modunu kaldırdı; hosted SMS ayarı uygulanmamıştı. Backend kaynak/kabul sınırı [devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026), güncel tüketici kuralı [telefon bölümündedir](settings.md#native-telefon-doğrulama-tüketicisi). Bu talep frontend teslimi veya talep kapanışı değildir.
+
+<a id="xreq-032"></a>
+## XREQ-032 Oturumdaki hesabın organizasyondaki kendi kişi kaydını keşfetme
+
+### Frontend talebi — 7 Kasım 2026
+
+R09 öğrenci/eğitmen günlük panelinde gerçek self `person_id` gerekir. Güncel `AccountView` ve `OrganizationView` bu bağı vermiyor; `RoleView` hesap veya `is_self` alanı taşımıyor. `person_get_v1` zaten kişi UUID’si istiyor. `linked_person_ids` hesabın organizasyon kişi bağlantısı değil, hedef kişinin birleştirme üyeleridir (`20261022153421_p07_account_profile_auth_merge.sql`). Filtresiz `reservation_list_v1` eğitmen/yöneticiye başka katılımcılar da döndürebilir ve henüz rezervasyonu olmayan kişide boş olabilir; self kaynağı olarak kullanılamaz (`20261017043309_schedule_reads.sql`). Bağımsız kaynak incelemesi aynı eksikliği doğruladı. Backend kodu değiştirilmedi, bu bulgu hosted çağrı kabulü değildir.
+
+**İstenen sonuç:** Mevcut çalışan normal tüketim yolu devredilsin veya native hesabın açık seçilmiş organizasyondaki canonical kişi bağlantısı normal kullanıcı okuyucusuyla teslim edilsin. Gerçek `person_id`, varsa nullable Abone No ve ilgili erişilebilir merkez/öğrenci/eğitmen kapsamı ayırt edilebilsin; bağlantı yokluğu boş/güvenli durum olsun. Hesap/Auth UUID’si, isim/e-posta benzerliği, Abone No veya rezervasyon satırlarından kişi türetilmesin. Abone No görüntüleme/arama kimliğidir; yetki ve komut UUID’si değildir. Yanlış organizasyon/başka hesap, birleştirme sonrası canonical kişi, bağlantı kaldırma ve rol/üyelik kaybı korunmalı. Yeni endpoint adı dayatılmıyor; varsa mevcut desteklenen yolun kesin devri yeterlidir.
+
+Bu kaynak gelmeden öğrenci/eğitmen kişisel ana ekranı tamamlandı sayılmaz. Kendi hesap takvim bağlantıları, izinli seans katılımcı paylaşımı, public takvim ve CRM bağımsız kaynak dilimleri ilerler. Frontend kapsam/kabul sahibi [R09](../apps/web/docs/todo.md#web-s09).

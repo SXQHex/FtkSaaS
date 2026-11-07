@@ -4,6 +4,10 @@ import { apiClient, ApiFailure } from "./api";
 import { browserClient } from "./supabase/client";
 
 export type AccountOperation =
+  | "calendar_links_get_v1"
+  | "calendar_link_create_v1"
+  | "calendar_link_rotate_v1"
+  | "calendar_link_revoke_v1"
   | "account_get_v1"
   | "management_state_get_v1"
   | "account_profile_update_v1"

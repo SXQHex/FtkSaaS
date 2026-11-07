@@ -23,6 +23,7 @@
   "dependencies": {
     "@ftksaas/api-contracts": "workspace:*",
     "@ftksaas/ui": "workspace:*",
+    "@marsidev/react-turnstile": "1.6.3",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.119.0",
     "@syncfusion/ej2-base": "35.1.37",
