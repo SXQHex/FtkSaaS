@@ -518,3 +518,16 @@ test('action discovery declares six supported typed management selectors without
   assert(valid('ManagementProjection_'+name,{operation:name,values:{}}));
  }
 });
+
+test('XREQ-029 discovers sale change records without requiring a replacement product',()=>{
+ assert.equal(fs.readFileSync('database/sale-change-inventory.sql','utf8'),fs.readFileSync('supabase/migrations/'+fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_sale_change_inventory.sql')),'utf8'));
+ assert(valid('ManagementSelector_sale_change_preview_v1',{operation:'sale_change_preview_v1',key:{sale_id:newUuidV7()}}));
+ const context={entity:{type:'sales',id:newUuidV7()},version:1};
+ assert(valid('ManagementStatePage',{items:[],next_cursor:null,as_of:new Date().toISOString(),sale_change_context:context}));
+ assert(!valid('ManagementStatePage',{items:[],next_cursor:null,as_of:new Date().toISOString(),sale_change_context:{...context,version:'1'}}));
+ assert(!valid('ManagementStatePage',{items:[],next_cursor:null,as_of:new Date().toISOString(),sale_change_context:{...context,extra:true}}));
+ const record={person_id:newUuidV7(),center_id:newUuidV7(),parent:{type:'sessions',id:newUuidV7()},starts_at:new Date().toISOString()};
+ assert(valid('SaleChangeInventoryRecord',record));
+ for(const key of Object.keys(record)){const bad={...record};delete bad[key];assert(!valid('SaleChangeInventoryRecord',bad));}
+ assert(!valid('SaleChangeInventoryRecord',{...record,extra:true}));
+});
