@@ -534,6 +534,8 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
             "crm",
             "events",
             "personal",
+            "reports",
+            "automation",
           ].includes(section) && (
             <Card className="shadow-none">
               <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">

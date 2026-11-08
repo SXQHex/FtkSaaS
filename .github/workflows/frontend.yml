@@ -4,15 +4,27 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened, edited]
   workflow_dispatch:
+    inputs:
+      live_acceptance:
+        description: Run batch hosted acceptance after serial implementation is complete
+        type: boolean
+        default: false
+      deployment_host:
+        description: Production deployment hostname (without https)
+        type: string
+        default: ftksaas-web.vercel.app
+      deployed_sha:
+        description: Full production application commit SHA
+        type: string
 permissions: {}
 concurrency:
-  group: frontend-${{ github.event.pull_request.number || github.ref }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
-  cancel-in-progress: true
+  group: frontend-${{ github.event_name == 'workflow_dispatch' && inputs.live_acceptance && 'live-batch' || github.event.pull_request.number || github.ref }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' || !inputs.live_acceptance }}
 jobs:
   scope:
     permissions:
       contents: read
-    if: github.event.action != 'edited' || github.event.changes.base != null
+    if: (github.event_name != 'workflow_dispatch' || !inputs.live_acceptance) && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -64,6 +76,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Frontend checks, coverage and build
         run: pnpm exec turbo run lint typecheck build test:coverage --filter=@ftksaas/web --filter=@ftksaas/ui
+      - name: Verify live acceptance source rejection cases
+        run: node --test apps/web/scripts/live-source.test.mjs apps/web/scripts/live-reporter.test.mjs
       - run: pnpm --filter @ftksaas/web test:isolation
       - name: Package verified build
         id: build-package
@@ -86,6 +100,74 @@ jobs:
             apps/web/coverage
             packages/ui/coverage
           if-no-files-found: ignore
+
+  reject-live-ref:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_acceptance && github.ref != 'refs/heads/main'
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: Reject untrusted live test source
+        run: |
+          echo "::error::Batch live acceptance must be started from main."
+          exit 1
+  live-acceptance:
+    if: github.event_name == 'workflow_dispatch' && inputs.live_acceptance && github.ref == 'refs/heads/main'
+    environment: vercel
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    concurrency:
+      group: frontend-live-acceptance
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: '.nvmrc'
+      - name: Verify immutable production source
+        id: live-source
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          LIVE_VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+          LIVE_DEPLOYMENT_HOST: ${{ inputs.deployment_host }}
+          LIVE_DEPLOYED_SHA: ${{ inputs.deployed_sha }}
+        run: node apps/web/scripts/live-source.mjs
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare Ubuntu package sources
+        timeout-minutes: 2
+        run: |
+          set -euo pipefail
+          sudo -- "$(command -v node)" apps/web/scripts/ci-apt.mjs
+      - name: Install live Chromium
+        timeout-minutes: 8
+        run: pnpm --filter @ftksaas/web exec playwright install --with-deps chromium
+      - name: Run the complete live batch once
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.live-source.outputs.base_url }}
+          FTK_LIVE_ACCOUNTS: ${{ secrets.FTK_LIVE_ACCOUNTS }}
+          FTK_LIVE_CALENDAR_ORIGIN: ${{ vars.FTK_LIVE_CALENDAR_ORIGIN }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm --filter @ftksaas/web exec playwright test --config=playwright.acceptance.config.ts
+      - name: Upload sanitized batch evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frontend-live-batch-${{ github.run_id }}-${{ github.run_attempt }}
+          include-hidden-files: true
+          path: |
+            .artifacts/frontend/live-batch/source.json
+            .artifacts/frontend/live-batch/results.json
+          if-no-files-found: error
+          retention-days: 14
+          archive: true
   browsers:
     permissions:
       contents: read

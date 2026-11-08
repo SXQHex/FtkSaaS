@@ -79,7 +79,28 @@ test.each([
       expect(config.on[event].branches).toEqual(["main"]);
     }
     expect(config.on.pull_request.types).toEqual(["opened", "synchronize", "reopened", "edited"]);
-    expect(config.on.workflow_dispatch).toBeNull();
+    expect(config.on.workflow_dispatch).toEqual(
+      output === "frontend"
+        ? {
+            inputs: {
+              live_acceptance: {
+                description: "Run batch hosted acceptance after serial implementation is complete",
+                type: "boolean",
+                default: false,
+              },
+              deployment_host: {
+                description: "Production deployment hostname (without https)",
+                type: "string",
+                default: "ftksaas-web.vercel.app",
+              },
+              deployed_sha: {
+                description: "Full production application commit SHA",
+                type: "string",
+              },
+            },
+          }
+        : null,
+    );
     expect(config.on.push).toBeUndefined();
     expect(config.concurrency.group).toContain(
       "github.event.changes.base == null && 'metadata' || 'source'",
@@ -89,7 +110,11 @@ test.each([
       expect(job.permissions).toEqual({ contents: "read" });
     }
     const scope = config.jobs.scope;
-    expect(scope.if).toBe("github.event.action != 'edited' || github.event.changes.base != null");
+    expect(scope.if).toBe(
+      output === "frontend"
+        ? "(github.event_name != 'workflow_dispatch' || !inputs.live_acceptance) && (github.event.action != 'edited' || github.event.changes.base != null)"
+        : "github.event.action != 'edited' || github.event.changes.base != null",
+    );
     expect(scope.outputs[output]).toBe(`\${{ steps.scope.outputs.${output} }}`);
     expect(scope.steps[0].with).toEqual({
       ref: "${{ github.sha }}",
@@ -108,6 +133,46 @@ test.each([
 );
 
 const registry = "apps/backend/scripts/ci/document-paths.json";
+test("hosted batch is explicit trusted-main work and uploads only sanitized evidence", () => {
+  const config = workflow("frontend.yml");
+  const job = config.jobs["live-acceptance"];
+  expect(job.if).toBe(
+    "github.event_name == 'workflow_dispatch' && inputs.live_acceptance && github.ref == 'refs/heads/main'",
+  );
+  expect(job.environment).toBe("vercel");
+  expect(job.permissions).toEqual({ contents: "read" });
+  expect(job.concurrency).toEqual({
+    group: "frontend-live-acceptance",
+    "cancel-in-progress": false,
+  });
+  expect(job.steps[0].with).toEqual({
+    ref: "${{ github.sha }}",
+    "fetch-depth": 0,
+    "persist-credentials": false,
+  });
+  const source = job.steps.find((step: { id?: string }) => step.id === "live-source");
+  expect(source.run).toBe("node apps/web/scripts/live-source.mjs");
+  const run = job.steps.find(
+    (step: { name?: string }) => step.name === "Run the complete live batch once",
+  );
+  expect(run.env.PLAYWRIGHT_BASE_URL).toBe("${{ steps.live-source.outputs.base_url }}");
+  expect(run.env.VERCEL_TOKEN).toBeUndefined();
+  expect(run.run).toBe(
+    "pnpm --filter @ftksaas/web exec playwright test --config=playwright.acceptance.config.ts",
+  );
+  const upload = job.steps.at(-1);
+  expect(upload.with.path.trim().split("\n")).toEqual([
+    ".artifacts/frontend/live-batch/source.json",
+    ".artifacts/frontend/live-batch/results.json",
+  ]);
+  expect(upload.with["include-hidden-files"]).toBe(true);
+  expect(config.on.deployment_status).toBeUndefined();
+  expect(config.on.workflow_run).toBeUndefined();
+  expect(config.jobs["reject-live-ref"].if).toBe(
+    "github.event_name == 'workflow_dispatch' && inputs.live_acceptance && github.ref != 'refs/heads/main'",
+  );
+  expect(config.jobs["reject-live-ref"].steps[0].run).toContain("exit 1");
+});
 const reviewed = [
   "apps/web/README.md",
   "apps/web/docs/todo.md",

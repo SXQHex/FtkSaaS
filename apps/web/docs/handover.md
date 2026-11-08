@@ -4,6 +4,8 @@ Aktif bölüm, geliştirme sırası, kaynak/CI/yayın ayrımı ve açık kabulle
 
 ## Devam bağlamı
 
+8 Kasım kullanıcı yönlendirmesiyle ayrı `test/web-batch-live-acceptance` test paketi hazırlandı: seri kodlama sonrasında main'den elle başlatılan toplu hosted kabul. Normal PR CI korunur, deploy başına hosted koşu yoktur. Test kapsamı ve kalan kabulün tek sahibi [todo bölüm 9](todo.md#pro-ilk-teslim-kapisi), çalıştırma/secret/fixture yöntemi [geliştirme rehberidir](development.md#toplu-canlı-tarayıcı-kabulünü-çalıştırma). Test kaynağı canlı başarı değildir; diğer geliştirme dalı aşağıdadır.
+
 Kullanıcı Pro ilk teslimini hedefliyor; canlı kabulleri açık tutarak XREQ-027 → R14 → kalan S12 ve belge/teslim uzlaştırmasını istedi. Güncel dal `feature/web-r14-settings-completion`; kaynak sınırı, devralınan PR257/PR258 ve gerçek backend bağımlılıkları todo’nun ilgili modül sahiplerindedir. İkinci yol haritası tutulmaz. XREQ-006’nın frontend todo’da yalnız Business olarak sınırlandırılması düzeltildi; ortak talebin ertelenmiş Pro/Business kapsamı korunur.
 
 Uygulama native Supabase Auth ve typed ortak transport üzerinden çalışır; özel tablo/service key yoktur. Hazır shadcn/ui, mevcut komut/preview/kurtarma ve alan bileşenleri kullanılır. Ayar formu ortak şemanın sunucuda çözülen görünümünü tüketir; ham JSON veya elle UUID formu değildir. Tasarım yöntemi [geliştirme rehberindedir](development.md).
