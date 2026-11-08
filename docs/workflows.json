@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "280554097a70bd5ad0e18d1c5a7fd5ba1e43e6d80bd3408dfab4b480ab50a6ee",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "8b1447e33db9cf0bdb48ff1018d7457c389d21d8c7b9026814c3e613e9c15f9d",
+        "reason": "Belge publish/preview koşullarının JSON Schema ve generated Edge validator eşliği, kapalı kaynak seçimi ve ortak komut operation_key tipleri incelendi. Runtime protokolü değişmez; tip üretimi required-only alternatifleri kapalı parent alanlarıyla temsil eder."
       }
     },
     {
@@ -1252,8 +1252,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "f5df3c27926a9507b859edfb9e286b925d04ea4078c2dc301b71268a471e0d46",
-        "reason": "SettingsView dış/center inherited_fields ortak8 alanlı kapalı kaynağa bağlandı. İstek kopyaları da ortaklaştırıldı; gerçek SQL view/invalidation→Edge validator ve tüm8 alan olumlu/olumsuz regresyonları incelendi."
+        "fingerprint": "d0f91d4c44c4c9b36953eb1f64d65289aca4b811822533c25356e1c02295d964",
+        "reason": "Başarısız native Pro hazırlık testinde org ayarı değişince eski program kaynağı kullanıldığı doğrulandı. Güncel katalog kaynağıyla pozitif resolve ve Starter plan reddi, eski kaynakla VERSION_CONFLICT ayrı sınanır; rehber/runtime aynı kalır."
       }
     },
     {
@@ -1377,8 +1377,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "d9dd21e6316bae9cf0ec2f3377b6cf1bcf112c506af111f734b4cee5417a6265",
-        "reason": "Önceki adayda native eğitmen onayı/get/replay/tek kanıt/rol kaybı geçti; bu fark yalnız ortak settings inheritance request/response şemalarını referanslaştırır, anlaşma davranışı değişmedi."
+        "fingerprint": "f70d1c8619c3235b35ef78d5ffaca76c3110f0c61956160e283b2a60da61b094",
+        "reason": "Ortak agreement-preparation testinin yalnız Pro şablon kökünde güncel sürüm kurulumu ve ek olumsuz/olumlu assertionlar değişti. Eğitmen anlaşması yetki/hash/snapshot/replay ve immutable kabul akışı değişmedi."
       }
     },
     {

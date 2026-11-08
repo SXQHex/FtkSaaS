@@ -623,12 +623,22 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  assert(!valid('DowngradeRetainedResource',{...resource,email:'unrequested@example.invalid'}));
 });
 
- test('Digital document bodies are closed, file-or-inline exclusive and consent snapshot hashes travel together',()=>{
+ test('Digital document bodies are closed, file-or-inline exclusive and consent snapshot hashes travel together',async()=>{
  const content={name:'Terms',language:'en-GB',template_id:'terms',template_version:'v1',text:'Exact text\n'};
  assert(valid('DigitalDocumentContent',content));assert(!valid('DigitalDocumentContent',{...content,script:'untrusted'}));
  const body={client_api_version:1,request_id:id,org_id:id,operation_key:id,version_label:'v1',scope:{kind:'organization'},requirements:[],digital_content:content};
  assert(valid('Request_document_version_publish',body));assert(!valid('Request_document_version_publish',{...body,file_id:id}));
  const {digital_content,...file}=body;assert(valid('Request_document_version_publish',{...file,file_id:id}));assert(!valid('Request_document_version_publish',file));
+ const generated=await import('../supabase/functions/backend-v1/validators.js');
+ for(const operation of ['document_publication_preview','document_version_publish']){
+  const {operation_key,...preview}=body,inline=operation==='document_version_publish'?body:preview;
+  const {digital_content,...withoutSource}=inline;
+  for(const check of [value=>valid('Request_'+operation,value),generated['request_'+operation+'_v1']]){
+   assert(check(inline));assert(check({...withoutSource,file_id:id}));
+   assert(!check({...inline,file_id:id}));assert(!check(withoutSource));
+   assert(!check({...inline,unexpected:true}));
+  }
+ }
  const acceptance={client_api_version:1,request_id:id,org_id:id,operation_key:id,document_version_id:id,context:{gate:'sale',subject:{type:'product_versions',id}}};
  assert(valid('Request_document_accept',acceptance));assert(!valid('Request_document_accept',{...acceptance,displayed_content:content}));
  assert(valid('Request_document_accept',{...acceptance,displayed_content:content,displayed_content_hash:'a'.repeat(64)}));

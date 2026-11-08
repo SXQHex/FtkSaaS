@@ -104,8 +104,12 @@ test('Pro workflow templates resolve real versioned defaults without creating do
  const created=(await api('center_create_v1',{name:'Program startup copy',timezone:'UTC'})).primary_id;
  await api('center_manager_assign_v1',{center_id:created,person_id:f.person});
  assert.deepEqual((await api('settings_get_v1',{scope:'center',center_id:created})).values.program_templates,templates.program_templates);
+ const currentProgramSource=(await api('settings_catalog_get_v1',cq)).preparation_templates.programs.find(x=>x.source.scope==='organization').source;
+ assert(currentProgramSource.version>resolved.program.source.version);
+ assert.deepEqual((await api('settings_preparation_resolve_v1',{center_id:center,kind:'program',source:currentProgramSource})).defaults,templates.program_templates[0].defaults);
  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
- await denied('PLAN_FEATURE_UNAVAILABLE','settings_preparation_resolve_v1',{center_id:center,kind:'program',source:resolved.program.source});
+ await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',{center_id:center,kind:'program',source:resolved.program.source});
+ await denied('PLAN_FEATURE_UNAVAILABLE','settings_preparation_resolve_v1',{center_id:center,kind:'program',source:currentProgramSource});
  assert.equal((await api('settings_catalog_get_v1',cq)).fields.find(x=>x.key==='program_templates').writable,false);
 });
 

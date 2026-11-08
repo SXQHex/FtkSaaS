@@ -1111,9 +1111,54 @@ scope: ConfigurationScope
 impact_approval?: DocumentImpactApproval
 digital_content?: DigitalDocumentContent
 } & RequestDocumentVersionPublish1)
-export type RequestDocumentVersionPublish1 = {
-[k: string]: unknown
-}
+export type RequestDocumentVersionPublish1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+document_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id: string
+version_label: Text
+requirements: DocumentRequirement[]
+scope: ConfigurationScope
+impact_approval?: DocumentImpactApproval
+digital_content?: never
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+document_id?: (string | null)
+file_id?: never
+version_label: Text
+requirements: DocumentRequirement[]
+scope: ConfigurationScope
+impact_approval?: DocumentImpactApproval
+digital_content: DigitalDocumentContent
+})
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_document_accept".
@@ -1543,9 +1588,44 @@ requirements: DocumentRequirement[]
 scope: ConfigurationScope
 digital_content?: DigitalDocumentContent
 } & RequestDocumentPublicationPreview1)
-export type RequestDocumentPublicationPreview1 = {
-[k: string]: unknown
-}
+export type RequestDocumentPublicationPreview1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+document_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id: string
+version_label: Text
+requirements: DocumentRequirement[]
+scope: ConfigurationScope
+digital_content?: never
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+document_id?: (string | null)
+file_id?: never
+version_label: Text
+requirements: DocumentRequirement[]
+scope: ConfigurationScope
+digital_content: DigitalDocumentContent
+})
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsVersion".
