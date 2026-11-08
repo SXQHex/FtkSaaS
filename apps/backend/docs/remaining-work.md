@@ -682,6 +682,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Dar profil aşaması:** Mevcut leased privacy worker için exact rol/hesap bağlantısı, global hesap ve somut kayıt hold'u, atomik profil/tercih/geçici kopya ve eski avatar baytı imhası hazırlanır. Migration hiçbir hosted hedefi bağlamaz. `job_status_get.privacy.profile_erasure` yalnız bu alt aşamanın güvenli ilerleme kanıtıdır; ana talep ve veritabanı/Auth/Storage/export/yedek yüzeyleri partial/pending kalır. Karma izin/güvenlik/işlem geçmişinin gerekli alanlara indirgenmesi, native Auth hard delete, organizasyon imhası ve tam işletim kabulü bu alt dilimle kapanmaz. [Kaynak ve gerçek doğrulama](00-FtkSaaS-yeni-sohbet-devir.md#hesap-profili-fiziksel-imha-aşaması).
 
+**Hosted profil dilimi:** Gerçek native Cron, geçmiş review tarihli hold altında durma→hold kaldırma→normal retry ile profil satırı temizliğini doğruladı; hedefte avatar/export baytı yoktu. Bu sonuç Auth/Storage/organizasyon veya bütün DB imhasını kapatmaz. Public self status yeniden giriş kabulü yapılmadı; [kanıt ve sınır](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
+
 **Native principal alt aşaması:** Scoped worker hazırlığı, provider transaction'ında canlı hold/lease fence, official hard delete, cascade sonrası commit proof ve404/readback PR267 aday/main/development ve gerçek native kabulüyle kaynak teslimini geçti. Canlı migration141 ve ertelenmiş trigger doğrulandı; target binding/proof0 olduğundan hosted fiziksel imha yapılmış sayılmaz. Provider audit/diğer Auth yüzeyleri, karma geçmiş minimizasyonu ve O04 bütünü açık kalır.
 
 **Seçili Auth kalıntıları:** Hedef flow/orphan refresh satır silme ve native audit'teki hedefe ait bilinen kişisel alanların kaldırılması, aynı scope/hold/lease ve atomic proof sınırında geliştirilir. Karma hesap flow'u ve yanlış refresh/session ownership fail-closed; başka aktör/subject ve stable kanıt korunur. UUID ile bağlı kalan kayıt anonim sayılmaz. Native/hosted kabul ve provider dış logları/diğer Auth yüzeyleri açıkken O04 kapanmaz; [aktif kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi).
@@ -697,6 +699,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Kaynak alanı:** Storage/export/temp executor; ilgili acceptance
 
 **DB export dilimi:** Hesap silme talebinde exact rol/hesap bağlantısı, tam report/job/file sahipliği, hold ve canlı lease kontrolüyle yalnız geçici DB export baytları kaldırılır. Olağan expiry de aynı hold/proof yolunu bounded100 dosyalık adımlarda kullanır; gerçek boyut/hash ve değişmez minimal kanıt atomiktir. Kaynak import dosyaları, tenant belge/kişi/finans ve rapor metadata'sı korunur. Bu alt aşama genel exports/Storage/backup veya privacy tamamlandı anlamına gelmez. Kaynak/native/CI/hosted ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#pro-export-saklama-ve-imha-paketi) tutulur.
+
+**Hosted expiry dilimi:** Gerçek API ile üretilip indirilen dolu CSV, test-owned erken expiry/hold enjeksiyonu sonrası native Cron ile fiziksel olarak temizlendi; ayrı kontrol dosyası korundu. Bu doğal yedi günlük süre veya dolu hesap-silme export kabulü değildir; [sonuç ve açık kapsam](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
