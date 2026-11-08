@@ -96,7 +96,7 @@ test('stale independent checkpoint prevents any data preparation',()=>restoreFix
 }));
 
 const {validateRestoreTarget,restorePostgresSnapshot}=await import('../scripts/postgres-restore.mjs');
-const restoreTarget={database:'ftk_restore_probe',system_identifier:'123456',tables:[{schema:'core',table:'people'}]};
+const restoreTarget={database:'ftk_restore_probe',system_identifier:'123456',server_address:'127.0.0.1',tables:[{schema:'core',table:'people'}]};
 test('PostgreSQL loader only accepts explicitly bound loopback recovery databases',()=>{
  assert.deepEqual(validateRestoreTarget('postgresql://localhost:54322/ftk_restore_probe',restoreTarget),restoreTarget);
  for(const url of ['postgresql://example.com/ftk_restore_probe','postgresql://localhost/postgres','postgresql://localhost/ftk_restore_probe?host=example.com','postgresql://localhost/ftk_restore_probe#x'])assert.throws(()=>validateRestoreTarget(url,restoreTarget),/ISOLATED_RESTORE_TARGET_REQUIRED/);
@@ -109,3 +109,8 @@ test('erased PostgreSQL snapshot is rejected without connecting to a target',()=
  const unsafe=fixture({id:erased});
  await assert.rejects(restorePostgresSnapshot({...unsafe,registerFile:file,connectionString:'postgresql://localhost:1/ftk_restore_probe',target:{...restoreTarget,tables:[{schema:'auth',table:'users'}]},readCheckpoint:async()=>unsafe.trust}),/ERASED_SUBJECT_PRESENT/);
 }));
+
+test('recovery approval pins one server IP while the client endpoint stays loopback',()=>{
+ assert.equal(validateRestoreTarget('postgresql://127.0.0.1:54322/ftk_restore_probe',{...restoreTarget,server_address:'172.18.0.2'}).server_address,'172.18.0.2');
+ for(const server_address of [undefined,'127.0.0.1/32','172.18.0.0/16','localhost',''])assert.throws(()=>validateRestoreTarget('postgresql://127.0.0.1/ftk_restore_probe',{...restoreTarget,server_address}),/ISOLATED_RESTORE_TARGET_REQUIRED/);
+});

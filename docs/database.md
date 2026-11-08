@@ -1,6 +1,6 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `fb51ac6ae3157cc2636b31fa9ecb12069173f9f73cb033dd92e22bdd85f787ff`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c83f120a11408f19bc15744c5a890826454a4686dfdac13b5ab2a0c3fc7d7943`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 

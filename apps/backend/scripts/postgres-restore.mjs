@@ -1,4 +1,5 @@
 import pg from 'pg';
+import {isIP} from 'node:net';
 import {sha256} from './restore-guard.mjs';
 import {guardedRestore} from './guarded-restore.mjs';
 
@@ -13,6 +14,7 @@ export function validateRestoreTarget(connectionString,target){
  let url;try{url=new URL(connectionString);}catch{throw Error('ISOLATED_RESTORE_TARGET_REQUIRED');}
  if(!['postgres:','postgresql:'].includes(url.protocol)||!['127.0.0.1','localhost','[::1]'].includes(url.hostname)||url.search||url.hash
   ||!target||!/^ftk_restore_[a-z0-9_]{1,40}$/.test(target.database)||decodeURIComponent(url.pathname.slice(1))!==target.database
+  ||typeof target.server_address!=='string'||!isIP(target.server_address)
   ||typeof target.system_identifier!=='string'||!/^\d+$/.test(target.system_identifier)||!Array.isArray(target.tables)||!target.tables.length
   ||target.tables.some(t=>!t||Object.keys(t).sort().join(',')!=='schema,table'||!identifier.test(t.schema)||!identifier.test(t.table)||['pg_catalog','information_schema','pg_toast'].includes(t.schema))
   ||new Set(target.tables.map(t=>t.schema+'.'+t.table)).size!==target.tables.length)throw Error('ISOLATED_RESTORE_TARGET_REQUIRED');
@@ -22,7 +24,7 @@ export function validateRestoreTarget(connectionString,target){
 export async function restorePostgresSnapshot({connectionString,target,readCheckpoint,...evidence}){
  const approved=validateRestoreTarget(connectionString,target);
  if(typeof readCheckpoint!=='function')throw Error('CURRENT_CHECKPOINT_REQUIRED');
- let client,observer,started=false,closed=false,gated=false,identity,gateState;
+ let client,observer,started=false,closed=false,gated=false,dataConnectionFailed=false,controlConnectionFailed=false,identity,gateState,closeGate;
  const end=async()=>{if(!closed){closed=true;try{if(client)await client.end();}finally{if(observer)await observer.end();}}};
  const transaction={
   async prepare(validated,proof,bytes){
@@ -30,27 +32,38 @@ export async function restorePostgresSnapshot({connectionString,target,readCheck
    // Keep exact numeric tokens, including bigint/decimal and nested JSON values.
    const snapshot=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes),(_key,value,context)=>typeof value==='number'?JSON.rawJSON(context.source):value);
    if(names(snapshot.tables)!==names(approved.tables))throw Error('RESTORE_TABLE_SET_MISMATCH');
-   client=new pg.Client({connectionString,connectionTimeoutMillis:10000,query_timeout:30000});await client.connect();
+   client=new pg.Client({connectionString,connectionTimeoutMillis:10000,query_timeout:30000});client.on('error',()=>{dataConnectionFailed=true;});await client.connect();
    identity=async()=>(await client.query(`select current_database() as database,
     (pg_catalog.pg_control_system()).system_identifier::text as system_identifier,
-    inet_server_addr()::text as address,pg_backend_pid() as pid, current_setting('session_replication_role') as replication_role,
+    host(inet_server_addr()) as address,pg_backend_pid() as pid, current_setting('session_replication_role') as replication_role,
     (select datallowconn from pg_database where datname=current_database()) as connections_allowed,
     (select count(*)::int from pg_stat_activity where datid=(select oid from pg_database where datname=current_database()) and pid<>pg_backend_pid()) as other_sessions`)).rows[0];
    const before=await identity();
-   if(before.database!==approved.database||before.system_identifier!==approved.system_identifier||!['127.0.0.1','::1'].includes(before.address)||before.replication_role!=='origin')throw Error('RESTORE_TARGET_IDENTITY_MISMATCH');
+   if(before.database!==approved.database||before.system_identifier!==approved.system_identifier||before.address!==approved.server_address||before.replication_role!=='origin')throw Error('RESTORE_TARGET_IDENTITY_MISMATCH');
    // Closing connections survives a data rollback and is never reversed here.
    // Recheck existing sessions after the gate closes to cover the connect race.
-   await client.query('alter database '+quote(approved.database)+' allow_connections false');gated=true;
    const maintenance=new URL(connectionString);maintenance.pathname='/postgres';
-   observer=new pg.Client({connectionString:maintenance.href,options:'-c default_transaction_read_only=on',connectionTimeoutMillis:10000,query_timeout:30000});await observer.connect();
+   observer=new pg.Client({connectionString:maintenance.href,options:'-c default_transaction_read_only=on',connectionTimeoutMillis:10000,query_timeout:30000});observer.on('error',()=>{controlConnectionFailed=true;});await observer.connect();
    // A separate autocommit reader avoids SERIALIZABLE's stale catalog snapshot.
    gateState=async()=>{
-    const state=(await observer.query(`select (pg_control_system()).system_identifier::text as system_identifier,inet_server_addr()::text as address,
+    if(controlConnectionFailed)throw Error('RESTORE_CONTROL_CONNECTION_LOST');
+    const state=(await observer.query(`select (pg_control_system()).system_identifier::text as system_identifier,host(inet_server_addr()) as address,
      (select datallowconn from pg_database where datname=$1) as connections_allowed,
      (select count(*)::int from pg_stat_activity where datname=$1 and pid<>$2) as other_sessions`,[approved.database,before.pid])).rows[0];
-    if(state.system_identifier!==approved.system_identifier||!['127.0.0.1','::1'].includes(state.address))throw Error('RESTORE_TARGET_IDENTITY_MISMATCH');
+    if(state.system_identifier!==approved.system_identifier||state.address!==approved.server_address)throw Error('RESTORE_TARGET_IDENTITY_MISMATCH');
     return state;
    };
+   // PostgreSQL forbids disabling connections from the target DB itself.
+   // Validate the maintenance identity before its narrow gate-only write.
+   closeGate=async()=>{
+    await gateState();
+    await observer.query('begin read write');
+    try{
+     await observer.query('alter database '+quote(approved.database)+' allow_connections false');
+     await observer.query('commit');gated=true;
+    }catch(error){await observer.query('rollback');throw error;}
+   };
+   await closeGate();
    if((await gateState()).other_sessions!==0)throw Error('RESTORE_TARGET_NOT_EXCLUSIVE');
    await client.query('begin isolation level serializable');started=true;
    await client.query("set local search_path='pg_catalog';set local row_security=off;set local lock_timeout='5s';set local statement_timeout='30s';set constraints all deferred");
@@ -84,14 +97,21 @@ export async function restorePostgresSnapshot({connectionString,target,readCheck
    if(after.connections_allowed||after.other_sessions!==0)throw Error('RESTORE_TARGET_GATE_CHANGED');
   },
   async commit(){
+   if(dataConnectionFailed)throw Error('RESTORE_DATA_CONNECTION_LOST');
    const state=await gateState();
    if(state.connections_allowed||state.other_sessions!==0)throw Error('RESTORE_TARGET_GATE_CHANGED');
    await client.query('commit');started=false;
   },
   async rollback(){
-   try{if(started)await client.query('rollback');started=false;
-    if(gated)await client.query('alter database '+quote(approved.database)+' allow_connections false');
-   }finally{await end();}
+   let rollbackFailed=false;
+   try{if(started)await client.query('rollback');}
+   catch{rollbackFailed=true;}
+   finally{
+    started=false;
+    // A dead data socket must never skip the independent maintenance fence.
+    try{if(gated)await closeGate();}finally{await end();}
+   }
+   if(rollbackFailed)throw Error('RESTORE_DATA_ROLLBACK_FAILED');
   }
  };
  try{
