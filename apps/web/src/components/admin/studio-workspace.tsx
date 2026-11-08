@@ -24,6 +24,18 @@ import {
 import { accessibleCenters } from "../../lib/context";
 import { browserClient } from "../../lib/supabase/client";
 
+const DeliverySettings = dynamic(
+  () => import("../automation/delivery-settings").then((m) => m.DeliverySettings),
+  { loading: WorkspaceLoading },
+);
+const AutomationWorkspace = dynamic(
+  () => import("../automation/automation-workspace").then((m) => m.AutomationWorkspace),
+  { loading: WorkspaceLoading },
+);
+const ReportsWorkspace = dynamic(
+  () => import("../reports/reports-workspace").then((m) => m.ReportsWorkspace),
+  { loading: WorkspaceLoading },
+);
 const CrmWorkspace = dynamic(() => import("../crm/crm-workspace").then((m) => m.CrmWorkspace), {
   loading: WorkspaceLoading,
 });
@@ -402,6 +414,10 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
             </CardHeader>
             <CardContent>
               <Preferences />
+              <DeliverySettings
+                scope={{ actorId: snapshot.account.id, orgId: snapshot.account.id }}
+                target="user"
+              />
             </CardContent>
           </Card>
           <Card className="shadow-none">
@@ -442,6 +458,12 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       )}
       {snapshot && section === "attendance" && (
         <AttendanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+      )}
+      {snapshot && section === "reports" && (
+        <ReportsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+      )}
+      {snapshot && section === "automation" && (
+        <AutomationWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
       )}
       {snapshot && section === "finance" && (
         <FinanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
