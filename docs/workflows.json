@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "cdf9d6d48cba9b5ea770b73f7decf0d2671745da0e8930bf2e0b2ecdf332ebff",
-        "reason": "Reviewed append-only migration133 byte equality and frozen inventory; native proof correction keeps existing CI trust, coverage and timeout policy unchanged."
+        "fingerprint": "bf82af8f733fea7483cd8b933ce6fcd12a143361e8fb7bd84097ebcdbfb44638",
+        "reason": "Reviewed settings acceptance import hash and shifted line ownership after native MFA prerequisite; source coverage and all CI acceptance gates remain unchanged."
       }
     },
     {
@@ -1179,7 +1179,8 @@
         "apps/backend/tests/agreement-preparation-acceptance.mjs",
         "apps/backend/tests/permission-preparation-acceptance.mjs",
         "apps/backend/tests/hosted-settings-restore-unit.mjs",
-        "apps/backend/tests/account-mfa-acceptance.mjs"
+        "apps/backend/tests/account-mfa-acceptance.mjs",
+        "apps/backend/tests/native-totp-fixture.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1244,8 +1245,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "ef00f7231b346701a19f1b1366fc98c54d3f38574fd9b9080892fb272430c764",
-        "reason": "Reviewed organization security gate and native proof boundary; settings update reset and historical policy checks retain current behavior without granting Auth factor SELECT to service_role."
+        "fingerprint": "682110da7815316e7ea12538065f01c91e1ced0913f13a8f44dab9c44c179802",
+        "reason": "Reviewed settings round-trip native TOTP enrollment and signed AAL2 actor; all declared fields including security_policy still round-trip, weak actor explicitly rejected, native factor cleaned afterward."
       }
     },
     {

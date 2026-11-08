@@ -751,27 +751,27 @@
         {
           "line": 7,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "0a6d4730d5dbe4a684d7d9c0a6e83cdc07cc4cbd8ae9fffb49aba3d83fcd50a3",
+          "sha256": "8450e8b8640e7ed0dd9146d544a28e33734b7deb4294918ed5743afaf90f69df",
           "shared": [
             [
               1,
-              28
+              29
             ],
             [
-              116,
-              116
+              117,
+              117
             ],
             [
-              174,
-              174
+              175,
+              175
             ],
             [
-              207,
-              208
+              210,
+              211
             ],
             [
-              249,
-              250
+              252,
+              253
             ]
           ],
           "parts": [
@@ -779,8 +779,8 @@
               "id": "settings-user-history",
               "ranges": [
                 [
-                  29,
-                  115
+                  30,
+                  116
                 ]
               ]
             },
@@ -788,12 +788,12 @@
               "id": "settings-tenant-authority",
               "ranges": [
                 [
-                  117,
-                  173
+                  118,
+                  174
                 ],
                 [
-                  175,
-                  206
+                  176,
+                  209
                 ]
               ]
             },
@@ -801,8 +801,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  209,
-                  248
+                  212,
+                  251
                 ]
               ]
             },
@@ -810,8 +810,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  251,
-                  287
+                  254,
+                  290
                 ]
               ]
             }
