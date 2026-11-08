@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "464bc3c4bc3e5a2556f3dead490fd25caad5fe833ace5777db5dbf922dcd4012",
-        "reason": "141 append-only migration/source eşliği ve mevcut P07 import hash genişlemesi incelendi; API protokolü ve CI politikası korunuyor."
+        "fingerprint": "aed1ecc3d4405fddb81d204932d295f767cddca2eb1ee5eb2514e13359c01a26",
+        "reason": "Yeni native kalıntı migration/source ve test hash eşliği incelendi; eski assertion satırları aynen korunarak yalnız ek kontroller getirildi."
       }
     },
     {
@@ -1329,8 +1329,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "f12331b84b72e242d75d395eda5cb34ae5bf66e020d094e3380d274e534f88ce",
-        "reason": "Ortak P07 native lifecycle testi gerçek refresh satırı ve tam Auth rollback sayımlarıyla genişledi; mevcut abonelik assertionları korundu."
+        "fingerprint": "7ed74d47fa074c5da36c5974cb94b0356cefc103c198959c728ae72389307829",
+        "reason": "Mevcut P07 assertionları aynı kaldı; kalıntı rollback ve unbound worker temp-trigger ret kontrolleri eklendi."
       }
     },
     {
@@ -1572,7 +1572,9 @@
         "apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql",
         "apps/backend/scripts/native-account-erasure.mjs",
         "apps/backend/database/account-native-erasure-finalization.sql",
-        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql"
+        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
+        "apps/backend/database/account-native-residues.sql",
+        "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1588,8 +1590,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "6bfe9ce8589e6bc026fac465a33eeb2e31fddde3bbd1a26b8aa4327c9970156b",
-        "reason": "Auth nested FK cascade sonrası transaction sonu constraint proof incelendi; hold/lease kilitleri ve geç hatada atomic rollback korunuyor."
+        "fingerprint": "0bdde94a7befa82a80cd4a39498581fdcfcae6654544d526c1a3bcee77a40083",
+        "reason": "Veri sınıfına göre alan/satır silme ve strict ownership incelendi; başka kişinin kanıtı korunur, anonim ve tüm kopya yok etme sonucu üretilmez."
       }
     },
     {
@@ -1735,7 +1737,9 @@
         "apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql",
         "apps/backend/scripts/native-account-erasure.mjs",
         "apps/backend/database/account-native-erasure-finalization.sql",
-        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql"
+        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
+        "apps/backend/database/account-native-residues.sql",
+        "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1750,8 +1754,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "dcdf712239b48bcf208d8f56c1f771f3b69038a2e0506ba182039d9bc127b1cd",
-        "reason": "Native principal proof normal AFTER yerine transaction sonunda ertelendi; aynı dedicated claim ve origin/instance/scope sınırları değişmedi."
+        "fingerprint": "3da701c8b520f07c4ba5ebe7c1cc7476a5cb2c3277fce2de2aa751ac4cb0d009",
+        "reason": "Private helperda native permit rolü ve executor session_user açık ayrıldı; doğrudan execute yok, hold/lease ve sonraki pass taraması korunuyor."
       }
     }
   ]

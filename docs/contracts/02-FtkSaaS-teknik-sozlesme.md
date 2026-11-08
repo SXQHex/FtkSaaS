@@ -491,6 +491,12 @@ Kullanıcı 15 Ekim 2026’da uzun saklama varsayılanları belirlenmesini, huku
 
 Kalıcı silme isteği, yukarıdaki operasyon saklama varsayılanlarından önceliklidir; yalnız belgelenmiş hukuki saklama gerekçesi bulunan gerekli kayıtlar istisnadır. Erişim hemen kapanır; hukuki saklama istisnası dışındaki veriler için operasyonel silme hedefi 30 gündür. Yedekler de bu süreyi aşmayacak biçimde O3’te doğrulanmalıdır; tamamlanma bilgisi gerçek imha durumuna göre verilir. Somut uyuşmazlık/resmî yükümlülükte yalnız ilgili kayıtlar gerekçeli saklama blokajına alınır. Yeni hukuki değerlendirme süresi dolmuş veriyi kendiliğinden geri getiremez. Süreler kayıt sınıfına göre sürümlü, merkezi yapılandırma olarak yönetilir; satış/paket ayarı değildir.
 
+### Veri türüne göre yöntem
+
+Yöntem veri yüzeyine ve kalan saklama amacına göre seçilir; bütün kayıtlar için tek anonimleştirme veya tek toplu silme uygulanmaz. İşleme amacı bitmiş bağımsız profil/avatar, hesap erişim kimliği ve geçici kimlik doğrulama akış/token kayıtlarında canlı depodan satır/bayt silme kullanılır. Gerekli denetim/işlem kanıtında yalnız hedefe ait gereksiz kişisel alanlar kaldırılır; olay kimliği, zaman, gerekli sabit referans ve başka özneye ait kanıt korunur. Bu alan silme/minimizasyonudur: UUID, ilişki veya başka veri üzerinden kişi hâlâ bulunabiliyorsa anonimleştirme sayılmaz. Başka hesapla karma sahipliği çözülemeyen kayıt otomatik silinmez; bütün hedef işlemi kapalı hata ile durur.
+
+Yok etme tamamlanması, ilgili verinin canlı tablo dışında dosya/export/geçici kopya, sağlayıcı logları ve yedekler dahil ilgili bütün ortamlarda geri getirilemezliğinin doğrulanmasını gerektirir. SQL satır silme veya alan boşaltma tek başına bu tamamlanma iddiasını vermez. Somut hold veya belgeli saklama gerekçesi varsa yalnız gerekli kayıt/alan sınırlı tutulur; genel profil arşivlenmez. Anonimleştirme ancak kişisel bağlantının gereksiz olduğu, ayrıca onaylanmış çıktı için geri eşleme riski doğrulanarak seçilebilir; mevcut hesap/finans/denetim referansları bu adla sunulmaz. Süreler yukarıdaki sınıflardan alınır; bu yöntem seçimi yeni süre veya hukuki saklama gerekçesi oluşturmaz.
+
 ### Resmî kaynaklar ve sınır
 
 - KVKK Silme/Yok Etme/Anonimleştirme Yönetmeliği, m.7, 11–12: https://www.kvkk.gov.tr/Icerik/5441/KISISEL-VERILERIN-SILINMESI-YOK-EDILMESI-VEYA-ANONIM-HALE-GETIRILMESI-HAKKINDA-YONETMELIK

@@ -253,3 +253,17 @@ Kaynak aday/main/development kabulünden sonra mevcut gönderici kurulumunda `--
 `native-account-erasure.mjs` yalnız dedicated privacy worker bağlantısında mevcut claim request'iyle çalışır; native Auth admin anahtarı DB worker rolüne yetki eklemez. `private.account_auth_erasure_scopes` exact db_role/account_id/provider_origin ve PostgreSQL system_identifier bağını tutar; migration hiçbir hedef bağlamaz. Scope kurulumu yalnız onaylı imha hedefi için yetkili işletim adımıdır. Hosted origin mevcut projenin HTTPS köküdür; izole kabulde yalnız loopback portu kullanılır. Restore/clone sırasında binding/permit ve admin anahtarları taşınıp etkinleştirilmez; fiziksel klon system_identifier'ı koruyabileceğinden instance bağı tam restore erişim kapısının yerine geçmez.
 
 Runner girdileri dedicated DB bağlantısı, claim request, API URL ve native admin key'dir; çıktı yalnız güvenli state'tir. Native HTTP sonucu belirsizse immutable proof ve sağlayıcı readback uzlaştırılır; eski izinle kör tekrar yapılmaz. Provider transaction'ındaki fence yeni hold'u ve kilit beklerken dolan lease'i reddeder. Principal yokluk kanıtı transaction sonundaki ertelenmiş constraint trigger'ında, nested Auth FK cascade'leri bittikten sonra yazılır. Commit'teki proof hatası provider silmesini ve tüm çocuk kayıtlarını birlikte geri alır. Native Storage sahipliği varsa işlem durur; Storage metadata'sı SQL ile silinmez ve ticari nesneler başka kullanıcıya keyfî devredilmez. Principal silme kanıtı Auth audit verilerinin imhası veya bütün privacy talebinin kapanışı değildir.
+
+### Auth kalıntı aşamasının kapsamı
+
+Aynı exact Auth target binding'i yeni kalıntı aşamasını da kapsar; migration yeni hedef bağlamaz. Private helper'a service/worker/in-app execute hakkı verilmez. Native DELETE'in ertelenmiş proof trigger'ı ve mevcut leased privacy executor sınırından çalışır. Global/hesap ve somut flow/audit hold'u blokajdır; review_at expiry değildir. İki farklı Auth kimliği içeren flow veya target refresh token'ın başka kullanıcı session'ına bağlanması integrity hatasıdır; otomatik veri düzeltmesi/silme yapılmaz.
+
+| Yüzey | Uygulanan yöntem / koruma |
+|---|---|
+| Hedefe ait geçici flow_state ve eski oturumsuz refresh token | Canlı satır silme; kalan hedef satır kontrolü, late failure rollback |
+| Native audit hedef actor | Yalnız actor_username/actor_name ve actor IP kaldırılır; sabit actor UUID/action/zaman korunur |
+| Native audit hedef subject | Yalnız traits.user_email/user_phone kaldırılır; foreign actor, identity/factor ve diğer kanıt aynen korunur |
+| Başka hesap/tenant kanıtı | Değiştirilmez; karma flow sahipliği otomatik geniş silme gerekçesi değildir |
+| Sağlayıcı dış logları / diğer Auth / backup | Bu helper'ın tamamlanma kapsamı değildir; ana Auth yüzeyi pending kalır |
+
+İlk kalıntı receipt'i request/subject/policy_version ve ilk pass satır sayılarıyla append-only'dir. Sonraki yeni claim'lerde aynı helper tekrar tarar; her pass sonucu checked_at ve o pass sayımlarını manifestte taşır. Böylece ilk transaction'dan sonra commit eden provider audit kopyası sonraki yetkili geçişte yeniden ele alınır. Aynı worker receipt replay'i tekrar iş yapmaz. Bu düzen bütün provider log retention'ını veya nihai yok etmeyi kanıtlamaz; kaynaklı yöntem tanımı teknik sözleşmenin19. bölümündedir.
