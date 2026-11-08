@@ -1,8 +1,41 @@
-# F01–F33 kaynak ve kabul haritası
+# F01–F33 teslim, kaynak ve kabul haritası
 
-Üretilmiştir: makine sözleşmesi ve `implemented.json` → `render_catalogs.py`. API sayıları güncel kaynaktan hesaplanır. Bir özelliğin bütün ekran/selector/provider/ortam kabulleri bu sayımdan çıkmaz. Ürün plan erişimi [01](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), açık işler [backend backlog](../apps/backend/docs/remaining-work.md), çalıştırılmış kaynak/CI/ortam kanıtı [güncel kabul](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir.
+Üretilmiştir: ürün kapsam sözleşmesi, makine sözleşmesi ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. Teslim kararı aşağıda ürün sahibinden aktarılır; API ve DS tabloları makine kaynağının görünümüdür. Bu belge ikinci backlog veya kabul kaydı değildir.
 
-| Özellik | Plan erişimi | Teknik API karşılığı | Kaynakta / contract-only | Tam özellik kabulü |
+## Genel teslim sırası
+
+Tek normatif kaynak: [ürün kapsam sözleşmesi](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#genel-teslim-sırası).
+
+8 Kasım 2026 kullanıcı kararı: projenin ürün teslim sırası **Pro → Starter → Business** olarak uygulanır. Bu sıra frontend ve backend için ortaktır; teknik bağımlılıkların geliştirme sırası veya planların özellik mirasıyla karıştırılmaz. Ortak temelin geliştirilmesi Starter ürün tesliminin önce yapılmasını gerektirmez. Önceden tamamlanmış kaynak ve kabuller korunur; yeni planın bütün ürün kabulüne otomatik taşınmaz.
+
+| Aşama | Plan | Teslim kapsamı |
+|---|---|---|
+| 1 | Pro | Ortak temel ve tek merkezli çok kaynaklı Pro işlevleri; uygulanabilir gerçek ortam ve bütün ürün kabulü. |
+| 2 | Starter | Pro ortak temeli üzerinde tek merkez/oda/disiplin/eğitmen varyantı; dar temel aday takibi ve kapalı üst plan işlemlerinin ayrı kabulü. |
+| 3 | Business | Pro kapsamının en fazla beş merkezli genişlemesi; merkez izolasyonu, birleşik kişi/CRM, merkezler arası hak/hesaplaşma ve rapor kabulü. |
+
+**Tamamen iptal edilen kapsam:** SMS ile telefon doğrulama, giriş/MFA, bildirim ve bunların sağlayıcı kurulum/kabul işleri; ayrıca beş merkezden fazla kullanım, özel teklif/özel limit ve bunlara bağlı geçiş/kabul işleri. Bunlar ertelenmiş görev veya sonraki sürüm taahhüdü değildir. Yeni açık ürün kararı olmadan yeniden sıraya alınmaz. Telefonun doğrulanmamış iletişim kaydı, mevcut e-posta/Google/TOTP akışları ve Business'ın beş merkeze kadar kapsamı korunur. Eski doğrulanmış telefon verileri ve güvenlik regresyonları yeni SMS desteği anlamına gelmez.
+
+## Teslim ve kanıt sahipleri
+
+| Konu | Tek sahibi |
+|---|---|
+| Ürün kapsamı, plan erişimi ve teslim kararı | [01 ürün sözleşmesi](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) |
+| Backend görevleri ve plan kabul ölçütleri | [Backlog](../apps/backend/docs/remaining-work.md); Pro [G02](../apps/backend/docs/remaining-work.md#g02), Starter [G01](../apps/backend/docs/remaining-work.md#g01), Business [G03](../apps/backend/docs/remaining-work.md#g03) |
+| Backend teknik bağımlılık ve paket sırası | [Üretim kuyruğu](../apps/backend/docs/production-queue.md) |
+| Frontend bölüm sırası ve gerçek ekran kabulü | [Frontend planı](../apps/web/docs/todo.md) |
+| Kaynak, çalıştırılmış CI ve hosted kanıtı | [Backend kabulü](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); frontend sonucu kendi planındadır |
+| Alanlar arası talep ve değerlendirme | [Ortak talepler](requests.md) |
+
+G/S/P/B/R kimlikleri mevcut kayıtlara bağlantıdır; alfabetik veya sayısal sıraları ürün teslim önceliği değildir. Kaynak hazır, test başarılı, merge edilmiş, hosted kabul edilmiş ve bütün ürün teslim edilmiş ayrı sonuçlardır.
+
+## F01–F33 API kapsamı
+
+Plan erişimi sütunu teslim sırası değildir. Bir planın özellik ailesine erişmesi bütün alt işlemleri açmaz: Starter F21 yalnız elle aday/not/takiptir, F25 yalnız temel ders takvimi/başvurusudur. Business genişlemeleri yalnız F18 değildir; ortak özelliklerin merkez/organizasyon davranışları da kendi kabulünü gerektirir. Kesin kapsam [ürün matrisinden](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#özellik-ve-plan-matrisi) ve operasyon kapılarından okunur.
+
+API sayıları güncel kaynaktan hesaplanır. Ortak operasyon birden fazla özellikte sayılabilir; satır toplamları benzersiz API sayısı değildir. `Kaynakta` envanterde bulunmayı, `contract-only` yalnız sözleşmede bulunmayı gösterir. `pending_feature_acceptance` makine kaydındaki tam özellik kabulünün açık olduğunu belirtir; tekil kaynak/ekran kabullerini geçersiz kılmaz ve uygulamanın eksik olduğu sonucunu tek başına vermez.
+
+| Özellik | Plan erişimi | Teknik API karşılığı | Kaynakta / contract-only | Makinedeki tam özellik kabul kaydı |
 |---|---|---|---|---|
 | F01 İşletme, merkez, oda ve kaynak tanımı | starter, pro, business | organization_create_v1, organization_get_v1, organization_update_v1, organization_close_preview_v1, organization_close_apply_v1, organization_reopen_v1, organization_delete_preview_v1, organization_delete_apply_v1, centers_list_v1, center_create_v1, center_update_v1, room_save_v1, disciplines_list_v1, discipline_save_v1, center_discipline_set_v1, management_state_get_v1 | 16 / 0 | pending_feature_acceptance |
 | F02 Çalışma saatleri, izin ve uygunluk | starter, pro, business | availability_save_v1, availability_exception_save_v1, management_state_get_v1, settings_preparation_resolve_v1 | 4 / 0 | pending_feature_acceptance |
@@ -40,7 +73,7 @@
 
 ## DS gerçek davranış vakaları
 
-Durum makine sözleşmesindeki vaka kaydından gelir; test referansı yeni head’de çalıştırılmış sonuç değildir. Yapısal test veya bu tablo gerçek Auth→Edge→RPC davranış kabulü yerine kullanılamaz.
+Durum makine sözleşmesindeki vaka kaydından gelir; test referansı yeni head’de çalıştırılmış sonuç değildir. `passed_runtime` kayıtlı bir davranış kanıtını, `pending_runtime` henüz kayda geçirilmemiş kabulü gösterir. İkisi de güncel kaynak/CI/hosted sonucunun yerine geçmez. Yapısal test veya bu tablo gerçek Auth→Edge→RPC davranış kabulü yerine kullanılamaz. Test yolları backend paketine göredir; dosya içindeki vaka adlarıdır, Markdown bölüm bağlantısı değildir.
 
 | Vaka | Beklenen davranış | Kayıtlı durum | Test kaynağı |
 |---|---|---|---|

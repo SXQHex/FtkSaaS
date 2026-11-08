@@ -54,13 +54,29 @@ for source,entry in zip(c['operations'],inventory['operations']):
  if 'authority_binding' in source:entry['authority_binding']=source['authority_binding']
 emit('../../docs/endpoint-inventory.json',json.dumps(inventory,ensure_ascii=False,indent=2))
 
-feature_doc=['# F01–F33 kaynak ve kabul haritası','',
- 'Üretilmiştir: makine sözleşmesi ve `implemented.json` → `render_catalogs.py`. API sayıları güncel kaynaktan hesaplanır. Bir özelliğin bütün ekran/selector/provider/ortam kabulleri bu sayımdan çıkmaz. Ürün plan erişimi [01](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), açık işler [backend backlog](../apps/backend/docs/remaining-work.md), çalıştırılmış kaynak/CI/ortam kanıtı [güncel kabul](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir.',
- '', '| Özellik | Plan erişimi | Teknik API karşılığı | Kaynakta / contract-only | Tam özellik kabulü |','|---|---|---|---|---|']
+product_scope=Path('../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md').read_text()
+delivery_policy=product_scope.split('\n## Genel teslim sırası\n',1)[1].split('\n## ',1)[0].strip()
+feature_doc=['# F01–F33 teslim, kaynak ve kabul haritası','',
+ 'Üretilmiştir: ürün kapsam sözleşmesi, makine sözleşmesi ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. Teslim kararı aşağıda ürün sahibinden aktarılır; API ve DS tabloları makine kaynağının görünümüdür. Bu belge ikinci backlog veya kabul kaydı değildir.',
+ '', '## Genel teslim sırası','',
+ 'Tek normatif kaynak: [ürün kapsam sözleşmesi](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#genel-teslim-sırası).','',delivery_policy,
+ '', '## Teslim ve kanıt sahipleri','',
+ '| Konu | Tek sahibi |','|---|---|',
+ '| Ürün kapsamı, plan erişimi ve teslim kararı | [01 ürün sözleşmesi](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) |',
+ '| Backend görevleri ve plan kabul ölçütleri | [Backlog](../apps/backend/docs/remaining-work.md); Pro [G02](../apps/backend/docs/remaining-work.md#g02), Starter [G01](../apps/backend/docs/remaining-work.md#g01), Business [G03](../apps/backend/docs/remaining-work.md#g03) |',
+ '| Backend teknik bağımlılık ve paket sırası | [Üretim kuyruğu](../apps/backend/docs/production-queue.md) |',
+ '| Frontend bölüm sırası ve gerçek ekran kabulü | [Frontend planı](../apps/web/docs/todo.md) |',
+ '| Kaynak, çalıştırılmış CI ve hosted kanıtı | [Backend kabulü](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); frontend sonucu kendi planındadır |',
+ '| Alanlar arası talep ve değerlendirme | [Ortak talepler](requests.md) |',
+ '', 'G/S/P/B/R kimlikleri mevcut kayıtlara bağlantıdır; alfabetik veya sayısal sıraları ürün teslim önceliği değildir. Kaynak hazır, test başarılı, merge edilmiş, hosted kabul edilmiş ve bütün ürün teslim edilmiş ayrı sonuçlardır.',
+ '', '## F01–F33 API kapsamı','',
+ 'Plan erişimi sütunu teslim sırası değildir. Bir planın özellik ailesine erişmesi bütün alt işlemleri açmaz: Starter F21 yalnız elle aday/not/takiptir, F25 yalnız temel ders takvimi/başvurusudur. Business genişlemeleri yalnız F18 değildir; ortak özelliklerin merkez/organizasyon davranışları da kendi kabulünü gerektirir. Kesin kapsam [ürün matrisinden](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#özellik-ve-plan-matrisi) ve operasyon kapılarından okunur.',
+ '', 'API sayıları güncel kaynaktan hesaplanır. Ortak operasyon birden fazla özellikte sayılabilir; satır toplamları benzersiz API sayısı değildir. `Kaynakta` envanterde bulunmayı, `contract-only` yalnız sözleşmede bulunmayı gösterir. `pending_feature_acceptance` makine kaydındaki tam özellik kabulünün açık olduğunu belirtir; tekil kaynak/ekran kabullerini geçersiz kılmaz ve uygulamanın eksik olduğu sonucunu tek başına vermez.',
+ '', '| Özellik | Plan erişimi | Teknik API karşılığı | Kaynakta / contract-only | Makinedeki tam özellik kabul kaydı |','|---|---|---|---|---|']
 for fid,row in c['feature_delivery'].items():
  ops=row['technical_operations'];implemented=sum(n in names for n in ops)
  feature_doc.append('| '+fid+' '+row['name']+' | '+', '.join(k for k,v in row['plans'].items() if v)+' | '+', '.join(ops)+' | '+str(implemented)+' / '+str(len(ops)-implemented)+' | '+row['acceptance']+' |')
-feature_doc+=['','## DS gerçek davranış vakaları','','Durum makine sözleşmesindeki vaka kaydından gelir; test referansı yeni head’de çalıştırılmış sonuç değildir. Yapısal test veya bu tablo gerçek Auth→Edge→RPC davranış kabulü yerine kullanılamaz.','','| Vaka | Beklenen davranış | Kayıtlı durum | Test kaynağı |','|---|---|---|---|']
+feature_doc+=['','## DS gerçek davranış vakaları','','Durum makine sözleşmesindeki vaka kaydından gelir; test referansı yeni head’de çalıştırılmış sonuç değildir. `passed_runtime` kayıtlı bir davranış kanıtını, `pending_runtime` henüz kayda geçirilmemiş kabulü gösterir. İkisi de güncel kaynak/CI/hosted sonucunun yerine geçmez. Yapısal test veya bu tablo gerçek Auth→Edge→RPC davranış kabulü yerine kullanılamaz. Test yolları backend paketine göredir; dosya içindeki vaka adlarıdır, Markdown bölüm bağlantısı değildir.','','| Vaka | Beklenen davranış | Kayıtlı durum | Test kaynağı |','|---|---|---|---|']
 for v in c['decision_sprint']['acceptance_cases']:
  feature_doc.append('| '+v['id']+' | '+cell(v['expected_flow'])+' | '+v['status']+' | '+cell(', '.join(v.get('evidence',[])))+' |')
 emit('../../docs/feature-delivery.md','\n'.join(feature_doc))

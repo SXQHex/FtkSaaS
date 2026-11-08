@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5e60de9a1b247175e3e9cecff6a4a460564523ce06adc79659cb27b25ff54b94",
-        "reason": "Only plan-target native fixture source hash changed after required page fix; original unit/shard inventory and all checks remain unchanged."
+        "fingerprint": "233998c66ff69f5bad0bcec576ab117f9cabab39971860eaa7ea3a480bfffa3e",
+        "reason": "Ürün teslim kararından üretilen görünüm ve mevcut WF00 protokolü incelendi; DTO, transport, runtime ve yetki davranışı değişmedi."
       }
     },
     {
