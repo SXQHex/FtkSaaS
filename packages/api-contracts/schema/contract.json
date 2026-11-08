@@ -3404,6 +3404,9 @@
         },
         "regional_defaults": {
           "$ref": "#/$defs/OrganizationRegionalDefaults"
+        },
+        "brand_colors": {
+          "$ref": "#/$defs/OrganizationBrandColors"
         }
       },
       "required": [
@@ -49583,6 +49586,9 @@
               "type": "null"
             }
           ]
+        },
+        "brand_colors": {
+          "$ref": "#/$defs/OrganizationBrandColors"
         }
       },
       "required": [],
@@ -51324,6 +51330,12 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/SubscriptionDowngradeOption"
+          }
+        },
+        "upgrade_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SubscriptionUpgradeOption"
           }
         }
       },
@@ -53391,6 +53403,66 @@
       "required": [
         "mfa_roles",
         "sensitive_reauth_max_age_seconds"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionUpgradeOption": {
+      "type": "object",
+      "properties": {
+        "plan": {
+          "$ref": "#/$defs/Plan"
+        },
+        "target": {
+          "$ref": "#/$defs/SubscriptionPlanTerms"
+        }
+      },
+      "required": [
+        "plan",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "OrganizationBrandColors": {
+      "type": "object",
+      "properties": {
+        "primary_color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "secondary_color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accent_color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "primary_color",
+        "secondary_color",
+        "accent_color"
       ],
       "additionalProperties": false
     }
@@ -97593,7 +97665,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 133,
+      "migration_count": 134,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

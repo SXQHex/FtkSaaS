@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "bf82af8f733fea7483cd8b933ce6fcd12a143361e8fb7bd84097ebcdbfb44638",
-        "reason": "Reviewed settings acceptance import hash and shifted line ownership after native MFA prerequisite; source coverage and all CI acceptance gates remain unchanged."
+        "fingerprint": "fac85e5dca762336dcd87f3be8822c845be141e8d35f4e2ad10efd02c256e37b",
+        "reason": "Reviewed additive DTOs, frozen migration source/count parity and unchanged protocol validation; closed color and upgrade schemas preserve existing required fields."
       }
     },
     {
@@ -1230,7 +1230,9 @@
         "apps/backend/database/settings-catalog-v17.sql",
         "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql",
         "apps/backend/database/organization-security-native-proof.sql",
-        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql"
+        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql",
+        "apps/backend/database/pro-upgrade-brand-discovery.sql",
+        "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1245,8 +1247,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "682110da7815316e7ea12538065f01c91e1ced0913f13a8f44dab9c44c179802",
-        "reason": "Reviewed settings round-trip native TOTP enrollment and signed AAL2 actor; all declared fields including security_policy still round-trip, weak actor explicitly rejected, native factor cleaned afterward."
+        "fingerprint": "e944a79b8fdb19adec3bd9d58cabad606a2056d2fc61fd24089a521cbb61a199",
+        "reason": "Reviewed member-list and existing org projection gates, public profile publication/feature/center guards and native closed projection tests; only configured public colors are added, private settings stay restricted."
       }
     },
     {
@@ -1307,7 +1309,9 @@
         "apps/backend/database/permission-and-plan-discovery.sql",
         "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql",
         "apps/backend/database/owner-downgrade-resource-discovery.sql",
-        "apps/backend/supabase/migrations/20261107225730_owner_downgrade_resource_discovery.sql"
+        "apps/backend/supabase/migrations/20261107225730_owner_downgrade_resource_discovery.sql",
+        "apps/backend/database/pro-upgrade-brand-discovery.sql",
+        "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1319,8 +1323,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "4929872bf1835af25da5210b805e735c1baa6a54107afd0879827ee8fffcbde0",
-        "reason": "CI api-10 rejected centers_list fixture without required page; explicit valid pagination preserves Owner discovery and every original assertion."
+        "fingerprint": "d3290a5a33de556d8c561eb5a71cd7ed34ac4a63b43f8891685a9a852d8305df",
+        "reason": "Reviewed live Owner target discovery against p07 quote rank/period/currency/state and pending-period restrictions; native tests prove read-only discovery, explicit quote and stale target rejection."
       }
     },
     {

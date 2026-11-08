@@ -107,6 +107,21 @@ test('ST-03 member privacy, calendar, media and public visibility',{timeout:6000
    await denied(owner,'settings_update_v1',{...q('center'),expected_version:(await read('center')).version,patch:{},logo_image:image},'VALIDATION_FAILED');
    await must(owner,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{},logo_image:null},key());assert.equal((await read('organization')).logo,null);await denied(student,'media_get_v1',{scope:'organization',org_id:org,asset_id:logo.id},'NOT_FOUND');
   });
+  await t.test('XREQ035 member brand colors are live and do not grant private organization settings',async()=>{
+   const colors={primary_color:'#123456',secondary_color:null,accent_color:'#abcdef'};
+   await change('organization',colors);
+   const memberOrgs=()=>must(student,'organizations_list_v1',{page:{}});
+   assert.deepEqual((await memberOrgs()).items.find(x=>x.id===org).brand_colors,colors);
+   const privateRead=await call(student,'settings_get_v1',q('organization'));assert.equal(privateRead.result.ok,false);assert.equal(privateRead.result.error.code,'FORBIDDEN');
+   assert.deepEqual((await api('organization_get_v1')).brand_colors,colors);
+   await change('organization',{primary_color:null});assert.equal((await memberOrgs()).items.find(x=>x.id===org).brand_colors.primary_color,null);
+   await change('organization',{public_profile_enabled:true,public_fields:['name']});
+   const anon={jwt:context().env.ANON_KEY},request={slug:org,center_id:center,interval:{starts_at:new Date().toISOString(),ends_at:new Date(Date.now()+7*86400000).toISOString()},page:{}};
+   const publicRead=()=>must(anon,'public_calendar_get_v1',request);
+   const profile=(await publicRead()).organization_profile;assert.deepEqual(profile.brand_colors,{...colors,primary_color:null});assert.deepEqual(Object.keys(profile).sort(),['brand_colors','name']);
+   await change('organization',{public_profile_enabled:false,accent_color:null});assert.equal((await publicRead()).organization_profile,null);
+
+  });
   await t.test('public field selection is default closed, live, scoped and independent of calendar publication',async()=>{
    const anon={jwt:context().env.ANON_KEY},request={slug:org,center_id:center,interval:{starts_at:new Date().toISOString(),ends_at:new Date(Date.now()+7*86400000).toISOString()},page:{}};
    const session=(await rows(`select id from core.sessions where org_id=$1 and starts_at>now() and state='planned' order by starts_at limit 1`,[org]))[0].id;
