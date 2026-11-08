@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "75ba2138469e51052575611930088b01763b3840ee8907440d56b8926955d5ad",
-        "reason": "Reviewed client protocol and source-bound inventory after catalogue v17 scoped descriptors, additive approval data and exact native-test import hashes; no transport or CI gate changes."
+        "fingerprint": "cdf9d6d48cba9b5ea770b73f7decf0d2671745da0e8930bf2e0b2ecdf332ebff",
+        "reason": "Reviewed append-only migration133 byte equality and frozen inventory; native proof correction keeps existing CI trust, coverage and timeout policy unchanged."
       }
     },
     {
@@ -355,7 +355,9 @@
         "apps/backend/scripts/acceptance/s08-native-mfa.mjs",
         "apps/backend/database/organization-security-preferences.sql",
         "apps/backend/database/settings-catalog-v17.sql",
-        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql"
+        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql",
+        "apps/backend/database/organization-security-native-proof.sql",
+        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -367,8 +369,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "7e38774839474ef2e6d5f1118bb9ce86c15c4447a13f3650e00098e3c18e0e25",
-        "reason": "Reviewed final O04 policy edit preview actor/scope binding, pre-reader enforcement and trusted native session assurance in recursive authorization; native security regression retains original assertions."
+        "fingerprint": "7fcacc2115ef5de67280a51fa1fb03b16d6df79b39d5acbe576200f0811bf10b",
+        "reason": "Reviewed native factor ACL: organization policy delegates mandatory enrollment and AAL proof to existing closed service-only account MFA boundary; native and role regressions preserve stale-token and missing-factor rejection."
       }
     },
     {
@@ -844,8 +846,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "b9843c9fe270aaf872682c85d5f38b1a8a915c9c339900eee4870782ae439ba5",
-        "reason": "Paylaşılan action native köküne finans correction testleri eklendi; mevcut kapasite/oda/atanmış eğitmen/Business cross-center ve kayıp rol assertionları korunuyor, WF06 runtime davranışı değişmedi."
+        "fingerprint": "a1a91e953dca83ce4f8181252ccd6be4e5b511548c1bd921b3c3458cf3becb1b",
+        "reason": "Reviewed shared finance/capacity discovery test roots after collection correction extraction; all role feature cross-center and revocation assertions remain with isolated setup."
       }
     },
     {
@@ -972,8 +974,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "58a7b98e6c7b4eef8aa5f2bc428f704453fc6d9830a6d2a454972dfc0bcbde85",
-        "reason": "XREQ-030 gerçek kök collection reader/projeksiyon/dispatch migrationı ve native subtestler incelendi; aynı finance.refund preflight, yan etkisiz okuma, açık preview/apply, child/refund/foreign-tenant/legacy-person sınırları."
+        "fingerprint": "0baa61c9c6dbe45551f77eb98095a4f3164887c69acd5baab99d6e2730ffac80",
+        "reason": "Reviewed action discovery acceptance split into independent authority and ledger correction roots; original assertions and 300-second root budgets retained with separate tenant fixtures."
       }
     },
     {
@@ -1225,7 +1227,9 @@
         "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql",
         "apps/backend/database/organization-security-preferences.sql",
         "apps/backend/database/settings-catalog-v17.sql",
-        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql"
+        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql",
+        "apps/backend/database/organization-security-native-proof.sql",
+        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1240,8 +1244,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "f29fb07afc6bfc271fd64b2b39da0d7ae309db9488f1770453567c7a876b81ef",
-        "reason": "Reviewed final v17 base and scoped catalog descriptors and security policy schema/preview scope guard; existing defaults, writer rights and history behavior remain unchanged."
+        "fingerprint": "ef00f7231b346701a19f1b1366fc98c54d3f38574fd9b9080892fb272430c764",
+        "reason": "Reviewed organization security gate and native proof boundary; settings update reset and historical policy checks retain current behavior without granting Auth factor SELECT to service_role."
       }
     },
     {

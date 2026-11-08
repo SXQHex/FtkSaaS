@@ -26,6 +26,22 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    const claims=JSON.parse(Buffer.from(verified.data.access_token.split('.')[1],'base64url'));assert.equal(claims.aal,'aal2');strong={...user,jwt:verified.data.access_token,session_id:claims.session_id};
    const history=await must(strong,'account_security_history_get_v1');assert.equal(history.items.filter(e=>e.action==='totp_enabled').length,1);assert(!JSON.stringify(history).includes(enrolled.data.totp.secret));
   });
+  await t.test('mandatory native proof uses service-only MFA access without exposing Auth factor rows',async()=>{
+   assert.equal((await db.query("select has_table_privilege('service_role','auth.mfa_factors','SELECT') allowed")).rows[0].allowed,false);
+   for(const role of ['anon','authenticated'])assert.equal((await db.query("select has_function_privilege($1,'private.account_mfa_assert(uuid,uuid,jsonb)','EXECUTE') allowed",[role])).rows[0].allowed,false);
+   await db.query('begin');
+   try{
+    await db.query('set local role service_role');
+    await db.query("select set_config('request.jwt.claim.role','service_role',true)");
+    await db.query('select private.account_mfa_assert($1,$2,$3)',[user.id,strong.session_id,{verified_aal:'aal2',mfa_required:true}]);
+    await db.query('savepoint missing_factor');
+    await assert.rejects(db.query('select private.account_mfa_assert($1,$2,$3)',[other.id,other.session_id,{verified_aal:'aal2',mfa_required:true}]),e=>e.code==='P0001'&&e.message==='AUTH_REQUIRED');
+    await db.query('rollback to savepoint missing_factor');
+    await db.query('savepoint factor_rows');
+    await assert.rejects(db.query('select 1 from auth.mfa_factors limit 1'),e=>e.code==='42501');
+    await db.query('rollback to savepoint factor_rows');
+   }finally{await db.query('rollback');}
+  });
   await t.test('organization MFA and stricter reauthentication cover direct and recursive discovery paths',async()=>{
    await db.query('insert into private.p07_lifecycle_config values(true,300) on conflict(singleton) do nothing');
    const {platform,plan}=await fixturePlatform(),account=await must(strong,'account_get_v1');

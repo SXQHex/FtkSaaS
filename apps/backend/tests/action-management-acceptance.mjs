@@ -4,7 +4,7 @@ import {preparationFixture} from './starter-preparation-fixture.mjs';
 import {authUser,must,call} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
-test('XREQ023/024 action discovery reuses live writer authority without domain effects',{timeout:300000},async t=>{
+async function actionFixture(t){
  const f=await preparationFixture({schedule:true,studentUser:true,studentMembership:true,session:true});
  const {db,org,center,owner,student,studentPerson,person,discipline,plan,room,api,day}=f;t.after(()=>db.end());
  const scope=b=>({org_id:org,center_id:center,...b});
@@ -14,7 +14,6 @@ test('XREQ023/024 action discovery reuses live writer authority without domain e
  const preview=await api('sale_preview_v1',{person_id:studentPerson,product_version_id:product,start_date:day(1),end_date:day(61)});
  const sale=(await api('sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
  const debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale])).rows[0].id;
- let collection;
  const actions=[
   ['collection_record_v1',{person_id:studentPerson}],
   ['reservation_capacity_override_v1',{person_id:studentPerson,session_id:session}],
@@ -31,6 +30,12 @@ test('XREQ023/024 action discovery reuses live writer authority without domain e
   const result={};for(const table of tables)result[table]=(await db.query('select coalesce(jsonb_agg(to_jsonb(x) order by x.id),\'[]\') data from core.'+table+' x where org_id=$1',[org])).rows[0].data;
   return result;
  };
+ return {db,org,center,owner,student,studentPerson,person,discipline,plan,room,api,day,session,debt,actions,read,denied,snapshot,scope};
+}
+
+test('XREQ023/024 action discovery reuses live writer authority without domain effects',{timeout:300000},async t=>{
+ const {db,org,center,owner,student,studentPerson,person,discipline,plan,room,api,day,session,debt,actions,read,denied,snapshot,scope}=await actionFixture(t);
+ let collection;
  await t.test('Starter CM discovers first collection and every typed action without money defaults or writes',async()=>{
   const before=await snapshot();assert.equal(before.cash_movements.length,0);
   for(const [op,k] of actions){
@@ -74,54 +79,7 @@ test('XREQ023/024 action discovery reuses live writer authority without domain e
    assert.equal(result.result.ok,false);assert.equal(result.result.error.code,'CAPACITY_FULL');
   }finally{await db.query('update core.rooms set capacity=10 where org_id=$1 and id=$2',[org,room]);}
  });
- await t.test('XREQ030 root collection discovery is read-only and precedes explicit correction preview/apply',async()=>{
-  const op='collection_correct_preview_v1',selector={cash_movement_id:collection};
-  const root=(await db.query('select * from core.cash_movements where org_id=$1 and id=$2',[org,collection])).rows[0];
-  assert.equal(root.kind,'collection');assert.equal(root.previous_id,null);
-  const before=await snapshot(),item=(await read(op,selector)).items[0];
-  assert.deepEqual(item.entity,{type:'cash_movements',id:collection});
-  assert.deepEqual(item.current.values,selector);assert.equal(item.state,null);
-  assert.deepEqual(item.versions,[{entity:item.entity,version:Number(root.version)}]);
-  assert.deepEqual(await snapshot(),before);
-  await denied(op,selector,'FORBIDDEN',student);
-  await denied(op,selector,'NOT_FOUND',await authUser('correction-discovery-outsider'));
-  await denied(op,{cash_movement_id:key()},'NOT_FOUND');
-  await denied(op,selector,'NOT_FOUND',owner,{entity:{type:'people',id:studentPerson}});
-  const features=(await db.query('select features from core.saas_plan_versions where id=$1',[plan])).rows[0].features;
-  await db.query("update core.saas_plan_versions set features=array_remove(features,'F33') where id=$1",[plan]);
-  try{await denied(op,selector,'PLAN_FEATURE_UNAVAILABLE');}finally{await db.query('update core.saas_plan_versions set features=$2 where id=$1',[plan,features]);}
-  const correction=await api(op,{...selector,correction:{direction:'increase',amount_minor:'100',currency:'TRY',occurred_at:new Date().toISOString()},reason:'Explicit synthetic collection correction'});
-  assert.deepEqual(correction.blockers,[]);
-  const applied=await api('collection_correct_apply_v1',{preview:{id:correction.id,token:correction.token}});
-  assert.notEqual(applied.primary_id,collection);
-  const child=(await db.query('select * from core.cash_movements where org_id=$1 and id=$2',[org,applied.primary_id])).rows[0];
-  assert.equal(child.previous_id,collection);assert.equal(child.kind,'correction_in');
-  await denied(op,{cash_movement_id:child.id},'NOT_FOUND');
-  const refund=(await api('student_credit_refund_v1',{person_id:studentPerson,amount_minor:'50',currency:'TRY',occurred_at:new Date().toISOString(),reason:'Synthetic non-collection source'})).primary_id;
-  const nonCollection=(await db.query('select kind,previous_id from core.cash_movements where org_id=$1 and id=$2',[org,refund])).rows[0];
-  assert.equal(nonCollection.kind,'refund');assert.equal(nonCollection.previous_id,null);
-  await denied(op,{cash_movement_id:refund},'NOT_FOUND');
-  assert.deepEqual((await read(op,selector)).items[0].current.values,selector);
-  actions.push([op,selector]);
- });
- await t.test('XREQ030 rejects another tenant ledger and preserves the original merged-person cash source',async()=>{
-  const foreign=await preparationFixture({studentUser:true,studentMembership:true});
-  try{
-   const receipt=await foreign.api('collection_record_v1',{person_id:foreign.studentPerson,debt_ids:[],amount_minor:'30',currency:'TRY',occurred_at:new Date().toISOString()});
-   await denied('collection_correct_preview_v1',{cash_movement_id:receipt.primary_id},'NOT_FOUND');
-  }finally{await foreign.db.end();}
-  const legacy=(await api('person_create_v1',{display_name:'Synthetic legacy cash identity',contacts:[]})).primary_id;
-  await api('student_activate_v1',{person_id:legacy});
-  const receipt=await api('collection_record_v1',{person_id:legacy,debt_ids:[],amount_minor:'30',currency:'TRY',occurred_at:new Date().toISOString()});
-  const canonical=(await api('person_create_v1',{display_name:'Synthetic canonical cash identity',contacts:[]})).primary_id;
-  await api('student_activate_v1',{person_id:canonical});
-  // Historical merge fixture: immutable ledger IDs/person pointers are retained.
-  await db.query("update core.people set state='merged',merged_into_id=$2,version=version+1 where org_id=$1 and id=$3",[org,canonical,legacy]);
-  const before=await snapshot(),item=(await read('collection_correct_preview_v1',{cash_movement_id:receipt.primary_id})).items[0];
-  assert.equal(item.entity.id,receipt.primary_id);assert.equal(item.entity.type,'cash_movements');
-  assert.equal((await db.query('select person_id from core.cash_movements where org_id=$1 and id=$2',[org,receipt.primary_id])).rows[0].person_id,legacy);
-  assert.deepEqual(await snapshot(),before);
- });
+ actions.push(['collection_correct_preview_v1',{cash_movement_id:collection}]);
  await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
  const other=(await api('center_create_v1',{name:'Other action center',timezone:'UTC'})).primary_id;
  await api('center_manager_assign_v1',{center_id:other,person_id:person});
@@ -174,4 +132,57 @@ test('XREQ023/024 action discovery reuses live writer authority without domain e
   for(const [op,k] of actions)await denied(op,k,'FORBIDDEN');
  });
 
+});
+
+test('XREQ030 collection correction discovery preserves ledger authority',{timeout:300000},async t=>{
+ const {db,org,center,owner,student,studentPerson,person,discipline,plan,room,api,day,session,debt,actions,read,denied,snapshot,scope}=await actionFixture(t);
+ const collection=(await api('collection_record_v1',{person_id:studentPerson,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()})).primary_id;
+ await t.test('XREQ030 root collection discovery is read-only and precedes explicit correction preview/apply',async()=>{
+  const op='collection_correct_preview_v1',selector={cash_movement_id:collection};
+  const root=(await db.query('select * from core.cash_movements where org_id=$1 and id=$2',[org,collection])).rows[0];
+  assert.equal(root.kind,'collection');assert.equal(root.previous_id,null);
+  const before=await snapshot(),item=(await read(op,selector)).items[0];
+  assert.deepEqual(item.entity,{type:'cash_movements',id:collection});
+  assert.deepEqual(item.current.values,selector);assert.equal(item.state,null);
+  assert.deepEqual(item.versions,[{entity:item.entity,version:Number(root.version)}]);
+  assert.deepEqual(await snapshot(),before);
+  await denied(op,selector,'FORBIDDEN',student);
+  await denied(op,selector,'NOT_FOUND',await authUser('correction-discovery-outsider'));
+  await denied(op,{cash_movement_id:key()},'NOT_FOUND');
+  await denied(op,selector,'NOT_FOUND',owner,{entity:{type:'people',id:studentPerson}});
+  const features=(await db.query('select features from core.saas_plan_versions where id=$1',[plan])).rows[0].features;
+  await db.query("update core.saas_plan_versions set features=array_remove(features,'F33') where id=$1",[plan]);
+  try{await denied(op,selector,'PLAN_FEATURE_UNAVAILABLE');}finally{await db.query('update core.saas_plan_versions set features=$2 where id=$1',[plan,features]);}
+  const correction=await api(op,{...selector,correction:{direction:'increase',amount_minor:'100',currency:'TRY',occurred_at:new Date().toISOString()},reason:'Explicit synthetic collection correction'});
+  assert.deepEqual(correction.blockers,[]);
+  const applied=await api('collection_correct_apply_v1',{preview:{id:correction.id,token:correction.token}});
+  assert.notEqual(applied.primary_id,collection);
+  const child=(await db.query('select * from core.cash_movements where org_id=$1 and id=$2',[org,applied.primary_id])).rows[0];
+  assert.equal(child.previous_id,collection);assert.equal(child.kind,'correction_in');
+  await denied(op,{cash_movement_id:child.id},'NOT_FOUND');
+  const refund=(await api('student_credit_refund_v1',{person_id:studentPerson,amount_minor:'50',currency:'TRY',occurred_at:new Date().toISOString(),reason:'Synthetic non-collection source'})).primary_id;
+  const nonCollection=(await db.query('select kind,previous_id from core.cash_movements where org_id=$1 and id=$2',[org,refund])).rows[0];
+  assert.equal(nonCollection.kind,'refund');assert.equal(nonCollection.previous_id,null);
+  await denied(op,{cash_movement_id:refund},'NOT_FOUND');
+  assert.deepEqual((await read(op,selector)).items[0].current.values,selector);
+  actions.push([op,selector]);
+ });
+ await t.test('XREQ030 rejects another tenant ledger and preserves the original merged-person cash source',async()=>{
+  const foreign=await preparationFixture({studentUser:true,studentMembership:true});
+  try{
+   const receipt=await foreign.api('collection_record_v1',{person_id:foreign.studentPerson,debt_ids:[],amount_minor:'30',currency:'TRY',occurred_at:new Date().toISOString()});
+   await denied('collection_correct_preview_v1',{cash_movement_id:receipt.primary_id},'NOT_FOUND');
+  }finally{await foreign.db.end();}
+  const legacy=(await api('person_create_v1',{display_name:'Synthetic legacy cash identity',contacts:[]})).primary_id;
+  await api('student_activate_v1',{person_id:legacy});
+  const receipt=await api('collection_record_v1',{person_id:legacy,debt_ids:[],amount_minor:'30',currency:'TRY',occurred_at:new Date().toISOString()});
+  const canonical=(await api('person_create_v1',{display_name:'Synthetic canonical cash identity',contacts:[]})).primary_id;
+  await api('student_activate_v1',{person_id:canonical});
+  // Historical merge fixture: immutable ledger IDs/person pointers are retained.
+  await db.query("update core.people set state='merged',merged_into_id=$2,version=version+1 where org_id=$1 and id=$3",[org,canonical,legacy]);
+  const before=await snapshot(),item=(await read('collection_correct_preview_v1',{cash_movement_id:receipt.primary_id})).items[0];
+  assert.equal(item.entity.id,receipt.primary_id);assert.equal(item.entity.type,'cash_movements');
+  assert.equal((await db.query('select person_id from core.cash_movements where org_id=$1 and id=$2',[org,receipt.primary_id])).rows[0].person_id,legacy);
+  assert.deepEqual(await snapshot(),before);
+ });
 });

@@ -233,3 +233,5 @@ assert next(Path('supabase/migrations').glob('*_action_management_discovery.sql'
 assert next(Path('supabase/migrations').glob('*_collection_correction_discovery.sql')).read_bytes()==Path('database/collection-correction-discovery.sql').read_bytes(),'Collection correction discovery source drift'
 
 assert next(Path('supabase/migrations').glob('*_owner_downgrade_resource_discovery.sql')).read_bytes()==Path('database/owner-downgrade-resource-discovery.sql').read_bytes(),'Owner downgrade discovery source drift'
+
+assert next(Path('supabase/migrations').glob('*_organization_security_native_proof.sql')).read_bytes()==Path('database/organization-security-native-proof.sql').read_bytes(),'Organization native MFA boundary source drift'
