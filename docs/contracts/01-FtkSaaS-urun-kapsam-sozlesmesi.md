@@ -1,5 +1,17 @@
 # FtkSaaS — Ürün kapsam sözleşmesi
 
+## Ürün teslim sırası
+
+8 Kasım 2026 kullanıcı kararıyla ürün teslim sırası **Pro → Starter → Business** olarak uygulanır; frontend ve backend için ortaktır. Önce Pro bütün ürün kabulü, ardından Starter varyantının ayrı ürün kabulü, son olarak Business çok merkezli genişlemesinin kabulü tamamlanır. Ortak teknik bağımlılıkların geliştirilmesi ve Starter regresyonlarının erken sınanması bu teslim sırasını değiştirmez. Önceden tamamlanmış uygulama ve kabul kanıtları korunur; bir planın kabulü diğer planın bütün ürün kabulü sayılmaz.
+
+Görev ve kabul ölçütleri [backend backlog](../../apps/backend/docs/remaining-work.md) ve [frontend teslim planında](../../apps/web/docs/todo.md), teknik bağımlılık sırası [backend kuyruğunda](../../apps/backend/docs/production-queue.md) tutulur. Bu bölüm genel ürün teslim kararının tek sahibidir.
+
+## Kalıcı kapsam iptalleri
+
+SMS ile telefon doğrulaması ve buna bağlı kod isteme, kod doğrulama, yeniden gönderim, sağlayıcı/test OTP kurulumu ve gerçek telefon doğrulama kabul işleri **tamamen iptal edilmiştir**. Bu işler V2'ye ertelenmiş görev veya gelecek sürüm taahhüdü değildir; yeni açık kullanıcı kararı olmadan yeniden sıraya alınmaz. Telefonun doğrulanmamış iletişim kaydı ve mevcut kimlik verilerinin güvenli korunumu [teknik sözleşmede](02-FtkSaaS-teknik-sozlesme.md#telefon-kaydı-ve-hesap-güvenliği--7-kasım-2026) tanımlıdır.
+
+Business sınırını aşan kullanım ve özel teklif/özel limit kapsamının kalıcı iptali [bağlayıcı plan sınırında](#lokasyon-ve-limit-temsili) tanımlıdır. İptal, eksik özellik veya başarılı kabul kaydı değildir.
+
 ## Kabul edilmiş SaaS plan sınırları
 
 Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararları [teknik sözleşmenin](02-FtkSaaS-teknik-sozlesme.md) sorumluluğundadır. Kaynak/CI/ortam kabulü [güncel kabul kaydından](../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), açık işler [backlog’dan](../../apps/backend/docs/remaining-work.md) okunur.
@@ -54,7 +66,7 @@ Plan değişiminin sürümlü kapsam seçimi, dönem sınırı ve kapalı kaynak
 
 Pro’nun odaları aynı fiziksel işletme lokasyonunun ders alanlarıdır. Ayrı lokasyon ayrı merkezdir ve Business gerektirir; oda adını değiştirmek bu sınırı kaldırmaz. Yazılım oda adından fiziksel adresi kanıtlamaz; aktif öğrenci kotası kötüye kullanımın ölçeğini sınırlar, tek başına lokasyon doğrulaması değildir.
 
-Business en fazla beş aktif merkezle sınırlıdır; bu sınır aşılamaz. Özel teklif, müşteri bazlı özel limit ve bunlara bağlı kabul/geçiş akışı ürün kapsamı dışındadır. Bütün planlarda bağlayıcı tablodaki standart limitler uygulanır. Oda/eğitmen için sınırsızlık API/DB/okuma/doğrulayıcı/kapılarda açık ve aynı anlamda temsil edilir; 0 veya sihirli büyük sayı kullanılmaz. Ürün kararı runtime/hosted kabulü değildir; aktarım [backend backlog’unun](../../apps/backend/docs/remaining-work.md#p01) sorumluluğundadır.
+Business en fazla beş aktif merkezle sınırlıdır; bu sınır aşılamaz. Beş merkezi aşan kullanım, özel teklif, müşteri bazlı özel limit ve bunlara bağlı kabul/geçiş işleri tamamen iptal edilmiştir; sonraki sürüme ertelenmiş görev veya otomatik taahhüt değildir. Bütün planlarda bağlayıcı tablodaki standart limitler uygulanır. Oda/eğitmen için sınırsızlık API/DB/okuma/doğrulayıcı/kapılarda açık ve aynı anlamda temsil edilir; 0 veya sihirli büyük sayı kullanılmaz. Ürün kararı runtime/hosted kabulü değildir; aktarım [backend backlog’unun](../../apps/backend/docs/remaining-work.md#p01) sorumluluğundadır.
 
 ## Belgenin durumu
 
@@ -151,7 +163,9 @@ Tam web sitesi oluşturucu kapsam dışıdır; paylaşılabilir takvim/başvuru 
 <a id="ilk-tam-sürüm-ve-sonraki-aşama-sınırı"></a>
 ### İlk tam sürüm ve sonraki aşama sınırı
 
-İlk tam sürümde Pro/Business e-postası işlemsel bildirimler ve hizmet hatırlatmaları içindir. Kampanya/indirim/geri kazanım e-postası ertelidir; F21–F24 segmentleri, deneme, takip listeleri ve CRM görev otomasyonu kapsamda kalır. SMS, WhatsApp ve mobil push ile günlük/haftalık özet sonraki aşamadadır. Starter’ın uygulama içi sınırı korunur; Native Auth e-postaları uygulama dış kanal lisansından ayrıdır. Zamanlama ve sessiz saat davranışının tek sahibi teknik sözleşmedeki FD04’tür.
+7 Kasım 2026 kullanıcı kararıyla gerçek Meta/Google form bağlantıları ve dış site form adaptörlerinin tamamlanması **bu sürüm için iptal edilmiştir**; Pro, Starter veya Business'ın bu sürümdeki teslimini engellemez. Gelecek sürüm taahhüdü verilmez. Mevcut kaynak ve geçmiş test kanıtı korunur; iptal başarılı entegrasyon kabulü değildir. Manuel aday takibi, ortak CRM kutusu ve uygulamanın kendi public başvurusu kapsamda kalır. Ortak başvuru davranışı [P08 kararında](../decisions/P08-accepted-scope.md#ortak-alım-kuralları) tanımlıdır.
+
+İlk tam sürümde Pro/Business e-postası işlemsel bildirimler ve hizmet hatırlatmaları içindir. Kampanya/indirim/geri kazanım e-postası ertelidir; F21–F24 segmentleri, deneme, takip listeleri ve CRM görev otomasyonu kapsamda kalır. SMS bildirimleri, WhatsApp ve mobil push ile günlük/haftalık özet sonraki aşamadadır; SMS bildirim kanalı ifadesi [kalıcı iptal edilmiş telefon doğrulamasını](#kalıcı-kapsam-iptalleri) yeniden kapsama almaz. Starter’ın uygulama içi sınırı korunur; Native Auth e-postaları uygulama dış kanal lisansından ayrıdır. Zamanlama ve sessiz saat davranışının tek sahibi teknik sözleşmedeki FD04’tür.
 
 Lead/follow/switch rol dengesi ve partnerli rezervasyon sonraki aşamadadır; mevcut kategori kontenjanı korunur. Çok aktiviteli/kombine bilet de ertelidir: ilk tam sürümde workshop/parti ayrı etkinlik kaydı ve katılım koşullarıyla yürür. Pakete bağlı kredi tüketmeyen katılım ilk tam sürümdedir; davranış [P08’de](../decisions/P08-accepted-scope.md#pakete-bağlı-kredi-tüketmeyen-etkinlik-katılımı) tanımlıdır. Abone No Starter’dan itibaren bütün planlardadır; yaşam döngüsünün tek sahibi [P08](../decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası).
 

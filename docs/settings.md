@@ -176,7 +176,7 @@ Google giriş/otomatik kimlik bağlama, manuel `supabase.auth.linkIdentity({prov
 
 Uygulamanın Google prepare ve TOTP remove endpoint’leri kaldırılmıştır. Frontend doğrudan native SDK’ya geçer; geçici uyumluluk yolu yoktur.
 
-E-posta/telefon request/resend/verify native Auth SDK’sındadır. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native işlem oturum yenilerse dönen oturum kullanılmalıdır. SMS sağlayıcı kabulü ayrı ortam işidir; numara kaydı gerçek SMS teslimi olarak gösterilmez.
+E-posta request/resend/verify native Auth SDK’sındadır; telefon için yeni native doğrulama/değişim isteği yapılmaz. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native işlem oturum yenilerse dönen oturum kullanılmalıdır. Telefon doğrulaması için SMS sağlayıcı kabulü açık ortam işi değildir; [telefon tüketici sınırı](#native-telefon-doğrulama-tüketicisi) uygulanır.
 
 ### Native Auth tüketici eşlemesi
 
@@ -222,11 +222,11 @@ Uygulamanın parola challenge ve recovery endpoint’leri kaldırılmıştır. P
 Doğrulanmamış telefon account_profile_update_v1.unverified_phone ile E.164 biçiminde kaydedilir; null yalnız bu doğrulanmamış kaydı temizler, alanın gönderilmemesi mevcut değeri korur. account_get_v1.identity.unverified_phone ayrı döner; identity.phone/phone_verified_at yalnız native doğrulama kaynağındandır. Aynı numaranın doğrulanmış native değer olması halinde doğrulanmamış kopya gösterilmez. Org canonical iletişimlerine otomatik yayılmaz, giriş/sahiplik kanıtı değildir. Native SMS pending_phone ile aynı alan değildir. Sürüm/receipt/profile audit mevcut yol üzerinden korunur. Kaynak ve ortam kabulü güncel kabul kaydında izlenir.
 
 
-Native Auth CAPTCHA/token seçenekleri sağlayıcı yapılandırmasına göre kullanılır; public Turnstile ile karıştırılmaz. Kurtarmada mevcut native oturum korunur, istemci zorunlu global signOut/ikinci completion RPC çağırmaz. Telefon/SMS doğrulaması V1 kapsamı dışındadır; numara kaydı doğrulama başarısı olarak gösterilmez.
+Native Auth CAPTCHA/token seçenekleri sağlayıcı yapılandırmasına göre kullanılır; public Turnstile ile karıştırılmaz. Kurtarmada mevcut native oturum korunur, istemci zorunlu global signOut/ikinci completion RPC çağırmaz. Telefon/SMS doğrulamasının [kalıcı iptal kararı](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#kalıcı-kapsam-iptalleri) geçerlidir; numara kaydı doğrulama başarısı olarak gösterilmez.
 
 ### Native telefon doğrulama tüketicisi
 
-7 Kasım 2026 kullanıcı kararıyla telefon/SMS doğrulaması V1 kapsamından çıkarılmıştır. Yeni telefon doğrulama, SMS kodu isteme/doğrulama ve yeniden gönderim tüketicisi sunulmaz; telefonla giriş ve SMS MFA açılmaz. Telefon bilgisi mevcut `account_profile_update_v1.unverified_phone` üzerinden doğrulanmamış iletişim olarak tutulur. Numara kaydetmek sahiplik veya ikinci faktör kanıtı değildir.
+Telefon/SMS doğrulamasının durumu [ürün sözleşmesindeki kalıcı iptal kararıyla](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#kalıcı-kapsam-iptalleri) belirlenir. Yeni telefon doğrulama, SMS kodu isteme/doğrulama ve yeniden gönderim tüketicisi sunulmaz; telefonla giriş ve SMS MFA açılmaz. Telefon bilgisi mevcut `account_profile_update_v1.unverified_phone` üzerinden doğrulanmamış iletişim olarak tutulur. Numara kaydetmek sahiplik veya ikinci faktör kanıtı değildir.
 
 Mevcut native identity DTO alanları ve eski doğrulanmış telefon verilerinin güvenli projeksiyonu geriye uyumluluk için korunur; alanları silmek, bekleyen değeri doğrulanmış yapmak veya eski hesap bağlarını değiştirmek bu kapsam temizliği değildir. Yerel eski native telefon fixture'ları regresyon güvencesidir; hosted SMS kurulumu veya aktif ürün desteği sayılmaz. Arayüz temizliği [XREQ-031](requests.md#xreq-031-telefon-sms-doğrulamasının-v1-arayüzünden-kaldırılması) üzerinden frontend sahibine iletilir. Hesap ikinci faktörü mevcut native TOTP akışıdır; telefon sahipliğini doğrulamaz.
 
