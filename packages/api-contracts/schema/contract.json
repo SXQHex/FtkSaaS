@@ -23635,7 +23635,14 @@
           "$ref": "#/$defs/PositiveInt"
         },
         "org_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "subject_table": {
           "$ref": "#/$defs/Text"
@@ -23663,7 +23670,21 @@
         "authority_reference",
         "review_at"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "org_id": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "subject_table": {
+            "const": "accounts"
+          }
+        }
+      }
     },
     "Table_deletion_receipts": {
       "type": "object",
@@ -43690,6 +43711,16 @@
             ]
           },
           "uniqueItems": true
+        },
+        "profile_erasure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AccountProfileErasureProgress"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -55366,6 +55397,72 @@
         }
       },
       "additionalProperties": false
+    },
+    "AccountProfileErasureProgress": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "unbound",
+            "held",
+            "completed"
+          ]
+        },
+        "policy_version": {
+          "const": 1
+        },
+        "completed_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "removed_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "removed_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "state",
+        "policy_version"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "state": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "completed_at",
+          "removed_rows",
+          "removed_bytes"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "completed_at"
+              ]
+            },
+            {
+              "required": [
+                "removed_rows"
+              ]
+            },
+            {
+              "required": [
+                "removed_bytes"
+              ]
+            }
+          ]
+        }
+      }
     }
   },
   "x-contract": {
@@ -57224,12 +57321,12 @@
       {
         "name": "retention_holds",
         "module": "X",
-        "scope": "O",
+        "scope": "G",
         "schema": {
           "$ref": "#/$defs/Table_retention_holds"
         },
         "foreign_keys": [],
-        "invariants": "Yalnız somut gerekli kayıt; tüm tenant süresiz dondurulmaz. Müşteri API’sine açık değil."
+        "invariants": "Yalnız somut gerekli kayıt; tüm tenant süresiz dondurulmaz. org_id=null yalnız accounts global hedefi; review_at hold bitişi değildir. Müşteri API’sine açık değil."
       },
       {
         "name": "deletion_receipts",
@@ -99928,7 +100025,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 137,
+      "migration_count": 138,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

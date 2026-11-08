@@ -49,8 +49,10 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    assert.equal((await q('select cancel_at_period_end from core.saas_subscriptions where org_id=$1',[org]))[0].cancel_at_period_end,true);
    await must(owner,'subscription_renewal_set_v1',{org_id:org,expected_version:await renewVersion(),renew:true},key());
   });
-  let globalJob;
+  let globalJob,memberPerson;
   await t.test('native reauth rejects other users; account deletion revokes sessions and permits only fresh own progress',async()=>{
+   memberPerson=(await must(owner,'person_create_v1',{org_id:org,center_id:center,display_name:'Retained business identity',contacts:[{kind:'email',value:member.email}]},key())).primary_id;
+   await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',clock_timestamp())",[key(),org,memberAccount.id,memberPerson]);
    const p=await must(member,'account_delete_preview_v1'),body={preview:{id:p.id,token:p.token},reauth:owner.jwt};const wrong=await call(member,'account_delete_apply_v1',body,key());assert.equal(wrong.result.error.code,'AUTH_REQUIRED');
    const k=key();globalJob=(await must(member,'account_delete_apply_v1',{...body,reauth:member.jwt},k)).job_id;
    assert.equal((await q('select count(*)::int n from auth.sessions where user_id=$1',[member.id]))[0].n,0);
@@ -96,13 +98,86 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await privacy.query("call private.ops_run('p07_privacy')");assert.equal((await q("select last_org from private.ops_worker_health where lane='p07_privacy'"))[0].last_org,null);
    await db.query("update private.ops_worker_health set enabled=false where lane='p07_privacy'");const ticks=(await q("select ticks from private.ops_worker_health where lane='p07_privacy'"))[0].ticks;await privacy.query("call private.ops_run('p07_privacy')");assert.equal((await q("select ticks from private.ops_worker_health where lane='p07_privacy'"))[0].ticks,ticks);
   });
+  await t.test('bound account profile erasure honors non-expiring holds, rolls back late failures and preserves tenant evidence',async()=>{
+   const c=await native('ftk_p07_privacy_worker',true),role=(await c.query('select session_user role')).rows[0].role;
+   const request=(await q('select request_id from private.p07_privacy_jobs where id=$1',[globalJob]))[0].request_id;
+   const target=memberAccount.id,skey='user:'+target,first=key(),second=key(),foreign=key(),receipt=key(),hold=key();
+   await db.query('insert into private.p07_profiles values($1,$2) on conflict(account_id) do update set display_name=excluded.display_name',[target,'Synthetic erasable profile']);
+   await db.query('insert into private.account_identity_names(account_id,given_name,unverified_phone) values($1,$2,$3) on conflict(account_id) do update set given_name=excluded.given_name,unverified_phone=excluded.unverified_phone',[target,'Synthetic','+905551234567']);
+   await db.query("insert into private.frontend_settings(scope_key,scope,values) values($1,'user','{\"language\":\"tr\"}') on conflict(scope_key) do update set values=excluded.values",[skey]);
+   await db.query("insert into core.operation_receipts(id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,'account_profile_update_v1',$3,$4,'succeeded',clock_timestamp()+interval '30 days')",[receipt,target,'a'.repeat(64),'b'.repeat(64)]);
+   for(const [id,scope,body] of [[first,skey,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==','base64')],[second,skey,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/5ncLrgAAAABJRU5ErkJggg==','base64')],[foreign,'user:'+account.id,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/5ncLrgAAAABJRU5ErkJggg==','base64')]]){
+    await db.query("insert into private.settings_media_assets(id,scope_key,mime,body,checksum) values($1,$2,'image/png',$3,encode(extensions.digest($3,'sha256'),'hex'))",[id,scope,body]);
+   }
+   await db.query('insert into private.settings_media_current values($1,$2)',[skey,second]);
+   await db.query('insert into private.settings_media_history values($1,$2,$3,$4)',[receipt,skey,first,second]);
+   const preserved=await q('select id,scope_key,checksum from private.settings_media_assets where id=$1',[foreign]);
+   const tenantBefore=await q('select id,state from core.people where org_id=$1 order by id',[org]);
+   const targetBefore=await q('select * from core.people where org_id=$1 and id=$2',[org,memberPerson]);assert.equal(targetBefore.length,1);
+   const contactsBefore=await q('select * from core.person_contacts where org_id=$1 and person_id=$2 order by id',[org,memberPerson]);assert(contactsBefore.length>0);
+   const evidenceBefore=await q('select * from core.audit_events where org_id=$1 and subject_id=$2 order by id',[org,memberPerson]);assert(evidenceBefore.length>0);
+   const retry=async()=>{await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[globalJob]);const [entry]=await claim(c,true,null);assert.equal(entry.request.job_id,globalJob);return entry;};
+   await db.query('insert into private.account_profile_erasure_scopes values($1,$2)',[role,account.id]);
+   let entry=await retry();assert.equal((await execute(c,entry,true)).ok,true);
+   assert.equal((await must(member,'job_status_get_v1',{org_id:null,job_id:globalJob})).privacy.profile_erasure.state,'unbound');
+   assert.equal((await q('select count(*)::int n from private.settings_media_assets where scope_key=$1',[skey]))[0].n,2);
+   await db.query('insert into private.account_profile_erasure_scopes values($1,$2)',[role,target]);
+   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,null,'accounts',$2,'Synthetic explicit hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,target]);
+   entry=await retry();assert.equal((await execute(c,entry,true)).ok,true);
+   assert.equal((await must(member,'job_status_get_v1',{org_id:null,job_id:globalJob})).privacy.profile_erasure.state,'held');
+   assert.equal((await q('select count(*)::int n from private.settings_media_assets where scope_key=$1',[skey]))[0].n,2);
+   await db.query('delete from core.retention_holds where id=$1',[hold]);
+   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,'settings_media_assets',$3,'Synthetic specific avatar hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,org,first]);
+   entry=await retry();assert.equal((await execute(c,entry,true)).ok,true);
+   assert.equal((await must(member,'job_status_get_v1',{org_id:null,job_id:globalJob})).privacy.profile_erasure.state,'held');
+   assert.equal((await q('select count(*)::int n from private.settings_media_assets where scope_key=$1',[skey]))[0].n,2);
+   await db.query('delete from core.retention_holds where id=$1',[hold]);
+   await assert.rejects(c.query('select private.account_profile_erasure($1)',[request]),/permission denied/);
+   await c.query("select set_config('ftk.profile_erasure_request',$1,false)",[request]);
+   await assert.rejects(c.query('delete from private.settings_media_assets where scope_key=$1',[skey]),/permission denied/);
+   entry=await retry();const lockTimeout=(await db.query('show lock_timeout')).rows[0].lock_timeout;
+   await c.query('begin');
+   try{
+    assert.equal((await execute(c,{...entry,request:{...entry.request,lease_token:'wrong'}},true)).error.code,'FORBIDDEN');
+    assert.equal((await execute(c,entry,true)).ok,true);
+    await db.query("set lock_timeout='100ms'");
+    await assert.rejects(db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,null,'accounts',$2,'Synthetic concurrent hold','synthetic-test',clock_timestamp())",[hold,target]),error=>error.code==='55P03');
+   }finally{await c.query('rollback');await db.query("select set_config('lock_timeout',$1,false)",[lockTimeout]);}
+   assert.equal((await q('select count(*)::int n from private.settings_media_assets where scope_key=$1',[skey]))[0].n,2);
+   trigger='profile_erase_'+key().replaceAll('-','');triggerTable='private.account_profile_erasures';
+   await db.query(`create function private.${trigger}() returns trigger language plpgsql as $$begin if new.request_id='${request}'::uuid and new.completed_at is not null then raise exception using errcode='23514',message='synthetic late purge';end if;return new;end$$`);
+   await db.query(`create trigger ${trigger} before update on ${triggerTable} for each row execute function private.${trigger}()`);
+   assert.equal((await execute(c,entry,true)).error.code,'INTEGRITY_VIOLATION');
+   assert.equal((await q('select count(*)::int n from private.settings_media_assets where scope_key=$1',[skey]))[0].n,2);
+   assert.equal((await q('select count(*)::int n from private.account_profile_erasures where request_id=$1',[request]))[0].n,0);
+   await db.query(`drop trigger ${trigger} on ${triggerTable}`);await db.query(`drop function private.${trigger}()`);trigger=null;
+   assert.equal((await execute(c,entry,true)).ok,true);
+   const done=(await must(member,'job_status_get_v1',{org_id:null,job_id:globalJob})).privacy;
+   assert.equal(done.profile_erasure.state,'completed');assert.equal(done.profile_erasure.removed_bytes,140);assert(done.profile_erasure.removed_rows>=6);
+   assert.equal(done.request_state,'partial');assert.equal(done.completed_at,null);assert.deepEqual(new Set(done.pending_scopes),new Set(['database','auth','storage','exports','backups']));
+   for(const table of ['p07_profiles','account_identity_names'])assert.equal((await q('select count(*)::int n from private.'+table+' where account_id=$1',[target]))[0].n,0);
+   assert.equal((await q('select count(*)::int n from private.settings_media_assets where scope_key=$1',[skey]))[0].n,0);
+   assert.deepEqual(await q('select id,scope_key,checksum from private.settings_media_assets where id=$1',[foreign]),preserved);
+   assert.deepEqual(await q('select id,state from core.people where org_id=$1 order by id',[org]),tenantBefore);
+   assert.deepEqual(await q('select * from core.people where org_id=$1 and id=$2',[org,memberPerson]),targetBefore);
+   assert.deepEqual(await q('select * from core.person_contacts where org_id=$1 and person_id=$2 order by id',[org,memberPerson]),contactsBefore);
+   assert.deepEqual(await q('select * from core.audit_events where org_id=$1 and subject_id=$2 order by id',[org,memberPerson]),evidenceBefore);
+   assert.equal((await q('select count(*)::int n from auth.users where id=$1',[member.id]))[0].n,1);
+   const proof=await q('select * from private.account_profile_erasures where request_id=$1',[request]);
+   await db.query('delete from private.account_profile_erasure_scopes where db_role=$1 and account_id=$2',[role,target]);
+   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,null,'accounts',$2,'Synthetic post-completion hold','synthetic-test',clock_timestamp())",[hold,target]);
+   entry=await retry();assert.equal((await execute(c,entry,true)).ok,true);assert.deepEqual(await q('select * from private.account_profile_erasures where request_id=$1',[request]),proof);
+   assert.equal((await must(member,'job_status_get_v1',{org_id:null,job_id:globalJob})).privacy.profile_erasure.state,'completed');
+   await db.query('delete from core.retention_holds where id=$1',[hold]);
+   await assert.rejects(db.query('delete from private.settings_media_assets where id=$1',[foreign]),/INTEGRITY_VIOLATION/);
+  });
  }finally{
   if(trigger){await db.query(`drop trigger if exists ${trigger} on ${triggerTable}`);await db.query(`drop function if exists private.${trigger}()`);}
   for(const c of clients)if(!c._ending)await c.end();
   for(const role of hostedRoles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await db.query(`alter role ${role} password null`);}
   await db.query("update private.ops_worker_health set enabled=false where lane in ('p07','p07_privacy')");
   // These roles only receive group membership. DROP ROLE rejects unexpected owned objects/direct grants.
-  for(const role of roles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await step('cleanup.drop-role',()=>db.query(`drop role ${role}`));}
+  for(const role of roles){await db.query('delete from private.account_profile_erasure_scopes where db_role=$1',[role]);await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await step('cleanup.drop-role',()=>db.query(`drop role ${role}`));}
   await db.end();
  }
 });

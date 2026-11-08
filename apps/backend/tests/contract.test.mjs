@@ -41,6 +41,26 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('profile erasure progress cannot imply full erasure or invent completion counters',async()=>{
+ const base={request_state:'partial',completed_at:null,pending_scopes:['database','auth','storage','exports','backups']};
+ assert(valid('PrivacyProgress',base));assert(valid('PrivacyProgress',{...base,profile_erasure:null}));
+ for(const state of ['unbound','held']){
+  assert(valid('PrivacyProgress',{...base,profile_erasure:{state,policy_version:1}}));
+  assert(!valid('PrivacyProgress',{...base,profile_erasure:{state,policy_version:1,completed_at:'2026-11-08T00:00:00Z'}}));
+ }
+ const completed={state:'completed',policy_version:1,completed_at:'2026-11-08T00:00:00Z',removed_rows:3,removed_bytes:140};
+ assert(valid('PrivacyProgress',{...base,profile_erasure:completed}));
+ for(const patch of [{removed_rows:-1},{removed_bytes:-1},{policy_version:2},{auth_erased:true}])assert(!valid('PrivacyProgress',{...base,profile_erasure:{...completed,...patch}}));
+ const {removed_bytes,...incomplete}=completed;assert(!valid('AccountProfileErasureProgress',incomplete));
+ const generated=await import('../supabase/functions/backend-v1/validators.js');
+ const response={ok:true,trace_id:id,data:{id,state:'retry_wait',progress_count:0,total_count:null,result_reference:{type:'privacy_requests',id},safe_error_code:'RESULT_NOT_CONFIRMED',privacy:{...base,profile_erasure:completed}}};
+ assert(generated.success_job_status_get_v1(response));assert(!generated.success_job_status_get_v1({...response,data:{...response.data,privacy:{...base,profile_erasure:incomplete}}}));
+});
+test('global legal holds target only accounts and a review date does not encode expiry',()=>{
+ const hold={id,created_at:'2026-11-08T00:00:00Z',org_id:null,subject_table:'accounts',subject_id:id,reason:'Synthetic specific hold',authority_reference:'synthetic-test',review_at:'2020-01-01T00:00:00Z'};
+ assert(valid('Table_retention_holds',hold));assert(!valid('Table_retention_holds',{...hold,subject_table:'people'}));
+ assert(valid('Table_retention_holds',{...hold,org_id:id,subject_table:'settings_media_assets'}));
+});
 test('XREQ032 self context is canonical UUID identity with closed live center scope, never account authority',()=>{
  const context={person_id:id,subscriber_number:null,centers:[{center_id:id,student:true,instructor:false,assistant:false}]};
  assert(valid('AccountSelfContext',context));

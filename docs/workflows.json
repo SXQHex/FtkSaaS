@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8b1447e33db9cf0bdb48ff1018d7457c389d21d8c7b9026814c3e613e9c15f9d",
-        "reason": "Belge publish/preview koşullarının JSON Schema ve generated Edge validator eşliği, kapalı kaynak seçimi ve ortak komut operation_key tipleri incelendi. Runtime protokolü değişmez; tip üretimi required-only alternatifleri kapalı parent alanlarıyla temsil eder."
+        "fingerprint": "49efece9961d3225360133cee6875a2cbc0f1ab4fe4d6ee81ea20748b7ff9dc3",
+        "reason": "PrivacyProgress opsiyonel dar profil ilerlemesi legacy yanıtla uyumludur; source/generated validator alan ve sayaç sınırları incelendi. retention_holds global/tenant nullable org alanı, G kapsam metadata sı ve account-only global constraint ile eşleşir."
       }
     },
     {
@@ -1328,8 +1328,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "5412a5ced9f72b2157e5c046d81ea0e23eddf7f11846638b672fdd8c89a37bba",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "1d77bf965014dbc0f1ba85ceb86d5c7426f4608220af7a884e01128bd5d2dc95",
+        "reason": "p07 ortak native test dosyası hesap profil imhası için genişledi; abonelik hesap/dönem/plan davranışı değişmedi. Hedef üyenin native kişi/hesap bağı, tenant kişi/iletişim/audit geçmişinin korunmasını sınar."
       }
     },
     {
@@ -1561,7 +1561,9 @@
         "docs/workflows.md",
         "apps/backend/scripts/restore-guard.mjs",
         "apps/backend/scripts/erasure-register.mjs",
-        "apps/backend/scripts/guarded-restore.mjs"
+        "apps/backend/scripts/guarded-restore.mjs",
+        "apps/backend/database/account-privacy-execution.sql",
+        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1577,8 +1579,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "7970e7da1d6732984cafdafc6d305631cf340dbc8a38ba4badba40afadaa1954",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "5953ac04c93f0dd7b809a6e88c55b2953e066fd9cc76c81c266aeed61ba68372",
+        "reason": "Dar profil imhası bütün talep/DB/Auth imhası değildir; mevcut self job status yetkisi ve partial/pending kapıları korunur. Genel hesabın UUID ve tenant geçmişi tutulur, global ve somut kayıt hold u uygulanır; native Auth bu pakette silinmez."
       }
     },
     {
@@ -1714,7 +1716,9 @@
         "apps/backend/supabase/migrations/20261106084130_p15_p16_reminders_automation.sql",
         "docs/workflows.md",
         "apps/backend/database/notification-language-rendering.sql",
-        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql"
+        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql",
+        "apps/backend/database/account-privacy-execution.sql",
+        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1729,8 +1733,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "120c563b81e2f6dbb0639381b72ae23058ed0007876b946bfe6a55e9162cf0e5",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "b0c160e312a9ba48718029a1dde6a9d7d951f5051e496e54a78d65bf8ecfbf85",
+        "reason": "Yeni kaynak mevcut leased definer privacy worker içinde exact rol/hesap bağlantısı ve request/state/hold fence ile çalışır. Atomik satır/bayt silme, geç hata rollback, hold yazım kilidi, doğrudan helper/medya ACL ve immutable completion replay incelendi."
       }
     }
   ]

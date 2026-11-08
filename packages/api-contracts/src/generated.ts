@@ -4102,6 +4102,7 @@ ManagementProjection_instructor_agreement_accept_v1?: ManagementProjectionInstru
 SettingsInheritedTemplateFields?: SettingsInheritedTemplateFields
 SettingsTemplateInheritanceSource?: SettingsTemplateInheritanceSource
 SettingsTemplateInheritanceSources?: SettingsTemplateInheritanceSources
+AccountProfileErasureProgress?: AccountProfileErasureProgress
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7197,6 +7198,18 @@ export interface PrivacyProgress {
 request_state: PrivacyState
 completed_at: (Instant | null)
 pending_scopes: ("database" | "auth" | "storage" | "exports" | "backups")[]
+profile_erasure?: (AccountProfileErasureProgress | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccountProfileErasureProgress".
+ */
+export interface AccountProfileErasureProgress {
+state: ("unbound" | "held" | "completed")
+policy_version: 1
+completed_at?: Instant
+removed_rows?: number
+removed_bytes?: number
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16479,10 +16492,7 @@ export interface TableRetentionHolds {
 id: string
 created_at: Instant
 version?: PositiveInt
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
+org_id: (string | null)
 subject_table: Text
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
