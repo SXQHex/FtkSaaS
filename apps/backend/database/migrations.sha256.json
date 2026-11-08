@@ -137,5 +137,6 @@
   "20261108034041_pro_workflow_preparations.sql": "e99a64160476e3060d9b5d7b7b96d47dde833701b9299b0b484f9dfbd71676ed",
   "20261108033820_digital_agreement_acceptance.sql": "c2cad8eea1cf351df193889fd3359342fb9ca3e446dcefc0db2b6460039c8137",
   "20261108100733_account_privacy_execution.sql": "46667d30d393d97449ab4d396115f1fa6ef6d5a20e8b8a211f029dcca4c20996",
-  "20261108155000_account_privacy_active_surfaces.sql": "df0e7acc81e4d37dc48dfec0b81d28562fe4e858ab08c5ca3fca31b7c134ace5"
+  "20261108155000_account_privacy_active_surfaces.sql": "df0e7acc81e4d37dc48dfec0b81d28562fe4e858ab08c5ca3fca31b7c134ace5",
+  "20261108160000_account_native_erasure.sql": "00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999"
 }

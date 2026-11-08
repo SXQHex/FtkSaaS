@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `2815cb40fb48f6bb753ce92dd97c88a68ad9b55a4ab0ce4e0433cf17b063b775`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `d3964c5b385ebdb35d8672d9e3443717d3d618f07be1db85f52ff8a4e9a84b7a`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 139. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 140. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -147,3 +147,4 @@ Sıralı migration: 139. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261108034041_pro_workflow_preparations.sql](../apps/backend/supabase/migrations/20261108034041_pro_workflow_preparations.sql) | `e99a64160476e3060d9b5d7b7b96d47dde833701b9299b0b484f9dfbd71676ed` |
 | [20261108100733_account_privacy_execution.sql](../apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql) | `46667d30d393d97449ab4d396115f1fa6ef6d5a20e8b8a211f029dcca4c20996` |
 | [20261108155000_account_privacy_active_surfaces.sql](../apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql) | `df0e7acc81e4d37dc48dfec0b81d28562fe4e858ab08c5ca3fca31b7c134ace5` |
+| [20261108160000_account_native_erasure.sql](../apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql) | `00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999` |
