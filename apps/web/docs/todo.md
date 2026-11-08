@@ -972,7 +972,7 @@ Katalog/read/sürüm/writable ile user/member/organization/center hatırlatma t�
 
 ### WEB-S12 — Ayarlar ve gerçek davranış tüketicileri
 
-**Kaynak durumu:** Mevcut native sözleşmenin desteklediği editör/tüketici akışları bu pakette bağlandı. Tam S12 kapanışı verilmez: genel üye marka rengi [XREQ-035](../../../docs/requests.md#xreq-035), arka plan e-postasında kişisel dil [XREQ-033](../../../docs/requests.md#xreq-033) entegrasyonu açıktır. Canlı kabuller ayrıca açıktır.
+**Kaynak durumu:** Mevcut native sözleşmenin desteklediği editör/tüketici akışları bu pakette bağlandı. Tam S12 kapanışı verilmez: genel üye marka rengi [XREQ-035](../../../docs/requests.md#xreq-035-genel-üye-ve-açık-profil-için-dar-marka-rengi-projeksiyonu), arka plan e-postasında kişisel dil [XREQ-033](../../../docs/requests.md#xreq-033) entegrasyonu açıktır. Canlı kabuller ayrıca açıktır.
 
 - [x] Kendi user/member, izinli organization/center katalog, sürüm, writable/readonly, tek alan patch ve ayrı açık onay. Form yapısı ortak makine şemasından sunucu tarafında çözülür; ikinci alan sözleşmesi veya ham JSON/elle UUID giriş ekranı kurulmaz. Null-only tema/font paketleri düzenlenebilir özellik gibi gösterilmez.
 - [x] FD01: kişisel dil, tarih/sayı/saat biçimi, cihaz/manual görüntüleme timezone'u, tema/ölçek/kontrast/hareket; gün/hafta/ay/ajanda, hafta başlangıcı ve hafta sonu. Para string/BigInt olarak korunur. İşletim/program/işlem timezone’u merkezde kalır. Açık çalışma alanı seçimi, cihazda hatırlama ve geçerli sabit başlangıç bağlamı gerçek gezinmeye bağlandı; tercih yetki vermez.
@@ -982,7 +982,7 @@ Katalog/read/sürüm/writable ile user/member/organization/center hatırlatma t�
 - [x] FD10: rapor/import/availability/paket/anlaşma/izin şablonlarının oluşturma/düzenleme/kaldırma, gerçek kaynak/default/miras ve sürümü. R13 rapor/import, R03 anlaşma, bu paket availability/product/sale-date/personnel hazırlıklarını bağlar. Salt okunur resolve otomatik domain komutu değildir; gerçek kayıt ayrıca onaylanır. Satış tarih hazırlığı yalnız seçili ürünün aynı native şartlarıyla uygulanır.
 - [x] FD11: seçili alan reset preview→sürüm/expiry/etki onayı→apply; ortak şablon için açık inherit_fields; immutable geçmişin önce/sonra/aktör/zaman/gerekçesi ve history_source ile tek alanı yeni sürümde geri alma. Kapatılmış tercihlerin yeniden açılması backend tarafından engellenir. Başlamış job, önceki satış/anlaşma ve yayınlanmış domain kaydı şablondan yeniden yazılmaz.
 - [x] FD12: hesap ve kuruluş lifecycle hedefleri, abonelik kurtarma ve organizasyon listesinden bağımsız silme iş takibi [S13](#web-s13) sahibindedir; alındı/partial/retry_wait fiziksel imha sayılmaz.
-- [ ] [XREQ-035](../../../docs/requests.md#xreq-035): Owner/OM dışındaki üyeler ve açık profil için üç rengin dar normal okuma projeksiyonu. Özel org settings okuyucusu veya fatura verisi üyelere açılmaz.
+- [ ] [XREQ-035](../../../docs/requests.md#xreq-035-genel-üye-ve-açık-profil-için-dar-marka-rengi-projeksiyonu): Owner/OM dışındaki üyeler ve açık profil için üç rengin dar normal okuma projeksiyonu. Özel org settings okuyucusu veya fatura verisi üyelere açılmaz.
 - [ ] [XREQ-033](../../../docs/requests.md#xreq-033): kişisel dilde arka plan e-postasının mevcut claim/frozen payload hattına bağlanması. Frontend kataloğu verildi; mevcut yayımlanmış renderer'ın bağlanması kaynak/gerçek kabul değildir.
 - [ ] Chrome/canlı: kaydet→gerçek tüketici etkisi→default/miras→reset/geri alma→geçmiş; TR/EN, erişim kaybı, dar ekran/klavye ve yayın/veri sınırları. Kaynak/otomatik test bu matrisi kapatmaz.
 
@@ -990,7 +990,7 @@ Katalog/read/sürüm/writable ile user/member/organization/center hatırlatma t�
 
 ### WEB-S13 — Plan, erişim ve organizasyon yaşam döngüsü
 
-**Kaynak durumu:** Daralma/dönem/yenileme/ödeme bildirimi/kuruluş lifecycle akışları adayda tamamlandı. Üst plan hedef keşfi [XREQ-034](../../../docs/requests.md#xreq-034) nedeniyle yükseltme quote yolu ve tam R14 kapanışı açıktır.
+**Kaynak durumu:** Daralma/dönem/yenileme/ödeme bildirimi/kuruluş lifecycle akışları adayda tamamlandı. Üst plan hedef keşfi [XREQ-034](../../../docs/requests.md#xreq-034-abonelik-yükseltmesi-için-gerçek-hedef-plan-sürümü-keşfi) nedeniyle yükseltme quote yolu ve tam R14 kapanışı açıktır.
 
 - [x] `subscription_get_v1`: gerçek plan/dönem/erişim/kullanım ve sonlu/sınırsız limit, native abonelik sürümü; Starter kapsam gerekli/seçili durumları. İlk sayfadan kota veya sabit fiyat hesaplanmaz.
 - [x] XREQ-027: CM olmayan Owner için exact hedef/merkez/abonelik sürümüne bağlı rooms/disciplines/instructors/students okuyucusu; bütün cursor’lar ve hassasiyeti kaybetmeyen Abone No. Açık kaynak ve en fazla100 öğrenci seçimi, bilinçli sıfır öğrenci, güncel exact selector→ayrı onay→daralma; tarihçe silinmez.
@@ -998,7 +998,7 @@ Katalog/read/sürüm/writable ile user/member/organization/center hatırlatma t�
 - [x] Yenileme tercihi: normal canlı okuyucudan sürüm ve mevcut renew seçimi→açık onay→yeniden okuma. Ödeme bildirimi gerçek tutar/currency/zaman/referansla ayrı komuttur; doğrulama, online tahsilat veya aktif abonelik başarısı sayılmaz.
 - [x] Kuruluş kapatma preview’si: gerçek etki/engeller/expiry ve kuruluş sürümü→açık onay→close; yeniden açılma ayrı komut ve native koşullardır. Hizmet tarihi istemcide ileri taşınmaz.
 - [x] Kuruluş silme: all_data preview/etki→taze native hesap doğrulaması→açık onay→aynı intent apply. Reauth kanıtı/parola/kod journal’a yazılmaz. Belirsiz yanıt aynı key/payload ile yeni proof kullanır; başarı job metadata’sı korunur. Hesap ayarlarından, kuruluş artık listelenmese de yalnız aktörün kendi intent/job takibi açılır. Privacy request durumu ve database/auth/storage/exports/backups bekleyenleri gösterilir; partial/retry_wait fiziksel imha değildir.
-- [ ] [XREQ-034](../../../docs/requests.md#xreq-034): üst planın gerçek izinli plan sürümü keşfi; ardından native upgrade quote ve ona bağlı ödeme bildirimi. Dönem/daralma kaynağından UUID/fiyat türetilmez; çalışmayan satın alma akışı yayınlanmaz.
+- [ ] [XREQ-034](../../../docs/requests.md#xreq-034-abonelik-yükseltmesi-için-gerçek-hedef-plan-sürümü-keşfi): üst planın gerçek izinli plan sürümü keşfi; ardından native upgrade quote ve ona bağlı ödeme bildirimi. Dönem/daralma kaynağından UUID/fiyat türetilmez; çalışmayan satın alma akışı yayınlanmaz.
 - [ ] Chrome/canlı: Owner/CM/personel ayrımı, plan/dönem sınırı, bekleyen değişiklik/ödeme/erişim kurtarma; close/reopen/delete, kayıp yanıt ve gerçek privacy takibi. R13 rapor bağlantısı fiziksel imha veya bütün verinin JSON kopyası kabulü sayılmaz.
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
