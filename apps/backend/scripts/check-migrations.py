@@ -252,3 +252,5 @@ assert next(Path('supabase/migrations').glob('*_account_native_erasure.sql')).re
 assert next(Path('supabase/migrations').glob('*_account_native_erasure_finalization.sql')).read_bytes()==Path('database/account-native-erasure-finalization.sql').read_bytes(),'Native principal finalization source drift'
 
 assert next(Path('supabase/migrations').glob('*_account_native_residues.sql')).read_bytes()==Path('database/account-native-residues.sql').read_bytes(),'Auth residue source drift'
+
+assert next(Path('supabase/migrations').glob('*_account_export_erasure.sql')).read_bytes()==Path('database/account-export-erasure.sql').read_bytes(),'Account export erasure source drift'

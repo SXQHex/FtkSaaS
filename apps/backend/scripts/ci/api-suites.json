@@ -675,35 +675,35 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "db4f1cf2abbf6563a35d46c91d88e2b8e78cc3f3cd9b8e2f1c8b37119224dea9",
+      "sha256": "b5b25804fa5b14aaa056341c46719e427eb3a493c2278606ac549ccf6463917b",
       "shared": [
         [
-          8,
-          8
+          9,
+          9
         ],
         [
-          13,
-          18
+          14,
+          19
         ],
         [
-          132,
-          132
+          133,
+          133
         ],
         [
-          138,
-          138
+          139,
+          139
         ],
         [
-          140,
-          140
+          141,
+          141
         ],
         [
-          142,
-          142
+          143,
+          143
         ],
         [
-          153,
-          153
+          154,
+          154
         ]
       ],
       "parts": [
@@ -711,45 +711,45 @@
           "id": "registry-root-1",
           "ranges": [
             [
-              19,
-              131
+              20,
+              132
             ]
           ]
         }
       ],
       "imports": [
         {
-          "line": 1,
+          "line": 2,
           "path": "apps/backend/tests/action-management-acceptance.mjs",
           "sha256": "844b1f83fd8a513198fa6d3fa1679cdac71f60a23692a88d8b2689668a67ada8"
         },
         {
-          "line": 2,
+          "line": 3,
           "path": "apps/backend/tests/sale-preview-impact-acceptance.mjs",
           "sha256": "0a43443bea867eedd47ee9808d506d46cac790b4123395ca6b9b45238e392219"
         },
         {
-          "line": 3,
+          "line": 4,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
           "sha256": "7087d82524678c3638199cf18439212bb4a1eae03bc1f8d3756aabbee4ca9611"
         },
         {
-          "line": 4,
+          "line": 5,
           "path": "apps/backend/tests/commercial-plan-acceptance.mjs",
           "sha256": "dda8dfa2da7b4f1847830a3b3513d7b36a9ab4a07cd25676433eb23866d568f8"
         },
         {
-          "line": 5,
+          "line": 6,
           "path": "apps/backend/tests/subscription-period-acceptance.mjs",
           "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322"
         },
         {
-          "line": 6,
+          "line": 7,
           "path": "apps/backend/tests/starter-document-acceptance.mjs",
           "sha256": "35ef4cab910cbf4b3d5a4d8a2e9dcb9050f5e41917c93157b6a3f37fa32d8e98"
         },
         {
-          "line": 7,
+          "line": 8,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
           "sha256": "8450e8b8640e7ed0dd9146d544a28e33734b7deb4294918ed5743afaf90f69df",
           "shared": [
@@ -818,17 +818,17 @@
           ]
         },
         {
-          "line": 9,
+          "line": 10,
           "path": "apps/backend/tests/p05-acceptance.mjs",
           "sha256": "30bacb89320b514fa3641eb1574a5c1b9cf2e746d75c7227643467d816a8091c"
         },
         {
-          "line": 10,
+          "line": 11,
           "path": "apps/backend/tests/p06-acceptance.mjs",
           "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242"
         },
         {
-          "line": 11,
+          "line": 12,
           "path": "apps/backend/tests/starter-operations-acceptance.mjs",
           "sha256": "9eba90c529f4cda60ad56ab9254f5dde38bb4edf9bb35bf1726faddb65d78737",
           "shared": [
@@ -895,37 +895,37 @@
           ]
         },
         {
-          "line": 12,
+          "line": 13,
           "path": "apps/backend/tests/canonical-settings-migration-acceptance.mjs",
           "sha256": "923be16ae737f6ee56fb1febc42618d4bafac41ff8b2a88d2d268b4cb69c1acb"
         },
         {
-          "line": 133,
+          "line": 134,
           "path": "apps/backend/tests/ops-hosted-acceptance.mjs",
           "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676"
         },
         {
-          "line": 134,
+          "line": 135,
           "path": "apps/backend/tests/p07-account-revocation-acceptance.mjs",
           "sha256": "e755d94ebd85f355bb4e0c279b295e65a1ea6dacddfa296c6ccc2f0f53c2c05e"
         },
         {
-          "line": 135,
+          "line": 136,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
           "sha256": "6ef2f1340c58a7816446b7bbe62b5454910b1ae4c8d00f429efd9447ba6c2a14"
         },
         {
-          "line": 136,
+          "line": 137,
           "path": "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
           "sha256": "08cab358e5d1834b26196ba6c5cbc6c1c3d1a3739488f58b9c1580685b2c2831"
         },
         {
-          "line": 137,
+          "line": 138,
           "path": "apps/backend/tests/p07-lifecycle-acceptance.mjs",
           "sha256": "ce7e8ef17f5915b8aac90698846d70c7a87017b540054de7ac11b9a055222ffc"
         },
         {
-          "line": 139,
+          "line": 140,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
           "sha256": "d3d05ce84d70c457f0c5ba69c741752d50eaf90464f7bebbc81d9146fdb00de2",
           "shared": [
@@ -960,27 +960,27 @@
           ]
         },
         {
-          "line": 141,
+          "line": 142,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
           "sha256": "f9b6646b79b69b30007ac0f5d408b09f7119977fd902af84822299ed1341a1f3"
         },
         {
-          "line": 143,
+          "line": 144,
           "path": "apps/backend/tests/document-self-requirements-acceptance.mjs",
           "sha256": "c71d21409d151be93f6867a476828e412c7a6935f106a5220eb4a58f2f2dca05"
         },
         {
-          "line": 144,
+          "line": 145,
           "path": "apps/backend/tests/crm-application-intake-acceptance.mjs",
           "sha256": "ea64788526db258f1a30e9ec01e61b90c57da4d66570d787e1472c96b8a4acb7"
         },
         {
-          "line": 145,
+          "line": 146,
           "path": "apps/backend/tests/crm-application-review-acceptance.mjs",
           "sha256": "2f1fb13abde1b2a8d123ab8ea619bf29bcd9ba1677db648940a12a128a6d1c9c"
         },
         {
-          "line": 146,
+          "line": 147,
           "path": "apps/backend/tests/crm-provider-intake-acceptance.mjs",
           "sha256": "c54e0810890a76848c6e829630b4debb1c172e74707a45ad8662368c18f8aab8",
           "shared": [
@@ -1011,69 +1011,74 @@
           ]
         },
         {
-          "line": 147,
+          "line": 148,
           "path": "apps/backend/tests/crm-provider-webhook-acceptance.mjs",
           "sha256": "44518d5b6bc6b7fceac9fa29985cfd8f755cd14a635fdc0551d20201ff58cc32"
         },
         {
-          "line": 148,
+          "line": 149,
           "path": "apps/backend/tests/crm-meta-queue-acceptance.mjs",
           "sha256": "b51c9068c8b2f35270d3a59f5424232969cd79c4ee953a50679e9ce7ed16dcbe"
         },
         {
-          "line": 149,
+          "line": 150,
           "path": "apps/backend/tests/crm-meta-queue-authority-acceptance.mjs",
           "sha256": "e4793fd5442a5c5dc29c3aa2b4036852a442f405f7b7cbab1ea71724931a14d6"
         },
         {
-          "line": 150,
+          "line": 151,
           "path": "apps/backend/tests/crm-provider-host-acceptance.mjs",
           "sha256": "b0742d774364a2274bd279e79c0729538c77f3c535197c701d8ee1a85e6b93a0"
         },
         {
-          "line": 151,
+          "line": 152,
           "path": "apps/backend/tests/crm-import-acceptance.mjs",
           "sha256": "c978928caebc3e8a339f75eca00a24416e8fabc7f4086de02eea75516a80a487"
         },
         {
-          "line": 152,
+          "line": 153,
           "path": "apps/backend/tests/crm-import-authority-acceptance.mjs",
           "sha256": "20a0ab62a84af439b432a4cc6318484771f9c915ed136c0c9885124e8d1c3424"
         },
         {
-          "line": 154,
+          "line": 155,
           "path": "apps/backend/tests/reminder-scheduling-acceptance.mjs",
           "sha256": "a18ba01ffbbd9d06d9a7cf44e68150c39eb599170212f757eaa9ffdbb83e6e29"
         },
         {
-          "line": 155,
+          "line": 156,
           "path": "apps/backend/tests/automation-results-acceptance.mjs",
           "sha256": "dfb129f39201693fb72dc7dfaa1f1bd790c09cb81a254449e8f90f0b5b6faad8"
         },
         {
-          "line": 156,
+          "line": 157,
           "path": "apps/backend/tests/people-self-scale-acceptance.mjs",
           "sha256": "0590f78531c2fad0289e140f510d448357dfd69b3bca46f994e18eac41991f05"
         },
         {
-          "line": 157,
+          "line": 158,
           "path": "apps/backend/tests/agreement-preparation-acceptance.mjs",
           "sha256": "c5045f0bee008ae4cbe93d16104ad1daad7362320f026f3a06d5135e6f660bf4"
         },
         {
           "path": "apps/backend/tests/permission-preparation-acceptance.mjs",
           "sha256": "b091a76b3ea4729d2c31f8b9f710607b9e42bdd4cdbcf12abaf4eb0b8c4fef1f",
-          "line": 158
+          "line": 159
         },
         {
-          "line": 159,
+          "line": 160,
           "path": "apps/backend/tests/plan-target-discovery-acceptance.mjs",
           "sha256": "32ed1b790c65452c5e36c69bfba79dcd14933a50d922b37afbeb6e7e6ffa7ccd"
         },
         {
           "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",
           "sha256": "0016d13081cb630639c56e450d95d318191b88b9684e1e65344473fc1bb4b5cf",
-          "line": 160
+          "line": 161
+        },
+        {
+          "line": 1,
+          "path": "apps/backend/tests/export-retention-acceptance.mjs",
+          "sha256": "215174267d76e2e40fc188f4e3d119dc720265d184288199cd2b675dd2d363a8"
         }
       ],
       "estimated_seconds": 1356.24

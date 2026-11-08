@@ -1,3 +1,4 @@
+import './export-retention-acceptance.mjs';
 import './action-management-acceptance.mjs';
 import './sale-preview-impact-acceptance.mjs';
 import './transactional-email-acceptance.mjs';

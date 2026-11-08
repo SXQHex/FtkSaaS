@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `10390f0e91373b19f70fa5066907f270655f320d55e372d51133134201347c3a`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6c89760fbdeea26621c749603ca677b1924e11756cec6fc93d7e86ded8d00b16`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -8,6 +8,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 
 | Güvenlik kaynağı | SHA256 |
 |---|---|
+| [account-export-erasure.sql](../apps/backend/database/account-export-erasure.sql) | `043d4df218cf40d1fad04ee3de9b2c852634524f8558f88bdfd57ac221d30d18` |
 | [account-identity-projection.sql](../apps/backend/database/account-identity-projection.sql) | `a04d73dca3c04b224c287447fd1f6639604a5a4c9caa76571b7348f271c9fe21` |
 | [account-native-erasure.sql](../apps/backend/database/account-native-erasure.sql) | `00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999` |
 | [account-native-residues.sql](../apps/backend/database/account-native-residues.sql) | `4e63601dedec8a1972f3f4b2846f695baf0a6d3f1df8344c132f28fc52803534` |
@@ -305,3 +306,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261108100733_account_privacy_execution.sql](../apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql) | `46667d30d393d97449ab4d396115f1fa6ef6d5a20e8b8a211f029dcca4c20996` |
 | [20261108160000_account_native_erasure.sql](../apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql) | `00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999` |
 | [20261108161621_account_native_residues.sql](../apps/backend/supabase/migrations/20261108161621_account_native_residues.sql) | `4e63601dedec8a1972f3f4b2846f695baf0a6d3f1df8344c132f28fc52803534` |
+| [20261108211924_account_export_erasure.sql](../apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql) | `043d4df218cf40d1fad04ee3de9b2c852634524f8558f88bdfd57ac221d30d18` |
