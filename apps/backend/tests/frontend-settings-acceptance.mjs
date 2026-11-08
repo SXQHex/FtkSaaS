@@ -1,6 +1,7 @@
 import test,{resources} from './p07-diagnostics.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {nativeTotp} from './native-totp-fixture.mjs';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
@@ -174,13 +175,15 @@ test('Tenant settings authority, privacy and notification delivery',async t=>{
 
 test('Typed settings catalog round-trip in every scope',async t=>{
  const fixture=await settingsFixture(t);
- const {platform,plan,owner,other,account,db,read,write,fail}=fixture;
+ let {platform,plan,owner,other,account,db,read,write,fail}=fixture;
  let trigger;
  try{
  const {org,center,person}=await settingsTenant(fixture);
+ const weakOwner=owner;owner=await nativeTotp(t,owner);
   await t.test('all declared fields in five scopes round-trip through real typed APIs; unsupported branding cannot fake success',async()=>{
    const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
    const orgScope={scope:'organization',org_id:org},centerScope={scope:'center',org_id:org,center_id:center};
+   await fail('AUTH_REQUIRED',weakOwner,'settings_update_v1',{...orgScope,expected_version:(await read(owner,orgScope)).version,patch:{security_policy:fields.find(f=>f.key==='security_policy').default}},key());
    assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='lesson_reminder_hours').writable,false);
    await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{lesson_reminder_hours:1}},key());
    await write(owner,orgScope,{reminder_center_overrides_enabled:true},(await read(owner,orgScope)).version);

@@ -1,5 +1,5 @@
 {
-  "version": 16,
+  "version": 17,
   "fields": [
     {
       "scope": "user",
@@ -2503,6 +2503,19 @@
       },
       "group": "O06",
       "consumer": "organization_regional_context"
+    },
+    {
+      "scope": "organization",
+      "key": "security_policy",
+      "schema": {
+        "$ref": "#/$defs/OrganizationSecurityPolicy"
+      },
+      "default": {
+        "mfa_roles": [],
+        "sensitive_reauth_max_age_seconds": null
+      },
+      "group": "O04",
+      "consumer": "organization_security_assert"
     }
   ]
 }

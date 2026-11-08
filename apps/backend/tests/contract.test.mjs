@@ -70,6 +70,31 @@ test('settings source commands stay explicit and regional defaults do not introd
   assert.equal(fs.readFileSync('supabase/migrations/'+file,'utf8'),fs.readFileSync('database/'+name.replaceAll('_','-')+'.sql','utf8'));
  }
 });
+test('XREQ006 discovers a closed approval-only capability and safe merge effects',()=>{
+ const selector={operation:'person_merge_approve_v1',key:{approval_center_id:id}};
+ assert(valid('ManagementSelector_person_merge_approve_v1',selector));
+ assert(valid('ManagementSelector_person_merge_approve_v1',{...selector,key:{...selector.key,preview_id:id}}));
+ assert(!valid('ManagementSelector_person_merge_approve_v1',{...selector,key:{}}));
+ const info={source_id:id,target_id:id,approval_center_id:id,preview:{id,token:'a'.repeat(64)},expires_at:'2030-01-01T00:00:00Z',affected_center_ids:[id],required_approvals:[{center_id:id,approved:false}],linked_history:true,effects:[{entity:{type:'people',id},action:'adjust',reason:'merge alias; history IDs and center ownership retained'}]};
+ assert(valid('MergeApprovalDiscovery',info));
+ for(const extra of [{original_token:'private'},{snapshot:{}},{linked_history:false},{required_approvals:[{center_id:id,approved:'yes'}]}])assert(!valid('MergeApprovalDiscovery',{...info,...extra}));
+ const file=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_merge_approval_discovery.sql'));assert(file);
+ assert.equal(fs.readFileSync('supabase/migrations/'+file,'utf8'),fs.readFileSync('database/merge-approval-discovery.sql','utf8'));
+});
+test('O04 organization security preference cannot weaken the platform or become a user/center override',()=>{
+ const policy={mfa_roles:['owner','center_manager'],sensitive_reauth_max_age_seconds:null};
+ assert(valid('OrganizationSecurityPolicy',policy));assert(valid('OrganizationSettingsValues',{security_policy:policy}));
+ for(const scope of ['User','Member','Center','Platform'])assert(!valid(scope+'SettingsValues',{security_policy:policy}));
+ for(const change of [{mfa_roles:['unknown']},{mfa_roles:['owner','owner']},{sensitive_reauth_max_age_seconds:0},{sensitive_reauth_max_age_seconds:1.5},{bypass:true}])assert(!valid('OrganizationSecurityPolicy',{...policy,...change}));
+ assert(valid('OrganizationSecurityPolicy',{...policy,sensitive_reauth_max_age_seconds:1}));
+ const config=JSON.parse(fs.readFileSync('config/frontend-settings.json')),previous=JSON.parse(fs.readFileSync('database/settings-catalog-v16.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''", "'"));
+ assert.deepEqual(config.fields.filter(x=>x.key!=='security_policy'),previous);
+ const field=config.fields.find(x=>x.key==='security_policy');assert.deepEqual(field.default,{mfa_roles:[],sensitive_reauth_max_age_seconds:null});assert.equal(field.group,'O04');
+ const implementation=fs.readFileSync('database/organization-security-preferences.sql','utf8');
+ const schema=JSON.parse(implementation.split("$schema$select '")[1].split("'::jsonb$schema$")[0]);assert.deepEqual(schema,p.$defs.OrganizationSecurityPolicy);
+ const file=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_organization_security_preferences.sql'));assert(file);
+ assert.equal(fs.readFileSync('supabase/migrations/'+file,'utf8'),fs.readFileSync('database/settings-catalog-v17.sql','utf8').replace('commit;\n',()=>implementation.replace('begin;\n','')));
+});
 test('XREQ026/027 expose stored override state and genuine downgrade target terms without command authority',async()=>{
  const generated=await import('../supabase/functions/backend-v1/validators.js');
  assert(generated.request_management_state_get_v1({client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:id,permission:'attendance.draft'}}}));
@@ -117,7 +142,7 @@ test('permission preparations contain only explicit delegable proposals and no t
  const oldCatalog=JSON.parse(fs.readFileSync('database/settings-catalog-v13.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
  const config={fields:JSON.parse(fs.readFileSync('database/settings-catalog-v14.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"))};
  assert.deepEqual(config.fields.filter(x=>x.key!=='permission_templates'),oldCatalog);
- const currentConfig=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ const currentConfig={fields:JSON.parse(fs.readFileSync('database/settings-catalog-v16.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"))};
  assert.deepEqual(currentConfig.fields.filter(x=>x.key!=='regional_defaults'),config.fields);
 
  for(const scope of ['organization','center']){
@@ -245,7 +270,7 @@ test('subscriber numbers are lossless decimal identifiers on person and report p
  assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
 });
 test('settings catalogue groups isolate calendar display, reminders and package preparation without changing stored fields',()=>{
- const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>!['agreement_templates','permission_templates','regional_defaults'].includes(f.key));
+ const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>!['agreement_templates','permission_templates','regional_defaults','security_policy'].includes(f.key));
  for(const f of fields){
   if(f.consumer==='reminder_settings')assert.equal(f.group,{organization:'O07',center:'M14',member:'S13'}[f.scope],f.scope+'.'+f.key);
   if(f.consumer==='reminder_quiet_until')assert.equal(f.group,'S13',f.key);

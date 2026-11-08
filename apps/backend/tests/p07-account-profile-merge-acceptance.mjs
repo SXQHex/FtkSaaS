@@ -77,6 +77,31 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    const managed=await must(second,'management_state_get_v1',scope({center_id:c2,operation:'person_merge_approve_v1',selector:{operation:'person_merge_approve_v1',key:{preview_id:p.id,approval_center_id:c2}}}));assert.equal(managed.items[0].current.values.approval_center_id,c2);assert.equal(JSON.stringify(managed).includes(p.token),false);
    await fail('person_merge_approve_v1',{approval_center_id:c2,preview:{id:p.id,token:p.token}},'FORBIDDEN');
   });
+  await t.test('CM discovers pending merge approvals without a creator token and receives an approval-only capability',async()=>{
+   const additional=await preview();
+   const request=scope({center_id:c2,operation:'person_merge_approve_v1',selector:{operation:'person_merge_approve_v1',key:{approval_center_id:c2}},page:{limit:1}});
+   const before=Number((await rows('select count(*)::int n from core.operation_receipts where org_id=$1',[org]))[0].n);
+   const listing=await must(second,'management_state_get_v1',request),item=listing.items.find(x=>x.merge_approval.preview.id===p.id);assert(item);const info=item.merge_approval;
+   assert.equal(info.source_id,source);assert.equal(info.target_id,target);assert.notEqual(info.preview.token,p.token);assert.deepEqual(info.required_approvals,[{center_id:c2,approved:false}]);assert.equal(info.linked_history,true);assert.deepEqual(info.effects,p.effects);
+   assert(listing.next_cursor);const next=await must(second,'management_state_get_v1',{...request,page:{limit:1,cursor:listing.next_cursor}});assert.equal(next.items[0].merge_approval.preview.id,additional.id);assert.equal(next.next_cursor,null);
+   assert.equal(Number((await rows('select count(*)::int n from core.operation_receipts where org_id=$1',[org]))[0].n),before);
+   await fail('person_merge_apply_v1',{preview:info.preview},'NOT_FOUND');
+   await fail('person_merge_approve_v1',{approval_center_id:c2,preview:info.preview},'NOT_FOUND');
+   await fail('person_merge_approve_v1',{approval_center_id:c1,preview:info.preview},'NOT_FOUND',key(),second);
+   const approvalKey=key(),body=scope({center_id:c2,approval_center_id:c2,preview:info.preview});
+   await must(second,'person_merge_approve_v1',body,approvalKey);assert.equal((await must(second,'person_merge_approve_v1',body,approvalKey)).replayed,true);
+   await fail('management_state_get_v1',{...request,page:{limit:1,cursor:listing.next_cursor}},'VERSION_CONFLICT',undefined,second);
+   const exact=await must(second,'management_state_get_v1',{...request,selector:{...request.selector,key:{approval_center_id:c2,preview_id:p.id}}});assert.deepEqual(exact.items[0].merge_approval.required_approvals,[{center_id:c2,approved:true}]);
+   await db.query('update core.role_assignments set version=version+1 where id=$1',[assignment]);
+   await fail('person_merge_approve_v1',{approval_center_id:c2,preview:info.preview},'NOT_FOUND',key(),second);
+   const fresh=await must(second,'management_state_get_v1',request);assert.notEqual(fresh.items[0].merge_approval.preview.token,info.preview.token);assert.deepEqual(fresh.items[0].merge_approval.required_approvals,[{center_id:c2,approved:false}]);
+   await db.query("update private.preview_payloads set expires_at=clock_timestamp()-interval '1 second' where preview_id=$1",[additional.id]);
+   await fail('management_state_get_v1',{...request,selector:{...request.selector,key:{approval_center_id:c2,preview_id:additional.id}}},'PREVIEW_STALE',undefined,second);
+   const link=(await rows('select id from core.account_links where org_id=$1 and account_id=$2',[org,secondAccount.id]))[0].id;
+   await db.query("update core.account_links set state='revoked' where id=$1",[link]);
+   await fail('person_merge_approve_v1',{center_id:c2,approval_center_id:c2,preview:fresh.items[0].merge_approval.preview},'NOT_FOUND',key(),second);
+   await db.query("update core.account_links set state='active' where id=$1",[link]);
+  });
   await t.test('other-center CM approval is live and version-bound; late audit error is atomic',async()=>{
    const approve=()=>must(second,'person_merge_approve_v1',scope({center_id:c2,approval_center_id:c2,preview:{id:p.id,token:p.token}}),key());await approve();
    await db.query('update core.role_assignments set version=version+1 where id=$1',[assignment]);await fail('person_merge_apply_v1',{preview:{id:p.id,token:p.token}},'APPROVAL_REQUIRED');await approve();

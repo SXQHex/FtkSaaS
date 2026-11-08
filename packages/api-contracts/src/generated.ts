@@ -1669,7 +1669,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults")[]
+overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1693,14 +1693,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 16
+catalog_version: 17
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -1771,23 +1771,23 @@ center_id: string
 export type SettingsCatalog1 = ({
 scope: "user"
 defaults: UserSettingsValues
-catalog_version: 16
+catalog_version: 17
 } | {
 scope: "member"
 defaults: MemberSettingsValues
-catalog_version: 16
+catalog_version: 17
 } | {
 scope: "center"
 defaults: CenterSettingsValues
-catalog_version: 16
+catalog_version: 17
 } | {
 scope: "organization"
 defaults: OrganizationSettingsValues
-catalog_version: 16
+catalog_version: 17
 } | {
 scope: "platform"
 defaults: PlatformSettingsValues
-catalog_version: 16
+catalog_version: 17
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3902,6 +3902,8 @@ OrganizationRegionalDefaults?: OrganizationRegionalDefaults
 SettingsHistorySource?: SettingsHistorySource
 PublicRegionalContext?: PublicRegionalContext
 DowngradeRetainedResource?: DowngradeRetainedResource
+MergeApprovalDiscovery?: MergeApprovalDiscovery
+OrganizationSecurityPolicy?: OrganizationSecurityPolicy
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16976,6 +16978,7 @@ session_detail?: SessionView
 management_attention?: "instructor_required"
 sale_change_record?: SaleChangeInventoryRecord
 retained_resource?: DowngradeRetainedResource
+merge_approval?: MergeApprovalDiscovery
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19428,6 +19431,39 @@ subscriber_number: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeApprovalDiscovery".
+ */
+export interface MergeApprovalDiscovery {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+approval_center_id: string
+preview: PreviewToken
+expires_at: Instant
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+affected_center_ids: string[]
+required_approvals: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+approved: boolean
+}[]
+linked_history: true
+effects: Effect[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionPreview".
  */
 export interface ReservationProtectionPreview {
@@ -20035,7 +20071,7 @@ approval_center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-preview_id: string
+preview_id?: string
 }
 }
 /**
@@ -22800,6 +22836,18 @@ terms: PayTerms
  */
 permission_templates?: PermissionPreparationTemplate[]
 regional_defaults?: OrganizationRegionalDefaults
+security_policy?: OrganizationSecurityPolicy
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "OrganizationSecurityPolicy".
+ */
+export interface OrganizationSecurityPolicy {
+/**
+ * @maxItems 7
+ */
+mfa_roles: []|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]|[("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student"), ("owner" | "org_manager" | "center_manager" | "staff" | "instructor" | "assistant" | "student")]
+sensitive_reauth_max_age_seconds: (number | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22888,7 +22936,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: SettingsFieldKey
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert")
 writable: boolean
 }
 /**

@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5e60de9a1b247175e3e9cecff6a4a460564523ce06adc79659cb27b25ff54b94",
-        "reason": "Only plan-target native fixture source hash changed after required page fix; original unit/shard inventory and all checks remain unchanged."
+        "fingerprint": "bf82af8f733fea7483cd8b933ce6fcd12a143361e8fb7bd84097ebcdbfb44638",
+        "reason": "Reviewed settings acceptance import hash and shifted line ownership after native MFA prerequisite; source coverage and all CI acceptance gates remain unchanged."
       }
     },
     {
@@ -352,7 +352,12 @@
         "apps/backend/transports/account-signup-gateway.mjs",
         "docs/settings.md",
         "apps/backend/scripts/acceptance/s07-s15-browser.mjs",
-        "apps/backend/scripts/acceptance/s08-native-mfa.mjs"
+        "apps/backend/scripts/acceptance/s08-native-mfa.mjs",
+        "apps/backend/database/organization-security-preferences.sql",
+        "apps/backend/database/settings-catalog-v17.sql",
+        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql",
+        "apps/backend/database/organization-security-native-proof.sql",
+        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -364,8 +369,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "36a8851db5b33c57c38c086afc799021200e58411d760f37bef69c2db37d8723",
-        "reason": "Reviewed actual independent native backup TOTP and AAL1 denial; hosted runner verifies created-factor removal and backend denial after local logout. Native recovery boundaries remain."
+        "fingerprint": "7fcacc2115ef5de67280a51fa1fb03b16d6df79b39d5acbe576200f0811bf10b",
+        "reason": "Reviewed native factor ACL: organization policy delegates mandatory enrollment and AAL proof to existing closed service-only account MFA boundary; native and role regressions preserve stale-token and missing-factor rejection."
       }
     },
     {
@@ -636,7 +641,9 @@
         "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
         "apps/backend/database/people-registry-scaling.sql",
         "apps/backend/database/upper-plan-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
+        "apps/backend/database/merge-approval-discovery.sql",
+        "apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -655,8 +662,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "7cbef87b95c7aaf73b6a350fa7217eff5f70afd186b810f1badf0f96a47e5580",
-        "reason": "Shared person-registry root adds self discovery isolation and live role tests; existing person lifecycle, contacts, merge and subscriber assignment behavior remains unchanged."
+        "fingerprint": "370d4989d7e71cfcc6526a23f190126d3fa7cddff135b3f26eba1774afdc25c2",
+        "reason": "Reviewed approval-only HMAC, safe frozen merge effect, paging and current authority/expiry checks; original apply token and final mutation guards remain private and unchanged."
       }
     },
     {
@@ -839,8 +846,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "b9843c9fe270aaf872682c85d5f38b1a8a915c9c339900eee4870782ae439ba5",
-        "reason": "Paylaşılan action native köküne finans correction testleri eklendi; mevcut kapasite/oda/atanmış eğitmen/Business cross-center ve kayıp rol assertionları korunuyor, WF06 runtime davranışı değişmedi."
+        "fingerprint": "a1a91e953dca83ce4f8181252ccd6be4e5b511548c1bd921b3c3458cf3becb1b",
+        "reason": "Reviewed shared finance/capacity discovery test roots after collection correction extraction; all role feature cross-center and revocation assertions remain with isolated setup."
       }
     },
     {
@@ -967,8 +974,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "58a7b98e6c7b4eef8aa5f2bc428f704453fc6d9830a6d2a454972dfc0bcbde85",
-        "reason": "XREQ-030 gerçek kök collection reader/projeksiyon/dispatch migrationı ve native subtestler incelendi; aynı finance.refund preflight, yan etkisiz okuma, açık preview/apply, child/refund/foreign-tenant/legacy-person sınırları."
+        "fingerprint": "0baa61c9c6dbe45551f77eb98095a4f3164887c69acd5baab99d6e2730ffac80",
+        "reason": "Reviewed action discovery acceptance split into independent authority and ledger correction roots; original assertions and 300-second root budgets retained with separate tenant fixtures."
       }
     },
     {
@@ -1171,7 +1178,9 @@
         "apps/backend/tests/starter-preparation-fixture.mjs",
         "apps/backend/tests/agreement-preparation-acceptance.mjs",
         "apps/backend/tests/permission-preparation-acceptance.mjs",
-        "apps/backend/tests/hosted-settings-restore-unit.mjs"
+        "apps/backend/tests/hosted-settings-restore-unit.mjs",
+        "apps/backend/tests/account-mfa-acceptance.mjs",
+        "apps/backend/tests/native-totp-fixture.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1216,7 +1225,12 @@
         "apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql",
         "apps/backend/scripts/acceptance/s10-hosted-sources.mjs",
         "apps/backend/database/notification-language-rendering.sql",
-        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql"
+        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql",
+        "apps/backend/database/organization-security-preferences.sql",
+        "apps/backend/database/settings-catalog-v17.sql",
+        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql",
+        "apps/backend/database/organization-security-native-proof.sql",
+        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1231,8 +1245,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "bf69fc7b7105422e4e0943be5e4e7a9ac383f293622211308c0eee966ac2472a",
-        "reason": "Organization regional language consumed by closed email renderer; current settings source/version history unchanged."
+        "fingerprint": "682110da7815316e7ea12538065f01c91e1ced0913f13a8f44dab9c44c179802",
+        "reason": "Reviewed settings round-trip native TOTP enrollment and signed AAL2 actor; all declared fields including security_policy still round-trip, weak actor explicitly rejected, native factor cleaned afterward."
       }
     },
     {

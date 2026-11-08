@@ -591,7 +591,7 @@
         {
           "line": 5,
           "path": "apps/backend/tests/account-mfa-acceptance.mjs",
-          "sha256": "c0d15055107819778ca19806412457252fecb60f3b5ea1bf30a87f3d73846437"
+          "sha256": "dc8a6b43e6306cbe71298252175a3787dcc6cba17d980b03a5ef6dc199d1e43f"
         },
         {
           "line": 6,
@@ -721,7 +721,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/action-management-acceptance.mjs",
-          "sha256": "374995b2b5bd25dcaf1c956f57ee71f3d7988efbbaf8c2d05e1eb40efdf7aaa1"
+          "sha256": "844b1f83fd8a513198fa6d3fa1679cdac71f60a23692a88d8b2689668a67ada8"
         },
         {
           "line": 2,
@@ -751,27 +751,27 @@
         {
           "line": 7,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "0a6d4730d5dbe4a684d7d9c0a6e83cdc07cc4cbd8ae9fffb49aba3d83fcd50a3",
+          "sha256": "8450e8b8640e7ed0dd9146d544a28e33734b7deb4294918ed5743afaf90f69df",
           "shared": [
             [
               1,
-              28
+              29
             ],
             [
-              116,
-              116
+              117,
+              117
             ],
             [
-              174,
-              174
+              175,
+              175
             ],
             [
-              207,
-              208
+              210,
+              211
             ],
             [
-              249,
-              250
+              252,
+              253
             ]
           ],
           "parts": [
@@ -779,8 +779,8 @@
               "id": "settings-user-history",
               "ranges": [
                 [
-                  29,
-                  115
+                  30,
+                  116
                 ]
               ]
             },
@@ -788,12 +788,12 @@
               "id": "settings-tenant-authority",
               "ranges": [
                 [
-                  117,
-                  173
+                  118,
+                  174
                 ],
                 [
-                  175,
-                  206
+                  176,
+                  209
                 ]
               ]
             },
@@ -801,8 +801,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  209,
-                  248
+                  212,
+                  251
                 ]
               ]
             },
@@ -810,8 +810,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  251,
-                  287
+                  254,
+                  290
                 ]
               ]
             }
@@ -912,7 +912,7 @@
         {
           "line": 135,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
-          "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c"
+          "sha256": "6ef2f1340c58a7816446b7bbe62b5454910b1ae4c8d00f429efd9447ba6c2a14"
         },
         {
           "line": 136,
