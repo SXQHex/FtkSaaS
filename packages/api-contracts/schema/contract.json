@@ -25892,6 +25892,9 @@
         },
         "retained_resource": {
           "$ref": "#/$defs/DowngradeRetainedResource"
+        },
+        "merge_approval": {
+          "$ref": "#/$defs/MergeApprovalDiscovery"
         }
       },
       "required": [
@@ -37417,8 +37420,7 @@
             }
           },
           "required": [
-            "approval_center_id",
-            "preview_id"
+            "approval_center_id"
           ],
           "additionalProperties": false
         }
@@ -45440,6 +45442,9 @@
         },
         "regional_defaults": {
           "$ref": "#/$defs/OrganizationRegionalDefaults"
+        },
+        "security_policy": {
+          "$ref": "#/$defs/OrganizationSecurityPolicy"
         }
       },
       "required": [],
@@ -45882,7 +45887,8 @@
                   "reminder_center_overrides_enabled",
                   "agreement_templates",
                   "permission_templates",
-                  "regional_defaults"
+                  "regional_defaults",
+                  "security_policy"
                 ]
               },
               "uniqueItems": true,
@@ -46163,7 +46169,8 @@
             "schedule_calendar_preferences",
             "reminder_settings",
             "reminder_quiet_until",
-            "organization_regional_context"
+            "organization_regional_context",
+            "organization_security_assert"
           ]
         },
         "writable": {
@@ -46192,7 +46199,7 @@
           ]
         },
         "catalog_version": {
-          "const": 16
+          "const": 17
         },
         "fields": {
           "type": "array",
@@ -46244,7 +46251,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 16
+              "const": 17
             }
           },
           "required": [
@@ -46262,7 +46269,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 16
+              "const": 17
             }
           },
           "required": [
@@ -46280,7 +46287,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 16
+              "const": 17
             }
           },
           "required": [
@@ -46298,7 +46305,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 16
+              "const": 17
             }
           },
           "required": [
@@ -46316,7 +46323,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 16
+              "const": 17
             }
           },
           "required": [
@@ -52869,7 +52876,8 @@
         "agreement_templates",
         "permission_templates",
         "regional_defaults",
-        "regional_defaults"
+        "regional_defaults",
+        "security_policy"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -53278,6 +53286,111 @@
         "id",
         "display_name",
         "subscriber_number"
+      ],
+      "additionalProperties": false
+    },
+    "MergeApprovalDiscovery": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "target_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "approval_center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "preview": {
+          "$ref": "#/$defs/PreviewToken"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "affected_center_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
+        },
+        "required_approvals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "approved": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "center_id",
+              "approved"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "linked_history": {
+          "const": true
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "approval_center_id",
+        "preview",
+        "expires_at",
+        "affected_center_ids",
+        "required_approvals",
+        "linked_history",
+        "effects"
+      ],
+      "additionalProperties": false
+    },
+    "OrganizationSecurityPolicy": {
+      "type": "object",
+      "properties": {
+        "mfa_roles": {
+          "type": "array",
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "org_manager",
+              "center_manager",
+              "staff",
+              "instructor",
+              "assistant",
+              "student"
+            ]
+          }
+        },
+        "sensitive_reauth_max_age_seconds": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "mfa_roles",
+        "sensitive_reauth_max_age_seconds"
       ],
       "additionalProperties": false
     }
@@ -96999,6 +97112,36 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MergeApprovalDiscovery/properties/source_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MergeApprovalDiscovery/properties/target_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MergeApprovalDiscovery/properties/approval_center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MergeApprovalDiscovery/properties/affected_center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MergeApprovalDiscovery/properties/required_approvals/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -97450,7 +97593,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 130,
+      "migration_count": 132,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

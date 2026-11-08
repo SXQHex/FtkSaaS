@@ -591,7 +591,7 @@
         {
           "line": 5,
           "path": "apps/backend/tests/account-mfa-acceptance.mjs",
-          "sha256": "c0d15055107819778ca19806412457252fecb60f3b5ea1bf30a87f3d73846437"
+          "sha256": "4535562576728a70c0012afe1bbf521b29336200a2f6fd021eca04053de40c30"
         },
         {
           "line": 6,
@@ -912,7 +912,7 @@
         {
           "line": 135,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
-          "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c"
+          "sha256": "6ef2f1340c58a7816446b7bbe62b5454910b1ae4c8d00f429efd9447ba6c2a14"
         },
         {
           "line": 136,

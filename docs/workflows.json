@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5e60de9a1b247175e3e9cecff6a4a460564523ce06adc79659cb27b25ff54b94",
-        "reason": "Only plan-target native fixture source hash changed after required page fix; original unit/shard inventory and all checks remain unchanged."
+        "fingerprint": "75ba2138469e51052575611930088b01763b3840ee8907440d56b8926955d5ad",
+        "reason": "Reviewed client protocol and source-bound inventory after catalogue v17 scoped descriptors, additive approval data and exact native-test import hashes; no transport or CI gate changes."
       }
     },
     {
@@ -352,7 +352,10 @@
         "apps/backend/transports/account-signup-gateway.mjs",
         "docs/settings.md",
         "apps/backend/scripts/acceptance/s07-s15-browser.mjs",
-        "apps/backend/scripts/acceptance/s08-native-mfa.mjs"
+        "apps/backend/scripts/acceptance/s08-native-mfa.mjs",
+        "apps/backend/database/organization-security-preferences.sql",
+        "apps/backend/database/settings-catalog-v17.sql",
+        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -364,8 +367,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "36a8851db5b33c57c38c086afc799021200e58411d760f37bef69c2db37d8723",
-        "reason": "Reviewed actual independent native backup TOTP and AAL1 denial; hosted runner verifies created-factor removal and backend denial after local logout. Native recovery boundaries remain."
+        "fingerprint": "7e38774839474ef2e6d5f1118bb9ce86c15c4447a13f3650e00098e3c18e0e25",
+        "reason": "Reviewed final O04 policy edit preview actor/scope binding, pre-reader enforcement and trusted native session assurance in recursive authorization; native security regression retains original assertions."
       }
     },
     {
@@ -636,7 +639,9 @@
         "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
         "apps/backend/database/people-registry-scaling.sql",
         "apps/backend/database/upper-plan-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
+        "apps/backend/database/merge-approval-discovery.sql",
+        "apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -655,8 +660,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "7cbef87b95c7aaf73b6a350fa7217eff5f70afd186b810f1badf0f96a47e5580",
-        "reason": "Shared person-registry root adds self discovery isolation and live role tests; existing person lifecycle, contacts, merge and subscriber assignment behavior remains unchanged."
+        "fingerprint": "370d4989d7e71cfcc6526a23f190126d3fa7cddff135b3f26eba1774afdc25c2",
+        "reason": "Reviewed approval-only HMAC, safe frozen merge effect, paging and current authority/expiry checks; original apply token and final mutation guards remain private and unchanged."
       }
     },
     {
@@ -1171,7 +1176,8 @@
         "apps/backend/tests/starter-preparation-fixture.mjs",
         "apps/backend/tests/agreement-preparation-acceptance.mjs",
         "apps/backend/tests/permission-preparation-acceptance.mjs",
-        "apps/backend/tests/hosted-settings-restore-unit.mjs"
+        "apps/backend/tests/hosted-settings-restore-unit.mjs",
+        "apps/backend/tests/account-mfa-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1216,7 +1222,10 @@
         "apps/backend/supabase/migrations/20261107095157_settings_template_inheritance.sql",
         "apps/backend/scripts/acceptance/s10-hosted-sources.mjs",
         "apps/backend/database/notification-language-rendering.sql",
-        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql"
+        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql",
+        "apps/backend/database/organization-security-preferences.sql",
+        "apps/backend/database/settings-catalog-v17.sql",
+        "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1231,8 +1240,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "bf69fc7b7105422e4e0943be5e4e7a9ac383f293622211308c0eee966ac2472a",
-        "reason": "Organization regional language consumed by closed email renderer; current settings source/version history unchanged."
+        "fingerprint": "f29fb07afc6bfc271fd64b2b39da0d7ae309db9488f1770453567c7a876b81ef",
+        "reason": "Reviewed final v17 base and scoped catalog descriptors and security policy schema/preview scope guard; existing defaults, writer rights and history behavior remain unchanged."
       }
     },
     {

@@ -44,7 +44,17 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 
 **Starter public/self:** Temel halka açık ders takvimi ve yalnız programa ilişkin başvuru; doğrulanmış öğrencinin geçerli hak/katılım koşullarıyla kendi rezervasyon/iptal işlemi. Hesapsız başvuru **kesin rezervasyon, satış, kredi, aktif hesap veya pazarlama rızası yaratmaz**; bot/rate/tenant/yetki doğrulaması korunur. Başvuruyu görme ve gerektiğinde öğrenci ilişkisine bağlama için dar operasyonel değerlendirme sunulur; genel CRM `lead_*`, reklam entegrasyonu, kampanya, segment, otomasyon yetkileri Starter'a bu yüzden açılmaz. Provider ve tarayıcı kabulü backlog’da ayrı izlenir; Native Auth SMTP ile uygulama dış bildirim kanalları farklıdır. Online ödeme/gateway bu plan kararıyla otomatik açılmaz.
 
-**Aktif öğrenci sınırı:** Önceden kabul edilmiş `RelationshipState=active` öğrenci sayımı esas alınır; hesapsız öğrenciler dahildir, aynı organizasyon kişisi bir kez sayılır, yalnız aday/eğitmen/personel olanlar sayılmaz. Seçili planın bağlayıcı tablodaki sınırı yeni aktive/yeniden aktive ve ilgili kesinleştirmede eşzamanlı atomik kontrol edilir. Limit aşıldığında mevcut hak, borç, yoklama ve kesin rezervasyonlar silinmez veya otomatik iptal edilmez. Açık işlemi olan öğrenci kotayı boşaltmak için keyfî pasifleştirilemez. Pro/Business öğrenci sınırları da aynı sayım ve korumayı kullanır. Business’ta farklı merkezlere bağlı aynı kişi organizasyonda bir kez sayılır; merkez başına öğrenci kotası yoktur. Ticari sınırsız oda/eğitmen teknik hız ve iş yükü korumalarını kaldırmaz. Fiyat bu kararla belirlenmez.
+**Aktif öğrenci sınırı:** Önceden kabul edilmiş `RelationshipState=active` öğrenci sayımı esas alınır; hesapsız öğrenciler dahildir, aynı organizasyon kişisi bir kez sayılır, yalnız aday/eğitmen/personel olanlar sayılmaz. Seçili planın bağlayıcı tablodaki sınırı yeni aktive/yeniden aktive ve ilgili kesinleştirmede eşzamanlı atomik kontrol edilir. Limit aşıldığında mevcut hak, borç, yoklama ve kesin rezervasyonlar silinmez veya otomatik iptal edilmez. Açık işlemi olan öğrenci kotayı boşaltmak için keyfî pasifleştirilemez. Pro/Business öğrenci sınırları da aynı sayım ve korumayı kullanır. Business’ta farklı merkezlere bağlı aynı kişi organizasyonda bir kez sayılır; merkez başına öğrenci kotası yoktur. Ticari sınırsız oda/eğitmen teknik hız ve iş yükü korumalarını kaldırmaz. Güncel fiyatların sahibi aşağıdaki SaaS plan fiyatlarıdır.
+
+#### SaaS plan fiyatları
+
+8 Kasım 2026 kullanıcı kararı; tutarlar TRY cinsindedir. Aylık ve yıllık abonelik ayrı fiyat sürümleridir. Aynı talimat mevcut aboneliklerin geçerli dönem fiyatlarının da bu tutarlara geçirilmesini ve tahsil edilmiş kaydedilmesini kapsar; uygulama/ödeme kanıtı backend devir sahibindedir.
+
+| Plan | Aylık | Yıllık |
+|---|---:|---:|
+| Starter | 3.000 TL | 30.000 TL |
+| Pro | 10.000 TL | 100.000 TL |
+| Business | 20.000 TL | 200.000 TL |
 
 #### Plan geçişleri ve kaynak bütünlüğü
 
