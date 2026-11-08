@@ -1,3 +1,5 @@
+import { reportWrites } from "./report-command";
+import { automationWrites } from "./automation-command";
 import { eventWrites } from "./event-command";
 import {
   proAccessWrites,
@@ -21,6 +23,9 @@ export type PendingOperation = {
     | "event"
     | "access"
     | "crm"
+    | "automation"
+    | "report"
+    | "import"
     | "settings"
     | "agreements"
     | "attendance"
@@ -34,8 +39,16 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
   event: eventWrites,
   access: proAccessWrites,
   crm: crmWrites,
+  automation: automationWrites,
+  report: reportWrites.filter((op) => op.startsWith("report_")),
+  import: reportWrites.filter((op) => op.startsWith("import_")),
   attendance: attendanceWrites,
-  settings: ["settings_update_v1", "settings_reset_apply_v1", "negcredit_valuation_set_v1"],
+  settings: [
+    "notification_preferences_set_v1",
+    "settings_update_v1",
+    "settings_reset_apply_v1",
+    "negcredit_valuation_set_v1",
+  ],
   agreements: ["instructor_agreement_publish_v1"],
   finance: [
     ...paymentWrites,
@@ -53,6 +66,8 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
   request: bookingWrites.filter((operation) => operation.startsWith("lesson_request_")),
 };
 function slotKind(slot: string): PendingOperation["kind"] | null {
+  if (/^email:(transactional|reminder)$/.test(slot)) return "settings";
+  if (/^delivery:(user|member|center|organization)$/.test(slot)) return "settings";
   if (slot === "operating-settings:organization" || slot === "operating-settings:center")
     return "settings";
   if (slot.startsWith("permission:")) {
@@ -86,6 +101,16 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
     case "subscription-downgrade":
     case "subscription-cancel":
       return "access";
+    case "report-export":
+      return "report";
+    case "import-preview":
+    case "import-apply":
+      return "import";
+    case "automation-org":
+    case "segment-org":
+    case "automation":
+    case "segment":
+      return "automation";
     case "crm-person":
     case "crm-lead":
     case "crm-activity":
@@ -147,6 +172,10 @@ export function discoverPendingOperations(actorId: string): PendingOperation[] |
       if (
         centerId === "organization" &&
         slot !== "operating-settings:organization" &&
+        !slot.startsWith("email:") &&
+        !slot.startsWith("automation-org:") &&
+        !slot.startsWith("segment-org:") &&
+        !/^delivery:(user|member|organization)$/.test(slot) &&
         !slot.startsWith("crm-application:") &&
         !slot.startsWith("subscription-")
       )

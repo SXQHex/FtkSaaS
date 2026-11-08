@@ -50,6 +50,7 @@ export const sections = [
   "packages",
   "finance",
   "reports",
+  "automation",
   "studio",
   "settings",
   "inbox",
@@ -67,6 +68,7 @@ const icons = {
   packages: Package,
   finance: CreditCard,
   reports: ChartNoAxesCombined,
+  automation: Bell,
   studio: Building2,
   settings: Settings2,
   inbox: Bell,
@@ -74,7 +76,7 @@ const icons = {
 };
 const groups: AdminSection[][] = [
   ["overview", "schedule", "events", "personal", "attendance", "students"],
-  ["crm", "packages", "finance", "reports"],
+  ["crm", "packages", "finance", "reports", "automation"],
   ["studio", "documents", "settings"],
 ];
 

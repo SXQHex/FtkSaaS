@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { OrganizationView } from "@ftksaas/api-contracts";
 import { Label } from "@ftksaas/ui/components/label";
 import { NotificationPreferences } from "./notification-preferences";
+import { EmailPreferences } from "../automation/email-preferences";
 import { InboxFeed } from "./inbox-feed";
 
 export function InboxWorkspace({
@@ -39,6 +40,7 @@ export function InboxWorkspace({
         </select>
       </div>
       <NotificationPreferences scope={scope} />
+      <EmailPreferences scope={scope} />
       <InboxFeed key={`${actorId}:${org.id}`} scope={scope} />
     </div>
   );
