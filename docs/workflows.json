@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "c39030121ce2d6c1cc232b6bd3a6ae995a773da58183d3099d891e19093282ef",
-        "reason": "Merged main c97a965 keeping workflow downloader byte-identical and preserving all download failure assertions; native media parameter cast verified against real source SQL"
+        "fingerprint": "5097a1593a1f2654a59fa0093e575ce33f456b88ec8f7cc26fb69f3dd5a3e847",
+        "reason": "Read append-only migration139 and inventory/checker changes; public operation contracts unchanged"
       }
     },
     {
@@ -1329,8 +1329,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "21ba5573a1b915fef26b1c7ce65521cfc05cdeac4a1a4cbf1056beb9b4be485e",
-        "reason": "Read native lifecycle media fixture: explicit bytea fixes PostgreSQL overload inference; deletion and hold contract unchanged"
+        "fingerprint": "802b7c96af40f375ea779f6c1f5423efa1eab52c8572278aeffab2b8c35714be",
+        "reason": "Native fixture verifies retired Auth tables absent and preserves lifecycle worker success/failure assertions"
       }
     },
     {
@@ -1564,7 +1564,9 @@
         "apps/backend/scripts/erasure-register.mjs",
         "apps/backend/scripts/guarded-restore.mjs",
         "apps/backend/database/account-privacy-execution.sql",
-        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql"
+        "apps/backend/database/account-privacy-active-surfaces.sql",
+        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql",
+        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1580,8 +1582,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "d9a6856064f1221e32c4ae8ff0216007ac46f151c94a019441e02e6d4a92ee3b",
-        "reason": "Read original six passing native cases and new media insert: bytea fixture cast only, no permissions or privacy boundary change"
+        "fingerprint": "26ac771ddbd032d8ebfad8657c30ec3c4bf7b6f67c8e570cb195ace211c4f8c6",
+        "reason": "Read native Auth retirement migration: remove dropped intent tables from hold and purge targets, retain current authorization and scope"
       }
     },
     {
@@ -1719,7 +1721,9 @@
         "apps/backend/database/notification-language-rendering.sql",
         "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql",
         "apps/backend/database/account-privacy-execution.sql",
-        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql"
+        "apps/backend/database/account-privacy-active-surfaces.sql",
+        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql",
+        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1734,8 +1738,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "43f2058bf5f112d252ac487fc2cc41dad1e9c5886ee59596bd9d1ebd56d1e3c6",
-        "reason": "Verified exact media insert70 PNG bytes and SHA256 with pgcrypto; leased worker hold rollback and replay assertions unchanged"
+        "fingerprint": "aaef080b50c9e8282c7bd102d30e015bedb8e480c4ed5105db6c362e00519edd",
+        "reason": "Verified dedicated worker claim execute with DROP migration and139: hold late-failure rollback140bytes foreign preservation receipt replay"
       }
     }
   ]

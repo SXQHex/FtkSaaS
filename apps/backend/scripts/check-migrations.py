@@ -244,3 +244,5 @@ assert next(Path('supabase/migrations').glob('*_digital_agreement_acceptance.sql
 assert next(Path('supabase/migrations').glob('*_pro_workflow_preparations.sql')).read_text()==Path('database/settings-catalog-v18.sql').read_text().replace('commit;\n',Path('database/pro-workflow-preparations.sql').read_text().replace('begin;\n','',1)),'Pro preparation source drift'
 
 assert next(Path('supabase/migrations').glob('*_account_privacy_execution.sql')).read_bytes()==Path('database/account-privacy-execution.sql').read_bytes(),'Account profile erasure source drift'
+
+assert next(Path('supabase/migrations').glob('*_account_privacy_active_surfaces.sql')).read_bytes()==Path('database/account-privacy-active-surfaces.sql').read_bytes(),'Active account privacy surfaces source drift'
