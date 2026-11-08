@@ -22,6 +22,8 @@ jobs:
       - name: Install verified validators
         id: install
         timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           bash apps/web/scripts/workflow-validation/install-tools.sh "$RUNNER_TEMP/workflow-tools"

@@ -109,7 +109,7 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await db.query("insert into private.frontend_settings(scope_key,scope,values) values($1,'user','{\"language\":\"tr\"}') on conflict(scope_key) do update set values=excluded.values",[skey]);
    await db.query("insert into core.operation_receipts(id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,'account_profile_update_v1',$3,$4,'succeeded',clock_timestamp()+interval '30 days')",[receipt,target,'a'.repeat(64),'b'.repeat(64)]);
    for(const [id,scope,body] of [[first,skey,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==','base64')],[second,skey,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/5ncLrgAAAABJRU5ErkJggg==','base64')],[foreign,'user:'+account.id,Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPj/HwADAgH/5ncLrgAAAABJRU5ErkJggg==','base64')]]){
-    await db.query("insert into private.settings_media_assets(id,scope_key,mime,body,checksum) values($1,$2,'image/png',$3,encode(extensions.digest($3,'sha256'),'hex'))",[id,scope,body]);
+    await db.query("insert into private.settings_media_assets(id,scope_key,mime,body,checksum) values($1,$2,'image/png',$3::bytea,encode(extensions.digest($3::bytea,'sha256'),'hex'))",[id,scope,body]);
    }
    await db.query('insert into private.settings_media_current values($1,$2)',[skey,second]);
    await db.query('insert into private.settings_media_history values($1,$2,$3,$4)',[receipt,skey,first,second]);

@@ -163,6 +163,26 @@ test("API failure renders a retryable error without demo fallback", async () => 
   expect(await screen.findByRole("alert")).toHaveTextContent("Bağlantı kurulamadı");
   expect(screen.queryByText("Ece Demir")).not.toBeInTheDocument();
 });
+test.each([
+  ["reports", "Raporu getir"],
+  ["automation", "Otomasyonlar"],
+])(
+  "implemented %s module does not also show a preparation placeholder",
+  async (section, action) => {
+    await import("../src/components/reports/reports-workspace");
+    await import("../src/components/automation/automation-workspace");
+    window.location.hash = `#${section}`;
+    render(<StudioWorkspace authUserId="native-user" />);
+    await userEvent
+      .setup()
+      .selectOptions(
+        await screen.findByRole("combobox", { name: "Merkez" }),
+        `${organizations[0].id}:center-a`,
+      );
+    expect(await screen.findByRole("button", { name: action })).toBeVisible();
+    expect(screen.queryByText("Bu bölüm hazırlanıyor")).not.toBeInTheDocument();
+  },
+);
 test("account theme initializes an unset device but never overwrites a saved device choice", async () => {
   mocks.settings.mockResolvedValue({ remember_context: false, theme: "light" });
   const first = render(<StudioWorkspace authUserId="native-user" />);

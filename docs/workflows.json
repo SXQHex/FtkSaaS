@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "664cb2a6f6cdff12912a76a56da68446a33979a72a5a2ea829038e7eab7295e5",
-        "reason": "Reviewed downloader success/failure and corrupt fallback archives fail closed; private native startup diagnostics emit closed categories only"
+        "fingerprint": "c39030121ce2d6c1cc232b6bd3a6ae995a773da58183d3099d891e19093282ef",
+        "reason": "Merged main c97a965 keeping workflow downloader byte-identical and preserving all download failure assertions; native media parameter cast verified against real source SQL"
       }
     },
     {
@@ -1329,8 +1329,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "b1caa14efa4a933cd7ffc2c71da1e5fa8210afc1b98ff9ff9e48ee3384ceb1d4",
-        "reason": "Owner CM explicitly assigned before creating native deletion target; unchanged deletion lifecycle and worker contract"
+        "fingerprint": "21ba5573a1b915fef26b1c7ce65521cfc05cdeac4a1a4cbf1056beb9b4be485e",
+        "reason": "Read native lifecycle media fixture: explicit bytea fixes PostgreSQL overload inference; deletion and hold contract unchanged"
       }
     },
     {
@@ -1580,8 +1580,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "9f5ae7ee49eada0c25dc9e2e5c2ca8eb4f00491d51cffb32d0e6ce7885591f12",
-        "reason": "Owner CM fixture correction follows existing center authorization; unchanged privacy and security contract"
+        "fingerprint": "d9a6856064f1221e32c4ae8ff0216007ac46f151c94a019441e02e6d4a92ee3b",
+        "reason": "Read original six passing native cases and new media insert: bytea fixture cast only, no permissions or privacy boundary change"
       }
     },
     {
@@ -1734,8 +1734,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "c662e6a0013eb8be5933b8e2cc3c2e79967d4623992595d07eec3f0606026abb",
-        "reason": "Native worker fixture Owner CM setup corrected; unchanged lease hold rollback and privacy scope"
+        "fingerprint": "43f2058bf5f112d252ac487fc2cc41dad1e9c5886ee59596bd9d1ebd56d1e3c6",
+        "reason": "Verified exact media insert70 PNG bytes and SHA256 with pgcrypto; leased worker hold rollback and replay assertions unchanged"
       }
     }
   ]
