@@ -716,6 +716,9 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Gerçek izole yükleyicide ret/yarım yük/başarı; erişim kapısı ve geri dönüş denemesi.
 - **Kaynak alanı:** guarded-restore/loader/runbook; restore-guard.test.mjs
 
+**İzole satır yükleyicisi:** O07 için `guarded-restore` transaction protokolü ve `postgres-restore` somut PostgreSQL adaptörü hazırlanır. Son sicil/checkpoint kontrolünden önce commit yok; geç hata rollback, belirsiz COMMIT başarısız sonuçtur. Hedef explicit loopback/instance/ayrı recovery DB ile sınırlı, bağlantı kapısı kapalı kalır. Exact tablo/sütun, boş hedef, lossless sayı, typed readback ve RLS nedeniyle gizlenen satırın fail-closed reddi gerekir. Genel migration/ACL/RLS/Auth giriş/Storage/sequence/config/worker geri dönüşü bu adaptörün kapsamı değildir; kaynak kabulü ve gerçek native durum [devir](00-FtkSaaS-yeni-sohbet-devir.md#pro-kurtarma-yükleyicisi-paketi) sahibindedir. O06 bağımsız güncel checkpoint ortamı ve O08/O09 bütün kabulü açık kalır.
+
+
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 

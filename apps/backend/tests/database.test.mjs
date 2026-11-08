@@ -1,3 +1,4 @@
+import './postgres-restore-acceptance.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {connect} from '../scripts/db.mjs';import {newUuidV7} from '../scripts/uuid.mjs';
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));
 import {migrationBatch,migrationBody,migrationPlan,migrationTransportProbe} from '../scripts/ci/deploy-development.mjs';
