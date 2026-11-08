@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "aed1ecc3d4405fddb81d204932d295f767cddca2eb1ee5eb2514e13359c01a26",
-        "reason": "Yeni native kalıntı migration/source ve test hash eşliği incelendi; eski assertion satırları aynen korunarak yalnız ek kontroller getirildi."
+        "fingerprint": "3a4082a0599dc5a8c2c67c9f26de5111b8c77dfb9677ae7e5e97c995a409cdd0",
+        "reason": "database.test mevcut core köküne yalnız izole recovery kabul importu eklendi; ortak API ve önceki assertionlar değişmedi."
       }
     },
     {
@@ -1522,7 +1522,8 @@
         "apps/backend/tests/restore-guard.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
-        "apps/backend/tests/native-account-erasure-unit.mjs"
+        "apps/backend/tests/native-account-erasure-unit.mjs",
+        "apps/backend/tests/postgres-restore-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1574,7 +1575,8 @@
         "apps/backend/database/account-native-erasure-finalization.sql",
         "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
         "apps/backend/database/account-native-residues.sql",
-        "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql"
+        "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
+        "apps/backend/scripts/postgres-restore.mjs"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1590,8 +1592,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "0bdde94a7befa82a80cd4a39498581fdcfcae6654544d526c1a3bcee77a40083",
-        "reason": "Veri sınıfına göre alan/satır silme ve strict ownership incelendi; başka kişinin kanıtı korunur, anonim ve tüm kopya yok etme sonucu üretilmez."
+        "fingerprint": "5afb91328fa05a844c7f1743dc231c178c50edef6e2cf1b849790a0ffef6bbd7",
+        "reason": "İzole transactional PostgreSQL yükleme, kayıpsız sayılar, açık tablo/instance ve kapalı erişim sınırları incelendi; tam kurtarma değildir."
       }
     },
     {

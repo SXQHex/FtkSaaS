@@ -42,3 +42,70 @@ test('mutable caller trust cannot bless a changed head after await',()=>restoreF
 
 test('pending crash state blocks even identical receipt replay',()=>diskFixture(file=>{const args=appendArgs(file),head=appendErasure(args);fs.writeFileSync(file+'.pending','ambiguous');assert.throws(()=>appendErasure({...args,expectedHead:head.sha256,expectedSequence:1}),/REGISTER_RECOVERY_REQUIRED/);}));
 test('pending crash state blocks restore without invoking adapter',()=>restoreFixture(async(x,file)=>{fs.writeFileSync(file+'.pending','ambiguous');let called=false;await assert.rejects(guardedRestore({...x,registerFile:file,apply:async()=>{called=true;}}),/REGISTER_RECOVERY_REQUIRED/);assert.equal(called,false);}));
+
+// Transactional recovery must retain a rollback boundary until the last guard.
+test('transactional restore commits only after the final register check',()=>restoreFixture(async(x,file)=>{
+ const events=[];
+ const result=await guardedRestore({...x,registerFile:file,transaction:{
+  prepare:async(snapshot)=>{events.push('prepared');assert(Object.isFrozen(snapshot));},
+  commit:async()=>{assert(fs.existsSync(file+'.lock'));events.push('committed');},
+  rollback:async()=>events.push('rolled_back')
+ }});
+ assert.deepEqual(events,['prepared','committed']);assert.equal(result.result,'validated_transaction_committed');
+}));
+test('register mutation rolls back prepared data before commit',()=>restoreFixture(async(x,file)=>{
+ const events=[];
+ await assert.rejects(guardedRestore({...x,registerFile:file,transaction:{
+  prepare:async()=>{events.push('prepared');fs.writeFileSync(file,'{}');},
+  commit:async()=>events.push('committed'),rollback:async()=>events.push('rolled_back')
+ }}),/REGISTER_CHANGED_DURING_RESTORE/);
+ assert.deepEqual(events,['prepared','rolled_back']);
+}));
+test('late pending journal prevents transaction commit',()=>restoreFixture(async(x,file)=>{
+ let committed=false,rolled=false;
+ await assert.rejects(guardedRestore({...x,registerFile:file,transaction:{
+  prepare:async()=>fs.writeFileSync(file+'.pending','uncertain'),
+  commit:async()=>{committed=true;},rollback:async()=>{rolled=true;}
+ }}),/REGISTER_RECOVERY_REQUIRED/);
+ assert.equal(committed,false);assert.equal(rolled,true);
+}));
+test('partial prepare failure invokes rollback and preserves original error',()=>restoreFixture(async(x,file)=>{
+ let rolled=false;
+ await assert.rejects(guardedRestore({...x,registerFile:file,transaction:{
+  prepare:async()=>{throw Error('PARTIAL_LOAD');},commit:async()=>{},rollback:async()=>{rolled=true;}
+ }}),/PARTIAL_LOAD/);assert.equal(rolled,true);
+}));
+test('ambiguous commit cannot produce a successful recovery result',()=>restoreFixture(async(x,file)=>{
+ let rolled=false;
+ await assert.rejects(guardedRestore({...x,registerFile:file,transaction:{
+  prepare:async()=>{},commit:async()=>{throw Error('CONNECTION_LOST');},rollback:async()=>{rolled=true;}
+ }}),/RESTORE_COMMIT_OUTCOME_UNKNOWN/);assert.equal(rolled,true);
+}));
+test('independent current checkpoint is reread before committing',()=>restoreFixture(async(x,file)=>{
+ let reads=0,committed=false,rolled=false;
+ await assert.rejects(guardedRestore({...x,registerFile:file,readCheckpoint:async()=>{
+  reads++;return {...x.trust,ledger_sequence:reads===1?2:3};
+ },transaction:{prepare:async()=>{},commit:async()=>{committed=true;},rollback:async()=>{rolled=true;}}}),/CURRENT_CHECKPOINT_CHANGED/);
+ assert.equal(reads,2);assert.equal(committed,false);assert.equal(rolled,true);
+}));
+test('stale independent checkpoint prevents any data preparation',()=>restoreFixture(async(x,file)=>{
+ let prepared=false;
+ await assert.rejects(guardedRestore({...x,registerFile:file,readCheckpoint:async()=>({...x.trust,ledger_sha256:'0'.repeat(64)}),transaction:{
+  prepare:async()=>{prepared=true;},commit:async()=>{},rollback:async()=>{}
+ }}),/CURRENT_CHECKPOINT_CHANGED/);assert.equal(prepared,false);
+}));
+
+const {validateRestoreTarget,restorePostgresSnapshot}=await import('../scripts/postgres-restore.mjs');
+const restoreTarget={database:'ftk_restore_probe',system_identifier:'123456',tables:[{schema:'core',table:'people'}]};
+test('PostgreSQL loader only accepts explicitly bound loopback recovery databases',()=>{
+ assert.deepEqual(validateRestoreTarget('postgresql://localhost:54322/ftk_restore_probe',restoreTarget),restoreTarget);
+ for(const url of ['postgresql://example.com/ftk_restore_probe','postgresql://localhost/postgres','postgresql://localhost/ftk_restore_probe?host=example.com','postgresql://localhost/ftk_restore_probe#x'])assert.throws(()=>validateRestoreTarget(url,restoreTarget),/ISOLATED_RESTORE_TARGET_REQUIRED/);
+ for(const target of [{...restoreTarget,system_identifier:'unknown'},{...restoreTarget,tables:[{schema:'pg_catalog',table:'pg_authid'}]},{...restoreTarget,tables:[...restoreTarget.tables,...restoreTarget.tables]}])assert.throws(()=>validateRestoreTarget('postgresql://localhost/ftk_restore_probe',target),/ISOLATED_RESTORE_TARGET_REQUIRED/);
+});
+test('PostgreSQL loader requires independently supplied current head before connecting',async()=>{
+ await assert.rejects(restorePostgresSnapshot({connectionString:'postgresql://localhost:1/ftk_restore_probe',target:restoreTarget}),/CURRENT_CHECKPOINT_REQUIRED/);
+});
+test('erased PostgreSQL snapshot is rejected without connecting to a target',()=>restoreFixture(async(x,file)=>{
+ const unsafe=fixture({id:erased});
+ await assert.rejects(restorePostgresSnapshot({...unsafe,registerFile:file,connectionString:'postgresql://localhost:1/ftk_restore_probe',target:{...restoreTarget,tables:[{schema:'auth',table:'users'}]},readCheckpoint:async()=>unsafe.trust}),/ERASED_SUBJECT_PRESENT/);
+}));
