@@ -2,6 +2,7 @@
 import { useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
+import { PreparationPicker } from "../settings/preparation-picker";
 import { Button } from "@ftksaas/ui/components/button";
 import { useRemote } from "../../lib/use-remote";
 import { readPermission, readPersonnel } from "../../lib/personnel-permissions";
@@ -14,6 +15,7 @@ export function PersonnelPermissions({ scope, personId }: { scope: SetupScope; p
   const t = useTranslations("personnelPermissions"),
     [open, setOpen] = useState(false),
     [permission, setPermission] = useState<PersonnelPermission>();
+  const [prepared, setPrepared] = useState<{ permission: string; enabled: boolean }[]>([]);
   return (
     <section className="space-y-4 border-t pt-4" aria-label={t("title")}>
       <Button
@@ -27,6 +29,18 @@ export function PersonnelPermissions({ scope, personId }: { scope: SetupScope; p
       {open && (
         <>
           <p>{t("hint")}</p>
+          <PreparationPicker
+            scope={scope}
+            kind="permission"
+            contextKey={personId}
+            onResolved={(p) => {
+              if (p.kind === "permission") {
+                setPrepared(p.permission_requests);
+                setPermission(undefined);
+              }
+            }}
+          />
+
           <label className="block space-y-2">
             {t("permission")}
             <select
@@ -44,10 +58,11 @@ export function PersonnelPermissions({ scope, personId }: { scope: SetupScope; p
           </label>
           {permission && (
             <PermissionEditor
-              key={`${scope.actorId}:${scope.orgId}:${scope.centerId}:${personId}:${permission}`}
+              key={`${scope.actorId}:${scope.orgId}:${scope.centerId}:${personId}:${permission}:${JSON.stringify(prepared)}`}
               scope={scope}
               personId={personId}
               permission={permission}
+              initialChoice={prepared.find((g) => g.permission === permission)?.enabled}
             />
           )}
         </>
@@ -59,14 +74,18 @@ function PermissionEditor({
   scope,
   personId,
   permission,
+  initialChoice,
 }: {
   scope: SetupScope;
   personId: string;
   permission: PersonnelPermission;
+  initialChoice?: boolean;
 }) {
   const t = useTranslations("personnelPermissions"),
     [revision, setRevision] = useState(0),
-    [choice, setChoice] = useState(""),
+    [choice, setChoice] = useState(
+      initialChoice === undefined ? "" : initialChoice ? "allow" : "deny",
+    ),
     [review, setReview] = useState<SetupCommand | null>(null);
   const load = useCallback(
     () => readPermission(scope, personId, permission),

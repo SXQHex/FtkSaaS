@@ -1,10 +1,11 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { validate } from "uuid";
 import type { Preview } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { effectMoney } from "../../lib/effect-money";
 import { AttendanceError } from "./attendance-error";
 export function AttendanceReview({
   preview,
@@ -21,6 +22,8 @@ export function AttendanceReview({
   onApply: () => void;
   onBack: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("attendance"),
     flow = useTranslations("flows"),
     action = useTranslations("program.action"),

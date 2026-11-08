@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useCallback, useEffect, useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { JobStatusView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { readJob } from "../../lib/job-record";
@@ -16,6 +17,7 @@ export function JobProgress({
   id: string;
   onRead?: (job: JobStatusView | null) => void;
 }) {
+  const account = useTranslations("account");
   const t = useTranslations("reports"),
     f = useFormatter(),
     [revision, setRevision] = useState(0),
@@ -41,6 +43,32 @@ export function JobProgress({
               {t(`states.${state.data.state}`)} · {state.data.progress_count}
               {state.data.total_count !== null ? ` / ${state.data.total_count}` : ""}
             </p>
+            {state.data.privacy && (
+              <section className="space-y-2">
+                <p>
+                  {account("privacyState")}:{" "}
+                  {account(`privacyStates.${state.data.privacy.request_state}`)}
+                </p>
+                {state.data.privacy.completed_at && (
+                  <p>
+                    {f.dateTime(new Date(state.data.privacy.completed_at), {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </p>
+                )}
+                {state.data.privacy.pending_scopes.length > 0 && (
+                  <>
+                    <p>{account("pendingScopes")}</p>
+                    <ul>
+                      {state.data.privacy.pending_scopes.map((scope) => (
+                        <li key={scope}>{account(`privacyScopes.${scope}`)}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
+            )}
             {state.data.safe_error_code && <FlowError code={state.data.safe_error_code} />}
             {state.data.email_delivery && (
               <p>

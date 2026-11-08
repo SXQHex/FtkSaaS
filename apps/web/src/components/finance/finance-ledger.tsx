@@ -1,8 +1,11 @@
 "use client";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
+import { useLocale, useTranslations } from "next-intl";
 import type { FinanceView } from "@ftksaas/api-contracts";
-import { effectMoney } from "../../lib/effect-money";
 export function FinanceLedger({ view }: { view: FinanceView }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("finance"),
     locale = useLocale(),
     format = useFormatter();

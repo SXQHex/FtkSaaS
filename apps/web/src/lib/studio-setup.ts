@@ -1,3 +1,10 @@
+import { validSettingsMedia } from "./settings-media";
+import { validSettingsEditor } from "./settings-editor-command";
+import {
+  subscriptionWrites,
+  subscriptionFields,
+  validSubscriptionCommand,
+} from "./subscription-command";
 import { reportWrites, reportFields, validReportCommand } from "./report-command";
 import { validDelivery } from "./delivery-settings";
 import { automationWrites, automationFields, validAutomationCommand } from "./automation-command";
@@ -43,6 +50,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  ...subscriptionWrites,
   ...reportWrites,
   ...automationWrites,
   ...eventWrites,
@@ -95,6 +103,8 @@ type SetupUpload =
   | "import_upload_prepare_v1"
   | "file_upload_complete_v1";
 type SetupRead =
+  | "organization_close_preview_v1"
+  | "organization_delete_preview_v1"
   | "report_file_get_v1"
   | "settings_template_resolve_v1"
   | "job_status_get_v1"
@@ -155,7 +165,10 @@ export type SetupInput<K extends SetupWrite | SetupRead | SetupUpload> = Omit<
   "request_id" | "client_api_version"
 >;
 export type SetupCommand = {
-  [K in SetupWrite]: { operation: K; input: SetupInput<K> };
+  [K in SetupWrite]: {
+    operation: K;
+    input: K extends "organization_delete_apply_v1" ? Omit<SetupInput<K>, "reauth"> : SetupInput<K>;
+  };
 }[SetupWrite];
 export async function setupCall<K extends SetupWrite | SetupRead | SetupUpload>(
   operation: K,
@@ -169,7 +182,12 @@ export async function setupCall<K extends SetupWrite | SetupRead | SetupUpload>(
   if (!result.ok) throw new ApiFailure(result);
   return result.data as Operations[K]["response"]["data"];
 }
-export async function sendSetupCommand(command: SetupCommand) {
+export async function sendSetupCommand(command: SetupCommand, reauth?: string) {
+  if (command.operation === "organization_delete_apply_v1") {
+    if (!reauth) throw Error("reauthNeeded");
+    const j = await setupCall(command.operation, { ...command.input, reauth });
+    return { primary_id: j.job_id };
+  }
   if (
     command.operation === "report_export_start_v1" ||
     command.operation === "import_preview_v1" ||
@@ -191,6 +209,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...subscriptionFields,
   ...reportFields,
   ...automationFields,
   ...eventFields,
@@ -261,7 +280,15 @@ const fields: Record<SetupWrite, string[]> = {
   ],
   product_publish_v1: ["product_id", "terms"],
   document_accept_v1: ["document_version_id", "context"],
-  settings_update_v1: ["scope", "patch", "expected_version", "reason"],
+  settings_update_v1: [
+    "scope",
+    "patch",
+    "expected_version",
+    "reason",
+    "inherit_fields",
+    "logo_image",
+    "history_source",
+  ],
   settings_reset_apply_v1: ["scope", "expected_version", "preview", "reason"],
   document_version_publish_v1: [
     "document_id",
@@ -315,7 +342,11 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       !setupWrites.includes(command?.operation) ||
       !input ||
       (input.org_id !== scope.orgId &&
-        !(input.org_id === undefined && input.scope === "user" && slot === "delivery:user")) ||
+        !(
+          input.org_id === undefined &&
+          input.scope === "user" &&
+          ["delivery:user", "settings-editor:user"].includes(slot)
+        )) ||
       (input.center_id !== undefined && (input.center_id ?? undefined) !== scope.centerId) ||
       !keyPattern.test(input.operation_key) ||
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
@@ -388,7 +419,9 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       return "invalid";
     if (
       (slot.startsWith("permission:") ||
-        slot.startsWith("subscription-") ||
+        (slot.startsWith("subscription-") &&
+          !["subscription-renewal", "subscription-payment"].includes(slot) &&
+          !slot.startsWith("subscription-period:")) ||
         proAccessWrites.some((op) => op === command.operation)) &&
       !validProAccessCommand(command.operation, input, scope.centerId, slot)
     )
@@ -480,6 +513,33 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       !validAttendanceCommand(command.operation as AttendanceWrite, input, scope.centerId, slot)
     )
       return "invalid";
+    if (
+      (subscriptionWrites.some((op) => op === command.operation) ||
+        slot.startsWith("organization-") ||
+        slot.startsWith("subscription-period:") ||
+        ["subscription-renewal", "subscription-payment"].includes(slot)) &&
+      !validSubscriptionCommand(command.operation, input, scope.centerId, slot)
+    )
+      return "invalid";
+    if (
+      slot.startsWith("settings-editor:") &&
+      (!["settings_update_v1", "settings_reset_apply_v1"].includes(command.operation) ||
+        !validSettingsEditor(input, scope.centerId, slot) ||
+        (command.operation === "settings_update_v1"
+          ? input.preview !== undefined
+          : input.patch !== undefined))
+    )
+      return "invalid";
+    if (
+      (slot.startsWith("settings-media:") || input.logo_image !== undefined) &&
+      (command.operation !== "settings_update_v1" ||
+        !validSettingsMedia(input, scope.centerId, slot))
+    )
+      return "invalid";
+    if (input.history_source !== undefined && !slot.startsWith("settings-editor:"))
+      return "invalid";
+    if (input.inherit_fields !== undefined && !slot.startsWith("settings-editor:"))
+      return "invalid";
     if (slot.startsWith("agreements:") && command.operation !== "instructor_agreement_publish_v1")
       return "invalid";
     if (
@@ -514,6 +574,8 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       command.operation === "settings_update_v1" &&
       !slot.startsWith("operating-settings:") &&
       !slot.startsWith("delivery:") &&
+      !slot.startsWith("settings-editor:") &&
+      !slot.startsWith("settings-media:") &&
       (input.scope !== "member" ||
         input.center_id !== undefined ||
         !Number.isSafeInteger(input.expected_version) ||
@@ -544,7 +606,9 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       command.operation === "settings_reset_apply_v1" &&
       !slot.startsWith("operating-settings:") &&
-      !slot.startsWith("delivery:")
+      !slot.startsWith("delivery:") &&
+      !slot.startsWith("settings-editor:") &&
+      !slot.startsWith("settings-media:")
     )
       return "invalid";
     if (

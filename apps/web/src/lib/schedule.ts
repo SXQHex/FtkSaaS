@@ -11,7 +11,7 @@ export type CalendarEntry = {
   disciplineIds?: string[];
   capacity?: { total: number; held: number; remaining: number };
 };
-export type CalendarRange = "day" | "week";
+export type CalendarRange = "day" | "week" | "month" | "agenda";
 export const calendarEntry = (item: CalendarItem): CalendarEntry => ({
   id: item.id,
   kind: item.type,
@@ -50,9 +50,9 @@ export function addDays(date: string, amount: number) {
   value.setUTCDate(value.getUTCDate() + amount);
   return value.toISOString().slice(0, 10);
 }
-export function weekStart(date: string) {
+export function weekStart(date: string, firstDay: "monday" | "sunday" = "monday") {
   const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
-  return addDays(date, -(weekday === 0 ? 6 : weekday - 1));
+  return addDays(date, firstDay === "sunday" ? -weekday : -(weekday === 0 ? 6 : weekday - 1));
 }
 function midnight(date: string, timeZone: string) {
   const target = Date.parse(`${date}T00:00:00Z`);
@@ -83,11 +83,26 @@ function midnight(date: string, timeZone: string) {
   }
   return new Date(instant).toISOString();
 }
-export function calendarInterval(date: string, range: CalendarRange, timeZone: string): Interval {
-  const start = range === "week" ? weekStart(date) : date;
+export function calendarInterval(
+  date: string,
+  range: CalendarRange,
+  timeZone: string,
+  firstDay: "monday" | "sunday" = "monday",
+): Interval {
+  const month = range === "month" || range === "agenda";
+  const start = month
+    ? `${date.slice(0, 7)}-01`
+    : range === "week"
+      ? weekStart(date, firstDay)
+      : date;
+  const next = month
+    ? new Date(Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)), 1))
+        .toISOString()
+        .slice(0, 10)
+    : addDays(start, range === "week" ? 7 : 1);
   return {
     starts_at: midnight(start, timeZone),
-    ends_at: midnight(addDays(start, range === "week" ? 7 : 1), timeZone),
+    ends_at: midnight(next, timeZone),
   };
 }
 export function entryKey(entry: CalendarEntry) {

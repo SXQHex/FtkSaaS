@@ -1,4 +1,5 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { v7 } from "uuid";
@@ -7,7 +8,6 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { valuationApi, valuationVersion } from "../../lib/negative-valuation";
 import { priceToMinor } from "../../lib/product-terms";
-import { effectMoney } from "../../lib/effect-money";
 import { localTimeChoices } from "../../lib/session-change";
 import type { SetupScope, SetupCommand } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
@@ -113,6 +113,8 @@ function ValuationEditor({
   format: SessionFormat;
   timeZone: string;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("valuation"),
     locale = useLocale(),
     [result, setResult] = useState<ReturnType<typeof valuationVersion> | null>(null),

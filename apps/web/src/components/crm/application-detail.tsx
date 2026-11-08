@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useState } from "react";
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
 import type { ManagementStateView, PersonSummary } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";

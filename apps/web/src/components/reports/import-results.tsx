@@ -1,6 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useEffect, useState } from "react";
-import { useLocale, useFormatter, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { JobStatusView } from "@ftksaas/api-contracts";
 import Link from "next/link";
 import { personPath } from "../../lib/person-route";
@@ -9,7 +11,6 @@ import { Button } from "@ftksaas/ui/components/button";
 import { setupCall, type SetupCommand, type SetupScope } from "../../lib/studio-setup";
 import { restoreJob } from "../../lib/job-record";
 import { useRemote } from "../../lib/use-remote";
-import { effectMoney } from "../../lib/effect-money";
 import { JobProgress } from "./job-progress";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { ConfirmWrite, FlowError } from "../bookings/flow-controls";
@@ -22,6 +23,8 @@ export function ImportResults({
   previewJob: string;
   onCanRestart?: (ready: boolean) => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("reports"),
     locale = useLocale(),
     format = useFormatter(),

@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import Image from "next/image";
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { PublicBusinessProfile } from "@ftksaas/api-contracts";
 export function PublicBusinessCard({ profile }: { profile: PublicBusinessProfile }) {
   const t = useTranslations("publicSchedule"),

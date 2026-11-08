@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useCallback, useEffect, useId, useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { validate, v7 } from "uuid";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
@@ -198,7 +199,8 @@ function DeliveryField({
               className="min-h-11 rounded-md border bg-background"
               onChange={(e) => setValue(e.target.value)}
             >
-              <option value="device">{t("device")}</option>
+              <option value="auto">{t("device")}</option>
+              {value === "device" && <option value="device">{t("device")}</option>}
               <option value="manual">{t("manual")}</option>
             </select>
           ) : name === "quiet_hours_weekdays" ? (
