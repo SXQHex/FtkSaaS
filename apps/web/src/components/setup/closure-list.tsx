@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useEffect, useState } from "react";
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { ManagementStateView, ResourceRef } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { getClosures, setupError, type SetupScope } from "../../lib/studio-setup";

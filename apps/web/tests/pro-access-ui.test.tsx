@@ -37,6 +37,30 @@ vi.mock("../src/lib/plan-downgrade", async (load) => ({
   readRetentionResources: mocks.resources,
   readRetainedStudents: mocks.students,
 }));
+vi.mock("../src/lib/owner-retention", () => ({
+  readOwnerRetention: (...args: unknown[]) => mocks.resources(...(args as [])),
+  readOwnerResources: async (
+    scope: import("../src/lib/studio-setup").SetupScope,
+    _target: string,
+    _version: number,
+    _kind: string,
+    query: string,
+    cursor?: string,
+  ) => {
+    const p = (await mocks.students(scope, query, cursor)) as {
+      items: { id: string; display_name: string; subscriber_number: string | null }[];
+      next_cursor: string | null;
+    };
+    return {
+      ...p,
+      items: p.items.map((r) => ({
+        id: r.id,
+        name: r.display_name,
+        subscriber_number: r.subscriber_number,
+      })),
+    };
+  },
+}));
 const scope = { actorId: v7(), orgId: v7() },
   center = v7(),
   person = v7(),

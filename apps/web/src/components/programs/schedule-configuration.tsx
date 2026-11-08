@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import type { Preview } from "@ftksaas/api-contracts";
 import type { NamedOption } from "./class-form";

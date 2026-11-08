@@ -1,13 +1,14 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useState, useCallback, useSyncExternalStore } from "react";
-import { useFormatter, useTranslations, useLocale } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { CenterView, OrganizationView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { setupCall, type SetupScope } from "../../lib/studio-setup";
 import { eventDetail } from "../../lib/events";
 import { dateInZone, calendarInterval } from "../../lib/schedule";
-import { effectMoney } from "../../lib/effect-money";
 import { useRemote } from "../../lib/use-remote";
 import { FlowError } from "../bookings/flow-controls";
 import { EventEditor, control, button } from "./event-editor";
@@ -220,6 +221,8 @@ function EventPanel({
   onSaved: () => void;
   selfPersonId?: string;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("events"),
     locale = useLocale(),
     [edit, setEdit] = useState(false),

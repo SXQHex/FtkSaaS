@@ -1,6 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useId, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { EarningView, P03PaymentView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
@@ -8,7 +10,6 @@ import { Label } from "@ftksaas/ui/components/label";
 import type { SetupScope } from "../../lib/studio-setup";
 import { paymentCommand } from "../../lib/earnings";
 import { localTimeChoices } from "../../lib/session-change";
-import { effectMoney } from "../../lib/effect-money";
 import { NativeCommandReview } from "../setup/native-command-review";
 import { FlowError, flowError } from "../bookings/flow-controls";
 const button = "h-auto min-h-11 max-w-full whitespace-normal";
@@ -29,6 +30,8 @@ export function InstructorPaymentForm({
   onSaved: (code?: string) => void;
   onCancel: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("earnings"),
     locale = useLocale(),
     format = useFormatter(),

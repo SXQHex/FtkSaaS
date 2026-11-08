@@ -1,9 +1,10 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { Preview } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { effectMoney } from "../../lib/effect-money";
 import { errorKey } from "../setup/setup-command";
 export function CancellationReview({
   preview,
@@ -18,6 +19,8 @@ export function CancellationReview({
   onApply: () => void;
   onBack: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("sessionLifecycle"),
     errors = useTranslations("setup"),
     actions = useTranslations("program.action");

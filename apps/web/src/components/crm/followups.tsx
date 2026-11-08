@@ -1,9 +1,10 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import Link from "next/link";
 import { personPath } from "../../lib/person-route";
 import { leadPath } from "../../lib/lead-route";
 import { useCallback, useState } from "react";
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { FollowupKind } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import type { SetupScope } from "../../lib/studio-setup";

@@ -1,8 +1,9 @@
 "use client";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
+import { useLocale, useTranslations } from "next-intl";
 import type { ComponentProps } from "react";
 import type { SetupInput } from "../../lib/studio-setup";
-import { effectMoney } from "../../lib/effect-money";
 import { FinancePreviewReview } from "./finance-preview-review";
 export function CorrectionReview({
   request,
@@ -10,6 +11,8 @@ export function CorrectionReview({
 }: Omit<ComponentProps<typeof FinancePreviewReview>, "children"> & {
   request: SetupInput<"collection_correct_preview_v1">;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("finance"),
     locale = useLocale(),
     format = useFormatter();

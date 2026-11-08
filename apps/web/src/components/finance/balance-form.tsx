@@ -1,6 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useId, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { FinanceView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
@@ -10,7 +12,6 @@ import {
   financeActionSlot,
   type BalanceOperation,
 } from "../../lib/finance-actions";
-import { effectMoney } from "../../lib/effect-money";
 import type { SetupCommand, SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { ConfirmWrite } from "../bookings/flow-controls";
@@ -30,6 +31,8 @@ export function BalanceForm({
   operation: BalanceOperation;
   onSaved: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("finance"),
     flow = useTranslations("flows"),
     locale = useLocale(),

@@ -1,7 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useState } from "react";
-import { useTranslations, useFormatter, useLocale } from "next-intl";
-import { effectMoney } from "../../lib/effect-money";
+import { useTranslations, useLocale } from "next-intl";
 import { saleDocumentPath } from "../../lib/sale-document-route";
 import { v7 } from "uuid";
 import type { Preview, EntitlementView } from "@ftksaas/api-contracts";
@@ -90,6 +91,8 @@ function ChangeForm({
   sale: EntitlementView;
   onSaved: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("saleChange"),
     format = useFormatter(),
     locale = useLocale(),

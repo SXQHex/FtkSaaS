@@ -1,6 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useId, useState } from "react";
-import { useTranslations, useFormatter, useLocale, useTimeZone } from "next-intl";
+import { useTranslations, useLocale, useTimeZone } from "next-intl";
 import type { Page_PublicCalendarItem } from "@ftksaas/api-contracts";
 import { validate } from "uuid";
 import { Button } from "@ftksaas/ui/components/button";
@@ -8,7 +10,6 @@ import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { useRemote } from "../../lib/use-remote";
 import { calendarInterval, dateInZone } from "../../lib/schedule";
-import { effectMoney } from "../../lib/effect-money";
 import { money } from "../../lib/collection-command";
 import { PublicBusinessCard } from "./public-business-card";
 import { PublicApplication } from "./public-application";
@@ -24,6 +25,8 @@ export function PublicSchedule({
   centerId?: string;
   siteKey?: string;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("publicSchedule"),
     f = useFormatter(),
     locale = useLocale(),

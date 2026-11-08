@@ -38,7 +38,7 @@ export function deliveryValue(key: DeliveryKey, value: unknown) {
     );
   if (key === "quiet_hours_start" || key === "quiet_hours_end")
     return typeof value === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
-  if (key === "timezone_mode") return value === "device" || value === "manual";
+  if (key === "timezone_mode") return value === "auto" || value === "device" || value === "manual";
   if (key === "timezone_name") {
     if (typeof value !== "string" || !value.trim()) return false;
     try {

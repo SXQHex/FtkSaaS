@@ -5,12 +5,19 @@ import dynamic from "next/dynamic";
 import { WorkspaceLoading } from "../workspace-loading";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useTranslations } from "next-intl";
+import { setLocale } from "../../i18n/actions";
+import { useTranslations, useLocale } from "next-intl";
 import { ArrowUpRight, CalendarDays, CreditCard, Layers3, Users } from "lucide-react";
-import type { AccountView, CenterView, OrganizationView } from "@ftksaas/api-contracts";
+import type {
+  AccountView,
+  CenterView,
+  OrganizationView,
+  UserSettingsValues,
+} from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components/card";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
+import { UserPreferencesProvider } from "../user-preferences";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -24,6 +31,14 @@ import {
 import { accessibleCenters } from "../../lib/context";
 import { browserClient } from "../../lib/supabase/client";
 
+const OrganizationRecovery = dynamic(
+  () => import("../subscription/organization-recovery").then((m) => m.OrganizationRecovery),
+  { loading: WorkspaceLoading },
+);
+const SettingsEditor = dynamic(
+  () => import("../settings/settings-editor").then((m) => m.SettingsEditor),
+  { loading: WorkspaceLoading },
+);
 const DeliverySettings = dynamic(
   () => import("../automation/delivery-settings").then((m) => m.DeliverySettings),
   { loading: WorkspaceLoading },
@@ -95,7 +110,7 @@ const PendingOperations = dynamic(
 );
 
 type Studio = { organization: OrganizationView; centers: CenterView[]; centerError?: string };
-type Snapshot = { account: AccountView; studios: Studio[] };
+type Snapshot = { account: AccountView; studios: Studio[]; settings: UserSettingsValues };
 function subscribe(callback: () => void) {
   window.addEventListener("hashchange", callback);
   return () => window.removeEventListener("hashchange", callback);
@@ -114,6 +129,7 @@ const shortcuts = [
 
 export function StudioWorkspace({ authUserId }: { authUserId: string }) {
   const router = useRouter();
+  const currentLocale = useLocale();
   const { setTheme } = useTheme();
   const t = useTranslations("live");
   const nav = useTranslations("admin");
@@ -186,7 +202,15 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
           }),
         );
         if (lifetime.signal.aborted) return;
-        setSnapshot({ account, studios });
+        if (
+          (settings.language === "tr" || settings.language === "en") &&
+          settings.language !== currentLocale
+        ) {
+          await setLocale(settings.language);
+          if (lifetime.signal.aborted) return;
+          router.refresh();
+        }
+        setSnapshot({ account, studios, settings });
         setError("");
         let deviceTheme: string | null = null;
         try {
@@ -216,18 +240,20 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       setRetry((value) => value + 1);
     }
     window.addEventListener("focus", revalidate);
+    window.addEventListener("ftk-settings-changed", revalidate);
     document.addEventListener("visibilitychange", revalidate);
     void load();
     return () => {
       lifetime.abort();
       window.removeEventListener("focus", revalidate);
+      window.removeEventListener("ftk-settings-changed", revalidate);
       document.removeEventListener("visibilitychange", revalidate);
       data.subscription.unsubscribe();
       document.documentElement.style.fontSize = "";
       delete document.documentElement.dataset.motion;
       delete document.documentElement.dataset.contrast;
     };
-  }, [authUserId, retry, router, setTheme]);
+  }, [authUserId, retry, router, setTheme, currentLocale]);
   async function signOut() {
     setSigningOut(true);
     try {
@@ -246,132 +272,190 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
     window.location.assign(`#${next}`);
   }
   return (
-    <AdminShell
-      section={section}
-      onNavigate={navigate}
-      accountName={snapshot?.account.display_name ?? ""}
-      onSignOut={signOut}
-      signingOut={signingOut}
-    >
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            {section === "overview"
-              ? snapshot
-                ? t("greeting", { name: snapshot.account.display_name })
-                : t("welcome")
-              : nav(`nav.${section}`)}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            {t(`descriptions.${section}`)}
-          </p>
+    <UserPreferencesProvider value={snapshot?.settings ?? null}>
+      <AdminShell
+        section={section}
+        onNavigate={navigate}
+        accountName={snapshot?.account.display_name ?? ""}
+        onSignOut={signOut}
+        signingOut={signingOut}
+      >
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {section === "overview"
+                ? snapshot
+                  ? t("greeting", { name: snapshot.account.display_name })
+                  : t("welcome")
+                : nav(`nav.${section}`)}
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              {t(`descriptions.${section}`)}
+            </p>
+          </div>
         </div>
-      </div>
-      {accountId && (
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            className="h-auto min-h-11 whitespace-normal"
-            aria-expanded={recovering}
-            onClick={() => setRecovering((value) => !value)}
-          >
-            {recovery(recovering ? "close" : "open")}
-          </Button>
-          {recovering && (
-            <div className="mt-4">
-              <PendingOperations
-                key={accountId}
-                actorId={accountId}
-                onSaved={() => setRetry((value) => value + 1)}
-              />
-            </div>
-          )}
-        </div>
-      )}
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertDescription>
-            <p>{error === "signOutFailed" ? t("signOutFailed") : api(error)}</p>
+        {accountId && (
+          <div className="mb-6">
             <Button
               variant="outline"
-              className="mt-3 min-h-11"
-              onClick={() => {
-                setSnapshot(null);
-                setError("");
-                setRetry((value) => value + 1);
-              }}
+              className="h-auto min-h-11 whitespace-normal"
+              aria-expanded={recovering}
+              onClick={() => setRecovering((value) => !value)}
             >
-              {common("retry")}
+              {recovery(recovering ? "close" : "open")}
             </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-      {snapshot?.studios
-        .filter((studio) => studio.centerError)
-        .map((studio) => (
-          <Alert key={studio.organization.id} variant="destructive" className="mb-6">
+            {recovering && (
+              <div className="mt-4">
+                <PendingOperations
+                  key={accountId}
+                  actorId={accountId}
+                  onSaved={() => setRetry((value) => value + 1)}
+                />
+              </div>
+            )}
+          </div>
+        )}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
             <AlertDescription>
-              <p>
-                {t("centerReadFailed", { name: studio.organization.name })}{" "}
-                {api(studio.centerError!)}
-              </p>
+              <p>{error === "signOutFailed" ? t("signOutFailed") : api(error)}</p>
               <Button
                 variant="outline"
                 className="mt-3 min-h-11"
-                onClick={() => setRetry((value) => value + 1)}
+                onClick={() => {
+                  setSnapshot(null);
+                  setError("");
+                  setRetry((value) => value + 1);
+                }}
               >
                 {common("retry")}
               </Button>
             </AlertDescription>
           </Alert>
-        ))}
-      {!snapshot && !error && <WorkspaceLoading />}
-      {snapshot &&
-        ["overview", "studio"].includes(section) &&
-        snapshot.studios.flatMap(({ organization, centers }) =>
-          organization.access_mode === "normal"
-            ? centers.map((center) => (
-                <InstructorTasks
-                  key={`${snapshot.account.id}:${organization.id}:${center.id}:${retry}`}
-                  scope={{
-                    actorId: snapshot.account.id,
-                    orgId: organization.id,
-                    centerId: center.id,
-                  }}
-                  centerName={center.name}
-                />
-              ))
-            : [],
         )}
-      {snapshot && section === "overview" && (
-        <div className="space-y-7">
-          <div className="flex flex-wrap gap-2">
-            {shortcuts.map(({ section: key, icon: Icon }) => (
-              <Button
-                key={key}
-                type="button"
-                variant="outline"
-                className="group min-h-11 gap-2 pr-3"
-                onClick={() => navigate(key)}
-              >
-                <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
-                {nav(`nav.${key}`)}
-                <ArrowUpRight
-                  className="size-3.5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </Button>
-            ))}
+        {snapshot?.studios
+          .filter((studio) => studio.centerError)
+          .map((studio) => (
+            <Alert key={studio.organization.id} variant="destructive" className="mb-6">
+              <AlertDescription>
+                <p>
+                  {t("centerReadFailed", { name: studio.organization.name })}{" "}
+                  {api(studio.centerError!)}
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-3 min-h-11"
+                  onClick={() => setRetry((value) => value + 1)}
+                >
+                  {common("retry")}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          ))}
+        {!snapshot && !error && <WorkspaceLoading />}
+        {snapshot &&
+          ["overview", "studio"].includes(section) &&
+          snapshot.studios.flatMap(({ organization, centers }) =>
+            organization.access_mode === "normal"
+              ? centers.map((center) => (
+                  <InstructorTasks
+                    key={`${snapshot.account.id}:${organization.id}:${center.id}:${retry}`}
+                    scope={{
+                      actorId: snapshot.account.id,
+                      orgId: organization.id,
+                      centerId: center.id,
+                    }}
+                    centerName={center.name}
+                  />
+                ))
+              : [],
+          )}
+        {snapshot && section === "overview" && (
+          <div className="space-y-7">
+            <div className="flex flex-wrap gap-2">
+              {shortcuts.map(({ section: key, icon: Icon }) => (
+                <Button
+                  key={key}
+                  type="button"
+                  variant="outline"
+                  className="group min-h-11 gap-2 pr-3"
+                  onClick={() => navigate(key)}
+                >
+                  <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
+                  {nav(`nav.${key}`)}
+                  <ArrowUpRight
+                    className="size-3.5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </Button>
+              ))}
+            </div>
+            <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_300px]">
+              <Card className="shadow-none">
+                <CardHeader>
+                  <CardTitle>
+                    <h2 className="text-base">{t("dailyFlow")}</h2>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScheduleWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
+                </CardContent>
+              </Card>
+              <Card className="shadow-none">
+                <CardHeader>
+                  <CardTitle>
+                    <h2 className="text-base">{t("accountTitle")}</h2>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <p className="font-medium">{snapshot.account.display_name}</p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {snapshot.studios.length ? t("studioHelp") : t("noStudioHelp")}
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="h-auto min-h-11 whitespace-normal"
+                    onClick={() => navigate(snapshot.studios.length ? "studio" : "settings")}
+                  >
+                    {nav(`nav.${snapshot.studios.length ? "studio" : "settings"}`)}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-          <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_300px]">
+        )}
+        {snapshot && section === "studio" && (
+          <StudioSetup
+            actorId={snapshot.account.id}
+            organizations={snapshot.studios.map(({ organization }) => organization)}
+            onChanged={() => setRetry((n) => n + 1)}
+          />
+        )}
+        {snapshot && section === "settings" && (
+          <div className="grid gap-6 lg:grid-cols-2">
             <Card className="shadow-none">
               <CardHeader>
                 <CardTitle>
-                  <h2 className="text-base">{t("dailyFlow")}</h2>
+                  <h2 className="text-base">{nav("appearance")}</h2>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ScheduleWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
+                <Preferences />
+                <SettingsEditor
+                  scope={{ actorId: snapshot.account.id, orgId: snapshot.account.id }}
+                  target="user"
+                />
+                {snapshot.studios.map(({ organization }) => (
+                  <SettingsEditor
+                    key={organization.id}
+                    scope={{ actorId: snapshot.account.id, orgId: organization.id }}
+                    target="member"
+                  />
+                ))}
+                <DeliverySettings
+                  scope={{ actorId: snapshot.account.id, orgId: snapshot.account.id }}
+                  target="user"
+                />
               </CardContent>
             </Card>
             <Card className="shadow-none">
@@ -381,138 +465,94 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
-                <p className="font-medium">{snapshot.account.display_name}</p>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {snapshot.studios.length ? t("studioHelp") : t("noStudioHelp")}
-                </p>
-                <Button
-                  variant="outline"
-                  className="h-auto min-h-11 whitespace-normal"
-                  onClick={() => navigate(snapshot.studios.length ? "studio" : "settings")}
-                >
-                  {nav(`nav.${snapshot.studios.length ? "studio" : "settings"}`)}
+                <p>{snapshot.account.display_name}</p>
+                <OrganizationRecovery actorId={snapshot.account.id} />
+                <Button variant="outline" onClick={signOut} disabled={signingOut}>
+                  {common(signingOut ? "signingOut" : "signOut")}
                 </Button>
               </CardContent>
             </Card>
           </div>
-        </div>
-      )}
-      {snapshot && section === "studio" && (
-        <StudioSetup
-          actorId={snapshot.account.id}
-          organizations={snapshot.studios.map(({ organization }) => organization)}
-          onChanged={() => setRetry((n) => n + 1)}
-        />
-      )}
-      {snapshot && section === "settings" && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="shadow-none">
-            <CardHeader>
-              <CardTitle>
-                <h2 className="text-base">{nav("appearance")}</h2>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Preferences />
-              <DeliverySettings
-                scope={{ actorId: snapshot.account.id, orgId: snapshot.account.id }}
-                target="user"
-              />
-            </CardContent>
-          </Card>
-          <Card className="shadow-none">
-            <CardHeader>
-              <CardTitle>
-                <h2 className="text-base">{t("accountTitle")}</h2>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <p>{snapshot.account.display_name}</p>
-              <Button variant="outline" onClick={signOut} disabled={signingOut}>
-                {common(signingOut ? "signingOut" : "signOut")}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      {snapshot && section === "schedule" && (
-        <ScheduleWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
-      )}
-      {snapshot && section === "students" && (
-        <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
-      )}
-      {snapshot && section === "events" && (
-        <EventsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "crm" && (
-        <CrmWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "personal" && (
-        <>
-          <SelfDashboard actorId={snapshot.account.id} studios={snapshot.studios} />
-          <CalendarLinks
-            actorId={snapshot.account.id}
-            organizations={snapshot.studios.map((s) => s.organization)}
-          />
-        </>
-      )}
-      {snapshot && section === "attendance" && (
-        <AttendanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "reports" && (
-        <ReportsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "automation" && (
-        <AutomationWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "finance" && (
-        <FinanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "packages" && (
-        <ProductsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "documents" && (
-        <DocumentsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
-      )}
-      {snapshot && section === "inbox" && (
-        <InboxWorkspace
-          actorId={snapshot.account.id}
-          organizations={snapshot.studios.map(({ organization }) => organization)}
-        />
-      )}
-      {snapshot &&
-        ![
-          "overview",
-          "studio",
-          "settings",
-          "schedule",
-          "students",
-          "inbox",
-          "documents",
-          "packages",
-          "finance",
-          "attendance",
-          "crm",
-          "events",
-          "personal",
-        ].includes(section) && (
-          <Card className="shadow-none">
-            <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
-              <Layers3 aria-hidden="true" className="mb-5 size-8 text-muted-foreground" />
-              <h2 className="text-lg font-medium">{t("comingTitle")}</h2>
-              <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
-                {t("comingDescription")}
-              </p>
-              <Button
-                className="mt-6 h-auto min-h-11 whitespace-normal"
-                variant="outline"
-                onClick={() => navigate("overview")}
-              >
-                {t("backToToday")}
-              </Button>
-            </CardContent>
-          </Card>
         )}
-    </AdminShell>
+        {snapshot && section === "schedule" && (
+          <ScheduleWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
+        )}
+        {snapshot && section === "students" && (
+          <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
+        )}
+        {snapshot && section === "events" && (
+          <EventsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "crm" && (
+          <CrmWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "personal" && (
+          <>
+            <SelfDashboard actorId={snapshot.account.id} studios={snapshot.studios} />
+            <CalendarLinks
+              actorId={snapshot.account.id}
+              organizations={snapshot.studios.map((s) => s.organization)}
+            />
+          </>
+        )}
+        {snapshot && section === "attendance" && (
+          <AttendanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "reports" && (
+          <ReportsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "automation" && (
+          <AutomationWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "finance" && (
+          <FinanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "packages" && (
+          <ProductsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "documents" && (
+          <DocumentsWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+        )}
+        {snapshot && section === "inbox" && (
+          <InboxWorkspace
+            actorId={snapshot.account.id}
+            organizations={snapshot.studios.map(({ organization }) => organization)}
+          />
+        )}
+        {snapshot &&
+          ![
+            "overview",
+            "studio",
+            "settings",
+            "schedule",
+            "students",
+            "inbox",
+            "documents",
+            "packages",
+            "finance",
+            "attendance",
+            "crm",
+            "events",
+            "personal",
+          ].includes(section) && (
+            <Card className="shadow-none">
+              <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
+                <Layers3 aria-hidden="true" className="mb-5 size-8 text-muted-foreground" />
+                <h2 className="text-lg font-medium">{t("comingTitle")}</h2>
+                <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+                  {t("comingDescription")}
+                </p>
+                <Button
+                  className="mt-6 h-auto min-h-11 whitespace-normal"
+                  variant="outline"
+                  onClick={() => navigate("overview")}
+                >
+                  {t("backToToday")}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+      </AdminShell>
+    </UserPreferencesProvider>
   );
 }

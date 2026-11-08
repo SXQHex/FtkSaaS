@@ -1,7 +1,7 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import { useLocale, useTranslations } from "next-intl";
 import type { PayComponent, PayTerms } from "@ftksaas/api-contracts";
-import { effectMoney } from "../../lib/effect-money";
 export function PayTermsSummary({
   terms,
   packages = [],
@@ -9,6 +9,8 @@ export function PayTermsSummary({
   terms: PayTerms;
   packages?: { productId: string; name?: string }[];
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("agreements"),
     locale = useLocale(),
     room = terms.room_fee;
@@ -56,6 +58,8 @@ export function PayTermsSummary({
   );
 }
 function ComponentSummary({ value, currency }: { value: PayComponent; currency: string }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("agreements"),
     locale = useLocale();
   return (

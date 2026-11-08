@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import type { ProductTerms, ProductView, DisciplineView } from "@ftksaas/api-contracts";
 import { v7 } from "uuid";
+import { PreparationPicker } from "../settings/preparation-picker";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
@@ -178,6 +179,52 @@ export function ProductPublicationForm({
       </h3>
       {product && <p className="text-sm">{t("versionTarget", { name: product.terms.name })}</p>}
       <p className="text-sm text-muted-foreground">{t("publicationHint")}</p>
+      {!product && (
+        <PreparationPicker
+          scope={scope}
+          kind="package"
+          disabled={commandLocked}
+          onResolved={(p) => {
+            if (p.kind !== "package") return;
+            const terms = p.product_request.terms;
+            const decimal = (v: string) => {
+              const digits =
+                new Intl.NumberFormat("en", {
+                  style: "currency",
+                  currency: terms.currency,
+                }).resolvedOptions().maximumFractionDigits ?? 2;
+              const n = BigInt(v),
+                unit = 10n ** BigInt(digits);
+              return digits
+                ? `${n / unit}.${(n % unit).toString().padStart(digits, "0")}`
+                : n.toString();
+            };
+            setDraft({
+              name: terms.name,
+              disciplineId:
+                terms.scopes[0]?.scope_kind === "center_discipline"
+                  ? terms.scopes[0].discipline_id
+                  : "",
+              kind: terms.kind === "credits" ? "credits" : terms.quota ? "quota" : "unlimited",
+              bookingMode: terms.booking_mode,
+              credits: terms.credits?.toString() ?? "",
+              price: decimal(terms.price_minor),
+              currency: terms.currency,
+              quotaPeriod: terms.quota?.period ?? "month",
+              quotaLimit: terms.quota?.limit.toString() ?? "",
+              refund: terms.refund.method,
+              usedUnitPrice: terms.refund.used_unit_minor
+                ? decimal(terms.refund.used_unit_minor)
+                : "",
+              scopes: terms.scopes,
+              freeze: terms.freeze,
+            });
+            setApproval(null);
+            setInvalid(false);
+          }}
+        />
+      )}
+
       <Button
         className={buttonClass}
         type="button"

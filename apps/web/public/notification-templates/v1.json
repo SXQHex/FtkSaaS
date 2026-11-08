@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "fallback_language": "tr",
+  "kind_mapping": {
+    "reservation_create_v1": "reservation",
+    "reservation_cancel_v1": "reservation",
+    "reservation_impact_apply_v1": "reservation",
+    "lesson_request_reject_v1": "lesson_request",
+    "lesson_request_offer_alternative_v1": "lesson_request",
+    "lesson_request_accept_alternative_v1": "lesson_request",
+    "lesson_request_approve_v1": "lesson_request",
+    "session_cancelled_by_center": "session_cancel",
+    "session_cancel_apply_v1": "session_cancel",
+    "session_change_apply_v1": "session_change",
+    "seat_offer": "seat_offer",
+    "seat_offer_accept_v1": "seat_offer",
+    "seat_offer_reject_v1": "seat_offer",
+    "p01_expired": "seat_offer",
+    "collection_record_v1": "collection",
+    "collection_correct_apply_v1": "collection",
+    "sale_refund_apply_v1": "refund",
+    "student_credit_refund_v1": "refund",
+    "role_assign_v1": "access",
+    "role_revoke_v1": "access",
+    "p05.lesson": "lesson_reminder",
+    "p05.event": "event_reminder",
+    "p05.entitlement": "package_reminder",
+    "p05.payment": "payment_reminder"
+  },
+  "templates": {
+    "reservation": {
+      "tr": "Rezervasyon sonucu",
+      "en": "Reservation update"
+    },
+    "lesson_request": {
+      "tr": "Ders talebi sonucu",
+      "en": "Lesson request update"
+    },
+    "session_cancel": {
+      "tr": "Ders iptali",
+      "en": "Lesson cancellation"
+    },
+    "session_change": {
+      "tr": "Ders değişikliği",
+      "en": "Lesson update"
+    },
+    "seat_offer": {
+      "tr": "Yer teklifi sonucu",
+      "en": "Seat offer update"
+    },
+    "collection": {
+      "tr": "Tahsilat sonucu",
+      "en": "Payment update"
+    },
+    "refund": {
+      "tr": "İade sonucu",
+      "en": "Refund update"
+    },
+    "access": {
+      "tr": "Erişim değişikliği",
+      "en": "Access update"
+    },
+    "lesson_reminder": {
+      "tr": "Ders hatırlatması",
+      "en": "Lesson reminder"
+    },
+    "event_reminder": {
+      "tr": "Etkinlik hatırlatması",
+      "en": "Event reminder"
+    },
+    "package_reminder": {
+      "tr": "Paket bitişi hatırlatması",
+      "en": "Package expiry reminder"
+    },
+    "payment_reminder": {
+      "tr": "Ödeme vadesi hatırlatması",
+      "en": "Payment due reminder"
+    }
+  },
+  "email_subject": "[{organization}] {title}",
+  "email_text": {
+    "tr": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {app_origin}",
+    "en": "View your new notification in the application: {app_origin}"
+  },
+  "unknown": {
+    "tr": "Yeni bildirim",
+    "en": "New notification"
+  }
+}

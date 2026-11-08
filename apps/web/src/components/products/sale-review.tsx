@@ -1,9 +1,10 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useRef, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { Preview, SalePreview, SessionView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { effectMoney } from "../../lib/effect-money";
 import { SaleImpact } from "./sale-impact";
 import { FlowError } from "../bookings/flow-controls";
 export function SaleReview({
@@ -19,6 +20,8 @@ export function SaleReview({
   onApply: () => void;
   onBack: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("flows"),
     format = useFormatter(),
     locale = useLocale(),

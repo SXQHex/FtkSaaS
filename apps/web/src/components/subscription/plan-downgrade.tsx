@@ -1,6 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useMemo, useState } from "react";
-import { useTranslations, useFormatter, useLocale } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { v7 } from "uuid";
 import type { SubscriptionDowngradeOption, StarterRetainedScope } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
@@ -8,7 +10,6 @@ import { getCenters } from "../../lib/api";
 import { readSubscription, readDowngrade, readPlanChange } from "../../lib/plan-downgrade";
 import type { SetupScope, SetupCommand } from "../../lib/studio-setup";
 import { useRemote } from "../../lib/use-remote";
-import { effectMoney } from "../../lib/effect-money";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { ConfirmWrite, FlowError, flowError } from "../bookings/flow-controls";
 import { RetentionForm } from "./retention-form";
@@ -31,6 +32,8 @@ export function PlanDowngrade({ scope }: { scope: SetupScope }) {
   );
 }
 function DowngradePanel({ scope }: { scope: SetupScope }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("planChange"),
     f = useFormatter(),
     locale = useLocale(),
@@ -197,6 +200,8 @@ function DowngradeRequest({
         {option.plan === "starter" && centerScope ? (
           <RetentionForm
             scope={centerScope}
+            target={option.target.id}
+            version={subscriptionVersion}
             onReview={(s, names) => void prepare(s, names)}
             onDirty={() => setReview(null)}
           />

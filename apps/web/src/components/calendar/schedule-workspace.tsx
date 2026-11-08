@@ -2,8 +2,10 @@
 
 import dynamic from "next/dynamic";
 import { WorkspaceLoading } from "../workspace-loading";
+import { useContextPreference } from "../context-preference";
+import { useUserPreferences } from "../user-preferences";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useTimeZone } from "next-intl";
 import type { CenterView, OrganizationView } from "@ftksaas/api-contracts";
 import { CalendarDays } from "lucide-react";
 import { Button } from "@ftksaas/ui/components/button";
@@ -38,6 +40,7 @@ export function ScheduleWorkspace({
   studios: { organization: OrganizationView; centers: CenterView[] }[];
 }) {
   const t = useTranslations("calendar");
+  const context = useContextPreference(actorId);
   const scopes = studios
     .filter(({ organization }) => ["normal", "grace"].includes(organization.access_mode))
     .flatMap(({ organization, centers }) =>
@@ -46,7 +49,35 @@ export function ScheduleWorkspace({
         .map((center) => ({ organization, center })),
     );
   const [selected, setSelected] = useState("");
-  const scope = scopes.find(({ center }) => center.id === selected) ?? scopes[0];
+  const scope =
+    scopes.find(({ center }) => center.id === selected) ??
+    scopes.find(
+      (s) =>
+        s.organization.id === context.preferred?.org_id &&
+        (!context.preferred.center_id || s.center.id === context.preferred.center_id),
+    ) ??
+    (context.requireChoice ? undefined : scopes[0]);
+  function selectCenter(id: string) {
+    setSelected(id);
+    const next = scopes.find((s) => s.center.id === id);
+    if (next)
+      context.remember({
+        org_id: next.organization.id,
+        center_id: next.center.id,
+        discipline_id: null,
+      });
+  }
+  if (!scope && scopes.length)
+    return (
+      <section className="space-y-3">
+        <h2>{t("chooseContext")}</h2>
+        {scopes.map((s) => (
+          <Button key={s.center.id} variant="outline" onClick={() => selectCenter(s.center.id)}>
+            {s.organization.name} / {s.center.name}
+          </Button>
+        ))}
+      </section>
+    );
   if (!scope)
     return (
       <section className="rounded-xl border border-dashed bg-card px-6 py-12 text-center">
@@ -66,7 +97,7 @@ export function ScheduleWorkspace({
               key={center.id}
               variant={scope.center.id === center.id ? "secondary" : "outline"}
               aria-pressed={scope.center.id === center.id}
-              onClick={() => setSelected(center.id)}
+              onClick={() => selectCenter(center.id)}
             >
               {organization.name} / {center.name}
             </Button>
@@ -77,11 +108,18 @@ export function ScheduleWorkspace({
           </p>
         )}
       </div>
+      {context.failed && <p role="alert">{t("rememberFailed")}</p>}
       <CalendarContent
         key={`${actorId ?? "member"}:${scope.organization.id}:${scope.center.id}`}
         actorId={actorId}
         orgId={scope.organization.id}
         center={scope.center}
+        initialDiscipline={
+          context.preferred?.org_id === scope.organization.id &&
+          context.preferred?.center_id === scope.center.id
+            ? (context.preferred.discipline_id ?? undefined)
+            : undefined
+        }
       />
     </div>
   );
@@ -91,19 +129,26 @@ function CalendarContent({
   orgId,
   center,
   actorId,
+  initialDiscipline,
 }: {
+  initialDiscipline?: string;
   orgId: string;
   center: CenterView;
   actorId?: string;
 }) {
+  const preferences = useUserPreferences();
+  const displayTimeZone = useTimeZone();
+  const viewZone = preferences ? (displayTimeZone ?? center.timezone) : center.timezone;
   const program = useTranslations("program");
   const [managing, setManaging] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false),
-    [filters, setFilters] = useState<CalendarFilters>({});
+    [filters, setFilters] = useState<CalendarFilters>(
+      initialDiscipline ? { disciplineId: initialDiscipline } : {},
+    );
   const calendar = useTranslations("calendar");
   const api = useTranslations("api");
-  const [date, setDate] = useState(() => dateInZone(new Date(), center.timezone));
-  const [range, setRange] = useState<CalendarRange>("day");
+  const [date, setDate] = useState(() => dateInZone(new Date(), viewZone));
+  const [range, setRange] = useState<CalendarRange>(preferences?.calendar_view ?? "day");
   const [attempt, setAttempt] = useState(0);
   const [selected, setSelected] = useState<CalendarEntry | null>(null);
   const [result, setResult] = useState<{
@@ -111,7 +156,7 @@ function CalendarContent({
     entries?: CalendarEntry[];
     error?: string;
   } | null>(null);
-  const interval = calendarInterval(date, range, center.timezone);
+  const interval = calendarInterval(date, range, viewZone, preferences?.week_start);
   const key = `${orgId}:${center.id}:${interval.starts_at}:${interval.ends_at}:${attempt}`;
   useEffect(() => {
     const lifetime = new AbortController();
@@ -194,7 +239,7 @@ function CalendarContent({
         <SessionCalendar
           date={date}
           range={range}
-          timeZone={center.timezone}
+          timeZone={viewZone}
           entries={(current?.entries ?? []).filter((entry) =>
             matchesCalendarFilters(entry, filters),
           )}

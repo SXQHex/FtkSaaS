@@ -1,4 +1,5 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { v7 } from "uuid";
@@ -9,7 +10,6 @@ import { readEntitlements } from "../../lib/products";
 import { useRemote } from "../../lib/use-remote";
 import { bookingApi } from "../../lib/bookings";
 import { eventPreviewMatches } from "../../lib/event-command";
-import { effectMoney } from "../../lib/effect-money";
 import { PersonChooser } from "../bookings/person-chooser";
 import { SelfDocuments } from "../documents/self-documents";
 import { ContextDocuments } from "../documents/context-documents";
@@ -213,6 +213,8 @@ function EventPayment({
   person: PersonSummary;
   onPrepared: (id: string) => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("events"),
     locale = useLocale(),
     [id, setId] = useState<string>(),

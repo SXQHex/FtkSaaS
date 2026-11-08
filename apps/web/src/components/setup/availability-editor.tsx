@@ -7,6 +7,7 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { getAvailability, setupError, weeklyRule, type SetupScope } from "../../lib/studio-setup";
+import { PreparationPicker } from "../settings/preparation-picker";
 import { ClosureList } from "./closure-list";
 import { ExceptionForm } from "./exception-form";
 import { errorKey, SetupFeedback, useSetupCommand } from "./setup-command";
@@ -36,6 +37,8 @@ function RuleForm({
     onSaved,
   );
   const [invalid, setInvalid] = useState(false);
+  const [prepared, setPrepared] = useState<AvailabilityRule | null>(null);
+  const effectiveRule = prepared ?? rule;
   if (existing && (!rule || !ruleId || !version)) return <p role="alert">{t("unreadableRule")}</p>;
   const suffix = `${resource.kind}-${resource.id}-${ruleId ?? "new"}`;
   return (
@@ -65,7 +68,26 @@ function RuleForm({
       }}
     >
       <h4 className="font-medium">{t(rule ? "editRule" : "newRule")}</h4>
-      <fieldset disabled={command.busy || !!command.pending} className="space-y-4">
+      {!existing && (
+        <PreparationPicker
+          scope={scope}
+          kind="availability"
+          resource={resource}
+          contextKey={JSON.stringify(resource)}
+          disabled={command.busy || !!command.pending}
+          onResolved={(p) => {
+            if (p.kind === "availability") {
+              setPrepared(p.request.rule);
+              setInvalid(false);
+            }
+          }}
+        />
+      )}
+      <fieldset
+        key={JSON.stringify(effectiveRule ?? null)}
+        disabled={command.busy || !!command.pending}
+        className="space-y-4"
+      >
         <fieldset className="space-y-3">
           <legend className="mb-2 text-sm font-medium">{t("weekdays")}</legend>
           <div className="flex flex-wrap gap-x-5 gap-y-3">
@@ -75,7 +97,7 @@ function RuleForm({
                   name="weekdays"
                   type="checkbox"
                   value={day}
-                  defaultChecked={rule?.weekdays.includes(day)}
+                  defaultChecked={effectiveRule?.weekdays.includes(day)}
                 />
                 {t(`days.${day}`)}
               </label>
@@ -90,7 +112,7 @@ function RuleForm({
               name="start"
               type="time"
               step={1}
-              defaultValue={rule?.local_start}
+              defaultValue={effectiveRule?.local_start}
               required
             />
           </div>
@@ -99,7 +121,7 @@ function RuleForm({
             <Input
               id={`end-${suffix}`}
               name="end"
-              defaultValue={rule?.local_end}
+              defaultValue={effectiveRule?.local_end}
               placeholder="24:00"
               required
             />
@@ -110,7 +132,7 @@ function RuleForm({
               id={`from-${suffix}`}
               name="from"
               type="date"
-              defaultValue={rule?.valid_from}
+              defaultValue={effectiveRule?.valid_from}
               required
             />
           </div>
@@ -120,7 +142,7 @@ function RuleForm({
               id={`until-${suffix}`}
               name="until"
               type="date"
-              defaultValue={rule?.valid_until ?? ""}
+              defaultValue={effectiveRule?.valid_until ?? ""}
             />
           </div>
         </div>

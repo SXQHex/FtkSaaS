@@ -1,4 +1,5 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -10,7 +11,6 @@ import { salesApi, type SalesApi } from "../../lib/sales";
 import type { SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { FlowError, flowError } from "../bookings/flow-controls";
-import { effectMoney } from "../../lib/effect-money";
 import { SaleForm } from "./sale-form";
 const SaleChange = dynamic(() => import("./sale-change").then((m) => m.SaleChange));
 const SaleLifecycle = dynamic(() => import("./sale-lifecycle").then((m) => m.SaleLifecycle));
@@ -220,6 +220,8 @@ function RenewalFinance({
   currency: string;
   api: SalesApi;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("flows"),
     locale = useLocale(),
     [data, setData] = useState<FinanceView | null>(null),

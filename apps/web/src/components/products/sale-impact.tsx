@@ -1,8 +1,11 @@
 "use client";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
+import { useLocale, useTranslations } from "next-intl";
 import type { SaleImpact as Impact, SessionView } from "@ftksaas/api-contracts";
-import { effectMoney } from "../../lib/effect-money";
 export function SaleImpact({ sale, sessions }: { sale: Impact; sessions: SessionView[] }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("flows"),
     p = useTranslations("products"),
     format = useFormatter(),

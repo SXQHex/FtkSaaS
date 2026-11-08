@@ -1,31 +1,35 @@
 "use client";
 import { useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { PersonSummary, StarterRetainedScope } from "@ftksaas/api-contracts";
+import type { StarterRetainedScope } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
+import { retainedScopeValid, type RetentionResources } from "../../lib/plan-downgrade";
 import {
-  readRetentionResources,
-  readRetainedStudents,
-  retainedScopeValid,
-  type RetentionResources,
-} from "../../lib/plan-downgrade";
+  readOwnerRetention,
+  readOwnerResources,
+  type RetainedPerson,
+} from "../../lib/owner-retention";
 import { useRemote } from "../../lib/use-remote";
 import type { SetupScope } from "../../lib/studio-setup";
 import { FlowError } from "../bookings/flow-controls";
 const control = "min-h-11 w-full rounded-md border bg-background px-3";
 export function RetentionForm({
   scope,
+  target,
+  version,
   onReview,
   onDirty,
 }: {
   scope: SetupScope;
+  target: string;
+  version: number;
   onReview: (selected: StarterRetainedScope, labels: string[]) => void;
   onDirty: () => void;
 }) {
   const t = useTranslations("planChange"),
-    load = useCallback(() => readRetentionResources(scope), [scope]),
-    result = useRemote(load, JSON.stringify(scope));
+    load = useCallback(() => readOwnerRetention(scope, target, version), [scope, target, version]),
+    result = useRemote(load, JSON.stringify([scope, target, version]));
   return (
     <section className="space-y-4" aria-label={t("retention")}>
       <h4>{t("retention")}</h4>
@@ -35,6 +39,8 @@ export function RetentionForm({
       {result?.data && (
         <ResourceSelection
           scope={scope}
+          target={target}
+          version={version}
           resources={result.data}
           onReview={onReview}
           onDirty={onDirty}
@@ -46,11 +52,15 @@ export function RetentionForm({
 function ResourceSelection({
   scope,
   resources,
+  target,
+  version,
   onReview,
   onDirty,
 }: {
   scope: SetupScope;
   resources: RetentionResources;
+  target: string;
+  version: number;
   onReview: (selected: StarterRetainedScope, labels: string[]) => void;
   onDirty: () => void;
 }) {
@@ -61,7 +71,7 @@ function ResourceSelection({
       instructor_id: null,
       student_person_ids: [],
     }),
-    [students, setStudents] = useState<PersonSummary[]>([]),
+    [students, setStudents] = useState<RetainedPerson[]>([]),
     [noStudents, setNoStudents] = useState(false);
   const families = [
     ["room_id", "rooms"],
@@ -93,6 +103,8 @@ function ResourceSelection({
       ))}
       <StudentSelection
         scope={scope}
+        target={target}
+        version={version}
         selected={students}
         onChange={(next) => {
           onDirty();
@@ -125,7 +137,7 @@ function ResourceSelection({
                 .map((r) => `${t(family)}: ${r.name}`),
             ),
             ...students.map(
-              (p) => `${p.display_name}${p.subscriber_number ? ` · ${p.subscriber_number}` : ""}`,
+              (p) => `${p.name}${p.subscriber_number ? ` · ${p.subscriber_number}` : ""}`,
             ),
           ])
         }
@@ -138,11 +150,15 @@ function ResourceSelection({
 function StudentSelection({
   scope,
   selected,
+  target,
+  version,
   onChange,
 }: {
   scope: SetupScope;
-  selected: PersonSummary[];
-  onChange: (people: PersonSummary[]) => void;
+  target: string;
+  version: number;
+  selected: RetainedPerson[];
+  onChange: (people: RetainedPerson[]) => void;
 }) {
   const t = useTranslations("planChange"),
     [query, setQuery] = useState(""),
@@ -150,8 +166,8 @@ function StudentSelection({
     [cursor, setCursor] = useState<string>(),
     [attempt, setAttempt] = useState(0);
   const load = useCallback(
-      () => readRetainedStudents(scope, search, cursor),
-      [scope, search, cursor],
+      () => readOwnerResources(scope, target, version, "students", search, cursor),
+      [scope, target, version, search, cursor],
     ),
     result = useRemote(load, JSON.stringify([scope, search, cursor, attempt]));
   return (
@@ -179,7 +195,7 @@ function StudentSelection({
         {selected.map((p) => (
           <li className="flex flex-wrap items-center justify-between gap-2" key={p.id}>
             <span>
-              {p.display_name}
+              {p.name}
               {p.subscriber_number ? ` · ${p.subscriber_number}` : ""}
             </span>
             <Button
@@ -187,7 +203,7 @@ function StudentSelection({
               variant="outline"
               onClick={() => onChange(selected.filter((s) => s.id !== p.id))}
             >
-              {t("remove", { name: p.display_name })}
+              {t("remove", { name: p.name })}
             </Button>
           </li>
         ))}
@@ -210,7 +226,7 @@ function StudentSelection({
                       )
                     }
                   />
-                  {p.display_name}
+                  {p.name}
                   {p.subscriber_number ? ` · ${p.subscriber_number}` : ""}
                 </label>
               </li>

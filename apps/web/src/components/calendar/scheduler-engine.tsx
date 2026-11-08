@@ -1,9 +1,12 @@
 "use client";
 
+import { useUserPreferences } from "../user-preferences";
 import { useLocale } from "next-intl";
 import {
   Day,
   Week,
+  Month,
+  Agenda,
   Inject,
   ScheduleComponent,
   type EventClickArgs,
@@ -38,6 +41,7 @@ export default function SchedulerEngine({
   onSelect: (entry: CalendarEntry) => void;
 }) {
   const locale = useLocale();
+  const preferences = useUserPreferences();
   const format = new Intl.DateTimeFormat(locale, {
     timeZone,
     dateStyle: "full",
@@ -66,12 +70,21 @@ export default function SchedulerEngine({
         width="100%"
         height="640px"
         selectedDate={new Date(`${date}T12:00:00`)}
-        currentView={range === "day" ? "Day" : "Week"}
-        views={["Day", "Week"]}
+        currentView={
+          range === "day"
+            ? "Day"
+            : range === "week"
+              ? "Week"
+              : range === "month"
+                ? "Month"
+                : "Agenda"
+        }
+        views={["Day", "Week", "Month", "Agenda"]}
         timezone={timeZone}
         locale={locale === "tr" ? "tr" : "en-US"}
-        firstDayOfWeek={1}
-        timeFormat="HH:mm"
+        firstDayOfWeek={preferences?.week_start === "sunday" ? 0 : 1}
+        showWeekend={preferences?.show_weekends !== false}
+        timeFormat={preferences?.time_format === "12" ? "hh:mm a" : "HH:mm"}
         dateFormat="dd.MM.yyyy"
         showHeaderBar={false}
         showQuickInfo={false}
@@ -99,7 +112,7 @@ export default function SchedulerEngine({
           args.cancel = true;
         }}
       >
-        <Inject services={[Day, Week]} />
+        <Inject services={[Day, Week, Month, Agenda]} />
       </ScheduleComponent>
     </div>
   );
