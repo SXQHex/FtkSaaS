@@ -114,3 +114,10 @@ test('recovery approval pins one server IP while the client endpoint stays loopb
  assert.equal(validateRestoreTarget('postgresql://127.0.0.1:54322/ftk_restore_probe',{...restoreTarget,server_address:'172.18.0.2'}).server_address,'172.18.0.2');
  for(const server_address of [undefined,'127.0.0.1/32','172.18.0.0/16','localhost',''])assert.throws(()=>validateRestoreTarget('postgresql://127.0.0.1/ftk_restore_probe',{...restoreTarget,server_address}),/ISOLATED_RESTORE_TARGET_REQUIRED/);
 });
+
+test('Unix server transport requires explicit null approval, never a missing address',()=>{
+ const approved=validateRestoreTarget('postgresql://127.0.0.1:54322/ftk_restore_probe',{...restoreTarget,server_address:null});
+ assert.equal(approved.server_address,null);
+ const missing={...restoreTarget};delete missing.server_address;
+ assert.throws(()=>validateRestoreTarget('postgresql://127.0.0.1/ftk_restore_probe',missing),/ISOLATED_RESTORE_TARGET_REQUIRED/);
+});

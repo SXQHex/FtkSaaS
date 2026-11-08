@@ -1592,8 +1592,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "3ed0dcdb8bd41c56e564bfa530db7d77ad8ee434214c25acbee7c854c5cc30a2",
-        "reason": "Gerçek PostgreSQL17 direct/forwarded11 test, öldürme dönüşü true assertionı ve dead data rollback sonrası bağımsız maintenance fence son kaynakta incelendi; kabul daraltılmadı."
+        "fingerprint": "f2a46b17a209908614c75a2af1f19d8d7b8ab9653e854cef34a38231c0e366ff",
+        "reason": "Supabase CLI3 native Unix socket null transport approval, exact identity checks and new missing-address regression reviewed; original assertions retained."
       }
     },
     {

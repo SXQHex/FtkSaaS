@@ -14,7 +14,7 @@ export function validateRestoreTarget(connectionString,target){
  let url;try{url=new URL(connectionString);}catch{throw Error('ISOLATED_RESTORE_TARGET_REQUIRED');}
  if(!['postgres:','postgresql:'].includes(url.protocol)||!['127.0.0.1','localhost','[::1]'].includes(url.hostname)||url.search||url.hash
   ||!target||!/^ftk_restore_[a-z0-9_]{1,40}$/.test(target.database)||decodeURIComponent(url.pathname.slice(1))!==target.database
-  ||typeof target.server_address!=='string'||!isIP(target.server_address)
+  ||(target.server_address!==null&&(typeof target.server_address!=='string'||!isIP(target.server_address)))
   ||typeof target.system_identifier!=='string'||!/^\d+$/.test(target.system_identifier)||!Array.isArray(target.tables)||!target.tables.length
   ||target.tables.some(t=>!t||Object.keys(t).sort().join(',')!=='schema,table'||!identifier.test(t.schema)||!identifier.test(t.table)||['pg_catalog','information_schema','pg_toast'].includes(t.schema))
   ||new Set(target.tables.map(t=>t.schema+'.'+t.table)).size!==target.tables.length)throw Error('ISOLATED_RESTORE_TARGET_REQUIRED');
