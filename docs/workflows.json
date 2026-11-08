@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3a4082a0599dc5a8c2c67c9f26de5111b8c77dfb9677ae7e5e97c995a409cdd0",
-        "reason": "database.test mevcut core köküne yalnız izole recovery kabul importu eklendi; ortak API ve önceki assertionlar değişmedi."
+        "fingerprint": "d882b75ede0f990440947252c635232d5189766c9648a8d7a59ae2b7b6408051",
+        "reason": "Final test inventory is an exact hash refresh for the additive native acceptance; source-bound CI and every previous assertion are preserved."
       }
     },
     {
@@ -847,8 +847,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "97415f32cf36953bcb53234353059072f2043bd3dbd9ed41db2099edb178c753",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "7d9b232efb602643efc89c558f49d1bbaaf4f08cc45d5c6fcbe306f9e02a8b71",
+        "reason": "Reviewed final existing document acceptance root; added consent runner checks do not change reservation semantics."
       }
     },
     {
@@ -1133,7 +1133,8 @@
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/starter-document-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/transactional-email-acceptance.mjs"
+        "apps/backend/tests/transactional-email-acceptance.mjs",
+        "apps/backend/tests/hosted-digital-runner-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/crm-legacy-import.sql",
@@ -1150,7 +1151,8 @@
         "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
         "docs/workflows.md",
         "apps/backend/database/digital-document-snapshots.sql",
-        "apps/backend/supabase/migrations/20261108033244_digital_document_snapshots.sql"
+        "apps/backend/supabase/migrations/20261108033244_digital_document_snapshots.sql",
+        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1162,8 +1164,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "5af5a0ab825a187b16e851e661b03eec86f2b6d0565535610a12e203ad35d7db",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "79190a8868a3aea0743bf34875a42ed9b32a41b4a2707d6df0d847d2fda7d328",
+        "reason": "Reviewed final session-local variable rename with unchanged native /auth/v1/token path and exact request bodies. Five runner safety tests pass and no public API or assertion changes."
       }
     },
     {

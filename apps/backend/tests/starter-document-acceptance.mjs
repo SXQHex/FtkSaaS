@@ -122,3 +122,35 @@ test('Digital documents freeze frontend text and consent without Storage objects
  await db.query("update core.account_links set state='revoked',version=version+1 where org_id=$1 and person_id=$2",[org,studentPerson]);
  await deny('NOT_FOUND','document_accept_v1',body,student,k);assert.equal((await db.query('select count(*)::int n from private.digital_document_acceptances where org_id=$1',[org])).rows[0].n,1);
 });
+
+test('Hosted digital acceptance runner uses real native Auth, Edge and PostgreSQL',async t=>{
+ const {acceptDigital}=await import('../scripts/acceptance/s10-hosted-digital.mjs');
+ const {preparationFixture}=await import('./starter-preparation-fixture.mjs');
+ const {context}=await import('./api-client.mjs');
+ const {db,org,center,owner,person,plan}=await preparationFixture();t.after(()=>db.end());
+ await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+ const api=(op,b={})=>must(owner,op,{org_id:org,center_id:center,...b},key());
+ const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Native digital runner',state:'active'},key())).primary_id;
+ await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+ await api('role_assign_v1',{person_id:person,role:'instructor',scope:{center_id:center}});
+ const product=(await api('product_publish_v1',{terms:{name:'Dedicated runner package',kind:'credits',booking_mode:'flexible',credits:10,price_minor:'200000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
+ const terms={model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'25000'}],room_fee:{kind:'free',order:'before_instructor_share'}};
+ const agreement=(await api('instructor_agreement_publish_v1',{person_id:person,discipline_id:discipline,format:'group',terms,valid:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2031-01-01T00:00:00Z'},reason:'Dedicated synthetic native runner acceptance'})).primary_id;
+ const outsider=await authUser('digital-runner-outsider');await must(outsider,'account_get_v1');
+ const {env}=context(),local=new URL(env.API_URL);assert(['127.0.0.1','localhost','[::1]'].includes(local.hostname));
+ // Only the transport origin changes. Every auth/API response is from the real
+ // native stack; no envelope, database row or error result is stubbed.
+ const request=(url,options)=>{const u=new URL(url);assert.equal(u.origin,'https://gwyprhenabtpkbojephw.supabase.co');return fetch(new URL(u.pathname+u.search,local),options);};
+ const count=async sql=>Number((await db.query(sql,[org])).rows[0].n);
+ const storage=()=>count("select count(*) n from storage.objects where bucket_id='ftksaas-documents' and name like $1||'/%'");
+ const before=await storage();
+ const result=await acceptDigital({email:owner.email,password:owner.password,outsiderEmail:outsider.email,outsiderPassword:outsider.password,apikey:env.ANON_KEY,org,center,product,agreement,request});
+ assert.equal(result.status,'passed');assert.equal(result.checks.length,4);
+ assert.equal(await storage(),before);
+ assert.equal(await count('select count(*) n from private.digital_agreement_acceptances where org_id=$1'),1);
+ assert.equal(await count('select count(*) n from private.digital_document_acceptances where org_id=$1'),1);
+ assert.equal(await count('select count(*) n from core.earnings where org_id=$1'),0);
+ assert.deepEqual((await db.query('select terms from core.instructor_agreements where org_id=$1 and id=$2',[org,agreement])).rows[0].terms,terms);
+ // The fixture login survives; both additional runner sessions are gone.
+ for(const user of [owner,outsider])assert.equal((await db.query('select count(*)::int n from auth.sessions where user_id=$1',[user.id])).rows[0].n,1);
+});
