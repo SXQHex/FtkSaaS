@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "757bc063aecc83ba18e0297f83793fb23cdfd3654f07cf3c77febc753ed2d587",
-        "reason": "API test envanterinde yalnız iki incelenmiş fixture kaynağının hashleri yenilendi; protokol ve runner politikası aynı."
+        "fingerprint": "18d2300aba45e975d5ba249f0aefea1e8dfcfd173334bfa12741e64a9fd8d963",
+        "reason": "Gerçek generated contract/types/Edge farkı incelendi; center inheritance8 alanla eşlendi. Yalnız bu PR içindeki henüz uygulanmamış agreement migration hash kaydı related düzeltmesiyle yenilendi; önceki134 migration değişmedi."
       }
     },
     {
@@ -370,7 +370,7 @@
       ],
       "review": {
         "fingerprint": "161f98ae4de161ca79516e9de755862cb3988075f21db6f4a55c2e9d0ced81bb",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -474,7 +474,7 @@
       ],
       "review": {
         "fingerprint": "26386996e39bf565dca50f0366d96d114806dd84cb6037b56dcf210856c9930e",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -570,7 +570,7 @@
       ],
       "review": {
         "fingerprint": "8dfa41eefcc41b1e210db2bf43711eda581c0bce7a7b3b2597e99da856ed1702",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -663,7 +663,7 @@
       ],
       "review": {
         "fingerprint": "1520db4cae5febd598c1f30081dc7bd46bebf19bfbb2448beda5697b50b3a514",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -763,7 +763,7 @@
       ],
       "review": {
         "fingerprint": "d7c0dce6557dc29c0582a84d5c8b414444fdeb7a209ef5a5fe5a67a8162a0756",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -847,7 +847,7 @@
       ],
       "review": {
         "fingerprint": "97415f32cf36953bcb53234353059072f2043bd3dbd9ed41db2099edb178c753",
-        "reason": "Dijital belge testinde disiplin kurulumu organization kapsamına düzeltildi; rezervasyon kuralları ve tüm assertionlar korundu."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -910,7 +910,7 @@
       ],
       "review": {
         "fingerprint": "cd94f1abf463fb6d8978a8775b4c833c466dd068745911243c83dd9cb12d6f45",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -975,7 +975,7 @@
       ],
       "review": {
         "fingerprint": "e59febbf7b0dc46a65f7605fa3e87779b6641bc026c22779cb3b76fd6c4f760a",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1067,7 +1067,7 @@
       ],
       "review": {
         "fingerprint": "2cc423a417cd514736f8a9051fd0b0e6245fce3c59fb11f13e318db549ffbf39",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1113,7 +1113,7 @@
       ],
       "review": {
         "fingerprint": "d654ef25201b1831390105dedbd304805e1a7f98cf99f444568664929ac06c0e",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1162,7 +1162,7 @@
       ],
       "review": {
         "fingerprint": "5af5a0ab825a187b16e851e661b03eec86f2b6d0565535610a12e203ad35d7db",
-        "reason": "Native logdaki fazla center_id disiplin kurulumundan çıkarıldı; dijital belge ve eski Storage assertionları aynen korunuyor."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1252,8 +1252,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "d4bd3bbb3e0f6877844c8fe096e4fab21043ea37b9fcd6e9c3f3a91584cb9a28",
-        "reason": "Şablon testinin yan etki sayımı gerçek program_versions tablosunu kullanıyor; defaults çözümleme ve miras davranışı aynı."
+        "fingerprint": "03806860deb5a2134f2b66291927b784b31c9c907379fa171cde06a89ae19fce",
+        "reason": "Center oneOf inherit_fields eski4 ile kısıtlıydı; mevcut8 alanla eşlendi. Gerçek generated validator ve8 alan/bireysel alan/kapsam/tekrar regresyonları incelendi; WF12 hedef davranışı korunur."
       }
     },
     {
@@ -1329,7 +1329,7 @@
       ],
       "review": {
         "fingerprint": "5412a5ced9f72b2157e5c046d81ea0e23eddf7f11846638b672fdd8c89a37bba",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1377,8 +1377,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "a5c5be4c675d0cb0f27a73a6c5c8e4b02e6812e845b040d2e9a5a56e4f590a43",
-        "reason": "Eğitmen onay testi disiplin kurulumunu mevcut organization sözleşmesine uyarladı; self yetki ve immutable onay assertionları aynı."
+        "fingerprint": "040726e36cf3d78a825b4f2dae138adfd1cd5539353af3d21ef0b3b5a5afc8b7",
+        "reason": "Gerçek SQL eğitmen onayı Mutation.related döndürecek şekilde düzeltildi; gerçek generated Edge validator eski affected çıktısını reddetti, yeni çıktı geçti. Native receipt/replay/tek kanıt assertionları eklendi."
       }
     },
     {
@@ -1450,7 +1450,7 @@
       ],
       "review": {
         "fingerprint": "bedea0690cf869ad38c2f311ff6dbcb4250d1a031d6ae741424df021b633b317",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1506,7 +1506,7 @@
       ],
       "review": {
         "fingerprint": "e0ee4bef25096d88757956e317a768afebf14c8cd53d48754e876b4e183c0d95",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1578,7 +1578,7 @@
       ],
       "review": {
         "fingerprint": "7970e7da1d6732984cafdafc6d305631cf340dbc8a38ba4badba40afadaa1954",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1611,7 +1611,7 @@
       ],
       "review": {
         "fingerprint": "7842fe90ba80e4c8076cb8cd137c2ae2ce7c67d1ad866c8fcff3362b3581dd87",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1640,7 +1640,7 @@
       ],
       "review": {
         "fingerprint": "c1db0cc38d75eb952aca509fa842023a9b030f91210ab87ab8f961ef77b61cee",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     },
     {
@@ -1730,7 +1730,7 @@
       ],
       "review": {
         "fingerprint": "120c563b81e2f6dbb0639381b72ae23058ed0007876b946bfe6a55e9162cf0e5",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "reason": "Ortak generated contract/types/Edge validator farkı incelendi: yalnız center settings inherit_fields mevcut8 aileye eşlendi; bu akışın mevcut API imzaları ve davranışı korunur."
       }
     }
   ]

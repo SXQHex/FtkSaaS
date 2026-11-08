@@ -47881,11 +47881,15 @@
                   "report_templates",
                   "import_templates",
                   "agreement_templates",
-                  "permission_templates"
+                  "permission_templates",
+                  "event_templates",
+                  "collection_templates",
+                  "crm_templates",
+                  "automation_templates"
                 ]
               },
               "minItems": 1,
-              "maxItems": 4,
+              "maxItems": 8,
               "uniqueItems": true
             }
           },

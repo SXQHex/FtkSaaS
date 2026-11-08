@@ -40,7 +40,7 @@ begin
    values(aid,org,a.id,person,account,r->'displayed_content',display_hash,h,facts,operation) on conflict(org_id,agreement_id,account_id) do nothing;
   select * into e from private.digital_agreement_acceptances x where x.org_id=org and x.agreement_id=a.id and x.account_id=account;
   if e.displayed_content is distinct from r->'displayed_content' or e.source_content_hash is distinct from h then perform private.fail('IDEMPOTENCY_PAYLOAD_MISMATCH');end if;
-  result:=jsonb_build_object('operation_id',operation,'primary_id',a.id,'version',a.version,'replayed',false,'affected',jsonb_build_array(jsonb_build_object('type','instructor_agreements','id',a.id)));
+  result:=jsonb_build_object('operation_id',operation,'primary_id',a.id,'version',a.version,'replayed',false,'related',jsonb_build_array(jsonb_build_object('type','instructor_agreements','id',a.id)));
  else
   select * into e from private.digital_agreement_acceptances x where x.org_id=org and x.agreement_id=a.id and x.person_id=a.person_id order by x.accepted_at,x.id limit 1;
   result:=jsonb_build_object('agreement',facts,'source_content_hash',h,'acceptance',case when e.id is not null then jsonb_build_object('id',e.id,'agreement_id',a.id,'account_id',e.account_id,'person_id',e.person_id,'accepted_at',e.accepted_at,'content_hash',e.content_hash,'source_content_hash',e.source_content_hash,'displayed_content',e.displayed_content) end);

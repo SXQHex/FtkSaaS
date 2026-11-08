@@ -640,6 +640,11 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  const keys=['program_templates','event_templates','collection_templates','crm_templates','automation_templates'];
  assert.deepEqual(current.filter(f=>!keys.includes(f.key)),prior);assert.equal(current.filter(f=>keys.includes(f.key)).length,10);
  for(const field of current.filter(f=>keys.includes(f.key))){assert.deepEqual(field.default,[]);assert.deepEqual(p.$defs[field.scope==='center'?'CenterSettingsValues':'OrganizationSettingsValues'].properties[field.key],field.schema);}
+ const inherited=['report_templates','import_templates','agreement_templates','permission_templates','event_templates','collection_templates','crm_templates','automation_templates'];
+ const request={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,scope:'center',expected_version:0,patch:{},inherit_fields:inherited};
+ assert(valid('Request_settings_update',request));
+ for(const field of inherited)assert(valid('Request_settings_update',{...request,inherit_fields:[field]}));
+ for(const change of [{...request,inherit_fields:['program_templates']},{...request,inherit_fields:['crm_templates','crm_templates']},{...request,scope:'organization',center_id:undefined}])assert(!valid('Request_settings_update',change));
  const source={scope:'organization',key:'manual',version:1};
  assert(valid('ResolvedDomainPreparation',{kind:'crm',source,defaults:{source:'manual',interest:'Explicit enquiry'}}));
  assert(!valid('ResolvedDomainPreparation',{kind:'crm',source,defaults:{source:'manual',interest:'Explicit enquiry',person_id:id}}));

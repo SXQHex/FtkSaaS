@@ -125,7 +125,9 @@ test('Instructor accepts the exact frontend agreement text bound to immutable ba
  const b={agreement_id:agreement,expected_version:initial.agreement.version,source_content_hash:initial.source_content_hash,displayed_content:displayed,displayed_content_hash:hash};
  await deny('FORBIDDEN','instructor_agreement_accept_v1',b);
  await deny('VERSION_CONFLICT','instructor_agreement_accept_v1',{...b,source_content_hash:'0'.repeat(64)},student);
- const k=key();await api('instructor_agreement_accept_v1',b,student,k);assert.equal((await api('instructor_agreement_accept_v1',b,student,k)).replayed,true);
+ const k=key(),accepted=await api('instructor_agreement_accept_v1',b,student,k);assert.deepEqual(accepted.related,[{type:'instructor_agreements',id:agreement}]);assert.equal((await api('instructor_agreement_accept_v1',b,student,k)).replayed,true);
+ assert.equal((await db.query('select state from core.operation_receipts where org_id=$1 and id=$2',[org,accepted.operation_id])).rows[0].state,'succeeded');
+ assert.equal((await db.query('select count(*)::int n from private.digital_agreement_acceptances where org_id=$1 and agreement_id=$2',[org,agreement])).rows[0].n,1);
  const done=await read();assert.deepEqual(done.acceptance.displayed_content,displayed);assert.equal(done.acceptance.content_hash,hash);assert.equal(done.acceptance.source_content_hash,initial.source_content_hash);assert.equal(done.acceptance.person_id,studentPerson);assert.deepEqual(done.agreement,initial.agreement);
  assert.equal((await db.query('select count(*)::int n from core.earnings where org_id=$1',[org])).rows[0].n,0);
  await assert.rejects(db.query('delete from private.digital_agreement_acceptances where agreement_id=$1',[agreement]),/INTEGRITY_VIOLATION/);

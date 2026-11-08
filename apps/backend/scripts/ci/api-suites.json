@@ -1058,7 +1058,7 @@
         {
           "line": 157,
           "path": "apps/backend/tests/agreement-preparation-acceptance.mjs",
-          "sha256": "57d3fbd15d075fc41d72d6ac230ee1c258682d491ba4049bd523ac40be83d01e"
+          "sha256": "fafd97080900bdac080519001b5f0bb0c7c4261854e03453b28895b8f75eb780"
         },
         {
           "path": "apps/backend/tests/permission-preparation-acceptance.mjs",
