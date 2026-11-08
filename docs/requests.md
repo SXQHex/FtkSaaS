@@ -645,3 +645,11 @@ Eğitmenin kendi kabulü `instructor_agreement_get_v1` → açık ekran → `ins
 Pro/Business için beş yeni preparation ailesi katalogda sunulur: programs/events/collections/crm/automations. Gerçek source/version ile resolve edilen defaults, eksik hedef/tarih/kişi ve gerekiyorsa banka referansı açık seçildikten sonra mevcut writer'a gider; şablon otomatik işlem/enable üretmez. Program yeni merkeze başlangıç kopyası, diğer dört aile açık org mirasıdır; [ayar rehberi](settings.md#pro-iş-akışı-hazırlıkları).
 
 **Frontend kabul ölçütü:** Dijital yolda blob/PDF yükleme istenmemesi; görünen nihai metnin ve gerçek dilin eksiksiz gönderilmesi; aynı metnin SHA-256 hesabı ve aynı işlem anahtarlı retry; stale source/sürümde yeniden okuma; geçmişin saklanan snapshot'tan gösterilmesi; rol/bağ kaybında erişim kapanması. Pro şablonları yalnız desteklenen writable alan ve canlı kaynaklarla tüketilmeli. Backend kaynak/native/merge/hosted ve frontend ekran kapanışı ayrı izlenir. Bu talep XREQ-033 ertelenmiş e-posta çeviri entegrasyonunu yeniden açmaz.
+
+## XREQ-037 Hesap silme işinde dar profil imha ilerlemesi
+
+### Backend devri — 8 Kasım 2026
+
+Mevcut `job_status_get_v1` çağrısı/yetkisi değişmez. Opsiyonel `privacy.profile_erasure` kapalı `AccountProfileErasureProgress` DTO'sudur: `unbound`, `held`, `completed`; `policy_version:1`. Yalnız completed durumda `completed_at`, `removed_rows`, `removed_bytes` zorunludur. Alan yok/null ise önceki tüketim korunur. Genel worker kimliği, hukuki gerekçe veya başka hesap bilgisi verilmez.
+
+Frontend bu alt ilerlemeyi gösterirse “uygulama profili ve avatar kopyaları kaldırıldı” ifadesini kullanmalı; ana `privacy.request_state/completed_at/pending_scopes` tamamlanmadan hesabın bütün verilerinin silindiğini söylememelidir. Auth, karma geçmiş, tenant işletme kayıtları, Storage/export/yedek ve bağımsız sicil bu dar aşamadan tamamlanmış sayılamaz. Yeni endpoint, frontend hold düzenleme veya otomatik worker/hedef bağlama yoktur. Kabul: held/unbound/alt aşama completed ve bütün talep partial birlikte doğru gösterilir; eski yanıt uyumu korunur. Kaynak/native/merge/deploy kabulünün tek sahibi backend devridir; frontend adına kapanış verilmez.

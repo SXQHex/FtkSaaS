@@ -150,6 +150,7 @@
         "apps/backend/scripts/test-clean.mjs",
         "apps/backend/scripts/update-docs.mjs",
         "apps/backend/scripts/uuid.mjs",
+        "apps/backend/scripts/local-readiness.mjs",
         "apps/backend/scripts/wait-local.mjs",
         "apps/backend/supabase/config.toml",
         "apps/backend/supabase/functions/backend-v1/calendar-feed.ts",
@@ -285,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8b1447e33db9cf0bdb48ff1018d7457c389d21d8c7b9026814c3e613e9c15f9d",
-        "reason": "Belge publish/preview koşullarının JSON Schema ve generated Edge validator eşliği, kapalı kaynak seçimi ve ortak komut operation_key tipleri incelendi. Runtime protokolü değişmez; tip üretimi required-only alternatifleri kapalı parent alanlarıyla temsil eder."
+        "fingerprint": "5097a1593a1f2654a59fa0093e575ce33f456b88ec8f7cc26fb69f3dd5a3e847",
+        "reason": "Read append-only migration139 and inventory/checker changes; public operation contracts unchanged"
       }
     },
     {
@@ -1328,8 +1329,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "5412a5ced9f72b2157e5c046d81ea0e23eddf7f11846638b672fdd8c89a37bba",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "802b7c96af40f375ea779f6c1f5423efa1eab52c8572278aeffab2b8c35714be",
+        "reason": "Native fixture verifies retired Auth tables absent and preserves lifecycle worker success/failure assertions"
       }
     },
     {
@@ -1561,7 +1562,11 @@
         "docs/workflows.md",
         "apps/backend/scripts/restore-guard.mjs",
         "apps/backend/scripts/erasure-register.mjs",
-        "apps/backend/scripts/guarded-restore.mjs"
+        "apps/backend/scripts/guarded-restore.mjs",
+        "apps/backend/database/account-privacy-execution.sql",
+        "apps/backend/database/account-privacy-active-surfaces.sql",
+        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql",
+        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1577,8 +1582,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "7970e7da1d6732984cafdafc6d305631cf340dbc8a38ba4badba40afadaa1954",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "26ac771ddbd032d8ebfad8657c30ec3c4bf7b6f67c8e570cb195ace211c4f8c6",
+        "reason": "Read native Auth retirement migration: remove dropped intent tables from hold and purge targets, retain current authorization and scope"
       }
     },
     {
@@ -1714,7 +1719,11 @@
         "apps/backend/supabase/migrations/20261106084130_p15_p16_reminders_automation.sql",
         "docs/workflows.md",
         "apps/backend/database/notification-language-rendering.sql",
-        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql"
+        "apps/backend/supabase/migrations/20261107231323_notification_language_rendering.sql",
+        "apps/backend/database/account-privacy-execution.sql",
+        "apps/backend/database/account-privacy-active-surfaces.sql",
+        "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql",
+        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1729,8 +1738,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "120c563b81e2f6dbb0639381b72ae23058ed0007876b946bfe6a55e9162cf0e5",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "aaef080b50c9e8282c7bd102d30e015bedb8e480c4ed5105db6c362e00519edd",
+        "reason": "Verified dedicated worker claim execute with DROP migration and139: hold late-failure rollback140bytes foreign preservation receipt replay"
       }
     }
   ]
