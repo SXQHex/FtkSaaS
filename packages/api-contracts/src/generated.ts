@@ -1680,24 +1680,7 @@ overridden_fields: unknown
 program_duration_source?: unknown
 logo?: unknown
 preparation_sources?: unknown
-inherited_fields?: {
-report_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-import_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-agreement_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-permission_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-}
+inherited_fields?: SettingsTemplateInheritanceSources
 } & SettingsView1)
 export type SettingsView1 = ({
 scope: "user"
@@ -1731,24 +1714,7 @@ kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
 }
 preparation_sources?: PreparationSources
-inherited_fields?: {
-report_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-import_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-agreement_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-permission_templates?: {
-kind: "organization_inherited"
-organization_version: SettingsVersion
-}
-}
+inherited_fields?: SettingsTemplateInheritanceSources
 } | {
 scope: "organization"
 version: SettingsVersion
@@ -2030,11 +1996,7 @@ reason?: string
 patch: unknown
 logo_image?: unknown
 history_source?: SettingsHistorySource
-/**
- * @minItems 1
- * @maxItems 8
- */
-inherit_fields?: [("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]
+inherit_fields?: SettingsInheritedTemplateFields
 } & RequestSettingsUpdate2)
 export type RequestSettingsUpdate1 = ({
 patch?: {
@@ -2053,6 +2015,14 @@ patch?: {
 }
 inherit_fields: unknown
 })
+/**
+ * @minItems 1
+ * @maxItems 8
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsInheritedTemplateFields".
+ */
+export type SettingsInheritedTemplateFields = [("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]
 export type RequestSettingsUpdate2 = ({
 client_api_version: unknown
 request_id: unknown
@@ -2092,11 +2062,7 @@ expected_version: unknown
 reason?: unknown
 patch: CenterSettingsValues
 history_source?: SettingsHistorySource
-/**
- * @minItems 1
- * @maxItems 8
- */
-inherit_fields?: [("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]|[("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates"), ("report_templates" | "import_templates" | "agreement_templates" | "permission_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")]
+inherit_fields?: SettingsInheritedTemplateFields
 } | {
 client_api_version: unknown
 request_id: unknown
@@ -4053,6 +4019,9 @@ ProCrmPreparation?: ProCrmPreparation
 ProAutomationPreparation?: ProAutomationPreparation
 ManagementSelector_instructor_agreement_accept_v1?: ManagementSelectorInstructorAgreementAcceptV1
 ManagementProjection_instructor_agreement_accept_v1?: ManagementProjectionInstructorAgreementAcceptV1
+SettingsInheritedTemplateFields?: SettingsInheritedTemplateFields
+SettingsTemplateInheritanceSource?: SettingsTemplateInheritanceSource
+SettingsTemplateInheritanceSources?: SettingsTemplateInheritanceSources
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23207,6 +23176,28 @@ application_name?: string
 support_email?: (string | null)
 support_url?: (string | null)
 maintenance_message?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsTemplateInheritanceSources".
+ */
+export interface SettingsTemplateInheritanceSources {
+report_templates?: SettingsTemplateInheritanceSource
+import_templates?: SettingsTemplateInheritanceSource
+agreement_templates?: SettingsTemplateInheritanceSource
+permission_templates?: SettingsTemplateInheritanceSource
+event_templates?: SettingsTemplateInheritanceSource
+collection_templates?: SettingsTemplateInheritanceSource
+crm_templates?: SettingsTemplateInheritanceSource
+automation_templates?: SettingsTemplateInheritanceSource
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsTemplateInheritanceSource".
+ */
+export interface SettingsTemplateInheritanceSource {
+kind: "organization_inherited"
+organization_version: SettingsVersion
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

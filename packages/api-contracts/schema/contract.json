@@ -46580,74 +46580,7 @@
         "logo": {},
         "preparation_sources": {},
         "inherited_fields": {
-          "type": "object",
-          "properties": {
-            "report_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            },
-            "import_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            },
-            "agreement_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            },
-            "permission_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "additionalProperties": false
+          "$ref": "#/$defs/SettingsTemplateInheritanceSources"
         }
       },
       "required": [
@@ -46841,74 +46774,7 @@
               "$ref": "#/$defs/PreparationSources"
             },
             "inherited_fields": {
-              "type": "object",
-              "properties": {
-                "report_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                },
-                "import_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                },
-                "agreement_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                },
-                "permission_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "additionalProperties": false
+              "$ref": "#/$defs/SettingsTemplateInheritanceSources"
             }
           },
           "required": [
@@ -47761,23 +47627,7 @@
           "$ref": "#/$defs/SettingsHistorySource"
         },
         "inherit_fields": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "report_templates",
-              "import_templates",
-              "agreement_templates",
-              "permission_templates",
-              "event_templates",
-              "collection_templates",
-              "crm_templates",
-              "automation_templates"
-            ]
-          },
-          "minItems": 1,
-          "maxItems": 8,
-          "uniqueItems": true
+          "$ref": "#/$defs/SettingsInheritedTemplateFields"
         }
       },
       "required": [
@@ -47874,23 +47724,7 @@
               "$ref": "#/$defs/SettingsHistorySource"
             },
             "inherit_fields": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "report_templates",
-                  "import_templates",
-                  "agreement_templates",
-                  "permission_templates",
-                  "event_templates",
-                  "collection_templates",
-                  "crm_templates",
-                  "automation_templates"
-                ]
-              },
-              "minItems": 1,
-              "maxItems": 8,
-              "uniqueItems": true
+              "$ref": "#/$defs/SettingsInheritedTemplateFields"
             }
           },
           "required": [
@@ -55466,6 +55300,71 @@
         "operation",
         "values"
       ],
+      "additionalProperties": false
+    },
+    "SettingsInheritedTemplateFields": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "report_templates",
+          "import_templates",
+          "agreement_templates",
+          "permission_templates",
+          "event_templates",
+          "collection_templates",
+          "crm_templates",
+          "automation_templates"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true
+    },
+    "SettingsTemplateInheritanceSource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "organization_inherited"
+        },
+        "organization_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        }
+      },
+      "required": [
+        "kind",
+        "organization_version"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsTemplateInheritanceSources": {
+      "type": "object",
+      "properties": {
+        "report_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "import_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "agreement_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "permission_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "event_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "collection_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "crm_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "automation_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        }
+      },
       "additionalProperties": false
     }
   },

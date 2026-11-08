@@ -96,7 +96,7 @@ test('Pro workflow templates resolve real versioned defaults without creating do
  assert.deepEqual(await counts(),effects);
  const program=await api('program_preview_v1',{center_id:center,class_id:f.classId,schedule:{...resolved.program.defaults,room_id:f.room,assignments:[{person_id:f.person,duty:'instructor'}],starts_on:f.day(2),ends_on:f.day(16)}});assert(program.id);assert.equal((await db.query('select count(*)::int n from core.program_versions where org_id=$1',[org])).rows[0].n,effects.program_versions);
  const cv=await api('settings_get_v1',cq);await api('settings_update_v1',{...cq,expected_version:cv.version,patch:{},inherit_fields:['event_templates','collection_templates','crm_templates','automation_templates']});
- const inherited=await api('settings_get_v1',cq);assert.equal(inherited.inherited_fields.crm_templates.kind,'organization_inherited');
+ const inherited=await api('settings_get_v1',cq);assert.equal(inherited.inherited_fields.crm_templates.kind,'organization_inherited');assert.deepEqual(Object.keys(inherited.inherited_fields).sort(),['event_templates','collection_templates','crm_templates','automation_templates'].sort());
  const oldSource=(await api('settings_catalog_get_v1',cq)).preparation_templates.crm.find(x=>x.source.scope==='center').source;
  const ov=await api('settings_get_v1',q);await api('settings_update_v1',{...q,expected_version:ov.version,patch:{crm_templates:[{...templates.crm_templates[0],name:'Changed shared draft'}]}});
  await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',{center_id:center,kind:'crm',source:oldSource});

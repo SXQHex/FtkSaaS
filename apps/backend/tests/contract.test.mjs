@@ -650,3 +650,22 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  assert(!valid('ResolvedDomainPreparation',{kind:'crm',source,defaults:{source:'manual',interest:'Explicit enquiry',person_id:id}}));
  assert(!valid('Request_instructor_agreement_accept',{client_api_version:1,request_id:id,org_id:id,center_id:id,agreement_id:id,operation_key:id}));
 });
+
+ test('template inheritance round trips every allowed field through generated request and response validators',async()=>{
+ const validators=await import('../supabase/functions/backend-v1/validators.js');
+ const keys=['report_templates','import_templates','agreement_templates','permission_templates','event_templates','collection_templates','crm_templates','automation_templates'];
+ const view={scope:'center',version:1,values:{},as_of:new Date().toISOString(),overridden_fields:[],inherited_fields:Object.fromEntries(keys.map(key=>[key,{kind:'organization_inherited',organization_version:2}]))};
+ const response={ok:true,data:view,trace_id:id};
+ assert(validators.success_settings_update_v1({ok:true,trace_id:id,data:{operation_id:id,primary_id:id,version:1,replayed:false,related:[]}}));
+ assert(valid('Success_settings_get',response));
+ assert(validators.success_settings_get_v1(response),JSON.stringify(validators.success_settings_get_v1.errors));
+ for(const key of keys){
+  const request={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,scope:'center',expected_version:0,patch:{},inherit_fields:[key]};
+  assert(validators.request_settings_update_v1(request));
+  assert(validators.success_settings_get_v1({...response,data:{...view,inherited_fields:{[key]:view.inherited_fields[key]}}}));
+ }
+ for(const inherited_fields of [{unknown_templates:{kind:'organization_inherited',organization_version:2}},{program_templates:{kind:'organization_inherited',organization_version:2}},{crm_templates:{kind:'organization_inherited',organization_version:-1}},{crm_templates:{kind:'local',organization_version:2}}]){
+  assert(!validators.success_settings_get_v1({...response,data:{...view,inherited_fields}}));
+ }
+ assert(!validators.success_settings_get_v1({...response,data:{...view,scope:'organization'}}));
+});
