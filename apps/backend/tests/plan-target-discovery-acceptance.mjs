@@ -83,3 +83,29 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  const expired=await read();assert.deepEqual(expired.billing.downgrade_options,[]);assert(Date.parse(expired.period_start)<Date.parse(expired.period_end));
  await denied('SUBSCRIPTION_NOT_STARTED','subscription_downgrade_request_v1',{...command,expected_version:expired.subscription_version});
 });
+
+
+test('XREQ034 Owner discovers upgrade targets without creating quotes or exposing management authority',{timeout:300000},async t=>{
+ const {db,org,owner,person,plan}=await preparationFixture();t.after(()=>db.end());
+ await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+ const api=(op,b={})=>must(owner,op,{org_id:org,...b},key());
+ const version=async(name,period,currency,amount,future=false)=>{
+  const id=key();await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,$2,now()+case when $3 then interval '1 day' else interval '-1 day' end,$4,$5,$6,limits,features from core.saas_plan_versions where id=$7",[id,name,future,amount,currency,period,plan]);return id;
+ };
+ const business=await version('business','monthly','TRY',2000),future=await version('business','monthly','TRY',2000,true),annual=await version('business','yearly','TRY',24000),foreign=await version('business','monthly','USD',2000),cheaper=await version('business','monthly','TRY',500),same=await version('pro','monthly','TRY',2000);
+ const effects=async()=> (await db.query('select (select count(*) from core.saas_quotes where org_id=$1)::int quotes,(select count(*) from core.saas_change_requests where org_id=$1)::int changes,(select count(*) from core.operation_receipts where org_id=$1)::int receipts',[org])).rows[0];
+ const before=await effects(),snapshot=await api('subscription_get_v1'),options=snapshot.billing.upgrade_options;
+ assert.deepEqual(options.find(o=>o.target.id===business),{plan:'business',target:{id:business,period:'monthly',amount_minor:'2000',currency:'TRY'}});
+ for(const id of [future,annual,foreign,cheaper,same,plan])assert(!options.some(o=>o.target.id===id));
+ assert.deepEqual(await effects(),before);
+ assert.deepEqual((await db.query('select private.subscription_upgrade_options($1,$2) options',[org,key()])).rows[0].options,[]);
+ const outsider=await authUser('upgrade-outsider');await must(outsider,'account_get_v1');
+ const denied=await call(outsider,'subscription_get_v1',{org_id:org});assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'NOT_FOUND');
+ await db.query("insert into private.p07_billing_config values(true,900) on conflict(singleton) do update set quote_ttl_seconds=excluded.quote_ttl_seconds");
+ const quote=await api('subscription_upgrade_quote_v1',{target_plan_id:business});assert.equal(quote.to_plan,'business');assert.equal(quote.currency,'TRY');assert.equal((await api('subscription_get_v1')).plan,'pro');
+ await db.query("update core.saas_plan_versions set effective_at=now()+interval '1 day' where id=$1",[business]);
+ assert(!(await api('subscription_get_v1')).billing.upgrade_options.some(o=>o.target.id===business));
+ const stale=await call(owner,'subscription_upgrade_quote_v1',{org_id:org,target_plan_id:business},key());assert.equal(stale.result.ok,false);assert.equal(stale.result.error.code,'NOT_FOUND');
+ await db.query("update core.saas_subscriptions set state='ended' where org_id=$1",[org]);assert.deepEqual((await api('subscription_get_v1')).billing.upgrade_options,[]);
+ assert.deepEqual((await db.query('select private.subscription_upgrade_options($1,$2) options',[org,person])).rows[0].options,[]);
+});

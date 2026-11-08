@@ -95,6 +95,16 @@ test('O04 organization security preference cannot weaken the platform or become 
  const file=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_organization_security_preferences.sql'));assert(file);
  assert.equal(fs.readFileSync('supabase/migrations/'+file,'utf8'),fs.readFileSync('database/settings-catalog-v17.sql','utf8').replace('commit;\n',()=>implementation.replace('begin;\n','')));
 });
+test('Pro upgrade targets and public brand colors expose only closed additive data',()=>{
+ const target={id,period:'monthly',amount_minor:'1000',currency:'TRY'};
+ assert(valid('SubscriptionUpgradeOption',{plan:'business',target}));
+ assert(!valid('SubscriptionUpgradeOption',{plan:'business',target,approved:true}));
+ const colors={primary_color:'#12aBcF',secondary_color:null,accent_color:'#FFFFFF'};
+ assert(valid('OrganizationBrandColors',colors));assert(valid('PublicBusinessProfile',{brand_colors:colors}));
+ for(const change of [{primary_color:'red'},{billing_name:'private'},{logo:'private'}])assert(!valid('OrganizationBrandColors',{...colors,...change}));
+ assert(valid('PublicBusinessProfile',{}));
+ assert(valid('SubscriptionBillingView',{current:target,period_change_options:[],pending_period_change:null,upgrade_options:[{plan:'business',target}]}));
+});
 test('XREQ026/027 expose stored override state and genuine downgrade target terms without command authority',async()=>{
  const generated=await import('../supabase/functions/backend-v1/validators.js');
  assert(generated.request_management_state_get_v1({client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:id,permission:'attendance.draft'}}}));

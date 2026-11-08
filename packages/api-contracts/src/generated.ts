@@ -3904,6 +3904,8 @@ PublicRegionalContext?: PublicRegionalContext
 DowngradeRetainedResource?: DowngradeRetainedResource
 MergeApprovalDiscovery?: MergeApprovalDiscovery
 OrganizationSecurityPolicy?: OrganizationSecurityPolicy
+SubscriptionUpgradeOption?: SubscriptionUpgradeOption
+OrganizationBrandColors?: OrganizationBrandColors
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6354,6 +6356,7 @@ version: PositiveInt
 logo?: (SettingsMediaAsset | null)
 self_context?: (AccountSelfContext | null)
 regional_defaults?: OrganizationRegionalDefaults
+brand_colors?: OrganizationBrandColors
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6395,6 +6398,15 @@ number_format: ("tr-TR" | "en-US")
 week_start: ("monday" | "sunday")
 fallback_language: "tr"
 new_center_timezone: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "OrganizationBrandColors".
+ */
+export interface OrganizationBrandColors {
+primary_color: (string | null)
+secondary_color: (string | null)
+accent_color: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7223,6 +7235,7 @@ current: SubscriptionPlanTerms
 period_change_options: SubscriptionPlanTerms[]
 pending_period_change: (SubscriptionPeriodChange | null)
 downgrade_options?: SubscriptionDowngradeOption[]
+upgrade_options?: SubscriptionUpgradeOption[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7259,6 +7272,14 @@ plan: Plan
 target: SubscriptionPlanTerms
 effective_at: Instant
 kept_center_required: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SubscriptionUpgradeOption".
+ */
+export interface SubscriptionUpgradeOption {
+plan: Plan
+target: SubscriptionPlanTerms
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7726,6 +7747,7 @@ timezone: string
 }[]
 timezone?: string
 logo?: (SettingsMediaContent | null)
+brand_colors?: OrganizationBrandColors
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

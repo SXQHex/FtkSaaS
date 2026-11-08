@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0e9c95d0c1951bc28b701bb08e440fa505e5693615ec002ede6ed1abd96f679e`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `1c7cdf638324f0b55aa7641c7532a838f72499d1a57a0ec82b1155d47483e3ee`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -127,6 +127,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [pilot-operational-security.sql](../apps/backend/database/pilot-operational-security.sql) | `38120b53cd3c130c0bdf025466863341520b6feb9fa1355814aa9d933c3cdeb5` |
 | [planned-start-cancellation.sql](../apps/backend/database/planned-start-cancellation.sql) | `25065e2714247553d72b8396b0ab99bd078c3e15380262e2283d1ea327e86460` |
 | [planned-start-decision-clock.sql](../apps/backend/database/planned-start-decision-clock.sql) | `79a88d9324f14d5ed8949be693d332d33a6add45743f2207221cdb2ec285918c` |
+| [pro-upgrade-brand-discovery.sql](../apps/backend/database/pro-upgrade-brand-discovery.sql) | `66c777294677bf4d709db2dc10f183f0dd89a7f7183050c1c04621f496e6f470` |
 | [program-configuration-requirements.sql](../apps/backend/database/program-configuration-requirements.sql) | `1902c23b1a4842b8fc775ac6141a2d1575381183b1d6eb7d702803375f4a72af` |
 | [program-session-lifecycle-wrappers.sql](../apps/backend/database/program-session-lifecycle-wrappers.sql) | `43231fb97b73b4ba09fef899cdbed8917efff85b7bafc4c74f18a0e85ffe2281` |
 | [program-session-lifecycle.sql](../apps/backend/database/program-session-lifecycle.sql) | `65efcea9fc3c6d9bd42b61a2b24f266543b14580faab64be22500e81be091b58` |
@@ -291,3 +292,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261108003318_merge_approval_discovery.sql](../apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql) | `754d0d683739619f3af8b1d058627fd7f973eb9454695ba2702a1ab838046cd1` |
 | [20261108003615_organization_security_preferences.sql](../apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql) | `21764d29a9d36ebbf75a1c23ad3ff5be4b3b8ecfa48fc02f2aef210d817a8f13` |
 | [20261108014454_organization_security_native_proof.sql](../apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql) | `5cd97216e22efc2adb0ebe643dc187fa64bcc855d38147717f29682a56560d02` |
+| [20261108025013_pro_upgrade_brand_discovery.sql](../apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql) | `66c777294677bf4d709db2dc10f183f0dd89a7f7183050c1c04621f496e6f470` |

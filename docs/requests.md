@@ -618,6 +618,10 @@ R14 kaynak incelemesinde `SubscriptionBillingView` yalnız current, period_chang
 
 **İstenen sonuç:** Mevcut desteklenen normal keşif yolu devredilsin; eksikse gerçek izinli/yürürlükte üst plan sürümleri, dönem/para birimi/bedel ve gereken bağlam normal Owner okuyucusunda sağlansın. UI bu kaynaktan açık seçimin ardından native quote alır, quote tutarı/expiry'sini ayrı gösterir; ödeme bildirimi doğrulama sayılmaz. Yeni endpoint adı dayatılmıyor. Pro→Business ticari kapsamı ve abonelik/rol kapıları backend tarafından korunmalıdır. R14'ün diğer dönem/yenileme/daralma/ödeme/lifecycle akışları bağımsız ilerler. Bu frontend kaynak bulgusudur; backend onayı veya hosted kabulü değildir.
 
+### Backend değerlendirmesi — XREQ-034, 8 Kasım 2026
+
+Talep doğrulandı. Aday kaynak `subscription_get_v1.billing.upgrade_options` ile mevcut Owner kapısı altında gerçek izinli üst plan sürümlerini sunar. Açık seçimden sonra mevcut quote komutu kullanılmalıdır; katalog okuması quote veya ödeme üretmez. Kesin tüketim [WF13](workflows.md#wf13) sahibindedir. Native aday, merge/development ve hosted kabulü henüz verilmez; frontend kapanışı ayrı kalır.
+
 ## XREQ-035 Genel üye ve açık profil için dar marka rengi projeksiyonu
 
 ### Frontend talebi — 8 Kasım 2026
@@ -626,3 +630,6 @@ S12 FD02 kaynak incelemesinde üç renk yalnız OrganizationSettingsValues'ta bu
 
 **İstenen sonuç:** Mevcut normal org/merkez/izinli açık profil projection'ında veya mevcut başka desteklenen dar yolda primary_color/secondary_color/accent_color değerlerinin null/default anlamıyla tüketimi devredilsin. Genel org settings yetkisi genişlemesin; başka kuruluş/kapalı yayın sızmasın. Logo özel dosya yetkisi, kişisel tema/kontrast ve işlevsel durum renkleri korunur. Backend kesin projeksiyon/alan yerini değerlendirir; frontend endpoint veya sahte renk kaynağı icat etmez. Bu kaynak talebi frontend veya backend gerçek kabulünü kapatmaz.
 
+### Backend değerlendirmesi — XREQ-035, 8 Kasım 2026
+
+Aday kaynak mevcut `organizations_list_v1`/yetkili `organization_get_v1` ve yayın kapıları açık public profil içinde yalnız üç renkli `brand_colors` projeksiyonu sağlar. Genel üye özel org settings okumaz; null sistem/kişisel tema fallback anlamındadır. Kesin tüketim [ayar rehberinde](settings.md) açıklanır. Native aday, merge/development ve hosted kabulü henüz verilmez; frontend kapanışı ayrı kalır.

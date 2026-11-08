@@ -73,7 +73,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/starter-preparation-acceptance.mjs",
-          "sha256": "81961408b6343c4b6985e622511552287c5b9c6f2ea8946fab440f8bc56ac2e9"
+          "sha256": "ede1dc4b7a8d8b48868ef53255864ba0445b04581e66c040a6ee13fff847cac9"
         }
       ],
       "estimated_seconds": 960.91
@@ -1068,7 +1068,7 @@
         {
           "line": 159,
           "path": "apps/backend/tests/plan-target-discovery-acceptance.mjs",
-          "sha256": "3593b6177e9b02906485458c0cb89b513e7deabec6f6353da48ae94dd4ec10b7"
+          "sha256": "32ed1b790c65452c5e36c69bfba79dcd14933a50d922b37afbeb6e7e6ffa7ccd"
         },
         {
           "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",

@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** Kullanıcının XREQ-006, S10 ayarları, PR256 gerçek ortam ve S08 hesap/güvenlik kapanışı yürütülür. XREQ-006/O04 kaynak ve native regresyonu önce aday kabulüne gider; sonraki S10 program/etkinlik/finans/CRM/otomasyon ve belge alt alanları [backlog](remaining-work.md#s10) kapsamında devam eder. Fiyat/ödeme düzeltmesi kullanıcı kararıyla gerçek ortamda uygulanır; PR256 kabulü ardından normal Owner komutlarıyla tamamlanır. Bildirim dili/çeviri [XREQ-033](../../../docs/requests.md#xreq-033) frontend sorumluluğunda kalır. Doğal 24 saat ve gerçek posta gereken S08 ile ortak kurulum bekleyen S14, kaynak testlerinden ayrı tutulur. [Aktif kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#xreq-006-ve-o04-kaynak-paketi).
+**Aktif paket:** Pro teslimindeki XREQ-034/035 keşif boşlukları tek kaynak paketiyle aday kabulüne gider. Sonraki S10 alt alanları backlog sırasını korur. XREQ-033 kullanıcı kararıyla ertelidir; bu paket dil geliştirmesi açmaz. [Kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#pro-keşif-paketi).
 
 ## Uygulama sırası
 
