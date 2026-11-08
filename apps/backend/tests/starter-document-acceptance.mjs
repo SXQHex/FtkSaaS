@@ -92,7 +92,7 @@ test('Digital documents freeze frontend text and consent without Storage objects
  const f=await preparationFixture({studentUser:true,studentMembership:true}),{db,org,center,owner,student,studentPerson}=f;t.after(()=>db.end());
  const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,center_id:center,...b},k);
  const deny=async(code,op,b,u=student,k=key())=>{const r=await call(u,op,{org_id:org,center_id:center,...b},k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
- const discipline=(await api('discipline_save_v1',{name:'Digital evidence',state:'active'})).primary_id;
+ const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Digital evidence',state:'active'},key())).primary_id;
  await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  const product=(await api('product_publish_v1',{terms:{name:'Digital evidence · terms',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'0',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
  const ctx={gate:'sale',subject:{type:'product_versions',id:product}},source={name:'Synthetic digital consent',language:'tr',template_id:'service-terms',template_version:'v1',text:'Başlık\nKoşullar: ı İ ş\nOnaylıyorum.\n'};

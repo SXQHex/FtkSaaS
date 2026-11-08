@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d2a7628764eb6a1eec2bd0ef94e0dc3ef07fbc3d98d4c9c2866a41c3d87ef29c",
-        "reason": "Reviewed final regenerated 222-operation contract/types/request validators and Edge bundle after scoped settings keys changed; legacy wrappers unchanged and digital content bypasses Storage only after authorized SQL projection."
+        "fingerprint": "757bc063aecc83ba18e0297f83793fb23cdfd3654f07cf3c77febc753ed2d587",
+        "reason": "API test envanterinde yalnız iki incelenmiş fixture kaynağının hashleri yenilendi; protokol ve runner politikası aynı."
       }
     },
     {
@@ -846,8 +846,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "2163126b7c3d66e50bc612d110b4cafeb873aea0fc8398c2bfaec9de25012644",
-        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
+        "fingerprint": "97415f32cf36953bcb53234353059072f2043bd3dbd9ed41db2099edb178c753",
+        "reason": "Dijital belge testinde disiplin kurulumu organization kapsamına düzeltildi; rezervasyon kuralları ve tüm assertionlar korundu."
       }
     },
     {
@@ -1161,8 +1161,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "1d0c5cbe17bee6f2a3d7ddcda490a89ec14ca31560e02bf15cfbaec6d4596a7e",
-        "reason": "Reviewed file-or-inline p05 publication/impact preservation, contextual content and self consent history, exact UTF-8 hash, immutable snapshots and native negative/replay coverage; FD08 and WF11 updated."
+        "fingerprint": "5af5a0ab825a187b16e851e661b03eec86f2b6d0565535610a12e203ad35d7db",
+        "reason": "Native logdaki fazla center_id disiplin kurulumundan çıkarıldı; dijital belge ve eski Storage assertionları aynen korunuyor."
       }
     },
     {
@@ -1252,8 +1252,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "34759835b8115d3ad6732f1ffaef27d66e50d19001fc4abb5cfe2697314de787",
-        "reason": "Reviewed five closed Pro template schemas, conditional feature/CM access, explicit versioned resolve, program startup copy and four opt-in live inheritance paths; invalid program clock rejected and native fixtures retain plan limits."
+        "fingerprint": "d4bd3bbb3e0f6877844c8fe096e4fab21043ea37b9fcd6e9c3f3a91584cb9a28",
+        "reason": "Şablon testinin yan etki sayımı gerçek program_versions tablosunu kullanıyor; defaults çözümleme ve miras davranışı aynı."
       }
     },
     {
@@ -1377,8 +1377,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "58d4596eddd43fa68d8fc6fcaf64fa7b2000a0ba6450e524f07c1e9781915be9",
-        "reason": "Reviewed native self-only instructor agreement read/accept/management, stable UTC source facts/hash, source version recheck and immutable evidence; no publishing or earning repricing from acknowledgement."
+        "fingerprint": "a5c5be4c675d0cb0f27a73a6c5c8e4b02e6812e845b040d2e9a5a56e4f590a43",
+        "reason": "Eğitmen onay testi disiplin kurulumunu mevcut organization sözleşmesine uyarladı; self yetki ve immutable onay assertionları aynı."
       }
     },
     {

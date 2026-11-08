@@ -84,7 +84,7 @@ test('Pro workflow templates resolve real versioned defaults without creating do
  const before=(await api('settings_get_v1',q)).version;
  await denied('VALIDATION_FAILED','settings_update_v1',{...q,expected_version:before,patch:{program_templates:[{...templates.program_templates[0],defaults:{...templates.program_templates[0].defaults,local_start:'99:99:99'}}]}});
  await api('settings_update_v1',{...q,expected_version:before,patch:templates});
- const counts=async()=>{const out={};for(const name of ['automations','outbox_jobs','programs','events','cash_movements','leads','operation_receipts'])out[name]=Number((await db.query('select count(*)::int n from core.'+name+' where org_id=$1',[org])).rows[0].n);return out;};
+ const counts=async()=>{const out={};for(const name of ['automations','outbox_jobs','program_versions','events','cash_movements','leads','operation_receipts'])out[name]=Number((await db.query('select count(*)::int n from core.'+name+' where org_id=$1',[org])).rows[0].n);return out;};
  await api('instructor_agreement_publish_v1',{center_id:center,person_id:f.person,discipline_id:f.discipline,format:'group',terms:{model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'10000'}],room_fee:{kind:'free',order:'before_instructor_share'}},valid:{starts_at:new Date(Date.now()-86400000).toISOString(),ends_at:new Date(Date.now()+60*86400000).toISOString()},reason:'Explicit synthetic program preparation agreement'});
  const effects=await counts(),catalog=await api('settings_catalog_get_v1',cq),resolved={};
  for(const [kind,plural] of [['program','programs'],['event','events'],['collection','collections'],['crm','crm'],['automation','automations']]){
@@ -94,7 +94,7 @@ test('Pro workflow templates resolve real versioned defaults without creating do
   await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',{center_id:center,kind,source:{...chosen.source,version:0}});
  }
  assert.deepEqual(await counts(),effects);
- const program=await api('program_preview_v1',{center_id:center,class_id:f.classId,schedule:{...resolved.program.defaults,room_id:f.room,assignments:[{person_id:f.person,duty:'instructor'}],starts_on:f.day(2),ends_on:f.day(16)}});assert(program.id);assert.equal((await db.query('select count(*)::int n from core.programs where org_id=$1',[org])).rows[0].n,effects.programs);
+ const program=await api('program_preview_v1',{center_id:center,class_id:f.classId,schedule:{...resolved.program.defaults,room_id:f.room,assignments:[{person_id:f.person,duty:'instructor'}],starts_on:f.day(2),ends_on:f.day(16)}});assert(program.id);assert.equal((await db.query('select count(*)::int n from core.program_versions where org_id=$1',[org])).rows[0].n,effects.program_versions);
  const cv=await api('settings_get_v1',cq);await api('settings_update_v1',{...cq,expected_version:cv.version,patch:{},inherit_fields:['event_templates','collection_templates','crm_templates','automation_templates']});
  const inherited=await api('settings_get_v1',cq);assert.equal(inherited.inherited_fields.crm_templates.kind,'organization_inherited');
  const oldSource=(await api('settings_catalog_get_v1',cq)).preparation_templates.crm.find(x=>x.source.scope==='center').source;
@@ -115,7 +115,7 @@ test('Instructor accepts the exact frontend agreement text bound to immutable ba
  await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
  const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,center_id:center,...b},k);
  const deny=async(code,op,b,u=owner,k=key())=>{const r=await call(u,op,{org_id:org,center_id:center,...b},k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
- const discipline=(await api('discipline_save_v1',{name:'Digital agreement',state:'active'})).primary_id;await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+ const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Digital agreement',state:'active'},key())).primary_id;await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  await api('role_assign_v1',{person_id:studentPerson,role:'instructor',scope:{center_id:center}});
  const terms={model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'20000'}],room_fee:{kind:'free',order:'before_instructor_share'}};
  const agreement=(await api('instructor_agreement_publish_v1',{person_id:studentPerson,discipline_id:discipline,format:'group',terms,valid:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2031-01-01T00:00:00Z'},reason:'Synthetic digital agreement'})).primary_id;
