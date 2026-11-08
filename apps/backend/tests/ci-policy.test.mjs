@@ -1,3 +1,4 @@
+import {readinessSummary,isLocalReady,nativeFailureSummary} from '../scripts/local-readiness.mjs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import test from 'node:test';
@@ -395,4 +396,47 @@ test('merge proof accepts a newly added test using exact candidate coverage and 
   assert.equal((await verifyMerged(f.github,{repo:f.repo,sha:'A',runId:6},core)).coverage,f.v.binding.coverage);
  }finally{rmSync(dir,{recursive:true,force:true});}
  }
+});
+
+for(const installer of ['apps/backend/scripts/ci/install-gitleaks.sh','apps/web/scripts/workflow-validation/install-tools.sh']){
+ test(`${installer}: official fallback, checksum rejection and total network failure`,()=>{
+  const dir=mkdtempSync(join(tmpdir(),'ftk-download-')),bin=join(dir,'bin'),log=join(dir,'calls');fs.mkdirSync(bin);
+  const shim=(name,source)=>writeFileSync(join(bin,name),'#!/usr/bin/env bash\nset -euo pipefail\n'+source,{mode:0o755});
+  shim('curl',`printf 'curl %s\\n' "$*" >> "$TEST_LOG"
+if [[ "$TEST_MODE" == all-fail ]] || { [[ "$TEST_MODE" == fallback* ]] && [[ "$*" == *api.github.com* ]]; }; then exit 22; fi
+output='';while (($#));do if [[ "$1" == -o ]];then output="$2";break;fi;shift;done
+printf 'corrupt archive' > "$output"
+`);
+  shim('sha256sum',`printf 'hash %s\\n' "$(cat)" >> "$TEST_LOG"
+if [[ "$TEST_MODE" == *corrupt ]];then exit 1;fi
+`);
+  shim('tar',`printf 'extract\\n' >> "$TEST_LOG"\n`);
+  const run=mode=>{
+   writeFileSync(log,'');
+   let ok=true;try{execFileSync('bash',[repoFile(installer),join(dir,'tools')],{env:{...process.env,PATH:bin+':'+process.env.PATH,TEST_MODE:mode,TEST_LOG:log},stdio:'pipe'});}catch{ok=false;}
+   return {ok,lines:fs.readFileSync(log,'utf8').trim().split('\n')};
+  };
+  try{
+   const fallback=run('fallback');assert(fallback.ok);const calls=fallback.lines.filter(l=>l.startsWith('curl '));
+   assert(calls[0].includes('https://api.github.com/repos/'));assert(calls[1].includes('https://github.com/'));
+   assert(fallback.lines.some(l=>/^hash [a-f0-9]{64}  /.test(l)));assert(fallback.lines.includes('extract'));
+   const corrupt=run('corrupt');assert(!corrupt.ok);assert.equal(corrupt.lines.filter(l=>l.startsWith('curl ')).length,1);assert(!corrupt.lines.includes('extract'));
+   const badMirror=run('fallback-corrupt');assert(!badMirror.ok);assert.equal(badMirror.lines.filter(l=>l.startsWith('curl ')).length,2);assert(!badMirror.lines.includes('extract'));
+   const failed=run('all-fail');assert(!failed.ok);assert.equal(failed.lines.filter(l=>l.startsWith('curl ')).length,2);assert(!failed.lines.some(l=>l.startsWith('hash ')));assert(!failed.lines.includes('extract'));
+  }finally{rmSync(dir,{recursive:true,force:true});}
+ });
+}
+
+test('local readiness retains strict native Auth/Data API/Edge contract and safe diagnostics',()=>{
+ const ok={auth:200,rpc:200,edge:401,code:'AUTH_REQUIRED'};assert(isLocalReady(readinessSummary(ok)));
+ for(const patch of [{auth:503},{rpc:403},{edge:200},{code:'INTERNAL_ERROR'},{failure:'TimeoutError'},{failure:'ProviderSecretError'},{auth:undefined}])assert(!isLocalReady(readinessSummary({...ok,...patch})));
+ const report=JSON.stringify(readinessSummary({...ok,code:'secret-body',failure:'token-value',url:'https://secret.invalid',headers:{apikey:'secret-key'}}));
+ assert(!report.includes('secret'));assert(!report.includes('token-value'));assert.equal(JSON.parse(report).failure,'ProbeError');
+});
+
+test('native startup classification exposes only closed categories from private logs',()=>{
+ const log='secret-token https://private.invalid password=private Unable to prepare database artifact EAI_AGAIN';
+ assert.deepEqual(nativeFailureSummary(log),{classes:['artifact_download','dns']});
+ assert.deepEqual(nativeFailureSummary('chown exited with 1; password=private'),{classes:['ownership']});
+ assert.deepEqual(nativeFailureSummary('unrecognized secret=abc'),{classes:['unclassified']});
 });

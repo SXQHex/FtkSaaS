@@ -51,6 +51,8 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
   });
   let globalJob,memberPerson;
   await t.test('native reauth rejects other users; account deletion revokes sessions and permits only fresh own progress',async()=>{
+   const ownerPerson=(await q('select owner_person_id from core.organizations where id=$1',[org]))[0].owner_person_id;
+   await must(owner,'center_manager_assign_v1',{org_id:org,center_id:center,person_id:ownerPerson},key());
    memberPerson=(await must(owner,'person_create_v1',{org_id:org,center_id:center,display_name:'Retained business identity',contacts:[{kind:'email',value:member.email}]},key())).primary_id;
    await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',clock_timestamp())",[key(),org,memberAccount.id,memberPerson]);
    const p=await must(member,'account_delete_preview_v1'),body={preview:{id:p.id,token:p.token},reauth:owner.jwt};const wrong=await call(member,'account_delete_apply_v1',body,key());assert.equal(wrong.result.error.code,'AUTH_REQUIRED');
