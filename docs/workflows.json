@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "28eb8afc4e23808a22eae0ddc64529bd4c7e366fb39252853dbccde87a8de017",
-        "reason": "Yeni unit importu ve source-aware reset regresyonu incelendi; API envanterinde yalnız mevcut P07 source hash güncellendi, politika korunuyor."
+        "fingerprint": "464bc3c4bc3e5a2556f3dead490fd25caad5fe833ace5777db5dbf922dcd4012",
+        "reason": "141 append-only migration/source eşliği ve mevcut P07 import hash genişlemesi incelendi; API protokolü ve CI politikası korunuyor."
       }
     },
     {
@@ -1329,8 +1329,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "8e879b8b95e5a87a4a71ded72d3b3534a275f74bc2c0dafb7053ab675fc37785",
-        "reason": "Ortak P07 lifecycle suite yeni native principal silme kabulüyle genişledi; abonelik ödeme/yenileme/daraltma davranışı ve mevcut assertionlar korunuyor."
+        "fingerprint": "f12331b84b72e242d75d395eda5cb34ae5bf66e020d094e3380d274e534f88ce",
+        "reason": "Ortak P07 native lifecycle testi gerçek refresh satırı ve tam Auth rollback sayımlarıyla genişledi; mevcut abonelik assertionları korundu."
       }
     },
     {
@@ -1570,7 +1570,9 @@
         "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql",
         "apps/backend/database/account-native-erasure.sql",
         "apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql",
-        "apps/backend/scripts/native-account-erasure.mjs"
+        "apps/backend/scripts/native-account-erasure.mjs",
+        "apps/backend/database/account-native-erasure-finalization.sql",
+        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1586,8 +1588,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "cd7579002594308b397c8335dd661a912cc321e6672995510605e99b7cd63cf5",
-        "reason": "Native principal hold/lease/origin fence ve giriş/JWT ret native testi incelendi; response body serbest bırakılır, Auth yüzeyi pending korunur."
+        "fingerprint": "6bfe9ce8589e6bc026fac465a33eeb2e31fddde3bbd1a26b8aa4327c9970156b",
+        "reason": "Auth nested FK cascade sonrası transaction sonu constraint proof incelendi; hold/lease kilitleri ve geç hatada atomic rollback korunuyor."
       }
     },
     {
@@ -1731,7 +1733,9 @@
         "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql",
         "apps/backend/database/account-native-erasure.sql",
         "apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql",
-        "apps/backend/scripts/native-account-erasure.mjs"
+        "apps/backend/scripts/native-account-erasure.mjs",
+        "apps/backend/database/account-native-erasure-finalization.sql",
+        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1746,8 +1750,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "cab9b37f5ee64dbeed4274ed87bb6d5c010a2ff5132b8dfa09994e3546af5bae",
-        "reason": "Dedicated native runner body cleanup ve exact provider/instance scope yeniden incelendi; bounded HTTP ve immutable proof öncesi başarı yok."
+        "fingerprint": "dcdf712239b48bcf208d8f56c1f771f3b69038a2e0506ba182039d9bc127b1cd",
+        "reason": "Native principal proof normal AFTER yerine transaction sonunda ertelendi; aynı dedicated claim ve origin/instance/scope sınırları değişmedi."
       }
     }
   ]

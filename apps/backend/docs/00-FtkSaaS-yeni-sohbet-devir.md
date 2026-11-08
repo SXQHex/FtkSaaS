@@ -1,5 +1,15 @@
 # Güncel kaynak ve kabul
 
+## PR267 native Auth cascade düzeltmesi
+
+PR267 head `e710550a2631d8b8a1812a70e4b9c4e3fd830fe3`, base `df6a138455d37fbc28bac31451b29a131650aac4`, tested merge `8beaf29a92a9bebd09a0dc98c7e9f05831326d16` için [42487925326](https://github.com/SXQHex/FtkSaaS/actions/runs/42487925326) başarısızdır. Core, quality ve11 API shard başarılı; API7 yeni principal silmesinde NATIVE_AUTH_DELETE_REJECTED alır. Önceki profil aşaması native kabulü geçti. Frontend/workflow/compatibility başarılıdır; kaynak merge/deploy kabulü verilmedi.
+
+Kök neden: normal AFTER auth.users proof trigger'ı users→sessions→refresh_tokens nested FK cascade tamamlanmadan refresh satırını okur ve INTEGRITY_VIOLATION ile provider transaction'ını geri alır. Önceki yerel Auth fixture'ında session'a bağlı gerçek refresh satırı bulunmadığından bu sıra kaçırıldı. Canlı read-only pg_constraint, sessions_user_id ve refresh_tokens_session_id CASCADE zincirini doğruladı. Resmî Auth adminUserDelete hard-delete kaynağı native transaction içinde tx.Destroy(user) kullanır. Aynı iki FK ve refresh satırı yerel PostgreSQL/PGlite denemesine eklendiğinde eski kaynak proof içinde aynı hatayla kırmızı oldu.
+
+Append-only141 normal trigger'ı DEFERRABLE INITIALLY DEFERRED constraint trigger'a çevirir. Proof commit sırasında tüm cascade'lerden sonra çalışır; BEFORE fence hold/satır kilitleri transaction sonuna kadar tutulur. Önceki140 migration byte'ı ve ACL/function body değişmez. Yerel denemede delete statement sonrası refresh0/proof0, commit'teki geç proof hatasında user/session/refresh rollback, başarılı commit sonrası refresh0/proof1 ve replay geçti. Bu SQL kanıtı native HTTP kabulü değildir. Mevcut native suite gerçek native login refresh/session sayısını pozitif doğrular; her ret sonrasında user/identity/session/refresh sayıları başlangıçla aynı olmak zorundadır. Başarıdan sonra mevcut404/proof/login/JWT/partial assertion'ları korunur.
+
+Yeni kaynakta backend verify455/455 (304 sözleşme/yönetişim/restore,141 CI,10 kalite), quality0 bulgu,141 frozen migration/source eşliği, önceki140 byte karşılaştırması ve git diff --check geçti; skipped/cancelled0. Bağımsız son incelemede Required yok. Aynı PR'ye tek push hazırlanır; yeni aday/native kabul henüz yoktur.
+
 ## Pro işletim kapanışı — aktif kaynak
 
 Aktif dal `feature/backend-pro-operational-closure`; güncel main `df6a138455d37fbc28bac31451b29a131650aac4` (PR265). PR265 head `9f6072b98926fcec6afebcf0b463553c05b5ed07` için [aday42482103888](https://github.com/SXQHex/FtkSaaS/actions/runs/42482103888), aynı main [source42483905740](https://github.com/SXQHex/FtkSaaS/actions/runs/42483905740), [merge42483905780](https://github.com/SXQHex/FtkSaaS/actions/runs/42483905780), [development42483936765](https://github.com/SXQHex/FtkSaaS/actions/runs/42483936765) ve [Vercel42483936753](https://github.com/SXQHex/FtkSaaS/actions/runs/42483936753) completed/success doğrulandı. Canlı139 migration, son sürüm20261108155000; profil scope/proof0. Emekli intent tablo referansları139 ile giderildi ve gerçek native suite adayda geçti. Bu başarı yeni140 migration kaynağına taşınmaz.

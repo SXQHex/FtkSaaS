@@ -188,7 +188,9 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const {env}=context(),endpoint=env.API_URL+'/auth/v1/admin/users/'+member.id;
    const headers={apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'};
    const remove=()=>fetch(endpoint,{method:'DELETE',headers,body:JSON.stringify({should_soft_delete:false}),signal:AbortSignal.timeout(15000)});
-   const rejected=async()=>{const r=await remove();assert.equal(r.ok,false,'Native provider must reject fenced deletion');await r.body?.cancel();assert.equal((await q('select count(*)::int n from auth.users where id=$1',[member.id]))[0].n,1);};
+   const nativeCounts=async()=>(await q('select (select count(*)::int from auth.users where id=$1) users,(select count(*)::int from auth.identities where user_id=$1) identities,(select count(*)::int from auth.sessions where user_id=$1) sessions,(select count(*)::int from auth.refresh_tokens where user_id=$1::text) refresh_tokens',[member.id]))[0];
+   const nativeBefore=await nativeCounts();assert(nativeBefore.sessions>0);assert(nativeBefore.refresh_tokens>0,'Real native login must exercise users -> sessions -> refresh_tokens cascades');
+   const rejected=async()=>{const r=await remove();assert.equal(r.ok,false,'Native provider must reject fenced deletion');await r.body?.cancel();assert.equal((await q('select count(*)::int n from auth.users where id=$1',[member.id]))[0].n,1);assert.deepEqual(await nativeCounts(),nativeBefore,'Rejected native deletion must roll back all Auth cascades');};
    await db.query("insert into core.retention_holds(id,subject_table,subject_id,reason,authority_reference,review_at) values($1,'accounts',$2,'Synthetic late Auth hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,memberAccount.id]);
    assert.equal((await prepare()).state,'held');await rejected();
    await db.query('delete from core.retention_holds where id=$1',[hold]);
