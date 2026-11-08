@@ -65,6 +65,8 @@ jobs:
       - name: Frontend checks, coverage and build
         run: pnpm exec turbo run lint typecheck build test:coverage --filter=@ftksaas/web --filter=@ftksaas/ui
       - run: pnpm --filter @ftksaas/web test:isolation
+      - name: Verify live acceptance source rejection cases
+        run: node --test apps/web/scripts/live-source.test.mjs apps/web/scripts/live-reporter.test.mjs
       - name: Package verified build
         id: build-package
         run: node apps/web/scripts/ci-build.mjs package

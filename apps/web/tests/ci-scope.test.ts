@@ -108,6 +108,43 @@ test.each([
 );
 
 const registry = "apps/backend/scripts/ci/document-paths.json";
+test("hosted batch is explicit trusted-main work and uploads only sanitized evidence", () => {
+  const config = workflow("frontend-live.yml");
+  const job = config.jobs["live-acceptance"];
+  expect(job.if).toBe("github.ref == 'refs/heads/main'");
+  expect(job.environment).toBe("vercel");
+  expect(job.permissions).toEqual({ contents: "read" });
+  expect(job.concurrency).toEqual({
+    group: "frontend-live-acceptance",
+    "cancel-in-progress": false,
+  });
+  expect(job.steps[0].with).toEqual({
+    ref: "${{ github.sha }}",
+    "fetch-depth": 0,
+    "persist-credentials": false,
+  });
+  const source = job.steps.find((step: { id?: string }) => step.id === "live-source");
+  expect(source.run).toBe("node apps/web/scripts/live-source.mjs");
+  const run = job.steps.find(
+    (step: { name?: string }) => step.name === "Run the complete live batch once",
+  );
+  expect(run.env.PLAYWRIGHT_BASE_URL).toBe("${{ steps.live-source.outputs.base_url }}");
+  expect(run.env.VERCEL_TOKEN).toBeUndefined();
+  expect(run.run).toBe(
+    "pnpm --filter @ftksaas/web exec playwright test --config=playwright.acceptance.config.ts",
+  );
+  const upload = job.steps.at(-1);
+  expect(upload.with.path.trim().split("\n")).toEqual([
+    ".artifacts/frontend/live-batch/source.json",
+    ".artifacts/frontend/live-batch/results.json",
+  ]);
+  expect(upload.with["include-hidden-files"]).toBe(true);
+  expect(Object.keys(config.on)).toEqual(["workflow_dispatch"]);
+  expect(config.on.deployment_status).toBeUndefined();
+  expect(config.on.workflow_run).toBeUndefined();
+  expect(config.jobs["reject-live-ref"].if).toBe("github.ref != 'refs/heads/main'");
+  expect(config.jobs["reject-live-ref"].steps[0].run).toContain("exit 1");
+});
 const reviewed = [
   "apps/web/README.md",
   "apps/web/docs/todo.md",
