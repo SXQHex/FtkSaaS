@@ -1,3 +1,6 @@
+import { reportWrites, reportFields, validReportCommand } from "./report-command";
+import { validDelivery } from "./delivery-settings";
+import { automationWrites, automationFields, validAutomationCommand } from "./automation-command";
 import { eventWrites, eventFields, validEventCommand } from "./event-command";
 import { proAccessWrites, proAccessFields, validProAccessCommand } from "./pro-access-command";
 import { crmWrites, crmFields, validCrmCommand } from "./crm-command";
@@ -40,6 +43,8 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  ...reportWrites,
+  ...automationWrites,
   ...eventWrites,
   ...proAccessWrites,
   ...crmWrites,
@@ -61,6 +66,7 @@ export const setupWrites = [
   "settings_reset_apply_v1",
   "document_version_publish_v1",
   "notification_mark_read_v1",
+  "notification_preferences_set_v1",
   "organization_update_v1",
   "center_create_v1",
   "center_update_v1",
@@ -84,8 +90,16 @@ export const setupWrites = [
   "replacement_session_create_v1",
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
-type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
+type SetupUpload =
+  | "document_upload_prepare_v1"
+  | "import_upload_prepare_v1"
+  | "file_upload_complete_v1";
 type SetupRead =
+  | "report_file_get_v1"
+  | "settings_template_resolve_v1"
+  | "job_status_get_v1"
+  | "preview_get_v1"
+  | "import_rows_list_v1"
   | "leads_list_v1"
   | "crm_followup_list_v1"
   | "earnings_list_v1"
@@ -156,6 +170,14 @@ export async function setupCall<K extends SetupWrite | SetupRead | SetupUpload>(
   return result.data as Operations[K]["response"]["data"];
 }
 export async function sendSetupCommand(command: SetupCommand) {
+  if (
+    command.operation === "report_export_start_v1" ||
+    command.operation === "import_preview_v1" ||
+    command.operation === "import_apply_v1"
+  ) {
+    const j = await setupCall(command.operation, command.input);
+    return { primary_id: j.job_id };
+  }
   if (command.operation === "event_payment_prepare_v1") {
     const p = await setupCall(command.operation, command.input);
     return { primary_id: p.id };
@@ -169,6 +191,8 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...reportFields,
+  ...automationFields,
   ...eventFields,
   sale_change_apply_v1: ["preview"],
   ...proAccessFields,
@@ -247,6 +271,7 @@ const fields: Record<SetupWrite, string[]> = {
     "scope",
     "impact_approval",
   ],
+  notification_preferences_set_v1: ["channel", "purpose", "enabled", "expected_version"],
   notification_mark_read_v1: ["notification_id", "expected_version"],
   organization_update_v1: ["name", "expected_version"],
   center_create_v1: ["name", "timezone"],
@@ -289,10 +314,41 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       !setupWrites.includes(command?.operation) ||
       !input ||
-      input.org_id !== scope.orgId ||
+      (input.org_id !== scope.orgId &&
+        !(input.org_id === undefined && input.scope === "user" && slot === "delivery:user")) ||
       (input.center_id !== undefined && (input.center_id ?? undefined) !== scope.centerId) ||
       !keyPattern.test(input.operation_key) ||
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
+    )
+      return "invalid";
+    if (
+      (command.operation === "notification_preferences_set_v1" || slot.startsWith("email:")) &&
+      (command.operation !== "notification_preferences_set_v1" ||
+        scope.centerId !== undefined ||
+        input.center_id !== undefined ||
+        input.channel !== "email" ||
+        !["transactional", "reminder"].includes(input.purpose) ||
+        slot !== `email:${input.purpose}` ||
+        typeof input.enabled !== "boolean" ||
+        !Number.isSafeInteger(input.expected_version) ||
+        input.expected_version < 1)
+    )
+      return "invalid";
+    if (
+      (reportWrites.some((op) => op === command.operation) ||
+        slot.startsWith("report-export:") ||
+        slot.startsWith("import-preview:") ||
+        slot.startsWith("import-apply:")) &&
+      !validReportCommand(command.operation, input, scope.centerId, slot)
+    )
+      return "invalid";
+    if (
+      (automationWrites.some((op) => op === command.operation) ||
+        slot.startsWith("automation:") ||
+        slot.startsWith("automation-org:") ||
+        slot.startsWith("segment:") ||
+        slot.startsWith("segment-org:")) &&
+      !validAutomationCommand(command.operation, input, scope.centerId, slot)
     )
       return "invalid";
     if (slot.startsWith("self-requests:") || slot.startsWith("self-bookings:")) {
@@ -457,6 +513,7 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       command.operation === "settings_update_v1" &&
       !slot.startsWith("operating-settings:") &&
+      !slot.startsWith("delivery:") &&
       (input.scope !== "member" ||
         input.center_id !== undefined ||
         !Number.isSafeInteger(input.expected_version) ||
@@ -475,7 +532,20 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
           : input.patch !== undefined))
     )
       return "invalid";
-    if (command.operation === "settings_reset_apply_v1" && !slot.startsWith("operating-settings:"))
+    if (
+      slot.startsWith("delivery:") &&
+      (!["settings_update_v1", "settings_reset_apply_v1"].includes(command.operation) ||
+        !validDelivery(input, scope.centerId, slot) ||
+        (command.operation === "settings_update_v1"
+          ? input.preview !== undefined
+          : input.patch !== undefined))
+    )
+      return "invalid";
+    if (
+      command.operation === "settings_reset_apply_v1" &&
+      !slot.startsWith("operating-settings:") &&
+      !slot.startsWith("delivery:")
+    )
       return "invalid";
     if (
       command.operation === "product_publish_v1" &&

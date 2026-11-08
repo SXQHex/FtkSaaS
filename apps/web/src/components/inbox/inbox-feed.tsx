@@ -16,6 +16,7 @@ import {
 import { getNotificationVersion, inboxTarget, listInbox, listAudit } from "../../lib/inbox";
 import type { SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
+import { NotificationDelivery } from "./notification-delivery";
 import { AuditHistory } from "./audit-history";
 
 type FeedReads = {
@@ -227,6 +228,7 @@ export function InboxFeedView({
                         {t(notice.read_at ? "read" : "unread")}
                       </Badge>
                     </div>
+                    {notice.email_job && <NotificationDelivery job={notice.email_job} />}
                     {notice.payload.body && (
                       <p className="whitespace-pre-wrap break-words text-sm">
                         {notice.payload.body}

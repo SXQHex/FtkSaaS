@@ -1,4 +1,5 @@
 "use client";
+import { asyncCommand, persistJob } from "../../lib/job-record";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
@@ -70,6 +71,10 @@ export function useSetupCommand(
       sent = true;
       const result = await sendSetupCommand(record.command);
       if (!mounted.current) return;
+      if (asyncCommand(record.command)) {
+        if (!("primary_id" in result) || !result.primary_id) throw Error("invalidJob");
+        persistJob(scope, slot, result.primary_id, record.command);
+      }
       if (!clear(record)) return;
       if ("outcome" in result && result.outcome === "capacity_closed") {
         setMessage("CAPACITY_FULL");
@@ -118,7 +123,12 @@ export function useSetupCommand(
     try {
       if (!ownsRecord(pending)) return;
       const result = await setupCall("operation_status_get_v1", {
-        org_id: scope.orgId,
+        ...(pending.command.operation === "settings_update_v1" ||
+        pending.command.operation === "settings_reset_apply_v1"
+          ? pending.command.input.scope === "user"
+            ? {}
+            : { org_id: scope.orgId }
+          : { org_id: scope.orgId }),
         operation: pending.command.operation,
         key: pending.command.input.operation_key,
       });
@@ -131,6 +141,19 @@ export function useSetupCommand(
         return;
       }
       if (result.status === "succeeded") {
+        if (asyncCommand(pending.command)) {
+          if (
+            !result.result_reference ||
+            result.result_reference.type !==
+              (pending.command.operation === "report_export_start_v1"
+                ? "report_jobs"
+                : "import_jobs")
+          ) {
+            setMessage("uncertain");
+            return;
+          }
+          persistJob(scope, slot, result.result_reference.id, pending.command);
+        }
         if (pending.command.operation === "event_register_v1") {
           if (result.result_reference?.type === "event_payment_preparations") {
             if (!clear(pending)) return;
