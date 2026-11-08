@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "fac85e5dca762336dcd87f3be8822c845be141e8d35f4e2ad10efd02c256e37b",
-        "reason": "Reviewed additive DTOs, frozen migration source/count parity and unchanged protocol validation; closed color and upgrade schemas preserve existing required fields."
+        "fingerprint": "d2a7628764eb6a1eec2bd0ef94e0dc3ef07fbc3d98d4c9c2866a41c3d87ef29c",
+        "reason": "Reviewed final regenerated 222-operation contract/types/request validators and Edge bundle after scoped settings keys changed; legacy wrappers unchanged and digital content bypasses Storage only after authorized SQL projection."
       }
     },
     {
@@ -369,8 +369,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "7fcacc2115ef5de67280a51fa1fb03b16d6df79b39d5acbe576200f0811bf10b",
-        "reason": "Reviewed native factor ACL: organization policy delegates mandatory enrollment and AAL proof to existing closed service-only account MFA boundary; native and role regressions preserve stale-token and missing-factor rejection."
+        "fingerprint": "161f98ae4de161ca79516e9de755862cb3988075f21db6f4a55c2e9d0ced81bb",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -473,8 +473,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "2e9911ebda9109288a1db3a7407bdb29058d3402bde0610929116178b6981468",
-        "reason": "Reviewed verified canonical self context, live accessible center/role membership, nullable subscriber identity and independent command authority."
+        "fingerprint": "26386996e39bf565dca50f0366d96d114806dd84cb6037b56dcf210856c9930e",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -569,8 +569,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "03441f3691b4393b841d4c4a0a7bf2f68e3c4b4b8d13c09087e07da2d5009788",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF03 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "8dfa41eefcc41b1e210db2bf43711eda581c0bce7a7b3b2597e99da856ed1702",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -662,8 +662,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "370d4989d7e71cfcc6526a23f190126d3fa7cddff135b3f26eba1774afdc25c2",
-        "reason": "Reviewed approval-only HMAC, safe frozen merge effect, paging and current authority/expiry checks; original apply token and final mutation guards remain private and unchanged."
+        "fingerprint": "1520db4cae5febd598c1f30081dc7bd46bebf19bfbb2448beda5697b50b3a514",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -762,8 +762,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "d11f5bb9323cd44ebcbb55b027f5f8d8ac50f7d92fc92557a43f524d99a27243",
-        "reason": "Kaynak satış aktif gelecek ders/event allocation kümesi writer ile eşlendi; original preflight ve bütün merkez yetkisi korunur, stable cursor yalnız source state/version'a bağlıdır; yeni native geçiş kökü incelendi"
+        "fingerprint": "d7c0dce6557dc29c0582a84d5c8b414444fdeb7a209ef5a5fe5a67a8162a0756",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -846,8 +846,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "a1a91e953dca83ce4f8181252ccd6be4e5b511548c1bd921b3c3458cf3becb1b",
-        "reason": "Reviewed shared finance/capacity discovery test roots after collection correction extraction; all role feature cross-center and revocation assertions remain with isolated setup."
+        "fingerprint": "2163126b7c3d66e50bc612d110b4cafeb873aea0fc8398c2bfaec9de25012644",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -909,8 +909,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "aaeff6672fd84639cd930747e8da42bb9acfc74bb865eaae72923fdc5c03ba35",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "cd94f1abf463fb6d8978a8775b4c833c466dd068745911243c83dd9cb12d6f45",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -974,8 +974,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "0baa61c9c6dbe45551f77eb98095a4f3164887c69acd5baab99d6e2730ffac80",
-        "reason": "Reviewed action discovery acceptance split into independent authority and ledger correction roots; original assertions and 300-second root budgets retained with separate tenant fixtures."
+        "fingerprint": "e59febbf7b0dc46a65f7605fa3e87779b6641bc026c22779cb3b76fd6c4f760a",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1066,8 +1066,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "4dac8ff2d303a32b63c98f046c3da3a0c84f5f4be67d5165be0e618818d7f9d3",
-        "reason": "Reviewed real hosted calendar GET/HEAD and local pinned-CA headless Chromium login-to-ICS-session-route/logout, rotation/revoke/replay/stale checks, optional admin fixture access-loss hook and explicit coverage. Owned-link pending writes recovered and unrelated subscriptions preserved."
+        "fingerprint": "2cc423a417cd514736f8a9051fd0b0e6245fce3c59fb11f13e318db549ffbf39",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1112,8 +1112,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "677e0b34ed9f4922660803046952af4f7de3c715f35de591941529d80894c298",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "d654ef25201b1831390105dedbd304805e1a7f98cf99f444568664929ac06c0e",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1147,7 +1147,9 @@
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/supabase/migrations/20261104131914_document_self_requirements.sql",
         "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/digital-document-snapshots.sql",
+        "apps/backend/supabase/migrations/20261108033244_digital_document_snapshots.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1159,8 +1161,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "8cd978bf142ca1375f3f0f6bc68b69eab124748f264304e497567e212efd125c",
-        "reason": "New notification language native regression preserves inbox/document authority and opt-in behavior."
+        "fingerprint": "1d0c5cbe17bee6f2a3d7ddcda490a89ec14ca31560e02bf15cfbaec6d4596a7e",
+        "reason": "Reviewed file-or-inline p05 publication/impact preservation, contextual content and self consent history, exact UTF-8 hash, immutable snapshots and native negative/replay coverage; FD08 and WF11 updated."
       }
     },
     {
@@ -1232,7 +1234,10 @@
         "apps/backend/database/organization-security-native-proof.sql",
         "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql",
         "apps/backend/database/pro-upgrade-brand-discovery.sql",
-        "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql"
+        "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql",
+        "apps/backend/database/pro-workflow-preparations.sql",
+        "apps/backend/database/settings-catalog-v18.sql",
+        "apps/backend/supabase/migrations/20261108034041_pro_workflow_preparations.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1247,8 +1252,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "e944a79b8fdb19adec3bd9d58cabad606a2056d2fc61fd24089a521cbb61a199",
-        "reason": "Reviewed member-list and existing org projection gates, public profile publication/feature/center guards and native closed projection tests; only configured public colors are added, private settings stay restricted."
+        "fingerprint": "34759835b8115d3ad6732f1ffaef27d66e50d19001fc4abb5cfe2697314de787",
+        "reason": "Reviewed five closed Pro template schemas, conditional feature/CM access, explicit versioned resolve, program startup copy and four opt-in live inheritance paths; invalid program clock rejected and native fixtures retain plan limits."
       }
     },
     {
@@ -1323,8 +1328,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "d3290a5a33de556d8c561eb5a71cd7ed34ac4a63b43f8891685a9a852d8305df",
-        "reason": "Reviewed live Owner target discovery against p07 quote rank/period/currency/state and pending-period restrictions; native tests prove read-only discovery, explicit quote and stale target rejection."
+        "fingerprint": "5412a5ced9f72b2157e5c046d81ea0e23eddf7f11846638b672fdd8c89a37bba",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1357,7 +1362,9 @@
         "apps/backend/database/upper-plan-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
         "apps/backend/database/agreement-preparations.sql",
-        "apps/backend/database/settings-catalog-v13.sql"
+        "apps/backend/database/settings-catalog-v13.sql",
+        "apps/backend/database/digital-agreement-acceptance.sql",
+        "apps/backend/supabase/migrations/20261108033820_digital_agreement_acceptance.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1365,11 +1372,13 @@
         "instructor_payment_record_v1",
         "instructor_payment_correct_v1",
         "negcredit_valuation_set_v1",
-        "instructor_agreements_list_v1"
+        "instructor_agreements_list_v1",
+        "instructor_agreement_get_v1",
+        "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "eb265d79c6cbe938ead713a4fe91e6f8e13bb1cd6b82c18da6a7595a2acc86be",
-        "reason": "Aynı PayTerms anlaşma hazırlık dalı; immutable yayın ve canlı CM/F20 kapıları değişmedi."
+        "fingerprint": "58d4596eddd43fa68d8fc6fcaf64fa7b2000a0ba6450e524f07c1e9781915be9",
+        "reason": "Reviewed native self-only instructor agreement read/accept/management, stable UTC source facts/hash, source version recheck and immutable evidence; no publishing or earning repricing from acknowledgement."
       }
     },
     {
@@ -1440,8 +1449,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "52394f8388e91abac099b597debf289665e7829e8c0c9dd2330fb87d41bd26f8",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "bedea0690cf869ad38c2f311ff6dbcb4250d1a031d6ae741424df021b633b317",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1496,8 +1505,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "ba818d729fdafc038bae0195e108fdd2e10462fe72bd1cc6a3b32cf697c7a952",
-        "reason": "Shared registry/imported preparation acceptance changed; existing CRM routing, consent, trial, worker and plan scope remain unchanged after source and guide review."
+        "fingerprint": "e0ee4bef25096d88757956e317a768afebf14c8cd53d48754e876b4e183c0d95",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1568,8 +1577,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "232fabc28d00565e8cedf0e8da4fc85b346236e5b4dd93d6bb0fd18a8c418726",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF17 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "7970e7da1d6732984cafdafc6d305631cf340dbc8a38ba4badba40afadaa1954",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1601,8 +1610,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "7ea991d3c5466440ba05ed99db07bc6b494fcbd6b55280742a3805027855dc11",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "7842fe90ba80e4c8076cb8cd137c2ae2ce7c67d1ad866c8fcff3362b3581dd87",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1630,8 +1639,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "73ec6c0f7745bae1b238c6e17546ccdf6f59aab734164b235a4e929144e71341",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF19 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "c1db0cc38d75eb952aca509fa842023a9b030f91210ab87ab8f961ef77b61cee",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     },
     {
@@ -1720,8 +1729,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "180506dd66c27d9487485b04aef526ff5f36cb727c0f816c53128c81492be47f",
-        "reason": "Email claim uses current organization language once and retains the existing frozen retry payload fence."
+        "fingerprint": "120c563b81e2f6dbb0639381b72ae23058ed0007876b946bfe6a55e9162cf0e5",
+        "reason": "Reviewed generated runtime-wrappers-current diff: two additive agreement endpoints only; this flow’s existing entrypoints, permission, feature, billing and dispatch signatures are byte-unchanged. Shared acceptance additions retain existing assertions and behavior."
       }
     }
   ]

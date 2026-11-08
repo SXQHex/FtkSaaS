@@ -86,3 +86,39 @@ test('Starter private document lifecycle through native Auth and Storage',async 
   await db.end();
  }
 });
+
+test('Digital documents freeze frontend text and consent without Storage objects',async t=>{
+ const {preparationFixture}=await import('./starter-preparation-fixture.mjs');
+ const f=await preparationFixture({studentUser:true,studentMembership:true}),{db,org,center,owner,student,studentPerson}=f;t.after(()=>db.end());
+ const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,center_id:center,...b},k);
+ const deny=async(code,op,b,u=student,k=key())=>{const r=await call(u,op,{org_id:org,center_id:center,...b},k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+ const discipline=(await api('discipline_save_v1',{name:'Digital evidence',state:'active'})).primary_id;
+ await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+ const product=(await api('product_publish_v1',{terms:{name:'Digital evidence · terms',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'0',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
+ const ctx={gate:'sale',subject:{type:'product_versions',id:product}},source={name:'Synthetic digital consent',language:'tr',template_id:'service-terms',template_version:'v1',text:'Başlık\nKoşullar: ı İ ş\nOnaylıyorum.\n'};
+ const sha=text=>createHash('sha256').update(text,'utf8').digest('hex');
+ const publication={digital_content:source,version_label:'digital-v1',scope:{kind:'center',center_id:center},requirements:[{gate:'sale',scope:{center_ids:[center]},renewed_acceptance:true}]};
+ const count=async()=>Number((await db.query("select count(*) n from storage.objects where bucket_id='ftksaas-documents' and name like $1",[org+'/%'])).rows[0].n),before=await count();
+ await deny('FORBIDDEN','document_version_publish_v1',publication);
+ const preview=await api('document_publication_preview_v1',publication);assert.deepEqual(preview.affected,[]);
+ const published=await api('document_version_publish_v1',publication),version=published.primary_id;
+ const read=(extra={})=>api('document_requirements_get_v1',{context:ctx,...extra},student);
+ const list=await read(),item=list.find(x=>x.version_id===version);assert(item);assert.equal(item.content_kind,'digital');assert.equal(item.digital_content,undefined);assert.equal(item.accepted,false);
+ const contents=()=>read({content_file_id:item.file.id});
+ const shown=(await contents()).find(x=>x.version_id===version);assert.deepEqual(shown.digital_content,source);assert.equal(shown.content_hash,sha(source.text));assert.equal(Buffer.from(shown.content.data,'base64').toString('utf8'),source.text);
+ await deny('VALIDATION_FAILED','document_accept_v1',{document_version_id:version,context:ctx});
+ const displayed={...source,language:'en',text:'Title\nTerms shown in English.\nI accept.\n'},body={document_version_id:version,context:ctx,displayed_content:displayed,displayed_content_hash:sha(displayed.text)};
+ await deny('VALIDATION_FAILED','document_accept_v1',{...body,displayed_content_hash:'0'.repeat(64)});
+ await deny('VERSION_CONFLICT','document_accept_v1',{...body,displayed_content:{...displayed,template_version:'v2'}});
+ const k=key(),accepted=await api('document_accept_v1',body,student,k);assert.equal((await api('document_accept_v1',body,student,k)).replayed,true);
+ const evidence=(await contents()).find(x=>x.version_id===version).digital_acceptance;
+ assert.equal(evidence.id,accepted.primary_id);assert.equal(evidence.person_id,studentPerson);assert.deepEqual(evidence.displayed_content,displayed);assert.equal(evidence.content_hash,sha(displayed.text));assert.equal(evidence.source_content_hash,sha(source.text));assert(Number.isFinite(Date.parse(evidence.accepted_at)));
+ await deny('IDEMPOTENCY_PAYLOAD_MISMATCH','document_accept_v1',{...body,displayed_content:{...displayed,text:'Changed'},displayed_content_hash:sha('Changed')});
+ await assert.rejects(db.query('update private.digital_document_acceptances set content_hash=$1 where acceptance_id=$2',['0'.repeat(64),accepted.primary_id]),/INTEGRITY_VIOLATION/);
+ await assert.rejects(db.query('delete from private.digital_document_contents where file_id=$1',[item.file.id]),/INTEGRITY_VIOLATION/);
+ const history=await api('management_state_get_v1',{operation:'document_accept_v1',selector:{operation:'document_accept_v1',key:{document_version_id:version}}},student);assert.deepEqual(history.items[0].current.values.digital_acceptance,evidence);
+ assert.equal(await count(),before);
+ const stranger=await authUser('digital-document-outsider');await must(stranger,'account_get_v1');await deny('NOT_FOUND','document_requirements_get_v1',{context:ctx,content_file_id:item.file.id},stranger);
+ await db.query("update core.account_links set state='revoked',version=version+1 where org_id=$1 and person_id=$2",[org,studentPerson]);
+ await deny('NOT_FOUND','document_accept_v1',body,student,k);assert.equal((await db.query('select count(*)::int n from private.digital_document_acceptances where org_id=$1',[org])).rows[0].n,1);
+});

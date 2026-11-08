@@ -237,3 +237,8 @@ assert next(Path('supabase/migrations').glob('*_owner_downgrade_resource_discove
 assert next(Path('supabase/migrations').glob('*_organization_security_native_proof.sql')).read_bytes()==Path('database/organization-security-native-proof.sql').read_bytes(),'Organization native MFA boundary source drift'
 
 assert next(Path('supabase/migrations').glob('*_pro_upgrade_brand_discovery.sql')).read_bytes()==Path('database/pro-upgrade-brand-discovery.sql').read_bytes(),'Pro upgrade and brand discovery source drift'
+
+assert next(Path('supabase/migrations').glob('*_digital_document_snapshots.sql')).read_bytes()==Path('database/digital-document-snapshots.sql').read_bytes(),'Digital document source drift'
+
+assert next(Path('supabase/migrations').glob('*_digital_agreement_acceptance.sql')).read_bytes()==Path('database/digital-agreement-acceptance.sql').read_bytes(),'Digital agreement source drift'
+assert next(Path('supabase/migrations').glob('*_pro_workflow_preparations.sql')).read_text()==Path('database/settings-catalog-v18.sql').read_text().replace('commit;\n',Path('database/pro-workflow-preparations.sql').read_text().replace('begin;\n','',1)),'Pro preparation source drift'

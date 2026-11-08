@@ -746,7 +746,7 @@
         {
           "line": 6,
           "path": "apps/backend/tests/starter-document-acceptance.mjs",
-          "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18"
+          "sha256": "9453bdabd633f0ee484122844f2e1b2d0b7ba53d32385d31c59c4c23a2988f2c"
         },
         {
           "line": 7,
@@ -1058,7 +1058,7 @@
         {
           "line": 157,
           "path": "apps/backend/tests/agreement-preparation-acceptance.mjs",
-          "sha256": "695fca4333215afd1b0a3824f3e5ce1e6f31d6717a6aaab13f149d89c1400e51"
+          "sha256": "787e956c49823a3927f41d5fc050143f38294288562d1e71de060599d2468630"
         },
         {
           "path": "apps/backend/tests/permission-preparation-acceptance.mjs",

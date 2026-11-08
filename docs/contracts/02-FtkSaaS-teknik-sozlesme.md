@@ -1175,6 +1175,8 @@ ST-03 manuel tahsilat adayı cash/bank_transfer/card_pos yöntemini ve banka/kar
 | Yeni org/merkez | Dış yayın default kapalı. Ad/açıklama/logo/adres/iletişim/çalışma saatleri ayrı seçilir. |
 | Kamusal takvim | Merkez görünürlüğünden ayrı açılır; açık yayımlanmış ders/event. Üye/yoklama/borç/kişisel iletişim listesi yok. Mevcut yayınlar değişmez. |
 
+**Dijital belge ve anlaşma — 8 Kasım 2026 kullanıcı kararı:** Platformun ürettiği belge/sözleşmelerin şablonu, çevirisi, gerçek ekran dili ve fallback frontend/Next.js sorumluluğundadır. Onay anında gösterilen nihai metnin tamamı ve gerçek dil backend'e gönderilir; backend aynı UTF-8 metnin SHA-256 değerini kendisi hesaplar ve metni, şablon kimlik/sürümünü, ilgili belge/anlaşmanın değişmez kaynak sürümünü, onaylayan native hesap/kişiyi, kuruluş/merkezi ve sunucu zamanını birlikte saklar. Yalnız hash veya güncel frontend şablonuna bağlantı kanıt değildir. Geçmiş içerik güncel şablondan yeniden üretilmez. Platformun ürettiği dijital belgeler için PDF/blob/Storage yüklemesi zorunlu değildir; dışarıdan yüklenen gerçek dosyaların mevcut destek/erişim ve geçmişi korunur. Dil/fallback backend'de ikinci kez çözülmez. Snapshot ve hash piksel veya kullanıcının gerçekten okuduğu iddiası değildir; uygulamanın sunduğu içerik ile native onayın değişmez kaydıdır. Eğitmenin kendi dijital kabulü anlaşma yayını/hakediş hesabından ayrıdır; güncel gerçek parasal şartlara ve sürüme bağlanır, onay ücret değiştirmez ve genel yeni mali onay kapısı oluşturmaz.
+
 ##### FD09 — CRM başvuru (kabul edildi)
 
 | Alan | Kabul edilen seçenek/default |

@@ -66,3 +66,69 @@ test('S10 agreement templates prepare explicit immutable publications with live 
   assert.equal(await count(),before+1);
  }finally{await db.end();}
 });
+
+test('Pro workflow templates resolve real versioned defaults without creating domain actions',{timeout:300000},async t=>{
+ const {preparationFixture}=await import('./starter-preparation-fixture.mjs');
+ const f=await preparationFixture({schedule:true}),{db,org,center,owner,plan}=f;t.after(()=>db.end());
+ await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+ const api=(op,b={},k=key())=>must(owner,op,{org_id:org,...b},k);
+ const denied=async(code,op,b)=>{const r=await call(owner,op,{org_id:org,...b},key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+ const q={scope:'organization'},cq={scope:'center',center_id:center};
+ const templates={
+  program_templates:[{key:'weekly',name:'Weekly class',defaults:{weekdays:[1,3],local_start:'10:00:00',duration_minutes:50,capacity:{total:8}}}],
+  event_templates:[{key:'event',name:'Explicit event',defaults:{capacity:{nominal:20,maximum:20},terms:{fee_minor:'0',currency:'TRY',full_payment_required:false,allowed_product_version_ids:[],cancellation:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'consume'},refund:{method:'none'}}}}],
+  collection_templates:[{key:'cash',name:'Cash in TRY',defaults:{currency:'TRY',payment_method:'cash'}}],
+  crm_templates:[{key:'manual',name:'Incoming enquiry',defaults:{source:'manual',interest:'Explicit class interest'}}],
+  automation_templates:[{key:'inactive',name:'Inactive followup',defaults:{trigger:{kind:'student_inactive',offset_days:7},action:{kind:'create_followup',channel:'in_app',template_key:'crm_followup'}}}]
+ };
+ const before=(await api('settings_get_v1',q)).version;
+ await denied('VALIDATION_FAILED','settings_update_v1',{...q,expected_version:before,patch:{program_templates:[{...templates.program_templates[0],defaults:{...templates.program_templates[0].defaults,local_start:'99:99:99'}}]}});
+ await api('settings_update_v1',{...q,expected_version:before,patch:templates});
+ const counts=async()=>{const out={};for(const name of ['automations','outbox_jobs','programs','events','cash_movements','leads','operation_receipts'])out[name]=Number((await db.query('select count(*)::int n from core.'+name+' where org_id=$1',[org])).rows[0].n);return out;};
+ await api('instructor_agreement_publish_v1',{center_id:center,person_id:f.person,discipline_id:f.discipline,format:'group',terms:{model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'10000'}],room_fee:{kind:'free',order:'before_instructor_share'}},valid:{starts_at:new Date(Date.now()-86400000).toISOString(),ends_at:new Date(Date.now()+60*86400000).toISOString()},reason:'Explicit synthetic program preparation agreement'});
+ const effects=await counts(),catalog=await api('settings_catalog_get_v1',cq),resolved={};
+ for(const [kind,plural] of [['program','programs'],['event','events'],['collection','collections'],['crm','crm'],['automation','automations']]){
+  const chosen=catalog.preparation_templates[plural].find(x=>x.source.scope==='organization');assert(chosen);
+  const r=await api('settings_preparation_resolve_v1',{center_id:center,kind,source:chosen.source});resolved[kind]=r;
+  assert.deepEqual(r.defaults,templates[kind+'_templates'][0].defaults);
+  await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',{center_id:center,kind,source:{...chosen.source,version:0}});
+ }
+ assert.deepEqual(await counts(),effects);
+ const program=await api('program_preview_v1',{center_id:center,class_id:f.classId,schedule:{...resolved.program.defaults,room_id:f.room,assignments:[{person_id:f.person,duty:'instructor'}],starts_on:f.day(2),ends_on:f.day(16)}});assert(program.id);assert.equal((await db.query('select count(*)::int n from core.programs where org_id=$1',[org])).rows[0].n,effects.programs);
+ const cv=await api('settings_get_v1',cq);await api('settings_update_v1',{...cq,expected_version:cv.version,patch:{},inherit_fields:['event_templates','collection_templates','crm_templates','automation_templates']});
+ const inherited=await api('settings_get_v1',cq);assert.equal(inherited.inherited_fields.crm_templates.kind,'organization_inherited');
+ const oldSource=(await api('settings_catalog_get_v1',cq)).preparation_templates.crm.find(x=>x.source.scope==='center').source;
+ const ov=await api('settings_get_v1',q);await api('settings_update_v1',{...q,expected_version:ov.version,patch:{crm_templates:[{...templates.crm_templates[0],name:'Changed shared draft'}]}});
+ await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',{center_id:center,kind:'crm',source:oldSource});
+ await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
+ const created=(await api('center_create_v1',{name:'Program startup copy',timezone:'UTC'})).primary_id;
+ await api('center_manager_assign_v1',{center_id:created,person_id:f.person});
+ assert.deepEqual((await api('settings_get_v1',{scope:'center',center_id:created})).values.program_templates,templates.program_templates);
+ await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
+ await denied('PLAN_FEATURE_UNAVAILABLE','settings_preparation_resolve_v1',{center_id:center,kind:'program',source:resolved.program.source});
+ assert.equal((await api('settings_catalog_get_v1',cq)).fields.find(x=>x.key==='program_templates').writable,false);
+});
+
+test('Instructor accepts the exact frontend agreement text bound to immutable backend terms',{timeout:300000},async t=>{
+ const {preparationFixture}=await import('./starter-preparation-fixture.mjs');const {createHash}=await import('node:crypto');
+ const {db,org,center,owner,student,studentPerson,plan}=await preparationFixture({studentUser:true,studentMembership:true});t.after(()=>db.end());
+ await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+ const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,center_id:center,...b},k);
+ const deny=async(code,op,b,u=owner,k=key())=>{const r=await call(u,op,{org_id:org,center_id:center,...b},k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+ const discipline=(await api('discipline_save_v1',{name:'Digital agreement',state:'active'})).primary_id;await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+ await api('role_assign_v1',{person_id:studentPerson,role:'instructor',scope:{center_id:center}});
+ const terms={model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'20000'}],room_fee:{kind:'free',order:'before_instructor_share'}};
+ const agreement=(await api('instructor_agreement_publish_v1',{person_id:studentPerson,discipline_id:discipline,format:'group',terms,valid:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2031-01-01T00:00:00Z'},reason:'Synthetic digital agreement'})).primary_id;
+ const management=await api('management_state_get_v1',{operation:'instructor_agreement_accept_v1',selector:{operation:'instructor_agreement_accept_v1',key:{agreement_id:agreement}}},student);assert.equal(management.items[0].versions[0].version,1);
+ const read=()=>api('instructor_agreement_get_v1',{agreement_id:agreement},student),initial=await read();assert.equal(initial.acceptance,null);assert.deepEqual(initial.agreement.terms,terms);
+ const displayed={name:'Instructor agreement',language:'en',template_id:'instructor',template_version:'1',text:'Instructor agreement\nSession fee: TRY 200.00\nI accept.\n'},hash=createHash('sha256').update(displayed.text).digest('hex');
+ const b={agreement_id:agreement,expected_version:initial.agreement.version,source_content_hash:initial.source_content_hash,displayed_content:displayed,displayed_content_hash:hash};
+ await deny('FORBIDDEN','instructor_agreement_accept_v1',b);
+ await deny('VERSION_CONFLICT','instructor_agreement_accept_v1',{...b,source_content_hash:'0'.repeat(64)},student);
+ const k=key();await api('instructor_agreement_accept_v1',b,student,k);assert.equal((await api('instructor_agreement_accept_v1',b,student,k)).replayed,true);
+ const done=await read();assert.deepEqual(done.acceptance.displayed_content,displayed);assert.equal(done.acceptance.content_hash,hash);assert.equal(done.acceptance.source_content_hash,initial.source_content_hash);assert.equal(done.acceptance.person_id,studentPerson);assert.deepEqual(done.agreement,initial.agreement);
+ assert.equal((await db.query('select count(*)::int n from core.earnings where org_id=$1',[org])).rows[0].n,0);
+ await assert.rejects(db.query('delete from private.digital_agreement_acceptances where agreement_id=$1',[agreement]),/INTEGRITY_VIOLATION/);
+ await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='instructor'",[org,studentPerson]);
+ await deny('FORBIDDEN','instructor_agreement_accept_v1',b,student,k);
+});

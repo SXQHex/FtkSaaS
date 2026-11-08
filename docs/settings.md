@@ -125,6 +125,14 @@ Import şablonu yalnız explicit center_id/source_namespace ve sütun eşlemesid
 
 Şablon resolve sonucu kendi başına güncelleme sürümü değildir. İstemci bu okumadan aldığı expected_version ile mevcut availability_save_v1 komutunu çalıştırır; arada değişiklik varsa sürüm çatışması korunur. Sadece generic settings JSON saklama veya merkez sürümünü kural sürümü yerine kullanma kabul değildir. Bu okuma yeni bir endpoint veya yazma yetkisi açmaz; mevcut typed yönetim seçicisini tamamlar.
 
+## Pro iş akışı hazırlıkları
+
+Organization ve center scope'larında `program_templates`, `event_templates`, `collection_templates`, `crm_templates`, `automation_templates` default[] kapalı katalog alanlarıdır. Yalnız Pro/Business ve ilgili F08/F29/F19/F21/F24 desteğiyle yazılır; katalog desteklenmeyen alanı writable:false verir. Şablonlar key/name/defaults içerir. Programda hafta günleri, yerel saat, süre ve sayısal kapasite; etkinlikte kapasite/koşullar; tahsilatta para birimi/ödeme yöntemi; CRM'de açık kaynak/ilgi; otomasyonda desteklenen trigger ve in_app action hazırlanır. Tarih, kişi, ücret anlaşması, borç dağıtımı, işlem anahtarı, operasyon yetkisi veya otomatik enable üretilmez. Banka/kart gerçek tahsilat referansı mevcut writer'da ayrıca zorunludur.
+
+CM `settings_catalog_get_v1(center)` içindeki `preparation_templates.programs/events/collections/crm/automations` listesinden gerçek source seçer; `settings_preparation_resolve_v1(kind:program|event|collection|crm|automation,source)` aynı kapsam ve kaynak sürümüyle `{kind,source,defaults}` verir. Yerel olmayan merkez/rol/plan kapıları korunur. UI açık gerçek hedef ve eksik şartları doldurduktan sonra mevcut program preview, event save, collection record, lead save veya automation save komutunu çağırır. Şablon kaydı/okuması/resolve'u domain işi veya izin üretmez; writer bütün iş ve yetki sınırlarını yeniden denetler.
+
+Program hazırlığı yeni merkeze tek seferlik başlangıç kopyasıdır; mevcut merkez sonradan değişmez. Diğer dört aile için merkezde açık `inherit_fields` seçimi canlı org mirası sağlar; yerel patch mirastan çıkarır. Org değişimi miras alan merkez sürümünü ilerletir; eski source VERSION_CONFLICT sonrası yeniden okunur. Reset/history mevcut izinli alan/sürüm semantiğini kullanır. Dijital belge dili/fallback'i bu katalogda yeni backend çeviri motoru değildir; FD08 ve WF11'deki frontend snapshot sözleşmesine tabidir.
+
 ## Sürüm, reset ve bildirim uyumu
 
 İlk saklanmamış belge version0; yazma bu değeri açık ister. Sürüm opaktır, istemci +1 hesaplamaz. Eski notification_preferences_set insert/update/delete tetikleyicisi member ayar sürümünü de ilerletir; genel yazma birden çok alt değişiklik nedeniyle birden fazla artırabilir. Katalogdaki scope alanları dışına veya özel finans/politika/yetki alanlarına yazma VALIDATION_FAILED olur. Sahiplik alanları aynı kalır.

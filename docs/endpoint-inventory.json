@@ -5873,7 +5873,12 @@
         "F15",
         "F16",
         "F20",
-        "F05"
+        "F05",
+        "F08",
+        "F29",
+        "F19",
+        "F21",
+        "F24"
       ],
       "required_features": [],
       "runtime_required_features": [],
@@ -5969,6 +5974,60 @@
       },
       "billing_class": "exempt",
       "limits": []
+    },
+    {
+      "name": "instructor_agreement_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_agreement_get_v1",
+      "permission": "earnings.read",
+      "features": [
+        "F20"
+      ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [
+        "F20"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_agreement_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Native self-only agreement acknowledgement; signed frontend text and backend source terms are immutable; acknowledgement does not publish an agreement or reprice earnings."
+      ]
+    },
+    {
+      "name": "instructor_agreement_accept_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_agreement_accept_v1",
+      "permission": "document.accept",
+      "features": [
+        "F20"
+      ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [
+        "F20"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_agreement_accept"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "Native self-only agreement acknowledgement; signed frontend text and backend source terms are immutable; acknowledgement does not publish an agreement or reprice earnings."
+      ]
     }
   ]
 }
