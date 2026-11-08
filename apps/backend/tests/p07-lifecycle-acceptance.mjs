@@ -184,16 +184,38 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const prepare=async()=>(await c.query('select private.p07_auth_erasure_prepare($1) result',[entry.request])).rows[0].result;
    assert.equal((await prepare()).state,'unbound');
    await db.query('insert into private.account_auth_erasure_scopes(db_role,account_id,provider_origin) values($1,$2,$3)',[role,memberAccount.id,new URL(context().env.API_URL).origin]);
+   const flow=key(),foreignFlow=key(),ownAudit=key(),actorAudit=key(),subjectAudit=key(),foreignAudit=key(),stable=key();
+   for(const [id,user] of [[flow,member.id],[foreignFlow,owner.id]])await db.query("insert into auth.flow_state(id,user_id,auth_code,provider_type,authentication_method,provider_access_token,created_at,updated_at) values($1,$2,$3,'email','email',$4,clock_timestamp(),clock_timestamp())",[id,user,'synthetic-'+id,'synthetic-provider-token']);
+   await db.query("insert into auth.refresh_tokens(token,user_id,session_id,revoked,created_at,updated_at) values($1,$2,null,true,clock_timestamp(),clock_timestamp())",['synthetic-retired-'+key(),member.id]);
+   const auditRows=[
+    [ownAudit,{actor_id:member.id,actor_username:member.email,actor_name:'Synthetic deleted name',action:'login',traits:{user_id:member.id,user_email:member.email,user_phone:'synthetic-phone',factor_id:stable}},'192.0.2.1'],
+    [actorAudit,{actor_id:member.id,actor_username:member.email,action:'user_modified',traits:{user_id:owner.id,user_email:owner.email,identity_id:stable},other_evidence:{preserve:true}},'192.0.2.2'],
+    [subjectAudit,{actor_id:owner.id,actor_username:owner.email,action:'user_modified',traits:{user_id:member.id,user_email:member.email,user_phone:'synthetic-phone',identity_id:stable},other_evidence:{preserve:true}},'192.0.2.3'],
+    [foreignAudit,{actor_id:owner.id,actor_username:owner.email,action:'login',traits:{factor_id:stable}},'192.0.2.4']
+   ];
+   for(const [id,payload,ip] of auditRows)await db.query('insert into auth.audit_log_entries(id,payload,ip_address,created_at) values($1,$2,$3,clock_timestamp())',[id,payload,ip]);
+   const residueState=async()=>({flows:await q('select id from auth.flow_state where id=any($1::uuid[]) order by id',[[flow,foreignFlow]]),audit:await q("select id,encode(extensions.digest(to_jsonb(e)::text,'sha256'),'hex') hash from auth.audit_log_entries e where id=any($1::uuid[]) order by id",[auditRows.map(x=>x[0])]),proofs:await q('select count(*)::int n from private.account_auth_residue_erasures where request_id=$1',[request])});
+   const residueBefore=await residueState();
+   await assert.rejects(c.query('select private.account_auth_residue_erasure($1,$2,false)',[request,role]),/permission denied/);
    assert.equal((await prepare()).state,'ready');
    const {env}=context(),endpoint=env.API_URL+'/auth/v1/admin/users/'+member.id;
    const headers={apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'};
-   const remove=()=>fetch(endpoint,{method:'DELETE',headers,body:JSON.stringify({should_soft_delete:false}),signal:AbortSignal.timeout(15000)});
+   const remove=async()=>{
+    const response=await fetch(endpoint,{method:'DELETE',headers,body:JSON.stringify({should_soft_delete:false}),signal:AbortSignal.timeout(15000)});
+    if(!response.ok)assert.deepEqual(await residueState(),residueBefore,'Auth residues, audit fields and receipt must also roll back');
+    return response;
+   };
    const nativeCounts=async()=>(await q('select (select count(*)::int from auth.users where id=$1) users,(select count(*)::int from auth.identities where user_id=$1) identities,(select count(*)::int from auth.sessions where user_id=$1) sessions,(select count(*)::int from auth.refresh_tokens where user_id=$1::text) refresh_tokens',[member.id]))[0];
    const nativeBefore=await nativeCounts();assert(nativeBefore.sessions>0);assert(nativeBefore.refresh_tokens>0,'Real native login must exercise users -> sessions -> refresh_tokens cascades');
    const rejected=async()=>{const r=await remove();assert.equal(r.ok,false,'Native provider must reject fenced deletion');await r.body?.cancel();assert.equal((await q('select count(*)::int n from auth.users where id=$1',[member.id]))[0].n,1);assert.deepEqual(await nativeCounts(),nativeBefore,'Rejected native deletion must roll back all Auth cascades');};
    await db.query("insert into core.retention_holds(id,subject_table,subject_id,reason,authority_reference,review_at) values($1,'accounts',$2,'Synthetic late Auth hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,memberAccount.id]);
    assert.equal((await prepare()).state,'held');await rejected();
    await db.query('delete from core.retention_holds where id=$1',[hold]);
+   for(const [table,id] of [['flow_state',flow],['audit_log_entries',subjectAudit]]){
+    await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,$3,$4,'Synthetic exact Auth hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,org,table,id]);
+    assert.equal((await prepare()).state,'held');await rejected();
+    await db.query('delete from core.retention_holds where id=$1',[hold]);
+   }
    await db.query("update private.account_auth_erasure_permits set expires_at=clock_timestamp()-interval '1 second' where request_id=$1",[request]);await rejected();
    assert.equal((await prepare()).state,'ready');
    trigger='auth_erase_'+key().replaceAll('-','');triggerTable='private.account_auth_erasures';
@@ -208,13 +230,36 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const login=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:member.password}),signal:AbortSignal.timeout(15000)});assert.equal(login.ok,false);await login.body?.cancel();
    assert.equal((await call(member,'account_get_v1')).result.ok,false);
 
+   assert.deepEqual(await q('select id from auth.flow_state where id=any($1::uuid[])',[[flow,foreignFlow]]),[{id:foreignFlow}]);
+   const audit=async id=>(await q('select payload::jsonb payload,ip_address from auth.audit_log_entries where id=$1',[id]))[0];
+   const own=await audit(ownAudit);assert.equal(own.payload.actor_username,undefined);assert.equal(own.payload.actor_name,undefined);assert.deepEqual(own.payload.traits,{user_id:member.id,factor_id:stable});assert.equal(own.ip_address,'');
+   const actor=await audit(actorAudit);assert.equal(actor.payload.actor_username,undefined);assert.deepEqual(actor.payload.traits,auditRows[1][1].traits);assert.deepEqual(actor.payload.other_evidence,{preserve:true});
+   const subject=await audit(subjectAudit);assert.equal(subject.payload.actor_username,owner.email);assert.deepEqual(subject.payload.traits,{user_id:member.id,identity_id:stable});assert.equal(subject.ip_address,'192.0.2.3');
+   assert.deepEqual(await audit(foreignAudit),{payload:auditRows[3][1],ip_address:'192.0.2.4'});
+   const residueProof=(await q('select flow_rows,refresh_rows,audit_rows from private.account_auth_residue_erasures where request_id=$1',[request]))[0];assert.equal(Number(residueProof.flow_rows),1);assert.equal(Number(residueProof.refresh_rows),1);assert(Number(residueProof.audit_rows)>=3);
+   await assert.rejects(db.query('delete from private.account_auth_residue_erasures where request_id=$1',[request]),/INTEGRITY_VIOLATION/);
    const proof=await q('select * from private.account_auth_erasures where request_id=$1',[request]);assert.equal(proof.length,1);
    assert.deepEqual(await eraseNativeAccount({db:c,request:entry.request,apiUrl:env.API_URL,serviceKey:env.SERVICE_ROLE_KEY}),{state:'completed'});
    await assert.rejects(db.query('delete from private.account_auth_erasures where request_id=$1',[request]),/INTEGRITY_VIOLATION/);
    assert.equal((await execute(c,entry,true)).ok,true);
    const manifest=(await q('select scopes from private.p07_privacy_manifests where request_id=$1',[request]))[0].scopes;
    assert.equal(manifest.auth.principal_erasure.state,'completed');assert.equal(manifest.auth.state,'pending');
+   assert.equal(manifest.auth.residue_erasure.state,'completed');
    assert.equal((await q('select state from core.privacy_requests where id=$1',[request]))[0].state,'partial');
+   // Trigger depth is not worker identity. A second global worker without the
+   // exact Auth target binding must not borrow the original permit's role.
+   const unbound=await native('ftk_p07_privacy_worker',true),late=key();
+   await db.query('insert into auth.audit_log_entries(id,payload,ip_address,created_at) values($1,$2,$3,clock_timestamp())',[late,{actor_id:member.id,actor_username:member.email,action:'login'},'192.0.2.9']);
+   await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[globalJob]);
+   const [unboundEntry]=await claim(unbound,true,null);assert.equal(unboundEntry.request.job_id,globalJob);
+   await unbound.query('create temp table p07_residue_attempt(payload jsonb)');
+   await unbound.query(`create function pg_temp.p07_residue_attempt() returns trigger language plpgsql as $$begin perform private.p07_privacy_execute(new.payload,array[${bank().map(id=>"'"+id+"'").join(',')}]::uuid[]);return new;end$$`);
+   await unbound.query('create trigger p07_residue_attempt before insert on p07_residue_attempt for each row execute function pg_temp.p07_residue_attempt()');
+   await unbound.query('insert into p07_residue_attempt values($1)',[unboundEntry.request]);
+   assert.equal((await audit(late)).payload.actor_username,member.email);
+   const deniedManifest=(await q('select scopes from private.p07_privacy_manifests where request_id=$1',[request]))[0].scopes;
+   assert.equal(deniedManifest.auth.residue_erasure.state,'unbound');
+   await unbound.query('drop table p07_residue_attempt');await unbound.query('drop function pg_temp.p07_residue_attempt()');
   });
  }finally{
   if(trigger){await db.query(`drop trigger if exists ${trigger} on ${triggerTable}`);await db.query(`drop function if exists private.${trigger}()`);}
