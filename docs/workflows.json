@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d882b75ede0f990440947252c635232d5189766c9648a8d7a59ae2b7b6408051",
-        "reason": "Final test inventory is an exact hash refresh for the additive native acceptance; source-bound CI and every previous assertion are preserved."
+        "fingerprint": "a18bf114be97172642c3f56ed0cc6d455a5ae573e05030fa1160a25094b95734",
+        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
       }
     },
     {
@@ -474,8 +474,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "26386996e39bf565dca50f0366d96d114806dd84cb6037b56dcf210856c9930e",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "b1ebc14aa1ef1e269e37058e573b1a337e22b592c58d1b1d0a637297572bb397",
+        "reason": "Reviewed additive native export acceptance import and migration inventory143. Existing flow operations, requests, permissions and assertions are unchanged."
       }
     },
     {
@@ -663,8 +663,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1520db4cae5febd598c1f30081dc7bd46bebf19bfbb2448beda5697b50b3a514",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "217b9fc653f4ed02002511384381e6fe77106a86c7e252f419d9062af2053341",
+        "reason": "Reviewed additive native export acceptance import and migration inventory143. Existing flow operations, requests, permissions and assertions are unchanged."
       }
     },
     {
@@ -1081,7 +1081,8 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p06-parser.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/subscriber-number-acceptance.mjs"
+        "apps/backend/tests/subscriber-number-acceptance.mjs",
+        "apps/backend/tests/export-retention-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1100,7 +1101,9 @@
         "apps/backend/database/subscriber-numbers.sql",
         "apps/backend/database/settings-catalog-v10.sql",
         "apps/backend/database/commercial-plan-limits.sql",
-        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql"
+        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
+        "apps/backend/database/account-export-erasure.sql",
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1113,8 +1116,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "d654ef25201b1831390105dedbd304805e1a7f98cf99f444568664929ac06c0e",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "31feb6a844f759e754ad5bfaf1fdde570e7a2bbb39718a93f661c30ed14cd6d5",
+        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
       }
     },
     {
@@ -1525,7 +1528,8 @@
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/native-account-erasure-unit.mjs",
-        "apps/backend/tests/postgres-restore-acceptance.mjs"
+        "apps/backend/tests/postgres-restore-acceptance.mjs",
+        "apps/backend/tests/export-retention-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1578,7 +1582,9 @@
         "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
         "apps/backend/database/account-native-residues.sql",
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
-        "apps/backend/scripts/postgres-restore.mjs"
+        "apps/backend/scripts/postgres-restore.mjs",
+        "apps/backend/database/account-export-erasure.sql",
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1594,8 +1600,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "f2a46b17a209908614c75a2af1f19d8d7b8ab9653e854cef34a38231c0e366ff",
-        "reason": "Supabase CLI3 native Unix socket null transport approval, exact identity checks and new missing-address regression reviewed; original assertions retained."
+        "fingerprint": "40cba0a90d5b04a37899a00286c00e1d724c4c0393a96cd5b5ef83f9607c5aea",
+        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
       }
     },
     {
@@ -1682,7 +1688,8 @@
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/transactional-email-acceptance.mjs",
         "apps/backend/tests/transactional-email-unit.mjs",
-        "apps/backend/tests/native-account-erasure-unit.mjs"
+        "apps/backend/tests/native-account-erasure-unit.mjs",
+        "apps/backend/tests/export-retention-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1743,7 +1750,9 @@
         "apps/backend/database/account-native-erasure-finalization.sql",
         "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
         "apps/backend/database/account-native-residues.sql",
-        "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql"
+        "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
+        "apps/backend/database/account-export-erasure.sql",
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1758,8 +1767,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "3da701c8b520f07c4ba5ebe7c1cc7476a5cb2c3277fce2de2aa751ac4cb0d009",
-        "reason": "Private helperda native permit rolü ve executor session_user açık ayrıldı; doğrudan execute yok, hold/lease ve sonraki pass taraması korunuyor."
+        "fingerprint": "af8b9cfb5d1698a67c23caa9819f2795f2e46acd1799a36151757282760ba0f2",
+        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
       }
     }
   ]

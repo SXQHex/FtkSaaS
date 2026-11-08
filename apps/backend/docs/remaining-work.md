@@ -696,6 +696,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Dosya/download kalıntısı, kesinti/retry ve expiry; checksum/envanter ile kanıt.
 - **Kaynak alanı:** Storage/export/temp executor; ilgili acceptance
 
+**DB export dilimi:** Hesap silme talebinde exact rol/hesap bağlantısı, tam report/job/file sahipliği, hold ve canlı lease kontrolüyle yalnız geçici DB export baytları kaldırılır. Olağan expiry de aynı hold/proof yolunu bounded100 dosyalık adımlarda kullanır; gerçek boyut/hash ve değişmez minimal kanıt atomiktir. Kaynak import dosyaları, tenant belge/kişi/finans ve rapor metadata'sı korunur. Bu alt aşama genel exports/Storage/backup veya privacy tamamlandı anlamına gelmez. Kaynak/native/CI/hosted ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#pro-export-saklama-ve-imha-paketi) tutulur.
+
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
