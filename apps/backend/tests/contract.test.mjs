@@ -1,5 +1,6 @@
 import './native-account-erasure-unit.mjs';
 import './hosted-settings-restore-unit.mjs';
+import './hosted-digital-runner-unit.mjs';
 import './hosted-calendar-runner-unit.mjs';
 import './reminder-contract-unit.mjs';
 import './transactional-email-unit.mjs';
