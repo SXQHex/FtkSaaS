@@ -29,6 +29,36 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  assert.deepEqual((await db.query('select private.subscription_downgrade_options($1,$2) options',[org,person])).rows[0].options,[]);
  await denied('FORBIDDEN','subscription_downgrade_request_v1',{target_plan_id:pro,kept_center_id:center},manager);
  const outsider=await authUser('plan-target-outsider');await must(outsider,'account_get_v1');await denied('NOT_FOUND','subscription_get_v1',{},outsider);
+ // Owner loses CM but retains only the subscription-scoped discovery path.
+ const room=(await api('room_save_v1',{center_id:center,name:'Retained room',capacity:10})).primary_id;
+ const discipline=(await api('discipline_save_v1',{name:'Retained discipline',state:'active'})).primary_id;
+ await api('center_discipline_set_v1',{center_id:center,discipline_id:discipline,state:'active'});
+ const students=[];for(let i=0;i<3;i++){const id=(await api('person_create_v1',{center_id:center,display_name:'Synthetic retained '+i,contacts:[]})).primary_id;await api('student_activate_v1',{center_id:center,person_id:id});students.push(id);}
+ await api('role_assign_v1',{center_id:center,person_id:f.person,role:'instructor',scope:{center_id:center}});
+ await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='center_manager' and state='active'",[org,f.person]);
+ await denied('FORBIDDEN','management_state_get_v1',{center_id:center,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}}});
+ assert((await api('centers_list_v1',{page:{limit:200,sort:'created_at_asc'}})).items.some(x=>x.id===center));
+ await denied('FORBIDDEN','room_save_v1',{center_id:center,name:'Owner cannot create this room',capacity:10});
+ const catalog=(resources,extra={})=>({operation:'subscription_downgrade_request_v1',selector:{operation:'subscription_downgrade_request_v1',key:{target_plan_id:starter,kept_center_id:center,expected_version:snapshot.subscription_version},resources,...extra}});
+ const discoveryEffects=await effects();
+ for(const [family,id] of [['rooms',room],['disciplines',discipline],['instructors',f.person]]){const page=await api('management_state_get_v1',catalog(family));assert.deepEqual(page.items.map(x=>x.retained_resource.id),[id]);assert.equal(page.items[0].versions[0].version,snapshot.subscription_version);assert.equal(page.items[0].current.values.resources,undefined);}
+ const request=catalog('students'),first=await api('management_state_get_v1',{...request,page:{limit:1}});assert(first.next_cursor);
+ const second=await api('management_state_get_v1',{...request,page:{limit:1,cursor:first.next_cursor}});assert.equal(second.items.length,1);assert.notEqual(first.items[0].retained_resource.id,second.items[0].retained_resource.id);
+ const number=first.items[0].retained_resource.subscriber_number;assert(number);
+ assert.deepEqual((await api('management_state_get_v1',catalog('students',{subscriber_number:number}))).items.map(x=>x.retained_resource.id),[first.items[0].retained_resource.id]);
+ assert.deepEqual((await api('management_state_get_v1',catalog('students',{subscriber_number:'999999999'}))).items,[]);
+ for(const item of first.items)assert.deepEqual(Object.keys(item.retained_resource).sort(),['display_name','id','kind','subscriber_number']);
+ await denied('VALIDATION_FAILED','management_state_get_v1',{...catalog('rooms'),page:{limit:1,cursor:first.next_cursor}});
+ await denied('VALIDATION_FAILED','management_state_get_v1',{...catalog('students',{subscriber_number:number}),page:{limit:1,cursor:first.next_cursor}});
+ await denied('FORBIDDEN','management_state_get_v1',request,manager);
+ await denied('NOT_FOUND','management_state_get_v1',request,outsider);
+ await denied('NOT_FOUND','management_state_get_v1',{...request,selector:{...request.selector,key:{...request.selector.key,kept_center_id:key()}}});
+ await denied('NOT_FOUND','management_state_get_v1',{...request,selector:{...request.selector,key:{...request.selector.key,target_plan_id:pro}}});
+ assert.deepEqual(await effects(),discoveryEffects);
+ await db.query("update core.center_relationships set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and kind='student'",[org,students[2]]);
+ await denied('VERSION_CONFLICT','management_state_get_v1',{...request,page:{limit:1,cursor:first.next_cursor}});
+ const remaining=(await api('management_state_get_v1',request)).items;assert.equal(remaining.length,2);assert(!remaining.some(x=>x.retained_resource.id===students[2]));
+ await denied('VERSION_CONFLICT','management_state_get_v1',{...request,selector:{...request.selector,key:{...request.selector.key,expected_version:snapshot.subscription_version+1}}});
  const selected=await api('management_state_get_v1',{operation:'subscription_downgrade_request_v1',selector:{operation:'subscription_downgrade_request_v1',key:{target_plan_id:chosen.target.id}}});
  assert.equal(selected.items[0].current.values.target_plan_id,pro);assert.equal(selected.items[0].versions[0].version,snapshot.subscription_version);
  const command={target_plan_id:chosen.target.id,kept_center_id:center,expected_version:selected.items[0].versions[0].version};
@@ -38,6 +68,11 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  const operationKey=key(),scheduled=await api('subscription_downgrade_request_v1',command,owner,operationKey);assert.equal((await api('subscription_downgrade_request_v1',command,owner,operationKey)).replayed,true);
  const actual=(await db.query('select target_plan_id,effective_at,state from core.saas_change_requests where org_id=$1 and id=$2',[org,scheduled.primary_id])).rows[0];assert.equal(actual.target_plan_id,pro);assert.equal(actual.state,'scheduled');assert.equal(+actual.effective_at,Date.parse(chosen.effective_at));assert.equal((await read()).billing.current.id,plan);
  await api('subscription_change_cancel_v1',{change_id:scheduled.primary_id,expected_version:scheduled.version});
+ const scope={room_id:room,discipline_id:discipline,instructor_id:f.person,student_person_ids:remaining.map(x=>x.retained_resource.id)};
+ const starterContext=await read(),starterCommand={target_plan_id:starter,kept_center_id:center,kept_scope:scope,expected_version:starterContext.subscription_version};
+ const starterScheduled=await api('subscription_downgrade_request_v1',starterCommand);
+ assert.deepEqual((await read()).pending_starter_scope,{center_id:center,scope});
+ await api('subscription_change_cancel_v1',{change_id:starterScheduled.primary_id,expected_version:starterScheduled.version});
  const yearly=await planVersion('business',{period:'yearly',amount:12000}),current=await read();
  const period=await api('subscription_period_change_request_v1',{target_plan_id:yearly,expected_version:current.subscription_version,amount_minor:'12000',currency:'TRY',effective_at:current.period_end});
  assert.deepEqual((await read()).billing.downgrade_options,[]);
