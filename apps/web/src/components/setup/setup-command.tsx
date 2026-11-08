@@ -56,10 +56,14 @@ export function useSetupCommand(
     setPending(null);
     return true;
   }
-  async function run(command?: SetupCommand) {
+  async function run(command?: SetupCommand, reauth?: string) {
     if (lock.current || pending === "invalid") return;
     const record = pending || (command ? { command } : null);
     if (!record || record.blocked) return;
+    if (record.command.operation === "organization_delete_apply_v1" && !reauth) {
+      setMessage("reauthNeeded");
+      return;
+    }
     lock.current = true;
     setBusy(true);
     setMessage("");
@@ -69,7 +73,9 @@ export function useSetupCommand(
       sessionStorage.setItem(key, JSON.stringify(record));
       setPending(record);
       sent = true;
-      const result = await sendSetupCommand(record.command);
+      const result = await (reauth
+        ? sendSetupCommand(record.command, reauth)
+        : sendSetupCommand(record.command));
       if (!mounted.current) return;
       if (asyncCommand(record.command)) {
         if (!("primary_id" in result) || !result.primary_id) throw Error("invalidJob");
@@ -141,6 +147,10 @@ export function useSetupCommand(
         return;
       }
       if (result.status === "succeeded") {
+        if (pending.command.operation === "organization_delete_apply_v1") {
+          setMessage("reauthNeeded");
+          return;
+        }
         if (asyncCommand(pending.command)) {
           if (
             !result.result_reference ||

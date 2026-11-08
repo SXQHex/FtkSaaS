@@ -1,5 +1,6 @@
 "use client";
 
+import { useUserPreferences } from "../user-preferences";
 import { useId, useState } from "react";
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
@@ -78,6 +79,7 @@ export function SessionCalendar({
 }: SessionCalendarProps) {
   const t = useTranslations("calendar");
   const locale = useLocale();
+  const preferences = useUserPreferences();
   const id = useId();
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState("all");
@@ -94,16 +96,37 @@ export function SessionCalendar({
       timeZone,
       hour: "2-digit",
       minute: "2-digit",
-      hourCycle: "h23",
+      hourCycle: preferences?.time_format === "12" ? "h12" : "h23",
     }).format(new Date(instant));
-  const start = weekStart(date);
+  const start =
+    range === "month" || range === "agenda"
+      ? `${date.slice(0, 7)}-01`
+      : weekStart(date, preferences?.week_start);
   const visible = entries.filter(
     (entry) =>
       (kind === "all" || entry.kind === kind) &&
       entry.title.toLocaleLowerCase(locale).includes(query.toLocaleLowerCase(locale).trim()),
   );
-  const days =
-    range === "day" ? [date] : Array.from({ length: 7 }, (_, index) => addDays(start, index));
+  const days = (
+    range === "day"
+      ? [date]
+      : Array.from(
+          {
+            length:
+              range === "week"
+                ? 7
+                : new Date(
+                    Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)), 0),
+                  ).getUTCDate(),
+          },
+          (_, index) => addDays(start, index),
+        )
+  ).filter(
+    (day) =>
+      range === "day" ||
+      preferences?.show_weekends !== false ||
+      ![0, 6].includes(new Date(`${day}T12:00:00Z`).getUTCDay()),
+  );
   return (
     <section aria-label={t("label")} className="min-w-0 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -118,7 +141,15 @@ export function SessionCalendar({
             variant="outline"
             size="icon"
             aria-label={t("previous")}
-            onClick={() => onDateChange(addDays(date, range === "week" ? -7 : -1))}
+            onClick={() =>
+              onDateChange(
+                range === "month" || range === "agenda"
+                  ? new Date(Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)) - 2, 1))
+                      .toISOString()
+                      .slice(0, 10)
+                  : addDays(date, range === "week" ? -7 : -1),
+              )
+            }
           >
             <ChevronLeft />
           </Button>
@@ -129,7 +160,15 @@ export function SessionCalendar({
             variant="outline"
             size="icon"
             aria-label={t("next")}
-            onClick={() => onDateChange(addDays(date, range === "week" ? 7 : 1))}
+            onClick={() =>
+              onDateChange(
+                range === "month" || range === "agenda"
+                  ? new Date(Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)), 1))
+                      .toISOString()
+                      .slice(0, 10)
+                  : addDays(date, range === "week" ? 7 : 1),
+              )
+            }
           >
             <ChevronRight />
           </Button>
@@ -200,7 +239,7 @@ export function SessionCalendar({
           className="flex min-w-0 flex-wrap gap-1 rounded-lg border bg-card p-1"
           aria-label={t("range")}
         >
-          {(["day", "week"] as const).map((value) => (
+          {(["day", "week", "month", "agenda"] as const).map((value) => (
             <Button
               key={value}
               variant={range === value ? "secondary" : "ghost"}

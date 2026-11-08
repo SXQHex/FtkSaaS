@@ -1,8 +1,10 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import { useLocale, useTranslations } from "next-intl";
 import type { ProductTerms } from "@ftksaas/api-contracts";
-import { effectMoney } from "../../lib/effect-money";
 export function ProductSummary({ terms }: { terms: ProductTerms }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("products"),
     locale = useLocale();
   return (

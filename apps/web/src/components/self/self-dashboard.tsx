@@ -1,6 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useState, useMemo } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { OrganizationView, CenterView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
@@ -9,7 +11,6 @@ import { setupCall, type SetupScope } from "../../lib/studio-setup";
 import { readEntitlements } from "../../lib/products";
 import { calendarInterval, dateInZone } from "../../lib/schedule";
 import { useRemote } from "../../lib/use-remote";
-import { effectMoney } from "../../lib/effect-money";
 import { getSession } from "../../lib/api";
 import { bookingApi } from "../../lib/bookings";
 import { RequestList } from "../bookings/lesson-requests";
@@ -264,6 +265,8 @@ function SelfStudent({
   personId: string;
   timeZone: string;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("selfDashboard"),
     [cursor, setCursor] = useState<string>(),
     [currency, setCurrency] = useState(""),

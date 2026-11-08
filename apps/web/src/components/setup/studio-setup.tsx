@@ -1,4 +1,5 @@
 "use client";
+import { useContextPreference } from "../context-preference";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -18,8 +19,17 @@ import { RoomSetup } from "./room-setup";
 import { RoleSetup } from "./role-setup";
 import { errorKey } from "./setup-command";
 
+const SubscriptionBilling = dynamic(() =>
+  import("../subscription/subscription-billing").then((m) => m.SubscriptionBilling),
+);
+const OrganizationLifecycle = dynamic(() =>
+  import("../subscription/organization-lifecycle").then((m) => m.OrganizationLifecycle),
+);
 const PlanDowngrade = dynamic(() =>
   import("../subscription/plan-downgrade").then((m) => m.PlanDowngrade),
+);
+const SettingsEditor = dynamic(() =>
+  import("../settings/settings-editor").then((m) => m.SettingsEditor),
 );
 const OperatingSettings = dynamic(() =>
   import("../settings/operating-settings").then((m) => m.OperatingSettings),
@@ -43,7 +53,12 @@ function OperatingSettingsAccess({
       >
         {t(target)}
       </Button>
-      {open && <OperatingSettings scope={scope} target={target} />}
+      {open && (
+        <>
+          <OperatingSettings scope={scope} target={target} />
+          <SettingsEditor scope={scope} target={target} />
+        </>
+      )}
     </section>
   );
 }
@@ -323,6 +338,12 @@ function OrganizationSetup({
       {error && <p role="alert">{t(error)}</p>}
       <PlanSummary key={`${initial.id}:${retry}`} orgId={initial.id} />
       <PlanDowngrade key={`downgrade:${initial.id}:${retry}`} scope={scope} />
+      <SubscriptionBilling key={`billing:${initial.id}:${retry}`} scope={scope} />
+      <OrganizationLifecycle
+        key={`lifecycle:${initial.id}:${retry}`}
+        scope={scope}
+        onChanged={saved}
+      />
       {!org && !error && (
         <output className="block" aria-live="polite">
           {t("loading")}
@@ -405,13 +426,19 @@ export function StudioSetup({
   onChanged: () => void;
 }) {
   const t = useTranslations("setup");
-  const [selected, setSelected] = useState(organizations.length === 1 ? organizations[0].id : "");
+  const context = useContextPreference(actorId);
+  const [selected, setSelected] = useState(
+    (organizations.some((o) => o.id === context.preferred?.org_id)
+      ? context.preferred!.org_id
+      : undefined) ??
+      (organizations.length === 1 && !context.requireChoice ? organizations[0].id : ""),
+  );
   const organization = organizations.find((row) => row.id === selected);
   return (
     <div className="max-w-3xl space-y-6 [&_button]:h-auto [&_button]:min-h-9 [&_button]:whitespace-normal [&_fieldset]:min-w-0">
       <p className="text-sm text-muted-foreground">{t("intro")}</p>
       {organizations.length === 0 && <p>{t("noOrganization")}</p>}
-      {organizations.length > 1 && (
+      {(organizations.length > 1 || (!selected && organizations.length > 0)) && (
         <div className="flex flex-wrap gap-3">
           {organizations.map((org) => (
             <Button
@@ -419,7 +446,10 @@ export function StudioSetup({
               type="button"
               variant={selected === org.id ? "default" : "outline"}
               aria-pressed={selected === org.id}
-              onClick={() => setSelected(org.id)}
+              onClick={() => {
+                setSelected(org.id);
+                context.remember({ org_id: org.id, center_id: null, discipline_id: null });
+              }}
             >
               {org.name}
             </Button>

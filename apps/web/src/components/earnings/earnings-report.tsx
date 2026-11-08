@@ -1,11 +1,12 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { Interval } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import type { SetupScope } from "../../lib/studio-setup";
 import { earningsApi, type EarningsApi } from "../../lib/earnings";
-import { effectMoney } from "../../lib/effect-money";
 import { FlowError, flowError } from "../bookings/flow-controls";
 export function EarningsReport({
   scope,
@@ -18,6 +19,8 @@ export function EarningsReport({
   interval: Interval;
   api?: EarningsApi;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("earnings"),
     f = useFormatter(),
     locale = useLocale();

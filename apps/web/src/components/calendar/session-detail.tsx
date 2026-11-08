@@ -1,9 +1,10 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import type { SessionView } from "@ftksaas/api-contracts";
 import { ArrowLeft, ArrowUpRight, CalendarPlus, Pencil, X, XCircle } from "lucide-react";
 import { Button } from "@ftksaas/ui/components/button";

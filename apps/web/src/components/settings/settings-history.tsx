@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useEffect, useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { FlowError, flowError } from "../bookings/flow-controls";
 import {

@@ -1,7 +1,7 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import { useCallback, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { effectMoney } from "../../lib/effect-money";
 import { validEventCommand } from "../../lib/event-command";
 import { v7 } from "uuid";
 import type { EventView, EventDutyInput } from "@ftksaas/api-contracts";
@@ -29,6 +29,8 @@ export function EventEditor({
   event?: EventView;
   onSaved: (id?: string) => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("events"),
     locale = useLocale(),
     load = useCallback(() => eventCatalog(scope), [scope]),

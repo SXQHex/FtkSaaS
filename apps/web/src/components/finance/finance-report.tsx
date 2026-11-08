@@ -1,12 +1,13 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useId, useMemo, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { financeReportApi, type FinanceReportApi } from "../../lib/finance-report";
 import { calendarInterval, dateInZone, type CalendarRange } from "../../lib/schedule";
-import { effectMoney } from "../../lib/effect-money";
 import type { SetupScope } from "../../lib/studio-setup";
 import { FlowError, flowError } from "../bookings/flow-controls";
 export function FinanceReport({
@@ -22,6 +23,8 @@ export function FinanceReport({
   timeZone: string;
   api?: FinanceReportApi;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("financeReport"),
     f = useFormatter(),
     locale = useLocale(),

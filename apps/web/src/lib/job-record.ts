@@ -42,9 +42,12 @@ export function restoreJob(scope: SetupScope, slot: string, binding?: string) {
   return binding !== undefined && record.binding !== binding ? null : (record.id as string);
 }
 export function asyncCommand(command: SetupCommand) {
-  return ["report_export_start_v1", "import_preview_v1", "import_apply_v1"].includes(
-    command.operation,
-  );
+  return [
+    "report_export_start_v1",
+    "import_preview_v1",
+    "import_apply_v1",
+    "organization_delete_apply_v1",
+  ].includes(command.operation);
 }
 export async function readJob(scope: SetupScope, id: string) {
   const job = await setupCall("job_status_get_v1", {

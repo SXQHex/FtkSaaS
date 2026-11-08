@@ -1,6 +1,7 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { WorkspaceScope, type WorkspaceStudios } from "../workspace-scope";
 import { readAutomations } from "../../lib/automations";

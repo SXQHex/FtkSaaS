@@ -1,7 +1,9 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useFormatter, useTranslations } from "next-intl";
+import { notificationCopy } from "../../lib/notification-copy";
+import { useTranslations, useLocale } from "next-intl";
 import type { EntityRef, NotificationView } from "@ftksaas/api-contracts";
 import { v7 } from "uuid";
 import { Button } from "@ftksaas/ui/components/button";
@@ -57,6 +59,7 @@ export function InboxFeedView({
   onUnreadChange: (value: boolean) => void;
 } & FeedReads) {
   const t = useTranslations("inbox");
+  const locale = useLocale();
   const format = useFormatter();
   const [cursor, setCursor] = useState<string>();
   const [retry, setRetry] = useState(0);
@@ -214,11 +217,13 @@ export function InboxFeedView({
             <ul className="divide-y rounded-xl border bg-card px-4 sm:px-6">
               {page.items.map((notice) => {
                 const target = inboxTarget(scope.orgId, notice.payload.subject);
+                const copy = notificationCopy(notice.kind, notice.payload.template_key, locale);
                 return (
                   <li key={notice.id} className="space-y-3 py-5">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <h3 className="min-w-0 break-words font-medium">
-                        {notice.payload.title ||
+                        {copy?.title ||
+                          notice.payload.title ||
                           (t.has(`kinds.${notice.kind}`) ? t(`kinds.${notice.kind}`) : t("notice"))}
                       </h3>
                       <Badge
@@ -229,7 +234,7 @@ export function InboxFeedView({
                       </Badge>
                     </div>
                     {notice.email_job && <NotificationDelivery job={notice.email_job} />}
-                    {notice.payload.body && (
+                    {!copy && notice.payload.body && (
                       <p className="whitespace-pre-wrap break-words text-sm">
                         {notice.payload.body}
                       </p>

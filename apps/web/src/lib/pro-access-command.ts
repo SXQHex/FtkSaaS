@@ -4,6 +4,7 @@ export const personnelPermissions = [
   "person.activate",
   "invite.student",
   "reservation.write",
+  "reservation.capacity_override",
   "attendance.draft",
   "sale.write",
   "finance.collect",

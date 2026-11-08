@@ -1,7 +1,8 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
 import type { LeadRecord } from "../../lib/crm";
 import { useCallback, useState } from "react";
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import type { ManagementStateView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";

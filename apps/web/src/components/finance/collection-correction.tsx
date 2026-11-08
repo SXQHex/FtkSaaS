@@ -1,12 +1,13 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import dynamic from "next/dynamic";
 import { useEffect, useId, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { CashSummary } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Label } from "@ftksaas/ui/components/label";
 import { correctionApi, type CorrectionApi } from "../../lib/collection-correction";
-import { effectMoney } from "../../lib/effect-money";
 import type { SetupScope } from "../../lib/studio-setup";
 const CorrectionForm = dynamic(() =>
   import("./correction-form").then((module) => module.CorrectionForm),
@@ -24,6 +25,8 @@ export function CollectionCorrection({
   onSaved: () => void;
   api?: CorrectionApi;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("finance"),
     format = useFormatter(),
     locale = useLocale(),

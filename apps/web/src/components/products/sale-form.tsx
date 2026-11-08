@@ -19,6 +19,7 @@ import { ApiFailure } from "../../lib/api";
 import type { SetupScope } from "../../lib/studio-setup";
 import type { useSetupCommand } from "../setup/setup-command";
 import { FlowError, flowError } from "../bookings/flow-controls";
+import { PreparationPicker } from "../settings/preparation-picker";
 import { ContextDocuments } from "../documents/context-documents";
 import { ProductSummary } from "./product-summary";
 import { SaleReview } from "./sale-review";
@@ -81,6 +82,11 @@ export function SaleForm({
       active = false;
     };
   }, [scope, personId, api, cursor, attempt, mode]);
+  const [preparedDates, setPreparedDates] = useState<{
+    start: string;
+    end: string;
+    revision: number;
+  } | null>(null);
   const disabled = busy || command.busy || !!command.pending,
     product = page?.items.find((row) => row.version_id === productId);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -190,6 +196,7 @@ export function SaleForm({
               className="min-h-11 w-full rounded-md border bg-background px-3"
               onChange={(event) => {
                 setProductId(event.target.value);
+                setPreparedDates(null);
                 setDocs(false);
               }}
             >
@@ -201,10 +208,57 @@ export function SaleForm({
               ))}
             </select>
             {product && <ProductSummary terms={product.terms} />}
+            {product && (
+              <PreparationPicker
+                scope={scope}
+                kind="package"
+                contextKey={`${personId}:${productId}:${mode}`}
+                disabled={disabled}
+                onResolved={(p) => {
+                  if (p.kind !== "package") return;
+                  const canonical = (v: unknown): string =>
+                    JSON.stringify(v, (_key, value) =>
+                      value && typeof value === "object" && !Array.isArray(value)
+                        ? Object.fromEntries(
+                            Object.keys(value)
+                              .sort()
+                              .map((k) => [k, value[k]]),
+                          )
+                        : value,
+                    );
+                  if (canonical(p.product_request.terms) !== canonical(product.terms)) {
+                    setError("invalidProduct");
+                    setReview(null);
+                    return;
+                  }
+                  setPreparedDates((old) => ({
+                    start: p.sale_dates.start_date,
+                    end: p.sale_dates.end_date,
+                    revision: (old?.revision ?? 0) + 1,
+                  }));
+                  setReview(null);
+                  setError("");
+                }}
+              />
+            )}
             <Label htmlFor={`${id}-start`}>{t("startDate")}</Label>
-            <Input id={`${id}-start`} type="date" name="start" required />
+            <Input
+              key={`start:${preparedDates?.revision ?? 0}`}
+              id={`${id}-start`}
+              type="date"
+              name="start"
+              defaultValue={preparedDates?.start}
+              required
+            />
             <Label htmlFor={`${id}-end`}>{t("endDate")}</Label>
-            <Input id={`${id}-end`} type="date" name="end" required />
+            <Input
+              key={`end:${preparedDates?.revision ?? 0}`}
+              id={`${id}-end`}
+              type="date"
+              name="end"
+              defaultValue={preparedDates?.end}
+              required
+            />
             <Button
               className="h-auto min-h-11 max-w-full whitespace-normal"
               ref={inspect}

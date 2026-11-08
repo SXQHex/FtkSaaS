@@ -1,4 +1,5 @@
 "use client";
+import { useDisplayMoney } from "../display-format";
 import { useId, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { FinanceView } from "@ftksaas/api-contracts";
@@ -6,7 +7,6 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { collectionCommand } from "../../lib/collection-command";
-import { effectMoney } from "../../lib/effect-money";
 import type { SetupCommand, SetupScope } from "../../lib/studio-setup";
 import type { useSetupCommand } from "../setup/setup-command";
 import { LocalTimeField } from "../programs/local-time-field";
@@ -22,6 +22,8 @@ export function CollectionForm({
   timeZone: string;
   command: ReturnType<typeof useSetupCommand>;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("finance"),
     locale = useLocale(),
     id = useId();

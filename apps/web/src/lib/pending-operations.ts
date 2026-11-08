@@ -1,3 +1,4 @@
+import { subscriptionWrites } from "./subscription-command";
 import { reportWrites } from "./report-command";
 import { automationWrites } from "./automation-command";
 import { eventWrites } from "./event-command";
@@ -37,7 +38,7 @@ export type PendingOperation = {
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
   event: eventWrites,
-  access: proAccessWrites,
+  access: [...proAccessWrites, ...subscriptionWrites],
   crm: crmWrites,
   automation: automationWrites,
   report: reportWrites.filter((op) => op.startsWith("report_")),
@@ -66,6 +67,19 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
   request: bookingWrites.filter((operation) => operation.startsWith("lesson_request_")),
 };
 function slotKind(slot: string): PendingOperation["kind"] | null {
+  if (
+    [
+      "subscription-renewal",
+      "subscription-payment",
+      "organization-close",
+      "organization-reopen",
+      "organization-delete",
+    ].includes(slot) ||
+    /^subscription-period:[^:]+$/.test(slot)
+  )
+    return "access";
+  if (slot === "settings-media:organization") return "settings";
+  if (/^settings-editor:(user|member|center|organization)$/.test(slot)) return "settings";
   if (/^email:(transactional|reminder)$/.test(slot)) return "settings";
   if (/^delivery:(user|member|center|organization)$/.test(slot)) return "settings";
   if (slot === "operating-settings:organization" || slot === "operating-settings:center")
@@ -176,6 +190,9 @@ export function discoverPendingOperations(actorId: string): PendingOperation[] |
         !slot.startsWith("automation-org:") &&
         !slot.startsWith("segment-org:") &&
         !/^delivery:(user|member|organization)$/.test(slot) &&
+        !/^settings-editor:(user|member|organization)$/.test(slot) &&
+        slot !== "settings-media:organization" &&
+        !["organization-close", "organization-reopen", "organization-delete"].includes(slot) &&
         !slot.startsWith("crm-application:") &&
         !slot.startsWith("subscription-")
       )

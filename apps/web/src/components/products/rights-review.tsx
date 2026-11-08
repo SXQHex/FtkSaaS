@@ -1,9 +1,10 @@
 "use client";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useDisplayMoney } from "../display-format";
 import { useEffect, useRef, useState } from "react";
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { ReservationProtectionPreview, SessionView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { effectMoney } from "../../lib/effect-money";
 import { errorKey } from "../setup/setup-command";
 export function RightsReview({
   result,
@@ -18,6 +19,8 @@ export function RightsReview({
   onApply: () => void;
   onBack: () => void;
 }) {
+  const effectMoney = useDisplayMoney();
+
   const t = useTranslations("rights"),
     errors = useTranslations("setup"),
     actions = useTranslations("program.action"),

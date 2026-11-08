@@ -1,5 +1,6 @@
 "use client";
-import { useFormatter, useTranslations } from "next-intl";
+import { useDisplayFormatter as useFormatter } from "../display-format";
+import { useTranslations } from "next-intl";
 import type { JobStatusView } from "@ftksaas/api-contracts";
 import { FlowError } from "../bookings/flow-controls";
 export function NotificationDelivery({ job }: { job: JobStatusView }) {
