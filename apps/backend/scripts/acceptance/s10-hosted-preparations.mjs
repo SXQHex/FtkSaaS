@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {restoreSettingsField} from './s10-hosted-sources.mjs';
 import {pathToFileURL} from 'node:url';
 import {newUuidV7 as key} from '../uuid.mjs';
 
@@ -20,24 +21,29 @@ export async function acceptPreparations({email,password,apikey,org,center,disci
  const denied=async(code,body)=>{
   await assert.rejects(()=>call('settings_preparation_resolve_v1',body),error=>error.message===code);
  };
- const restoreValue=async restore=>{
-  const current=await call('settings_get_v1',restore.scope);
-  if(JSON.stringify(current.values[restore.field])===JSON.stringify(restore.prior))return;
-  await call('settings_update_v1',{...restore.scope,expected_version:restore.version,patch:{[restore.field]:restore.prior}},key());
- };
+ const restoreValue=restore=>restoreSettingsField(restore,{read:scope=>call('settings_get_v1',scope),call});
  try{
   token=(await json('/auth/v1/token?grant_type=password',{email,password})).access_token;
   assert(token,'Native session required');
   const grants=[{permission:'attendance.draft',enabled:true},{permission:'sale.write',enabled:false}];
   const permission={key:'acceptance_'+key(),name:'Hosted acceptance preparation',grants};
   const agreement={key:'acceptance_'+key(),name:'Hosted acceptance agreement',discipline_id:discipline,format:'group',terms:{model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'25000'}],room_fee:{kind:'free',order:'after_instructor_share'}}};
-  for(const [field,template,kind] of [['permission_templates',permission,'permission'],['agreement_templates',agreement,'agreement']]){
+  const defaults={
+   program:{weekdays:[1,3],local_start:'10:00:00',duration_minutes:50,capacity:{total:8}},
+   event:{capacity:{nominal:20,maximum:20},terms:{fee_minor:'0',currency:'TRY',full_payment_required:false,allowed_product_version_ids:[],cancellation:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'consume'},refund:{method:'none'}}},
+   collection:{currency:'TRY',payment_method:'cash'},
+   crm:{source:'manual',interest:'Hosted explicit enquiry preparation'},
+   automation:{trigger:{kind:'student_inactive',offset_days:7},action:{kind:'create_followup',channel:'in_app',template_key:'crm_followup'}}
+  };
+  const cases=[['permission_templates',permission,'permission','permissions'],['agreement_templates',agreement,'agreement','agreements'],
+   ...Object.entries(defaults).map(([kind,defaults])=>[kind+'_templates',{key:'acceptance_'+key(),name:'Hosted '+kind+' preparation',defaults},kind,kind==='crm'?'crm':kind+'s'])];
+  for(const [field,template,kind,plural] of cases){
    phase=kind+' save';const scope={scope:'organization'};
    const before=await call('settings_get_v1',scope),prior=before.values[field];assert(Array.isArray(prior));
    const patch={[field]:[...prior,template]},saveKey=key();
    const save={...scope,expected_version:before.version,patch};
    // Register before the request: a timeout may happen after the server commits.
-   const restore={scope,field,prior,version:before.version+1};restores.push(restore);
+   const restore={q:scope,field,before,expected:patch[field],expectedInherited:false,expectedOverride:true};restores.push(restore);
    await call('settings_update_v1',save,saveKey);
    const saved=await call('settings_get_v1',scope);
    // Do not restore over another writer. All later commands use our saved version.
@@ -46,23 +52,22 @@ export async function acceptPreparations({email,password,apikey,org,center,disci
    assert.equal((await call('settings_update_v1',save,saveKey)).replayed,true);
    checks.push(kind+' saved, reread and replayed');
    phase=kind+' resolve';const catalog=await call('settings_catalog_get_v1',{scope:'center',center_id:center});
-   const source=catalog.preparation_templates[kind==='permission'?'permissions':'agreements'].find(item=>item.source.scope==='organization'&&item.template.key===template.key)?.source;
+   const source=catalog.preparation_templates[plural].find(item=>item.source.scope==='organization'&&item.template.key===template.key)?.source;
    assert(source,'Real organization source required');
    const resolve={center_id:center,kind,source};
    const proposal=await call('settings_preparation_resolve_v1',resolve);
-   assert.deepEqual(kind==='permission'?proposal.permission_requests:proposal.agreement_request,kind==='permission'?grants:{discipline_id:discipline,format:'group',terms:agreement.terms});
+   assert.deepEqual(kind==='permission'?proposal.permission_requests:kind==='agreement'?proposal.agreement_request:proposal.defaults,kind==='permission'?grants:kind==='agreement'?{discipline_id:discipline,format:'group',terms:agreement.terms}:template.defaults);
    await denied('VERSION_CONFLICT',{...resolve,source:{...source,version:source.version-1}});
    await denied('NOT_FOUND',{...resolve,source:{...source,key:'missing_'+key()}});
    checks.push(kind+' source resolved; stale and missing sources rejected');
    phase=kind+' restore';await restoreValue(restore);
    restores.pop();const after=await call('settings_get_v1',scope);assert.deepEqual(after.values[field],prior);
    await denied('VERSION_CONFLICT',resolve);
-   checks.push(kind+' prior value restored with a new version; old proposal rejected');
+   checks.push(kind+' prior value and local/default/inherited source restored; old proposal rejected');
   }
   phase='history';const history=await call('settings_history_get_v1',{scope:'organization'});
-  assert(history.items.some(item=>item.after.permission_templates?.some(value=>value.key===permission.key)));
-  assert(history.items.some(item=>item.after.agreement_templates?.some(value=>value.key===agreement.key)));
-  checks.push('immutable history contains both explicit preparations');
+  for(const [field,template] of cases)assert(history.items.some(item=>item.after[field]?.some(value=>value.key===template.key)));
+  checks.push('immutable history contains all seven explicit preparation families');
   return {status:'passed',checks};
  }catch{
   // Never include provider errors, locators, payloads or credentials in reports.

@@ -1,4 +1,5 @@
 // Existing registry shard. Native Auth -> Edge -> RPC plus real dedicated LOGIN sessions.
+import {eraseNativeAccount} from '../scripts/native-account-erasure.mjs';
 import test,{resources,step} from './p07-diagnostics.mjs';import assert from 'node:assert/strict';import {randomBytes} from 'node:crypto';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 test('P07 billing and privacy use live Auth, atomic receipts and scoped native workers',async t=>{
@@ -175,13 +176,53 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await db.query('delete from core.retention_holds where id=$1',[hold]);
    await assert.rejects(db.query('delete from private.settings_media_assets where id=$1',[foreign]),/INTEGRITY_VIOLATION/);
   });
+  await t.test('native principal deletion fences late holds and expired leases and rolls back provider failures',async()=>{
+   const c=await native('ftk_p07_privacy_worker',true),role=(await c.query('select session_user role')).rows[0].role;
+   const request=(await q('select request_id from private.p07_privacy_jobs where id=$1',[globalJob]))[0].request_id,hold=key();
+   await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[globalJob]);
+   const [entry]=await claim(c,true,null);assert.equal(entry.request.job_id,globalJob);
+   const prepare=async()=>(await c.query('select private.p07_auth_erasure_prepare($1) result',[entry.request])).rows[0].result;
+   assert.equal((await prepare()).state,'unbound');
+   await db.query('insert into private.account_auth_erasure_scopes(db_role,account_id,provider_origin) values($1,$2,$3)',[role,memberAccount.id,new URL(context().env.API_URL).origin]);
+   assert.equal((await prepare()).state,'ready');
+   const {env}=context(),endpoint=env.API_URL+'/auth/v1/admin/users/'+member.id;
+   const headers={apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'};
+   const remove=()=>fetch(endpoint,{method:'DELETE',headers,body:JSON.stringify({should_soft_delete:false}),signal:AbortSignal.timeout(15000)});
+   const nativeCounts=async()=>(await q('select (select count(*)::int from auth.users where id=$1) users,(select count(*)::int from auth.identities where user_id=$1) identities,(select count(*)::int from auth.sessions where user_id=$1) sessions,(select count(*)::int from auth.refresh_tokens where user_id=$1::text) refresh_tokens',[member.id]))[0];
+   const nativeBefore=await nativeCounts();assert(nativeBefore.sessions>0);assert(nativeBefore.refresh_tokens>0,'Real native login must exercise users -> sessions -> refresh_tokens cascades');
+   const rejected=async()=>{const r=await remove();assert.equal(r.ok,false,'Native provider must reject fenced deletion');await r.body?.cancel();assert.equal((await q('select count(*)::int n from auth.users where id=$1',[member.id]))[0].n,1);assert.deepEqual(await nativeCounts(),nativeBefore,'Rejected native deletion must roll back all Auth cascades');};
+   await db.query("insert into core.retention_holds(id,subject_table,subject_id,reason,authority_reference,review_at) values($1,'accounts',$2,'Synthetic late Auth hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,memberAccount.id]);
+   assert.equal((await prepare()).state,'held');await rejected();
+   await db.query('delete from core.retention_holds where id=$1',[hold]);
+   await db.query("update private.account_auth_erasure_permits set expires_at=clock_timestamp()-interval '1 second' where request_id=$1",[request]);await rejected();
+   assert.equal((await prepare()).state,'ready');
+   trigger='auth_erase_'+key().replaceAll('-','');triggerTable='private.account_auth_erasures';
+   await db.query(`create function private.${trigger}() returns trigger language plpgsql as $$begin if new.request_id='${request}'::uuid then raise exception using errcode='23514',message='synthetic late Auth proof';end if;return new;end$$`);
+   await db.query(`create trigger ${trigger} before insert on ${triggerTable} for each row execute function private.${trigger}()`);
+   await rejected();assert.equal((await q('select count(*)::int n from private.account_auth_erasures where request_id=$1',[request]))[0].n,0);
+   await db.query(`drop trigger ${trigger} on ${triggerTable}`);await db.query(`drop function private.${trigger}()`);trigger=null;
+   const result=await eraseNativeAccount({db:c,request:entry.request,apiUrl:env.API_URL,serviceKey:env.SERVICE_ROLE_KEY});assert.equal(result.state,'completed');
+   for(const table of ['users','identities','sessions','mfa_factors'])assert.equal((await q('select count(*)::int n from auth.'+table+' where '+(table==='users'?'id':'user_id')+'=$1',[member.id]))[0].n,0);
+   assert.equal((await q('select count(*)::int n from auth.refresh_tokens where user_id=$1',[member.id]))[0].n,0);
+   assert.equal((await q('select count(*)::int n from auth.users where id=$1',[owner.id]))[0].n,1);
+   const login=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:member.password}),signal:AbortSignal.timeout(15000)});assert.equal(login.ok,false);await login.body?.cancel();
+   assert.equal((await call(member,'account_get_v1')).result.ok,false);
+
+   const proof=await q('select * from private.account_auth_erasures where request_id=$1',[request]);assert.equal(proof.length,1);
+   assert.deepEqual(await eraseNativeAccount({db:c,request:entry.request,apiUrl:env.API_URL,serviceKey:env.SERVICE_ROLE_KEY}),{state:'completed'});
+   await assert.rejects(db.query('delete from private.account_auth_erasures where request_id=$1',[request]),/INTEGRITY_VIOLATION/);
+   assert.equal((await execute(c,entry,true)).ok,true);
+   const manifest=(await q('select scopes from private.p07_privacy_manifests where request_id=$1',[request]))[0].scopes;
+   assert.equal(manifest.auth.principal_erasure.state,'completed');assert.equal(manifest.auth.state,'pending');
+   assert.equal((await q('select state from core.privacy_requests where id=$1',[request]))[0].state,'partial');
+  });
  }finally{
   if(trigger){await db.query(`drop trigger if exists ${trigger} on ${triggerTable}`);await db.query(`drop function if exists private.${trigger}()`);}
   for(const c of clients)if(!c._ending)await c.end();
   for(const role of hostedRoles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await db.query(`alter role ${role} password null`);}
   await db.query("update private.ops_worker_health set enabled=false where lane in ('p07','p07_privacy')");
   // These roles only receive group membership. DROP ROLE rejects unexpected owned objects/direct grants.
-  for(const role of roles){await db.query('delete from private.account_profile_erasure_scopes where db_role=$1',[role]);await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await step('cleanup.drop-role',()=>db.query(`drop role ${role}`));}
+  for(const role of roles){await db.query('delete from private.account_auth_erasure_permits where db_role=$1',[role]);await db.query('delete from private.account_auth_erasure_scopes where db_role=$1',[role]);await db.query('delete from private.account_profile_erasure_scopes where db_role=$1',[role]);await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await step('cleanup.drop-role',()=>db.query(`drop role ${role}`));}
   await db.end();
  }
 });

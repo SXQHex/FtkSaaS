@@ -246,3 +246,7 @@ assert next(Path('supabase/migrations').glob('*_pro_workflow_preparations.sql'))
 assert next(Path('supabase/migrations').glob('*_account_privacy_execution.sql')).read_bytes()==Path('database/account-privacy-execution.sql').read_bytes(),'Account profile erasure source drift'
 
 assert next(Path('supabase/migrations').glob('*_account_privacy_active_surfaces.sql')).read_bytes()==Path('database/account-privacy-active-surfaces.sql').read_bytes(),'Active account privacy surfaces source drift'
+
+assert next(Path('supabase/migrations').glob('*_account_native_erasure.sql')).read_bytes()==Path('database/account-native-erasure.sql').read_bytes(),'Native principal erasure source drift'
+
+assert next(Path('supabase/migrations').glob('*_account_native_erasure_finalization.sql')).read_bytes()==Path('database/account-native-erasure-finalization.sql').read_bytes(),'Native principal finalization source drift'

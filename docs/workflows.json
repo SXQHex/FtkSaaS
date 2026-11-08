@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5097a1593a1f2654a59fa0093e575ce33f456b88ec8f7cc26fb69f3dd5a3e847",
-        "reason": "Read append-only migration139 and inventory/checker changes; public operation contracts unchanged"
+        "fingerprint": "464bc3c4bc3e5a2556f3dead490fd25caad5fe833ace5777db5dbf922dcd4012",
+        "reason": "141 append-only migration/source eşliği ve mevcut P07 import hash genişlemesi incelendi; API protokolü ve CI politikası korunuyor."
       }
     },
     {
@@ -1253,8 +1253,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "d0f91d4c44c4c9b36953eb1f64d65289aca4b811822533c25356e1c02295d964",
-        "reason": "Başarısız native Pro hazırlık testinde org ayarı değişince eski program kaynağı kullanıldığı doğrulandı. Güncel katalog kaynağıyla pozitif resolve ve Starter plan reddi, eski kaynakla VERSION_CONFLICT ayrı sınanır; rehber/runtime aynı kalır."
+        "fingerprint": "43229d97b09291bbfdb5e76d55953c0c4501984ac851021b25c1e8fb35cc58d8",
+        "reason": "Yedi hazırlığın geri alması ortak source-aware helpera bağlandı; default/inherited/local kaynak ve eşzamanlı writer korunuyor, normal reset regresyonu eklendi."
       }
     },
     {
@@ -1329,8 +1329,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "802b7c96af40f375ea779f6c1f5423efa1eab52c8572278aeffab2b8c35714be",
-        "reason": "Native fixture verifies retired Auth tables absent and preserves lifecycle worker success/failure assertions"
+        "fingerprint": "f12331b84b72e242d75d395eda5cb34ae5bf66e020d094e3380d274e534f88ce",
+        "reason": "Ortak P07 native lifecycle testi gerçek refresh satırı ve tam Auth rollback sayımlarıyla genişledi; mevcut abonelik assertionları korundu."
       }
     },
     {
@@ -1521,7 +1521,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/restore-guard.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql"
+        "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
+        "apps/backend/tests/native-account-erasure-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1566,7 +1567,12 @@
         "apps/backend/database/account-privacy-execution.sql",
         "apps/backend/database/account-privacy-active-surfaces.sql",
         "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql",
-        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql"
+        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql",
+        "apps/backend/database/account-native-erasure.sql",
+        "apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql",
+        "apps/backend/scripts/native-account-erasure.mjs",
+        "apps/backend/database/account-native-erasure-finalization.sql",
+        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1582,8 +1588,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "26ac771ddbd032d8ebfad8657c30ec3c4bf7b6f67c8e570cb195ace211c4f8c6",
-        "reason": "Read native Auth retirement migration: remove dropped intent tables from hold and purge targets, retain current authorization and scope"
+        "fingerprint": "6bfe9ce8589e6bc026fac465a33eeb2e31fddde3bbd1a26b8aa4327c9970156b",
+        "reason": "Auth nested FK cascade sonrası transaction sonu constraint proof incelendi; hold/lease kilitleri ve geç hatada atomic rollback korunuyor."
       }
     },
     {
@@ -1669,7 +1675,8 @@
         "apps/backend/tests/resend-webhook-unit.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/transactional-email-acceptance.mjs",
-        "apps/backend/tests/transactional-email-unit.mjs"
+        "apps/backend/tests/transactional-email-unit.mjs",
+        "apps/backend/tests/native-account-erasure-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1723,7 +1730,12 @@
         "apps/backend/database/account-privacy-execution.sql",
         "apps/backend/database/account-privacy-active-surfaces.sql",
         "apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql",
-        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql"
+        "apps/backend/supabase/migrations/20261108155000_account_privacy_active_surfaces.sql",
+        "apps/backend/database/account-native-erasure.sql",
+        "apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql",
+        "apps/backend/scripts/native-account-erasure.mjs",
+        "apps/backend/database/account-native-erasure-finalization.sql",
+        "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1738,8 +1750,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "aaef080b50c9e8282c7bd102d30e015bedb8e480c4ed5105db6c362e00519edd",
-        "reason": "Verified dedicated worker claim execute with DROP migration and139: hold late-failure rollback140bytes foreign preservation receipt replay"
+        "fingerprint": "dcdf712239b48bcf208d8f56c1f771f3b69038a2e0506ba182039d9bc127b1cd",
+        "reason": "Native principal proof normal AFTER yerine transaction sonunda ertelendi; aynı dedicated claim ve origin/instance/scope sınırları değişmedi."
       }
     }
   ]

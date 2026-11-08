@@ -19,3 +19,13 @@ test('explicit restoration uses the guarded version and never adopts a subsequen
  await assert.rejects(restoreSettingsField(local,{read:async()=>{reads++;return {...checked,version:reads===1?3:4,inherited_fields:{},overridden_fields:['permission_templates']};},call:async(op,body)=>{assert.equal(op,'settings_update_v1');version=body.expected_version;throw Error('VERSION_CONFLICT');}}),/VERSION_CONFLICT/);
  assert.equal(reads,1);assert.equal(version,3);
 });
+
+test('default preparation restoration resets the local override and verifies its source',async()=>{
+ const source={q:{scope:'organization'},field:'program_templates',before:{values:{program_templates:[]},inherited_fields:{},overridden_fields:[]},expected:[{key:'probe'}],expectedInherited:false,expectedOverride:true};
+ let view={version:8,values:{program_templates:source.expected},inherited_fields:{},overridden_fields:['program_templates']},calls=[];
+ await restoreSettingsField(source,{read:async()=>structuredClone(view),call:async(op,body)=>{
+  calls.push(op);if(op==='settings_reset_preview_v1')return {version:8,before:view.values,id:'synthetic',token:'synthetic'};
+  assert.equal(op,'settings_reset_apply_v1');assert.equal(body.expected_version,8);view={...view,version:9,values:{program_templates:[]},overridden_fields:[]};
+ }});
+ assert.deepEqual(calls,['settings_reset_preview_v1','settings_reset_apply_v1']);assert.equal(view.overridden_fields.length,0);
+});

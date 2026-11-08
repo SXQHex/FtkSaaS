@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `2815cb40fb48f6bb753ce92dd97c88a68ad9b55a4ab0ce4e0433cf17b063b775`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `2bdaa195d16aac605fdf4a2849019eda459e653e8498cdbd55b4e2357cce9c8b`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -9,6 +9,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | Güvenlik kaynağı | SHA256 |
 |---|---|
 | [account-identity-projection.sql](../apps/backend/database/account-identity-projection.sql) | `a04d73dca3c04b224c287447fd1f6639604a5a4c9caa76571b7348f271c9fe21` |
+| [account-native-erasure.sql](../apps/backend/database/account-native-erasure.sql) | `00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999` |
 | [account-privacy-execution.sql](../apps/backend/database/account-privacy-execution.sql) | `46667d30d393d97449ab4d396115f1fa6ef6d5a20e8b8a211f029dcca4c20996` |
 | [account-self-context.sql](../apps/backend/database/account-self-context.sql) | `872412f23bbdd60f61be0c1a5b1e3c7406b26e85f458682fbb6c9601696cc859` |
 | [account-session-management-wrappers.sql](../apps/backend/database/account-session-management-wrappers.sql) | `59e8b222734d07b32d237b5faed565498951d177a09e8c6e24c42f3c14266e17` |
@@ -301,3 +302,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261108033820_digital_agreement_acceptance.sql](../apps/backend/supabase/migrations/20261108033820_digital_agreement_acceptance.sql) | `c2cad8eea1cf351df193889fd3359342fb9ca3e446dcefc0db2b6460039c8137` |
 | [20261108034041_pro_workflow_preparations.sql](../apps/backend/supabase/migrations/20261108034041_pro_workflow_preparations.sql) | `e99a64160476e3060d9b5d7b7b96d47dde833701b9299b0b484f9dfbd71676ed` |
 | [20261108100733_account_privacy_execution.sql](../apps/backend/supabase/migrations/20261108100733_account_privacy_execution.sql) | `46667d30d393d97449ab4d396115f1fa6ef6d5a20e8b8a211f029dcca4c20996` |
+| [20261108160000_account_native_erasure.sql](../apps/backend/supabase/migrations/20261108160000_account_native_erasure.sql) | `00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999` |
