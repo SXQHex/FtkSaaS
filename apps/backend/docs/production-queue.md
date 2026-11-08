@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** Frontend'i bekleten [XREQ-027](../../../docs/requests.md#xreq-027) CM olmayan Owner kaynak keşfi, mevcut kaynak dalı incelenip güncel main ile birleştirilerek aday kabulüne hazırlanır; S10 bildirim dili tüketicisi aynı pakettedir. [Kaynak/test/ortam ayrımı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi). S15 hosted backend kabulü kapalıdır. Sonraki bağımsız backend işi S10'un diğer69 grup alt alanları; doğal süre/posta gerektiren S08 ve ortak kurulum bekleyen S14 ayrı açık kalır. Frontend işleri bu sıraya alınmaz.
+**Aktif paket:** Kullanıcının frontend talepleri, S10 ayarları, PR256 gerçek ortam ve S08 hesap/güvenlik doğrulaması talimatı yürütülür; teslim edilmiş kaynak yeniden kurulmaz. Bildirim dili/çeviri [XREQ-033](../../../docs/requests.md#xreq-033) ile frontend’e devredildi ve backend dil geliştirmesi/ayrı dil kabulü sırasından çıkarıldı. PR256 kaynak/test/ortam ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi), açık backend işleri [backlog](remaining-work.md#s10) sahibindedir. S15 hosted backend kabulü kapalıdır; doğal süre/posta gerektiren S08 ve ortak kurulum bekleyen S14 ayrı açık kalır.
 
 ## Uygulama sırası
 
