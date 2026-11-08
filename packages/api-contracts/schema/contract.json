@@ -16416,6 +16416,9 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_disciplines": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -23902,6 +23905,9 @@
         },
         "state": {
           "$ref": "#/$defs/RecordState"
+        },
+        "presentation": {
+          "$ref": "#/$defs/DisciplinePresentation"
         }
       },
       "required": [
@@ -23910,7 +23916,8 @@
         "version",
         "org_id",
         "name",
-        "state"
+        "state",
+        "presentation"
       ],
       "additionalProperties": false
     },
@@ -23937,6 +23944,9 @@
         },
         "state": {
           "$ref": "#/$defs/RecordState"
+        },
+        "presentation": {
+          "$ref": "#/$defs/CenterDisciplinePresentation"
         }
       },
       "required": [
@@ -23946,7 +23956,8 @@
         "org_id",
         "center_id",
         "discipline_id",
-        "state"
+        "state",
+        "presentation"
       ],
       "additionalProperties": false
     },
@@ -24014,6 +24025,9 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "presentation": {
+          "$ref": "#/$defs/DisciplinePresentationView"
         }
       },
       "required": [
@@ -24064,6 +24078,19 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_presentation": {
+          "type": "boolean"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -24127,6 +24154,9 @@
         },
         "expected_version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "presentation": {
+          "$ref": "#/$defs/DisciplinePresentationPatch"
         }
       },
       "required": [
@@ -24185,6 +24215,9 @@
         },
         "expected_version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "presentation": {
+          "$ref": "#/$defs/CenterDisciplinePresentationPatch"
         }
       },
       "required": [
@@ -50546,6 +50579,13 @@
         },
         "brand_colors": {
           "$ref": "#/$defs/OrganizationBrandColors"
+        },
+        "disciplines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PublicDisciplinePresentation"
+          },
+          "maxItems": 200
         }
       },
       "required": [],
@@ -55463,6 +55503,262 @@
           ]
         }
       }
+    },
+    "DisciplinePresentation": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_order": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "public_visible": {
+          "type": "boolean"
+        },
+        "allow_center_description": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "description",
+        "color",
+        "icon",
+        "display_order",
+        "public_visible",
+        "allow_center_description"
+      ],
+      "additionalProperties": false
+    },
+    "DisciplinePresentationPatch": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_order": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "public_visible": {
+          "type": "boolean"
+        },
+        "allow_center_description": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "CenterDisciplinePresentation": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "public_visible": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "description",
+        "public_visible"
+      ],
+      "additionalProperties": false
+    },
+    "CenterDisciplinePresentationPatch": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "public_visible": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "DisciplinePresentationView": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "$ref": "#/$defs/DisciplinePresentation"
+        },
+        "center": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "state": {
+                  "$ref": "#/$defs/RecordState"
+                },
+                "version": {
+                  "$ref": "#/$defs/PositiveInt"
+                },
+                "presentation": {
+                  "$ref": "#/$defs/CenterDisciplinePresentation"
+                }
+              },
+              "required": [
+                "id",
+                "state",
+                "version",
+                "presentation"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "organization",
+        "center"
+      ],
+      "additionalProperties": false
+    },
+    "PublicDisciplinePresentation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_order": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "color",
+        "icon",
+        "display_order"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -74758,7 +75054,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_public_calendar_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "include_disciplines opt-in exposes only active explicitly public metadata inside enabled profiles. Center visibility narrows organization visibility; bounded 200 items/2MiB rejects overflow without truncation."
+        ]
       },
       {
         "name": "public_application_submit_v1",
@@ -78037,7 +78336,8 @@
         "runtime_rpc": "api_v1.disciplines_list_v1",
         "runtime_limits": [
           "Pagination supports created_at_asc; cursor is bound to request scope.",
-          "Only org readers or center managers; managers receive active disciplines actively offered by their accessible assigned centers."
+          "Only org readers or center managers; managers receive active disciplines actively offered by their accessible assigned centers.",
+          "include_presentation opt-in adds organization/local metadata and actual local relationship version; optional center_id narrows the authorized page. Legacy requests retain their original response shape and ordering."
         ],
         "required_features": [
           "F01"
@@ -78143,7 +78443,9 @@
         "runtime_rpc": "api_v1.discipline_save_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/discipline_save_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "Optional presentation patch preserves unspecified metadata; existing organization discipline identity, scope/version/idempotency and lifecycle rules remain authoritative."
+        ],
         "required_features": [
           "F01"
         ],
@@ -78250,7 +78552,9 @@
         "runtime_rpc": "api_v1.center_discipline_set_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/center_discipline_set_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "Optional local presentation only permits description/public_visible; writing description requires the organization discipline allow_center_description flag. No organization metadata or operational scope is granted."
+        ],
         "required_features": [
           "F01"
         ],
@@ -92926,7 +93230,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Table_retention_holds/properties/org_id",
+        "path": "#/$defs/Table_retention_holds/properties/org_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -99572,6 +99876,24 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_disciplines_list/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DisciplinePresentationView/properties/center/anyOf/0/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PublicDisciplinePresentation/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -100025,7 +100347,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 143,
+      "migration_count": 144,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
