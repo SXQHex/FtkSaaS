@@ -161,9 +161,11 @@ Deno.serve(async req=>{
    }
    if(operation==='document_requirements_get_v1'&&request.content_file_id){
     const item=result.data.find((x:any)=>x.file.id===request.content_file_id);if(!item)return failure('NOT_FOUND',404);
+    if(!item.digital_content){
     const file=await storage.download(request.org_id+'/'+item.file.id);if(file.checksum!==item.content_hash)return failure('INTEGRITY_VIOLATION',500);
     let raw='';for(let i=0;i<file.bytes.length;i+=8192)raw+=String.fromCharCode(...file.bytes.slice(i,i+8192));
     item.content={mime:file.mime,encoding:'base64',data:btoa(raw)};
+    }
    }
    if(operation==='calendar_links_get_v1'){
     let ready=false;try{calendarOrigin(Deno.env.get('FTK_CALENDAR_ORIGIN'));calendarAppUrl(Deno.env.get('FTK_CALENDAR_SESSION_URL_TEMPLATE'),'00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000');ready=/^[a-f0-9]{64}$/.test(Deno.env.get('FTK_CALENDAR_SIGNING_KEY')??'');}catch{ready=false;}

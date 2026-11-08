@@ -921,7 +921,9 @@
         "settings_preparation_resolve_v1",
         "account_signup_check_v1",
         "role_revoke_preview_v1",
-        "subscription_period_change_request_v1"
+        "subscription_period_change_request_v1",
+        "instructor_agreement_get_v1",
+        "instructor_agreement_accept_v1"
       ]
     },
     "EntityType": {
@@ -5190,6 +5192,19 @@
             "data"
           ],
           "additionalProperties": false
+        },
+        "content_kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "digital"
+          ]
+        },
+        "digital_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        },
+        "digital_acceptance": {
+          "$ref": "#/$defs/DigitalDocumentAcceptance"
         }
       },
       "required": [
@@ -16073,6 +16088,9 @@
         },
         "impact_approval": {
           "$ref": "#/$defs/DocumentImpactApproval"
+        },
+        "digital_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
         }
       },
       "required": [
@@ -16080,12 +16098,33 @@
         "request_id",
         "org_id",
         "operation_key",
-        "file_id",
         "version_label",
         "requirements",
         "scope"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "file_id"
+          ],
+          "not": {
+            "required": [
+              "digital_content"
+            ]
+          }
+        },
+        {
+          "required": [
+            "digital_content"
+          ],
+          "not": {
+            "required": [
+              "file_id"
+            ]
+          }
+        }
+      ]
     },
     "Success_document_version_publish": {
       "type": "object",
@@ -16200,6 +16239,13 @@
         },
         "context": {
           "$ref": "#/$defs/AcceptanceContext"
+        },
+        "displayed_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        },
+        "displayed_content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "required": [
@@ -16210,7 +16256,33 @@
         "document_version_id",
         "context"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "displayed_content"
+            ]
+          },
+          "then": {
+            "required": [
+              "displayed_content_hash"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "displayed_content_hash"
+            ]
+          },
+          "then": {
+            "required": [
+              "displayed_content"
+            ]
+          }
+        }
+      ]
     },
     "Success_document_accept": {
       "type": "object",
@@ -35171,6 +35243,9 @@
             },
             "context": {
               "$ref": "#/$defs/AcceptanceContext"
+            },
+            "digital_acceptance": {
+              "$ref": "#/$defs/DigitalDocumentAcceptance"
             }
           },
           "required": [],
@@ -36463,6 +36538,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_subscription_period_change_request_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_instructor_agreement_accept_v1"
         }
       ]
     },
@@ -36622,7 +36700,8 @@
         "settings_reset_apply_v1",
         "reservation_capacity_override_v1",
         "role_revoke_preview_v1",
-        "subscription_period_change_request_v1"
+        "subscription_period_change_request_v1",
+        "instructor_agreement_accept_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -41092,6 +41171,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_subscription_period_change_request_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_instructor_agreement_accept_v1"
         }
       ]
     },
@@ -43243,18 +43325,42 @@
         },
         "scope": {
           "$ref": "#/$defs/ConfigurationScope"
+        },
+        "digital_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "org_id",
-        "file_id",
         "version_label",
         "requirements",
         "scope"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "file_id"
+          ],
+          "not": {
+            "required": [
+              "digital_content"
+            ]
+          }
+        },
+        {
+          "required": [
+            "digital_content"
+          ],
+          "not": {
+            "required": [
+              "file_id"
+            ]
+          }
+        }
+      ]
     },
     "DocumentImpactApproval": {
       "type": "object",
@@ -44724,6 +44830,490 @@
           "items": {
             "$ref": "#/$defs/PermissionPreparationTemplate"
           }
+        },
+        "program_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "weekdays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 7
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "local_start": {
+                    "type": "string",
+                    "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                  },
+                  "duration_minutes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "capacity": {
+                    "type": "object",
+                    "properties": {
+                      "total": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "categories": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "male": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "female": {
+                                "type": "integer",
+                                "minimum": 0
+                              }
+                            },
+                            "required": [
+                              "male",
+                              "female"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "total"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "weekdays",
+                  "local_start",
+                  "duration_minutes",
+                  "capacity"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "event_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "capacity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "nominal": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maximum": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "nominal",
+                          "maximum"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "unlimited",
+                            "enum": [
+                              "unlimited"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "terms": {
+                    "type": "object",
+                    "properties": {
+                      "fee_minor": {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]{0,18})$",
+                        "x-validation": "int(value)<=9223372036854775807"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                      },
+                      "full_payment_required": {
+                        "type": "boolean"
+                      },
+                      "allowed_product_version_ids": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/FtkUuid"
+                        }
+                      },
+                      "cancellation": {
+                        "type": "object",
+                        "properties": {
+                          "cutoff_minutes": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "before_cutoff": {
+                            "enum": [
+                              "release",
+                              "consume"
+                            ],
+                            "type": "string"
+                          },
+                          "after_cutoff": {
+                            "enum": [
+                              "release",
+                              "consume"
+                            ],
+                            "type": "string"
+                          },
+                          "no_show": {
+                            "enum": [
+                              "release",
+                              "consume"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "before_cutoff",
+                          "after_cutoff",
+                          "no_show"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "refund": {
+                        "type": "object",
+                        "properties": {
+                          "method": {
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "credit_ratio",
+                              "used_at_unit_price",
+                              "time_ratio"
+                            ]
+                          },
+                          "used_unit_minor": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]{0,18})$",
+                                "x-validation": "int(value)<=9223372036854775807"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "method"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "package_usage": {
+                        "enum": [
+                          "consume",
+                          "eligibility_only"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "fee_minor",
+                      "currency",
+                      "full_payment_required",
+                      "allowed_product_version_ids",
+                      "cancellation",
+                      "refund"
+                    ],
+                    "additionalProperties": false,
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "package_usage": {
+                              "const": "eligibility_only",
+                              "enum": [
+                                "eligibility_only"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "package_usage"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "fee_minor": {
+                              "const": "0",
+                              "enum": [
+                                "0"
+                              ],
+                              "type": "string"
+                            },
+                            "allowed_product_version_ids": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "capacity",
+                  "terms"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "collection_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "card_pos"
+                    ]
+                  }
+                },
+                "required": [
+                  "currency",
+                  "payment_method"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "crm_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "interest": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                },
+                "required": [
+                  "source",
+                  "interest"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "automation_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "trigger": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "entitlement_expiring",
+                          "student_inactive",
+                          "lead_followup_due"
+                        ],
+                        "type": "string"
+                      },
+                      "offset_days": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "offset_days"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "action": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "create_followup",
+                          "send_reminder"
+                        ],
+                        "type": "string"
+                      },
+                      "channel": {
+                        "const": "in_app",
+                        "type": "string",
+                        "enum": [
+                          "in_app"
+                        ]
+                      },
+                      "template_key": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "channel",
+                      "template_key"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "trigger",
+                  "action"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
         }
       },
       "required": [],
@@ -45448,6 +46038,490 @@
         },
         "security_policy": {
           "$ref": "#/$defs/OrganizationSecurityPolicy"
+        },
+        "program_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "weekdays": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 7
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "local_start": {
+                    "type": "string",
+                    "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                  },
+                  "duration_minutes": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "capacity": {
+                    "type": "object",
+                    "properties": {
+                      "total": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "categories": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "male": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "female": {
+                                "type": "integer",
+                                "minimum": 0
+                              }
+                            },
+                            "required": [
+                              "male",
+                              "female"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "total"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "weekdays",
+                  "local_start",
+                  "duration_minutes",
+                  "capacity"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "event_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "capacity": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "nominal": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "maximum": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "nominal",
+                          "maximum"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "unlimited",
+                            "enum": [
+                              "unlimited"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "terms": {
+                    "type": "object",
+                    "properties": {
+                      "fee_minor": {
+                        "type": "string",
+                        "pattern": "^(0|[1-9][0-9]{0,18})$",
+                        "x-validation": "int(value)<=9223372036854775807"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                      },
+                      "full_payment_required": {
+                        "type": "boolean"
+                      },
+                      "allowed_product_version_ids": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/FtkUuid"
+                        }
+                      },
+                      "cancellation": {
+                        "type": "object",
+                        "properties": {
+                          "cutoff_minutes": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "before_cutoff": {
+                            "enum": [
+                              "release",
+                              "consume"
+                            ],
+                            "type": "string"
+                          },
+                          "after_cutoff": {
+                            "enum": [
+                              "release",
+                              "consume"
+                            ],
+                            "type": "string"
+                          },
+                          "no_show": {
+                            "enum": [
+                              "release",
+                              "consume"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "before_cutoff",
+                          "after_cutoff",
+                          "no_show"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "refund": {
+                        "type": "object",
+                        "properties": {
+                          "method": {
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "credit_ratio",
+                              "used_at_unit_price",
+                              "time_ratio"
+                            ]
+                          },
+                          "used_unit_minor": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "pattern": "^(0|[1-9][0-9]{0,18})$",
+                                "x-validation": "int(value)<=9223372036854775807"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "method"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "package_usage": {
+                        "enum": [
+                          "consume",
+                          "eligibility_only"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "fee_minor",
+                      "currency",
+                      "full_payment_required",
+                      "allowed_product_version_ids",
+                      "cancellation",
+                      "refund"
+                    ],
+                    "additionalProperties": false,
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "package_usage": {
+                              "const": "eligibility_only",
+                              "enum": [
+                                "eligibility_only"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "package_usage"
+                          ]
+                        },
+                        "then": {
+                          "properties": {
+                            "fee_minor": {
+                              "const": "0",
+                              "enum": [
+                                "0"
+                              ],
+                              "type": "string"
+                            },
+                            "allowed_product_version_ids": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "capacity",
+                  "terms"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "collection_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "card_pos"
+                    ]
+                  }
+                },
+                "required": [
+                  "currency",
+                  "payment_method"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "crm_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "interest": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                },
+                "required": [
+                  "source",
+                  "interest"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
+        },
+        "automation_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "defaults": {
+                "type": "object",
+                "properties": {
+                  "trigger": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "entitlement_expiring",
+                          "student_inactive",
+                          "lead_followup_due"
+                        ],
+                        "type": "string"
+                      },
+                      "offset_days": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "offset_days"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "action": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "create_followup",
+                          "send_reminder"
+                        ],
+                        "type": "string"
+                      },
+                      "channel": {
+                        "const": "in_app",
+                        "type": "string",
+                        "enum": [
+                          "in_app"
+                        ]
+                      },
+                      "template_key": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "channel",
+                      "template_key"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "trigger",
+                  "action"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "defaults"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 100
         }
       },
       "required": [],
@@ -45506,74 +46580,7 @@
         "logo": {},
         "preparation_sources": {},
         "inherited_fields": {
-          "type": "object",
-          "properties": {
-            "report_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            },
-            "import_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            },
-            "agreement_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            },
-            "permission_templates": {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "const": "organization_inherited"
-                },
-                "organization_version": {
-                  "$ref": "#/$defs/SettingsVersion"
-                }
-              },
-              "required": [
-                "kind",
-                "organization_version"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "additionalProperties": false
+          "$ref": "#/$defs/SettingsTemplateInheritanceSources"
         }
       },
       "required": [
@@ -45732,7 +46739,12 @@
                   "payment_reminders_enabled",
                   "payment_reminder_days",
                   "agreement_templates",
-                  "permission_templates"
+                  "permission_templates",
+                  "program_templates",
+                  "event_templates",
+                  "collection_templates",
+                  "crm_templates",
+                  "automation_templates"
                 ]
               },
               "uniqueItems": true,
@@ -45762,74 +46774,7 @@
               "$ref": "#/$defs/PreparationSources"
             },
             "inherited_fields": {
-              "type": "object",
-              "properties": {
-                "report_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                },
-                "import_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                },
-                "agreement_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                },
-                "permission_templates": {
-                  "type": "object",
-                  "properties": {
-                    "kind": {
-                      "const": "organization_inherited"
-                    },
-                    "organization_version": {
-                      "$ref": "#/$defs/SettingsVersion"
-                    }
-                  },
-                  "required": [
-                    "kind",
-                    "organization_version"
-                  ],
-                  "additionalProperties": false
-                }
-              },
-              "additionalProperties": false
+              "$ref": "#/$defs/SettingsTemplateInheritanceSources"
             }
           },
           "required": [
@@ -45861,26 +46806,26 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "accent_color",
+                  "description",
                   "address",
-                  "availability_templates",
+                  "contact_phone",
+                  "contact_email",
+                  "theme_package_id",
+                  "font_package_id",
+                  "billing_name",
                   "billing_address",
                   "billing_email",
-                  "billing_name",
-                  "contact_email",
-                  "contact_phone",
-                  "description",
-                  "font_package_id",
-                  "import_templates",
-                  "package_templates",
-                  "primary_color",
                   "program_duration_minutes",
+                  "report_templates",
+                  "import_templates",
+                  "public_profile_enabled",
                   "public_fields",
                   "public_hours",
-                  "public_profile_enabled",
-                  "report_templates",
+                  "availability_templates",
+                  "package_templates",
+                  "primary_color",
                   "secondary_color",
-                  "theme_package_id",
+                  "accent_color",
                   "lesson_reminders_enabled",
                   "lesson_reminder_hours",
                   "package_reminders_enabled",
@@ -45891,7 +46836,12 @@
                   "agreement_templates",
                   "permission_templates",
                   "regional_defaults",
-                  "security_policy"
+                  "security_policy",
+                  "program_templates",
+                  "event_templates",
+                  "collection_templates",
+                  "crm_templates",
+                  "automation_templates"
                 ]
               },
               "uniqueItems": true,
@@ -46202,7 +47152,7 @@
           ]
         },
         "catalog_version": {
-          "const": 17
+          "const": 18
         },
         "fields": {
           "type": "array",
@@ -46254,7 +47204,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 17
+              "const": 18
             }
           },
           "required": [
@@ -46272,7 +47222,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 17
+              "const": 18
             }
           },
           "required": [
@@ -46290,7 +47240,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 17
+              "const": 18
             }
           },
           "required": [
@@ -46308,7 +47258,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 17
+              "const": 18
             }
           },
           "required": [
@@ -46326,7 +47276,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 17
+              "const": 18
             }
           },
           "required": [
@@ -46677,19 +47627,7 @@
           "$ref": "#/$defs/SettingsHistorySource"
         },
         "inherit_fields": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "report_templates",
-              "import_templates",
-              "agreement_templates",
-              "permission_templates"
-            ]
-          },
-          "minItems": 1,
-          "maxItems": 4,
-          "uniqueItems": true
+          "$ref": "#/$defs/SettingsInheritedTemplateFields"
         }
       },
       "required": [
@@ -46786,19 +47724,7 @@
               "$ref": "#/$defs/SettingsHistorySource"
             },
             "inherit_fields": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "report_templates",
-                  "import_templates",
-                  "agreement_templates",
-                  "permission_templates"
-                ]
-              },
-              "minItems": 1,
-              "maxItems": 4,
-              "uniqueItems": true
+              "$ref": "#/$defs/SettingsInheritedTemplateFields"
             }
           },
           "required": [
@@ -50374,6 +51300,26 @@
             "kind"
           ],
           "additionalProperties": false
+        },
+        "program_templates": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "system_default",
+                "organization_copy",
+                "center_local"
+              ]
+            },
+            "organization_version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -50467,6 +51413,101 @@
             ],
             "additionalProperties": false
           }
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/ProProgramPreparation"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/ProEventPreparation"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/ProCollectionPreparation"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "crm": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/ProCrmPreparation"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "automations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/ProAutomationPreparation"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
@@ -50497,7 +51538,12 @@
             "availability",
             "package",
             "agreement",
-            "permission"
+            "permission",
+            "program",
+            "event",
+            "collection",
+            "crm",
+            "automation"
           ]
         },
         "source": {
@@ -50541,7 +51587,12 @@
               "enum": [
                 "package",
                 "agreement",
-                "permission"
+                "permission",
+                "program",
+                "event",
+                "collection",
+                "crm",
+                "automation"
               ]
             }
           },
@@ -50697,6 +51748,217 @@
             "kind",
             "source",
             "permission_requests"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "program"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "weekdays": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 7
+                  },
+                  "uniqueItems": true,
+                  "minItems": 1
+                },
+                "local_start": {
+                  "type": "string",
+                  "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                },
+                "duration_minutes": {
+                  "$ref": "#/$defs/PositiveInt"
+                },
+                "capacity": {
+                  "$ref": "#/$defs/SessionCapacity"
+                }
+              },
+              "required": [
+                "weekdays",
+                "local_start",
+                "duration_minutes",
+                "capacity"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "event"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "capacity": {
+                  "$ref": "#/$defs/EventCapacity"
+                },
+                "terms": {
+                  "$ref": "#/$defs/EventTerms"
+                }
+              },
+              "required": [
+                "capacity",
+                "terms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "collection"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "$ref": "#/$defs/Currency"
+                },
+                "payment_method": {
+                  "type": "string",
+                  "enum": [
+                    "cash",
+                    "bank_transfer",
+                    "card_pos"
+                  ]
+                }
+              },
+              "required": [
+                "currency",
+                "payment_method"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "crm"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "interest": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "source",
+                "interest"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "automation"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "trigger": {
+                  "$ref": "#/$defs/AutomationTrigger"
+                },
+                "action": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "create_followup",
+                        "send_reminder"
+                      ]
+                    },
+                    "channel": {
+                      "const": "in_app",
+                      "type": "string"
+                    },
+                    "template_key": {
+                      "$ref": "#/$defs/Text"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "channel",
+                    "template_key"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "trigger",
+                "action"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "defaults"
           ],
           "additionalProperties": false
         }
@@ -52771,7 +54033,12 @@
         "payment_reminders_enabled",
         "payment_reminder_days",
         "agreement_templates",
-        "permission_templates"
+        "permission_templates",
+        "program_templates",
+        "event_templates",
+        "collection_templates",
+        "crm_templates",
+        "automation_templates"
       ]
     },
     "OrganizationSettingsFieldKey": {
@@ -52806,7 +54073,12 @@
         "reminder_center_overrides_enabled",
         "agreement_templates",
         "permission_templates",
-        "regional_defaults"
+        "regional_defaults",
+        "program_templates",
+        "event_templates",
+        "collection_templates",
+        "crm_templates",
+        "automation_templates"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -52889,7 +54161,12 @@
         "permission_templates",
         "regional_defaults",
         "regional_defaults",
-        "security_policy"
+        "security_policy",
+        "program_templates",
+        "event_templates",
+        "collection_templates",
+        "crm_templates",
+        "automation_templates"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -53464,6 +54741,630 @@
         "secondary_color",
         "accent_color"
       ],
+      "additionalProperties": false
+    },
+    "DigitalDocumentContent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "language": {
+          "type": "string",
+          "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$",
+          "maxLength": 35
+        },
+        "template_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "template_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 262144
+        }
+      },
+      "required": [
+        "name",
+        "language",
+        "template_id",
+        "template_version",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "DigitalDocumentAcceptance": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "accepted_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "displayed_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        }
+      },
+      "required": [
+        "id",
+        "account_id",
+        "person_id",
+        "accepted_at",
+        "content_hash",
+        "source_content_hash",
+        "displayed_content"
+      ],
+      "additionalProperties": false
+    },
+    "Request_instructor_agreement_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "agreement_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "agreement_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_instructor_agreement_accept": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "agreement_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "source_content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "displayed_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        },
+        "displayed_content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "operation_key",
+        "agreement_id",
+        "expected_version",
+        "source_content_hash",
+        "displayed_content",
+        "displayed_content_hash"
+      ],
+      "additionalProperties": false
+    },
+    "DigitalAgreementAcceptance": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "accepted_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "displayed_content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        },
+        "agreement_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "id",
+        "account_id",
+        "person_id",
+        "accepted_at",
+        "content_hash",
+        "source_content_hash",
+        "displayed_content",
+        "agreement_id"
+      ],
+      "additionalProperties": false
+    },
+    "DigitalAgreementView": {
+      "type": "object",
+      "properties": {
+        "agreement": {
+          "$ref": "#/$defs/AgreementVersionView"
+        },
+        "source_content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "acceptance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DigitalAgreementAcceptance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "agreement",
+        "source_content_hash",
+        "acceptance"
+      ],
+      "additionalProperties": false
+    },
+    "Success_instructor_agreement_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/DigitalAgreementView"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_instructor_agreement_accept": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ProProgramPreparation": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "weekdays": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 7
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            },
+            "local_start": {
+              "type": "string",
+              "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+            },
+            "duration_minutes": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "capacity": {
+              "$ref": "#/$defs/SessionCapacity"
+            }
+          },
+          "required": [
+            "weekdays",
+            "local_start",
+            "duration_minutes",
+            "capacity"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "defaults"
+      ],
+      "additionalProperties": false
+    },
+    "ProEventPreparation": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "capacity": {
+              "$ref": "#/$defs/EventCapacity"
+            },
+            "terms": {
+              "$ref": "#/$defs/EventTerms"
+            }
+          },
+          "required": [
+            "capacity",
+            "terms"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "defaults"
+      ],
+      "additionalProperties": false
+    },
+    "ProCollectionPreparation": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "$ref": "#/$defs/Currency"
+            },
+            "payment_method": {
+              "type": "string",
+              "enum": [
+                "cash",
+                "bank_transfer",
+                "card_pos"
+              ]
+            }
+          },
+          "required": [
+            "currency",
+            "payment_method"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "defaults"
+      ],
+      "additionalProperties": false
+    },
+    "ProCrmPreparation": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "interest": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "source",
+            "interest"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "defaults"
+      ],
+      "additionalProperties": false
+    },
+    "ProAutomationPreparation": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "defaults": {
+          "type": "object",
+          "properties": {
+            "trigger": {
+              "$ref": "#/$defs/AutomationTrigger"
+            },
+            "action": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "create_followup",
+                    "send_reminder"
+                  ]
+                },
+                "channel": {
+                  "const": "in_app",
+                  "type": "string"
+                },
+                "template_key": {
+                  "$ref": "#/$defs/Text"
+                }
+              },
+              "required": [
+                "kind",
+                "channel",
+                "template_key"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "trigger",
+            "action"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "defaults"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_instructor_agreement_accept_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "instructor_agreement_accept_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "agreement_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "agreement_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_instructor_agreement_accept_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "instructor_agreement_accept_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "agreement_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "source_content_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "agreement_id",
+            "source_content_hash"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsInheritedTemplateFields": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "report_templates",
+          "import_templates",
+          "agreement_templates",
+          "permission_templates",
+          "event_templates",
+          "collection_templates",
+          "crm_templates",
+          "automation_templates"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true
+    },
+    "SettingsTemplateInheritanceSource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "organization_inherited"
+        },
+        "organization_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        }
+      },
+      "required": [
+        "kind",
+        "organization_version"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsTemplateInheritanceSources": {
+      "type": "object",
+      "properties": {
+        "report_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "import_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "agreement_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "permission_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "event_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "collection_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "crm_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        },
+        "automation_templates": {
+          "$ref": "#/$defs/SettingsTemplateInheritanceSource"
+        }
+      },
       "additionalProperties": false
     }
   },
@@ -77302,7 +79203,8 @@
           "debt_adjust_v1",
           "sale_refund_preview_v1",
           "permission_set_v1",
-          "sale_change_preview_v1"
+          "sale_change_preview_v1",
+          "instructor_agreement_accept_v1"
         ]
       },
       {
@@ -81185,7 +83087,12 @@
           "F15",
           "F16",
           "F20",
-          "F05"
+          "F05",
+          "F08",
+          "F29",
+          "F19",
+          "F21",
+          "F24"
         ],
         "permission": "preparation.resolve",
         "actor_source": "server_verified",
@@ -81289,6 +83196,31 @@
           {
             "feature": "F05",
             "when": "permission_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F08",
+            "when": "program_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F29",
+            "when": "event_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "collection_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "crm_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F24",
+            "when": "automation_preparation",
             "mode": "required_if_selected"
           }
         ],
@@ -81617,6 +83549,203 @@
             "$ref": "#/$defs/Request_subscription_period_change_request"
           }
         }
+      },
+      {
+        "name": "instructor_agreement_get_v1",
+        "module": "M08",
+        "features": [
+          "F20"
+        ],
+        "permission": "earnings.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_instructor_agreement_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_instructor_agreement_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read authorized document_requirements_get projection only; no domain/rights/earning/settlement/receipt mutation.",
+        "transition": {
+          "effect": "read_authorized_agreement_and_consent",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "same_org_center_agreement",
+          "self_instructor_acceptance_only",
+          "immutable_frontend_text_and_source_terms",
+          "no_implicit_financial_effect"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A39",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F20"
+        ],
+        "runtime_required_features": [
+          "F20"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "instructor_agreements",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_instructor_agreement_get"
+          }
+        },
+        "runtime_limits": [
+          "Native self-only agreement acknowledgement; signed frontend text and backend source terms are immutable; acknowledgement does not publish an agreement or reprice earnings."
+        ]
+      },
+      {
+        "name": "instructor_agreement_accept_v1",
+        "module": "M08",
+        "features": [
+          "F20"
+        ],
+        "permission": "document.accept",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_instructor_agreement_accept"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_instructor_agreement_accept"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "single",
+        "transaction_guarantee": "Atomic documents.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transition": {
+          "effect": "append_self_agreement_acknowledgement",
+          "from": [],
+          "to": [],
+          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "same_org_center_agreement",
+          "self_instructor_acceptance_only",
+          "immutable_frontend_text_and_source_terms",
+          "no_implicit_financial_effect",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "instructor_agreements.version",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A39",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F20"
+        ],
+        "runtime_required_features": [
+          "F20"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "instructor_agreements",
+          "version_mode": "append_or_current_scope_lock",
+          "version_field": null,
+          "read_operation": "instructor_agreement_get_v1",
+          "atomic_effects": [
+            "instructor_agreements.acknowledgement"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_instructor_agreement_accept"
+          }
+        },
+        "runtime_limits": [
+          "Native self-only agreement acknowledgement; signed frontend text and backend source terms are immutable; acknowledgement does not publish an agreement or reprice earnings."
+        ]
       }
     ],
     "policy_value_map": {
@@ -97214,6 +99343,138 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/event_templates/items/properties/defaults/properties/terms/properties/allowed_product_version_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/event_templates/items/properties/defaults/properties/terms/properties/allowed_product_version_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalDocumentAcceptance/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalDocumentAcceptance/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalDocumentAcceptance/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_get/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_get/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_accept/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_accept/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_accept/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_accept/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreement_accept/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalAgreementAcceptance/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalAgreementAcceptance/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalAgreementAcceptance/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalAgreementAcceptance/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_instructor_agreement_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_instructor_agreement_accept/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_instructor_agreement_accept_v1/properties/key/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_instructor_agreement_accept_v1/properties/values/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -97659,13 +99920,15 @@
         "settings_preparation_resolve_v1",
         "account_signup_check_v1",
         "role_revoke_preview_v1",
-        "subscription_period_change_request_v1"
+        "subscription_period_change_request_v1",
+        "instructor_agreement_get_v1",
+        "instructor_agreement_accept_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 134,
+      "migration_count": 137,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -98363,7 +100626,9 @@
         "settings_preparation_resolve_v1",
         "account_signup_check_v1",
         "role_revoke_preview_v1",
-        "subscription_period_change_request_v1"
+        "subscription_period_change_request_v1",
+        "instructor_agreement_get_v1",
+        "instructor_agreement_accept_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -98878,7 +101143,8 @@
           "calendar_link_create_v1",
           "calendar_link_rotate_v1",
           "calendar_link_revoke_v1",
-          "calendar_feed_get_v1"
+          "calendar_feed_get_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -98898,7 +101164,8 @@
           "calendar_link_create_v1",
           "calendar_link_rotate_v1",
           "calendar_link_revoke_v1",
-          "calendar_feed_get_v1"
+          "calendar_feed_get_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -99607,7 +101874,8 @@
           "import_preview_v1",
           "import_apply_v1",
           "import_rows_process_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -99637,7 +101905,8 @@
           "import_preview_v1",
           "import_apply_v1",
           "import_rows_process_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -99706,7 +101975,9 @@
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
           "attendance_start_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "instructor_agreement_get_v1",
+          "instructor_agreement_accept_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -99732,7 +102003,9 @@
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
           "attendance_start_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "instructor_agreement_get_v1",
+          "instructor_agreement_accept_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -99782,7 +102055,8 @@
           "public_application_review_v1",
           "report_build_v1",
           "import_preview_v1",
-          "import_apply_v1"
+          "import_apply_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
@@ -99803,7 +102077,8 @@
           "public_application_review_v1",
           "report_build_v1",
           "import_preview_v1",
-          "import_apply_v1"
+          "import_apply_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
@@ -99891,7 +102166,8 @@
         "technical_operations": [
           "segment_save_v1",
           "automation_save_v1",
-          "automation_run_v1"
+          "automation_run_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -99900,7 +102176,8 @@
         "implemented_operations": [
           "segment_save_v1",
           "automation_save_v1",
-          "automation_run_v1"
+          "automation_run_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
@@ -100089,7 +102366,8 @@
           "event_payment_prepare_v1",
           "event_payment_get_v1",
           "event_actual_start_record_v1",
-          "event_actual_start_correct_v1"
+          "event_actual_start_correct_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -100115,7 +102393,8 @@
           "event_payment_prepare_v1",
           "event_payment_get_v1",
           "event_actual_start_record_v1",
-          "event_actual_start_correct_v1"
+          "event_actual_start_correct_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

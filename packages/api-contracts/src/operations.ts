@@ -221,4 +221,6 @@ export interface Operations {
   account_signup_check_v1: {request: T.RequestAccountSignupCheck; response: T.SuccessAccountSignupCheck};
   role_revoke_preview_v1: {request: T.RequestRoleRevokePreview; response: T.SuccessRoleRevokePreview};
   subscription_period_change_request_v1: {request: T.RequestSubscriptionPeriodChangeRequest; response: T.SuccessSubscriptionPeriodChangeRequest};
+  instructor_agreement_get_v1: {request: T.RequestInstructorAgreementGet; response: T.SuccessInstructorAgreementGet};
+  instructor_agreement_accept_v1: {request: T.RequestInstructorAgreementAccept; response: T.SuccessInstructorAgreementAccept};
 }

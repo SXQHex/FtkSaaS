@@ -1,5 +1,5 @@
 {
-  "version": 17,
+  "version": 18,
   "fields": [
     {
       "scope": "user",
@@ -2516,6 +2516,1044 @@
       },
       "group": "O04",
       "consumer": "organization_security_assert"
+    },
+    {
+      "scope": "organization",
+      "key": "program_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "weekdays": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 7
+                  },
+                  "uniqueItems": true,
+                  "minItems": 1
+                },
+                "local_start": {
+                  "type": "string",
+                  "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                },
+                "duration_minutes": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "capacity": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "categories": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "male": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "female": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": [
+                            "male",
+                            "female"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "weekdays",
+                "local_start",
+                "duration_minutes",
+                "capacity"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "O18",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "program_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "weekdays": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 7
+                  },
+                  "uniqueItems": true,
+                  "minItems": 1
+                },
+                "local_start": {
+                  "type": "string",
+                  "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                },
+                "duration_minutes": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "capacity": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "categories": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "male": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "female": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": [
+                            "male",
+                            "female"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "total"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "weekdays",
+                "local_start",
+                "duration_minutes",
+                "capacity"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "M06",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "event_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "capacity": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "nominal": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "maximum": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "nominal",
+                        "maximum"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "unlimited",
+                          "enum": [
+                            "unlimited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "terms": {
+                  "type": "object",
+                  "properties": {
+                    "fee_minor": {
+                      "type": "string",
+                      "pattern": "^(0|[1-9][0-9]{0,18})$",
+                      "x-validation": "int(value)<=9223372036854775807"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$",
+                      "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                    },
+                    "full_payment_required": {
+                      "type": "boolean"
+                    },
+                    "allowed_product_version_ids": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/FtkUuid"
+                      }
+                    },
+                    "cancellation": {
+                      "type": "object",
+                      "properties": {
+                        "cutoff_minutes": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "before_cutoff": {
+                          "enum": [
+                            "release",
+                            "consume"
+                          ],
+                          "type": "string"
+                        },
+                        "after_cutoff": {
+                          "enum": [
+                            "release",
+                            "consume"
+                          ],
+                          "type": "string"
+                        },
+                        "no_show": {
+                          "enum": [
+                            "release",
+                            "consume"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "before_cutoff",
+                        "after_cutoff",
+                        "no_show"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "refund": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "credit_ratio",
+                            "used_at_unit_price",
+                            "time_ratio"
+                          ]
+                        },
+                        "used_unit_minor": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]{0,18})$",
+                              "x-validation": "int(value)<=9223372036854775807"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "method"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "package_usage": {
+                      "enum": [
+                        "consume",
+                        "eligibility_only"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "fee_minor",
+                    "currency",
+                    "full_payment_required",
+                    "allowed_product_version_ids",
+                    "cancellation",
+                    "refund"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "package_usage": {
+                            "const": "eligibility_only",
+                            "enum": [
+                              "eligibility_only"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "package_usage"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "fee_minor": {
+                            "const": "0",
+                            "enum": [
+                              "0"
+                            ],
+                            "type": "string"
+                          },
+                          "allowed_product_version_ids": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "capacity",
+                "terms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "O18",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "event_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "capacity": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "nominal": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "maximum": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "nominal",
+                        "maximum"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "unlimited",
+                          "enum": [
+                            "unlimited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "terms": {
+                  "type": "object",
+                  "properties": {
+                    "fee_minor": {
+                      "type": "string",
+                      "pattern": "^(0|[1-9][0-9]{0,18})$",
+                      "x-validation": "int(value)<=9223372036854775807"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$",
+                      "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                    },
+                    "full_payment_required": {
+                      "type": "boolean"
+                    },
+                    "allowed_product_version_ids": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/FtkUuid"
+                      }
+                    },
+                    "cancellation": {
+                      "type": "object",
+                      "properties": {
+                        "cutoff_minutes": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "before_cutoff": {
+                          "enum": [
+                            "release",
+                            "consume"
+                          ],
+                          "type": "string"
+                        },
+                        "after_cutoff": {
+                          "enum": [
+                            "release",
+                            "consume"
+                          ],
+                          "type": "string"
+                        },
+                        "no_show": {
+                          "enum": [
+                            "release",
+                            "consume"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "before_cutoff",
+                        "after_cutoff",
+                        "no_show"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "refund": {
+                      "type": "object",
+                      "properties": {
+                        "method": {
+                          "type": "string",
+                          "enum": [
+                            "none",
+                            "credit_ratio",
+                            "used_at_unit_price",
+                            "time_ratio"
+                          ]
+                        },
+                        "used_unit_minor": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^(0|[1-9][0-9]{0,18})$",
+                              "x-validation": "int(value)<=9223372036854775807"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "method"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "package_usage": {
+                      "enum": [
+                        "consume",
+                        "eligibility_only"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "fee_minor",
+                    "currency",
+                    "full_payment_required",
+                    "allowed_product_version_ids",
+                    "cancellation",
+                    "refund"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "package_usage": {
+                            "const": "eligibility_only",
+                            "enum": [
+                              "eligibility_only"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "package_usage"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "fee_minor": {
+                            "const": "0",
+                            "enum": [
+                              "0"
+                            ],
+                            "type": "string"
+                          },
+                          "allowed_product_version_ids": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "capacity",
+                "terms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "M13",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "collection_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$",
+                  "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                },
+                "payment_method": {
+                  "type": "string",
+                  "enum": [
+                    "cash",
+                    "bank_transfer",
+                    "card_pos"
+                  ]
+                }
+              },
+              "required": [
+                "currency",
+                "payment_method"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "O12",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "collection_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$",
+                  "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                },
+                "payment_method": {
+                  "type": "string",
+                  "enum": [
+                    "cash",
+                    "bank_transfer",
+                    "card_pos"
+                  ]
+                }
+              },
+              "required": [
+                "currency",
+                "payment_method"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "M11",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "crm_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "interest": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "source",
+                "interest"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "O09",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "crm_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "interest": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "source",
+                "interest"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "M21",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "automation_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "trigger": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "entitlement_expiring",
+                        "student_inactive",
+                        "lead_followup_due"
+                      ],
+                      "type": "string"
+                    },
+                    "offset_days": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "offset_days"
+                  ],
+                  "additionalProperties": false
+                },
+                "action": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "create_followup",
+                        "send_reminder"
+                      ],
+                      "type": "string"
+                    },
+                    "channel": {
+                      "const": "in_app",
+                      "type": "string",
+                      "enum": [
+                        "in_app"
+                      ]
+                    },
+                    "template_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "channel",
+                    "template_key"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "trigger",
+                "action"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "O13",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "automation_templates",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "defaults": {
+              "type": "object",
+              "properties": {
+                "trigger": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "entitlement_expiring",
+                        "student_inactive",
+                        "lead_followup_due"
+                      ],
+                      "type": "string"
+                    },
+                    "offset_days": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "offset_days"
+                  ],
+                  "additionalProperties": false
+                },
+                "action": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "create_followup",
+                        "send_reminder"
+                      ],
+                      "type": "string"
+                    },
+                    "channel": {
+                      "const": "in_app",
+                      "type": "string",
+                      "enum": [
+                        "in_app"
+                      ]
+                    },
+                    "template_key": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "channel",
+                    "template_key"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "trigger",
+                "action"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "defaults"
+          ],
+          "additionalProperties": false
+        },
+        "maxItems": 100
+      },
+      "default": [],
+      "group": "M17",
+      "consumer": "domain_preparation_resolve"
     }
   ]
 }

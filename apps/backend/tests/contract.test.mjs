@@ -87,7 +87,7 @@ test('O04 organization security preference cannot weaken the platform or become 
  for(const scope of ['User','Member','Center','Platform'])assert(!valid(scope+'SettingsValues',{security_policy:policy}));
  for(const change of [{mfa_roles:['unknown']},{mfa_roles:['owner','owner']},{sensitive_reauth_max_age_seconds:0},{sensitive_reauth_max_age_seconds:1.5},{bypass:true}])assert(!valid('OrganizationSecurityPolicy',{...policy,...change}));
  assert(valid('OrganizationSecurityPolicy',{...policy,sensitive_reauth_max_age_seconds:1}));
- const config=JSON.parse(fs.readFileSync('config/frontend-settings.json')),previous=JSON.parse(fs.readFileSync('database/settings-catalog-v16.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''", "'"));
+ const config={fields:JSON.parse(fs.readFileSync('database/settings-catalog-v17.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"))},previous=JSON.parse(fs.readFileSync('database/settings-catalog-v16.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''", "'"));
  assert.deepEqual(config.fields.filter(x=>x.key!=='security_policy'),previous);
  const field=config.fields.find(x=>x.key==='security_policy');assert.deepEqual(field.default,{mfa_roles:[],sensitive_reauth_max_age_seconds:null});assert.equal(field.group,'O04');
  const implementation=fs.readFileSync('database/organization-security-preferences.sql','utf8');
@@ -280,7 +280,7 @@ test('subscriber numbers are lossless decimal identifiers on person and report p
  assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
 });
 test('settings catalogue groups isolate calendar display, reminders and package preparation without changing stored fields',()=>{
- const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>!['agreement_templates','permission_templates','regional_defaults','security_policy'].includes(f.key));
+ const fields=JSON.parse(fs.readFileSync('database/settings-catalog-v12.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
  for(const f of fields){
   if(f.consumer==='reminder_settings')assert.equal(f.group,{organization:'O07',center:'M14',member:'S13'}[f.scope],f.scope+'.'+f.key);
   if(f.consumer==='reminder_quiet_until')assert.equal(f.group,'S13',f.key);
@@ -621,4 +621,61 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  assert(!valid('Request_subscription_downgrade_request',{client_api_version:1,request_id:id,org_id:id,operation_key:id,...selector.key,resources:'students'}));
  const resource={kind:'students',id,display_name:'Synthetic candidate',subscriber_number:'12345'};assert(valid('DowngradeRetainedResource',resource));
  assert(!valid('DowngradeRetainedResource',{...resource,email:'unrequested@example.invalid'}));
+});
+
+ test('Digital document bodies are closed, file-or-inline exclusive and consent snapshot hashes travel together',async()=>{
+ const content={name:'Terms',language:'en-GB',template_id:'terms',template_version:'v1',text:'Exact text\n'};
+ assert(valid('DigitalDocumentContent',content));assert(!valid('DigitalDocumentContent',{...content,script:'untrusted'}));
+ const body={client_api_version:1,request_id:id,org_id:id,operation_key:id,version_label:'v1',scope:{kind:'organization'},requirements:[],digital_content:content};
+ assert(valid('Request_document_version_publish',body));assert(!valid('Request_document_version_publish',{...body,file_id:id}));
+ const {digital_content,...file}=body;assert(valid('Request_document_version_publish',{...file,file_id:id}));assert(!valid('Request_document_version_publish',file));
+ const generated=await import('../supabase/functions/backend-v1/validators.js');
+ for(const operation of ['document_publication_preview','document_version_publish']){
+  const {operation_key,...preview}=body,inline=operation==='document_version_publish'?body:preview;
+  const {digital_content,...withoutSource}=inline;
+  for(const check of [value=>valid('Request_'+operation,value),generated['request_'+operation+'_v1']]){
+   assert(check(inline));assert(check({...withoutSource,file_id:id}));
+   assert(!check({...inline,file_id:id}));assert(!check(withoutSource));
+   assert(!check({...inline,unexpected:true}));
+  }
+ }
+ const acceptance={client_api_version:1,request_id:id,org_id:id,operation_key:id,document_version_id:id,context:{gate:'sale',subject:{type:'product_versions',id}}};
+ assert(valid('Request_document_accept',acceptance));assert(!valid('Request_document_accept',{...acceptance,displayed_content:content}));
+ assert(valid('Request_document_accept',{...acceptance,displayed_content:content,displayed_content_hash:'a'.repeat(64)}));
+});
+
+ test('Pro preparation catalog adds only five closed explicit workflow template families',()=>{
+ const current=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields;
+ const prior=JSON.parse(fs.readFileSync('database/settings-catalog-v17.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
+ const keys=['program_templates','event_templates','collection_templates','crm_templates','automation_templates'];
+ assert.deepEqual(current.filter(f=>!keys.includes(f.key)),prior);assert.equal(current.filter(f=>keys.includes(f.key)).length,10);
+ for(const field of current.filter(f=>keys.includes(f.key))){assert.deepEqual(field.default,[]);assert.deepEqual(p.$defs[field.scope==='center'?'CenterSettingsValues':'OrganizationSettingsValues'].properties[field.key],field.schema);}
+ const inherited=['report_templates','import_templates','agreement_templates','permission_templates','event_templates','collection_templates','crm_templates','automation_templates'];
+ const request={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,scope:'center',expected_version:0,patch:{},inherit_fields:inherited};
+ assert(valid('Request_settings_update',request));
+ for(const field of inherited)assert(valid('Request_settings_update',{...request,inherit_fields:[field]}));
+ for(const change of [{...request,inherit_fields:['program_templates']},{...request,inherit_fields:['crm_templates','crm_templates']},{...request,scope:'organization',center_id:undefined}])assert(!valid('Request_settings_update',change));
+ const source={scope:'organization',key:'manual',version:1};
+ assert(valid('ResolvedDomainPreparation',{kind:'crm',source,defaults:{source:'manual',interest:'Explicit enquiry'}}));
+ assert(!valid('ResolvedDomainPreparation',{kind:'crm',source,defaults:{source:'manual',interest:'Explicit enquiry',person_id:id}}));
+ assert(!valid('Request_instructor_agreement_accept',{client_api_version:1,request_id:id,org_id:id,center_id:id,agreement_id:id,operation_key:id}));
+});
+
+ test('template inheritance round trips every allowed field through generated request and response validators',async()=>{
+ const validators=await import('../supabase/functions/backend-v1/validators.js');
+ const keys=['report_templates','import_templates','agreement_templates','permission_templates','event_templates','collection_templates','crm_templates','automation_templates'];
+ const view={scope:'center',version:1,values:{},as_of:new Date().toISOString(),overridden_fields:[],inherited_fields:Object.fromEntries(keys.map(key=>[key,{kind:'organization_inherited',organization_version:2}]))};
+ const response={ok:true,data:view,trace_id:id};
+ assert(validators.success_settings_update_v1({ok:true,trace_id:id,data:{operation_id:id,primary_id:id,version:1,replayed:false,related:[]}}));
+ assert(valid('Success_settings_get',response));
+ assert(validators.success_settings_get_v1(response),JSON.stringify(validators.success_settings_get_v1.errors));
+ for(const key of keys){
+  const request={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,scope:'center',expected_version:0,patch:{},inherit_fields:[key]};
+  assert(validators.request_settings_update_v1(request));
+  assert(validators.success_settings_get_v1({...response,data:{...view,inherited_fields:{[key]:view.inherited_fields[key]}}}));
+ }
+ for(const inherited_fields of [{unknown_templates:{kind:'organization_inherited',organization_version:2}},{program_templates:{kind:'organization_inherited',organization_version:2}},{crm_templates:{kind:'organization_inherited',organization_version:-1}},{crm_templates:{kind:'local',organization_version:2}}]){
+  assert(!validators.success_settings_get_v1({...response,data:{...view,inherited_fields}}));
+ }
+ assert(!validators.success_settings_get_v1({...response,data:{...view,scope:'organization'}}));
 });

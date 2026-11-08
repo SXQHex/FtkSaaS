@@ -633,3 +633,15 @@ S12 FD02 kaynak incelemesinde üç renk yalnız OrganizationSettingsValues'ta bu
 ### Backend değerlendirmesi — XREQ-035, 8 Kasım 2026
 
 Aday kaynak mevcut `organizations_list_v1`/yetkili `organization_get_v1` ve yayın kapıları açık public profil içinde yalnız üç renkli `brand_colors` projeksiyonu sağlar. Genel üye özel org settings okumaz; null sistem/kişisel tema fallback anlamındadır. Kesin tüketim [ayar rehberinde](settings.md) açıklanır. Native aday, merge/development ve hosted kabulü henüz verilmez; frontend kapanışı ayrı kalır.
+
+## XREQ-036 Dosyasız dijital içerik/onay ve Pro hazırlık tüketimi
+
+### Backend talebi ve devri — 8 Kasım 2026
+
+Kullanıcı kararı [FD08](contracts/02-FtkSaaS-teknik-sozlesme.md#fd08--belge-onay-dış-görünürlük-kabul-edildi): frontend/Next.js nihai ekran metnini, gerçek dili ve fallback'i yönetir. Yeni backend adayında dosyasız `document_publication_preview_v1`/`document_version_publish_v1(digital_content)`, mevcut requirements/content ve `document_accept_v1(displayed_content,displayed_content_hash)` vardır. Eski dosya yolu korunur; yeni dijital yol Storage upload istemez. Backend metni yeniden hashler ve native hesap/kişi, bağlam, kaynak sürüm, metin/dil ve sunucu zamanını değişmez saklar. Geçmiş metin güncel şablondan üretilmez. Kesin veri şekli/kurtarma ve geçmiş okuma [WF11](workflows.md#wf11) sahibindedir.
+
+Eğitmenin kendi kabulü `instructor_agreement_get_v1` → açık ekran → `instructor_agreement_accept_v1` → yeniden get sırasındadır. Gerçek şartlar/sürüm ve okunan source_content_hash aynen gönderilir; metin/hash frontend'den, yeniden hash ve zaman/özne backend'den gelir. CM başkası adına kabul veremez. Bu kabul yayın veya hakediş hesabı değildir; [WF14](workflows.md#wf14).
+
+Pro/Business için beş yeni preparation ailesi katalogda sunulur: programs/events/collections/crm/automations. Gerçek source/version ile resolve edilen defaults, eksik hedef/tarih/kişi ve gerekiyorsa banka referansı açık seçildikten sonra mevcut writer'a gider; şablon otomatik işlem/enable üretmez. Program yeni merkeze başlangıç kopyası, diğer dört aile açık org mirasıdır; [ayar rehberi](settings.md#pro-iş-akışı-hazırlıkları).
+
+**Frontend kabul ölçütü:** Dijital yolda blob/PDF yükleme istenmemesi; görünen nihai metnin ve gerçek dilin eksiksiz gönderilmesi; aynı metnin SHA-256 hesabı ve aynı işlem anahtarlı retry; stale source/sürümde yeniden okuma; geçmişin saklanan snapshot'tan gösterilmesi; rol/bağ kaybında erişim kapanması. Pro şablonları yalnız desteklenen writable alan ve canlı kaynaklarla tüketilmeli. Backend kaynak/native/merge/hosted ve frontend ekran kapanışı ayrı izlenir. Bu talep XREQ-033 ertelenmiş e-posta çeviri entegrasyonunu yeniden açmaz.
