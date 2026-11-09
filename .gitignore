@@ -13,3 +13,4 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .DS_Store
+test-dummy-data/
