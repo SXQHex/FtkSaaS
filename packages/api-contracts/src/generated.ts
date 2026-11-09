@@ -4103,6 +4103,12 @@ SettingsInheritedTemplateFields?: SettingsInheritedTemplateFields
 SettingsTemplateInheritanceSource?: SettingsTemplateInheritanceSource
 SettingsTemplateInheritanceSources?: SettingsTemplateInheritanceSources
 AccountProfileErasureProgress?: AccountProfileErasureProgress
+DisciplinePresentation?: DisciplinePresentation
+DisciplinePresentationPatch?: DisciplinePresentationPatch
+CenterDisciplinePresentation?: CenterDisciplinePresentation
+CenterDisciplinePresentationPatch?: CenterDisciplinePresentationPatch
+DisciplinePresentationView?: DisciplinePresentationView
+PublicDisciplinePresentation?: PublicDisciplinePresentation
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7993,6 +7999,10 @@ timezone: string
 timezone?: string
 logo?: (SettingsMediaContent | null)
 brand_colors?: OrganizationBrandColors
+/**
+ * @maxItems 200
+ */
+disciplines?: PublicDisciplinePresentation[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8001,6 +8011,21 @@ brand_colors?: OrganizationBrandColors
 export interface SettingsMediaContent {
 asset: SettingsMediaAsset
 data_base64: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicDisciplinePresentation".
+ */
+export interface PublicDisciplinePresentation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+name: Text
+description: (string | null)
+color: (string | null)
+icon: (string | null)
+display_order: number
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13068,6 +13093,7 @@ center_id?: (string | null)
 slug: Text
 interval: Interval
 page: Page
+include_disciplines?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16588,6 +16614,19 @@ version: PositiveInt
 org_id: string
 name: Text
 state: RecordState
+presentation: DisciplinePresentation
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DisciplinePresentation".
+ */
+export interface DisciplinePresentation {
+description: (string | null)
+color: (string | null)
+icon: (string | null)
+display_order: number
+public_visible: boolean
+allow_center_description: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16613,6 +16652,15 @@ center_id: string
  */
 discipline_id: string
 state: RecordState
+presentation: CenterDisciplinePresentation
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CenterDisciplinePresentation".
+ */
+export interface CenterDisciplinePresentation {
+description: (string | null)
+public_visible: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16656,6 +16704,23 @@ id: string
 name: Text
 state: RecordState
 version: PositiveInt
+presentation?: DisciplinePresentationView
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DisciplinePresentationView".
+ */
+export interface DisciplinePresentationView {
+organization: DisciplinePresentation
+center: ({
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+state: RecordState
+version: PositiveInt
+presentation: CenterDisciplinePresentation
+} | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16680,6 +16745,8 @@ request_id: string
  */
 org_id: string
 page: Page
+include_presentation?: boolean
+center_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16715,6 +16782,19 @@ discipline_id?: (string | null)
 name: Text
 state: RecordState
 expected_version?: PositiveInt
+presentation?: DisciplinePresentationPatch
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DisciplinePresentationPatch".
+ */
+export interface DisciplinePresentationPatch {
+description?: (string | null)
+color?: (string | null)
+icon?: (string | null)
+display_order?: number
+public_visible?: boolean
+allow_center_description?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16756,6 +16836,15 @@ center_id: string
 discipline_id: string
 state: RecordState
 expected_version?: PositiveInt
+presentation?: CenterDisciplinePresentationPatch
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CenterDisciplinePresentationPatch".
+ */
+export interface CenterDisciplinePresentationPatch {
+description?: (string | null)
+public_visible?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

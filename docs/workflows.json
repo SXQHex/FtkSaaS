@@ -17,7 +17,8 @@
         "apps/backend/tests/ci-experiment-checks.mjs",
         "apps/backend/tests/ci-api-suites.test.mjs",
         "apps/backend/tests/deployment-cli-unit.mjs",
-        "apps/backend/tests/edge-bundle-unit.mjs"
+        "apps/backend/tests/edge-bundle-unit.mjs",
+        "apps/backend/tests/discipline-presentation-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -286,8 +287,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "a18bf114be97172642c3f56ed0cc6d455a5ae573e05030fa1160a25094b95734",
-        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
+        "fingerprint": "b82dbf5667060966ec59dd1f7a696c9762e324960455ae81c666e17dc61394eb",
+        "reason": "Reviewed final native discipline presentation requests including the mandatory revocation reason and updated imported test hash. Assertions, authorization, replay and public bounds remain unchanged."
       }
     },
     {
@@ -389,7 +390,8 @@
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-instructor-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/permission-preparation-acceptance.mjs"
+        "apps/backend/tests/permission-preparation-acceptance.mjs",
+        "apps/backend/tests/discipline-presentation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -448,7 +450,9 @@
         "apps/backend/database/permission-and-plan-discovery.sql",
         "apps/backend/supabase/migrations/20261106223659_permission_and_plan_discovery.sql",
         "apps/backend/database/account-self-context.sql",
-        "apps/backend/supabase/migrations/20261107093756_account_self_context.sql"
+        "apps/backend/supabase/migrations/20261107093756_account_self_context.sql",
+        "apps/backend/database/discipline-presentation.sql",
+        "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -474,8 +478,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "b1ebc14aa1ef1e269e37058e573b1a337e22b592c58d1b1d0a637297572bb397",
-        "reason": "Reviewed additive native export acceptance import and migration inventory143. Existing flow operations, requests, permissions and assertions are unchanged."
+        "fingerprint": "32188a939302541dde114dde94a2736859bd2f12cdd409e66d19ee9f4d29d633",
+        "reason": "Reviewed final native discipline presentation requests including the mandatory revocation reason and updated imported test hash. Assertions, authorization, replay and public bounds remain unchanged."
       }
     },
     {
@@ -663,8 +667,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "217b9fc653f4ed02002511384381e6fe77106a86c7e252f419d9062af2053341",
-        "reason": "Reviewed additive native export acceptance import and migration inventory143. Existing flow operations, requests, permissions and assertions are unchanged."
+        "fingerprint": "2770d3bacbd1e4485e72f23831d4f35d9dedda953d1591fecc4669a743f9019c",
+        "reason": "Reviewed additive registry side-effect acceptance import. Existing person role permission and revoke source, requests, assertions and workflow are unchanged."
       }
     },
     {
@@ -1009,7 +1013,8 @@
         "apps/backend/tests/crm-provider-host-unit.mjs",
         "apps/backend/tests/crm-provider-host-db-unit.mjs",
         "apps/backend/tests/crm-provider-host-acceptance.mjs",
-        "apps/backend/tests/hosted-calendar-runner-unit.mjs"
+        "apps/backend/tests/hosted-calendar-runner-unit.mjs",
+        "apps/backend/tests/discipline-presentation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1053,7 +1058,9 @@
         "apps/backend/supabase/functions/personal-calendar/index.ts",
         "apps/backend/scripts/calendar-configuration-plan.mjs",
         "apps/backend/scripts/acceptance/s15-hosted-calendar.mjs",
-        "apps/backend/scripts/acceptance/s15-calendar-browser-route.mjs"
+        "apps/backend/scripts/acceptance/s15-calendar-browser-route.mjs",
+        "apps/backend/database/discipline-presentation.sql",
+        "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1067,8 +1074,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "2cc423a417cd514736f8a9051fd0b0e6245fce3c59fb11f13e318db549ffbf39",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "104cccf20c45896674178145ab8249c6239dd5693401f27c8e269f53c7f6d016",
+        "reason": "Reviewed final native discipline presentation requests including the mandatory revocation reason and updated imported test hash. Assertions, authorization, replay and public bounds remain unchanged."
       }
     },
     {

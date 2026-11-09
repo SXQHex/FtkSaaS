@@ -3917,7 +3917,9 @@
         }
       },
       "billing_class": "public",
-      "limits": []
+      "limits": [
+        "include_disciplines opt-in exposes only active explicitly public metadata inside enabled profiles. Center visibility narrows organization visibility; bounded 200 items/2MiB rejects overflow without truncation."
+      ]
     },
     {
       "name": "public_application_submit_v1",
@@ -4673,7 +4675,8 @@
       "billing_class": "read",
       "limits": [
         "Pagination supports created_at_asc; cursor is bound to request scope.",
-        "Only org readers or center managers; managers receive active disciplines actively offered by their accessible assigned centers."
+        "Only org readers or center managers; managers receive active disciplines actively offered by their accessible assigned centers.",
+        "include_presentation opt-in adds organization/local metadata and actual local relationship version; optional center_id narrows the authorized page. Legacy requests retain their original response shape and ordering."
       ]
     },
     {
@@ -4699,7 +4702,9 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Optional presentation patch preserves unspecified metadata; existing organization discipline identity, scope/version/idempotency and lifecycle rules remain authoritative."
+      ]
     },
     {
       "name": "center_discipline_set_v1",
@@ -4724,7 +4729,9 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Optional local presentation only permits description/public_visible; writing description requires the organization discipline allow_center_description flag. No organization metadata or operational scope is granted."
+      ]
     },
     {
       "name": "person_discipline_set_v1",

@@ -254,3 +254,5 @@ assert next(Path('supabase/migrations').glob('*_account_native_erasure_finalizat
 assert next(Path('supabase/migrations').glob('*_account_native_residues.sql')).read_bytes()==Path('database/account-native-residues.sql').read_bytes(),'Auth residue source drift'
 
 assert next(Path('supabase/migrations').glob('*_account_export_erasure.sql')).read_bytes()==Path('database/account-export-erasure.sql').read_bytes(),'Account export erasure source drift'
+
+assert next(Path('supabase/migrations').glob('*_discipline_presentation.sql')).read_bytes()==Path('database/discipline-presentation.sql').read_bytes(),'Discipline presentation source drift'
