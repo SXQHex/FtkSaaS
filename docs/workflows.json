@@ -277,7 +277,8 @@
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
-        "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql"
+        "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql",
+        "apps/backend/scripts/ci/manual-full.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -287,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "88860209204df5aca3800f6b3fe4d09a24a258bebb0fe0e1975f24e000473c07",
-        "reason": "CI589: CRM kabul fixture bigint sürümünü integer projekte eder; API envanterinde yalnız kaynak hash güncellendi, parça aralıkları ve politika korundu."
+        "fingerprint": "f4ee097670e4823cf9b865a9805afcd61ef4e9a69e145c330171ed663d0f8d02",
+        "reason": "Manual full Backend CI uses exact tested SHA and fresh successful PR timings; diagnostic-only artifacts, frozen reruns and unchanged automatic PR/main/deploy acceptance reviewed."
       }
     },
     {

@@ -183,7 +183,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.tested_sha }}
+          # Manual collection never executes the target's orchestration.
+          ref: ${{ fromJSON(inputs.binding).kind == 'manual-full' && github.sha || inputs.tested_sha }}
           persist-credentials: false
       - name: Verify all required jobs
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
@@ -191,19 +192,29 @@ jobs:
           BINDING: ${{ inputs.binding }}
         with:
           script: |
-            const collector=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/collect.mjs`);
-            await collector.collect(github,context,core,JSON.parse(process.env.BINDING));
+            const binding=JSON.parse(process.env.BINDING);
+            if(binding.kind==='manual-full'){
+              const manual=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/manual-full.mjs`);
+              await manual.collectManualFull(github,context,core,binding);
+            }else{
+              const collector=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/collect.mjs`);
+              await collector.collect(github,context,core,binding);
+            }
       - if: always()
+        # Diagnostic runs cannot mint candidate/main acceptance artifacts.
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: ${{ fromJSON(inputs.binding).actual && 'main-binding' || 'candidate-binding' }}-${{ github.run_attempt }}
+          name: ${{ fromJSON(inputs.binding).kind == 'manual-full' && 'manual-full-binding' || fromJSON(inputs.binding).actual && 'main-binding' || 'candidate-binding' }}-${{ github.run_attempt }}
           path: |
             .artifacts/ci/binding.json
             .artifacts/ci/measurements.json
-          if-no-files-found: error
+            .artifacts/ci/manual-binding.json
+            .artifacts/ci/manual-measurements.json
+          if-no-files-found: ${{ fromJSON(inputs.binding).kind == 'manual-full' && 'warn' || 'error' }}
           include-hidden-files: true
           archive: true
       - name: Publish next-run timing reference
+        if: fromJSON(inputs.binding).kind != 'manual-full'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: api-duration-reference-${{ github.run_attempt }}

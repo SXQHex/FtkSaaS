@@ -176,3 +176,74 @@ test('production hook preserves native test deadlines and failure propagation',(
   assert.equal(fs.readFileSync(target,'utf8'),body);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+test('manual full source requires main dispatch, exact commit and separate workflow identity',async()=>{
+ const {manualRequest,manualBinding}=await import('../scripts/ci/manual-full.mjs');
+ const context={eventName:'workflow_dispatch',ref:'refs/heads/main',sha:'a'.repeat(40),runId:77,payload:{inputs:{tested_sha:'b'.repeat(40)}},repo:{owner:'SXQHex',repo:'FtkSaaS'}};
+ const request=manualRequest(context,1),inventory=buildInventory(repositoryRoot),manifest=JSON.parse(fs.readFileSync(path.join(repositoryRoot,'apps/backend/scripts/ci/api-suites.json')));
+ const binding=manualBinding(request,{sha:'b'.repeat(40),tree:{sha:'c'.repeat(40)}},{inventory,manifest},null);
+ assert.equal(binding.kind,'manual-full');assert.equal(binding.head,context.sha);assert.equal(binding.merge,context.payload.inputs.tested_sha);
+ assert.equal(binding.schedule.plan.length,12);assert.equal(binding.pr,undefined);assert.equal(binding.benchmark,false);
+ assert.deepEqual(binding.schedule.plan.flatMap(p=>p.units).sort(),inventory.units.map(u=>u.id).sort());
+ for(const patch of [{eventName:'pull_request'},{ref:'refs/heads/feature'},{sha:'main'},{repo:{owner:'other',repo:'FtkSaaS'}},{payload:{inputs:{tested_sha:'main'}}}])assert.throws(()=>manualRequest({...context,...patch},1));
+ assert.throws(()=>manualRequest(context,0));
+ assert.throws(()=>manualBinding(request,{sha:'d'.repeat(40),tree:{sha:'c'.repeat(40)}},{inventory,manifest},null));
+});
+
+test('manual full new dispatch learns measurements while rerun preserves frozen source and plan',async()=>{
+ const {manualRequest,manualBinding,restoreManualBinding}=await import('../scripts/ci/manual-full.mjs');
+ const context={eventName:'workflow_dispatch',ref:'refs/heads/main',sha:'a'.repeat(40),runId:77,payload:{inputs:{tested_sha:'b'.repeat(40)}},repo:{owner:'SXQHex',repo:'FtkSaaS'}};
+ const request=manualRequest(context,1),inventory=buildInventory(repositoryRoot),manifest=JSON.parse(fs.readFileSync(path.join(repositoryRoot,'apps/backend/scripts/ci/api-suites.json'))),candidate={inventory,manifest,tree:'c'.repeat(40)};
+ const unit=inventory.units[0],reference={run_id:50,attempt:1,head:'d'.repeat(40),merge:'e'.repeat(40),tree:'f'.repeat(40),units:{[unit.id]:{sha256:createHash('sha256').update(unit.code).digest('hex'),seconds:123}}};
+ const frozen=manualBinding(request,{sha:request.tested_sha,tree:{sha:'c'.repeat(40)}},candidate,reference);
+ assert.equal(frozen.schedule.units[unit.id].seconds,123);assert.equal(frozen.schedule.reference.run_id,50);
+ const rerun=restoreManualBinding(frozen,manualRequest(context,2),candidate);
+ assert.deepEqual(rerun,frozen);
+ for(const patch of [{run_id:78},{head:'f'.repeat(40)},{tested_sha:'d'.repeat(40)},{kind:'full'},{attempt:2},{tree:'d'.repeat(40)}])assert.throws(()=>restoreManualBinding({...frozen,...patch},manualRequest(context,2),candidate));
+ const tampered=structuredClone(frozen);tampered.schedule.plan[0].units.pop();assert.throws(()=>restoreManualBinding(tampered,manualRequest(context,2),candidate));
+});
+
+test('manual full collection rejects stale workflow jobs and validates test-only phase measurements',async()=>{
+ const {validateManualRun,manualTestBalance}=await import('../scripts/ci/manual-full.mjs');
+ const binding={kind:'manual-full',head:'a'.repeat(40),run_id:77,attempt:1};
+ const run={id:77,head_sha:binding.head,run_attempt:2,event:'workflow_dispatch',path:'.github/workflows/ci-full.yml',head_branch:'main'};
+ assert(validateManualRun(run,binding,2));
+ for(const patch of [{event:'pull_request'},{head_branch:'feature'},{head_sha:'b'.repeat(40)},{run_attempt:3},{id:78},{path:'.github/workflows/backend.yml'}])assert.throws(()=>validateManualRun({...run,...patch},binding,2));
+ const phases=Array.from({length:12},(_,i)=>({role:'api',shard:i+1,coverage:'hash',tests_s:i===11?120:100,backend_setup_s:10}));
+ assert.equal(manualTestBalance(phases,'hash').ratio,1.2);assert.equal(manualTestBalance(phases,'hash').balanced,true);
+ phases[11].tests_s=121;assert.equal(manualTestBalance(phases,'hash').balanced,false);
+ for(const bad of [phases.slice(1),[...phases.slice(0,11),phases[0]],phases.map(p=>({...p,coverage:'other'})),phases.map(p=>({...p,tests_s:NaN}))])assert.throws(()=>manualTestBalance(bad,'hash'));
+});
+
+test('manual dispatch resolves immutable Git data, freezes reruns and reports without merge status',async()=>{
+ const {resolveManualFull,collectManualFull}=await import('../scripts/ci/manual-full.mjs');
+ const {main:mergeGate}=await import('../scripts/ci/gate.mjs');
+ const git=(...args)=>execFileSync('git',args,{cwd:repositoryRoot,encoding:'utf8'}).trim();
+ const sha=git('rev-parse','HEAD'),tree=git('rev-parse','HEAD^{tree}');
+ const entries=git('ls-tree','-r','HEAD').split('\n').map(line=>{const [meta,path]=line.split('\t'),[mode,type,sha]=meta.split(' ');return {path,mode,type,sha};});
+ const context={eventName:'workflow_dispatch',ref:'refs/heads/main',sha,runId:77,payload:{inputs:{tested_sha:sha}},repo:{owner:'SXQHex',repo:'FtkSaaS'}};
+ const run={id:77,head_sha:sha,run_attempt:1,event:'workflow_dispatch',path:'.github/workflows/ci-full.yml',head_branch:'main',created_at:'2026-11-12T00:00:00Z'};
+ const outputs={},core={setOutput(k,v){outputs[k]=v;},warning(){},summary:{addRaw(){return this;},async write(){}}};
+ const files=['manual-source.json','manual-binding.json','manual-measurements.json'].map(name=>path.join(repositoryRoot,'.artifacts/ci',name)),saved=files.map(file=>fs.existsSync(file)?fs.readFileSync(file):null),prior=process.env.GITHUB_RUN_ATTEMPT;
+ let artifacts=[],jobs=[],zip;
+ const github={rest:{git:{getCommit:async()=>({data:{sha,tree:{sha:tree}}}),getTree:async()=>({data:{tree:entries}})},actions:{listWorkflowRuns:async()=>({data:{workflow_runs:[]}}),listWorkflowRunArtifacts:'artifacts',listJobsForWorkflowRunAttempt:'jobs',getWorkflowRun:async()=>({data:run}),downloadArtifact:async()=>({data:zip})}},paginate:async method=>method==='jobs'?jobs:artifacts};
+ try{
+  process.env.GITHUB_RUN_ATTEMPT='1';await resolveManualFull(github,context,core);
+  const binding=JSON.parse(outputs.binding);assert.equal(binding.merge,sha);assert.equal(binding.kind,'manual-full');
+  const members={'manual-source.json':binding};
+  for(let n=1;n<=12;n++)members['clean-api'+n+'.json']={clean_phases:{role:'api',shard:n,coverage:binding.coverage,tests_s:100+n,backend_setup_s:10}};
+  zip=execFileSync('python3',['-c','import io,json,sys,zipfile;b=io.BytesIO();z=zipfile.ZipFile(b,"w");[z.writestr(k,json.dumps(v)) for k,v in json.loads(sys.argv[1]).items()];z.close();sys.stdout.buffer.write(b.getvalue())',JSON.stringify(members)]);
+  artifacts=[{id:1,name:'manual-source',size_in_bytes:zip.length},...Array.from({length:12},(_,i)=>({id:i+2,name:'timings-api-'+(i+1)+'-1',size_in_bytes:zip.length}))];
+  github.rest.actions.listWorkflowRuns=async()=>{throw Error('Rerun must not query latest reference');};
+  process.env.GITHUB_RUN_ATTEMPT='2';run.run_attempt=2;
+  await resolveManualFull(github,context,core);assert.deepEqual(JSON.parse(outputs.binding),binding);
+  jobs=['core',...Array.from({length:12},(_,i)=>'api-'+(i+1))].map((role,i)=>({id:i+1,name:'clean / '+role,run_id:77,run_attempt:2,head_sha:sha,status:'completed',conclusion:'success',created_at:run.created_at,started_at:run.created_at,completed_at:'2026-11-12T00:03:00Z',steps:['Verify tested merge','Clean acceptance',...(role==='core'?['Upload schema baseline']:[])].map(name=>({name,conclusion:'success',started_at:run.created_at,completed_at:'2026-11-12T00:02:00Z'}))}));
+  await collectManualFull(github,context,core,binding);
+  const report=JSON.parse(fs.readFileSync(files[2]));assert.equal(report.kind,'manual-full');assert.equal(report.distribution.length,12);assert.equal(report.source.attempt,2);assert.equal(report.source.source_attempt,1);assert.equal(report.balance.balanced,true);
+  await mergeGate({}, {eventName:'workflow_run',payload:{workflow_run:run}},core);
+  jobs[0].conclusion='skipped';await assert.rejects(collectManualFull(github,context,core,binding),/Failed\/skipped/);
+ }finally{
+  if(prior===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=prior;
+  files.forEach((file,i)=>{if(saved[i]===null)fs.rmSync(file,{force:true});else fs.writeFileSync(file,saved[i]);});
+ }
+});

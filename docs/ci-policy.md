@@ -42,6 +42,12 @@ Kalite işi olayın tam merge SHA/parent/tree’sini doğrular. Salt-okuma token
 
 Kalite sözleşmesi, checker/istisna dosyaları, uygulama/root görev manifestleri, Turbo, frontend/UI lint ve coverage config’leri ile TypeScript/Playwright config’leri (yeni iç klasör config’leri dahil) trusted politika karşılaştırmasına dahildir. Kurulum değişiklikleri mevcut kaynak-özel inceleme/kurulum prosedürünü izler; yeni status veya bypass mekanizması eklenmez. Yerel `pnpm check:quality` Turbo üzerinden çalışır; Git farkına bağlı görev cache kullanmaz. Bütçe ve ölçülmemiş boyutların tek sahibi CONSTRAINTS’tir.
 
+## Manuel tam koşu
+
+`Backend CI` içindeki `workflow_dispatch`, yalnız main’den tam40 karakter `tested_sha` ile yeni bir tanısal full clean başlatır. Workflow ve planlama/toplayıcı kodu dispatch olayının sabit main SHA’sından gelir; hedef commit’in envanteri güvenilir parser ile Git blob/mode/hash ve kaynak sahipliği denetlenerek veri olarak okunur. İlk denemede son uygun başarılı PR koşusunun ölçümleriyle yeni plan üretilir; core ve on iki API shard aynı tam hedef SHA/tree ve planla çalışır. Test runner’ı hedef commit’teki mevcut clean protokolüyle uyumlu olmalıdır; uyumsuzluk açık hata verir. PR kapsam seçimi, kalite kabulü ve otomatik CI/CD yolu değişmez.
+
+Manuel koşular PR’lerden ayrı concurrency grubundadır. `manual-source` ilk planı korur; rerun aynı workflow/hedef/tree/envanter/run kaydını ve planı kullanır, yeni ölçüm seçmez. Yeniden dağıtım için yeni `Run workflow` gerekir. `manual-full-binding-ATTEMPT` yalnız tanı raporudur; candidate/main kabul artifact’ı, merge status’u veya deploy yetkisi üretmez. Manuel ölçümler otomatik PR süre referansı havuzuna katılmaz. Rapor gerçek test sürelerini backend kurulumu ve kuyruktan ayırır; en uzun/en kısa oranı1,20 hedefi yalnız uyarıdır, işlev testinin yerine geçmez veya merge’i engellemez.
+
 ## Manuel targeted
 
 Girdiler tam 40 karakter SHA’dır; base test edilen head’in atası ve checkout birebir head olmalıdır. Son commit için parent→commit, birikimli değişiklik için seçilen ancestor→head kullanılır; origin/main merge-base’i açık aralığın yerine geçmez. Plan ve shard çıktıları kaynak aralığını gösterir; bu tanı mevcut main ile birleşim uygunluğunu kanıtlamaz.
