@@ -287,8 +287,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8c278345614a10f8cf30da6574a080d6e1266796a49c5f5ce0e1cac738f0ed45",
-        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
+        "fingerprint": "88860209204df5aca3800f6b3fe4d09a24a258bebb0fe0e1975f24e000473c07",
+        "reason": "CI589: CRM kabul fixture bigint sürümünü integer projekte eder; API envanterinde yalnız kaynak hash güncellendi, parça aralıkları ve politika korundu."
       }
     },
     {
@@ -1081,8 +1081,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "7fd528d41454c3c6103ad6ba6ff55d5d25712696be2299db65d6129a82f90949",
-        "reason": "Reviewed final S10 consumers and unchanged workflow protocol; native alert tests now distinguish unprocessed pre-enable targets from fresh post-enable work."
+        "fingerprint": "4848fd28ee43e2cf9d41fad053afc46598e384dbc885692e6a19e5a57697c818",
+        "reason": "CI589: e-posta başvurusunun aday oluşturma testi DB bigint sürümünü API integer tipinde yollar; telefon opsiyonelliği ve tüm kabul assertionları korundu, rehber ve runtime sözleşmesi değişmedi."
       }
     },
     {

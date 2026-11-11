@@ -50,7 +50,7 @@ test('P05 common intake normalizes phone and preserves distinct form delivery an
   const emailRequest={...request,request_id:key(),client_request_key:key(),contact_intake:{display_name:'Email-only applicant',email:'Applicant@Example.invalid',level:'Beginner',consents:request.intake.consents}};delete emailRequest.intake;
   const emailAux={target_hashes:{email:hash('applicant@example.invalid'),phone:hash('arbitrary optional phone')}};
   assert.equal((await rpc(emailRequest,emailAux)).ok,true);
-  const first=(await db.query("select * from core.public_applications where org_id=$1 and intake_format='contact'",[org])).rows[0];
+  const first=(await db.query("select *,version::int as version from core.public_applications where org_id=$1 and intake_format='contact'",[org])).rows[0];
   assert.equal(first.target_contact,'applicant@example.invalid');assert.equal(first.intake.phone,undefined);assert.equal(first.form_rules_snapshot.contact_requirement,'email');
   const withPhone={...emailRequest,client_request_key:key(),contact_intake:{...emailRequest.contact_intake,phone:'+905550000009'}};
   assert.equal((await rpc(withPhone,{target_hashes:{email:emailAux.target_hashes.email,phone:hash('+905550000009')}})).ok,true);
