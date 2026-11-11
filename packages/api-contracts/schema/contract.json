@@ -2219,18 +2219,55 @@
           "enum": [
             "entitlement_expiring",
             "student_inactive",
-            "lead_followup_due"
+            "lead_followup_due",
+            "pending_request",
+            "unclosed_attendance"
           ]
         },
         "offset_days": {
           "$ref": "#/$defs/Count"
+        },
+        "recipient_person_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
         }
       },
       "required": [
         "kind",
         "offset_days"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "pending_request",
+                  "unclosed_attendance"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "recipient_person_ids"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "recipient_person_ids"
+              ]
+            }
+          }
+        }
+      ]
     },
     "AutomationAction": {
       "type": "object",
@@ -16505,6 +16542,9 @@
         },
         "intake": {
           "$ref": "#/$defs/CrmIntake"
+        },
+        "contact_intake": {
+          "$ref": "#/$defs/CrmContactIntake"
         }
       },
       "required": [
@@ -16531,6 +16571,11 @@
                 "required": [
                   "intake"
                 ]
+              },
+              {
+                "required": [
+                  "contact_intake"
+                ]
               }
             ]
           }
@@ -16550,6 +16595,36 @@
               {
                 "required": [
                   "contact"
+                ]
+              },
+              {
+                "required": [
+                  "contact_intake"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "form_id",
+            "contact_intake"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "publication_id"
+                ]
+              },
+              {
+                "required": [
+                  "contact"
+                ]
+              },
+              {
+                "required": [
+                  "intake"
                 ]
               }
             ]
@@ -23541,6 +23616,9 @@
               "$ref": "#/$defs/CrmIntakeView"
             },
             {
+              "$ref": "#/$defs/CrmContactIntakeView"
+            },
+            {
               "type": "null"
             }
           ]
@@ -23569,6 +23647,23 @@
           "anyOf": [
             {
               "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intake_format": {
+          "type": "string",
+          "enum": [
+            "phone",
+            "contact"
+          ]
+        },
+        "form_rules_snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CrmFormRulesSnapshot"
             },
             {
               "type": "null"
@@ -24186,6 +24281,10 @@
         },
         "presentation": {
           "$ref": "#/$defs/DisciplinePresentationPatch"
+        },
+        "deactivation_proof": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
         }
       },
       "required": [
@@ -24247,6 +24346,10 @@
         },
         "presentation": {
           "$ref": "#/$defs/CenterDisciplinePresentationPatch"
+        },
+        "deactivation_proof": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
         }
       },
       "required": [
@@ -35498,6 +35601,9 @@
             },
             "phone_matches_truncated": {
               "type": "boolean"
+            },
+            "contact_intake": {
+              "$ref": "#/$defs/CrmContactIntakeView"
             }
           },
           "required": [],
@@ -35828,6 +35934,9 @@
             },
             "state": {
               "$ref": "#/$defs/RecordState"
+            },
+            "deactivation_effects": {
+              "$ref": "#/$defs/SettingsDeactivationEffects"
             }
           },
           "required": [],
@@ -35854,6 +35963,9 @@
             },
             "state": {
               "$ref": "#/$defs/RecordState"
+            },
+            "deactivation_effects": {
+              "$ref": "#/$defs/SettingsDeactivationEffects"
             }
           },
           "required": [],
@@ -36634,6 +36746,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_instructor_agreement_accept_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_settings_update_v1"
         }
       ]
     },
@@ -40146,6 +40261,9 @@
                   "type": "null"
                 }
               ]
+            },
+            "include_contact_intake": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -40468,6 +40586,9 @@
                   "type": "null"
                 }
               ]
+            },
+            "include_deactivation_effects": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -40491,6 +40612,9 @@
           "properties": {
             "discipline_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "include_deactivation_effects": {
+              "type": "boolean"
             }
           },
           "required": [
@@ -42045,6 +42169,9 @@
         },
         "discipline_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_delegation": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -42143,6 +42270,9 @@
               "type": "null"
             }
           ]
+        },
+        "personal_override_enabled": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -45454,6 +45584,101 @@
               "type": "null"
             }
           ]
+        },
+        "work_calendar": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "rules": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "weekdays": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 7
+                        },
+                        "uniqueItems": true,
+                        "minItems": 1
+                      },
+                      "local_start": {
+                        "type": "string",
+                        "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                      },
+                      "local_end": {
+                        "type": "string",
+                        "pattern": "^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]|24:00:00)$"
+                      },
+                      "valid_from": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "valid_until": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "weekdays",
+                      "local_start",
+                      "local_end",
+                      "valid_from"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "local_start < local_end; overnight explicitly split at 24:00:00 / next-day 00:00:00; adjacent rules jointly cover actual UTC interval; absent or ambiguous weekly boundaries are not silently shifted"
+                  }
+                },
+                "closures": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      }
+                    },
+                    "required": [
+                      "starts_at",
+                      "ends_at",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "rules",
+                "closures"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -46695,6 +46920,144 @@
               "type": "null"
             }
           ]
+        },
+        "personal_negative_limits_enabled": {
+          "type": "boolean"
+        },
+        "application_form_rules": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "form_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "contact_requirement": {
+                "type": "string",
+                "enum": [
+                  "phone",
+                  "email",
+                  "either"
+                ]
+              },
+              "required_fields": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "interest",
+                    "message",
+                    "partner_name",
+                    "mode",
+                    "level"
+                  ]
+                },
+                "maxItems": 5,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "form_id",
+              "contact_requirement",
+              "required_fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "work_calendar": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "rules": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "weekdays": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 7
+                        },
+                        "uniqueItems": true,
+                        "minItems": 1
+                      },
+                      "local_start": {
+                        "type": "string",
+                        "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                      },
+                      "local_end": {
+                        "type": "string",
+                        "pattern": "^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]|24:00:00)$"
+                      },
+                      "valid_from": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "valid_until": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "weekdays",
+                      "local_start",
+                      "local_end",
+                      "valid_from"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "local_start < local_end; overnight explicitly split at 24:00:00 / next-day 00:00:00; adjacent rules jointly cover actual UTC interval; absent or ambiguous weekly boundaries are not silently shifted"
+                  }
+                },
+                "closures": {
+                  "type": "array",
+                  "maxItems": 200,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      }
+                    },
+                    "required": [
+                      "starts_at",
+                      "ends_at",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "rules",
+                "closures"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -46921,7 +47284,8 @@
                   "crm_local_tags",
                   "map_url",
                   "directions",
-                  "website_url"
+                  "website_url",
+                  "work_calendar"
                 ]
               },
               "uniqueItems": true,
@@ -47022,7 +47386,10 @@
                   "crm_pipeline",
                   "map_url",
                   "directions",
-                  "website_url"
+                  "website_url",
+                  "personal_negative_limits_enabled",
+                  "application_form_rules",
+                  "work_calendar"
                 ]
               },
               "uniqueItems": true,
@@ -47305,7 +47672,10 @@
             "reminder_quiet_until",
             "organization_regional_context",
             "organization_security_assert",
-            "crm_pipeline"
+            "crm_pipeline",
+            "lesson_impact_authorize",
+            "crm_intake_submit",
+            "center_work_calendar_contains"
           ]
         },
         "writable": {
@@ -47334,7 +47704,7 @@
           ]
         },
         "catalog_version": {
-          "const": 19
+          "const": 20
         },
         "fields": {
           "type": "array",
@@ -47386,7 +47756,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 19
+              "const": 20
             }
           },
           "required": [
@@ -47404,7 +47774,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 19
+              "const": 20
             }
           },
           "required": [
@@ -47422,7 +47792,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 19
+              "const": 20
             }
           },
           "required": [
@@ -47440,7 +47810,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 19
+              "const": 20
             }
           },
           "required": [
@@ -47458,7 +47828,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 19
+              "const": 20
             }
           },
           "required": [
@@ -48720,6 +49090,9 @@
           "properties": {
             "scope": {
               "$ref": "#/$defs/SettingsScope"
+            },
+            "work_calendar": {
+              "$ref": "#/$defs/SettingsCenterWorkCalendarValue"
             }
           },
           "required": [
@@ -51489,64 +51862,16 @@
       "type": "object",
       "properties": {
         "availability_templates": {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "enum": [
-                "system_default",
-                "organization_copy",
-                "center_local"
-              ]
-            },
-            "organization_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "additionalProperties": false
+          "$ref": "#/$defs/CenterPreparationSource"
         },
         "package_templates": {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "enum": [
-                "system_default",
-                "organization_copy",
-                "center_local"
-              ]
-            },
-            "organization_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "additionalProperties": false
+          "$ref": "#/$defs/CenterPreparationSource"
         },
         "program_templates": {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "enum": [
-                "system_default",
-                "organization_copy",
-                "center_local"
-              ]
-            },
-            "organization_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "additionalProperties": false
+          "$ref": "#/$defs/CenterPreparationSource"
+        },
+        "work_calendar": {
+          "$ref": "#/$defs/CenterPreparationSource"
         }
       },
       "required": [
@@ -54269,7 +54594,8 @@
         "crm_local_tags",
         "map_url",
         "directions",
-        "website_url"
+        "website_url",
+        "work_calendar"
       ]
     },
     "OrganizationSettingsFieldKey": {
@@ -54314,7 +54640,10 @@
         "crm_pipeline",
         "map_url",
         "directions",
-        "website_url"
+        "website_url",
+        "personal_negative_limits_enabled",
+        "application_form_rules",
+        "work_calendar"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -54407,7 +54736,10 @@
         "crm_local_tags",
         "map_url",
         "directions",
-        "website_url"
+        "website_url",
+        "personal_negative_limits_enabled",
+        "application_form_rules",
+        "work_calendar"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -56099,6 +56431,533 @@
         "stage",
         "tags",
         "loss_reason"
+      ],
+      "additionalProperties": false
+    },
+    "CrmContactIntake": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "$ref": "#/$defs/CrmContactDisplayName"
+        },
+        "phone": {
+          "$ref": "#/$defs/CrmContactPhone"
+        },
+        "email": {
+          "$ref": "#/$defs/CrmContactEmail"
+        },
+        "interest": {
+          "$ref": "#/$defs/CrmContactInterest"
+        },
+        "message": {
+          "$ref": "#/$defs/CrmContactMessage"
+        },
+        "partner_name": {
+          "$ref": "#/$defs/CrmContactPartnerName"
+        },
+        "mode": {
+          "$ref": "#/$defs/CrmContactMode"
+        },
+        "attribution": {
+          "$ref": "#/$defs/CrmContactAttribution"
+        },
+        "consents": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/CrmIntakeConsent"
+          }
+        },
+        "level": {
+          "$ref": "#/$defs/CrmContactLevel"
+        }
+      },
+      "required": [
+        "display_name",
+        "consents"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "phone"
+          ]
+        },
+        {
+          "required": [
+            "email"
+          ]
+        }
+      ]
+    },
+    "CrmContactIntakeView": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "$ref": "#/$defs/CrmContactDisplayName"
+        },
+        "phone": {
+          "$ref": "#/$defs/CrmContactPhone"
+        },
+        "email": {
+          "$ref": "#/$defs/CrmContactEmail"
+        },
+        "interest": {
+          "$ref": "#/$defs/CrmContactInterest"
+        },
+        "message": {
+          "$ref": "#/$defs/CrmContactMessage"
+        },
+        "partner_name": {
+          "$ref": "#/$defs/CrmContactPartnerName"
+        },
+        "mode": {
+          "$ref": "#/$defs/CrmContactMode"
+        },
+        "attribution": {
+          "$ref": "#/$defs/CrmContactAttribution"
+        },
+        "consents": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/CrmIntakeConsentEvidence"
+          }
+        },
+        "level": {
+          "$ref": "#/$defs/CrmContactLevel"
+        }
+      },
+      "required": [
+        "display_name",
+        "consents"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "phone"
+          ]
+        },
+        {
+          "required": [
+            "email"
+          ]
+        }
+      ]
+    },
+    "SettingsDeactivationEffects": {
+      "type": "object",
+      "properties": {
+        "blocking": {
+          "type": "boolean"
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "sessions": {
+              "$ref": "#/$defs/Count"
+            },
+            "reservations": {
+              "$ref": "#/$defs/Count"
+            },
+            "requests": {
+              "$ref": "#/$defs/Count"
+            },
+            "waitlist": {
+              "$ref": "#/$defs/Count"
+            },
+            "offers": {
+              "$ref": "#/$defs/Count"
+            },
+            "classes": {
+              "$ref": "#/$defs/Count"
+            },
+            "programs": {
+              "$ref": "#/$defs/Count"
+            },
+            "products": {
+              "$ref": "#/$defs/Count"
+            },
+            "sales": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "sessions",
+            "reservations",
+            "requests",
+            "waitlist",
+            "offers",
+            "classes",
+            "programs",
+            "products",
+            "sales"
+          ],
+          "additionalProperties": false
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "enum": [
+                  "sessions",
+                  "reservations",
+                  "requests",
+                  "waitlist",
+                  "offers",
+                  "classes",
+                  "programs",
+                  "products",
+                  "sales"
+                ]
+              },
+              "id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "version": {
+                "$ref": "#/$defs/PositiveInt"
+              },
+              "blocking": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "category",
+              "id",
+              "version",
+              "blocking"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "proof": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{32}$"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "blocking",
+        "counts",
+        "items",
+        "proof",
+        "truncated"
+      ],
+      "additionalProperties": false
+    },
+    "CenterWorkCalendar": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "weekdays": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 7
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "local_start": {
+                "type": "string",
+                "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+              },
+              "local_end": {
+                "type": "string",
+                "pattern": "^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]|24:00:00)$"
+              },
+              "valid_from": {
+                "type": "string",
+                "format": "date"
+              },
+              "valid_until": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "weekdays",
+              "local_start",
+              "local_end",
+              "valid_from"
+            ],
+            "additionalProperties": false,
+            "x-invariant": "local_start < local_end; overnight explicitly split at 24:00:00 / next-day 00:00:00; adjacent rules jointly cover actual UTC interval; absent or ambiguous weekly boundaries are not silently shifted"
+          }
+        },
+        "closures": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "starts_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "ends_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "starts_at",
+              "ends_at",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "rules",
+        "closures"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsWorkCalendarImpact": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "$ref": "#/$defs/Count"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "sessions": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "version": {
+                "$ref": "#/$defs/PositiveInt"
+              },
+              "starts_at": {
+                "$ref": "#/$defs/Instant"
+              },
+              "ends_at": {
+                "$ref": "#/$defs/Instant"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "starts_at",
+              "ends_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "count",
+        "truncated",
+        "sessions"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_settings_update_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "settings_update_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "center"
+            },
+            "work_calendar": {
+              "$ref": "#/$defs/SettingsCenterWorkCalendarValue"
+            },
+            "work_calendar_impact": {
+              "$ref": "#/$defs/SettingsWorkCalendarImpact"
+            },
+            "settings_version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "scope",
+            "work_calendar",
+            "work_calendar_impact",
+            "settings_version"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsCenterWorkCalendarValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CenterWorkCalendar"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "CrmContactAttribution": {
+      "type": "object",
+      "properties": {
+        "campaign_id": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "ad_id": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "utm_source": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "utm_medium": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "utm_campaign": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "utm_term": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "utm_content": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "page_url": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "CrmContactDisplayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "CrmContactPhone": {
+      "type": "string",
+      "minLength": 7,
+      "maxLength": 40
+    },
+    "CrmContactEmail": {
+      "type": "string",
+      "format": "email",
+      "maxLength": 320
+    },
+    "CrmContactInterest": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "CrmContactMessage": {
+      "type": "string",
+      "maxLength": 10000
+    },
+    "CrmContactPartnerName": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "CrmContactMode": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "CrmContactLevel": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "CenterPreparationSource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "system_default",
+            "organization_copy",
+            "center_local"
+          ]
+        },
+        "organization_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "CrmFormRulesSnapshot": {
+      "type": "object",
+      "properties": {
+        "form_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "contact_requirement": {
+          "type": "string",
+          "enum": [
+            "phone",
+            "email",
+            "either"
+          ]
+        },
+        "required_fields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "interest",
+              "message",
+              "partner_name",
+              "mode",
+              "level"
+            ]
+          },
+          "maxItems": 5,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "contact_requirement",
+        "required_fields"
       ],
       "additionalProperties": false
     }
@@ -100236,6 +101095,36 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationTrigger/properties/recipient_person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFormRulesSnapshot/properties/form_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/application_form_rules/items/properties/form_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettingsDeactivationEffects/properties/items/items/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettingsWorkCalendarImpact/properties/sessions/items/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -100689,7 +101578,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 145,
+      "migration_count": 146,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

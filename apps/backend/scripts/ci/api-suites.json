@@ -372,15 +372,15 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "293da01552f8712f4cd6f13c3d729963204d769ad9f1bf7179eb7c553b1eb80f",
+      "sha256": "a90e30be4617573c9a9f5fa8976ad38d34776f02195bc058798b765a9a08b303",
       "shared": [
         [
           2,
           69
         ],
         [
-          352,
-          353
+          354,
+          355
         ]
       ],
       "parts": [
@@ -392,8 +392,8 @@
               103
             ],
             [
-              354,
-              354
+              356,
+              356
             ]
           ]
         },
@@ -405,8 +405,8 @@
               166
             ],
             [
-              355,
-              355
+              357,
+              357
             ]
           ]
         },
@@ -415,11 +415,11 @@
           "ranges": [
             [
               167,
-              219
+              221
             ],
             [
-              356,
-              356
+              358,
+              358
             ]
           ]
         },
@@ -427,12 +427,12 @@
           "id": "earnings-occurrence-authority",
           "ranges": [
             [
-              220,
-              319
+              222,
+              321
             ],
             [
-              357,
-              357
+              359,
+              359
             ]
           ]
         },
@@ -440,12 +440,12 @@
           "id": "earnings-pilot",
           "ranges": [
             [
-              320,
-              351
+              322,
+              353
             ],
             [
-              358,
-              358
+              360,
+              360
             ]
           ]
         }
@@ -992,7 +992,7 @@
         {
           "line": 148,
           "path": "apps/backend/tests/crm-application-intake-acceptance.mjs",
-          "sha256": "ea64788526db258f1a30e9ec01e61b90c57da4d66570d787e1472c96b8a4acb7"
+          "sha256": "fd19e9bb6ff0be8f5daad80010a995513b0415eea4b9a2cb811b0a8416b833e0"
         },
         {
           "line": 149,
@@ -1068,7 +1068,7 @@
         {
           "line": 159,
           "path": "apps/backend/tests/automation-results-acceptance.mjs",
-          "sha256": "dfb129f39201693fb72dc7dfaa1f1bd790c09cb81a254449e8f90f0b5b6faad8"
+          "sha256": "151b1ac2501e3b1be82716b1ba96ad13023d1458e9ee647b1f211a4739ccffe1"
         },
         {
           "line": 160,
@@ -1163,23 +1163,23 @@
     },
     {
       "path": "apps/backend/tests/starter-attendance-protection.test.mjs",
-      "sha256": "f5202f7070d166393dad23ff69c349817256874304a41b11f20f9ed6cdc7dc13",
+      "sha256": "12acd4aaae7f3c73b955b59bf4831e35b70c0f17134774c474b96c95b0825dcb",
       "shared": [
         [
-          1,
-          60
+          2,
+          70
         ],
         [
-          167,
-          167
+          183,
+          183
         ],
         [
-          210,
-          210
+          226,
+          226
         ],
         [
-          311,
-          311
+          327,
+          327
         ]
       ],
       "parts": [
@@ -1187,8 +1187,8 @@
           "id": "starter-attendance-revisions",
           "ranges": [
             [
-              61,
-              166
+              71,
+              182
             ]
           ]
         },
@@ -1196,8 +1196,8 @@
           "id": "starter-attendance-authority",
           "ranges": [
             [
-              168,
-              209
+              184,
+              225
             ]
           ]
         },
@@ -1205,8 +1205,8 @@
           "id": "starter-attendance-ledger",
           "ranges": [
             [
-              211,
-              310
+              227,
+              326
             ]
           ]
         },
@@ -1214,13 +1214,19 @@
           "id": "starter-attendance-policy",
           "ranges": [
             [
-              312,
-              404
+              328,
+              420
             ]
           ]
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/settings-behavior-acceptance.mjs",
+          "sha256": "7bde74c78f4f7533fff8b17bd98c862b80d7d18f074b7eede0ad1ee19f176aa7"
+        }
+      ],
       "estimated_seconds": 240.63
     }
   ],

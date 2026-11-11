@@ -680,3 +680,13 @@ Aynı katalogda organization/center map_url/directions/website_url gerçek priva
 **Backend gözlemi (11 Kasım):** ftksaas-web.vercel.app/login üzerinden Google seçimi canonical uye.fethiyetango.com/login?error=callback sonucuna döndü. Aynı mevcut Google kimliğiyle canonical login üzerinden yeniden deneme, gerçek MFA ve korumalı hesap ekranıyla tamamlandı. İki deneme ayrı değerlendirilir. Frontend native callback ve appOrigin kaynağı incelendi: yan origin'de başlayan PKCE verifier çerezi canonical callback origin'inde bulunamaz. Native Auth ayarı/kimliği, izin listesi veya backend güvenlik kapısı gevşetilmedi.
 
 **İstenen sonuç ve kabul:** Frontend desteklenen origin kararını uygular. Yan origin desteklenmiyorsa kullanıcı Google akışını başlatmadan canonical girişe güvenli yönlendirilir; destekleniyorsa native PKCE dönüşü kendi origin sınırında korunur. Verifier/token query, fragment veya sunucu loguna taşınmaz; yeni özel Auth katmanı kurulmaz. Önce Playwright ile canonical ve yan-origin girişleri, mevcut kimliğin korunması, MFA ve izinli yerel next hedefi doğrulanır; yalnız Playwright ile tamamlanamayan kontrol Chrome eklentisine taşınır. Frontend uygulaması ve son kabulü kendi sahibindedir.
+
+
+<a id="xreq-041-iş-takvimi-başvuru-gereksinimleri-ve-disiplin-etki-tüketimi"></a>
+## XREQ-041 İş takvimi, başvuru gereksinimleri ve disiplin etki tüketimi
+
+### Backend devri — 12 Kasım 2026
+
+PR278 adayı katalogv20 ve güncel typed sözleşmeyle dört yeni ayar alanı, disiplin etki/proof okuması, iki iş uyarısı ve esnek iletişim başvurusu sunar. Kesin alan/izin/default/miras ve eski DTO uyumluluğu [ayar rehberinde](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), başvuru opt-in'i [iletişim gereksinimlerinde](settings.md#başvuru-formunun-iletişim-gereksinimleri) açıklanır. Native backend kabulü frontend ekranı beklemeden yapılır; aday/merge/deploy/hosted durumu [backend devrinden](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-ayar-davranışlarını-tamamlama) okunur.
+
+**Frontend kabul ölçütü:** Katalogdan yalnız desteklenen writable alanları tüket; iş takvimi değişiminde güncel etki/sürümü göster, açık işleri otomatik iptal etme. Disiplin kapatmada gerçek referansları ve güncel proof'u kullan; stale/engelde yeniden oku. Kişisel negatif hak seçiminde include_delegation okuyucusunu kullan; org izni yokken yazma sunma. Eski intake yolu korunur; e-posta/either başvurusunda contact_intake ve inbox include_contact_intake kullan, telefon uydurma. Uyarı yalnız açık yetkili alıcıyla yapılandırılır; kullanıcıya otomatik talep/yoklama tamamlanması gösterilmez. Belirsiz mutasyonda aynı işlem anahtarıyla kurtar ve gerçek sonucu yeniden oku. Bu devir frontend uygulama veya kapanış onayı değildir.

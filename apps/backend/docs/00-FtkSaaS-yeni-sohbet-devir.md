@@ -1,5 +1,13 @@
 # Güncel kaynak ve kabul
 
+## S10 ayar davranışlarını tamamlama
+
+PR278 üzerinde frontend beklenmeden backend API/SQL/native kabulü yürütülür. Katalogv20,115 alanı39 normatif ayar grubuna bağlar; bu sayı69 grubun tamamının kapanışı değildir. Kabul edilmiş program/etkinlik/tahsilat/CRM/otomasyon ve dijital onay teslimleri yeniden iş sayılmaz. Bu paketin kesin scope/varsayılan/miras/etki sınırı [ayar rehberinde](../../../docs/settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), kalan görev [S10](remaining-work.md#s10) sahibindedir.
+
+Yeni kaynak: organizasyon kişisel negatif hak izni; yetkili form iletişim/alan gereksinimleri ve ayrı contact_intake; canlı kapatma etkisi/proof; merkez iş takvimi ve başlangıç kopyası; pending_request/unclosed_attendance iş uyarıları. Migration146 eskileri değiştirmeden eklenir. Doğrulayıcı üretimi aynı kapalı şemaların kopyalarını yalnız derleme sırasında ortaklaştırır; wire sözleşmesi veya kalite/boyut sınırı değişmez.
+
+Yerel PostgreSQL derlemesi ve doğrudan helper sorguları geçti: yedi SQL kaynağı, e-posta normalizasyonu/telefonlu eski ret, yetkili form gereksinimi, gece yarısı aralık birleşimi ve açık kapanış reddi. Bu PGlite/snapshot kabulü native Auth→Edge→RPC veya hosted kabulü değildir. Yerel tam verify502/502 (351 sözleşme/yönetişim/restore,141 CI protokolü,10 kalite) geçti; skipped/cancelled0. Kalite guard0 bulgu; belge kontrolü35 dosya/2033 bağlantı;114 API biriminde her kaynak satırı sahipli. E-posta başvurusuna yeniden telefon zorunluluğu ekleyen izole mutasyon regresyonu düşürdü; özgün sözleşme byte-for-byte geri alındı. Bağımsız incelemede açık Critical/Required0; ayrıca Edge standalone/parite2/2 geçti. Son JSON-encoded Edge yükü3.837.469 bayt ve mevcut4.000.000 sınırının altında. Son aday native CI henüz başlamadı; merge/deploy/hosted kabulü yapılmadı.
+
 ## S08 son kapanış kabulü — 11 Kasım 2026
 
 Aktif dal `feature/backend-s08-closure`, taban main `0b93acc54b5a68e213b57cdff9a6af65f4c54d5c` (PR277). Aday43088285756, aynı main source43092122433/merge43092122389 ve development43092191301 success doğrulandı. Bu kayıt S08 kapanış hazırlığıdır; görev henüz kapalı değildir.
@@ -353,29 +361,29 @@ Tablo tam grup envanteridir; bütün alt alanların runtime teslimi değildir. S
 | S15 | 4 | Üye paylaşım tercihleri ve katılımcı projeksiyonu | Ayrıntılı amaç/metin izin geçmişi bütünlüğü O08/S10. |
 | S16 | 0 | Mevcut hesap/org lifecycle komutları | Veri kopyası ve doğrulanmış imha O08; tamamlandı uydurulmaz. |
 | S17 | 0 | Kendi güvenlik geçmişi; alan seçmeli reset | Her güvenilen cihaz/cache akışı teslim edilmiş sayılmaz; S08/S10. |
-| M01 | 4 | Merkez komutları ve kimlik/iletişim tercihleri | Harita/ulaşımın bütün alt alanları mevcut DTO değil; S10. |
-| M02 | 1 | Merkez timezone/availability; hazırlık şablonları | Geçmiş seans değişmez; bütün takvim şablonları S10. |
+| M01 | 7 | Merkez komutları ve kimlik/iletişim tercihleri | Harita/ulaşım/web alanları PR277 kaynağında; hosted görünürlük kabulü S10. |
+| M02 | 2 | Merkez timezone/availability; hazırlık şablonları | Geçmiş seans değişmez; bütün takvim şablonları S10. |
 | M03 | 0 | Oda/kaynak/kapasite komutları | Kaynak varsayılanları domain API; bütün görünüm seçenekleri S10. |
-| M04 | 0 | Merkez disiplin komutları | Sıra/simge/renk gibi eksik alt alanlar S10; yeni global katalog V2. |
+| M04 | 0 | Merkez disiplin komutları | Sunum alanları mevcut; kapatma etki okuyucusu aktif S10 paketinde; global katalog V2. |
 | M05 | 1 | Merkez rol/grant komutları | Sekiz gerçek writer izni ve staff-only kapasite istisnası hazırlığı; native teslim/kabul bu pakette. Kalan yerel sınır/rol güvenlik tercihleri S10/O04. |
-| M06 | 1 | Program/seans komutları; süre hazırlığı | Her biçim/tekrar/özel gün defaultu hazır değil; S10. |
+| M06 | 2 | Program/seans komutları; süre hazırlığı | Program hazırlıkları mevcut; ayrı iş takvimi ve açık özel gün etkisi aktif S10 paketinde. |
 | M07 | 0 | Talep/rezervasyon/bekleme ve pencere politikaları | Domain politika yayını; paket şablonu bu gruptan çıkarıldı. Eksik tercihler S10. |
 | M08 | 0 | Borç/negatif hak/kişisel limit komutları | Domain politika/etki kapıları; serbest generic ayar yok; S10. |
 | M09 | 0 | Yoklama/gerçekleşme/düzeltme komutları | Yeni yoklama default/gösterim alt alanları S10. |
 | M10 | 1 | Paket hazırlığı ve ürün/satış komutları | Her indirim/fiyat defaultu hazır değil; S10/P03. |
-| M11 | 0 | Tahsilat/iade/düzeltme komutları | Banka/finans özet defaultları tam değil; S10. |
-| M12 | 1 | Eğitmen anlaşması komutları | Anlaşma default/şablon kataloğu tam değil; S10/P04. |
-| M13 | 0 | Etkinlik komutları | Yeni etkinlik defaultları tam değil; S10/P12–P13. |
+| M11 | 1 | Tahsilat/iade/düzeltme komutları | Kapalı tahsilat hazırlığı mevcut; desteklenmeyen banka entegrasyonu etkin gösterilmez. |
+| M12 | 1 | Eğitmen anlaşması komutları | Anlaşma hazırlık/resolve teslimi mevcut; hakediş domain kapıları ve hosted kabul izi korunur. |
+| M13 | 1 | Etkinlik komutları | Kapalı event hazırlığı ve gerçek source/version resolve mevcut; etkinlik domain kapıları korunur. |
 | M14 | 6 | Merkez hatırlatma ayarları | P15 default/override kapıları; her şablon/alıcı seçeneği hazır değil; S10. |
 | M15 | 0 | Belge yükle/yayın/etki/onay | S13 hosted kapalı; metin/dil/şablon alt alanları S10. |
 | M16 | 3 | Public profil/yayın/başvuru komutları | Gerçek widget/hostname/action S14/P07. |
-| M17 | 0 | Plan kapılı iş otomasyonu komutları | P16 worker kanıtı korunur; hazır şablon tercihleri S10. |
+| M17 | 1 | Plan kapılı iş otomasyonu komutları | P16 worker kanıtı korunur; hazır şablon tercihleri S10. |
 | M18 | 1 | Merkez rapor şablonları ve export | S11 hosted kapalı; bütün rapor tasarım seçenekleri S10. |
 | M19 | 1 | Merkez import şablonları ve mapping | S12 hosted kapalı; yeni paylaşım seçenekleri S10. |
 | M20 | 0 | Mevcut policy override ve alan seçmeli reset | Bütün gruplara genellenmiş miras/yayın ekranı/APIsi yok; S10. |
-| M21 | 0 | CRM alım/lead/takip/atama komutları | Yeni aşama/alan/sıra ayar kataloğu tam değil; S10/P05–P11. |
+| M21 | 2 | CRM alım/lead/takip/atama komutları | Yeni aşama/alan/sıra ayar kataloğu tam değil; S10/P05–P11. |
 | M22 | 0 | Canlı role/grant/management ve ayar history | Her ayar grubunun alan bazlı izin/denetimi S10/O04. |
-| O01 | 15 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur; S10. |
+| O01 | 18 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur; S10. |
 | O02 | 1 | Ortak politika yayını ve availability hazırlığı | Kopya canlı miras değildir; bütün alanların lock/override desteği S10. |
 | O03 | 1 | Org/merkez görev ve izin komutları | Sekiz destekli izin için açık hazırlık vardır; yeni genel toplu grant motoru yoktur. Kalan rol güvenlik tercihleri S10/O04. |
 | O04 | 1 | Native MFA ve organization security_policy ortak dispatch/keşif kapısı | Kaynak/SQL regresyonu bu pakette; yeni native/main/hosted kabulü ayrı bekler. Genel ikinci onay yoktur. |
@@ -383,18 +391,18 @@ Tablo tam grup envanteridir; bütün alt alanların runtime teslimi değildir. S
 | O06 | 1 | Kişisel tercihlerden ayrı regional defaults ve normal org/public bağlamı | Gerçek HTTP regional tüketimi tamam; bildirim dili XREQ-033 frontend sorumluluğunda, belge dil/fallback tüketimi S10’da açık. |
 | O07 | 7 | Org hatırlatma ve merkez override tercihleri | P14/P15 teslim kanıtı korunur; tüm gönderici/şablon alanları S10. |
 | O08 | 0 | Org belge ve sürümlü gereksinim komutları | S13 hosted kapalı; her kurumsal şablon/dil/yerel kilit S10. |
-| O09 | 0 | Ortak CRM inbox/route/review komutları | Yeni ortak aşama/alan ayarları tam değil; S10/P05–P11/B02. |
+| O09 | 3 | Ortak CRM inbox/route/review komutları | Yeni ortak aşama/alan ayarları tam değil; S10/P05–P11/B02. |
 | O10 | 1 | Paket hazırlığı; ürün/satış komutları | Yeni şablon ürün yayını değildir; bütün kilit/defaultlar S10. |
-| O11 | 0 | Katılım/negatif hak/pencere policy komutları | Geçmiş rezervasyon koruması ayrı; tüm ortak yerel sınırlar S10. |
-| O12 | 0 | Finans ve merkezler arası hesaplaşma komutları | Banka/alıcı/özet ayar kataloğu tam değil; S10/B03. |
-| O13 | 0 | Otomasyon komutları/worker | Ortak hazır iş şablonları tam değil; S10/P16. |
+| O11 | 1 | Katılım/negatif hak/pencere policy komutları | Geçmiş rezervasyon koruması ayrı; tüm ortak yerel sınırlar S10. |
+| O12 | 1 | Finans ve merkezler arası hesaplaşma komutları | Banka/alıcı/özet ayar kataloğu tam değil; S10/B03. |
+| O13 | 1 | Otomasyon komutları/worker | Ortak hazır iş şablonları tam değil; S10/P16. |
 | O14 | 2 | Org rapor/import şablonları | Canlı tüketici yetkisi paylaşım izninden ayrıdır; kalan seçenekler S10. |
 | O15 | 0 | Hazır sağlayıcı backend ingress/worker | Meta/Google gerçek kurulum kullanıcı kararıyla erteli; P08/P09/S10. |
 | O16 | 0 | Üye paylaşımı ve public alan seçimi | Org amaç/metin/alıcı ayarlarının bütünü hazır değil; S10/O08. |
 | O17 | 0 | SaaS dönem/plan/yenileme komutları; fatura O01 | S16 kaynak kapalı; harici otomatik ödeme sağlayıcısı açılmaz; S10. |
-| O18 | 1 | Yeni merkeze tek sefer program süresi kopyası | Bütün takvim/çalışma günü defaultları mevcut değil; S10. |
+| O18 | 3 | Yeni merkeze tek sefer program süresi kopyası | Bütün takvim/çalışma günü defaultları mevcut değil; S10. |
 | O19 | 1 | agreement_templates ve mevcut anlaşma/ücret model komutları | Gerçek kaynak/sürüm hazırlığı ve açık writer ayrıdır; kalan yerel ücret sınırları S10/P04. |
-| O20 | 0 | Etkinlik komutları | Ortak event default/şablon kataloğu eksik; S10/P12–P13. |
+| O20 | 1 | Etkinlik komutları | Ortak event default/şablon kataloğu eksik; S10/P12–P13. |
 | O21 | 0 | Settings history/reset ve domain sürümlü yayın | Bütün ayarlarda ileri yürürlük/taslak/rollback yok; S10. |
 | P01 | 4 | Uygulama/destek/bakım metni tercihleri | Hazır dil/logo/default kataloglarının bütünü yok; S10. |
 | P02 | 0 | Native Auth config ve hesap güvenlik komutları | Teknik Auth motoru işletim alanı; genel platform ayar UI/API yok; S08/O04. |

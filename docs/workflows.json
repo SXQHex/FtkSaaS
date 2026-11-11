@@ -287,8 +287,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "0d7b4d9c8a3c7188247d025d31544ef4bfa880fd4533ddfb40f53d120e62e5f6",
-        "reason": "Scoped reset enums reviewed against all catalog fields; shared and Edge validators now accept valid scope keys and reject unknown or foreign fields"
+        "fingerprint": "ccd18bb2de8a6da38c1a53285b4ce4987ef6f6e34e217f52c6eed8a438d65330",
+        "reason": "Reviewed final S10 direct work alerts and preserved preparation-template schema; all old assertions/parts remain and exact scope/version consumers are aligned."
       }
     },
     {
@@ -456,7 +456,8 @@
         "apps/backend/database/account-self-context.sql",
         "apps/backend/supabase/migrations/20261107093756_account_self_context.sql",
         "apps/backend/database/discipline-presentation.sql",
-        "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql"
+        "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql",
+        "apps/backend/database/settings-discipline-effects.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -482,8 +483,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "8f24ab3531d61c13c96ac0c207d496a083e5bfdc3a310ed2ca64071219de6bae",
-        "reason": "Organization settings schema additions reviewed; existing studio bootstrap and role boundaries unchanged"
+        "fingerprint": "6f9ee361e5762a7ee147d6f4f65ab968fa895843e7b2eb0a7ac91a6b778ec8d5",
+        "reason": "Discipline deactivation effect reader and current proof guard preserve unresolved work and historical references."
       }
     },
     {
@@ -578,8 +579,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8dfa41eefcc41b1e210db2bf43711eda581c0bce7a7b3b2597e99da856ed1702",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "32669c9cda388be275a74c99748189a8980f58d22ef4e6c4a830e666959be6bf",
+        "reason": "Center work calendar is enforced by canonical schedule validation independently of resource lists."
       }
     },
     {
@@ -771,8 +772,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "d7c0dce6557dc29c0582a84d5c8b414444fdeb7a209ef5a5fe5a67a8162a0756",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "c3d54051bcbcba461cf2a763684cf09e20baae1614b59078951f484704ae71e4",
+        "reason": "Shared template schemas preserve existing sales and rights wire acceptance; no sales behavior change."
       }
     },
     {
@@ -840,7 +841,8 @@
         "apps/backend/database/lesson-request-catalog.sql",
         "apps/backend/supabase/migrations/20261105170617_lesson_request_catalog.sql",
         "apps/backend/database/action-management-discovery.sql",
-        "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql"
+        "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql",
+        "apps/backend/database/lesson-request-actionability.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -855,8 +857,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "7d9b232efb602643efc89c558f49d1bbaaf4f08cc45d5c6fcbe306f9e02a8b71",
-        "reason": "Reviewed final existing document acceptance root; added consent runner checks do not change reservation semantics."
+        "fingerprint": "5d8085d62dffd040af13ede2d2fcddeeb62921fcb8fdfa33b9c79a364990f631",
+        "reason": "Personal negative-limit writes require organization permission; accepted future alternatives remain actionable."
       }
     },
     {
@@ -918,8 +920,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "cd94f1abf463fb6d8978a8775b4c833c466dd068745911243c83dd9cb12d6f45",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "18058f10344a235ac2d9aade6923b7e9515dd96fbf42f0871684f72ecad799ff",
+        "reason": "Attendance flow unchanged; fixture explicitly enables the accepted organization personal-limit gate."
       }
     },
     {
@@ -983,8 +985,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "e59febbf7b0dc46a65f7605fa3e87779b6641bc026c22779cb3b76fd6c4f760a",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "8608347a255e4de7018712ea0249f748a90aaeaeecf6e221b0fe6a09bd92e41f",
+        "reason": "Shared wire template validators preserve financial commands; no collection or balance rule change."
       }
     },
     {
@@ -1064,7 +1066,8 @@
         "apps/backend/scripts/acceptance/s15-hosted-calendar.mjs",
         "apps/backend/scripts/acceptance/s15-calendar-browser-route.mjs",
         "apps/backend/database/discipline-presentation.sql",
-        "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql"
+        "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql",
+        "apps/backend/database/settings-application-forms.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1078,8 +1081,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "104cccf20c45896674178145ab8249c6239dd5693401f27c8e269f53c7f6d016",
-        "reason": "Reviewed final native discipline presentation requests including the mandatory revocation reason and updated imported test hash. Assertions, authorization, replay and public bounds remain unchanged."
+        "fingerprint": "7fd528d41454c3c6103ad6ba6ff55d5d25712696be2299db65d6129a82f90949",
+        "reason": "Reviewed final S10 consumers and unchanged workflow protocol; native alert tests now distinguish unprocessed pre-enable targets from fresh post-enable work."
       }
     },
     {
@@ -1201,7 +1204,8 @@
         "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/native-totp-fixture.mjs",
         "apps/backend/tests/crm-pipeline-unit.mjs",
-        "apps/backend/tests/business-location-acceptance.mjs"
+        "apps/backend/tests/business-location-acceptance.mjs",
+        "apps/backend/tests/settings-behavior-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1260,7 +1264,11 @@
         "apps/backend/database/settings-catalog-v19.sql",
         "apps/backend/database/crm-pipeline-settings.sql",
         "apps/backend/database/settings-business-location.sql",
-        "apps/backend/supabase/migrations/20261109112455_crm_pipeline_settings.sql"
+        "apps/backend/supabase/migrations/20261109112455_crm_pipeline_settings.sql",
+        "apps/backend/database/settings-catalog-v20.sql",
+        "apps/backend/database/settings-negative-delegation.sql",
+        "apps/backend/database/settings-work-calendar.sql",
+        "apps/backend/supabase/migrations/20261111210453_s10_settings_completion.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1275,8 +1283,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "38487e7e4d0cfeffd434ff24ab09276b4164d02969d0ef2d6a975021629b584f",
-        "reason": "Reset key/catalog parity regression reproduced red then passed after organization and center enum completion; native reset authority and SQL checks unchanged"
+        "fingerprint": "899d43a0a2df3c81e237e5165f3ac79921351a3a4937e4b4cfacfd8ac4600fca",
+        "reason": "Reviewed final S10 direct work alerts and preserved preparation-template schema; all old assertions/parts remain and exact scope/version consumers are aligned."
       }
     },
     {
@@ -1400,8 +1408,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "f70d1c8619c3235b35ef78d5ffaca76c3110f0c61956160e283b2a60da61b094",
-        "reason": "Ortak agreement-preparation testinin yalnız Pro şablon kökünde güncel sürüm kurulumu ve ek olumsuz/olumlu assertionlar değişti. Eğitmen anlaşması yetki/hash/snapshot/replay ve immutable kabul akışı değişmedi."
+        "fingerprint": "539b7bd60f47a7f62b7f53c7d453ab64af7700c2e2a79052ccd8d5c183f84628",
+        "reason": "Instructor earnings fixture explicitly enables organization personal-limit permission; agreement and earning behavior unchanged."
       }
     },
     {
@@ -1516,7 +1524,8 @@
         "docs/workflows.md",
         "apps/backend/database/upper-plan-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
-        "apps/backend/database/crm-pipeline-settings.sql"
+        "apps/backend/database/crm-pipeline-settings.sql",
+        "apps/backend/database/settings-work-alerts.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1530,8 +1539,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "ae12b124b9ce53a590f28574dc73a12ccf462f25ad1a1a5579b542535ea0147b",
-        "reason": "Final lead pipeline writer/view and migration reviewed after optional physical column alignment; consumer and conversion behavior unchanged"
+        "fingerprint": "d580f28f1cda43fa4f48f2717244e34f71354e8437dd81875847c4d89fa93c17",
+        "reason": "Reviewed final S10 consumers and unchanged workflow protocol; native alert tests now distinguish unprocessed pre-enable targets from fresh post-enable work."
       }
     },
     {
@@ -1786,8 +1795,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "af8b9cfb5d1698a67c23caa9819f2795f2e46acd1799a36151757282760ba0f2",
-        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
+        "fingerprint": "d929b46882654f845c40d0f0df1a19fb5200c6a6636a393c6160d95187a41835",
+        "reason": "Reviewed final S10 consumers and unchanged workflow protocol; native alert tests now distinguish unprocessed pre-enable targets from fresh post-enable work."
       }
     }
   ]

@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** Kullanıcının son talimatıyla önce [S08 son kapanış](remaining-work.md#s08), ardından S10 kalan gerçek ayar alt alanları → S14 gerçek ortam → O01–O10 → G02 sırası yürütülür. Kaynak adayı tek geniş teslimde toplanır; doğal süre, gerçek widget, fiziksel imha, bağımsız sicil ve tam DB/Auth/Storage restore kanıtı kaynak testinden türetilmez. XREQ-033 ertelidir. [S08 güncel kaynak ve açık kabul kapıları](00-FtkSaaS-yeni-sohbet-devir.md#s08-son-kapanış-kabulü--11-kasım-2026).
+**Aktif paket:** Kullanıcının son talimatıyla PR278 üzerinde [S10 kalan ayar tüketicileri](remaining-work.md#s10) frontend beklenmeden yürütülür; [S08](remaining-work.md#s08) doğal nonce kapıları ayrı açık kalır. Sonraki sıra S14 → O01–O10 → G02’dir. Kaynak, native CI, development ve gerçek hosted kabulü ayrı doğrulanır; iptal/erteleme kararları korunur.
 
 ## Uygulama sırası
 

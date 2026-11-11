@@ -24,6 +24,7 @@ test('CRM pipeline inputs and list opt-in are closed and keep legacy requests ca
 });
 
 test('v19 adds only CRM and business links, preserving prior field semantics and explicit public visibility',()=>{
+ const catalog={version:19,fields:JSON.parse(fs.readFileSync('database/settings-catalog-v19.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"))};
  const prior=JSON.parse(fs.readFileSync('database/settings-catalog-v18.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
  const additions=['crm_pipeline','crm_local_tags','map_url','directions','website_url'];
  const existing=catalog.fields.filter(f=>!additions.includes(f.key));
