@@ -187,6 +187,10 @@ test('Typed settings catalog round-trip in every scope',async t=>{
    assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='lesson_reminder_hours').writable,false);
    await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{lesson_reminder_hours:1}},key());
    await write(owner,orgScope,{reminder_center_overrides_enabled:true},(await read(owner,orgScope)).version);
+   const pipeline=(await read(owner,orgScope)).values.crm_pipeline;
+   assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='crm_local_tags').writable,false);
+   await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{crm_local_tags:[]}},key());
+   await write(owner,orgScope,{crm_pipeline:{...pipeline,allow_center_tags:true}},(await read(owner,orgScope)).version);
    const operator=await authUser('settings-field-operator');await must(operator,'account_get_v1');
    await db.query('insert into private.platform_operators(auth_user_id) values($1)',[operator.id]);
    try{

@@ -4,11 +4,26 @@ Güncel kabul/hosted durum [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-soh
 
 ## Katalog grupları ve sıfırlama sınırı
 
-`settings_catalog_get_v1` katalog sürümü18,103 desteklenen alanı37 normatif davranış grubuna bağlar. `group` bir izin veya domain komutu değildir. Takvim görünümü S10; kullanıcı sessiz saatleri ve üyenin olay bazlı hatırlatma seçimleri S13; merkez hatırlatmaları M14, org hatırlatmaları O07; paket hazırlık şablonları merkezde M10, orgda O10, anlaşma hazırlık şablonları merkezde M12, orgda O19 grubundadır. S12 kanal/amaç tercihi bu ayrımdan bağımsızdır. Kalan normatif gruplar native Auth/domain komutları veya henüz desteklenmeyen alt alanlar içerebilir;103 alan bütün69 grubun teslimi sayılmaz.
+`settings_catalog_get_v1` katalog sürümü19,111 desteklenen alanı37 normatif davranış grubuna bağlar. `group` bir izin veya domain komutu değildir. Takvim görünümü S10; kullanıcı sessiz saatleri ve üyenin olay bazlı hatırlatma seçimleri S13; merkez hatırlatmaları M14, org hatırlatmaları O07; paket hazırlık şablonları merkezde M10, orgda O10, anlaşma hazırlık şablonları merkezde M12, orgda O19 grubundadır. S12 kanal/amaç tercihi bu ayrımdan bağımsızdır. Kalan normatif gruplar native Auth/domain komutları veya henüz desteklenmeyen alt alanlar içerebilir;111 alan bütün69 grubun teslimi sayılmaz.
 
 İstemci grubu güncel katalogdan çözer; eski grup üyeliğini sabitlemez. Reset isteği grup kimliği yerine açık `fields` listesi gönderir. Önizlemenin before/after etkisi kullanıcıya gösterilir; katalog etiketinden örtük reset veya yazma yetkisi türetilmez. Grup düzeltmesi kayıtlı değer, default, miras, consumer veya geçmişi taşımaz; daha önce açık alanlarla alınmış reset önizlemesi aynı sürüm/yetki şartlarıyla korunur.
 
 ## İşlemler
+
+### CRM aşama, etiket ve takip hazırlığı
+
+Pro/Business organization `crm_pipeline` kapalı O09 ayarıdır. `stages` sıralı `{key,name,kind}` listesidir; başlangıç yeni/iletişim/görüşme-değerlendirme/kazanıldı-kaybedildi anlamındaki altı aşamadır. `kind=open|won|lost`; en az bir açık, tam bir kazanıldı ve bir kaybedildi aşaması gerekir. Organizasyon adı/sırayı değiştirir veya açık ara aşama ekler; anahtarlar tekildir. `tags` ortak `{key,name}` listesidir. `allow_center_tags=false` başlangıcı yerel etiketi kapatır; açıkken merkez `crm_local_tags` ile ortak anahtarla çakışmayan ek etiket yönetir. Etkili ortak+yerel etiket toplamı100'ü geçmez. `followup_days=null` takip önerisini kapatır; açık öneri yalnız1/3/7 gündür, otomatik faaliyet veya gönderim yaratmaz. Kendi CM kapsamı dışındaki merkez ayarı ve org yazma yetkisi genişlemez. Starter bu yeni alanları yazamaz; katalog `writable` durumunu canlı plan ve yerel izinle verir.
+
+`leads_list_v1(include_pipeline:true,center_id)` yetkili lead'lerle birlikte `pipeline_catalog` ve her lead'in nullable `pipeline` değerini döndürür. Merkezler birlikte listelenirse katalog ortak aşama/etiketleri içerir; yerel düzenleme için ilgili merkez seçilir. Eski istek bu iki alanı almaz. Yeni aşama atanmadıkça eski lead'e kazanıldı/kaybedildi veya neden uydurulmaz. `management_state_get_v1(operation:lead_save_v1)` gerçek kaynak sürümü ve mevcut nullable pipeline girdisini verir. `lead_save_v1.pipeline={stage_key,tag_keys,loss_reason}` güncel katalogdan çözümlenir; lost türünde neden zorunlu `unreachable|timing|price|alternative|other`, diğerlerinde null'dır. İşlem kaynak sürümünü, canlı scope/plan/izin ve aynı-key replay'de katalog geçerliliğini denetler. Aşama ticari takip bilgisidir; mevcut `state=open|converted|closed` kişi dönüşüm yaşam döngüsünden ayrıdır. Kazanıldı aşaması öğrenci/satış/ödeme/izin oluşturmaz; gerekiyorsa mevcut ayrı conversion/satış komutları açıkça kullanılır. Mevcut takip işleri aşama yazısıyla sessiz tamamlanmaz veya silinmez.
+
+Açık lead'in kullandığı aşama/tür veya etiket, o lead açıkça yeniden eşlenmeden kaldırılamaz; reset ve history reapply aynı denetimden geçer. Yerel izin kapatması da kullanılan yerel etiketi boşa çıkaramaz. Ortak etiket yerel anahtarla çakışamaz. Güncel etiket/aşama adı normal okuyucuda kullanılır; saklanan snapshot ve audit'in eski/yeni içeriği korunur. Başarıdan sonra aynı merkezli liste ve gerekiyorsa kaynak selector yeniden okunur. Yeni genel endpoint veya otomatik dönüşüm yoktur.
+
+<a id="işletme-harita-ulaşım-ve-web-bağlantısı"></a>
+### İşletme harita, ulaşım ve web bağlantısı
+
+Organization ve center `map_url`, `directions`, `website_url` kimlik/iletişim grubundadır. URL'ler yalnız en çok2048 karakter HTTPS ve kullanıcı adı/parola içermeyen bağlantı veya açık null'dır; directions en çok2000 karakter metin, başlangıç boş metindir. URL başlangıcı null'dır. Backend bu bağlantıları ziyaret etmez. Merkez ve organizasyon kendi yerel değerini yönetir; kayıt sürümü, alan bazlı reset ve geçmiş protokolü aynıdır.
+
+Public profilin iki mevcut yayın kapısı korunur. `public_fields` içinde açık `location` seçimi yalnız `{map_url,directions}`, `website` seçimi yalnız website_url yayımlar. Alan seçilmezse private kayıt public yanıta eklenmez. Bu tanıtım bilgisi mevcut seans UTC/konumunu, satış veya belge snapshot'ını değiştirmez; public saatlerin availability yerine geçmemesi de korunur. İstemci directions'ı metin, bağlantıyı güvenli HTTPS href olarak gösterir.
 
 ### Disiplin sunumu ve yerel açıklama
 
@@ -259,6 +274,8 @@ Kuruluşun üç marka rengi `organizations_list_v1.items[].brand_colors` ve mevc
 Alan beyaz listesi name/description/logo/address/contact/hours'tur. Billing, kişisel hesap iletişimi, roller, kaynak uygunluğu ve iç ayar belgesi açılmaz. contact yalnız işletmenin açık contact_phone/contact_email alanıdır. Logo güncel private org pointer'ından `{asset,data_base64}` döner; kaldırma/değişim bir sonraki okumaya yansır, asset ID ile tarihsel public okuma yoktur. Center aynı org logosunu ancak org public_fields.logo da açıkken kullanabilir; merkez marka override yoktur.
 
 public_hours açık tanıtım saatleri dizisidir; her satır ISO1–7 weekdays, HH:mm:ss local_start/local_end ve geçerli IANA timezone ister. Gece aşımı desteklenir; eşit başlangıç/bitiş reddedilir. Default[] saat ilan etmez.100 satır mevcut yapılandırılmış JSON dizi tavanıdır, plan kotası değildir. Bu bilgi oda/eğitmen availability veya rezervasyon kapısı yerine geçmez; iş takvimi değişikliği kendi domain komutudur. UTC seanslar, mevcut program ve ücret snapshotları değiştirilmez.
+
+İşletme bağlantıları `map_url`/`website_url` için desteklenen biçim ASCII DNS adı (uluslararası adlar punycode), isteğe bağlı0–65535 port ve HTTPS yol/query/fragment’tir. Kullanıcı adı/parola, IP literal, ters eğik çizgi ve boşluk kabul edilmez; URL sunucudan çağrılmaz.
 
 ## Manuel tahsilat yöntemi
 

@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `4debae8c7368550c9f08c091fe038a6ffaba6fd50a8ed95b36236985c13cc060`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0e22e7cde0619a7e361c34918104c9e764d5002552bcc2aa289fa867ee57ba78`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -31,6 +31,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [crm-application-intake.sql](../apps/backend/database/crm-application-intake.sql) | `65ea718668a031095265e936981bce6457759cfb538d1c4d525534249460e3ba` |
 | [crm-legacy-import.sql](../apps/backend/database/crm-legacy-import.sql) | `cc7418d3f4d295cce8962f2cf61427a9a2c8f0769608379d25875add29421719` |
 | [crm-meta-queue.sql](../apps/backend/database/crm-meta-queue.sql) | `42c611d109d70cd541e8f0ddc8ced3c51ed0fe8764aa41c831a182fef22c3b02` |
+| [crm-pipeline-settings.sql](../apps/backend/database/crm-pipeline-settings.sql) | `2680b575bb843d4d3ae5d6f6e44507fa196374b4221747fce09e65f58da80b98` |
 | [crm-provider-health.sql](../apps/backend/database/crm-provider-health.sql) | `f05445ab1d121bd21e23618246e8ad6389cedcbd54ec5c5c484c4cb721f1d5cc` |
 | [crm-provider-intake.sql](../apps/backend/database/crm-provider-intake.sql) | `00fd9a3d81be075942172c873aa6cf07ec1317981152886e80893d7c059744bf` |
 | [crm-provider-route.sql](../apps/backend/database/crm-provider-route.sql) | `7d9349675a11a56cf4d86a7bf3e4574eb5dbc6c12588ba04fa1012d6216478d7` |
@@ -309,3 +310,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261108161621_account_native_residues.sql](../apps/backend/supabase/migrations/20261108161621_account_native_residues.sql) | `4e63601dedec8a1972f3f4b2846f695baf0a6d3f1df8344c132f28fc52803534` |
 | [20261108211924_account_export_erasure.sql](../apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql) | `043d4df218cf40d1fad04ee3de9b2c852634524f8558f88bdfd57ac221d30d18` |
 | [20261108230214_discipline_presentation.sql](../apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql) | `1bfdbb8151b96e10f8eded8a911981a111d4d6ca26d682481c3127fb9f4e1ded` |
+| [20261109112455_crm_pipeline_settings.sql](../apps/backend/supabase/migrations/20261109112455_crm_pipeline_settings.sql) | `c3dedb271ad57213e659f6df9f068d2cba7e43ee0348915160393ec93d6f67b6` |

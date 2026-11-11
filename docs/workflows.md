@@ -238,6 +238,8 @@ Bildirim opt-in default ve miras kuralları [ayar sözleşmesinden](contracts/02
 
 **Sıra:** `settings_catalog_get_v1` → `settings_get_v1` → supported/izin/default/miras ve typed alanları göster → `settings_update_v1` → etkili değerleri ve `settings_history_get_v1` oku. Reset `settings_reset_preview_v1` → etki onayı → `settings_reset_apply_v1`. Medya `media_get_v1`; template/preparation resolve domain komutunun yerine geçmez.
 
+CRM ortak aşama/etiket ve izinli merkez ekleri aynı sürümlü ayar yolundan yönetilir; kullanılan anahtarın kaldırılması/reseti açık yeniden eşleme ister. Takip gün önerisi kendiliğinden faaliyet oluşturmaz. İşletme harita/ulaşım/web değerleri de private ayardır; public aktarım açık alan seçimi ve iki yayın kapısını ister. [Kesin typed tüketim](settings.md#crm-aşama-etiket-ve-takip-hazırlığı).
+
 **Hata/kurtarma:** Unsupported alan yazılabilir gibi sunulmaz. `null`, miras, false ve sıfır farklıdır. Gerçek provider/domain politikası bir görünüm tercihiyle kurulmuş sayılmaz. **Sonuç/yan etki:** Organizasyonun üç isteğe bağlı #RRGGBB ana/ikincil/vurgu rengi vardır; font paketi seçimi ve merkez özel renk yoktur. Kontrast, açık/koyu ve hata/başarı renkleri sistemce yönetilir. Ayarın davranış etkisi alan tüketici devrinden izlenir; generic ayar yazımı keyfî ürün kuralı oluşturmaz.
 
 İzin hazırlığı için yetkili CM, `settings_catalog_get_v1(scope:center)` içindeki `preparation_templates.permissions` kaynağını seçer; `settings_preparation_resolve_v1(kind:permission)` yalnız açık öneri verir. Hedef/sürüm ve izin başına ayrı `permission_set_v1` komutu ayrıca gerekir. Şablon yazımı, reset veya çözümleme mevcut yetkileri değiştirmez. F05/merkez yetkisi her çözümleme ve writer/replay aşamasında yeniden denetlenir; kapsam ve desteklenen izinler [ayar rehberindedir](settings.md#personel-izin-hazırlık-şablonları).
@@ -294,6 +296,8 @@ Pakete bağlı kredi tüketmeyen katılım aynı etkinlikte `terms.package_usage
 `EventRegistrationView.package_eligible` canlı koşuldur; hak kaybı kayıt veya yeri otomatik iptal etmez. `package_eligible_at_attendance` yalnız son açık yoklama/düzeltme anının sonucudur. Uygun olmayan attended komutu reddedilir. Fiilen gerçekleşmiş uygunsuz katılımı CM gerekçeyle `record_ineligible_attendance=true` kullanarak kaydedebilir; false uygunluk işareti kalır ve ücretsiz hak onayı verilmez. Sonradan paket almak bu geçmiş sonucu değiştirmez; gerekçeli yoklama düzeltmesi açık işlemdir.
 
 ## WF16
+
+Pro/Business aşama tüketimi: ilgili merkezde `leads_list_v1(include_pipeline:true)` → gerçek `pipeline_catalog` ve lead sürümü → açık aşama/etiket/neden seçimiyle `lead_save_v1(pipeline)` → aynı liste ve kaynak selector yeniden okuma. Kaybedildi neden ister; kazanıldı ayrı öğrenci dönüşümü/satış komutunun yerine geçmez. Eski istekler pipeline projeksiyonu almaz. Güncel katalog, yerel izin ve plan receipt replay'de de denetlenir; kaldırılmış anahtar için istemci yeniden okur. [Aşama, base state ve geçmiş ayrımı](settings.md#crm-aşama-etiket-ve-takip-hazırlığı).
 
 Starter temel aday takibi ve üst planlarda genel CRM/segment/otomasyon. Lead list/save → faaliyet/takip → izinli trial teklif/kayıt → gerekliyse `lead_convert_v1` → kişi ve CRM durumunu yeniden oku. Public başvuru alımı WF09'dan bağımsız bir genel CRM yetkisi değildir. Segment/automation save worker'ın frontend'den çalıştırılmasını gerektirmez; teslimat ve domain commit farklıdır. Kaynak/onay/hesap bağı ve plan kapıları korunur; doğrulanmamış kişiden otomatik hesap veya satış türetilmez. Rapor/import ile CRM izinleri ayrı değerlendirilir.
 
