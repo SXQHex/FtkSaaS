@@ -1,4 +1,7 @@
 import './native-account-erasure-unit.mjs';
+import './crm-pipeline-unit.mjs';
+import './hosted-password-runner-unit.mjs';
+import './hosted-recovery-runner-unit.mjs';
 import './discipline-presentation-unit.mjs';
 import './hosted-settings-restore-unit.mjs';
 import './hosted-digital-runner-unit.mjs';
@@ -667,8 +670,8 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  assert(valid('Request_document_accept',{...acceptance,displayed_content:content,displayed_content_hash:'a'.repeat(64)}));
 });
 
- test('Pro preparation catalog adds only five closed explicit workflow template families',()=>{
- const current=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields;
+ test('v18 Pro preparation catalog adds only five closed explicit workflow template families',()=>{
+ const current=JSON.parse(fs.readFileSync('database/settings-catalog-v18.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
  const prior=JSON.parse(fs.readFileSync('database/settings-catalog-v17.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
  const keys=['program_templates','event_templates','collection_templates','crm_templates','automation_templates'];
  assert.deepEqual(current.filter(f=>!keys.includes(f.key)),prior);assert.equal(current.filter(f=>keys.includes(f.key)).length,10);

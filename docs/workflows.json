@@ -287,8 +287,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b82dbf5667060966ec59dd1f7a696c9762e324960455ae81c666e17dc61394eb",
-        "reason": "Reviewed final native discipline presentation requests including the mandatory revocation reason and updated imported test hash. Assertions, authorization, replay and public bounds remain unchanged."
+        "fingerprint": "f62c37a53b0f0f0ac2895761f0a87e8f3b7949731a02716f464ecf973b04c6c3",
+        "reason": "Shared additive CRM/URL schemas and generated validator/types reviewed; native protocol and replay envelope unchanged"
       }
     },
     {
@@ -303,7 +303,9 @@
         "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/account-signup-adapter.mjs",
         "apps/backend/tests/account-signup-acceptance.mjs",
-        "apps/backend/tests/auth-password-security-unit.mjs"
+        "apps/backend/tests/auth-password-security-unit.mjs",
+        "apps/backend/tests/hosted-password-runner-unit.mjs",
+        "apps/backend/tests/hosted-recovery-runner-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
@@ -359,7 +361,9 @@
         "apps/backend/database/settings-catalog-v17.sql",
         "apps/backend/supabase/migrations/20261108003615_organization_security_preferences.sql",
         "apps/backend/database/organization-security-native-proof.sql",
-        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql"
+        "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql",
+        "apps/backend/scripts/acceptance/s08-hosted-password.mjs",
+        "apps/backend/scripts/acceptance/s08-hosted-recovery.mjs"
       ],
       "operations": [
         "account_get_v1",
@@ -371,8 +375,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "161f98ae4de161ca79516e9de755862cb3988075f21db6f4a55c2e9d0ced81bb",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "83e473fff2169b6bb0f7e94b709db4d8a12c2b61270458b7b855dde279f95f46",
+        "reason": "Native aged password and PKCE recovery runners reviewed against real provider request and finally restoration; no new Auth layer"
       }
     },
     {
@@ -478,8 +482,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "32188a939302541dde114dde94a2736859bd2f12cdd409e66d19ee9f4d29d633",
-        "reason": "Reviewed final native discipline presentation requests including the mandatory revocation reason and updated imported test hash. Assertions, authorization, replay and public bounds remain unchanged."
+        "fingerprint": "8f24ab3531d61c13c96ac0c207d496a083e5bfdc3a310ed2ca64071219de6bae",
+        "reason": "Organization settings schema additions reviewed; existing studio bootstrap and role boundaries unchanged"
       }
     },
     {
@@ -667,8 +671,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "2770d3bacbd1e4485e72f23831d4f35d9dedda953d1591fecc4669a743f9019c",
-        "reason": "Reviewed additive registry side-effect acceptance import. Existing person role permission and revoke source, requests, assertions and workflow are unchanged."
+        "fingerprint": "acadd46c48c0e45e661fe2ba59a286521217259e8083d76892508c8abe002401",
+        "reason": "Optional lead pipeline snapshot reviewed; conversion remains separate student activation with existing authority and subscriber allocation"
       }
     },
     {
@@ -1195,7 +1199,9 @@
         "apps/backend/tests/permission-preparation-acceptance.mjs",
         "apps/backend/tests/hosted-settings-restore-unit.mjs",
         "apps/backend/tests/account-mfa-acceptance.mjs",
-        "apps/backend/tests/native-totp-fixture.mjs"
+        "apps/backend/tests/native-totp-fixture.mjs",
+        "apps/backend/tests/crm-pipeline-unit.mjs",
+        "apps/backend/tests/business-location-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1250,7 +1256,11 @@
         "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql",
         "apps/backend/database/pro-workflow-preparations.sql",
         "apps/backend/database/settings-catalog-v18.sql",
-        "apps/backend/supabase/migrations/20261108034041_pro_workflow_preparations.sql"
+        "apps/backend/supabase/migrations/20261108034041_pro_workflow_preparations.sql",
+        "apps/backend/database/settings-catalog-v19.sql",
+        "apps/backend/database/crm-pipeline-settings.sql",
+        "apps/backend/database/settings-business-location.sql",
+        "apps/backend/supabase/migrations/20261109112455_crm_pipeline_settings.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1265,8 +1275,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "43229d97b09291bbfdb5e76d55953c0c4501984ac851021b25c1e8fb35cc58d8",
-        "reason": "Yedi hazırlığın geri alması ortak source-aware helpera bağlandı; default/inherited/local kaynak ve eşzamanlı writer korunuyor, normal reset regresyonu eklendi."
+        "fingerprint": "e9ddfede0eb86f6cffdfe9becdd2407e7c8dc5cecca7fed58d79cae6c51fb5df",
+        "reason": "Final append-only pipeline column uses existing migration coverage convention; settings source and reset/public/plan boundaries reviewed"
       }
     },
     {
@@ -1481,7 +1491,8 @@
         "apps/backend/tests/crm-lifecycle-authority-acceptance.mjs",
         "apps/backend/tests/crm-segment-worker-acceptance.mjs",
         "apps/backend/tests/p05-acceptance.mjs",
-        "apps/backend/tests/person-registry.test.mjs"
+        "apps/backend/tests/person-registry.test.mjs",
+        "apps/backend/tests/crm-pipeline-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1504,7 +1515,8 @@
         "apps/backend/tests/crm-lifecycle-fixture.mjs",
         "docs/workflows.md",
         "apps/backend/database/upper-plan-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
+        "apps/backend/database/crm-pipeline-settings.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1518,8 +1530,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "e0ee4bef25096d88757956e317a768afebf14c8cd53d48754e876b4e183c0d95",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "ae12b124b9ce53a590f28574dc73a12ccf462f25ad1a1a5579b542535ea0147b",
+        "reason": "Final lead pipeline writer/view and migration reviewed after optional physical column alignment; consumer and conversion behavior unchanged"
       }
     },
     {

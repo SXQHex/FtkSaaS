@@ -670,6 +670,11 @@ reference?: (string | null)
  */
 export type EarningDirection = ("add" | "subtract")
 /**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmLossReason".
+ */
+export type CrmLossReason = ("unreachable" | "timing" | "price" | "alternative" | "other")
+/**
  * Utilization basis points may exceed 10000 when occupancy exceeds nominal capacity.
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1788,7 +1793,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -1803,7 +1808,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1827,14 +1832,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 18
+catalog_version: 19
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -1905,23 +1910,23 @@ center_id: string
 export type SettingsCatalog1 = ({
 scope: "user"
 defaults: UserSettingsValues
-catalog_version: 18
+catalog_version: 19
 } | {
 scope: "member"
 defaults: MemberSettingsValues
-catalog_version: 18
+catalog_version: 19
 } | {
 scope: "center"
 defaults: CenterSettingsValues
-catalog_version: 18
+catalog_version: 19
 } | {
 scope: "organization"
 defaults: OrganizationSettingsValues
-catalog_version: 18
+catalog_version: 19
 } | {
 scope: "platform"
 defaults: PlatformSettingsValues
-catalog_version: 18
+catalog_version: 19
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4109,6 +4114,12 @@ CenterDisciplinePresentation?: CenterDisciplinePresentation
 CenterDisciplinePresentationPatch?: CenterDisciplinePresentationPatch
 DisciplinePresentationView?: DisciplinePresentationView
 PublicDisciplinePresentation?: PublicDisciplinePresentation
+CrmPipelineStage?: CrmPipelineStage
+CrmTag?: CrmTag
+CrmLossReason?: CrmLossReason
+CrmPipelineConfiguration?: CrmPipelineConfiguration
+LeadPipelineInput?: LeadPipelineInput
+LeadPipelineView?: LeadPipelineView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7144,6 +7155,36 @@ last_contact: (Instant | null)
 due_followup: (Instant | null)
 version: PositiveInt
 subscriber_number?: (SubscriberNumber | null)
+pipeline?: (LeadPipelineView | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LeadPipelineView".
+ */
+export interface LeadPipelineView {
+stage: CrmPipelineStage
+/**
+ * @maxItems 100
+ */
+tags: CrmTag[]
+loss_reason: (CrmLossReason | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmPipelineStage".
+ */
+export interface CrmPipelineStage {
+key: string
+name: string
+kind: ("open" | "won" | "lost")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmTag".
+ */
+export interface CrmTag {
+key: string
+name: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7884,6 +7925,24 @@ export interface Page_LeadView {
 items: LeadView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+pipeline_catalog?: CrmPipelineConfiguration
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmPipelineConfiguration".
+ */
+export interface CrmPipelineConfiguration {
+/**
+ * @minItems 3
+ * @maxItems 50
+ */
+stages: [CrmPipelineStage, CrmPipelineStage, CrmPipelineStage, ...(CrmPipelineStage)[]]
+/**
+ * @maxItems 100
+ */
+tags: CrmTag[]
+allow_center_tags: boolean
+followup_days: ((1 | 3 | 7) | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8003,6 +8062,11 @@ brand_colors?: OrganizationBrandColors
  * @maxItems 200
  */
 disciplines?: PublicDisciplinePresentation[]
+location?: {
+map_url: (string | null)
+directions: string
+}
+website_url?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11695,6 +11759,7 @@ org_id: string
 center_id?: (string | null)
 page: Page
 query?: (Text | null)
+include_pipeline?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11736,6 +11801,19 @@ person_id: string
 source: Text
 interest: Text
 assigned_to?: (string | null)
+pipeline?: LeadPipelineInput
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LeadPipelineInput".
+ */
+export interface LeadPipelineInput {
+stage_key: string
+/**
+ * @maxItems 100
+ */
+tag_keys: string[]
+loss_reason: (CrmLossReason | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15595,6 +15673,7 @@ interest: Text
 assigned_person_id?: (string | null)
 state: LeadState
 last_meaningful_contact_at?: (Instant | null)
+pipeline?: (LeadPipelineView | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18497,6 +18576,7 @@ person_id?: string
 source?: Text
 interest?: Text
 assigned_to?: (string | null)
+pipeline?: (LeadPipelineInput | null)
 }
 }
 /**
@@ -22851,9 +22931,9 @@ source_namespace: string
 }[]
 public_profile_enabled?: boolean
 /**
- * @maxItems 6
+ * @maxItems 8
  */
-public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]
+public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]
 /**
  * @maxItems 100
  */
@@ -23051,6 +23131,13 @@ template_key: string
 }
 }
 }[]
+/**
+ * @maxItems 100
+ */
+crm_local_tags?: CrmTag[]
+map_url?: (string | null)
+directions?: string
+website_url?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23128,9 +23215,9 @@ source_namespace: string
 }[]
 public_profile_enabled?: boolean
 /**
- * @maxItems 6
+ * @maxItems 8
  */
-public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]
+public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]|[("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website"), ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")]
 /**
  * @maxItems 100
  */
@@ -23334,6 +23421,10 @@ template_key: string
 }
 }
 }[]
+crm_pipeline?: CrmPipelineConfiguration
+map_url?: (string | null)
+directions?: string
+website_url?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23459,7 +23550,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: SettingsFieldKey
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline")
 writable: boolean
 }
 /**

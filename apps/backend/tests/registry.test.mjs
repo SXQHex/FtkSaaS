@@ -1,3 +1,5 @@
+import './crm-pipeline-acceptance.mjs';
+import './business-location-acceptance.mjs';
 import './export-retention-acceptance.mjs';
 import './discipline-presentation-acceptance.mjs';
 import './action-management-acceptance.mjs';
