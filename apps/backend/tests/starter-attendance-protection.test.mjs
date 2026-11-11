@@ -1,3 +1,4 @@
+import './settings-behavior-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -55,6 +56,15 @@ async function attendanceFixture(t){
  const get=sid=>must(owner,'attendance_get_v1',scope({session_id:sid}));
  const token=p=>({id:p.id,token:p.token});
  const preview=change=>must(owner,'reservation_impact_preview_v1',scope({change,reason:'Explicit impact approval'}));
+ const orgSettings={org_id:org,scope:'organization'};
+ const settings=await must(owner,'settings_get_v1',orgSettings);
+ assert.equal(settings.values.personal_negative_limits_enabled,false);
+ const initialLimit=await mut('negative_limits_get_v1',{person_id:student.p,discipline_id:discipline,include_delegation:true});
+ assert.equal(initialLimit.personal_override_enabled,false);
+ await fail('reservation_impact_preview_v1',{change:{kind:'negative_limit',person_id:student.p,discipline_id:discipline,allowed_negative_credits:1},reason:'Delegation requires explicit opt-in'},'FORBIDDEN');
+ await must(owner,'settings_update_v1',{...orgSettings,expected_version:settings.version,patch:{personal_negative_limits_enabled:true}},key());
+ assert.equal((await mut('negative_limits_get_v1',{person_id:student.p,discipline_id:discipline,include_delegation:true})).personal_override_enabled,true);
+
  return {platform,owner,outsider,db,rows,contract,plan,features,account,org,center,scope,mut,fail,person,pay,discipline,linked,student,instructor,room,syncFixtureBookings,fixturePastSession,effective_at,publish,makeSession,book,get,token,preview};
 }
 
@@ -112,7 +122,13 @@ test('Starter protected reservation, attendance revisions and rollback',async t=
   const l=await must(owner,'negative_limits_get_v1',scope({person_id:student.p,discipline_id:discipline}));assert.equal(l.effective_limit,2);
   await fail('reservation_impact_apply_v1',{preview:token(impact.preview),accepted_reservation_ids:[]},'VALIDATION_FAILED');
   await fail('negative_limit_set_v1',{person_id:student.p,discipline_id:discipline,allowed_negative_credits:0,reason:'Explicit impact approval',expected_version:l.version+1,impact_approval:token(impact.preview),accepted_reservation_ids:[rid]},'VERSION_CONFLICT');
-  await mut('negative_limit_set_v1',{person_id:student.p,discipline_id:discipline,allowed_negative_credits:0,reason:'Explicit impact approval',expected_version:l.version,impact_approval:token(impact.preview),accepted_reservation_ids:[rid]});
+  const setBody={person_id:student.p,discipline_id:discipline,allowed_negative_credits:0,reason:'Explicit impact approval',expected_version:l.version,impact_approval:token(impact.preview),accepted_reservation_ids:[rid]},setKey=key();
+  await mut('negative_limit_set_v1',setBody,setKey);
+  const settingsScope={org_id:org,scope:'organization'};let settings=await must(owner,'settings_get_v1',settingsScope);
+  await must(owner,'settings_update_v1',{...settingsScope,expected_version:settings.version,patch:{personal_negative_limits_enabled:false}},key());
+  await fail('negative_limit_set_v1',setBody,'FORBIDDEN',owner,setKey);
+  await fail('reservation_impact_preview_v1',{change,reason:'Delegation was revoked'},'FORBIDDEN');
+  settings=await must(owner,'settings_get_v1',settingsScope);await must(owner,'settings_update_v1',{...settingsScope,expected_version:settings.version,patch:{personal_negative_limits_enabled:true}},key());
   const v=await get(sid);assert(v.entries[0].protected);assert.equal(v.entries[0].result,'unmarked');
   const d=(await rows('select state from core.credit_deficits where reservation_id=$1',[rid]))[0];assert.equal(d.state,'reserved');
   const another=(await makeSession()).primary_id;await fail('reservation_create_v1',{session_id:another,person_id:student.p,mode:'flexible'},'CREDIT_LIMIT_EXCEEDED');

@@ -43,3 +43,17 @@ export function crmIntakePhone(value:unknown):string{
  if(!/^\+[1-9][0-9]{6,14}$/.test(phone))throw Error('VALIDATION_FAILED');
  return phone;
 }
+
+// Hash both supplied contacts; SQL chooses the authoritative form requirement
+// under the organization lock. Optional alternate contacts cannot rotate quotas.
+export function crmIntakeTargets(value:unknown):Record<string,string>{
+ if(!value||typeof value!=='object'||Array.isArray(value))throw Error('VALIDATION_FAILED');
+ const intake=value as Record<string,unknown>,targets:Record<string,string>={};
+ if(intake.phone!==undefined)targets.phone=crmIntakePhone(intake.phone);
+ if(intake.email!==undefined){
+  if(typeof intake.email!=='string'||intake.email.length>320||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(intake.email))throw Error('VALIDATION_FAILED');
+  targets.email=intake.email.trim().toLowerCase();
+ }
+ if(!targets.phone&&!targets.email)throw Error('VALIDATION_FAILED');
+ return targets;
+}

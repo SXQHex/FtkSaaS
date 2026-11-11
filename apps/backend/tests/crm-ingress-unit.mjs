@@ -27,3 +27,11 @@ test('CRM configuration data cannot terminate its generated PLpgSQL dollar body'
  assert.notEqual(delimiter,'$intake_setup$');
  assert.notEqual(delimiter,'$intake_setup_1$');
 });
+
+test('flexible CRM contact hashing supplies both canonical identities and never fabricates a phone',async()=>{
+ const out=await build({entryPoints:['supabase/functions/backend-v1/public-ingress.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+ const {crmIntakeTargets}=await import('data:text/javascript;base64,'+Buffer.from(out.outputFiles[0].text).toString('base64'));
+ assert.deepEqual(crmIntakeTargets({email:'Applicant@Example.invalid'}),{email:'applicant@example.invalid'});
+ assert.deepEqual(crmIntakeTargets({email:'Applicant@Example.invalid',phone:'00 90 (555) 000-00.01'}),{phone:'+905550000001',email:'applicant@example.invalid'});
+ for(const value of [{},{phone:null,email:'a@example.invalid'},{email:'bad email'},null])assert.throws(()=>crmIntakeTargets(value),/VALIDATION_FAILED/);
+});
