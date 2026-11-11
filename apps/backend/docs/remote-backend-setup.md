@@ -13,7 +13,7 @@ node scripts/acceptance/s10-hosted-preparations.mjs
 node scripts/acceptance/s07-s15-browser.mjs
 ```
 
-Playwright ayrı kurulumdan yüklenir; gerekirse FTK_PLAYWRIGHT_MODULE modül yolu ve FTK_PLAYWRIGHT_CHROMIUM kurulu headless Chromium executable'ı belirtilir. Kullanıcı Chrome profili veya eklentisi kullanılmaz. Ortam HTTPS_PROXY kullanıyorsa browser da kullanır; CODEX_PROXY_CERT varsa yalnız bu CA'nın SPKI fingerprint'i eklenir, genel ignoreHTTPSErrors açılmaz. Credential/provider payload/HTML/browser storage raporlanmaz; screenshot/trace/video alınmaz.
+Playwright ayrı kurulumdan yüklenir; gerekirse FTK_PLAYWRIGHT_MODULE modül yolu ve FTK_PLAYWRIGHT_CHROMIUM kurulu headless Chromium executable'ı belirtilir. Kullanıcının11 Kasım kabul yöntemi: bütün tarayıcı kontrolleri önce Playwright ile denenir; yalnız Playwright ile tamamlanamayan kontrol Chrome eklentisine taşınır. Playwright runner ayrı profilde çalışır. Eklentiye geçişin somut nedeni ve doğrulanan senaryo kabul kaydında belirtilir. Ortam HTTPS_PROXY kullanıyorsa browser da kullanır; CODEX_PROXY_CERT varsa yalnız bu CA'nın SPKI fingerprint'i eklenir, genel ignoreHTTPSErrors açılmaz. Credential/provider payload/HTML/browser storage raporlanmaz; screenshot/trace/video alınmaz.
 
 ## Native TOTP ve takvim kabulü
 
