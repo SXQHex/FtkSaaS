@@ -44,3 +44,19 @@ test('CRM migration schema references are exactly the shared schema and append-o
  const expected=['database/settings-catalog-v19.sql','database/crm-pipeline-settings.sql','database/settings-business-location.sql'].map((p,i)=>fs.readFileSync(p,'utf8').replace(i?'begin;\n':'','').replace(i<2?'commit;\n':'','')).join('');
  assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),expected);
 });
+
+test('every catalog field has a scoped reset key and passes both shared and Edge reset request validation',()=>{
+ const scopes={user:'User',member:'Member',center:'Center',organization:'Organization',platform:'Platform'};
+ const shared=ajv.getSchema('contract#/$defs/Request_settings_reset_preview');
+ for(const [scope,prefix] of Object.entries(scopes)){
+  const fields=catalog.fields.filter(f=>f.scope===scope).map(f=>f.key),allowed=contract.$defs[prefix+'SettingsFieldKey'].enum;
+  assert.deepEqual(new Set(allowed),new Set(fields),scope+' reset key/catalog parity');
+  const body={client_api_version:1,request_id:key(),scope,...(['member','center','organization'].includes(scope)?{org_id:key()}:{}),...(scope==='center'?{center_id:key()}:{}),fields};
+  for(const check of [shared,generated.request_settings_reset_preview_v1]){
+   assert.equal(check(body),true,scope+' reset catalog request');
+   assert.equal(check({...body,fields:['unknown_setting']}),false);
+   const foreign=catalog.fields.find(f=>f.scope!==scope&&!fields.includes(f.key));
+   assert(foreign);assert.equal(check({...body,fields:[foreign.key]}),false,scope+' foreign field denied');
+  }
+ }
+});

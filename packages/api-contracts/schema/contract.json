@@ -54265,7 +54265,11 @@
         "event_templates",
         "collection_templates",
         "crm_templates",
-        "automation_templates"
+        "automation_templates",
+        "crm_local_tags",
+        "map_url",
+        "directions",
+        "website_url"
       ]
     },
     "OrganizationSettingsFieldKey": {
@@ -54305,7 +54309,12 @@
         "event_templates",
         "collection_templates",
         "crm_templates",
-        "automation_templates"
+        "automation_templates",
+        "security_policy",
+        "crm_pipeline",
+        "map_url",
+        "directions",
+        "website_url"
       ]
     },
     "PlatformSettingsFieldKey": {

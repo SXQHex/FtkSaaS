@@ -287,8 +287,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f62c37a53b0f0f0ac2895761f0a87e8f3b7949731a02716f464ecf973b04c6c3",
-        "reason": "Shared additive CRM/URL schemas and generated validator/types reviewed; native protocol and replay envelope unchanged"
+        "fingerprint": "0d7b4d9c8a3c7188247d025d31544ef4bfa880fd4533ddfb40f53d120e62e5f6",
+        "reason": "Scoped reset enums reviewed against all catalog fields; shared and Edge validators now accept valid scope keys and reject unknown or foreign fields"
       }
     },
     {
@@ -1275,8 +1275,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "e9ddfede0eb86f6cffdfe9becdd2407e7c8dc5cecca7fed58d79cae6c51fb5df",
-        "reason": "Final append-only pipeline column uses existing migration coverage convention; settings source and reset/public/plan boundaries reviewed"
+        "fingerprint": "38487e7e4d0cfeffd434ff24ab09276b4164d02969d0ef2d6a975021629b584f",
+        "reason": "Reset key/catalog parity regression reproduced red then passed after organization and center enum completion; native reset authority and SQL checks unchanged"
       }
     },
     {
