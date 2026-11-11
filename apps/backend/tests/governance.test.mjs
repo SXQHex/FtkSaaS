@@ -271,7 +271,7 @@ test('workspace layout keeps application ownership and a configuration-only repo
  const tracked=execFileSync('git',['ls-files','-z'],{cwd:repositoryRoot,encoding:'utf8'}).split('\0').filter(Boolean);
  for(const file of tracked){const top=file.split('/')[0];assert(roots.has(top)||files.has(file),'Unexpected repository root source: '+file);assert(!/(?:^|\/)\.env(?!\.example$)/.test(file),'Tracked environment secret file: '+file);}
  const root=JSON.parse(fs.readFileSync(repoFile('package.json'))),backend=JSON.parse(fs.readFileSync(repoFile('apps/backend/package.json')));
- assert.equal(root.dependencies,undefined);assert.deepEqual(Object.keys(root.devDependencies),['turbo']);
+ assert.equal(root.dependencies,undefined);assert.deepEqual(Object.keys(root.devDependencies).sort(),['oxfmt','oxlint','turbo']);
  assert.equal(backend.name,'@ftksaas/backend');assert(backend.dependencies.pg);assert(backend.devDependencies.supabase);assert.equal(backend.devDependencies['@ftksaas/api-contracts'],'workspace:*');
  const node=fs.readFileSync(repoFile('.nvmrc'),'utf8').trim();assert.equal(root.engines.node,backend.engines.node);assert(root.engines.node.includes(node));
  assert(!fs.existsSync(repoFile('.node-version')));assert(!fs.existsSync(repoFile('package-lock.json')));

@@ -24,6 +24,8 @@
     "check:quality": "turbo run quality --filter=@ftksaas/backend"
   },
   "devDependencies": {
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
     "turbo": "2.11.10"
   }
 }

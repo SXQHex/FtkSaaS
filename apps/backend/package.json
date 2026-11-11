@@ -32,9 +32,9 @@
     "ajv-formats": "3.0.1",
     "esbuild": "0.28.2",
     "json-schema-to-typescript": "16.0.0",
-    "nodemailer": "10.1.1",
+    "nodemailer": "10.5.0",
     "standardwebhooks": "1.1.1",
-    "supabase": "3.0.0",
+    "supabase": "3.1.0",
     "typescript": "catalog:"
   },
   "dependencies": {
