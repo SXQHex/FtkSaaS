@@ -1,6 +1,16 @@
 {
   "ignorePatterns": [
     "src/routeTree.gen.ts",
-    "src/components/ui/**"
+    "src/i18n/generated/**",
+    "package-lock.json",
+    ".npm-cache/**",
+    ".tmp/**",
+    ".playwright-browsers/**",
+    ".tanstack/**",
+    "coverage/**",
+    "dist/**",
+    "playwright-report/**",
+    "test-results/**",
+    "AGENTS.md"
   ]
 }

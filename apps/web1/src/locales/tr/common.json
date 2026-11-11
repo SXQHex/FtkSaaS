@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "FtkSaaS V2",
+    "description": "Vite + React + TanStack Router + React Aria"
+  },
+  "demo": {
+    "action": "Test Et",
+    "clickCount": "Tıklama sayısı: {{value}}"
+  }
+}

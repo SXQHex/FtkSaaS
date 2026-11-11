@@ -26,3 +26,15 @@ dist-ssr
 # Local npm cache and temporary files
 .npm-cache/
 .tmp/
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+coverage/
+
+# Generated router and browser test artifacts
+.tanstack/
+.playwright-browsers/
+playwright-report/
+test-results/
