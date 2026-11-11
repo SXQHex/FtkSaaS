@@ -18,6 +18,7 @@ Pro/Business organization `crm_pipeline` kapalı O09 ayarıdır. `stages` sıral
 
 Açık lead'in kullandığı aşama/tür veya etiket, o lead açıkça yeniden eşlenmeden kaldırılamaz; reset ve history reapply aynı denetimden geçer. Yerel izin kapatması da kullanılan yerel etiketi boşa çıkaramaz. Ortak etiket yerel anahtarla çakışamaz. Güncel etiket/aşama adı normal okuyucuda kullanılır; saklanan snapshot ve audit'in eski/yeni içeriği korunur. Başarıdan sonra aynı merkezli liste ve gerekiyorsa kaynak selector yeniden okunur. Yeni genel endpoint veya otomatik dönüşüm yoktur.
 
+<a id="işletme-harita-ulaşım-ve-web-bağlantısı"></a>
 ### İşletme harita, ulaşım ve web bağlantısı
 
 Organization ve center `map_url`, `directions`, `website_url` kimlik/iletişim grubundadır. URL'ler yalnız en çok2048 karakter HTTPS ve kullanıcı adı/parola içermeyen bağlantı veya açık null'dır; directions en çok2000 karakter metin, başlangıç boş metindir. URL başlangıcı null'dır. Backend bu bağlantıları ziyaret etmez. Merkez ve organizasyon kendi yerel değerini yönetir; kayıt sürümü, alan bazlı reset ve geçmiş protokolü aynıdır.
