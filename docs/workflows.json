@@ -287,8 +287,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "ccd18bb2de8a6da38c1a53285b4ce4987ef6f6e34e217f52c6eed8a438d65330",
-        "reason": "Reviewed final S10 direct work alerts and preserved preparation-template schema; all old assertions/parts remain and exact scope/version consumers are aligned."
+        "fingerprint": "8c278345614a10f8cf30da6574a080d6e1266796a49c5f5ce0e1cac738f0ed45",
+        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
       }
     },
     {
@@ -1283,8 +1283,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "899d43a0a2df3c81e237e5165f3ac79921351a3a4937e4b4cfacfd8ac4600fca",
-        "reason": "Reviewed final S10 direct work alerts and preserved preparation-template schema; all old assertions/parts remain and exact scope/version consumers are aligned."
+        "fingerprint": "c0e34b24c1235c0d8308efcf9ce6c4f4f287bd2c66b00b2fbe5805387fbf0161",
+        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
       }
     },
     {
@@ -1539,8 +1539,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "d580f28f1cda43fa4f48f2717244e34f71354e8437dd81875847c4d89fa93c17",
-        "reason": "Reviewed final S10 consumers and unchanged workflow protocol; native alert tests now distinguish unprocessed pre-enable targets from fresh post-enable work."
+        "fingerprint": "d6ad8f33bcce558d679edea47985278599f79a47571affe9a0c2a3892dc33f86",
+        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
       }
     },
     {
@@ -1795,8 +1795,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "d929b46882654f845c40d0f0df1a19fb5200c6a6636a393c6160d95187a41835",
-        "reason": "Reviewed final S10 consumers and unchanged workflow protocol; native alert tests now distinguish unprocessed pre-enable targets from fresh post-enable work."
+        "fingerprint": "68422a0c6c8710a9c8864ead416d7ffd13ceb5d0a0817636bb7de2e2b1e2c03b",
+        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
       }
     }
   ]

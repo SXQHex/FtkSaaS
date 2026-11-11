@@ -3756,7 +3756,8 @@
                   "partner_name",
                   "mode",
                   "level"
-                ]
+                ],
+                "type": "string"
               },
               "maxItems": 5,
               "uniqueItems": true

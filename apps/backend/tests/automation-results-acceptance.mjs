@@ -1,4 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
+import {must} from './api-client.mjs';
 import {segmentFixture,lifecycleFixture} from './crm-lifecycle-fixture.mjs';import {newUuidV7 as id} from '../scripts/uuid.mjs';
 
 test('P16 native automation failure, bounded retry, lease fencing, live disable and single domain result',async t=>{
@@ -32,12 +33,12 @@ test('P16 native automation failure, bounded retry, lease fencing, live disable 
 });
 
 for(const kind of ['pending_request','unclosed_attendance'])test('S10 '+kind+' work alert uses explicit recipients, live source and no blind catch-up',async t=>{
- const {db,org,center,ownerPerson,api,denied,managed,nativeWorker,person}=await lifecycleFixture(t);
+ const {db,org,center,owner,ownerPerson,api,denied,managed,nativeWorker,person}=await lifecycleFixture(t);
  const stranger=await person('No work-alert authority'),configScope={kind:'center',center_id:center};
  const definition={name:'Explicit work alert',trigger:{kind,offset_days:0,recipient_person_ids:[ownerPerson]},segment_id:null,action:{kind:'send_reminder',channel:'in_app',template_key:'work.'+kind},execution_center_ids:[center],enabled:true};
  await denied('automation_save_v1',{scope:configScope,definition:{...definition,trigger:{...definition.trigger,recipient_person_ids:[stranger]}}},'FORBIDDEN');
  const automation=(await api('automation_save_v1',{scope:configScope,definition})).primary_id;
- const discipline=(await api('discipline_save_v1',{center_id:undefined,name:'Work alert discipline',state:'active'})).primary_id;
+ const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Work alert discipline',state:'active'},id())).primary_id;
  await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  const makeTarget=async()=>{const target=id();
  if(kind==='pending_request')await db.query("insert into core.lesson_requests(id,org_id,center_id,person_id,discipline_id,format,requested_start,duration_minutes,state) values($1,$2,$3,$4,$5,'private',now()+interval '2 days',60,'pending')",[target,org,center,stranger,discipline]);
