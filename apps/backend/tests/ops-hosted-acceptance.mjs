@@ -1,6 +1,56 @@
 // Existing registry shard: real LOGIN roles, native CALL and durable recovery.
 import test from 'node:test';import assert from 'node:assert/strict';import pg from 'pg';import {randomBytes} from 'node:crypto';
 import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
+test('O01 p07 native scheduler applies one due Pro boundary without renewal or email and restores its fixture',async()=>{
+ const db=await connect(),password=randomBytes(24).toString('hex');let worker,org,before,health,armed=false,roleTouched=false;
+ const read=async()=> (await db.query('select to_jsonb(s) value from core.saas_subscriptions s where org_id=$1',[org])).rows[0].value;
+ const money=async()=> (await db.query('select count(*)::int payments,coalesce(sum(amount_minor),0)::text amount,(select count(*)::int from private.p07_payment_allocations a where a.payment_id in (select id from core.saas_payment_verifications where org_id=$1)) allocations from core.saas_payment_verifications where org_id=$1',[org])).rows[0];
+ try{
+  const {platform,plan}=await fixturePlatform(),owner=await authUser('o01-p07-owner');
+  const proPlan=key();
+  await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $2,'pro',effective_at,price_minor,currency,period,limits,features from core.saas_plan_versions where id=$1",[plan,proPlan]);
+  const account=await must(owner,'account_get_v1');
+  org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic O01 p07',initial_plan_id:proPlan},key())).primary_id;
+  const payment=await must(owner,'saas_payment_submit_v1',{org_id:org,amount_minor:'1000',currency:'TRY',reference:'synthetic O01 p07 initial',occurred_at:new Date().toISOString()},key());
+  await must(platform,'saas_payment_verify_v1',{org_id:org,payment_id:payment.primary_id,accepted:true},key());
+  before=await read();assert.equal(before.state,'active');assert.equal((await must(owner,'subscription_get_v1',{org_id:org})).plan,'pro');const financial=await money();
+  health=(await db.query("select enabled,claimed,succeeded,failed from private.ops_worker_health where lane='p07'")).rows[0];
+  assert.equal((await db.query("select rolpassword is null empty from pg_authid where rolname='ftk_ops_p07'")).rows[0].empty,true);
+  assert.equal((await db.query("select count(*)::int n from private.p07_worker_scopes where db_role='ftk_ops_p07'")).rows[0].n,0);
+  await db.query(`alter role ftk_ops_p07 password '${password}'`);roleTouched=true;
+  await db.query("insert into private.p07_worker_scopes values('ftk_ops_p07',$1)",[org]);
+  await db.query("update private.ops_worker_health set enabled=true where lane='p07'");
+  const changed=await db.query("update core.saas_subscriptions set starts_at=least(starts_at,clock_timestamp()-interval '1 day'),period_end=clock_timestamp()-interval '1 minute',cancel_at_period_end=true,version=version+1 where id=$1 and version=$2 returning id",[before.id,before.version]);
+  assert.equal(changed.rowCount,1);armed=true;
+  const url=new URL(context().env.DB_URL);assert(['127.0.0.1','localhost','[::1]'].includes(url.hostname));url.username='ftk_ops_p07';url.password=password;
+  worker=new pg.Client({connectionString:url.href});await worker.connect();
+  assert.equal((await worker.query('select session_user role')).rows[0].role,'ftk_ops_p07');
+  await worker.query("call private.ops_run('p07')");
+  const ended=await read();assert.equal(ended.state,'ended');assert.equal(Number(ended.version),Number(before.version)+2);
+  assert.equal((await must(owner,'subscription_get_v1',{org_id:org})).state,'ended');
+  const jobs=(await db.query("select o.id,o.state,o.attempts::int from core.outbox_jobs o join private.p07_jobs j on j.job_id=o.id where j.org_id=$1 and j.operation='subscription_boundary_apply_v1'",[org])).rows;
+  assert.equal(jobs.length,1);assert.equal(jobs[0].state,'succeeded');assert.equal(jobs[0].attempts,1);
+  const after=(await db.query("select claimed,succeeded,failed from private.ops_worker_health where lane='p07'")).rows[0];
+  assert.equal(Number(after.claimed)-Number(health.claimed),1);assert.equal(Number(after.succeeded)-Number(health.succeeded),1);assert.equal(after.failed,health.failed);
+  await worker.query("call private.ops_run('p07')");assert.deepEqual(await read(),ended);assert.deepEqual(await money(),financial);
+  assert.equal((await db.query("select count(*)::int n from core.outbox_jobs where org_id=$1 and kind='transactional_email'",[org])).rows[0].n,0);
+  assert.equal((await db.query("select count(*)::int n from core.audit_events where org_id=$1 and action='subscription_boundary_apply_v1'",[org])).rows[0].n,1);
+ }finally{
+  try{
+   if(worker)await worker.end();
+   if(armed){
+    const restored=await db.query("update core.saas_subscriptions set starts_at=$3,period_end=$4,grace_until=$5,cancel_at_period_end=$6,state=$7,version=version+1 where id=$1 and version in ($2::bigint+1,$2::bigint+2) returning id",[before.id,before.version,before.starts_at,before.period_end,before.grace_until,before.cancel_at_period_end,before.state]);
+    assert.equal(restored.rowCount,1);
+    const restoredRow=await read();for(const field of ['starts_at','period_end','grace_until','cancel_at_period_end','state','plan_version_id'])assert.equal(restoredRow[field],before[field]);
+   }
+  }finally{
+   try{
+    if(org)await db.query("delete from private.p07_worker_scopes where db_role='ftk_ops_p07' and org_id=$1",[org]);
+    if(health)await db.query("update private.ops_worker_health set enabled=$1 where lane='p07'",[health.enabled]);
+   }finally{try{if(roleTouched)await db.query('alter role ftk_ops_p07 password null');}finally{await db.end();}}
+  }
+ }
+});
 test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease recovery',async t=>{
  const db=await connect(),password=randomBytes(24).toString('hex');let worker,trigger;const clients=[];
  const login=async lane=>{const u=new URL(context().env.DB_URL);u.username='ftk_ops_'+lane;u.password=password;const c=new pg.Client({connectionString:u.href});await c.connect();clients.push(c);return c;};
@@ -97,4 +147,154 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
   for(const c of clients)if(!c._ending)await c.end();
   await db.query('update private.ops_worker_health set enabled=false');for(const lane of ['p01','p05','p06'])await db.query(`alter role ftk_ops_${lane} password null`);await db.end();
  }
+});
+
+import {evaluateMonitor} from '../scripts/ops-monitor.mjs';
+import {runOperatorMonitor as runMonitor} from '../scripts/ops-monitor-outbox.mjs';
+const runOperatorMonitor=args=>runMonitor({...args,clock:()=>Date.parse(args.observation.checkedAt)});
+
+const start=Date.parse('2026-11-12T12:00:00Z');
+const lanes=['p01','p05','p06','p07','p07_privacy'];
+const snapshot=(minutes=0)=>({checkedAt:new Date(start+minutes*60000).toISOString(),serviceAvailable:true,
+ workers:lanes.map(lane=>({lane,enabled:true,lastFinishedAt:new Date(start+minutes*60000).toISOString(),lastStatus:'idle'})),
+ jobs:{stuck:0,exhausted:0,integrity:0},backup:{state:'usable',usableAt:new Date(start).toISOString()}});
+const keys=result=>result.events.map(event=>[event.kind,event.key]);
+
+test('O02 healthy observation is silent and input objects are not mutated',()=>{
+ const input=snapshot(),copy=structuredClone(input),result=evaluateMonitor(null,input);
+ assert.deepEqual(result.events,[]);assert.deepEqual(input,copy);assert.deepEqual(result.state.active,[]);
+});
+test('O02 availability requires two observations at least five minutes apart',()=>{
+ const first=snapshot();first.serviceAvailable=false;
+ const one=evaluateMonitor(null,first);assert.deepEqual(one.events,[]);
+ const early=snapshot(1);early.serviceAvailable=false;
+ const two=evaluateMonitor(one.state,early);assert.deepEqual(two.events,[]);
+ const due=snapshot(5);due.serviceAvailable=false;
+ const alarm=evaluateMonitor(two.state,due);assert.deepEqual(keys(alarm),[['alarm','availability']]);
+ const later=snapshot(10);later.serviceAvailable=false;
+ const ongoing=evaluateMonitor(alarm.state,later);assert.deepEqual(ongoing.events,[]);
+ const recovered=evaluateMonitor(ongoing.state,snapshot(15));assert.deepEqual(keys(recovered),[['recovery','availability']]);
+});
+test('O02 a healthy availability sample resets the consecutive failure streak',()=>{
+ const bad=snapshot();bad.serviceAvailable=false;
+ const first=evaluateMonitor(null,bad),good=evaluateMonitor(first.state,snapshot(5));
+ const again=snapshot(10);again.serviceAvailable=false;
+ assert.deepEqual(evaluateMonitor(good.state,again).events,[]);
+});
+test('O02 extra healthy observations cannot postpone two real failed probes',()=>{
+ const healthy=evaluateMonitor(null,snapshot());
+ const extra=evaluateMonitor(healthy.state,snapshot(1));
+ const first=snapshot(5);first.serviceAvailable=false;
+ const failed=evaluateMonitor(JSON.parse(JSON.stringify(extra.state)),first);
+ assert.equal(failed.state.availabilityFailures,1);
+ const second=snapshot(10);second.serviceAvailable=false;
+ assert.deepEqual(keys(evaluateMonitor(JSON.parse(JSON.stringify(failed.state)),second)),[['alarm','availability']]);
+});
+test('O02 stale worker alarms after two minutes, with equality still healthy',()=>{
+ const boundary=snapshot(2);boundary.workers[0].lastFinishedAt=new Date(start).toISOString();
+ assert.deepEqual(evaluateMonitor(null,boundary).events,[]);
+ const stale=snapshot(3);stale.workers[0].lastFinishedAt=new Date(start).toISOString();
+ const result=evaluateMonitor(null,stale);assert.deepEqual(keys(result),[['alarm','worker:p01']]);
+ assert.equal(result.events[0].reason,'stale');
+ assert.deepEqual(keys(evaluateMonitor(result.state,snapshot(4))),[['recovery','worker:p01']]);
+});
+test('O02 disabling a failed worker produces suppression, never a recovery claim',()=>{
+ const failed=snapshot();failed.workers[0].lastStatus='claim_error';
+ const alarm=evaluateMonitor(null,failed);assert.deepEqual(keys(alarm),[['alarm','worker:p01']]);
+ const disabled=snapshot(1);disabled.workers[0].enabled=false;disabled.workers[0].lastFinishedAt=null;
+ const result=evaluateMonitor(alarm.state,disabled);assert.deepEqual(keys(result),[['disabled','worker:p01']]);
+ assert.deepEqual(result.state.active,[]);assert.deepEqual(evaluateMonitor(result.state,disabled).events,[]);
+});
+test('O02 every native lane, including privacy, requires a real heartbeat when enabled',()=>{
+ for(const lane of lanes){const input=snapshot();input.workers.find(w=>w.lane===lane).lastFinishedAt=null;
+  assert.deepEqual(keys(evaluateMonitor(null,input)),[['alarm','worker:'+lane]]);
+ }
+});
+test('O02 failed, missing and older-than-24h backups alarm immediately',()=>{
+ for(const backup of [{state:'failed',usableAt:new Date(start).toISOString()},{state:'missing',usableAt:null},{state:'usable',usableAt:new Date(start-86400001).toISOString()}]){
+  const input=snapshot();input.backup=backup;assert.deepEqual(keys(evaluateMonitor(null,input)),[['alarm','backup']]);
+ }
+ const boundary=snapshot();boundary.backup.usableAt=new Date(start-86400000).toISOString();assert.deepEqual(evaluateMonitor(null,boundary).events,[]);
+});
+test('O02 stuck leases, exhausted deliveries and integrity violations alarm and recover independently',()=>{
+ const input=snapshot();input.jobs={stuck:1,exhausted:2,integrity:1};
+ const alarm=evaluateMonitor(null,input);
+ assert.deepEqual(keys(alarm),[['alarm','jobs:stuck'],['alarm','jobs:exhausted'],['alarm','jobs:integrity']]);
+ assert.equal(alarm.events.find(e=>e.key==='jobs:integrity').severity,'critical');
+ assert.deepEqual(evaluateMonitor(alarm.state,{...input,checkedAt:snapshot(1).checkedAt}).events,[]);
+ assert.deepEqual(keys(evaluateMonitor(alarm.state,snapshot(2))),[['recovery','jobs:stuck'],['recovery','jobs:exhausted'],['recovery','jobs:integrity']]);
+});
+test('O02 observation payload fields, credentials and person data never enter persisted state or events',()=>{
+ const input=snapshot();input.secret='private-sentinel';input.jobs.payload={email:'private-sentinel'};input.workers[0].lastError='private-sentinel';input.jobs.exhausted=1;
+ const result=evaluateMonitor(null,input);assert(!JSON.stringify(result).includes('private-sentinel'));
+ const repeated=evaluateMonitor(JSON.parse(JSON.stringify(result.state)),snapshot(5));assert.deepEqual(keys(repeated),[['recovery','jobs:exhausted']]);
+});
+test('O02 missing telemetry, duplicate lanes, invalid counts and clock reversal fail closed',()=>{
+ const initial=evaluateMonitor(null,snapshot(5));
+ for(const mutate of [s=>delete s.jobs,s=>s.workers.pop(),s=>s.workers.push(s.workers[0]),s=>s.jobs.stuck=-1,s=>s.jobs.exhausted='1',s=>s.workers[0].enabled='false',s=>s.backup.usableAt='invalid',s=>s.backup.usableAt=snapshot(10).checkedAt,s=>s.workers[0].lastStatus='untrusted-text',s=>s.checkedAt='invalid']){
+  const input=snapshot(6);mutate(input);assert.throws(()=>evaluateMonitor(initial.state,input),/INVALID_MONITOR/);
+ }
+ assert.throws(()=>evaluateMonitor(initial.state,snapshot(4)),/MONITOR_CLOCK_REVERSED/);
+ assert.throws(()=>evaluateMonitor({format:99},snapshot()),/INVALID_MONITOR/);
+});
+test('O02 inconsistent persisted incidents fail closed instead of announcing false recovery',()=>{
+ const input=snapshot(1);input.serviceAvailable=false;
+ const base=evaluateMonitor(null,snapshot()).state;
+ const incident={key:'availability',reason:'unavailable',severity:'error',openedAt:snapshot().checkedAt};
+ for(const state of [
+  {...base,active:[incident]},
+  {...base,availabilityFailures:2},
+  {...base,checkedAt:null,lastProbeAt:null,active:[incident]},
+  {...base,active:[{key:'worker:p01',reason:'old',severity:'error',openedAt:base.checkedAt}]},
+  {...base,active:[{key:'jobs:integrity',reason:'integrity',severity:'error',openedAt:base.checkedAt}]},
+  {...base,active:[{key:'backup',reason:'missing',severity:'error',openedAt:input.checkedAt}]}
+ ])assert.throws(()=>evaluateMonitor(state,input),/INVALID_MONITOR/);
+});
+async function monitorFixture(t){
+ const fs=await import('node:fs'),os=await import('node:os'),path=await import('node:path');
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'ftk-ops-monitor-'));fs.chmodSync(directory,0o700);
+ t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
+ const mail={apiKey:'synthetic-key',from:'monitor@example.invalid',to:'operator@example.invalid'};
+ const policy={maxAttempts:3,retryDelayMs:30000,idempotencyAgeMs:23*3600000};
+ return {fs,directory,mail,policy,read:()=>JSON.parse(fs.readFileSync(path.join(directory,'state.json')))};
+}
+test('O02 outbox persists before send and frozen same-key retry survives process restart',async t=>{
+ const f=await monitorFixture(t),bad=snapshot();bad.jobs.exhausted=1;const attempts=[];
+ const send=async input=>{attempts.push(input);const durable=f.read();assert.equal(durable.outbox[0].status,'sending');assert.equal(durable.outbox[0].attempts,attempts.length);return attempts.length===1?{state:'unknown'}:{state:'accepted',provider_reference:'01900000-0000-7000-8000-000000000001'};};
+ const first=await runOperatorMonitor({...f,observation:bad,send});assert.equal(first.pending,1);
+ const next={...bad,checkedAt:snapshot(1).checkedAt};const second=await runOperatorMonitor({...f,observation:next,send});
+ assert.equal(second.accepted,1);assert.equal(attempts.length,2);assert.deepEqual(attempts[0],attempts[1]);
+ await runOperatorMonitor({...f,observation:{...bad,checkedAt:snapshot(2).checkedAt},send});assert.equal(attempts.length,2);
+ assert.equal(f.fs.statSync(f.directory+'/state.json').mode&0o777,0o600);assert(!JSON.stringify(f.read()).includes(f.mail.apiKey));
+});
+test('O02 outbox does not call provider after bounded attempts or unresolved lock',async t=>{
+ const f=await monitorFixture(t),bad=snapshot();bad.jobs.stuck=1;let calls=0;
+ const send=async()=>{calls++;return {state:'retryable'};};
+ for(const minutes of [0,1,2,3])await runOperatorMonitor({...f,observation:{...snapshot(minutes),jobs:bad.jobs},send});
+ assert.equal(calls,3);assert.equal(f.read().outbox[0].status,'exhausted');
+ f.fs.writeFileSync(f.directory+'/monitor.lock','existing-owner',{mode:0o600});
+ await assert.rejects(runOperatorMonitor({...f,observation:snapshot(4),send}),/MONITOR_LOCKED/);assert.equal(calls,3);
+});
+test('O02 crash during send retries only the same frozen event inside provider safety window',async t=>{
+ const f=await monitorFixture(t),bad=snapshot();bad.jobs.integrity=1;
+ await runOperatorMonitor({...f,observation:bad,send:async()=>({state:'retryable'})});
+ const state=f.read();state.outbox[0].status='sending';f.fs.writeFileSync(f.directory+'/state.json',JSON.stringify(state));
+ let calls=0;const late={...snapshot(24*60),jobs:bad.jobs};
+ const result=await runOperatorMonitor({...f,observation:late,send:async()=>{calls++;return {state:'accepted',provider_reference:'01900000-0000-7000-8000-000000000001'};}});
+ assert.equal(calls,0);assert.equal(result.expired,1);
+});
+test('O02 rejected provider response is terminal and unsafe private files fail closed',async t=>{
+ const f=await monitorFixture(t),bad=snapshot();bad.jobs.stuck=1;let calls=0;
+ const send=async()=>{calls++;return {state:'rejected'};};
+ assert.equal((await runOperatorMonitor({...f,observation:bad,send})).rejected,1);
+ await runOperatorMonitor({...f,observation:{...snapshot(1),jobs:bad.jobs},send});assert.equal(calls,1);
+ f.fs.chmodSync(f.directory+'/state.json',0o644);
+ await assert.rejects(runOperatorMonitor({...f,observation:snapshot(2),send}),/PRIVATE_MONITOR_STORAGE_REQUIRED/);assert.equal(calls,1);
+});
+test('O02 provider error text is not persisted and an unsent alarm holds its recovery in order',async t=>{
+ const f=await monitorFixture(t),bad=snapshot();bad.jobs.stuck=1;
+ await runOperatorMonitor({...f,observation:bad,send:async()=>{throw new Error('private-provider-sentinel');}});
+ const sent=[];
+ await runOperatorMonitor({...f,observation:snapshot(1),send:async input=>{sent.push(input.payload.subject);return {state:'retryable'};}});
+ assert.equal(sent.length,1);assert.equal(f.read().outbox.length,2);assert(!JSON.stringify(f.read()).includes('private-provider-sentinel'));
 });

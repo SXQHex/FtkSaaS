@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "29332265f320965774e5caea45df2f2fd075e0c94123badbf13b684c92f20a5c",
-        "reason": "Reviewed agents-only classification with tracked-env rejection, quality/exact-source proof, explicit source-bound main/CD skip marker and malformed marker negatives; mixed/rename/deletion preserve application acceptance. Real CI policy remains trusted and S07 additions retain exact imported-source binding."
+        "fingerprint": "f5785a950e12fbabcd1d19edb48ef74248116620992897494ac49a5a21bd18c3",
+        "reason": "Reviewed OPS exact import digest for evaluator/outbox regression additions; all pre-existing tests and isolated native unit ownership retained, no CI source acceptance changed."
       }
     },
     {
@@ -1818,7 +1818,9 @@
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
         "apps/backend/database/settings-offer-duration-required.sql",
-        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
+        "apps/backend/scripts/ops-monitor.mjs",
+        "apps/backend/scripts/ops-monitor-outbox.mjs"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1833,8 +1835,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "138eddb7e7c87f27b8ed48f33160d9a16a948616850973378ed2ca91a955370a",
-        "reason": "Reviewed worker final authorization: preclaim expiry/revoke cancels with zero attempts; postclaim denial cancels unsent lease without provider reference."
+        "fingerprint": "838f6da8d1954b951bd1476b820f45d6dc5c2c5cecd96d5323806d8a8bb5fccb",
+        "reason": "Reviewed pure monitor debounce/corrupt-state fixes and private filesystem outbox with frozen idempotency delivery; existing sender retained. New runbook separates provider acceptance, real delivery and uninstalled external collector/scheduler."
       }
     }
   ]

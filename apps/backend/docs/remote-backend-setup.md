@@ -314,3 +314,19 @@ Aynı exact Auth target binding'i yeni kalıntı aşamasını da kapsar; migrati
 | Sağlayıcı dış logları / diğer Auth / backup | Bu helper'ın tamamlanma kapsamı değildir; ana Auth yüzeyi pending kalır |
 
 İlk kalıntı receipt'i request/subject/policy_version ve ilk pass satır sayılarıyla append-only'dir. Sonraki yeni claim'lerde aynı helper tekrar tarar; her pass sonucu checked_at ve o pass sayımlarını manifestte taşır. Böylece ilk transaction'dan sonra commit eden provider audit kopyası sonraki yetkili geçişte yeniden ele alınır. Aynı worker receipt replay'i tekrar iş yapmaz. Bu düzen bütün provider log retention'ını veya nihai yok etmeyi kanıtlamaz; kaynaklı yöntem tanımı teknik sözleşmenin19. bölümündedir.
+
+
+<a id="o02-alarm-mudahalesi"></a>
+## O02 alarm müdahalesi
+
+Operator değerlendirmesi [ops-monitor.mjs](../scripts/ops-monitor.mjs), kalıcı gönderim döngüsü [ops-monitor-outbox.mjs](../scripts/ops-monitor-outbox.mjs) sahibindedir. Bu sunucu araçları frontend/native kullanıcı API'si değildir. Sürekli dış gözlemci bunları çağırmadan önce gerçek sağlık/job sayımlarını ve kullanılabilir kurtarma noktası kanıtını toplamalıdır; yalnız backup işinin başlaması başarılı yedek sayılmaz. Kabul edilmiş izleme hedefleri [teknik sözleşmededir](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#20-kabul-edilmiş-o3-pilot-işletim-hedefleri).
+
+`runOperatorMonitor` açık `directory`, `observation`, `mail` ve `policy` alır. Mail alıcısı/göndericisi/API anahtarı ve tekrar politikası runtime girdileridir; test fixture değerleri kurulum varsayılanı değildir. Dedicated state dizini sahibi çalıştıran kullanıcı, izinleri0700; state ve lock0600 olmalıdır. Dizin izlenen DB'den bağımsız kalıcı diskte tutulur. Snapshot/state ve posta olayı atomik/fsync sınırından sonra mevcut Resend transport'una gider. Alıcı, gönderici, içerik, idempotency anahtarı ve politika pending olay için sabittir; API anahtarı dosyaya yazılmaz. Tekrar sayısı/aralığı açık seçilir; sağlayıcı anahtarının güvenli penceresi23saati aşamaz. State alıcı içerdiğinden özel işletim verisidir, kaynak veya rapora kopyalanmaz. Bu araç tek döngü çalıştırır; kendisi cron/host kurmaz.
+
+- `worker:*`: önce [read-only sağlık sorgusunda](../scripts/ops-cron-health.sql) enabled ve gerçek Cron owner/active/schedule bilgilerini kontrol et. Kapalı worker toparlanmış sayılmaz. Enabled/stale ise gerçek LOGIN, scope ve son tick/lease durumunu incele; kullanıcının onayı olmadan tenant scope icat etme.
+- `jobs:stuck`, `jobs:exhausted`, `jobs:integrity`: ilgili mevcut job/receipt ve lane teşhisini kullan. İşlemi veya tahsilatı körlemesine tekrarlama; bütünlük ihlalinde ilgili işlem güvenli biçimde durmalıdır. Başarısız geçmiş kayıtlarını yalnız alarmı susturmak için silme.
+- `backup`: son kullanılabilir DB/Auth/Storage kurtarma noktası ve bağımsız manifesti doğrula. Eksik/bozuk/gecikmiş yedeği sağlıklı olarak işaretleme; restore kabulü kendi kapılarındadır.
+- `rejected`, `exhausted`, `expired`: provider/reference ve gönderim yapılandırmasını yetkili SaaS işletim sorumlusu inceler. `accepted`, yalnız sağlayıcı kabulüdür; teslimi sağlayıcı olayı veya yetkili alıcı kutusunda ayrıca doğrula. Ham sağlayıcı mesajını/credential'ı loglama. Güvenli pencere dışındaki belirsiz olayı yeni anahtarla otomatik gönderme.
+- `MONITOR_LOCKED`: önce önceki sürecin gerçekten bittiğini doğrula. Lock yaşından/PID numarasından otomatik ölüm sonucu çıkarma. State'i silerek yeniden başlatma; pending/sending olayları koru ve olası provider kabulünü uzlaştır. Yapılandırma veya state bozulmasında araç kapalı hata verir; sahte toparlanma üretme.
+
+Alarmın ulaşması müdahale edildiğini kanıtlamaz. Gerçek fault→teslim→müdahale→toparlanma kabulü ve sürekli gözlemci kurulumunun durumu [backend kabul sahibindedir](00-FtkSaaS-yeni-sohbet-devir.md#o02-alarm-cekirdegi).

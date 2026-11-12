@@ -651,12 +651,14 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o01"></a>
 ### O01 — Gerçek worker yükü ve tekrar güvenliği
 
-- [ ] **Tür:** D/H · **Plan:** Tümü; lane bazlı · **Özellik:** F12,F24,F26,F28,F31,F33
+- [x] **Tür:** D/H · **Plan:** Tümü; lane bazlı · **Özellik:** F12,F24,F26,F28,F31,F33
 - **Bağımlılık:** A03
 - **Kabul:** Her uygulanabilir lane en az bir gerçek iş ve sonuçla doğrulanır.
 - **Sınır/olumsuz durum:** Report-worker kapanmış dilim yeniden yapılmaz; idle/claim0 tam kabul değildir.
 - **Doğrulama senaryosu:** Lease kaybı, kesinti, retry, disable/rebind/restart; yanlış binding reddi; P14/P16 sonrası e-posta yükü eklenir.
 - **Kaynak alanı:** worker p01/p05/p06/p07/privacy; mevcut ops test/runbook
+
+**Ortak/Pro kapanışı:** Lane başına gerçek hosted iş/sonuç ve mevcut native lease/kesinti/retry/disable/rebind/restart/yanlış scope kanıtları [tek kabul eşlemesinde](00-FtkSaaS-yeni-sohbet-devir.md#o01-worker-kapanisi) uzlaştırıldı. Yeni regresyon kaynağının CI teslimi bu kayıtta ayrıca ayrılır; G01/G03 plan ekleri ve O02/O03–O10 bu kapanışla tamamlanmaz.
 
 <a id="o02"></a>
 ### O02 — Alarm ve müdahale kabulü
@@ -667,6 +669,8 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 - **Sınır/olumsuz durum:** Logda secret/kişisel veri yok; kapalı worker ile sağlıksız worker ayrılır.
 - **Doğrulama senaryosu:** Hata enjeksiyonu→alarm→müdahale→toparlanma; alıcı/kanal ortam girdisi seçilmeden hazır sayılmaz.
 - **Kaynak alanı:** mevcut diagnostics/monitoring/config; runbook
+
+**Kaynak ilerlemesi:** Alarm değerlendirme çekirdeği ve olumsuz/toparlanma testleri [devirde](00-FtkSaaS-yeni-sohbet-devir.md#o02-alarm-cekirdegi) kayıtlıdır. Sürekli dış gözlemci, kalıcı gönderim kuyruğu ve gerçek alıcıya teslim/müdahale kabulü tamamlanmadan O02 kapanmaz.
 
 <a id="o03"></a>
 ### O03 — Saklama ve imha kapsamı
