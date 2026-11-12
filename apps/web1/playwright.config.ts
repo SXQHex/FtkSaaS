@@ -23,10 +23,18 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort --mode e2e",
-    url: baseURL,
-    reuseExistingServer: false,
-    env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
-  },
+  webServer: [
+    {
+      command: "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort --mode e2e",
+      url: baseURL,
+      reuseExistingServer: false,
+      env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
+    },
+    {
+      command: "npm run dev -- --host 127.0.0.1 --port 4174 --strictPort --mode development",
+      url: "http://127.0.0.1:4174",
+      reuseExistingServer: false,
+      env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
+    },
+  ],
 });
