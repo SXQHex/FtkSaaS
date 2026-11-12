@@ -150,7 +150,7 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
 });
 
 import {evaluateMonitor} from '../scripts/ops-monitor.mjs';
-import {runOperatorMonitor as runMonitor} from '../scripts/ops-monitor-outbox.mjs';
+import {runOperatorMonitor as runMonitor,monitorReviewToken} from '../scripts/ops-monitor-outbox.mjs';
 import {readMonitorTelemetry,collectMonitorObservation,probeServices} from '../scripts/ops-monitor-collector.mjs';
 const runOperatorMonitor=args=>runMonitor({...args,clock:()=>Date.parse(args.observation.checkedAt)});
 
@@ -299,7 +299,7 @@ test('O02 provider error text is not persisted and an unsent alarm holds its rec
  await runOperatorMonitor({...f,observation:snapshot(1),send:async input=>{sent.push(input.payload.subject);return {state:'retryable'};}});
  assert.equal(sent.length,1);assert.equal(f.read().outbox.length,2);assert(!JSON.stringify(f.read()).includes('private-provider-sentinel'));
 });
-test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evidence survives an idle tick',async()=>{
+test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evidence survives an idle tick',async t=>{
  const db=await connect(),password=randomBytes(24).toString('hex'),ids=[key(),key()],providerEvent=key(),providerReference=key();let client,org,health,eventIds=[],roleTouched=false;
  try{
   assert.equal((await db.query("select rolpassword is null empty from pg_authid where rolname='ftk_ops_monitor'")).rows[0]?.empty,true);
@@ -307,7 +307,7 @@ test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evid
   const url=new URL(context().env.DB_URL);url.username='ftk_ops_monitor';url.password=password;client=new pg.Client({connectionString:url.href});await client.connect();
   assert.equal((await client.query('show default_transaction_read_only')).rows[0].default_transaction_read_only,'on');
   const read=()=>readMonitorTelemetry(client);
-  const baseline=await read();assert.equal(baseline.workers.length,5);
+  const baseline=await read();assert.equal(baseline.workers.length,5);assert.equal(baseline.incidents.exhausted.total,baseline.jobs.exhausted);assert.equal(baseline.incidents.integrity.total,baseline.jobs.integrity);
   for(const sql of ['select * from core.people','select * from auth.users','select * from private.ops_worker_health','select * from private.ops_integrity_events',"call private.ops_run('p01')"] )await assert.rejects(client.query(sql),/permission denied/);
   await assert.rejects(db.query('select ops_monitor.snapshot()'),/FORBIDDEN/);
   const {platform,plan}=await fixturePlatform(),owner=await authUser('o02-monitor-owner');const account=await must(owner,'account_get_v1');
@@ -319,6 +319,9 @@ test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evid
   eventIds=(await db.query("select id from private.ops_integrity_events where lane='p01'")).rows.map(row=>row.id).filter(id=>!beforeEvents.includes(id));assert.equal(eventIds.length,1);assert.equal(eventIds[0][14],'7');
   await db.query("update private.ops_worker_health set last_status='idle',last_error_code=null,last_finished_at=clock_timestamp() where lane='p01'");
   const result=await read();assert.equal(result.jobs.stuck,baseline.jobs.stuck+1);assert.equal(result.jobs.exhausted,baseline.jobs.exhausted+1);assert.equal(result.jobs.integrity,baseline.jobs.integrity+1);
+  const ownFailure=result.incidents.exhausted.keys.filter(id=>!baseline.incidents.exhausted.keys.includes(id));assert.equal(ownFailure.length,1);assert.match(ownFailure[0],/^[a-f0-9]{64}$/);
+  await db.query('update core.outbox_jobs set version=version+1 where id=$1',[ids[1]]);
+  const revised=await read();assert.equal(revised.jobs.exhausted,result.jobs.exhausted);assert(!revised.incidents.exhausted.keys.includes(ownFailure[0]));
   await db.query("insert into private.email_provider_events(event_id,provider_reference,kind,occurred_at,payload_hash) values($1,$2,'failed',clock_timestamp(),repeat('a',64))",[providerEvent,providerReference]);
   assert.equal((await read()).jobs.exhausted,baseline.jobs.exhausted+1);
   await db.query('update core.outbox_jobs set provider_reference=$1 where id=$2',[providerReference,ids[1]]);
@@ -328,6 +331,13 @@ test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evid
   assert.equal((await read()).jobs.exhausted,baseline.jobs.exhausted+2);
   assert(!JSON.stringify(result).includes(org));assert(!JSON.stringify(result).includes(account.id));assert(!JSON.stringify(result).includes(password));
   assert.equal((await client.query('select has_schema_privilege(current_user,\'private\',\'USAGE\') access')).rows[0].access,false);
+  const disk=await monitorFixture(t);
+  const collect=()=>collectMonitorObservation({readTelemetry:options=>readMonitorTelemetry(client,options),readBackup:async()=>({state:'missing',usableAt:null}),probe:()=>probeServices({targets:[{url:context().env.API_URL+'/auth/v1/health',statuses:[200]}],timeoutMs:1000}),readerTimeoutMs:1000});
+  const observed=await collect(),send=async()=>({state:'accepted',provider_reference:key()});assert.equal(observed.serviceAvailable,true);
+  const delivered=await runMonitor({...disk,observation:observed,send});assert(delivered.events.some(event=>event.key==='jobs:integrity'&&event.kind==='alarm'));
+  const current=await collect();
+  await runMonitor({...disk,observation:current,send,acknowledge:{expectedSnapshot:monitorReviewToken(observed),exhausted:observed.incidents.exhausted.keys.filter(id=>!baseline.incidents.exhausted.keys.includes(id)),integrity:observed.incidents.integrity.keys.filter(id=>!baseline.incidents.integrity.keys.includes(id))}});
+  assert.equal(disk.read().acknowledgments.length,1);assert.deepEqual((await read()).jobs,observed.jobs);
  }finally{
   if(client)await client.end();
   try{
@@ -371,4 +381,41 @@ test('O02 timed-out native reader closes its dedicated connection without return
  let closed=0,rejectQuery;const client={query:()=>new Promise((_,reject)=>{rejectQuery=reject;}),end:async()=>{closed++;rejectQuery(new Error('private-connection-sentinel'));}};
  const result=await collectMonitorObservation({readTelemetry:options=>readMonitorTelemetry(client,options),readBackup:async()=>snapshot().backup,probe:async()=>true,readerTimeoutMs:10,clock:()=>start});
  assert.equal(result.telemetryAvailable,false);assert.equal(closed,1);assert(!JSON.stringify(result).includes('private-connection-sentinel'));
+});
+const withIncidents=(minutes,exhausted=[],integrity=[])=>({...snapshot(minutes),jobs:{stuck:0,exhausted:exhausted.length,integrity:integrity.length},incidents:{exhausted:{keys:exhausted,total:exhausted.length},integrity:{keys:integrity,total:integrity.length}}});
+test('O02 explicit operator acknowledgment preserves evidence and differs from recovery',async t=>{
+ const f=await monitorFixture(t),incident='a'.repeat(64),bad=withIncidents(0,[incident]);
+ const send=async()=>({state:'accepted',provider_reference:'01900000-0000-7000-8000-000000000001'});
+ await runOperatorMonitor({...f,observation:bad,send});
+ const reviewed=withIncidents(1,[incident]);
+ const result=await runOperatorMonitor({...f,observation:reviewed,send,acknowledge:{expectedSnapshot:monitorReviewToken(bad),exhausted:[incident],integrity:[]}});
+ assert.deepEqual(keys(result),[['acknowledged','jobs:exhausted']]);assert.equal(f.read().acknowledgments.length,1);
+ assert.equal(f.read().outbox[0].event.kind,'alarm');assert.equal(bad.jobs.exhausted,1);
+ assert.deepEqual((await runOperatorMonitor({...f,observation:withIncidents(2,[incident]),send})).events,[]);
+});
+test('O02 a later critical event alerts after acknowledgment even when total counts are unchanged',async t=>{
+ const f=await monitorFixture(t),old='a'.repeat(64),fresh='b'.repeat(64),send=async()=>({state:'rejected'});
+ const original=withIncidents(0,[],[old]);await runOperatorMonitor({...f,observation:original,send});
+ await runOperatorMonitor({...f,observation:withIncidents(1,[],[old]),send,acknowledge:{expectedSnapshot:monitorReviewToken(original),exhausted:[],integrity:[old]}});
+ const result=await runOperatorMonitor({...f,observation:withIncidents(2,[],[fresh]),send});
+ assert.deepEqual(keys(result),[['alarm','jobs:integrity']]);assert.equal(result.events[0].severity,'critical');
+ assert.equal(f.read().acknowledgments.length,1);
+});
+test('O02 new faults alert while another incident remains open and stale acknowledgments fail closed',async t=>{
+ const f=await monitorFixture(t),old='a'.repeat(64),fresh='b'.repeat(64),send=async()=>({state:'rejected'});
+ const original=withIncidents(0,[],[old]);await runOperatorMonitor({...f,observation:original,send});
+ const changed=withIncidents(1,[],[old,fresh]);
+ await assert.rejects(runOperatorMonitor({...f,observation:changed,send,acknowledge:{expectedSnapshot:monitorReviewToken(original),exhausted:[],integrity:[old]}}),/MONITOR_REVIEW_STALE/);
+ const result=await runOperatorMonitor({...f,observation:changed,send});assert.deepEqual(keys(result),[['alarm','jobs:integrity']]);
+ assert.deepEqual((await runOperatorMonitor({...f,observation:withIncidents(2,[],[old,fresh]),send})).events,[]);
+});
+test('O02 acknowledgment requires exact known keys and cannot clear truncated or unavailable observations',async t=>{
+ const f=await monitorFixture(t),old='a'.repeat(64),unknown='b'.repeat(64),send=async()=>({state:'rejected'});
+ const original=withIncidents(0,[old]);await runOperatorMonitor({...f,observation:original,send});
+ await assert.rejects(runOperatorMonitor({...f,observation:withIncidents(1,[old]),send,acknowledge:{expectedSnapshot:monitorReviewToken(original),exhausted:[unknown],integrity:[]}}),/UNKNOWN_MONITOR_INCIDENT/);
+ const truncated=withIncidents(1,[old]);truncated.incidents.exhausted.total=2;truncated.jobs.exhausted=2;
+ const result=await runOperatorMonitor({...f,observation:truncated,send,acknowledge:{expectedSnapshot:monitorReviewToken(truncated),exhausted:[old],integrity:[]}});
+ assert(!result.events.some(event=>event.kind==='acknowledged'));assert(f.read().monitor.active.some(event=>event.key==='jobs:exhausted'));
+ const unavailable={...snapshot(2),serviceAvailable:false,telemetryAvailable:false,workers:null,jobs:null};
+ await assert.rejects(runOperatorMonitor({...f,observation:unavailable,send,acknowledge:{expectedSnapshot:monitorReviewToken(truncated),exhausted:[old],integrity:[]}}),/MONITOR_INCIDENT_EVIDENCE_REQUIRED/);
 });

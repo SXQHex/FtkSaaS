@@ -14,7 +14,7 @@ const timestamp=value=>{
 const count=value=>{if(!Number.isSafeInteger(value)||value<0)invalid();return value;};
 
 export function validateMonitorEvent(event){
- if(!event||!['alarm','recovery','disabled'].includes(event.kind)||!keys.includes(event.key)||!validIncident(event)||(event.kind==='disabled'&&!event.key.startsWith('worker:'))||timestamp(event.openedAt)>timestamp(event.checkedAt))invalid();
+ if(!event||!['alarm','recovery','disabled','acknowledged'].includes(event.kind)||!keys.includes(event.key)||!validIncident(event)||(event.kind==='disabled'&&!event.key.startsWith('worker:'))||(event.kind==='acknowledged'&&!['jobs:exhausted','jobs:integrity'].includes(event.key))||timestamp(event.openedAt)>timestamp(event.checkedAt))invalid();
  const projected={kind:event.kind,key:event.key,reason:event.reason,severity:event.severity,openedAt:event.openedAt,checkedAt:event.checkedAt};
  if(JSON.stringify(event)!==JSON.stringify(projected))invalid();
  return projected;
@@ -36,9 +36,15 @@ export function evaluateMonitor(previous,observation){
  }
  if(old.has('availability')!==(prior.availabilityFailures===2))invalid();
  const active=[],events=[],disabled=new Set();
+ const flags=name=>{
+  const values=observation[name]??[];
+  if(!Array.isArray(values)||new Set(values).size!==values.length||values.some(value=>!['exhausted','integrity'].includes(value)))invalid();
+  return new Set(values.map(value=>'jobs:'+value));
+ };
+ const acknowledged=flags('acknowledgedJobs'),fresh=flags('newJobIncidents');
  const alarm=(key,reason,severity='error')=>{
   const incident={key,reason,severity,openedAt:old.get(key)?.openedAt??at};active.push(incident);
-  if(!old.has(key))events.push({kind:'alarm',...incident,checkedAt:at});
+  if(!old.has(key)||fresh.has(key))events.push({kind:'alarm',...incident,checkedAt:at});
  };
  let lastProbeAt=prior.lastProbeAt,availabilityFailures=prior.availabilityFailures;
  // Technical contract: five-minute probes, two consecutive failures. Extra
@@ -49,7 +55,7 @@ export function evaluateMonitor(previous,observation){
 
  const telemetryMissing=observation.telemetryAvailable===false;
  if(telemetryMissing){
-  if(observation.serviceAvailable||observation.workers!==null||observation.jobs!==null)invalid();
+  if(observation.serviceAvailable||observation.workers!==null||observation.jobs!==null||acknowledged.size||fresh.size)invalid();
   for(const incident of old.values())if(incident.key.startsWith('worker:')||incident.key.startsWith('jobs:'))active.push({...incident});
  }
  if(!telemetryMissing&&(!Array.isArray(observation.workers)||observation.workers.length!==lanes.length))invalid();
@@ -67,7 +73,11 @@ export function evaluateMonitor(previous,observation){
  }
  if(!telemetryMissing){
   if(!observation.jobs)invalid();
-  for(const kind of ['stuck','exhausted','integrity'])if(count(observation.jobs[kind])>0)alarm('jobs:'+kind,kind,kind==='integrity'?'critical':'error');
+  for(const kind of ['stuck','exhausted','integrity']){
+   const amount=count(observation.jobs[kind]),key='jobs:'+kind;
+   if((acknowledged.has(key)&&amount!==0)||(fresh.has(key)&&amount===0))invalid();
+   if(amount>0)alarm(key,kind,kind==='integrity'?'critical':'error');
+  }
  }
  const backup=observation.backup;
  if(!backup||!['usable','failed','missing','unavailable'].includes(backup.state))invalid();
@@ -77,6 +87,6 @@ export function evaluateMonitor(previous,observation){
  if(backup.state!=='usable')alarm('backup',backup.state);
  else if(now-usable>86400000)alarm('backup','old');
  const current=new Set(active.map(incident=>incident.key));
- for(const incident of old.values())if(!current.has(incident.key))events.push({kind:disabled.has(incident.key)?'disabled':'recovery',...incident,checkedAt:at});
+ for(const incident of old.values())if(!current.has(incident.key))events.push({kind:disabled.has(incident.key)?'disabled':acknowledged.has(incident.key)?'acknowledged':'recovery',...incident,checkedAt:at});
  return {state:{format:1,checkedAt:at,lastProbeAt,availabilityFailures,active},events};
 }

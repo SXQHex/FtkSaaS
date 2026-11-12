@@ -39,5 +39,5 @@ export async function collectMonitorObservation({readTelemetry,readBackup,probe,
  const readable=telemetry.status==='fulfilled'&&telemetry.value!==null;
  return {checkedAt:new Date(clock()).toISOString(),telemetryAvailable:readable,
   serviceAvailable:readable&&available.status==='fulfilled'&&available.value===true,
-  workers:readable?telemetry.value.workers:null,jobs:readable?telemetry.value.jobs:null,backup:backup.status==='fulfilled'?backup.value:{state:'unavailable',usableAt:null}};
+  workers:readable?telemetry.value.workers:null,jobs:readable?telemetry.value.jobs:null,incidents:readable?telemetry.value.incidents:null,backup:backup.status==='fulfilled'?backup.value:{state:'unavailable',usableAt:null}};
 }

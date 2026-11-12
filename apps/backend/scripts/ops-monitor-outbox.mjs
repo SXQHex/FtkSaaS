@@ -3,6 +3,8 @@ import path from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
 import {sendEmail} from '../supabase/functions/backend-v1/email-provider.ts';
 import {evaluateMonitor,validateMonitorEvent} from './ops-monitor.mjs';
+import {prepareMonitorObservation} from './ops-monitor-ack.mjs';
+export {monitorReviewToken} from './ops-monitor-ack.mjs';
 
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const fail=code=>{throw new Error(code);};
@@ -25,7 +27,7 @@ const payload=(mail,event)=>({from:mail.from,to:[mail.to],subject:`FtkSaaS ops: 
 // One externally scheduled cycle. A private, independent disk must survive
 // process restarts and the monitored DB failing. A stale lock requires operator
 // investigation: never infer that its owner died from a timestamp or PID alone.
-export async function runOperatorMonitor({directory,observation,mail,policy,send=sendEmail,clock=Date.now}){
+export async function runOperatorMonitor({directory,observation,mail,policy,acknowledge=null,send=sendEmail,clock=Date.now}){
  privateFile(directory,true);
  if(!mail||!['from','to'].every(key=>typeof mail[key]==='string'&&mail[key].length<=254&&/^[^\s<>@]+@[^\s<>@]+$/.test(mail[key]))||typeof mail.apiKey!=='string'||!mail.apiKey||/[\r\n]/.test(mail.apiKey))fail('MONITOR_MAIL_CONFIG_REQUIRED');
  if(!policy||!Number.isSafeInteger(policy.maxAttempts)||policy.maxAttempts<1||!Number.isSafeInteger(policy.retryDelayMs)||policy.retryDelayMs<1||!Number.isSafeInteger(policy.idempotencyAgeMs)||policy.idempotencyAgeMs<1||policy.idempotencyAgeMs>23*3600000)fail('MONITOR_DELIVERY_POLICY_REQUIRED');
@@ -48,7 +50,9 @@ export async function runOperatorMonitor({directory,observation,mail,policy,send
    if(job.attempts===0){if(job.status!=='pending'||job.firstAttemptAt!==null||job.lastAttemptAt!==null)fail('INVALID_MONITOR_OUTBOX');}
    else if(date(job.firstAttemptAt)>date(job.lastAttemptAt)||date(job.lastAttemptAt)>clock())fail('INVALID_MONITOR_OUTBOX');
   }
-  const evaluated=evaluateMonitor(state.monitor,observation);state.monitor=evaluated.state;
+  const now=clock();if(!Number.isFinite(now)||now<date(observation.checkedAt))fail('MONITOR_CLOCK_REVERSED');
+  const projected=prepareMonitorObservation(state,observation,acknowledge,now);
+  const evaluated=evaluateMonitor(state.monitor,projected);state.monitor=evaluated.state;
   for(const event of evaluated.events){const id=hash(event);if(ids.has(id))fail('DUPLICATE_MONITOR_EVENT');ids.add(id);state.outbox.push({id,event,payload:payload(mail,event),status:'pending',attempts:0,firstAttemptAt:null,lastAttemptAt:null});}
   // Monitor advancement and its outbox events share one atomic fsync boundary.
   save(file,state);

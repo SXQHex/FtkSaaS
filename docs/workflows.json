@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "00aa1e332b358a4ac1e90a89aef0b53ecd661a184a5b230adf9d5f3606ddbd82",
-        "reason": "Reviewed exact OPS imported-source hash for native provider ownership assertions and collector cases; migration metadata152 appended, historic151 hashes retained and application API contracts unchanged."
+        "fingerprint": "94a42f50944f6e8635574f095a369874eeef424e42fedfa6a4769fa7654b440d",
+        "reason": "Reviewed exact OPS import hash after integrated native acknowledgment assertions; all previous test membership and gates retained, appended153 migration only and no callable client API changed."
       }
     },
     {
@@ -1823,7 +1823,10 @@
         "apps/backend/scripts/ops-monitor-outbox.mjs",
         "apps/backend/database/ops-monitor.sql",
         "apps/backend/supabase/migrations/20261112212500_ops_monitor.sql",
-        "apps/backend/scripts/ops-monitor-collector.mjs"
+        "apps/backend/scripts/ops-monitor-collector.mjs",
+        "apps/backend/scripts/ops-monitor-ack.mjs",
+        "apps/backend/database/ops-monitor-incidents.sql",
+        "apps/backend/supabase/migrations/20261112214500_ops_monitor_incidents.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1838,8 +1841,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "b66746917f979d3a7b34729c0a27259fc508fad456122203d1058fa1fe6a05ad",
-        "reason": "Reviewed native monitor schema isolation, UUIDv7 durable integrity evidence and ownership-scoped provider failures without double-counting; collector deadlines/abort cleanup and outage-preserved incidents covered. WF20 now documents operator-only snapshot, no client API or worker grant."
+        "fingerprint": "75718922edbbba1bfabbe3ebc5862e40106cf218b3630b5151a6174bf3dac0e1",
+        "reason": "Reviewed native collector-to-outbox acknowledgment integration with actual Auth health HTTP probe and safe provider double. Operator acknowledgment is explicit, snapshot-pinned and distinct from recovery; unknown/truncated evidence cannot clear unseen incidents; new failure versions re-alert. Hosted delivery remains separate."
       }
     }
   ]
