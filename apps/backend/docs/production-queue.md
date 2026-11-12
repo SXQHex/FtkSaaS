@@ -6,17 +6,16 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 Öncelik Pro'nun ortak uygulamasını tamamlamak ve [G02](remaining-work.md#g02) backend kabulünü kapatmaktır. Sonraki paket [G01](remaining-work.md#g01) ile aynı uygulamanın Starter kısıtları, ardından [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir.
 
-**Aktif sıra:** S08 → S10 → S14 → Pro'ya uygulanabilir kalan S/P ve O kabulleri → G02. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır. S08'in doğal süre sınırı beklenirken S10 ve bağımsız işletim işleri ilerler; süre kısaltılmaz ve eksik kanıt tamamlandı sayılmaz.
+**Aktif sıra:** S08 → S14 → Pro'ya uygulanabilir kalan S/P ve O kabulleri → G02. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır. S08'in doğal süre sınırı beklenirken S14 ve bağımsız işletim işleri ilerler; süre kısaltılmaz ve eksik kanıt tamamlandı sayılmaz.
 
 | Öncelik | Paket | Bağımlılık ve kontrol noktası |
 |---|---|---|
 | 1 | [S08](remaining-work.md#s08) hesap/güvenlik | Kalan native/hosted Auth kanıtı ve kabul oturumunun kapatılması; frontend ekran onayı backend'i bekletmez. |
-| 2 | [S10](remaining-work.md#s10) ayar davranışı | Son kaynak teslimini 69 grubun gerçek tüketici/yetki/varsayılan/miras kapsamıyla uzlaştır; hazır alt teslimleri yeniden geliştirme. |
-| 3 | [S14](remaining-work.md#s14) public backend | Gerçek sağlayıcı/hostname/config ve HTTP kabulü; kaynak testini veya frontend görünümünü hosted backend kanıtı sayma. |
-| 4 | Pro ortak akışlarının kalan kabulleri | [S01–S16](remaining-work.md#ortak-uygulama-temeli) ve [P01–P16](remaining-work.md#pro-işlevleri) içindeki yürürlükteki, Pro'ya uygulanabilir açıkları kapat. |
-| 5 | [O01–O10](remaining-work.md#ortak-üretim-işletimi) ve [G02](remaining-work.md#g02) | Pro kapsamındaki worker, alarm, saklama/imha, restore ve yük kanıtı tamamlanınca Pro backend kabulünü kapat. |
-| 6 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
-| 7 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon, ortak kullanım/hesaplaşma ve ek yük kapsamını doğrula. |
+| 2 | [S14](remaining-work.md#s14) public backend | Gerçek sağlayıcı/hostname/config ve HTTP kabulü; kaynak testini veya frontend görünümünü hosted backend kanıtı sayma. |
+| 3 | Pro ortak akışlarının kalan kabulleri | [S01–S16](remaining-work.md#ortak-uygulama-temeli) ve [P01–P16](remaining-work.md#pro-işlevleri) içindeki yürürlükteki, Pro'ya uygulanabilir açıkları kapat. |
+| 4 | [O01–O10](remaining-work.md#ortak-üretim-işletimi) ve [G02](remaining-work.md#g02) | Pro kapsamındaki worker, alarm, saklama/imha, restore ve yük kanıtı tamamlanınca Pro backend kabulünü kapat. |
+| 5 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
+| 6 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon, ortak kullanım/hesaplaşma ve ek yük kapsamını doğrula. |
 
 Tamamlanmış bir S/P/B görevi sıra değişti diye yeniden açılmaz. Ortak kaynakta güvenlik veya veri tutarlılığı hatası bulunursa hangi plan testinde görüldüğüne bakılmadan düzeltilir ve etkilenen plan regresyonları çalışır. Starter veya Business testlerinin mevcut CI kapsamından çıkarılması bu sıralamanın sonucu değildir.
 
