@@ -48,6 +48,8 @@ async function settlementFixture(t){
   const publish=(k,v)=>mut('policy_publish_v1',{key:k,value:v,effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false},null);
   if(c===A){
    await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
+   // Settlement accrues from consumed rights independently of student collection.
+   for(const k of ['debt_booking','debt_participation'])await mut('policy_publish_v1',{key:k,value:{kind:'boolean',value:false},effective_at:new Date().toISOString(),mandatory:false},null);
    await publish('negative_default',{kind:'integer',value:10});await publish('negative_upper',{kind:'integer',value:10});
    await publish('negative_valuation',{kind:'valuation',discipline_id:D,format:'group',amount_minor:'100',currency:'TRY'});
    await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});

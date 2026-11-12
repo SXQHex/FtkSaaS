@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** Kullanıcının son talimatıyla PR278 üzerinde [S10 kalan ayar tüketicileri](remaining-work.md#s10) frontend beklenmeden yürütülür; [S08](remaining-work.md#s08) doğal nonce kapıları ayrı açık kalır. Sonraki sıra S14 → O01–O10 → G02’dir. Kaynak, native CI, development ve gerçek hosted kabulü ayrı doğrulanır; iptal/erteleme kararları korunur.
+**Aktif paket:** Kullanıcının son talimatıyla önce [S08](remaining-work.md#s08), ardından [S10 kalan ayar tüketicileri](remaining-work.md#s10) kapatılır. S08 doğal nonce eşiği beklenirken hazır S10 kaynağı doğrulanır; süre kabulü yerine geçmez. Sonraki sıra S14 → O01–O10 → G02’dir. Kaynak, native CI, development ve gerçek hosted kabulü ayrı doğrulanır; iptal/erteleme kararları korunur.
 
 ## Uygulama sırası
 

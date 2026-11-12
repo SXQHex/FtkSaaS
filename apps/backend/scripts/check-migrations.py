@@ -256,3 +256,5 @@ assert next(Path('supabase/migrations').glob('*_account_native_residues.sql')).r
 assert next(Path('supabase/migrations').glob('*_account_export_erasure.sql')).read_bytes()==Path('database/account-export-erasure.sql').read_bytes(),'Account export erasure source drift'
 
 assert next(Path('supabase/migrations').glob('*_discipline_presentation.sql')).read_bytes()==Path('database/discipline-presentation.sql').read_bytes(),'Discipline presentation source drift'
+
+assert next(Path('supabase/migrations').glob('*_settings_domain_closure.sql')).read_text()==''.join(Path('database',n+'.sql').read_text() for n in ['settings-catalog-v21','settings-room-lifecycle','settings-form-discovery','settings-onboarding-plans','settings-waitlist-opt-in','settings-calendar-exceptions']),'Settings domain closure source drift'

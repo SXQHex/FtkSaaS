@@ -685,6 +685,10 @@ Aynı katalogda organization/center map_url/directions/website_url gerçek priva
 <a id="xreq-041-iş-takvimi-başvuru-gereksinimleri-ve-disiplin-etki-tüketimi"></a>
 ## XREQ-041 İş takvimi, başvuru gereksinimleri ve disiplin etki tüketimi
 
+### Backend tüketici eki — 12 Kasım 2026
+
+Katalogv21 ve mevcut domain komutlarına additive oda detay/aktiflik, sınıf bekleme listesi seçimi, izinli web form keşfi ve gerekçeli iş takvimi istisnası desteği hazırlanır. Tam wire/scope/sürüm ve geçmiş davranışı [ayar rehberinde](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları) tutulur. Oda ve sınıf yönetim selector'ları opt-in detay ister; eski yanıt biçimi korunur. Form kimliği keşfinden özel URL/anahtar okunmaz. İstisna UI'si yalnız açık organizasyon izni ve canlı merkez yetkisiyle gerekçe/güncel ayar sürümlerini gönderir; kapasite veya kaynak çatışmasını atlatma seçeneği değildir. Başarılı apply replay'i izin kapatıldıysa FORBIDDEN verir; kayıtlı seansın geçmiş onayı değişmez. Frontend kabulü: oda kapatmada açık işleri çözme, bekleme/teklifleri sonuçlandırmadan liste kapatmama, form sayfa/scope ve stale sürümde yeniden okuma; timeout'ta aynı operation_key ile kurtarma. Bu ek frontend uygulaması veya kabul onayı değildir.
+
 ### Backend devri — 12 Kasım 2026
 
 PR278 adayı katalogv20 ve güncel typed sözleşmeyle dört yeni ayar alanı, disiplin etki/proof okuması, iki iş uyarısı ve esnek iletişim başvurusu sunar. Kesin alan/izin/default/miras ve eski DTO uyumluluğu [ayar rehberinde](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), başvuru opt-in'i [iletişim gereksinimlerinde](settings.md#başvuru-formunun-iletişim-gereksinimleri) açıklanır. Native backend kabulü frontend ekranı beklemeden yapılır; aday/merge/deploy/hosted durumu [backend devrinden](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-ayar-davranışlarını-tamamlama) okunur.

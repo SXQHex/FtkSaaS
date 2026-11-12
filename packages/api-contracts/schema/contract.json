@@ -3920,6 +3920,16 @@
           "enum": [
             "instructor_required"
           ]
+        },
+        "work_calendar_exception": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkCalendarExceptionRecord"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -7482,6 +7492,17 @@
         },
         "capacity": {
           "$ref": "#/$defs/Count"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "state": {
+          "$ref": "#/$defs/RecordState"
         }
       },
       "required": [
@@ -9183,6 +9204,9 @@
         },
         "discipline_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "waitlist_enabled": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -9244,6 +9268,9 @@
         },
         "schedule": {
           "$ref": "#/$defs/ProgramSpec"
+        },
+        "work_calendar_exception": {
+          "$ref": "#/$defs/WorkCalendarExceptionInput"
         }
       },
       "required": [
@@ -9394,6 +9421,9 @@
         },
         "inherit_class_assignments": {
           "$ref": "#/$defs/Bool"
+        },
+        "work_calendar_exception": {
+          "$ref": "#/$defs/WorkCalendarExceptionInput"
         }
       },
       "required": [
@@ -9454,6 +9484,9 @@
         },
         "session_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_work_calendar_exception": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -9523,6 +9556,9 @@
           "items": {
             "$ref": "#/$defs/LocalOffsetChoice"
           }
+        },
+        "work_calendar_exception": {
+          "$ref": "#/$defs/WorkCalendarExceptionInput"
         }
       },
       "required": [
@@ -9839,6 +9875,9 @@
         },
         "capacity": {
           "$ref": "#/$defs/SessionCapacity"
+        },
+        "work_calendar_exception": {
+          "$ref": "#/$defs/WorkCalendarExceptionInput"
         }
       },
       "required": [
@@ -9922,6 +9961,9 @@
         },
         "state": {
           "$ref": "#/$defs/RecordState"
+        },
+        "work_calendar_exception": {
+          "$ref": "#/$defs/WorkCalendarExceptionInput"
         }
       },
       "required": [
@@ -17629,6 +17671,9 @@
         },
         "state": {
           "$ref": "#/$defs/RecordState"
+        },
+        "work_calendar_exception": {
+          "$ref": "#/$defs/WorkCalendarExceptionInput"
         }
       },
       "required": [
@@ -18498,6 +18543,14 @@
               "type": "null"
             }
           ]
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 1000
         }
       },
       "required": [
@@ -19212,6 +19265,9 @@
         },
         "discipline_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "waitlist_enabled": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -19411,6 +19467,16 @@
           "anyOf": [
             {
               "$ref": "#/$defs/CategoryCapacities"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "work_calendar_exception": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WorkCalendarExceptionRecord"
             },
             {
               "type": "null"
@@ -32366,6 +32432,20 @@
                   "type": "null"
                 }
               ]
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "location": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "state": {
+              "$ref": "#/$defs/RecordState"
+            },
+            "deactivation_effects": {
+              "$ref": "#/$defs/RoomDeactivationEffects"
             }
           },
           "required": [],
@@ -32927,6 +33007,12 @@
             },
             "discipline_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "waitlist_enabled": {
+              "type": "boolean"
+            },
+            "waitlist_impact": {
+              "$ref": "#/$defs/ClassWaitlistImpact"
             }
           },
           "required": [],
@@ -37186,6 +37272,9 @@
                   "type": "null"
                 }
               ]
+            },
+            "include_details": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -37767,6 +37856,9 @@
             },
             "discipline_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "include_waitlist": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -47059,6 +47151,9 @@
               "type": "null"
             }
           ]
+        },
+        "work_calendar_exceptions_enabled": {
+          "type": "boolean"
         }
       },
       "required": [],
@@ -47390,7 +47485,8 @@
                   "website_url",
                   "personal_negative_limits_enabled",
                   "application_form_rules",
-                  "work_calendar"
+                  "work_calendar",
+                  "work_calendar_exceptions_enabled"
                 ]
               },
               "uniqueItems": true,
@@ -47676,7 +47772,8 @@
             "crm_pipeline",
             "lesson_impact_authorize",
             "crm_intake_submit",
-            "center_work_calendar_contains"
+            "center_work_calendar_contains",
+            "work_calendar_exception_assert"
           ]
         },
         "writable": {
@@ -47705,7 +47802,7 @@
           ]
         },
         "catalog_version": {
-          "const": 20
+          "const": 21
         },
         "fields": {
           "type": "array",
@@ -47736,6 +47833,9 @@
         },
         "notification_delivery": {
           "$ref": "#/$defs/NotificationDeliverySupport"
+        },
+        "configured_forms": {
+          "$ref": "#/$defs/ConfiguredFormsPage"
         }
       },
       "required": [
@@ -47757,7 +47857,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 20
+              "const": 21
             }
           },
           "required": [
@@ -47775,7 +47875,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 20
+              "const": 21
             }
           },
           "required": [
@@ -47793,7 +47893,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 20
+              "const": 21
             }
           },
           "required": [
@@ -47811,7 +47911,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 20
+              "const": 21
             }
           },
           "required": [
@@ -47829,7 +47929,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 20
+              "const": 21
             }
           },
           "required": [
@@ -47848,7 +47948,9 @@
         "scope": {},
         "org_id": {},
         "center_id": {},
-        "template_center_id": {}
+        "template_center_id": {},
+        "include_configured_forms": {},
+        "configured_forms_page": {}
       },
       "required": [
         "client_api_version",
@@ -47921,6 +48023,24 @@
             },
             "center_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "include_configured_forms": {
+              "type": "boolean"
+            },
+            "configured_forms_page": {
+              "type": "object",
+              "properties": {
+                "cursor": {
+                  "type": "string",
+                  "maxLength": 4000
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 200
+                }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -47930,7 +48050,26 @@
             "org_id",
             "center_id"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "configured_forms_page"
+                ]
+              },
+              "then": {
+                "required": [
+                  "include_configured_forms"
+                ],
+                "properties": {
+                  "include_configured_forms": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -47946,6 +48085,24 @@
             },
             "org_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "include_configured_forms": {
+              "type": "boolean"
+            },
+            "configured_forms_page": {
+              "type": "object",
+              "properties": {
+                "cursor": {
+                  "type": "string",
+                  "maxLength": 4000
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 200
+                }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -47954,7 +48111,26 @@
             "scope",
             "org_id"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "configured_forms_page"
+                ]
+              },
+              "then": {
+                "required": [
+                  "include_configured_forms"
+                ],
+                "properties": {
+                  "include_configured_forms": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -54644,7 +54820,8 @@
         "website_url",
         "personal_negative_limits_enabled",
         "application_form_rules",
-        "work_calendar"
+        "work_calendar",
+        "work_calendar_exceptions_enabled"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -54726,7 +54903,6 @@
         "agreement_templates",
         "permission_templates",
         "regional_defaults",
-        "regional_defaults",
         "security_policy",
         "program_templates",
         "event_templates",
@@ -54740,7 +54916,8 @@
         "website_url",
         "personal_negative_limits_enabled",
         "application_form_rules",
-        "work_calendar"
+        "work_calendar",
+        "work_calendar_exceptions_enabled"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -56960,6 +57137,222 @@
       "required": [
         "contact_requirement",
         "required_fields"
+      ],
+      "additionalProperties": false
+    },
+    "ConfiguredFormsPage": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "form_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/FtkUuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "channel": {
+                "const": "web_form"
+              },
+              "form_key": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "form_id",
+              "center_id",
+              "channel",
+              "form_key",
+              "enabled"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 4000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor"
+      ],
+      "additionalProperties": false
+    },
+    "ClassWaitlistImpact": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "$ref": "#/$defs/Count"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "entries": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "session_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "version": {
+                "$ref": "#/$defs/PositiveInt"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "waiting",
+                  "offered"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "session_id",
+              "version",
+              "state"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "count",
+        "truncated",
+        "entries"
+      ],
+      "additionalProperties": false
+    },
+    "RoomDeactivationEffects": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "$ref": "#/$defs/Count"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "version": {
+                "$ref": "#/$defs/PositiveInt"
+              },
+              "starts_at": {
+                "$ref": "#/$defs/Instant"
+              },
+              "ends_at": {
+                "$ref": "#/$defs/Instant"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sessions",
+                  "events"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "starts_at",
+              "ends_at",
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "count",
+        "truncated",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "WorkCalendarExceptionInput": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "settings_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "organization_settings_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        }
+      },
+      "required": [
+        "reason",
+        "settings_version",
+        "organization_settings_version"
+      ],
+      "additionalProperties": false
+    },
+    "WorkCalendarExceptionRecord": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "settings_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "organization_settings_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "approved_by": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "approved_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "reason",
+        "settings_version",
+        "organization_settings_version",
+        "approved_by",
+        "approved_at"
       ],
       "additionalProperties": false
     }
@@ -101127,6 +101520,42 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ConfiguredFormsPage/properties/items/items/properties/form_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ConfiguredFormsPage/properties/items/items/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ClassWaitlistImpact/properties/entries/items/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ClassWaitlistImpact/properties/entries/items/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/RoomDeactivationEffects/properties/items/items/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WorkCalendarExceptionRecord/properties/approved_by",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -101580,7 +102009,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 146,
+      "migration_count": 147,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -104377,7 +104806,13 @@
         },
         "existing_policies": "unchanged; no backfill",
         "consumer_read": "policies_get_v1 and existing policy_at/lesson/reservation consumers",
-        "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing"
+        "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing",
+        "plans": [
+          "starter",
+          "pro",
+          "business"
+        ],
+        "zero_without_upper": "No deficit can be granted: ENTITLEMENT_UNAVAILABLE. A positive effective limit requires explicit negative_upper; configured limits retain CREDIT_LIMIT_EXCEEDED."
       },
       "basic_crm": {
         "operations": [

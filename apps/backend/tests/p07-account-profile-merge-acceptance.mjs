@@ -56,6 +56,8 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
   const saleDebt=(await rows('select id from core.debts where org_id=$1 and sale_id=$2',[org,sold]))[0].id;
   await mut('collection_record_v1',{person_id:source,debt_ids:[saleDebt],amount_minor:'1500',currency:'TRY',occurred_at:new Date().toISOString()});
   const publish=(policy,value)=>mut('policy_publish_v1',{center_id:null,key:policy,value,effective_at:new Date().toISOString(),mandatory:false});
+  // Merge must preserve this person's unpaid debt and existing reservation together.
+  await publish('debt_booking',{kind:'boolean',value:false});
   await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
   await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
   await publish('debt_participation',{kind:'boolean',value:true});

@@ -1,3 +1,4 @@
+import './settings-domain-closure-acceptance.mjs';
 import './settings-behavior-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';

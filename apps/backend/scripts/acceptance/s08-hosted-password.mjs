@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {randomBytes} from 'node:crypto';
+import {randomBytes,randomInt} from 'node:crypto';
 import {newUuidV7 as key} from '../uuid.mjs';
 
 const origin='https://gwyprhenabtpkbojephw.supabase.co';
 // The aged session must be an actual previously opened test session. Its age is
 // read through the native actor's backend session projection, never injected.
-export async function acceptAgedPassword({apikey,email,password,accessToken,nonce,request=fetch}){
+export async function acceptAgedPassword({apikey,email,password,accessToken,nonce,expiredNonce,expiredNonceOnly=false,request=fetch}){
  let current=accessToken,fresh,changed=false,uncertain=false,mutated=false,phase='session read';const checks=[],candidates=[],opened=new Set();
  const temporary='Acceptance!'+randomBytes(30).toString('base64url');
  const native=async(path,method,body,token=current)=>{
@@ -21,13 +21,23 @@ export async function acceptAgedPassword({apikey,email,password,accessToken,nonc
  const rejected=async(body,codes,token=current)=>{const r=await change(body,token);assert.notEqual(r.status,200);if(!codes.includes(r.data?.error_code))throw Error('PROVIDER_'+r.status+'_'+String(r.data?.error_code).replace(/[^a-z_]/g,''));};
  let failed=false;
  try{
-  assert(apikey&&email&&password&&accessToken&&nonce,'Authorized aged session and real delivered nonce required');
+  assert(apikey&&email&&password&&accessToken,'Authorized aged session required');
+  assert(expiredNonceOnly?expiredNonce&&!nonce:nonce&&!expiredNonce,'Expired proof must be tested separately before requesting a fresh nonce');
   const identity=await native('/user','GET');assert.equal(identity.status,200);assert.equal(identity.data.email,email);
   const claims=JSON.parse(Buffer.from(accessToken.split('.')[1],'base64url'));
   const sessions=await backend('account_sessions_list_v1');assert.equal(sessions.ok,true);
   const own=sessions.data.items.find(s=>s.session_id===claims.session_id);assert(own);
   assert(Date.now()-Date.parse(own.created_at)>24*3600000,'Natural 24-hour session required');
   checks.push('actual native session older than 24 hours');
+  if(expiredNonceOnly){
+   phase='expired nonce';
+   await rejected({password:temporary,current_password:password,nonce:expiredNonce},['reauthentication_not_valid']);
+   checks.push('previously delivered unused nonce rejected after natural expiry');
+   phase='wrong nonce';let wrongNonce;
+   do{wrongNonce=String(randomInt(1000000)).padStart(6,'0');}while(wrongNonce===expiredNonce);
+   await rejected({password:temporary,current_password:password,nonce:wrongNonce},['reauthentication_not_valid']);
+   checks.push('different incorrect nonce rejected without requesting new proof');
+  }else{
   phase='missing nonce';
   await rejected({password:temporary,current_password:password},['reauthentication_needed']);
   checks.push('missing nonce rejected after native refresh');
@@ -45,6 +55,7 @@ export async function acceptAgedPassword({apikey,email,password,accessToken,nonc
   phase='consumed nonce';
   await rejected({password:'Unused!'+randomBytes(30).toString('base64url'),current_password:temporary,nonce},['reauthentication_not_valid']);
   checks.push('consumed nonce cannot be reused');
+  }
  }catch(error){failed=/^PROVIDER_/.test(error.message)?error.message:'ASSERTION';}
  finally{
   let cleanupFailed=false;
@@ -68,5 +79,5 @@ export async function acceptAgedPassword({apikey,email,password,accessToken,nonc
   if(cleanupFailed)throw Error('Hosted password cleanup requires inspection; credential and provider data withheld');
  }
  if(failed)throw Error('Hosted password acceptance failed at '+phase+'; code='+failed+'; credential and provider data withheld');
- return {status:'passed',cleanup:'complete',checks};
+ return {status:'passed',cleanup:expiredNonceOnly?'aged_session_preserved':'complete',checks};
 }
