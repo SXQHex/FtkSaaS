@@ -2,6 +2,8 @@
 
 Önce kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/client-integration.md), kendi [todo](docs/todo.md) ve [sohbet devrin](docs/handover.md) okunur.
 
+Aktif bölümdeki ekranları kendi [todo kaydına](docs/todo.md) ve [proje teslim hedefine](../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi) göre sırala. Her akışın gerçek entegrasyon kabulünü, gerektirdiği backend davranışı ilgili ortamda kullanılabilir olduğunda ilgili planla doğrula. Eksik backend bağımlılığını o akışta açık tut ve bağımsız frontend işlerine devam et.
+
 ## Yetki ve sınır
 
 - Uygulama `apps/web`, ortak UI `packages/ui`; plan, ilerleme, test/kabul ve sohbet devri `apps/web/docs` sahibindedir.
