@@ -1,0 +1,5 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "entry": ["i18next.config.ts"],
+  "ignore": ["src/i18n/generated/**"]
+}

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test.beforeEach(async ({ context }) => {
   // This foundation needs only the local Vite server; fail any external HTTP request.
@@ -39,4 +40,13 @@ test("supports React Aria pointer and keyboard presses", async ({ page }) => {
   await expect(status).toHaveText("Tıklama sayısı: 3");
   await page.reload();
   await expect(status).toHaveText("Tıklama sayısı: 0");
+});
+
+test("has no automatically detectable accessibility violations on the home page", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "FtkSaaS V2", exact: true })).toBeVisible();
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
 });
