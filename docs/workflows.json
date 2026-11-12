@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "fafa170e720f85035b762f2aaa977f56045acd1095b2d71e91bf087552cb23b3",
-        "reason": "API envanteri iki fixtureın güncel hashleriyle eşlendi;115 birimde tam satır sahipliği ve orijinal assertionlar korunuyor; worker, timeout ve kabul protokolü değişmiyor."
+        "fingerprint": "b037604e9836fb1ece7d40e987f2405dded14b6a01312b5ffdec3429425a30be",
+        "reason": "Contract test köküne hosted iş takvimi runner güvenlik testleri eklendi; aynı anahtar kurtarması ve canlı kaynak koruması incelendi, ortak istemci protokolü değişmedi."
       }
     },
     {
@@ -1208,7 +1208,8 @@
         "apps/backend/tests/business-location-acceptance.mjs",
         "apps/backend/tests/settings-behavior-acceptance.mjs",
         "apps/backend/tests/settings-domain-closure-unit.mjs",
-        "apps/backend/tests/settings-domain-closure-acceptance.mjs"
+        "apps/backend/tests/settings-domain-closure-acceptance.mjs",
+        "apps/backend/tests/hosted-work-calendar-runner-unit.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1278,7 +1279,8 @@
         "apps/backend/database/settings-onboarding-plans.sql",
         "apps/backend/database/settings-waitlist-opt-in.sql",
         "apps/backend/database/settings-calendar-exceptions.sql",
-        "apps/backend/supabase/migrations/20261112003727_settings_domain_closure.sql"
+        "apps/backend/supabase/migrations/20261112003727_settings_domain_closure.sql",
+        "apps/backend/scripts/acceptance/s10-hosted-work-calendar.mjs"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1293,8 +1295,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "a402f582bf1b5075d2616dcc7840583fc03fa7f0e4527c570a0841f5e181b649",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "bc2a93adcc909c1c3a61ca4d44ed38c78030a6d14b377e85f88b9889a9d25423",
+        "reason": "Hosted iş takvimi runner ve15 güvenlik testi incelendi: hatalı zarf ve yanıt kaybında aynı key recovery, kaynak restore/concurrent ret, logout204 sonrası gerçek Edge session reddi; WF12 runtime rehberi değişmedi."
       }
     },
     {
