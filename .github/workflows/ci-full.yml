@@ -1,22 +1,29 @@
 name: Backend CI
-run-name: 'PR #${{ github.event.pull_request.number }} · ${{ github.event.pull_request.head.sha }}'
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch' && format('Manual full · {0}', inputs.tested_sha) || format('PR #{0} · {1}', github.event.pull_request.number, github.event.pull_request.head.sha) }}
 on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, edited]
+  workflow_dispatch:
+    inputs:
+      tested_sha:
+        description: Exact commit SHA for diagnostic full clean (run from main)
+        required: true
+        type: string
 defaults:
   run:
     working-directory: apps/backend
 permissions: {}
 concurrency:
-  group: backend-pr-${{ github.event.pull_request.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
+  group: ${{ github.event_name == 'workflow_dispatch' && format('backend-manual-{0}', inputs.tested_sha) || format('backend-pr-{0}-{1}', github.event.pull_request.number, github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source') }}
   cancel-in-progress: true
 jobs:
   quality:
     needs: candidate
     permissions:
       contents: read
-    if: needs.candidate.outputs.kind != 'sandbox' && (github.event.action != 'edited' || github.event.changes.base != null)
+    if: github.event_name == 'pull_request' && needs.candidate.outputs.kind != 'sandbox' && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     defaults:
@@ -64,7 +71,7 @@ jobs:
       contents: read
       pull-requests: read
     # GitHub exposes retargeting as edited; title/body edits start no jobs.
-    if: github.event.action != 'edited' || github.event.changes.base != null
+    if: github.event_name == 'pull_request' && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
@@ -93,16 +100,51 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           archive: true
+  manual:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      tested_sha: ${{ steps.plan.outputs.tested_sha }}
+      binding: ${{ steps.plan.outputs.binding }}
+    steps:
+      # Dispatch orchestration is always the event's main SHA; target files are data.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Plan manual full clean
+        id: plan
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const manual=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/manual-full.mjs`);
+            await manual.resolveManualFull(github,context,core);
+      - name: Preserve frozen manual schedule
+        if: github.run_attempt == 1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: manual-source
+          path: .artifacts/ci/manual-source.json
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 90
+          archive: true
   clean:
     permissions:
       contents: read
       actions: read
-    needs: candidate
-    if: needs.candidate.outputs.kind == 'full'
+    needs: [candidate, manual]
+    # One source job is deliberately skipped; neither failed source can start clean.
+    if: always() && !cancelled() && (needs.candidate.outputs.kind == 'full' && needs.candidate.result == 'success' || needs.manual.result == 'success')
     uses: ./.github/workflows/clean-suite.yml
     with:
-      tested_sha: ${{ needs.candidate.outputs.merge }}
-      binding: ${{ needs.candidate.outputs.binding }}
+      tested_sha: ${{ needs.candidate.outputs.merge || needs.manual.outputs.tested_sha }}
+      binding: ${{ needs.candidate.outputs.binding || needs.manual.outputs.binding }}
   documentation:
     permissions:
       contents: read

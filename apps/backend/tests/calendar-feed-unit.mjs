@@ -57,3 +57,32 @@ test('calendar application deep link requires an explicit route template and saf
  const template='https://app.ftksaas.invalid/org/{org_id}/session/{session_id}';assert.equal(calendarAppUrl(template,item.org_id,item.id),'https://app.ftksaas.invalid/org/'+item.org_id+'/session/'+item.id);
  for(const value of [undefined,'https://app.ftksaas.invalid/session/{session_id}','javascript:{org_id}{session_id}','https://app.ftksaas.invalid/{org_id}/{session_id}/{actor_id}'])assert.throws(()=>calendarAppUrl(value,item.org_id,item.id),/CALENDAR_NOT_CONFIGURED/);
 });
+
+test('calendar diagnostic mode classifies failures without publishing upstream bodies or credentials',async()=>{
+ const token='ab'.repeat(32),request=new Request('https://calendar.invalid/calendar/'+token+'.ics');
+ for(const [fetcher,reason] of [
+  [async()=>new Response('private upstream detail '+token,{status:503}),'upstream-http'],
+  [async()=>{throw new DOMException('private '+token,'TimeoutError');},'upstream-fetch-timeout'],
+  [async()=>new Response('not-json private '+token),'upstream-json'],
+  [async()=>Response.json({ok:false,error:{code:'INTERNAL_ERROR',message:token}}),'upstream-application'],
+  [async()=>Response.json({ok:true,data:{ics_base64:'invalid'}}),'ics-base64'],
+ ]){
+  for(const diagnostics of [false,true]){
+   const handler=calendarProxy({supabaseUrl:'https://project.supabase.invalid',anonKey:'private-public-key',fetcher,diagnostics});
+   const result=await handler(request);assert.equal(result.status,503);assert.equal(await result.text(),'');
+   assert.equal(result.headers.get('x-ftk-calendar-failure'),diagnostics?reason:null);
+   assert(!JSON.stringify([...result.headers]).includes(token));assert(!JSON.stringify([...result.headers]).includes('private-public-key'));
+  }
+ }
+});
+
+test('calendar diagnostic upstream metadata is bounded and restricted to public worker codes',async()=>{
+ const token='ab'.repeat(32),request=new Request('https://calendar.invalid/calendar/'+token+'.ics');
+ for(const code of ['BOOT_ERROR','WORKER_LIMIT',token]){
+  const handle=calendarProxy({supabaseUrl:'https://project.supabase.invalid',anonKey:'synthetic',diagnostics:true,fetcher:async()=>Response.json({code,message:token},{status:503})});
+  const response=await handle(request);assert.equal(response.status,503);assert.equal(response.headers.get('x-ftk-calendar-upstream-status'),'503');assert.equal(response.headers.get('x-ftk-calendar-worker'),code===token?null:code);assert.equal(await response.text(),'');
+ }
+ let cancelled=false;
+ const handle=calendarProxy({supabaseUrl:'https://project.supabase.invalid',anonKey:'synthetic',diagnostics:true,fetcher:async()=>new Response(new ReadableStream({pull(controller){controller.enqueue(new Uint8Array(2049));},cancel(){cancelled=true;}}),{status:503})});
+ const response=await handle(request);assert.equal(response.status,503);assert.equal(response.headers.get('x-ftk-calendar-worker'),null);assert.equal(cancelled,true);
+});

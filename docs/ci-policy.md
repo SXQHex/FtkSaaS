@@ -42,6 +42,12 @@ Kalite işi olayın tam merge SHA/parent/tree’sini doğrular. Salt-okuma token
 
 Kalite sözleşmesi, checker/istisna dosyaları, uygulama/root görev manifestleri, Turbo, frontend/UI lint ve coverage config’leri ile TypeScript/Playwright config’leri (yeni iç klasör config’leri dahil) trusted politika karşılaştırmasına dahildir. Kurulum değişiklikleri mevcut kaynak-özel inceleme/kurulum prosedürünü izler; yeni status veya bypass mekanizması eklenmez. Yerel `pnpm check:quality` Turbo üzerinden çalışır; Git farkına bağlı görev cache kullanmaz. Bütçe ve ölçülmemiş boyutların tek sahibi CONSTRAINTS’tir.
 
+## Manuel tam koşu
+
+`Backend CI` içindeki `workflow_dispatch`, yalnız main’den tam40 karakter `tested_sha` ile yeni bir tanısal full clean başlatır. Workflow ve planlama/toplayıcı kodu dispatch olayının sabit main SHA’sından gelir; hedef commit’in envanteri güvenilir parser ile Git blob/mode/hash ve kaynak sahipliği denetlenerek veri olarak okunur. İlk denemede son uygun başarılı PR koşusunun ölçümleriyle yeni plan üretilir; core ve on iki API shard aynı tam hedef SHA/tree ve planla çalışır. Test runner’ı hedef commit’teki mevcut clean protokolüyle uyumlu olmalıdır; uyumsuzluk açık hata verir. PR kapsam seçimi, kalite kabulü ve otomatik CI/CD yolu değişmez.
+
+Manuel koşular PR’lerden ayrı concurrency grubundadır. `manual-source` ilk planı korur; rerun aynı workflow/hedef/tree/envanter/run kaydını ve planı kullanır, yeni ölçüm seçmez. Yeniden dağıtım için yeni `Run workflow` gerekir. `manual-full-binding-ATTEMPT` yalnız tanı raporudur; candidate/main kabul artifact’ı, merge status’u veya deploy yetkisi üretmez. Manuel ölçümler otomatik PR süre referansı havuzuna katılmaz. Rapor gerçek test sürelerini backend kurulumu ve kuyruktan ayırır; en uzun/en kısa oranı1,20 hedefi yalnız uyarıdır, işlev testinin yerine geçmez veya merge’i engellemez.
+
 ## Manuel targeted
 
 Girdiler tam 40 karakter SHA’dır; base test edilen head’in atası ve checkout birebir head olmalıdır. Son commit için parent→commit, birikimli değişiklik için seçilen ancestor→head kullanılır; origin/main merge-base’i açık aralığın yerine geçmez. Plan ve shard çıktıları kaynak aralığını gösterir; bu tanı mevcut main ile birleşim uygunluğunu kanıtlamaz.
@@ -57,6 +63,8 @@ Seçilen API suite’leri mevcut ölçümlü dört shard planının kesişimine 
 PR’nin gerçek merge ağacında [belge kontrolü](../apps/backend/scripts/ci/docs-check.mjs) yaşayan inbound/outgoing bağlantıları ve anchor’ları denetler. Belge-only iş dependency/backend kurulumu yapmaz; DB/API/full clean gibi raporlanmaz. Main aynı parent/tree ve receipt’i doğrular; kontrol tekrarı yoktur. Ayrı eski belge workflow’u ve recovery girişi kaldırılmıştır. Eski başarısız run değiştirilmez; sorun düzeltildiyse yeni gerçek kaynak kanıtı gerekir.
 
 ## Tam clean ve kanıt doğrulama
+
+İzole yerel/CI takvim fixture’ı `FTK_CALENDAR_DIAGNOSTICS=1` ile native takvim503 yanıtında yalnız sabit hata aşaması, upstream HTTP durumu ve izinli worker hata kodunu açar. Hosted yapılandırmaya eklenmez; varsayılan kapalıdır. Kabul testi başarısız isteğin metodunu ve süresini bu sınıflarla kaydeder; URL, takvim credential’ı, upstream gövdesi ve özel hata metni raporlanmaz. HTTP200 beklentisi, süre sınırları ve paralellik korunur; bu tanı kök nedenin çözüldüğü veya canlı kabul verildiği anlamına gelmez.
 
 [Ortak clean suite](../.github/workflows/clean-suite.yml) yalnız adayda çalışır. Core ve on iki API işi ayrı runner/backend/DB’de temiz migration manifesti ve boş Auth/tenant/receipt ile başlar. Core verify/DB/seed/health/advisors’ı, on iki shard bütün API parçalarını eksiksiz ve tekrarsız taşır. Test gövdelerindeki yarışlar bölünmez; fail-fast:false korunur. Normal parçalar concurrency=2, global fixture yazan parçalar ayrı concurrency=1 fazında çalışır. Üretim envanteri ve parça yükleyicisi `apps/backend/scripts/ci/api-suites.json` ve `api-suites.mjs` sahibindedir; üretim runner’ı deney dizininden kod yüklemez. API job üst sınırı 90 dakikadır; kök/alt testlerde kaynakta tanımlı timeout’lar, istek/SQL deadline’ları ve 3 GiB Edge RSS koruması korunur. Backend clean, targeted ve CD işleri sabit pnpm ile `corepack enable` ve `pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile` kullanır; root Turbo ve backend bağımlılıkları kurulur, web/UI runtime bağımlılıkları kurulmaz.
 

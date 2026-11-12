@@ -1,5 +1,11 @@
 # Güncel kaynak ve kabul
 
+## CI279 — native takvim503 tanısı
+
+[Aday43124571790](https://github.com/SXQHex/FtkSaaS/actions/runs/43124571790) core/quality ve11 API shard geçti; API11’de ST03 native kişisel takvim GET/HEAD200 beklentisi503 aldı. Önceki başarılı43115795153 ile test gövde hash’i aynıydı; otomatik plan testi API10’dan API11’e taşıdı. Manuel iş çalışmadı. Bellek bütçesi geçti; önceki Node proxy GET/HEAD istekleri de aynı alt testte başarılıydı.503’ün worker, upstream veya cevap ayrıştırma kökü henüz bilinmiyor.
+
+Dar tanı yalnız izole fixture’da sabit hata aşaması/upstream HTTP durumu/izinli worker kodunu açar; credential/URL/gövde yazmaz. Kabul assertion’ları, oneshot, concurrency ve deadline’lar korunur. Yerel native yeniden üretim PostgreSQL Unix socket için Operation not permitted engeline takıldı. Sonraki native adaydan neden kanıtı beklenir; bu kaynak kök neden düzeltmesi veya hosted kabul sayılmaz.
+
 ## S10 ayar davranışlarını tamamlama
 
 PR278 üzerinde frontend beklenmeden backend API/SQL/native kabulü yürütülür. Katalogv20,115 alanı39 normatif ayar grubuna bağlar; bu sayı69 grubun tamamının kapanışı değildir. Kabul edilmiş program/etkinlik/tahsilat/CRM/otomasyon ve dijital onay teslimleri yeniden iş sayılmaz. Bu paketin kesin scope/varsayılan/miras/etki sınırı [ayar rehberinde](../../../docs/settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), kalan görev [S10](remaining-work.md#s10) sahibindedir.

@@ -36,8 +36,15 @@ test('ST-03 personal calendar real HTTP GET, native Auth, live SQL scope and cre
    const gatewayUrl=env.API_URL+'/functions/v1/personal-calendar'+new URL(ownerLink.subscription_url).pathname;
    for(const method of ['GET','HEAD']){
     const requestedAt=Date.now(),direct=await fetch(gatewayUrl,{method,signal:AbortSignal.timeout(35000)});
-    assert.equal(direct.status,200,'Native calendar gateway must accept calendar clients without Auth headers');
     const body=await direct.text();
+    if(direct.status!==200){
+     let worker=null;try{const code=direct.headers.get('x-ftk-calendar-worker')??JSON.parse(body)?.code;worker=['BOOT_ERROR','WORKER_ERROR','WORKER_LIMIT','WORKER_TIMEOUT'].includes(code)?code:null;}catch{worker=null;}
+     const value=direct.headers.get('x-ftk-calendar-failure');
+     const gateway=['configuration','upstream-http','upstream-fetch','upstream-fetch-timeout','upstream-body','upstream-size','upstream-json','upstream-application','ics-base64'].includes(value)?value:null;
+     const status=Number(direct.headers.get('x-ftk-calendar-upstream-status')),upstream=status>=100&&status<=599?status:null;
+     console.error('Native calendar failure: '+JSON.stringify({method,status:direct.status,elapsed_ms:Date.now()-requestedAt,gateway,upstream,worker}));
+    }
+    assert.equal(direct.status,200,'Native calendar gateway must accept calendar clients without Auth headers');
     if(method==='GET'){
      // Separate HTTP requests have separate generation instants. Every event's
      // DTSTAMP must be fresh; all other bytes must still match exactly.

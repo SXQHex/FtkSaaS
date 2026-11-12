@@ -61,8 +61,9 @@ test('API suite inventory exactly matches package test command; no shard loses t
 test('automatic PR acceptance and manual diagnostics have disjoint event and cancellation boundaries',()=>{
  const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8'),full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),main=fs.readFileSync('.github/workflows/backend.yml','utf8');
  assert(fast.includes('workflow_dispatch:'));assert(!fast.includes('  push:'));assert(!fast.includes('  pull_request:'));
- assert(full.includes('types: [opened, synchronize, reopened, edited]'));assert(!full.includes('labeled'));assert(full.includes("if: github.event.action != 'edited' || github.event.changes.base != null"));assert(!full.includes('workflow_dispatch'));
- assert(full.includes('backend-pr-${{ github.event.pull_request.number }}'));assert(full.includes('cancel-in-progress: true'));assert(full.includes("github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source'"));
+ assert(full.includes('types: [opened, synchronize, reopened, edited]'));assert(!full.includes('labeled'));assert(full.includes("if: github.event_name == 'pull_request' && (github.event.action != 'edited' || github.event.changes.base != null)"));assert(full.includes('  workflow_dispatch:'));
+ assert(full.includes("format('backend-pr-{0}-{1}', github.event.pull_request.number"));assert(full.includes('cancel-in-progress: true'));assert(full.includes("github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source'"));
+ assert(full.includes("format('backend-manual-{0}', inputs.tested_sha)"));assert(full.includes("if: github.event_name == 'workflow_dispatch'"));
  assert(main.includes('main-acceptance-${{ github.sha }}'));assert(main.includes('cancel-in-progress: false'));assert(!main.includes('workflow_dispatch'));assert(!main.includes('uses: ./.github/workflows/clean-suite.yml'));
 });
 

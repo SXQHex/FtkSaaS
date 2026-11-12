@@ -277,7 +277,8 @@
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
-        "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql"
+        "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql",
+        "apps/backend/scripts/ci/manual-full.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -287,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "88860209204df5aca3800f6b3fe4d09a24a258bebb0fe0e1975f24e000473c07",
-        "reason": "CI589: CRM kabul fixture bigint sürümünü integer projekte eder; API envanterinde yalnız kaynak hash güncellendi, parça aralıkları ve politika korundu."
+        "fingerprint": "a1beb976a4e8834782ce8a842966bda863a81b309ddfaaf06e2e39e346cece3b",
+        "reason": "CI279 native calendar diagnostics are opt-in only in isolated local fixture; HTTP expectations, oneshot concurrency and deadlines unchanged."
       }
     },
     {
@@ -1081,8 +1082,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "4848fd28ee43e2cf9d41fad053afc46598e384dbc885692e6a19e5a57697c818",
-        "reason": "CI589: e-posta başvurusunun aday oluşturma testi DB bigint sürümünü API integer tipinde yollar; telefon opsiyonelliği ve tüm kabul assertionları korundu, rehber ve runtime sözleşmesi değişmedi."
+        "fingerprint": "c9a298191e759abb029cca3e4a647b00ab2a2832cda2ae96511a7d2bdd131c7a",
+        "reason": "Calendar gateway keeps existing response status/body and closed feed checks; isolated fixture adds bounded allowlisted failure classification, with no URL/token/body disclosure. Root cause still awaiting native evidence."
       }
     },
     {

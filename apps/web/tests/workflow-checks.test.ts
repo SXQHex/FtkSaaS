@@ -111,7 +111,7 @@ test("Zizmor exceptions stay anchored to the reviewed trigger or reusable workfl
       "ci-gate.yml:4:3",
       "ci-gate.yml:7:3",
     ],
-    "self-repository": ["ci-full.yml:102:11"],
+    "self-repository": ["ci-full.yml:144:11"],
   };
   for (const [name, locations] of Object.entries(expected)) {
     expect(config.rules[name]).toEqual({ ignore: locations });

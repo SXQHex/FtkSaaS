@@ -13,4 +13,4 @@ rules:
     ignore:
       # Relative reusable workflow is bound to the candidate merge commit.
       # Keep the repository's supported GitHub syntax rather than rewriting it.
-      - ci-full.yml:102:11
+      - ci-full.yml:144:11
