@@ -1,5 +1,5 @@
 {
-  "version": 20,
+  "version": 21,
   "fields": [
     {
       "scope": "user",
@@ -3978,6 +3978,16 @@
       "default": null,
       "group": "M02",
       "consumer": "center_work_calendar_contains"
+    },
+    {
+      "scope": "organization",
+      "key": "work_calendar_exceptions_enabled",
+      "schema": {
+        "type": "boolean"
+      },
+      "default": false,
+      "group": "O18",
+      "consumer": "work_calendar_exception_assert"
     }
   ]
 }

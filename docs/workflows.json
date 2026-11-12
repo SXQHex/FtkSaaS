@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "a1beb976a4e8834782ce8a842966bda863a81b309ddfaaf06e2e39e346cece3b",
-        "reason": "CI279 native calendar diagnostics are opt-in only in isolated local fixture; HTTP expectations, oneshot concurrency and deadlines unchanged."
+        "fingerprint": "257f4ec389cd13b98170f00d30de080421bc64f3980d2b99f9e60a7c8af09eb3",
+        "reason": "Reviewed PR279 manual dispatch and bounded calendar diagnostics alongside approved catalog assertion record; merged inventory preserves all source lines and both policy exception sets."
       }
     },
     {
@@ -376,8 +376,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "83e473fff2169b6bb0f7e94b709db4d8a12c2b61270458b7b855dde279f95f46",
-        "reason": "Native aged password and PKCE recovery runners reviewed against real provider request and finally restoration; no new Auth layer"
+        "fingerprint": "5a23e12e6eb6a47863361425eef1a69811dab36a8a366754f6a3e32f6a69b199",
+        "reason": "Reviewed aged nonce-only rejection runner and restore on unexpected write/response loss; native Auth session age, provider errors and cleanup remain authoritative."
       }
     },
     {
@@ -580,8 +580,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "32669c9cda388be275a74c99748189a8980f58d22ef4e6c4a830e666959be6bf",
-        "reason": "Center work calendar is enforced by canonical schedule validation independently of resource lists."
+        "fingerprint": "d2ae33ef5ca0bb02556d6b8c33d51f96d867f0d535e27457f47b617103f3ee96",
+        "reason": "Reviewed calendar exception input, owned preview replay authority, immutable approval snapshots and physical resource checks; settings guide explains explicit permission and versions."
       }
     },
     {
@@ -773,8 +773,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "c3d54051bcbcba461cf2a763684cf09e20baae1614b59078951f484704ae71e4",
-        "reason": "Shared template schemas preserve existing sales and rights wire acceptance; no sales behavior change."
+        "fingerprint": "4372968fe2fa4ae8130a2240e7284622a799d66bcaf36da64c23d04fc876f9fd",
+        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
       }
     },
     {
@@ -858,8 +858,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "5d8085d62dffd040af13ede2d2fcddeeb62921fcb8fdfa33b9c79a364990f631",
-        "reason": "Personal negative-limit writes require organization permission; accepted future alternatives remain actionable."
+        "fingerprint": "554d78dafde15d5e22b58641ce3ea76fe5794e9d05b5ebbdd2918106b290e5bf",
+        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
       }
     },
     {
@@ -921,8 +921,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "18058f10344a235ac2d9aade6923b7e9515dd96fbf42f0871684f72ecad799ff",
-        "reason": "Attendance flow unchanged; fixture explicitly enables the accepted organization personal-limit gate."
+        "fingerprint": "2e824f112f814b4da80ce15435a3bacccc8470fa644e7db75f7335d988c36ec4",
+        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
       }
     },
     {
@@ -986,8 +986,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "8608347a255e4de7018712ea0249f748a90aaeaeecf6e221b0fe6a09bd92e41f",
-        "reason": "Shared wire template validators preserve financial commands; no collection or balance rule change."
+        "fingerprint": "d73833d9b3e256f8fe41280540029b4118d32319e678d949c9551aad9887a654",
+        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
       }
     },
     {
@@ -1206,7 +1206,9 @@
         "apps/backend/tests/native-totp-fixture.mjs",
         "apps/backend/tests/crm-pipeline-unit.mjs",
         "apps/backend/tests/business-location-acceptance.mjs",
-        "apps/backend/tests/settings-behavior-acceptance.mjs"
+        "apps/backend/tests/settings-behavior-acceptance.mjs",
+        "apps/backend/tests/settings-domain-closure-unit.mjs",
+        "apps/backend/tests/settings-domain-closure-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1269,7 +1271,14 @@
         "apps/backend/database/settings-catalog-v20.sql",
         "apps/backend/database/settings-negative-delegation.sql",
         "apps/backend/database/settings-work-calendar.sql",
-        "apps/backend/supabase/migrations/20261111210453_s10_settings_completion.sql"
+        "apps/backend/supabase/migrations/20261111210453_s10_settings_completion.sql",
+        "apps/backend/database/settings-catalog-v21.sql",
+        "apps/backend/database/settings-room-lifecycle.sql",
+        "apps/backend/database/settings-onboarding-plans.sql",
+        "apps/backend/database/settings-form-discovery.sql",
+        "apps/backend/database/settings-waitlist-opt-in.sql",
+        "apps/backend/database/settings-calendar-exceptions.sql",
+        "apps/backend/supabase/migrations/20261112003727_settings_domain_closure.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1284,8 +1293,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "c0e34b24c1235c0d8308efcf9ce6c4f4f287bd2c66b00b2fbe5805387fbf0161",
-        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
+        "fingerprint": "6d34d0ab44a0a96a94665e5eabe96bd4df8488dd90fb5afce8e175fc6f6f71b1",
+        "reason": "Reviewed exact v21 equals immutable v20 fields plus one closed O18 exception switch, new native apply/replay tests, actual PostgreSQL helper smoke and preserved source-bound migration history; no native runtime success inferred."
       }
     },
     {

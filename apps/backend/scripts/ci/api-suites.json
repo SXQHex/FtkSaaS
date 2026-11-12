@@ -1163,23 +1163,23 @@
     },
     {
       "path": "apps/backend/tests/starter-attendance-protection.test.mjs",
-      "sha256": "12acd4aaae7f3c73b955b59bf4831e35b70c0f17134774c474b96c95b0825dcb",
+      "sha256": "d2dbf7734f1f6e6915690c4d7b03498a927488088d2c5a86e2adf27c08a342ca",
       "shared": [
         [
-          2,
-          70
+          3,
+          71
         ],
         [
-          183,
-          183
+          184,
+          184
         ],
         [
-          226,
-          226
+          227,
+          227
         ],
         [
-          327,
-          327
+          328,
+          328
         ]
       ],
       "parts": [
@@ -1187,8 +1187,8 @@
           "id": "starter-attendance-revisions",
           "ranges": [
             [
-              71,
-              182
+              72,
+              183
             ]
           ]
         },
@@ -1196,8 +1196,8 @@
           "id": "starter-attendance-authority",
           "ranges": [
             [
-              184,
-              225
+              185,
+              226
             ]
           ]
         },
@@ -1205,8 +1205,8 @@
           "id": "starter-attendance-ledger",
           "ranges": [
             [
-              227,
-              326
+              228,
+              327
             ]
           ]
         },
@@ -1214,8 +1214,8 @@
           "id": "starter-attendance-policy",
           "ranges": [
             [
-              328,
-              420
+              329,
+              421
             ]
           ]
         }
@@ -1223,6 +1223,11 @@
       "imports": [
         {
           "line": 1,
+          "path": "apps/backend/tests/settings-domain-closure-acceptance.mjs",
+          "sha256": "69e2c047b16c77e823051a9b8994df1131f6f7e3df3d46ef824d9c6a773a385b"
+        },
+        {
+          "line": 2,
           "path": "apps/backend/tests/settings-behavior-acceptance.mjs",
           "sha256": "7bde74c78f4f7533fff8b17bd98c862b80d7d18f074b7eede0ad1ee19f176aa7"
         }

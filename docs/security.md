@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `450f9ce1e02815134d689e01ef9d8d1fd0c3d8e6072ce8f73885832b14d43b3d`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `08a811ccc83a4ce649f38dbd17d150c8ffe061300b7eddc2e9e0f19e88000c7c`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -160,10 +160,15 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [schedule-reads.sql](../apps/backend/database/schedule-reads.sql) | `12c4e4957ff70ac6bd082239908d451a10debe4c5ff3aac6c9760cab882d42f0` |
 | [session-capacity.sql](../apps/backend/database/session-capacity.sql) | `11554b9292cb11e96322ed9f4d5eb66a06a41820d65a3e0187eb10175b835bc6` |
 | [settings-application-forms.sql](../apps/backend/database/settings-application-forms.sql) | `5aaa1d652f01b3a60fd4b5ed24d2758713664c3583d52fc5dd14cc6413b4671e` |
+| [settings-calendar-exceptions.sql](../apps/backend/database/settings-calendar-exceptions.sql) | `1a2c84ac1d4bc00a74d07f5597486a332773877656dfa00165e6829914238272` |
 | [settings-discipline-effects.sql](../apps/backend/database/settings-discipline-effects.sql) | `244ddeeaabe34d53264bcc920d42b93908e5bd913f6f398b7b940c156d78fadb` |
+| [settings-form-discovery.sql](../apps/backend/database/settings-form-discovery.sql) | `153e0c709805b8bc1d8a69d22e9bd7b1a1f494ae175471f65ab9ae9cee01a22d` |
 | [settings-negative-delegation.sql](../apps/backend/database/settings-negative-delegation.sql) | `86e99302de6828e5b33f3ff32b2d0a64d8b76f172ddeb1e7cb2a72fc17ba84cd` |
+| [settings-onboarding-plans.sql](../apps/backend/database/settings-onboarding-plans.sql) | `e769d1414e943eb884542ec47886206f6d3e19ec115fe64e8db0818db348b940` |
+| [settings-room-lifecycle.sql](../apps/backend/database/settings-room-lifecycle.sql) | `6d762ccab04d3708a96a6f5c9aa7f987e20932b83db8f4b9cd4d208d69d3a2ea` |
 | [settings-sources-history-region.sql](../apps/backend/database/settings-sources-history-region.sql) | `b024b9eb46bd8ac6dba320f66a6001eb694730bc9a5930e2dc0398195f0d75fa` |
 | [settings-template-inheritance.sql](../apps/backend/database/settings-template-inheritance.sql) | `5579bea5781fef7eab09c86c9a466ab41f7ccabc05b3a79905b25397df421bd6` |
+| [settings-waitlist-opt-in.sql](../apps/backend/database/settings-waitlist-opt-in.sql) | `5120fa89dae9ece48e80c4c57679dadaea72f09052860c7b6be7cffdc45a3207` |
 | [settings-work-alerts.sql](../apps/backend/database/settings-work-alerts.sql) | `0987310f7ce60b9ef4c94b1d726bcf8000349fe4c699fad57cc2e4c35dd58335` |
 | [settings-work-calendar.sql](../apps/backend/database/settings-work-calendar.sql) | `4e75c9c9ebf3b789646a16fa1fbcb318259d75be6c6b646372808bf7ae484e38` |
 | [starter-attendance-protection-wrappers.sql](../apps/backend/database/starter-attendance-protection-wrappers.sql) | `083c1358ce0ff3c0cfa141794763fc5aa9f9ca1b5aeeb91757888c013532ea9e` |
@@ -318,3 +323,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261108230214_discipline_presentation.sql](../apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql) | `1bfdbb8151b96e10f8eded8a911981a111d4d6ca26d682481c3127fb9f4e1ded` |
 | [20261109112455_crm_pipeline_settings.sql](../apps/backend/supabase/migrations/20261109112455_crm_pipeline_settings.sql) | `c3dedb271ad57213e659f6df9f068d2cba7e43ee0348915160393ec93d6f67b6` |
 | [20261111210453_s10_settings_completion.sql](../apps/backend/supabase/migrations/20261111210453_s10_settings_completion.sql) | `57ac1e14ed387914cff6a4e515c99bcfe64f95df9c6d828986c34dca6f7908e9` |
+| [20261112003727_settings_domain_closure.sql](../apps/backend/supabase/migrations/20261112003727_settings_domain_closure.sql) | `f8a77ad07989d24fd06e224035fd188463b31c9198d4f83e927843413a4235f7` |

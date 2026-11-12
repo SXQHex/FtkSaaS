@@ -668,6 +668,11 @@ management_attention?: "instructor_required"
 export type EventDisciplineIds = string[]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsVersion".
+ */
+export type SettingsVersion = number
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "BookingCategory".
  */
 export type BookingCategory = ("male" | "female")
@@ -1526,11 +1531,6 @@ export type SettlementProposal = (SettlementPaymentProposal | SettlementOffsetPr
 export type SettingsCenterWorkCalendarValue = (CenterWorkCalendar | null)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "SettingsVersion".
- */
-export type SettingsVersion = number
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Target_policy_publish_protected".
  */
 export type TargetPolicyPublishProtected = {
@@ -1913,7 +1913,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1937,14 +1937,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 20
+catalog_version: 21
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -1955,6 +1955,7 @@ limitations: string[]
 work_templates?: WorkTemplates
 preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
+configured_forms?: ConfiguredFormsPage
 } & SettingsCatalog1)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2015,23 +2016,23 @@ center_id: string
 export type SettingsCatalog1 = ({
 scope: "user"
 defaults: UserSettingsValues
-catalog_version: 20
+catalog_version: 21
 } | {
 scope: "member"
 defaults: MemberSettingsValues
-catalog_version: 20
+catalog_version: 21
 } | {
 scope: "center"
 defaults: CenterSettingsValues
-catalog_version: 20
+catalog_version: 21
 } | {
 scope: "organization"
 defaults: OrganizationSettingsValues
-catalog_version: 20
+catalog_version: 21
 } | {
 scope: "platform"
 defaults: PlatformSettingsValues
-catalog_version: 20
+catalog_version: 21
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2044,6 +2045,8 @@ scope: unknown
 org_id?: unknown
 center_id?: unknown
 template_center_id?: unknown
+include_configured_forms?: unknown
+configured_forms_page?: unknown
 } & RequestSettingsCatalogGet1)
 export type RequestSettingsCatalogGet1 = ({
 client_api_version: 1
@@ -2082,6 +2085,11 @@ org_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id: string
+include_configured_forms?: boolean
+configured_forms_page?: {
+cursor?: string
+limit?: number
+}
 } | {
 client_api_version: 1
 /**
@@ -2093,6 +2101,11 @@ scope: "organization"
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+include_configured_forms?: boolean
+configured_forms_page?: {
+cursor?: string
+limit?: number
+}
 } | {
 client_api_version: 1
 /**
@@ -2385,7 +2398,7 @@ export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationSettingsFieldKey".
  */
-export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "security_policy" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar")
+export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "security_policy" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlatformSettingsFieldKey".
@@ -4243,6 +4256,11 @@ CrmContactMode?: CrmContactMode
 CrmContactLevel?: CrmContactLevel
 CenterPreparationSource?: CenterPreparationSource
 CrmFormRulesSnapshot?: CrmFormRulesSnapshot
+ConfiguredFormsPage?: ConfiguredFormsPage
+ClassWaitlistImpact?: ClassWaitlistImpact
+RoomDeactivationEffects?: RoomDeactivationEffects
+WorkCalendarExceptionInput?: WorkCalendarExceptionInput
+WorkCalendarExceptionRecord?: WorkCalendarExceptionRecord
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6894,6 +6912,7 @@ class_version?: PositiveInt
 capacity: SessionCapacityView
 shared_participants?: SharedLessonParticipant[]
 management_attention?: "instructor_required"
+work_calendar_exception?: (WorkCalendarExceptionRecord | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6908,6 +6927,20 @@ display_name?: string
 email?: string
 phone?: string
 photo?: SettingsMediaAsset
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "WorkCalendarExceptionRecord".
+ */
+export interface WorkCalendarExceptionRecord {
+reason: string
+settings_version: SettingsVersion
+organization_settings_version: SettingsVersion
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+approved_by: string
+approved_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8765,6 +8798,9 @@ expected_version?: PositiveInt
 room_id?: (string | null)
 name: Text
 capacity: Count
+description?: string
+location?: string
+state?: RecordState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9669,6 +9705,7 @@ external_open: Bool
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+waitlist_enabled?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9702,6 +9739,16 @@ center_id?: (string | null)
  */
 class_id: string
 schedule: ProgramSpec
+work_calendar_exception?: WorkCalendarExceptionInput
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "WorkCalendarExceptionInput".
+ */
+export interface WorkCalendarExceptionInput {
+reason: string
+settings_version: SettingsVersion
+organization_settings_version: SettingsVersion
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9778,6 +9825,7 @@ capacity: SessionCapacity
 discipline_id: string
 format: SessionFormat
 inherit_class_assignments?: Bool
+work_calendar_exception?: WorkCalendarExceptionInput
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9810,6 +9858,7 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 session_id: string
+include_work_calendar_exception?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9846,6 +9895,7 @@ patch: SessionPatch
 scope: ChangeScope
 reason: Text
 offset_choices?: LocalOffsetChoice[]
+work_calendar_exception?: WorkCalendarExceptionInput
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10023,6 +10073,7 @@ replaces_id: string
 interval: Interval
 resources: ResourceRef[]
 capacity: SessionCapacity
+work_calendar_exception?: WorkCalendarExceptionInput
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10067,6 +10118,7 @@ person_id: string
 duty: Duty
 agreement_id?: (string | null)
 state?: RecordState
+work_calendar_exception?: WorkCalendarExceptionInput
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13887,6 +13939,7 @@ class_id: string
 person_id: string
 duty: Duty
 state?: RecordState
+work_calendar_exception?: WorkCalendarExceptionInput
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14293,6 +14346,8 @@ center_id: string
 name: Text
 state: RecordState
 capacity?: (Count | null)
+description?: string
+location?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14682,6 +14737,7 @@ state: RecordState
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+waitlist_enabled?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14752,6 +14808,7 @@ assignment_mode?: ("legacy" | "inherit" | "explicit")
 actual_started_at?: (Instant | null)
 started_agreements?: (LessonStartedAgreement[] | null)
 category_capacities?: (CategoryCapacities | null)
+work_calendar_exception?: (WorkCalendarExceptionRecord | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17650,7 +17707,32 @@ values: {
 room_id?: (string | null)
 name?: Text
 capacity?: (Count | null)
+description?: string
+location?: string
+state?: RecordState
+deactivation_effects?: RoomDeactivationEffects
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "RoomDeactivationEffects".
+ */
+export interface RoomDeactivationEffects {
+count: Count
+truncated: boolean
+/**
+ * @maxItems 200
+ */
+items: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+starts_at: Instant
+ends_at: Instant
+type: ("sessions" | "events")
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17940,7 +18022,32 @@ external_open?: Bool
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id?: string
+waitlist_enabled?: boolean
+waitlist_impact?: ClassWaitlistImpact
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ClassWaitlistImpact".
+ */
+export interface ClassWaitlistImpact {
+count: Count
+truncated: boolean
+/**
+ * @maxItems 200
+ */
+entries: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+version: PositiveInt
+state: ("waiting" | "offered")
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -20455,6 +20562,7 @@ export interface ManagementSelectorRoomSaveV1 {
 operation: "room_save_v1"
 key: {
 room_id?: (string | null)
+include_details?: boolean
 }
 }
 /**
@@ -20736,6 +20844,7 @@ class_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id?: string
+include_waitlist?: boolean
 }
 }
 /**
@@ -23735,6 +23844,7 @@ ends_at: string
 reason: string
 }[]
 } | null)
+work_calendar_exceptions_enabled?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23860,7 +23970,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: SettingsFieldKey
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline" | "lesson_impact_authorize" | "crm_intake_submit" | "center_work_calendar_contains")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline" | "lesson_impact_authorize" | "crm_intake_submit" | "center_work_calendar_contains" | "work_calendar_exception_assert")
 writable: boolean
 }
 /**
@@ -24180,6 +24290,26 @@ new_user_default_enabled: false
  */
 exceptions: [("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer"), ("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer"), ("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer"), ("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer")]
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ConfiguredFormsPage".
+ */
+export interface ConfiguredFormsPage {
+/**
+ * @maxItems 200
+ */
+items: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+center_id: (string | null)
+channel: "web_form"
+form_key: string
+enabled: boolean
+}[]
+next_cursor: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
