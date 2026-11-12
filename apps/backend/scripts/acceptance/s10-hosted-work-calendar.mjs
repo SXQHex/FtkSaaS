@@ -35,7 +35,8 @@ export async function acceptWorkCalendar({email,password,apikey,org,center,disci
   const preview=await call('session_cancel_preview_v1',{session_id:id,reason:'Complete isolated backend calendar acceptance'});
   assert.deepEqual(preview.blockers,[]);
   const body={preview:{id:preview.id,token:preview.token}},operationKey=key();pendingCancels.set(operationKey,{id,body});
-  await call('session_cancel_apply_v1',body,operationKey);pendingCancels.delete(operationKey);owned.delete(id);
+  const cancelled=await call('session_cancel_apply_v1',body,operationKey);assert.equal(cancelled.primary_id,id);
+  pendingCancels.delete(operationKey);owned.delete(id);
  };
  try{
   token=(await json('/auth/v1/token?grant_type=password',{email,password})).access_token;assert(token);
@@ -70,7 +71,7 @@ export async function acceptWorkCalendar({email,password,apikey,org,center,disci
    // response is not evidence that a create/apply failed to commit.
    const unresolvedCancels=new Set();
    for(const [operationKey,body] of pendingCreates){try{owned.add((await call('session_create_v1',body,operationKey)).primary_id);}catch{failed=true;}}
-   for(const [operationKey,{id,body}] of pendingCancels){try{await call('session_cancel_apply_v1',body,operationKey);owned.delete(id);}catch{failed=true;unresolvedCancels.add(id);}}
+   for(const [operationKey,{id,body}] of pendingCancels){try{const cancelled=await call('session_cancel_apply_v1',body,operationKey);assert.equal(cancelled.primary_id,id);owned.delete(id);}catch{failed=true;unresolvedCancels.add(id);}}
    for(const id of owned)if(!unresolvedCancels.has(id))try{await cancel(id);}catch{failed=true;}
    if(restore)try{await restoreSettingsField(restore,{read,call});}catch{failed=true;}
    try{

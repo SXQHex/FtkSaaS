@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {acceptWorkCalendar} from '../scripts/acceptance/s10-hosted-work-calendar.mjs';
 
 const input={email:'acceptance@example.invalid',password:'Synthetic!Password',apikey:'synthetic-key',org:'org',center:'center',discipline:'discipline',startsAt:'2040-06-01T12:00:00Z'};
-function fixture({lostCreate=false,lostCancel=false,lostSave=false,acceptProtectedWrite=false,acceptBlockedCreate=false,lostBlockedCreate=false,concurrentChange=false,foreignImpact=false,plan='pro',logoutFails=false,initialCalendar=null,initialOverride=false,invalidCreateResponse=false,logoutStillActive=false}={}){
- let version=0,calendar=structuredClone(initialCalendar),override=initialOverride,sequence=0,logout=false;const receipts=new Map(),sessions=new Map(),calls=[];
+function fixture({lostCreate=false,lostCancel=false,lostSave=false,acceptProtectedWrite=false,acceptBlockedCreate=false,lostBlockedCreate=false,concurrentChange=false,foreignImpact=false,plan='pro',logoutFails=false,initialCalendar=null,initialOverride=false,invalidCreateResponse=false,logoutStillActive=false,cancelFaults=[]}={}){
+ let version=0,calendar=structuredClone(initialCalendar),override=initialOverride,sequence=0,logout=false,cancelAttempt=0;const receipts=new Map(),sessions=new Map(),calls=[];
  const result=data=>Response.json({ok:true,data});
  const denied=code=>Response.json({ok:false,error:{code}});
  const snapshot=()=>({version,values:{work_calendar:structuredClone(calendar),public_hours:{unchanged:true}},overridden_fields:override?['work_calendar']:[],inherited_fields:{}});
@@ -16,6 +16,12 @@ function fixture({lostCreate=false,lostCancel=false,lostSave=false,acceptProtect
   if(op==='account_get_v1')return logout&&!logoutStillActive?denied('AUTH_REQUIRED'):result({id:'synthetic'});
   if(op==='subscription_get_v1')return result({plan});
   if(op==='settings_get_v1')return result(snapshot());
+  if(op==='session_cancel_apply_v1'){
+   const fault=cancelFaults[cancelAttempt++];
+   if(fault==='lost')throw Error('sensitive cancellation transport failure');
+   if(fault==='invalid')return result({});
+   if(fault==='wrong')return result({primary_id:'unrelated-session'});
+  }
   if(receipts.has(body.operation_key))return result({...receipts.get(body.operation_key),replayed:true});
   const commit=data=>{receipts.set(body.operation_key,data);return result(data);};
   if(op==='session_create_v1'){
@@ -77,6 +83,20 @@ test('calendar acceptance refuses an impact containing an unrelated session befo
  const f=fixture({foreignImpact:true});await assert.rejects(()=>acceptWorkCalendar({...input,request:f.request}),/exact impact/);
  assert.equal(f.calls.some(c=>c.op==='settings_update_v1'),false);assert.deepEqual(f.state(),{calendar:null,override:false,logout:true});
  assert.deepEqual([...f.sessions.values()],['cancelled']);
+});
+
+for(const fault of ['invalid','wrong'])test('calendar cleanup reconciles a '+fault+' cancellation result with the original key',async()=>{
+ const f=fixture({cancelFaults:[fault]});await assert.rejects(()=>acceptWorkCalendar({...input,request:f.request}),/Hosted work-calendar acceptance failed at explicit session cancellation/);
+ assert.deepEqual([...f.sessions.values()],['cancelled']);assert.deepEqual(f.state(),{calendar:null,override:false,logout:true});
+ const attempts=f.calls.filter(c=>c.op==='session_cancel_apply_v1');assert.equal(attempts.length,2);assert.equal(attempts[0].body.operation_key,attempts[1].body.operation_key);
+ assert.equal(f.calls.filter(c=>c.op==='session_cancel_preview_v1').length,1);
+});
+
+for(const cancelFaults of [['lost','invalid'],['invalid','invalid']])test('unresolved cancellation cannot disappear from cleanup after '+cancelFaults.join('/'),async()=>{
+ const f=fixture({cancelFaults});await assert.rejects(()=>acceptWorkCalendar({...input,request:f.request}),/cleanup requires inspection/);
+ assert.deepEqual([...f.sessions.values()],['planned']);assert(f.state().logout);
+ const attempts=f.calls.filter(c=>c.op==='session_cancel_apply_v1');assert.equal(attempts.length,2);assert.equal(attempts[0].body.operation_key,attempts[1].body.operation_key);
+ assert.equal(f.calls.filter(c=>c.op==='session_cancel_preview_v1').length,1);
 });
 
 test('calendar cleanup refuses to overwrite a concurrent writer and still closes its session',async()=>{

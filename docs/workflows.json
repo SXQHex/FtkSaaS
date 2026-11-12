@@ -1295,8 +1295,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "bc2a93adcc909c1c3a61ca4d44ed38c78030a6d14b377e85f88b9889a9d25423",
-        "reason": "Hosted iş takvimi runner ve15 güvenlik testi incelendi: hatalı zarf ve yanıt kaybında aynı key recovery, kaynak restore/concurrent ret, logout204 sonrası gerçek Edge session reddi; WF12 runtime rehberi değişmedi."
+        "fingerprint": "708ed53a5ea803b341405b27e33e8a6a322e667483dad1486ce53156f5cb6633",
+        "reason": "Bağımsız P2 incelemesi düzeltildi: normal ve pending cancel yalnız hedef session primary_id doğrulanınca tamamlanır; bozuk/yanlış mutation ve belirsiz replay19 güvenlik testinde fail-closed incelendi."
       }
     },
     {
