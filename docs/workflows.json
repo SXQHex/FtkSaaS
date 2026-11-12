@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f4ee097670e4823cf9b865a9805afcd61ef4e9a69e145c330171ed663d0f8d02",
-        "reason": "Manual full Backend CI uses exact tested SHA and fresh successful PR timings; diagnostic-only artifacts, frozen reruns and unchanged automatic PR/main/deploy acceptance reviewed."
+        "fingerprint": "a1beb976a4e8834782ce8a842966bda863a81b309ddfaaf06e2e39e346cece3b",
+        "reason": "CI279 native calendar diagnostics are opt-in only in isolated local fixture; HTTP expectations, oneshot concurrency and deadlines unchanged."
       }
     },
     {
@@ -1082,8 +1082,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "4848fd28ee43e2cf9d41fad053afc46598e384dbc885692e6a19e5a57697c818",
-        "reason": "CI589: e-posta başvurusunun aday oluşturma testi DB bigint sürümünü API integer tipinde yollar; telefon opsiyonelliği ve tüm kabul assertionları korundu, rehber ve runtime sözleşmesi değişmedi."
+        "fingerprint": "c9a298191e759abb029cca3e4a647b00ab2a2832cda2ae96511a7d2bdd131c7a",
+        "reason": "Calendar gateway keeps existing response status/body and closed feed checks; isolated fixture adds bounded allowlisted failure classification, with no URL/token/body disclosure. Root cause still awaiting native evidence."
       }
     },
     {

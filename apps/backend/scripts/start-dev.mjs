@@ -11,7 +11,7 @@ if(process.env.CI||process.env.FTK_CALENDAR_TEST_FIXTURE==='1'){
   const {createServer}=await import('node:net'),{randomBytes}=await import('node:crypto');
   const reserve=createServer();await new Promise((resolve,reject)=>{reserve.once('error',reject);reserve.listen(0,'127.0.0.1',resolve);});
   const port=reserve.address().port;await new Promise(resolve=>reserve.close(resolve));const origin='http://127.0.0.1:'+port;
-  fs.writeFileSync(envPath,'FTK_CALENDAR_ORIGIN='+origin+'\nFTK_CALENDAR_SESSION_URL_TEMPLATE=https://calendar-app.ftksaas.invalid/org/{org_id}/session/{session_id}\nFTK_CALENDAR_SIGNING_KEY='+randomBytes(32).toString('hex')+'\n',{mode:0o600});
+  fs.writeFileSync(envPath,'FTK_CALENDAR_DIAGNOSTICS=1\nFTK_CALENDAR_ORIGIN='+origin+'\nFTK_CALENDAR_SESSION_URL_TEMPLATE=https://calendar-app.ftksaas.invalid/org/{org_id}/session/{session_id}\nFTK_CALENDAR_SIGNING_KEY='+randomBytes(32).toString('hex')+'\n',{mode:0o600});
   fs.writeFileSync(marker,JSON.stringify({origin,port}),{mode:0o600});
  }
 }
