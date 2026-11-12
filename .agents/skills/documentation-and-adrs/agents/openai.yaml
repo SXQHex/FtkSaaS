@@ -1,0 +1,13 @@
+interface:
+  display_name: Documentation and ADRs
+  short_description: Teknik kararları ve gerekçeleri belgele
+  default_prompt: $documentation-and-adrs becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

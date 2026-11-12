@@ -1,0 +1,14 @@
+interface:
+  display_name: Browser Testing with DevTools
+  short_description: Tarayıcı davranışını DevTools ile doğrula
+  default_prompt: $browser-testing-with-devtools becerisini kullanarak bu görevi ele
+    al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

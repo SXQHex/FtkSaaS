@@ -1,0 +1,13 @@
+interface:
+  display_name: Kubernetes Catch-Up
+  short_description: Yeni Kubernetes özelliklerini doğru uygula
+  default_prompt: $k8s-catch-up becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

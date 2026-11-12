@@ -1,0 +1,13 @@
+interface:
+  display_name: Super Linting
+  short_description: Projeye uygun yerel lint araçlarını kur
+  default_prompt: $super-linting becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

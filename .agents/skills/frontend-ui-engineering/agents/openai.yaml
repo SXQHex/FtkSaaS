@@ -1,0 +1,13 @@
+interface:
+  display_name: Frontend UI Engineering
+  short_description: Erişilebilir ve tutarlı web arayüzleri kur
+  default_prompt: $frontend-ui-engineering becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

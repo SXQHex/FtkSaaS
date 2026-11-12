@@ -1,0 +1,13 @@
+interface:
+  display_name: Deprecation and Migration
+  short_description: Eski sistemleri güvenli biçimde taşı
+  default_prompt: $deprecation-and-migration becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

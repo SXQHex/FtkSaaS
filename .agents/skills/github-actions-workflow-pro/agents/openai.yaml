@@ -1,0 +1,14 @@
+interface:
+  display_name: GitHub Actions Workflow Pro
+  short_description: GitHub Actions iş akışlarını kur ve iyileştir
+  default_prompt: $github-actions-workflow-pro becerisini kullanarak bu görevi ele
+    al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -1,0 +1,13 @@
+interface:
+  display_name: macOS Screen Capture
+  short_description: macOS uygulamalarını ekran görüntüsüyle incele
+  default_prompt: $screencapture becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

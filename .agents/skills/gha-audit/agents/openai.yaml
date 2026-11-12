@@ -1,0 +1,13 @@
+interface:
+  display_name: GitHub Actions Audit
+  short_description: İstek üzerine CI güvenlik ve hız denetimi
+  default_prompt: $gha-audit becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  allow_implicit_invocation: false
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas

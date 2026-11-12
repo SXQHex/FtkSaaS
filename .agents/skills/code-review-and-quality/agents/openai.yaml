@@ -1,0 +1,13 @@
+interface:
+  display_name: Code Review and Quality
+  short_description: Kod değişikliklerini beş eksende incele
+  default_prompt: $code-review-and-quality becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

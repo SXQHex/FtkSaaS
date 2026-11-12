@@ -1,0 +1,13 @@
+interface:
+  display_name: Using Agent Skills
+  short_description: İşe uygun geliştirme becerisini seç
+  default_prompt: $using-agent-skills becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
