@@ -338,6 +338,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Gerçek token/action/hostname, replay ve rate testi; public HTTP→inbox→yetkili inceleme. Frontend PUBLIC-01 devri ayrı izlenir ve backend kapanışını bekletmez.
 - **Kaynak alanı:** public ingress/review; provider config; runbook
 
+**Ortam/consumer devri:** Canonical gateway config ve gerçek widget action/hostname için [XREQ-042](../../../docs/requests.md#xreq-042) backend talebi açıldı. Güncel503 tanısı ve kesin kabul sınırı [tek kabul kaydındadır](00-FtkSaaS-yeni-sohbet-devir.md#guncel-backend-durumu); talep açılması canlı ayarı değiştirme veya frontend adına kabul yetkisi değildir.
+
 **Backend kaynak dilimi:** Mevcut public intent→review→davet/hesap→ayrı satış/tahsilat→self rezervasyon zinciri incelendi ve mevcut Starter harness’inde doğrulandı; yeni public motoru kurulmadı. Yerel Edge-owned verified context gerçek widget/token/action/hostname veya frontend ekranı değildir; S14 bu hosted sınırıyla açık kalır. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
 
 <a id="s15"></a>
@@ -456,9 +458,9 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p07"></a>
 ### P07 — Web formlarını ortak alıma bağla
 
-- [ ] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
+- **Durum:** Dış site contact/kayit bağlantısı V1 kapsamı dışında; kaynak teslimi korunur. **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
 - **Bağımlılık:** P05,P06
-- **Kabul:** Contact/kayit sunucu adapter’ı ve backend alımı güvenilir form/config, alan ve onay sözleşmesiyle çalışır; gerçek backend HTTP/sağlayıcı sonucu kanıtlanır. Site sahibinin ekranı ve handler’ı kendi entegrasyon kabulüdür.
+- **Kabul sınırı:** [XREQ-018'deki 7 Kasım kullanıcı kararı](../../../docs/requests.md#xreq-018) dış site adaptörlerinin canlı handler/config/widget ve gerçek form kabulünü bu sürümden çıkardı. Aşağıdaki kaynak teslimi başarılı entegrasyon anlamına gelmez; kalan dış site kabulü G02 engeli değildir. Uygulamanın kendi public başvurusu [S14](#s14) kapsamında açık kalır.
 - **Sınır/olumsuz durum:** Mevcut site koruması korunur; istemci org/source beyanı yetki değildir; başka repo kendiliğinden değiştirilmez.
 - **Doğrulama senaryosu:** Gerçek geçerli sağlayıcı token/action/hostname ve güvenilir form bağlamıyla HTTP→backend→inbox; partnerName/mode ve ayrı onayların korunması. Frontend form ekranının hazır olması backend kapısına eklenmez.
 - **Kaynak alanı:** backend ingress/adapter config; docs/requests backend devri
@@ -467,9 +469,9 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 - [x] P07.1 — Backend adaptör kaynağı: mevcut contact/kayit alanlarını tek yayımlanmış CRM DTO'suna eşle; ayrı onay sürümleri, sabit gönderim anahtarı/zamanı, partner/mode ve istemci atfı korunsun. Bu işaret yerel kaynak dilimidir; aday teslimi [devirde](00-FtkSaaS-yeni-sohbet-devir.md#p07-web-formu-adaptörü).
 
-**P07.2 — Siteye bağlama devri (frontend/site sahibi):** Site sahibi güncel handler/DTO, iki formun güvenilir form_id ve gerçek onay metni/sürümlerini doğrular; mevcut hız/validasyon korumasından sonra adapter’a bağlar. [XREQ-018](../../../docs/requests.md#xreq-018) bu alanlar arası kabulün sahibidir. Bu devir backend görev işareti veya G02 önkoşulu değildir; başka repo/frontend bu dilimde değiştirilmez.
+**P07.2 — Siteye bağlama devri (frontend/site sahibi):** V1'den çıkarılan devir [XREQ-018](../../../docs/requests.md#xreq-018) sahibinde korunur; yeniden uygulama talimatı değildir. Başka repo/frontend bu dilimde değiştirilmez.
 
-- [ ] P07.3 — Backend’in gerçek HTTP→Turnstile doğrulama→CRM inbox kabulü: iki form sözleşmesi, gerçek onay metni/sürümleri ve partner/mode, aynı teslim retry, yeni gerçek başvuru, yetkili kaynak/merkez okuması. Gerçek token/action/hostname ve güvenilir config şartı korunur; mock bot kanıtı kabul edilmez. Sunucu zamanıyla tarihsel onay üretilmez. Backend kanıtı site handler’ının bağlandığını veya ekranın kabul edildiğini göstermez; bu sonuç P07.2 sahibinde ayrıca doğrulanır.
+**P07.3 — Dış site backend kabulü:** İki dış formun gerçek HTTP→Turnstile→CRM inbox kabulü yapılmadı; V1 kapsamı dışındadır. Kaynak testleri gerçek token/action/hostname veya entegrasyon kabulüne çevrilmez. Yeniden kapsam kararı olmadan bu iş aktif sıraya alınmaz. Ortak ingress'in uygulama içi public başvuru kabulü S14'te ayrıca yürür.
 
 
 <a id="p08"></a>
