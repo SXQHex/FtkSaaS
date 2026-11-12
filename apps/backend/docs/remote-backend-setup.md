@@ -15,6 +15,12 @@ node scripts/acceptance/s07-s15-browser.mjs
 
 Playwright ayrı kurulumdan yüklenir; gerekirse FTK_PLAYWRIGHT_MODULE modül yolu ve FTK_PLAYWRIGHT_CHROMIUM kurulu headless Chromium executable'ı belirtilir. Kullanıcının11 Kasım kabul yöntemi: bütün tarayıcı kontrolleri önce Playwright ile denenir; yalnız Playwright ile tamamlanamayan kontrol Chrome eklentisine taşınır. Playwright runner ayrı profilde çalışır. Eklentiye geçişin somut nedeni ve doğrulanan senaryo kabul kaydında belirtilir. Ortam HTTPS_PROXY kullanıyorsa browser da kullanır; CODEX_PROXY_CERT varsa yalnız bu CA'nın SPKI fingerprint'i eklenir, genel ignoreHTTPSErrors açılmaz. Credential/provider payload/HTML/browser storage raporlanmaz; screenshot/trace/video alınmaz.
 
+## İş takvimi API kabulü
+
+`node scripts/acceptance/s10-hosted-work-calendar.mjs` mevcut development projesindeki açık seçilmiş Pro test merkezinde çalışır. README'deki `FTK_ACCEPTANCE_*` girdileriyle mevcut aktif test disiplini ve gelecekte açık test aralığı verilir; runner disiplin/rol/ürün kurmaz. Başlangıçtaki takvim kuralları ve kapanışlar korunarak yalnız test seansına dar bir kapanış önerilir. Etki birden fazla veya başka seans içeriyorsa ayar yazılmadan durulur. Canlı seans nedeniyle `OPEN_OPERATIONS_EXIST`, açık iptal sonrası ayar/replay ve yeni kaynak gerektirmeyen Pro seansında `RESOURCE_CONFLICT` doğrulanır.
+
+Yanıt kaybında create/cancel aynı operation_key ile uzlaştırılır; başarısız olması beklenen create beklenmedik şekilde commit etmişse o seans da test-owned temizliğe alınır. Ayar restore'u önceki effective değeri ve local/default kaynağını birlikte korur; başka writer değişmişse ezmez. İptal/ayar geçmişi silinmez; finans, katılımcı veya görev yaratılmaz. Native oturum local logout ile kapatılır. Gerçek yerel/hosted sonuç ve kalan S10 sınırı [kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md#s10-is-takvimi-hosted-kabulu) tutulur.
+
 ## Native TOTP ve takvim kabulü
 
 `node scripts/acceptance/s08-native-mfa.mjs` yalnız FTK_ACCEPTANCE_EMAIL/PASSWORD/APIKEY özel ortam girdilerini kullanır. Önceden verified MFA faktörü olan hesapta değişiklik yapmadan durur. Primary+bağımsız backup enroll/verify, weak-session reddi, primary kaldırma ve backup AAL2/backend erişimini gerçek native HTTP ile sınar; oluşturduğu faktörleri finally'de kaldırır. TOTP secret/code/JWT/kişisel payload rapora yazılmaz. Mevcut Google veya recovery/24saat nonce kabulünü ikame etmez.
