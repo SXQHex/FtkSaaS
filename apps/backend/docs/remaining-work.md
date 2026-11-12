@@ -337,18 +337,18 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 **Backend dilimi:** Mevcut registry harness’inde ayrı sınırlı Starter belge kökü eklendi. Gerçek native Auth ve private Storage baytları, iki farklı hash/sürüm, self onay olmadan ret, onay sonrası aynı komutla rezervasyon, eski rezervasyon/byte/onay geçmişinin korunması ve link kaybında içerik/replay reddi doğrulanır. Ürün davranışı, Storage grantları veya private dosya transport’u değişmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted signed upload/checksum/publish ve contextual private bayt okuması iki sürümde doğrulandı. Self kabul olmadan gerçek satış apply reddi, onay sonrası yeni preview ile satış, yenilenen sürümde tekrar gate, eski sürüm/içerik ve yabancı org/on-behalf/direct Storage retleri geçti; ilk satış/hak ve iki onay geçmişi korundu. S13 backend hosted kabulü kapalıdır; tarayıcı/ekran kabulü karşı alanda kalır. [Hosted kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s13-gerçek-private-belge-ve-yenilenmiş-onay).
 
 <a id="s14"></a>
-### S14 — Temel public başvuru kabulü
+### S14 — Public başvurunun backend kabulü
 
 - [ ] **Tür:** D/H · **Plan:** Tümü; Starter dar kapsam · **Özellik:** F25
 - **Bağımlılık:** S06
-- **Kabul:** Gerçek ders yayını başvurusu tek merkeze düşer ve yetkili inceler.
+- **Kabul:** Backend'in oluşturduğu gerçek ders yayınına anonim HTTP başvurusu tek merkeze düşer ve yetkili API ile incelenir. Kabulü backend kendi fixture/transport'u ile yürütür; uygulama ekranının hazır olması veya frontend onayı önkoşul değildir.
 - **Sınır/olumsuz durum:** Başvuru hesap/satış/rezervasyon/pazarlama izni yaratmaz; Starter'ın ayrı temel aday takibi P05 kapsamındadır, genel reklam/CRM yetkisi açılmaz.
-- **Doğrulama senaryosu:** Gerçek token/action/hostname, replay ve rate testi; public HTTP→inbox→yetkili inceleme. Frontend PUBLIC-01 devri ayrı izlenir ve backend kapanışını bekletmez.
+- **Doğrulama senaryosu:** Native domain zinciri ve ingress/provider sözleşmesi ayrı kanıtlanır; hosted kabulde backend'in kontrol ettiği yayın, güvenilir imzalı HTTP transport'u ve gerçek sağlayıcı token/action/hostname ile inbox→yetkili inceleme, replay ve rate sınanır. Tarayıcı widget'ı, uygulamanın `/p/[slug]` ekranı ve frontend deployment'ı bu backend kapısının önkoşulu değildir. Geçerli sağlayıcı proof'u teknik bir girdidir; ekran tamamlanmasını beklemek yerine backend işletiminde temin edilir. Mock/Edge-owned sentetik bağlam hosted sağlayıcı başarısı sayılmaz.
 - **Kaynak alanı:** public ingress/review; provider config; runbook
 
-**Ortam/consumer devri:** Canonical gateway config ve gerçek widget action/hostname için [XREQ-042](../../../docs/requests.md#xreq-042) backend talebi açıldı. Güncel503 tanısı ve kesin kabul sınırı [tek kabul kaydındadır](00-FtkSaaS-yeni-sohbet-devir.md#guncel-backend-durumu); talep açılması canlı ayarı değiştirme veya frontend adına kabul yetkisi değildir.
+**Sorumluluk ve kalan iş:** Public ingress/HMAC, Edge sağlayıcı config'i, gerçek sağlayıcı proof'unun hazırlanması, yayın/başvuru fixture'ı, inbox/review ve cleanup backend'in işidir. Uygulama widget/site key tüketimi ve canonical frontend gateway kurulumu [XREQ-042](../../../docs/requests.md#xreq-042) tüketici devridir; frontend kuyruğu S14 kapanış bağımlılığı değildir. Backend'in kendi sağlayıcı/HTTP kanıtı eksikse bunu frontend bekleyişi diye kaydetme. Doğrudan kabul yolu [backend işletim rehberindedir](remote-backend-setup.md#s14-bagimsiz-backend-kabulu); kaynak, canlı kurulum ve gerçek kabul sonucu [tek kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md#s14-backend-kabul-siniri) ayrı tutulur.
 
-**Backend kaynak dilimi:** Mevcut public intent→review→davet/hesap→ayrı satış/tahsilat→self rezervasyon zinciri incelendi ve mevcut Starter harness’inde doğrulandı; yeni public motoru kurulmadı. Yerel Edge-owned verified context gerçek widget/token/action/hostname veya frontend ekranı değildir; S14 bu hosted sınırıyla açık kalır. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
+**Backend kaynak dilimi:** Mevcut public intent→review→davet/hesap→ayrı satış/tahsilat→self rezervasyon zinciri incelendi ve mevcut Starter harness’inde doğrulandı; yeni public motoru kurulmadı. Yerel Edge-owned verified context gerçek sağlayıcı token/action/hostname değildir; kalan hosted backend kanıtı tamamlanmadan S14 kapalı sayılmaz. Frontend ekran kabulü bu eksiğin yerine eklenmez. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
 
 <a id="s15"></a>
 ### S15 — Gerçek takvim aboneliği

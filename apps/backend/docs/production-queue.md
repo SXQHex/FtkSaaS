@@ -11,7 +11,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 | Öncelik | Paket | Bağımlılık ve kontrol noktası |
 |---|---|---|
 | 1 | [S08](remaining-work.md#s08) hesap/güvenlik | Kalan native/hosted Auth kanıtı ve kabul oturumunun kapatılması; frontend ekran onayı backend'i bekletmez. |
-| 2 | [S14](remaining-work.md#s14) public backend | Gerçek sağlayıcı/hostname/config ve HTTP kabulü; kaynak testini veya frontend görünümünü hosted backend kanıtı sayma. |
+| 2 | [S14](remaining-work.md#s14) public backend | Backend'in kendi yayın/ingress/provider/HTTP→inbox→review kabulü; frontend widget/ekran/deployment bağımlılığı yoktur. Kaynak testi hosted sağlayıcı kanıtı değildir. |
 | 3 | Pro ortak akışlarının kalan kabulleri | [S01–S16](remaining-work.md#ortak-uygulama-temeli) ve [P01–P16](remaining-work.md#pro-işlevleri) içindeki yürürlükteki, Pro'ya uygulanabilir açıkları kapat. |
 | 4 | [O01–O10](remaining-work.md#ortak-üretim-işletimi) ve [G02](remaining-work.md#g02) | Pro kapsamındaki worker, alarm, saklama/imha, restore ve yük kanıtı tamamlanınca Pro backend kabulünü kapat. |
 | 5 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
@@ -30,7 +30,7 @@ Pro için [P05–P07](remaining-work.md#p05), [P10–P11](remaining-work.md#p10)
 ## CRM paketinin iç sırası
 
 1. Mevcut P05/P06 ortak alım, inceleme/eşleme ve Starter temel alt kümesinin kaynağını koru.
-2. S14'ün uygulama içi public başvuru config/gerçek HTTP kabul boşluklarını kapat; ilgili tüketici devrini [ortak talep](../../../docs/requests.md) üzerinden sürdür. V1'den çıkarılmış P07 dış site bağlantısını yeniden etkinleştirme.
+2. S14'ün backend'e ait public ingress/provider config ve gerçek HTTP kabul boşluklarını kendi fixture/transport'u ile kapat; uygulama widget/gateway tüketici devrini [ortak talepte](../../../docs/requests.md#xreq-042) bağımsız sürdür. Frontend kuyruğunu backend bağımlılığı yapma; V1'den çıkarılmış P07 dış site bağlantısını yeniden etkinleştirme.
 3. P10 kontrollü aktarım ve P11 deneme/takip/segment için kalan uygulanabilir backend kabullerini doğrula.
 4. P14 → P15 → P16 bağımlılıklarında gerçek teslim, zamanlama ve otomasyon sonuçlarını uzlaştır; sağlayıcı kabulü gelen kutusuna teslim veya ekran kabulü değildir.
 5. P08/P09 ve genişletilmiş reklam/pazarlama işleri için yalnız normatif kapsamın verdiği sırayı uygula.
