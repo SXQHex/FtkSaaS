@@ -705,3 +705,61 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  }
  assert(!validators.success_settings_get_v1({...response,data:{...view,scope:'organization'}}));
 });
+
+test('S10 organization personal-limit delegation defaults closed and event preparation belongs to O20',()=>{
+ const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
+ const personal=fields.find(f=>f.scope==='organization'&&f.key==='personal_negative_limits_enabled');
+ assert(personal);assert.equal(personal.default,false);assert.equal(personal.group,'O11');
+ assert.equal(fields.find(f=>f.scope==='organization'&&f.key==='event_templates').group,'O20');
+ assert(valid('OrganizationSettingsValues',{personal_negative_limits_enabled:true}));
+ assert(!valid('CenterSettingsValues',{personal_negative_limits_enabled:true}));
+ assert(valid('OrganizationSettingsFieldKey','personal_negative_limits_enabled'));
+});
+
+test('S10 work alerts require explicit responsible recipients and keep existing automation triggers compatible',()=>{
+ for(const kind of ['pending_request','unclosed_attendance']){
+  const trigger={kind,offset_days:1,recipient_person_ids:[id]};assert(valid('AutomationTrigger',trigger));
+  for(const recipients of [undefined,[],[id,id]])assert(!valid('AutomationTrigger',{...trigger,recipient_person_ids:recipients}));
+ }
+ assert(valid('AutomationTrigger',{kind:'lead_followup_due',offset_days:1}));
+ assert(!valid('AutomationTrigger',{kind:'lead_followup_due',offset_days:1,recipient_person_ids:[id]}));
+});
+
+test('S10 flexible form input and inbox are additive to the required-phone legacy contract',()=>{
+ const intake={display_name:'Synthetic enquiry',email:'applicant@example.invalid',level:'Beginner',consents:[]};
+ assert(valid('CrmContactIntake',intake));assert(!valid('CrmIntake',intake));
+ assert(!valid('CrmContactIntake',{display_name:'No contact',consents:[]}));
+ const base={client_api_version:1,request_id:id,client_request_key:id,bot_proof:'synthetic',form_id:id};
+ assert(valid('Request_public_application_submit',{...base,contact_intake:intake}));
+ assert(valid('Request_public_application_submit',{...base,intake:{display_name:'Existing',phone:'+905551112233',consents:[]}}));
+ assert(!valid('Request_public_application_submit',{...base,intake:{display_name:'Existing',phone:'+905551112233',consents:[]},contact_intake:intake}));
+ assert(valid('ManagementProjection_public_application_review_v1',{operation:'public_application_review_v1',values:{contact_intake:intake}}));
+ assert(valid('OrganizationSettingsValues',{application_form_rules:[{form_id:id,contact_requirement:'email',required_fields:['level']}]}));
+});
+
+test('S10 discipline effects are explicit opt-in reads and acknowledgments cannot bypass blockers',()=>{
+ const selector={operation:'discipline_save_v1',key:{discipline_id:id,include_deactivation_effects:true}};
+ assert(valid('ManagementSelector_discipline_save_v1',selector));
+ assert(valid('ManagementSelector_center_discipline_set_v1',{...selector,operation:'center_discipline_set_v1'}));
+ assert(!valid('SettingsDeactivationEffects',{blocking:false,items:[],counts:{},proof:'not-a-proof',truncated:false}));
+});
+
+test('S10 center work calendar is separate from public hours and has a typed impact reader',()=>{
+ const calendar={rules:[{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'24:00:00',valid_from:'2026-01-01'}],closures:[{starts_at:'2027-01-01T00:00:00Z',ends_at:'2027-01-02T00:00:00Z',reason:'Explicit closure'}]};
+ assert(valid('CenterWorkCalendar',calendar));assert(!valid('CenterWorkCalendar',{...calendar,timezone:'UTC'}));
+ assert(valid('CenterSettingsValues',{work_calendar:calendar}));assert(valid('OrganizationSettingsValues',{work_calendar:calendar}));
+ assert(valid('ManagementSelector_settings_update_v1',{operation:'settings_update_v1',key:{scope:'center',work_calendar:calendar}}));
+});
+
+
+test('S10 shares unchanged large validators without changing scope-specific wire acceptance',()=>{
+ const resolve=s=>s.$ref?resolve(p.$defs[s.$ref.split('/').at(-1)]):s;
+ const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ for(const field of config.fields.filter(f=>['report_templates','import_templates','map_url','website_url'].includes(f.key))){
+  const scope={member:'Member',center:'Center',organization:'Organization'}[field.scope];
+  assert.deepEqual(resolve(p.$defs[scope+'SettingsValues'].properties[field.key]),field.schema);
+ }
+ assert.equal(config.version,20);assert.equal(config.fields.length,115);
+ const sql=['settings-catalog-v20','lesson-request-actionability','settings-negative-delegation','settings-work-alerts','settings-application-forms','settings-discipline-effects','settings-work-calendar'].map(n=>fs.readFileSync('database/'+n+'.sql','utf8').replace('begin;\n','').replace(/commit;\n$/,'')).join('');
+ assert.equal(fs.readFileSync('supabase/migrations/20261111210453_s10_settings_completion.sql','utf8'),'-- S10 accepted settings consumers; existing migrations remain immutable.\nbegin;\n'+sql+'commit;\n');
+});

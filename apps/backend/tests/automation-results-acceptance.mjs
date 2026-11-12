@@ -1,5 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {segmentFixture} from './crm-lifecycle-fixture.mjs';import {newUuidV7 as id} from '../scripts/uuid.mjs';
+import {must} from './api-client.mjs';
+import {segmentFixture,lifecycleFixture} from './crm-lifecycle-fixture.mjs';import {newUuidV7 as id} from '../scripts/uuid.mjs';
 
 test('P16 native automation failure, bounded retry, lease fencing, live disable and single domain result',async t=>{
  let cleanup;t.after(async()=>{if(cleanup)await cleanup();});
@@ -29,4 +30,37 @@ test('P16 native automation failure, bounded retry, lease fencing, live disable 
  ({row,body}=await definition());const done=row.current.values.recent_jobs.find(j=>j.id===jobId);assert.equal(done.state,'succeeded');assert.equal(done.retry_available,false);assert.equal(done.safe_error_code,null);assert.equal(done.result_reference.type,'crm_activities');
  await denied('automation_save_v1',{...body,retry_job:{id:jobId,version:done.version}},'INVALID_STATE_TRANSITION');
  await api('automation_save_v1',{...body,definition:{...body.definition,enabled:false}});const disabled=(await definition()).row;assert.equal(disabled.current.values.definition.enabled,false);assert.equal((await selected()),undefined);
+});
+
+for(const kind of ['pending_request','unclosed_attendance'])test('S10 '+kind+' work alert uses explicit recipients, live source and no blind catch-up',async t=>{
+ const {db,org,center,owner,ownerPerson,api,denied,managed,nativeWorker,person}=await lifecycleFixture(t);
+ const stranger=await person('No work-alert authority'),configScope={kind:'center',center_id:center};
+ const definition={name:'Explicit work alert',trigger:{kind,offset_days:0,recipient_person_ids:[ownerPerson]},segment_id:null,action:{kind:'send_reminder',channel:'in_app',template_key:'work.'+kind},execution_center_ids:[center],enabled:true};
+ await denied('automation_save_v1',{scope:configScope,definition:{...definition,trigger:{...definition.trigger,recipient_person_ids:[stranger]}}},'FORBIDDEN');
+ const automation=(await api('automation_save_v1',{scope:configScope,definition})).primary_id;
+ const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Work alert discipline',state:'active'},id())).primary_id;
+ await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+ const makeTarget=async()=>{const target=id();
+ if(kind==='pending_request')await db.query("insert into core.lesson_requests(id,org_id,center_id,person_id,discipline_id,format,requested_start,duration_minutes,state) values($1,$2,$3,$4,$5,'private',now()+interval '2 days',60,'pending')",[target,org,center,stranger,discipline]);
+ else await db.query("insert into core.sessions(id,org_id,center_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state,actual_started_at) values($1,$2,$3,$4,'group',now()-interval '1 minute',now()+interval '59 minutes',1,1,'planned','open',clock_timestamp())",[target,org,center,discipline]);
+ return target;};
+ const target=await makeTarget();
+ const worker=await nativeWorker();
+ const selected=async()=>{let found;for(const job of await worker.claim()){const row=(await db.query('select automation_id from private.p05_jobs where job_id=$1',[job.request.job_id])).rows[0];if(row.automation_id===automation)found=job;else assert.equal((await worker.invoke(job)).ok,true);}return found;};
+ const job=await selected();assert(job);const result=await worker.invoke(job);assert.equal(result.ok,true);assert.deepEqual(await worker.invoke(job),result);
+ const alerts=(await db.query("select recipient_person_id,subject_id,payload from core.notifications where org_id=$1 and payload->>'template_key'=$2",[org,definition.action.template_key])).rows;
+ assert.equal(alerts.length,1);assert.equal(alerts[0].recipient_person_id,ownerPerson);assert.equal(alerts[0].subject_id,target);
+ assert.equal(alerts[0].payload.subject.type,kind==='pending_request'?'lesson_requests':'sessions');assert.equal(await selected(),undefined);
+ // Disable and re-enable are normal versioned commands; existing subjects must not be replayed.
+ let row=(await managed('automation_save_v1',{scope:configScope,automation_id:automation})).items[0];
+ await api('automation_save_v1',{scope:configScope,automation_id:automation,expected_version:row.versions[0].version,definition:{...definition,enabled:false}});
+ const whileDisabled=await makeTarget();assert.equal(await selected(),undefined);
+ row=(await managed('automation_save_v1',{scope:configScope,automation_id:automation})).items[0];
+ await api('automation_save_v1',{scope:configScope,automation_id:automation,expected_version:row.versions[0].version,definition});
+ assert.equal(await selected(),undefined);
+ const fresh=await makeTarget(),freshJob=await selected();assert(freshJob);assert.equal((await worker.invoke(freshJob)).ok,true);
+ const subjects=(await db.query("select subject_id from core.notifications where org_id=$1 and payload->>'template_key'=$2",[org,definition.action.template_key])).rows.map(x=>x.subject_id);
+ assert(subjects.includes(target));assert(subjects.includes(fresh));assert(!subjects.includes(whileDisabled));assert.equal(subjects.length,2);assert.equal(await selected(),undefined);
+ if(kind==='pending_request')assert.equal((await db.query('select state from core.lesson_requests where id=$1',[target])).rows[0].state,'pending');
+ else assert.equal((await db.query('select attendance_state from core.sessions where id=$1',[target])).rows[0].attendance_state,'open');
 });

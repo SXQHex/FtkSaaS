@@ -552,6 +552,21 @@ package_usage?: ("consume" | "eligibility_only")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AutomationTrigger".
+ */
+export type AutomationTrigger = {
+kind: ("entitlement_expiring" | "student_inactive" | "lead_followup_due" | "pending_request" | "unclosed_attendance")
+offset_days: Count
+/**
+ * @minItems 1
+ * @maxItems 50
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+recipient_person_ids?: [string, ...(string)[]]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ImportTarget".
  */
 export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url")
@@ -1217,7 +1232,70 @@ client_request_key: string
  */
 form_id?: string
 intake?: CrmIntake
+contact_intake?: CrmContactIntake
 } & RequestPublicApplicationSubmit1)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactIntake".
+ */
+export type CrmContactIntake = (CrmContactIntake1 & {
+display_name: CrmContactDisplayName
+phone?: CrmContactPhone
+email?: CrmContactEmail
+interest?: CrmContactInterest
+message?: CrmContactMessage
+partner_name?: CrmContactPartnerName
+mode?: CrmContactMode
+attribution?: CrmContactAttribution
+/**
+ * @maxItems 20
+ */
+consents: []|[CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]
+level?: CrmContactLevel
+})
+export type CrmContactIntake1 = {
+[k: string]: unknown
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactDisplayName".
+ */
+export type CrmContactDisplayName = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactPhone".
+ */
+export type CrmContactPhone = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactEmail".
+ */
+export type CrmContactEmail = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactInterest".
+ */
+export type CrmContactInterest = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactMessage".
+ */
+export type CrmContactMessage = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactPartnerName".
+ */
+export type CrmContactPartnerName = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactMode".
+ */
+export type CrmContactMode = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactLevel".
+ */
+export type CrmContactLevel = string
 export type RequestPublicApplicationSubmit1 = {
 [k: string]: unknown
 }
@@ -1367,6 +1445,28 @@ is_test?: (boolean | null)
 attribution?: CrmProviderAttribution
 }
 /**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactIntakeView".
+ */
+export type CrmContactIntakeView = (CrmContactIntakeView1 & {
+display_name: CrmContactDisplayName
+phone?: CrmContactPhone
+email?: CrmContactEmail
+interest?: CrmContactInterest
+message?: CrmContactMessage
+partner_name?: CrmContactPartnerName
+mode?: CrmContactMode
+attribution?: CrmContactAttribution
+/**
+ * @maxItems 20
+ */
+consents: []|[CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]
+level?: CrmContactLevel
+})
+export type CrmContactIntakeView1 = {
+[k: string]: unknown
+}
+/**
  * All UUIDs generated by FtkSaaS must be RFC 9562 UUIDv7. Provider-issued IDs retain their original version.
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1408,7 +1508,7 @@ export type EventPaymentPreparationState = ("prepared" | "registered" | "capacit
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementProjection".
  */
-export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementDelegationSetV1 | ManagementProjectionSettlementAuthoritySetV1 | ManagementProjectionAttendanceStartV1 | ManagementProjectionDocumentPublicationPreviewV1 | ManagementProjectionReservationCapacityOverrideV1 | ManagementProjectionRoleRevokePreviewV1 | ManagementProjectionSubscriptionPeriodChangeRequestV1 | ManagementProjectionInstructorAgreementAcceptV1)
+export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementDelegationSetV1 | ManagementProjectionSettlementAuthoritySetV1 | ManagementProjectionAttendanceStartV1 | ManagementProjectionDocumentPublicationPreviewV1 | ManagementProjectionReservationCapacityOverrideV1 | ManagementProjectionRoleRevokePreviewV1 | ManagementProjectionSubscriptionPeriodChangeRequestV1 | ManagementProjectionInstructorAgreementAcceptV1 | ManagementProjectionSettingsUpdateV1)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionChange".
@@ -1419,6 +1519,16 @@ export type ReservationProtectionChange = (PolicyProtectionChange | NegativeLimi
  * via the `definition` "SettlementProposal".
  */
 export type SettlementProposal = (SettlementPaymentProposal | SettlementOffsetProposal | SettlementCorrectionProposal)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsCenterWorkCalendarValue".
+ */
+export type SettingsCenterWorkCalendarValue = (CenterWorkCalendar | null)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsVersion".
+ */
+export type SettingsVersion = number
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Target_policy_publish_protected".
@@ -1632,11 +1742,6 @@ scope: ConfigurationScope
 digital_content: DigitalDocumentContent
 })
 /**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "SettingsVersion".
- */
-export type SettingsVersion = number
-/**
  * @minItems 1
  * @maxItems 8
  *
@@ -1793,7 +1898,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "work_calendar")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -1808,7 +1913,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1832,14 +1937,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 19
+catalog_version: 20
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -1910,23 +2015,23 @@ center_id: string
 export type SettingsCatalog1 = ({
 scope: "user"
 defaults: UserSettingsValues
-catalog_version: 19
+catalog_version: 20
 } | {
 scope: "member"
 defaults: MemberSettingsValues
-catalog_version: 19
+catalog_version: 20
 } | {
 scope: "center"
 defaults: CenterSettingsValues
-catalog_version: 19
+catalog_version: 20
 } | {
 scope: "organization"
 defaults: OrganizationSettingsValues
-catalog_version: 19
+catalog_version: 20
 } | {
 scope: "platform"
 defaults: PlatformSettingsValues
-catalog_version: 19
+catalog_version: 20
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2275,12 +2380,12 @@ export type MemberSettingsFieldKey = ("profile_visible" | "photo_visible" | "ema
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CenterSettingsFieldKey".
  */
-export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url")
+export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "work_calendar")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationSettingsFieldKey".
  */
-export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "security_policy" | "crm_pipeline" | "map_url" | "directions" | "website_url")
+export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "security_policy" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlatformSettingsFieldKey".
@@ -4120,6 +4225,24 @@ CrmLossReason?: CrmLossReason
 CrmPipelineConfiguration?: CrmPipelineConfiguration
 LeadPipelineInput?: LeadPipelineInput
 LeadPipelineView?: LeadPipelineView
+CrmContactIntake?: CrmContactIntake
+CrmContactIntakeView?: CrmContactIntakeView
+SettingsDeactivationEffects?: SettingsDeactivationEffects
+CenterWorkCalendar?: CenterWorkCalendar
+SettingsWorkCalendarImpact?: SettingsWorkCalendarImpact
+ManagementProjection_settings_update_v1?: ManagementProjectionSettingsUpdateV1
+SettingsCenterWorkCalendarValue?: SettingsCenterWorkCalendarValue
+CrmContactAttribution?: CrmContactAttribution
+CrmContactDisplayName?: CrmContactDisplayName
+CrmContactPhone?: CrmContactPhone
+CrmContactEmail?: CrmContactEmail
+CrmContactInterest?: CrmContactInterest
+CrmContactMessage?: CrmContactMessage
+CrmContactPartnerName?: CrmContactPartnerName
+CrmContactMode?: CrmContactMode
+CrmContactLevel?: CrmContactLevel
+CenterPreparationSource?: CenterPreparationSource
+CrmFormRulesSnapshot?: CrmFormRulesSnapshot
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4577,14 +4700,6 @@ value?: (string | number | boolean | string[])
 export interface SegmentDefinition {
 all?: SegmentCondition[]
 any?: SegmentCondition[]
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "AutomationTrigger".
- */
-export interface AutomationTrigger {
-kind: ("entitlement_expiring" | "student_inactive" | "lead_followup_due")
-offset_days: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13187,6 +13302,20 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmContactAttribution".
+ */
+export interface CrmContactAttribution {
+campaign_id?: string
+ad_id?: string
+utm_source?: string
+utm_medium?: string
+utm_campaign?: string
+utm_term?: string
+utm_content?: string
+page_url?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_public_application_submit".
  */
 export interface SuccessPublicApplicationSubmit {
@@ -16492,11 +16621,13 @@ crm_form_id?: (string | null)
 source_snapshot?: (CrmApplicationSource | {
 
 })
-intake?: (CrmIntakeView | null)
+intake?: (CrmIntakeView | CrmContactIntakeView | null)
 routing_history?: CrmApplicationRouting[]
 provider_payload_hash?: (string | null)
 provider_lead_id?: (string | null)
 import_row_id?: (string | null)
+intake_format?: ("phone" | "contact")
+form_rules_snapshot?: (CrmFormRulesSnapshot | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16566,6 +16697,21 @@ to_center_id: string
  */
 actor_person_id: string
 occurred_at: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFormRulesSnapshot".
+ */
+export interface CrmFormRulesSnapshot {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id?: string
+contact_requirement: ("phone" | "email" | "either")
+/**
+ * @maxItems 5
+ */
+required_fields: []|[("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16862,6 +17008,7 @@ name: Text
 state: RecordState
 expected_version?: PositiveInt
 presentation?: DisciplinePresentationPatch
+deactivation_proof?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16916,6 +17063,7 @@ discipline_id: string
 state: RecordState
 expected_version?: PositiveInt
 presentation?: CenterDisciplinePresentationPatch
+deactivation_proof?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19089,6 +19237,7 @@ routing_history?: CrmApplicationRouting[]
  */
 phone_matches?: CrmPhoneMatch[]
 phone_matches_truncated?: boolean
+contact_intake?: CrmContactIntakeView
 }
 }
 /**
@@ -19254,7 +19403,40 @@ values: {
 discipline_id?: (string | null)
 name?: Text
 state?: RecordState
+deactivation_effects?: SettingsDeactivationEffects
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsDeactivationEffects".
+ */
+export interface SettingsDeactivationEffects {
+blocking: boolean
+counts: {
+sessions: Count
+reservations: Count
+requests: Count
+waitlist: Count
+offers: Count
+classes: Count
+programs: Count
+products: Count
+sales: Count
+}
+/**
+ * @maxItems 200
+ */
+items: {
+category: ("sessions" | "reservations" | "requests" | "waitlist" | "offers" | "classes" | "programs" | "products" | "sales")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+blocking: boolean
+}[]
+proof: string
+truncated: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19268,6 +19450,7 @@ values: {
  */
 discipline_id?: string
 state?: RecordState
+deactivation_effects?: SettingsDeactivationEffects
 }
 }
 /**
@@ -19682,6 +19865,66 @@ values: {
 agreement_id: string
 source_content_hash: string
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settings_update_v1".
+ */
+export interface ManagementProjectionSettingsUpdateV1 {
+operation: "settings_update_v1"
+values: {
+scope: "center"
+work_calendar: SettingsCenterWorkCalendarValue
+work_calendar_impact: SettingsWorkCalendarImpact
+settings_version: SettingsVersion
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CenterWorkCalendar".
+ */
+export interface CenterWorkCalendar {
+/**
+ * @maxItems 100
+ */
+rules: {
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+}[]
+/**
+ * @maxItems 200
+ */
+closures: {
+starts_at: string
+ends_at: string
+reason: string
+}[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsWorkCalendarImpact".
+ */
+export interface SettingsWorkCalendarImpact {
+count: Count
+truncated: boolean
+/**
+ * @maxItems 200
+ */
+sessions: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+starts_at: Instant
+ends_at: Instant
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21671,6 +21914,7 @@ key: {
  */
 application_id?: string
 person_id?: (string | null)
+include_contact_intake?: boolean
 }
 }
 /**
@@ -21827,6 +22071,7 @@ export interface ManagementSelectorDisciplineSaveV1 {
 operation: "discipline_save_v1"
 key: {
 discipline_id?: (string | null)
+include_deactivation_effects?: boolean
 }
 }
 /**
@@ -21840,6 +22085,7 @@ key: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+include_deactivation_effects?: boolean
 }
 }
 /**
@@ -22050,6 +22296,7 @@ export interface ManagementSelectorSettingsUpdateV1 {
 operation: "settings_update_v1"
 key: {
 scope: SettingsScope
+work_calendar?: SettingsCenterWorkCalendarValue
 }
 }
 /**
@@ -22636,6 +22883,7 @@ person_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+include_delegation?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22667,6 +22915,7 @@ consumed_deficit: Count
 policy_version_ids: string[]
 override_version: (PositiveInt | null)
 subscriber_number?: (SubscriberNumber | null)
+personal_override_enabled?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23138,6 +23387,29 @@ crm_local_tags?: CrmTag[]
 map_url?: (string | null)
 directions?: string
 website_url?: (string | null)
+work_calendar?: ({
+/**
+ * @maxItems 100
+ */
+rules: {
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+}[]
+/**
+ * @maxItems 200
+ */
+closures: {
+starts_at: string
+ends_at: string
+reason: string
+}[]
+} | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23425,6 +23697,44 @@ crm_pipeline?: CrmPipelineConfiguration
 map_url?: (string | null)
 directions?: string
 website_url?: (string | null)
+personal_negative_limits_enabled?: boolean
+/**
+ * @maxItems 100
+ */
+application_form_rules?: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+contact_requirement: ("phone" | "email" | "either")
+/**
+ * @maxItems 5
+ */
+required_fields: []|[("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]|[("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level"), ("interest" | "message" | "partner_name" | "mode" | "level")]
+}[]
+work_calendar?: ({
+/**
+ * @maxItems 100
+ */
+rules: {
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+}[]
+/**
+ * @maxItems 200
+ */
+closures: {
+starts_at: string
+ends_at: string
+reason: string
+}[]
+} | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23474,18 +23784,18 @@ organization_version: SettingsVersion
  * via the `definition` "PreparationSources".
  */
 export interface PreparationSources {
-availability_templates: {
+availability_templates: CenterPreparationSource
+package_templates: CenterPreparationSource
+program_templates?: CenterPreparationSource
+work_calendar?: CenterPreparationSource
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CenterPreparationSource".
+ */
+export interface CenterPreparationSource {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
-}
-package_templates: {
-kind: ("system_default" | "organization_copy" | "center_local")
-organization_version?: SettingsVersion
-}
-program_templates?: {
-kind: ("system_default" | "organization_copy" | "center_local")
-organization_version?: SettingsVersion
-}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23550,7 +23860,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: SettingsFieldKey
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline" | "lesson_impact_authorize" | "crm_intake_submit" | "center_work_calendar_contains")
 writable: boolean
 }
 /**

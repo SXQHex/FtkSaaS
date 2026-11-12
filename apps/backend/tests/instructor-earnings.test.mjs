@@ -211,6 +211,8 @@ async function earningsFixture(t){
  });
  await t.test('acknowledged negative-limit protection survives paid closure and earns the frozen fee',async()=>{
   const p=await linked('earning-protected'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
+  const oq={org_id:org,scope:'organization'},sv=await must(owner,'settings_get_v1',oq);
+  await must(owner,'settings_update_v1',{...oq,expected_version:sv.version,patch:{personal_negative_limits_enabled:true}},key());
   const change={kind:'negative_limit',person_id:p.p,discipline_id:discipline,allowed_negative_credits:0};
   const approval=await must(owner,'reservation_impact_preview_v1',scope({change,reason:'Protect existing paid obligation'}));assert(approval.affected.some(x=>x.reservation_id===rv));
   await mut('reservation_impact_apply_v1',{preview:token(approval.preview),accepted_reservation_ids:approval.affected.map(x=>x.reservation_id)});

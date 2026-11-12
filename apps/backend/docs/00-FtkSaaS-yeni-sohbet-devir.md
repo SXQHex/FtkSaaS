@@ -1,5 +1,33 @@
 # Güncel kaynak ve kabul
 
+## S10 ayar davranışlarını tamamlama
+
+PR278 üzerinde frontend beklenmeden backend API/SQL/native kabulü yürütülür. Katalogv20,115 alanı39 normatif ayar grubuna bağlar; bu sayı69 grubun tamamının kapanışı değildir. Kabul edilmiş program/etkinlik/tahsilat/CRM/otomasyon ve dijital onay teslimleri yeniden iş sayılmaz. Bu paketin kesin scope/varsayılan/miras/etki sınırı [ayar rehberinde](../../../docs/settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), kalan görev [S10](remaining-work.md#s10) sahibindedir.
+
+Yeni kaynak: organizasyon kişisel negatif hak izni; yetkili form iletişim/alan gereksinimleri ve ayrı contact_intake; canlı kapatma etkisi/proof; merkez iş takvimi ve başlangıç kopyası; pending_request/unclosed_attendance iş uyarıları. Migration146 eskileri değiştirmeden eklenir. Doğrulayıcı üretimi aynı kapalı şemaların kopyalarını yalnız derleme sırasında ortaklaştırır; wire sözleşmesi veya kalite/boyut sınırı değişmez.
+
+Yerel PostgreSQL derlemesi ve doğrudan helper sorguları geçti: yedi SQL kaynağı, e-posta normalizasyonu/telefonlu eski ret, yetkili form gereksinimi, gece yarısı aralık birleşimi ve açık kapanış reddi. Bu PGlite/snapshot kabulü native Auth→Edge→RPC veya hosted kabulü değildir. Yerel tam verify502/502 (351 sözleşme/yönetişim/restore,141 CI protokolü,10 kalite) geçti; skipped/cancelled0. Kalite guard0 bulgu; belge kontrolü35 dosya/2033 bağlantı;114 API biriminde her kaynak satırı sahipli. E-posta başvurusuna yeniden telefon zorunluluğu ekleyen izole mutasyon regresyonu düşürdü; özgün sözleşme byte-for-byte geri alındı. Bağımsız incelemede açık Critical/Required0; ayrıca Edge standalone/parite2/2 geçti. Son JSON-encoded Edge yükü3.837.799 bayt ve mevcut4.000.000 sınırının altında. [Aday43107815752](https://github.com/SXQHex/FtkSaaS/actions/runs/43107815752) core/quality ve10 API shard geçti; api-5 form kurallarında VALIDATION_FAILED, api-11 iki iş uyarısı fixture’ında fazla center_id nedeniyle başarısız oldu. Düzeltme form required_fields enumuna açık string tipi ekler ve disiplin kurulumunu organizasyon kapsamından gönderir. Mevcut assertion’lar korunur; doğrudan PostgreSQL doğrulaması için geçerli/boş/bilinmeyen/yinelenen gereksinim regresyonu eklendi. Snapshot üzerinde önce ret yeniden üretildi, düzeltme sonrası beş izinli alan ve olumsuzlar geçti; organizasyon isteği de değişmeyen Edge doğrulayıcısında kabul edildi. Yerel native başlangıç slim-services artifact hazırlığında DNS/indirme hatası verdi; iki resmî mirror denendi, tam Auth→Edge→RPC kabulü burada verilmez. Düzeltmenin yerel verify502/502 ve kalite guard0 bulgusu geçti; yeni native aday, merge/deploy/hosted kabulü bekler.
+
+[Aday43112287164](https://github.com/SXQHex/FtkSaaS/actions/runs/43112287164) core/quality ve11 API shard geçti; yalnız api-5 yeni e-posta başvurusunun create_candidate isteğinde reddedildi. PostgreSQL bigint sürümü node-postgres tarafından metin döndürülüyor; kapalı Edge sözleşmesi expected_version için integer ister. Aynı gerçek pg parser ve generated Edge doğrulayıcısıyla metin ret/sayı kabulü yeniden üretildi. Testin DB okuması mevcut CRM kabul testleri gibi version::int projeksiyonuna düzeltildi; API/SQL davranışı ve tüm assertion’lar korundu. Düzeltme sonrası yerel verify502/502, skipped/cancelled0; kalite guard0 bulgu, belge kontrolü35 dosya/2033 bağlantı ve bağımsız dar inceleme Required0 geçti. Bu kaynak için yeni native aday kabulü bekler.
+
+## S08 son kapanış kabulü — 11 Kasım 2026
+
+Aktif dal `feature/backend-s08-closure`, taban main `0b93acc54b5a68e213b57cdff9a6af65f4c54d5c` (PR277). Aday43088285756, aynı main source43092122433/merge43092122389 ve development43092191301 success doğrulandı. Bu kayıt S08 kapanış hazırlığıdır; görev henüz kapalı değildir.
+
+Eski özel recovery projesinin tarihsel kesin kimliği ve deployment'ı emekli kaynak kaydından bulundu. Aynı Vercel team'inde project `prj_8hDFgbUopkdTBUEXIA7yJbM17VRA`, deployment `dpl_BBsyDkw5QMumw7w3rxV1JD5Ya9mW` ve proje environment metadata GET'leri404/not_found verdi; eski acceptance hostname GET410 döndü. Aktif team proje listesinde yalnız mevcut ftksaas-web ve legacy studiosaas var; bu kabulde proje/deployment/env silinmedi. Aktif frontend env envanterinde recovery/harness Preview kaydı yok. Eski projenin share/Preview erişimi artık kullanılabilir bir hedefe bağlı değildir; sağlayıcının dahili backup imhası iddia edilmez. Tarihsel beş public-ingress anahtarı halen mevcut public başvuru tüketicisinin adlarıdır; S08 temizliği gerekçesiyle çalışan S14 sırları silinmez.
+
+Canlı Supabase'te emekli özel Auth RPC/fence/trigger ve intent/recovery tabloları yok. Native girişle beş emekli Edge operasyonu404/NOT_FOUND verdi; probe'un açtığı session local logout204 ile kapatıldı. Public native settings google=true/phone=false döndürdü. Backend-v1 verify_jwt=true; canlı Edge envanteri yalnız backend-v1, resend-webhook ve personal-calendar içeriyor.
+
+Ek gerçek recovery kabulünde ilk proof e-postası delivered oldu. Çok erken ikinci istek429 ile reddedildi ve yeni posta oluşmadı; süre kısaltılmadı. Bekleme sonrası normal yeni recover200, önceki proof303/otp_expired ve auth code yokluğu doğrulandı. Yeni teslim edilen proof ise izinli callback ve kendi PKCE verifier'ıyla200 verdi; native user okuması beklenen test kimliğini doğruladı. Parola değiştirilmedi; yeni recovery session local logout204 ile kapatıldı. Önceki doğal expiry ve gerçek parola restore kanıtları PR277 kaydında korunur.
+
+Önce Playwright1.64.1 ile sistem Chromium denendi: process-singleton socket Operation not permitted nedeniyle açılamadı. Aynı pinli Headless Shell indirmesi geçersiz ZIP verdi; iki resmî mirror denemesi de BadZipFile/HTTPError ile başarısız oldu. Kaynak/CI/paket sürümü ve TLS güvenliği değiştirilmedi. Yalnız bu engellenen canlı kontrol Chrome eklentisiyle sürdürüldü.
+
+Canonical uye.fethiyetango.com üzerinde mevcut Google kimliğiyle giriş, kullanıcının tamamladığı gerçek TOTP sonrasında korumalı çalışma alanına ve /account ekranına ulaştı. Hesap/oturum/güvenlik geçmişi, doğrulanmış TOTP ve mevcut Google bağı okundu; ikinci bağlama düğmesi görünmedi. Native readback mevcut Google principal'ında tek kimlik ve yeni AAL2 session doğruladı. Yalnız bu yeni kabul session'ı hesap ekranındaki current revoke ve açık onayla kapatıldı; login'e dönüş ve /account tekrar açıldığında giriş kapısı doğrulandı. Eski diğer session'lar ve kullanıcının TOTP faktörü korundu. Süresi dolmuş recovery link'inin tarayıcıdaki sonuç ekranı kesin gözlenmedi; native otp_expired kanıtı ekran kabulü diye sunulmaz.
+
+Yan origin ftksaas-web.vercel.app üzerinde başlatılan Google denemesi canonical origin'e dönüşte callback hatası verdi; bu deneme başarı sayılmadı. Frontend appOrigin/cookie sınırı ayrı consumer bulgusudur; [XREQ-040](../../../docs/requests.md#xreq-040-google-girişinde-origin-ve-pkce-dönüşü) ile devredildi. Frontend kodu değiştirilmedi.
+
+**Kapanış engeli:** Gerçek eski oturumda yanlış nonce ve kullanılmadan doğal süresi dolmuş nonce reddi henüz ayrı kanıtlanmadı. Eksik ve tüketilmiş nonce sonuçları bu iki senaryonun yerine geçmez. Eski Asistant checkpoint refresh'i400/refresh_token_not_found verdi; yeni oturumun eskiymiş gibi kullanılması veya zaman/TTL değiştirme yapılmadı. Normal native girişle yeni checkpoint açıldı; native session projeksiyonu created_at=11 Kasım20:39:37.972 UTC doğruladı. Gerçek nonce postası20:39:55.984 UTC delivered; hiç tüketilmedi. Yeniden deneme en erken12 Kasım20:40:38 UTC (Türkiye23:40:38), önce aynı session'ın refresh ve gerçek yaş okumasıyla yapılır. Yeni nonce istemeden önce mevcut proof'un doğal expiry reddi ve ayrı yanlış nonce reddi denenir; beklenmeyen parola yazımı için mevcut restore güvenliği korunur. Bu tek session kabul devamı için açık bırakıldı; private checkpoint ignored .dev içindedir. Sonunda local logout gerekir. Talep eden frontend'in XREQ-002 son onayı ve kendi ek ekran kabulleri devredilmiş kalır; S08 tam kapalı değildir.
+
 ## S10 CRM ve S08 native kabul paketi
 
 Aktif dal `feature/backend-s10-s08-completion`;11 Kasım senkronize main tabanı `f1bfddca43344a07a70168d3a98c39a45772a1ba` (PR274). Aynı main [source42634955004](https://github.com/SXQHex/FtkSaaS/actions/runs/42634955004), [merge42634955008](https://github.com/SXQHex/FtkSaaS/actions/runs/42634955008) ve [development42635039352](https://github.com/SXQHex/FtkSaaS/actions/runs/42635039352) completed/success doğrulandı. Kullanıcının tamamlandı dediği PR273 teslimi önceki main `1cefc2fe862366d9164236a0659e84aa1fd59f94` ve development42606291290 ile doğrulandı. PR277 head `6339489dc2311a4619d3b4b783c7724abaf8b9e4` için [aday43080775850](https://github.com/SXQHex/FtkSaaS/actions/runs/43080775850) clean/core işi130732579980 başarısız oldu:145 migration temiz DB'ye uygulandıktan sonra docs-check, XREQ-039 işletme bağlantısındaki `İ`/`i` Unicode anchor farkını reddetti. Aynı kontrol yerelde kırmızı üretildi; settings rehberine linkin mevcut hedefini koruyan açık sabit anchor eklendi. Kontrol/kalite eşiği veya backend davranışı değiştirilmedi. Düzeltme sonrası aynı docs-check35 dosya/2007 yerel bağlantıyla ve kalite10/10/0 bulguyla geçti; bağımsız dar inceleme Required0. Yeni aday/main/deploy kabulü bekler.
@@ -335,29 +363,29 @@ Tablo tam grup envanteridir; bütün alt alanların runtime teslimi değildir. S
 | S15 | 4 | Üye paylaşım tercihleri ve katılımcı projeksiyonu | Ayrıntılı amaç/metin izin geçmişi bütünlüğü O08/S10. |
 | S16 | 0 | Mevcut hesap/org lifecycle komutları | Veri kopyası ve doğrulanmış imha O08; tamamlandı uydurulmaz. |
 | S17 | 0 | Kendi güvenlik geçmişi; alan seçmeli reset | Her güvenilen cihaz/cache akışı teslim edilmiş sayılmaz; S08/S10. |
-| M01 | 4 | Merkez komutları ve kimlik/iletişim tercihleri | Harita/ulaşımın bütün alt alanları mevcut DTO değil; S10. |
-| M02 | 1 | Merkez timezone/availability; hazırlık şablonları | Geçmiş seans değişmez; bütün takvim şablonları S10. |
+| M01 | 7 | Merkez komutları ve kimlik/iletişim tercihleri | Harita/ulaşım/web alanları PR277 kaynağında; hosted görünürlük kabulü S10. |
+| M02 | 2 | Merkez timezone/availability; hazırlık şablonları | Geçmiş seans değişmez; bütün takvim şablonları S10. |
 | M03 | 0 | Oda/kaynak/kapasite komutları | Kaynak varsayılanları domain API; bütün görünüm seçenekleri S10. |
-| M04 | 0 | Merkez disiplin komutları | Sıra/simge/renk gibi eksik alt alanlar S10; yeni global katalog V2. |
+| M04 | 0 | Merkez disiplin komutları | Sunum alanları mevcut; kapatma etki okuyucusu aktif S10 paketinde; global katalog V2. |
 | M05 | 1 | Merkez rol/grant komutları | Sekiz gerçek writer izni ve staff-only kapasite istisnası hazırlığı; native teslim/kabul bu pakette. Kalan yerel sınır/rol güvenlik tercihleri S10/O04. |
-| M06 | 1 | Program/seans komutları; süre hazırlığı | Her biçim/tekrar/özel gün defaultu hazır değil; S10. |
+| M06 | 2 | Program/seans komutları; süre hazırlığı | Program hazırlıkları mevcut; ayrı iş takvimi ve açık özel gün etkisi aktif S10 paketinde. |
 | M07 | 0 | Talep/rezervasyon/bekleme ve pencere politikaları | Domain politika yayını; paket şablonu bu gruptan çıkarıldı. Eksik tercihler S10. |
 | M08 | 0 | Borç/negatif hak/kişisel limit komutları | Domain politika/etki kapıları; serbest generic ayar yok; S10. |
 | M09 | 0 | Yoklama/gerçekleşme/düzeltme komutları | Yeni yoklama default/gösterim alt alanları S10. |
 | M10 | 1 | Paket hazırlığı ve ürün/satış komutları | Her indirim/fiyat defaultu hazır değil; S10/P03. |
-| M11 | 0 | Tahsilat/iade/düzeltme komutları | Banka/finans özet defaultları tam değil; S10. |
-| M12 | 1 | Eğitmen anlaşması komutları | Anlaşma default/şablon kataloğu tam değil; S10/P04. |
-| M13 | 0 | Etkinlik komutları | Yeni etkinlik defaultları tam değil; S10/P12–P13. |
+| M11 | 1 | Tahsilat/iade/düzeltme komutları | Kapalı tahsilat hazırlığı mevcut; desteklenmeyen banka entegrasyonu etkin gösterilmez. |
+| M12 | 1 | Eğitmen anlaşması komutları | Anlaşma hazırlık/resolve teslimi mevcut; hakediş domain kapıları ve hosted kabul izi korunur. |
+| M13 | 1 | Etkinlik komutları | Kapalı event hazırlığı ve gerçek source/version resolve mevcut; etkinlik domain kapıları korunur. |
 | M14 | 6 | Merkez hatırlatma ayarları | P15 default/override kapıları; her şablon/alıcı seçeneği hazır değil; S10. |
 | M15 | 0 | Belge yükle/yayın/etki/onay | S13 hosted kapalı; metin/dil/şablon alt alanları S10. |
 | M16 | 3 | Public profil/yayın/başvuru komutları | Gerçek widget/hostname/action S14/P07. |
-| M17 | 0 | Plan kapılı iş otomasyonu komutları | P16 worker kanıtı korunur; hazır şablon tercihleri S10. |
+| M17 | 1 | Plan kapılı iş otomasyonu komutları | P16 worker kanıtı korunur; hazır şablon tercihleri S10. |
 | M18 | 1 | Merkez rapor şablonları ve export | S11 hosted kapalı; bütün rapor tasarım seçenekleri S10. |
 | M19 | 1 | Merkez import şablonları ve mapping | S12 hosted kapalı; yeni paylaşım seçenekleri S10. |
 | M20 | 0 | Mevcut policy override ve alan seçmeli reset | Bütün gruplara genellenmiş miras/yayın ekranı/APIsi yok; S10. |
-| M21 | 0 | CRM alım/lead/takip/atama komutları | Yeni aşama/alan/sıra ayar kataloğu tam değil; S10/P05–P11. |
+| M21 | 2 | CRM alım/lead/takip/atama komutları | Yeni aşama/alan/sıra ayar kataloğu tam değil; S10/P05–P11. |
 | M22 | 0 | Canlı role/grant/management ve ayar history | Her ayar grubunun alan bazlı izin/denetimi S10/O04. |
-| O01 | 15 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur; S10. |
+| O01 | 18 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur; S10. |
 | O02 | 1 | Ortak politika yayını ve availability hazırlığı | Kopya canlı miras değildir; bütün alanların lock/override desteği S10. |
 | O03 | 1 | Org/merkez görev ve izin komutları | Sekiz destekli izin için açık hazırlık vardır; yeni genel toplu grant motoru yoktur. Kalan rol güvenlik tercihleri S10/O04. |
 | O04 | 1 | Native MFA ve organization security_policy ortak dispatch/keşif kapısı | Kaynak/SQL regresyonu bu pakette; yeni native/main/hosted kabulü ayrı bekler. Genel ikinci onay yoktur. |
@@ -365,18 +393,18 @@ Tablo tam grup envanteridir; bütün alt alanların runtime teslimi değildir. S
 | O06 | 1 | Kişisel tercihlerden ayrı regional defaults ve normal org/public bağlamı | Gerçek HTTP regional tüketimi tamam; bildirim dili XREQ-033 frontend sorumluluğunda, belge dil/fallback tüketimi S10’da açık. |
 | O07 | 7 | Org hatırlatma ve merkez override tercihleri | P14/P15 teslim kanıtı korunur; tüm gönderici/şablon alanları S10. |
 | O08 | 0 | Org belge ve sürümlü gereksinim komutları | S13 hosted kapalı; her kurumsal şablon/dil/yerel kilit S10. |
-| O09 | 0 | Ortak CRM inbox/route/review komutları | Yeni ortak aşama/alan ayarları tam değil; S10/P05–P11/B02. |
+| O09 | 3 | Ortak CRM inbox/route/review komutları | Yeni ortak aşama/alan ayarları tam değil; S10/P05–P11/B02. |
 | O10 | 1 | Paket hazırlığı; ürün/satış komutları | Yeni şablon ürün yayını değildir; bütün kilit/defaultlar S10. |
-| O11 | 0 | Katılım/negatif hak/pencere policy komutları | Geçmiş rezervasyon koruması ayrı; tüm ortak yerel sınırlar S10. |
-| O12 | 0 | Finans ve merkezler arası hesaplaşma komutları | Banka/alıcı/özet ayar kataloğu tam değil; S10/B03. |
-| O13 | 0 | Otomasyon komutları/worker | Ortak hazır iş şablonları tam değil; S10/P16. |
+| O11 | 1 | Katılım/negatif hak/pencere policy komutları | Geçmiş rezervasyon koruması ayrı; tüm ortak yerel sınırlar S10. |
+| O12 | 1 | Finans ve merkezler arası hesaplaşma komutları | Banka/alıcı/özet ayar kataloğu tam değil; S10/B03. |
+| O13 | 1 | Otomasyon komutları/worker | Ortak hazır iş şablonları tam değil; S10/P16. |
 | O14 | 2 | Org rapor/import şablonları | Canlı tüketici yetkisi paylaşım izninden ayrıdır; kalan seçenekler S10. |
 | O15 | 0 | Hazır sağlayıcı backend ingress/worker | Meta/Google gerçek kurulum kullanıcı kararıyla erteli; P08/P09/S10. |
 | O16 | 0 | Üye paylaşımı ve public alan seçimi | Org amaç/metin/alıcı ayarlarının bütünü hazır değil; S10/O08. |
 | O17 | 0 | SaaS dönem/plan/yenileme komutları; fatura O01 | S16 kaynak kapalı; harici otomatik ödeme sağlayıcısı açılmaz; S10. |
-| O18 | 1 | Yeni merkeze tek sefer program süresi kopyası | Bütün takvim/çalışma günü defaultları mevcut değil; S10. |
+| O18 | 3 | Yeni merkeze tek sefer program süresi kopyası | Bütün takvim/çalışma günü defaultları mevcut değil; S10. |
 | O19 | 1 | agreement_templates ve mevcut anlaşma/ücret model komutları | Gerçek kaynak/sürüm hazırlığı ve açık writer ayrıdır; kalan yerel ücret sınırları S10/P04. |
-| O20 | 0 | Etkinlik komutları | Ortak event default/şablon kataloğu eksik; S10/P12–P13. |
+| O20 | 1 | Etkinlik komutları | Ortak event default/şablon kataloğu eksik; S10/P12–P13. |
 | O21 | 0 | Settings history/reset ve domain sürümlü yayın | Bütün ayarlarda ileri yürürlük/taslak/rollback yok; S10. |
 | P01 | 4 | Uygulama/destek/bakım metni tercihleri | Hazır dil/logo/default kataloglarının bütünü yok; S10. |
 | P02 | 0 | Native Auth config ve hesap güvenlik komutları | Teknik Auth motoru işletim alanı; genel platform ayar UI/API yok; S08/O04. |

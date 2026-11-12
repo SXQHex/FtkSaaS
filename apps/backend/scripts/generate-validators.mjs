@@ -15,6 +15,28 @@ function validationSchema(schema){
  return result;
 }
 for(const [name,schema] of Object.entries(contract.$defs))contract.$defs[name]=validationSchema(schema);
+// Intern identical nested object/array schemas before compilation. Ajv shares
+// named refs; inline copies otherwise generate one validator per scope. Only
+// schema positions are visited, so user property names and enum data stay data.
+const nestedMaps=['properties','patternProperties','$defs','definitions','dependentSchemas'];
+const nestedLists=['allOf','anyOf','oneOf','prefixItems'];
+const nestedSingles=['items','contains','not','if','then','else','additionalProperties','unevaluatedProperties','propertyNames'];
+function children(schema,visit){
+ if(!schema||typeof schema!=='object'||Array.isArray(schema))return schema;
+ const out={...schema};
+ for(const key of nestedMaps)if(out[key])out[key]=Object.fromEntries(Object.entries(out[key]).map(([name,value])=>[name,visit(value)]));
+ for(const key of nestedLists)if(out[key])out[key]=out[key].map(visit);
+ for(const key of nestedSingles)if(out[key]&&typeof out[key]==='object')out[key]=visit(out[key]);
+ return out;
+}
+const occurrences=new Map();
+const count=schema=>{children(schema,count);if(schema&&typeof schema==='object'&&!Array.isArray(schema)&&(schema.type==='object'||schema.type==='array')){const key=JSON.stringify(schema);if(key.length>200)occurrences.set(key,(occurrences.get(key)??0)+1);}return schema;};
+for(const schema of Object.values(contract.$defs))count(schema);
+const shared=new Map([...occurrences].filter(([,count])=>count>1).map(([key],i)=>[key,'__shared_validation_'+i]));
+for(const name of shared.values())assert(!Object.hasOwn(contract.$defs,name),'Internal validation name collision');
+function intern(schema){const name=shared.get(JSON.stringify(schema));return name?{$ref:'#/$defs/'+name}:children(schema,intern);}
+for(const [name,schema] of Object.entries(contract.$defs))contract.$defs[name]=intern(schema);
+for(const [key,name] of shared)contract.$defs[name]=children(JSON.parse(key),intern);
 // Share referenced validators instead of duplicating them in every operation.
 // Validation rules and standalone (no runtime compiler) execution stay unchanged.
 const ajv=new Ajv({strict:false,allErrors:false,messages:false,inlineRefs:false,code:{source:true,esm:true,optimize:2}});addFormats(ajv);ajv.addSchema(contract,'contract');const exports={};

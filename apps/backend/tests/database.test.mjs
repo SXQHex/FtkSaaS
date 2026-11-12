@@ -116,3 +116,17 @@ test('real PostgreSQL physical baseline and D/U integrity',async t=>{
  await db.query('rollback');
  }finally{await db.query('rollback');await db.end();}
 });
+
+
+test('S10 nonempty public form requirements pass native validation and reject unknown or duplicate choices',async()=>{
+ const db=await connect();
+ try{
+  const schema=(await db.query("select f->'schema' schema from jsonb_array_elements(private.frontend_settings_fields()) f where f->>'scope'='organization' and f->>'key'='application_form_rules'")).rows[0].schema;
+  const valid=async rules=>(await db.query('select private.frontend_setting_valid($1,$2) accepted',[JSON.stringify(rules),schema])).rows[0].accepted;
+  const rule={form_id:newUuidV7(),contact_requirement:'email',required_fields:['level']};
+  assert.equal(await valid([rule]),true);
+  assert.equal(await valid([{...rule,required_fields:[]}]),true);
+  for(const field of ['interest','message','partner_name','mode','level'])assert.equal(await valid([{...rule,required_fields:[field]}]),true);
+  for(const required_fields of [['unknown'],['level','level'],[1],[null]])assert.equal(await valid([{...rule,required_fields}]),false);
+ }finally{await db.end();}
+});

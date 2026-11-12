@@ -3,7 +3,7 @@ import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
 // Each acceptance root owns a tenant and only the prerequisites it consumes.
-export async function preparationFixture({schedule=false,templates=false,studentUser=false,studentMembership=false,session=false,roomOnly=false}={}){
+export async function preparationFixture({schedule=false,templates=false,studentUser=false,studentMembership=false,session=false,roomOnly=false,workCalendar}={}){
  const started=performance.now();
  const {platform,plan}=await fixturePlatform(),owner=await authUser('st03-owner');
  const student=studentUser?await authUser('st03-student'):undefined;
@@ -33,6 +33,7 @@ export async function preparationFixture({schedule=false,templates=false,student
   const pay=await api('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'SYNTHETIC ST03',occurred_at:new Date().toISOString()});await api('saas_payment_verify_v1',{payment_id:pay.primary_id,accepted:true},platform);
   if(schedule||templates)discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Yoga',state:'active'},key())).primary_id;
   const patch={program_duration_minutes:45};
+  if(workCalendar!==undefined)patch.work_calendar=workCalendar;
   if(templates){
    packageTemplate={key:'credit',name:'Explicit credits preparation',discipline_id:discipline,terms:{name:'Yoga · prepared credits',kind:'credits',booking_mode:'flexible',credits:4,price_minor:'400',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'credit_ratio'},quota:null},start_date:day(1),end_date:day(61)};
    Object.assign(patch,{availability_templates:[availabilityTemplate],package_templates:[packageTemplate]});
