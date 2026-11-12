@@ -3,7 +3,7 @@
 const lanes=['p01','p05','p06','p07','p07_privacy'];
 const keys=['availability',...lanes.map(lane=>'worker:'+lane),'jobs:stuck','jobs:exhausted','jobs:integrity','backup'];
 const validIncident=incident=>{
- const reason=incident.key==='availability'?['unavailable']:incident.key.startsWith('worker:')?['stale','claim_error','job_error']:incident.key==='backup'?['failed','missing','old']:[incident.key.slice(5)];
+ const reason=incident.key==='availability'?['unavailable']:incident.key.startsWith('worker:')?['stale','claim_error','job_error']:incident.key==='backup'?['failed','missing','old','unavailable']:[incident.key.slice(5)];
  return reason.includes(incident.reason)&&incident.severity===(incident.key==='jobs:integrity'?'critical':'error');
 };
 const invalid=()=>{throw new Error('INVALID_MONITOR_OBSERVATION_OR_STATE');};
@@ -22,6 +22,7 @@ export function validateMonitorEvent(event){
 
 export function evaluateMonitor(previous,observation){
  if(!observation||typeof observation.serviceAvailable!=='boolean')invalid();
+ if(observation.telemetryAvailable!==undefined&&typeof observation.telemetryAvailable!=='boolean')invalid();
  const now=timestamp(observation.checkedAt),at=new Date(now).toISOString();
  const prior=previous??{format:1,checkedAt:null,lastProbeAt:null,availabilityFailures:0,active:[]};
  if(prior.format!==1||!Array.isArray(prior.active)||!Number.isSafeInteger(prior.availabilityFailures)||prior.availabilityFailures<0||prior.availabilityFailures>2)invalid();
@@ -46,9 +47,14 @@ export function evaluateMonitor(previous,observation){
  else if(availabilityFailures===0||lastProbeAt===null||now-timestamp(lastProbeAt)>=300000){availabilityFailures=Math.min(2,availabilityFailures+1);lastProbeAt=at;}
  if(availabilityFailures>=2)alarm('availability','unavailable');
 
- if(!Array.isArray(observation.workers)||observation.workers.length!==lanes.length)invalid();
+ const telemetryMissing=observation.telemetryAvailable===false;
+ if(telemetryMissing){
+  if(observation.serviceAvailable||observation.workers!==null||observation.jobs!==null)invalid();
+  for(const incident of old.values())if(incident.key.startsWith('worker:')||incident.key.startsWith('jobs:'))active.push({...incident});
+ }
+ if(!telemetryMissing&&(!Array.isArray(observation.workers)||observation.workers.length!==lanes.length))invalid();
  const seen=new Set();
- for(const worker of observation.workers){
+ for(const worker of observation.workers??[]){
   if(!worker||!lanes.includes(worker.lane)||seen.has(worker.lane)||typeof worker.enabled!=='boolean'||!['not_started','running','idle','succeeded','claim_error','job_error'].includes(worker.lastStatus))invalid();
   seen.add(worker.lane);
   const finished=worker.lastFinishedAt===null?null:timestamp(worker.lastFinishedAt);
@@ -59,10 +65,12 @@ export function evaluateMonitor(previous,observation){
   if(finished===null||now-finished>120000)alarm(key,'stale');
   else if(['claim_error','job_error'].includes(worker.lastStatus))alarm(key,worker.lastStatus);
  }
- if(!observation.jobs)invalid();
- for(const kind of ['stuck','exhausted','integrity'])if(count(observation.jobs[kind])>0)alarm('jobs:'+kind,kind,kind==='integrity'?'critical':'error');
+ if(!telemetryMissing){
+  if(!observation.jobs)invalid();
+  for(const kind of ['stuck','exhausted','integrity'])if(count(observation.jobs[kind])>0)alarm('jobs:'+kind,kind,kind==='integrity'?'critical':'error');
+ }
  const backup=observation.backup;
- if(!backup||!['usable','failed','missing'].includes(backup.state))invalid();
+ if(!backup||!['usable','failed','missing','unavailable'].includes(backup.state))invalid();
  const usable=backup.usableAt===null?null:timestamp(backup.usableAt);
  if(usable!==null&&usable>now)invalid();
  if(backup.state==='usable'&&usable===null)invalid();

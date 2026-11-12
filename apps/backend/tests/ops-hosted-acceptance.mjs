@@ -151,6 +151,7 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
 
 import {evaluateMonitor} from '../scripts/ops-monitor.mjs';
 import {runOperatorMonitor as runMonitor} from '../scripts/ops-monitor-outbox.mjs';
+import {readMonitorTelemetry,collectMonitorObservation,probeServices} from '../scripts/ops-monitor-collector.mjs';
 const runOperatorMonitor=args=>runMonitor({...args,clock:()=>Date.parse(args.observation.checkedAt)});
 
 const start=Date.parse('2026-11-12T12:00:00Z');
@@ -297,4 +298,77 @@ test('O02 provider error text is not persisted and an unsent alarm holds its rec
  const sent=[];
  await runOperatorMonitor({...f,observation:snapshot(1),send:async input=>{sent.push(input.payload.subject);return {state:'retryable'};}});
  assert.equal(sent.length,1);assert.equal(f.read().outbox.length,2);assert(!JSON.stringify(f.read()).includes('private-provider-sentinel'));
+});
+test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evidence survives an idle tick',async()=>{
+ const db=await connect(),password=randomBytes(24).toString('hex'),ids=[key(),key()],providerEvent=key(),providerReference=key();let client,org,health,eventIds=[],roleTouched=false;
+ try{
+  assert.equal((await db.query("select rolpassword is null empty from pg_authid where rolname='ftk_ops_monitor'")).rows[0]?.empty,true);
+  await db.query(`alter role ftk_ops_monitor password '${password}'`);roleTouched=true;
+  const url=new URL(context().env.DB_URL);url.username='ftk_ops_monitor';url.password=password;client=new pg.Client({connectionString:url.href});await client.connect();
+  assert.equal((await client.query('show default_transaction_read_only')).rows[0].default_transaction_read_only,'on');
+  const read=()=>readMonitorTelemetry(client);
+  const baseline=await read();assert.equal(baseline.workers.length,5);
+  for(const sql of ['select * from core.people','select * from auth.users','select * from private.ops_worker_health','select * from private.ops_integrity_events',"call private.ops_run('p01')"] )await assert.rejects(client.query(sql),/permission denied/);
+  await assert.rejects(db.query('select ops_monitor.snapshot()'),/FORBIDDEN/);
+  const {platform,plan}=await fixturePlatform(),owner=await authUser('o02-monitor-owner');const account=await must(owner,'account_get_v1');
+  org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic monitor',initial_plan_id:plan},key())).primary_id;
+  health=(await db.query("select last_status,last_error_code,last_finished_at from private.ops_worker_health where lane='p01'")).rows[0];
+  await db.query("insert into core.outbox_jobs(id,org_id,kind,dedupe_key,state,attempts,lease_until) values($1::uuid,$3,'p07.boundary',$1::uuid::text,'running',1,clock_timestamp()-interval '1 minute'),($2::uuid,$3,'p07.boundary',$2::uuid::text,'failed',3,null)",[...ids,org]);
+  const beforeEvents=(await db.query("select id from private.ops_integrity_events where lane='p01'")).rows.map(row=>row.id);
+  await db.query("update private.ops_worker_health set last_status='job_error',last_error_code='INTEGRITY_VIOLATION',last_finished_at=clock_timestamp() where lane='p01'");
+  eventIds=(await db.query("select id from private.ops_integrity_events where lane='p01'")).rows.map(row=>row.id).filter(id=>!beforeEvents.includes(id));assert.equal(eventIds.length,1);assert.equal(eventIds[0][14],'7');
+  await db.query("update private.ops_worker_health set last_status='idle',last_error_code=null,last_finished_at=clock_timestamp() where lane='p01'");
+  const result=await read();assert.equal(result.jobs.stuck,baseline.jobs.stuck+1);assert.equal(result.jobs.exhausted,baseline.jobs.exhausted+1);assert.equal(result.jobs.integrity,baseline.jobs.integrity+1);
+  await db.query("insert into private.email_provider_events(event_id,provider_reference,kind,occurred_at,payload_hash) values($1,$2,'failed',clock_timestamp(),repeat('a',64))",[providerEvent,providerReference]);
+  assert.equal((await read()).jobs.exhausted,baseline.jobs.exhausted+1);
+  await db.query('update core.outbox_jobs set provider_reference=$1 where id=$2',[providerReference,ids[1]]);
+  assert.equal((await read()).jobs.exhausted,baseline.jobs.exhausted+1);
+  await db.query('update core.outbox_jobs set provider_reference=null where id=$1',[ids[1]]);
+  await db.query('update core.outbox_jobs set provider_reference=$1 where id=$2',[providerReference,ids[0]]);
+  assert.equal((await read()).jobs.exhausted,baseline.jobs.exhausted+2);
+  assert(!JSON.stringify(result).includes(org));assert(!JSON.stringify(result).includes(account.id));assert(!JSON.stringify(result).includes(password));
+  assert.equal((await client.query('select has_schema_privilege(current_user,\'private\',\'USAGE\') access')).rows[0].access,false);
+ }finally{
+  if(client)await client.end();
+  try{
+   if(health)await db.query("update private.ops_worker_health set last_status=$1,last_error_code=$2,last_finished_at=$3 where lane='p01'",[health.last_status,health.last_error_code,health.last_finished_at]);
+   if(eventIds.length)await db.query('delete from private.ops_integrity_events where id=any($1::uuid[])',[eventIds]);
+   await db.query('delete from private.email_provider_events where event_id=$1',[providerEvent]);
+   if(org)await db.query('delete from core.outbox_jobs where id=any($1::uuid[]) and org_id=$2',[ids,org]);
+  }finally{try{if(roleTouched)await db.query('alter role ftk_ops_monitor password null');}finally{await db.end();}}
+ }
+});
+test('O02 unavailable DB preserves open worker/job incidents while independent probes advance availability',async()=>{
+ const bad=snapshot();bad.jobs.exhausted=1;bad.workers[0].lastStatus='claim_error';const previous=evaluateMonitor(null,bad);
+ const observe=minutes=>collectMonitorObservation({readTelemetry:async()=>{throw new Error('private-db-sentinel');},readBackup:async()=>snapshot().backup,probe:async()=>true,readerTimeoutMs:1000,clock:()=>start+minutes*60000});
+ const first=evaluateMonitor(previous.state,await observe(5));assert.deepEqual(first.events,[]);
+ const second=evaluateMonitor(first.state,await observe(10));assert.deepEqual(keys(second),[['alarm','availability']]);
+ assert.equal(second.state.active.length,3);assert(!JSON.stringify(second).includes('private-db-sentinel'));
+ const healthy=await collectMonitorObservation({readTelemetry:async()=>snapshot(15),readBackup:async()=>snapshot().backup,probe:async()=>true,readerTimeoutMs:1000,clock:()=>start+15*60000});
+ const recovered=evaluateMonitor(second.state,healthy);assert.equal(recovered.events.filter(e=>e.kind==='recovery').length,3);
+});
+test('O02 collector probes use bounded HTTP with no redirects or secret-bearing URL',async t=>{
+ const {createServer}=await import('node:http');const server=createServer((req,res)=>{res.writeHead(req.url==='/ok'?200:503);res.end('synthetic');});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>server.close(resolve)));
+ const url='http://127.0.0.1:'+server.address().port;
+ assert.equal(await probeServices({targets:[{url:url+'/ok',statuses:[200]}],timeoutMs:1000}),true);
+ assert.equal(await probeServices({targets:[{url:url+'/fail',statuses:[200]}],timeoutMs:1000}),false);
+ await assert.rejects(probeServices({targets:[{url:url+'/ok?key=synthetic',statuses:[200]}],timeoutMs:1000}),/INVALID_MONITOR_PROBE/);
+ const unknown=await collectMonitorObservation({readTelemetry:()=>{throw new Error('private-db-sentinel');},readBackup:()=>{throw new Error('private-backup-sentinel');},probe:async()=>true,readerTimeoutMs:1000,clock:()=>start});
+ assert.equal(unknown.backup.state,'unavailable');assert.equal(unknown.serviceAvailable,false);
+ const alarm=evaluateMonitor(null,unknown);assert.deepEqual(keys(alarm),[['alarm','backup']]);assert(!JSON.stringify(alarm).includes('private-'));
+});
+test('O02 collector bounds hung readers and cancels them before advancing alarms',async()=>{
+ const signals=[];const hung=({signal}={})=>{signals.push(signal);return new Promise(()=>{});};let timer;
+ const result=await Promise.race([
+  collectMonitorObservation({readTelemetry:hung,readBackup:hung,probe:async()=>false,readerTimeoutMs:10,clock:()=>start}),
+  new Promise(resolve=>{timer=setTimeout(()=>resolve(null),500);})
+ ]);clearTimeout(timer);
+ assert(result);assert.equal(result.telemetryAvailable,false);assert.equal(result.backup.state,'unavailable');assert.equal(signals.length,2);assert(signals.every(signal=>signal?.aborted));
+ assert.deepEqual(keys(evaluateMonitor(null,result)),[['alarm','backup']]);
+});
+test('O02 timed-out native reader closes its dedicated connection without returning raw errors',async()=>{
+ let closed=0,rejectQuery;const client={query:()=>new Promise((_,reject)=>{rejectQuery=reject;}),end:async()=>{closed++;rejectQuery(new Error('private-connection-sentinel'));}};
+ const result=await collectMonitorObservation({readTelemetry:options=>readMonitorTelemetry(client,options),readBackup:async()=>snapshot().backup,probe:async()=>true,readerTimeoutMs:10,clock:()=>start});
+ assert.equal(result.telemetryAvailable,false);assert.equal(closed,1);assert(!JSON.stringify(result).includes('private-connection-sentinel'));
 });

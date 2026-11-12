@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f5785a950e12fbabcd1d19edb48ef74248116620992897494ac49a5a21bd18c3",
-        "reason": "Reviewed OPS exact import digest for evaluator/outbox regression additions; all pre-existing tests and isolated native unit ownership retained, no CI source acceptance changed."
+        "fingerprint": "00aa1e332b358a4ac1e90a89aef0b53ecd661a184a5b230adf9d5f3606ddbd82",
+        "reason": "Reviewed exact OPS imported-source hash for native provider ownership assertions and collector cases; migration metadata152 appended, historic151 hashes retained and application API contracts unchanged."
       }
     },
     {
@@ -1820,7 +1820,10 @@
         "apps/backend/database/settings-offer-duration-required.sql",
         "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
         "apps/backend/scripts/ops-monitor.mjs",
-        "apps/backend/scripts/ops-monitor-outbox.mjs"
+        "apps/backend/scripts/ops-monitor-outbox.mjs",
+        "apps/backend/database/ops-monitor.sql",
+        "apps/backend/supabase/migrations/20261112212500_ops_monitor.sql",
+        "apps/backend/scripts/ops-monitor-collector.mjs"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1835,8 +1838,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "838f6da8d1954b951bd1476b820f45d6dc5c2c5cecd96d5323806d8a8bb5fccb",
-        "reason": "Reviewed pure monitor debounce/corrupt-state fixes and private filesystem outbox with frozen idempotency delivery; existing sender retained. New runbook separates provider acceptance, real delivery and uninstalled external collector/scheduler."
+        "fingerprint": "b66746917f979d3a7b34729c0a27259fc508fad456122203d1058fa1fe6a05ad",
+        "reason": "Reviewed native monitor schema isolation, UUIDv7 durable integrity evidence and ownership-scoped provider failures without double-counting; collector deadlines/abort cleanup and outage-preserved incidents covered. WF20 now documents operator-only snapshot, no client API or worker grant."
       }
     }
   ]

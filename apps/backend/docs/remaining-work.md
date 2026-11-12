@@ -670,7 +670,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 - **Doğrulama senaryosu:** Hata enjeksiyonu→alarm→müdahale→toparlanma; alıcı/kanal ortam girdisi seçilmeden hazır sayılmaz.
 - **Kaynak alanı:** mevcut diagnostics/monitoring/config; runbook
 
-**Kaynak ilerlemesi:** Alarm değerlendirme çekirdeği ve olumsuz/toparlanma testleri [devirde](00-FtkSaaS-yeni-sohbet-devir.md#o02-alarm-cekirdegi) kayıtlıdır. Sürekli dış gözlemci, kalıcı gönderim kuyruğu ve gerçek alıcıya teslim/müdahale kabulü tamamlanmadan O02 kapanmaz.
+**Kaynak ilerlemesi:** Alarm değerlendirmesi, kalıcı gönderim kuyruğu ve native collector kaynağı/testleri [devirde](00-FtkSaaS-yeni-sohbet-devir.md#o02-alarm-cekirdegi) kayıtlıdır. Sürekli dış kurulum, geçmiş terminal/kritik olaylar silinmeden operatör teyidi/yeni olay ayrımı ve gerçek alıcıya alarm→müdahale→toparlanma kabulü tamamlanmadan O02 kapanmaz.
 
 <a id="o03"></a>
 ### O03 — Saklama ve imha kapsamı
