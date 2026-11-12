@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "9b590e7f144cc31d4abb9b4c47c1c85649fb54211395a564a78c11aa5f82b042",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "fafa170e720f85035b762f2aaa977f56045acd1095b2d71e91bf087552cb23b3",
+        "reason": "API envanteri iki fixtureın güncel hashleriyle eşlendi;115 birimde tam satır sahipliği ve orijinal assertionlar korunuyor; worker, timeout ve kabul protokolü değişmiyor."
       }
     },
     {
@@ -580,8 +580,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "5d375acbce220a1553daff6b578e2028436d569316ac1ade69583cfbdbba46a6",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "3dda259292af9a55f532743c4afecd5a8d63f4caadbc9193a3066a3281321cea",
+        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
       }
     },
     {
@@ -673,8 +673,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "197573275dea503d1e5289bb8e52aa15ef1dd0113b9f75c46c8073071824d417",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "d990354fcc4b4aed2893f97b7aee001347f2e65cd3fc4b4111de4c2fb5ea9f9c",
+        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
       }
     },
     {
@@ -773,8 +773,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "f2fc6d6beb534d0fa58c9d98d1293698e31dafa9ded66117b23e79a6b1d5074d",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "a1400426b99a96b173e93df26babe7a2c51483cacc1d5c2b0a91bf165e8440b1",
+        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
       }
     },
     {
@@ -858,8 +858,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "bbc12ea5cf8a63ac6b0e34a4b0f854a6dc250bc7fcb01a41587ea92ef2d1f5e3",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "018a8a508d5875531169fdcdc4075a90cf35598e89e71e908e7cdea6b9e9bafc",
+        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
       }
     },
     {
@@ -1082,8 +1082,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "5548f4915d6503027d4ee1668e60aa9cdb5bd9646c6fb16ecbb3d58f9b5a16fb",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "7054d846fc2114b6c20e932c848274d71450950a52767650bd19cdca38ab5125",
+        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
       }
     },
     {
@@ -1549,8 +1549,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "c3567e7e951e8f1ed181f333897caac6b63bdf1e787ed5a898215642c4ae66e5",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "f84caf858cb76333d14846f1816307bc8ab6fc928c49dc4c45c072529df78de5",
+        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
       }
     },
     {

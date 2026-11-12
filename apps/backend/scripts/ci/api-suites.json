@@ -536,7 +536,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "95f9a7bbbbb0782215d6270077bd41613d3d36238f20d91e11a1006a0b0bfa56",
+      "sha256": "b1563475f9ea64b992aa1726836f94c02719681645d9b5b2c753b4fe85e782d4",
       "shared": [
         [
           7,
@@ -628,7 +628,7 @@
     },
     {
       "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
-      "sha256": "d11de1d3406253caaadb56d3a2711973b1508eb404ed553f10119fddb3ce836e",
+      "sha256": "3658f9b237ae049d45df83d4c27ab1f28486580d8c9058df87ff02209a2717b9",
       "shared": [
         [
           3,
