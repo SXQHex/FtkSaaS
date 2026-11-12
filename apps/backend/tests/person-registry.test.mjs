@@ -144,6 +144,8 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
  try{
  await mut('center_manager_assign_v1',{person_id:ownerPerson});await mut('center_manager_assign_v1',{center_id:other,person_id:ownerPerson});
  const payment=await mut('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'synthetic P04',occurred_at:new Date().toISOString()});await mut('saas_payment_verify_v1',{payment_id:payment.primary_id,accepted:true},platform);
+ // This CRM chain keeps earlier paid-trial debts open while offering another trial.
+ await mut('policy_publish_v1',{center_id:null,key:'debt_participation',value:{kind:'boolean',value:false},effective_at:new Date().toISOString(),mandatory:false});
  const staffPerson=(await mut('person_create_v1',{display_name:'P04 staff',contacts:[]})).primary_id,staffAccount=await must(staff,'account_get_v1');
  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,staffAccount.id,staffPerson]);
  await mut('role_assign_v1',{person_id:staffPerson,role:'staff',scope:{center_id:center}});

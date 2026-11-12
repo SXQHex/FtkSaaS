@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "34f964708238f9701bfb6e7f71f5ff747c501661010b55ba95291810b99c8c77",
-        "reason": "Reviewed exact API suite hash and immutable baseline migration history while removing unapproved Pro/Business onboarding expansion; no CI gate, error expectation or existing native suite body changes."
+        "fingerprint": "9b590e7f144cc31d4abb9b4c47c1c85649fb54211395a564a78c11aa5f82b042",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -377,7 +377,7 @@
       ],
       "review": {
         "fingerprint": "5a23e12e6eb6a47863361425eef1a69811dab36a8a366754f6a3e32f6a69b199",
-        "reason": "Reviewed aged nonce-only rejection runner and restore on unexpected write/response loss; native Auth session age, provider errors and cleanup remain authoritative."
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -484,8 +484,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "6f9ee361e5762a7ee147d6f4f65ab968fa895843e7b2eb0a7ac91a6b778ec8d5",
-        "reason": "Discipline deactivation effect reader and current proof guard preserve unresolved work and historical references."
+        "fingerprint": "37c4109d6cdff29f03ddac0b18ce73b316687936ccb28eca2428c04b19cefea0",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -580,8 +580,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "d2ae33ef5ca0bb02556d6b8c33d51f96d867f0d535e27457f47b617103f3ee96",
-        "reason": "Reviewed calendar exception input, owned preview replay authority, immutable approval snapshots and physical resource checks; settings guide explains explicit permission and versions."
+        "fingerprint": "5d375acbce220a1553daff6b578e2028436d569316ac1ade69583cfbdbba46a6",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -673,8 +673,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "acadd46c48c0e45e661fe2ba59a286521217259e8083d76892508c8abe002401",
-        "reason": "Optional lead pipeline snapshot reviewed; conversion remains separate student activation with existing authority and subscriber allocation"
+        "fingerprint": "197573275dea503d1e5289bb8e52aa15ef1dd0113b9f75c46c8073071824d417",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -773,8 +773,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "4372968fe2fa4ae8130a2240e7284622a799d66bcaf36da64c23d04fc876f9fd",
-        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
+        "fingerprint": "f2fc6d6beb534d0fa58c9d98d1293698e31dafa9ded66117b23e79a6b1d5074d",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -858,8 +858,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "554d78dafde15d5e22b58641ce3ea76fe5794e9d05b5ebbdd2918106b290e5bf",
-        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
+        "fingerprint": "bbc12ea5cf8a63ac6b0e34a4b0f854a6dc250bc7fcb01a41587ea92ef2d1f5e3",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -921,8 +921,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "2e824f112f814b4da80ce15435a3bacccc8470fa644e7db75f7335d988c36ec4",
-        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
+        "fingerprint": "b14eec04010bbff74d14cd511187a7975c47f6509276c21e4ac955bae7bcfca8",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -1082,8 +1082,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "c9a298191e759abb029cca3e4a647b00ab2a2832cda2ae96511a7d2bdd131c7a",
-        "reason": "Calendar gateway keeps existing response status/body and closed feed checks; isolated fixture adds bounded allowlisted failure classification, with no URL/token/body disclosure. Root cause still awaiting native evidence."
+        "fingerprint": "5548f4915d6503027d4ee1668e60aa9cdb5bd9646c6fb16ecbb3d58f9b5a16fb",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -1275,6 +1275,7 @@
         "apps/backend/database/settings-catalog-v21.sql",
         "apps/backend/database/settings-room-lifecycle.sql",
         "apps/backend/database/settings-form-discovery.sql",
+        "apps/backend/database/settings-onboarding-plans.sql",
         "apps/backend/database/settings-waitlist-opt-in.sql",
         "apps/backend/database/settings-calendar-exceptions.sql",
         "apps/backend/supabase/migrations/20261112003727_settings_domain_closure.sql"
@@ -1292,8 +1293,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "6f2bbc6dbfe183a8be7dfe280d7143eadd4c9d34ae3a56b7911fd4a963a57cab",
-        "reason": "FD07 is Starter-only in normative technical contract and main; removed erroneous new onboarding patch. Native regression requires exact3 Starter policies and exact0 Pro/Business policies with replay/history preserved; PostgreSQL failing/corrected source branches reproduced."
+        "fingerprint": "a402f582bf1b5075d2616dcc7840583fc03fa7f0e4527c570a0841f5e181b649",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -1417,8 +1418,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "539b7bd60f47a7f62b7f53c7d453ab64af7700c2e2a79052ccd8d5c183f84628",
-        "reason": "Instructor earnings fixture explicitly enables organization personal-limit permission; agreement and earning behavior unchanged."
+        "fingerprint": "d2fdef92f09fccae3f3f06458268e8ec9f1456c088b9637e4afe1f4264179ad6",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -1489,8 +1490,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "bedea0690cf869ad38c2f311ff6dbcb4250d1a031d6ae741424df021b633b317",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "aa98c101fa6b7643733d3514b213302ff56d1e5a1846cdc8699df7ea662fae3f",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -1548,8 +1549,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "d6ad8f33bcce558d679edea47985278599f79a47571affe9a0c2a3892dc33f86",
-        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
+        "fingerprint": "c3567e7e951e8f1ed181f333897caac6b63bdf1e787ed5a898215642c4ae66e5",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {
@@ -1670,8 +1671,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "7842fe90ba80e4c8076cb8cd137c2ae2ce7c67d1ad866c8fcff3362b3581dd87",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "696e11589b11cfd92f9fabff1a0def8a5f7fe84a305c7ad8868f0000c15ca88e",
+        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
       }
     },
     {

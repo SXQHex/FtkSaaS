@@ -61,6 +61,8 @@ for(const planName of ['pro','business']){
  test('P13 '+planName+' package eligibility is live while attendance and credits stay distinct',async()=>{
   const f=await fixture(planName),{db,org,api,student,fail,event,read}=f;
   try{
+   // The renewed sale intentionally remains unpaid; test package use independently.
+   await api('policy_publish_v1',{center_id:null,key:'debt_booking',value:{kind:'boolean',value:false},effective_at:new Date().toISOString(),mandatory:false});
    const p=await student();
    const discipline=(await must(f.owner,'discipline_save_v1',{org_id:org,name:'Synthetic event discipline',state:'active'},key())).primary_id;
    await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});

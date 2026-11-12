@@ -27,7 +27,7 @@ test('room details and deactivation preserve capacity, active work, history and 
  assert.equal((await db.query('select description,location from core.rooms where id=$1',[room])).rows[0].description,save.description);
 });
 
-test('new Starter gets FD07 defaults while Pro and Business retain explicit policy configuration and existing histories',async()=>{
+test('every new plan gets the same safe debt and negative defaults without changing existing histories',async()=>{
  const db=await connect();
  try{
   const existing=(await db.query('select id,org_id,key,value,version from core.policy_versions order by id')).rows;
@@ -38,7 +38,7 @@ test('new Starter gets FD07 defaults while Pro and Business retain explicit poli
    const created=await must(platform,'organization_create_v1',body,opKey);
    assert.equal((await must(platform,'organization_create_v1',body,opKey)).replayed,true);
    const policies=(await db.query('select key,value,version::int version from core.policy_versions where org_id=$1 order by key',[created.primary_id])).rows;
-   assert.deepEqual(policies,name==='starter'?[{key:'debt_booking',value:{kind:'boolean',value:true},version:1},{key:'debt_participation',value:{kind:'boolean',value:true},version:1},{key:'negative_default',value:{kind:'integer',value:0},version:1}]:[]);
+   assert.deepEqual(policies,[{key:'debt_booking',value:{kind:'boolean',value:true},version:1},{key:'debt_participation',value:{kind:'boolean',value:true},version:1},{key:'negative_default',value:{kind:'integer',value:0},version:1}]);
   }
   if(existing.length){const after=(await db.query('select id,org_id,key,value,version from core.policy_versions where id=any($1::uuid[]) order by id',[existing.map(p=>p.id)])).rows;assert.deepEqual(after,existing);}
  }finally{await db.end();}
@@ -70,6 +70,52 @@ test('configured forms are discoverable without secrets, scoped to live managers
  assert.deepEqual((await must(owner,'settings_get_v1',oq)).values.application_form_rules,rules);
  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
  const denied=await call(owner,'settings_catalog_get_v1',{...oq,include_configured_forms:true});assert.equal(denied.result.error.code,'PLAN_FEATURE_UNAVAILABLE');
+});
+
+test('initial zero credit needs no invented upper and default debt guards remain live until explicitly changed',async t=>{
+ const f=await preparationFixture({schedule:true,studentUser:true,studentMembership:true});t.after(()=>f.db.end());
+ const {owner,org,center,discipline,studentPerson,db,api,must}=f;
+ const session=(await api('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:f.day(1)+'T09:00:00Z',ends_at:f.day(1)+'T10:00:00Z'},resources:[{kind:'room',id:f.room}],assignments:[{person_id:f.person,duty:'instructor'}],capacity:{total:10}})).primary_id;
+ const publish=(key,value)=>api('policy_publish_v1',{center_id:null,key,value,effective_at:new Date().toISOString(),mandatory:false});
+ await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
+ await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
+ await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
+ const body={org_id:org,center_id:center,session_id:session,person_id:studentPerson,mode:'flexible'};
+ const reject=async code=>{
+  const operationKey=key(),r=await call(owner,'reservation_create_v1',body,operationKey);
+  assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);
+  assert.equal((await f.rows('select count(*)::int n from core.reservations where org_id=$1',[org]))[0].n,0);
+  assert.equal((await f.rows('select count(*)::int n from core.credit_deficits where org_id=$1',[org]))[0].n,0);
+  assert.equal((await f.rows("select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=encode(extensions.digest($2,'sha256'),'hex')",[org,operationKey]))[0].n,0);
+ };
+ await reject('ENTITLEMENT_UNAVAILABLE');
+ await publish('negative_default',{kind:'integer',value:1});await reject('POLICY_NOT_CONFIGURED');
+ const personal=key();
+ await db.query("insert into core.negative_limit_overrides(id,org_id,center_id,person_id,discipline_id,limit_count,reason) values($1,$2,$3,$4,$5,0,'Explicit pre-existing personal restriction')",[personal,org,center,studentPerson,discipline]);
+ await reject('ENTITLEMENT_UNAVAILABLE');
+ await publish('negative_default',{kind:'integer',value:0});
+ await db.query('update core.negative_limit_overrides set limit_count=1 where id=$1',[personal]);await reject('POLICY_NOT_CONFIGURED');
+ await db.query('update core.negative_limit_overrides set limit_count=0 where id=$1',[personal]);
+ await publish('negative_upper',{kind:'integer',value:2});await reject('CREDIT_LIMIT_EXCEEDED');
+ const terms={name:'Yoga · debt guard control',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'100',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]};
+ const product=(await api('product_publish_v1',{terms})).primary_id;
+ const preview=await api('sale_preview_v1',{person_id:studentPerson,product_version_id:product,start_date:f.day(0),end_date:f.day(30)});
+ const sale=(await api('sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
+ await reject('FORBIDDEN');
+ await publish('debt_booking',{kind:'boolean',value:false});
+ const booked=await must(owner,'reservation_create_v1',{...body,source_sale_id:sale},key());
+ assert.equal((await f.rows('select private.debt_remaining($1,id)::text n from core.debts where org_id=$1 and sale_id=$2',[org,sale]))[0].n,'100');
+ let attendance=await api('attendance_get_v1',{session_id:session});
+ const mark=()=>call(owner,'attendance_mark_v1',{org_id:org,center_id:center,reservation_id:booked.primary_id,expected_version:attendance.entries[0].version,result:'attended'},key());
+ assert.equal((await mark()).result.error.code,'FORBIDDEN');
+ await publish('debt_participation',{kind:'boolean',value:false});
+ // Explicit start follows the policy choice and preserves planned resource intervals.
+ await api('attendance_start_v1',{session_id:session,expected_version:attendance.session_version,actual_started_at:new Date().toISOString(),reason:'Synthetic start after explicit debt policy choice'});
+ attendance=await api('attendance_get_v1',{session_id:session});assert(attendance.actual_started_at);
+ assert.equal((await mark()).result.ok,true);
+ attendance=await api('attendance_get_v1',{session_id:session});assert.equal(attendance.entries[0].result,'attended');
+ assert.equal((await f.rows('select count(*)::int n from core.cash_movements where org_id=$1',[org]))[0].n,0);
+ assert.equal((await f.rows('select count(*)::int n from core.credit_deficits where org_id=$1',[org]))[0].n,0);
 });
 
 test('new class waitlists default closed and closure requires explicit resolution without cancelling reservations',async t=>{

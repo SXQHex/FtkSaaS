@@ -23,6 +23,8 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
  for(const c of [c1,c2])await mut('center_manager_assign_v1',{center_id:c,person_id:ownerPerson});
  const pay=await mut('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'synthetic program',occurred_at:new Date().toISOString()});
  await mut('saas_payment_verify_v1',{payment_id:pay.primary_id,accepted:true},key(),platform);
+ // Keep unpaid sales/debt for lifecycle and refund assertions; explicitly permit booking.
+ await mut('policy_publish_v1',{center_id:null,key:'debt_booking',value:{kind:'boolean',value:false},effective_at:new Date().toISOString(),mandatory:false});
  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Program discipline',state:'active'},key())).primary_id;
  for(const c of [c1,c2])await mut('center_discipline_set_v1',{center_id:c,discipline_id:discipline,state:'active'});
  const cls=async(name,c=c1)=>(await mut('class_save_v1',{center_id:c,name,discipline_id:discipline,external_open:true})).primary_id;

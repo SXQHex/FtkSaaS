@@ -104806,7 +104806,13 @@
         },
         "existing_policies": "unchanged; no backfill",
         "consumer_read": "policies_get_v1 and existing policy_at/lesson/reservation consumers",
-        "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing"
+        "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing",
+        "plans": [
+          "starter",
+          "pro",
+          "business"
+        ],
+        "zero_without_upper": "No deficit can be granted: ENTITLEMENT_UNAVAILABLE. A positive effective limit requires explicit negative_upper; configured limits retain CREDIT_LIMIT_EXCEEDED."
       },
       "basic_crm": {
         "operations": [

@@ -109,11 +109,11 @@
     },
     {
       "path": "apps/backend/tests/cross-center-settlement.test.mjs",
-      "sha256": "a68b8b36ae0d959eca4d62ae70001bcca0ee95a928d43275107019d7a05623a9",
+      "sha256": "3b41aa0bef300a12549e79f89cd3d329fa35f106d65f1b888531c0827d157dd2",
       "shared": [
         [
           1,
-          102
+          104
         ]
       ],
       "parts": [
@@ -121,8 +121,8 @@
           "id": "cross-center-payments",
           "ranges": [
             [
-              103,
-              226
+              105,
+              228
             ]
           ]
         },
@@ -130,8 +130,8 @@
           "id": "cross-center-deficit-sources",
           "ranges": [
             [
-              227,
-              247
+              229,
+              249
             ]
           ]
         },
@@ -139,8 +139,8 @@
           "id": "cross-center-no-transfer",
           "ranges": [
             [
-              248,
-              269
+              250,
+              271
             ]
           ]
         },
@@ -148,8 +148,8 @@
           "id": "cross-center-rounding",
           "ranges": [
             [
-              270,
-              286
+              272,
+              288
             ]
           ]
         },
@@ -157,8 +157,8 @@
           "id": "cross-center-source-scope",
           "ranges": [
             [
-              287,
-              312
+              289,
+              314
             ]
           ]
         },
@@ -166,8 +166,8 @@
           "id": "cross-center-authority",
           "ranges": [
             [
-              313,
-              393
+              315,
+              395
             ]
           ]
         },
@@ -175,8 +175,8 @@
           "id": "cross-center-atomic",
           "ranges": [
             [
-              394,
-              445
+              396,
+              447
             ]
           ]
         }
@@ -360,7 +360,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/event-capacity-package-acceptance.mjs",
-          "sha256": "a2587cde639bdcbcb7d7b308bace6ebd78add1b6b62736077c14afd87d44ceca"
+          "sha256": "c592408742f203e49040ad18dc4b664bbd982d288690bd2767977219041b7b66"
         },
         {
           "line": 2,
@@ -372,15 +372,15 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "a90e30be4617573c9a9f5fa8976ad38d34776f02195bc058798b765a9a08b303",
+      "sha256": "a1f9a8a583658f2cedc3fe406eb9c769b1c41ec522dd49d84d31ab939e1f3fb4",
       "shared": [
         [
           2,
-          69
+          71
         ],
         [
-          354,
-          355
+          356,
+          357
         ]
       ],
       "parts": [
@@ -388,34 +388,8 @@
           "id": "earnings-publication",
           "ranges": [
             [
-              70,
-              103
-            ],
-            [
-              356,
-              356
-            ]
-          ]
-        },
-        {
-          "id": "earnings-packages-corrections",
-          "ranges": [
-            [
-              104,
-              166
-            ],
-            [
-              357,
-              357
-            ]
-          ]
-        },
-        {
-          "id": "earnings-valuation-closure",
-          "ranges": [
-            [
-              167,
-              221
+              72,
+              105
             ],
             [
               358,
@@ -424,11 +398,11 @@
           ]
         },
         {
-          "id": "earnings-occurrence-authority",
+          "id": "earnings-packages-corrections",
           "ranges": [
             [
-              222,
-              321
+              106,
+              168
             ],
             [
               359,
@@ -437,15 +411,41 @@
           ]
         },
         {
-          "id": "earnings-pilot",
+          "id": "earnings-valuation-closure",
           "ranges": [
             [
-              322,
-              353
+              169,
+              223
             ],
             [
               360,
               360
+            ]
+          ]
+        },
+        {
+          "id": "earnings-occurrence-authority",
+          "ranges": [
+            [
+              224,
+              323
+            ],
+            [
+              361,
+              361
+            ]
+          ]
+        },
+        {
+          "id": "earnings-pilot",
+          "ranges": [
+            [
+              324,
+              355
+            ],
+            [
+              362,
+              362
             ]
           ]
         }
@@ -536,7 +536,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "dfeb3e1ba7e5c2901d4c0939995d0b4bdfc4bbbbd54c37e3c4ee1012cbe8c765",
+      "sha256": "95f9a7bbbbb0782215d6270077bd41613d3d36238f20d91e11a1006a0b0bfa56",
       "shared": [
         [
           7,
@@ -562,7 +562,7 @@
           "ranges": [
             [
               134,
-              371
+              373
             ]
           ]
         }
@@ -599,27 +599,27 @@
           "sha256": "e19ed9722521850b3a35b97117f342cda93b1fab8a75ab794451fa7335913e81"
         },
         {
-          "line": 372,
+          "line": 374,
           "path": "apps/backend/tests/crm-lifecycle-authority-acceptance.mjs",
           "sha256": "e247768f315e48ac05aafa019c357cfd78d1a323cae722670af3f23152fbd04c"
         },
         {
-          "line": 373,
+          "line": 375,
           "path": "apps/backend/tests/crm-lifecycle-acceptance.mjs",
           "sha256": "8cbaf2228d6aaa2bbb185959acb11ae298312225ead78c23bb3849cc21e5c03f"
         },
         {
-          "line": 374,
+          "line": 376,
           "path": "apps/backend/tests/crm-followup-projections-acceptance.mjs",
           "sha256": "49d763d43cfb80f93cd92d2c612b349713335939e16b02b95a0344d40b263aae"
         },
         {
-          "line": 375,
+          "line": 377,
           "path": "apps/backend/tests/crm-segment-worker-acceptance.mjs",
           "sha256": "84dce9fe217f6a786876721b4765c282100d6bc5840f8d15328082497d52fe23"
         },
         {
-          "line": 376,
+          "line": 378,
           "path": "apps/backend/tests/crm-followup-acceptance.mjs",
           "sha256": "8e2ccfed55fe4fab9d3e1d789825aac0f4934ad26fa9d9caa1d2db28154882e8"
         }
@@ -628,15 +628,15 @@
     },
     {
       "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
-      "sha256": "a746a2e833cd43f13d66289ec31e31bd93fd0c4136ae2423bd8fb4f2eaf010d6",
+      "sha256": "d11de1d3406253caaadb56d3a2711973b1508eb404ed553f10119fddb3ce836e",
       "shared": [
         [
           3,
           9
         ],
         [
-          471,
-          471
+          473,
+          473
         ]
       ],
       "parts": [
@@ -645,7 +645,7 @@
           "ranges": [
             [
               10,
-              470
+              472
             ]
           ]
         },
@@ -653,8 +653,8 @@
           "id": "program-session-lifecycle-root-2",
           "ranges": [
             [
-              472,
-              591
+              474,
+              593
             ]
           ]
         }
@@ -932,7 +932,7 @@
         {
           "line": 139,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
-          "sha256": "6ef2f1340c58a7816446b7bbe62b5454910b1ae4c8d00f429efd9447ba6c2a14"
+          "sha256": "c55f9ea4811efeb1a59e1440a95e1ba9c762c608eff09aed67afcd49e7fa62f6"
         },
         {
           "line": 140,
@@ -1224,7 +1224,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/settings-domain-closure-acceptance.mjs",
-          "sha256": "988a0488141f23eab5c112908330c623259c1b361ed6f12cda0b645d7fc6931a"
+          "sha256": "b1f33c9ac54e205e2b8195b4af6b0dc1ecc8b1c0d853b7a5b57278e5b2c3119d"
         },
         {
           "line": 2,

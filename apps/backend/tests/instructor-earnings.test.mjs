@@ -31,6 +31,8 @@ async function earningsFixture(t){
  const effective_at=new Date(Date.now()-10000).toISOString();
  const publish=(k,value)=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:new Date().toISOString(),mandatory:false});
  await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
+ // These cases deliberately prove earnings without collecting the student's sale.
+ for(const k of ['debt_booking','debt_participation'])await publish(k,{kind:'boolean',value:false});
  await publish('negative_default',{kind:'integer',value:2});await publish('negative_upper',{kind:'integer',value:2});
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:60000,closes_minutes_before:0,manager_exception:false});
