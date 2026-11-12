@@ -278,7 +278,8 @@
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
         "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql",
-        "apps/backend/scripts/ci/manual-full.mjs"
+        "apps/backend/scripts/ci/manual-full.mjs",
+        "apps/backend/scripts/ci/agent-tooling.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -288,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "78585651e76996439caa1d3d14c8d96ec0f65aff76db5fd3470d1fec32ced070",
-        "reason": "Reviewed additive native invitation preclaim and postclaim expiry/revoke tests; existing assertions and runtime unchanged."
+        "fingerprint": "29332265f320965774e5caea45df2f2fd075e0c94123badbf13b684c92f20a5c",
+        "reason": "Reviewed agents-only classification with tracked-env rejection, quality/exact-source proof, explicit source-bound main/CD skip marker and malformed marker negatives; mixed/rename/deletion preserve application acceptance. Real CI policy remains trusted and S07 additions retain exact imported-source binding."
       }
     },
     {

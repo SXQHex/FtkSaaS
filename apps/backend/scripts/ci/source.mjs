@@ -1,4 +1,5 @@
 import {testDataPolicyMatches,inventoryPath,packagePath} from './candidate-inventory.mjs';
+import {isAgentTooling} from './agent-tooling.mjs';
 import {isDesignSandbox} from './design-sandbox.mjs';
 import {classifyChanges,ownerOf} from './scope.mjs';
 import {coverageHash,acceptanceProfile} from './shards.mjs';
@@ -17,7 +18,7 @@ export async function remoteDocumentScope(github,repo,base,head,{allowFrontend=f
   return new Map(t.tree.filter(x=>x.type==='blob'||x.mode==='160000').map(x=>[x.path,x]));
  }));
  const changes=[...new Set([...trees[0].keys(),...trees[1].keys()])].filter(p=>trees[0].get(p)?.sha!==trees[1].get(p)?.sha||trees[0].get(p)?.mode!==trees[1].get(p)?.mode).map(path=>({path,status:!trees[0].has(path)?'A':!trees[1].has(path)?'D':'M'}));
- if(allowFrontend){for(let i=changes.length-1;i>=0;i--)if(['frontend','sandbox'].includes(ownerOf(changes[i].path)))changes.splice(i,1);}
+ if(allowFrontend){for(let i=changes.length-1;i>=0;i--)if(['frontend','sandbox','agents'].includes(ownerOf(changes[i].path)))changes.splice(i,1);}
  const contents=new Map();
  for(const c of changes)for(let i=0;i<2;i++){
   const f=trees[i].get(c.path);if(!f)continue;
@@ -57,7 +58,7 @@ export async function backendUnchanged(github,repo,base,head){
  try{return !(await remoteSourceScope(github,repo,base,head)).backend;}catch{return false;}
 }
 // Protect the commands and config that define the bar, including new nested configs.
-export const policyPath=p=>!isDesignSandbox(p)&&(
+export const policyPath=p=>!isDesignSandbox(p)&&!isAgentTooling(p)&&(
  ['CONSTRAINTS.md','turbo.json','.gitignore','docs/history/manifest.json','.github/dependabot.yml'].includes(p)
  || /(^|\/)(?:package\.json|\.gitignore|\.ignore|\.eslintignore|\.oxlintignore)$/.test(p)
  || /(^|\/)tsconfig(?:\.[^/]+)?\.json$/.test(p)
@@ -89,7 +90,7 @@ export async function resolveCandidate(github,context,core,kind){
  assertParents(commit,p.base.sha,p.head.sha);
  const sourceScope=await remoteSourceScope(github,context.repo,p.base.sha,p.head.sha);
  core.setOutput('kind',sourceScope.kind);
- if(['frontend','sandbox'].includes(sourceScope.kind)){core.setOutput('eligible','false');return;}
+ if(['frontend','sandbox','agents'].includes(sourceScope.kind)){core.setOutput('eligible','false');return;}
  if(kind==='auto')kind=sourceScope.kind;
  const scope={safe:sourceScope.kind==='documentation'};
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');

@@ -23,6 +23,13 @@ export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
   if(v2.length!==1||j.status!=='completed'||j.conclusion!=='success'||j.run_id!==run.id||j.run_attempt!==run.run_attempt||j.head_sha!==run.head_sha||!j.steps?.some(s=>s.name==='V2 development only (no runtime acceptance)'&&s.conclusion==='success'))throw Error('Invalid V2 main marker');
   return {deploy:false,reason:'Isolated V2 development; no runtime acceptance',v2:true};
  }
+ const agents=jobs.filter(j=>j.name==='agents');
+ if(agents.length>1)throw Error('Duplicate agent tooling main marker');
+ if(agents.length&&agents[0].conclusion!=='skipped'){
+  const j=agents[0];
+  if(j.status!=='completed'||j.conclusion!=='success'||j.run_id!==run.id||j.run_attempt!==run.run_attempt||j.head_sha!==run.head_sha||!j.steps?.some(s=>s.name==='Agent tooling only (no application acceptance)'&&s.conclusion==='success')||jobs.some(x=>['frontend','documentation','acceptance'].includes(x.name)&&x.conclusion!=='skipped'))throw Error('Invalid agent tooling main marker');
+  return {deploy:false,reason:'Agent tooling only; no application acceptance',agents:true};
+ }
  const frontend=jobs.filter(j=>j.name==='frontend'&&j.conclusion==='success'&&j.status==='completed'&&j.run_id===run.id&&j.run_attempt===run.run_attempt&&j.head_sha===run.head_sha&&j.steps?.some(s=>s.name==='Backend unchanged (no backend acceptance)'&&s.conclusion==='success'));
  if(frontend.length===1)return {deploy:false,reason:'Frontend-only scope; no backend acceptance',frontend:true};
  const docs=jobs.filter(j=>j.name==='documentation'&&j.conclusion==='success'&&j.status==='completed'&&j.run_id===run.id&&j.run_attempt===run.run_attempt&&j.head_sha===run.head_sha&&j.steps?.some(s=>s.name==='Documentation main acceptance (no full clean)'&&s.conclusion==='success'));
@@ -54,7 +61,7 @@ async function fullProof(github,repo,run,jobs,currentMain,attempt){
 }
 export async function resolveAcceptedSource(github,repo,run,jobs,currentMain,attempt){
  const initial=deploymentSource({run,jobs,currentMain:run.head_sha,repository:repo.owner+'/'+repo.repo,attempt});
- if(initial.frontend||initial.v2)return initial;
+ if(initial.frontend||initial.agents||initial.v2)return initial;
  if(initial.deploy)return await fullProof(github,repo,run,jobs,currentMain,attempt)??{deploy:false,reason:'Superseded runtime source'};
  if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded documentation source'};
  // A docs-only main may have overtaken an accepted runtime before CD ran.

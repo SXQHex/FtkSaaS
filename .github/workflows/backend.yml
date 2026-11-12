@@ -62,6 +62,16 @@ jobs:
       - name: Backend unchanged (no backend acceptance)
         working-directory: .
         run: echo 'Frontend-only merge; backend tests and delivery are not required.'
+  agents:
+    permissions: {}
+    needs: source
+    if: needs.source.outputs.kind == 'agents'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Agent tooling only (no application acceptance)
+        working-directory: .
+        run: echo 'Verified agent tooling source; no application tests or delivery required.'
   acceptance:
     permissions: {}
     needs: source
