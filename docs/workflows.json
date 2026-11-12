@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "29332265f320965774e5caea45df2f2fd075e0c94123badbf13b684c92f20a5c",
-        "reason": "Reviewed agents-only classification with tracked-env rejection, quality/exact-source proof, explicit source-bound main/CD skip marker and malformed marker negatives; mixed/rename/deletion preserve application acceptance. Real CI policy remains trusted and S07 additions retain exact imported-source binding."
+        "fingerprint": "0e79fb6be4ca23a142effa7246d302cd9f300a5c211dca7ee1e088e007547815",
+        "reason": "Mevcut protokol/generator ve yeni154 migration incelendi; public API değişmeden private Edge teknik kayıt handoffu ve kaynak bağları korundu."
       }
     },
     {
@@ -377,8 +377,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "5a23e12e6eb6a47863361425eef1a69811dab36a8a366754f6a3e32f6a69b199",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "a3b3c9859fac3f73f408e94f1e2dea07fccb550ac2ddfb57169862d9c2af7c68",
+        "reason": "Reviewed WF01 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -485,8 +485,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "5c973c70df896e01c1bb9709935a942dcd7d7971819d9c04f58660b852873a44",
-        "reason": "S10 approved new-plan reservation window defaults reviewed; existing role, center and management selector authority unchanged."
+        "fingerprint": "ea474c48755f5cd852e4fb6bbd07066651051fcfa1e09f735e12404a179e591d",
+        "reason": "Reviewed WF02 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -584,8 +584,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "e3bd252d0939d85a9054dc9f2c5b4e631f92f0ea3e91fba31a7ea478ebf52db6",
-        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
+        "fingerprint": "7e5ac49693046186644ae075210cc12a1fc9d7eb6baf14cb90d5a13c2c78d2d6",
+        "reason": "Reviewed WF03 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -677,8 +677,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "b26ddc4316f068c308bb4ebda1259f5725e31a84005de665299674862dd13135",
-        "reason": "Reviewed native invitation actor verification and lifecycle tests; frontend screen acceptance remains separate from backend claim/delivery/account acceptance."
+        "fingerprint": "07c05dd08d9a974658035f396bf7e2492e2fe3e60701fcad2b5cc634f1e31bd9",
+        "reason": "Reviewed WF04 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -777,8 +777,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "3d099e3c9abdbd04f4baa11710468b8a62c9e41316eaa5ac05b5ede75cc8c4d6",
-        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
+        "fingerprint": "5bf4f35ea7589ebc4ff86a523f27ff7ab0b514e5223e09878baa1880ca7b1442",
+        "reason": "Reviewed WF05 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -862,8 +862,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "770a22a5777710bdc687a4dd31716183539e7a8ff4685e39283890c962154760",
-        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
+        "fingerprint": "cb7ac147077a2f5a431f72ff255fdb0ccff6600fbdca65f183d5b260b95bbeb3",
+        "reason": "Reviewed WF06 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -925,8 +925,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "62b63f774c7221183224ee941b09a58f689ba37cfe92ad9df78bcad0a9020c2d",
-        "reason": "S10 lifecycle fixture now explicitly publishes offer duration for paid-plan worker acceptance; attendance and earnings guards/assertions unchanged."
+        "fingerprint": "c6917f6bfdeca59f4d78e4229dc3b784528aad9b967ac88aebbc5c36635943d8",
+        "reason": "Reviewed WF07 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -990,8 +990,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "02ca2fe5fad33d581a1abd79bdecb0b516ffb8142c9a5fae2a2617f8e22fef95",
-        "reason": "S10 lifecycle fixture explicitly supplies positive offer duration; existing debt, refund and money flow unchanged and source assertions retained."
+        "fingerprint": "a6120d076b4ee7be9d10ef0280f342cce2e02d4663e2e0649d8f40017b82c2fc",
+        "reason": "Reviewed WF08 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1088,8 +1088,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "a7048bae7de29b08bac2bfd79c8f77198b7c1807de9488fb59528e57a764309e",
-        "reason": "S14 runner test fixture now generates an ephemeral 32-byte HMAC key; signing assertions and production guide remain unchanged."
+        "fingerprint": "5760f3ed6b3db9d225d376fe25f01e158f4763268785df1f59a2a04b2b5c24cd",
+        "reason": "Reviewed WF09 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1137,8 +1137,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "31feb6a844f759e754ad5bfaf1fdde570e7a2bbb39718a93f661c30ed14cd6d5",
-        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
+        "fingerprint": "ee926f270b0f5b6780c79c299b5fdd728b683055f0642454dbc5753e46370b63",
+        "reason": "Reviewed WF10 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1188,8 +1188,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "79190a8868a3aea0743bf34875a42ed9b32a41b4a2707d6df0d847d2fda7d328",
-        "reason": "Reviewed final session-local variable rename with unchanged native /auth/v1/token path and exact request bodies. Five runner safety tests pass and no public API or assertion changes."
+        "fingerprint": "8bfe7c08c19529f090494b75d5a87df3f933eafdfa9e0ff138fe65763c284a75",
+        "reason": "Reviewed WF11 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1314,8 +1314,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "f3984af8f50d47cb24570b62c2b07b436a94af521c8155571e6f3f18494a2c94",
-        "reason": "S10 source151 requires explicit positive offer duration and fingerprints effective policy for recovery after retry exhaustion; settings/default/private sharing source and native tests reviewed."
+        "fingerprint": "a944d101a7df6e5b3a69195232f1e984460cf03c119002b76c4972a8ca78e1a4",
+        "reason": "Reviewed WF12 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1390,8 +1390,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "7ed74d47fa074c5da36c5974cb94b0356cefc103c198959c728ae72389307829",
-        "reason": "Mevcut P07 assertionları aynı kaldı; kalıntı rollback ve unbound worker temp-trigger ret kontrolleri eklendi."
+        "fingerprint": "52aa676c3f69e40018f918a3149c541d1365976928f8e47e848c5cf036668095",
+        "reason": "Reviewed WF13 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1439,8 +1439,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "70daf532432abff80013bb6b64aeb4799cf9455c7e9e308d145b0befb0b150c8",
-        "reason": "S10 paid lifecycle fixture explicitly supplies offer duration without changing agreement, earnings or payment assertions; existing native flow reviewed."
+        "fingerprint": "63f471040eb133a0a9b570e6b9b3d0fec8a2eb794bf8c4c2d942655e38e0b98b",
+        "reason": "Reviewed WF14 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1514,8 +1514,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "9dc31f3142d1fe36d211b55e9a4ef67da36004d09f779a2eee77755df324555d",
-        "reason": "S10 event sharing source and native audience/media tests reviewed, including org permission/catalog consistency; payment/cancellation unchanged."
+        "fingerprint": "33afc82d07a7babc65775f5f761129a5ea430fca21584c1ec005cffaaaa07434",
+        "reason": "Reviewed WF15 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1573,8 +1573,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "f84caf858cb76333d14846f1816307bc8ab6fc928c49dc4c45c072529df78de5",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "5dfa8e617ac9d63cc313e8d70526e69deb17c1399c4b1c967e72b70a1a3cedac",
+        "reason": "Reviewed WF16 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1662,8 +1662,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "40cba0a90d5b04a37899a00286c00e1d724c4c0393a96cd5b5ef83f9607c5aea",
-        "reason": "Reviewed final acceptance teardown: its own global retry_wait fixture is removed so later privacy claim roots cannot consume it. Runtime erasure/hold/lease/race checks and every existing assertion are preserved."
+        "fingerprint": "d2e38fbaf72581a8f821bb7b19e9339c424476603a3cbf6c82462d1d6a8f3371",
+        "reason": "Reviewed WF17 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1695,8 +1695,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "696e11589b11cfd92f9fabff1a0def8a5f7fe84a305c7ad8868f0000c15ca88e",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "49705ec287854b280d541ee13b5f7f8fbf6a87d6a24ac03de6eb96c87b6b304f",
+        "reason": "Reviewed WF18 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1726,8 +1726,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "feadd9cb2d49e3d27ac681877a700d343528f3bd81c23a579b24353f2ce7b54a",
-        "reason": "S10 missing duration produces no offer, keeps waiting state through three real retries, and explicit policy publication recovers the same entry; native source and guide reviewed."
+        "fingerprint": "9cca53d85bb8e04cc2a06107643c94ca071631150fb27f4791826c43df96ba18",
+        "reason": "Reviewed WF19 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
       }
     },
     {
@@ -1818,7 +1818,18 @@
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
         "apps/backend/database/settings-offer-duration-required.sql",
-        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
+        "apps/backend/scripts/ops-monitor.mjs",
+        "apps/backend/scripts/ops-monitor-outbox.mjs",
+        "apps/backend/database/ops-monitor.sql",
+        "apps/backend/supabase/migrations/20261112212500_ops_monitor.sql",
+        "apps/backend/scripts/ops-monitor-collector.mjs",
+        "apps/backend/scripts/ops-monitor-ack.mjs",
+        "apps/backend/database/ops-monitor-incidents.sql",
+        "apps/backend/supabase/migrations/20261112214500_ops_monitor_incidents.sql",
+        "apps/backend/database/ops-edge-integrity.sql",
+        "apps/backend/supabase/migrations/20261112220500_ops_edge_integrity.sql",
+        "apps/backend/supabase/functions/backend-v1/ops-errors.ts"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1833,8 +1844,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "138eddb7e7c87f27b8ed48f33160d9a16a948616850973378ed2ca91a955370a",
-        "reason": "Reviewed worker final authorization: preclaim expiry/revoke cancels with zero attempts; postclaim denial cancels unsent lease without provider reference."
+        "fingerprint": "cf5feb3a6f5cd11e13b8656b12692ab0144dd36cec4b0dedf4bc300a116ebdfb",
+        "reason": "Worker, Edge critical handoff, özel monitor ve gerçek native testler incelendi; eksik delivery config null kalır, heartbeat teslim sayılmaz. WF20 mevcut service-only sınırı açıklıyor."
       }
     }
   ]

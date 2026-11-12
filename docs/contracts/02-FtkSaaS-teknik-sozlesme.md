@@ -509,28 +509,35 @@ Yok etme tamamlanması, ilgili verinin canlı tablo dışında dosya/export/geç
 
 ## 20. Kabul edilmiş O3 pilot işletim hedefleri
 
-### Yedekleme ve kurtarma
+### Yedekleme ve kurtarma — Business sonrası altyapı hedefleri
+
+Bu alt bölümdeki genişletilmiş yedek/restore ve RPO/RTO hedefleri Business tesliminden sonraki ayrı altyapı projesine aittir; mevcut Pro/Starter/Business teslim kapılarına önkoşul değildir. Bu teslimin tek asgari kontrolü [ürün teslim sınırında](01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) tanımlıdır. Mevcut uygulama davranışları ve testler korunur.
 
 - Pilot RPO en fazla 24 saat, RTO olayın tespitinden itibaren 8 saattir. Bunlar testle kanıtlanacak tasarım hedefidir; mevcut garanti/SLA değildir. Ücretli üretim için ayrıca değerlendirilecektir.
 - Her gün veritabanı ve dosyalar birbiriyle tutarlı kurtarma noktası oluşturacak biçimde yedeklenir; canlı projeden bağımsız, şifreli, erişimi sınırlı 30 günlük döngü tutulur. Veritabanı yedeği Storage nesnelerinin içeriğini tek başına kapsamaz.
-- Üretim öncesinde ve sonrasında ayda bir izole geri yükleme testi yapılır. Kimlik/erişim, veri bütünlüğü, kod/yapılandırma ile dosya eşleşmesi ve silinen verinin açılmaması doğrulanır. Gerekli kapsamın tam envanteri uygulama öncesi hazırlanır.
+- Altyapı projesinin uygulamaya alınmasında ve sonrasında ayda bir izole geri yükleme testi yapılır. Kimlik/erişim, veri bütünlüğü, kod/yapılandırma ile dosya eşleşmesi ve silinen verinin açılmaması doğrulanır. Gerekli kapsamın tam envanteri uygulama öncesi hazırlanır.
 - Başarısız/gecikmiş yedek otomatik alarm üretir. RPO, yalnız işin zamanlanmasıyla değil son kullanılabilir kurtarma noktasıyla değerlendirilir.
 - Geri yükleme sonrası erişimden önce bütünlük, silme kayıtları ve bekleyen işler denetlenir; eski bildirimler topluca yeniden gönderilmez.
 - Yedek yaşı döngüsü ile kalıcı silme talebinden itibaren imha son tarihi aynı şey değildir. Bölüm 19’daki 30 günlük silme hedefinin bütün yedeklerde sağlanması tasarım/test gereğidir; 30 günlük rotasyon bunu tek başına kanıtlamaz.
 
 ### İzleme
 
+Bu teslimde asgari işletim kabulü, mevcut sağlık kontrolü ve mevcut kanalla tek gerçek alarm→müdahale→toparlanma denemesidir. Yeni daimi izleyici/ayrı alarm servisi kurmak gerekmez; [uygulama kabulünün sahibi O02](../../apps/backend/docs/remaining-work.md#o02) kaydıdır. Aşağıdaki otomatik izleme hedefleri ayrı altyapı projesinde sürdürülür; mevcut davranış ve testler korunur.
+
+
 | Durum | Kabul edilmiş davranış |
 |---|---|
 | Hizmete erişilemiyor | 5 dakikada bir dış kontrol; art arda 2 başarısızlıkta alarm. |
-| Yedek başarısız / kurtarma noktası 24 saatten eski | Beklemeden alarm. |
+| Yedek başarısız / kurtarma noktası 24 saatten eski | Otomatik yedekleme ile birlikte Business sonrası altyapı projesinin alarm hedefidir; mevcut plan teslimine ek kapı değildir. |
 | Tahsilat/kredi/rezervasyon bütünlük ihlali | Tek olayda kritik alarm; ilgili işlem güvenli biçimde durur. |
 | Bildirim/arka plan işi başarısız | Sınırlı otomatik tekrar; denemeler tükenince alarm. İş türü sayıları katalogda belirlenecek. |
 | Beklenmeyen backend hatası | Merkezi kayıt, işlem/izleme kimliği; hassas içerik loglanmaz. |
 
 Alarmlar SaaS işletim sorumlusunadır; müşteri owner’ına teknik müdahale yükümlülüğü verilmez. Sorumlu kişi/kanal seçimi açıktır. Alarmın oluşması müdahale edildiğini göstermez; 7/24 insan desteği taahhüt edilmemiştir. RTO hedefinin işletim kapasitesiyle sağlanması test ve üretim değerlendirmesinde ele alınır.
 
-### Performans
+### Performans — Business sonrası ölçüm hedefleri
+
+Aşağıdaki yük/performans ve RPO/RTO ölçümleri mevcut plan tesliminin kabul şartı değildir. Mevcut fonksiyon, güvenlik, CI ve kaynak bütçesi testleri değişmez.
 
 | İşlem | İsteklerin %95’i için backend hedefi |
 |---|---|

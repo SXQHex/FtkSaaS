@@ -12,7 +12,7 @@ Tek backend uygulaması geliştirilir. Pro ortak işlevlerin tamamlandığı ana
 | S01–S16 | Ortak uygulama temeli | Pro kabulüne dahildir; Starter aynı akışların izinli alt kümesini kullanır. |
 | P01–P16 | Pro işlevleri ve ortak temelin geniş davranışları | Yalnız yürürlükteki, Pro'ya uygulanabilir işler G02'ye girer; iptal/erteli entegrasyonlar eklenmez. |
 | B01–B04 | Çok merkez ve merkezler arası ekler | Business ek kabulü; Pro'da bu yeteneklerin kapalı kalması ayrıca doğrulanır. |
-| O01–O10 | Ortak güvenlik ve üretim işletimi | Kullanılan veri yüzeyi/worker için gereken kanıt korunur; her planın ek kapsamı ayrıca sınanır. |
+| O01/O02/O11 | Ortak worker/alarm ve asgari veri güvenliği | Tek ortak işletim kabulü; O03–O10 Business sonrası ayrı altyapı projesidir. |
 | G02 / G01 / G03 | Plan bazlı backend kabul kapıları | Ortak Pro temeli, Starter kısıtları ve Business ekleri kendi ölçütleriyle kapanır. |
 
 S/P/B kimlikleri tarihsel görev referanslarıdır; ayrı ürün veya kod tabanı anlamına gelmez. Önceden tamamlanan görevler korunur. Pro'dan sonra Starter için yapılacak iş, gerekli ortak akışların kendi plan bağlamında çalıştığını ve kapalı özellik/limitlerin backend tarafından uygulandığını kanıtlamaktır. İstemcide alan veya düğme gizlemek bu kabulü karşılamaz.
@@ -646,32 +646,52 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 ## Ortak üretim işletimi
 
-O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth/Storage/export/worker yüzeylerine uygulanabilir bütün güvenlik, saklama, imha, restore ve yük koşulları G02 için korunur. Starter aynı mekanizmaları kendi dar yetki/limitleri altında, Business çok merkez ve birleşik yük ekleriyle doğrular. Pro'da kullanılmayan Business'a özgü senaryo G02'nin önkoşulu yapılmaz; bütün planlarda kullanılan bir veri yüzeyi ise plan gerekçesiyle kapsamdan çıkarılmaz. Açık koşul, eksik ortam girdisi veya tamamlanmamış fiziksel imha bu ayrımla kapanmış sayılmaz.
+Bu teslimin ortak işletim işleri O01, O02 ve [O11 asgari veri güvenliği kontrolüdür](#o11). [Ürün teslim sınırı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) uyarınca O03–O10 Business sonrası ayrı altyapı projesine ertelenmiştir; G02/G01/G03 bağımlılığı değildir ve tamamlandı sayılmaz. Aynı uygulama için plan başına ayrı işletim kabulü yapılmaz. Mevcut hesap silme, erişim engelleme, dosya temizliği ve bütün mevcut testler korunur; yeni genişletme bu teslimin şartı değildir.
 
 <a id="o01"></a>
-### O01 — Gerçek worker yükü ve tekrar güvenliği
+### O01 — Gerçek worker işi ve tekrar güvenliği
 
-- [ ] **Tür:** D/H · **Plan:** Tümü; lane bazlı · **Özellik:** F12,F24,F26,F28,F31,F33
+- [x] **Tür:** D/H · **Plan:** Tümü; lane bazlı · **Özellik:** F12,F24,F26,F28,F31,F33
 - **Bağımlılık:** A03
 - **Kabul:** Her uygulanabilir lane en az bir gerçek iş ve sonuçla doğrulanır.
 - **Sınır/olumsuz durum:** Report-worker kapanmış dilim yeniden yapılmaz; idle/claim0 tam kabul değildir.
-- **Doğrulama senaryosu:** Lease kaybı, kesinti, retry, disable/rebind/restart; yanlış binding reddi; P14/P16 sonrası e-posta yükü eklenir.
+- **Doğrulama senaryosu:** Lease kaybı, kesinti, retry, disable/rebind/restart; yanlış binding reddi. P14/P16 e-posta işlerinin mevcut gerçek teslim kanıtı kullanılır; ayrı plan yük kabulü eklenmez.
 - **Kaynak alanı:** worker p01/p05/p06/p07/privacy; mevcut ops test/runbook
+
+**Ortak/Pro kapanışı:** Lane başına gerçek hosted iş/sonuç ve mevcut native lease/kesinti/retry/disable/rebind/restart/yanlış scope kanıtları [tek kabul eşlemesinde](00-FtkSaaS-yeni-sohbet-devir.md#o01-worker-kapanisi) uzlaştırıldı. Yeni regresyon kaynağının CI teslimi bu kayıtta ayrıca ayrılır; G01/G03 işlev/kısıt kabulleri ve O02/O11 ayrıca izlenir; erteli O03–O10 bu kapanışla tamamlanmış sayılmaz.
 
 <a id="o02"></a>
 ### O02 — Alarm ve müdahale kabulü
 
-- [ ] **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [x] **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O01
-- **Kabul:** Takılmış iş, teslim hatası, stale heartbeat ve backup gecikmesi gözlenip sorumluya ulaşır.
+- **Kabul:** Mevcut salt okunur worker/job sağlık kontrolü çalışır; tek kontrollü hata için seçilmiş mevcut e-posta kanalından gerçek alarm ve toparlanma bildirimi sorumluya ulaşır. Yeni daimi izleyici veya ayrı alarm servisi kurulmaz.
 - **Sınır/olumsuz durum:** Logda secret/kişisel veri yok; kapalı worker ile sağlıksız worker ayrılır.
-- **Doğrulama senaryosu:** Hata enjeksiyonu→alarm→müdahale→toparlanma; alıcı/kanal ortam girdisi seçilmeden hazır sayılmaz.
+- **Doğrulama senaryosu:** İzole kontrollü hata→mevcut sağlık sorgusunda tespit→onaylı alıcıya gerçek test uyarısı→hata giderme/sağlık yeniden okuma→gerçek toparlanma bildirimi ve gelen kutusu doğrulaması. Mevcut araç ve sağlayıcı kullanılır.
 - **Kaynak alanı:** mevcut diagnostics/monitoring/config; runbook
+
+**Asgari kapsam:** Mevcut sorgu, araçlar, yazılmış kaynak ve testler korunur; yeni host/zamanlayıcı, kalıcı alarm platformu, kapsamlı teyit arayüzü veya otomatik yedek izleme bu teslimin şartı değildir. Gerçek kontrol/teslim sonucu [devirde](00-FtkSaaS-yeni-sohbet-devir.md#o02-alarm-cekirdegi) kayıtlıdır. O11'e düzenli yedekleme, RPO/RTO veya tam restore bağımlılığı taşınmaz.
+
+**Asgari operasyonel kabul:** Gerçek native sağlık hatası/müdahale/toparlanma ve mevcut sağlayıcıdan iki bildirimin Gmail gelen kutusuna teslimi [kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md#o02-alarm-cekirdegi) doğrulandı. Yazılmış kaynak paketinin CI/merge/development teslimi ayrı izlenir.
+
+<a id="o11"></a>
+### O11 — Asgari veri güvenliği kontrolü
+
+- [ ] **Tür:** H · **Plan:** Ortak; bir kez · **Özellik:** F33
+- **Bağımlılık:** Çalışan uygulama ve ondan alınmış gerçek yedek; O03–O10 önkoşulu yoktur.
+- **Kabul:** [Ürün teslim sınırındaki](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) tek asgari kontrol gerçek sonuçla kanıtlanır.
+- **Doğrulama senaryosu:** Bir yedek al → ayrı izole hedefe geri yükle → uygulamayı aç → temel veriyi uygulamanın mevcut okuma yolundan oku. Yalnız SQL sorgusu veya boş servis health sonucu uygulama kabulü değildir.
+- **Sınır:** Kaynak ortama reset/seed/restore uygulanmaz; hedef izole kalır. Geniş imha/sicil/checkpoint, özel restore altyapısı, tam DB/Auth/Storage tatbikatı, RPO/RTO ve yük ölçümü bu işin şartı değildir. Mevcut testler değiştirilmez.
+- **Kanıt sahibi:** Yedek, izole hedef ve uygulama/temel okuma sonucu [devirde](00-FtkSaaS-yeni-sohbet-devir.md) kaydedilir; veri veya secret rapora yazılmaz.
+
+## Business sonrası ayrı altyapı projesi
+
+Aşağıdaki O03–O10 görevleri ertelenmiştir. Mevcut kaynak ve kabul izleri korunur; bunlar mevcut plan tesliminin engeli veya plan başına yeni işletim kabulü değildir.
 
 <a id="o03"></a>
 ### O03 — Saklama ve imha kapsamı
 
-- [ ] **Tür:** D/K · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** D/K · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** A03
 - **Kabul:** DB/Auth/Storage/export/geçici kopya ve backup kapsamı, hold ve korunan iş kayıtları eşlenir.
 - **Sınır/olumsuz durum:** Salt manifest fiziksel imha değildir; kabul edilmemiş süre/hukuki taahhüt uydurulmaz.
@@ -681,7 +701,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o04"></a>
 ### O04 — DB ve Auth fiziksel imha
 
-- [ ] **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O03
 - **Kabul:** Yetkili imha gerçek profil/Auth yüzeyini hedef sırada kaldırır.
 - **Sınır/olumsuz durum:** Hold/korunan finans verisi keyfî silinmez; yarım iş completed olmaz.
@@ -699,7 +719,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
 
-- [ ] **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F30,F28,F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F30,F28,F33
 - **Bağımlılık:** O03
 - **Kabul:** Hedef baytlar ve geçici/export kopyaları gerçekten kaldırılır.
 - **Sınır/olumsuz durum:** Metadata silmek bayt silmek değildir; izinli hold ve retry sınırları korunur.
@@ -713,7 +733,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
-- [ ] **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O04,O05
 - **Kabul:** İmzalı sicil gerçek imha sonucuna ve bağımsız güncel checkpoint/trust kaynağına bağlıdır.
 - **Sınır/olumsuz durum:** Sicil ve trust aynı eski backup ile geriye alınamaz; tamamlanmamış imha başarı yazmaz.
@@ -723,7 +743,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o07"></a>
 ### O07 — Guard ile gerçek restore yükleyicisi
 
-- [ ] **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O06
 - **Kabul:** Guard reddi yüklemeyi, loader hatası hizmete erişim açılmasını engeller.
 - **Sınır/olumsuz durum:** Kod rollback DB restore değildir; production reset/seed yok.
@@ -736,7 +756,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** Business sonrası erteli · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
@@ -746,7 +766,7 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
 
-- [ ] **Tür:** H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O08
 - **Kabul:** Silme öncesi backup restore edilince silinmiş kişi/org erişime dönmez.
 - **Sınır/olumsuz durum:** Eski trust+ledger veya eksik sicil erişim açamaz.
@@ -756,9 +776,9 @@ O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** Business sonrası erteli · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
-- **Kabul:** Aynı uygulamanın Pro250 tek merkez, Starter100 kısıtlı plan ve Business1250 çok merkez veri profilleri için uygulanabilir gecikme/queue/finans doğruluğu ölçülür. G02 Pro profilini, G01 Starter limit/özellik etkisini, G03 Business ek yükünü gerektirir; geçerli ortak restore kanıtı kapsamı aynıysa yeniden kullanılabilir.
+- **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
 - **Doğrulama senaryosu:** Yük profili ve eşikler koşudan önce kaydedilir; pilot RPO≤24saat/RTO≤8saat hedefleri ölçülür, ticari SLA sayılmaz.
 - **Kaynak alanı:** yük senaryoları; query/worker ölçümleri; runbook
@@ -771,7 +791,7 @@ Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/de
 ### G02 — Pro ortak uygulamasının backend kabulü
 
 - [ ] **Tür:** D/H · **Plan:** Pro · **Özellik:** Pro erişimli F01–F33
-- **Bağımlılık:** S01–S16 ve P01–P16 içindeki yürürlükteki Pro kapsamı; O01–O10’un Pro’da kullanılan yüzeylere uygulanabilir ölçütleri. İptal/erteli sağlayıcı işleri ve Business ek senaryoları bu kapıya taşınmaz.
+- **Bağımlılık:** S01–S16 ve P01–P16 içindeki yürürlükteki Pro kapsamı; ortak O01/O02 ve O11 asgari veri güvenliği kontrolü. O03–O10 bu kapının şartı değildir. İptal/erteli sağlayıcı işleri ve Business ek senaryoları bu kapıya taşınmaz.
 - **Kabul:** Çok kaynaklı operasyon ve CRM/başvuru→inceleme/eşleme→öğrenci dönüşümü→ders/etkinlik/paketli Pratik→yoklama/hakediş→bildirim bağlı zinciri aynı uygulamada gerçek backend yollarıyla tamamdır. Ortak kişi/Abone No→paket/satış/tahsilat→program/rezervasyon/talep→yoklama/düzeltme→hakediş/ödeme→rapor/import/belge zinciri de aynı kaynaklarla uzlaştırılır; bağımsız endpoint başarıları bu uçtan uca kabulün yerine geçmez.
 - **Sınır/olumsuz durum:** 250 öğrenci/tek merkez, merkezler arası kullanım kapalıdır. Canlı yetki, borç/hak/kapasite, tarihsel snapshot, sürüm/replay ve atomiklik denetlenir. Ortak işletim veya gerçek sağlayıcı kabulü, frontend beklenmiyor gerekçesiyle mock'a çevrilmez.
 - **Doğrulama senaryosu:** Geçerli Pro akışları, başka tenant/merkez ve yetki kaybı retleri, son yer/son hak/finans yarışları; gerçek e-posta ve yürürlükteki sağlayıcı/config/worker kanıtı. Eksik girdi ve erteli kapsam açık ayrılır.
@@ -781,7 +801,7 @@ Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/de
 ### G01 — Aynı uygulamanın Starter kısıt kabulü
 
 - [ ] **Tür:** D/H · **Plan:** Starter · **Özellik:** Starter erişimli F01–F33
-- **Bağımlılık:** G02’nin kabul edilmiş ortak uygulaması; Starter'a uygulanabilir S/P/O kanıtı ve plan kısıt regresyonları. Ortak özellikler ikinci kez geliştirilmez.
+- **Bağımlılık:** G02’nin kabul edilmiş ortak uygulaması; Starter'a uygulanabilir S/P kanıtı ve plan kısıt regresyonları. Ortak O01/O02/O11 kanıtı kullanılır; plan başına ayrı işletim kabulü yoktur. Ortak özellikler ikinci kez geliştirilmez.
 - **Kabul:** Hesapsız öğrenci/No→izinli paket/tahsilat→program/self rezervasyon→yoklama/düzeltme→izinli rapor/import/belge ve temel lead/not/takip aynı backend’de Starter yetki ve limitleriyle çalışır.
 - **Sınır/olumsuz durum:** 100 aktif öğrenci ve tek merkez/oda/disiplin/eğitmen sınırları backend'de uygulanır. Yalnız üst plana ait personel, ileri CRM/deneme/segment/otomasyon, etkinlik, hakediş, dış bildirim ve merkezler arası yollar doğrudan API çağrısında da reddedilir; kesin kapsam normatif plan matrisinden alınır. Temel lead/not/takip ileri CRM reddiyle yanlışlıkla kapatılmaz.
 - **Doğrulama senaryosu:** İzinli uçtan uca backend zinciri; her uygulanabilir kota sınırı ve eşzamanlı aşım; üst plan komut/selector/worker reddi, plan/rol kaybından sonra eski receipt ile yetki kazanılamaması; kapsam seçimi ve geçmişin korunması. Starter’a izinli public HTTP, gerçek takvim GET/HEAD/rotate/revoke ve native hesap/oturum gerçek ortam kanıtı ayrıca doğrulanır. Ortak başlangıç politikaları bir özellik kilidi değildir: yönetici izinli organizasyon sınırlarında bunları değiştirebilir.
@@ -791,10 +811,10 @@ Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/de
 ### G03 — Business ekleri ve toplam backend kabulü
 
 - [ ] **Tür:** D/H · **Plan:** Business/Tümü · **Özellik:** F01–F33
-- **Bağımlılık:** Kabul edilmiş ortak Pro temeli (G02), Starter kısıt kabulü (G01), B01–B04 ve Business'a uygulanabilir O01–O10 ek kanıtları. Business temel ders/finans/Auth motorunu yeniden geliştirmez.
+- **Bağımlılık:** Kabul edilmiş ortak Pro temeli (G02), Starter kısıt kabulü (G01), B01–B04 ve ortak O01/O02/O11 kanıtı. Ayrı Business işletim/yük/restore kabulü eklenmez; O03–O10 bu teslimin sonrasındadır. Business temel ders/finans/Auth motorunu yeniden geliştirmez.
 - **Kabul:** Beş merkeze/1250 aktif öğrenciye kadar aynı uygulama; orgda tek kişi/Abone No ve kota sayımı, merkez izolasyonu, ortak inbox/rapor, merkezler arası hak kullanımı, satış bedeli payı ve karşı merkez onaylı hesaplaşma birlikte doğrulanır.
 - **Sınır/olumsuz durum:** Org yetkisi merkez operasyon yetkisi sayılmaz; her A/B adımında canlı kapsam doğrulanır. Geçmiş finans/ödeme/hakediş yeniden yazılmaz; tek taraflı hesaplaşma, mükerrer kişi sayımı ve scope sızıntısı reddedilir.
-- **Doğrulama senaryosu:** A/B/Org olumlu/olumsuz akışlar, aynı aktörün ayrı merkez yetkileri, yarış/replay/düzeltme ve rapor tutar mutabakatı; Business ek yük/restore kapsamı ve ortak Pro/Starter regresyonu. 33 özellik ilgili planlarda izlenebilir kalır.
+- **Doğrulama senaryosu:** A/B/Org olumlu/olumsuz akışlar, aynı aktörün ayrı merkez yetkileri, yarış/replay/düzeltme ve rapor tutar mutabakatı; Business işlev/yetki ekleri ve ortak Pro/Starter regresyonu. 33 özellik ilgili planlarda izlenebilir kalır.
 - **Kaynak alanı:** B01–B04, ortak S/P/O, mevcut settlement/report/CRM testleri ve backend devir kaydı.
 
 ## F01–F33 kapsama izi

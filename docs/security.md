@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ff5fdd242f05b16b697d93cad2e8d7c8249f6a400a97fecf61d8895fa4c90330`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `3059c816ad54436d9fa758b36de15b86e4f594865657bcfdc6a24ed388580168`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -62,7 +62,10 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [merge-approval-discovery.sql](../apps/backend/database/merge-approval-discovery.sql) | `754d0d683739619f3af8b1d058627fd7f973eb9454695ba2702a1ab838046cd1` |
 | [native-auth-signup-check.sql](../apps/backend/database/native-auth-signup-check.sql) | `6acf9d503533661d721afa98e157e59bb0c869f617ca006561024b0ee1ccc186` |
 | [notification-language-rendering.sql](../apps/backend/database/notification-language-rendering.sql) | `bb9c33f28dabb30b6484ce93a26c8e616f8db53cf11a873cfece2c164234da2d` |
+| [ops-edge-integrity.sql](../apps/backend/database/ops-edge-integrity.sql) | `cafcd0eecf00a9d11516534a003eb3b15deb9c2173a16889780773704a1bd557` |
 | [ops-hosted-workers.sql](../apps/backend/database/ops-hosted-workers.sql) | `f43952f01f12589a38e10527859227c0c340f5455bcbcbcc9237063115fd635c` |
+| [ops-monitor-incidents.sql](../apps/backend/database/ops-monitor-incidents.sql) | `f3aa0f8b5c616ce7004e3e75bba9945c6d70dbb40f682bd039e22d838d31e52a` |
+| [ops-monitor.sql](../apps/backend/database/ops-monitor.sql) | `15807509a9d3ec340003d01b56a908b4170a86f958353e4bbdae0058b1fff2d0` |
 | [organization-security-native-proof.sql](../apps/backend/database/organization-security-native-proof.sql) | `5cd97216e22efc2adb0ebe643dc187fa64bcc855d38147717f29682a56560d02` |
 | [organization-security-preferences.sql](../apps/backend/database/organization-security-preferences.sql) | `841e24e4a3dedd571d2bd606a4eec248b9fa703a007ca492f6286c5bcf2ccf71` |
 | [owner-downgrade-resource-discovery.sql](../apps/backend/database/owner-downgrade-resource-discovery.sql) | `e0dbfcedcb24217d5ccdd25d1d3d671bbf612c68843d4ed83d37337045a42a9a` |
@@ -151,7 +154,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `a92948dd0f49725d3eb17e5a6cbe9e81e59cdb73254d1fa7620c986f8bee0cd6` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `95408e4cbd6fd2c2835fe8812a808a592557f9819f50dad72742a7c0300950f9` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [sale-change-inventory.sql](../apps/backend/database/sale-change-inventory.sql) | `0985f3a2ddc067265966ad61dd2144578f5605a50a8f10393e642faf4cf1f8c2` |
@@ -331,3 +334,6 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261112072827_s10_reservation_window_default.sql](../apps/backend/supabase/migrations/20261112072827_s10_reservation_window_default.sql) | `4458e605dc41fa5bd6f1e4bb6d2b1fe67ee984880b0a2b0579069e103c55604a` |
 | [20261112074118_s10_sharing_consent.sql](../apps/backend/supabase/migrations/20261112074118_s10_sharing_consent.sql) | `8dcdcee9d7d2dd0e7381b9681de751ab2535ac1862866d6b1b84468665f6026a` |
 | [20261112093024_s10_offer_duration_required.sql](../apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql) | `493ca006120f828b417bc5bffb13456dc4d91cc1f6a893c996b637820b5a3495` |
+| [20261112212500_ops_monitor.sql](../apps/backend/supabase/migrations/20261112212500_ops_monitor.sql) | `15807509a9d3ec340003d01b56a908b4170a86f958353e4bbdae0058b1fff2d0` |
+| [20261112214500_ops_monitor_incidents.sql](../apps/backend/supabase/migrations/20261112214500_ops_monitor_incidents.sql) | `f3aa0f8b5c616ce7004e3e75bba9945c6d70dbb40f682bd039e22d838d31e52a` |
+| [20261112220500_ops_edge_integrity.sql](../apps/backend/supabase/migrations/20261112220500_ops_edge_integrity.sql) | `a8c6caa5fe8a7bbd78c54c794e1e6db00aed8a0f1de10759d78d04d9cdfe7344` |

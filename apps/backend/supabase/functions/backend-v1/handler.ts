@@ -7,13 +7,14 @@ import {crmIntakeTargets,publicIngress,verifyPublicBot,publicBotHostname} from "
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
 import {verifySettingsImage} from './settings-image.ts';
+import {noteGatewayError,reportGatewayError} from './ops-errors.ts';
 import implementation from "./implemented.json" with {type:"json"};
 import { v7 } from "uuid";
 import * as validators from "./validators.js";
 const implemented=new Set(implementation.operations);
-const json=(x:unknown,status=200,noStore=false)=>new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","access-control-allow-origin":"*",...(noStore?{'cache-control':'private, no-store'}:{})}});
-const failure=(code:string,status=400)=>json({ok:false,error:{code,retryable:code==="TEMPORARY_FAILURE"||code==="OPERATION_IN_PROGRESS",trace_id:v7()}},status);
-Deno.serve(async req=>{
+const json=(x:unknown,status=200,noStore=false)=>{const response=new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","access-control-allow-origin":"*",...(noStore?{'cache-control':'private, no-store'}:{})}});noteGatewayError(response,x);return response;};
+const failure=(code:string,status=400,unexpected=false)=>{const payload={ok:false,error:{code,retryable:code==="TEMPORARY_FAILURE"||code==="OPERATION_IN_PROGRESS",trace_id:v7()}},response=json(payload,status);if(unexpected)noteGatewayError(response,payload,true);return response;};
+const handleRequest=async(req:Request):Promise<Response>=>{
  if(req.method==="OPTIONS")return new Response("",{headers:{"access-control-allow-origin":"*","access-control-allow-headers":"authorization,apikey,content-type,x-ftk-client-ip,x-ftk-ingress-time,x-ftk-ingress-signature,x-ftk-bot-proof","access-control-allow-methods":"POST,OPTIONS"}});
  if(req.method!=="POST")return failure("VALIDATION_FAILED");
  try{
@@ -178,5 +179,10 @@ Deno.serve(async req=>{
   return json(result,200,operation==='media_get_v1'||operation.startsWith('calendar_'));
   }
   return failure("TEMPORARY_FAILURE",503);
- }catch{return failure("TEMPORARY_FAILURE",503);}
+ }catch{return failure("TEMPORARY_FAILURE",503,true);}
+};
+Deno.serve(async req=>{
+ const response=await handleRequest(req),operation=new URL(req.url).pathname.split('/').filter(Boolean).at(-1);
+ await reportGatewayError(response,operation&&implemented.has(operation)?operation:undefined,name=>Deno.env.get(name));
+ return response;
 });
