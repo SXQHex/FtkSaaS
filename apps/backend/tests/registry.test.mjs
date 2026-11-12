@@ -162,3 +162,4 @@ import './agreement-preparation-acceptance.mjs';
 import './permission-preparation-acceptance.mjs';
 import './plan-target-discovery-acceptance.mjs';
 import './sale-change-inventory-acceptance.mjs';
+import './sharing-consent-acceptance.mjs';

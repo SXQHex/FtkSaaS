@@ -40,9 +40,10 @@ test('Starter studio setup: one room, timed sales and immutable published names'
   const policy=(key,value)=>mut('policy_publish_v1',{center_id:null,key,value,effective_at:new Date().toISOString(),mandatory:false});
   await t.test('new Starter inherits the approved zero credit default; unconfigured policies and center overrides stay closed',async()=>{
    assert.equal((await must(platform,'organization_create_v1',creationBody,creationKey)).primary_id,org);
-   assert.equal((await rows('select count(*)::int n from core.policy_versions where org_id=$1',[org]))[0].n,3);
-   const read=await mut('policies_get_v1',{keys:['negative_default','reservation_window']});
+   assert.equal((await rows('select count(*)::int n from core.policy_versions where org_id=$1',[org]))[0].n,4);
+   const read=await mut('policies_get_v1',{keys:['negative_default']});
    assert.equal(read.length,1);assert.equal(read[0].key,'negative_default');assert.deepEqual(read[0].value,{kind:'integer',value:0});assert.equal(read[0].scope.kind,'organization');
+   const window=await mut('policies_get_v1',{keys:['reservation_window']});assert.equal(window.length,1);assert.deepEqual(window[0].value,{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});assert.equal(window[0].scope.kind,'organization');assert.equal(window[0].version,1);
    const debt=await mut('policies_get_v1',{keys:['debt_booking','debt_participation']});assert.equal(debt.length,2);assert(debt.every(p=>p.value.kind==='boolean'&&p.value.value===true&&p.scope.kind==='organization'));
    const denied=await call(owner,'policy_publish_v1',scope({key:'negative_default',value:{kind:'integer',value:3},effective_at:new Date().toISOString(),mandatory:false}),key());
    assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'PLAN_FEATURE_UNAVAILABLE');

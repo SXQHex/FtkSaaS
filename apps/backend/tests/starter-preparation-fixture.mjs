@@ -1,3 +1,4 @@
+import {explicitSharingConsentInputs} from './sharing-consent-fixture.mjs';
 import {authUser,fixturePlatform,must as nativeMust} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
@@ -22,7 +23,7 @@ export async function preparationFixture({schedule=false,templates=false,student
  const read=scope=>must(owner,'settings_get_v1',q(scope));
  const change=async(scope,patch)=>{
   if(!versions.has(scope))await read(scope);
-  return must(owner,'settings_update_v1',{...q(scope),expected_version:versions.get(scope),patch},key());
+  return must(owner,'settings_update_v1',{...q(scope),expected_version:versions.get(scope),patch,...(scope==='member'?await explicitSharingConsentInputs(owner,org,patch):{})},key());
  };
  const day=n=>new Date(Date.now()+n*86400000).toISOString().slice(0,10);
  const availabilityTemplate={key:'weekday',name:'Explicit weekly preparation',rules:[{weekdays:[1,2,3,4,5,6,7],local_start:'08:00:00',local_end:'19:00:00',valid_from:'2020-01-01'}]};

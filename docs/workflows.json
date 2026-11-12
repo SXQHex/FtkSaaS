@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b037604e9836fb1ece7d40e987f2405dded14b6a01312b5ffdec3429425a30be",
-        "reason": "Contract test köküne hosted iş takvimi runner güvenlik testleri eklendi; aynı anahtar kurtarması ve canlı kaynak koruması incelendi, ortak istemci protokolü değişmedi."
+        "fingerprint": "39fbf2411f62422520041200da069c490cabc7f4ce4b73fdfb870adbb7063d82",
+        "reason": "PR289 CI fixes: two exact API source hashes and user-approved Starter count3to4 fingerprint reviewed; previous policy records, 117 unit ownership, protocol and source gates unchanged."
       }
     },
     {
@@ -484,8 +484,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "37c4109d6cdff29f03ddac0b18ce73b316687936ccb28eca2428c04b19cefea0",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "5c973c70df896e01c1bb9709935a942dcd7d7971819d9c04f58660b852873a44",
+        "reason": "S10 approved new-plan reservation window defaults reviewed; existing role, center and management selector authority unchanged."
       }
     },
     {
@@ -501,7 +501,8 @@
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
-        "apps/backend/tests/class-duty-management-acceptance.mjs"
+        "apps/backend/tests/class-duty-management-acceptance.mjs",
+        "apps/backend/tests/sharing-consent-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -557,7 +558,9 @@
         "apps/backend/database/program-configuration-requirements.sql",
         "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql",
         "apps/backend/database/class-duty-management.sql",
-        "apps/backend/supabase/migrations/20261103194514_class_duty_management.sql"
+        "apps/backend/supabase/migrations/20261103194514_class_duty_management.sql",
+        "apps/backend/database/settings-sharing-consent.sql",
+        "apps/backend/database/settings-sharing-events.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -580,8 +583,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "3dda259292af9a55f532743c4afecd5a8d63f4caadbc9193a3066a3281321cea",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "e3bd252d0939d85a9054dc9f2c5b4e631f92f0ea3e91fba31a7ea478ebf52db6",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -673,8 +676,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "d990354fcc4b4aed2893f97b7aee001347f2e65cd3fc4b4111de4c2fb5ea9f9c",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "aef32117123bcffe66450a78794ff45aeb69422599fbed05370905fb1eb75356",
+        "reason": "S10 newly verified account-link episode invalidates old sharing consent; native invitation/revoke/discovery authority unchanged."
       }
     },
     {
@@ -773,8 +776,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "a1400426b99a96b173e93df26babe7a2c51483cacc1d5c2b0a91bf165e8440b1",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "3d099e3c9abdbd04f4baa11710468b8a62c9e41316eaa5ac05b5ede75cc8c4d6",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -858,8 +861,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "018a8a508d5875531169fdcdc4075a90cf35598e89e71e908e7cdea6b9e9bafc",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "770a22a5777710bdc687a4dd31716183539e7a8ff4685e39283890c962154760",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -921,8 +924,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "b14eec04010bbff74d14cd511187a7975c47f6509276c21e4ac955bae7bcfca8",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "62b63f774c7221183224ee941b09a58f689ba37cfe92ad9df78bcad0a9020c2d",
+        "reason": "S10 lifecycle fixture now explicitly publishes offer duration for paid-plan worker acceptance; attendance and earnings guards/assertions unchanged."
       }
     },
     {
@@ -986,8 +989,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "d73833d9b3e256f8fe41280540029b4118d32319e678d949c9551aad9887a654",
-        "reason": "Reviewed unchanged existing attendance suite body; only a side-effect import adds settings domain closure acceptance. Existing sales, reservation, attendance and finance assertions and workflow semantics are preserved."
+        "fingerprint": "02ca2fe5fad33d581a1abd79bdecb0b516ffb8142c9a5fae2a2617f8e22fef95",
+        "reason": "S10 lifecycle fixture explicitly supplies positive offer duration; existing debt, refund and money flow unchanged and source assertions retained."
       }
     },
     {
@@ -1082,8 +1085,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "7054d846fc2114b6c20e932c848274d71450950a52767650bd19cdca38ab5125",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "a9ca6dabad19283af6e34ca499850310005bd6e895d27240d4d8cdf4a664fa71",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -1209,7 +1212,10 @@
         "apps/backend/tests/settings-behavior-acceptance.mjs",
         "apps/backend/tests/settings-domain-closure-unit.mjs",
         "apps/backend/tests/settings-domain-closure-acceptance.mjs",
-        "apps/backend/tests/hosted-work-calendar-runner-unit.mjs"
+        "apps/backend/tests/hosted-work-calendar-runner-unit.mjs",
+        "apps/backend/tests/sharing-consent-acceptance.mjs",
+        "apps/backend/tests/sharing-consent-fixture.mjs",
+        "apps/backend/tests/p01-waitlist-workers.test.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1280,7 +1286,17 @@
         "apps/backend/database/settings-waitlist-opt-in.sql",
         "apps/backend/database/settings-calendar-exceptions.sql",
         "apps/backend/supabase/migrations/20261112003727_settings_domain_closure.sql",
-        "apps/backend/scripts/acceptance/s10-hosted-work-calendar.mjs"
+        "apps/backend/scripts/acceptance/s10-hosted-work-calendar.mjs",
+        "apps/backend/database/settings-sharing-consent.sql",
+        "apps/backend/database/settings-sharing-events.sql",
+        "apps/backend/database/settings-catalog-v22.sql",
+        "apps/backend/database/settings-reservation-window-default.sql",
+        "apps/backend/supabase/migrations/20261112072827_s10_reservation_window_default.sql",
+        "apps/backend/supabase/migrations/20261112074118_s10_sharing_consent.sql",
+        "apps/backend/database/settings-sharing-catalog-authority.sql",
+        "apps/backend/supabase/migrations/20261112083837_s10_sharing_catalog_authority.sql",
+        "apps/backend/database/settings-offer-duration-required.sql",
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1295,8 +1311,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "708ed53a5ea803b341405b27e33e8a6a322e667483dad1486ce53156f5cb6633",
-        "reason": "Bağımsız P2 incelemesi düzeltildi: normal ve pending cancel yalnız hedef session primary_id doğrulanınca tamamlanır; bozuk/yanlış mutation ve belirsiz replay19 güvenlik testinde fail-closed incelendi."
+        "fingerprint": "f3984af8f50d47cb24570b62c2b07b436a94af521c8155571e6f3f18494a2c94",
+        "reason": "S10 source151 requires explicit positive offer duration and fingerprints effective policy for recovery after retry exhaustion; settings/default/private sharing source and native tests reviewed."
       }
     },
     {
@@ -1420,8 +1436,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "d2fdef92f09fccae3f3f06458268e8ec9f1456c088b9637e4afe1f4264179ad6",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "70daf532432abff80013bb6b64aeb4799cf9455c7e9e308d145b0befb0b150c8",
+        "reason": "S10 paid lifecycle fixture explicitly supplies offer duration without changing agreement, earnings or payment assertions; existing native flow reviewed."
       }
     },
     {
@@ -1434,7 +1450,8 @@
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/event-cancellation.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/sharing-consent-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1469,7 +1486,9 @@
         "apps/backend/database/event-capacity-practice.sql",
         "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
         "apps/backend/database/upper-plan-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
+        "apps/backend/database/settings-sharing-consent.sql",
+        "apps/backend/database/settings-sharing-events.sql"
       ],
       "operations": [
         "event_save_v1",
@@ -1492,8 +1511,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "aa98c101fa6b7643733d3514b213302ff56d1e5a1846cdc8699df7ea662fae3f",
-        "reason": "Gerçek kaynak ve rehber incelendi: ortak güvenli başlangıç, sıfır hakkın hata ayrımı ve açık borçlu fixture politikaları; canlı yetki, nakit bağımsız hakediş/hesaplaşma ve değişmeyen yarış assertionları korunur."
+        "fingerprint": "9dc31f3142d1fe36d211b55e9a4ef67da36004d09f779a2eee77755df324555d",
+        "reason": "S10 event sharing source and native audience/media tests reviewed, including org permission/catalog consistency; payment/cancellation unchanged."
       }
     },
     {
@@ -1693,7 +1712,9 @@
         "apps/backend/database/runtime-wrappers-current.sql",
         "docs/workflows.md",
         "apps/backend/database/starter-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
+        "apps/backend/database/settings-offer-duration-required.sql",
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
       ],
       "operations": [
         "waitlist_join_v1",
@@ -1702,8 +1723,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "c1db0cc38d75eb952aca509fa842023a9b030f91210ab87ab8f961ef77b61cee",
-        "reason": "Generated contract/types/Edge farkı incelendi: request ve response inheritance kopyaları ortak kapalı referanslara taşındı; bu akışın mevcut API/davranışı değişmedi."
+        "fingerprint": "feadd9cb2d49e3d27ac681877a700d343528f3bd81c23a579b24353f2ce7b54a",
+        "reason": "S10 missing duration produces no offer, keeps waiting state through three real retries, and explicit policy publication recovers the same entry; native source and guide reviewed."
       }
     },
     {
@@ -1792,7 +1813,9 @@
         "apps/backend/database/account-native-residues.sql",
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
         "apps/backend/database/account-export-erasure.sql",
-        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/database/settings-offer-duration-required.sql",
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1807,8 +1830,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "68422a0c6c8710a9c8864ead416d7ffd13ceb5d0a0817636bb7de2e2b1e2c03b",
-        "reason": "Reviewed CI failure fixes: typed nonempty form choices align native/Edge schemas; organization-only discipline fixture omits center; regression passes JSON text across node-postgres boundary. Existing workflow behavior and assertions remain."
+        "fingerprint": "8bcd21bec2ea8fe90013fed22159e367d444606e31737cf32a5a90aa7f2bca16",
+        "reason": "S10 worker requires configured offer duration and requeues on effective policy identity change after failed jobs; actor, scope, lease, retry bounds and FIFO unchanged; native recovery proof reviewed."
       }
     }
   ]

@@ -212,7 +212,7 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
  let reservation,sale;
  await t.test('existing reservation and entitlement identity survive single time/resource edits and capacity below occupancy',async()=>{
   await mut('policy_publish_v1',{center_id:null,key:'student_cancel_group',mandatory:true,effective_at:'2020-01-01T00:00:00Z',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}}});
-  await mut('policy_publish_v1',{center_id:null,key:'reservation_window',mandatory:true,effective_at:'2020-01-01T00:00:00Z',value:{kind:'window',opens_minutes_before:10000000,closes_minutes_before:0,manager_exception:false}});
+  await mut('policy_publish_v1',{center_id:null,key:'reservation_window',mandatory:true,effective_at:new Date().toISOString(),value:{kind:'window',opens_minutes_before:10000000,closes_minutes_before:0,manager_exception:false}});
   const terms={name:'Program synthetic credits',kind:'credits',booking_mode:'flexible',credits:10,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
   const pv=(await mut('product_publish_v1',{terms})).primary_id,p=await mut('sale_preview_v1',{person_id:student.p,product_version_id:pv,start_date:'2027-01-01',end_date:'2027-02-15'});sale=(await mut('sale_apply_v1',{preview:token(p)})).primary_id;
   reservation=(await mut('reservation_create_v1',{session_id:sids[0],person_id:student.p,mode:'flexible',source_sale_id:sale})).primary_id;
@@ -487,7 +487,7 @@ test('Session capacity revision: total, categories, explicit override and physic
  await mut('center_manager_assign_v1',{person_id:ownerPerson});
  const payment=await mut('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'synthetic capacity',occurred_at:new Date().toISOString()});await mut('saas_payment_verify_v1',{payment_id:payment.primary_id,accepted:true},key(),platform);
  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Capacity discipline',state:'active'},key())).primary_id;await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
- const publish=(key,value)=>mut('policy_publish_v1',{center_id:null,key,value,effective_at:'2020-01-01T00:00:00Z',mandatory:false});
+ const publish=(key,value)=>mut('policy_publish_v1',{center_id:null,key,value,effective_at:new Date().toISOString(),mandatory:false});
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:100000,closes_minutes_before:0,manager_exception:false});
  await publish('negative_default',{kind:'integer',value:0});await publish('negative_upper',{kind:'integer',value:0});

@@ -761,7 +761,7 @@ test('S10 shares unchanged large validators without changing scope-specific wire
   const scope={member:'Member',center:'Center',organization:'Organization'}[field.scope];
   assert.deepEqual(resolve(p.$defs[scope+'SettingsValues'].properties[field.key]),field.schema);
  }
- assert.equal(config.version,21);assert.equal(config.fields.length,116);
+ assert.equal(config.version,22);assert.equal(config.fields.length,119);
  const sql=['settings-catalog-v20','lesson-request-actionability','settings-negative-delegation','settings-work-alerts','settings-application-forms','settings-discipline-effects','settings-work-calendar'].map(n=>fs.readFileSync('database/'+n+'.sql','utf8').replace('begin;\n','').replace(/commit;\n$/,'')).join('');
  assert.equal(fs.readFileSync('supabase/migrations/20261111210453_s10_settings_completion.sql','utf8'),'-- S10 accepted settings consumers; existing migrations remain immutable.\nbegin;\n'+sql+'commit;\n');
 });

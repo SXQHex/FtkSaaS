@@ -32,6 +32,30 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
  const drain=async(n=6)=>{for(let i=0;i<n;i++){const results=await tick(worker,org);assert(results.every(r=>r.ok),JSON.stringify(results));if(!results.length)break;}};
  const invoke=async(op,r)=>(await worker.query('select private.p01_worker_execute($1,$2,$3) result',[op,r,ids()])).rows[0].result;
  const deniedResult=promise=>assert.rejects(promise,/FORBIDDEN/);
+ await t.test('missing offer duration never invents a timed offer or consumes the waiting intent',async()=>{
+  const sid=await session(),joined=await join(sid);
+  try{
+   for(let attempt=1;attempt<=3;attempt++){
+    if(attempt>1){const next=(await rows("select j.next_attempt_at from core.outbox_jobs j join private.p01_jobs c on c.job_id=j.id where c.org_id=$1 and c.target_id=$2 order by j.created_at limit 1",[org,sid]))[0].next_attempt_at;await new Promise(resolve=>setTimeout(resolve,Math.max(0,+next-Date.now()+50)));}
+    const result=await tick(worker,org);
+    assert.equal(result.length,1);
+    assert.equal(result[0].ok,false);
+    assert.equal(result[0].error.code,'POLICY_NOT_CONFIGURED');
+    assert.equal(await holds(sid),0);
+    assert.equal((await view(sid))[0].state,'waiting');
+   }
+   const exhausted=(await rows("select j.id,j.state,j.attempts::int attempts from core.outbox_jobs j join private.p01_jobs c on c.job_id=j.id where c.org_id=$1 and c.target_id=$2",[org,sid]));
+   assert.equal(exhausted.length,1);assert.equal(exhausted[0].state,'failed');assert.equal(exhausted[0].attempts,3);
+   await pub('waitlist_offer_minutes',{kind:'integer',value:30});
+   const recovered=await tick(worker,org);assert.equal(recovered.length,1);assert.equal(recovered[0].ok,true);
+   const same=(await view(sid))[0];assert.equal(same.id,joined.primary_id);assert.equal(same.state,'offered');assert.equal(await holds(sid),1);
+   const jobs=await rows("select j.id,j.state from core.outbox_jobs j join private.p01_jobs c on c.job_id=j.id where c.org_id=$1 and c.target_id=$2 order by j.created_at",[org,sid]);assert.equal(jobs.length,2);assert.equal(jobs[0].id,exhausted[0].id);assert.equal(jobs[0].state,'failed');assert.equal(jobs[1].state,'succeeded');
+  }finally{
+   const current=(await rows('select version::int version from core.waitlist_entries where id=$1',[joined.primary_id]))[0];
+   await mut('waitlist_leave_v1',{entry_id:joined.primary_id,expected_version:current.version},first.u);
+  }
+ });
+ await pub('waitlist_offer_minutes',{kind:'integer',value:30});
  await t.test('join is intent, scoped and duplicate-safe; worker identity is not a human grant',async()=>{
   const sid=await session(),w=await join(sid);await join(sid,second);assert.equal(await holds(sid),0);
   const duplicate=await call(first.u,'waitlist_join_v1',scope({session_id:sid,person_id:first.p}),key());assert.equal(duplicate.result.error.code,'OPEN_OPERATIONS_EXIST');

@@ -61,6 +61,8 @@ Personel izin durumunda `management_state_get_v1(operation:permission_set_v1, se
 
 ## WF03
 
+Katılımcılar arası profil/fotoğraf/iletişim görünümü yalnız aynı kayıttaki kesin katılımcılara, güncel ayrı paylaşım onayıyla verilir; bitiş/iptal/bağlantı veya onay kaybında kapanır. Medya erişimi aynı canlı kitleyi yeniden denetler. [Açık karar ve medya protokolü](settings.md#katılımcı-paylaşımı-ve-açık-karar-kanıtı).
+
 Merkez iş takvimi public saatlerden ve kaynak availability kısıtlarından ayrıdır; yeni/değişen seans takvime uyar. Ayar değişiminden etkilenen işler açık komutlarla çözülür; [etki okuması](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları) otomatik iptal üretmez.
 
 **Amaç/aktör:** Yetkili merkez operatörü sınıf, sonlu program ve seansları yönetir; öğrenci/eğitmen yetkili görünümü okur.
@@ -236,6 +238,8 @@ Bildirim opt-in default ve miras kuralları [ayar sözleşmesinden](contracts/02
 
 ## WF12
 
+Katılımcı paylaşımı [açık karar protokolünü](settings.md#katılımcı-paylaşımı-ve-açık-karar-kanıtı) kullanır: güncel bildirimi oku/göster → her alan için ayrı karar ve hash/sürümle kaydet → member ayarını yeniden oku. True boolean tek başına onay değildir; false geri çekme güncel metin istemez. History/reset eski onayı açmaz.
+
 İş takvimi, kişisel negatif hak yetkisi ve başvuru form gereksinimleri aynı kapalı ayar/sürüm/reset/history protokolünü kullanır. [Yeni tüketicilerin etkisi ve scope sınırı](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları) domain davranışında uygulanır; frontend ekranı backend kabul önkoşulu değildir.
 
 **Organizasyon güvenliği (O04):** Organization `security_policy` kapalı `mfa_roles` ve nullable `sensitive_reauth_max_age_seconds` içerir. Boş rol listesi/null mevcut platform asgarisini korur; seçili canlı org rolü native doğrulanmış TOTP ve gerçekten AAL2 olan oturum gerektirir. Politika düzenleme/history reapply/reset için AAL2 gerekir; kullanıcı MFA kaydı global hesap akışındadır. Pozitif reauth yaşı mevcut platform sınırından uzun olamaz; hassas rol/izin/bağlantı/birleştirme/lifecycle işlemlerinde güncel oturum yaşı ayrıca doğrulanır. Bu kapı erken dönen keşif okuyucularından önce uygulanır; iç yetki preflight’ı native oturumun güvenilir assurance değerini korur. Başka orga veya global MFA kurulum/kurtarma akışına org şartı taşınmaz.
@@ -293,6 +297,8 @@ Yayımlanmış anlaşma zinciri immutable'dır; yerine geçen sürüm açık pre
 
 ## WF15
 
+Katılımcılar arası profil/fotoğraf/iletişim görünümü yalnız aynı kayıttaki kesin katılımcılara, güncel ayrı paylaşım onayıyla verilir; bitiş/iptal/bağlantı veya onay kaybında kapanır. Medya erişimi aynı canlı kitleyi yeniden denetler. [Açık karar ve medya protokolü](settings.md#katılımcı-paylaşımı-ve-açık-karar-kanıtı).
+
 Starter dışında bağımsız etkinlik akışı. Liste/detay → save/publish → `event_registration_preview_v1` → gerekiyorsa `event_payment_prepare_v1` ve `event_payment_get_v1` → `event_register_v1` → kayıt/finans/hakları yeniden oku. Ödeme hazırlığı kesin kayıt veya kontenjan garantisi değildir; son kontenjan yarışı backend'de çözülür. Negatif kredi yasaktır. Fiilî başlangıç, etkinlik yoklaması/kapanış/düzeltmesi ayrı komutlardır. Öğrenci iptali ile merkez iptali aynı finans sonucu değildir: merkez iptal preview/apply tam hak iadesi ve ödenmiş tutarın öğrenci alacağına dönüşmesini sağlar; otomatik nakit çıkışı yapmaz. Başlamış/kısmen gerçekleşmiş etkinlikte öğrenci iptali parasal iade üretmez; planlı saati geçmiş iptali sonradan girilen fiilî başlangıçla geriye dönük erken iptal sayma. İlgili teknik sözleşme kararları normatiftir.
 
 Fiilî başlangıç kayıt/düzeltmesi gerekçe ve sürüm ister; draft veya gelecekte başlangıç kabul edilmez. Published/occurred/cancelled kayıtta izinli düzeltme yapılabilir; nullable kaldırma geçmişi silmez. CM audit ayrıntısını, diğer yetkili okuyucular yalnız izinli zamanı görür. Merkezce iptal edilen etkinliğin sonraki mark/close/correct işlemi hakkı yeniden tüketemez. Tahsilat–iptal yarışının iki seri sonucu da tutarlıdır; fazlalık öğrenci alacağında kalır. Etkinlik kararlarının tek normatif sahibi [teknik sözleşmedir](contracts/02-FtkSaaS-teknik-sozlesme.md#etkinlik-kararlari).
@@ -345,11 +351,15 @@ Kısmi düzeltmede özgün record ve allocation ID/sürümleri, açık amount ve
 
 ## WF19
 
+Teklif üretimi için etkili pozitif süre politikası gerekir; süre tanımsızken bekleme niyeti korunur. Yetkili yönetici politikayı yayımlayınca aynı kayıt eski job hata bütçesine takılmadan yeniden işlenebilir. [Süre ve kurtarma protokolü](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları).
+
 Üst-plan bekleme/yer teklifi. Seans ve güncel liste/state → waitlist join/leave → worker'ın yetkili FIFO teklifi → kullanıcının offer accept/reject komutu → rezervasyon/teklif/hakları yeniden oku. Listeye girmek veya teklif almak hak tüketimi/kesin rezervasyon değildir. Kabulde canlı kapasite, hak, belge ve politika tekrar denetlenir. Ret/expiry eski sırayı kapatır; yeni başvuru FIFO sonudur. Seans toplam/kategori boşluğu, süresi dolmamış teklifler ve aktif kayıtlarla birlikte backend'de hesaplanır; istemci worker issue/expire çağırmaz. Starter'da bu akış kapalıdır.
 
 FIFO yalnız uygun kategoride işler; dolu kategorinin bekleyeni diğer kategoriyi bloke etmez. Worker otomatik kontrollü kapasite aşımı kullanmaz. Keşif parmak izi oda kapasitesi ve kategori doluluğunu içerir; toplam boşluk değişmeden kategori boşluğu açılması yeniden keşif üretir.
 
 ## WF20
+
+P01 teklif job parmak izi etkili teklif süresi politikasını da içerir; politika kaynak değişimi, önceki bounded retry/failed kaydını yeni yapılandırmanın kalıcı engeline dönüştürmez. İnsan istemci worker kimliğini taklit etmez.
 
 Frontend çağrı zinciri değildir. Ayrı bounded worker kimliği/scope → claim → gerçek iş → fenced lease/receipt/result → gerekirse sınırlı retry/failed → yetkili işletim incelemesi. P01, belge/bildirim, rapor/import, abonelik ve privacy lane'leri aynı insan rolüne indirgenmez. Kullanıcı arayüzü yalnız izinli job/işlem sonucunu okur. Retry domain commit'i çoğaltmaz; lease/scope kaybı yeni yetki sağlamaz. Partial/retry_wait imha sayılmaz; boş worker sağlık sonucu yük/restore/SLA kabulü değildir. Gerçek worker/retention/restore açıkları güncel backlog sahibindedir.
 

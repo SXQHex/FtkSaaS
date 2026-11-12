@@ -258,3 +258,13 @@ assert next(Path('supabase/migrations').glob('*_account_export_erasure.sql')).re
 assert next(Path('supabase/migrations').glob('*_discipline_presentation.sql')).read_bytes()==Path('database/discipline-presentation.sql').read_bytes(),'Discipline presentation source drift'
 
 assert next(Path('supabase/migrations').glob('*_settings_domain_closure.sql')).read_text()==''.join(Path('database',n+'.sql').read_text() for n in ['settings-catalog-v21','settings-room-lifecycle','settings-form-discovery','settings-onboarding-plans','settings-waitlist-opt-in','settings-calendar-exceptions']),'Settings domain closure source drift'
+
+assert next(Path('supabase/migrations').glob('*_s10_reservation_window_default.sql')).read_text()==Path('database/settings-reservation-window-default.sql').read_text(),'Initial reservation window source drift'
+
+s10_parts=['settings-catalog-v22.sql','settings-sharing-consent.sql','settings-sharing-events.sql']
+s10_sharing_sql='-- S10 explicit participant sharing notice, immutable evidence and live lesson/event media gates.\nbegin;\n'+'\n'.join('\n'.join(l for l in Path('database',n).read_text().splitlines() if l.strip() not in ('begin;','commit;')) for n in s10_parts)+'\ncommit;\n'
+assert next(Path('supabase/migrations').glob('*_s10_sharing_consent.sql')).read_text()==s10_sharing_sql,'Participant sharing source drift'
+
+assert next(Path('supabase/migrations').glob('*_s10_sharing_catalog_authority.sql')).read_text()==Path('database/settings-sharing-catalog-authority.sql').read_text(),'Sharing catalogue live authority source drift'
+
+assert next(Path('supabase/migrations').glob('*_s10_offer_duration_required.sql')).read_text()==Path('database/settings-offer-duration-required.sql').read_text(),'Explicit offer duration and policy recovery source drift'

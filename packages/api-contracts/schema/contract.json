@@ -5184,6 +5184,12 @@
           "items": {
             "$ref": "#/$defs/ActualStartHistoryItem"
           }
+        },
+        "shared_participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedLessonParticipant"
+          }
         }
       },
       "required": [
@@ -45771,6 +45777,14 @@
               "type": "null"
             }
           ]
+        },
+        "sharing_restrictions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharingField"
+          },
+          "uniqueItems": true,
+          "maxItems": 4
         }
       },
       "required": [],
@@ -47154,6 +47168,16 @@
         },
         "work_calendar_exceptions_enabled": {
           "type": "boolean"
+        },
+        "sharing_notices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharingNotice"
+          },
+          "maxItems": 4
+        },
+        "allow_center_sharing_restrictions": {
+          "type": "boolean"
         }
       },
       "required": [],
@@ -47213,7 +47237,9 @@
         "preparation_sources": {},
         "inherited_fields": {
           "$ref": "#/$defs/SettingsTemplateInheritanceSources"
-        }
+        },
+        "sharing_notices": {},
+        "sharing_approved_fields": {}
       },
       "required": [
         "scope",
@@ -47321,6 +47347,21 @@
               },
               "uniqueItems": true,
               "maxItems": 50
+            },
+            "sharing_notices": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SharingNoticeView"
+              },
+              "maxItems": 4
+            },
+            "sharing_approved_fields": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SharingField"
+              },
+              "uniqueItems": true,
+              "maxItems": 4
             }
           },
           "required": [
@@ -47381,7 +47422,8 @@
                   "map_url",
                   "directions",
                   "website_url",
-                  "work_calendar"
+                  "work_calendar",
+                  "sharing_restrictions"
                 ]
               },
               "uniqueItems": true,
@@ -47486,7 +47528,9 @@
                   "personal_negative_limits_enabled",
                   "application_form_rules",
                   "work_calendar",
-                  "work_calendar_exceptions_enabled"
+                  "work_calendar_exceptions_enabled",
+                  "sharing_notices",
+                  "allow_center_sharing_restrictions"
                 ]
               },
               "uniqueItems": true,
@@ -47698,6 +47742,13 @@
               "type": "null"
             }
           ]
+        },
+        "sharing_consents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharingConsentEvidence"
+          },
+          "maxItems": 4
         }
       },
       "required": [
@@ -47773,7 +47824,8 @@
             "lesson_impact_authorize",
             "crm_intake_submit",
             "center_work_calendar_contains",
-            "work_calendar_exception_assert"
+            "work_calendar_exception_assert",
+            "sharing_consent"
           ]
         },
         "writable": {
@@ -47802,7 +47854,7 @@
           ]
         },
         "catalog_version": {
-          "const": 21
+          "const": 22
         },
         "fields": {
           "type": "array",
@@ -47857,7 +47909,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 21
+              "const": 22
             }
           },
           "required": [
@@ -47875,7 +47927,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 21
+              "const": 22
             }
           },
           "required": [
@@ -47893,7 +47945,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 21
+              "const": 22
             }
           },
           "required": [
@@ -47911,7 +47963,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 21
+              "const": 22
             }
           },
           "required": [
@@ -47929,7 +47981,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 21
+              "const": 22
             }
           },
           "required": [
@@ -48357,6 +48409,13 @@
         },
         "inherit_fields": {
           "$ref": "#/$defs/SettingsInheritedTemplateFields"
+        },
+        "sharing_consents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharingConsentInput"
+          },
+          "maxItems": 4
         }
       },
       "required": [
@@ -48416,6 +48475,13 @@
             },
             "history_source": {
               "$ref": "#/$defs/SettingsHistorySource"
+            },
+            "sharing_consents": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SharingConsentInput"
+              },
+              "maxItems": 4
             }
           },
           "required": [
@@ -50389,7 +50455,8 @@
           "enum": [
             "user",
             "organization",
-            "lesson_participant"
+            "lesson_participant",
+            "event_participant"
           ]
         },
         "asset_id": {
@@ -50402,6 +50469,9 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "event_id": {
           "$ref": "#/$defs/FtkUuid"
         }
       },
@@ -50497,6 +50567,42 @@
             "asset_id",
             "org_id",
             "session_id",
+            "person_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "scope": {
+              "const": "event_participant"
+            },
+            "asset_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "event_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "scope",
+            "asset_id",
+            "org_id",
+            "event_id",
             "person_id"
           ],
           "additionalProperties": false
@@ -54772,32 +54878,33 @@
         "map_url",
         "directions",
         "website_url",
-        "work_calendar"
+        "work_calendar",
+        "sharing_restrictions"
       ]
     },
     "OrganizationSettingsFieldKey": {
       "type": "string",
       "enum": [
-        "accent_color",
+        "description",
         "address",
-        "availability_templates",
+        "contact_phone",
+        "contact_email",
+        "theme_package_id",
+        "font_package_id",
+        "billing_name",
         "billing_address",
         "billing_email",
-        "billing_name",
-        "contact_email",
-        "contact_phone",
-        "description",
-        "font_package_id",
-        "import_templates",
-        "package_templates",
-        "primary_color",
         "program_duration_minutes",
+        "report_templates",
+        "import_templates",
+        "public_profile_enabled",
         "public_fields",
         "public_hours",
-        "public_profile_enabled",
-        "report_templates",
+        "availability_templates",
+        "package_templates",
+        "primary_color",
         "secondary_color",
-        "theme_package_id",
+        "accent_color",
         "lesson_reminders_enabled",
         "lesson_reminder_hours",
         "package_reminders_enabled",
@@ -54808,12 +54915,12 @@
         "agreement_templates",
         "permission_templates",
         "regional_defaults",
+        "security_policy",
         "program_templates",
         "event_templates",
         "collection_templates",
         "crm_templates",
         "automation_templates",
-        "security_policy",
         "crm_pipeline",
         "map_url",
         "directions",
@@ -54821,7 +54928,9 @@
         "personal_negative_limits_enabled",
         "application_form_rules",
         "work_calendar",
-        "work_calendar_exceptions_enabled"
+        "work_calendar_exceptions_enabled",
+        "sharing_notices",
+        "allow_center_sharing_restrictions"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -54917,7 +55026,10 @@
         "personal_negative_limits_enabled",
         "application_form_rules",
         "work_calendar",
-        "work_calendar_exceptions_enabled"
+        "work_calendar_exceptions_enabled",
+        "sharing_notices",
+        "allow_center_sharing_restrictions",
+        "sharing_restrictions"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -57353,6 +57465,165 @@
         "organization_settings_version",
         "approved_by",
         "approved_at"
+      ],
+      "additionalProperties": false
+    },
+    "SharingField": {
+      "type": "string",
+      "enum": [
+        "profile_visible",
+        "photo_visible",
+        "email_visible",
+        "phone_visible"
+      ]
+    },
+    "SharingNotice": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/SharingField"
+        },
+        "content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        }
+      },
+      "required": [
+        "field",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "SharingNoticeView": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/SharingField"
+        },
+        "content": {
+          "$ref": "#/$defs/DigitalDocumentContent"
+        },
+        "notice_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "notice_revision": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "field",
+        "content",
+        "notice_hash",
+        "notice_revision"
+      ],
+      "additionalProperties": false
+    },
+    "SharingConsentInput": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/SharingField"
+        },
+        "notice_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "notice_revision": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "field",
+        "notice_hash",
+        "notice_revision"
+      ],
+      "additionalProperties": false
+    },
+    "SharingConsentEvidence": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/SharingField"
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "account_link_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "link_verified_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "audience": {
+          "const": "confirmed_participants"
+        },
+        "channel": {
+          "const": "in_app"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DigitalDocumentContent"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "notice_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "notice_revision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "participant_profile",
+            "participant_photo",
+            "participant_email",
+            "participant_phone"
+          ]
+        }
+      },
+      "required": [
+        "field",
+        "accepted",
+        "org_id",
+        "person_id",
+        "account_link_id",
+        "link_verified_at",
+        "audience",
+        "channel",
+        "occurred_at",
+        "content",
+        "notice_hash",
+        "notice_revision",
+        "purpose"
       ],
       "additionalProperties": false
     }
@@ -77332,7 +77603,9 @@
           "source_and_deficit_not_double_counted",
           "same_org_center_discipline",
           "required_feature_gates_separate_from_references",
-          "live_accessible_center_before_discovery_commit_and_replay"
+          "live_accessible_center_before_discovery_commit_and_replay",
+          "explicit_positive_waitlist_offer_duration_before_worker_commit",
+          "effective_duration_policy_requeues_unchanged_waiting_intent"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -101556,6 +101829,60 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/asset_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SharingConsentEvidence/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SharingConsentEvidence/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SharingConsentEvidence/properties/account_link_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -102009,7 +102336,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 147,
+      "migration_count": 151,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -104802,11 +105129,17 @@
           "debt_participation": {
             "kind": "boolean",
             "value": true
+          },
+          "reservation_window": {
+            "kind": "window",
+            "opens_minutes_before": 10080,
+            "closes_minutes_before": 0,
+            "manager_exception": false
           }
         },
         "existing_policies": "unchanged; no backfill",
         "consumer_read": "policies_get_v1 and existing policy_at/lesson/reservation consumers",
-        "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing",
+        "unconfigured_business_values": "explicit setup required for other windows, hours, terms or pricing; no invented values",
         "plans": [
           "starter",
           "pro",
