@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error"
+  },
+  "overrides": [
+    {
+      "files": ["src/components/ui/**/*.{ts,tsx}"],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
+  ],
+  "options": {
+    "typeAware": true,
+    "maxWarnings": 0
+  },
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    "src/i18n/generated/**",
+    ".npm-cache/**",
+    ".tmp/**",
+    ".playwright-browsers/**",
+    ".tanstack/**",
+    "coverage/**",
+    "dist/**",
+    "playwright-report/**",
+    "test-results/**",
+    "test-reports/**"
+  ]
+}
