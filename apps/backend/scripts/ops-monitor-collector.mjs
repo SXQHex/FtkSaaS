@@ -8,7 +8,8 @@ export async function readMonitorTelemetry(client,{signal}={}){
  try{
   if(signal?.aborted){abort();throw new Error('MONITOR_TELEMETRY_UNAVAILABLE');}
   const result=await client.query('select ops_monitor.snapshot() value');
-  if(result.rows?.length!==1||!result.rows[0].value)throw new Error('MONITOR_TELEMETRY_UNAVAILABLE');
+  const value=result.rows?.[0]?.value;
+  if(result.rows?.length!==1||!value||!Object.hasOwn(value,'deliveryWorker')||(value.deliveryWorker!==null&&typeof value.deliveryWorker?.enabled!=='boolean'))throw new Error('MONITOR_TELEMETRY_UNAVAILABLE');
   return result.rows[0].value;
  }finally{signal?.removeEventListener('abort',abort);}
 }
@@ -39,5 +40,5 @@ export async function collectMonitorObservation({readTelemetry,readBackup,probe,
  const readable=telemetry.status==='fulfilled'&&telemetry.value!==null;
  return {checkedAt:new Date(clock()).toISOString(),telemetryAvailable:readable,
   serviceAvailable:readable&&available.status==='fulfilled'&&available.value===true,
-  workers:readable?telemetry.value.workers:null,jobs:readable?telemetry.value.jobs:null,incidents:readable?telemetry.value.incidents:null,backup:backup.status==='fulfilled'?backup.value:{state:'unavailable',usableAt:null}};
+  workers:readable?telemetry.value.workers:null,deliveryWorker:readable?telemetry.value.deliveryWorker:null,jobs:readable?telemetry.value.jobs:null,incidents:readable?telemetry.value.incidents:null,backup:backup.status==='fulfilled'?backup.value:{state:'unavailable',usableAt:null}};
 }

@@ -152,6 +152,7 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
 import {evaluateMonitor} from '../scripts/ops-monitor.mjs';
 import {runOperatorMonitor as runMonitor,monitorReviewToken} from '../scripts/ops-monitor-outbox.mjs';
 import {readMonitorTelemetry,collectMonitorObservation,probeServices} from '../scripts/ops-monitor-collector.mjs';
+import {noteGatewayError,reportGatewayError} from '../supabase/functions/backend-v1/ops-errors.ts';
 const runOperatorMonitor=args=>runMonitor({...args,clock:()=>Date.parse(args.observation.checkedAt)});
 
 const start=Date.parse('2026-11-12T12:00:00Z');
@@ -210,6 +211,15 @@ test('O02 every native lane, including privacy, requires a real heartbeat when e
  for(const lane of lanes){const input=snapshot();input.workers.find(w=>w.lane===lane).lastFinishedAt=null;
   assert.deepEqual(keys(evaluateMonitor(null,input)),[['alarm','worker:'+lane]]);
  }
+});
+test('O02 invitation/email worker uses verified tick heartbeat and missing observations never claim recovery',()=>{
+ const disabled=snapshot();disabled.deliveryWorker={enabled:false,lastFinishedAt:null,lastStatus:'not_started'};assert.deepEqual(evaluateMonitor(null,disabled).events,[]);
+ const stale=snapshot(3);stale.deliveryWorker={enabled:true,lastFinishedAt:new Date(start).toISOString(),lastStatus:'succeeded'};
+ const alarm=evaluateMonitor(null,stale);assert.deepEqual(keys(alarm),[['alarm','worker:invitation']]);
+ const unknown=evaluateMonitor(alarm.state,snapshot(4));assert.deepEqual(unknown.events,[]);assert(unknown.state.active.some(item=>item.key==='worker:invitation'));
+ const healthy=snapshot(5);healthy.deliveryWorker={enabled:true,lastFinishedAt:healthy.checkedAt,lastStatus:'succeeded'};
+ assert.deepEqual(keys(evaluateMonitor(unknown.state,healthy)),[['recovery','worker:invitation']]);
+ const off=snapshot(5);off.deliveryWorker=disabled.deliveryWorker;assert.deepEqual(keys(evaluateMonitor(alarm.state,off)),[['disabled','worker:invitation']]);
 });
 test('O02 failed, missing and older-than-24h backups alarm immediately',()=>{
  for(const backup of [{state:'failed',usableAt:new Date(start).toISOString()},{state:'missing',usableAt:null},{state:'usable',usableAt:new Date(start-86400001).toISOString()}]){
@@ -308,6 +318,16 @@ test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evid
   assert.equal((await client.query('show default_transaction_read_only')).rows[0].default_transaction_read_only,'on');
   const read=()=>readMonitorTelemetry(client);
   const baseline=await read();assert.equal(baseline.workers.length,5);assert.equal(baseline.incidents.exhausted.total,baseline.jobs.exhausted);assert.equal(baseline.incidents.integrity.total,baseline.jobs.integrity);
+  assert(Object.hasOwn(baseline,'deliveryWorker'));assert(baseline.deliveryWorker===null||typeof baseline.deliveryWorker.enabled==='boolean');
+  const cfg=(await db.query('select to_jsonb(c) value from private.invitation_dispatch_config c where singleton')).rows[0]?.value;
+  try{
+   await db.query('delete from private.invitation_dispatch_config where singleton');
+   const missing=await read();assert.equal(missing.deliveryWorker,null);
+   const context={...missing,checkedAt:new Date().toISOString(),serviceAvailable:true,telemetryAvailable:true,backup:{state:'missing',usableAt:null}};
+   const open=evaluateMonitor(null,{...context,deliveryWorker:{enabled:true,lastFinishedAt:new Date(Date.now()-180000).toISOString(),lastStatus:'succeeded'}});
+   const stillOpen=evaluateMonitor(open.state,{...context,checkedAt:new Date().toISOString()});
+   assert(stillOpen.state.active.some(item=>item.key==='worker:invitation'));assert(!stillOpen.events.some(item=>item.key==='worker:invitation'));
+  }finally{if(cfg)await db.query('insert into private.invitation_dispatch_config select * from jsonb_populate_record(null::private.invitation_dispatch_config,$1::jsonb)',[JSON.stringify(cfg)]);}
   for(const sql of ['select * from core.people','select * from auth.users','select * from private.ops_worker_health','select * from private.ops_integrity_events',"call private.ops_run('p01')"] )await assert.rejects(client.query(sql),/permission denied/);
   await assert.rejects(db.query('select ops_monitor.snapshot()'),/FORBIDDEN/);
   const {platform,plan}=await fixturePlatform(),owner=await authUser('o02-monitor-owner');const account=await must(owner,'account_get_v1');
@@ -338,6 +358,22 @@ test('O02 native monitor LOGIN sees only aggregate diagnostics and critical evid
   const current=await collect();
   await runMonitor({...disk,observation:current,send,acknowledge:{expectedSnapshot:monitorReviewToken(observed),exhausted:observed.incidents.exhausted.keys.filter(id=>!baseline.incidents.exhausted.keys.includes(id)),integrity:observed.incidents.integrity.keys.filter(id=>!baseline.incidents.integrity.keys.includes(id))}});
   assert.equal(disk.read().acknowledgments.length,1);assert.deepEqual((await read()).jobs,observed.jobs);
+  const trace=key(),faultRequest=key(),signature='api_v1.account_get_v1(jsonb,uuid,uuid,uuid[],jsonb)';
+  const original=(await db.query('select pg_get_functiondef($1::regprocedure) definition',[signature])).rows[0].definition;let edgeRecorded=false;
+  assert.match(owner.id,/^[a-f0-9-]{36}$/);
+  try{
+   const forbidden=await fetch(context().env.API_URL+'/rest/v1/rpc/outbox_deliver_v1',{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:{operation:'account_get_v1',trace_id:trace},p_actor_auth_id:null,p_session_id:null,p_ids:[],p_aux:{ops_integrity_event:true}})});
+   assert([401,403].includes(forbidden.status));assert.equal((await db.query('select count(*)::int n from private.ops_edge_integrity_events where id=$1',[trace])).rows[0].n,0);
+   await db.query(`create or replace function api_v1.account_get_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select case when p_actor_auth_id='${owner.id}'::uuid and p_request->>'request_id'='${faultRequest}' then jsonb_build_object('ok',false,'error',jsonb_build_object('code','INTEGRITY_VIOLATION','retryable',false,'trace_id','${trace}')) else private.execute_operation('account_get_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux) end$$`);
+   const beforeEdge=await read();
+   for(let n=0;n<2;n++){const critical=await call(owner,'account_get_v1',{request_id:faultRequest});assert.equal(critical.status,200);assert.equal(critical.result.ok,false);assert.equal(critical.result.error.code,'INTEGRITY_VIOLATION');assert.equal(critical.result.error.trace_id,trace);}
+   const stored=(await db.query('select count(*)::int n,min(operation) operation from private.ops_edge_integrity_events where id=$1',[trace])).rows[0];edgeRecorded=stored.n>0;assert.equal(stored.n,1);assert.equal(stored.operation,'account_get_v1');
+   assert.equal((await read()).jobs.integrity,beforeEdge.jobs.integrity+1);
+   await assert.rejects(client.query('select * from private.ops_edge_integrity_events'),/permission denied/);
+  }finally{
+   await db.query(original);assert.equal((await db.query('select pg_get_functiondef($1::regprocedure) definition',[signature])).rows[0].definition,original);
+   if(edgeRecorded)await db.query('delete from private.ops_edge_integrity_events where id=$1',[trace]);
+  }
  }finally{
   if(client)await client.end();
   try{
@@ -418,4 +454,30 @@ test('O02 acknowledgment requires exact known keys and cannot clear truncated or
  assert(!result.events.some(event=>event.kind==='acknowledged'));assert(f.read().monitor.active.some(event=>event.key==='jobs:exhausted'));
  const unavailable={...snapshot(2),serviceAvailable:false,telemetryAvailable:false,workers:null,jobs:null};
  await assert.rejects(runOperatorMonitor({...f,observation:unavailable,send,acknowledge:{expectedSnapshot:monitorReviewToken(truncated),exhausted:[old],integrity:[]}}),/MONITOR_INCIDENT_EVIDENCE_REQUIRED/);
+});
+const edgeEnv=name=>({SUPABASE_URL:'https://synthetic.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'synthetic-service'})[name];
+const edgeFailure=(code='INTEGRITY_VIOLATION')=>({ok:false,error:{code,retryable:false,trace_id:'01900000-0000-7000-8000-000000000001',message:'private-payload-sentinel'}});
+test('O02 Edge critical observation sends only trace/operation through the existing service worker transport',async()=>{
+ const body=edgeFailure(),response=new Response(JSON.stringify(body),{status:500}),logs=[],calls=[];noteGatewayError(response,body);
+ await reportGatewayError(response,'account_get_v1',edgeEnv,async(url,init)=>{calls.push({url,init});return new Response(JSON.stringify({accepted:true}));},event=>logs.push(event));
+ assert.equal(calls.length,1);assert(calls[0].url.endsWith('/rpc/outbox_deliver_v1'));
+ const request=JSON.parse(calls[0].init.body);assert.deepEqual(request.p_request,{operation:'account_get_v1',trace_id:body.error.trace_id});assert.equal(request.p_aux.ops_integrity_event,true);assert.equal(request.p_actor_auth_id,null);assert.equal(request.p_session_id,null);
+ assert(!JSON.stringify(logs).includes('private-payload-sentinel'));assert(!JSON.stringify(logs).includes('synthetic-service'));assert.equal(await response.text(),JSON.stringify(body));assert.equal(response.status,500);
+ await reportGatewayError(response,'account_get_v1',edgeEnv,async()=>{throw Error('duplicate');},event=>logs.push(event));assert.equal(calls.length,1);assert.equal(logs.length,1);
+});
+test('O02 Edge unexpected failures get central trace logs while ordinary denials stay silent',async()=>{
+ const logs=[];let calls=0;const send=async()=>{calls++;throw Error('must not send');};
+ const denied=edgeFailure('AUTH_REQUIRED'),normal=new Response(JSON.stringify(denied));noteGatewayError(normal,denied);await reportGatewayError(normal,'account_get_v1',edgeEnv,send,event=>logs.push(event));assert.equal(logs.length,0);
+ const temporary=edgeFailure('TEMPORARY_FAILURE'),unexpected=new Response(JSON.stringify(temporary),{status:503});noteGatewayError(unexpected,temporary,true);await reportGatewayError(unexpected,'account_get_v1',edgeEnv,send,event=>logs.push(event));
+ assert.equal(calls,0);assert.equal(logs[0].event,'backend_unexpected_error');assert.equal(logs[0].trace_id,temporary.error.trace_id);assert(!JSON.stringify(logs).includes('private-payload-sentinel'));assert.equal(unexpected.status,503);
+});
+test('O02 Edge telemetry transport failure never changes the original fail-closed response',async()=>{
+ const body=edgeFailure(),response=new Response(JSON.stringify(body),{status:500}),logs=[];noteGatewayError(response,body);
+ await reportGatewayError(response,'account_get_v1',edgeEnv,async()=>{throw Error('private-provider-sentinel');},event=>logs.push(event));
+ assert.equal(logs[1].event,'backend_integrity_report_failed');assert(!JSON.stringify(logs).includes('private-provider-sentinel'));assert.equal(await response.text(),JSON.stringify(body));
+});
+test('O02 Edge critical reporting bounds a hung body and cancels the internal request',async t=>{
+ t.mock.timers.enable({apis:['setTimeout']});const body=edgeFailure(),response=new Response(JSON.stringify(body)),logs=[];let signal;noteGatewayError(response,body);
+ const pending=reportGatewayError(response,'account_get_v1',edgeEnv,async(_,init)=>{signal=init.signal;return {ok:true,json:()=>new Promise(()=>{})};},event=>logs.push(event));
+ t.mock.timers.tick(1500);await pending;assert.equal(signal.aborted,true);assert.equal(logs[1].event,'backend_integrity_report_failed');assert.equal(await response.text(),JSON.stringify(body));
 });

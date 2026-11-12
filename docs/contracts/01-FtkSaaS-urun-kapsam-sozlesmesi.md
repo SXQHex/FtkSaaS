@@ -14,6 +14,14 @@ Bir planın ürün teslimi, aşağıdaki kapsam ve limitlere göre kullanıcı i
 
 Frontend geliştirmesi kendi planında ilerler. Bir ekranın gerçek entegrasyon kabulü, kullandığı backend iş akışının ve yayımlanmış API sözleşmesinin ilgili ortamda kullanılabilir olmasına bağlıdır. Bu bağımlılık ilgili akış düzeyindedir. Yukarıdaki sıra, kullanıcıya sunulan bütünleşik planların teslim sırasıdır.
 
+### Bu teslimin veri güvenliği sınırı
+
+Pro öncesinde tek ortak asgari veri güvenliği kontrolü yapılır: bir yedek alınır, izole ortamda geri yüklenir ve uygulamanın açılıp temel veriyi okuyabildiği doğrulanır. Aynı kontrol Starter ve Business için ayrı işletim kabulü olarak tekrarlanmaz.
+
+Otomatik kapsamlı imha ve bütün veri yüzeylerinde kalıntı denetimi; bağımsız imha sicili, imza, checkpoint ve özel restore altyapısı; silme öncesi yedekten dönüşte otomatik yeniden imha; tam DB/Auth/Storage kurtarma tatbikatı; yük/performans kabulü ve RPO/RTO ölçümü bu plan teslimlerinin şartı değildir. Bunlar Business tesliminden sonra ayrı altyapı projesinde ele alınır.
+
+Mevcut hesap silme, erişim engelleme ve dosya temizliği davranışları korunur; bunları genişletmek yeni teslim şartı olmaz. Mevcut testler, CI kapsamı ve kalite kapıları korunur. Planlara özgü işlev/yetki/limit regresyonları bu kararla kaldırılmaz. Asgari kontrolün kabul kaydı [backend açık iş sahibindedir](../../apps/backend/docs/remaining-work.md#o11).
+
 ## Kabul edilmiş SaaS plan sınırları
 
 Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararları [teknik sözleşmenin](02-FtkSaaS-teknik-sozlesme.md) sorumluluğundadır. Kaynak/CI/ortam kabulü [güncel kabul kaydından](../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), açık işler [backlog’dan](../../apps/backend/docs/remaining-work.md) okunur.

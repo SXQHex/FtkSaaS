@@ -1,7 +1,7 @@
 // Operator-only observations. This module neither reads tenant payloads nor sends
 // mail. The caller must durably persist state/events before acknowledging a cycle.
 const lanes=['p01','p05','p06','p07','p07_privacy'];
-const keys=['availability',...lanes.map(lane=>'worker:'+lane),'jobs:stuck','jobs:exhausted','jobs:integrity','backup'];
+const keys=['availability',...lanes.map(lane=>'worker:'+lane),'worker:invitation','jobs:stuck','jobs:exhausted','jobs:integrity','backup'];
 const validIncident=incident=>{
  const reason=incident.key==='availability'?['unavailable']:incident.key.startsWith('worker:')?['stale','claim_error','job_error']:incident.key==='backup'?['failed','missing','old','unavailable']:[incident.key.slice(5)];
  return reason.includes(incident.reason)&&incident.severity===(incident.key==='jobs:integrity'?'critical':'error');
@@ -59,17 +59,22 @@ export function evaluateMonitor(previous,observation){
   for(const incident of old.values())if(incident.key.startsWith('worker:')||incident.key.startsWith('jobs:'))active.push({...incident});
  }
  if(!telemetryMissing&&(!Array.isArray(observation.workers)||observation.workers.length!==lanes.length))invalid();
- const seen=new Set();
- for(const worker of observation.workers??[]){
-  if(!worker||!lanes.includes(worker.lane)||seen.has(worker.lane)||typeof worker.enabled!=='boolean'||!['not_started','running','idle','succeeded','claim_error','job_error'].includes(worker.lastStatus))invalid();
-  seen.add(worker.lane);
+ const inspectHealth=(worker,key)=>{
+  if(!worker||typeof worker.enabled!=='boolean'||!['not_started','running','idle','succeeded','claim_error','job_error'].includes(worker.lastStatus))invalid();
   const finished=worker.lastFinishedAt===null?null:timestamp(worker.lastFinishedAt);
   if(finished!==null&&finished>now)invalid();
-  const key='worker:'+worker.lane;
-  if(!worker.enabled){disabled.add(key);continue;}
+  if(!worker.enabled){disabled.add(key);return;}
   // Matches ops-cron-health.sql: disabled first, then stale, then last error.
   if(finished===null||now-finished>120000)alarm(key,'stale');
   else if(['claim_error','job_error'].includes(worker.lastStatus))alarm(key,worker.lastStatus);
+ };
+ const seen=new Set();
+ for(const worker of observation.workers??[]){
+  if(!worker||!lanes.includes(worker.lane)||seen.has(worker.lane))invalid();seen.add(worker.lane);inspectHealth(worker,'worker:'+worker.lane);
+ }
+ if(!telemetryMissing){
+  if(observation.deliveryWorker)inspectHealth(observation.deliveryWorker,'worker:invitation');
+  else if(old.has('worker:invitation'))active.push({...old.get('worker:invitation')});
  }
  if(!telemetryMissing){
   if(!observation.jobs)invalid();

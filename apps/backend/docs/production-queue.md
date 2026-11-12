@@ -6,15 +6,15 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 Öncelik Pro'nun ortak uygulamasını tamamlamak ve [G02](remaining-work.md#g02) backend kabulünü kapatmaktır. Sonraki paket [G01](remaining-work.md#g01) ile aynı uygulamanın Starter kısıtları, ardından [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir.
 
-**Aktif sıra:** S08 → Pro'ya uygulanabilir kalan S/P ve O kabulleri → G02. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır. S08'in doğal süre sınırı beklenirken bağımsız kalan Pro ve işletim işleri ilerler; süre kısaltılmaz ve eksik kanıt tamamlandı sayılmaz.
+**Aktif sıra:** S08 → Pro'ya uygulanabilir kalan S/P, O01/O02 ve O11 kabulleri → G02 → G01 → G03; ardından ayrı O03–O10 altyapı projesi. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır. S08'in doğal süre sınırı beklenirken bağımsız kalan Pro ve işletim işleri ilerler; süre kısaltılmaz ve eksik kanıt tamamlandı sayılmaz.
 
 | Öncelik | Paket | Bağımlılık ve kontrol noktası |
 |---|---|---|
 | 1 | [S08](remaining-work.md#s08) hesap/güvenlik | Kalan native/hosted Auth kanıtı ve kabul oturumunun kapatılması; frontend ekran onayı backend'i bekletmez. |
 | 2 | Pro ortak akışlarının kalan kabulleri | [S01–S16](remaining-work.md#ortak-uygulama-temeli) ve [P01–P16](remaining-work.md#pro-işlevleri) içindeki yürürlükteki, Pro'ya uygulanabilir açıkları kapat. |
-| 3 | [O01–O10](remaining-work.md#ortak-üretim-işletimi) ve [G02](remaining-work.md#g02) | Pro kapsamındaki worker, alarm, saklama/imha, restore ve yük kanıtı tamamlanınca Pro backend kabulünü kapat. |
+| 3 | [O01/O02](remaining-work.md#ortak-üretim-işletimi), [O11](remaining-work.md#o11) ve [G02](remaining-work.md#g02) | Mevcut worker kanıtı, tek gerçek alarm/toparlanma kontrolü ve asgari yedek→izole restore→uygulama/temel okuma kontrolüyle Pro backend kabulünü kapat. |
 | 4 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
-| 5 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon, ortak kullanım/hesaplaşma ve ek yük kapsamını doğrula. |
+| 5 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon ve ortak kullanım/hesaplaşma işlevlerini doğrula. |
 
 Teslim paketinde kullanıcının istediği genel backend belge tutarlılığı taraması tamamlanır: mevcut backlog/teslim kuyruğu/devir ile main'deki yayın farkları ve eski açık/kapalı anlatımlar aynı kaynak kanıtına göre uzlaştırılır. Bu teslim kontrolüdür; yeni roadmap veya ikinci durum listesi açılmaz.
 
@@ -38,9 +38,9 @@ Pro için [P05–P07](remaining-work.md#p05), [P10–P11](remaining-work.md#p10)
 
 ## Ortak işletim hattı
 
-[A03](remaining-work.md#a03) kaynak/kanıt eşlemesinden sonra [O01](remaining-work.md#o01) worker ve [O03](remaining-work.md#o03) saklama/imha kapsamı hazırlanabilir. O01 → [O02](remaining-work.md#o02) alarm; O03 → [O04](remaining-work.md#o04)/[O05](remaining-work.md#o05) fiziksel imha → [O06](remaining-work.md#o06) bağımsız sicil → [O07](remaining-work.md#o07) guarded loader → [O08](remaining-work.md#o08) tam restore → [O09](remaining-work.md#o09) non-resurrection bağımlılıkları korunur. [O10](remaining-work.md#o10) yük/kurtarma kabulü kendi O02/O08 önkoşullarıyla yürür. E-posta yükü ilgili P14–P16 kaynağını kullanır.
+[O01](remaining-work.md#o01) → [O02](remaining-work.md#o02) asgari mevcut sağlık/gerçek uyarı kontrolü ile [O11](remaining-work.md#o11) asgari veri güvenliği kontrolü mevcut teslimde yürür. Planlar arasında aynı kaynak/ortam için ortak kanıt kullanılır; Starter ve Business adına ayrı işletim, yük veya tam restore kabulü üretilmez. İşlev/yetki/limit regresyonları korunur.
 
-Önce Pro'nun kullandığı veri yüzeyleri ve worker'lar için gereken kanıt tamamlanır. Ortak güvenlik/imha/restore sorumluluğu plan küçüldü diye kaldırılmaz. Starter aynı mekanizmaları kendi izin ve limitleri altında doğrular; Business çok merkez ve birleşik yük için ek kanıt üretir. Planlar arasında geçerli kanıt yalnız aynı kaynak, ortam, config ve yetki kapsamı için yeniden kullanılabilir.
+[O03–O10](remaining-work.md#business-sonrası-ayrı-altyapı-projesi), G03/Business tesliminden sonra ayrı altyapı projesidir. Bu işlerin iç bağımlılıkları kendi kayıtlarında korunur; Pro/Starter/Business teslimine doğrudan veya O02 üzerinden dolaylı kapı yapılmaz. Mevcut hesap silme, erişim engelleme, dosya temizliği ve testler bu ertelemeyle değiştirilmez.
 
 Aynı migration veya ortak sözleşmeye yazan işler seri yönetilir. Bağımsız kaynak ve kanıt işleri eşzamanlı ilerleyebilir; kesin bağımlılık görevin kendi kaydındadır. Her ilişkili pakette olumsuz senaryolar, açık ortam girdileri ve son kaynak incelemesi tamamlanır. PR bir anlamlı teslim paketidir; her fonksiyon için ayrı push veya full clean üretilmez.
 
