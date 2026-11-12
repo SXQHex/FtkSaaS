@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d372cab0cd738e465253d3402a182bcaebb20a964cc281cfd2c219f8149acec7",
-        "reason": "User-approved four exact assertion fingerprints reviewed against final tests; prior exceptions and protocol/receipt/security checks unchanged, expiry 2026-11-26."
+        "fingerprint": "39fbf2411f62422520041200da069c490cabc7f4ce4b73fdfb870adbb7063d82",
+        "reason": "PR289 CI fixes: two exact API source hashes and user-approved Starter count3to4 fingerprint reviewed; previous policy records, 117 unit ownership, protocol and source gates unchanged."
       }
     },
     {
@@ -583,8 +583,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "a9866e47bc2da04b037e9d41402c015838fc272d98c1e17dae7607623810b166",
-        "reason": "S10 lesson sharing source and native confirmed audience/media tests reviewed, including current org permission reflected in the catalog; scheduling/capacity unchanged."
+        "fingerprint": "e3bd252d0939d85a9054dc9f2c5b4e631f92f0ea3e91fba31a7ea478ebf52db6",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -776,8 +776,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "0625b38bfb94a34049ccd09e0ca5c981fe388bb3d0fd55db0dd84c6b13831a6f",
-        "reason": "S10 Pro/Business lifecycle fixture explicitly configures offer duration30 for existing positive worker acceptance; sale, money, entitlement and original assertions unchanged."
+        "fingerprint": "3d099e3c9abdbd04f4baa11710468b8a62c9e41316eaa5ac05b5ede75cc8c4d6",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -861,8 +861,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "2c8e69e7943e9cd71be15a10aed32fdc03cda5e03a489f37b0809735d9783706",
-        "reason": "S10 native waiting intent remains unchanged on missing duration and recovers after policy publication; explicit duration fixture and reservation/request protocol reviewed."
+        "fingerprint": "770a22a5777710bdc687a4dd31716183539e7a8ff4685e39283890c962154760",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {
@@ -1085,8 +1085,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "7054d846fc2114b6c20e932c848274d71450950a52767650bd19cdca38ab5125",
-        "reason": "Kaynak ve rehber yeniden incelendi: borç açık kalan ücretli deneme ve yaşam döngüsü fixtureları hem debt_booking hem debt_participation politikasını açık seçer; finans, hak tüketimi ve iade assertionları aynen korunur."
+        "fingerprint": "a9ca6dabad19283af6e34ca499850310005bd6e895d27240d4d8cdf4a664fa71",
+        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
       }
     },
     {

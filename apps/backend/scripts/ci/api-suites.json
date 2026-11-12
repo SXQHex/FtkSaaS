@@ -628,7 +628,7 @@
     },
     {
       "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
-      "sha256": "3658f9b237ae049d45df83d4c27ab1f28486580d8c9058df87ff02209a2717b9",
+      "sha256": "a93d9c6f0c8427bf6388481c98da05bb528cabe1feec9c3662981ed71a588567",
       "shared": [
         [
           3,
@@ -982,7 +982,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "f9b6646b79b69b30007ac0f5d408b09f7119977fd902af84822299ed1341a1f3"
+          "sha256": "fd8152f2a150aeef6808e23e0fff64361d75abaafbbbdb95c8c66481b31f0d59"
         },
         {
           "line": 147,
