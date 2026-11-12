@@ -1224,7 +1224,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/settings-domain-closure-acceptance.mjs",
-          "sha256": "69e2c047b16c77e823051a9b8994df1131f6f7e3df3d46ef824d9c6a773a385b"
+          "sha256": "988a0488141f23eab5c112908330c623259c1b361ed6f12cda0b645d7fc6931a"
         },
         {
           "line": 2,

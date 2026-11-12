@@ -27,7 +27,7 @@ test('room details and deactivation preserve capacity, active work, history and 
  assert.equal((await db.query('select description,location from core.rooms where id=$1',[room])).rows[0].description,save.description);
 });
 
-test('new organization policies apply FD07 defaults on every plan without changing existing histories',async()=>{
+test('new Starter gets FD07 defaults while Pro and Business retain explicit policy configuration and existing histories',async()=>{
  const db=await connect();
  try{
   const existing=(await db.query('select id,org_id,key,value,version from core.policy_versions order by id')).rows;
@@ -38,7 +38,7 @@ test('new organization policies apply FD07 defaults on every plan without changi
    const created=await must(platform,'organization_create_v1',body,opKey);
    assert.equal((await must(platform,'organization_create_v1',body,opKey)).replayed,true);
    const policies=(await db.query('select key,value,version::int version from core.policy_versions where org_id=$1 order by key',[created.primary_id])).rows;
-   assert.deepEqual(policies,[{key:'debt_booking',value:{kind:'boolean',value:true},version:1},{key:'debt_participation',value:{kind:'boolean',value:true},version:1},{key:'negative_default',value:{kind:'integer',value:0},version:1}]);
+   assert.deepEqual(policies,name==='starter'?[{key:'debt_booking',value:{kind:'boolean',value:true},version:1},{key:'debt_participation',value:{kind:'boolean',value:true},version:1},{key:'negative_default',value:{kind:'integer',value:0},version:1}]:[]);
   }
   if(existing.length){const after=(await db.query('select id,org_id,key,value,version from core.policy_versions where id=any($1::uuid[]) order by id',[existing.map(p=>p.id)])).rows;assert.deepEqual(after,existing);}
  }finally{await db.end();}

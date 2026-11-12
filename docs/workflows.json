@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "257f4ec389cd13b98170f00d30de080421bc64f3980d2b99f9e60a7c8af09eb3",
-        "reason": "Reviewed PR279 manual dispatch and bounded calendar diagnostics alongside approved catalog assertion record; merged inventory preserves all source lines and both policy exception sets."
+        "fingerprint": "34f964708238f9701bfb6e7f71f5ff747c501661010b55ba95291810b99c8c77",
+        "reason": "Reviewed exact API suite hash and immutable baseline migration history while removing unapproved Pro/Business onboarding expansion; no CI gate, error expectation or existing native suite body changes."
       }
     },
     {
@@ -1274,7 +1274,6 @@
         "apps/backend/supabase/migrations/20261111210453_s10_settings_completion.sql",
         "apps/backend/database/settings-catalog-v21.sql",
         "apps/backend/database/settings-room-lifecycle.sql",
-        "apps/backend/database/settings-onboarding-plans.sql",
         "apps/backend/database/settings-form-discovery.sql",
         "apps/backend/database/settings-waitlist-opt-in.sql",
         "apps/backend/database/settings-calendar-exceptions.sql",
@@ -1293,8 +1292,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "6d34d0ab44a0a96a94665e5eabe96bd4df8488dd90fb5afce8e175fc6f6f71b1",
-        "reason": "Reviewed exact v21 equals immutable v20 fields plus one closed O18 exception switch, new native apply/replay tests, actual PostgreSQL helper smoke and preserved source-bound migration history; no native runtime success inferred."
+        "fingerprint": "6f2bbc6dbfe183a8be7dfe280d7143eadd4c9d34ae3a56b7911fd4a963a57cab",
+        "reason": "FD07 is Starter-only in normative technical contract and main; removed erroneous new onboarding patch. Native regression requires exact3 Starter policies and exact0 Pro/Business policies with replay/history preserved; PostgreSQL failing/corrected source branches reproduced."
       }
     },
     {
