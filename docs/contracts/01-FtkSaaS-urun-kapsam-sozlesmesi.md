@@ -1,5 +1,17 @@
 # FtkSaaS — Ürün kapsam sözleşmesi
 
+## Proje teslim hedefi
+
+Planlar şu sırayla teslim edilir:
+
+1. **Çalışan Pro Plan** — tek merkezde ortak temel ve Pro iş akışları.
+2. **Çalışan Starter Plan** — Starter iş akışları, tek kaynak sınırları ve üst plan özelliklerine erişim engelleri.
+3. **Çalışan Business Plan** — Pro kapsamına ek olarak merkez izolasyonu, merkezler arası kullanım ve hesaplaşma.
+
+Bir planın ürün teslimi, aşağıdaki kapsam ve limitlere göre kullanıcı iş akışlarının frontend üzerinden gerçek backend ile uçtan uca çalışmasını ve plana uygulanabilir kabul ölçütlerinin karşılanmasını gerektirir. Ortak bir işlev için mevcut kanıt kendi geçerli kapsamında kullanılabilir. Her planın kendine özgü izinleri ve sınırları o plan bağlamında doğrulanır.
+
+[Backend kabul kapıları](../../apps/backend/docs/remaining-work.md) ve [frontend bölüm kabulleri](../../apps/web/docs/todo.md) kendi alanlarında izlenir. Bu sıra ürün teslimleri içindir. Bir alan, diğerinin uyarlamasını beklemeden kendi kapsamındaki işi doğrulayıp teslim edebilir.
+
 ## Kabul edilmiş SaaS plan sınırları
 
 Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararları [teknik sözleşmenin](02-FtkSaaS-teknik-sozlesme.md) sorumluluğundadır. Kaynak/CI/ortam kabulü [güncel kabul kaydından](../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), açık işler [backlog’dan](../../apps/backend/docs/remaining-work.md) okunur.

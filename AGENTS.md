@@ -8,6 +8,8 @@ Kod yazmadan önce [CONSTRAINTS.md](CONSTRAINTS.md) kalite sözleşmesini oku; b
 
 Son açık kullanıcı kararı üstündür; kabul edilmiş D01–D09/U01–U08/Q-D01/Q-E02/Q-E03 ve FD01–FD12 hükümleri korunur. Bilinmeyen ürün, fiyat, politika veya config değeri uydurulmaz. Karar, uygulama, test, merge ve hosted kabulü ayrı durumlardır.
 
+Alan işlerini önceliklendirirken ürün sözleşmesindeki [proje teslim hedefi](docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi) esas alınır. Her alan kendi kabul kanıtını ve açıklarını kendi planında tutar.
+
 ## Belge yazma sınırı
 
 **Yalnız görevinle ilgili, yetkili olduğun dosya ve bölümleri güncelle. Okuma gerekliliği yazma yetkisi vermez.**

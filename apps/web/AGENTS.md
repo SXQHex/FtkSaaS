@@ -2,6 +2,8 @@
 
 Önce kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/client-integration.md), kendi [todo](docs/todo.md) ve [sohbet devrin](docs/handover.md) okunur.
 
+Aktif bölümdeki ekran ve gerçek API kabullerini ürün sözleşmesindeki [proje teslim hedefi](../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi) doğrultusunda sırala. Hangi kullanıcı akışının hangi planla doğrulandığını kendi [todo kaydında](docs/todo.md) belirt.
+
 ## Yetki ve sınır
 
 - Uygulama `apps/web`, ortak UI `packages/ui`; plan, ilerleme, test/kabul ve sohbet devri `apps/web/docs` sahibindedir.

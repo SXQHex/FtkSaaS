@@ -2,6 +2,8 @@
 
 Önce kök [AGENTS](../../AGENTS.md), [kaynak indeksi](../../docs/source-index.md), kendi [devrin](docs/00-FtkSaaS-yeni-sohbet-devir.md), [backlog](docs/remaining-work.md) ve [sıran](docs/production-queue.md), ardından ilgili sözleşme/WF okunur.
 
+Üretim kuyruğundaki işleri ürün sözleşmesindeki [proje teslim hedefi](../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi) doğrultusunda seç. G01, G02 ve G03 ilgili planın backend kabul kapılarıdır. Kapı kimlikleri ürün teslim sırasını belirlemez.
+
 ## Yetki ve sınır
 
 - Kod/test/işletim sahibi `apps/backend`dir. İlerleme, test/kabul, sıra ve sohbet devri yalnız `apps/backend/docs` içine yazılır.
