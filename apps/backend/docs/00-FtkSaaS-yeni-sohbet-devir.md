@@ -2,16 +2,17 @@
 
 <a id="guncel-backend-durumu"></a>
 <a id="s08s10-yerel-çalışmanın-devri--12-kasım-2026"></a>
-## PR284 sonrası güncel backend durumu — 12 Kasım 2026
+## PR285 sonrası güncel backend durumu — 12 Kasım 2026
 
-**Kaynak tabanı:** Main ve origin/main `d63ce8c336f70e81f7c5b256c652226a1ef0f69f`; temiz yerel ağaç ve uzak main eşliği doğrulandı. [PR284](https://github.com/SXQHex/FtkSaaS/pull/284) birleşti; head `eadb8bc6fb7c5bf7e136116f543d564d98c59d02`, base `5cb7cc8dddbfd041be39ac5efce923c41aa4ce0b`, tested merge `58e77bdb85559141cd85a5e02bcb09a1e131c348`. Aday ile main ağacı aynı: `3e9a11a64a7f513620907bcfc950101cfd9af480`. Devam dalı `test/backend-pro-security-acceptance`; yeni hosted güvenlik kabulü mevcut runtime üzerinde yürütüldü.
+**Kaynak tabanı:** Main ve origin/main `e6f7218da81a1381c89e4b5c83133fcee3bd2945`; temiz yerel ağaç ve uzak main eşliği doğrulandı. [PR285](https://github.com/SXQHex/FtkSaaS/pull/285) hosted rol MFA/doğal reauth kabul kaydıdır; head `4be6d219813551b5167a7725bf20106720807c2a`, base `d63ce8c336f70e81f7c5b256c652226a1ef0f69f`, tested merge `d459ec1f6fa17f9a9bedd2b106e3a7102c2f8573`. Aday ile main ağacı aynı: `b48e89b420b6daa46b644fb464fa20ad65b07579`. Devam dalı `test/backend-pro-calendar-exception-acceptance`; yeni hosted kabuller mevcut runtime üzerinde yürütüldü.
 
 | Katman | Doğrulanan sonuç | Kanıt |
 |---|---|---|
 | Yerel kaynak kontrolleri | Yeni iş takvimi runner’ında19/19 güvenlik testi; sözleşme/yönetişim/restore380/380. Önceki tam verify Linux `/proc` nedeniyle başarısız; yeni aday native CI ayrıdır. | Yerel ortam ve hosted iş takvimi kaydı aşağıda |
-| Native aday | PR284 son head için attempt1 core, kalite,12/12 API shard ve full-clean toplayıcısı başarılı. | [43162810613](https://github.com/SXQHex/FtkSaaS/actions/runs/43162810613) |
-| Main ve merge kanıtı | Günceld63ce8c main için ikisi de completed/success. | [Main43165210639](https://github.com/SXQHex/FtkSaaS/actions/runs/43165210639), [merge43165210779](https://github.com/SXQHex/FtkSaaS/actions/runs/43165210779) |
-| Development | Günceld63ce8c için source success; Supabase ağacı değişmediği için deploy skipped. Son gerçek dağıtım43148278402 (PR280) ile aynı Supabase ağacı `b247f7b9ef65f883a3abe02e1d2a63e1f087f5eb` doğrulandı; yeni deploy iddia edilmez. | [43165267041](https://github.com/SXQHex/FtkSaaS/actions/runs/43165267041), [son gerçek dağıtım](https://github.com/SXQHex/FtkSaaS/actions/runs/43148278402) |
+| Son native aday | PR284 head `eadb8bc6fb7c5bf7e136116f543d564d98c59d02`, base `5cb7cc8dddbfd041be39ac5efce923c41aa4ce0b`, tested merge `58e77bdb85559141cd85a5e02bcb09a1e131c348`, tree `3e9a11a64a7f513620907bcfc950101cfd9af480`: attempt1 core, kalite,12/12 API shard ve full-clean toplayıcısı başarılı. PR285 runtime değiştirmedi. | [43162810613](https://github.com/SXQHex/FtkSaaS/actions/runs/43162810613) |
+| Son belge adayı | PR285 aynı head/base/merge ağacında candidate, quality ve documentation başarılı; full clean kapsam gereği skipped. Bağımsız inceleme PR açılmadan önce tamamlandı; zorunlu bulgu yok. | [43168784554](https://github.com/SXQHex/FtkSaaS/actions/runs/43168784554) |
+| Main ve merge kanıtı | Güncele6f7218 main için ikisi de completed/success. | [Main43168937940](https://github.com/SXQHex/FtkSaaS/actions/runs/43168937940), [merge43168937892](https://github.com/SXQHex/FtkSaaS/actions/runs/43168937892) |
+| Development | Güncele6f7218 için source success; Supabase ağacı değişmediği için deploy skipped. Son gerçek dağıtım43148278402 (PR280) ile aynı Supabase ağacı `b247f7b9ef65f883a3abe02e1d2a63e1f087f5eb` doğrulandı; yeni deploy iddia edilmez. | [43168995486](https://github.com/SXQHex/FtkSaaS/actions/runs/43168995486), [son gerçek dağıtım](https://github.com/SXQHex/FtkSaaS/actions/runs/43148278402) |
 
 Önceki PR279 tabanı, ara f14 adayının geri alma sonucu ve o tarihte gözlenen run durumları [PR280 ile birleşen değişmez devir sürümünde](https://github.com/SXQHex/FtkSaaS/blob/985a0ccbb7f1d95296f09bb8a43adb70aedb6661/apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) korunur. Bu tarihsel kayıt güncel durum veya yeni kaynağın kabulü değildir.
 
@@ -46,6 +47,24 @@ Mevcut development runtime'ında gerçek Pro organizasyonunda iki ayrı sentetik
 Parola girişli yönetici security_policy yazarken AUTH_REQUIRED aldı; ayar sürümü değişmedi. Gerçek native enrollment→challenge→TOTP verify ile AAL2 olan aynı yönetici, öğrenci rolü için MFA ve60 saniyelik hassas reauth tercihini yazıp yeniden okudu. MFA'sız öğrenci member ayar okuyucusunda reddedildi; global account_get erişimi korundu. Gerçek auth.sessions.created_at üzerinden61 saniye doğal süre beklendi; aynı AAL2 oturumun hassas politika yazısı AUTH_REQUIRED verdi ve sürüm değişmedi. Yeni native parola girişi ve gerçek TOTP ile yeni session açılınca aynı yazı başarıyla yeni sürüm üretti. Saat, native session veya platform TTL değiştirilmedi.
 
 Sonunda özgün effective güvenlik değeri ve DEFAULT/local kaynağı sürümlü normal settings protokolüyle geri yüklendi. Yalnız bu kabulün TOTP faktörü kaldırıldı ve geçici rolü revoke edildi; öğrencinin normal organizasyon okuması geri geldi. Bütün yeni kabul session'ları local logout ile kapatılıp eski token'ları Edge'de reddedildi. S08 checkpoint session kimliği/created_at korundu. Sonuç12 Kasım06:23:36 UTC'de passed; private `apps/backend/.dev/org-security-result.json` yalnız güvenli kontrol/temizlik metadatasını tutar, tamamlanan JWT/TOTP checkpoint'i kaldırıldı. Bu sonuç mevcut kaynakta gerçek rol-MFA/reauth alt kabulüdür; history/reset, tüm rol/izin kombinasyonları, bütün69 grup, işletim O04 fiziksel imha işi veya G02 kapanışı değildir. Runtime/API/migration ve test kapıları değişmedi.
+
+<a id="s10-takvim-istisnasi-hosted-kabulu"></a>
+### S10 takvim istisnası hosted kabulü — 12 Kasım 2026
+
+Gerçek Pro Owner/CM ile normal Auth→Edge→RPC üzerinden, önceki kabulün test-owned disiplini geçici etkinleştirilerek katılımcısız/görevsiz bir seans sınandı. Dar kapanışın etki sayısı0/truncated=false okunduktan sonra merkez takvimi yazıldı. Normal session_create RESOURCE_CONFLICT; açık gerekçe/sürüm taşıyan istisna, organizasyon izni kapalıyken FORBIDDEN verdi. İzin açıkken güncel org/merkez ayar sürümüyle aynı seans oluşturuldu ve replay geçti. Varsayılan session_get kanıtı açmadı; açık manager okuması gerekçeyi, beklenen gerçek onaylayan kişiyi ve sunucu zamanını doğruladı.
+
+Organizasyon izni kapatılınca başarılı create replay'i FORBIDDEN verdi; mevcut seans ve tarihsel kanıtı değişmedi. İzin yeniden açılınca başarılı replay eski ayar sürümüyle çalıştı; aynı eski proof ile yeni niyet PREVIEW_STALE aldı. Açık capacity değişikliği preview/apply geçti; onun başarılı replay'i de izin kapalıyken reddedilip izin yeniden açılınca çalıştı. Program/oda/eğitmen/anlaşma kolları bu dar hosted seans kabulüne dahil değildir; native kaynak testleri ayrı korunur.
+
+Yalnız owned seans iptal edildi; takvim ve org izin alanının özgün effective/default/local kaynakları geri geldi, disiplin ve merkez ilişkisi inactive okundu. İlk yardımcı logout kontrolü yalnız200 hata zarfı bekledi; gerçek Edge401 ve native session yokluğu ayrı readback ile doğrulandı, kabul yeniden çalıştırılmadı. Doğrulama oturumu da local logout204 ve Edge reddiyle kapandı; S08 checkpoint aynı kaldı. Sonuç12 Kasım06:37:54 UTC'de passed; private `apps/backend/.dev/calendar-exception-result.json` yalnız kontrol/temizlik metadatasını taşır, tamamlanan token checkpoint'i kaldırıldı. Runtime veya kapılar değişmedi; bu M02/M06/O18 alt kabulü bütün S10/G02 kapanışı değildir.
+
+<a id="s10-public-konum-marka-hosted-kabulu"></a>
+### S10 public konum ve marka hosted kabulü — 12 Kasım 2026
+
+Aynı gerçek Pro organizasyon/merkezinde map_url/directions/website_url alanları normal sürümlü API ile yazıldı, yeniden okundu ve replay edildi. Yalnız sentetik `.invalid` HTTPS adresleri ve gerçek adres içermeyen ulaşım metni kullanıldı; URL'ler sunucudan/tarayıcıdan çağrılmadı. Başlangıçta iki public profil kapalıydı. **Anonim** public_calendar_get API'si publishable key ile, Authorization olmadan200 verdi; kapalı profiller null kaldı. Org/merkez yayın kapısı açık fakat public_fields boşken konum/web/iletişim açılmadı. Açık location/website seçimiyle yalnız sentetik konum/web projeksiyonu geldi; seçilmemiş contact saklı kaldı.
+
+Üç açık sentetik marka rengi yazıldı; bağlı organizations_list ile iki anonim profil aynı org renklerini okudu. Center marka override'ı oluşturulmadı. Javascript, HTTP, URL credential ve sınır dışı port içeren dört map_url değeri gerçek HTTP400/VALIDATION_FAILED verdi; değerler ve ayar sürümü değişmedi. İlk yardımcı araç200 varsaydığı için bu ret kontrolünde durdu; kapılar/alanlar önce geri yüklendi. Yalnız başarısız negatif kontrol ve kaynak/temizlik readback'i doğru400 sözleşmesiyle tamamlandı; başarılı yayın testleri tekrarlanmadı.
+
+Toplam13 alanın özgün effective/default/local kaynakları doğrulandı; sonraki anonim okumada iki profil null. Tüm yeni session'lar local logout204 ve eski token Edge reddiyle kapatıldı; S08 checkpoint korundu. Sonuç12 Kasım06:41:27 UTC'de passed; private `apps/backend/.dev/public-location-result.json` güvenli metadata tutar, tamamlanan token checkpoint'i kaldırıldı. Rehberdeki public alan beyaz listesine runtime'da mevcut location/website açıklandı; runtime/API/migration değişmedi. Bu M01/O01 konum/marka alt kabulüdür; public başvuru/Turnstile S14 veya bütün S10/G02 kapanışı değildir.
 
 **S14 canlı sınır:**12 Kasım canonical `uye.fethiyetango.com/api/public/application` aynı-origin boş JSON POST tekrarında503/SERVICE_UNAVAILABLE verdi; bu yalnız gateway erişilebilirlik tanısıdır, gerçek widget veya başvuru kabulü değildir. Önceki eksik key/hostname metadata'sı bugünkü ayar readback'i olarak sunulmaz. Gerekli config ve gerçek token/action/hostname devri [XREQ-042](../../../docs/requests.md#xreq-042) sahibindedir. Dış site contact/kayit entegrasyonu son kullanıcı kararıyla V1 dışında; uygulamanın kendi public kabulü S14'te açık kalır.
 
@@ -420,8 +439,8 @@ Yerel son verify270 sözleşme/yönetişim/restore +135 CI +10 kalite testi (415
 | S15 | 4 | Üye paylaşım tercihleri ve katılımcı projeksiyonu | Ayrıntılı amaç/metin izin geçmişi bütünlüğü O08/S10. |
 | S16 | 0 | Mevcut hesap/org lifecycle komutları | Veri kopyası ve doğrulanmış imha O08; tamamlandı uydurulmaz. |
 | S17 | 0 | Kendi güvenlik geçmişi; alan seçmeli reset | Her güvenilen cihaz/cache akışı teslim edilmiş sayılmaz; S08/S10. |
-| M01 | 7 | Merkez komutları ve kimlik/iletişim tercihleri | Harita/ulaşım/web alanları PR277 kaynağında; hosted görünürlük kabulü S10. |
-| M02 | 2 | Merkez timezone, availability hazırlığı ve work_calendar | Çok aralıklı takvim/kapanış/etki ve tek sefer kopya kaynakta; mevcut UTC geçmişi korunur. Yerel domain kabulü güncel kayıtta, hosted dilim ayrıca değerlendirilir. |
+| M01 | 7 | Merkez komutları ve kimlik/iletişim tercihleri | [Konum/web anonim alan seçimi ve ret/restore hosted alt kabulü](#s10-public-konum-marka-hosted-kabulu) geçti; diğer normatif alanlar buradan kapanmaz. |
+| M02 | 2 | Merkez timezone, availability hazırlığı ve work_calendar | Çok aralıklı takvim/kapanış/etki ve tek sefer kopya kaynakta; mevcut UTC geçmişi korunur. [Hosted kapanış](#s10-is-takvimi-hosted-kabulu) ve [seans istisna izni](#s10-takvim-istisnasi-hosted-kabulu) alt kabulleri geçti; program istisnası aynı kabul değildir. |
 | M03 | 0 | Oda kimlik/açıklama/konum/aktiflik ve kapasite komutları | PR280 kaynak/native teslimi seans/iç etkinlik engellerini ve geçmişi korur; bu alanlar yeniden kaynak eksiği sayılmaz. Ayrıntılı tüketim XREQ-041. |
 | M04 | 0 | Merkez disiplin sunumu ve pasifleştirme etki/proof okuyucusu | PR280 etki/ret kaynağı teslim edildi; global katalog V2. Frontend etki gösterimi XREQ-041 sahibinde. |
 | M05 | 1 | Merkez rol/grant ve sekiz izin hazırlığı | Mevcut source/resolve ve writer yetkileri korunur; otomatik grant yoktur. Kalan normatif yerel sınırlar S10, frontend ekranı ayrı. |
@@ -442,7 +461,7 @@ Yerel son verify270 sözleşme/yönetişim/restore +135 CI +10 kalite testi (415
 | M20 | 0 | Mevcut policy override ve alan seçmeli reset | Bütün gruplara genellenmiş miras/yayın ekranı/APIsi yok; S10. |
 | M21 | 2 | CRM hazırlık şablonu, org izinli merkez ek etiketi ve lead writer/read | PR277 aşama/etiket/yeniden eşleme kaynak dilimi teslim edildi; bütün normatif atama/görünüm alt alanları bu teslimden çıkarılmaz. |
 | M22 | 0 | Canlı role/grant/management ve ayar history | Her ayar grubunun alan bazlı izin/denetimi S10/O04. |
-| O01 | 18 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur; S10. |
+| O01 | 18 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur. [Anonim konum/marka alt kabulü](#s10-public-konum-marka-hosted-kabulu) bütün O01 kabulü değildir. |
 | O02 | 1 | Ortak politika yayını ve availability hazırlığı | Kopya canlı miras değildir; bütün alanların lock/override desteği S10. |
 | O03 | 1 | Org/merkez görev ve sekiz izin hazırlığı | Açık miras/source/history/restore kabulü mevcut; otomatik veya genel toplu grant motoru yok. Kalan normatif alt alanlar S10. |
 | O04 | 1 | Native MFA ve organization security_policy ortak dispatch/keşif kapısı | [Gerçek rol-MFA ve doğal süreli hassas reauth alt kabulü](#s10-o04-hosted-guvenlik-kabulu) geçti; history/reset ve tüm rol kombinasyonları buradan kapanmaz. Genel ikinci onay yoktur. |
