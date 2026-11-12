@@ -1,0 +1,13 @@
+interface:
+  display_name: Idea Refine
+  short_description: Ham fikirleri uygulanabilir önerilere dönüştür
+  default_prompt: $idea-refine becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

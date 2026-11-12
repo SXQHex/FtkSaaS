@@ -1,0 +1,96 @@
+# Security reference
+
+The full rule set behind the security lines of the SKILL.md checklist, each with the reason it exists and the scanner that detects a violation (actionlint, zizmor, poutine, gasa). Rules marked as detected are validated by running the tool, in the build path's Validate step and in an audit; your own reading is for the rules no tool covers. Read this when granting permissions, adding or pinning a third-party action, adding a secret or cloud credential, meeting `pull_request_target`, checking Dependabot, or writing the security section of an audit. GitHub Actions is a high-value supply-chain target: a workflow runs arbitrary code with a token, so these are defaults, not add-ons.
+
+## Permissions: least-privilege
+
+- Start every workflow with `permissions: {}` at the top level, then grant per job. The token starts with nothing, and each job's block documents exactly what it can touch, so a compromised step inherits only that job's grants. Default token permissions vary by org and repo setting; the empty block makes the workflow independent of them. Detected by zizmor `excessive-permissions`, gasa `workflows/workflow-permissions` and `write-all-permissions`.
+- `actions/checkout` needs `contents: read`, even under `permissions: {}`. A job that only calls an API and never checks out can stay at zero grants.
+- `actions/checkout` sets `persist-credentials: false` unless a later step in that job pushes or pulls with the token. By default it writes the token into `.git/config`, where any later step, cached artifact, or uploaded workspace can read it. Detected by zizmor `artipacked`, so leaving it out costs a validate-and-fix cycle every time.
+- Look up each action's README for the permissions it needs before granting. When the README is silent and you are still unsure, ask the user about that specific grant rather than widening it. An unexplained `write` grant is how `write-all` creeps back in. Put the reason on the same line as each `write` grant (`contents: write # release job pushes the tag`): the block then documents itself, and zizmor `undocumented-permissions` accepts only a trailing comment, not one on the line above.
+- When you meet `permissions: write-all`, `read-all`, or any non-empty top-level block, enumerate what each job actually does and replace it with `permissions: {}` plus per-job grants. `read-all` hands every read scope to every job, including jobs that call no API, so it is the same shape as `write-all` at lower stakes. The rewrite is the finding, so show the before and after.
+
+## Third-party actions: pinned
+
+- Pin every action outside the user's or org's scope to a full commit SHA with the version as a trailing comment: `uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1`. Tags move; a SHA is immutable. The comment keeps the version readable for humans and lets Dependabot update the pin. Detected by zizmor `unpinned-uses` (missing SHA) and `ref-version-mismatch` (comment wrong or missing), gasa `workflows/action-version-pinning`, poutine `unpinnable_action`, and pinact `--check --verify-comment`.
+- Choose a release that is at least 7 days old. Compromised releases are usually caught and yanked within days; the wait lets the ecosystem catch a bad one before this repo adopts it. pinact enforces this: `--update --min-age 7` skips releases inside the window, `--verify-min-age` flags existing pins that are inside it.
+- `pinact` does the pinning. `--update` always moves to the newest release, across majors (`@v4` becomes v7.0.1), and pinact has no flag that holds a major. So the command depends on where the `uses:` line came from:
+
+```bash
+scripts/scan.sh pinact run --update --min-age 7 <file>                     # new workflow you wrote: newest release at least 7 days old, every action
+scripts/scan.sh pinact run --update --min-age 7 -i '<owner/repo>' <file>   # an action you added to an existing file: touch only that action
+scripts/scan.sh pinact run --min-age 7 -i '<owner/repo>' <file>            # an action already on a tag (@v4): pin the release the tag points at, same major
+scripts/scan.sh pinact run --check --verify-comment --min-age 7 --verify-min-age   # audit: report unpinned, wrong comments, too-fresh pins; edits nothing
+```
+
+`scan.sh` sets `GITHUB_TOKEN` from your `gh` login inside its own process (unauthenticated API calls rate-limit fast), so the token never appears in a command line, a `set -x` trace, or a transcript; `gh auth token` has no place in a command you type or log. An existing `@v4` stays on v4 because a new major can change inputs, defaults, or the runtime, and that bump is the user's decision: name the newer major in the hand-back or report as a question, with a link to its release notes. `pinact run` without `--update` pins whatever the tag points at today, and `--min-age 7` does not pick an older release; it exits 2 with `min-age violation` when that release is younger than 7 days. Then write the previous release of the same major (`@v4.3.1`, from `gh release list -R <owner/repo>`) and run the same command again. `--update` acts on every action in the file, so on a file that is already pinned, scope it with `-i '<owner/repo>'` (a regex, repeatable; `-e` excludes) to the action the finding names, or the diff bumps five unrelated pins along with the one you meant and the reviewer cannot tell the fix from the noise. Let pinact resolve every SHA: a tag looked up by hand through `gh api .../git/refs/tags/<tag>` returns the annotated tag object's SHA, not the commit's, and `pinact --check` rejects it; writing `@v1.2.3` and running pinact is both faster and right the first time.
+
+- Keep the comment after a SHA pin to the version alone: `# v7.0.1`, nothing after it. Dependabot rewrites that comment when it bumps the SHA only when the comment is exactly the old version; with any other text on it (`# v7.0.1 # zizmor: ignore[artipacked]`, `# v7.0.1 # needed for release`) it bumps the SHA and leaves the comment as it was, on purpose, so the comment goes stale on the first update and zizmor `ref-version-mismatch` and pinact `--verify-comment` fire on every bump after that. When you meet extra text on a `uses:` line, recommend removing it: a note moves to a `#` line above the step, and a `# zizmor: ignore[...]` moves into `.github/zizmor.yml`, which zizmor reads from the repo root and which keeps the reason next to the exception (`rules.<audit>.ignore` takes `file.yml`, `file.yml:line`, or `file.yml:line:col`):
+
+```yaml
+# zizmor configuration: https://docs.zizmor.sh/configuration/
+# Ignores live here, not as inline comments on SHA-pinned `uses:` lines,
+# so Dependabot can keep rewriting the version comment.
+rules:
+  artipacked:
+    # release.yml checkout must persist credentials: the release job pushes the tag.
+    ignore:
+      - release.yml
+  unpinned-uses:
+    # lint.yml calls our reusable super-linter workflow by @main; see the Hard finding.
+    ignore:
+      - lint.yml
+```
+
+No scanner flags the extra text itself; the damage shows up one Dependabot PR later, so this one is yours to check.
+
+- Same-owner actions and reusable workflows may use a tag or a SHA. A branch ref such as `@main` is the one form to replace, whoever owns it: the branch moves on every push, so a compromise there runs here on the next event with no release step and no review in this repo in between. A reusable workflow multiplies that: every caller inherits the same moving target, so one bad push cascades into every downstream repo at once, each with its own permissions and secrets. Rate it high when the ref is a reusable workflow or a shared action; gasa says medium, the blast radius says otherwise. Detected by gasa `workflows/action-version-pinning` and zizmor `unpinned-uses`. When the repo has tags, `pinact run --branch-to-tag '^main$'` converts the branch to the latest stable tag's SHA. A clean pinact run proves the pin is immutable, not that it is current: check the distance first with `gh api repos/O/R/compare/<tag>...<default-branch> --jq .ahead_by`. A tag a handful of commits behind is the normal fix. A tag far behind (hundreds of commits, or older than the features the caller relies on; `docker-build-workflow`'s only tag was 264 commits and three years behind `main`) would pin the caller to code the owner no longer ships, so leave the ref as it is, report the branch ref as the finding with the distance, and give the user the two real options: the owner tags a current release, or the caller stays on the branch knowingly. No scanner or update bot measures this gap; Dependabot and Renovate chase the latest tag and never ask how far it trails the default branch.
+- When the repo has no tags or releases, pinact reports "action can't be pinned" because there is nothing it can verify against. The fix is upstream: the owner tags a release (`gh release create v1.0.0 --generate-notes` in that repo), then `pinact run --branch-to-tag` pins every caller. Report the finding with the cascading reason and put that choice to the user. Hand-pinning the branch HEAD or adding an `ignore_actions` entry only quiets the tools: the pin fails `pinact --check` forever and Dependabot cannot bump it, and the ignore hides the finding from the one tool that tracks it.
+- A repo can carry `.github/pinact.yaml` (`min_age`, `ignore_actions`, `rules`). Read it before reporting a pin: an `ignore_actions` entry means the owner recorded the decision, so quote its reason next to the finding. The finding stays in Hard, because the config changes who knows about the risk, not the risk.
+- An update bot keeps SHA pins current, with a delay before it proposes a new release. Any delay the repo already has is fine; use 7 days, to match the pin age, only in a config you write. Dependabot and Renovate both do this; the repo needs exactly one of them, and which one is the user's choice. Look for both: `.github/dependabot.yml`, and Renovate's `renovate.json`, `renovate.jsonc`, `renovate.json5`, the same three under `.github/`, `.renovaterc`, `.renovaterc.json`, or a `renovate` key in `package.json`.
+  - **Both present:** a Hard finding, because both bots open a PR for the same bump. Ask which one to keep.
+  - **Neither present:** ask which bot the user prefers, then give that bot's complete config below. An org can apply a shared Renovate config without a file in the repo, so a missing file does not prove a missing bot.
+  - **Dependabot:** a `github-actions` entry with a daily schedule and a `cooldown`. Recommend the entry below for whatever is missing (the whole file when the user chose Dependabot and none exists):
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "[actions] "
+```
+
+- **Renovate:** the GitHub Actions manager runs (no `enabledManagers` list, or one that includes `github-actions`); digests are pinned (`helpers:pinGitHubActionDigests` or `config:best-practices` in `extends`, or a `packageRules` entry with `pinDigests: true` for `matchDepTypes: ["action", "workflow"]`); and `minimumReleaseAge` is set for these updates. Recommend only the missing parts; the whole file, when the user chose Renovate and none exists:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "packageRules": [
+    { "matchManagers": ["github-actions"], "minimumReleaseAge": "7 days" }
+  ]
+}
+```
+
+Renovate keeps the `# vX.Y.Z` comment when it bumps a digest and skips a bare SHA with no comment, so the comment rule above applies to both bots. `minimumReleaseAge` needs a release timestamp, which the `github-tags` datasource behind actions provides.
+
+Without a cooldown (`cooldown` in Dependabot, `minimumReleaseAge` in Renovate), the bot proposes the fresh SHA on release day, before the ecosystem has had time to catch a bad release. zizmor `dependabot-cooldown` also flags a Dependabot cooldown shorter than 7 days; when the repo has a shorter delay, report that under Opinions, not Hard, and give the `.github/zizmor.yml` entry that records the repo's choice (`rules: dependabot-cooldown: config: days: <N>`). Detected by zizmor `dependabot-cooldown` (`--collect all`) and gasa `updates/update-tool-configuration`, `updates/update-tool-actions-cooldown`, `updates/update-tool-actions-pinning`.
+
+## Credentials: OIDC over static secrets
+
+- For cloud deploys and any tool that supports it, authenticate with GitHub OIDC federation: the job gets `id-token: write` and the cloud trusts the repo's identity. There is no long-lived key to leak, rotate, or find in a log. When a tool needs a secret and you are unsure whether it supports OIDC, offer to check its docs before adding the secret. No scanner judges the auth method; this one is yours to check.
+- Scope each third-party secret to a GitHub repository environment and have the job declare `environment:`. The secret is then visible only to jobs that name that environment, and environment protection rules gate who can trigger them. Detected by zizmor `secrets-outside-env` (auditor persona): <https://docs.zizmor.sh/audits/#secrets-outside-env>.
+- Configure cloud credentials (`configure-aws-credentials`) after `npm ci`, `pip install`, and the build steps, or build in a separate job that has no `id-token: write` and hands the artifact over. Package lifecycle scripts run arbitrary code at install time; run them before the credentials exist in the job's environment. A registry login (`docker/login-action`) before `build-push-action` is fine: the Dockerfile's install runs inside BuildKit, not in the runner environment that holds the login.
+- Pass secrets into the one step that uses them via `env:` and reference them as `$VAR` in `run:`. Print only derived, non-secret values (an image digest, a URL). Full `env` dumps and `set -x` in a step with secrets belong to debugging in a fork, not to a committed workflow. Partly detected: zizmor `unredacted-secrets` and `overprovisioned-secrets`, poutine `job_all_secrets`; a plain `echo $TOKEN` is yours to spot.
+
+## Untrusted input: trusted context only
+
+- Put any `${{ github.event.* }}` value (PR title, branch name, issue body, commit message) into `env:` and reference it as `"$VAR"` inside `run:`. Interpolating it directly into the script is shell injection by anyone who can open a PR. Detected by actionlint (script injection), zizmor `template-injection`, poutine `injection`.
+- `pull_request` is the safe default for PRs: fork runs get a read-only token and no secrets.
+- `pull_request_target` runs the base branch's YAML with a write token and secrets, so its risk is whoever can open a PR. It is acceptable in any repo whose pull request access is set to **Collaborators only** (Settings > General > Features, a February 2026 setting: only users with write access can open PRs, so no external PR exists to abuse the trusted context); check with `gh api repos/O/R --jq .pull_request_creation_policy`, which reads `collaborators_only`, and gasa `workflows/pull-request-target` already scores it low then. Otherwise it belongs only in a private repo where a fork PR genuinely needs trusted context (labeling, commenting). When it must be used, keep untrusted code out of the privileged job: check out `github.event.pull_request.head.sha` only in a separate job with zero grants, and gate the privileged job on a maintainer label. In a public repo that accepts external PRs, use `pull_request` and move the privileged work to a `workflow_run` follow-up. zizmor `dangerous-triggers` fires on the trigger itself and stays red however the jobs are arranged or the repo is configured; when the trigger stays for one of the reasons above, that one finding is the accepted tradeoff, so state the reason in the hand-back rather than chasing it. Detected by gasa `workflows/pull-request-target` (critical), zizmor `dangerous-triggers`, poutine `untrusted_checkout_exec`, `confused_deputy_auto_merge`, `default_permissions_on_risky_events`. poutine also flags the zero-grant job itself (`default_permissions_on_risky_events` treats `permissions: {}` as unset, though GitHub treats it as none and the rule's own doc uses it); that is the tool, not the workflow, so keep `{}`. A repo that wants poutine clean in CI records the exception in a committed `.poutine.yml` (`skip: - rule: default_permissions_on_risky_events` with `path:` and this reason as a comment), where an audit finds and quotes it.
+- Adding `workflow_dispatch` or `repository_dispatch` widens who can start a privileged run, so it is a decision for the user: ask before adding either. No scanner flags these triggers.

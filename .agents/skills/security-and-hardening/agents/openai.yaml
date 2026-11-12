@@ -1,0 +1,13 @@
+interface:
+  display_name: Security and Hardening
+  short_description: Kod ve sistem güvenliğini incele ve güçlendir
+  default_prompt: $security-and-hardening becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

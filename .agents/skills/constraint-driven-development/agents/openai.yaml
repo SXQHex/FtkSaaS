@@ -1,0 +1,14 @@
+interface:
+  display_name: Constraint-Driven Development
+  short_description: Proje kalite sınırlarını tanımla ve koru
+  default_prompt: $constraint-driven-development becerisini kullanarak bu görevi ele
+    al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

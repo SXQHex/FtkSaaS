@@ -1,0 +1,14 @@
+interface:
+  display_name: Incremental Implementation
+  short_description: İşlevleri küçük doğrulanabilir adımlarla geliştir
+  default_prompt: $incremental-implementation becerisini kullanarak bu görevi ele
+    al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

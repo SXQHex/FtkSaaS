@@ -1,0 +1,13 @@
+interface:
+  display_name: Doubt-Driven Development
+  short_description: Varsayımları bağımsız incelemeyle sına
+  default_prompt: $doubt-driven-development becerisini kullanarak bu görevi ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -1,0 +1,14 @@
+interface:
+  display_name: Observability and Instrumentation
+  short_description: Log, metrik ve izleme sistemlerini kur
+  default_prompt: $observability-and-instrumentation becerisini kullanarak bu görevi
+    ele al.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
