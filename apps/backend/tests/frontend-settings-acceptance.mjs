@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import {nativeTotp} from './native-totp-fixture.mjs';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import {publishSyntheticSharingNotices,explicitSharingConsentInputs} from './sharing-consent-fixture.mjs';
 
 const settingsCatalogVersion=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).version;
 async function settingsFixture(t){
@@ -12,7 +13,7 @@ async function settingsFixture(t){
  const account=await must(owner,'account_get_v1');await must(other,'account_get_v1');
  const db=await guard.connect(context().env.DB_URL);
  const read=(u,q)=>must(u,'settings_get_v1',q);
- const write=(u,q,patch,version,k=key())=>must(u,'settings_update_v1',{...q,patch,expected_version:version},k);
+ const write=async(u,q,patch,version,k=key())=>must(u,'settings_update_v1',{...q,patch,expected_version:version,...(q.scope==='member'?await explicitSharingConsentInputs(u,q.org_id,patch):{})},k);
  const fail=async(code,u,op,b,k)=>{const x=await call(u,op,b,k);assert.equal(x.result.ok,false,JSON.stringify(x.result));assert.equal(x.result.error.code,code,JSON.stringify(x.result));};
  return {platform,plan,owner,other,account,db,read,write,fail};
 }
@@ -121,6 +122,7 @@ test('Tenant settings authority, privacy and notification delivery',async t=>{
  let trigger;
  try{
  const {org,center,person}=await settingsTenant(fixture);
+ await publishSyntheticSharingNotices(owner,org);
   await t.test('Owner-only field authority is rechecked before update and reset receipt replay',async()=>{
    const successor=await authUser('settings-successor'),successorAccount=await must(successor,'account_get_v1');
    await must(owner,'org_manager_assign_v1',{org_id:org,person_id:person},key());
@@ -179,6 +181,7 @@ test('Typed settings catalog round-trip in every scope',async t=>{
  let trigger;
  try{
  const {org,center,person}=await settingsTenant(fixture);
+ await publishSyntheticSharingNotices(owner,org);
  const weakOwner=owner;owner=await nativeTotp(t,owner);
   await t.test('all declared fields in five scopes round-trip through real typed APIs; unsupported branding cannot fake success',async()=>{
    const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
@@ -186,7 +189,7 @@ test('Typed settings catalog round-trip in every scope',async t=>{
    await fail('AUTH_REQUIRED',weakOwner,'settings_update_v1',{...orgScope,expected_version:(await read(owner,orgScope)).version,patch:{security_policy:fields.find(f=>f.key==='security_policy').default}},key());
    assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='lesson_reminder_hours').writable,false);
    await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{lesson_reminder_hours:1}},key());
-   await write(owner,orgScope,{reminder_center_overrides_enabled:true},(await read(owner,orgScope)).version);
+   await write(owner,orgScope,{reminder_center_overrides_enabled:true,allow_center_sharing_restrictions:true},(await read(owner,orgScope)).version);
    const pipeline=(await read(owner,orgScope)).values.crm_pipeline;
    assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='crm_local_tags').writable,false);
    await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{crm_local_tags:[]}},key());

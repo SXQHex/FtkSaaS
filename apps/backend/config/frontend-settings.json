@@ -1,5 +1,5 @@
 {
-  "version": 21,
+  "version": 22,
   "fields": [
     {
       "scope": "user",
@@ -3988,6 +3988,45 @@
       "default": false,
       "group": "O18",
       "consumer": "work_calendar_exception_assert"
+    },
+    {
+      "scope": "organization",
+      "key": "sharing_notices",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/SharingNotice"
+        },
+        "maxItems": 4
+      },
+      "default": [],
+      "group": "O16",
+      "consumer": "sharing_consent"
+    },
+    {
+      "scope": "organization",
+      "key": "allow_center_sharing_restrictions",
+      "schema": {
+        "type": "boolean"
+      },
+      "default": false,
+      "group": "O16",
+      "consumer": "sharing_consent"
+    },
+    {
+      "scope": "center",
+      "key": "sharing_restrictions",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/SharingField"
+        },
+        "uniqueItems": true,
+        "maxItems": 4
+      },
+      "default": [],
+      "group": "M22",
+      "consumer": "sharing_consent"
     }
   ]
 }

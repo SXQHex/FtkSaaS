@@ -1,3 +1,4 @@
+import {publishSyntheticSharingNotices} from './sharing-consent-fixture.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {call,context} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
@@ -46,6 +47,7 @@ test('ST-03 member privacy, calendar, media and public visibility',{timeout:6000
  t.diagnostic('Isolated fixture setup: '+fixture.setup_ms.toFixed(1)+' ms');
  let {platform,plan,owner,student,db,rows,org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate,account,scoped,api,q,read,change,day,availabilityTemplate,classId,preview,must,observe}=fixture;
  try{
+  observe('organization',await publishSyntheticSharingNotices(owner,org));
   await t.test('peer fields require opt-in and live confirmed co-attendance; end, cancellation and unlink close visibility',async()=>{
    const member=await must(student,'account_get_v1');studentPerson=(await api('person_create_v1',{display_name:'Synthetic ST03 member',contacts:[]})).primary_id;await api('student_activate_v1',{person_id:studentPerson});
    const link=key();await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[link,org,member.id,studentPerson]);

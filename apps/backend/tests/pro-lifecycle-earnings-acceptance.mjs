@@ -32,6 +32,7 @@ async function fixture(planName){
   for(const format of ['group','private'])await publish('student_cancel_'+format,{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
   await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
   await publish('request_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
+  if(['pro','business'].includes(planName))await publish('waitlist_offer_minutes',{kind:'integer',value:30});
   await publish('negative_default',{kind:'integer',value:0});await publish('negative_upper',{kind:'integer',value:0});
   const linked=async(label,role)=>{
    const p=(await api('person_create_v1',{display_name:'Synthetic '+label,contacts:[]})).primary_id;

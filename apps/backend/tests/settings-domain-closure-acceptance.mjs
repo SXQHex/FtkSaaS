@@ -38,10 +38,31 @@ test('every new plan gets the same safe debt and negative defaults without chang
    const created=await must(platform,'organization_create_v1',body,opKey);
    assert.equal((await must(platform,'organization_create_v1',body,opKey)).replayed,true);
    const policies=(await db.query('select key,value,version::int version from core.policy_versions where org_id=$1 order by key',[created.primary_id])).rows;
-   assert.deepEqual(policies,[{key:'debt_booking',value:{kind:'boolean',value:true},version:1},{key:'debt_participation',value:{kind:'boolean',value:true},version:1},{key:'negative_default',value:{kind:'integer',value:0},version:1}]);
+   assert.deepEqual(policies,[{key:'debt_booking',value:{kind:'boolean',value:true},version:1},{key:'debt_participation',value:{kind:'boolean',value:true},version:1},{key:'negative_default',value:{kind:'integer',value:0},version:1},{key:'reservation_window',value:{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false},version:1}]);
   }
   if(existing.length){const after=(await db.query('select id,org_id,key,value,version from core.policy_versions where id=any($1::uuid[]) order by id',[existing.map(p=>p.id)])).rows;assert.deepEqual(after,existing);}
  }finally{await db.end();}
+});
+
+test('reservation window setup defaults remain editable by live scoped managers',async t=>{
+ const f=await preparationFixture({studentUser:true,studentMembership:true});t.after(()=>f.db.end());
+ const {owner,student,org,center,plan,db,api,must,studentPerson}=f;
+ const initial=(await must(owner,'policies_get_v1',{org_id:org,center_id:center,keys:['reservation_window']}))[0];
+ assert.deepEqual(initial.value,{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});assert.equal(initial.version,1);
+ const changed={kind:'window',opens_minutes_before:4320,closes_minutes_before:60,manager_exception:false};
+ const body={org_id:org,center_id:null,key:'reservation_window',value:changed,effective_at:new Date().toISOString(),mandatory:false},opKey=key();
+ await must(owner,'policy_publish_v1',body,opKey);assert.equal((await must(owner,'policy_publish_v1',body,opKey)).replayed,true);
+ const current=(await must(owner,'policies_get_v1',{org_id:org,center_id:center,keys:['reservation_window']}))[0];assert.deepEqual(current.value,changed);assert.equal(current.version,2);
+ const original=(await db.query("select value,version::int version from core.policy_versions where org_id=$1 and key='reservation_window' and scope_center_id is null and version=1",[org])).rows[0];assert.deepEqual(original,{value:initial.value,version:1});
+ await api('center_manager_assign_v1',{person_id:studentPerson});
+ const orgWrite=await call(student,'policy_publish_v1',{...body,effective_at:new Date().toISOString()},key());assert.equal(orgWrite.result.ok,false);assert.equal(orgWrite.result.error.code,'FORBIDDEN');
+ const local={...body,center_id:center,value:{...changed,opens_minutes_before:2880}};
+ for(const name of ['starter','pro']){
+  await db.query('update core.saas_plan_versions set name=$1 where id=$2',[name,plan]);const r=await call(student,'policy_publish_v1',{...local,effective_at:new Date().toISOString()},key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,'PLAN_FEATURE_UNAVAILABLE');
+ }
+ await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);await must(student,'policy_publish_v1',{...local,effective_at:new Date().toISOString()},key());assert.deepEqual((await must(owner,'policies_get_v1',{org_id:org,center_id:center,keys:['reservation_window']}))[0].value,local.value);
+ await must(owner,'policy_publish_v1',{...body,mandatory:true,effective_at:new Date().toISOString()},key());const before=(await db.query("select count(*)::int n from core.policy_versions where org_id=$1 and key='reservation_window'",[org])).rows[0].n;
+ const denied=await call(student,'policy_publish_v1',{...local,effective_at:new Date().toISOString()},key());assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'FORBIDDEN');assert.equal((await db.query("select count(*)::int n from core.policy_versions where org_id=$1 and key='reservation_window'",[org])).rows[0].n,before);
 });
 
 test('configured forms are discoverable without secrets, scoped to live managers and usable by form rules',async t=>{

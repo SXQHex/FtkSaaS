@@ -1148,7 +1148,7 @@ ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapa
 | Çalışma saatleri | Default tanımsız; org şablonundan al veya merkez belirle. Yeni seans ve saat/oda/eğitmen değişiminde kontrol; görüntüleme/iptal/yoklama düzeltmesini engellemez. |
 | Zaman istisnası | Default kapalı; org izin verirse yetkili yönetici gerekçeyle kullanır. Diğer kapılar aşılmaz. |
 | Yeni program | Ders süresi önerisi 60 dakika, değiştirilebilir. Saat seçici adımı 15 dakika; elle geçerli saat desteklenir. Default tek seans; tekrar açılırsa bitiş tarihi veya sayı açık. |
-| Rezervasyon/talep | Açılış/kapanış ayrı, orgdan miras; tanımsızsa yetkili yapılandırma gerekir. Otomatik pencere değeri uydurulmaz. |
+| Rezervasyon/talep | Yeni Starter/Pro/Business kurulumunda rezervasyon penceresi seans başlangıcından7gün önce açılır, seans başlangıcında kapanır; yönetici zaman istisnası başlangıçta kapalıdır. Yetkili org yöneticisi sürümlü politikayla değiştirir; Business merkez override'ı mevcut org zorunluluk sınırını korur. Mevcut organizasyonlara toplu backfill yoktur. Talep ve diğer tanımsız pencere değerleri ayrı yetkili yapılandırma ister; uydurulmaz. |
 | Bekleme/teklif | Yeni sınıfta liste default kapalı. Teklif süresi orgdan miras; değer yoksa teklif üretimi başlamaz. |
 | Yerel değişiklik | Org zorunlu alan kilitli, serbest alan yerel değiştirilebilir. Mevcut 100 tekrar/3600sn kulüp seçimi korunur, yeni orglara yayılmaz. |
 

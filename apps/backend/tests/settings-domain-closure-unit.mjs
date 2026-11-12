@@ -38,8 +38,9 @@ test('calendar exception proofs are closed, version bound and cannot claim a ser
 test('catalog keys, values and override projections cover every configured scope field',()=>{
  const contract=JSON.parse(fs.readFileSync(new URL('../../../packages/api-contracts/schema/contract.json',import.meta.url))),config=JSON.parse(fs.readFileSync(new URL('../config/frontend-settings.json',import.meta.url))),d=contract.$defs;
  const frozen=JSON.parse(fs.readFileSync(new URL('../database/settings-catalog-v20.sql',import.meta.url),'utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
- assert.equal(config.version,21);assert.equal(config.fields.length,116);
- assert.deepEqual(config.fields.filter(f=>f.key!=='work_calendar_exceptions_enabled'),frozen);
+ assert.equal(config.version,22);assert.equal(config.fields.length,119);
+ assert.deepEqual(config.fields.filter(f=>f.key!=='work_calendar_exceptions_enabled'&&f.consumer!=='sharing_consent'),frozen);
+ assert.deepEqual(config.fields.filter(f=>f.consumer==='sharing_consent').map(f=>[f.scope,f.key]),[['organization','sharing_notices'],['organization','allow_center_sharing_restrictions'],['center','sharing_restrictions']]);
  assert.deepEqual(config.fields.find(f=>f.key==='work_calendar_exceptions_enabled'),{scope:'organization',key:'work_calendar_exceptions_enabled',schema:{type:'boolean'},default:false,group:'O18',consumer:'work_calendar_exception_assert'});
  for(const scope of ['user','member','center','organization','platform']){
   const fields=config.fields.filter(f=>f.scope===scope).map(f=>f.key).sort(),name=scope[0].toUpperCase()+scope.slice(1),view=d.SettingsView.oneOf.find(v=>v.properties.scope.const===scope);

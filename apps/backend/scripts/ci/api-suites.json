@@ -73,7 +73,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/starter-preparation-acceptance.mjs",
-          "sha256": "ede1dc4b7a8d8b48868ef53255864ba0445b04581e66c040a6ee13fff847cac9"
+          "sha256": "b2bd33be56c0cc436faf417eda03180f17baeba72e4b31980f0e644c3611e885"
         }
       ],
       "estimated_seconds": 960.91
@@ -454,7 +454,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-          "sha256": "d40456222d07929ec30116603fe61991c742dc24ae6135354b25f0dc3d554084"
+          "sha256": "ed217ccafdfa51543fb9ad10c7e6b76b5c6ccbba6d49b2838a428ec8e4be5166"
         }
       ],
       "estimated_seconds": 780.97
@@ -513,7 +513,7 @@
     },
     {
       "path": "apps/backend/tests/p01-waitlist-workers.test.mjs",
-      "sha256": "5159dbbd5f96d89f44133acb2d605e1d4a424600b3119d35a59d206768012280",
+      "sha256": "d28eb852815b2f2758870aded708d9e7469ac52d302f49700f44dd41fec7e6ed",
       "shared": [
         [
           1,
@@ -526,7 +526,7 @@
           "ranges": [
             [
               7,
-              184
+              208
             ]
           ]
         }
@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "a4952c3e324c1bc59a939771bb078bfca91e8e1dd8719037ef8b1b85fb393b9f",
+      "sha256": "334b964a2a5541719b53acbfe981d0f512aa14a86e00df35217811c1c46831fb",
       "shared": [
         [
           12,
@@ -771,27 +771,27 @@
         {
           "line": 11,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "468352e5ef5a935de6057bcd74d7eb04c7b51689af2b64af7d5788b672dbe034",
+          "sha256": "d999781cb6a286b703f038fb40ec172941bff842a97595e74a563a33cbe7d277",
           "shared": [
             [
               1,
-              29
+              30
             ],
             [
-              117,
-              117
+              118,
+              118
             ],
             [
-              175,
-              175
+              177,
+              177
             ],
             [
-              214,
-              215
+              217,
+              218
             ],
             [
-              256,
-              257
+              259,
+              260
             ]
           ],
           "parts": [
@@ -799,8 +799,8 @@
               "id": "settings-user-history",
               "ranges": [
                 [
-                  30,
-                  116
+                  31,
+                  117
                 ]
               ]
             },
@@ -808,12 +808,12 @@
               "id": "settings-tenant-authority",
               "ranges": [
                 [
-                  118,
-                  174
+                  119,
+                  176
                 ],
                 [
-                  176,
-                  213
+                  178,
+                  216
                 ]
               ]
             },
@@ -821,8 +821,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  216,
-                  255
+                  219,
+                  258
                 ]
               ]
             },
@@ -830,8 +830,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  258,
-                  294
+                  261,
+                  297
                 ]
               ]
             }
@@ -1094,6 +1094,37 @@
           "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",
           "sha256": "0016d13081cb630639c56e450d95d318191b88b9684e1e65344473fc1bb4b5cf",
           "line": 164
+        },
+        {
+          "line": 165,
+          "path": "apps/backend/tests/sharing-consent-acceptance.mjs",
+          "sha256": "fde3e7e6455296cc755bd15a4498bd3f1172b4aedd7d97d4637618c524d21f9f",
+          "shared": [
+            [
+              1,
+              8
+            ]
+          ],
+          "parts": [
+            {
+              "id": "sharing-consent-evidence",
+              "ranges": [
+                [
+                  9,
+                  69
+                ]
+              ]
+            },
+            {
+              "id": "sharing-consent-peer-media",
+              "ranges": [
+                [
+                  70,
+                  134
+                ]
+              ]
+            }
+          ]
         }
       ],
       "estimated_seconds": 1356.24
@@ -1224,7 +1255,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/settings-domain-closure-acceptance.mjs",
-          "sha256": "b1f33c9ac54e205e2b8195b4af6b0dc1ecc8b1c0d853b7a5b57278e5b2c3119d"
+          "sha256": "946f1beb7150848fe3b9e39f03c01a78efe763c908de7bc2321f2a3704620edd"
         },
         {
           "line": 2,
