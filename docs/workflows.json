@@ -288,8 +288,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "39fbf2411f62422520041200da069c490cabc7f4ce4b73fdfb870adbb7063d82",
-        "reason": "PR289 CI fixes: two exact API source hashes and user-approved Starter count3to4 fingerprint reviewed; previous policy records, 117 unit ownership, protocol and source gates unchanged."
+        "fingerprint": "060803a1924bb7aea1ac1f8920c13f58dda6576c749c76ccadb103fc3a228aab",
+        "reason": "Reviewed additive import of seven public-runner safety units; no existing runtime assertion or admission guard changed, including explicit fake transport versus real hosted evidence separation."
       }
     },
     {
@@ -1024,7 +1024,8 @@
         "apps/backend/tests/crm-provider-host-db-unit.mjs",
         "apps/backend/tests/crm-provider-host-acceptance.mjs",
         "apps/backend/tests/hosted-calendar-runner-unit.mjs",
-        "apps/backend/tests/discipline-presentation-acceptance.mjs"
+        "apps/backend/tests/discipline-presentation-acceptance.mjs",
+        "apps/backend/tests/s14-public-runner-unit.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1071,7 +1072,8 @@
         "apps/backend/scripts/acceptance/s15-calendar-browser-route.mjs",
         "apps/backend/database/discipline-presentation.sql",
         "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql",
-        "apps/backend/database/settings-application-forms.sql"
+        "apps/backend/database/settings-application-forms.sql",
+        "apps/backend/scripts/acceptance/s14-hosted-public.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1085,8 +1087,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "a9ca6dabad19283af6e34ca499850310005bd6e895d27240d4d8cdf4a664fa71",
-        "reason": "PR289 CI fixture correction reviewed: exact new Starter window assertions and current-effective synthetic lifecycle policies; production policy precedence, capacity, rights, rollback and public protocol unchanged."
+        "fingerprint": "a7048bae7de29b08bac2bfd79c8f77198b7c1807de9488fb59528e57a764309e",
+        "reason": "S14 runner test fixture now generates an ephemeral 32-byte HMAC key; signing assertions and production guide remain unchanged."
       }
     },
     {

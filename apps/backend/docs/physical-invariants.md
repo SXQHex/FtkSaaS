@@ -36,4 +36,4 @@ Yerel saat geçersizse sessiz kaydırma yapılmaz; ambiguous yerel seans saati o
 
 ## Üretimden önce
 
-RLS, grants, private privileged rutin sahibi/search_path, indeks ve exclusion/lock uygulaması migration/test görevindedir. Bu belge SQL veya uygulanmış güvenlik kanıtı değildir. O3 pilot restore/load hedefleri ve hukuki saklama incelemesi ayrıca doğrulanacaktır.
+RLS, grants, private privileged rutin sahibi/search_path, indeks ve exclusion/lock uygulaması migration/test görevindedir. Bu belge SQL veya uygulanmış güvenlik kanıtı değildir. Pilot restore ve yük hedeflerinin gerçek kabulü [O08/O10](remaining-work.md#o08), hukuki saklama incelemesi teknik sözleşmenin kendi kapsamındadır. Bu tasarım referansı bu işleri tamamlanmış saymaz.
