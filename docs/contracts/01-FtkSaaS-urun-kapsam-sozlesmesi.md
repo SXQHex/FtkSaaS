@@ -10,7 +10,9 @@ Planlar şu sırayla teslim edilir:
 
 Bir planın ürün teslimi, aşağıdaki kapsam ve limitlere göre kullanıcı iş akışlarının frontend üzerinden gerçek backend ile uçtan uca çalışmasını ve plana uygulanabilir kabul ölçütlerinin karşılanmasını gerektirir. Ortak bir işlev için mevcut kanıt kendi geçerli kapsamında kullanılabilir. Her planın kendine özgü izinleri ve sınırları o plan bağlamında doğrulanır.
 
-[Backend kabul kapıları](../../apps/backend/docs/remaining-work.md) ve [frontend bölüm kabulleri](../../apps/web/docs/todo.md) kendi alanlarında izlenir. Bu sıra ürün teslimleri içindir. Bir alan, diğerinin uyarlamasını beklemeden kendi kapsamındaki işi doğrulayıp teslim edebilir.
+[Backend kabul kapıları](../../apps/backend/docs/remaining-work.md) ve [frontend bölüm kabulleri](../../apps/web/docs/todo.md) ayrı yürütülür. Backend, ilgili planın kendi kabul ölçütlerini karşılayıp gerekli kaynak ve ortam kanıtlarını kaydettiğinde teslimini kapatır. Frontend uyarlaması ve ekran kabulü bu kapının önkoşulu değildir. Backend kendi üretim kuyruğundaki sonraki işe geçebilir.
+
+Frontend geliştirmesi kendi planında ilerler. Bir ekranın gerçek entegrasyon kabulü, kullandığı backend iş akışının ve yayımlanmış API sözleşmesinin ilgili ortamda kullanılabilir olmasına bağlıdır. Bu bağımlılık ilgili akış düzeyindedir. Yukarıdaki sıra, kullanıcıya sunulan bütünleşik planların teslim sırasıdır.
 
 ## Kabul edilmiş SaaS plan sınırları
 

@@ -2,7 +2,7 @@
 
 Önce kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/client-integration.md), kendi [todo](docs/todo.md) ve [sohbet devrin](docs/handover.md) okunur.
 
-Aktif bölümdeki ekran ve gerçek API kabullerini ürün sözleşmesindeki [proje teslim hedefi](../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi) doğrultusunda sırala. Hangi kullanıcı akışının hangi planla doğrulandığını kendi [todo kaydında](docs/todo.md) belirt.
+Aktif bölümdeki ekranları kendi [todo kaydına](docs/todo.md) ve [proje teslim hedefine](../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi) göre sırala. Her akışın gerçek entegrasyon kabulünü, gerektirdiği backend davranışı ilgili ortamda kullanılabilir olduğunda ilgili planla doğrula. Eksik backend bağımlılığını o akışta açık tut ve bağımsız frontend işlerine devam et.
 
 ## Yetki ve sınır
 
