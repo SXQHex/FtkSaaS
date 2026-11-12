@@ -38,6 +38,16 @@ Snapshot kapsamı yalnız uygulamanın `core`, `private`, `api_v1` şemalarıdı
 
 CD main'e veya ayrı dala otomatik commit atmaz. Üretilmiş referans eskimesi PR'de zaten reddedildiğinden post-CD kaynak güncelleme PR'si gerekmez; dağıtım durumu kaynak dosyası değil artifact'tır. Şema drift'i yeni bir belge PR'siyle gizlenmez, gerçek uygulama/ortam uyumsuzluğu olarak çözülür. Ajan sonraki doğal PR'de yalnız doğrulanmış kanıta dayanarak güncel devri eşitler. Böylece otomatik commit/clean döngüsü ve yeni bot token/PR yetkisi gerekmez.
 
+## Plan ve kabul kayıtlarını güncelleme
+
+Görev ailesi veya dosya adı ayrı ürün mimarisi anlamına gelmez. Ortak Pro uygulaması, Starter kısıt kabulü ve Business ek kabulünün görev eşlemesi [yol haritasında](remaining-work.md#backend-çalışma-modeli), sıra [üretim kuyruğunda](production-queue.md) tutulur. Ürün plan hakları, sayısal limitler ve bütünleşik teslim hedefi ortak sözleşmelerin sahibidir; backend belgelerine yeni normatif matris kopyalanmaz.
+
+Planı yeniden düzenlerken S/P/B/O/G kimliklerini, açık anchor'ları, teknik önkoşulları ve geçerli geçmiş kanıtı koru. Tamamlanmış ortak iş sırf Starter veya Business adıyla tekrar açılmaz. Önceden çalışan testin adı Starter diye Pro temelinin ayrı implementasyon olduğu sonucu çıkarılmaz; kanıtın hangi plan/config/ortamda neyi doğruladığı yazılır.
+
+Her G kaydında gerekli backend olumlu/olumsuz senaryo, native CI ve uygulanabilir hosted/işletim kanıtı açık olmalıdır. Frontend ekranı, frontend'in iş sırası veya talep edenin son onayı backend kapanışına eklenmez. Gerçek Auth/sağlayıcı/config/byte/restore koşulları korunur; ekran bağımsızlığı bu koşulları mock ile geçme izni vermez. Frontend entegrasyon/kabulü kendi alanında ve ortak talepte açık kalabilir.
+
+Belge değişikliği yeni test veya hosted kabul sonucu üretmez. PR/main/development doğrulaması devirde, görev işareti yalnız kendi kabul kanıtı yeterliyse backlog'da güncellenir. Yaşayan bir paragraf yeni kararla çelişiyorsa aynı yetkili paragraf düzeltilir; eski hükmün yanına yeni zıt talimat eklenmez. Başka bölümlerin bağlı olduğu tarihsel anchor veya eşsiz teknik kanıt silinmez.
+
 ## Birleştirme ve arşiv kuralı
 
 Backend geliştirme yol haritasının görev/kabul sahibi `remaining-work.md`, sıra ve kontrol noktası sahibi `production-queue.md`, kaynak/test/hosted durum sahibi `00-FtkSaaS-yeni-sohbet-devir.md` dosyasıdır. Yeni paralel `roadmap.md`, `todo.md` veya karar özeti kurulmaz. Backlog’daki test senaryosu normatif kararın yerine geçmez; ürün değerleri sözleşmeden alınır. Gelecek hedef için typed alan uygulanmış gösterilmez; tüketici rehberi mevcut desteği, sözleşme hedefi açıkça ayırır.
