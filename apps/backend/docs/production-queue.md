@@ -1,63 +1,51 @@
 # Backend geliştirme sırası ve koordinasyon
 
-Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
-
-**Aktif paket:** Kullanıcının son talimatıyla önce [S08](remaining-work.md#s08), ardından [S10 kalan ayar tüketicileri](remaining-work.md#s10) kapatılır. S08 doğal nonce eşiği beklenirken hazır S10 kaynağı doğrulanır; süre kabulü yerine geçmez. Sonraki sıra S14 → O01–O10 → G02’dir. Kaynak, native CI, development ve gerçek hosted kabulü ayrı doğrulanır; iptal/erteleme kararları korunur.
+Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görevlerin kabul ölçütleri [remaining-work.md](remaining-work.md), kaynak/CI/development/hosted sonuçları [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Ürün teslim hedefi [ana sözleşmeden](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi), backend çalışma modeli [yol haritasından](remaining-work.md#backend-çalışma-modeli) okunur.
 
 ## Uygulama sırası
 
-**4 Kasım telefon kontrol noktası:** [S08 native telefon backend dilimi](remaining-work.md#s08), PR183 aday/main/development kabulüyle tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Kalan frontend consumer/ekran kabulü [XREQ-017](../../../docs/requests.md#xreq-017) ve PR184 sahibindedir. CRM PR182 ve CI PR185 ayrı yürütülür; bu kapanış onların kaynağını veya sırasını değiştirmez.
+Öncelik Pro'nun ortak uygulamasını tamamlamak ve [G02](remaining-work.md#g02) backend kabulünü kapatmaktır. Sonraki paket [G01](remaining-work.md#g01) ile aynı uygulamanın Starter kısıtları, ardından [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir.
 
-| Sıra | Görev paketi | Bağımlılık ve kontrol noktası |
+**Aktif sıra:** S08 → S10 → S14 → Pro'ya uygulanabilir kalan S/P ve O kabulleri → G02. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır. S08'in doğal süre sınırı beklenirken S10 ve bağımsız işletim işleri ilerler; süre kısaltılmaz ve eksik kanıt tamamlandı sayılmaz.
+
+| Öncelik | Paket | Bağımlılık ve kontrol noktası |
 |---|---|---|
-| 0 | [A01](remaining-work.md#a01)–[A03](remaining-work.md#a03) | Karar aktarımı ve kaynak/kanıt uzlaştırması; sahipsiz özellik veya çelişen karar bırakma |
-| 1 | [S01](remaining-work.md#s01)–[S02](remaining-work.md#s02) | Mevcut oda/sınıf/program okuma-düzenleme kapanışı |
-| 2 | [S03](remaining-work.md#s03)–[S05](remaining-work.md#s05) | Abone No tahsis→ilk aktarım/merge→operasyon projeksiyonları |
-| 3 | [S06](remaining-work.md#s06)–[S08](remaining-work.md#s08) | Davet/job ve native Auth; 1–2 ile bağımsız hazırlanabilir |
-| 4 | [S09](remaining-work.md#s09)–[S10](remaining-work.md#s10) | Starter günlük akış ve ayar/izin tüketicileri |
-| 5 | [S11](remaining-work.md#s11)–[S13](remaining-work.md#s13) | Rapor/import/belge gerçek işler ve indirme |
-| 6 | [S14](remaining-work.md#s14)–[S16](remaining-work.md#s16) | Gerçek public/ICS tüketicisi ve SaaS dönem değişimi; hazır tüketici dilimi diğer frontend modüllerini beklemez |
-| 7 | [P01](remaining-work.md#p01)–[P04](remaining-work.md#p04) | Ticari limit, çok kaynak, ileri paket/planlama ve hakediş |
-| 8 | [P05](remaining-work.md#p05)–[P07](remaining-work.md#p07) | Tek ortak CRM alımı→inceleme/eşleme→web bağlantısı |
-| 9 | [P08](remaining-work.md#p08)–[P11](remaining-work.md#p11) | Sağlayıcı başına gerçek kabul, kontrollü aktarım ve CRM tam akışı |
-| 10 | [P12](remaining-work.md#p12)–[P13](remaining-work.md#p13) | Etkinlik kapasitesi ve kredi tüketmeyen uygunluk |
-| 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
-| 12 | [B01](remaining-work.md#b01)–[B04](remaining-work.md#b04) | Business scope, ortak inbox, hesaplaşma ve rapor |
+| 1 | [S08](remaining-work.md#s08) hesap/güvenlik | Kalan native/hosted Auth kanıtı ve kabul oturumunun kapatılması; frontend ekran onayı backend'i bekletmez. |
+| 2 | [S10](remaining-work.md#s10) ayar davranışı | Son kaynak teslimini 69 grubun gerçek tüketici/yetki/varsayılan/miras kapsamıyla uzlaştır; hazır alt teslimleri yeniden geliştirme. |
+| 3 | [S14](remaining-work.md#s14) public backend | Gerçek sağlayıcı/hostname/config ve HTTP kabulü; kaynak testini veya frontend görünümünü hosted backend kanıtı sayma. |
+| 4 | Pro ortak akışlarının kalan kabulleri | [S01–S16](remaining-work.md#ortak-uygulama-temeli) ve [P01–P16](remaining-work.md#pro-işlevleri) içindeki yürürlükteki, Pro'ya uygulanabilir açıkları kapat. |
+| 5 | [O01–O10](remaining-work.md#ortak-üretim-işletimi) ve [G02](remaining-work.md#g02) | Pro kapsamındaki worker, alarm, saklama/imha, restore ve yük kanıtı tamamlanınca Pro backend kabulünü kapat. |
+| 6 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
+| 7 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon, ortak kullanım/hesaplaşma ve ek yük kapsamını doğrula. |
 
-**S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
-
-**S14–S16 kontrol noktası:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
+Tamamlanmış bir S/P/B görevi sıra değişti diye yeniden açılmaz. Ortak kaynakta güvenlik veya veri tutarlılığı hatası bulunursa hangi plan testinde görüldüğüne bakılmadan düzeltilir ve etkilenen plan regresyonları çalışır. Starter veya Business testlerinin mevcut CI kapsamından çıkarılması bu sıralamanın sonucu değildir.
 
 ### CRM paketinin kalan gerçek kabulleri
 
-P01–P04, P12/P13, PR177 Starter CRM, PR182 P05/P06 + XREQ-016 ve PR188 P07 backend adaptörü teslimleri tamamlandı; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. P07'nin gerçek site bağlantısı ve form→inbox kabulü [XREQ-018](../../../docs/requests.md#xreq-018) altında açık; frontend deploy kısıtı bu kabulü bekletir, P05/P06'ya bağlı P08–P11 backend kaynağını durdurmaz.
+Pro için [P05–P07](remaining-work.md#p05), [P10–P11](remaining-work.md#p10) ve ilgili bildirim/otomasyon akışlarının yürürlükteki backend kapsamı değerlendirilir. Mevcut kişi, başvuru, onay, lead ve finans kaynakları yeniden kurulmaz. Starter temel lead/not/takip aynı uygulamadaki dar yetki kapsamıdır; ayrı CRM motoru yapılmaz.
 
-P08–P11 backend kaynak paketi teslim edildi; gerçek sağlayıcı erişimi, site bağlantısı ve veri aktarımının açık sınırları [backlog](remaining-work.md#p08) sahibindedir. Kullanıcının Meta/Google canlı kurulumunu erteleme kararı korunur; bu işler bağımsız P14–P16 ürün geliştirmesini bekletmez. Yeni kaynakta küçük hedefli testler, bağımsız inceleme ve merge adayında yürürlükteki tam kabul korunur.
+[P07](remaining-work.md#p07) ve [S14](remaining-work.md#s14) altında gerçek sağlayıcı/config/HTTP kanıtı backend'e, mevcut sitenin adapter'a bağlanması ve ekran kabulü frontend/site sahibine aittir. Eksik bir backend girdisi somut olarak kaydedilir; site sahibinin geliştirme sırası veya son ekran onayı genel backend kapanış koşulu yapılmaz.
 
-Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan başlatılmaz. P14/P15 mevcut kaynak/sağlayıcı incelemesiyle kendi sırasında yürütülür; P16, P11/P15 bağımlılıklarını korur. Posta kurulumunun varlığı bütün bildirim olaylarının teslim kabulü değildir.
+[P08](remaining-work.md#p08)/[P09](remaining-work.md#p09) sağlayıcı işleri yalnız [yürürlükteki kapsam](remaining-work.md#ertelenmiş-ve-kapsam-dışı) gerektiriyorsa aktif sıraya girer. İptal/erteli Meta/Google bağlantıları Pro tesliminin önüne yeniden alınmaz. Tarihsel kaynak, test ve açık sağlayıcı adımları korunur; kapsam dışı olmak başarı kanıtı değildir.
 
 ## CRM paketinin iç sırası
 
-[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. P07 backend kaynak tesliminden sonra aktif kaynak paketi P08–P11'dir; P07 canlı site kabulü ayrı açık kalır. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
-
-1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
-2. PR177 ile teslim edilen Starter temel dilimini yeniden geliştirme; frontend ekran kabulü kendi alanında kalır.
-3. Teslim edilmiş P05/P06 ortak kutu/inceleme/eşlemeyi koruyarak P07 web formu bağlantısını tamamla.
-4. Son kullanıcı önceliğiyle P08 Instagram reklam anlık formları; P09 Google kaynak dilimi aynı PR'de korunur. Her sağlayıcının gerçek erişim/teslim kabulü ayrıdır.
-5. P10 kontrollü eski kayıt aktarımı ve P11 ileri CRM, kendi bağımlılık ve yetkileriyle; Starter kapanışı bunları beklemez.
-
-Reklam performans/harcama ve dönüşüm geri bildirimi sonraki ayrı dilimlerdir. Kaynak desteği ile gerçek sağlayıcı/ekran kabulü aynı kapanış değildir.
+1. Mevcut P05/P06 ortak alım, inceleme/eşleme ve Starter temel alt kümesinin kaynağını koru.
+2. Yürürlükteki P07/S14 backend adapter/config/gerçek HTTP kabul boşluklarını kapat; frontend/site bağlama devrini [ortak talep](../../../docs/requests.md) üzerinden sürdür.
+3. P10 kontrollü aktarım ve P11 deneme/takip/segment için kalan uygulanabilir backend kabullerini doğrula.
+4. P14 → P15 → P16 bağımlılıklarında gerçek teslim, zamanlama ve otomasyon sonuçlarını uzlaştır; sağlayıcı kabulü gelen kutusuna teslim veya ekran kabulü değildir.
+5. P08/P09 ve genişletilmiş reklam/pazarlama işleri için yalnız normatif kapsamın verdiği sırayı uygula.
 
 ## Ortak işletim hattı
 
-[A03](remaining-work.md#a03) sonrası [O01](remaining-work.md#o01)–[O03](remaining-work.md#o03) başlayabilir. Ardından [O04](remaining-work.md#o04)/[O05](remaining-work.md#o05) → [O06](remaining-work.md#o06) → [O07](remaining-work.md#o07) → [O08](remaining-work.md#o08) → [O09](remaining-work.md#o09). [O10](remaining-work.md#o10) gerekli alarm/restore kaynaklarıyla yürür. E-posta gerçek yük kabulü P14–P16’yı bekler. Ortak işletim bütün ürün işlerinin sonuna ertelenmez.
+[A03](remaining-work.md#a03) kaynak/kanıt eşlemesinden sonra [O01](remaining-work.md#o01) worker ve [O03](remaining-work.md#o03) saklama/imha kapsamı hazırlanabilir. O01 → [O02](remaining-work.md#o02) alarm; O03 → [O04](remaining-work.md#o04)/[O05](remaining-work.md#o05) fiziksel imha → [O06](remaining-work.md#o06) bağımsız sicil → [O07](remaining-work.md#o07) guarded loader → [O08](remaining-work.md#o08) tam restore → [O09](remaining-work.md#o09) non-resurrection bağımlılıkları korunur. [O10](remaining-work.md#o10) yük/kurtarma kabulü kendi O02/O08 önkoşullarıyla yürür. E-posta yükü ilgili P14–P16 kaynağını kullanır.
 
-Aynı migration veya ortak sözleşmeye yazan işler seri yönetilir; bağımsız kaynak/kanıt işleri eşzamanlı hazırlanabilir. Her 2–3 ilişkili dilimde kaynak/olumsuz senaryo ve açık ortam bağımlılıkları gözden geçirilir. PR sınırı anlamlı modül teslimidir, her fonksiyon için ayrı PR açılmaz. Kesin bağımlılık her görevin kendi satırında tanımlıdır; bu sıra bağımlılık atlama yetkisi vermez.
+Önce Pro'nun kullandığı veri yüzeyleri ve worker'lar için gereken kanıt tamamlanır. Ortak güvenlik/imha/restore sorumluluğu plan küçüldü diye kaldırılmaz. Starter aynı mekanizmaları kendi izin ve limitleri altında doğrular; Business çok merkez ve birleşik yük için ek kanıt üretir. Planlar arasında geçerli kanıt yalnız aynı kaynak, ortam, config ve yetki kapsamı için yeniden kullanılabilir.
+
+Aynı migration veya ortak sözleşmeye yazan işler seri yönetilir. Bağımsız kaynak ve kanıt işleri eşzamanlı ilerleyebilir; kesin bağımlılık görevin kendi kaydındadır. Her ilişkili pakette olumsuz senaryolar, açık ortam girdileri ve son kaynak incelemesi tamamlanır. PR bir anlamlı teslim paketidir; her fonksiyon için ayrı push veya full clean üretilmez.
 
 ## Plan bazlı kapanış
 
-- [G01](remaining-work.md#g01): Starter; kendi uygulanabilir ortak işletim kapılarıyla kapanır, bütün Pro/Business’ın bitmesini beklemez.
-- [G02](remaining-work.md#g02): Pro; ortak temel ve Pro işlevlerinin tamamı.
-- [G03](remaining-work.md#g03): Business ve toplam backend; Pro’yu ve merkezler arası kapsamı içerir.
+Kapanış ölçütleri [G02 Pro](remaining-work.md#g02), [G01 Starter](remaining-work.md#g01) ve [G03 Business](remaining-work.md#g03) görevlerinde tutulur. Her backend kapısı kendi gerekli kaynak/CI/development/hosted kanıtı tamamlanınca kapanır. Frontend'in ekranı veya onayı bu kapılara ek önkoşul değildir; bütünleşik ürün teslimi ve frontend kabulü kendi sahiplerinde ayrıca yürür.
 
-Kaynak hazır, test geçti, hosted kabul edildi ve production yayımlandı farklı sonuçlardır. Yayın/merge/full-clean devir kuralları [AGENTS](../../../AGENTS.md) ve [CI politikası](../../../docs/ci-policy.md) sahibindedir. Frontend gerçek ekran kabulü kendi sahibinde kalır; yalnız ilgili [talep](../../../docs/requests.md) üzerinden koordine edilir.
+Kaynak hazır, test geçti, main'e birleşti, development dağıtıldı ve hosted kabul edildi ayrı sonuçlardır. [AGENTS](../../../AGENTS.md) ve [CI politikası](../../../docs/ci-policy.md) kaynak/merge/full-clean kurallarının sahibidir; bu kuyruk yeni istisna veya kalite muafiyeti vermez.

@@ -2,15 +2,30 @@
 
 Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin tek sahibidir**. [Sıra ve kontrol noktaları](production-queue.md), [kaynak/test/hosted kabulü](00-FtkSaaS-yeni-sohbet-devir.md), [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [domain davranışı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [P08](../../../docs/decisions/P08-accepted-scope.md) kendi sahiplerinde tutulur. Buradaki ölçülebilir kabul senaryoları yeni ürün kuralı değildir. F01–F33/14 modül kapsamı korunur; mevcut sağlam kod yeniden yazılmaz.
 
+## Backend çalışma modeli
+
+Tek backend uygulaması geliştirilir. Pro ortak işlevlerin tamamlandığı ana kabul kapsamıdır. Starter aynı uygulamanın plan hakları, limitler ve yetkilerle kısıtlanmış halidir; ortak ders, kişi, satış, ödeme, yoklama, rapor ve Auth akışları için ikinci implementasyon yapılmaz. Business aynı temele çok merkez ve merkezler arası işlevler ekler. Plan özellikleri ve sayısal limitlerin normatif sahibi [ürün sözleşmesidir](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md); uygulama/kabul sırası [üretim kuyruğunda](production-queue.md) tutulur.
+
+| Görev ailesi | Backend sorumluluğu | Plan kabulündeki rolü |
+|---|---|---|
+| A01–A03 | Karar, kaynak ve kanıt eşlemesi | Bütün planların ortak izlenebilirliği |
+| S01–S16 | Ortak uygulama temeli | Pro kabulüne dahildir; Starter aynı akışların izinli alt kümesini kullanır. |
+| P01–P16 | Pro işlevleri ve ortak temelin geniş davranışları | Yalnız yürürlükteki, Pro'ya uygulanabilir işler G02'ye girer; iptal/erteli entegrasyonlar eklenmez. |
+| B01–B04 | Çok merkez ve merkezler arası ekler | Business ek kabulü; Pro'da bu yeteneklerin kapalı kalması ayrıca doğrulanır. |
+| O01–O10 | Ortak güvenlik ve üretim işletimi | Kullanılan veri yüzeyi/worker için gereken kanıt korunur; her planın ek kapsamı ayrıca sınanır. |
+| G02 / G01 / G03 | Plan bazlı backend kabul kapıları | Ortak Pro temeli, Starter kısıtları ve Business ekleri kendi ölçütleriyle kapanır. |
+
+S/P/B kimlikleri tarihsel görev referanslarıdır; ayrı ürün veya kod tabanı anlamına gelmez. Önceden tamamlanan görevler korunur. Pro'dan sonra Starter için yapılacak iş, gerekli ortak akışların kendi plan bağlamında çalıştığını ve kapalı özellik/limitlerin backend tarafından uygulandığını kanıtlamaktır. İstemcide alan veya düğme gizlemek bu kabulü karşılamaz.
+
 ## Takip ve tamamlanma kuralı
 
 - K: yeni/değişen backend işlevi. D: mevcut kaynak/kanıtı incele, yalnız gerçek boşluğu düzelt. H: gerçek ortam kabulü. D işinde eksik kanıt bütün modülün kodunun yok olduğu anlamına gelmez.
-- Karar, kaynak uygulaması, test ve hosted kabul ayrı durumdur. Görev ancak kendisine uygulanabilir katmanlar kanıtlıysa kapanır. Kaynak/SHA/run/attempt bilgisi burada kopyalanmaz; devir kaydına bağlanır. Operasyon sayısı veya boş feature evidence listesi tamamlanma yüzdesi değildir.
+- Karar, kaynak uygulaması, test ve hosted kabul ayrı durumdur. Görev ancak kendisine uygulanabilir katmanlar kanıtlıysa kapanır. Kaynak/SHA/run/attempt bilgisi burada kopyalanmaz; devir kaydına bağlanır. Operasyon sayısı veya boş feature evidence listesi tamamlanma yüzdesi değildir. Tamamlanmış alt kaydın kanıtı belirtilen plan/config/ortamla sınırlıdır; görev ailesini ortak temel olarak sınıflamak Starter’da doğrulanmış bir senaryoyu kendiliğinden Pro veya Business kabulü yapmaz.
 - Görev dosya alanları başlangıç incelemesi içindir. Her dilim bir kullanıcı/backend akışını doğrular; bağımsız alt sistemler tek uygulama oturumuna yığılmaz. Büyük çıkan iş aynı kimliğin alt adımlarına bölünür. PR sınırı tek fonksiyon değil tamamlanan anlamlı modüldür.
-- Sorumlu backend’dir. Frontend ekran/tasarım/kabulü bu planın işi değildir; yalnız gerçek API tüketicisi gerektiren bağımlılık [ortak taleple](../../../docs/requests.md) izlenir. Backend frontend adına kapanış vermez.
+- Sorumlu backend’dir. Frontend ekran/tasarım/kabulü ve talep eden frontend onayı backend kapılarının önkoşulu değildir. Gerekli native/hosted davranış gerçek backend API, worker ve sağlayıcı yollarıyla kanıtlanır; eksik config veya sağlayıcı erişimi somut backend girdisi olarak kaydedilir. [Ortak talepler](../../../docs/requests.md) entegrasyon devrini izler; iki alan birbirinin adına kapanış vermez.
 - Test/doğrulama yöntemi [aşağıda](#doğrulama-ve-kayıt); saf belge işi DB/API çalıştırmayı gerektirmez. Hosted reset/seed, yeni dış gönderim, production dağıtımı veya canlı veri aktarımı bu planın yazılmasıyla başlamaz.
 
-**ST-02 kabul onarımı tamamlandı:** PR192 aday/main/development kabulü doğrulandı; [kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#st-02-bağımsız-rapor-kabul-kökleri). PR190 güncel main ile senkronize edilerek yeni birleşik kaynak kabulüne gider. P08–P11 ürün/sağlayıcı işleri kendi alt adımlarında açık kalır.
+Kaynak tabanı ve güncel PR/CI/development sonuçları [devirde](00-FtkSaaS-yeni-sohbet-devir.md), sıradaki çalışma [üretim kuyruğunda](production-queue.md) tutulur. Eski PR bekleme notları bu yol haritasının aktif görevi değildir.
 
 ## Eski iş kimliklerinin tek görev karşılığı
 
@@ -22,7 +37,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 | XREQ-003 | [S06](#s06), [S07](#s07) |
 | XREQ-007 / XREQ-008 | [S01](#s01) ek Starter yapılandırma okumaları; talep/teslim durumu yalnız [ortak kayıt](../../../docs/requests.md) |
 | DOCS-01 | [A01](#a01), [A02](#a02), [A03](#a03); metadata kanıtı devirde |
-| WEB-01 | Yalnız gerçek tüketici bağımlılığı: S08/S14/S15 ve G kabulü; frontend aktif sıra sahibi değişmez |
+| WEB-01 | S08/S14/S15 ve plan API’lerinin frontend entegrasyon devri; frontend kendi kabulünü yönetir, backend G kapıları frontend’i beklemez |
 | PUBLIC-01 / ST-03 | [S14](#s14), [S15](#s15), [S10](#s10), [P15](#p15) |
 | OPS-01 / REL-01 | [O01](#o01)–[O10](#o10) |
 | FIN-01 | [P04](#p04) |
@@ -73,7 +88,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 - [x] A03.4 — Otomatik API süre referansı üretimi ve sonraki adayda 91/91 ölçümün otomatik kullanımı PR197/PR198 aday/main kabulüyle doğrulandı. Kaynak/run/inceleme kanıtı devir sahibindedir.
 
-## Starter ve ortak ürün temeli
+<a id="starter-ve-ortak-ürün-temeli"></a>
+## Ortak uygulama temeli
 
 <a id="s01"></a>
 ### S01 — Oda yönetim okumalarını tamamla
@@ -198,32 +214,34 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Tamamlanan dilim:** XREQ-003 backend worker/sağlayıcı teslimi, iş takibi ve yetkili gerçek alıcı kutusu kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#xreq-003-operasyonel-kabulü). Native hesap kabulü ve yanlış hesap/expired/revoked/link çakışması kaynak testleri gerçek frontend bağlantı kabulünden ayrıdır.
 
-**Kabul ayrımı:** Gerçek parola/Google/MFA dönüşü, doğru hesapla kabul, aynı anahtarla replay ve farklı anahtarla kullanılmış/geçersiz davet reddi frontend kabul kaydında tamamlandı. Yanlış hesap, gerçek expiry/revoke ve link çakışması kabulü frontend sahibinde açık kalır; [XREQ-004](../../../docs/requests.md#xreq-004-giriş-boyunca-davet-fragmentini-koruma) ile koordine edilir. S07 bu bağımlılık nedeniyle açık; tamamlanan teslim hattı yeniden kurulmaz.
+**Kabul ayrımı:** Gerçek parola/Google/MFA dönüşü, doğru hesapla kabul, aynı anahtarla replay ve farklı anahtarla kullanılmış/geçersiz davet reddi frontend kabul kaydında tamamlandı. Yanlış hesap, gerçek expiry/revoke ve link çakışması kabulü frontend sahibinde açık kalır; [XREQ-004](../../../docs/requests.md#xreq-004-giriş-boyunca-davet-fragmentini-koruma) ile koordine edilir. Bu frontend kabulü S07 backend kapanışının önkoşulu değildir. S07’nin backend işareti, mevcut native/gerçek teslim kanıtının kendi ölçütleriyle uzlaştırılmasına göre güncellenir; bu belge düzenlemesi yeni kabul sonucu üretmez ve tamamlanan teslim hattını yeniden açmaz.
 
 <a id="s08"></a>
 ### S08 — Native hesap ve güvenlik kapanışı
 
 - [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F04,F06
 - **Bağımlılık:** A02
-- **Kabul:** XREQ-001/002 mevcut hesap, Google, parola/nonce ve recovery gerçek tüketiciyle kapanır.
+- **Kabul:** XREQ-001/002 backend kapsamındaki native hesap, Google, parola/nonce, recovery ve oturum davranışları gerçek sağlayıcı/API üzerinden kanıtlanır. Frontend ekranı veya son talep onayı ayrı devirdir.
 - **Sınır/olumsuz durum:** Yeni özel Auth katmanı kurulmaz; ön kontrol hesap/e-posta üretmez; eski harness/secret temizliği ayrıca doğrulanır.
-- **Doğrulama senaryosu:** Mevcut/yeni/doğrulanmamış/Google adresi; gerçek PKCE/nonce ekranı frontend sahibinde; kaynak teslimi tekrar yapılmaz.
+- **Doğrulama senaryosu:** Mevcut/yeni/doğrulanmamış/Google adresi; gerçek PKCE, nonce ve oturum ret/başarıları; doğal süre ve parola restore güvenliği. Frontend ekranı kendi sahibinde kalır; backend kanıtı onun hazır olmasını beklemez.
 - **Kaynak alanı:** native Auth config/readback; mevcut hesap acceptance; runbook
 
 **Tamamlanan native telefon backend dilimi:** PR183 ile iki izole yerel test numarası kullanılarak ilk doğrulama, yanlış kod, authenticated yeniden kod üretimi, tüketilmiş istek, doğrulanmış numara değişikliği, numara çakışmasında hesap izolasyonu ve güvenlik geçmişi kaynak/aday/main/development kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Descope köprüsü veya hosted sabit OTP kurulmadı. [XREQ-017](../../../docs/requests.md#xreq-017) consumer düzeltmesi PR184'te; frontend ekran kabulü kendi sahibinde açık kalır. Bu geçmiş test dilimi aktif SMS teslim desteği değildir; son kapsam kararından sonra gerçek +90/telefon doğrulaması S08 gereksinimi değildir. Genel S08 diğer açıklarıyla kapanmadı.
 
 **Bu paketin backend dilimi:** Mevcut hesap-oturum harness’inde native parola değişimi sonrası işlem yapılan oturumun korunması, diğer native session’ın silinmesi, henüz süresi dolmamış JWT ve refresh isteğinin reddi eklendi. Bu kaynak testi hosted mevcut-parola/24 saat nonce, gerçek PKCE/recovery/posta veya eski ortamların fiziksel temizliği kabulü değildir; S08 bu dış kabul sınırlarıyla açık kalır. Yeni sağlayıcı harness’i/özel Auth katmanı kurulmadı. Gerçek çalışma sonucu ve aday/main/ortam aşaması [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
 
-**Doğal süre ve native recovery kabulü:**9Kasım gerçek,24saatten eski Pro test oturumu native refresh sonrasında nonce zorunluluğunu korudu; geçerli nonce/mevcut parola ile değişim, tüketilmiş nonce ret ve eski diğer oturum reddi doğrulandı. Gerçek recovery e-postası→izinli callback auth code→yanlış/doğru PKCE verifier→native yeni parola/oturum ve kullanılmış proof ret zinciri geçti; özgün test parolası geri yüklenip bağımsız login ile doğrulandı. Kaynak/son runner ve doğal recovery expiry sonucu [güncel kabulde](00-FtkSaaS-yeni-sohbet-devir.md#s10-crm-ve-s08-native-kabul-paketi) ayrıdır. Eski recovery projesi/deployment/Preview ortamının yokluğu ve emekli özel Auth yüzeylerinin kapanışı11 Kasım readback'iyle doğrulandı. Canonical Google→gerçek TOTP→hesap/oturum okuma→current revoke→korunan sayfaya yeniden giriş kapısı kabul edildi. Gerçek recovery yenilemesi eski proof'u iptal etti; yeni proof doğru PKCE ile çalıştı. [Son kanıt ve doğal süre checkpoint'i](00-FtkSaaS-yeni-sohbet-devir.md#s08-son-kapanış-kabulü--11-kasım-2026) tek durum sahibidir. **Kalan:** Gerçek eski oturumda yanlış ve kullanılmadan doğal süresi dolmuş nonce retleri; XREQ-002 talep eden son onayı. Yan origin Google callback bulgusu [XREQ-040](../../../docs/requests.md#xreq-040-google-girişinde-origin-ve-pkce-dönüşü) ile frontend'e devredildi. S08 bu kanıtlar olmadan kapatılmaz.
+**Doğal süre ve native recovery kabulü:**9Kasım gerçek,24saatten eski Pro test oturumu native refresh sonrasında nonce zorunluluğunu korudu; geçerli nonce/mevcut parola ile değişim, tüketilmiş nonce ret ve eski diğer oturum reddi doğrulandı. Gerçek recovery e-postası→izinli callback auth code→yanlış/doğru PKCE verifier→native yeni parola/oturum ve kullanılmış proof ret zinciri geçti; özgün test parolası geri yüklenip bağımsız login ile doğrulandı. Kaynak/son runner ve doğal recovery expiry sonucu [güncel kabulde](00-FtkSaaS-yeni-sohbet-devir.md#s10-crm-ve-s08-native-kabul-paketi) ayrıdır. Eski recovery projesi/deployment/Preview ortamının yokluğu ve emekli özel Auth yüzeylerinin kapanışı11 Kasım readback'iyle doğrulandı. Canonical Google→gerçek TOTP→hesap/oturum okuma→current revoke→korunan sayfaya yeniden giriş kapısı kabul edildi. Gerçek recovery yenilemesi eski proof'u iptal etti; yeni proof doğru PKCE ile çalıştı. [Son kanıt ve doğal süre checkpoint'i](00-FtkSaaS-yeni-sohbet-devir.md#s08-son-kapanış-kabulü--11-kasım-2026) tek durum sahibidir. **Backend’de kalan:** Gerçek eski oturumda yanlış ve kullanılmadan doğal süresi dolmuş nonce retleri ile kabul checkpoint oturumunun kapatılması. XREQ-002 talep eden frontend onayı ayrı entegrasyon kaydıdır, backend kapanış koşulu değildir. Yan origin Google callback bulgusu [XREQ-040](../../../docs/requests.md#xreq-040-google-girişinde-origin-ve-pkce-dönüşü) ile frontend'e devredildi. S08 bu kanıtlar olmadan kapatılmaz.
 
 **7 Kasım kapsam kararı:** Gerçek native yedek TOTP ile birincil cihaz kaybı kabulü ve sıfır test-factor kalıntısı doğrulandı; [kanıt ve kalan hosted sınırlar](00-FtkSaaS-yeni-sohbet-devir.md#hesap-ayar-ve-takvim-kabul-paketi). Kullanıcı telefon/SMS doğrulamasını V1'den çıkardı; gerçek SMS/testOTP kurulumu ve telefon doğrulama kabulü artık S08 kapanış gereksinimi değildir. Doğrulanmamış iletişim kaydı ve geriye uyumlu kimlik projeksiyonları korunur. Native TOTP ile gerçek browser girişi/hesap-oturum okuması/aynı parola reddi/çıkış ayrı konulardır; [son kabul ve frontend temizleme talebi](00-FtkSaaS-yeni-sohbet-devir.md#s07s15-eklentisiz-hosted-kabulü--7-kasım-2026) devirdedir. S08'in diğer açıkları kapanmış sayılmaz.
 
 <a id="s09"></a>
-### S09 — Starter günlük ders ve hak akışı
+### S09 — Ortak günlük ders/hak akışı ve Starter regresyonu
+
+**Kanıt kapsamı:** Aşağıdaki tamamlanmış dilim Starter bağlamında kaydedilmiş günlük zinciri korur. Pro ortak zincirinin bütün kabulü G02, Starter kısıtlarının bütün kabulü G01 sahibindedir; bu sınıflandırma yeni bir plan kabulü değildir.
 
 **Ek talep — XREQ-021:** Dar katalog main/development teslim edildi. Bağlı öğrencinin katalog öncesi people_list zaman aşımı, ölçülmüş alias/yetki taraması kaynağına bağlıdır. İndeksli self keşfi/alias bileşeni ve 10k kişi regresyonu PR221 native/main/development ve hosted tekrarında doğrulandı; bu backend düzeltmesi kapalıdır. [Tüketim devri](../../../docs/requests.md#xreq-021), [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md).
 
-- [x] **Tür:** D · **Plan:** Starter ve miras alanlar · **Özellik:** F02,F08,F09,F10,F11,F13,F14,F15,F16,F19
+- [x] **Tür:** D · **Plan:** Pro ortak temeli; Starter izinli alt küme regresyonu · **Özellik:** F02,F08,F09,F10,F11,F13,F14,F15,F16,F19
 - **Bağımlılık:** S02,S03
 - **Kabul:** Program→paket→manuel tahsilat→self rezervasyon→yoklama→düzeltme zinciri çalışır.
 - **Sınır/olumsuz durum:** Tek oda/disiplin/eğitmen, borç/hak/kapasite korunur; Starter hakediş üretmez.
@@ -244,9 +262,9 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Owner/merkez/personel/self ve plan kapıları; değişiklik→yeniden okuma→etkilenen işlem; Pro bildirim alanları P14/P15 ile kapanır. Hatırlatma/quiet-hours hedefi P15, mevcut availability okuması kaynakta mevcuttur.
 - **Kaynak alanı:** docs/settings.md; typed settings/management SQL; ilgili test
 
-**S10.8 — Domain ayar boşlukları:** Oda açıklama/konum/pasifleştirme ve seans/iç etkinlik etkisi, yeni sınıfta açık bekleme listesi seçimi, gerçek web formu keşfi, açık iş takvimi istisnası aynı backend tesliminde ele alınır. Kesin alan/izin/geçmiş sınırı [ayar rehberinde](../../../docs/settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), tüketici devri [XREQ-041](../../../docs/requests.md#xreq-041-iş-takvimi-başvuru-gereksinimleri-ve-disiplin-etki-tüketimi), kaynak/test/ortam aşaması [güncel kabulde](00-FtkSaaS-yeni-sohbet-devir.md#s08s10-yerel-çalışmanın-devri--12-kasım-2026) tutulur. Bu alt paket69 grubun tamamının veya S08'in kapanışı değildir.
+**S10.8 — Domain ayar boşlukları:** Ortak başlangıç politikaları ile oda açıklama/konum/pasifleştirme ve seans/iç etkinlik etkisi, yeni sınıfta açık bekleme listesi seçimi, gerçek web formu keşfi, açık iş takvimi istisnası aynı backend tesliminde ele alınır. Kesin alan/izin/geçmiş sınırı [ayar rehberinde](../../../docs/settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları), tüketici devri [XREQ-041](../../../docs/requests.md#xreq-041-iş-takvimi-başvuru-gereksinimleri-ve-disiplin-etki-tüketimi), kaynak/test/ortam aşaması [güncel kabulde](00-FtkSaaS-yeni-sohbet-devir.md#s08s10-yerel-çalışmanın-devri--12-kasım-2026) tutulur. Bu alt paket69 grubun tamamının veya S08'in kapanışı değildir.
 
-**İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 115 typed alan (bu kaynakta 39 grup) aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun veya gerçek hosted davranışının kapandığı sonucu çıkarılmaz. P14/P15 backend kaynak ve canlı bildirim/zamanlama kabulü tamamlandı; kalan S10 işi bütün 69 grubun tüketici/varsayılan/miras/yetki eşlemesidir. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
+**İncelenen kapsam:** 69 normatif davranış grubu ile PR280’deki 116 typed alan/39 grup aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun veya gerçek hosted davranışının kapandığı sonucu çıkarılmaz. P14/P15 backend kaynak ve canlı bildirim/zamanlama kabulü tamamlandı; kalan S10 işi bütün 69 grubun tüketici/varsayılan/miras/yetki eşlemesidir. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
 
 **S10.1 — XREQ-023/024 eylem okuyucuları:** Mevcut typed management yolu kapasite istisnası, tahsilat, alacak iadesi/mahsup, borç düzeltmesi ve satış iade önizlemesi için gerçek source entity/sürümü ve canlı writer yetkisini sunar. İlk işlem geçmiş receipt istemez; tutar veya başarılı komut uydurmaz. Aynı selector'ın self/başka merkez/rol-grant-plan kaybı, canonical alias ve Business cross-center kaynak durumu sınanır. Backend kaynak/native/main/development ve altı gerçek hosted okuma kabulü tamamlandı; frontend ekran kabulü ayrı kalır; [aktif kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Bu alt teslim bütün 69 ayar grubunun kapanışı değildir.
 
@@ -317,7 +335,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Bağımlılık:** S06
 - **Kabul:** Gerçek ders yayını başvurusu tek merkeze düşer ve yetkili inceler.
 - **Sınır/olumsuz durum:** Başvuru hesap/satış/rezervasyon/pazarlama izni yaratmaz; Starter'ın ayrı temel aday takibi P05 kapsamındadır, genel reklam/CRM yetkisi açılmaz.
-- **Doğrulama senaryosu:** Gerçek token/action/hostname, replay ve rate testi; public→inbox→inceleme; frontend PUBLIC-01 bağı.
+- **Doğrulama senaryosu:** Gerçek token/action/hostname, replay ve rate testi; public HTTP→inbox→yetkili inceleme. Frontend PUBLIC-01 devri ayrı izlenir ve backend kapanışını bekletmez.
 - **Kaynak alanı:** public ingress/review; provider config; runbook
 
 **Backend kaynak dilimi:** Mevcut public intent→review→davet/hesap→ayrı satış/tahsilat→self rezervasyon zinciri incelendi ve mevcut Starter harness’inde doğrulandı; yeni public motoru kurulmadı. Yerel Edge-owned verified context gerçek widget/token/action/hostname veya frontend ekranı değildir; S14 bu hosted sınırıyla açık kalır. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
@@ -440,16 +458,19 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 - [ ] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
 - **Bağımlılık:** P05,P06
-- **Kabul:** Mevcut contact/kayit sunucu akışları ortak modele güvenilir biçimde bağlanabilir.
+- **Kabul:** Contact/kayit sunucu adapter’ı ve backend alımı güvenilir form/config, alan ve onay sözleşmesiyle çalışır; gerçek backend HTTP/sağlayıcı sonucu kanıtlanır. Site sahibinin ekranı ve handler’ı kendi entegrasyon kabulüdür.
 - **Sınır/olumsuz durum:** Mevcut site koruması korunur; istemci org/source beyanı yetki değildir; başka repo kendiliğinden değiştirilmez.
-- **Doğrulama senaryosu:** Gerçek form→backend→inbox; partnerName/mode ve ayrı onayların kaybolmaması; site sahibiyle sınır devri.
+- **Doğrulama senaryosu:** Gerçek geçerli sağlayıcı token/action/hostname ve güvenilir form bağlamıyla HTTP→backend→inbox; partnerName/mode ve ayrı onayların korunması. Frontend form ekranının hazır olması backend kapısına eklenmez.
 - **Kaynak alanı:** backend ingress/adapter config; docs/requests backend devri
 
 **Alt adımlar:**
 
 - [x] P07.1 — Backend adaptör kaynağı: mevcut contact/kayit alanlarını tek yayımlanmış CRM DTO'suna eşle; ayrı onay sürümleri, sabit gönderim anahtarı/zamanı, partner/mode ve istemci atfı korunsun. Bu işaret yerel kaynak dilimidir; aday teslimi [devirde](00-FtkSaaS-yeni-sohbet-devir.md#p07-web-formu-adaptörü).
-- [ ] P07.2 — Site sahibi güncel handler/DTO, iki formun güvenilir form_id ve gerçek onay metni/sürümlerini doğrulasın; mevcut hız/validasyon korumasından sonra adaptöre bağlasın. [XREQ-018](../../../docs/requests.md#xreq-018) sınır devri; başka repo veya frontend bu dilimde değiştirilmez.
-- [ ] P07.3 — Yetkili gerçek form→Turnstile→backend→CRM inbox kabulü: iki form, ayrı onaylar/partner/mode, aynı teslim retry, yeni gerçek başvuru, yetkili kaynak/merkez okuması. Sunucu zamanı kullanılarak tarihsel onay üretilmez; site handler'ı doğrulanmadan alan eşlemesi canlı uyumluluk sayılmaz.
+
+**P07.2 — Siteye bağlama devri (frontend/site sahibi):** Site sahibi güncel handler/DTO, iki formun güvenilir form_id ve gerçek onay metni/sürümlerini doğrular; mevcut hız/validasyon korumasından sonra adapter’a bağlar. [XREQ-018](../../../docs/requests.md#xreq-018) bu alanlar arası kabulün sahibidir. Bu devir backend görev işareti veya G02 önkoşulu değildir; başka repo/frontend bu dilimde değiştirilmez.
+
+- [ ] P07.3 — Backend’in gerçek HTTP→Turnstile doğrulama→CRM inbox kabulü: iki form sözleşmesi, gerçek onay metni/sürümleri ve partner/mode, aynı teslim retry, yeni gerçek başvuru, yetkili kaynak/merkez okuması. Gerçek token/action/hostname ve güvenilir config şartı korunur; mock bot kanıtı kabul edilmez. Sunucu zamanıyla tarihsel onay üretilmez. Backend kanıtı site handler’ının bağlandığını veya ekranın kabul edildiğini göstermez; bu sonuç P07.2 sahibinde ayrıca doğrulanır.
+
 
 <a id="p08"></a>
 ### P08 — Meta yerel reklam formu alımı
@@ -648,6 +669,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 ## Ortak üretim işletimi
 
+O01–O10 tek uygulamanın işletim görevleridir. Pro'nun kullandığı DB/Auth/Storage/export/worker yüzeylerine uygulanabilir bütün güvenlik, saklama, imha, restore ve yük koşulları G02 için korunur. Starter aynı mekanizmaları kendi dar yetki/limitleri altında, Business çok merkez ve birleşik yük ekleriyle doğrular. Pro'da kullanılmayan Business'a özgü senaryo G02'nin önkoşulu yapılmaz; bütün planlarda kullanılan bir veri yüzeyi ise plan gerekçesiyle kapsamdan çıkarılmaz. Açık koşul, eksik ortam girdisi veya tamamlanmamış fiziksel imha bu ayrımla kapanmış sayılmaz.
+
 <a id="o01"></a>
 ### O01 — Gerçek worker yükü ve tekrar güvenliği
 
@@ -758,42 +781,44 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 - [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
-- **Kabul:** Starter100/Pro250/Business1250 veri profilleri ve olay yoğunluğu altında gecikme/queue/finans doğruluğu ölçülür.
+- **Kabul:** Aynı uygulamanın Pro250 tek merkez, Starter100 kısıtlı plan ve Business1250 çok merkez veri profilleri için uygulanabilir gecikme/queue/finans doğruluğu ölçülür. G02 Pro profilini, G01 Starter limit/özellik etkisini, G03 Business ek yükünü gerektirir; geçerli ortak restore kanıtı kapsamı aynıysa yeniden kullanılabilir.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
 - **Doğrulama senaryosu:** Yük profili ve eşikler koşudan önce kaydedilir; pilot RPO≤24saat/RTO≤8saat hedefleri ölçülür, ticari SLA sayılmaz.
 - **Kaynak alanı:** yük senaryoları; query/worker ölçümleri; runbook
 
 ## Plan bazlı son kabul
 
-<a id="g01"></a>
-### G01 — Starter bütün ürün kabulü
-
-- [ ] **Tür:** D/H · **Plan:** Starter · **Özellik:** Starter erişimli F01–F33
-- **Bağımlılık:** S01–S16; uygulanabilir O01–O10; ortak P01 değişikliği teslim edilmişse Starter regresyonu
-- **Kabul:** Hesapsız öğrenci/No→paket/tahsilat→program/self→yoklama/düzeltme→rapor/import/belge çalışır.
-- **Sınır/olumsuz durum:** Pro CRM/etkinlik/personel/hakediş/hatırlatma kapalı; teknik hazır ile gerçek ekran kabulü ayrılır.
-- **Doğrulama senaryosu:** 100 sınırı ve tek kaynak; public/ICS/hesap gerçek ortam kanıtları; açık blocker kalmadan Starter hazır denir.
-- **Kaynak alanı:** backend kabul matrisi; frontend talep referansları
+Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/development ve görevde tanımlanan gerçek ortam kanıtı birlikte izlenir; frontend ekran kabulü veya frontend'in talebi kapatması ek önkoşul değildir. G kapısı yalnız ilgili planın gerekli ölçütleri kanıtlandığında işaretlenir. Mevcut ortak kanıtın tekrar kullanımı planın kendine özgü olumlu/olumsuz senaryolarını atlamaz.
 
 <a id="g02"></a>
-### G02 — Pro bütün ürün kabulü
+### G02 — Pro ortak uygulamasının backend kabulü
 
 - [ ] **Tür:** D/H · **Plan:** Pro · **Özellik:** Pro erişimli F01–F33
-- **Bağımlılık:** S01–S16,P01–P16; uygulanabilir O01–O10
-- **Kabul:** Çok kaynaklı operasyon+CRM/başvuru→dönüşüm→ders/etkinlik/Pratik→hakediş→bildirim zinciri tamam.
-- **Sınır/olumsuz durum:** 250 öğrenci/tek lokasyon, merkezler arası kullanım kapalı; yalnız yürürlükteki ürün kapsamı kapanışa alınır, iptal/erteli sağlayıcı işleri yeniden teslim engeli yapılmaz.
-- **Doğrulama senaryosu:** Gerçek e-posta/sağlayıcı kabulü ve yetki/finans/kapasite yarışları; erteli özellikler açık etiketli.
-- **Kaynak alanı:** backend kabul matrisi; frontend bağımlılıkları
+- **Bağımlılık:** S01–S16 ve P01–P16 içindeki yürürlükteki Pro kapsamı; O01–O10’un Pro’da kullanılan yüzeylere uygulanabilir ölçütleri. İptal/erteli sağlayıcı işleri ve Business ek senaryoları bu kapıya taşınmaz.
+- **Kabul:** Çok kaynaklı operasyon ve CRM/başvuru→inceleme/eşleme→öğrenci dönüşümü→ders/etkinlik/paketli Pratik→yoklama/hakediş→bildirim bağlı zinciri aynı uygulamada gerçek backend yollarıyla tamamdır. Ortak kişi/Abone No→paket/satış/tahsilat→program/rezervasyon/talep→yoklama/düzeltme→hakediş/ödeme→rapor/import/belge zinciri de aynı kaynaklarla uzlaştırılır; bağımsız endpoint başarıları bu uçtan uca kabulün yerine geçmez.
+- **Sınır/olumsuz durum:** 250 öğrenci/tek merkez, merkezler arası kullanım kapalıdır. Canlı yetki, borç/hak/kapasite, tarihsel snapshot, sürüm/replay ve atomiklik denetlenir. Ortak işletim veya gerçek sağlayıcı kabulü, frontend beklenmiyor gerekçesiyle mock'a çevrilmez.
+- **Doğrulama senaryosu:** Geçerli Pro akışları, başka tenant/merkez ve yetki kaybı retleri, son yer/son hak/finans yarışları; gerçek e-posta ve yürürlükteki sağlayıcı/config/worker kanıtı. Eksik girdi ve erteli kapsam açık ayrılır.
+- **Kaynak alanı:** Ortak S/P/O kaynak/testleri; backend kabul matrisi ve devir. Frontend entegrasyon talepleri ayrı sahiplerindedir.
+
+<a id="g01"></a>
+### G01 — Aynı uygulamanın Starter kısıt kabulü
+
+- [ ] **Tür:** D/H · **Plan:** Starter · **Özellik:** Starter erişimli F01–F33
+- **Bağımlılık:** G02’nin kabul edilmiş ortak uygulaması; Starter'a uygulanabilir S/P/O kanıtı ve plan kısıt regresyonları. Ortak özellikler ikinci kez geliştirilmez.
+- **Kabul:** Hesapsız öğrenci/No→izinli paket/tahsilat→program/self rezervasyon→yoklama/düzeltme→izinli rapor/import/belge ve temel lead/not/takip aynı backend’de Starter yetki ve limitleriyle çalışır.
+- **Sınır/olumsuz durum:** 100 aktif öğrenci ve tek merkez/oda/disiplin/eğitmen sınırları backend'de uygulanır. Yalnız üst plana ait personel, ileri CRM/deneme/segment/otomasyon, etkinlik, hakediş, dış bildirim ve merkezler arası yollar doğrudan API çağrısında da reddedilir; kesin kapsam normatif plan matrisinden alınır. Temel lead/not/takip ileri CRM reddiyle yanlışlıkla kapatılmaz.
+- **Doğrulama senaryosu:** İzinli uçtan uca backend zinciri; her uygulanabilir kota sınırı ve eşzamanlı aşım; üst plan komut/selector/worker reddi, plan/rol kaybından sonra eski receipt ile yetki kazanılamaması; kapsam seçimi ve geçmişin korunması. Starter’a izinli public HTTP, gerçek takvim GET/HEAD/rotate/revoke ve native hesap/oturum gerçek ortam kanıtı ayrıca doğrulanır. Ortak başlangıç politikaları bir özellik kilidi değildir: yönetici izinli organizasyon sınırlarında bunları değiştirebilir.
+- **Kaynak alanı:** Aynı S/P domain kaynakları, Starter plan/limit/retained-scope testleri ve uygulanabilir O kanıtı. Ekranda düğme gizlemek API kabulü değildir.
 
 <a id="g03"></a>
-### G03 — Business ve toplam backend kapanışı
+### G03 — Business ekleri ve toplam backend kabulü
 
 - [ ] **Tür:** D/H · **Plan:** Business/Tümü · **Özellik:** F01–F33
-- **Bağımlılık:** G01,G02,B01–B04; O01–O10
-- **Kabul:** 5 merkez/1250, ortak CRM, org raporu ve hesaplaşma uçtan uca; 33 özellik izlenebilir.
-- **Sınır/olumsuz durum:** Her plan kendi kapısını taşır; genel güvenlik/retention kapıları korunur.
-- **Doğrulama senaryosu:** A/B merkez+org rolleri, restore ve yük kanıtı; bütün uygulanabilir K/T/H tamam, son kaynak incelemesi.
-- **Kaynak alanı:** backend kabul matrisi; devir/backlog/kuyruk
+- **Bağımlılık:** Kabul edilmiş ortak Pro temeli (G02), Starter kısıt kabulü (G01), B01–B04 ve Business'a uygulanabilir O01–O10 ek kanıtları. Business temel ders/finans/Auth motorunu yeniden geliştirmez.
+- **Kabul:** Beş merkeze/1250 aktif öğrenciye kadar aynı uygulama; orgda tek kişi/Abone No ve kota sayımı, merkez izolasyonu, ortak inbox/rapor, merkezler arası hak kullanımı, satış bedeli payı ve karşı merkez onaylı hesaplaşma birlikte doğrulanır.
+- **Sınır/olumsuz durum:** Org yetkisi merkez operasyon yetkisi sayılmaz; her A/B adımında canlı kapsam doğrulanır. Geçmiş finans/ödeme/hakediş yeniden yazılmaz; tek taraflı hesaplaşma, mükerrer kişi sayımı ve scope sızıntısı reddedilir.
+- **Doğrulama senaryosu:** A/B/Org olumlu/olumsuz akışlar, aynı aktörün ayrı merkez yetkileri, yarış/replay/düzeltme ve rapor tutar mutabakatı; Business ek yük/restore kapsamı ve ortak Pro/Starter regresyonu. 33 özellik ilgili planlarda izlenebilir kalır.
+- **Kaynak alanı:** B01–B04, ortak S/P/O, mevcut settlement/report/CRM testleri ve backend devir kaydı.
 
 ## F01–F33 kapsama izi
 
@@ -843,7 +868,7 @@ Repo kökünden `pnpm --filter @ftksaas/backend verify`; dar belge kontrolü iç
 
 Backend dizininden mevcut örnek odak testleri: `node --test tests/room-role-registry.test.mjs tests/program-session-lifecycle.test.mjs`, `node --test tests/person-registry.test.mjs`, `node --test tests/p01-lesson-requests.test.mjs tests/p01-waitlist-workers.test.mjs`, `node --test tests/event-payment.test.mjs tests/event-cancellation.test.mjs`, `node --test tests/instructor-earnings.test.mjs tests/cross-center-settlement.test.mjs`, `node --test tests/restore-guard.test.mjs`. Bunlar ilgili izole servis önkoşullarıyla, yalnız değişen davranışa uygun seçilir. `*-acceptance.mjs` yardımcıları standalone test gibi çağrılmaz; mevcut harness/suite sahibi kullanılır. Yeni testler mevcut suite/shard envanterinde eksiksiz yer alır.
 
-Her görev için karar bağlantısı, kaynak uygulaması, test senaryosu/sonucu, gerçek ortam bağımlılığı ve açık blocker izlenir. Tam SHA/run/attempt ve ortam sonuçlarının tek kaydı [devir](00-FtkSaaS-yeni-sohbet-devir.md); frontend onayı [ortak talep](../../../docs/requests.md) sahibindedir. CI, rerun, kaynak kanıtı ve full-clean sırasında turu bitirme kuralları [CI politikası](../../../docs/ci-policy.md) ve [AGENTS](../../../AGENTS.md) üzerinden uygulanır; burada ikinci politika kurulmaz.
+Her görev için karar bağlantısı, kaynak uygulaması, test senaryosu/sonucu, gerçek ortam bağımlılığı ve açık blocker izlenir. Tam SHA/run/attempt ve ortam sonuçlarının tek kaydı [devir](00-FtkSaaS-yeni-sohbet-devir.md); frontend entegrasyon/kabul durumu [ortak talep](../../../docs/requests.md) sahibindedir ve backend kapanışının önkoşulu değildir. CI, rerun, kaynak kanıtı ve full-clean sırasında turu bitirme kuralları [CI politikası](../../../docs/ci-policy.md) ve [AGENTS](../../../AGENTS.md) üzerinden uygulanır; burada ikinci politika kurulmaz.
 
 ## Uygulama sırasında tamamlanacak ortam girdileri
 

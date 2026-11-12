@@ -2,6 +2,14 @@
 
 Supabase uygulaması, SQL kaynakları, Edge işlevleri, sunucu adapter’ı ve izole kabul testleri bu pakettedir. [Repo ve ortam düzeni](../../docs/monorepo.md), [kaynak indeksi](../../docs/source-index.md) ve [güncel kabul](docs/00-FtkSaaS-yeni-sohbet-devir.md) esas alınır.
 
+## Uygulama ve kabul modeli
+
+Planlar aynı backend kaynaklarını kullanır. Pro ortak iş akışlarının ana kabul kapsamıdır; Starter bu uygulamanın plan hakları ve limitlerle kısıtlanmış halidir. Business çok merkez ve merkezler arası ekleri kullanır. Geliştirme görevlerinin bu modele göre anlamı [backend yol haritasında](docs/remaining-work.md#backend-çalışma-modeli), kabul önceliği [üretim kuyruğunda](docs/production-queue.md) tutulur. Ortak özellik için ikinci bir Starter motoru geliştirilmez; izinli akış ve kapalı özellik/kota retleri gerçek API'de sınanır.
+
+Backend kapıları gerekli kaynak/native CI/development/hosted ölçütleriyle kapanır; frontend ekranı veya onayı beklenmez. Frontend yayımlanmış backend akışına bağımlı kendi entegrasyon kabulünü yönetir. Ayrıntılı alan ve bütünleşik ürün teslim sınırı [proje teslim hedefindedir](../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#proje-teslim-hedefi).
+
+## Yerel geliştirme ve test
+
 Repo kökünden:
 
 ```sh
