@@ -8,6 +8,14 @@ export default interface Resources {
     "demo": {
       "action": "Test Et",
       "clickCount": "Tıklama sayısı: {{value}}"
+    },
+    "formExample": {
+      "invalid": "En az 3 karakter girin.",
+      "label": "Örnek metin",
+      "required": "Bu alan zorunludur.",
+      "submit": "Örneği gönder",
+      "success": "Örnek gönderildi.",
+      "title": "Form altyapısı örneği"
     }
   }
 }

@@ -49,6 +49,54 @@ Vite 8, React 19 ve strict TypeScript 7; dosya tabanlı TanStack Router ve TanSt
 
 `verify` ilk başarısız kontrolde durur. Audit ayrı çalıştırılır ve bulgular varsa sıfır olmayan çıkış kodu üretir; kapatılmış veya susturulmuş değildir.
 
+## Erişilebilirlik, analiz, Devtools ve form örneği
+
+Bu aşamada kurulan güncel kararlı sürümler `^` politikasıyla manifestte, tam çözülmüş sürümleri lockfile'da tutulur:
+
+| Paket                             | Kurulan sürüm |
+| --------------------------------- | ------------- |
+| `@axe-core/playwright`            | 4.14.0        |
+| `knip`                            | 6.45.1        |
+| `@tanstack/react-devtools`        | 0.10.14       |
+| `@tanstack/devtools-vite`         | 0.8.6         |
+| `@tanstack/react-query-devtools`  | 5.107.1       |
+| `@tanstack/react-router-devtools` | 1.167.3       |
+| `@tanstack/react-form-devtools`   | 0.2.34        |
+| `@tanstack/react-form`            | 1.33.5        |
+| `zod`                             | 4.6.7         |
+
+### Knip analizi
+
+`npm run knip` kullanılmayan dosya, bağımlılık ve export'ları raporlar. **Şimdilik tanı komutudur; `verify`, `verify:ci` veya CI şablonuna zorunlu kapı olarak eklenmemiştir.** Otomatik silme veya bulgu bastırma yapılmaz; bulgular varken sıfır olmayan çıkış kodu korunur.
+
+`knip.json` asgari ek yapılandırmadır: i18next CLI tarafından dosya adıyla dinamik yüklenen `i18next.config.ts` bir entry'dir; üretilmiş `src/i18n/generated/**` deklarasyonları analizden çıkarılır. Knip'in Vite/Vitest/Playwright ve TanStack Router eklentileri otomatik aktiftir. Vite `index.html` girişini, test glob'larını, setup dosyasını, npm script'lerindeki Node girişlerini ve Router'ın `routeTree.gen.ts` üzerinden dinamik route grafiğini izler. Route ağacı veya bütün `src` entry olarak eklenerek bulgular gizlenmez.
+
+Bu kaynağın gerçek açık bulguları:
+
+| Tür        | Bulgu                          | Değerlendirme                                                                           |
+| ---------- | ------------------------------ | --------------------------------------------------------------------------------------- |
+| Dosya      | `src/lib/supabase.ts`          | Hazır lazy istemcinin henüz uygulama tüketicisi yok; bu görev canlı entegrasyon yapmaz  |
+| Dosya      | `src/lib/utils.ts`             | Mevcut Button doğrudan `cn` paketini import ediyor; bu re-export kullanılmıyor          |
+| Bağımlılık | `@supabase/supabase-js`        | Kullanılmayan istemci dosyası üzerinden mevcut; aktif uygulama grafiğinde kullanılmıyor |
+| Bağımlılık | `lucide-react`                 | Henüz uygulama import'u yok                                                             |
+| Export     | `LinkButton`, `buttonVariants` | Yerel UI kaynağında tanımlı, mevcut tüketicileri yok                                    |
+
+Bu kayıtlar yanlış pozitif olarak ignore edilmemiştir. Silme/uyarlama kararı ayrı bakımdır; mevcut temel istemci ve UI API'si bu görevde topluca kaldırılmaz.
+
+### Tek TanStack Devtools arayüzü
+
+[Resmî ortak arayüz entegrasyonu](https://tanstack.com/devtools/latest/docs/quick-start) ile Query ve Router **Panel** bileşenleri ile [resmî Form `formDevtoolsPlugin()` entegrasyonu](https://tanstack.com/form/latest/docs/framework/react/guides/devtools) `src/components/devtools.tsx` içinde tek `TanStackDevtools` altında birleşir. İkinci bağımsız Query/Router/Form floating panel'i yoktur. Root route altında Router bağlamını, ana uygulamadaki QueryClientProvider'dan Query bağlamını alırlar.
+
+`npm run dev` (`mode=development`) açıldığında ortak panel lazy yüklenir; normal ürün içeriği aynı kalır. `import.meta.env.DEV` ve açık development mode koşulu sayesinde production, Vitest ve `mode=e2e` çalıştırmalarında panel yüklenmez. E2E/Axe normal uygulamayı tarar; geliştirici panelinin erişilebilirlik kabulünü iddia etmez. Vite Devtools eklentisi yalnız development serve sırasında [resmî öneriyle ilk sıradadır](https://tanstack.com/devtools/latest/docs/vite-plugin); mevcut Router → React → Tailwind sırası korunur.
+
+`npm run build` sonundaki `npm run check:bundle`, Vite'ın gerçekten ürettiği chunk modül kimliklerini `.tmp/production-modules.json` üzerinden denetler. TanStack Devtools/event-bus paketlerini veya yerel Devtools bileşenini içeren çıktı hata verir. Üretilen bütün JavaScript chunk'larında panel/source-injection işaretleri de denetlenir; kaynak dosyada sadece `DEV` koşulu bulunması yeterli kanıt sayılmaz. Modül raporu `dist` içine konmaz. `check:bundle` için önce güncel build gereklidir. Bu kaynakta ölçülen çıktı: 154 modül kaydı, 4 JS chunk, sıfır Devtools modülü/işareti.
+
+### Standard Schema + React Aria form örneği
+
+`src/examples/schema-form.tsx`, küçük bir temel bileşendir; normal ana sayfaya veya ürün route'una eklenmez, backend isteği yapmaz. Testler ve yalnız development modunda `http://localhost:5173/?__form_example` ile açılan örnek görünüm tarafından tüketilir (Vite portu değişirse URL'yi uyarlayın). Bu görünüm production'da bulunmaz; `schema-example` form kimliğiyle ortak Form Devtools listesinde görünür. Değerleri ve doğrulama hatalarını incelemek için formu seçip Individual Fields → text → meta → errors ağacını açın. `@tanstack/react-form`, Zod 4 şemasını [Standard Schema aracılığıyla doğrudan](https://tanstack.com/form/latest/docs/framework/react/guides/validation) kullanır; resolver adaptörü, React Hook Form veya ikinci doğrulama sistemi yoktur. İlk doğrulama blur/submit, ilk submit sonrasında yeniden doğrulama change olayındadır; aynı hata birden fazla event listesinde tekrarlanmaz.
+
+React Aria `TextField`, `Label`, `Input`, `FieldError` ve submit Button kullanılır. Örneğin boş olmama ve en az üç karakter sınırı yalnız entegrasyon test verisidir; ürün iş kuralı değildir. Yerelleştirilmiş hatalar `aria-invalid` ve `aria-describedby` ile input'a bağlanır. Testler boş alanı, kısa değeri, hatanın düzelmesini, submit payload/başarı durumunu ve Tab/Shift+Tab/Enter ile kullanımını doğrular. Gerçek kişisel veri veya hosted kaynak kullanılmaz. `npm run test:coverage`/`test:ci` glob'ları bu testleri; mevcut E2E komutları Axe testini otomatik kapsar. Etkin olmayan CI YAML dosyalarında yeni bir test listesi kopyalanmamıştır.
+
 ## Türkçe ve üretilen kaynaklar
 
 Tek katalog `src/locales/tr/common.json`, varsayılan dil `tr`, React Aria locale değeri `tr-TR` ve HTML dil niteliği `tr`'dir. Çeviriler tipli selector API ile tüketilir. Katalog değişince `i18n:extract`, ardından `i18n:types` ve kontrolleri çalıştırın. Bu aşamada başka dil eklenmez.
@@ -63,7 +111,7 @@ Vitest jsdom, React Testing Library, user-event ve jest-dom kullanır. `src/test
 
 Coverage test edilmemiş `src/**/*.{ts,tsx}` dosyalarını da içerir. Test/kurulum dosyaları, üretilmiş dosyalar ve Vitest'in standart istisnaları dışarıdadır; main, route, Supabase ve UI kaynakları kapsamda kalır. Ölçülmemiş minimum yüzde eşiği yoktur.
 
-Playwright iki bağımsız Chromium testiyle Türkçe ekranı, HTML dilini, başlangıç durumunu, pointer/Enter/Space etkileşimlerini ve yeniden yüklemede sıfırlamayı doğrular. Her testin ayrı browser context'i vardır; retry yoktur ve odaklı testler yasaktır. Sunucu `127.0.0.1:4173` üzerinde strict port ile açılır, mevcut sunucu yeniden kullanılmaz. Tarayıcı HTTP istekleri yalnız bu origin'e izin verir; service worker'lar engellenir. E2E sunucusu Supabase değişkenlerini boşaltır. Hata halinde trace/screenshot `test-results/`, HTML rapor `playwright-report/` altındadır.
+Playwright dört bağımsız Chromium testiyle Türkçe ekranı, HTML dilini, başlangıç durumunu, pointer/Enter/Space etkileşimlerini ve yeniden yüklemede sıfırlamayı doğrular. Her testin ayrı browser context'i vardır; retry yoktur ve odaklı testler yasaktır. Axe testi ana sayfanın render edilmiş DOM'unda bütün varsayılan axe kurallarını çalıştırır ve herhangi bir ihlalde başarısız olur; kural kapatma veya selector muafiyeti yoktur. Bu otomatik tarama bütün WCAG uyumunu veya manuel ekran okuyucu/klavye incelemesini kanıtlamaz. Sunucu `127.0.0.1:4173` üzerinde strict port ile açılır, mevcut sunucu yeniden kullanılmaz. Tarayıcı HTTP istekleri yalnız bu origin'e izin verir; service worker'lar engellenir. E2E sunucusu Supabase değişkenlerini boşaltır. Hata halinde trace/screenshot `test-results/`, HTML rapor `playwright-report/` altındadır. Aynı Playwright yapılandırması ayrıca `127.0.0.1:4174` üzerinde development sunucusu açar. Yeni Devtools testi tek ortak panelde Query/Router/Form erişimini ve örnek formun canlı değer, doğrulama hatası, touched/valid durumları ile düzeltme/submit akışını doğrular; bu test de yalnız yerel origin'e HTTP erişimine izin verir.
 
 ## Ortam ve güvenlik
 
