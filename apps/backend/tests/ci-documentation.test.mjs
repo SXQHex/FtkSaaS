@@ -17,6 +17,14 @@ process.chdir(repositoryRoot);
 
 test('deleting or renaming referenced documentation is detected through unchanged inbound links',()=>fixture((dir,git)=>{writeFileSync(join(dir,'README.md'),'[Target](target.md)\n');writeFileSync(join(dir,'target.md'),'Target\n');git('add','.');git('commit','-m','links');fs.renameSync(join(dir,'target.md'),join(dir,'renamed.md'));assert.throws(()=>execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/docs-check.mjs'),'target.md'],{cwd:dir,stdio:'pipe'}),/Command failed/);}));
 
+test('agent instructions are outside the product document registry and link acceptance',()=>fixture((dir)=>{
+ mkdirSync(join(dir,'.agents/skills/example'),{recursive:true});
+ writeFileSync(join(dir,'.agents/skills/example/SKILL.md'),'[Agent-only reference](unavailable.md)');
+ mkdirSync(join(dir,'.agents-other'),{recursive:true});writeFileSync(join(dir,'.agents-other/unknown.md'),'Unknown product document');
+ const files=livingMarkdown(dir);assert(!files.includes('.agents/skills/example/SKILL.md'));assert(files.includes('.agents-other/unknown.md'));
+ const previous=process.cwd();try{process.chdir(dir);checkDocuments(['.agents/skills/example/SKILL.md']);}finally{process.chdir(previous);}
+}));
+
 test('reviewed documentation scope excludes runtime with document-looking paths or labels',()=>{
  const read=()=>'',mode=()=>'100644';
  assert(documentScope([{path:'README.md',status:'M'}],read,mode).safe);

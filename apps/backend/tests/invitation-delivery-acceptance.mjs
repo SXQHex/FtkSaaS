@@ -59,6 +59,31 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
    try{await db.query('update core.outbox_jobs set next_attempt_at=now() where id=$1',[job]);const c=await claim();assert.equal(c.api_key,'synthetic-resend-invitation-key');assert.equal(c.from_email,'sender@ftksaas.invalid');assert.equal(c.app_origin,'https://invitation.ftksaas.invalid');await worker(c,{invitation_phase:'finish',retryable:true});}
    finally{await db.query("update private.invitation_sender_config set resend_secret_id=$2,from_email='sender@ftksaas.invalid',app_origin='https://invitation.ftksaas.invalid' where org_id=$1",[org,secret]);await db.query('delete from vault.secrets where id=$1',[next]);}
   });
+  await t.test('expired or revoked invitations are cancelled before claim without a provider attempt',async()=>{
+   for(const state of ['expired','revoked']){
+    job=(await send()).job_id;
+    const invitation=(await db.query('select invitation_id from private.invitation_deliveries where job_id=$1',[job])).rows[0].invitation_id;
+    if(state==='expired')await db.query("update core.invitations set expires_at=clock_timestamp()-interval '1 second' where id=$1",[invitation]);
+    else await db.query("update core.invitations set state='revoked',version=version+1 where id=$1",[invitation]);
+    assert.equal(await claim(),null);
+    assert.equal((await status(job)).state,'cancelled');
+    const stored=(await db.query('select attempts::int,provider_reference,lease_until from core.outbox_jobs where id=$1',[job])).rows[0];
+    assert.equal(stored.attempts,0);assert.equal(stored.provider_reference,null);assert.equal(stored.lease_until,null);
+   }
+  });
+  await t.test('expiry or revocation after claim denies final authorization and cancels an unsent job',async()=>{
+   for(const state of ['expired','revoked']){
+    job=(await send()).job_id;const c=await claim();assert.equal(c.job_id,job);
+    assert.equal((await worker(c,{invitation_phase:'authorize'})).authorized,true);
+    if(state==='expired')await db.query("update core.invitations set expires_at=clock_timestamp()-interval '1 second' where id=$1",[c.invitation_id]);
+    else await db.query("update core.invitations set state='revoked',version=version+1 where id=$1",[c.invitation_id]);
+    assert.equal((await worker(c,{invitation_phase:'authorize'})).authorized,false);
+    assert.equal((await worker(c,{invitation_phase:'finish',retryable:false})).state,'cancelled');
+    assert.equal(await claim(),null);
+    const stored=(await db.query('select attempts::int,provider_reference,lease_until from core.outbox_jobs where id=$1',[job])).rows[0];
+    assert.equal(stored.attempts,1);assert.equal(stored.provider_reference,null);assert.equal(stored.lease_until,null);
+   }
+  });
   await t.test('late ambiguous retry cannot resend outside provider idempotency retention',async()=>{
    job=(await send()).job_id;const c=await claim();await worker(c,{invitation_phase:'finish',retryable:true});
    await db.query("update private.invitation_delivery_state set first_attempt_at=now()-interval '24 hours' where job_id=$1",[job]);await db.query('update core.outbox_jobs set next_attempt_at=now() where id=$1',[job]);assert.equal(await claim(),null);assert.equal((await status(job)).state,'failed');

@@ -128,6 +128,26 @@ test('frontend candidate never starts backend clean, while actual merge verifies
  await assert.rejects(verifyMerged(github,{repo:{},sha:'M'},core),/parents/);
 });
 
+test('agent tooling keeps quality and exact source proof without application test receipts',async()=>{
+ const {github,pr}=scopedGithub(['.agents/skills/example/SKILL.md']);
+ const outputs={},core={setOutput:(k,v)=>outputs[k]=v,summary:{addRaw(){return this;},async write(){}}};
+ await resolveCandidate(github,{repo:{},issue:{number:9},payload:{pull_request:pr},runId:1,sha:'M'},core,'auto');
+ assert.equal(outputs.kind,'agents');assert.equal(outputs.eligible,'false');assert.equal(outputs.binding,undefined);
+ const accepted=await checkPr(github,{repo:{}},9);assert.equal(accepted.state,'success');assert.match(accepted.description,/Agent tooling only; quality and exact source verified/);
+ assert.equal((await verifyMerged(github,{repo:{},sha:'M'},core)).kind,'agents');
+ github.rest.git.getCommit=async()=>({data:{sha:'M',tree:{sha:'wrong-tree'},parents:[{sha:'B'},{sha:'H'}]}});
+ assert.equal((await checkPr(github,{repo:{}},9)).state,'failure');
+ for(const options of [{truncated:true},{moved:true}]){
+  const {github:g}=scopedGithub(['.agents/skills/example/SKILL.md'],options);assert.equal((await checkPr(g,{repo:{}},9)).state,'failure');
+ }
+ const {github:g}=scopedGithub(['.agents/skills/example/SKILL.md']);const paginate=g.paginate;
+ g.paginate=async(method,...args)=>method==='runs'?[]:paginate(method,...args);
+ assert.equal((await checkPr(g,{repo:{}},9)).state,'failure');
+ await assert.rejects(verifyMerged(g,{repo:{},sha:'M'},core),/quality/i);
+ const {github:mixed}=scopedGithub(['.agents/skills/example/SKILL.md','README.md']);
+ const missingDocumentProof=await checkPr(mixed,{repo:{}},9);assert.equal(missingDocumentProof.state,'failure');assert.match(missingDocumentProof.description,/documentation/);
+});
+
 test('every workflow is trusted policy including frontend; its scope marker cannot authorize policy installation',async()=>{
  assert(policyPath('.github/dependabot.yml'));assert.equal(classifyChanges([change('.github/dependabot.yml')]).kind,'full');
  assert(policyPath('.github/workflows/frontend.yml'));assert(policyPath('.github/workflows/new.yml'));

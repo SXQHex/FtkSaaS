@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {isAgentTooling} from './ci/agent-tooling.mjs';
 import {isDesignSandbox} from './ci/design-sandbox.mjs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -6,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 export const registryPath='docs/documentation.json';
 export function livingMarkdown(root){
  return [...new Set(execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard'],{cwd:root,encoding:'utf8'}).split('\0'))]
-  .filter(p=>p.endsWith('.md')&&!isDesignSandbox(p)&&!p.startsWith('docs/history/')&&fs.existsSync(path.join(root,p))).sort();
+  .filter(p=>p.endsWith('.md')&&!isDesignSandbox(p)&&!isAgentTooling(p)&&!p.startsWith('docs/history/')&&fs.existsSync(path.join(root,p))).sort();
 }
 export function validateDocumentRegistry(registry,files,root){
  if(registry.format!==1||!Array.isArray(registry.documents))throw Error('INVALID_DOCUMENT_REGISTRY');

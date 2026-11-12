@@ -1,3 +1,4 @@
+import {isAgentTooling} from './agent-tooling.mjs';
 import {isDesignSandbox} from './design-sandbox.mjs';
 import {repositoryRoot,repoFile} from '../paths.mjs';
 import {ciFile} from '../paths.mjs';
@@ -37,7 +38,7 @@ export function markdownAnchors(text){
 export function checkDocuments(files){
  let count=0;const targets=new Map();
  for(const f of [...new Set(files)]){
-  if(isDesignSandbox(f)||!fs.existsSync(f))continue;
+  if(isDesignSandbox(f)||isAgentTooling(f)||!fs.existsSync(f))continue;
   const text=fs.readFileSync(f,'utf8');if(/^(<<<<<<<|=======|>>>>>>>) /m.test(text))throw Error('MERGE_MARKER '+f);
   if(!f.endsWith('.md')||historicalSnapshot(f,text))continue;
   for(const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)){

@@ -273,6 +273,20 @@ test('CD source equivalence accepts frontend progress only with unchanged backen
  ]){const {github}=scopedGithub(paths,options);assert.equal(await backendUnchanged(github,{},'B','H'),expected);}
 });
 
+test('agent-only main marker skips CD with exact source binding and rejects malformed markers',async()=>{
+ const v=valid(),sha='a'.repeat(40),run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ const source={name:'source',status:'completed',conclusion:'success',run_id:run.id,run_attempt:run.run_attempt,head_sha:sha};
+ const marker={...source,name:'agents',steps:[{name:'Agent tooling only (no application acceptance)',conclusion:'success'}]};
+ const input={run,jobs:[source,marker,{...source,name:'acceptance',conclusion:'skipped'}],currentMain:sha,repository:'SXQHex/FtkSaaS'};
+ assert.deepEqual(deploymentSource(input),{deploy:false,reason:'Agent tooling only; no application acceptance',agents:true});
+ assert.equal((await resolveAcceptedSource({}, {owner:'SXQHex',repo:'FtkSaaS'},run,input.jobs,sha)).agents,true);
+ for(const mutate of [x=>x.jobs[1].conclusion='skipped',x=>x.jobs[1].run_attempt++,x=>x.jobs[1].run_id++,x=>x.jobs[1].head_sha='other',x=>x.jobs[1].steps=[],x=>x.jobs.push({...x.jobs[1]}),x=>x.jobs[0].conclusion='failure',x=>x.jobs[2].conclusion='success']){
+  const x=structuredClone(input);mutate(x);assert.throws(()=>deploymentSource(x));
+ }
+ const workflow=fs.readFileSync('.github/workflows/backend.yml','utf8');
+ assert(workflow.includes("if: needs.source.outputs.kind == 'agents'"));assert(workflow.includes('name: Agent tooling only (no application acceptance)'));
+});
+
 test('frontend scope marker cannot authorize CD or substitute for missing executed full jobs',()=>{
  const v=valid(),sha='a'.repeat(40),run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
  const source={name:'source',status:'completed',conclusion:'success',run_id:run.id,run_attempt:run.run_attempt,head_sha:sha};

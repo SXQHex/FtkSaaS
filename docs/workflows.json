@@ -278,7 +278,8 @@
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
         "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql",
-        "apps/backend/scripts/ci/manual-full.mjs"
+        "apps/backend/scripts/ci/manual-full.mjs",
+        "apps/backend/scripts/ci/agent-tooling.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -288,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "060803a1924bb7aea1ac1f8920c13f58dda6576c749c76ccadb103fc3a228aab",
-        "reason": "Reviewed additive import of seven public-runner safety units; no existing runtime assertion or admission guard changed, including explicit fake transport versus real hosted evidence separation."
+        "fingerprint": "29332265f320965774e5caea45df2f2fd075e0c94123badbf13b684c92f20a5c",
+        "reason": "Reviewed agents-only classification with tracked-env rejection, quality/exact-source proof, explicit source-bound main/CD skip marker and malformed marker negatives; mixed/rename/deletion preserve application acceptance. Real CI policy remains trusted and S07 additions retain exact imported-source binding."
       }
     },
     {
@@ -676,8 +677,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "aef32117123bcffe66450a78794ff45aeb69422599fbed05370905fb1eb75356",
-        "reason": "S10 newly verified account-link episode invalidates old sharing consent; native invitation/revoke/discovery authority unchanged."
+        "fingerprint": "b26ddc4316f068c308bb4ebda1259f5725e31a84005de665299674862dd13135",
+        "reason": "Reviewed native invitation actor verification and lifecycle tests; frontend screen acceptance remains separate from backend claim/delivery/account acceptance."
       }
     },
     {
@@ -1832,8 +1833,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "8bcd21bec2ea8fe90013fed22159e367d444606e31737cf32a5a90aa7f2bca16",
-        "reason": "S10 worker requires configured offer duration and requeues on effective policy identity change after failed jobs; actor, scope, lease, retry bounds and FIFO unchanged; native recovery proof reviewed."
+        "fingerprint": "138eddb7e7c87f27b8ed48f33160d9a16a948616850973378ed2ca91a955370a",
+        "reason": "Reviewed worker final authorization: preclaim expiry/revoke cancels with zero attempts; postclaim denial cancels unsent lease without provider reference."
       }
     }
   ]

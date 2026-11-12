@@ -205,7 +205,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s07"></a>
 ### S07 — Davet teslim yaşam döngüsü
 
-- [ ] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F04,F26
+- [x] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F04,F26
 - **Bağımlılık:** S06
 - **Kabul:** Claim→geçerli davet→teslim sonucu→hesap kabulü izlenebilir.
 - **Sınır/olumsuz durum:** İptal/eski/expired davet gönderilmez; belirsiz sağlayıcı sonucu kör tekrar edilmez.
@@ -214,7 +214,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Tamamlanan dilim:** XREQ-003 backend worker/sağlayıcı teslimi, iş takibi ve yetkili gerçek alıcı kutusu kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#xreq-003-operasyonel-kabulü). Native hesap kabulü ve yanlış hesap/expired/revoked/link çakışması kaynak testleri gerçek frontend bağlantı kabulünden ayrıdır.
 
-**Kabul ayrımı:** Gerçek parola/Google/MFA dönüşü, doğru hesapla kabul, aynı anahtarla replay ve farklı anahtarla kullanılmış/geçersiz davet reddi frontend kabul kaydında tamamlandı. Yanlış hesap, gerçek expiry/revoke ve link çakışması kabulü frontend sahibinde açık kalır; [XREQ-004](../../../docs/requests.md#xreq-004-giriş-boyunca-davet-fragmentini-koruma) ile koordine edilir. Bu frontend kabulü S07 backend kapanışının önkoşulu değildir. S07’nin backend işareti, mevcut native/gerçek teslim kanıtının kendi ölçütleriyle uzlaştırılmasına göre güncellenir; bu belge düzenlemesi yeni kabul sonucu üretmez ve tamamlanan teslim hattını yeniden açmaz.
+**Backend kapanışı:** Mevcut kaynak/native CI ve yetkili gerçek teslim kanıtı kendi kabul ölçütleriyle uzlaştırıldı; [S07 kanıtı ve yeni test kaynağının ayrı CI durumu](00-FtkSaaS-yeni-sohbet-devir.md#s07-backend-kapanisi). İptal/expiry öncesi ve claim sonrası son yetki denetimi, lease kaybı, belirsiz provider retry sınırı ve doğru/yanlış native hesap davranışları kanıtlıdır. Frontend'in gerçek parola/Google/MFA dönüşü ve davet ekranı kabulü kendi sahibindedir; kalan yanlış hesap/expiry/revoke/link ekranları [XREQ-004](../../../docs/requests.md#xreq-004-giriş-boyunca-davet-fragmentini-koruma) ile izlenir, S07 backend kapanışını bekletmez.
 
 <a id="s08"></a>
 ### S08 — Native hesap ve güvenlik kapanışı

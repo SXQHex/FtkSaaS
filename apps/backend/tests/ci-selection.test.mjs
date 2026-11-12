@@ -232,6 +232,25 @@ test('positive ownership separates backend frontend prose and shared inputs, rej
  assert.equal(policyPath('.github/workflows/frontend.yml'),true);assert.equal(policyPath('.github/workflows/ci-full.yml'),true);
 });
 
+test('agent tooling is outside application acceptance while mixed source keeps its required scope',()=>{
+ for(const path of ['.agents/skills/README.md','.agents/skills/example/SKILL.md','.agents/skills/example/agents/openai.yaml','.agents/skills/example/assets/icon.svg','.agents/skills/example/run.mjs','.agents/skills/example/package.json']){
+  assert.equal(ownerOf(path),'agents');assert.equal(classifyChanges([change(path)]).kind,'agents');
+  assert.equal(select([change(path)]).db,false);assert.equal(policyPath(path),false);
+ }
+ assert.equal(classifyChanges([change('.agents/skills/README.md'),change('README.md')]).kind,'documentation');
+ assert.equal(classifyChanges([change('.agents/skills/README.md'),change('apps/web/page.tsx')]).kind,'frontend');
+ for(const path of ['apps/backend/database/kernel.sql','packages/api-contracts/schema/contract.json','.github/workflows/ci-full.yml','package.json']){
+  assert.equal(classifyChanges([change('.agents/skills/README.md'),change(path)]).kind,'full');
+ }
+ for(const path of ['.agents-other/tool.md','.agents','other/tool.md'])assert.throws(()=>ownerOf(path),/UNCLASSIFIED_SOURCE/);
+ assert.throws(()=>ownerOf('.agents/../apps/backend/example.mjs'),/INVALID_SOURCE_PATH/);
+ for(const path of ['.agents/.env','.agents/skills/example/.env.local','.agents/skills/example/.env.example.local'])assert.throws(()=>ownerOf(path),/TRACKED_AGENT_ENVIRONMENT/);
+ assert.equal(ownerOf('.agents/skills/example/.env.example'),'agents');
+ const rename=parseChanges('R100\0apps/backend/tests/api-acceptance.test.mjs\0.agents/example.mjs\0');
+ assert.equal(classifyChanges(rename).kind,'full');
+ assert.equal(classifyChanges([{path:'.agents/skills/example/SKILL.md',status:'D'}]).kind,'agents');
+});
+
 test('one main proof gate covers all pushes and manual targeted cannot auto-run or install for prose',()=>{
  const main=fs.readFileSync('.github/workflows/backend.yml','utf8');
  assert.match(main,/push:\n    branches: \[main\]/);
