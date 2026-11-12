@@ -34,6 +34,7 @@
     "coverage/**",
     "dist/**",
     "playwright-report/**",
-    "test-results/**"
+    "test-results/**",
+    "test-reports/**"
   ]
 }

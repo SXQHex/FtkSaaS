@@ -9,7 +9,12 @@ export default defineConfig({
   retries: 0,
   workers: process.env.CI ? 2 : undefined,
   outputDir: "./test-results",
-  reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "playwright-report", open: "never" }],
+    ["json", { outputFile: "test-reports/playwright.json" }],
+    ["junit", { outputFile: "test-reports/playwright.xml" }],
+  ],
   use: {
     baseURL,
     locale: "tr-TR",

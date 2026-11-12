@@ -38,3 +38,6 @@ coverage/
 .playwright-browsers/
 playwright-report/
 test-results/
+
+# Machine-readable CI reports
+test-reports/

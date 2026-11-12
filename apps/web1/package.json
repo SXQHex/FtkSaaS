@@ -19,7 +19,14 @@
     "typecheck": "tsc -b",
     "test:e2e": "node scripts/playwright.mjs test",
     "test:e2e:install": "node scripts/playwright.mjs install chromium",
-    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run i18n:check && npm run test:coverage && npm run test:e2e && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run i18n:check && npm run test:coverage && npm run test:e2e && npm run build",
+    "test:ci": "vitest run --coverage --allowOnly=false --reporter=default --reporter=json --reporter=junit --outputFile.json=test-reports/vitest.json --outputFile.junit=test-reports/vitest.xml && node scripts/check-test-results.mjs vitest test-reports/vitest.json",
+    "test:ci:guards": "node --test scripts/check-test-results.test.mjs",
+    "test:e2e:ci": "node scripts/playwright.mjs test && node scripts/check-test-results.mjs playwright test-reports/playwright.json",
+    "test:e2e:deps": "node scripts/playwright.mjs install-deps chromium",
+    "audit:production": "node scripts/audit.mjs production",
+    "audit:all": "node scripts/audit.mjs all",
+    "verify:ci": "npm run typecheck && npm run lint && npm run format:check && npm run i18n:check && npm run test:ci:guards && npm run test:ci && npm run build && npm run test:e2e:ci"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

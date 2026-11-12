@@ -20,7 +20,7 @@ npm run dev
 
 `.npmrc` npm cache/log yolunu `.npm-cache` içine alır. Yukarıdaki ortam değişkenleri geçici çıktıları proje içinde tutar. Kurulumda bağımlılık lifecycle scriptleri çalıştırılmaz; mevcut platforma ait native araçlar npm'in optional paketleriyle sağlanır. İşletim sistemi değişince `node_modules` taşımak yerine `npm ci --ignore-scripts` çalıştırın.
 
-Playwright başlatıcısı hem indirme hem test sırasında tarayıcı yolunu `.playwright-browsers`, geçici dizini `.tmp` olarak sabitler. Tarayıcılar npm kurulumundan ayrı indirilir. Linux çalıştırıcısında Chromium sistem bağımlılıkları önceden sağlanmalıdır; bu proje sistem paketlerini kurmaz. İndirme veya başlatma hatasını çözmek için TLS doğrulamasını ya da işletim sistemi güvenlik kontrollerini kapatmayın.
+Playwright başlatıcısı hem indirme hem test sırasında tarayıcı yolunu `.playwright-browsers`, geçici dizini `.tmp` olarak sabitler. Tarayıcılar npm kurulumundan ayrı indirilir. Linux CI çalıştırıcısında `npm run test:e2e:deps` Chromium sistem bağımlılıklarını kurar; bu komut yalnız geçici CI runner içindir, geliştirici makinesinde çalıştırılmaz. Tarayıcı kurulumu ayrı `test:e2e:install` komutuyla yapılır. İndirme veya başlatma hatasını çözmek için TLS doğrulamasını ya da işletim sistemi güvenlik kontrollerini kapatmayın.
 
 ## Araçlar ve komutlar
 
@@ -73,6 +73,75 @@ Bu çalışma sırasında `npm audit --omit=dev` **0 bulgu**, tam audit **6 geli
 
 İncelenen güncel shadcn 4.23.0 hâlâ deepmerge 4.3.1 ve ts-morph 26 zincirini kullanır; güncel deepmerge sürümü de 4.3.1'dir. Güncel @ts-morph/common 0.29.0 da minimatch 10 ister. Uyumlu üst paket düzeltmesi doğrulanamadığı için zorunlu override, `audit fix --force` veya audit'in önerdiği shadcn 1.0.0'a dönüş uygulanmadı. Güncellemelerde audit'i yeniden çalıştırın; bu sonuç kalıcı güvenlik garantisi değildir.
 
-## Sonraki V2 CI aşaması
+## Bağımsız CI şablonları — henüz etkin değil
 
-Bu aşama GitHub Actions workflow'u oluşturmaz veya değiştirmez. Ayrı CI çalışmasında yalnız `apps/web1` için Node/npm sürümü, `npm ci --ignore-scripts`, proje içi cache/geçici yollar, Chromium sistem bağımlılıkları ve tarayıcı kurulumu, `npm run verify`, audit politikası ve hata raporu artifact yükleme adımları bağlanmalıdır. Coverage eşiği ve açık geliştirme advisory'lerinin kabul politikası ölçüm ve ayrı kararla belirlenmelidir. Yerel test başarısı hosted kabul veya V1 CI kabulü yerine geçmez.
+[ci.yml](.github/workflows/ci.yml) ve [security.yml](.github/workflows/security.yml) bu depoda **GitHub tarafından çalıştırılmaz**. GitHub yalnız depo kökündeki `.github/workflows/` dosyalarını yükler; `apps/web1/.github/workflows/` bir şablon dizinidir. Yerel doğrulama veya statik analiz, gerçek Actions koşusu/CI kabulü/merge yetkisi değildir. [GitHub workflow konumu](https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows).
+
+CI şablonu Ubuntu 24.04 ve Node 24.21.0 kullanır. `npm ci --ignore-scripts` zorunludur; lifecycle scriptleri çalışmaz, optional platform paketleri kurulur. Node'un npm 11'i kullanılır. Npm cache ve geçici dosyalar proje altında kalır. Setup-node otomatik paket yöneticisi cache'i kapalıdır; node_modules/build/browser cache'i başka koşudan devralınmaz.
+
+`ci.yml`, Chromium sistem bağımlılıklarını `npm run test:e2e:deps` ile **geçici GitHub-hosted Linux runner'a** kurar. Bu adım apt/sudo gerektirir ve runner işletim sistemine yazar; yerel çalışma alanı izolasyonuna uygun bir geliştirici komutu olarak sunulmaz. Ardından kilitli Playwright'ın Chromium'u `.playwright-browsers` altına indirilir; `npm run verify:ci` strict tip, type-aware lint, format, Türkçe katalog, rapor denetleyicisi testleri, Vitest/MSW+coverage, production build ve Chromium E2E'yi yürütür. E2E mevcut davranışı koruyarak yerel Vite geliştirme sunucusunu açar; üretilen production bundle'ın tarayıcı kabulünü kanıtlamaz.
+
+| Ek npm komutu              | Amaç                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `npm run test:ci`          | Coverage ile Vitest, JSON/JUnit raporu ve sıfır skipped/todo denetimi         |
+| `npm run test:ci:guards`   | Rapor denetleyicisinin boş/atlanmış/başarısız/flaky/beklenen hata senaryoları |
+| `npm run test:e2e:ci`      | Chromium testleri ve sıfır skipped/flaky denetimi                             |
+| `npm run test:e2e:deps`    | Yalnız geçici Linux CI runner'ında Chromium OS bağımlılıkları                 |
+| `npm run verify:ci`        | CI raporları ve rapor denetimi dahil bütün kalite zinciri                     |
+| `npm run audit:production` | Üretim audit JSON'unu kaydeder; gerçek npm çıkış kodunu korur                 |
+| `npm run audit:all`        | Geliştirme dahil bütün dependency audit'i; gerçek çıkış kodunu korur          |
+
+Rapor denetimi en az bir başarılı test ve bütün raporlanan testlerin gerçekten geçmiş olmasını ister. Vitest `only` yasaktır; pending/todo veya eksik sonuçlar reddedilir. Playwright'ta skipped, flaky, beklenen başarısızlık, global hata veya sonuçsuz test reddedilir. Test komutu başarısızsa rapor kontrolü o başarısızlığı yeşile çevirmez. Mevcut testler korunmuştur. `verify` yerel komutu değişmeden kullanılabilir; CI, raporlu ve ek denetimli `verify:ci` komutunu çağırır.
+
+Artifact'lar `test-reports/` (Vitest ve Playwright JSON/JUnit, audit JSON), `coverage/`, `playwright-report/` ve `test-results/` kaynaklarından yüklenir. Adlar run ID/attempt ve audit kapsamıyla ayrılır; saklama süresi 7 gündür. Raporlar kurulum sonrası hata olsa da iptal edilmemiş koşuda yüklenmeye çalışılır. Hiç rapor yoksa artifact adımı hata verir. Erken hata yüzünden çalışmayan test/adım, kayıp artifact, iptal veya metadata olayında atlanan job başarılı test kanıtı değildir. Job özetleri gerçek adım sonucunu (`success`, `failure`, `skipped`) gösterir. Yalnız upload başarısı kabul değildir; artifact içeriği çalıştırılacak kod veya merge kanıtı olarak güvenilmez.
+
+`security.yml` üretim (`production`) ve tam (`all`) audit'i ayrı runner/job'larda, `fail-fast: false` ile yürütür; birindeki hata diğerini iptal etmez. npm'in yalnız geliştirme bağımlılıklarını denetleyen güvenilir bir `audit --only=dev` modu yoktur: geliştirme maruziyeti tam raporun üretim raporuyla karşılaştırılmasıyla belirlenir. Düşük seviye dahil bulgular hata üretir; ağ/registry hataları da başarısızlıktır. JSON hem log'a yazılır hem artifact olur. `continue-on-error`, bulgu allowlist'i veya audit eşiği yükseltmesi yoktur. Mevcut 6 geliştirme bulgusuyla **tam audit/security kabulü açıktır ve ilgili job başarısız olur**; üretim audit'inin geçmesi bu sonucu değiştirmez. Haftalık tarama pazartesi 06:17 UTC'dir; manuel/scheduled koşu PR merge kanıtı değildir.
+
+Her iki şablon main tabanlı PR açma/kaynak güncelleme/yeniden açma/retarget ve manuel çalıştırma için hazırlanmıştır. Üst düzey path filtresi yoktur; henüz güvenilir V2 scope seçicisi bağlanmadığından etkinleştirilirse her ilgili PR'de tam zincir çalışır. Başlık/açıklama `edited` olayı testleri atlar ve ayrı metadata concurrency grubuyla kaynak koşusunu iptal etmez. Aynı PR'nin eski kaynak koşusu iptal edilir; farklı workflow/PR grupları ayrıdır. Main push ağır test tetikleyicisi eklenmemiştir; main kabulünün sahibi mevcut ortak kanıt mekanizmasıdır. PR için checkout varsayılan event merge kaynağını, manuel koşu seçilen ref'i kullanır; HEAD'in `GITHUB_SHA` eşleşmesi kontrol edilir. Bu basit kontrol parent/tree/run/attempt doğrulayıcısının yerine geçmez.
+
+### Action pinleri ve yetkiler
+
+12 Kasım 2026'da resmi upstream release/tag referansları `git ls-remote` ile doğrulandı:
+
+| Action                                                                                    | Sürüm  | Tam commit SHA                             |
+| ----------------------------------------------------------------------------------------- | ------ | ------------------------------------------ |
+| [actions/checkout](https://github.com/actions/checkout/releases/tag/v7.0.1)               | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| [actions/setup-node](https://github.com/actions/setup-node/releases/tag/v7.1.0)           | v7.1.0 | `949feb2413d6458794dcd2491c4babbbce0c15c1` |
+| [actions/upload-artifact](https://github.com/actions/upload-artifact/releases/tag/v7.0.2) | v7.0.2 | `cf430e030ddbb5b0abf93d22962f4752f3646cd9` |
+
+[GitHub güvenli kullanım rehberine](https://docs.github.com/en/actions/reference/security/secure-use) uygun olarak varsayılan izinler `{}`, job izni yalnız `contents: read` ve checkout `persist-credentials: false`'tur. Secret, environment, OIDC, status/check yazma veya deploy yetkisi verilmez. `pull_request_target`, ayrıcalıklı `workflow_run` ve self-hosted runner kullanılmaz. Action pin güncellemesinde resmi tag→commit eşleşmesi, release değişiklikleri ve statik taramalar yeniden incelenir; SHA kullanımı action kodunun bütünüyle denetlendiği anlamına gelmez.
+
+### Yerel şablon doğrulaması
+
+Kurulum bölümündeki cache/temp ortamını ayarladıktan sonra:
+
+```sh
+npm ci --ignore-scripts
+npm run verify
+npm run verify:ci
+npm run audit:production
+npm run audit:all
+```
+
+Audit komutları ayrı çalıştırılır; mevcut tam audit'in sıfır olmayan sonucu beklenen **açık bulgudur**, kabul edilmiş başarı değildir. Linux sistem bağımlılığı adımının gerçek kurulumu ve Actions artifact upload/izin/tetikleme davranışı yalnız etkinleştirme sonrası geçici Linux runner'da kanıtlanabilir.
+
+Statik analiz yalnız bu iki dosyayı hedefler. Bu çalışmada resmi release SHA256 digest'i doğrulanarak proje içindeki `.tmp/workflow-tools` altına indirilen actionlint 1.7.12 ve zizmor 1.32.0 kullanıldı. Araçlar runtime/npm bağımlılığı değildir. Uygun platform için resmi [actionlint](https://github.com/rhysd/actionlint/releases/tag/v1.7.12) ve [zizmor](https://github.com/zizmorcore/zizmor/releases/tag/v1.32.0) release asset'ini ve SHA256 değerini doğrulayarak aynı yere kurduktan sonra:
+
+```sh
+.tmp/workflow-tools/actionlint .github/workflows/ci.yml .github/workflows/security.yml
+.tmp/workflow-tools/zizmor --offline --no-config --no-ignores --strict-collection --no-progress --cache-dir .tmp/zizmor-cache .github/workflows/ci.yml .github/workflows/security.yml
+```
+
+Zizmor çevrimdışı kontrolü uzak advisory/branch/tag politikalarını incelemez. Actionlint YAML/Actions ifade ve şema kontrolüdür; bu yerel ortamda ShellCheck yoktur. SHA/tag eşleşmeleri ayrıca upstream'den doğrulanmıştır. Statik tarama gerçek GitHub çalıştırması değildir.
+
+### Gelecekte monorepo entegrasyonu
+
+Bu bölüm kurulum talimatıdır; kök dosyaları değiştirme yetkisi veya uygulanmış entegrasyon iddiası değildir. Normatif kabul kuralları [CI politikasında](../../docs/ci-policy.md), sahiplik [belge haritasında](../../docs/documentation-map.md) kalır.
+
+1. Ayrı açık yetki ve son kaynak incelemesiyle şablonlar depo köküne `.github/workflows/web1-ci.yml` ve `.github/workflows/web1-security.yml` olarak taşınmalıdır. Kök workflow adlarıyla çakışma önlenmeli; şablon ve etkin dosya iki ayrı yaşayan politika kaynağına dönüşmemelidir.
+2. Şablonların mevcut yolları monorepo köküne göre hazırdır: `defaults.run.working-directory: apps/web1`, ortam yolları `${{ github.workspace }}/apps/web1/...`; action `with.path` yolları depo kökünden `apps/web1/...` olarak çözülür, `defaults.run` action'ları etkilemez. Checkout ve setup-node adımlarına çalışma dizini eklenmez. V2 ayrı bir repoya çıkarılırsa run dizini `.`, ortam/artifact yolları da yeni repo köküne göre uyarlanmalıdır. V2 npm projesi kalır; root pnpm/Turbo veya V1/backend scriptleri test bağımlılığı yapılmaz.
+3. V2'yi bugün kapsam dışında tutan deneysel alan kararı, ilgili scope sahipleri tarafından açıkça ele alınmalıdır. [Backend scope kaydı](../backend/scripts/ci/scope.json), [frontend kapsam seçicisi](../web/scripts/ci-scope.mjs) ve ilgili workflow tetikleme listeleri birlikte incelenmelidir. V2 kendi kabulünü seçmeli; V1 veya backend testlerini V2 kabulü diye kullanmamalıdır. Tam Git farkı, silme/taşımanın iki ucu, mode değişiklikleri, ortak kaynak ve bilinmeyen yol davranışı korunmalıdır. Path filtreleri veya başarılı skipped job ile gerekli kabul atlanmamalıdır.
+4. Yeni kök workflow'lar ve V2 görev/test yapılandırmaları trusted politika yüzeyine kaydedilmeli; mevcut workflow validators'ın actionlint/zizmor/poutine/pinact kapsamı ve politika kurulum karşılaştırmaları güncellenmelidir. Bu dosyaların burada statik olarak geçmesi, kökteki mevcut taramaların veya trusted politika kurulumunun tamamlandığını göstermez. Required-check/strict-base/ruleset kurulumu ayrıca yetki ve gerçek kanıt ister.
+5. [Frontend kaynak kanıtı](../web/scripts/ci-proof.mjs) ve ortak [Main acceptance](../../.github/workflows/backend.yml) / `ftksaas/merge-clean` doğrulama zincirine V2'nin gerekli kalite ve güvenlik işleri eklenmelidir. Gerçek PR merge SHA'sı, event base/head parent'ları, tam tree, repo/workflow/job kimliği, run ID ve güncel attempt/step başarıları kaynak makbuzuna bağlanmalıdır. Rerun devralma, expired/kayıp artifact, stale base, fork ve yanlış kaynak reddi ayrıca test edilmelidir. Mevcut V1 kanıt biçimini taklit eden ikinci bir doğrulayıcı kurulmaz; yetkili sahipler V2 kanıt sözleşmesini mevcut zincire entegre eder. Şimdiki rapor artifact'ları böyle bir makbuz değildir.
+6. Güvenlik kabulü için mevcut geliştirme bulguları çözülmeli veya ayrı kullanıcı kararıyla normatif risk kabulü belirlenmelidir; şablonlar bunu kabul edilmiş saymaz. Beklenen audit başarısızlığını yeşil sonuç üretmek için bastırmak yetki değildir. Gerekli kalite/E2E/audit job veya adımları `skipped`, iptal ya da başarısızsa merge kabulü verilmez; kapsam gerektirmeyen atlama da test başarısı diye raporlanmaz.
+7. Etkinleştirme PR'sinde gerçek Ubuntu kurulum, Chromium, artifact, salt-okunur fork PR ve retarget/metadata/concurrency davranışı doğrulanmalıdır. Aynı kaynağın zorunlu kontrolleri ve trusted kurulum yetkisi olmadan merge yapılmaz. Main aynı ağır testleri tekrarlamadan aday kaynak/run/attempt kanıtını doğrulamalıdır; deploy/CD bağlantısı bu şablonlara eklenmemiştir.
