@@ -6,17 +6,14 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 **13 Kasım içerik kataloğu görevi:** [S17](remaining-work.md#s17) mevcut sıra içindeki backend teslimini tamamladı; kalan açık işlerin sırası aşağıdadır. Kaynak/CI/main/development kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu), frontend çağrı/gösterim bağımlılığı [XREQ-045](../../../docs/requests.md#xreq-045) sahibindedir. Frontend kabulü backend işini yeniden açmaz.
 
-Öncelik Pro'nun ortak uygulamasını tamamlamak ve [G02](remaining-work.md#g02) backend kabulünü kapatmaktır. Sonraki paket [G01](remaining-work.md#g01) ile aynı uygulamanın Starter kısıtları, ardından [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir.
+Kabul edilmiş Pro ortak temeli üzerinde sıradaki paket [G01](remaining-work.md#g01) ile aynı uygulamanın Starter kısıtları, ardından [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir. Tamamlanmış Pro kabulünün kanıt sahibi [G02 uzlaştırmasıdır](00-FtkSaaS-yeni-sohbet-devir.md#g02-bagli-zincir-incelemesi).
 
-**Aktif sıra:** S08 → Pro'ya uygulanabilir kalan S/P, O01/O02 ve O11 kabulleri → G02 → G01 → G03; ardından ayrı O03–O10 altyapı projesi. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır. S08'in doğal süre sınırı beklenirken bağımsız kalan Pro ve işletim işleri ilerler; süre kısaltılmaz ve eksik kanıt tamamlandı sayılmaz.
+**Aktif sıra:** G01 → G03; ardından ayrı O03–O10 altyapı projesi. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır.
 
 | Öncelik | Paket | Bağımlılık ve kontrol noktası |
 |---|---|---|
-| 1 | [S08](remaining-work.md#s08) hesap/güvenlik | Kalan native/hosted Auth kanıtı ve kabul oturumunun kapatılması; frontend ekran onayı backend'i bekletmez. |
-| 2 | Pro ortak akışlarının kalan kabulleri | [S01–S16](remaining-work.md#ortak-uygulama-temeli) ve [P01–P16](remaining-work.md#pro-işlevleri) içindeki yürürlükteki, Pro'ya uygulanabilir açıkları kapat. |
-| 3 | [O01/O02](remaining-work.md#ortak-üretim-işletimi), [O11](remaining-work.md#o11) ve [G02](remaining-work.md#g02) | Mevcut worker kanıtı, tek gerçek alarm/toparlanma kontrolü ve asgari yedek→izole restore→uygulama/temel okuma kontrolüyle Pro backend kabulünü kapat. |
-| 4 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
-| 5 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon ve ortak kullanım/hesaplaşma işlevlerini doğrula. |
+| 1 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |
+| 2 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon ve ortak kullanım/hesaplaşma işlevlerini doğrula. |
 
 Teslim paketinde kullanıcının istediği genel backend belge tutarlılığı taraması tamamlanır: mevcut backlog/teslim kuyruğu/devir ile main'deki yayın farkları ve eski açık/kapalı anlatımlar aynı kaynak kanıtına göre uzlaştırılır. Bu teslim kontrolüdür; yeni roadmap veya ikinci durum listesi açılmaz.
 
