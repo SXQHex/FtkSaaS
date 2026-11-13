@@ -452,12 +452,14 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p08"></a>
 ### P08 — Meta yerel reklam formu alımı
 
-- [ ] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
+- [ ] **Durum:** Bu sürüm dışı; kabul edilmedi · **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
 - **Bağımlılık:** P05,P06
 - **Kabul:** Instagram/Facebook yerel form başvurusu ortak inboxa alınır.
 - **Sınır/olumsuz durum:** Sosyal login değildir; provider/form org eşlemesi güvenilir, tokenlar gizli.
 - **Doğrulama senaryosu:** Resmi erişim/yöntem uygulama anında doğrulanır; imza/izin, replay/retry ve alan eşleme; gerçek provider kanıtı.
 - **Kaynak alanı:** sağlayıcı adapter/credential eşleme; ilgili test
+
+**Teslim sınırı:** [XREQ-018’deki7Kasım kullanıcı kararı](../../../docs/requests.md#xreq-018), gerçek Meta/Google form bağlantılarını bu sürümün Pro teslim koşulundan çıkardı. Aşağıdaki açık sağlayıcı adımları tamamlandı veya başarılı entegrasyon sayılmaz; G02’yi bekletmez. Mevcut kaynak/test/kanıt korunur; uygulamanın kendi public başvurusu S14 ve manuel/ortak CRM akışı ayrı yürür.
 
 **Ortak veri hedefi:** Son kullanıcı talimatıyla Meta (öncelikle Instagram reklamları) ve Google Ads başvuruları mevcut `core.public_applications` tablosunda birleşir. Sağlayıcı başına başvuru/kişi tablosu kurulmaz; kaynak/form/dış başvuru kimliği ve provider atfı aynı başvurunun kanıtıdır. İmza/anahtar doğrulaması sağlayıcıya özel, kalıcı alım/inbox/eşleme/dönüşüm ortaktır. Mevcut web_form-only eşlemesinin provider desteğine genişletilmesi P08.2b/P09.2b kaynak işidir; bu ilk doğrulama katmanı henüz provider kayıtlarını yazmaz.
 
@@ -478,12 +480,14 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p09"></a>
 ### P09 — Google yerel reklam formu alımı
 
-- [ ] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
+- [ ] **Durum:** Bu sürüm dışı; kabul edilmedi · **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F25
 - **Bağımlılık:** P05,P06
 - **Kabul:** Google yerel reklam formu ortak kaynağa alınır.
 - **Sınır/olumsuz durum:** Web forma yönlendirme ile native form ayrıdır; Meta kabulü Google kanıtı değildir.
 - **Doğrulama senaryosu:** Güncel resmi erişim/yöntem incelemesi, gönderici doğrulama, dedupe/geri doldurma ve gerçek sağlayıcı kabulü.
 - **Kaynak alanı:** Google adapter/config; ilgili test
+
+**Teslim sınırı:** [XREQ-018’deki7Kasım kullanıcı kararı](../../../docs/requests.md#xreq-018), gerçek Meta/Google form bağlantılarını bu sürümün Pro teslim koşulundan çıkardı. Aşağıdaki açık sağlayıcı adımları tamamlandı veya başarılı entegrasyon sayılmaz; G02’yi bekletmez. Mevcut kaynak/test/kanıt korunur; uygulamanın kendi public başvurusu S14 ve manuel/ortak CRM akışı ayrı yürür.
 
 **Uygulama dilimleri:**
 
@@ -498,7 +502,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p10"></a>
 ### P10 — Eski başvuru kontrollü aktarımı
 
-- [ ] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F31
+- [x] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F21,F31
 - **Bağımlılık:** P05,P06
 - **Kabul:** Alan/mükerrer/onay önizlemesinden seçilen kayıtlar yetkili onayıyla taşınır.
 - **Sınır/olumsuz durum:** Kaynak silinmez; kanıtsız pazarlama izni üretilemez; gerçek veri fixture olmaz.
@@ -507,11 +511,13 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday, merge/main ve development teslimi doğrulandı; P10.3 sentetik hosted zincir kabulü ayrı açık; işletmeye özel gerçek aktarım Pro tesliminden bağımsız operasyondur. Teknik sınırlar ve API sırası WF11 sahibindedir.
+**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday, merge/main ve development teslimi doğrulandı; P10.3 sentetik hosted zincir kabulü tamamlandı; işletmeye özel gerçek aktarım Pro tesliminden bağımsız operasyondur. Teknik sınırlar ve API sırası WF10 sahibindedir.
 
 - [x] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
 - [x] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
-- [ ] P10.3 — [Kabul edilmiş aktarım kararlarıyla](../../../docs/decisions/P08-accepted-scope.md#geçmiş-kayıtların-aktarımı) gerçek hosted sentetik dosya→önizleme→seçim→aktarım→mutabakat zincirini tamamla. Atomik hata sonrası kısmi kayıt kalmadığını, tekrarın yeni başvuru üretmediğini ve kaynak dosyanın korunduğunu doğrula. Karar belgesi, kaynak/test, CI/development ve hosted kabul ayrı kaydedilir; frontend ekranı/onayı beklenmez. İşletmeye özel gerçek eski veri aktarımı ayrıca yetkilendirilen operasyon olarak kalır; Pro teslimini bekletmez.
+- [x] P10.3 — [Kabul edilmiş aktarım kararlarıyla](../../../docs/decisions/P08-accepted-scope.md#geçmiş-kayıtların-aktarımı) gerçek hosted sentetik dosya→önizleme→seçim→aktarım→mutabakat zincirini tamamla. Atomik hata sonrası kısmi kayıt kalmadığını, tekrarın yeni başvuru üretmediğini ve kaynak dosyanın korunduğunu doğrula. Karar belgesi, kaynak/test, CI/development ve hosted kabul ayrı kaydedilir; frontend ekranı/onayı beklenmez. İşletmeye özel gerçek eski veri aktarımı ayrıca yetkilendirilen operasyon olarak kalır; Pro teslimini bekletmez.
+
+**Kapanış:** Karar, kaynak/native CI/main/development ve gerçek hosted sentetik aktarım/mutabakat kabulü [tek durum kaydında](00-FtkSaaS-yeni-sohbet-devir.md#p10-sentetik-hosted-kabul) doğrulandı. İşletmeye özel gerçek veri aktarımı bu kapanışın veya Pro tesliminin önkoşulu değildir.
 
 <a id="p11"></a>
 ### P11 — Deneme, takip ve segment tam akışı
@@ -677,12 +683,14 @@ Bu teslimin ortak işletim işleri O01, O02 ve [O11 asgari veri güvenliği kont
 <a id="o11"></a>
 ### O11 — Asgari veri güvenliği kontrolü
 
-- [ ] **Tür:** H · **Plan:** Ortak; bir kez · **Özellik:** F33
+- [x] **Tür:** H · **Plan:** Ortak; bir kez · **Özellik:** F33
 - **Bağımlılık:** Çalışan uygulama ve ondan alınmış gerçek yedek; O03–O10 önkoşulu yoktur.
 - **Kabul:** [Ürün teslim sınırındaki](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) tek asgari kontrol gerçek sonuçla kanıtlanır.
 - **Doğrulama senaryosu:** Bir yedek al → ayrı izole hedefe geri yükle → uygulamayı aç → temel veriyi uygulamanın mevcut okuma yolundan oku. Yalnız SQL sorgusu veya boş servis health sonucu uygulama kabulü değildir.
 - **Sınır:** Kaynak ortama reset/seed/restore uygulanmaz; hedef izole kalır. Geniş imha/sicil/checkpoint, özel restore altyapısı, tam DB/Auth/Storage tatbikatı, RPO/RTO ve yük ölçümü bu işin şartı değildir. Mevcut testler değiştirilmez.
 - **Kanıt sahibi:** Yedek, izole hedef ve uygulama/temel okuma sonucu [devirde](00-FtkSaaS-yeni-sohbet-devir.md) kaydedilir; veri veya secret rapora yazılmaz.
+
+**Kapanış:** Standart yedek gerçek ayrı native stack’e geri yüklendi; aynı sentetik hesap/organizasyon/merkez uygulamanın Auth→Edge→RPC okumasıyla doğrulandı. Kaynak korundu, geçici hedef kaldırıldı; [asgari kabul ve sınırları](00-FtkSaaS-yeni-sohbet-devir.md#o11-asgari-restore-kabulu).
 
 ## Business sonrası ayrı altyapı projesi
 

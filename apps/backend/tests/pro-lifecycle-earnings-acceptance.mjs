@@ -194,3 +194,72 @@ for(const planName of ['pro','business']){
   }finally{await db.end();}
  });
 }
+
+// G02 bridges existing accepted mechanisms using one Pro organization and the
+// same application -> person/No -> sale/reservation -> earning/report identities.
+test('G02 Pro imported application becomes the same documented paid learner in lesson, finance, earnings, notifications and CSV',{timeout:300000},async()=>{
+ const {createHash}=await import('node:crypto'),{tick:p06tick}=await import('../scripts/p06-worker.mjs');
+ const f=await fixture('pro'),{db,org,center,api,owner}=f;let worker;
+ const role='g02_p06_'+key().replaceAll('-',''),password=randomBytes(24).toString('hex');
+ try{
+  await db.query(`create role "${role}" login password '${password}'`);await db.query(`grant ftk_p06_worker to "${role}"`);
+  await db.query('insert into private.p06_worker_scopes values($1,$2)',[role,org]);await db.query('insert into private.p06_configuration values($1,2097152,100,2097152)',[org]);
+  const url=new URL(context().env.DB_URL);url.username=role;url.password=password;worker=new pg.Client({connectionString:url.href});await worker.connect();
+  const drain=async()=>{for(let i=0;i<8;i++){const results=await p06tick(worker,org);assert(results.every(x=>x.ok),JSON.stringify(results));if(!results.length)return;}throw Error('G02 worker did not settle');};
+  const csv='source_key,display_name,phone,consents\r\ng02-person,Synthetic G02 candidate,+905550000091,[]\r\n',checksum=createHash('sha256').update(csv).digest('hex');
+  const file=await api('import_upload_prepare_v1',{filename:'synthetic-g02.csv',mime:'text/csv',bytes:Buffer.byteLength(csv),checksum});
+  const upload=await fetch(new URL(file.upload_url,context().env.API_URL),{method:'PUT',headers:{apikey:context().env.ANON_KEY,'content-type':'text/csv'},body:csv});assert(upload.ok);
+  await api('file_upload_complete_v1',{file_id:file.file_id,checksum});
+  const mapping={kind:'crm_applications',columns:['source_key','display_name','phone','consents'].map(target=>({source_column:target,target}))};
+  const job=await api('import_preview_v1',{file_id:file.file_id,mapping,source_namespace:'synthetic-g02-'+key()});await drain();
+  const ready=await api('job_status_get_v1',{job_id:job.job_id}),preview=await api('preview_get_v1',{preview_id:ready.result_reference.id});
+  await api('import_apply_v1',{preview:token(preview),selected_row_numbers:[1]});await drain();
+  const imported=await api('import_rows_list_v1',{job_id:job.job_id,page:{limit:100}});assert.equal(imported.items[0].state,'applied');
+  const application=imported.items[0].created_references.find(x=>x.type==='public_applications').id;
+  await api('public_application_review_v1',{application_id:application,action:'create_candidate',expected_version:1});
+  const inbox=await api('management_state_get_v1',{operation:'public_application_review_v1',selector:{operation:'public_application_review_v1',key:{application_id:application}},page:{}});
+  const candidate=inbox.items[0].current.values;assert.equal(candidate.source.file_checksum,checksum);assert.deepEqual(candidate.intake.consents,[]);
+  const person=candidate.person_id;assert(person);assert.equal((await api('person_get_v1',{person_id:person})).subscriber_number,null);
+  const leads=await api('leads_list_v1',{page:{limit:100}}),lead=leads.items.find(x=>x.person_id===person);assert(lead);
+  const convertKey=key();await api('lead_convert_v1',{lead_id:lead.id},convertKey);assert.equal((await api('lead_convert_v1',{lead_id:lead.id},convertKey)).replayed,true);
+  const numbered=await api('person_get_v1',{person_id:person}),number=numbered.subscriber_number;assert(BigInt(number)>=1001n);
+  const student=await authUser('g02-converted-learner'),account=await must(student,'account_get_v1');
+  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,person]);
+  const version=(await f.product(4,'1000')).primary_id;
+  const content={name:'Synthetic G02 service terms',language:'tr',template_id:'synthetic-g02',template_version:'1',text:'Synthetic G02 acceptance terms.\n'};
+  const document=(await api('document_version_publish_v1',{digital_content:content,version_label:'synthetic-g02-v1',scope:{kind:'center',center_id:center},requirements:[{gate:'sale',scope:{center_ids:[center]},renewed_acceptance:true}]})).primary_id;
+  const saleBody={person_id:person,product_version_id:version,start_date:date(0),end_date:date(30)};
+  const blocked=await api('sale_preview_v1',saleBody);assert(blocked.blockers.some(x=>x.code==='DOCUMENT_REQUIRED'));
+  const ctx={gate:'sale',subject:{type:'product_versions',id:version}};
+  const requirements=await api('document_requirements_get_v1',{context:ctx},key(),student),requirement=requirements.find(x=>x.version_id===document);assert(requirement&&!requirement.accepted);
+  const shown=(await api('document_requirements_get_v1',{context:ctx,content_file_id:requirement.file.id},key(),student)).find(x=>x.version_id===document);assert.deepEqual(shown.digital_content,content);
+  const consent=await api('document_accept_v1',{document_version_id:document,context:ctx,displayed_content:content,displayed_content_hash:createHash('sha256').update(content.text).digest('hex')},key(),student);
+  const evidence=(await api('document_requirements_get_v1',{context:ctx,content_file_id:requirement.file.id},key(),student)).find(x=>x.version_id===document).digital_acceptance;assert.equal(evidence.id,consent.primary_id);assert.equal(evidence.person_id,person);
+  const sale=await f.sell(person,version),debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale])).rows[0].id;
+  const collectionKey=key(),collectionBody={person_id:person,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString(),payment:{method:'cash'}};
+  await api('collection_record_v1',collectionBody,collectionKey);assert.equal((await api('collection_record_v1',collectionBody,collectionKey)).replayed,true);
+  const finance=await api('finance_get_v1',{person_id:person,currency:'TRY',page:{}});assert.equal(finance.subscriber_number,number);assert.equal(finance.debts.find(x=>x.id===debt).remaining_minor,'0');
+  const teacher=await f.linked('g02-instructor','instructor');
+  await api('availability_save_v1',{resource:{kind:'person',id:teacher.person},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
+  const agreement=(await api('instructor_agreement_publish_v1',{person_id:teacher.person,discipline_id:f.discipline,format:'group',valid:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},terms:{model:'explicit_mixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'100'},{kind:'per_person',amount_minor:'50'}],room_fee:{kind:'free',order:'before_instructor_share'}},reason:'Synthetic G02 lesson terms'})).primary_id;
+  const lesson=(await f.session(2,{assignments:[{person_id:teacher.person,duty:'instructor'}]})).primary_id;
+  const reservation=(await api('reservation_create_v1',{session_id:lesson,person_id:person,source_sale_id:sale,mode:'flexible'},key(),student)).primary_id;
+  let attendance=await api('attendance_get_v1',{session_id:lesson});await api('attendance_start_v1',{session_id:lesson,expected_version:attendance.session_version,actual_started_at:new Date().toISOString(),reason:'Synthetic G02 observed early start'});
+  attendance=await api('attendance_get_v1',{session_id:lesson});await api('attendance_mark_v1',{reservation_id:reservation,expected_version:attendance.entries.find(x=>x.reservation_id===reservation).version,result:'attended'});
+  attendance=await api('attendance_get_v1',{session_id:lesson});await api('attendance_close_v1',{session_id:lesson,expected_version:attendance.session_version,performed:true,performed_instructor_ids:[teacher.person]});
+  const span={starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},earnings=async()=>(await api('earnings_list_v1',{person_id:teacher.person,interval:span,page:{}})).items;
+  const earning=(await earnings()).find(x=>x.session_id===lesson);assert.equal(earning.amount_minor,'150');assert.equal((await db.query('select agreement_id from core.earnings where id=$1',[earning.id])).rows[0].agreement_id,agreement);
+  const payment=await api('instructor_payment_record_v1',{person_id:teacher.person,earning_ids:[earning.id],amount_minor:'150',currency:'TRY',occurred_at:new Date().toISOString()});
+  const correction=await api('attendance_correct_preview_v1',{session_id:lesson,corrections:[{reservation_id:reservation,result:'no_show'}],reason:'Synthetic G02 correction'});assert.deepEqual(correction.blockers,[]);await api('attendance_correct_apply_v1',{preview:token(correction)});
+  await api('instructor_payment_correct_v1',{payment_id:payment.primary_id,expected_version:payment.version,correction:{amount_minor:'50',currency:'TRY',occurred_at:new Date().toISOString(),direction:'decrease'},reason:'Synthetic G02 payment correction'});
+  const net=(await earnings()).find(x=>x.id===earning.id);assert.equal(net.paid_minor,'100');assert.equal(net.overpaid_minor,'0');
+  const filters={interval:{starts_at:date(-1)+'T00:00:00Z',ends_at:date(4)+'T00:00:00Z'},center_ids:[center]};
+  const report=await api('report_get_v1',{report:'collections_debts',filters,page:{limit:200}});assert(report.rows.items.some(x=>x.group_key==='collections'&&x.person_id===person&&x.subscriber_number===number&&x.amount_minor==='1000'));assert(report.rows.items.some(x=>x.group_key==='outstanding_debt'&&x.person_id===person&&x.amount_minor==='0'));
+  const payReport=await api('report_get_v1',{report:'earnings',filters,page:{limit:200}});assert(payReport.rows.items.some(x=>x.person_id===teacher.person&&x.group_key==='earning_accrual'&&x.amount_minor==='100'));
+  const attendanceReport=await api('report_get_v1',{report:'lesson_attendance',filters,page:{limit:200}});assert(attendanceReport.rows.items.some(x=>x.person_id===person&&x.group_key==='attendance:no_show'&&x.count===1));
+  const notices=await api('notifications_list_v1',{page:{limit:200,sort:'created_at_asc'},unread_only:false},key(),student);assert(notices.items.some(x=>x.kind==='reservation_create_v1'&&x.payload.subject.id===reservation));
+  const exported=await api('report_export_start_v1',{report:'collections_debts',filters,format:'csv'});await drain();const descriptor=await api('report_file_get_v1',{job_id:exported.job_id});
+  const download=await fetch(context().env.API_URL+descriptor.download_path,{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify(f.scope({client_api_version:1,request_id:key(),operation_key:key(),job_id:exported.job_id}))});assert(download.ok);const output=await download.text();assert(output.includes('subscriber_number'));assert(output.split('\r\n').some(row=>row.includes(person)&&row.includes('"'+number+'"')&&row.includes('"1000"')));
+  assert.equal((await api('person_get_v1',{person_id:person})).subscriber_number,number);assert.equal((await db.query('select source_sale_id from core.reservations where id=$1',[reservation])).rows[0].source_sale_id,sale);
+ }finally{if(worker)await worker.end();await db.query('delete from private.p06_worker_scopes where db_role=$1',[role]);await db.query(`drop role if exists "${role}"`);await db.end();}
+});
