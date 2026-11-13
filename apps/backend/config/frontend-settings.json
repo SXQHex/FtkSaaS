@@ -1,5 +1,5 @@
 {
-  "version": 22,
+  "version": 23,
   "fields": [
     {
       "scope": "user",
@@ -17,15 +17,12 @@
       "key": "language",
       "schema": {
         "type": "string",
-        "enum": [
-          "auto",
-          "tr",
-          "en"
-        ]
+        "pattern": "^(auto|[a-z]{2,8}(-[a-z0-9]{1,8})*)$",
+        "maxLength": 35
       },
       "default": "auto",
       "group": "S07",
-      "consumer": "frontend"
+      "consumer": "user_content_language"
     },
     {
       "scope": "user",

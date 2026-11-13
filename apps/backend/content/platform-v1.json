@@ -652,10 +652,10 @@
     "code": "report.headers",
     "channel": "report",
     "language": "tr",
-    "version": 1,
+    "version": 2,
     "source_version": "1",
     "content": {
-      "text": "group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps"
+      "text": "group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps,subscriber_number"
     }
   },
   {
@@ -663,10 +663,10 @@
     "code": "report.headers",
     "channel": "report",
     "language": "en",
-    "version": 1,
+    "version": 2,
     "source_version": "1",
     "content": {
-      "text": "group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps"
+      "text": "group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps,subscriber_number"
     }
   }
 ]
