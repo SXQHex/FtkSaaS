@@ -1,6 +1,8 @@
-# FtkSaaS V2 frontend temeli
+# FtkSaaS bağımsız frontend
 
-`apps/web1`, pnpm workspace dışında bağımsız bir npm projesidir. Bu aşama ürün modülleri veya backend entegrasyonu içermez. Komutları bu dizinde çalıştırın; kök manifestleri ve V1 uygulamalarını kullanmayın.
+`apps/web1`, pnpm workspace dışında bağımsız bir npm projesidir. Mevcut kaynak araç zinciri ve örnek ekran temelini içerir. Komutları bu dizinde çalıştırın; kök manifestleri ve diğer uygulamaları kullanmayın.
+
+Geliştirme sırası, sayfa eşlemeleri ve `/goal` yürütme kaydı [todo.md](tasks/todo.md) içindedir. Özgün çizimler ve bütünlük bilgisi [salt okunur tasarım referansında](design-reference/README.md) bulunur.
 
 ## Kurulum ve yerel çalışma
 
