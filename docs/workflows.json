@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "7d3ac234ca505804201a3af3a9a02213d2ee09acc5ea816337e5c4c5a80d9c31",
-        "reason": "Yedi assertion parmak izi kullanıcı onayı ve bağımsız kapsam incelemesiyle 13 Aralık 2026 tarihine bağlı kaydedildi; kalite eşiği, checker ve güvenlik değişmedi."
+        "fingerprint": "403447fc26081472cceb5e946137b240cc81d14847ab2ace572fac8dfa7434c8",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -377,8 +377,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "30fb64db77dac43dbfc3d5595b56c66009fb68ece52beb64da0f091ec2e612dd",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "d185c1b173329ca85c7532bb72907d164202b92dad798b35e659542e5430bc04",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -485,8 +485,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "6a5d834eff2f1fe2cf3f05c9d8f33dea61493b27e4f04a39ababe03d4f7f83a0",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "b949adcad5c052e8ba74b3306923a3e55a3e5aec8bbde2f30cfde77d7ac00a34",
+        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
       }
     },
     {
@@ -503,7 +503,8 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
         "apps/backend/tests/class-duty-management-acceptance.mjs",
-        "apps/backend/tests/sharing-consent-acceptance.mjs"
+        "apps/backend/tests/sharing-consent-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -584,8 +585,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "b5d10e57468c177c6040e151ae8721af3950538eb046e6a63322234aee43b29c",
-        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
+        "fingerprint": "368cd3daf4ef21ddd0f9f20580b71b8ca6cfc1011bb20671a78e839bce4f52a1",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -603,7 +604,8 @@
         "apps/backend/tests/subscriber-number-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/commercial-plan-acceptance.mjs",
-        "apps/backend/tests/people-self-scale-acceptance.mjs"
+        "apps/backend/tests/people-self-scale-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -677,8 +679,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "cc5fbe673c3515d35f5bc4f87065c6fd16053ba49aee30deb46ef3496f2b3866",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "286be608bc0b3ea9c2138cc2307fbabf1c44b96535ab7f0f73abcde9cad4d260",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -753,7 +755,11 @@
         "apps/backend/supabase/migrations/20261107003633_sale_change_inventory.sql",
         "apps/backend/database/content-documents.sql",
         "apps/backend/database/content-source-guards.sql",
-        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
+        "apps/backend/database/starter-sale-change-gate.sql",
+        "apps/backend/supabase/migrations/20261113120834_starter_sale_change_gate.sql",
+        "apps/backend/database/starter-sale-change-registration.sql",
+        "apps/backend/supabase/migrations/20261113121249_starter_sale_change_registration.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -781,8 +787,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "f354c3f1c052aa8a581da1ce23588cb5451c5cca5091535e3adb2e7de3bc73be",
-        "reason": "Reviewed catalog publication, source guards, language fallback, frozen delivery, server-document consent, purchase pinning and sharing epochs with native regression sources; guide updated to the 13 November user decision."
+        "fingerprint": "841b24220452bbb908e1469165258cc3c0a26430fb8aacf49a10634e21b00fb2",
+        "reason": "Reviewed final F17 fix and RED/native coverage: Starter package-change preview/apply/management and previous-plan preview reject before business work. Migration159 stays immutable;160 records same gates with canonical upserts for unchanged source audit. Termination/renewal unaffected; guide updated."
       }
     },
     {
@@ -801,7 +807,8 @@
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
         "apps/backend/tests/lesson-request-catalog-acceptance.mjs",
-        "apps/backend/tests/action-management-acceptance.mjs"
+        "apps/backend/tests/action-management-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -866,8 +873,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "aed1fea35dbd295b3990c16a9f548735a53ad034de8de0d8129b929a78f4674b",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "c89b3d83d0297a06ddc7b8c50b24704fabc1f41367ca2b4c89a30134b6240870",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -880,7 +887,8 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -929,8 +937,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "9f8aed2212b52ab6b56099951f131a2f80fb69a509f0f4a8c51feae3490c1001",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "80b00d186c2ad1c6a8d5a86f0cacd600ba8a8d8f7c967ba4ef0d7edcb6b64ac1",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -945,7 +953,8 @@
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/action-management-acceptance.mjs"
+        "apps/backend/tests/action-management-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -994,8 +1003,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "1692ee09c124818915a7e1f54b5506e6c2fc421a84b1ab4deee2445167bb526f",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "2def9bdb4e85ac833c31a66707e6870751893a696e2a501c4f9ce818e56689f8",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -1093,8 +1102,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "0b1d9cc838577dc3cc2fcbad4396d45efd98185df892f377ddf858b65a6ad4d6",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "06fb150f6957792597c15c1b1bcd39c9146f0c436fa48e31977383c1ca3cf753",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -1113,7 +1122,8 @@
         "apps/backend/tests/crm-import-authority-acceptance.mjs",
         "apps/backend/tests/crm-import-fixture.mjs",
         "apps/backend/tests/crm-import-parser-unit.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1152,8 +1162,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "464bc32be1236c6f43ce2885ff2bea49ef849c72c1fb3da5fa4f3c0486617f3c",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "be307428607145e7d9e69b1b286e83032b96ad84d7244f01e1cb9c89c27a53c9",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -1172,7 +1182,8 @@
         "apps/backend/tests/hosted-digital-runner-unit.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/content-catalog-acceptance.mjs",
-        "apps/backend/tests/content-documents-acceptance.mjs"
+        "apps/backend/tests/content-documents-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1211,8 +1222,8 @@
         "content_catalog_save_v1"
       ],
       "review": {
-        "fingerprint": "e74aeb3831f3c86ba3c64562e9fd7e6002bcf20b8a7b1af70a2db78af95162b8",
-        "reason": "Dijital kabul runnerı typed backend HTTP4xx hata kodunu korur; istemci metin/hash reddi ve iki native oturumun temizliği ek regresyon testiyle doğrulanır. Ürün/API rehberi aynı."
+        "fingerprint": "25ea63d631defd781b261bd8d9b7d012a011b5f17d52b65cb0bfd72db1fed170",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -1344,8 +1355,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "92d33a7b4252882e5f243245dd7408b6f810d4feed1a2e5600070be57f119295",
-        "reason": "Sentetik paylaşım fixtureı EN bildirimi yayımlarken ilgili org belge dilini açık EN seçer ve kalan bölgesel değerleri korur; kaynak yokken fallback veya sunucu onay kapısı gevşetilmez."
+        "fingerprint": "432968041d25e5f65f208753a6038666e1db66657abde1af989453966c01fdb3",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -1420,8 +1431,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "8285955f247c4b3e1cc8bc946d3b1b06be672861dddcd2222c2efd246ded1255",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "f606c047022cefe9618f4e9961c2b243a4b77cba42e47c4469d47cb5c2e49ddc",
+        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
       }
     },
     {
@@ -1473,8 +1484,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "5233668650af47fadb1cacbbf3577799fd209b9f40ffce229465a15d24edeee2",
-        "reason": "Reviewed catalog publication, source guards, language fallback, frozen delivery, server-document consent, purchase pinning and sharing epochs with native regression sources; guide updated to the 13 November user decision."
+        "fingerprint": "b67bddea124f128cc6bc72a2e5a7da24568e233bed018c34c7ce64895c14358e",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -1548,8 +1559,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "016891e24c66ff40a813f4631b439f95565cead66ad4f3935077430eafc467a4",
-        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
+        "fingerprint": "7a36ab3b82238a76f1078a6401d95b9435adf0bcf133b0ca90635f37f35b3f80",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -1569,7 +1580,8 @@
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/person-registry.test.mjs",
         "apps/backend/tests/crm-pipeline-acceptance.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1608,8 +1620,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "30f4e7bb9424de36f3cde1d7b4baaba3741354fd455e6a70c66664217172c230",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "c4a03aaea4b25e0333b31ec14dbe137cf1644ae5eb979bc783dad43652ef941f",
+        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
       }
     },
     {
@@ -1697,8 +1709,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "05c1f06810464783e4c25adc0825bb86cdcc14b857eeea216496d2fc644be4bd",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "1befd6b9de89dc533d0d7d020e361ef5ca823e208876a073de27bab1cbcedfdc",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -1730,8 +1742,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "352ef5d85b6b83be7d63974df85e3f977d9078b75e4a09533bbc0760fab1917d",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "24629afe21a1c70f8855a429efc37add8efe1cb121fbaa35b97a0a945d66f4af",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -1761,8 +1773,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "f41ee740794bb3524dede2044b32d73fd1f263dbdd48aa9847516b76ec219ef7",
-        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
+        "fingerprint": "07c4b8c85772712d3733eaf7dd860c37bb158363e179dd590b74df9f34207bd0",
+        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
       }
     },
     {
@@ -1886,8 +1898,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "1519bb3893bd7c47767faff90dc57f6299726b87ffb11c0ee704522a272bc72d",
-        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
+        "fingerprint": "6543d25c8b3f64100dcfb233999563bed15ae0baf66cba9b6708811a832fad5d",
+        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
       }
     }
   ]

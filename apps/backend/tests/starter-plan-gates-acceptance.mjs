@@ -25,6 +25,27 @@ async function starterGateFixture(t){
  return {platform,plan,owner,db,contract,bodyFor,invoke,reject,org,center,account,ownerPerson};
 }
 
+test('G01 single center, room and discipline slots serialize competing native commands',{timeout:300000},async t=>{
+ const {platform,plan,owner,db,invoke,org,center,account}=await starterGateFixture(t);
+ const race=async(operation,bodies)=>{
+  const results=await Promise.all(bodies.map(body=>call(owner,operation,body,key())));
+  assert.equal(results.filter(x=>x.result.ok).length,1,operation);
+  assert.equal(results.filter(x=>x.result.error?.code==='PLAN_LIMIT_REACHED').length,1,JSON.stringify(results));
+  return results.find(x=>x.result.ok).result.data.primary_id;
+ };
+ const other=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic G01 center race',initial_plan_id:plan},key())).primary_id;
+ await race('center_create_v1',[0,1].map(i=>({org_id:other,name:'Synthetic contender '+i,timezone:'UTC'})));
+ const room=await race('room_save_v1',[0,1].map(i=>({org_id:org,center_id:center,name:'Synthetic room '+i,capacity:10})));
+ const discipline=await race('discipline_save_v1',[0,1].map(i=>({org_id:org,name:'Synthetic discipline '+i,state:'active'})));
+ for(const [table,target] of [['centers',other],['rooms',org],['disciplines',org]]){
+  assert.equal((await db.query('select count(*)::int n from core.'+table+" where org_id=$1 and state='active'",[target])).rows[0].n,1,table);
+ }
+ const usage=Object.fromEntries((await invoke('subscription_get_v1',{})).usage.entries.map(x=>[x.key,x.value]));
+ assert.equal(usage.rooms,1);assert.equal(usage.disciplines,1);
+ assert.equal((await db.query('select org_id from core.rooms where id=$1',[room])).rows[0].org_id,org);
+ assert.equal((await db.query('select org_id from core.disciplines where id=$1',[discipline])).rows[0].org_id,org);
+});
+
 test('Starter resource limits, concurrent capacity and feature gates',{timeout:300000},async t=>{
  const {platform,plan,owner,db,contract,bodyFor,invoke,reject,org,center,account,ownerPerson}=await starterGateFixture(t);
  let room,disc;
@@ -77,6 +98,34 @@ test('Starter resource limits, concurrent capacity and feature gates',{timeout:3
    await reject('crm_followup_list_v1',{kind:'renewal_due',page:{limit:10}},'PLAN_FEATURE_UNAVAILABLE');
    await reject('earnings_list_v1',{person_id:instructor,interval:{starts_at:'2026-01-01T00:00:00Z',ends_at:'2028-01-01T00:00:00Z'},page:{limit:10}},'PLAN_FEATURE_UNAVAILABLE');
    const raw=await call(owner,'event_publish_v1',{org_id:org,center_id:center,event_id:key(),published:true},key());assert.equal(raw.result.ok,false);assert.equal(raw.result.error.code,'PLAN_FEATURE_UNAVAILABLE');
+   const validators=await import('../supabase/functions/backend-v1/validators.js');
+   const scope={kind:'center',center_id:center};
+   for(const resource of [{kind:'room',id:room},{kind:'person',id:instructor}])await invoke('availability_save_v1',{resource,rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
+   const start=new Date(Date.now()+86400000);start.setUTCHours(9,0,0,0);
+   const session=(await invoke('session_create_v1',{discipline_id:disc,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},resources:[{kind:'room',id:room}],assignments:[{person_id:instructor,duty:'instructor'}],capacity:{total:10}})).primary_id;
+   const lead=(await invoke('lead_save_v1',{person_id:students[0],source:'manual',interest:'Synthetic gate fixture'})).primary_id;
+   const product=(await invoke('product_publish_v1',{terms:{name:'Yoga · gate fixture',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'0',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:disc,usage_targets:['lesson']}]}})).primary_id;
+   const gated=[
+    ['role_assign_v1',{person_id:ownerPerson,role:'staff',scope:{center_id:center}}],
+    ['waitlist_join_v1',{person_id:students[0],session_id:session}],
+    ['trial_offer_create_v1',{lead_id:lead,product_version_id:product}],
+    ['segment_save_v1',{name:'Synthetic forbidden segment',scope,definition:{all:[{field:'active_student',operator:'eq',value:true}]}}],
+    ['automation_save_v1',{scope,definition:{name:'Synthetic forbidden automation',trigger:{kind:'student_inactive',offset_days:0},segment_id:null,action:{kind:'create_followup',channel:'in_app',template_key:'followup'},execution_center_ids:[center],enabled:true}}],
+    ['settlement_movements_list_v1',{currency:'TRY',page:{}}],
+    ['settlement_requests_list_v1',{page:{}}]
+   ];
+   for(const [op,body] of gated){
+    const result=await call(owner,op,bodyFor(op,body),key());
+    assert.equal(validators['request_'+op](result.request),true,op+': '+JSON.stringify(validators['request_'+op].errors));
+    assert.equal(result.result.error?.code,'PLAN_FEATURE_UNAVAILABLE',op+': '+JSON.stringify(result.result));
+    assert.equal(result.result.data,undefined,op);
+   }
+   for(const operation of ['segment_save_v1','automation_save_v1']){
+    const result=await call(owner,'management_state_get_v1',bodyFor('management_state_get_v1',{operation,selector:{operation,key:{scope}},page:{}}));
+    assert.equal(validators.request_management_state_get_v1(result.request),true,JSON.stringify(validators.request_management_state_get_v1.errors));
+    assert.equal(result.result.error?.code,'PLAN_FEATURE_UNAVAILABLE',JSON.stringify(result.result));
+    assert.equal(result.result.data,undefined);
+   }
    // Direct service RPC with an authenticated claim must not impersonate the Edge.
    await db.query('begin');await db.query("select set_config('request.jwt.claim.role','authenticated',true)");
    const rawRpc=await db.query("select api_v1.centers_list_v1($1,$2,$3,$4,null) result",[{org_id:org},owner.id,owner.session_id,Array.from({length:32},key)]);

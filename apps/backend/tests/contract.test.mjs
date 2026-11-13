@@ -50,6 +50,14 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('G01 package change preview and apply require F17 in the generated runtime contract',()=>{
+ for(const name of ['sale_change_preview_v1','sale_change_apply_v1']){
+  const operation=p['x-contract'].operations.find(o=>o.name===name);
+  assert.deepEqual(operation.runtime_required_features,['F17']);
+ }
+ assert.equal(fs.readFileSync('supabase/migrations/20261113120834_starter_sale_change_gate.sql','utf8'),fs.readFileSync('database/starter-sale-change-gate.sql','utf8'));
+ assert.equal(fs.readFileSync('supabase/migrations/20261113121249_starter_sale_change_registration.sql','utf8'),fs.readFileSync('database/starter-sale-change-registration.sql','utf8'));
+});
 test('profile erasure progress cannot imply full erasure or invent completion counters',async()=>{
  const base={request_state:'partial',completed_at:null,pending_scopes:['database','auth','storage','exports','backups']};
  assert(valid('PrivacyProgress',base));assert(valid('PrivacyProgress',{...base,profile_erasure:null}));

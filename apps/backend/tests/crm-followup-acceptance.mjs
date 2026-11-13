@@ -27,6 +27,27 @@ test('P11 Pro worker keeps event dedupe and live disable feature and LOGIN scope
  await assert.rejects(invoke(selected),/PLAN_FEATURE_UNAVAILABLE/);await denied('segment_save_v1',{name:'Lost feature',scope:configScope,definition},'PLAN_FEATURE_UNAVAILABLE');
  await db.query("update core.saas_plan_versions set features=array_append(features,'F24') where id=$1",[plan]);
  assert.deepEqual(await invoke(selected),result);assert.equal(await activityCount(),1);
+ const pendingAutomation=await createAutomation('Synthetic G01 plan loss after claim');
+ let pending;
+ for(const job of await claim()){
+  const context=(await db.query('select automation_id from private.p05_jobs where job_id=$1',[job.request.job_id])).rows[0];
+  if(context.automation_id===pendingAutomation)pending=job;else assert.equal((await invoke(job)).ok,true);
+ }
+ assert(pending,'Native worker must hold an uncompleted automation lease');
+ await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
+ try{
+  await assert.rejects(invoke(selected),/PLAN_FEATURE_UNAVAILABLE/);
+  const refused=await invoke(pending);assert.equal(refused.ok,false);assert.equal(refused.error.code,'PLAN_FEATURE_UNAVAILABLE');
+  assert.equal((await db.query('select state from core.outbox_jobs where id=$1',[pending.request.job_id])).rows[0].state,'retry_wait');
+  assert.equal(await activityCount(),1);
+  assert.equal((await db.query('select count(*)::int n from private.p05_automation_activities where automation_id=$1',[pendingAutomation])).rows[0].n,0);
+  await denied('segment_save_v1',{name:'Starter cannot restore advanced CRM',scope:configScope,definition},'PLAN_FEATURE_UNAVAILABLE');
+ }finally{await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);}
+ await assert.rejects(invoke(pending),/OPERATION_IN_PROGRESS/);
+ await db.query('update core.outbox_jobs set next_attempt_at=now() where id=$1',[pending.request.job_id]);
+ const reclaimed=(await claim()).find(job=>job.request.job_id===pending.request.job_id);assert(reclaimed);
+ assert.notEqual(reclaimed.request.lease_token,pending.request.lease_token);
+ assert.equal((await invoke(reclaimed)).ok,true);
  await db.query('delete from private.p05_worker_scopes where db_role=$1',[role]);await assert.rejects(invoke(selected),/FORBIDDEN/);
  await db.query('insert into private.p05_worker_scopes values($1,$2)',[role,org]);assert.deepEqual(await invoke(selected),result);
 });

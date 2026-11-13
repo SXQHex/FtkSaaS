@@ -2398,7 +2398,9 @@
         "F17",
         "F19"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F17"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "p02_sale_runtime_pending_acceptance",
@@ -2423,7 +2425,9 @@
         "F17",
         "F19"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F17"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "p02_sale_runtime_pending_acceptance",
