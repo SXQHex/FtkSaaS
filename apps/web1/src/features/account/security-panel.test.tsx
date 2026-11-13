@@ -3,14 +3,18 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, expect, it, vi } from "vitest";
-const { factors, history, enroll, remove, refreshNative, account } = vi.hoisted(() => ({
-  factors: vi.fn(),
-  history: vi.fn(),
-  enroll: vi.fn(),
-  remove: vi.fn(),
-  refreshNative: vi.fn(),
-  account: vi.fn(),
-}));
+const { factors, history, enroll, remove, refreshNative, account, password, sessions } = vi.hoisted(
+  () => ({
+    factors: vi.fn(),
+    history: vi.fn(),
+    enroll: vi.fn(),
+    remove: vi.fn(),
+    refreshNative: vi.fn(),
+    account: vi.fn(),
+    password: vi.fn(),
+    sessions: vi.fn(),
+  }),
+);
 vi.mock("./security", () => ({
   readFactors: factors,
   readSecurityHistory: history,
@@ -23,6 +27,8 @@ vi.mock("@tanstack/react-router", () => ({ useRouter: () => ({ invalidate: vi.fn
 vi.mock("../../lib/supabase", () => ({
   getSupabaseClient: () => ({ auth: { refreshSession: refreshNative } }),
 }));
+vi.mock("./password", () => ({ changePassword: password, requestPasswordCode: vi.fn() }));
+vi.mock("./sessions", () => ({ readSessions: sessions }));
 import { SecurityPanel } from "./security-panel";
 afterEach(() => vi.resetAllMocks());
 it("keeps an active setup sheet when background factor rereads discover its pending factor or fail", async () => {
@@ -98,5 +104,42 @@ it("awaits native refresh before dependent reads and preserves refresh intent af
   expect(factors).toHaveBeenCalledTimes(2);
   expect(history).toHaveBeenCalledTimes(2);
   expect(remove).toHaveBeenCalledOnce();
+  client.clear();
+});
+
+it("keeps password success separate from session reread failure and retries only reads", async () => {
+  factors.mockResolvedValue({ all: [], totp: [] });
+  history.mockResolvedValue({ items: [], next_cursor: null });
+  password.mockResolvedValue(undefined);
+  sessions
+    .mockRejectedValueOnce(new Error("network"))
+    .mockResolvedValueOnce({ items: [], next_cursor: null });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+  client.setQueryData(["account-sessions", "fixture"], { stale: true });
+  render(
+    <QueryClientProvider client={client}>
+      <SecurityPanel accountId="fixture" />
+    </QueryClientProvider>,
+  );
+  await userEvent.click(await screen.findByRole("button", { name: "Parolayı değiştir" }));
+  await userEvent.type(screen.getByLabelText("Mevcut parola"), "current-password");
+  await userEvent.type(screen.getByLabelText("Yeni parola", { exact: true }), "new-password");
+  await userEvent.type(screen.getByLabelText("Yeni parola tekrar"), "new-password");
+  const buttons = screen.getAllByRole("button", { name: "Parolayı değiştir" });
+  await userEvent.click(buttons[buttons.length - 1]);
+  await screen.findByText("İşlem sonrasında güvenlik bilgileri yenilenemedi.");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(client.getQueryData(["account-sessions", "fixture"])).toBeUndefined();
+  expect(password).toHaveBeenCalledOnce();
+  expect(sessions).toHaveBeenCalledOnce();
+  await userEvent.click(screen.getByRole("button", { name: "Yeniden dene" }));
+  await waitFor(() => expect(sessions).toHaveBeenCalledTimes(2));
+  expect(password).toHaveBeenCalledOnce();
+  await waitFor(() =>
+    expect(
+      screen.queryByText("İşlem sonrasında güvenlik bilgileri yenilenemedi."),
+    ).not.toBeInTheDocument(),
+  );
+  expect(account).toHaveBeenCalledTimes(2);
   client.clear();
 });

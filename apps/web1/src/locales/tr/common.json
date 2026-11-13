@@ -188,5 +188,25 @@
     "typeError": "PNG, JPEG veya WebP seç.",
     "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",
     "readError": "Profil fotoğrafı okunamadı."
+  },
+  "passwordChange": {
+    "title": "Parolayı değiştir",
+    "description": "Değişince diğer cihazlardaki oturumlar kapanır.",
+    "current": "Mevcut parola",
+    "confirm": "Yeni parola tekrar",
+    "code": "Güvenlik kodu",
+    "enterCode": "Kayıtlı adresine gelen güvenlik kodunu yaz.",
+    "needed": "Bu oturum için güvenlik kodu gerekiyor. Kod göndermeyi seç.",
+    "currentError": "Mevcut parola eksik veya hatalı. Kod kullandıysan yeni kod iste.",
+    "codeError": "Kod geçersiz, süresi dolmuş veya kullanılmış. Yeni kod iste.",
+    "policyError": "Yeni parola sağlayıcının kurallarını karşılamıyor veya mevcut parolayla aynı.",
+    "unknownError": "Parola değişimi doğrulanamadı. Yeni parolanla giriş yaparak sonucu kontrol edebilirsin.",
+    "sendError": "Kod gönderimi doğrulanamadı. Yeniden deneyebilirsin.",
+    "codeDescription": "Güvenlik kodunu kayıtlı e-posta veya telefonuna gönderebilirsin. Kod mevcut parolanın yerine geçmez.",
+    "send": "Kod gönder",
+    "resend": "Yeni kod gönder",
+    "sent": "Kod gönderme isteği kabul edildi. Gelen kodu yaz.",
+    "rowDescription": "Mevcut parolanı doğrulayarak yeni parola belirle.",
+    "firstPassword": "İlk parolanı belirliyorsan boş bırak."
   }
 }

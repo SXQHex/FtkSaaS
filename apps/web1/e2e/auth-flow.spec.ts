@@ -368,3 +368,57 @@ test("private photo stays a profile draft until save, reloads through authentica
   expect(calls.photoWrites[1]).toBeNull();
   expect(errors).toEqual([]);
 });
+
+test("account password change handles native current-password and old-session nonce errors without automatic mail", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await page.getByRole("button", { name: "Parolayı değiştir", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  const submit = dialog.getByRole("button", { name: "Parolayı değiştir", exact: true });
+  await captureAuth(page, "e10-password-sheet", testInfo);
+  await page.getByLabel("Mevcut parola", { exact: true }).fill("fixture-current-password");
+  await page.getByLabel("Yeni parola", { exact: true }).fill("fixture-new-password");
+  await page.getByLabel("Yeni parola tekrar", { exact: true }).fill("mismatch");
+  await page.getByLabel("Yeni parola tekrar", { exact: true }).press("Tab");
+  await expect(submit).toBeDisabled();
+  await expect(page.getByText("Parolalar eşleşmiyor.")).toBeVisible();
+  expect(calls.password).toBe(0);
+  await page.getByLabel("Yeni parola tekrar", { exact: true }).fill("fixture-new-password");
+  calls.rejectCurrentPassword = true;
+  await submit.click();
+  await expect(page.getByText("Mevcut parola eksik veya hatalı.", { exact: false })).toBeVisible();
+  expect(calls.passwordCodeSends).toBe(0);
+  calls.passwordNeedsCode = true;
+  await submit.click();
+  await expect(page.getByLabel("Güvenlik kodu", { exact: true })).toBeVisible();
+  expect(calls.passwordCodeSends).toBe(0);
+  await page.getByRole("button", { name: "Kod gönder", exact: true }).click();
+  await expect(page.getByText("Kod gönderme isteği kabul edildi. Gelen kodu yaz.")).toBeVisible();
+  await page.getByLabel("Güvenlik kodu", { exact: true }).fill("invalid-nonce");
+  calls.rejectPasswordCode = true;
+  await submit.click();
+  await expect(
+    page.getByText("Kod geçersiz, süresi dolmuş veya kullanılmış. Yeni kod iste."),
+  ).toBeVisible();
+  await expect(page.getByLabel("Güvenlik kodu", { exact: true })).toHaveValue("");
+  expect(calls.passwordCodeSends).toBe(1);
+  await page.getByRole("button", { name: "Kod gönder", exact: true }).click();
+  await page.getByLabel("Güvenlik kodu", { exact: true }).fill("valid-nonce");
+  await submit.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await expect(page.getByText("Bu cihaz", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Daha fazla", exact: true })).toHaveCount(0);
+  expect(calls.passwordCodeSends).toBe(2);
+  expect(errors).toEqual([]);
+});
