@@ -1,6 +1,12 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import type { FailureEnvelope } from "../src/lib/api-contracts/generated.js";
+import type {
+  FailureEnvelope,
+  AccountSessionView,
+  SuccessAccountSessionsList,
+  SuccessAccountSessionLabel,
+  SuccessAccountSessionsRevoke,
+} from "../src/lib/api-contracts/generated.js";
 const origin = "http://127.0.0.1:4175";
 const id = "019a7b00-0000-7000-8000-000000000001";
 const fixtureUser = {
@@ -39,9 +45,13 @@ async function captureAuth(page: Page, name: string, testInfo: TestInfo) {
       await page.setViewportSize(viewport);
       await page.emulateMedia({ colorScheme });
       // Scan the stable requested theme, after the registry controls finish their CSS transitions.
-      await page.evaluate(
-        "Promise.all(document.getAnimations().map(animation => animation.finished))",
-      );
+      await expect
+        .poll(() =>
+          page.evaluate(
+            "document.getAnimations().filter(animation => animation.playState === 'running' || animation.pending).length",
+          ),
+        )
+        .toBe(0);
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       const body = await page.screenshot({
@@ -64,11 +74,20 @@ async function mockNative(page: Page, mfa = false) {
     enroll: 0,
     remove: 0,
     rejectNextAccount: false,
+    rejectNextLabel: false,
+    conflictNextLabel: false,
+    rejectNextRevoke: false,
+    labelKeys: [] as string[],
+    revokeKeys: [] as string[],
     challenge: 0,
     verify: 0,
     account: 0,
   };
   let elevated = false;
+  let otherActive = true;
+  let sessionLabel: string | null = null;
+  let labelVersion = 0;
+  const otherSessionId = "550e8400-e29b-41d4-a716-446655440000";
   const user = {
     ...fixtureUser,
     factors: mfa
@@ -116,6 +135,106 @@ async function mockNative(page: Page, mfa = false) {
     if (url.pathname === "/auth/v1/user") {
       if (route.request().method() === "PUT") calls.password++;
       return route.fulfill({ json: user });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/account_sessions_list_v1") {
+      const current: AccountSessionView = {
+        session_id: id,
+        current: true,
+        created_at: fixtureUser.created_at,
+        last_refreshed_at: fixtureUser.created_at,
+        expires_at: null,
+        aal: elevated ? "aal2" : "aal1",
+        user_agent: "Chromium, fixture desktop",
+        label: null,
+        version: 0,
+      };
+      const other = {
+        ...current,
+        session_id: otherSessionId,
+        current: false,
+        user_agent: "Firefox, fixture phone",
+        label: sessionLabel,
+        version: labelVersion,
+      };
+      const cursor = route.request().postDataJSON().cursor;
+      return route.fulfill({
+        json: {
+          ok: true,
+          data: {
+            items: cursor ? (otherActive ? [other] : []) : [current],
+            next_cursor: !cursor && otherActive ? "fixture-session-page" : null,
+            as_of: fixtureUser.created_at,
+          },
+          trace_id: id,
+        } satisfies SuccessAccountSessionsList,
+      });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/account_session_label_v1") {
+      const request = route.request().postDataJSON();
+      calls.labelKeys.push(request.operation_key);
+      if (calls.rejectNextLabel) {
+        calls.rejectNextLabel = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            ok: false,
+            error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
+      if (calls.conflictNextLabel) {
+        calls.conflictNextLabel = false;
+        labelVersion++;
+        sessionLabel = "Updated in another tab";
+        return route.fulfill({
+          status: 409,
+          json: {
+            ok: false,
+            error: { code: "VERSION_CONFLICT", retryable: false, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
+      expect(request.session_id).toBe(otherSessionId);
+      expect(request.expected_version).toBe(labelVersion);
+      sessionLabel = request.label;
+      labelVersion++;
+      return route.fulfill({
+        json: {
+          ok: true,
+          data: {
+            operation_id: id,
+            primary_id: id,
+            version: labelVersion,
+            replayed: false,
+            related: [],
+          },
+          trace_id: id,
+        } satisfies SuccessAccountSessionLabel,
+      });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/account_sessions_revoke_v1") {
+      const request = route.request().postDataJSON();
+      calls.revokeKeys.push(request.operation_key);
+      expect(request.mode).toBe("selected");
+      expect(request.session_id).toBe(otherSessionId);
+      if (calls.rejectNextRevoke) {
+        calls.rejectNextRevoke = false;
+        return route.fulfill({
+          status: 403,
+          json: {
+            ok: false,
+            error: { code: "FORBIDDEN", retryable: false, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
+      otherActive = false;
+      return route.fulfill({
+        json: {
+          ok: true,
+          data: { operation_id: id, affected_count: 1, current_revoked: false, replayed: false },
+          trace_id: id,
+        } satisfies SuccessAccountSessionsRevoke,
+      });
     }
     if (url.pathname === "/auth/v1/factors" && route.request().method() === "POST") {
       calls.enroll++;
@@ -354,5 +473,68 @@ test("native TOTP enrollment cancels safely then verifies and rereads without re
   await page.reload();
   await page.getByRole("tab", { name: "Güvenlik" }).click();
   await expect(page.getByText("Doğrulanmış uygulama")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("session pages preserve provider IDs, label intent retries and selected revocation boundaries", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Oturumu kapat", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Daha fazla", exact: true }).click();
+  await expect(page.getByText("Firefox, fixture phone")).toBeVisible();
+  await captureAuth(page, "e10-sessions", testInfo);
+  await page
+    .getByRole("button", { name: "Firefox, fixture phone etiketini düzenle", exact: true })
+    .click();
+  await page.getByLabel("Oturum etiketi", { exact: true }).fill("Fixture phone label");
+  calls.rejectNextLabel = true;
+  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(page.getByText("Etiket kaydedilemedi.", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("Fixture phone label", { exact: true })).toBeVisible();
+  expect(calls.labelKeys).toHaveLength(2);
+  expect(calls.labelKeys[1]).toBe(calls.labelKeys[0]);
+  await page
+    .getByRole("button", { name: "Fixture phone label etiketini düzenle", exact: true })
+    .click();
+  await page.getByLabel("Oturum etiketi", { exact: true }).fill("Conflicting label");
+  calls.conflictNextLabel = true;
+  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(
+    page.getByText("Oturum etiketi başka bir yerde değişti.", { exact: false }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Updated in another tab etiketini düzenle", exact: true })
+    .click();
+  await expect(page.getByLabel("Oturum etiketi", { exact: true })).toHaveValue(
+    "Updated in another tab",
+  );
+  await page.getByLabel("Oturum etiketi", { exact: true }).fill("Final fixture phone");
+  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("Final fixture phone", { exact: true })).toBeVisible();
+  expect(calls.labelKeys).toHaveLength(4);
+  expect(calls.labelKeys[3]).not.toBe(calls.labelKeys[2]);
+  calls.rejectNextRevoke = true;
+  await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
+  await expect(page.getByText("Oturum kapatma doğrulanamadı.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Final fixture phone", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
+  await expect(page.getByText("Final fixture phone", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
+  expect(calls.revokeKeys).toHaveLength(2);
+  expect(calls.revokeKeys[1]).toBe(calls.revokeKeys[0]);
   expect(errors).toEqual([]);
 });

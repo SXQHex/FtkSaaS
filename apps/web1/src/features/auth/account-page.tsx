@@ -1,6 +1,7 @@
 import { useIsMobile } from "../../hooks/use-mobile";
-import { ShieldIcon, UserIcon } from "lucide-react";
+import { MonitorIcon, ShieldIcon, UserIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/tabs";
+import { SessionsPanel } from "../account/sessions-panel";
 import { SecurityPanel } from "../account/security-panel";
 import { useState } from "react";
 import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
@@ -78,6 +79,10 @@ export function AccountPage() {
             <ShieldIcon />
             {t(($) => $.security.tab)}
           </TabsTrigger>
+          <TabsTrigger id="sessions">
+            <MonitorIcon />
+            {t(($) => $.sessions.tab)}
+          </TabsTrigger>
         </TabsList>
         <TabsContent id="profile">
           <Card>
@@ -97,6 +102,9 @@ export function AccountPage() {
         </TabsContent>
         <TabsContent id="security">
           <SecurityPanel accountId={account.id} />
+        </TabsContent>
+        <TabsContent id="sessions">
+          <SessionsPanel accountId={account.id} />
         </TabsContent>
       </Tabs>
     </main>

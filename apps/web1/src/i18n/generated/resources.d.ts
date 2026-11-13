@@ -124,6 +124,30 @@ export default interface Resources {
       "updated": "Güvenlik bilgileri yenilendi.",
       "verifiedFactor": "Doğrulanmış uygulama",
       "verifyCode": "Kodu doğrula"
+    },
+    "sessions": {
+      "actions": "İşlem",
+      "close": "Oturumu kapat",
+      "current": "Bu cihaz",
+      "description": "Tanımadığın bir cihaz görürsen oturumunu kapat. Son yenilenme, sağlayıcının oturum yenileme zamanıdır.",
+      "device": "Cihaz",
+      "editLabel": "{{name}} etiketini düzenle",
+      "empty": "Açık oturum bulunmuyor.",
+      "label": "Oturum etiketi",
+      "labelConflict": "Oturum etiketi başka bir yerde değişti. Güncel liste yenilendi; düzenlemeyi yeniden açıp son değerle devam et.",
+      "labelDescription": "Etiket yalnız kendi hesabında bu oturumu tanımana yardımcı olur. Boş bırakırsan kaldırılır.",
+      "labelError": "Etiket kaydedilemedi. Güncel listeyi kontrol et; sürüm değiştiyse bu pencereyi kapatıp yeniden aç.",
+      "labelInvalid": "Etiket en fazla 80 karakter olabilir.",
+      "labelTitle": "Oturum etiketini düzenle",
+      "readError": "Oturumlar okunamadı.",
+      "refreshError": "İşlem sonrasında oturum bilgileri yenilenemedi.",
+      "refreshed": "Son yenilenme",
+      "revokeError": "Oturum kapatma doğrulanamadı. Güncel listeyi kontrol edip yeniden dene.",
+      "save": "Kaydet",
+      "tab": "Oturumlar",
+      "title": "Açık oturumlar",
+      "unknownDevice": "Bilinmeyen cihaz",
+      "updated": "Oturum bilgileri yenilendi."
     }
   }
 }

@@ -122,5 +122,29 @@
     "removeConfirm": "Uygulamayı kaldır",
     "removeError": "Kaldırma doğrulanamadı. Güncel durumu kontrol edip yeniden dene.",
     "close": "Kapat"
+  },
+  "sessions": {
+    "tab": "Oturumlar",
+    "title": "Açık oturumlar",
+    "description": "Tanımadığın bir cihaz görürsen oturumunu kapat. Son yenilenme, sağlayıcının oturum yenileme zamanıdır.",
+    "device": "Cihaz",
+    "refreshed": "Son yenilenme",
+    "actions": "İşlem",
+    "current": "Bu cihaz",
+    "unknownDevice": "Bilinmeyen cihaz",
+    "close": "Oturumu kapat",
+    "editLabel": "{{name}} etiketini düzenle",
+    "labelTitle": "Oturum etiketini düzenle",
+    "labelDescription": "Etiket yalnız kendi hesabında bu oturumu tanımana yardımcı olur. Boş bırakırsan kaldırılır.",
+    "label": "Oturum etiketi",
+    "labelInvalid": "Etiket en fazla 80 karakter olabilir.",
+    "labelError": "Etiket kaydedilemedi. Güncel listeyi kontrol et; sürüm değiştiyse bu pencereyi kapatıp yeniden aç.",
+    "save": "Kaydet",
+    "updated": "Oturum bilgileri yenilendi.",
+    "revokeError": "Oturum kapatma doğrulanamadı. Güncel listeyi kontrol edip yeniden dene.",
+    "refreshError": "İşlem sonrasında oturum bilgileri yenilenemedi.",
+    "readError": "Oturumlar okunamadı.",
+    "empty": "Açık oturum bulunmuyor.",
+    "labelConflict": "Oturum etiketi başka bir yerde değişti. Güncel listeyi kontrol edip düzenlemeyi yeniden aç."
   }
 }
