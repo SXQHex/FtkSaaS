@@ -1,3 +1,5 @@
+import { AppearancePanel } from "../account/appearance-panel";
+import { useAccountTheme } from "../account/use-account-theme";
 import { ProfilePanel } from "../account/profile-panel";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { MonitorIcon, ShieldIcon, UserIcon } from "lucide-react";
@@ -12,10 +14,11 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { getSupabaseClient } from "../../lib/supabase";
 
-// E10 is implemented in slices; editable profile, identity and session actions remain open.
+// E10 is implemented in slices; the remaining scope is tracked in tasks/todo.md.
 export function AccountPage() {
   const mobile = useIsMobile();
   const account = useLoaderData({ from: "/account" });
+  const theme = useAccountTheme(account.id);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const router = useRouter();
@@ -76,8 +79,21 @@ export function AccountPage() {
             {t(($) => $.sessions.tab)}
           </TabsTrigger>
         </TabsList>
-        <TabsContent id="profile">
+        <TabsContent
+          id="profile"
+          shouldForceMount
+          className="flex flex-col gap-4 data-inert:hidden"
+        >
           <ProfilePanel accountId={account.id} />
+          <AppearancePanel
+            snapshot={theme.data}
+            readError={theme.isError}
+            onRefresh={async () => {
+              const result = await theme.refetch({ throwOnError: true });
+              if (!result.data) throw new Error("THEME_UNAVAILABLE");
+              return result.data;
+            }}
+          />
         </TabsContent>
         <TabsContent id="security">
           <SecurityPanel accountId={account.id} />

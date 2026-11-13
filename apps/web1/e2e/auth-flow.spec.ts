@@ -569,3 +569,96 @@ test("native email request preserves profile drafts and separates pending/no-cod
   await expect(page.getByLabel("Bekleyen e-posta", { exact: true })).toHaveCount(0);
   expect(errors).toEqual([]);
 });
+
+test("account theme uses versioned user settings, exact retry and read-only recovery while preserving profile drafts", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  const dark = page.getByRole("radio", { name: "Koyu", exact: true });
+  const light = page.getByRole("radio", { name: "Açık", exact: true });
+  const system = page.getByRole("radio", { name: "Sistem", exact: true });
+  await expect(system).toHaveAttribute("aria-checked", "true");
+  await page.getByLabel("Görünen ad", { exact: true }).fill("Unsaved appearance draft");
+  calls.rejectNextTheme = true;
+  let releaseWrite: () => void = () => {
+    throw new Error("Write gate not initialized");
+  };
+  calls.themeWriteGate = new Promise<void>((resolve) => {
+    releaseWrite = resolve;
+  });
+  await dark.click();
+  await expect.poll(() => calls.themeKeys.length).toBe(1);
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await expect(page.getByRole("radiogroup", { name: "Tema" })).not.toBeVisible();
+  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await expect(dark).toBeDisabled();
+  expect(calls.themeKeys).toHaveLength(1);
+  releaseWrite();
+  await expect(
+    page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
+  ).toBeVisible();
+  await expect(light).toBeDisabled();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
+  await page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await expect(page.getByText("Tema tercihi kaydedildi.")).toBeVisible();
+  expect(calls.themeKeys[1]).toBe(calls.themeKeys[0]);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByLabel("Görünen ad", { exact: true })).toHaveValue(
+    "Unsaved appearance draft",
+  );
+  expect(calls.profileKeys).toHaveLength(0);
+  calls.conflictNextTheme = true;
+  await light.click();
+  await expect(page.getByText("Tercih başka bir işlemle değişti.", { exact: false })).toBeVisible();
+  await expect(dark).toBeDisabled();
+  await page.getByRole("button", { name: "Güncel tercihi yükle", exact: true }).click();
+  await expect(dark).toBeEnabled();
+  await dark.click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect(calls.themeKeys[3]).not.toBe(calls.themeKeys[2]);
+  calls.blockThemeReads = true;
+  await light.click();
+  await expect(page.getByText("Tema kaydedildi. Güncel tercih okunamadı.")).toBeVisible();
+  await expect(dark).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Yeniden dene", exact: true })).toBeEnabled();
+  const writes = calls.themeKeys.length;
+  calls.blockThemeReads = false;
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(calls.themeKeys).toHaveLength(writes);
+  await page.reload();
+  await expect(light).toHaveAttribute("aria-checked", "true");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await system.click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
+  await page.reload();
+  await expect(system).toBeChecked();
+  await system.scrollIntoViewIfNeeded();
+  await captureAuth(
+    page,
+    "e10-appearance-theme",
+    testInfo,
+    page
+      .locator('[data-slot="card"]')
+      .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
+  );
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
+  await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/login`);
+  await expect(page.locator("html")).not.toHaveAttribute("data-theme");
+  expect(errors).toEqual([]);
+});

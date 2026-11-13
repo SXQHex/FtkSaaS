@@ -1,6 +1,6 @@
 import type { UserIdentity } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
-import { expect, type Page, type TestInfo } from "@playwright/test";
+import { expect, type Locator, type Page, type TestInfo } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import type {
   FailureEnvelope,
@@ -13,6 +13,9 @@ import type {
   SuccessManagementStateGet,
   SuccessAccountProfileUpdate,
   SuccessAccountGet,
+  SuccessSettingsGet,
+  SuccessSettingsCatalogGet,
+  SuccessSettingsUpdate,
 } from "../src/lib/api-contracts/generated.js";
 export const origin = "http://127.0.0.1:4175";
 const id = "019a7b00-0000-7000-8000-000000000001";
@@ -53,7 +56,7 @@ const token = (aal: "aal1" | "aal2" = "aal1", sessionId = id) =>
     Buffer.from("fixture-signature").toString("base64url"),
   ].join(".");
 
-export async function captureAuth(page: Page, name: string, testInfo: TestInfo) {
+export async function captureAuth(page: Page, name: string, testInfo: TestInfo, focus?: Locator) {
   await expect(page.locator("main h1")).toBeVisible();
   for (const viewport of [
     { width: 1440, height: 900 },
@@ -62,6 +65,7 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo) 
     for (const colorScheme of ["light", "dark"] as const) {
       await page.setViewportSize(viewport);
       await page.emulateMedia({ colorScheme });
+      await focus?.scrollIntoViewIfNeeded();
       // Scan the stable requested theme, after the registry controls finish their CSS transitions.
       await expect
         .poll(() =>
@@ -85,6 +89,14 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo) 
 
 export async function mockNative(page: Page, mfa = false) {
   const calls = {
+    theme: "system" as "system" | "light" | "dark",
+    themeWritable: true,
+    themeWriteGate: undefined as Promise<void> | undefined,
+    themeVersion: 0,
+    themeKeys: [] as string[],
+    rejectNextTheme: false,
+    conflictNextTheme: false,
+    blockThemeReads: false,
     exchange: 0,
     password: 0,
     emailUpdate: 0,
@@ -342,6 +354,96 @@ export async function mockNative(page: Page, mfa = false) {
           },
           trace_id: id,
         } satisfies SuccessManagementStateGet,
+      });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/settings_catalog_get_v1") {
+      expect(route.request().postDataJSON().scope).toBe("user");
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: id,
+          data: {
+            scope: "user",
+            catalog_version: 23,
+            fields: [
+              {
+                key: "theme",
+                group: "appearance",
+                consumer: "frontend",
+                writable: calls.themeWritable,
+              },
+            ],
+            defaults: { theme: "system" },
+            brand_packages: [],
+            limitations: [],
+          },
+        } satisfies SuccessSettingsCatalogGet,
+      });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/settings_get_v1") {
+      expect(route.request().postDataJSON().scope).toBe("user");
+      if (calls.blockThemeReads)
+        return route.fulfill({
+          status: 503,
+          json: {
+            ok: false,
+            error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: id,
+          data: {
+            scope: "user",
+            version: calls.themeVersion,
+            values: { theme: calls.theme, language: "tr", optional_analytics: false },
+            overridden_fields: [],
+            as_of: fixtureUser.created_at,
+          },
+        } satisfies SuccessSettingsGet,
+      });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/settings_update_v1") {
+      const request = route.request().postDataJSON();
+      expect(request.scope).toBe("user");
+      expect(Object.keys(request.patch)).toEqual(["theme"]);
+      calls.themeKeys.push(request.operation_key);
+      if (calls.themeWriteGate) {
+        const gate = calls.themeWriteGate;
+        calls.themeWriteGate = undefined;
+        await gate;
+      }
+      if (calls.rejectNextTheme) {
+        calls.rejectNextTheme = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            ok: false,
+            error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
+      if (calls.conflictNextTheme) {
+        calls.conflictNextTheme = false;
+        calls.themeVersion += 4;
+        calls.theme = "light";
+        return route.fulfill({
+          json: {
+            ok: false,
+            error: { code: "VERSION_CONFLICT", retryable: false, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
+      expect(request.expected_version).toBe(calls.themeVersion);
+      calls.theme = request.patch.theme;
+      calls.themeVersion += 2;
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: id,
+          data: { primary_id: accountId, operation_id: id, replayed: false, related: [] },
+        } satisfies SuccessSettingsUpdate,
       });
     }
     if (url.pathname === "/functions/v1/backend-v1/account_profile_update_v1") {

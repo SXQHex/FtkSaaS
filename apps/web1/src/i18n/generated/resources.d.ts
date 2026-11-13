@@ -5,6 +5,23 @@ export default interface Resources {
       "description": "Vite + React + TanStack Router + React Aria",
       "title": "FtkSaaS"
     },
+    "appearance": {
+      "conflict": "Tercih başka bir işlemle değişti. Güncel değeri yükleyip yeniden seç.",
+      "dark": "Koyu",
+      "description": "Tercihler hesabına kaydedilir; ayrıca kaydetmen gerekmez.",
+      "light": "Açık",
+      "readError": "Görünüm tercihi okunamadı.",
+      "readonly": "Bu ayar şu anda değiştirilemiyor.",
+      "reload": "Güncel tercihi yükle",
+      "retryWrite": "Aynı isteği yeniden dene",
+      "saved": "Tema tercihi kaydedildi.",
+      "savedReadError": "Tema kaydedildi. Güncel tercih okunamadı.",
+      "system": "Sistem",
+      "theme": "Tema",
+      "themeHint": "Sistem ayarını izle veya açık ya da koyu seç.",
+      "title": "Görünüm",
+      "unknown": "İşlemin sonucu doğrulanamadı. Aynı isteği yeniden deneyebilir veya güncel tercihi yükleyebilirsin."
+    },
     "auth": {
       "account": "Hesabım",
       "accountDescription": "Profilini, güvenliğini ve açık oturumlarını yönet.",
