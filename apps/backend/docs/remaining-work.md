@@ -5,14 +5,14 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="s18"></a>
 ## S18 — Statik SPA backend transportu
 
-Kullanıcının 13 Kasım görevi; kayıt ön kontrolü önce, ardından public başvuru. Cloudflare statik istemci ve küçük güvenilir Worker girişi kabul edildi; iş kuralları Supabase Edge'de kalır. Kaynak/ortam sonucu [devirde](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa), tüketim sözleşmesi [istemci protokolündedir](../../../docs/client-integration.md#statik-spa-transportu).
+**Durum:** Backend kaynak/CI/main/development/hosted ölçütleri karşılandı; kapanış belgesinin hafif kabulü ayrıca doğrulanır. Kullanıcının 13 Kasım görevi; kayıt ön kontrolü önce, ardından public başvuru. Cloudflare statik istemci ve küçük güvenilir Worker girişi kabul edildi; iş kuralları Supabase Edge'de kalır. Kaynak/ortam sonucu [devirde](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa), tüketim sözleşmesi [istemci protokolündedir](../../../docs/client-integration.md#statik-spa-transportu).
 
 - [x] Kaynak/native kayıt dilimi: güvenilir IP/HMAC, güvenli yanıt,30/5dk sınırı, native signup ve eski adapter uyumluluğu.
 - [x] Kaynak/native public dilimi: anonim takvim, backend CAPTCHA/hostname/action/rate/replay/tenant kontrolleri ve tek başvuru; eski çağrılar korunur.
 - [x] Kaynak/native güvenlik ve bağımlılık denetimi: explicit origin CORS, JWT/MFA/rol/plan/merkez retleri, personal-calendar GET/HEAD/revoke, Auth callback ve statik settings-shape devri.
-- [ ] Aday/main/development kaynak kabulü ve hosted origin/secret/Auth/provider config readback. Salt kaynak/native başarı hosted kabul değildir.
-- [ ] Gerçek Cloudflare IP/OPTIONS/yanlış origin/sahte başlık, gerçek widget submit/replay ve eski tüketici birlikte çalışma kabulü.
-- [ ] Backend tarafında native Google/doğrulama/kurtarma callback config readback, ICS URL hedefi ve seans API yetkisinin bağımsız test istemcisiyle doğrulanması; kesin kurulu URL/public env ile frontend coder devri. Frontend ekran/route geliştirmesi backend kapanış koşulu değildir; kaynak/ortam sonucu yalnız devir sahibindedir.
+- [x] Aday/main/development kaynak kabulü ve hosted origin/secret/Auth/provider config readback. Salt kaynak/native başarı hosted kabul değildir.
+- [x] Gerçek Cloudflare IP/OPTIONS/yanlış origin/sahte başlık, gerçek widget submit/replay ve eski tüketici birlikte çalışma kabulü.
+- [x] Backend tarafında native Google/doğrulama/kurtarma callback config readback, ICS URL hedefi ve seans API yetkisinin bağımsız test istemcisiyle doğrulanması; kesin kurulu URL/public env ile frontend coder devri. Frontend ekran/route geliştirmesi backend kapanış koşulu değildir; kaynak/ortam sonucu yalnız devir sahibindedir.
 
 ## Backend çalışma modeli
 
