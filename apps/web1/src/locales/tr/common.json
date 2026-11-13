@@ -179,5 +179,14 @@
     "unchanged": "Değişiklik yok.",
     "save": "Değişiklikleri kaydet",
     "accountPhone": "Hesap telefonu"
+  },
+  "photo": {
+    "upload": "Fotoğraf yükle",
+    "remove": "Kaldır",
+    "hint": "PNG, JPEG veya WebP, en fazla 1 MiB.",
+    "sizeError": "Boş dosya veya 1 MiB üstü fotoğraf yüklenemez.",
+    "typeError": "PNG, JPEG veya WebP seç.",
+    "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",
+    "readError": "Profil fotoğrafı okunamadı."
   }
 }

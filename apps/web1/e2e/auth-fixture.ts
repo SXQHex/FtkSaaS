@@ -1,7 +1,10 @@
+import { createHash } from "node:crypto";
 import { expect, type Page, type TestInfo } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import type {
   FailureEnvelope,
+  SettingsMediaAsset,
+  SuccessMediaGet,
   AccountSessionView,
   SuccessAccountSessionsList,
   SuccessAccountSessionLabel,
@@ -87,12 +90,17 @@ export async function mockNative(page: Page, mfa = false) {
     conflictNextProfile: false,
     blockProfileReads: false,
     profileKeys: [] as string[],
+    photoWrites: [] as (string | null)[],
+    mediaReads: 0,
+    rejectNextMedia: false,
     othersKeys: [] as string[],
     othersProofs: [] as string[],
     challenge: 0,
     verify: 0,
     account: 0,
   };
+  let photo: SettingsMediaAsset | null = null;
+  let photoBytes = "";
   let profileVersion = 7;
   let profile = {
     display_name: "Fixture Account",
@@ -191,7 +199,7 @@ export async function mockNative(page: Page, mfa = false) {
                 state: "active",
                 versions: [{ entity, version: profileVersion }],
                 as_of: fixtureUser.created_at,
-                current: { operation: "account_profile_update_v1", values: profile },
+                current: { operation: "account_profile_update_v1", values: { ...profile, photo } },
               },
             ],
             next_cursor: null,
@@ -227,7 +235,24 @@ export async function mockNative(page: Page, mfa = false) {
         });
       }
       expect(request.expected_version).toBe(profileVersion);
-      expect(request).not.toHaveProperty("photo");
+      if (Object.hasOwn(request, "photo")) {
+        calls.photoWrites.push(request.photo?.checksum ?? null);
+        if (request.photo) {
+          const bytes = Buffer.from(request.photo.data_base64, "base64");
+          expect(createHash("sha256").update(bytes).digest("hex")).toBe(request.photo.checksum);
+          expect(bytes.length).toBeLessThanOrEqual(1048576);
+          photoBytes = request.photo.data_base64;
+          photo = {
+            id: `019a7b00-0000-7000-8000-${String(profileVersion).padStart(12, "0")}`,
+            mime: request.photo.mime,
+            checksum: request.photo.checksum,
+            bytes: bytes.length,
+          };
+        } else {
+          photo = null;
+          photoBytes = "";
+        }
+      }
       expect(request).not.toHaveProperty("email");
       profile = {
         display_name: request.display_name,
@@ -248,6 +273,30 @@ export async function mockNative(page: Page, mfa = false) {
           },
           trace_id: id,
         } satisfies SuccessAccountProfileUpdate,
+      });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/media_get_v1") {
+      calls.mediaReads++;
+      const request = route.request().postDataJSON();
+      expect(route.request().method()).toBe("POST");
+      expect(request.scope).toBe("user");
+      if (calls.rejectNextMedia || !photo || request.asset_id !== photo.id) {
+        calls.rejectNextMedia = false;
+        return route.fulfill({
+          status: 404,
+          json: {
+            ok: false,
+            error: { code: "NOT_FOUND", retryable: false, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
+      return route.fulfill({
+        headers: { "cache-control": "private, no-store" },
+        json: {
+          ok: true,
+          data: { asset: photo, data_base64: photoBytes },
+          trace_id: id,
+        } satisfies SuccessMediaGet,
       });
     }
     if (url.pathname === "/functions/v1/backend-v1/account_sessions_list_v1") {
@@ -495,6 +544,7 @@ export async function mockNative(page: Page, mfa = false) {
             id,
             state: "active",
             display_name: profile.display_name,
+            photo,
             identity: {
               given_name: profile.given_name,
               family_name: profile.family_name,

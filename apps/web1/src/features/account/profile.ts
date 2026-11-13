@@ -1,5 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { getBackend } from "../../lib/backend";
+import type { SettingsImageUpload } from "../../lib/api-contracts/generated";
 import { readAccount } from "../../lib/account";
 
 export interface ProfileValues {
@@ -43,11 +44,13 @@ export async function readProfile(accountId: string) {
     typeof values.display_name !== "string" ||
     values.given_name === undefined ||
     values.family_name === undefined ||
-    values.unverified_phone === undefined
+    values.unverified_phone === undefined ||
+    values.photo === undefined
   )
     throw new Error("PROFILE_UNAVAILABLE");
   return {
     account,
+    photo: values.photo,
     version,
     values: {
       displayName: values.display_name,
@@ -67,13 +70,19 @@ export function profileChange(values: ProfileValues) {
   };
 }
 
-export function saveProfile(values: ProfileValues, version: number, operationKey: string) {
+export function saveProfile(
+  values: ProfileValues,
+  version: number,
+  operationKey: string,
+  photo?: SettingsImageUpload | null,
+) {
   return getBackend().call("account_profile_update_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
     operation_key: operationKey,
     expected_version: version,
     ...profileChange(values),
+    ...(photo !== undefined ? { photo } : {}),
   });
 }
 export type ProfileSnapshot = Awaited<ReturnType<typeof readProfile>>;

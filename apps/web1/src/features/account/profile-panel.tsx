@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { readProfile, saveProfile, profileChange, type ProfileSnapshot } from "./profile";
+import { ProfilePhotoRow } from "./profile-photo-row";
+import type { PhotoDraft } from "./profile-photo";
 import { BackendError } from "../../lib/backend";
 import {
   Card,
@@ -85,6 +87,8 @@ export function ProfileForm({
   const [notice, setNotice] = useState<Notice>("clean");
   const [reading, setReading] = useState(false);
   const [readFailed, setReadFailed] = useState(false);
+  const [photoDraft, setPhotoDraft] = useState<PhotoDraft>(undefined);
+  const [preparingPhoto, setPreparingPhoto] = useState(false);
   const [writeKnown, setWriteKnown] = useState(false);
   const intent = useRef<{ signature: string; key: string } | undefined>(undefined);
   async function refresh(reset: boolean) {
@@ -95,6 +99,7 @@ export function ProfileForm({
       if (reset) {
         setBase(next);
         form.reset(next.values);
+        setPhotoDraft(undefined);
         intent.current = undefined;
         setWriteKnown(false);
       }
@@ -110,12 +115,17 @@ export function ProfileForm({
     defaultValues: base.values,
     validationLogic: revalidateLogic({ mode: "blur", modeAfterSubmission: "change" }),
     onSubmit: async ({ value }) => {
-      if (writeKnown) return;
+      if (writeKnown || preparingPhoto) return;
+      const photo = photoDraft === null ? null : photoDraft?.upload;
       setNotice("clean");
-      const signature = JSON.stringify({ version: base.version, change: profileChange(value) });
+      const signature = JSON.stringify({
+        version: base.version,
+        change: profileChange(value),
+        photo,
+      });
       if (intent.current?.signature !== signature) intent.current = { signature, key: uuidv7() };
       try {
-        await saveProfile(value, base.version, intent.current.key);
+        await saveProfile(value, base.version, intent.current.key, photo);
         setWriteKnown(true);
       } catch (error) {
         setNotice(
@@ -191,183 +201,215 @@ export function ProfileForm({
         <CardContent className="pb-0.5">
           <form.Subscribe selector={(state) => state.isSubmitting}>
             {(submitting) => (
-              <FieldGroup className="grid gap-x-4 gap-y-3 min-[901px]:grid-cols-3">
-                {fields.map((descriptor) => (
-                  <form.Field
-                    key={descriptor.name}
-                    name={descriptor.name}
-                    validators={{ onDynamic: descriptor.validator }}
-                  >
-                    {(field) => (
-                      <Field
-                        className="gap-1 pb-1"
-                        data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FieldLabel
-                          className="w-full items-center"
-                          htmlFor={`profile-${descriptor.name}`}
+              <>
+                <ProfilePhotoRow
+                  accountId={base.account.id}
+                  asset={base.photo}
+                  name={base.values.displayName}
+                  draft={photoDraft}
+                  onChange={(draft) => {
+                    setPhotoDraft(draft);
+                    if (notice === "saved") setNotice("clean");
+                  }}
+                  disabled={submitting || reading || writeKnown || preparingPhoto}
+                  onBusy={setPreparingPhoto}
+                />
+                <FieldGroup className="grid gap-x-4 gap-y-3 min-[901px]:grid-cols-3">
+                  {fields.map((descriptor) => (
+                    <form.Field
+                      key={descriptor.name}
+                      name={descriptor.name}
+                      validators={{ onDynamic: descriptor.validator }}
+                    >
+                      {(field) => (
+                        <Field
+                          className="gap-1 pb-1"
+                          data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
                         >
-                          {descriptor.label}
-                          {descriptor.name === "phone" && (
-                            <Badge variant="hint" className="ml-auto">
-                              {t(($) => $.profile.unverified)}
-                            </Badge>
-                          )}
-                        </FieldLabel>
-                        <Input
-                          id={`profile-${descriptor.name}`}
-                          name={descriptor.name}
-                          type={descriptor.name === "phone" ? "tel" : "text"}
-                          autoComplete={descriptor.autocomplete}
-                          value={field.state.value}
-                          onChange={(event) => {
-                            field.handleChange(event.target.value);
-                            if (notice === "saved") setNotice("clean");
-                          }}
-                          onBlur={field.handleBlur}
-                          disabled={submitting || reading || writeKnown}
-                          aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-                          aria-describedby={
-                            field.state.meta.errors.length
-                              ? `profile-${descriptor.name}-error`
-                              : undefined
-                          }
-                        />
-                        <FieldError
-                          id={`profile-${descriptor.name}-error`}
-                          errors={field.state.meta.isTouched ? field.state.meta.errors : []}
-                        />
-                      </Field>
-                    )}
-                  </form.Field>
-                ))}
-                {identity && (
-                  <Field className="gap-1 pb-1 min-[901px]:col-span-2">
-                    <FieldLabel className="w-full items-center" htmlFor="profile-email">
-                      {t(($) => $.auth.email)}
-                      {identity.email && identity.email_verified_at && (
-                        <Badge variant="success" className="ml-auto">
-                          <CheckIcon data-icon="inline-start" />
-                          {t(($) => $.profile.verified)}
-                        </Badge>
+                          <FieldLabel
+                            className="w-full items-center"
+                            htmlFor={`profile-${descriptor.name}`}
+                          >
+                            {descriptor.label}
+                            {descriptor.name === "phone" && (
+                              <Badge variant="hint" className="ml-auto">
+                                {t(($) => $.profile.unverified)}
+                              </Badge>
+                            )}
+                          </FieldLabel>
+                          <Input
+                            id={`profile-${descriptor.name}`}
+                            name={descriptor.name}
+                            type={descriptor.name === "phone" ? "tel" : "text"}
+                            autoComplete={descriptor.autocomplete}
+                            value={field.state.value}
+                            onChange={(event) => {
+                              field.handleChange(event.target.value);
+                              if (notice === "saved") setNotice("clean");
+                            }}
+                            onBlur={field.handleBlur}
+                            disabled={submitting || reading || writeKnown || preparingPhoto}
+                            aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                            aria-describedby={
+                              field.state.meta.errors.length
+                                ? `profile-${descriptor.name}-error`
+                                : undefined
+                            }
+                          />
+                          <FieldError
+                            id={`profile-${descriptor.name}-error`}
+                            errors={field.state.meta.isTouched ? field.state.meta.errors : []}
+                          />
+                        </Field>
                       )}
-                    </FieldLabel>
-                    <Input id="profile-email" type="email" readOnly value={identity.email ?? ""} />
-                    {identity.pending_email && (
-                      <FieldDescription>
-                        {t(($) => $.profile.pendingEmail, { value: identity.pending_email })}
-                      </FieldDescription>
-                    )}
-                  </Field>
-                )}
-                {identity && (identity.phone || identity.pending_phone) && (
-                  <Field className="gap-1">
-                    <FieldLabel className="w-full items-center" htmlFor="profile-native-phone">
-                      {t(($) => $.profile.accountPhone)}
-                    </FieldLabel>
-                    <Input
-                      id="profile-native-phone"
-                      type="tel"
-                      readOnly
-                      value={identity.phone ?? ""}
-                    />
-                    {identity.pending_phone && (
-                      <FieldDescription>
-                        {t(($) => $.profile.pendingPhone, { value: identity.pending_phone })}
-                      </FieldDescription>
-                    )}
-                  </Field>
-                )}
-              </FieldGroup>
+                    </form.Field>
+                  ))}
+                  {identity && (
+                    <Field className="gap-1 pb-1 min-[901px]:col-span-2">
+                      <FieldLabel className="w-full items-center" htmlFor="profile-email">
+                        {t(($) => $.auth.email)}
+                        {identity.email && identity.email_verified_at && (
+                          <Badge variant="success" className="ml-auto">
+                            <CheckIcon data-icon="inline-start" />
+                            {t(($) => $.profile.verified)}
+                          </Badge>
+                        )}
+                      </FieldLabel>
+                      <Input
+                        id="profile-email"
+                        type="email"
+                        readOnly
+                        value={identity.email ?? ""}
+                      />
+                      {identity.pending_email && (
+                        <FieldDescription>
+                          {t(($) => $.profile.pendingEmail, { value: identity.pending_email })}
+                        </FieldDescription>
+                      )}
+                    </Field>
+                  )}
+                  {identity && (identity.phone || identity.pending_phone) && (
+                    <Field className="gap-1">
+                      <FieldLabel className="w-full items-center" htmlFor="profile-native-phone">
+                        {t(($) => $.profile.accountPhone)}
+                      </FieldLabel>
+                      <Input
+                        id="profile-native-phone"
+                        type="tel"
+                        readOnly
+                        value={identity.phone ?? ""}
+                      />
+                      {identity.pending_phone && (
+                        <FieldDescription>
+                          {t(($) => $.profile.pendingPhone, { value: identity.pending_phone })}
+                        </FieldDescription>
+                      )}
+                    </Field>
+                  )}
+                </FieldGroup>
+              </>
             )}
           </form.Subscribe>
-          {(stale || notice === "conflict") && (
-            <Alert>
-              <AlertDescription>
-                {t(($) => $.profile.conflict)}{" "}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  isDisabled={reading}
-                  onPress={() => {
-                    void refresh(true).then((ok) => {
-                      if (ok) setNotice("clean");
-                    });
-                  }}
-                >
-                  {t(($) => $.profile.loadCurrent)}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
-          {notice === "unknown" && (
-            <Alert variant="destructive">
-              <AlertDescription>{t(($) => $.profile.writeUnknown)}</AlertDescription>
-            </Alert>
-          )}
-          {(readFailed || backgroundError || notice === "saved-unread") && (
-            <Alert variant="destructive">
-              <AlertDescription>
-                {writeKnown ? t(($) => $.profile.savedReadError) : t(($) => $.profile.readError)}{" "}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  isDisabled={reading}
-                  onPress={() => {
-                    const reset = writeKnown;
-                    void refresh(reset).then((ok) => {
-                      if (ok && reset) setNotice("saved");
-                    });
-                  }}
-                >
-                  {t(($) => $.auth.retry)}
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(submitting) => (
+              <>
+                {(stale || notice === "conflict") && (
+                  <Alert>
+                    <AlertDescription>
+                      {t(($) => $.profile.conflict)}{" "}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        isDisabled={reading || preparingPhoto || submitting}
+                        onPress={() => {
+                          void refresh(true).then((ok) => {
+                            if (ok) setNotice("clean");
+                          });
+                        }}
+                      >
+                        {t(($) => $.profile.loadCurrent)}
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {notice === "unknown" && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{t(($) => $.profile.writeUnknown)}</AlertDescription>
+                  </Alert>
+                )}
+                {(readFailed || backgroundError || notice === "saved-unread") && (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      {writeKnown
+                        ? t(($) => $.profile.savedReadError)
+                        : t(($) => $.profile.readError)}{" "}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        isDisabled={reading || preparingPhoto || submitting}
+                        onPress={() => {
+                          const reset = writeKnown;
+                          void refresh(reset).then((ok) => {
+                            if (ok && reset) setNotice("saved");
+                          });
+                        }}
+                      >
+                        {t(($) => $.auth.retry)}
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </>
+            )}
+          </form.Subscribe>
         </CardContent>
         <CardFooter className="flex-wrap justify-between gap-3">
           <form.Subscribe
             selector={(state) => ({ dirty: state.isDirty, pending: state.isSubmitting })}
           >
-            {({ dirty, pending }) => (
-              <>
-                <span role="status" className="text-[13px] text-muted-foreground">
-                  {notice === "saved"
-                    ? t(($) => $.profile.saved)
-                    : notice === "clean"
-                      ? dirty
-                        ? t(($) => $.profile.unsaved)
-                        : t(($) => $.profile.unchanged)
-                      : ""}
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    isDisabled={pending || reading || writeKnown || !dirty}
-                    onPress={() => {
-                      form.reset(base.values);
-                      if (notice !== "conflict") setNotice("clean");
-                    }}
-                  >
-                    {t(($) => $.security.cancel)}
-                  </Button>
-                  <Button
-                    type="submit"
-                    isDisabled={
-                      pending ||
-                      reading ||
-                      writeKnown ||
-                      !dirty ||
-                      notice === "conflict" ||
-                      (stale && notice !== "unknown")
-                    }
-                  >
-                    {t(($) => $.profile.save)}
-                  </Button>
-                </div>
-              </>
-            )}
+            {({ dirty: textDirty, pending }) => {
+              const dirty = textDirty || photoDraft !== undefined;
+              return (
+                <>
+                  <span role="status" className="text-[13px] text-muted-foreground">
+                    {notice === "saved"
+                      ? t(($) => $.profile.saved)
+                      : notice === "clean"
+                        ? dirty
+                          ? t(($) => $.profile.unsaved)
+                          : t(($) => $.profile.unchanged)
+                        : ""}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      isDisabled={pending || reading || writeKnown || preparingPhoto || !dirty}
+                      onPress={() => {
+                        form.reset(base.values);
+                        setPhotoDraft(undefined);
+                        if (notice !== "conflict") setNotice("clean");
+                      }}
+                    >
+                      {t(($) => $.security.cancel)}
+                    </Button>
+                    <Button
+                      type="submit"
+                      isDisabled={
+                        pending ||
+                        preparingPhoto ||
+                        reading ||
+                        writeKnown ||
+                        !dirty ||
+                        notice === "conflict" ||
+                        (stale && notice !== "unknown")
+                      }
+                    >
+                      {t(($) => $.profile.save)}
+                    </Button>
+                  </div>
+                </>
+              );
+            }}
           </form.Subscribe>
         </CardFooter>
       </Card>

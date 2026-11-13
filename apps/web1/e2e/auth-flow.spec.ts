@@ -310,3 +310,61 @@ test("profile uses management versions, preserves conflicting drafts and retries
   await expect(page.getByLabel("E-posta", { exact: false })).toHaveValue("fixture@example.invalid");
   expect(errors).toEqual([]);
 });
+
+test("private photo stays a profile draft until save, reloads through authenticated media and removes explicitly", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  const file = page.locator('input[type="file"]');
+  await file.setInputFiles({
+    name: "invalid.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("invalid image"),
+  });
+  await expect(page.getByText("Fotoğraf okunamadı. Geçerli bir görsel seç.")).toBeVisible();
+  expect(calls.photoWrites).toHaveLength(0);
+  await file.setInputFiles("e2e/fixtures/profile-photo.png");
+  const image = page.locator('[data-slot="avatar-image"]');
+  await expect(image).toHaveAttribute("data-state", "loaded");
+  expect(calls.photoWrites).toHaveLength(0);
+  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(image).toHaveCount(0);
+  await file.setInputFiles("e2e/fixtures/profile-photo.png");
+  await expect(image).toHaveAttribute("data-state", "loaded");
+  await page.getByLabel("Ad", { exact: true }).fill("Photo draft");
+  calls.rejectNextProfile = true;
+  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await expect(page.getByText("Kaydetme doğrulanamadı.", { exact: false })).toBeVisible();
+  await expect(image).toHaveAttribute("data-state", "loaded");
+  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Değişiklikler kaydedildi.");
+  await expect(image).toHaveAttribute("data-state", "loaded");
+  expect(calls.profileKeys[1]).toBe(calls.profileKeys[0]);
+  await page.reload();
+  await expect(image).toHaveAttribute("data-state", "loaded");
+  await expect(page.getByLabel("Ad", { exact: true })).toHaveValue("Photo draft");
+  expect(calls.mediaReads).toBeGreaterThan(0);
+  await captureAuth(page, "e10-profile-photo", testInfo);
+  calls.rejectNextMedia = true;
+  await page.reload();
+  await expect(page.getByText("Profil fotoğrafı okunamadı.", { exact: false })).toBeVisible();
+  await expect(image).toHaveCount(0);
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(image).toHaveAttribute("data-state", "loaded");
+  await page.getByRole("button", { name: "Kaldır", exact: true }).click();
+  await expect(image).toHaveCount(0);
+  expect(calls.photoWrites).toHaveLength(1);
+  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Değişiklikler kaydedildi.");
+  await page.reload();
+  await expect(image).toHaveCount(0);
+  expect(calls.photoWrites[1]).toBeNull();
+  expect(errors).toEqual([]);
+});
