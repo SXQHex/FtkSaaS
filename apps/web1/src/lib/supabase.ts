@@ -12,6 +12,13 @@ export function getSupabaseClient(): SupabaseClient {
     throw new Error("Supabase bağlantı yapılandırması eksik.");
   }
 
-  client = createClient(url, publishableKey);
+  client = createClient(url, publishableKey, {
+    auth: {
+      flowType: "pkce",
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    },
+  });
   return client;
 }
