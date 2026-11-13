@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**13 Kasım kullanıcı görevi:** [S17 içerik kataloğu](remaining-work.md#s17) tek branch/Draft PR içinde katalog → gönderim/dil → değişmez belge/onay sırasıyla ilerler. Aşama başına ilgili test, teslimde tek zorunlu aday full clean kullanılır; bu görevde merge yoktur. Sonuç ve açık kontrol noktası yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu) tutulur. Önceki kapanmış işler yeniden açılmaz.
+**13 Kasım içerik kataloğu görevi:** [S17](remaining-work.md#s17) mevcut sıra içindeki backend teslimini tamamladı; kalan açık işlerin sırası aşağıdadır. Kaynak/CI/main/development kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu), frontend çağrı/gösterim bağımlılığı [XREQ-045](../../../docs/requests.md#xreq-045) sahibindedir. Frontend kabulü backend işini yeniden açmaz.
 
 Öncelik Pro'nun ortak uygulamasını tamamlamak ve [G02](remaining-work.md#g02) backend kabulünü kapatmaktır. Sonraki paket [G01](remaining-work.md#g01) ile aynı uygulamanın Starter kısıtları, ardından [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir.
 
