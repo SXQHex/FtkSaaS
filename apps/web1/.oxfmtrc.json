@@ -12,6 +12,7 @@
     "playwright-report/**",
     "test-results/**",
     "AGENTS.md",
-    "test-reports/**"
+    "test-reports/**",
+    "design-reference/**"
   ]
 }
