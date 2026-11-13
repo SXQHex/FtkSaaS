@@ -1,4 +1,4 @@
-# IDE Codex için kişisel skill’ler
+# IDE Codex için skill’ler
 
 ChatGPT ortamındaki 34 kişisel skill, ek kaynakları ve mevcut lisanslarıyla birlikte bu dizine kopyalanmıştır. İş akışı içerikleri korunmuş; beş referans dosyasında yalnız satır sonu boşlukları ve dosya sonundaki fazla boş satırlar temizlenmiştir; klasörler `SKILL.md` içindeki `name` değerine göre adlandırılmıştır. Buluttaki asıllar korunur. Bu aktarım otomatik çift yönlü eşitleme kurmaz.
 
@@ -22,13 +22,21 @@ Bu kopyalama MCP sunucusu, hesap bağlantısı, kimlik bilgisi veya yerel yazıl
 
 ## Aktarım sınırı
 
-Bu dizin kişisel skill koleksiyonunu içerir. ChatGPT’nin sistem/yerleşik skill’leri ve plugin’lerin sağladığı skill’ler bu aktarımda kopyalanmamıştır. GitHub, Cloudflare, Vercel, Resend, Library, Spaces ve benzeri bulut araçlarının bağlantıları da bu dosyalarla taşınmaz. IDE’de kullanılacak karşılıkları ayrıca kurulmalı ve yetkilendirilmelidir. Kişisel koleksiyondaki iki Supabase skill’i dahil edilmiştir; plugin üzerinden görünen aynı skill’ler ikinci kez eklenmemiştir.
+Bu dizin kişisel skill koleksiyonunu ve aşağıda kaynağı belirtilen resmî shadcn skill’ini içerir. ChatGPT’nin sistem/yerleşik skill’leri ve plugin’lerin sağladığı skill’ler bu aktarımda kopyalanmamıştır. GitHub, Cloudflare, Vercel, Resend, Library, Spaces ve benzeri bulut araçlarının bağlantıları da bu dosyalarla taşınmaz. IDE’de kullanılacak karşılıkları ayrıca kurulmalı ve yetkilendirilmelidir. Kişisel koleksiyondaki iki Supabase skill’i dahil edilmiştir; plugin üzerinden görünen aynı skill’ler ikinci kez eklenmemiştir.
 
 ## Kaynak
 
 Aktarım tarihi: 12 Kasım 2026. Kişisel koleksiyon kaynak revizyonu: `4d9dfe36ffbf4872dbc8a191fa5f5378a3213d8f`.
 
 Her klasörün `SKILL.md`, `agents`, `assets`, `references`, `scripts` ve varsa `LICENSE` dosyaları birlikte korunur. Güncellemelerde yalnız `SKILL.md` dosyasını kopyalamak yeterli değildir.
+
+## Resmî shadcn skill’i
+
+13 Kasım 2026 tarihinde `shadcn-ui/ui` deposunun `skills/shadcn` dizini tüm yardımcı dosyalarıyla, değiştirilmeden `.agents/skills/shadcn` altına alındı. Upstream MIT lisansı `shadcn/LICENSE.md` içinde korunur.
+
+Kaynak revizyonu: `e62c9435fff729a175f38983dee73b2cb4f6a069`. [Resmî kaynak](https://github.com/shadcn-ui/ui/tree/e62c9435fff729a175f38983dee73b2cb4f6a069/skills/shadcn).
+
+Skill, shadcn CLI ile hazır bileşen/blok arama, kurma, kompozisyon ve tema çalışmalarını yönlendirir. Yerel komutlar uygulamanın çalışma dizininde, kendi paket yöneticisiyle yürütülür. Projenin mevcut React Aria/Rhea temeli ve kullanıcının hazır UI bileşeni kullanma kararı esas alınır. CLI, registry veya preset işlemleri için geçerli alan talimatları uygulanır.
 
 ## İçerik
 
@@ -59,6 +67,7 @@ Her klasörün `SKILL.md`, `agents`, `assets`, `references`, `scripts` ve varsa 
 | `performance-optimization` | 6 |
 | `planning-and-task-breakdown` | 5 |
 | `screencapture` | 4 |
+| `shadcn` | 22 |
 | `security-and-hardening` | 6 |
 | `shipping-and-launch` | 8 |
 | `source-driven-development` | 4 |
