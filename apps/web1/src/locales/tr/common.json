@@ -240,5 +240,22 @@
     "resent": "Yeniden gönderme isteği işlendi. Onay iletisini kontrol et.",
     "error": "E-posta işlemi doğrulanamadı. Güncel ve bekleyen adresi kontrol edip yeniden deneyebilirsin.",
     "acceptedReadError": "İstek işlendi. Güncel hesap bilgileri yenilenemedi."
+  },
+  "appearance": {
+    "title": "Görünüm",
+    "description": "Tercihler hesabına kaydedilir; ayrıca kaydetmen gerekmez.",
+    "theme": "Tema",
+    "themeHint": "Sistem ayarını izle veya açık ya da koyu seç.",
+    "system": "Sistem",
+    "light": "Açık",
+    "dark": "Koyu",
+    "readonly": "Bu ayar şu anda değiştirilemiyor.",
+    "saved": "Tema tercihi kaydedildi.",
+    "unknown": "İşlemin sonucu doğrulanamadı. Aynı isteği yeniden deneyebilir veya güncel tercihi yükleyebilirsin.",
+    "retryWrite": "Aynı isteği yeniden dene",
+    "reload": "Güncel tercihi yükle",
+    "conflict": "Tercih başka bir işlemle değişti. Güncel değeri yükleyip yeniden seç.",
+    "savedReadError": "Tema kaydedildi. Güncel tercih okunamadı.",
+    "readError": "Görünüm tercihi okunamadı."
   }
 }
