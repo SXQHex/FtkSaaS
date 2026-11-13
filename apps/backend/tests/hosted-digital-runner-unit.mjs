@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {acceptDigital} from '../scripts/acceptance/s10-hosted-digital.mjs';
 
 const inputs={email:'owner@example.invalid',password:'synthetic-password',outsiderEmail:'outsider@example.invalid',outsiderPassword:'synthetic-other',apikey:'synthetic-publishable',org:'org',center:'center',product:'product',agreement:'agreement'};
-function fixture({accepted=false,affected=[],secondLoginFails=false,logoutFails=false}={}){
+function fixture({accepted=false,affected=[],secondLoginFails=false,logoutFails=false,apiErrorsUseHttpStatus=false}={}){
  const calls=[];let logins=0;
  const request=async(url,options)=>{
   assert.equal(new URL(url).origin,'https://gwyprhenabtpkbojephw.supabase.co');
@@ -20,7 +20,7 @@ function fixture({accepted=false,affected=[],secondLoginFails=false,logoutFails=
   }
   const op=url.split('/').at(-1);
   assert.equal(body.operation_key,undefined,'Read operations must not carry mutation keys');
-  if(options.headers.authorization==='Bearer synthetic-session-2')return Response.json({ok:false,error:{code:'NOT_FOUND'}});
+  if(options.headers.authorization==='Bearer synthetic-session-2')return Response.json({ok:false,error:{code:'NOT_FOUND'}},{status:apiErrorsUseHttpStatus?403:200});
   const data=op==='instructor_agreement_get_v1'?{agreement:{id:'agreement',center_id:'center',person_id:'self'},source_content_hash:'source',acceptance:accepted?{id:'previous'}:null}
    :op==='management_state_get_v1'?{items:[{current:{values:{source_content_hash:'source'}}}]}
    :op==='document_publication_preview_v1'?{affected}:null;
@@ -58,4 +58,12 @@ test('Digital hosted runner rejects the same native account for the outsider bef
  let requests=0;
  await assert.rejects(acceptDigital({...inputs,outsiderEmail:inputs.email,request:async()=>{requests++;}}),/Distinct native accounts required/);
  assert.equal(requests,0);
+});
+
+test('Digital hosted runner preserves a typed backend error carried by HTTP 4xx',async()=>{
+ const f=fixture({affected:[{synthetic:'existing reservation'}],apiErrorsUseHttpStatus:true});
+ await assert.rejects(acceptDigital({...inputs,request:f.request}),{message:'Hosted digital acceptance failed at publication'});
+ assert(f.calls.some(x=>x.url.endsWith('document_publication_preview_v1')));
+ assert.equal(f.calls.some(x=>x.url.endsWith('document_version_publish_v1')),false);
+ assert.equal(f.logouts().length,2);
 });

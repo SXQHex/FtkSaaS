@@ -221,6 +221,8 @@ export const runtimeOperationNames = [
   "role_revoke_preview_v1",
   "subscription_period_change_request_v1",
   "instructor_agreement_get_v1",
-  "instructor_agreement_accept_v1"
+  "instructor_agreement_accept_v1",
+  "content_catalog_get_v1",
+  "content_catalog_save_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

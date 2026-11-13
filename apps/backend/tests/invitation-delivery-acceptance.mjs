@@ -44,7 +44,8 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
   });
   await t.test('supersession cancels queued old job; same signed tick is consumed once',async()=>{
    const old=job;job=(await send()).job_id;assert.equal((await status(old)).state,'cancelled');
-   const r={request_id:id()};lease=(await worker(r,{invitation_phase:'claim'}))._internal_invitation;assert.equal(lease.job_id,job);assert.equal((await worker(r,{invitation_phase:'claim'}))._internal_invitation,null);
+   const preferences=await must(member,'settings_get_v1',{scope:'user'});await must(member,'settings_update_v1',{scope:'user',expected_version:preferences.version,patch:{language:'en'}},id());
+   const r={request_id:id()};lease=(await worker(r,{invitation_phase:'claim'}))._internal_invitation;assert.equal(lease.job_id,job);assert.equal(lease.catalog.language,'en');assert.equal(lease.catalog.content.title,'FtkSaaS account access invitation');assert.equal((await db.query("select count(*)::int n from core.account_links where org_id=$1 and person_id=$2 and state='active'",[org,target])).rows[0].n,0);assert.equal((await worker(r,{invitation_phase:'claim'}))._internal_invitation,null);
    assert.equal(await claim(),null);assert.equal((await status(job)).state,'running');
    const denied=await worker({...lease,lease_token:'wrong'},{invitation_phase:'authorize'}).catch(()=>null);assert.equal(denied,null);
   });

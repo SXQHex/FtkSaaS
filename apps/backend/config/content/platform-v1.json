@@ -1,0 +1,672 @@
+[
+  {
+    "scope_key": "platform",
+    "code": "notification.reservation",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Rezervasyon sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.reservation",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Rezervasyon sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.reservation",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Reservation update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.reservation",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Reservation update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson_request",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders talebi sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson_request",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders talebi sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson_request",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson request update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson_request",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson request update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.cancellation",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders iptali",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.cancellation",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders iptali",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.cancellation",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson cancellation",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.cancellation",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson cancellation",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.session_change",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders değişikliği",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.session_change",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders değişikliği",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.session_change",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.session_change",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.seat_offer",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Yer teklifi sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.seat_offer",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Yer teklifi sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.seat_offer",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Seat offer update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.seat_offer",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Seat offer update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.collection",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Tahsilat sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.collection",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Tahsilat sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.collection",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Payment update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.collection",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Payment update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.refund",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "İade sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.refund",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "İade sonucu",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.refund",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Refund update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.refund",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Refund update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.access",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Erişim değişikliği",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.access",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Erişim değişikliği",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.access",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Access update",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.access",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Access update",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ders hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson reminder",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.lesson",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Lesson reminder",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.event",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Etkinlik hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.event",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Etkinlik hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.event",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Event reminder",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.event",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Event reminder",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.entitlement",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Paket bitişi hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.entitlement",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Paket bitişi hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.entitlement",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Package expiry reminder",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.entitlement",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Package expiry reminder",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.payment",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ödeme vadesi hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.payment",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Ödeme vadesi hatırlatması",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.payment",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Payment due reminder",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.payment",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Payment due reminder",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.generic",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Bildirim",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.generic",
+    "channel": "in_app",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Bildirim",
+      "text": "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.generic",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Notification",
+      "text": "View your new notification in the application: {{app_url}}"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "notification.generic",
+    "channel": "in_app",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "Notification",
+      "text": "View your new notification in the application:"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "account.invitation",
+    "channel": "email",
+    "language": "tr",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "FtkSaaS hesap erişimi daveti",
+      "text": "Hesap erişimi davetinizi kabul etmek için bağlantıyı açın:\n{{link}}\n\nBu davet yalnız gönderildiği doğrulanmış e-posta hesabıyla kabul edilebilir. Talep etmediyseniz bu e-postayı yok sayabilirsiniz."
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "account.invitation",
+    "channel": "email",
+    "language": "en",
+    "version": 1,
+    "source_version": "1",
+    "content": {
+      "title": "FtkSaaS account access invitation",
+      "text": "Open the link to accept your account access invitation:\n{{link}}\n\nThis invitation can only be accepted with the verified email account it was sent to. If you did not request it, you can ignore this email."
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "report.headers",
+    "channel": "report",
+    "language": "tr",
+    "version": 2,
+    "source_version": "1",
+    "content": {
+      "text": "group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps,subscriber_number"
+    }
+  },
+  {
+    "scope_key": "platform",
+    "code": "report.headers",
+    "channel": "report",
+    "language": "en",
+    "version": 2,
+    "source_version": "1",
+    "content": {
+      "text": "group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps,subscriber_number"
+    }
+  }
+]

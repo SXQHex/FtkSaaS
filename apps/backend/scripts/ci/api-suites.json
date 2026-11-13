@@ -454,7 +454,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-          "sha256": "ed0c08a78ee751f0f187f2454334555fa95a4fadb05a3de9f38ce061efc9faad"
+          "sha256": "82994340054ff7132bf58c910ac5631eb54abdf47e2ec3cf98635b2ec08483bd"
         }
       ],
       "estimated_seconds": 780.97
@@ -581,7 +581,7 @@
         {
           "line": 3,
           "path": "apps/backend/tests/invitation-delivery-acceptance.mjs",
-          "sha256": "41a324fed4d1651358ab65fe7cc59373e8cc2d11d359d4ae9a128a43f218c1b5"
+          "sha256": "891217ff1a22121e30a7b67aba218d91df3cb2194a8b5d918665197aba7aa17c"
         },
         {
           "line": 4,
@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "334b964a2a5541719b53acbfe981d0f512aa14a86e00df35217811c1c46831fb",
+      "sha256": "7fc33711a5107ed7b71850fc0a22eb96ca75247bc5e1c36d448484cb417965b7",
       "shared": [
         [
           12,
@@ -751,7 +751,7 @@
         {
           "line": 7,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
-          "sha256": "7087d82524678c3638199cf18439212bb4a1eae03bc1f8d3756aabbee4ca9611"
+          "sha256": "55abd5f3566d109c774abfd555c2de53588e5e21f632bf8c2a8d05ebd936e111"
         },
         {
           "line": 8,
@@ -766,7 +766,7 @@
         {
           "line": 10,
           "path": "apps/backend/tests/starter-document-acceptance.mjs",
-          "sha256": "35ef4cab910cbf4b3d5a4d8a2e9dcb9050f5e41917c93157b6a3f37fa32d8e98"
+          "sha256": "a4ebf457a587121b29cd56ce41c4dcfadae0efc91426ca2dc52fab4890c5c8de"
         },
         {
           "line": 11,
@@ -1078,7 +1078,7 @@
         {
           "line": 161,
           "path": "apps/backend/tests/agreement-preparation-acceptance.mjs",
-          "sha256": "c5045f0bee008ae4cbe93d16104ad1daad7362320f026f3a06d5135e6f660bf4"
+          "sha256": "9b1abf9fe2fdbc4fd3dd67ead13c20eabb301f329663a9ca0179b63fd7bfd6ab"
         },
         {
           "path": "apps/backend/tests/permission-preparation-acceptance.mjs",
@@ -1098,7 +1098,7 @@
         {
           "line": 165,
           "path": "apps/backend/tests/sharing-consent-acceptance.mjs",
-          "sha256": "fde3e7e6455296cc755bd15a4498bd3f1172b4aedd7d97d4637618c524d21f9f",
+          "sha256": "4b50470c4d7696cdab0abc74f20cdfb57071950aceb8f46a614608e4756fbfa8",
           "shared": [
             [
               1,
@@ -1111,7 +1111,7 @@
               "ranges": [
                 [
                   9,
-                  69
+                  70
                 ]
               ]
             },
@@ -1119,12 +1119,31 @@
               "id": "sharing-consent-peer-media",
               "ranges": [
                 [
-                  70,
-                  134
+                  71,
+                  136
+                ]
+              ]
+            },
+            {
+              "id": "sharing-consent-catalog",
+              "ranges": [
+                [
+                  137,
+                  156
                 ]
               ]
             }
           ]
+        },
+        {
+          "line": 166,
+          "path": "apps/backend/tests/content-catalog-acceptance.mjs",
+          "sha256": "61d7e757ed9f90a2b319f8682a72c9d4aedc2d7948edb47454bf75ed54b2f69c"
+        },
+        {
+          "line": 167,
+          "path": "apps/backend/tests/content-documents-acceptance.mjs",
+          "sha256": "0aaee1ce58afdf2b7f7da34a0d1efdd46b077d767be62102f7f754a1868d0588"
         }
       ],
       "estimated_seconds": 1356.24

@@ -600,11 +600,7 @@ Talep doğrulandı. Mevcut organizations_list_v1 öğesine geriye uyumlu opsiyon
 
 ## XREQ-033
 
-**Talep — Bildirim dili ve çeviri frontend sorumluluğu:** 8 Kasım 2026 kullanıcı kararıyla backend bildirim dili geliştirmesine ve ayrı dil kabulüne vakit ayırmaz. Backend bildirim olayını, şablon kimliğini, izinli değişkenleri ve temel şablonu sağlar; frontend kullanıcının tercih ettiği dilde içeriği hazırlar. Normatif sınır [FD04](contracts/02-FtkSaaS-teknik-sozlesme.md#fd04--bildirim-hatırlatma-ve-pazarlama-kabul-edildi), mevcut API/şablonların kesin devri [ayar rehberindedir](settings.md#bildirim-kullanılabilirliği).
-
-**Backend devri:** `notifications_list_v1` öğesindeki `kind`, `payload.template_key`, `payload.subject` mevcut makine sözleşmesidir. Kullanıcı dili `settings_get_v1(scope:user)` ile `language:tr|en|auto` olarak okunur; `auto` frontend'in mevcut dil çözümlemesidir. Notification payload'a sınırsız değişken/HTML eklenmez. Yeni okuyucu veya bildirim üretimi bu talebin önkoşulu değildir. PR256'da yayımlanan renderer mevcut gönderimleri sürdürür; yeni backend dil matrisi veya gerçek posta dili kabulü açılmaz.
-
-**Frontend kabulü:** Kullanıcı dili organizasyon varsayılanından farklıyken in_app içerik doğru dilde, bilinmeyen anahtar/dil güvenli fallback ile gösterilmeli; aynı bildirim ikinci kez üretilmemeli. Arka plan e-postası için frontend'in sahip olduğu çeviri/şablon içeriği sunucuda kullanılabilmeli; kullanıcı tarayıcısının açık olmasına bağlanmamalı. Mevcut worker alıcı/erişim/opt-in, kanal/plan, tekrar/idempotency ve terminal temizleme kontrolleri korunmalı. Mevcut API'de e-posta gövdesi/locale override writer'ı yoktur; gereken sunucu entegrasyon noktası frontend değerlendirmesinde somutlaştırılır, çalışır kabul edilmez. Çeviri sorumluluğu credentials veya service-role anahtarını istemciye taşımaz. Frontend uygulaması ve gerçek tüketici kabulü bu devirle tamamlanmış sayılmaz.
+**Backend kapsamı — 13 Kasım 2026:** Kullanıcının yeni içerik kataloğu kararı bu talebin önceki frontend şablon sahipliğini değiştirdi. Güncel normatif sahiplik [FD04/FD08](contracts/02-FtkSaaS-teknik-sozlesme.md#fd04--bildirim-hatırlatma-ve-pazarlama-kabul-edildi), backend metni/dili ve değişmez belge tüketim talebi [XREQ-045](#xreq-045) sahibindedir. Aşağıdaki 8 Kasım frontend değerlendirmesi o teslimin kaydıdır; yeni backend runtime desteği veya yeni alan kabulü değildir. Karşı alan adına uygulama/kapama onayı verilmez.
 
 ### Frontend değerlendirmesi — XREQ-033, 8 Kasım 2026
 
@@ -640,15 +636,13 @@ Aday kaynak mevcut `organizations_list_v1`/yetkili `organization_get_v1` ve yay�
 
 ### Backend talebi ve devri — 8 Kasım 2026
 
-Kullanıcı kararı [FD08](contracts/02-FtkSaaS-teknik-sozlesme.md#fd08--belge-onay-dış-görünürlük-kabul-edildi): frontend/Next.js nihai ekran metnini, gerçek dili ve fallback'i yönetir. Backend main/development kaynağında dosyasız `document_publication_preview_v1`/`document_version_publish_v1(digital_content)`, mevcut requirements/content ve `document_accept_v1(displayed_content,displayed_content_hash)` vardır. Eski dosya yolu korunur; yeni dijital yol Storage upload istemez. Backend metni yeniden hashler ve native hesap/kişi, bağlam, kaynak sürüm, metin/dil ve sunucu zamanını değişmez saklar. Geçmiş metin güncel şablondan üretilmez. Kesin veri şekli/kurtarma ve geçmiş okuma [WF11](workflows.md#wf11) sahibindedir.
-
-Eğitmenin kendi kabulü `instructor_agreement_get_v1` → açık ekran → `instructor_agreement_accept_v1` → yeniden get sırasındadır. Gerçek şartlar/sürüm ve okunan source_content_hash aynen gönderilir; metin/hash frontend'den, yeniden hash ve zaman/özne backend'den gelir. CM başkası adına kabul veremez. Bu kabul yayın veya hakediş hesabı değildir; [WF14](workflows.md#wf14).
+13 Kasım içerik kataloğu kararıyla dosyasız belge ve eğitmen onayının güncel tüketimi [XREQ-045](#xreq-045), [WF11](workflows.md#wf11) ve [WF14](workflows.md#wf14) sahibindedir. Frontend backend'in kayıtlı belgesini gösterir ve rendered_document_id ile kabul eder; browser text/hash gönderimi kaldırılmıştır. Eski dosya yolu ve tarihsel onay kanıtı korunur. Bu talebin Pro hazırlık bölümü aşağıda kendi kapsamıyla sürer.
 
 Pro/Business için beş yeni preparation ailesi katalogda sunulur: programs/events/collections/crm/automations. Gerçek source/version ile resolve edilen defaults, eksik hedef/tarih/kişi ve gerekiyorsa banka referansı açık seçildikten sonra mevcut writer'a gider; şablon otomatik işlem/enable üretmez. Program yeni merkeze başlangıç kopyası, diğer dört aile açık org mirasıdır; [ayar rehberi](settings.md#pro-iş-akışı-hazırlıkları).
 
 Backend’in normal hosted API akışı kendi belge/eğitmen onayı, exact metin/hash, replay/geçmiş ve başka tenant retleriyle doğrulandı; kaynak/ortam kanıtının sahibi [backend devridir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#pro-dijital-kabul-paketi). Bu sonuç frontend ekran kabulü değildir.
 
-**Frontend kabul ölçütü:** Dijital yolda blob/PDF yükleme istenmemesi; görünen nihai metnin ve gerçek dilin eksiksiz gönderilmesi; aynı metnin SHA-256 hesabı ve aynı işlem anahtarlı retry; stale source/sürümde yeniden okuma; geçmişin saklanan snapshot'tan gösterilmesi; rol/bağ kaybında erişim kapanması. Pro şablonları yalnız desteklenen writable alan ve canlı kaynaklarla tüketilmeli. Backend kaynak/native/merge/hosted ve frontend ekran kapanışı ayrı izlenir. Bu talep XREQ-033 ertelenmiş e-posta çeviri entegrasyonunu yeniden açmaz.
+**Backend'in tüketici ölçütü:** Belge gösterim/onayı [XREQ-045](#xreq-045) sırasına uyar; geçmiş kayıtlı içerikten gösterilir ve rol/bağ kaybı erişimi kapatır. Pro hazırlık şablonları yalnız desteklenen writable alan ve canlı kaynaklarla tüketilir. Önceki hosted metin/hash kabulü kendi eski kaynağına aittir; yeni katalog backend/CI/hosted veya frontend ekran kabulü sayılmaz.
 
 ## XREQ-037 Hesap silme işinde dar profil imha ilerlemesi
 
@@ -727,3 +721,15 @@ S10 paketinde katalogv22 ve typed ayar/medya sözleşmesi güncellenir. [WF12](w
 [WF10](workflows.md#wf10) dosya→önizleme→satır listesi→seçim→asenkron apply→job/satır yeniden okuma sırasının sahibidir. `ImportRow.application` içindeki `CrmImportRowPreview` mevcut telefon uyarılarına ek opsiyonel `email_matches` ve `email_matches_truncated` alanları sunar; öğe şekli mevcut `CrmPhoneMatch` (`person_id`, `display_name`) ile aynıdır. Bu alanlar yalnız görünür org/merkez kapsamındaki mevcut kişi adaylarıdır, iletişim doğrulaması veya birleştirme talimatı değildir. Yeni kaynak/CI/development/hosted aşamaları [backend durum sahibinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p10-sentetik-hosted-kabul) ayrı tutulur.
 
 **Frontend kabul ölçütü:** Telefon/e-posta uyarısını göster; yönetici satırı dışarıda bırakabilsin veya ayrı başvuru olarak seçebilsin. Hatalı satırı seçme; `selected_row_numbers` sıralı/benzersiz ve valid satırlardan oluşsun. `consents: []` kanıtsızlığı gösterir, izin veya tarih doldurulmaz. Mevcut kişi/başvuru otomatik güncellenmez veya birleştirilmez. API belirsizliğinde aynı operation_key/payload korunur; PREVIEW_STALE durumunda yeni önizleme ve yeniden seçim alınır. selected_rows_count yalnız asenkron kabul sayısıdır; başarı için job ve satır sonuçları yeniden okunup seçili kaynak satırlarıyla karşılaştırılır. Başarı ekranı kaynak dosyanın silindiğini söylemez. Bu backend devri karşı alan adına uygulama veya kabul onayı değildir.
+
+
+<a id="xreq-045"></a>
+## XREQ-045 Backend içerik dili ve değişmez belge onayı
+
+### Backend tüketici devri — 13 Kasım 2026
+
+[WF11](workflows.md#wf11), [WF14](workflows.md#wf14) ve [ayar tüketimi](settings.md#katılımcı-paylaşımı-ve-açık-karar-kanıtı) çağrı/gösterim sahibidir. Frontend statik SPA kalır. `notifications_list_v1.payload.title/body/language` ve kayıtlı `rendered_document.content/language` tekrar çevrilmeden gösterilir; menü/buton/form çevirileri kendi alanında kalır. Aynı mevcut user.language alanı içerik dil tercihinin sahibidir; ikinci tercih açılmaz. Yeni dijital onay `rendered_document_id` ile verilir, browser text/hash gönderilmez. Eksik onaylı kaynakta POLICY_NOT_CONFIGURED gösterilir; platform hukuki metni veya tahmini metinle doldurulmaz.
+
+**Frontend entegrasyon talebi:** Dijital belgeli satışta ilk sale_preview.id değerini `context.purchase_preview_id` olarak belge okuma/onayına taşı; son sale_preview çağrısında aynı satın alma parametreleri ve `document_purchase_id` ile devam et. Yanlış/stale/invalid kaynakta ilgili belge/preview yeniden okunur; farklı işlem onayı veya sahte başarı kullanılamaz. Onay sonrası gereksinim/anlaşma/işlem yeniden okunur. Abone No onay isteğine kopyalanmaz; kullanıcıya göstermek için mevcut yetkili person/finance/report okumasından alınır. Paylaşım bildiriminin gerçek dili/kimliği mevcut ayrı alan kararlarında gösterilir; hash/revision kanıtı backend'in seçtiği bildirime aittir.
+
+Backend kaynak/native/CI durumu [tek durum kaydındadır](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu). Bu kayıt frontend uygulaması/kabulü veya karşı alan adına onay değildir; backend işi frontend ekranını beklemez.

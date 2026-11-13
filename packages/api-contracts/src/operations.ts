@@ -223,4 +223,6 @@ export interface Operations {
   subscription_period_change_request_v1: {request: T.RequestSubscriptionPeriodChangeRequest; response: T.SuccessSubscriptionPeriodChangeRequest};
   instructor_agreement_get_v1: {request: T.RequestInstructorAgreementGet; response: T.SuccessInstructorAgreementGet};
   instructor_agreement_accept_v1: {request: T.RequestInstructorAgreementAccept; response: T.SuccessInstructorAgreementAccept};
+  content_catalog_get_v1: {request: T.RequestContentCatalogGet; response: T.SuccessContentCatalogGet};
+  content_catalog_save_v1: {request: T.RequestContentCatalogSave; response: T.SuccessContentCatalogSave};
 }

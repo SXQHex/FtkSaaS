@@ -343,6 +343,16 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **XREQ-027 ek backend keşif açığı:** CM olmayan Owner için mevcut abonelik selector'ında dört kaynak ailesi, aktif öğrenci sayfalama/Abone No ve aynı subscription sürümü ile dar keşif aday kaynakta tamamlandı. Genel CM writer kapıları korunur. Native aday CI, main/deploy ve gerçek hosted kabul açık kalır; [kaynak/doğrulama](00-FtkSaaS-yeni-sohbet-devir.md#xreq-027-owner-kaynak-keşfi) tek durum sahibidir. Önceki dönem değişimi teslimi geri açılmaz; [ortak talep](../../../docs/requests.md#xreq-027).
 
+<a id="s17"></a>
+### S17 — Sürümlü içerik ve sunucu belgesine bağlı onay
+
+- [ ] **Tür:** K · **Plan:** Mevcut plan/kanal/yetki sınırları · **Bağımlılık:** S10, P14–P16; yeni özellik veya kanal açmaz.
+- **Kabul:** Tek küçük katalog, yetkili tekrar çalıştırılabilir yayın komutu ve TR/EN platform başlangıçları; diğer üç dili seçmeden sentetik içerikle beş dil kapasitesi. Yeni dil/çeviri deploy istemez.
+- **Güvenlik:** Kapalı tür/değişkenler, aynı sürümde farklı içerik reddi, DB değişmezliği ve tam org/merkez yetkisi; kanonik kaynak/etki ve paylaşım epoch kapıları katalogla aşılamaz.
+- **Akış:** Kullanıcı/auto/organizasyon/platform dil sırası; aynı kaynak sürümü belge fallback'i; mevcut kuyruk/lease/opt-out/sessiz saat/retry ve terminal temizleme. Sunucuda tamamlanan değişmez belge ve UUID onay ilişkileri, aynı satın alma parametrelerine bağlı tüketim, yanlış belge/işlem ve doğru hash'li istemci metni saldırısının reddi.
+- **Koruma:** Eski onaylar/renewed_acceptance=false/hold ve paylaşım doğrulamaları korunur; yeni onay metin kopyalamaz. Kayıp çeviri olumlu kararı kapatır, geri çekmeyi kapatmaz. Eksik onaylı hukuki kaynak üretilmez.
+- **Teslim sınırı:** Tek Draft PR, merge yok. Kaynak/native/kalite/CI durumunun sahibi [devir](00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu); frontend çağrı/gösterim talebi [XREQ-045](../../../docs/requests.md#xreq-045) sahibindedir, frontend kabulü backend'i bekletmez.
+
 ## Pro işlevleri
 
 <a id="p01"></a>

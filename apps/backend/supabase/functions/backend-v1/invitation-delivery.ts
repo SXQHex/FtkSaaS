@@ -2,7 +2,7 @@ import {deliverTransactionalEmail} from './transactional-email.ts';
 import {sendEmail} from './email-provider.ts';
 type Env=(name:string)=>string|undefined;
 type Fetch=typeof fetch;
-type Claim={job_id:string;org_id:string;invitation_id:string;lease_token:string;recipient:string;sealed_token:string;from_email:string;app_origin:string;api_key:string};
+type Claim={job_id:string;org_id:string;invitation_id:string;lease_token:string;recipient:string;sealed_token:string;from_email:string;app_origin:string;api_key:string;catalog:{id:string;language:string;version:number;content:{title:string;text:string}}};
 const enc=new TextEncoder();
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),x=>x.toString(16).padStart(2,'0')).join('');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -21,6 +21,8 @@ async function unseal(value:string,serviceKey:string){
 function validClaim(x:any):x is Claim{
  return x&&['job_id','org_id','invitation_id'].every(k=>typeof x[k]==='string'&&uuid.test(x[k]))
   &&['lease_token','recipient','sealed_token','from_email','app_origin','api_key'].every(k=>typeof x[k]==='string'&&x[k].length>0)
+  &&x.catalog&&uuid.test(x.catalog.id)&&typeof x.catalog.language==='string'&&Number.isInteger(x.catalog.version)
+  &&typeof x.catalog.content?.title==='string'&&typeof x.catalog.content?.text==='string'&&!/[\r\n]/.test(x.catalog.content.title)
   &&!/[\r\n]/.test(x.recipient+x.from_email)&&/^https:\/\/[a-zA-Z0-9.-]+(?::[0-9]+)?$/.test(x.app_origin);
 }
 // Native Cron's private operational transport. This does not establish a human
@@ -50,8 +52,8 @@ export async function invitationTick(req:Request,env:Env,send:Fetch=fetch,now=Da
    const token=await unseal(item.sealed_token,serviceKey);
    const link=new URL('/invite',item.app_origin);link.hash=new URLSearchParams({token}).toString();
    // Immutable invitation + frozen sender/origin give byte-identical retry bodies.
-   const payload={from:item.from_email,to:[item.recipient],subject:'FtkSaaS hesap erişimi daveti',
-    text:'Hesap erişimi davetinizi kabul etmek için bağlantıyı açın:\n'+link.href+'\n\nBu davet yalnız gönderildiği doğrulanmış e-posta hesabıyla kabul edilebilir. Talep etmediyseniz bu e-postayı yok sayabilirsiniz.'};
+   const payload={from:item.from_email,to:[item.recipient],subject:item.catalog.content.title,
+    text:item.catalog.content.text.split('{{link}}').join(link.href)};
    const authorized=await rpc(command,{invitation_phase:'authorize'});
    if(authorized.authorized!==true){await rpc(command,{invitation_phase:'finish',retryable:false});return reply(200,{claimed:1});}
    const outcome=await sendEmail({apiKey:item.api_key,idempotencyKey:'ftksaas-invitation/'+item.job_id,payload},send);

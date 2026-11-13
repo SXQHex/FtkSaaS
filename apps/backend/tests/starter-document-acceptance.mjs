@@ -87,7 +87,7 @@ test('Starter private document lifecycle through native Auth and Storage',async 
  }
 });
 
-test('Digital documents freeze frontend text and consent without Storage objects',async t=>{
+test('Digital documents use immutable backend content and reject client rewrites without Storage objects',async t=>{
  const {preparationFixture}=await import('./starter-preparation-fixture.mjs');
  const f=await preparationFixture({studentUser:true,studentMembership:true}),{db,org,center,owner,student,studentPerson}=f;t.after(()=>db.end());
  const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,center_id:center,...b},k);
@@ -107,13 +107,15 @@ test('Digital documents freeze frontend text and consent without Storage objects
  const contents=()=>read({content_file_id:item.file.id});
  const shown=(await contents()).find(x=>x.version_id===version);assert.deepEqual(shown.digital_content,source);assert.equal(shown.content_hash,sha(source.text));assert.equal(Buffer.from(shown.content.data,'base64').toString('utf8'),source.text);
  await deny('VALIDATION_FAILED','document_accept_v1',{document_version_id:version,context:ctx});
- const displayed={...source,language:'en',text:'Title\nTerms shown in English.\nI accept.\n'},body={document_version_id:version,context:ctx,displayed_content:displayed,displayed_content_hash:sha(displayed.text)};
- await deny('VALIDATION_FAILED','document_accept_v1',{...body,displayed_content_hash:'0'.repeat(64)});
- await deny('VERSION_CONFLICT','document_accept_v1',{...body,displayed_content:{...displayed,template_version:'v2'}});
+ const displayed=shown.digital_content,body={document_version_id:version,context:ctx,rendered_document_id:shown.rendered_document.id};
+ assert.equal(shown.rendered_document.language,'tr');
+ await deny('VALIDATION_FAILED','document_accept_v1',{...body,displayed_content:displayed,displayed_content_hash:'0'.repeat(64)});
+ await deny('VALIDATION_FAILED','document_accept_v1',{...body,displayed_content:{...displayed,template_version:'v2'},displayed_content_hash:sha(displayed.text)});
  const k=key(),accepted=await api('document_accept_v1',body,student,k);assert.equal((await api('document_accept_v1',body,student,k)).replayed,true);
  const evidence=(await contents()).find(x=>x.version_id===version).digital_acceptance;
  assert.equal(evidence.id,accepted.primary_id);assert.equal(evidence.person_id,studentPerson);assert.deepEqual(evidence.displayed_content,displayed);assert.equal(evidence.content_hash,sha(displayed.text));assert.equal(evidence.source_content_hash,sha(source.text));assert(Number.isFinite(Date.parse(evidence.accepted_at)));
- await deny('IDEMPOTENCY_PAYLOAD_MISMATCH','document_accept_v1',{...body,displayed_content:{...displayed,text:'Changed'},displayed_content_hash:sha('Changed')});
+ await deny('VALIDATION_FAILED','document_accept_v1',{...body,displayed_content:{...displayed,text:'Changed'},displayed_content_hash:sha('Changed')});
+ const stored=(await db.query('select displayed_content,rendered_document_id from private.digital_document_acceptances where acceptance_id=$1',[accepted.primary_id])).rows[0];assert.equal(stored.displayed_content,null);assert.equal(stored.rendered_document_id,shown.rendered_document.id);assert.equal(evidence.evidence_kind,'server_document');
  await assert.rejects(db.query('update private.digital_document_acceptances set content_hash=$1 where acceptance_id=$2',['0'.repeat(64),accepted.primary_id]),/INTEGRITY_VIOLATION/);
  await assert.rejects(db.query('delete from private.digital_document_contents where file_id=$1',[item.file.id]),/INTEGRITY_VIOLATION/);
  const history=await api('management_state_get_v1',{operation:'document_accept_v1',selector:{operation:'document_accept_v1',key:{document_version_id:version}}},student);assert.deepEqual(history.items[0].current.values.digital_acceptance,evidence);

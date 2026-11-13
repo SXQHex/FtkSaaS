@@ -125,10 +125,14 @@ test('Instructor accepts the exact frontend agreement text bound to immutable ba
  const agreement=(await api('instructor_agreement_publish_v1',{person_id:studentPerson,discipline_id:discipline,format:'group',terms,valid:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2031-01-01T00:00:00Z'},reason:'Synthetic digital agreement'})).primary_id;
  const management=await api('management_state_get_v1',{operation:'instructor_agreement_accept_v1',selector:{operation:'instructor_agreement_accept_v1',key:{agreement_id:agreement}}},student);assert.equal(management.items[0].versions[0].version,1);
  const read=()=>api('instructor_agreement_get_v1',{agreement_id:agreement},student),initial=await read();assert.equal(initial.acceptance,null);assert.deepEqual(initial.agreement.terms,terms);
- const displayed={name:'Instructor agreement',language:'en',template_id:'instructor',template_version:'1',text:'Instructor agreement\nSession fee: TRY 200.00\nI accept.\n'},hash=createHash('sha256').update(displayed.text).digest('hex');
- const b={agreement_id:agreement,expected_version:initial.agreement.version,source_content_hash:initial.source_content_hash,displayed_content:displayed,displayed_content_hash:hash};
+ assert.equal(initial.rendered_document,null);assert.equal(initial.document_error,'POLICY_NOT_CONFIGURED');
+ const approved={name:'Synthetic instructor source',language:'tr',template_id:'instructor',template_version:'1',text:'Synthetic terms\n{{facts}}'};
+ await api('content_catalog_save_v1',{scope_key:'center:'+org+':'+center,code:'instructor.agreement',channel:'document',language:'tr',version:1,source_version:agreement,content:approved,action:'publish'});
+ const prepared=await read(),displayed=prepared.rendered_document.content,hash=createHash('sha256').update(displayed.text).digest('hex');
+ const b={agreement_id:agreement,expected_version:initial.agreement.version,source_content_hash:initial.source_content_hash,rendered_document_id:prepared.rendered_document.id};
  await deny('FORBIDDEN','instructor_agreement_accept_v1',b);
  await deny('VERSION_CONFLICT','instructor_agreement_accept_v1',{...b,source_content_hash:'0'.repeat(64)},student);
+ await deny('VALIDATION_FAILED','instructor_agreement_accept_v1',{...b,displayed_content:{...displayed,text:'Changed'},displayed_content_hash:createHash('sha256').update('Changed').digest('hex')},student);
  const k=key(),accepted=await api('instructor_agreement_accept_v1',b,student,k);assert.deepEqual(accepted.related,[{type:'instructor_agreements',id:agreement}]);assert.equal((await api('instructor_agreement_accept_v1',b,student,k)).replayed,true);
  assert.equal((await db.query('select state from core.operation_receipts where org_id=$1 and id=$2',[org,accepted.operation_id])).rows[0].state,'succeeded');
  assert.equal((await db.query('select count(*)::int n from private.digital_agreement_acceptances where org_id=$1 and agreement_id=$2',[org,agreement])).rows[0].n,1);
