@@ -1,6 +1,6 @@
 # FtkSaaS · Frontend geliştirme ve kabul listesi
 
-**Sıradaki iş** · E01.1–E01.4 — login-02 ile giriş görünümünü uygula ve çizimle karşılaştır.
+**Sıradaki iş** · E02 kayıt sayfasının signup-02 görsel/işlem dilimi; Google/posta dönüşü ve MFA kabulü ilgili açık Auth maddelerinde sürer.
 **Aktif hedef** · Çalışan Pro kabulü.  
 **Sonraki teslimler** · Starter → Business; bu goal kapsamında başlatılmaz.  
 **Çalışma alanı** · `apps/web1`, kendi npm kurulumu, testleri ve yayın süreci olan bağımsız uygulamadır. Üç plan aynı uygulamayı ve ortak backend sözleşmelerini kullanır.
@@ -13,9 +13,9 @@ Bu çalışmanın hedefi yalnız Pro işlevlerini uygulamak ve gerçek backend i
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan | Sayfa/işlev    | Durum       | Son doğrulama veya engel                                                           | Sonraki eylem                                                |
-| ---------- | ---- | -------------- | ----------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| E01.1–4    | Pro  | Giriş görünümü | Uygulanıyor | T02.2 yerel taşıma/tip testleri ve build geçti; T02.3 gerçek rol/ortam kabulü açık | Resmî aria-rhea login-02 bloğunu auth alanında çizime uyarla |
+| Aktif adım | Plan | Sayfa/işlev | Durum  | Son doğrulama veya engel                                                                                                     | Sonraki eylem                                                                    |
+| ---------- | ---- | ----------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| E02.1–3    | Pro  | Kayıt       | Sırada | E01 görünüm/klavye/Axe ve P01.2 gerçek development parola–hesap–çıkış kabulü geçti; callback/oturum regresyonları doğrulandı | signup-02 hazır bloğunu auth alanında çizime ve native kayıt sözleşmesine uyarla |
 
 Her başarılı dilimden veya somut engelden sonra bu satırı güncelle. Yeni oturumda önce satırı, aktif sayfanın alt adımlarını ve yalnız ilgili sözleşme/kodu oku. Tamamlanmış maddeleri yeni kaynağa etkisi gerektirmedikçe yeniden uygulama. Mevcut Git değişikliklerini incele, başkasının çalışmasını koru.
 
@@ -216,13 +216,23 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 İlk uygulama sayfası **E01 giriş**. İş seçimi /goal çalışma tablosunu izler. Ortak kabuk ilk tüketici sayfada kurulur. Her sayfanın seçilen hazır kaynakları ve işlem bazlı ilerlemesi kendi maddesinde tutulur.
 
 - [ ] **E01** · **Giriş** — çizim `data-view="a-giris"` · İşlev P01.2, P01.3 · Route `/login` · Rol/kapsam: Anonim · Hazır kaynak: login-02; Field, Input, Button, Separator · Bağ: Native parola/Google; tek callback sahibi.
-  - [ ] **E01.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
-  - [ ] **E01.2** · Yukarıda eşlenen hazır kaynakları mevcut proje envanteriyle karşılaştır. Eksik olanın resmi registry/CLI kaynağını, sürümünü ve React Aria/Rhea uyumunu doğrula; kurulu bileşeni yeniden üretme. K02/K03 varsa seçim ölçütünü uygula.
-  - [ ] **E01.3** · `src/routes/login.tsx` üzerinden `src/features/auth/login-page.tsx` sayfasını aç. Resmî `login-02` bloğundan gelen `login-form.tsx` dosyasını sayfanın yanında tut. Hazır bloğun metnini, temasını ve yerleşimini çizime uyarla.
-  - [ ] **E01.4** · Aynı viewport, tema ve durumdaki çizimle tarayıcı karşılaştırması yap. Açıklanmamış görsel farkları düzelt, karşılaştırma sonucunu kaydet.
+  - [x] **E01.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
+  - [x] **E01.2** · Yukarıda eşlenen hazır kaynakları mevcut proje envanteriyle karşılaştır. Eksik olanın resmi registry/CLI kaynağını, sürümünü ve React Aria/Rhea uyumunu doğrula; kurulu bileşeni yeniden üretme. K02/K03 varsa seçim ölçütünü uygula.
+  - [x] **E01.3** · `src/routes/login.tsx` üzerinden `src/features/auth/login-page.tsx` sayfasını aç. Resmî `login-02` bloğundan gelen `login-form.tsx` dosyasını sayfanın yanında tut. Hazır bloğun metnini, temasını ve yerleşimini çizime uyarla.
+  - [x] **E01.4** · Aynı viewport, tema ve durumdaki çizimle tarayıcı karşılaştırması yap. Açıklanmamış görsel farkları düzelt, karşılaştırma sonucunu kaydet.
   - [ ] **E01.5** · Sayfanın gerçek işlevlerini ilgili P alt maddelerine göre tek tek bağla. Her işlemde yetkili okuma → kullanıcı eylemi → sonucu yeniden okuma yolunu tamamla. Birden çok işlemde ayrı alt kutular kullan.
   - [ ] **E01.6** · Bağlanan işlemler için ilgili başarı/ret/hata-kurtarma senaryosunu ve klavye/mobil davranışını doğrula. Gerçek ortam gerektiren açık kontrolleri kendi işlev maddesine bağla.
   - [ ] **E01.7** · Kaynak, test ve görsel kanıtı kaydet. Bu sayfadaki bütün uygulanabilir işlemler ve izinli farklar doğrulanınca üst kutuyu kapat, devam kaydını güncelle.
+
+  **E01 kayıt · 13 Kasım 2026:** `src/features/auth/login-form.tsx`, resmî `@shadcn/login-02` / `aria-rhea` bloğundan shadcn 4.23.0 CLI ile alındı; kurulu Button overwrite edilmedi. Field/Input/Label/Separator, Alert/Card ve ilk MFA tüketicisi için InputOTP de resmî CLI kaynaklarıdır. Form TanStack Form + Zod, sayfa TanStack Router kullanır. Kaynak `design-reference/index.html` içindeki `a-giris`; 1440×900 ve 390×844, açık/koyu temada yerel Chromium görüntüleri `.tmp/e01-{app,reference}-<genişlik>-<tema>.png` altında karşılaştırıldı. Font ailesi, 24px/30px başlık, 36px kontrol, 8px kontrol radius'u, 22rem form, 900px yan panel breakpoint'i ve tokenlar referansa uyar. Dört durumda taşma yok; E01 klavye/validation/Axe testleri 4/4 geçti. Çizimin önizleme barı, demo hesap/parola notu ve kurgusal stüdyo markası ürün arayüzüne taşınmadı; giriş öncesi organizasyon bilinmediğinden FtkSaaS adı kullanılır. Bu demo parçalarının çıkarılması merkezlenen formun dikey konumunu etkiler. Özgün çizim JS’sinde `SHARED.authRender is not a function` gözlendi; salt okunur kaynak değiştirilmedi, uygulamada bu hata yok.
+
+  **İşlev dilimi:** Native parola → AAL kontrolü → `account_get_v1`; tek manual PKCE callback sahibi ve allowlist next; native oturum değişiminde eski UI/cache saklanmadan route yeniden değerlendirmesi. İlk salt okunur `/account` ve TOTP `/mfa` tüketicileri E01 önkoşulu olarak bağlandı; E06/E10 tam görsel/işlev kabulü değildir. Google gerçek provider/posta callback kabulü ve P01 kimlik yönetimi açık.
+
+  **Gerçek ortam kanıtı (T02.3/E01.5–6/P01.2):** 13 Kasım 2026, mevcut development Supabase ve `http://127.0.0.1:5173`, headless Chromium, mevcut synthetic owner fixture. İlk denemedeki CORS403 sonrasında kullanıcı Edge/Worker allowlist’ine bu origin’i mevcut kayıtları koruyarak ekledi. Yeniden denemede native parola HTTP200 → `account_get_v1` HTTP200 → `/account` → sayfa yenileme → ikinci sekmede aynı hesap → native local çıkış → iki sekmede `/login` → korumalı adrese yeniden girişin reddi geçti. Browser pageerror sıfır. Kimlik bilgisi/token kaydedilmedi; maskesiz yalnız path/status içeren yerel sonuç `.tmp/e01-hosted-result.json`. P01.2 kapandı; rol bazlı diğer hesaplar, Google/posta/MFA ve gerçek statik yayın kabulü kendi açık maddelerinde kalır.
+
+  **Son dilim doğrulaması:** `npm run verify` (macOS, Node 24.22.1/npm 11) geçti: 37/37 birim/bileşen testi, 9/9 Chromium testi, tip/lint/format/i18n, production build ve 3/3 politika testi. Son graph 290 modül/22 JS chunk; etkin Devtools, UI/event-bus işareti, backend/shared veya çizim import’u yok. Yerel log `.tmp/e01-final-verify.log`. Callback bootstrap/single-exchange ve public formun oturum geçişinde korunması regresyonları eklendi. Farklı modelle bağımsız son kaynak incelemesinde gerekli bulgu kalmadı; bu inceleme gerçek Google/posta sağlayıcı kabulü değildir.
+
+  **Bundle kararı:** Kullanıcı resmî production no-op çözümünü açıkça seçti. TanStack Form’un altındaki etkin 0.4.4 yerine exact 0.5.1 npm override kullanıldı; yalnız kaynak hash'i doğrulanan `noop.js` ve root selector modülü izinli. Etkin plugin/panel/event-bus yasak; değiştirilmiş byte/sürüm ve aktif plugin olumsuz testleri 3/3 geçti. Production graph/JS denetimi etkin Devtools veya olay veri yolu bulmadı. [Resmî davranış](https://tanstack.com/devtools/latest/docs/production#event-client-in-production).
 
 - [ ] **E02** · **Kayıt** — çizim `data-view="a-kayit"` · İşlev P01.1 · Route `/signup` · Rol/kapsam: Anonim · Hazır kaynak: signup-02; Field, Input, Checkbox, Alert · Bağ: Signup-check → native kayıt; otomatik işletme vaadi yok.
   - [ ] **E02.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
@@ -634,7 +644,7 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 | T02.2 · ekran için ilgili T03 eşlemesi | F04, F06 · [WF01](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf01) | Native Auth ve hesap akışları |
 
 - [ ] **P01.1** · E-posta ile kayıtta sözleşmedeki ön kontrolü ve native doğrulama dönüşünü bağla. Yeni doğrulanmış hesap giriş yapabilir, bağlı merkez ve rolü backend’den okunur.
-- [ ] **P01.2** · Parolalı giriş, çıkış ve korumalı sayfayı yenileme akışını tamamla. Çıkıştan sonra aynı adresi açan kullanıcı giriş ekranına ulaşır.
+- [x] **P01.2** · Parolalı giriş, çıkış ve korumalı sayfayı yenileme akışını tamamla. Çıkıştan sonra aynı adresi açan kullanıcı giriş ekranına ulaşır.
 - [ ] **P01.3** · Google giriş/dönüşünü ve mevcut hesapta kimlik bağlama/kaldırmayı tamamla. Kullanıcı kendi hesabına döner ve kalan giriş yöntemleri güncel okunur.
 - [ ] **P01.4** · Parola kurtarma ve hesap içi parola değişikliğini tamamla. Geçerli bağlantıyla yeni parola kullanılabilir, tüketilmiş bağlantı anlaşılır hata verir.
 - [ ] **P01.5** · TOTP kurulumunu, native doğrulamayı ve korumalı hedefe dönüşü tamamla. Yanlış kodda hedef kapalı kalır, doğru koddan sonra erişim yeniden okunur.

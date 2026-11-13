@@ -6,6 +6,7 @@ import { I18nextProvider } from "react-i18next";
 import { I18nProvider } from "react-aria-components/I18nProvider";
 
 import { i18n } from "./i18n";
+import { captureAuthCallback } from "./features/auth/callback";
 import { routeTree } from "./routeTree.gen";
 import "./index.css";
 
@@ -17,6 +18,8 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+captureAuthCallback();
 
 const router = createRouter({
   routeTree,
