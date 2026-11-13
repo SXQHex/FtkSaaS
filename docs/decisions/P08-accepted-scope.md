@@ -44,7 +44,13 @@ Merkeze bağlı form/reklam güvenilir eşlemesindeki merkeze düşer. Merkez se
 
 ### Geçmiş kayıtların aktarımı
 
-Eski kayıtlar otomatik taşınmaz. Alan eşlemesi, mükerrerlik ve onay kanıtlarını gösteren önizlemeden seçilen kayıtlar yetkili onayıyla aktarılır. Kaynak veri silinmez. Kanıtı bulunmayan pazarlama izni verilmiş sayılmaz. Aktarım tekrarları yeni kişi/başvuru üretmez; farklı gerçek başvuruların geçmişi kaybolmaz. Bu karar canlı aktarım çalıştırma yetkisi değildir.
+Eski kayıtlar otomatik taşınmaz. Alan eşlemesi, mükerrerlik ve onay kanıtlarını gösteren önizlemeden seçilen kayıtlar yetkili onayıyla aktarılır. Telefon/e-posta eşleşmesi yalnız mükerrerlik uyarısıdır; mevcut kişi veya başvuru otomatik birleştirilmez/güncellenmez. Yönetici satırı seçim dışında bırakabilir veya ayrı başvuru olarak aktarabilir. Kalıcı kaynak kimliği aynı kaydın tekrarında yeni başvuru üretmez; telefon/e-posta tek başına kaynak kimliği değildir.
+
+Seçilen satır kümesi atomiktir: tamamı aktarılır veya hiçbir satır yazılmaz. Önizlemede hatalı satırlar seçilmeyebilir; uygulama anında geçersizleşen seçili satır sessizce atlanmaz. Kaynak dosya aktarım nedeniyle silinmez.
+
+Pazarlama izin kanıtı eksik başvurular aktarılabilir; eksik kanıt izin verilmiş sayılmaz ve pazarlama gönderimlerine dahil edilmez. Mevcut boş onay listesi kanıtsızlığı temsil eder; yeni bir izin durumu türetilmez. Kanıtlı onaylar kendi sürüm/zaman/kaynak bilgisiyle korunur. Başvuru tarihi izin tarihi yerine geçmez; eksik izin, metin veya tarih uydurulmaz.
+
+Pro kabulü gerçek hosted ortamda açıkça sentetik dosya → önizleme → satır seçimi → aktarım → kaynak satırlarıyla mutabakat zinciriyle yapılır. Belirli bir işletmenin gerçek eski verisini taşıması ayrı, somut dosya/önizleme/seçim onayı gerektiren operasyondur ve Pro teslimini bekletmez. Bu karar gerçek müşteri verisini taşıma veya kaynak veriyi silme yetkisi değildir.
 
 ## Etkinlik kapasitesi
 

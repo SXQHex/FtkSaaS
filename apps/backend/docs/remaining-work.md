@@ -502,16 +502,16 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Bağımlılık:** P05,P06
 - **Kabul:** Alan/mükerrer/onay önizlemesinden seçilen kayıtlar yetkili onayıyla taşınır.
 - **Sınır/olumsuz durum:** Kaynak silinmez; kanıtsız pazarlama izni üretilemez; gerçek veri fixture olmaz.
-- **Doğrulama senaryosu:** Örnek veriyle tekrar/rollback/mutabakat; gerçek aktarım için ayrı somut önizleme ve kullanıcı yetkisi.
+- **Doğrulama senaryosu:** Pro için gerçek hosted ortamda açık sentetik dosya→önizleme→seçim→atomik aktarım→kaynak satırlarıyla mutabakat; başarısız seçili setin sıfır kısmi kaydı ve tekrarın çoğalmaması. İşletmeye özel gerçek aktarım ayrı somut önizleme/seçim onayıyla operasyondur, Pro kapısı değildir.
 - **Kaynak alanı:** import preview/CRM mapping; aktarım runbook/test
 
 **Uygulama dilimleri:**
 
-**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday, merge/main ve development teslimi doğrulandı; P10.3 gerçek veri aktarımı ayrı açık. Teknik sınırlar ve API sırası WF11 sahibindedir.
+**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday, merge/main ve development teslimi doğrulandı; P10.3 sentetik hosted zincir kabulü ayrı açık; işletmeye özel gerçek aktarım Pro tesliminden bağımsız operasyondur. Teknik sınırlar ve API sırası WF11 sahibindedir.
 
 - [x] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
 - [x] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
-- [ ] P10.3 — Gerçek kaynak için somut önizleme ve seçilecek satırlar kullanıcı tarafından onaylanmadan hosted aktarım yapma. Kaynağı silme/değiştirme; çıktı/rapora kişisel veri veya secret yazma. Bu PR kaynak uygulaması canlı aktarım yetkisi değildir.
+- [ ] P10.3 — [Kabul edilmiş aktarım kararlarıyla](../../../docs/decisions/P08-accepted-scope.md#geçmiş-kayıtların-aktarımı) gerçek hosted sentetik dosya→önizleme→seçim→aktarım→mutabakat zincirini tamamla. Atomik hata sonrası kısmi kayıt kalmadığını, tekrarın yeni başvuru üretmediğini ve kaynak dosyanın korunduğunu doğrula. Karar belgesi, kaynak/test, CI/development ve hosted kabul ayrı kaydedilir; frontend ekranı/onayı beklenmez. İşletmeye özel gerçek eski veri aktarımı ayrıca yetkilendirilen operasyon olarak kalır; Pro teslimini bekletmez.
 
 <a id="p11"></a>
 ### P11 — Deneme, takip ve segment tam akışı
