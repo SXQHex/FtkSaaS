@@ -42,6 +42,7 @@ Dosyasız belge ve eğitmen onayının opt-in hosted API kabulü: `node scripts/
 
 İş takviminin opt-in hosted API kabulü: `node scripts/acceptance/s10-hosted-work-calendar.mjs`. Aynı development projesinde `FTK_ACCEPTANCE_EMAIL`, `FTK_ACCEPTANCE_PASSWORD`, `FTK_ACCEPTANCE_APIKEY`, `FTK_ACCEPTANCE_ORG`, `FTK_ACCEPTANCE_CENTER`, `FTK_ACCEPTANCE_DISCIPLINE` ve `FTK_ACCEPTANCE_START` gerekir. Aktif Pro planında CM yetkili test hesabı, ayrılmış test disiplini ve en az bir gün sonraki açık test saati seçilir. Çalıştırıcı katılımcısız/görevsiz bir saatlik seans oluşturur; kapanışın yalnız bu seansı etkilediğini doğrulamadan ayar yazmaz. Açık iptal, kapanış/replay ve sonraki seans reddini sınar; yalnız kendi seanslarını iptal edip takvimin özgün değer/kaynağını geri yükler. Değişmez test/ayar geçmişi kalır. Eşzamanlı takvim değişiminde zorla restore yapmaz; temizlik hatası başarı sayılmaz. Yalnız açtığı native oturumu local scope ile kapatır; kabul kapsamı [backend kaydındadır](docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-is-takvimi-hosted-kabulu).
 
+<a id="icerik-katalogu-yayin"></a>
 ## İçerik kataloğu ve yayın
 
 Normatif kapsam/dil/onay [FD04/FD08](../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#fd08--belge-onay-dış-görünürlük-kabul-edildi), tüketim [WF11](../../docs/workflows.md#wf11), kuyruk [WF20](../../docs/workflows.md#wf20) sahibindedir. Backend metin envanteri:

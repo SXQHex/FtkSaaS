@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4b08c964527548e6824283bf2a0a95f815198367f049ed2726279ce8174369f4",
-        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
+        "fingerprint": "7d3ac234ca505804201a3af3a9a02213d2ee09acc5ea816337e5c4c5a80d9c31",
+        "reason": "Yedi assertion parmak izi kullanıcı onayı ve bağımsız kapsam incelemesiyle 13 Aralık 2026 tarihine bağlı kaydedildi; kalite eşiği, checker ve güvenlik değişmedi."
       }
     },
     {
@@ -1211,8 +1211,8 @@
         "content_catalog_save_v1"
       ],
       "review": {
-        "fingerprint": "e066637691607ed395751169e8c5893f4bca5b5af20d83af3a3c905f5cfd2fcf",
-        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
+        "fingerprint": "e74aeb3831f3c86ba3c64562e9fd7e6002bcf20b8a7b1af70a2db78af95162b8",
+        "reason": "Dijital kabul runnerı typed backend HTTP4xx hata kodunu korur; istemci metin/hash reddi ve iki native oturumun temizliği ek regresyon testiyle doğrulanır. Ürün/API rehberi aynı."
       }
     },
     {
@@ -1344,8 +1344,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "9f1d6b2f31621a98e3b65fc0ba6b316d1ec163eb484bf4877f58f9a598d1e812",
-        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
+        "fingerprint": "92d33a7b4252882e5f243245dd7408b6f810d4feed1a2e5600070be57f119295",
+        "reason": "Sentetik paylaşım fixtureı EN bildirimi yayımlarken ilgili org belge dilini açık EN seçer ve kalan bölgesel değerleri korur; kaynak yokken fallback veya sunucu onay kapısı gevşetilmez."
       }
     },
     {

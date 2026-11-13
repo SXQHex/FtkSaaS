@@ -15,8 +15,13 @@ export async function acceptDigital({email,password,apikey,org,center,product,ag
  const sessions=[],checks=[];let phase='login';
  const json=async(path,body,session)=>{
   const response=await request(origin+path,{method:'POST',headers:{apikey,'content-type':'application/json',...(session?{authorization:'Bearer '+session}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
-  if(!response.ok)throw Error('HTTP_'+response.status);
-  return response.status===204?null:response.json();
+  if(response.status===204)return null;
+  const result=await response.json();
+  // Typed backend rejections may use HTTP 4xx. Preserve the safe error code
+  // for the existing negative scenarios; Auth/provider failures stay HTTP errors.
+  const backendError=path.startsWith('/functions/v1/backend-v1/')&&result?.ok===false&&typeof result.error?.code==='string';
+  if(!response.ok&&!backendError)throw Error('HTTP_'+response.status);
+  return result;
  };
  const login=async(email,password)=>{
   const session=(await json('/auth/v1/token?grant_type=password',{email,password})).access_token;
