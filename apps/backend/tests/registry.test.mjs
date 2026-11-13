@@ -163,3 +163,5 @@ import './permission-preparation-acceptance.mjs';
 import './plan-target-discovery-acceptance.mjs';
 import './sale-change-inventory-acceptance.mjs';
 import './sharing-consent-acceptance.mjs';
+import './content-catalog-acceptance.mjs';
+import './content-documents-acceptance.mjs';

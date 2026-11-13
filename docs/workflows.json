@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d2a6fba84648a44d15a834f2f942a4775b46e60e7c2ae38ac484db1232c1004a",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "4b08c964527548e6824283bf2a0a95f815198367f049ed2726279ce8174369f4",
+        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
       }
     },
     {
@@ -377,8 +377,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "a3b3c9859fac3f73f408e94f1e2dea07fccb550ac2ddfb57169862d9c2af7c68",
-        "reason": "Reviewed WF01 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "30fb64db77dac43dbfc3d5595b56c66009fb68ece52beb64da0f091ec2e612dd",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -485,8 +485,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "ea474c48755f5cd852e4fb6bbd07066651051fcfa1e09f735e12404a179e591d",
-        "reason": "Reviewed WF02 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "6a5d834eff2f1fe2cf3f05c9d8f33dea61493b27e4f04a39ababe03d4f7f83a0",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -584,8 +584,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "7e5ac49693046186644ae075210cc12a1fc9d7eb6baf14cb90d5a13c2c78d2d6",
-        "reason": "Reviewed WF03 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "b5d10e57468c177c6040e151ae8721af3950538eb046e6a63322234aee43b29c",
+        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
       }
     },
     {
@@ -677,8 +677,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "07c05dd08d9a974658035f396bf7e2492e2fe3e60701fcad2b5cc634f1e31bd9",
-        "reason": "Reviewed WF04 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "cc5fbe673c3515d35f5bc4f87065c6fd16053ba49aee30deb46ef3496f2b3866",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -696,7 +696,8 @@
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
         "apps/backend/tests/sale-preview-impact-acceptance.mjs",
-        "apps/backend/tests/sale-change-inventory-acceptance.mjs"
+        "apps/backend/tests/sale-change-inventory-acceptance.mjs",
+        "apps/backend/tests/content-documents-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -749,7 +750,10 @@
         "apps/backend/database/sale-preview-impact.sql",
         "apps/backend/supabase/migrations/20261105153000_sale_preview_impact.sql",
         "apps/backend/database/sale-change-inventory.sql",
-        "apps/backend/supabase/migrations/20261107003633_sale_change_inventory.sql"
+        "apps/backend/supabase/migrations/20261107003633_sale_change_inventory.sql",
+        "apps/backend/database/content-documents.sql",
+        "apps/backend/database/content-source-guards.sql",
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -777,8 +781,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "5c357bdabe993d5250184665a8eb2faf4a0af3431ca609f06307046978528b1c",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "f354c3f1c052aa8a581da1ce23588cb5451c5cca5091535e3adb2e7de3bc73be",
+        "reason": "Reviewed catalog publication, source guards, language fallback, frozen delivery, server-document consent, purchase pinning and sharing epochs with native regression sources; guide updated to the 13 November user decision."
       }
     },
     {
@@ -862,8 +866,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "88780b08967f7078ca92d6e6428f8c7692718891bb9f85854dab4380c4585128",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "aed1fea35dbd295b3990c16a9f548735a53ad034de8de0d8129b929a78f4674b",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -925,8 +929,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "09a2fb9de18763b63def4512d806f36b27ffec0a955f6fcef675bcf7505e4754",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "9f8aed2212b52ab6b56099951f131a2f80fb69a509f0f4a8c51feae3490c1001",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -990,8 +994,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "aadf34574442666f39d2a054e450f0d46400ba9dc1ec778c64bf6e0d91dae114",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "1692ee09c124818915a7e1f54b5506e6c2fc421a84b1ab4deee2445167bb526f",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1089,8 +1093,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "80e3bad249146115ded65d6f08c101a743b32cf302d2431591063e6d8758a46d",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "0b1d9cc838577dc3cc2fcbad4396d45efd98185df892f377ddf858b65a6ad4d6",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1148,8 +1152,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "4990b72c5529adf576813c3c3b68e6837f90f7f951d68b53345adf305cc7dfc8",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "464bc32be1236c6f43ce2885ff2bea49ef849c72c1fb3da5fa4f3c0486617f3c",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1166,7 +1170,9 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/transactional-email-acceptance.mjs",
         "apps/backend/tests/hosted-digital-runner-unit.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/content-catalog-acceptance.mjs",
+        "apps/backend/tests/content-documents-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1182,7 +1188,16 @@
         "docs/workflows.md",
         "apps/backend/database/digital-document-snapshots.sql",
         "apps/backend/supabase/migrations/20261108033244_digital_document_snapshots.sql",
-        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs"
+        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs",
+        "apps/backend/database/content-catalog.sql",
+        "apps/backend/database/content-catalog-api.sql",
+        "apps/backend/database/content-platform-v1.sql",
+        "apps/backend/database/content-documents.sql",
+        "apps/backend/database/content-source-guards.sql",
+        "apps/backend/config/content/platform-v1.json",
+        "apps/backend/scripts/content-publish.mjs",
+        "apps/backend/supabase/migrations/20261113090000_content_catalog.sql",
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1191,11 +1206,13 @@
         "document_version_publish_v1",
         "document_requirements_get_v1",
         "document_accept_v1",
-        "document_publication_preview_v1"
+        "document_publication_preview_v1",
+        "content_catalog_get_v1",
+        "content_catalog_save_v1"
       ],
       "review": {
-        "fingerprint": "3c582a9332c585629279882365c77f22851d957cedf50d86bfb903078c898454",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "e066637691607ed395751169e8c5893f4bca5b5af20d83af3a3c905f5cfd2fcf",
+        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
       }
     },
     {
@@ -1305,7 +1322,14 @@
         "apps/backend/database/settings-sharing-catalog-authority.sql",
         "apps/backend/supabase/migrations/20261112083837_s10_sharing_catalog_authority.sql",
         "apps/backend/database/settings-offer-duration-required.sql",
-        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
+        "apps/backend/database/settings-catalog-v23.sql",
+        "apps/backend/database/content-language-settings.sql",
+        "apps/backend/database/content-sharing.sql",
+        "apps/backend/database/content-documents.sql",
+        "apps/backend/database/content-source-guards.sql",
+        "apps/backend/supabase/migrations/20261113090100_content_delivery.sql",
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1320,8 +1344,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "a944d101a7df6e5b3a69195232f1e984460cf03c119002b76c4972a8ca78e1a4",
-        "reason": "Reviewed WF12 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "9f1d6b2f31621a98e3b65fc0ba6b316d1ec163eb484bf4877f58f9a598d1e812",
+        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
       }
     },
     {
@@ -1396,8 +1420,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "52aa676c3f69e40018f918a3149c541d1365976928f8e47e848c5cf036668095",
-        "reason": "Reviewed WF13 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "8285955f247c4b3e1cc8bc946d3b1b06be672861dddcd2222c2efd246ded1255",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1412,7 +1436,8 @@
         "apps/backend/tests/program-configuration-acceptance.mjs",
         "apps/backend/tests/earning-payment-selection-acceptance.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/agreement-preparation-acceptance.mjs"
+        "apps/backend/tests/agreement-preparation-acceptance.mjs",
+        "apps/backend/tests/content-documents-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1432,7 +1457,10 @@
         "apps/backend/database/agreement-preparations.sql",
         "apps/backend/database/settings-catalog-v13.sql",
         "apps/backend/database/digital-agreement-acceptance.sql",
-        "apps/backend/supabase/migrations/20261108033820_digital_agreement_acceptance.sql"
+        "apps/backend/supabase/migrations/20261108033820_digital_agreement_acceptance.sql",
+        "apps/backend/database/content-documents.sql",
+        "apps/backend/database/content-source-guards.sql",
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1445,8 +1473,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "2f365c1d9b4df3031092dc51b83dbb3bee90a650724ce000433157a7e99b9cc3",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "5233668650af47fadb1cacbbf3577799fd209b9f40ffce229465a15d24edeee2",
+        "reason": "Reviewed catalog publication, source guards, language fallback, frozen delivery, server-document consent, purchase pinning and sharing epochs with native regression sources; guide updated to the 13 November user decision."
       }
     },
     {
@@ -1520,8 +1548,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "33afc82d07a7babc65775f5f761129a5ea430fca21584c1ec005cffaaaa07434",
-        "reason": "Reviewed WF15 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "016891e24c66ff40a813f4631b439f95565cead66ad4f3935077430eafc467a4",
+        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
       }
     },
     {
@@ -1580,8 +1608,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "817787ebcb58726ed537358a9649d0d92cd4a5e23689027f844f94496f1ea9f9",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "30f4e7bb9424de36f3cde1d7b4baaba3741354fd455e6a70c66664217172c230",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1669,8 +1697,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "d2e38fbaf72581a8f821bb7b19e9339c424476603a3cbf6c82462d1d6a8f3371",
-        "reason": "Reviewed WF17 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "05c1f06810464783e4c25adc0825bb86cdcc14b857eeea216496d2fc644be4bd",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1702,8 +1730,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "49705ec287854b280d541ee13b5f7f8fbf6a87d6a24ac03de6eb96c87b6b304f",
-        "reason": "Reviewed WF18 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "352ef5d85b6b83be7d63974df85e3f977d9078b75e4a09533bbc0760fab1917d",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1733,8 +1761,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "6d4b1583c1b9330487b89f6109b80f61d7d3837f70130b0b5ccfa218ed18037a",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "f41ee740794bb3524dede2044b32d73fd1f263dbdd48aa9847516b76ec219ef7",
+        "reason": "Reviewed shared dispatcher and generated RPC/schema diff: two additive service-only catalog operations and shared DTO extensions only; existing flow behavior, permissions, plan gates and API sequence remain intact."
       }
     },
     {
@@ -1761,7 +1789,8 @@
         "apps/backend/tests/transactional-email-unit.mjs",
         "apps/backend/tests/native-account-erasure-unit.mjs",
         "apps/backend/tests/export-retention-acceptance.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/content-catalog-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1837,7 +1866,12 @@
         "apps/backend/supabase/migrations/20261112214500_ops_monitor_incidents.sql",
         "apps/backend/database/ops-edge-integrity.sql",
         "apps/backend/supabase/migrations/20261112220500_ops_edge_integrity.sql",
-        "apps/backend/supabase/functions/backend-v1/ops-errors.ts"
+        "apps/backend/supabase/functions/backend-v1/ops-errors.ts",
+        "apps/backend/database/content-catalog.sql",
+        "apps/backend/database/content-delivery.sql",
+        "apps/backend/database/content-platform-v1.sql",
+        "apps/backend/config/content/platform-v1.json",
+        "apps/backend/supabase/migrations/20261113090100_content_delivery.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1852,8 +1886,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "712e3b230246fddd089e6b7b3891c3049702d5eda290a4e74563a950acb7b03e",
-        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
+        "fingerprint": "1519bb3893bd7c47767faff90dc57f6299726b87ffb11c0ee704522a272bc72d",
+        "reason": "Reviewed final source and assertion coverage: normalize only changed language schema/consumer, preserve all other metadata, compare raw sharing evidence to API except resolved content; canonical source and all runtime safeguards retained."
       }
     }
   ]

@@ -90,7 +90,8 @@ test('settings source commands stay explicit and regional defaults do not introd
  assert(valid('OrganizationRegionalDefaults',region));
  for(const patch of [{fallback_language:'xx'},{application_language:'invented'},{currency:'USD'}])assert(!valid('OrganizationRegionalDefaults',{...region,...patch}));
  const implementation=fs.readFileSync('database/settings-sources-history-region.sql','utf8');
- const schema=JSON.parse(implementation.split("$schema$select '")[1].split("'::jsonb$schema$")[0]);assert.deepEqual(schema,p.$defs.OrganizationRegionalDefaults);
+ const schema=JSON.parse(implementation.split("$schema$select '")[1].split("'::jsonb$schema$")[0]);const historical=structuredClone(p.$defs.OrganizationRegionalDefaults);for(const field of ['document_language','notification_language'])historical.properties[field]={type:'string',enum:['tr','en']};assert.deepEqual(schema,historical);
+ const current=JSON.parse(fs.readFileSync('database/content-language-settings.sql','utf8').split("$schema$select '")[1].split("'::jsonb$schema$")[0]);const expanded=structuredClone(p.$defs.OrganizationRegionalDefaults);for(const field of ['document_language','notification_language'])expanded.properties[field]=p.$defs.ContentLanguage;assert.deepEqual(current,expanded);assert(valid('OrganizationRegionalDefaults',{...region,document_language:'qaa',notification_language:'qab'}));assert(!valid('OrganizationRegionalDefaults',{...region,document_language:'invalid_locale'}));
  const catalog=fs.readFileSync('database/settings-catalog-v16.sql','utf8');
  const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_settings_sources_history_region.sql'));
  assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),catalog.replace('commit;\n',()=>implementation.replace('begin;\n','')));
@@ -652,7 +653,7 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  assert(!valid('DowngradeRetainedResource',{...resource,email:'unrequested@example.invalid'}));
 });
 
- test('Digital document bodies are closed, file-or-inline exclusive and consent snapshot hashes travel together',async()=>{
+ test('Digital document bodies are closed, file-or-inline exclusive and consent references server-owned documents',async()=>{
  const content={name:'Terms',language:'en-GB',template_id:'terms',template_version:'v1',text:'Exact text\n'};
  assert(valid('DigitalDocumentContent',content));assert(!valid('DigitalDocumentContent',{...content,script:'untrusted'}));
  const body={client_api_version:1,request_id:id,org_id:id,operation_key:id,version_label:'v1',scope:{kind:'organization'},requirements:[],digital_content:content};
@@ -670,7 +671,7 @@ test('XREQ027 resource selectors require an explicit version and keep discovery 
  }
  const acceptance={client_api_version:1,request_id:id,org_id:id,operation_key:id,document_version_id:id,context:{gate:'sale',subject:{type:'product_versions',id}}};
  assert(valid('Request_document_accept',acceptance));assert(!valid('Request_document_accept',{...acceptance,displayed_content:content}));
- assert(valid('Request_document_accept',{...acceptance,displayed_content:content,displayed_content_hash:'a'.repeat(64)}));
+ assert(!valid('Request_document_accept',{...acceptance,displayed_content:content,displayed_content_hash:'a'.repeat(64)}));assert(valid('Request_document_accept',{...acceptance,rendered_document_id:id}));const {document_version_id,...byDocument}=acceptance;assert(valid('Request_document_accept',{...byDocument,rendered_document_id:id}));
 });
 
  test('v18 Pro preparation catalog adds only five closed explicit workflow template families',()=>{
@@ -762,7 +763,7 @@ test('S10 shares unchanged large validators without changing scope-specific wire
   const scope={member:'Member',center:'Center',organization:'Organization'}[field.scope];
   assert.deepEqual(resolve(p.$defs[scope+'SettingsValues'].properties[field.key]),field.schema);
  }
- assert.equal(config.version,22);assert.equal(config.fields.length,119);
+ assert.equal(config.version,23);assert.equal(config.fields.length,119);
  const sql=['settings-catalog-v20','lesson-request-actionability','settings-negative-delegation','settings-work-alerts','settings-application-forms','settings-discipline-effects','settings-work-calendar'].map(n=>fs.readFileSync('database/'+n+'.sql','utf8').replace('begin;\n','').replace(/commit;\n$/,'')).join('');
  assert.equal(fs.readFileSync('supabase/migrations/20261111210453_s10_settings_completion.sql','utf8'),'-- S10 accepted settings consumers; existing migrations remain immutable.\nbegin;\n'+sql+'commit;\n');
 });

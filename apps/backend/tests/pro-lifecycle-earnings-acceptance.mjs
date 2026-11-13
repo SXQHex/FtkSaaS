@@ -230,12 +230,12 @@ test('G02 Pro imported application becomes the same documented paid learner in l
   const document=(await api('document_version_publish_v1',{digital_content:content,version_label:'synthetic-g02-v1',scope:{kind:'center',center_id:center},requirements:[{gate:'sale',scope:{center_ids:[center]},renewed_acceptance:true}]})).primary_id;
   const saleBody={person_id:person,product_version_id:version,start_date:date(0),end_date:date(30)};
   const blocked=await api('sale_preview_v1',saleBody);assert(blocked.blockers.some(x=>x.code==='DOCUMENT_REQUIRED'));
-  const ctx={gate:'sale',subject:{type:'product_versions',id:version}};
+  const ctx={gate:'sale',subject:{type:'product_versions',id:version},purchase_preview_id:blocked.id};
   const requirements=await api('document_requirements_get_v1',{context:ctx},key(),student),requirement=requirements.find(x=>x.version_id===document);assert(requirement&&!requirement.accepted);
   const shown=(await api('document_requirements_get_v1',{context:ctx,content_file_id:requirement.file.id},key(),student)).find(x=>x.version_id===document);assert.deepEqual(shown.digital_content,content);
-  const consent=await api('document_accept_v1',{document_version_id:document,context:ctx,displayed_content:content,displayed_content_hash:createHash('sha256').update(content.text).digest('hex')},key(),student);
+  const consent=await api('document_accept_v1',{document_version_id:document,context:ctx,rendered_document_id:shown.rendered_document.id},key(),student);
   const evidence=(await api('document_requirements_get_v1',{context:ctx,content_file_id:requirement.file.id},key(),student)).find(x=>x.version_id===document).digital_acceptance;assert.equal(evidence.id,consent.primary_id);assert.equal(evidence.person_id,person);
-  const sale=await f.sell(person,version),debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale])).rows[0].id;
+  const finalPreview=await api('sale_preview_v1',{...saleBody,document_purchase_id:blocked.id});const sale=(await api('sale_apply_v1',{preview:{id:finalPreview.id,token:finalPreview.token}})).primary_id,debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale])).rows[0].id;
   const collectionKey=key(),collectionBody={person_id:person,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString(),payment:{method:'cash'}};
   await api('collection_record_v1',collectionBody,collectionKey);assert.equal((await api('collection_record_v1',collectionBody,collectionKey)).replayed,true);
   const finance=await api('finance_get_v1',{person_id:person,currency:'TRY',page:{}});assert.equal(finance.subscriber_number,number);assert.equal(finance.debts.find(x=>x.id===debt).remaining_minor,'0');

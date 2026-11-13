@@ -4,7 +4,20 @@
 <a id="s08s10-yerel-çalışmanın-devri--12-kasım-2026"></a>
 ## Güncel backend durumu — 13 Kasım 2026
 
-**Kaynak tabanı:** Main/origin main `01f2b0ee8558ddff895393a8fc4838f93563f8e5` (PR294); çalışma dalı `feature/backend-pro-final-acceptance`. PR294 head `e03d9650dc32ceba2498f3512fafdb47146741d6`, base `0976ce2ca313aa90a6d38fd60a52dd5e94b80521`, tested merge `fce82bc48f9f64f2dda2dc7ed4f86eaff809677e`; [aday43334572741](https://github.com/SXQHex/FtkSaaS/actions/runs/43334572741) core/kalite/12 API/full-clean ve [merge kontrolü43337138963](https://github.com/SXQHex/FtkSaaS/actions/runs/43337138963) başarılıdır. Önceki açık yetki ve temiz PR öncesi bağımsız incelemeyle olağan merge yapıldı; bypass yoktur. Aynı main'in [main43337246452](https://github.com/SXQHex/FtkSaaS/actions/runs/43337246452), [merge43337246500](https://github.com/SXQHex/FtkSaaS/actions/runs/43337246500) ve [development43337306409](https://github.com/SXQHex/FtkSaaS/actions/runs/43337306409) sonuçları başarılı; canlı readback155 migration/son `20261112235502` sürümünü doğruladı. Aşağıdaki P10/O11 gerçek ortam sonuçları bu runtime tabanına aittir.
+**Güncel başlangıç:** Main/origin main `7dfafe218ee9d1bb36dc5c21a81555962b7a1a6c`; aynı SHA'nın [Main proof43343661538](https://github.com/SXQHex/FtkSaaS/actions/runs/43343661538) ve [development43343722365](https://github.com/SXQHex/FtkSaaS/actions/runs/43343722365) başarıları bu görev başında doğrulandı. Önceki P10/O11/Pro sonuçları aşağıdaki kendi kaynak/ortamlarına aittir; yeni katalog kaynağına kabul taşınmaz.
+
+<a id="icerik-katalogu"></a>
+### S17 içerik kataloğu — Draft aday devri
+
+Tek çalışma dalı `feat/backend-versioned-content-catalog`; kullanıcı talimatı Draft PR ve **merge yok**. [S17 ölçütleri](remaining-work.md#s17), yayın/envanter [backend girişinde](../README.md#içerik-kataloğu-ve-yayın), frontend talebi [XREQ-045](../../../docs/requests.md#xreq-045) sahibindedir. Main'in155 migration baytı korunur; üç yeni kaynak aşamasıyla izole loopback158 migration kurulumu doğrulandı. Hosted migration, içerik yayını veya dış gönderim yapılmadı.
+
+Katalog/yayın, kullanıcı/fallback dili, mevcut davet/bildirim/hatırlatma/CSV tüketicileri, sunucuda tamamlanmış belge ve onay referansları, satın alma pin/tüketim ve paylaşım bildirimi bağlandı. Platform TR/EN verisi sürümlü JSON'dur; diğer üç dil belirlenmedi. Sentetik dil native yayın komutuyla deploy olmadan eklendi. Organizasyonun gerçek hukuki metni eklenmedi/otomatik çevrilmedi; eksik kaynak açık hata verir.
+
+**Native doğrulama:** Seçili9 dosyada67/67 test, fail/skip/cancel0: katalog2, belge/satın alma1, dosya/dijital/runner3, anlaşma3, bağlı Pro yaşam döngüsü5, paylaşım13, işlemsel/hatırlatma13, davet native16 ve birim11. Son uyumluluk düzeltmeleri sonrası temiz158 kurulumunda katalog/paylaşım/davet/belge testleri yeniden geçti. Güvenli loglar `.artifacts/content-tests/` altındadır; hosted sağlayıcı/ekran kabulü değildir.
+
+**İnceleme:** Bağımsız son runtime incelemesi Required0/Critical0. Kanonik metin/epoch bypass, farklı satın alma tarihleri, tarihsel yenileme, belirsiz sürüm, başlıkta değişken, eksik şablonun kuyruk tıkaması, bildirimsiz geri çekme, literal eski metin/bayt limiti ve davet alıcısı dili bulguları düzeltildi; kaynak/test izleri aynı PR'dadır. Statik/kalite ve aday CI sonucu aşağıdaki son kontrol notunda ayrılır.
+
+**Son kontrol:** Statik contract/governance/restore387/387 ve DB41/41 geçti. Yerel verify macOS üzerinde değişmemiş Linux /proc gözlem testinde kalıyor; checker veya test gevşetilmedi. Kalite guardı görevde değişen7 assertion satırı için kaynak bağlı inceleme kaydı istiyor; öneri `.artifacts/content-quality-review-proposal.json` içinde, protected floor-exceptions.json kullanıcı onayı olmadan değiştirilmedi. Draft açılışında otomatik aday core + mevcut12 API shard full clean başlar; run/PR/head/base/tested-merge bilgileri kullanıcıya verilip izleme durur. Aday sonucu kullanıcı döndüğünde bir kez okunur; merge yetkisi yoktur.
 
 <a id="p10-sentetik-hosted-kabul"></a>
 ### P10.3 sentetik hosted kabul paketi

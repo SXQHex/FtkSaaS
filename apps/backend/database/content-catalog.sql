@@ -64,7 +64,7 @@ create function private.content_validate(code text,channel text,lang text,body j
 declare vars jsonb:=private.content_variables(code,channel);sample jsonb;rendered jsonb;k text;
 begin
  if code is null or code!~'^[a-z][a-z0-9_.-]{0,127}$' or lang is null or length(lang)>35 or lang!~'^[a-z]{2,8}(-[a-z0-9]{1,8})*$'
- or jsonb_typeof(body) is distinct from 'object' or octet_length(body::text)>262144 then perform private.fail('VALIDATION_FAILED');end if;
+ or jsonb_typeof(body) is distinct from 'object' or (channel<>'document' and octet_length(body::text)>262144) then perform private.fail('VALIDATION_FAILED');end if;
  if channel in ('email','in_app') then
   if not body?&array['title','text'] or exists(select 1 from jsonb_object_keys(body) k where k not in ('title','text'))
    or jsonb_typeof(body->'title') is distinct from 'string' or jsonb_typeof(body->'text') is distinct from 'string'
@@ -75,10 +75,13 @@ begin
  elsif channel='report' then
   if code<>'report.headers' or not body?'text' or jsonb_typeof(body->'text') is distinct from 'string' or exists(select 1 from jsonb_object_keys(body) k where k<>'text') then perform private.fail('VALIDATION_FAILED');end if;
  else perform private.fail('VALIDATION_FAILED');end if;
+ -- Existing organization document/notice JSON is literal text, never executable template syntax.
+ if channel='document' and code<>'instructor.agreement' then return;end if;
  select coalesce(jsonb_object_agg(key,to_jsonb('sample'::text)),'{}') into sample from jsonb_each(vars);
+ if strpos((body-'text')::text,'{{')>0 or strpos((body-'text')::text,'}}')>0 then perform private.fail('VALIDATION_FAILED');end if;
  rendered:=private.content_render_value(body,sample);
  for k in select jsonb_object_keys(vars) loop
-  if strpos(body::text,'{{'||k||'}}')=0 then perform private.fail('VALIDATION_FAILED');end if;
+  if strpos(body->>'text','{{'||k||'}}')=0 then perform private.fail('VALIDATION_FAILED');end if;
  end loop;
 end$$;
 -- Store helper is private; only the native-auth dispatcher or deployment operator calls it.
@@ -119,6 +122,7 @@ begin
  if t.id is null then perform private.fail('POLICY_NOT_CONFIGURED');end if;
  if jsonb_typeof(variables) is distinct from 'object' or exists(select 1 from jsonb_each(variables) e where defs->>e.key is distinct from jsonb_typeof(e.value))
  or exists(select 1 from jsonb_object_keys(defs) k where not variables?k) then perform private.fail('VALIDATION_FAILED');end if;
+ if t.channel='document' and t.code<>'instructor.agreement' then return t.content;end if;
  return private.content_render_value(t.content,variables);
 end$$;
 commit;

@@ -25,6 +25,16 @@ test('P14 native transactional email: opt-in, source freshness, leases, retry, d
    const inapp=await call(owner,'notification_preferences_set_v1',{org_id:org,channel:'in_app',purpose:'transactional',enabled:false,expected_version:1},id());assert.equal(inapp.result.error.code,'FORBIDDEN');
    const ignored=await notice('reminder');assert.equal((await db.query('select count(*)::int n from private.transactional_email_jobs where job_id=$1',[ignored])).rows[0].n,0);
   });
+  await t.test('missing catalog closes only the selected job and leaves the next event deliverable',async()=>{
+   await db.query('begin');try{
+    const missing=await notice(),next=await notice('reservation_create_v1');await db.query('set constraints all immediate');
+    await db.query("insert into private.content_retirements(template_id) select id from private.content_templates where scope_key='platform' and code='notification.session_change' and channel='email' on conflict do nothing");
+    const direct=async()=> (await db.query("select private.transactional_email_worker($1,'{\"email_phase\":\"claim\"}') value",[{request_id:id()}])).rows[0].value;
+    assert.equal((await direct())._internal_invitation,null);const state=(await db.query('select state from core.outbox_jobs where id=$1',[missing])).rows[0];assert.equal(state.state,'failed');
+    assert.equal((await db.query('select safe_error_code from private.transactional_email_jobs where job_id=$1',[missing])).rows[0].safe_error_code,'POLICY_NOT_CONFIGURED');
+    assert.equal((await direct())._internal_email.job_id,next);
+   }finally{await db.query('rollback');}
+  });
   await t.test('organization notification language reaches fresh email and retries preserve the first rendered language',async()=>{
    const scope={org_id:org,scope:'organization'},before=await must(owner,'settings_get_v1',scope),regional={...before.values.regional_defaults,notification_language:'en'};
    const save=async value=>{const current=await must(owner,'settings_get_v1',scope);return must(owner,'settings_update_v1',{...scope,expected_version:current.version,patch:{regional_defaults:value}},id());};
@@ -49,11 +59,11 @@ test('P14 native transactional email: opt-in, source freshness, leases, retry, d
    const scope={org_id:org,scope:'organization'},before=await must(owner,'settings_get_v1',scope),userScope={scope:'user'};
    const userLanguage=async language=>{const v=await must(owner,'settings_get_v1',userScope);await must(owner,'settings_update_v1',{...userScope,expected_version:v.version,patch:{language}},id());};
    const regional=async language=>{const v=await must(owner,'settings_get_v1',scope);await must(owner,'settings_update_v1',{...scope,expected_version:v.version,patch:{regional_defaults:{...v.values.regional_defaults,notification_language:language}}},id());};
-   const template={scope_key:'platform',code:'notification.session_change',channel:'email',language:'qae',version:1,source_version:'1',action:'publish',content:{title:'Synthetic title',text:'Synthetic {{app_url}}'}};
-   await must(platform,'content_catalog_save_v1',template,id());await userLanguage('qae');
+   const syntheticLanguage='qae-'+id().slice(-8);const template={scope_key:'platform',code:'notification.session_change',channel:'email',language:syntheticLanguage,version:1,source_version:'1',action:'publish',content:{title:'Synthetic title',text:'Synthetic {{app_url}}'}};
+   await must(platform,'content_catalog_save_v1',template,id());await userLanguage(syntheticLanguage);
    const nid=await notice(),first=await claim();assert.equal(first.job_id,nid);assert.equal(first.payload.subject,'[P14 synthetic] Synthetic title');
    const metadata=async()=> (await db.query('select content_language,content_version,content_template_id from private.transactional_email_jobs where job_id=$1',[nid])).rows[0];
-   const frozen=await metadata();assert.equal(frozen.content_language,'qae');assert.equal(Number(frozen.content_version),1);
+   const frozen=await metadata();assert.equal(frozen.content_language,syntheticLanguage);assert.equal(Number(frozen.content_version),1);
    await worker(first,{email_phase:'finish',retryable:true});await must(platform,'content_catalog_save_v1',{...template,version:2,content:{title:'Synthetic changed',text:'Changed {{app_url}}'}},id());await userLanguage('en');
    await db.query('update core.outbox_jobs set next_attempt_at=now() where id=$1',[nid]);const retry=await claim();assert.deepEqual(retry.payload,first.payload);assert.deepEqual(await metadata(),frozen);await worker(retry,{email_phase:'finish',retryable:false});
    await regional('en');

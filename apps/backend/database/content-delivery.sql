@@ -41,14 +41,20 @@ begin
 end$$;
 alter table private.invitation_delivery_state add column content_template_id uuid references private.content_templates(id),add column content_language text,add column content_version bigint,add column content_template jsonb;
 create function private.invitation_content(job uuid,org uuid,person uuid) returns jsonb language plpgsql set search_path='' as $$
-declare s private.invitation_delivery_state;t private.content_templates;
+declare s private.invitation_delivery_state;t private.content_templates;preferred text;
 begin
  select * into s from private.invitation_delivery_state where job_id=job for update;
  if s.content_template is null then
   -- An in-flight pre-catalog job already used the original Turkish v1 copy.
   if s.first_attempt_at is not null then
    select * into t from private.content_templates c where c.scope_key='platform' and c.code='account.invitation' and c.channel='email' and c.language='tr' and c.version=1;
-  else t:=private.content_pick('platform','account.invitation','email',private.content_languages(org,person,'notification'));end if;
+  else
+   -- Language only: a confirmed native recipient may have an account before
+   -- this organization is allowed to establish its account_link.
+   select nullif(p.values->>'language','auto') into preferred from private.invitation_deliveries d join auth.users u on lower(btrim(u.email))=lower(btrim(d.recipient)) and u.email_confirmed_at is not null and u.deleted_at is null and (u.banned_until is null or u.banned_until<clock_timestamp())
+   join core.accounts a on a.auth_user_id=u.id and a.state='active' join private.frontend_settings p on p.scope_key='user:'||a.id where d.job_id=job;
+   t:=private.content_pick('platform','account.invitation','email',array_prepend(preferred,private.content_languages(org,person,'notification')));
+  end if;
   if t.id is null then perform private.fail('POLICY_NOT_CONFIGURED');end if;
   update private.invitation_delivery_state set content_template_id=t.id,content_language=t.language,content_version=t.version,content_template=t.content where job_id=job returning * into s;
  end if;
@@ -62,7 +68,13 @@ begin
  a:='ok boolean;';if array_length(string_to_array(b,a),1)<>2 then raise exception 'Catalog mail declaration drift';end if;b:=replace(b,a,a||'rendered jsonb;');
  a:='  update private.transactional_email_jobs set lease_hash=';if array_length(string_to_array(b,a),1)<>2 then raise exception 'Catalog mail freeze drift';end if;
  b:=replace(b,a,$a$  if s.payload is null then
-   rendered:=private.notification_email_selection(n,cfg.from_email,resolved_recipient->>'email',cfg.app_origin);
+   begin rendered:=private.notification_email_selection(n,cfg.from_email,resolved_recipient->>'email',cfg.app_origin);
+   exception when sqlstate 'P0001' then
+    if sqlerrm<>'POLICY_NOT_CONFIGURED' then raise;end if;
+    update core.outbox_jobs set state='failed',lease_until=null,version=version+1 where id=j.id;
+    update private.transactional_email_jobs set safe_error_code='POLICY_NOT_CONFIGURED' where job_id=j.id;
+    return jsonb_build_object('_internal_invitation',null);
+   end;
    update private.transactional_email_jobs set content_template_id=(rendered->>'template_id')::uuid,content_language=rendered->>'language',content_version=(rendered->>'version')::bigint where job_id=j.id;
   end if;
 $a$||a);
@@ -72,7 +84,14 @@ $a$||a);
  a:='''email_delivery'',private.email_delivery_status(j.provider_reference)';if array_length(string_to_array(b,a),1)<>2 then raise exception 'Catalog delivery status drift';end if;execute replace(b,a,a||',''content_language'',s.content_language,''content_template_id'',s.content_template_id,''content_version'',s.content_version');
  b:=pg_get_functiondef('private.invitation_worker(jsonb,jsonb)'::regprocedure);
  a:='  token:=encode(extensions.gen_random_bytes(32),''hex'');';if array_length(string_to_array(b,a),1)<>2 then raise exception 'Catalog invitation freeze drift';end if;
- b:=replace(b,a,'  perform private.invitation_content(q.id,q.org_id,i.person_id);'||E'\n'||a);
+ b:=replace(b,a,$a$  begin perform private.invitation_content(q.id,q.org_id,i.person_id);
+  exception when sqlstate 'P0001' then
+   if sqlerrm<>'POLICY_NOT_CONFIGURED' then raise;end if;
+   update core.outbox_jobs set state='failed',lease_until=null,version=version+1 where id=q.id;
+   update private.invitation_delivery_state set safe_error_code='POLICY_NOT_CONFIGURED' where job_id=q.id;
+   return jsonb_build_object('_internal_invitation',null);
+  end;
+$a$||a);
  a:='''api_key'',api_key));';if array_length(string_to_array(b,a),1)<>2 then raise exception 'Catalog invitation projection drift';end if;
  b:=replace(b,a,'''api_key'',api_key,''catalog'',private.invitation_content(q.id,q.org_id,i.person_id)));');execute b;
 end$patch$;

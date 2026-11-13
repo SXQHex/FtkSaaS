@@ -41,3 +41,26 @@ Hosted CD smoke, olmayan finans kaynağını reddetmeyi, doğrudan RPC ve geçer
 Dosyasız belge ve eğitmen onayının opt-in hosted API kabulü: `node scripts/acceptance/s10-hosted-digital.mjs`. Mevcut geliştirme projesine sabitlenmiştir. `FTK_ACCEPTANCE_EMAIL`, `FTK_ACCEPTANCE_PASSWORD`, `FTK_ACCEPTANCE_APIKEY`, `FTK_ACCEPTANCE_ORG`, `FTK_ACCEPTANCE_CENTER`, `FTK_ACCEPTANCE_PRODUCT`, `FTK_ACCEPTANCE_AGREEMENT`, `FTK_ACCEPTANCE_OUTSIDER_EMAIL` ve `FTK_ACCEPTANCE_OUTSIDER_PASSWORD` ortamdan verilir; değerler kaynak/rapora yazılmaz. Hesap merkezde CM ve kendi anlaşmasının aktif eğitmeni olmalıdır; outsider organizasyona bağlı olmamalıdır. Ürün yalnız bu kabul için ayrılmış, anlaşma aynı hesaba ait henüz onaylanmamış test kaydı olmalıdır. Çalıştırıcı bu ürüne sınırlı belge yayımlar ve iki değişmez onay kaydı bırakır; tekrar çalıştırmak yeni kabul değildir, kabul edilmiş anlaşmada durur. Mevcut ücret şartlarını, rolleri veya hakedişi değiştirmez. İki giriş oturumunu local scope ile kapatır. Hosted başarı, frontend ekran/dil/fallback kabulünün yerine geçmez; kaynak ve sonuç kaydı backend devrindedir.
 
 İş takviminin opt-in hosted API kabulü: `node scripts/acceptance/s10-hosted-work-calendar.mjs`. Aynı development projesinde `FTK_ACCEPTANCE_EMAIL`, `FTK_ACCEPTANCE_PASSWORD`, `FTK_ACCEPTANCE_APIKEY`, `FTK_ACCEPTANCE_ORG`, `FTK_ACCEPTANCE_CENTER`, `FTK_ACCEPTANCE_DISCIPLINE` ve `FTK_ACCEPTANCE_START` gerekir. Aktif Pro planında CM yetkili test hesabı, ayrılmış test disiplini ve en az bir gün sonraki açık test saati seçilir. Çalıştırıcı katılımcısız/görevsiz bir saatlik seans oluşturur; kapanışın yalnız bu seansı etkilediğini doğrulamadan ayar yazmaz. Açık iptal, kapanış/replay ve sonraki seans reddini sınar; yalnız kendi seanslarını iptal edip takvimin özgün değer/kaynağını geri yükler. Değişmez test/ayar geçmişi kalır. Eşzamanlı takvim değişiminde zorla restore yapmaz; temizlik hatası başarı sayılmaz. Yalnız açtığı native oturumu local scope ile kapatır; kabul kapsamı [backend kaydındadır](docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-is-takvimi-hosted-kabulu).
+
+## İçerik kataloğu ve yayın
+
+Normatif kapsam/dil/onay [FD04/FD08](../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#fd08--belge-onay-dış-görünürlük-kabul-edildi), tüketim [WF11](../../docs/workflows.md#wf11), kuyruk [WF20](../../docs/workflows.md#wf20) sahibindedir. Backend metin envanteri:
+
+| Mevcut kaynak | Katalog tüketimi |
+|---|---|
+| `notification-language-rendering.sql` on iki TR/EN olay başlığı/gövdesi | `notification.*`, email ve in_app; olay kodu seçilir. Unknown in_app olayı kapalı genel bildirim metnini kullanır. |
+| `invitation-delivery.ts` erişim daveti | `account.invitation`, email; mevcut token linki yalnız sınırlı `{{link}}` değişkenidir. |
+| `reminder-scheduling.sql`, `reminder-email.sql` dört hatırlatma türü | Aynı notification kodları; zaman/tercih/plan hesabı mevcut kaynakta kalır. |
+| `p06-workers.sql` CSV başlıkları | `report.headers`; subscriber_number dahil mevcut makine sütun kodları TR/EN'de aynıdır. Kullanıcı satırları/finans tutarları çevrilmez. |
+| `digital-document-snapshots.sql`, `digital-agreement-acceptance.sql` | Organizasyonun onaylı kaynak/çevirileri DB'de; backend tamamlanmış belgeyi ve onay referansını üretir. Hazır hukuki metin eklenmez. |
+| `settings-sharing-consent.sql` dört paylaşım bildirimi | `notice.sharing.<field>`; kanonik ayar/epoch, canlı bağ ve ayrı karar kapıları korunur. |
+
+Native Auth sağlayıcısının postaları sağlayıcı konfigurasyonundadır; teknik hata kodları, operasyonel alarm/diagnostic ve CSV makine alanları UI çeviri kataloğu değildir. Menü/buton/form çevirileri frontend'de, serbest kişi/organizasyon/rapor satırları kendi verisinde kalır. Kapsamdaki runtime metinlerinin başlangıç dosyası [platform-v1.json](config/content/platform-v1.json) yalnız platform TR/EN verisidir. Diğer üç dil belirlenmemiştir; sentetik qaa ailesi yalnız testtir.
+
+Mevcut native platform operatörünün canlı access token'ı, API key'i ve hedef origin'i `FTK_CONTENT_TOKEN`, `FTK_CONTENT_APIKEY`, `FTK_CONTENT_URL` ortam değişkenlerinden verilir; kaynağa/rapora yazılmaz. Repo kökünden:
+
+```sh
+node apps/backend/scripts/content-publish.mjs apps/backend/config/content/platform-v1.json
+```
+
+Komut aynı native Auth/Edge `content_catalog_save_v1` yetkisini kullanır; service key veya DB bypass kullanmaz. Aynı sürüm/aynı veri yeniden yayımlanabilir; farklı veri VERSION_CONFLICT olur. Yeni dil dosyası aynı kapalı veri biçimiyle, yeni çeviri düzeltmesi yeni içerik sürümüyle yayımlanır; migration/deploy gerekmez. Organizasyonun gerçek metni repoya alınmaz; yetkili katalog API'si DB'de yönetir. Kanonik belge veya paylaşım kaynağı değişikliği mevcut yayın/epoch komutunu gerektirir. Taslak için okunan revision, yayın için izinli değişkenlerin tamamı gerekir. Bu komut sağlayıcıya e-posta göndermez ve runtime dağıtmaz.

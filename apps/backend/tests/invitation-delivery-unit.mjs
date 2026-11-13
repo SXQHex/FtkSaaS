@@ -18,7 +18,7 @@ async function fixture({provider=()=>Response.json({id:id()}),authorized=true,fa
  const key=await crypto.subtle.importKey('raw',await crypto.subtle.digest('SHA-256',enc.encode(service)),'AES-GCM',false,['encrypt']);
  const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(token));
  const claim={job_id:id(),org_id:id(),invitation_id:id(),lease_token:'synthetic-private-lease',recipient:'recipient@ftksaas.invalid',sealed_token:JSON.stringify({iv:Buffer.from(iv).toString('base64'),cipher:Buffer.from(cipher).toString('base64')}),from_email:'sender@ftksaas.invalid',app_origin:'https://app.ftksaas.invalid',api_key:'synthetic-provider-key'};
- claim.catalog={id:id(),language:'tr',version:1,content:JSON.parse(fs.readFileSync('content/platform-v1.json')).find(x=>x.code==='account.invitation'&&x.language==='tr').content};
+ claim.catalog={id:id(),language:'tr',version:1,content:JSON.parse(fs.readFileSync('config/content/platform-v1.json')).find(x=>x.code==='account.invitation'&&x.language==='tr').content};
  const rpc=[],sent=[];
  const send=async(url,options)=>{
   assert(options.signal,'every network call must have an abort signal');

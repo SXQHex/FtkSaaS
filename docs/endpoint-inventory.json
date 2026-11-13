@@ -3836,9 +3836,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "Development/test only; final source candidate/main clean required.",
-        "No external email; dedicated scoped DB worker; hosted scheduling remains separate.",
-        "Omit person_id for self requirements/content in explicit AcceptanceContext; explicit person_id retains original operational access checks."
+        "Backend-selected approved source; rendered document identity binds acceptance. Legacy client snapshots retain explicit provenance. Missing approved organization source is POLICY_NOT_CONFIGURED; no platform legal fallback."
       ]
     },
     {
@@ -3865,8 +3863,7 @@
       },
       "billing_class": "maintenance",
       "limits": [
-        "Development/test only; final source candidate/main clean required.",
-        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        "Backend-selected approved source; rendered document identity binds acceptance. Legacy client snapshots retain explicit provenance. Missing approved organization source is POLICY_NOT_CONFIGURED; no platform legal fallback."
       ]
     },
     {
@@ -6006,7 +6003,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "Native self-only agreement acknowledgement; signed frontend text and backend source terms are immutable; acknowledgement does not publish an agreement or reprice earnings."
+        "Backend-selected approved source; rendered document identity binds acceptance. Legacy client snapshots retain explicit provenance. Missing approved organization source is POLICY_NOT_CONFIGURED; no platform legal fallback."
       ]
     },
     {
@@ -6033,7 +6030,49 @@
       },
       "billing_class": "maintenance",
       "limits": [
-        "Native self-only agreement acknowledgement; signed frontend text and backend source terms are immutable; acknowledgement does not publish an agreement or reprice earnings."
+        "Backend-selected approved source; rendered document identity binds acceptance. Legacy client snapshots retain explicit provenance. Missing approved organization source is POLICY_NOT_CONFIGURED; no platform legal fallback."
+      ]
+    },
+    {
+      "name": "content_catalog_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/content_catalog_get_v1",
+      "permission": "document.manage",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_content_catalog_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Existing platform operator or exact organization/center document authority; data-only publication, no CMS or inherited override."
+      ]
+    },
+    {
+      "name": "content_catalog_save_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/content_catalog_save_v1",
+      "permission": "document.manage",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_content_catalog_save"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "Existing platform operator or exact organization/center document authority; data-only publication, no CMS or inherited override."
       ]
     }
   ]

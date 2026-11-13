@@ -64,7 +64,7 @@ create function private.content_validate(code text,channel text,lang text,body j
 declare vars jsonb:=private.content_variables(code,channel);sample jsonb;rendered jsonb;k text;
 begin
  if code is null or code!~'^[a-z][a-z0-9_.-]{0,127}$' or lang is null or length(lang)>35 or lang!~'^[a-z]{2,8}(-[a-z0-9]{1,8})*$'
- or jsonb_typeof(body) is distinct from 'object' or octet_length(body::text)>262144 then perform private.fail('VALIDATION_FAILED');end if;
+ or jsonb_typeof(body) is distinct from 'object' or (channel<>'document' and octet_length(body::text)>262144) then perform private.fail('VALIDATION_FAILED');end if;
  if channel in ('email','in_app') then
   if not body?&array['title','text'] or exists(select 1 from jsonb_object_keys(body) k where k not in ('title','text'))
    or jsonb_typeof(body->'title') is distinct from 'string' or jsonb_typeof(body->'text') is distinct from 'string'
@@ -75,10 +75,13 @@ begin
  elsif channel='report' then
   if code<>'report.headers' or not body?'text' or jsonb_typeof(body->'text') is distinct from 'string' or exists(select 1 from jsonb_object_keys(body) k where k<>'text') then perform private.fail('VALIDATION_FAILED');end if;
  else perform private.fail('VALIDATION_FAILED');end if;
+ -- Existing organization document/notice JSON is literal text, never executable template syntax.
+ if channel='document' and code<>'instructor.agreement' then return;end if;
  select coalesce(jsonb_object_agg(key,to_jsonb('sample'::text)),'{}') into sample from jsonb_each(vars);
+ if strpos((body-'text')::text,'{{')>0 or strpos((body-'text')::text,'}}')>0 then perform private.fail('VALIDATION_FAILED');end if;
  rendered:=private.content_render_value(body,sample);
  for k in select jsonb_object_keys(vars) loop
-  if strpos(body::text,'{{'||k||'}}')=0 then perform private.fail('VALIDATION_FAILED');end if;
+  if strpos(body->>'text','{{'||k||'}}')=0 then perform private.fail('VALIDATION_FAILED');end if;
  end loop;
 end$$;
 -- Store helper is private; only the native-auth dispatcher or deployment operator calls it.
@@ -119,17 +122,15 @@ begin
  if t.id is null then perform private.fail('POLICY_NOT_CONFIGURED');end if;
  if jsonb_typeof(variables) is distinct from 'object' or exists(select 1 from jsonb_each(variables) e where defs->>e.key is distinct from jsonb_typeof(e.value))
  or exists(select 1 from jsonb_object_keys(defs) k where not variables?k) then perform private.fail('VALIDATION_FAILED');end if;
+ if t.channel='document' and t.code<>'instructor.agreement' then return t.content;end if;
  return private.content_render_value(t.content,variables);
 end$$;
-commit;
-begin;
 create function private.content_validate_row() returns trigger language plpgsql set search_path='' as $$
 begin perform private.content_validate(new.code,new.channel,new.language,new.content);return new;end$$;
 create trigger content_validate before insert or update on private.content_templates for each row execute function private.content_validate_row();
 revoke all on function private.content_immutable(),private.content_validate_row(),private.content_variables(text,text),private.content_render_value(jsonb,jsonb),private.content_validate(text,text,text,jsonb),private.content_store(jsonb,uuid),private.content_pick(text,text,text,text[],text),private.content_render(private.content_templates,jsonb) from public,anon,authenticated;
 grant execute on function private.content_variables(text,text),private.content_render_value(jsonb,jsonb),private.content_validate(text,text,text,jsonb),private.content_store(jsonb,uuid),private.content_pick(text,text,text,text[],text),private.content_render(private.content_templates,jsonb) to service_role;
-commit;
-begin;
+
 create function private.content_catalog_access(r jsonb,org uuid,center uuid,person uuid,platform boolean) returns void language plpgsql set search_path='' as $$
 declare sk text:=r->>'scope_key';
 begin
@@ -169,14 +170,14 @@ $a$||a);
   terms:=private.content_catalog_execute(p_operation,r,p_ids);out:=terms->'data';record_id:=(terms->>'primary_id')::uuid;subject:=terms->>'subject';version_n:=(terms->>'version')::bigint;
 $a$||a);
 end$patch$;
-insert into private.runtime_operations(name,permission,billing_class,features) values('content_catalog_get_v1','document.manage','read','{}'),('content_catalog_save_v1','document.manage','config','{}');
+insert into private.runtime_operations(name,permission,billing_class,features) values('content_catalog_get_v1','document.manage','read',array[]::text[]);
+insert into private.runtime_operations(name,permission,billing_class,features) values('content_catalog_save_v1','document.manage','config',array[]::text[]);
 create function api_v1.content_catalog_get_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('content_catalog_get_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 create function api_v1.content_catalog_save_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('content_catalog_save_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function private.content_catalog_access(jsonb,uuid,uuid,uuid,boolean),private.content_catalog_execute(text,jsonb,uuid[]),api_v1.content_catalog_get_v1(jsonb,uuid,uuid,uuid[],jsonb),api_v1.content_catalog_save_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
 grant execute on function private.content_catalog_access(jsonb,uuid,uuid,uuid,boolean),private.content_catalog_execute(text,jsonb,uuid[]),api_v1.content_catalog_get_v1(jsonb,uuid,uuid,uuid[],jsonb),api_v1.content_catalog_save_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
 notify pgrst,'reload schema';
-commit;
-begin;
+
 select private.content_store('{"scope_key":"platform","code":"notification.reservation","channel":"email","language":"tr","version":1,"source_version":"1","content":{"title":"Rezervasyon sonucu","text":"Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz: {{app_url}}"},"action":"publish"}'::jsonb,'01a1d2b1-3c05-77a7-9217-423621501c07'::uuid);
 select private.content_store('{"scope_key":"platform","code":"notification.reservation","channel":"in_app","language":"tr","version":1,"source_version":"1","content":{"title":"Rezervasyon sonucu","text":"Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:"},"action":"publish"}'::jsonb,'01a1d2b1-3c08-7677-a576-6d1ad300aeb8'::uuid);
 select private.content_store('{"scope_key":"platform","code":"notification.reservation","channel":"email","language":"en","version":1,"source_version":"1","content":{"title":"Reservation update","text":"View your new notification in the application: {{app_url}}"},"action":"publish"}'::jsonb,'01a1d2b1-3c08-7677-a576-724aa55d9411'::uuid);
@@ -233,4 +234,5 @@ select private.content_store('{"scope_key":"platform","code":"account.invitation
 select private.content_store('{"scope_key":"platform","code":"account.invitation","channel":"email","language":"en","version":1,"source_version":"1","content":{"title":"FtkSaaS account access invitation","text":"Open the link to accept your account access invitation:\n{{link}}\n\nThis invitation can only be accepted with the verified email account it was sent to. If you did not request it, you can ignore this email."},"action":"publish"}'::jsonb,'01a1d2b1-3c09-7128-a211-69d250682252'::uuid);
 select private.content_store('{"scope_key":"platform","code":"report.headers","channel":"report","language":"tr","version":2,"source_version":"1","content":{"text":"group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps,subscriber_number"},"action":"publish"}'::jsonb,'01a1d2b1-3c09-7128-a211-6d472bcc0e66'::uuid);
 select private.content_store('{"scope_key":"platform","code":"report.headers","channel":"report","language":"en","version":2,"source_version":"1","content":{"text":"group_key,center_id,person_id,currency,count,amount_minor,credits,basis_count,ratio_bps,subscriber_number"},"action":"publish"}'::jsonb,'01a1d2b1-3c09-7128-a211-7148f57fe4e7'::uuid);
+
 commit;

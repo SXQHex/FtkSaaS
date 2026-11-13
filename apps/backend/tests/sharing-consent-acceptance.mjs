@@ -24,6 +24,7 @@ test('Participant sharing binds each decision to an immutable notice generation'
   await publish();const current=await read(student,mq);assert.equal(current.sharing_notices.length,4);
   for(const n of current.sharing_notices){const source=notices.find(x=>x.field===n.field);assert.deepEqual(n.content,source.content);assert.equal(n.notice_revision,1);assert.equal(n.notice_hash,createHash('sha256').update(source.content.text,'utf8').digest('hex'));}
   initialSource=await consent('profile_visible');
+  const canonical=notices[0];const bypass=await call(owner,'content_catalog_save_v1',{org_id:org,scope_key:'organization:'+org,code:'notice.sharing.'+canonical.field,channel:'document',language:'tr',version:2,source_version:'1',action:'publish',content:{...canonical.content,text:'Changed canonical source without epoch'}},key());assert.equal(bypass.result.error.code,'VERSION_CONFLICT');
   await rejected(student,{...mq,expected_version:current.version,patch:{profile_visible:true}},'VALIDATION_FAILED');
   await rejected(student,{...mq,expected_version:current.version,patch:{profile_visible:true},sharing_consents:[{...initialSource,notice_hash:'0'.repeat(64)}]},'VERSION_CONFLICT');
   await rejected(student,{...mq,expected_version:current.version,patch:{profile_visible:true},sharing_consents:[initialSource,initialSource]},'VALIDATION_FAILED');
@@ -37,7 +38,7 @@ test('Participant sharing binds each decision to an immutable notice generation'
   const records=await history();assert.equal(records.length,1);grantedHistory=records[0];assert.equal(records[0].sharing_consents.length,4);
   const nativeAccount=await must(student,'account_get_v1');assert.equal(records[0].actor_account_id,nativeAccount.id);
   for(const e of records[0].sharing_consents){const source=notices.find(x=>x.field===e.field);assert.equal(e.accepted,true);assert.equal(e.purpose,'participant_'+e.field.replace('_visible',''));assert.equal(e.org_id,org);assert.equal(e.person_id,studentPerson);assert.equal(e.audience,'confirmed_participants');assert.equal(e.channel,'in_app');assert.deepEqual(e.content,source.content);assert.equal(e.notice_hash,createHash('sha256').update(source.content.text).digest('hex'));assert.equal(e.notice_revision,1);assert(Date.parse(e.occurred_at)>=started&&Date.parse(e.occurred_at)<=finished);assert(e.account_link_id);assert(Number.isFinite(Date.parse(e.link_verified_at)));}
-  const blocked=await db.query('select sharing_consents from private.frontend_settings_history where id=$1',[records[0].id]);assert.deepEqual(blocked.rows[0].sharing_consents,records[0].sharing_consents);
+  const blocked=await db.query('select sharing_consents from private.frontend_settings_history where id=$1',[records[0].id]);assert.equal(blocked.rows[0].sharing_consents.length,records[0].sharing_consents.length);assert.deepEqual(blocked.rows[0].sharing_consents,records[0].sharing_consents.map(({content,...entry})=>entry));assert(blocked.rows[0].sharing_consents.every(e=>e.rendered_document_id&&!Object.hasOwn(e,'content')));for(const e of records[0].sharing_consents)assert(e.rendered_document_id);
   await assert.rejects(()=>db.query("update private.frontend_settings_history set sharing_consents='[]' where id=$1",[records[0].id]));
  });
  await t.test('unrelated changes retain approval; A to B to A and same-text metadata changes never resurrect it',async()=>{
@@ -77,7 +78,7 @@ test('Peer consent fences lesson, event and private media with the same live aud
  const fields=['profile_visible','photo_visible','email_visible','phone_visible'],notices=fields.map(field=>({field,content:{name:'Synthetic '+field,language:'en',template_id:field,template_version:'v1',text:'Synthetic explicit participant '+field+' disclosure.'}}));
  const oq={scope:'organization',org_id:org},cq={scope:'center',org_id:org,center_id:center},mq={scope:'member',org_id:org},read=(actor,q)=>must(actor,'settings_get_v1',q);
  const update=async(actor,q,patch,extra={},operationKey=key())=>must(actor,'settings_update_v1',{...q,expected_version:(await read(actor,q)).version,patch,...extra},operationKey);
- await update(owner,oq,{sharing_notices:notices});
+ await update(owner,oq,{sharing_notices:notices,regional_defaults:{...(await read(owner,oq)).values.regional_defaults,document_language:'en'}});
  const sources=(await read(student,mq)).sharing_notices.map(n=>({field:n.field,notice_hash:n.notice_hash,notice_revision:n.notice_revision}));
  const originalGrantBody={...mq,expected_version:(await read(student,mq)).version,patch:Object.fromEntries(fields.map(field=>[field,true])),sharing_consents:sources},originalGrantKey=key();
  await must(student,'settings_update_v1',originalGrantBody,originalGrantKey);
@@ -131,4 +132,25 @@ test('Peer consent fences lesson, event and private media with the same live aud
   await update(student,mq,{photo_visible:false});for(const kind of ['lesson','event']){assert.equal((await shared(kind))[0].photo,undefined);await denied(kind);}
   const before=await read(student,mq);await update(owner,oq,{allow_center_sharing_restrictions:false});assert.deepEqual((await read(student,mq)).values,before.values);for(const kind of ['lesson','event'])await denied(kind);
  });
+});
+
+test('Sharing catalog selects only the same notice epoch, stores a document reference and preserves consent across language preferences',async t=>{
+ const f=await preparationFixture({studentUser:true,studentMembership:true}),{db,owner,student,org}=f;t.after(()=>db.end());
+ const orgScope={scope:'organization',org_id:org},memberScope={scope:'member',org_id:org};
+ const notice={field:'profile_visible',content:{name:'Synthetic sharing',language:'tr',template_id:'sharing',template_version:'1',text:'Sentetik izin kaynağı.'}};
+ const save=async(user,scope,patch,extra={})=>must(user,'settings_update_v1',{...scope,expected_version:(await must(user,'settings_get_v1',scope)).version,patch,...extra},key());
+ await save(owner,orgScope,{sharing_notices:[notice]});await save(student,{scope:'user'},{language:'en'});
+ assert.equal((await must(student,'settings_get_v1',memberScope)).sharing_notices[0].language,'tr');
+ const translation={org_id:org,scope_key:'organization:'+org,code:'notice.sharing.profile_visible',channel:'document',language:'en',version:1,source_version:'1',action:'publish',content:{...notice.content,language:'en',text:'Synthetic approved sharing source.'}};
+ await must(owner,'content_catalog_save_v1',translation,key());const shown=(await must(student,'settings_get_v1',memberScope)).sharing_notices[0];assert.equal(shown.language,'en');
+ await save(student,memberScope,{profile_visible:true},{sharing_consents:[{field:shown.field,notice_hash:shown.notice_hash,notice_revision:shown.notice_revision}]});
+ const stored=(await db.query("select e from private.frontend_settings_history h cross join lateral jsonb_array_elements(h.sharing_consents) e where h.scope_key=$1",['member:'+org+':'+(await must(student,'account_get_v1')).id])).rows[0].e;
+ assert.equal(stored.rendered_document_id,shown.rendered_document_id);assert.equal(stored.auth_session_id,student.session_id);assert(!Object.hasOwn(stored,'content'));
+ await save(student,{scope:'user'},{language:'auto'});assert((await must(student,'settings_get_v1',memberScope)).sharing_approved_fields.includes('profile_visible'));
+ await save(owner,orgScope,{sharing_notices:[{...notice,content:{...notice.content,template_version:'2',text:'Sentetik yeni kaynak.'}}]});const next=await must(student,'settings_get_v1',memberScope);assert.equal(next.sharing_notices[0].language,'tr');assert.equal(next.sharing_notices[0].notice_revision,2);assert(!next.sharing_approved_fields.includes('profile_visible'));
+ const currentNotice=next.sharing_notices[0];await save(student,memberScope,{profile_visible:true},{sharing_consents:[{field:currentNotice.field,notice_hash:currentNotice.notice_hash,notice_revision:currentNotice.notice_revision}]});
+ const regional=(await must(owner,'settings_get_v1',orgScope)).values.regional_defaults;await save(owner,orgScope,{regional_defaults:{...regional,document_language:'qax'}});
+ const missing=await must(student,'settings_get_v1',memberScope);assert.deepEqual(missing.sharing_notices,[]);assert.equal(missing.sharing_notice_errors[0].code,'POLICY_NOT_CONFIGURED');
+ await save(student,memberScope,{profile_visible:false});assert.equal((await must(student,'settings_get_v1',memberScope)).values.profile_visible,false);
+ const denied=await call(student,'settings_update_v1',{...memberScope,expected_version:(await must(student,'settings_get_v1',memberScope)).version,patch:{profile_visible:true}},key());assert.equal(denied.result.error.code,'POLICY_NOT_CONFIGURED');
 });
