@@ -46,3 +46,20 @@ it("hides cached content immediately on signout until protected routes are reeva
   unmount();
   expect(unsubscribe).toHaveBeenCalledOnce();
 });
+
+it("preserves recovery on the native same-session SIGNED_IN visibility notification", async () => {
+  vi.stubEnv("VITE_SUPABASE_URL", "https://auth.invalid");
+  vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "public-test-key");
+  changed.mockReturnValue({ data: { subscription: { unsubscribe } } });
+  const { result } = renderHook(useAuthSession);
+  const callback = changed.mock.calls[0][0];
+  await act(() => callback("INITIAL_SESSION", { user: { id: "recovery-account" } }));
+  sessionStorage.setItem("ftk-recovery-account", "recovery-account:native-session-one");
+  await act(() => callback("SIGNED_IN", { user: { id: "recovery-account" } }));
+  expect(sessionStorage.getItem("ftk-recovery-account")).toBe(
+    "recovery-account:native-session-one",
+  );
+  expect(result.current).toBe(true);
+  expect(clear).not.toHaveBeenCalled();
+  sessionStorage.clear();
+});

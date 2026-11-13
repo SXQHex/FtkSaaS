@@ -1,5 +1,6 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
+import { rememberRecoverySession, requireRecoverySession } from "./password-recovery";
 
 export function safeNext(next: unknown) {
   return next === "/reset-password" ? "/reset-password" : "/account";
@@ -34,18 +35,19 @@ export function completeCallback(input: CallbackInput): Promise<string> {
   const code = input.code;
   const result = (async () => {
     const auth = getSupabaseClient().auth;
-    const { data, error } = await auth.exchangeCodeForSession(
-      code,
-      input.flowId ? { flowId: input.flowId } : undefined,
-    );
+    let recovery = false;
+    const { data: observer } = auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") recovery = true;
+    });
+    const response = await auth
+      .exchangeCodeForSession(code, input.flowId ? { flowId: input.flowId } : undefined)
+      .finally(() => observer.subscription.unsubscribe());
+    const { data, error } = response;
     if (error) throw error;
     if (!data.session) throw new Error("AUTH_REQUIRED");
+    if (recovery) await rememberRecoverySession(data.session);
     const next = safeNext(input.next);
-    if (
-      next === "/reset-password" &&
-      sessionStorage.getItem("ftk-recovery-account") !== data.session.user.id
-    )
-      throw new Error("RECOVERY_REQUIRED");
+    if (next === "/reset-password") await requireRecoverySession();
     const assurance = await auth.mfa.getAuthenticatorAssuranceLevel();
     if (assurance.error) throw assurance.error;
     if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")

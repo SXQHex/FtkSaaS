@@ -15,6 +15,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input
 import { Button } from "../../components/ui/button";
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
+import { hasRecoverySession } from "./password-recovery";
 
 export function MfaPage() {
   const { t } = useTranslation();
@@ -36,7 +37,8 @@ export function MfaPage() {
       });
       if (result.error) throw result.error;
       await readAccount();
-      await navigate({ to: "/account", replace: true });
+      const recovery = await hasRecoverySession();
+      await navigate({ to: recovery ? "/reset-password" : "/account", replace: true });
     } catch {
       setFailed(true);
     } finally {

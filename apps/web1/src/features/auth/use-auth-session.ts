@@ -19,8 +19,9 @@ export function useAuthSession() {
         previous = id;
         return;
       }
-      if (event === "PASSWORD_RECOVERY" && id) sessionStorage.setItem("ftk-recovery-account", id);
-      else if (event === "SIGNED_IN" || event === "SIGNED_OUT" || id !== previous)
+      // SIGNED_IN is also re-emitted when the same native session regains focus.
+      // Recovery remains bound to its verified native session UUID, not just its account.
+      if (event === "SIGNED_OUT" || id !== previous)
         sessionStorage.removeItem("ftk-recovery-account");
       if (id === previous && event !== "SIGNED_OUT" && event !== "PASSWORD_RECOVERY") return;
       previous = id;

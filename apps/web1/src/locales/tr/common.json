@@ -50,6 +50,25 @@
     "verify": "Doğrula",
     "backLogin": "Girişe dön",
     "callbackError": "Bağlantı tamamlanamadı veya ek onay gerekiyor. Onay adımlarını kontrol et ya da yeni bir giriş başlat.",
-    "displayName": "Görünen ad"
+    "displayName": "Görünen ad",
+    "forgotTitle": "Parolanı mı unuttun?",
+    "forgotDescription": "E-posta adresini yaz, sıfırlama bağlantısı gönderelim.",
+    "checkEmail": "E-postanı kontrol et",
+    "recoveryNotice": "Adres uygunsa sıfırlama bağlantısı gönderilecektir.",
+    "recoveryError": "İstek tamamlanamadı. Daha sonra yeniden dene.",
+    "sendLink": "Bağlantı gönder",
+    "resetTitle": "Yeni parola belirle",
+    "resetDescription": "Bu bağlantı tek kullanımlıktır. Parolan değişince diğer oturumlar kapanır.",
+    "newPassword": "Yeni parola",
+    "confirmPassword": "Parola tekrar",
+    "passwordMismatch": "Parolalar eşleşmiyor.",
+    "passwordError": "Parola kaydedilemedi. Yeni parolanı kontrol edip yeniden dene.",
+    "savePassword": "Parolayı kaydet",
+    "passwordSaved": "Parolan kaydedildi.",
+    "passwordSavedReadError": "Parolan kaydedildi. Hesap bilgileri şu anda yenilenemedi.",
+    "verifyEmailTitle": "E-postanı doğrula",
+    "verifyEmailDescription": "E-postandaki doğrulama bağlantısıyla devam et.",
+    "resend": "Yeniden gönder",
+    "verificationNotice": "Uygun bir kayıt varsa doğrulama bağlantısı gönderilecektir."
   }
 }

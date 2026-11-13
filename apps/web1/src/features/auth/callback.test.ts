@@ -1,12 +1,24 @@
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 const { auth, account } = vi.hoisted(() => ({
-  auth: { exchangeCodeForSession: vi.fn(), mfa: { getAuthenticatorAssuranceLevel: vi.fn() } },
+  auth: {
+    exchangeCodeForSession: vi.fn(),
+    onAuthStateChange: vi.fn(),
+    getSession: vi.fn(),
+    getClaims: vi.fn(),
+    mfa: { getAuthenticatorAssuranceLevel: vi.fn() },
+  },
   account: vi.fn(),
 }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth }) }));
 vi.mock("../../lib/account", () => ({ readAccount: account }));
 import { completeCallback, safeNext } from "./callback";
-afterEach(() => vi.resetAllMocks());
+beforeEach(() =>
+  auth.onAuthStateChange.mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+);
+afterEach(() => {
+  vi.resetAllMocks();
+  sessionStorage.clear();
+});
 it.each(["https://evil.invalid", "//evil.invalid", "/account?redirect=evil", "/unknown"])(
   "rejects external or unlisted next %s",
   (next) => expect(safeNext(next)).toBe("/account"),
@@ -68,4 +80,41 @@ it("captures the native redirect before Router setup and removes URL credentials
     next: "/account",
   });
   window.history.replaceState({}, "", "/");
+});
+
+it("recognizes native recovery even before the root session observer mounts", async () => {
+  auth.getClaims.mockResolvedValue({
+    data: { claims: { sub: "native-recovery-user", session_id: "native-session-one" } },
+    error: null,
+  });
+  auth.getSession.mockResolvedValue({
+    data: { session: { user: { id: "native-recovery-user" } } },
+    error: null,
+  });
+  auth.exchangeCodeForSession.mockImplementation(async () => {
+    auth.onAuthStateChange.mock.calls[0][0]("PASSWORD_RECOVERY", {
+      user: { id: "native-recovery-user" },
+    });
+    return { data: { session: { user: { id: "native-recovery-user" } } }, error: null };
+  });
+  auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({
+    data: { currentLevel: "aal1", nextLevel: "aal1" },
+    error: null,
+  });
+  expect(await completeCallback({ code: "native-recovery-code", next: "/reset-password" })).toBe(
+    "/reset-password",
+  );
+  expect(sessionStorage.getItem("ftk-recovery-account")).toBe(
+    "native-recovery-user:native-session-one",
+  );
+});
+it("does not turn a normal OAuth session into a recovery session by changing next", async () => {
+  auth.exchangeCodeForSession.mockResolvedValue({
+    data: { session: { user: { id: "normal-user" } } },
+    error: null,
+  });
+  await expect(
+    completeCallback({ code: "normal-oauth-code", next: "/reset-password" }),
+  ).rejects.toThrow("RECOVERY_REQUIRED");
+  expect(account).not.toHaveBeenCalled();
 });

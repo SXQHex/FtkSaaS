@@ -22,8 +22,27 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", testIgnore: "**/auth-flow.spec.ts", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "auth-chromium",
+      testMatch: "**/auth-flow.spec.ts",
+      use: { ...devices["Desktop Chrome"], baseURL: "http://127.0.0.1:4175" },
+    },
+  ],
   webServer: [
+    {
+      command: "npm run dev -- --host 127.0.0.1 --port 4175 --strictPort --mode e2e",
+      url: "http://127.0.0.1:4175",
+      reuseExistingServer: false,
+      env: {
+        VITE_SUPABASE_URL: "http://127.0.0.1:4175",
+        VITE_SUPABASE_PUBLISHABLE_KEY: "public-test-key",
+        VITE_APP_ORIGIN: "http://127.0.0.1:4175",
+        VITE_PUBLIC_GATEWAY_URL: "",
+        VITE_TURNSTILE_SITE_KEY: "",
+      },
+    },
     {
       command: "npm run dev -- --host 127.0.0.1 --port 4173 --strictPort --mode e2e",
       url: baseURL,
