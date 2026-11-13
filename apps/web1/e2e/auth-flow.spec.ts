@@ -18,7 +18,7 @@ const fixtureUser = {
   created_at: "2026-11-13T00:00:00Z",
   email_confirmed_at: "2026-11-13T00:00:00Z",
 };
-const token = (aal: "aal1" | "aal2" = "aal1") =>
+const token = (aal: "aal1" | "aal2" = "aal1", sessionId = id) =>
   [
     Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url"),
     Buffer.from(
@@ -29,7 +29,7 @@ const token = (aal: "aal1" | "aal2" = "aal1") =>
         aal,
         amr: [{ method: "password", timestamp: Math.floor(Date.now() / 1000) }],
         exp: Math.floor(Date.now() / 1000) + 3600,
-        session_id: id,
+        session_id: sessionId,
       }),
     ).toString("base64url"),
     Buffer.from("fixture-signature").toString("base64url"),
@@ -79,11 +79,17 @@ async function mockNative(page: Page, mfa = false) {
     rejectNextRevoke: false,
     labelKeys: [] as string[],
     revokeKeys: [] as string[],
+    rejectNextOthers: false,
+    othersKeys: [] as string[],
+    othersProofs: [] as string[],
     challenge: 0,
     verify: 0,
     account: 0,
   };
   let elevated = false;
+  let nativeSessionId = id;
+  let passwordSignIns = 0;
+  let previousActive = false;
   let otherActive = true;
   let sessionLabel: string | null = null;
   let labelVersion = 0;
@@ -104,7 +110,7 @@ async function mockNative(page: Page, mfa = false) {
       : [],
   };
   const session = () => ({
-    access_token: token(elevated ? "aal2" : "aal1"),
+    access_token: token(elevated ? "aal2" : "aal1", nativeSessionId),
     refresh_token: "fixture-refresh",
     token_type: "bearer",
     expires_in: 3600,
@@ -120,6 +126,14 @@ async function mockNative(page: Page, mfa = false) {
       });
     if (url.pathname === "/auth/v1/token") {
       calls.exchange++;
+      if (url.searchParams.get("grant_type") === "password") {
+        passwordSignIns++;
+        elevated = false;
+        if (passwordSignIns > 1) {
+          nativeSessionId = "550e8400-e29b-41d4-a716-446655440099";
+          previousActive = true;
+        }
+      }
       return route.fulfill({
         json: session(),
       });
@@ -138,7 +152,7 @@ async function mockNative(page: Page, mfa = false) {
     }
     if (url.pathname === "/functions/v1/backend-v1/account_sessions_list_v1") {
       const current: AccountSessionView = {
-        session_id: id,
+        session_id: nativeSessionId,
         current: true,
         created_at: fixtureUser.created_at,
         last_refreshed_at: fixtureUser.created_at,
@@ -161,8 +175,22 @@ async function mockNative(page: Page, mfa = false) {
         json: {
           ok: true,
           data: {
-            items: cursor ? (otherActive ? [other] : []) : [current],
-            next_cursor: !cursor && otherActive ? "fixture-session-page" : null,
+            items: cursor
+              ? [
+                  ...(otherActive ? [other] : []),
+                  ...(previousActive
+                    ? [
+                        {
+                          ...current,
+                          session_id: id,
+                          current: false,
+                          user_agent: "Previous fixture browser",
+                        },
+                      ]
+                    : []),
+                ]
+              : [current],
+            next_cursor: !cursor && (otherActive || previousActive) ? "fixture-session-page" : null,
             as_of: fixtureUser.created_at,
           },
           trace_id: id,
@@ -214,6 +242,39 @@ async function mockNative(page: Page, mfa = false) {
     }
     if (url.pathname === "/functions/v1/backend-v1/account_sessions_revoke_v1") {
       const request = route.request().postDataJSON();
+      if (request.mode === "others") {
+        calls.othersKeys.push(request.operation_key);
+        calls.othersProofs.push(request.reauth);
+        const proof = JSON.parse(Buffer.from(request.reauth.split(".")[1], "base64url").toString());
+        const bearer = JSON.parse(
+          Buffer.from(
+            route.request().headers().authorization.split(".")[1],
+            "base64url",
+          ).toString(),
+        );
+        expect(proof.session_id).toBe(nativeSessionId);
+        expect(bearer.session_id).toBe(nativeSessionId);
+        expect(proof.aal).toBe(elevated ? "aal2" : "aal1");
+        if (calls.rejectNextOthers) {
+          calls.rejectNextOthers = false;
+          return route.fulfill({
+            status: 503,
+            json: {
+              ok: false,
+              error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: id },
+            } satisfies FailureEnvelope,
+          });
+        }
+        otherActive = false;
+        previousActive = false;
+        return route.fulfill({
+          json: {
+            ok: true,
+            data: { operation_id: id, affected_count: 2, current_revoked: false, replayed: false },
+            trace_id: id,
+          } satisfies SuccessAccountSessionsRevoke,
+        });
+      }
       calls.revokeKeys.push(request.operation_key);
       expect(request.mode).toBe("selected");
       expect(request.session_id).toBe(otherSessionId);
@@ -536,5 +597,71 @@ test("session pages preserve provider IDs, label intent retries and selected rev
   await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
   expect(calls.revokeKeys).toHaveLength(2);
   expect(calls.revokeKeys[1]).toBe(calls.revokeKeys[0]);
+  expect(errors).toEqual([]);
+});
+
+test("fresh native password session is adopted and exact proof survives others retry", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+  await captureAuth(page, "e10-others-fresh", testInfo);
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }),
+  ).toBeVisible();
+  await captureAuth(page, "e10-others-confirm", testInfo);
+  expect(calls.othersKeys).toHaveLength(0);
+  calls.rejectNextOthers = true;
+  await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
+  await expect(page.getByText("Oturum kapatma doğrulanamadı.", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("Bu cihaz", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Daha fazla", exact: true })).toHaveCount(0);
+  expect(calls.othersKeys).toHaveLength(2);
+  expect(calls.othersKeys[1]).toBe(calls.othersKeys[0]);
+  expect(calls.othersProofs[1]).toBe(calls.othersProofs[0]);
+  expect(errors).toEqual([]);
+});
+
+test("fresh password requiring TOTP uses the canonical MFA route before others confirmation", async ({
+  page,
+}) => {
+  const calls = await mockNative(page, true);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/mfa`);
+  await page.getByLabel("Doğrulama kodu").fill("123456");
+  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/mfa`);
+  expect(calls.othersKeys).toHaveLength(0);
+  await page.getByLabel("Doğrulama kodu").fill("123456");
+  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+  await page.getByRole("button", { name: "Yeni giriş yaptım", exact: true }).click();
+  await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(calls.othersKeys).toHaveLength(1);
   expect(errors).toEqual([]);
 });

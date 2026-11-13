@@ -145,6 +145,16 @@
     "refreshError": "İşlem sonrasında oturum bilgileri yenilenemedi.",
     "readError": "Oturumlar okunamadı.",
     "empty": "Açık oturum bulunmuyor.",
-    "labelConflict": "Oturum etiketi başka bir yerde değişti. Güncel listeyi kontrol edip düzenlemeyi yeniden aç."
+    "labelConflict": "Oturum etiketi başka bir yerde değişti. Güncel listeyi kontrol edip düzenlemeyi yeniden aç.",
+    "closeOthers": "Diğerlerini kapat",
+    "freshDescription": "Bu işlem yeni bir oturumla doğrulama ister. Parolayla devam et veya yeni giriş yaptıysan mevcut oturumunu kullan. Kod istenirse doğrulamayı tamamla, Oturumlar’a dönüp “Yeni giriş yaptım” ile devam et.",
+    "othersConfirm": "Diğer açık oturumlar kapanacak. Doğruladığın mevcut oturum korunacak.",
+    "googleFreshHelp": "Google kullanıyorsan giriş ekranından yeniden giriş yap, bu pencereyi tekrar aç ve “Yeni giriş yaptım” ile devam et.",
+    "justSignedIn": "Yeni giriş yaptım",
+    "freshExpired": "Oturum doğrulaması yenilenmeli. Yeniden giriş yapıp tekrar onayla.",
+    "freshError": "Doğrulama tamamlanamadı. Bilgilerini ve gerekiyorsa güncel kodunu kontrol et.",
+    "othersError": "Oturum kapatma doğrulanamadı. Güncel listeyi kontrol edip yeniden dene.",
+    "confirmOthers": "Diğer oturumları kapat",
+    "continue": "Devam et"
   }
 }

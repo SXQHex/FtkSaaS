@@ -8,6 +8,7 @@ import type { AccountSessionView } from "../../lib/api-contracts/generated";
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
 import { readSessions, revokeSession } from "./sessions";
+import { RevokeOthers } from "./revoke-others";
 import { SessionLabel } from "./session-label";
 import {
   Card,
@@ -16,6 +17,7 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
+  CardAction,
 } from "../../components/ui/card";
 import {
   Table,
@@ -99,6 +101,9 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
           <h2>{t(($) => $.sessions.title)}</h2>
         </CardTitle>
         <CardDescription>{t(($) => $.sessions.description)}</CardDescription>
+        <CardAction>
+          <RevokeOthers onRefresh={refresh} />
+        </CardAction>
       </CardHeader>
       <CardContent className="min-w-0">
         {changed && !pending && !failed && !refreshError && !labelConflict && (
