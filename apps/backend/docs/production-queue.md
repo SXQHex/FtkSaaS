@@ -10,6 +10,8 @@ Kabul edilmiş Pro ortak temeli üzerinde sıradaki paket [G01](remaining-work.m
 
 **Aktif sıra:** G01 → G03; ardından ayrı O03–O10 altyapı projesi. Görevlerin güncel açık/kapalı durumu yalnız [backlog](remaining-work.md), doğrulanmış sonuçları yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md) üzerinden alınır.
 
+G01'in ilişkili kabul eksikleri ve dar F17 düzeltmesi tek backend adayında toplanır; kaynak/ortam eşleştirmesi [G01 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kisit-kabulu). Aday/main/development ve kalan Starter gerçek kabulü bitmeden G03'e geçilmez.
+
 | Öncelik | Paket | Bağımlılık ve kontrol noktası |
 |---|---|---|
 | 1 | [G01](remaining-work.md#g01) Starter kısıt kabulü | Kabul edilmiş ortak temelde Starter'ın izinli akışlarını, limitlerini ve kapalı özelliklere API reddini doğrula. |

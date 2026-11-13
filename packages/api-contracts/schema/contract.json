@@ -71042,7 +71042,9 @@
           "F17",
           "F19"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F17"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "preview",
@@ -71178,7 +71180,9 @@
           "F17",
           "F19"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F17"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "apply",
@@ -103509,7 +103513,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 158,
+      "migration_count": 160,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

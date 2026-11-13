@@ -621,7 +621,7 @@
         {
           "line": 378,
           "path": "apps/backend/tests/crm-followup-acceptance.mjs",
-          "sha256": "8e2ccfed55fe4fab9d3e1d789825aac0f4934ad26fa9d9caa1d2db28154882e8"
+          "sha256": "976c83144aa9cd17ec09d9f86e290c6e0b86d0f10b7a777873dd87a580bd338f"
         }
       ],
       "estimated_seconds": 651.01
@@ -947,24 +947,29 @@
         {
           "line": 143,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
-          "sha256": "d3d05ce84d70c457f0c5ba69c741752d50eaf90464f7bebbc81d9146fdb00de2",
+          "sha256": "b6936c8d4087db840e84bd821e64d6d558c070fcac0999dbcab07116ccd654de",
           "shared": [
             [
               1,
               27
-            ],
-            [
-              107,
-              107
             ]
           ],
           "parts": [
             {
-              "id": "starter-plan-resources",
+              "id": "g01-resource-races",
               "ranges": [
                 [
                   28,
-                  106
+                  48
+                ]
+              ]
+            },
+            {
+              "id": "starter-plan-resources",
+              "ranges": [
+                [
+                  49,
+                  156
                 ]
               ]
             },
@@ -972,8 +977,8 @@
               "id": "starter-plan-downgrade",
               "ranges": [
                 [
-                  108,
-                  261
+                  157,
+                  310
                 ]
               ]
             }
@@ -982,7 +987,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "fd8152f2a150aeef6808e23e0fff64361d75abaafbbbdb95c8c66481b31f0d59"
+          "sha256": "e1a5aa2c145406d89dcc7d67eb627961ebb527d983f74241b68ae344fe1f0746"
         },
         {
           "line": 147,
@@ -1092,7 +1097,7 @@
         },
         {
           "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",
-          "sha256": "0016d13081cb630639c56e450d95d318191b88b9684e1e65344473fc1bb4b5cf",
+          "sha256": "4ba8bd887370d5d7f22918ebe48f9f24ab22aaf2db77d1a441193536709a23e4",
           "line": 164
         },
         {

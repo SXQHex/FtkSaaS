@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {deliverDevInvitation} from '../scripts/deliver-dev-invitations.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import {preparationFixture} from './starter-preparation-fixture.mjs';
 
 test('Starter studio setup: one room, timed sales and immutable published names',{timeout:300000},async t=>{
  const {platform,plan}=await fixturePlatform(),owner=await authUser('studio-owner'),student=await authUser('studio-student');
@@ -113,6 +114,96 @@ test('Starter studio setup: one room, timed sales and immutable published names'
    assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,4);
   });
  }finally{await db.end();}
+});
+
+test('G01 same offline Starter learner keeps number, consent, paid sale and corrected attendance in reports',{timeout:300000},async t=>{
+ const f=await preparationFixture({schedule:true}),{db,org,center,owner,api,discipline,day}=f;
+ t.after(()=>db.end());
+ const token=p=>({id:p.id,token:p.token});
+ const person=(await api('person_create_v1',{display_name:'Synthetic G01 offline learner',contacts:[]})).primary_id;
+ const lead=(await api('lead_save_v1',{person_id:person,source:'phone',interest:'Synthetic Yoga'})).primary_id;
+ await api('crm_activity_save_v1',{lead_id:lead,kind:'contact',note:'Synthetic call note'});
+ await api('crm_activity_save_v1',{lead_id:lead,kind:'followup',due_at:day(2)+'T08:00:00Z',note:'Synthetic callback'});
+ assert.equal((await api('person_get_v1',{person_id:person})).subscriber_number,null);
+ await api('student_activate_v1',{person_id:person});
+ const number=(await api('person_get_v1',{person_id:person})).subscriber_number;
+ assert.equal(number,'1001');
+ assert.equal((await db.query('select count(*)::int n from core.account_links where org_id=$1 and person_id=$2',[org,person])).rows[0].n,0);
+ const student=await authUser('g01-self'),account=await must(student,'account_get_v1');
+ // Explicit native link fixture comes after offline activation and number allocation.
+ await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,person]);
+ const version=(await api('product_publish_v1',{terms:{name:'Yoga · G01 two lessons',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
+ const content={name:'Synthetic G01 consent',language:'tr',template_id:'synthetic-g01',template_version:'1',text:'Synthetic acceptance fixture terms.\n'};
+ const document=(await api('document_version_publish_v1',{digital_content:content,version_label:'g01-v1',scope:{kind:'center',center_id:center},requirements:[{gate:'sale',scope:{center_ids:[center]},renewed_acceptance:true}]})).primary_id;
+ const saleBody={person_id:person,product_version_id:version,start_date:day(0),end_date:day(30)},blocked=await api('sale_preview_v1',saleBody);
+ assert(blocked.blockers.some(x=>x.code==='DOCUMENT_REQUIRED'));
+ const context={gate:'sale',subject:{type:'product_versions',id:version},purchase_preview_id:blocked.id};
+ const requirement=(await api('document_requirements_get_v1',{context},student)).find(x=>x.version_id===document);
+ assert(requirement&&!requirement.accepted);
+ const shown=(await api('document_requirements_get_v1',{context,content_file_id:requirement.file.id},student)).find(x=>x.version_id===document);
+ assert.deepEqual(shown.digital_content,content);
+ const consent=await api('document_accept_v1',{document_version_id:document,context,rendered_document_id:shown.rendered_document.id},student);
+ const quote=await api('sale_preview_v1',{...saleBody,document_purchase_id:blocked.id});
+ assert.deepEqual(quote.blockers,[]);
+ const sale=(await api('sale_apply_v1',{preview:token(quote)})).primary_id;
+ for(const [operation,body] of [
+  ['freeze_preview_v1',{sale_id:sale,dates:{start_date:day(1),end_date:day(2)},reason:'Synthetic Starter F17 gate'}],
+  ['sale_change_preview_v1',{sale_id:sale,new_product_version_id:version,keep_reservation_ids:[],cancel_reservation_ids:[],start_date:day(0),end_date:day(30),reason:'Synthetic Starter F17 gate'}]
+ ]){
+  const refused=await call(owner,operation,f.scoped(body));
+  assert.equal(refused.result.error?.code,'PLAN_FEATURE_UNAVAILABLE',JSON.stringify({ok:refused.result.ok,error:refused.result.error}));
+  assert.equal(refused.result.data,undefined);
+ }
+ const changeBody={sale_id:sale,new_product_version_id:version,keep_reservation_ids:[],cancel_reservation_ids:[],start_date:day(0),end_date:day(30),reason:'Synthetic G01 preview before plan loss'};
+ let priorPreview;
+ await db.query("update core.saas_plan_versions set name='pro' where id=$1",[f.plan]);
+ try{priorPreview=await api('sale_change_preview_v1',changeBody);}
+ finally{await db.query("update core.saas_plan_versions set name='starter' where id=$1",[f.plan]);}
+ for(const [operation,body] of [
+  ['sale_change_apply_v1',{preview:token(priorPreview)}],
+  ['management_state_get_v1',{operation:'sale_change_preview_v1',selector:{operation:'sale_change_preview_v1',key:{sale_id:sale}},page:{}}]
+ ]){
+  const refused=await call(owner,operation,f.scoped(body),key());
+  assert.equal(refused.result.error?.code,'PLAN_FEATURE_UNAVAILABLE',JSON.stringify({ok:refused.result.ok,error:refused.result.error}));
+  assert.equal(refused.result.data,undefined);
+ }
+ assert.equal((await db.query('select count(*)::int n from core.sales where org_id=$1',[org])).rows[0].n,1);
+ const debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale])).rows[0].id;
+ const collectionKey=key(),collectionBody={person_id:person,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString(),payment:{method:'cash'}};
+ await api('collection_record_v1',collectionBody,owner,collectionKey);
+ assert.equal((await api('collection_record_v1',collectionBody,owner,collectionKey)).replayed,true);
+ await api('policy_publish_v1',{center_id:null,key:'student_cancel_group',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}},effective_at:new Date().toISOString(),mandatory:false});
+ await api('class_save_v1',{class_id:f.classId,expected_version:1,name:'Synthetic G01 open Yoga',discipline_id:discipline,external_open:true});
+ const program=await f.preview('09');assert.deepEqual(program.blockers,[]);
+ await api('program_apply_v1',{preview:token(program)});
+ const session=(await db.query('select id from core.sessions where org_id=$1 and class_id=$2',[org,f.classId])).rows[0].id;
+ const reservation=(await api('reservation_create_v1',{session_id:session,person_id:person,source_sale_id:sale,mode:'flexible'},student)).primary_id;
+ let attendance=await api('attendance_get_v1',{session_id:session});
+ assert.equal(attendance.entries.find(x=>x.reservation_id===reservation).subscriber_number,number);
+ await api('attendance_start_v1',{session_id:session,expected_version:attendance.session_version,actual_started_at:new Date().toISOString(),reason:'Synthetic G01 observed early start'});
+ attendance=await api('attendance_get_v1',{session_id:session});
+ await api('attendance_mark_v1',{reservation_id:reservation,expected_version:attendance.entries.find(x=>x.reservation_id===reservation).version,result:'attended'});
+ attendance=await api('attendance_get_v1',{session_id:session});
+ const closeKey=key(),closeBody={session_id:session,expected_version:attendance.session_version};
+ await api('attendance_close_v1',closeBody,owner,closeKey);
+ assert.equal((await api('attendance_close_v1',closeBody,owner,closeKey)).replayed,true);
+ const allocation=()=>db.query('select state from core.entitlement_allocations where org_id=$1 and reservation_id=$2',[org,reservation]);
+ assert.equal((await allocation()).rows[0].state,'consumed');
+ const correction=await api('attendance_correct_preview_v1',{session_id:session,corrections:[{reservation_id:reservation,result:'no_show'}],reason:'Synthetic G01 corrected attendance'});
+ assert.deepEqual(correction.blockers,[]);
+ await api('attendance_correct_apply_v1',{preview:token(correction)});
+ assert.equal((await allocation()).rows[0].state,'released');
+ const filters={interval:{starts_at:day(-1)+'T00:00:00Z',ends_at:day(4)+'T00:00:00Z'},center_ids:[center],person_ids:[person]};
+ const report=await api('report_get_v1',{report:'collections_debts',filters,page:{limit:200}});
+ assert(report.rows.items.some(x=>x.group_key==='collections'&&x.person_id===person&&x.subscriber_number===number&&x.amount_minor==='1000'));
+ assert.equal(report.totals.find(x=>x.group_key==='outstanding_debt').amount_minor,'0');
+ const attendanceReport=await api('report_get_v1',{report:'lesson_attendance',filters,page:{limit:200}});
+ assert(attendanceReport.rows.items.some(x=>x.person_id===person&&x.subscriber_number===number&&x.group_key==='attendance:no_show'&&x.count===1));
+ assert.equal((await api('person_get_v1',{person_id:person})).subscriber_number,number);
+ const evidence=(await api('document_requirements_get_v1',{context,content_file_id:requirement.file.id},student)).find(x=>x.version_id===document).digital_acceptance;
+ assert.equal(evidence.id,consent.primary_id);assert.equal(evidence.person_id,person);
+ assert.equal((await db.query('select source_sale_id from core.reservations where id=$1',[reservation])).rows[0].source_sale_id,sale);
+ for(const table of ['earnings','instructor_agreements'])assert.equal((await db.query('select count(*)::int n from core.'+table+' where org_id=$1',[org])).rows[0].n,0);
 });
 
 // Attendance owns an independent Starter fixture; setup/catalog assertions above

@@ -114,8 +114,10 @@ for(const planName of ['pro','business'])test('XREQ029 '+planName+' discovers ex
  const activeSale=changed.primary_id;
  const beforeStarter=await read(activeSale);
  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
- const starter=await read(activeSale);assert.deepEqual(starter.sale_change_context,beforeStarter.sale_change_context);assert.deepEqual(starter.items.map(x=>x.entity.id),beforeStarter.items.map(x=>x.entity.id));
+ await denied('PLAN_FEATURE_UNAVAILABLE','management_state_get_v1',{operation,selector:{operation,key:{sale_id:activeSale}}});
  await db.query('update core.saas_plan_versions set name=$1 where id=$2',[planName,plan]);
+ // Reopening the licensed plan restores the same historical source view.
+ const starter=await read(activeSale);assert.deepEqual(starter.sale_change_context,beforeStarter.sale_change_context);assert.deepEqual(starter.items.map(x=>x.entity.id),beforeStarter.items.map(x=>x.entity.id));
  if(planName==='business'){
   const secondCenter=(await api('center_create_v1',{name:'Synthetic remote inventory',timezone:'UTC'})).primary_id;
   await api('center_manager_assign_v1',{center_id:secondCenter,person_id:person});await api('center_discipline_set_v1',{center_id:secondCenter,discipline_id:f.discipline,state:'active'});await api('student_activate_v1',{center_id:secondCenter,person_id:student.id});
