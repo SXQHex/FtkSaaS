@@ -1,100 +1,207 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "../../components/ui/card";
+import { z } from "zod";
+import { AuthLayout } from "./auth-layout";
+import { continueAfterMfa, verifyTotp } from "./mfa";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Field, FieldLabel } from "../../components/ui/field";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
+import { Field, FieldError, FieldGroup, FieldLabel } from "../../components/ui/field";
+import { Input } from "../../components/ui/input";
+import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Button } from "../../components/ui/button";
-import { getSupabaseClient } from "../../lib/supabase";
-import { readAccount } from "../../lib/account";
-import { hasRecoverySession } from "./password-recovery";
 
 export function MfaPage() {
+  const factors = useLoaderData({ from: "/mfa" });
   const { t } = useTranslation();
-  const [code, setCode] = useState("");
-  const [failed, setFailed] = useState(false);
-  const [pending, setPending] = useState(false);
   const navigate = useNavigate();
-  async function verify() {
-    setPending(true);
+  const [failed, setFailed] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [reading, setReading] = useState(false);
+  async function continueToAccount() {
+    setReading(true);
     setFailed(false);
     try {
-      const { data, error } = await getSupabaseClient().auth.mfa.listFactors();
-      if (error) throw error;
-      const factor = data.totp.find((item) => item.status === "verified");
-      if (!factor) throw new Error("MFA_FACTOR_REQUIRED");
-      const result = await getSupabaseClient().auth.mfa.challengeAndVerify({
-        factorId: factor.id,
-        code,
-      });
-      if (result.error) throw result.error;
-      await readAccount();
-      const recovery = await hasRecoverySession();
-      await navigate({ to: recovery ? "/reset-password" : "/account", replace: true });
+      await navigate({ to: await continueAfterMfa(), replace: true });
     } catch {
       setFailed(true);
     } finally {
-      setPending(false);
+      setReading(false);
     }
   }
+  const form = useForm({
+    defaultValues: { code: "", factorId: factors.length === 1 ? factors[0].id : "" },
+    validationLogic: revalidateLogic({ mode: "blur", modeAfterSubmission: "change" }),
+    onSubmit: async ({ value }) => {
+      setFailed(false);
+      try {
+        await verifyTotp(value.factorId, value.code);
+        setVerified(true);
+        form.reset();
+        await continueToAccount();
+      } catch {
+        setFailed(true);
+      }
+    },
+  });
   return (
-    <main className="flex min-h-svh items-center justify-center p-6">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>{t(($) => $.auth.mfaTitle)}</CardTitle>
-          <CardDescription>{t(($) => $.auth.mfaDescription)}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            id="mfa-form"
-            className="flex flex-col gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void verify();
-            }}
-          >
-            <Field>
-              <FieldLabel htmlFor="mfa-code">{t(($) => $.auth.mfaCode)}</FieldLabel>
-              <InputOTP
-                id="mfa-code"
-                maxLength={6}
-                minLength={6}
-                required
-                pattern="[0-9]*"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={code}
-                onChange={setCode}
-              >
-                <InputOTPGroup>
-                  {Array.from({ length: 6 }, (_, index) => (
-                    <InputOTPSlot key={index} index={index} />
-                  ))}
-                </InputOTPGroup>
-              </InputOTP>
-            </Field>
+    <AuthLayout>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1>{t(($) => $.auth.mfaTitle)}</h1>
+          <p className="mt-1 text-muted-foreground">{t(($) => $.auth.mfaDescription)}</p>
+        </div>
+        {factors.length === 0 ? (
+          <Alert>
+            <AlertDescription>{t(($) => $.auth.mfaNoFactor)}</AlertDescription>
+          </Alert>
+        ) : verified ? (
+          <div className="flex flex-col gap-4">
             {failed && (
               <Alert variant="destructive">
-                <AlertDescription>{t(($) => $.auth.mfaError)}</AlertDescription>
+                <AlertDescription>{t(($) => $.auth.mfaReadError)}</AlertDescription>
               </Alert>
             )}
+            <Button
+              isDisabled={reading}
+              onPress={() => {
+                void continueToAccount();
+              }}
+            >
+              {t(($) => $.auth.retry)}
+            </Button>
+          </div>
+        ) : (
+          <form
+            noValidate
+            onSubmit={(event) => {
+              event.preventDefault();
+              void form.handleSubmit();
+            }}
+          >
+            <FieldGroup className="gap-4">
+              {factors.length > 1 && (
+                <form.Field
+                  name="factorId"
+                  validators={{
+                    onDynamic: z.string().min(
+                      1,
+                      t(($) => $.auth.mfaChooseFactor),
+                    ),
+                  }}
+                >
+                  {(field) => (
+                    <Field
+                      className="gap-1"
+                      data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    >
+                      <FieldLabel htmlFor="mfa-factor">{t(($) => $.auth.mfaFactor)}</FieldLabel>
+                      <NativeSelect
+                        id="mfa-factor"
+                        value={field.state.value}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        onBlur={field.handleBlur}
+                        aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                        aria-describedby={
+                          field.state.meta.errors.length ? "mfa-factor-error" : undefined
+                        }
+                      >
+                        <NativeSelectOption value="">
+                          {t(($) => $.auth.mfaChooseFactor)}
+                        </NativeSelectOption>
+                        {factors.map((factor, index) => (
+                          <NativeSelectOption key={factor.id} value={factor.id}>
+                            {factor.friendly_name ||
+                              t(($) => $.auth.mfaFactorNumber, { number: index + 1 })}
+                          </NativeSelectOption>
+                        ))}
+                      </NativeSelect>
+                      <FieldError
+                        id="mfa-factor-error"
+                        errors={field.state.meta.isTouched ? field.state.meta.errors : []}
+                      />
+                    </Field>
+                  )}
+                </form.Field>
+              )}
+              <form.Field
+                name="code"
+                validators={{
+                  onDynamic: z.string().regex(
+                    /^\d{6}$/,
+                    t(($) => $.auth.mfaCodeInvalid),
+                  ),
+                }}
+              >
+                {(field) => (
+                  <Field
+                    className="gap-1 pb-1"
+                    data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
+                    <FieldLabel htmlFor="mfa-code">{t(($) => $.auth.mfaCode)}</FieldLabel>
+                    <Input
+                      id="mfa-code"
+                      name="code"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      value={field.state.value}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      onBlur={field.handleBlur}
+                      aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                      aria-describedby={
+                        field.state.meta.errors.length ? "mfa-code-error" : undefined
+                      }
+                    />
+                    <FieldError
+                      id="mfa-code-error"
+                      errors={field.state.meta.isTouched ? field.state.meta.errors : []}
+                    />
+                  </Field>
+                )}
+              </form.Field>
+              {failed && (
+                <Alert variant="destructive">
+                  <AlertDescription>{t(($) => $.auth.mfaError)}</AlertDescription>
+                </Alert>
+              )}
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(pending) => (
+                  <Button type="submit" isDisabled={pending}>
+                    {t(($) => $.auth.verify)}
+                  </Button>
+                )}
+              </form.Subscribe>
+            </FieldGroup>
           </form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-stretch gap-4">
-          <Button form="mfa-form" type="submit" isDisabled={pending || code.length !== 6}>
-            {t(($) => $.auth.verify)}
-          </Button>
+        )}
+        <p>
           <a href="/login">{t(($) => $.auth.backLogin)}</a>
-        </CardFooter>
-      </Card>
-    </main>
+        </p>
+      </div>
+    </AuthLayout>
+  );
+}
+
+export function MfaErrorPage() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  return (
+    <AuthLayout>
+      <div className="flex flex-col gap-4">
+        <h1>{t(($) => $.auth.mfaTitle)}</h1>
+        <Alert variant="destructive">
+          <AlertDescription>{t(($) => $.auth.mfaLoadError)}</AlertDescription>
+        </Alert>
+        <Button
+          onPress={() => {
+            void router.invalidate();
+          }}
+        >
+          {t(($) => $.auth.retry)}
+        </Button>
+        <a href="/login">{t(($) => $.auth.backLogin)}</a>
+      </div>
+    </AuthLayout>
   );
 }

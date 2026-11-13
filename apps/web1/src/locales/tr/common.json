@@ -44,7 +44,7 @@
     "welcome": "Hoş geldin, {{name}}.",
     "accountDescription": "Profilini, güvenliğini ve açık oturumlarını yönet.",
     "mfaTitle": "İki adımlı doğrulama",
-    "mfaDescription": "Doğrulama uygulamandaki altı haneli kodu gir.",
+    "mfaDescription": "Doğrulama uygulamandaki 6 haneli kodu yaz.",
     "mfaCode": "Doğrulama kodu",
     "mfaError": "Kod doğrulanamadı. Güncel kodla yeniden dene.",
     "verify": "Doğrula",
@@ -69,6 +69,13 @@
     "verifyEmailTitle": "E-postanı doğrula",
     "verifyEmailDescription": "E-postandaki doğrulama bağlantısıyla devam et.",
     "resend": "Yeniden gönder",
-    "verificationNotice": "Uygun bir kayıt varsa doğrulama bağlantısı gönderilecektir."
+    "verificationNotice": "Uygun bir kayıt varsa doğrulama bağlantısı gönderilecektir.",
+    "mfaCodeInvalid": "6 haneli doğrulama kodunu gir.",
+    "mfaNoFactor": "Kullanılabilir doğrulama uygulaması bulunamadı. Hesabından iki adımlı doğrulamayı kur.",
+    "mfaFactor": "Doğrulama uygulaması",
+    "mfaChooseFactor": "Doğrulama uygulamasını seç.",
+    "mfaFactorNumber": "Doğrulama uygulaması {{number}}",
+    "mfaReadError": "Kod doğrulandı. Hesap bilgileri yenilenemedi. Yeniden dene.",
+    "mfaLoadError": "Doğrulama bilgileri okunamadı. Yeniden dene."
   }
 }
