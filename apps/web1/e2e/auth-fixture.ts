@@ -1,3 +1,4 @@
+import type { UserIdentity } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { expect, type Page, type TestInfo } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
@@ -15,6 +16,7 @@ import type {
 } from "../src/lib/api-contracts/generated.js";
 export const origin = "http://127.0.0.1:4175";
 const id = "019a7b00-0000-7000-8000-000000000001";
+const accountId = "019a7b00-0000-7000-8000-000000000002";
 const fixtureUser = {
   id,
   email: "fixture@example.invalid",
@@ -23,6 +25,15 @@ const fixtureUser = {
   user_metadata: {},
   created_at: "2026-11-13T00:00:00Z",
   email_confirmed_at: "2026-11-13T00:00:00Z",
+  identities: [
+    {
+      identity_id: id,
+      id: "fixture-email-provider-id",
+      user_id: id,
+      provider: "email",
+      identity_data: { email: "fixture@example.invalid" },
+    },
+  ] as UserIdentity[],
 };
 const token = (aal: "aal1" | "aal2" = "aal1", sessionId = id) =>
   [
@@ -75,6 +86,13 @@ export async function mockNative(page: Page, mfa = false) {
   const calls = {
     exchange: 0,
     password: 0,
+    identityLink: 0,
+    identityEmail: "google@example.invalid",
+    identityUnlink: 0,
+    rejectNextIdentityLink: false,
+    rejectNextIdentityUnlink: false,
+    blockIdentityReads: false,
+    onlyGoogleIdentity: false,
     passwordNeedsCode: false,
     passwordCodeSends: 0,
     rejectCurrentPassword: false,
@@ -145,6 +163,47 @@ export async function mockNative(page: Page, mfa = false) {
   await page.context().route("**/*", async (route) => {
     const url = new URL(route.request().url());
     expect(url.origin).toBe(origin);
+    const googleIdentity: UserIdentity = {
+      identity_id: "019a7b00-0000-7000-8000-000000000903",
+      id: "fixture-google-provider-id",
+      user_id: id,
+      provider: "google",
+      identity_data: { email: calls.identityEmail, email_verified: true },
+    };
+    if (url.pathname === "/auth/v1/user/identities/authorize") {
+      calls.identityLink++;
+      expect(url.searchParams.get("provider")).toBe("google");
+      expect(url.searchParams.get("redirect_to")).toBe(`${origin}/auth/callback`);
+      if (calls.rejectNextIdentityLink) {
+        calls.rejectNextIdentityLink = false;
+        return route.fulfill({
+          status: 400,
+          headers: { "x-supabase-api-version": "2024-01-01" },
+          json: { code: "manual_linking_disabled", msg: "manual_linking_disabled" },
+        });
+      }
+      user.identities = [
+        ...user.identities.filter((identity) => identity.provider !== "google"),
+        googleIdentity,
+      ];
+      return route.fulfill({ json: { provider: "google", url: `${origin}/auth/v1/authorize` } });
+    }
+    if (url.pathname === `/auth/v1/user/identities/${googleIdentity.identity_id}`) {
+      expect(route.request().method()).toBe("DELETE");
+      calls.identityUnlink++;
+      if (calls.rejectNextIdentityUnlink) {
+        calls.rejectNextIdentityUnlink = false;
+        return route.fulfill({
+          status: 400,
+          headers: { "x-supabase-api-version": "2024-01-01" },
+          json: { code: "single_identity_not_deletable", msg: "single_identity_not_deletable" },
+        });
+      }
+      user.identities = user.identities.filter(
+        (identity) => identity.identity_id !== googleIdentity.identity_id,
+      );
+      return route.fulfill({ json: {} });
+    }
     if (url.pathname === "/auth/v1/authorize")
       return route.fulfill({
         status: 302,
@@ -177,6 +236,9 @@ export async function mockNative(page: Page, mfa = false) {
       return route.fulfill({ json: {} });
     }
     if (url.pathname === "/auth/v1/user") {
+      if (route.request().method() === "GET" && calls.blockIdentityReads)
+        return route.fulfill({ status: 503, json: { msg: "temporary failure" } });
+      if (calls.onlyGoogleIdentity) user.identities = [googleIdentity];
       if (route.request().method() === "PUT") {
         calls.password++;
         const request = route.request().postDataJSON();
@@ -220,7 +282,7 @@ export async function mockNative(page: Page, mfa = false) {
             error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: id },
           } satisfies FailureEnvelope,
         });
-      const entity = { type: "accounts" as const, id };
+      const entity = { type: "accounts" as const, id: accountId };
       return route.fulfill({
         json: {
           ok: true,
@@ -300,7 +362,7 @@ export async function mockNative(page: Page, mfa = false) {
           ok: true,
           data: {
             operation_id: id,
-            primary_id: id,
+            primary_id: accountId,
             version: profileVersion,
             replayed: false,
             related: [],
@@ -414,7 +476,7 @@ export async function mockNative(page: Page, mfa = false) {
           ok: true,
           data: {
             operation_id: id,
-            primary_id: id,
+            primary_id: accountId,
             version: labelVersion,
             replayed: false,
             related: [],
@@ -575,7 +637,7 @@ export async function mockNative(page: Page, mfa = false) {
         json: {
           ok: true,
           data: {
-            id,
+            id: accountId,
             state: "active",
             display_name: profile.display_name,
             photo,

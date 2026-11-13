@@ -208,5 +208,21 @@
     "sent": "Kod gönderme isteği kabul edildi. Gelen kodu yaz.",
     "rowDescription": "Mevcut parolanı doğrulayarak yeni parola belirle.",
     "firstPassword": "İlk parolanı belirliyorsan boş bırak."
+  },
+  "googleIdentity": {
+    "title": "Google hesabı",
+    "linked": "Bağlı",
+    "unlinked": "Bağlı değil",
+    "description": "Google ile tek tıkla giriş yapabilirsin.",
+    "link": "Google ile bağla",
+    "unlink": "Bağlantıyı kaldır",
+    "lastMethod": "En az bir giriş yöntemi bağlı kalmalı. Önce başka bir giriş yöntemi ekle.",
+    "readError": "Bağlı giriş yöntemleri okunamadı.",
+    "linkError": "Google hesabı bağlama başlatılamadı. Yeniden deneyebilirsin.",
+    "unlinkTitle": "Google bağlantısını kaldır",
+    "unlinkDescription": "Bu Google hesabıyla artık giriş yapamazsın. Diğer bağlı giriş yöntemini kullanabilirsin.",
+    "unlinkError": "Bağlantı kaldırma doğrulanamadı. Güncel giriş yöntemlerini kontrol et.",
+    "confirm": "Google bağlantısını kaldır",
+    "unlinkNamedDescription": "{{email}} Google hesabıyla artık giriş yapamazsın. Diğer bağlı giriş yöntemini kullanabilirsin."
   }
 }

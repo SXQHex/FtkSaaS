@@ -27,6 +27,11 @@ vi.mock("@tanstack/react-router", () => ({ useRouter: () => ({ invalidate: vi.fn
 vi.mock("../../lib/supabase", () => ({
   getSupabaseClient: () => ({ auth: { refreshSession: refreshNative } }),
 }));
+vi.mock("./identities", () => ({
+  readIdentities: async () => [],
+  linkGoogle: vi.fn(),
+  unlinkGoogle: vi.fn(),
+}));
 vi.mock("./password", () => ({ changePassword: password, requestPasswordCode: vi.fn() }));
 vi.mock("./sessions", () => ({ readSessions: sessions }));
 import { SecurityPanel } from "./security-panel";

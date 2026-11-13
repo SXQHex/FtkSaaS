@@ -422,3 +422,75 @@ test("account password change handles native current-password and old-session no
   expect(calls.passwordCodeSends).toBe(2);
   expect(errors).toEqual([]);
 });
+
+test("native Google linking returns through the existing callback and selected unlink keeps a truthful read-error state", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  calls.rejectNextIdentityLink = true;
+  await page.getByRole("button", { name: "Google ile bağla", exact: true }).click();
+  await expect(
+    page.getByText("Google hesabı bağlama başlatılamadı.", { exact: false }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await expect(page.getByText("google@example.invalid", { exact: true })).toBeVisible();
+  expect(calls.identityLink).toBe(2);
+  expect(calls.exchange).toBe(2);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).hover();
+  await captureAuth(page, "e10-google-linked", testInfo);
+  await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await expect(
+    page.getByRole("dialog").getByText("google@example.invalid", { exact: false }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
+    .hover();
+  await captureAuth(page, "e10-google-unlink", testInfo);
+  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(calls.identityUnlink).toBe(0);
+  await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  calls.rejectNextIdentityUnlink = true;
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
+    .click();
+  await expect(page.getByText("Bağlantı kaldırma doğrulanamadı.", { exact: false })).toBeVisible();
+  calls.blockIdentityReads = true;
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("Bağlı giriş yöntemleri okunamadı.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Google ile bağla", exact: true })).toBeDisabled();
+  await expect(page.getByText("Bağlı", { exact: true })).toHaveCount(0);
+  const removals = calls.identityUnlink;
+  calls.blockIdentityReads = false;
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "Bağlı giriş yöntemleri okunamadı." })
+    .getByRole("button", { name: "Yeniden dene", exact: true })
+    .click();
+  await expect(page.getByRole("button", { name: "Google ile bağla", exact: true })).toBeEnabled();
+  expect(calls.identityUnlink).toBe(removals);
+  calls.identityEmail = `${"a".repeat(63)}@${"b".repeat(50)}.example.invalid`;
+  calls.onlyGoogleIdentity = true;
+  await page.reload();
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true })).toBeDisabled();
+  await captureAuth(page, "e10-google-last-long-email", testInfo);
+  expect(errors).toEqual([]);
+});

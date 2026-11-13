@@ -80,6 +80,22 @@ export default interface Resources {
       "success": "Örnek gönderildi.",
       "title": "Form altyapısı örneği"
     },
+    "googleIdentity": {
+      "confirm": "Google bağlantısını kaldır",
+      "description": "Google ile tek tıkla giriş yapabilirsin.",
+      "lastMethod": "En az bir giriş yöntemi bağlı kalmalı. Önce başka bir giriş yöntemi ekle.",
+      "link": "Google ile bağla",
+      "linkError": "Google hesabı bağlama başlatılamadı. Yeniden deneyebilirsin.",
+      "linked": "Bağlı",
+      "readError": "Bağlı giriş yöntemleri okunamadı.",
+      "title": "Google hesabı",
+      "unlink": "Bağlantıyı kaldır",
+      "unlinkDescription": "Bu Google hesabıyla artık giriş yapamazsın. Diğer bağlı giriş yöntemini kullanabilirsin.",
+      "unlinkError": "Bağlantı kaldırma doğrulanamadı. Güncel giriş yöntemlerini kontrol et.",
+      "unlinkNamedDescription": "{{email}} Google hesabıyla artık giriş yapamazsın. Diğer bağlı giriş yöntemini kullanabilirsin.",
+      "unlinkTitle": "Google bağlantısını kaldır",
+      "unlinked": "Bağlı değil"
+    },
     "passwordChange": {
       "code": "Güvenlik kodu",
       "codeDescription": "Güvenlik kodunu kayıtlı e-posta veya telefonuna gönderebilirsin. Kod mevcut parolanın yerine geçmez.",
