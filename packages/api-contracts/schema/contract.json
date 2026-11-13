@@ -54521,6 +54521,17 @@
         },
         "phone_matches_truncated": {
           "type": "boolean"
+        },
+        "email_matches": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/CrmPhoneMatch"
+          },
+          "description": "Scoped email duplicate warnings only; never merges or updates existing records."
+        },
+        "email_matches_truncated": {
+          "type": "boolean"
         }
       }
     },
@@ -102336,7 +102347,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 154,
+      "migration_count": 155,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

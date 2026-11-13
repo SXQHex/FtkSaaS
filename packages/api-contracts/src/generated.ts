@@ -7536,6 +7536,13 @@ source: CrmLegacyImportSource
  */
 phone_matches: CrmPhoneMatch[]
 phone_matches_truncated: boolean
+/**
+ * Scoped email duplicate warnings only; never merges or updates existing records.
+ *
+ * @maxItems 50
+ */
+email_matches?: CrmPhoneMatch[]
+email_matches_truncated?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

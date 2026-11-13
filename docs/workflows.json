@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "0e79fb6be4ca23a142effa7246d302cd9f300a5c211dca7ee1e088e007547815",
-        "reason": "Mevcut protokol/generator ve yeni154 migration incelendi; public API değişmeden private Edge teknik kayıt handoffu ve kaynak bağları korundu."
+        "fingerprint": "e2517fceed648e71f6627ce5ff685011c58623d19b26e4724323a26566c07c8b",
+        "reason": "Final P10 DTO/generated sources and existing test-body fingerprint change reviewed; only CRM import test source hash changed in API inventory, no CI scope/gate/workflow modification."
       }
     },
     {
@@ -1176,7 +1176,10 @@
         "docs/workflows.md",
         "apps/backend/database/digital-document-snapshots.sql",
         "apps/backend/supabase/migrations/20261108033244_digital_document_snapshots.sql",
-        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs"
+        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs",
+        "apps/backend/database/crm-import-email-warnings.sql",
+        "apps/backend/supabase/migrations/20261112235502_crm_import_email_warnings.sql",
+        "apps/backend/scripts/acceptance/p10-hosted-import.mjs"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1188,8 +1191,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "8bfe7c08c19529f090494b75d5a87df3f933eafdfa9e0ff138fe65763c284a75",
-        "reason": "Reviewed WF11 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "a524c5632133d361625466c0e36482e35e8c235b4cab0ccd8c19f125aff7c8dc",
+        "reason": "Final P10 source and scoped warning tests reviewed; synthetic runner records/reclaims only owned native sessions and reports success after cleanup; stale set and actual inbox reconciliation plus original file reread are separate from native late-row rollback."
       }
     },
     {

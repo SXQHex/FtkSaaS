@@ -32,7 +32,7 @@ Pro için [P05–P07](remaining-work.md#p05), [P10–P11](remaining-work.md#p10)
 
 1. Mevcut P05/P06 ortak alım, inceleme/eşleme ve Starter temel alt kümesinin kaynağını koru.
 2. Uygulama widget/gateway tüketici devrini [XREQ-042](../../../docs/requests.md#xreq-042) üzerinden bağımsız sürdür; frontend kuyruğu kapanmış S14 backend kabulünü yeniden açmaz. V1'den çıkarılmış P07 dış site bağlantısını yeniden etkinleştirme.
-3. P10 kontrollü aktarım ve P11 deneme/takip/segment için kalan uygulanabilir backend kabullerini doğrula.
+3. P10.3 sentetik hosted dosya/önizleme/seçim/aktarım/mutabakat ile P11 deneme/takip/segment için kalan uygulanabilir backend kabullerini doğrula. İşletmeye özel gerçek veri aktarımını Pro önkoşulu yapma.
 4. P14 → P15 → P16 bağımlılıklarında gerçek teslim, zamanlama ve otomasyon sonuçlarını uzlaştır; sağlayıcı kabulü gelen kutusuna teslim veya ekran kabulü değildir.
 5. P08/P09 ve genişletilmiş reklam/pazarlama işleri için yalnız normatif kapsamın verdiği sırayı uygula.
 
