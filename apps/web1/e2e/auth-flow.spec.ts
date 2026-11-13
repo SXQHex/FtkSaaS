@@ -61,6 +61,9 @@ async function mockNative(page: Page, mfa = false) {
     password: 0,
     recover: 0,
     resend: 0,
+    enroll: 0,
+    remove: 0,
+    rejectNextAccount: false,
     challenge: 0,
     verify: 0,
     account: 0,
@@ -114,6 +117,60 @@ async function mockNative(page: Page, mfa = false) {
       if (route.request().method() === "PUT") calls.password++;
       return route.fulfill({ json: user });
     }
+    if (url.pathname === "/auth/v1/factors" && route.request().method() === "POST") {
+      calls.enroll++;
+      user.factors = [
+        {
+          id,
+          status: "unverified",
+          factor_type: "totp",
+          friendly_name: "Fixture TOTP",
+          created_at: fixtureUser.created_at,
+          updated_at: fixtureUser.created_at,
+        },
+      ];
+      return route.fulfill({
+        json: {
+          id,
+          type: "totp",
+          friendly_name: "Fixture TOTP",
+          totp: {
+            secret: "SYNTHETIC-TEST-KEY",
+            qr_code:
+              '<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144"><path fill="black" d="M8 8h40v40H8zM96 8h40v40H96zM8 96h40v40H8zM72 72h16v16H72z"/></svg>',
+            uri: "otpauth://totp/fixture?secret=SYNTHETIC",
+          },
+        },
+      });
+    }
+    if (url.pathname === `/auth/v1/factors/${id}` && route.request().method() === "DELETE") {
+      calls.remove++;
+      user.factors = [];
+      elevated = false;
+      return route.fulfill({ json: { id } });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/account_security_history_get_v1")
+      return route.fulfill({
+        json: {
+          ok: true,
+          data: {
+            items: elevated
+              ? [
+                  {
+                    id,
+                    at: fixtureUser.created_at,
+                    action: "totp_enabled",
+                    session_id: id,
+                    affected_count: 1,
+                  },
+                ]
+              : [],
+            next_cursor: null,
+            as_of: fixtureUser.created_at,
+          },
+          trace_id: id,
+        },
+      });
     if (url.pathname === `/auth/v1/factors/${id}/challenge`) {
       calls.challenge++;
       return route.fulfill({
@@ -128,10 +185,21 @@ async function mockNative(page: Page, mfa = false) {
           json: { code: "mfa_verification_failed", msg: "Invalid verification code" },
         });
       elevated = true;
+      user.factors = user.factors.map((factor) => ({ ...factor, status: "verified" }));
       return route.fulfill({ json: session() });
     }
     if (url.pathname === "/functions/v1/backend-v1/account_get_v1") {
       calls.account++;
+      if (calls.rejectNextAccount) {
+        calls.rejectNextAccount = false;
+        return route.fulfill({
+          status: 503,
+          json: {
+            ok: false,
+            error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: id },
+          } satisfies FailureEnvelope,
+        });
+      }
       if (mfa && !elevated)
         return route.fulfill({
           status: 403,
@@ -242,5 +310,49 @@ test("native TOTP keeps the protected target closed until verification and AAL2 
   expect(calls.challenge).toBe(2);
   expect(calls.verify).toBe(2);
   expect(calls.account).toBeGreaterThan(0);
+  expect(errors).toEqual([]);
+});
+
+test("native TOTP enrollment cancels safely then verifies and rereads without repeating the code", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("tab", { name: "Güvenlik" }).click();
+  await expect(page.getByRole("button", { name: "Kur", exact: true })).toBeVisible();
+  await captureAuth(page, "e10-security", testInfo);
+  await page.getByRole("button", { name: "Kur", exact: true }).click();
+  await expect(page.getByLabel("Uygulamadaki 6 haneli kod")).toBeVisible();
+  await captureAuth(page, "e10-totp-dialog", testInfo);
+  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(calls.enroll).toBe(1);
+  expect(calls.remove).toBe(0);
+  await page.getByRole("button", { name: "Kaldır", exact: true }).click();
+  expect(calls.remove).toBe(0);
+  await page.getByRole("button", { name: "Uygulamayı kaldır", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(calls.remove).toBe(1);
+  await page.getByRole("button", { name: "Kur", exact: true }).click();
+  await page.getByLabel("Uygulamadaki 6 haneli kod").fill("123456");
+  calls.rejectNextAccount = true;
+  await page.getByRole("button", { name: "Kodu doğrula", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByText("İşlem sonrasında güvenlik bilgileri yenilenemedi.")).toBeVisible();
+  await expect(page.getByText("Doğrulama uygulaması etkinleştirildi")).toBeVisible();
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Güvenlik bilgileri yenilendi.");
+  expect(calls.verify).toBe(1);
+  expect(calls.enroll).toBe(2);
+  await expect(page.getByText("SYNTHETIC-TEST-KEY")).toHaveCount(0);
+  await page.reload();
+  await page.getByRole("tab", { name: "Güvenlik" }).click();
+  await expect(page.getByText("Doğrulanmış uygulama")).toBeVisible();
   expect(errors).toEqual([]);
 });

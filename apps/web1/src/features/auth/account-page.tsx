@@ -1,3 +1,7 @@
+import { useIsMobile } from "../../hooks/use-mobile";
+import { ShieldIcon, UserIcon } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/tabs";
+import { SecurityPanel } from "../account/security-panel";
 import { useState } from "react";
 import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,8 +19,9 @@ import { Field, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { getSupabaseClient } from "../../lib/supabase";
 
-// First read-only consumer for E01; E10's editable profile/security slices remain open.
+// E10 is implemented in slices; editable profile, identity and session actions remain open.
 export function AccountPage() {
+  const mobile = useIsMobile();
   const account = useLoaderData({ from: "/account" });
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -59,20 +64,41 @@ export function AccountPage() {
           <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
         </Alert>
       )}
-      <Card>
-        <CardHeader>
-          <CardTitle>{account.display_name}</CardTitle>
-          <CardDescription>
-            {t(($) => $.auth.welcome, { name: account.display_name })}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Field>
-            <FieldLabel htmlFor="display-name">{t(($) => $.auth.displayName)}</FieldLabel>
-            <Input id="display-name" readOnly value={account.display_name} />
-          </Field>
-        </CardContent>
-      </Card>
+      <Tabs
+        orientation={mobile ? "horizontal" : "vertical"}
+        className="account-tabs"
+        defaultSelectedKey="profile"
+      >
+        <TabsList variant="sidebar" aria-label={t(($) => $.security.sections)}>
+          <TabsTrigger id="profile">
+            <UserIcon />
+            {t(($) => $.security.profile)}
+          </TabsTrigger>
+          <TabsTrigger id="security">
+            <ShieldIcon />
+            {t(($) => $.security.tab)}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent id="profile">
+          <Card>
+            <CardHeader>
+              <CardTitle>{account.display_name}</CardTitle>
+              <CardDescription>
+                {t(($) => $.auth.welcome, { name: account.display_name })}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Field>
+                <FieldLabel htmlFor="display-name">{t(($) => $.auth.displayName)}</FieldLabel>
+                <Input id="display-name" readOnly value={account.display_name} />
+              </Field>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent id="security">
+          <SecurityPanel accountId={account.id} />
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }

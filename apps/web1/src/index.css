@@ -242,3 +242,24 @@
     display: none;
   }
 }
+
+.account-tabs {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.account-tabs > [data-slot="tabs-list"] {
+  position: sticky;
+  top: 24px;
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .account-tabs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .account-tabs > [data-slot="tabs-list"] {
+    position: static;
+    flex-direction: row;
+  }
+}

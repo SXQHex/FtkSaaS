@@ -1,0 +1,25 @@
+import "../../i18n";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, expect, it, vi } from "vitest";
+const { remove } = vi.hoisted(() => ({ remove: vi.fn() }));
+vi.mock("./security", () => ({ removeTotpFactor: remove }));
+import { TotpRemove } from "./totp-remove";
+afterEach(() => vi.resetAllMocks());
+it("requires explicit factor removal confirmation and propagates native denial", async () => {
+  remove.mockRejectedValueOnce(new Error("aal2-required")).mockResolvedValueOnce(undefined);
+  const changed = vi.fn().mockResolvedValue(undefined);
+  render(<TotpRemove factorId="selected" name="Fixture app" onRemoved={changed} />);
+  await userEvent.click(screen.getByRole("button", { name: "Kaldır" }));
+  expect(screen.getByText(/Fixture app/)).toBeVisible();
+  expect(remove).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByRole("button", { name: "Uygulamayı kaldır" }));
+  expect(await screen.findByRole("alert")).toBeVisible();
+  expect(changed).toHaveBeenCalledOnce();
+  expect(screen.getByRole("dialog")).toBeVisible();
+  await userEvent.click(screen.getByRole("button", { name: "Uygulamayı kaldır" }));
+  await waitFor(() => expect(changed).toHaveBeenCalledTimes(2));
+  expect(remove).toHaveBeenNthCalledWith(1, "selected");
+  expect(remove).toHaveBeenNthCalledWith(2, "selected");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
