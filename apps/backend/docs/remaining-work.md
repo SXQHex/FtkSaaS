@@ -820,8 +820,8 @@ Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/de
 <a id="g01"></a>
 ### G01 — Aynı uygulamanın Starter kısıt kabulü
 
-- [ ] **Tür:** D/H · **Plan:** Starter · **Özellik:** Starter erişimli F01–F33
-- **Güncel kanıt ve açık teslim:** [G01 kaynak/native/gerçek ortam eşleştirmesi](00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kisit-kabulu). F17 paket değişimi açığı aday kaynakta dar kapıyla giderildi; yeni kaynak CI/main/development ve plan-özel gerçek ortam kabulü tamamlanmadan bu kapı kapanmaz.
+- [x] **Tür:** D/H · **Plan:** Starter · **Özellik:** Starter erişimli F01–F33
+- **Kapanış kanıtı:** [G01 kaynak/native CI/main/development ve gerçek Starter ortam kabulü](00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kisit-kabulu).
 - **Bağımlılık:** G02’nin kabul edilmiş ortak uygulaması; Starter'a uygulanabilir S/P kanıtı ve plan kısıt regresyonları. Ortak O01/O02/O11 kanıtı kullanılır; plan başına ayrı işletim kabulü yoktur. Ortak özellikler ikinci kez geliştirilmez.
 - **Kabul:** Hesapsız öğrenci/No→izinli paket/tahsilat→program/self rezervasyon→yoklama/düzeltme→izinli rapor/import/belge ve temel lead/not/takip aynı backend’de Starter yetki ve limitleriyle çalışır.
 - **Sınır/olumsuz durum:** 100 aktif öğrenci ve tek merkez/oda/disiplin/eğitmen sınırları backend'de uygulanır. Yalnız üst plana ait personel, ileri CRM/deneme/segment/otomasyon, etkinlik, hakediş, dış bildirim ve merkezler arası yollar doğrudan API çağrısında da reddedilir; kesin kapsam normatif plan matrisinden alınır. Temel lead/not/takip ileri CRM reddiyle yanlışlıkla kapatılmaz.
