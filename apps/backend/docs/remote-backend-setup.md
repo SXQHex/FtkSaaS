@@ -105,6 +105,12 @@ Bir lane için `private.ops_worker_health.enabled=false` yeni claim’i durdurur
 
 Kesinti denetimi lease expiry/reclaim, aynı işte tek domain sonuç, hata rollback, disable/rebind/restart ve expired export byte temizliğini ayrı sınar. Üç işlik bounded kabul yük SLA değildir. Privacy partial/retry_wait manifesti DB/Auth/Storage/export/backup fiziksel imha kanıtı değildir.
 
+## Asgari yedek ve izole geri yükleme
+
+Bu teslimin O11 kontrolü, [ürün teslim sınırındaki](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) tek yedek→ayrı hedef→uygulama açılışı/temel okuma işlemidir. Kaynak ile hedefin loopback API/DB URL’leri farklı olduğu doğrulanır; kaynakta reset/seed/restore çalıştırılmaz. Kabul edilmiş aynı migration/kod hedefe kurulur. Standart CLI şema/veri dump’ı private0700 dizinde0600 izinle tutulur; hedefteki boş uygulama tablolarına transaction içinde yüklenir. Sağlayıcının kendi kurduğu `auth.schema_migrations` metadata’sı veri yedeğine dahil edilmez. Kaynak hesap/organizasyon/merkez hedefin yeni native Auth oturumu ve mevcut Edge/RPC okumalarıyla karşılaştırılır; yalnız DB sorgusu/health yeterli değildir. Sonunda test oturumu kapatılır, kaynak yeniden okunur ve geçici hedef kaldırılır. Kabul/hash/sonuç [tek durum sahibindedir](00-FtkSaaS-yeni-sohbet-devir.md#o11-asgari-restore-kabulu).
+
+Bu asgari işlem aşağıdaki Business sonrası tam restore/sicil/non-resurrection hedeflerini yeni teslim önkoşulu yapmaz; mevcut kaynak ve testleri korur.
+
 ## Managed restore prosedürünün sınırı
 
 Kaynak ve hedef ayrı ve açık tanımlanır; deneme hedefi izole olmalıdır. Managed Auth/Storage şema sahiplerini platform kurar. Uygulama şema/rol/owner/ACL/RLS/policy/fonksiyon güvenlik ayarları korunur; `--no-owner/--no-acl` ile güvenlik farkı gizlenmez. Aynı read-only snapshot’tan veri ve uygulama migration geçmişi alınır; sağlayıcının kendi migration tabloları hedef platforma bırakılır. Rol üyelikleri mevcut grant zinciriyle karşılaştırılır, gereksiz grant tekrarları yapılmaz. Worker parolası veya provider secret’ı SQL dump’tan geri gelmiş sayılmaz.

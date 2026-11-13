@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e2517fceed648e71f6627ce5ff685011c58623d19b26e4724323a26566c07c8b",
-        "reason": "Final P10 DTO/generated sources and existing test-body fingerprint change reviewed; only CRM import test source hash changed in API inventory, no CI scope/gate/workflow modification."
+        "fingerprint": "d2a6fba84648a44d15a834f2f942a4775b46e60e7c2ae38ac484db1232c1004a",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -777,8 +777,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "5bf4f35ea7589ebc4ff86a523f27ff7ab0b514e5223e09878baa1880ca7b1442",
-        "reason": "Reviewed WF05 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "5c357bdabe993d5250184665a8eb2faf4a0af3431ca609f06307046978528b1c",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -862,8 +862,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "cb7ac147077a2f5a431f72ff255fdb0ccff6600fbdca65f183d5b260b95bbeb3",
-        "reason": "Reviewed WF06 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "88780b08967f7078ca92d6e6428f8c7692718891bb9f85854dab4380c4585128",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -925,8 +925,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "c6917f6bfdeca59f4d78e4229dc3b784528aad9b967ac88aebbc5c36635943d8",
-        "reason": "Reviewed WF07 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "09a2fb9de18763b63def4512d806f36b27ffec0a955f6fcef675bcf7505e4754",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -990,8 +990,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "a6120d076b4ee7be9d10ef0280f342cce2e02d4663e2e0649d8f40017b82c2fc",
-        "reason": "Reviewed WF08 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "aadf34574442666f39d2a054e450f0d46400ba9dc1ec778c64bf6e0d91dae114",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1026,7 +1026,8 @@
         "apps/backend/tests/crm-provider-host-acceptance.mjs",
         "apps/backend/tests/hosted-calendar-runner-unit.mjs",
         "apps/backend/tests/discipline-presentation-acceptance.mjs",
-        "apps/backend/tests/s14-public-runner-unit.mjs"
+        "apps/backend/tests/s14-public-runner-unit.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1088,8 +1089,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "5760f3ed6b3db9d225d376fe25f01e158f4763268785df1f59a2a04b2b5c24cd",
-        "reason": "Reviewed WF09 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "80e3bad249146115ded65d6f08c101a743b32cf302d2431591063e6d8758a46d",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1103,7 +1104,12 @@
         "apps/backend/tests/p06-parser.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/subscriber-number-acceptance.mjs",
-        "apps/backend/tests/export-retention-acceptance.mjs"
+        "apps/backend/tests/export-retention-acceptance.mjs",
+        "apps/backend/tests/crm-import-acceptance.mjs",
+        "apps/backend/tests/crm-import-authority-acceptance.mjs",
+        "apps/backend/tests/crm-import-fixture.mjs",
+        "apps/backend/tests/crm-import-parser-unit.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1124,7 +1130,12 @@
         "apps/backend/database/commercial-plan-limits.sql",
         "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
         "apps/backend/database/account-export-erasure.sql",
-        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/database/crm-legacy-import.sql",
+        "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
+        "apps/backend/database/crm-import-email-warnings.sql",
+        "apps/backend/supabase/migrations/20261112235502_crm_import_email_warnings.sql",
+        "apps/backend/scripts/acceptance/p10-hosted-import.mjs"
       ],
       "operations": [
         "report_get_v1",
@@ -1137,8 +1148,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "ee926f270b0f5b6780c79c299b5fdd728b683055f0642454dbc5753e46370b63",
-        "reason": "Reviewed WF10 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "4990b72c5529adf576813c3c3b68e6837f90f7f951d68b53345adf305cc7dfc8",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1148,20 +1159,16 @@
       "guide": "docs/workflows.md#wf11",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/crm-import-acceptance.mjs",
-        "apps/backend/tests/crm-import-authority-acceptance.mjs",
-        "apps/backend/tests/crm-import-fixture.mjs",
-        "apps/backend/tests/crm-import-parser-unit.mjs",
         "apps/backend/tests/document-self-contract-unit.mjs",
         "apps/backend/tests/document-self-requirements-acceptance.mjs",
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/starter-document-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/transactional-email-acceptance.mjs",
-        "apps/backend/tests/hosted-digital-runner-unit.mjs"
+        "apps/backend/tests/hosted-digital-runner-unit.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
-        "apps/backend/database/crm-legacy-import.sql",
         "apps/backend/database/document-self-requirements.sql",
         "apps/backend/database/p05-bind.sql",
         "apps/backend/database/p05-document-protection.sql",
@@ -1172,14 +1179,10 @@
         "apps/backend/database/reminder-email.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/supabase/migrations/20261104131914_document_self_requirements.sql",
-        "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
         "docs/workflows.md",
         "apps/backend/database/digital-document-snapshots.sql",
         "apps/backend/supabase/migrations/20261108033244_digital_document_snapshots.sql",
-        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs",
-        "apps/backend/database/crm-import-email-warnings.sql",
-        "apps/backend/supabase/migrations/20261112235502_crm_import_email_warnings.sql",
-        "apps/backend/scripts/acceptance/p10-hosted-import.mjs"
+        "apps/backend/scripts/acceptance/s10-hosted-digital.mjs"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1191,8 +1194,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "a524c5632133d361625466c0e36482e35e8c235b4cab0ccd8c19f125aff7c8dc",
-        "reason": "Final P10 source and scoped warning tests reviewed; synthetic runner records/reclaims only owned native sessions and reports success after cleanup; stale set and actual inbox reconciliation plus original file reread are separate from native late-row rollback."
+        "fingerprint": "3c582a9332c585629279882365c77f22851d957cedf50d86bfb903078c898454",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1442,8 +1445,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "63f471040eb133a0a9b570e6b9b3d0fec8a2eb794bf8c4c2d942655e38e0b98b",
-        "reason": "Reviewed WF14 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "2f365c1d9b4df3031092dc51b83dbb3bee90a650724ce000433157a7e99b9cc3",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1537,7 +1540,8 @@
         "apps/backend/tests/crm-segment-worker-acceptance.mjs",
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/person-registry.test.mjs",
-        "apps/backend/tests/crm-pipeline-acceptance.mjs"
+        "apps/backend/tests/crm-pipeline-acceptance.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1576,8 +1580,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "5dfa8e617ac9d63cc313e8d70526e69deb17c1399c4b1c967e72b70a1a3cedac",
-        "reason": "Reviewed WF16 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "817787ebcb58726ed537358a9649d0d92cd4a5e23689027f844f94496f1ea9f9",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1729,8 +1733,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "9cca53d85bb8e04cc2a06107643c94ca071631150fb27f4791826c43df96ba18",
-        "reason": "Reviewed WF19 guide and common generated wrapper diff: only service-only outbox_deliver_v1 integrity phase changed; this flow RPC entries remain byte-identical. Gateway observer preserves response body/status/headers and all actor, plan, preview/replay and reread rules; no domain guide change required."
+        "fingerprint": "6d4b1583c1b9330487b89f6109b80f61d7d3837f70130b0b5ccfa218ed18037a",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     },
     {
@@ -1756,7 +1760,8 @@
         "apps/backend/tests/transactional-email-acceptance.mjs",
         "apps/backend/tests/transactional-email-unit.mjs",
         "apps/backend/tests/native-account-erasure-unit.mjs",
-        "apps/backend/tests/export-retention-acceptance.mjs"
+        "apps/backend/tests/export-retention-acceptance.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1847,8 +1852,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "cf5feb3a6f5cd11e13b8656b12692ab0144dd36cec4b0dedf4bc300a116ebdfb",
-        "reason": "Worker, Edge critical handoff, özel monitor ve gerçek native testler incelendi; eksik delivery config null kalır, heartbeat teslim sayılmaz. WF20 mevcut service-only sınırı açıklıyor."
+        "fingerprint": "712e3b230246fddd089e6b7b3891c3049702d5eda290a4e74563a950acb7b03e",
+        "reason": "G02 existing Pro lifecycle source and new connected native acceptance reviewed: same import/application/person/No/document/sale/reservation/earning/report/notification IDs; old assertions/runtime unchanged. CRM import source ownership corrected to WF10; body hash is the sole CI inventory update."
       }
     }
   ]

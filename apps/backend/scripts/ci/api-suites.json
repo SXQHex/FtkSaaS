@@ -454,7 +454,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-          "sha256": "ed217ccafdfa51543fb9ad10c7e6b76b5c6ccbba6d49b2838a428ec8e4be5166"
+          "sha256": "ed0c08a78ee751f0f187f2454334555fa95a4fadb05a3de9f38ce061efc9faad"
         }
       ],
       "estimated_seconds": 780.97
