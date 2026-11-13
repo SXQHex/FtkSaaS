@@ -9,6 +9,11 @@ const forbidden = modules.filter((id) =>
   /@tanstack\/[^/]*(?:devtools|event-bus)|src\/components\/devtools\.tsx/.test(id),
 );
 assert.deepEqual(forbidden, [], "Devtools modules entered the production bundle");
+assert.deepEqual(
+  modules.filter((id) => /apps\/(?:backend|web)\/|packages\/|design-reference\//.test(id)),
+  [],
+  "Server, shared workspace, or reference modules entered the independent bundle",
+);
 const assets = new URL("../dist/assets/", import.meta.url);
 const files = readdirSync(assets).filter((file) => file.endsWith(".js"));
 assert.ok(files.length > 0, "No production JavaScript files");

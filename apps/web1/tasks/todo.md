@@ -1,6 +1,6 @@
 # FtkSaaS · Frontend geliştirme ve kabul listesi
 
-**Sıradaki iş** · T02.2 — bağımsız statik istemcide ilk Auth/Edge okumasını hazırlayıp E01 giriş sayfasına geç.
+**Sıradaki iş** · E01.1–E01.4 — login-02 ile giriş görünümünü uygula ve çizimle karşılaştır.
 **Aktif hedef** · Çalışan Pro kabulü.  
 **Sonraki teslimler** · Starter → Business; bu goal kapsamında başlatılmaz.  
 **Çalışma alanı** · `apps/web1`, kendi npm kurulumu, testleri ve yayın süreci olan bağımsız uygulamadır. Üç plan aynı uygulamayı ve ortak backend sözleşmelerini kullanır.
@@ -13,9 +13,9 @@ Bu çalışmanın hedefi yalnız Pro işlevlerini uygulamak ve gerçek backend i
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan         | Sayfa/işlev                      | Durum  | Son doğrulama veya engel                                                | Sonraki eylem                                                          |
-| ---------- | ------------ | -------------------------------- | ------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| T02.2      | Pro hazırlık | Auth/Edge bağlantısı → E01 giriş | Sırada | Bu değişiklikte araç zinciri, build, tarayıcı ve referanslar doğrulandı | T02.2 kapsamında ilk okumanın tiplerini ve public env bağlantısını kur |
+| Aktif adım | Plan | Sayfa/işlev    | Durum       | Son doğrulama veya engel                                                           | Sonraki eylem                                                |
+| ---------- | ---- | -------------- | ----------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| E01.1–4    | Pro  | Giriş görünümü | Uygulanıyor | T02.2 yerel taşıma/tip testleri ve build geçti; T02.3 gerçek rol/ortam kabulü açık | Resmî aria-rhea login-02 bloğunu auth alanında çizime uyarla |
 
 Her başarılı dilimden veya somut engelden sonra bu satırı güncelle. Yeni oturumda önce satırı, aktif sayfanın alt adımlarını ve yalnız ilgili sözleşme/kodu oku. Tamamlanmış maddeleri yeni kaynağa etkisi gerektirmedikçe yeniden uygulama. Mevcut Git değişikliklerini incele, başkasının çalışmasını koru.
 
@@ -610,7 +610,9 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 | Taramada kaynak okundu; uygulamada T01 | Aşağıdaki tarama kaydı, ürün sözleşmesi, WF/API haritası | Yalnız sürüm farkı ve aktif tüketici denetimi |
 
 - [x] **T02.1** · Ürün kapsamı F01–F33, 46 ekran, P01–P17 ve Starter/Business farkları önden eşlendi. Kanıt: bu dosyanın tarama kaydı ve E satırları; başlangıç kaynak SHA’sı `1249532c0abe8d340b268b3d5dff33a547fea9e5`. Bu iş kaynak incelemesidir; canlı kabul değildir.
-- [ ] **T02.2** · Mevcut `src/lib/supabase.ts` istemcisini kullan. Ortak Edge/Worker taşıma kodunu `src/lib/` içinde tut ve makine kaynağından gelen tipleri bağımsız build'e bağla. `@ftksaas/api-contracts` private pakettir, workspace bağımlılıkları vardır; dış klasöre `file:/link:/workspace:` bağlantı ekleme. Kanonik üretilmiş `src` dosyalarının gereken bütün göreli bağımlılıklarını uygulama içi üretilmiş snapshot olarak kaynak SHA/hash iziyle taşı; elle DTO türetme. Import kapanışını ve üretim bundle’ında private/server kodu bulunmadığını doğrula. Güncelleme yalnız kanonik üretimden yapılır; snapshot ikinci sözleşme sahibi değildir.
+- [x] **T02.2** · Mevcut `src/lib/supabase.ts` istemcisini kullan. Ortak Edge/Worker taşıma kodunu `src/lib/` içinde tut ve makine kaynağından gelen tipleri bağımsız build'e bağla. `@ftksaas/api-contracts` private pakettir, workspace bağımlılıkları vardır; dış klasöre `file:/link:/workspace:` bağlantı ekleme. Kanonik üretilmiş `src` dosyalarının gereken bütün göreli bağımlılıklarını uygulama içi üretilmiş snapshot olarak kaynak SHA/hash iziyle taşı; elle DTO türetme. Import kapanışını ve üretim bundle’ında private/server kodu bulunmadığını doğrula. Güncelleme yalnız kanonik üretimden yapılır; snapshot ikinci sözleşme sahibi değildir.
+      **T02.2 kanıtı · 13 Kasım 2026:** Taban `89fec00ac9d289073efc99a33741f59e563cc389`; aynı SHA [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43475477455) başarılı. macOS yerel npm: `src/lib/backend.ts`, `public-gateway.ts`, `account.ts` ve native PKCE istemcisi hazır. `npm test -- src/lib/` 10/10, strict typecheck/lint ve production build geçti. HTTP200 SafeError, bozuk/non-JSON/non-2xx yanıt, oturumsuz istek ve anonim Worker payload/credentials sınırı test edildi. MSW 3 handler Request metadata’sı credentials değerini yeniden kurduğu için omit assertion’ı gerçek fetch sınırında korunur. `node scripts/snapshot-api-contracts.mjs --check` dört kanonik dosyanın byte/hash ve yerel import kapanışını doğruladı; kaynak SHA/schema hash `src/lib/api-contracts/manifest.json` içinde. Yalnız byte korunan snapshot format dışıdır, lint ve strict tip denetimi açıktır. Bundle kontrolü backend/web/shared workspace ve özgün çizim import’unu reddeder. Public değerler hazır `.artifacts/spa-client/integration.env.example` içinden yalnız izinli VITE anahtarları seçilerek Git dışı yerel env’ye alındı; hosted hesap/Google/posta kabulü değildir.
+
 - [ ] **T02.3** · Rol bazlı test hesaplarının erişimini, güncel public env değerlerini ve gerçek build/yayın ortamını doğrula. Uygulama altındaki CI şablonları etkin workflow değildir. Dış kapsam değişikliği gerekiyorsa ihtiyacı kaydet; bu görev kök CI, backend, DNS veya production dağıtım yetkisi vermez. Yerel önizleme ve izinli development kabulüyle bağımsız sayfalara devam et.
 
 ### T03 · Salt okunur tasarım referansını kullanıma hazırla
