@@ -1097,7 +1097,7 @@
         },
         {
           "path": "apps/backend/tests/sale-change-inventory-acceptance.mjs",
-          "sha256": "0016d13081cb630639c56e450d95d318191b88b9684e1e65344473fc1bb4b5cf",
+          "sha256": "4ba8bd887370d5d7f22918ebe48f9f24ab22aaf2db77d1a441193536709a23e4",
           "line": 164
         },
         {

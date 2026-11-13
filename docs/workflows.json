@@ -289,8 +289,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "403447fc26081472cceb5e946137b240cc81d14847ab2ace572fac8dfa7434c8",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "bb04ee07a9574b1479976cfb07e9b92f59565fe5224212c6e5111a3ff3c9b090",
+        "reason": "Reviewed source ownership hash refresh for the XREQ029 native regression; original unit, runner, deadlines and every old assertion retained. No CI policy or selection change."
       }
     },
     {
@@ -787,8 +787,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "841b24220452bbb908e1469165258cc3c0a26430fb8aacf49a10634e21b00fb2",
-        "reason": "Reviewed final F17 fix and RED/native coverage: Starter package-change preview/apply/management and previous-plan preview reject before business work. Migration159 stays immutable;160 records same gates with canonical upserts for unchanged source audit. Termination/renewal unaffected; guide updated."
+        "fingerprint": "54af0e571c52602f3489532085128825ea86d126784b06d32892fc3a0ecec387",
+        "reason": "CI43424078673 exact-source native failure exposed legacy XREQ029 expectations: Starter package-change selector must reject F17. Added exact denial and retained both historical source-context/item identity assertions after restoring Pro/Business. No runtime, assertion strength or quality policy change."
       }
     },
     {
