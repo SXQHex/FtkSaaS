@@ -13,6 +13,8 @@ export default interface Resources {
       "brandInitials": "F",
       "calendarPitch": "Haftalık program, yoklama ve bekleme listesi",
       "callbackError": "Bağlantı tamamlanamadı veya ek onay gerekiyor. Onay adımlarını kontrol et ya da yeni bir giriş başlat.",
+      "callbackInfo": "E-posta değişikliği yaptıysan mevcut ve yeni adresindeki onayları tamamla. Güncel durumu hesabında kontrol edebilirsin.",
+      "callbackInfoTitle": "Hesap doğrulaması",
       "checkEmail": "E-postanı kontrol et",
       "confirmPassword": "Parola tekrar",
       "displayName": "Görünen ad",
@@ -71,6 +73,20 @@ export default interface Resources {
     "demo": {
       "action": "Test Et",
       "clickCount": "Tıklama sayısı: {{value}}"
+    },
+    "emailChange": {
+      "acceptedReadError": "İstek işlendi. Güncel hesap bilgileri yenilenemedi.",
+      "current": "Güncel e-posta",
+      "description": "Değişiklik için mevcut ve yeni adresindeki onay adımlarını tamamla.",
+      "error": "E-posta işlemi doğrulanamadı. Güncel ve bekleyen adresi kontrol edip yeniden deneyebilirsin.",
+      "newEmail": "Yeni e-posta",
+      "pending": "Bekleyen e-posta",
+      "pendingHint": "Bu adres henüz güncel doğrulanmış e-postan değildir.",
+      "request": "Değişim isteği gönder",
+      "requested": "Değişim isteği işlendi. Güncel ve bekleyen adresi kontrol et.",
+      "resend": "Bekleyen adrese yeniden gönder",
+      "resent": "Yeniden gönderme isteği işlendi. Onay iletisini kontrol et.",
+      "title": "E-postayı değiştir"
     },
     "formExample": {
       "invalid": "En az 3 karakter girin.",

@@ -3,7 +3,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import type { ProfileSnapshot } from "./profile";
-const { save, prepare } = vi.hoisted(() => ({ save: vi.fn(), prepare: vi.fn() }));
+const { save, prepare, emailRequest } = vi.hoisted(() => ({
+  save: vi.fn(),
+  prepare: vi.fn(),
+  emailRequest: vi.fn(),
+}));
 vi.mock("./profile", async (original) => ({
   ...(await original<typeof import("./profile")>()),
   saveProfile: save,
@@ -12,6 +16,7 @@ vi.mock("./profile-photo", async (original) => ({
   ...(await original<typeof import("./profile-photo")>()),
   preparePhoto: prepare,
 }));
+vi.mock("./email", () => ({ requestEmailChange: emailRequest, resendEmailChange: vi.fn() }));
 import { BackendError } from "../../lib/backend";
 import { ProfileForm } from "./profile-panel";
 afterEach(() => {
@@ -210,4 +215,28 @@ it("prevents snapshot reset while a selected photo is still being prepared", asy
   );
   expect(screen.getByRole("button", { name: "Kaldır" })).toBeDisabled();
   expect(save).not.toHaveBeenCalled();
+});
+
+it("preserves dirty profile text while the email Sheet reads canonical pending state without submitting the profile", async () => {
+  emailRequest.mockResolvedValue(undefined);
+  const identity = base.account.identity;
+  if (!identity) throw new Error("fixture identity missing");
+  const pending: ProfileSnapshot = {
+    ...base,
+    account: { ...base.account, identity: { ...identity, pending_email: "next@example.invalid" } },
+  };
+  const refresh = vi.fn().mockResolvedValueOnce(base).mockResolvedValueOnce(pending);
+  render(<ProfileForm latest={base} onRefresh={refresh} />);
+  const name = screen.getByLabelText("Görünen ad");
+  await userEvent.clear(name);
+  await userEvent.type(name, "My draft");
+  await userEvent.click(screen.getByRole("button", { name: "E-postayı değiştir" }));
+  await userEvent.type(await screen.findByLabelText("Yeni e-posta"), "next@example.invalid");
+  await userEvent.click(screen.getByRole("button", { name: "Değişim isteği gönder" }));
+  expect(await screen.findByLabelText("Bekleyen e-posta")).toHaveValue("next@example.invalid");
+  expect(emailRequest).toHaveBeenCalledExactlyOnceWith("next@example.invalid");
+  expect(save).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByLabelText("Kapat"));
+  expect(name).toHaveValue("My draft");
+  expect(screen.getByRole("button", { name: "Değişiklikleri kaydet" })).toBeEnabled();
 });

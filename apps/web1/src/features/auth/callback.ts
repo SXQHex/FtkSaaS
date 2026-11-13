@@ -17,7 +17,9 @@ export function captureAuthCallback() {
   captured = {
     code: search.get("code") ?? undefined,
     flowId: search.get("sb_flow_id") ?? undefined,
-    providerError: search.has("error") || fragment.has("error"),
+    providerError: ["error", "error_code", "error_description"].some(
+      (field) => search.has(field) || fragment.has(field),
+    ),
     next: safeNext(search.get("next")),
   };
   window.history.replaceState(window.history.state, "", "/auth/callback");
