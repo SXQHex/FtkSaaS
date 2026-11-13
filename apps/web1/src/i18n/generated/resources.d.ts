@@ -80,6 +80,15 @@ export default interface Resources {
       "success": "Örnek gönderildi.",
       "title": "Form altyapısı örneği"
     },
+    "photo": {
+      "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",
+      "hint": "PNG, JPEG veya WebP, en fazla 1 MiB.",
+      "readError": "Profil fotoğrafı okunamadı.",
+      "remove": "Kaldır",
+      "sizeError": "Boş dosya veya 1 MiB üstü fotoğraf yüklenemez.",
+      "typeError": "PNG, JPEG veya WebP seç.",
+      "upload": "Fotoğraf yükle"
+    },
     "profile": {
       "accountPhone": "Hesap telefonu",
       "conflict": "Profil başka bir yerde değişti. Taslağın korunuyor; güncel değerleri yükleyip yeniden onayla.",
