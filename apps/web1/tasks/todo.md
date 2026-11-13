@@ -19,6 +19,23 @@ Bu çalışmanın hedefi yalnız Pro işlevlerini uygulamak ve gerçek backend i
 
 Her başarılı dilimden veya somut engelden sonra bu satırı güncelle. Yeni oturumda önce satırı, aktif sayfanın alt adımlarını ve yalnız ilgili sözleşme/kodu oku. Tamamlanmış maddeleri yeni kaynağa etkisi gerektirmedikçe yeniden uygulama. Mevcut Git değişikliklerini incele, başkasının çalışmasını koru.
 
+### Dosya yerleşimi
+
+Hibrit feature-based düzeni kullan. Her sayfayı kendi E maddesiyle teslim et, dosyalarını ise ilgili iş alanında tut. Giriş, kayıt ve parola kurtarma aynı `auth` alanına aittir.
+
+| Konum                  | Sorumluluk                                                                                                                                               |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/`          | TanStack Router girişleri. URL parametrelerini, route düzeyindeki erişim kontrolünü ve yönlendirmeyi bağlar, ilgili feature sayfasını açar.              |
+| `src/features/<alan>/` | Alana ait sayfalar, hazır bloklardan gelen formlar, sorgular ve kullanıcı işlemleri birlikte durur. Alana özel test, sınadığı dosyanın yanında yer alır. |
+| `src/components/ui/`   | shadcn registry’sinden gelen ortak UI bileşenleri. Mevcut `components.json` eşlemelerini kullan.                                                         |
+| `src/components/`      | Uygulama genelinde paylaşılan kabuk ve yerleşim. Yönetici ve öğrenciye özgü gezinmeyi gerektiğinde burada hazır parçalarla birleştir.                    |
+| `src/lib/`             | Mevcut Supabase istemcisi, ortak API taşıma kodu ve alandan bağımsız teknik yardımcılar.                                                                 |
+| `src/test/`, `e2e/`    | Ortak test kurulumu ve MSW sunucusu `src/test/` içinde, tarayıcı senaryoları `e2e/` içinde yer alır.                                                     |
+
+Klasörü ilk dosyası gerektiğinde aç. Mevcut boilerplate’i koru. Ekran envanteri veya plan başına klasör açma. Bir iş alanı düz bir klasörle başlar, alt klasörler içerik büyüdüğünde eklenir. Tam FSD katmanları kurmak için hazırlık görevi açma.
+
+Ortak kullanılan bir işin sahibi kendi alanıdır. Örneğin öğrenci profili ve finans ekranı aynı tahsilat işlemini `features/billing/` üzerinden kullanır. Pro, Starter ve Business aynı alan kodunu kullanır. Ekranda hangi eylemlerin açılacağını güncel backend yetkisi ve plan kapsamı belirler.
+
 ### İlerleme döngüsü
 
 1. Ürün geneli taraması aşağıda tamamlandı. T01 ile yerel temeli, T02/T03 ile kaynak sürümü ve taşınan referansları doğrula. Yeni baştan ürün/bileşen taraması yapma; yalnız aktif sayfanın kaynağını ve değişen sözleşmeyi kontrol et.
@@ -201,7 +218,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 - [ ] **E01** · **Giriş** — çizim `data-view="a-giris"` · İşlev P01.2, P01.3 · Route `/login` · Rol/kapsam: Anonim · Hazır kaynak: login-02; Field, Input, Button, Separator · Bağ: Native parola/Google; tek callback sahibi.
   - [ ] **E01.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
   - [ ] **E01.2** · Yukarıda eşlenen hazır kaynakları mevcut proje envanteriyle karşılaştır. Eksik olanın resmi registry/CLI kaynağını, sürümünü ve React Aria/Rhea uyumunu doğrula; kurulu bileşeni yeniden üretme. K02/K03 varsa seçim ölçütünü uygula.
-  - [ ] **E01.3** · Seçilen hazır kaynaklarla sayfanın görsel kompozisyonunu oluştur. Metin, tema, ikon ve yerleşimi çizime göre uygula. Elle UI bileşeni yazma.
+  - [ ] **E01.3** · `src/routes/login.tsx` üzerinden `src/features/auth/login-page.tsx` sayfasını aç. Resmî `login-02` bloğundan gelen `login-form.tsx` dosyasını sayfanın yanında tut. Hazır bloğun metnini, temasını ve yerleşimini çizime uyarla.
   - [ ] **E01.4** · Aynı viewport, tema ve durumdaki çizimle tarayıcı karşılaştırması yap. Açıklanmamış görsel farkları düzelt, karşılaştırma sonucunu kaydet.
   - [ ] **E01.5** · Sayfanın gerçek işlevlerini ilgili P alt maddelerine göre tek tek bağla. Her işlemde yetkili okuma → kullanıcı eylemi → sonucu yeniden okuma yolunu tamamla. Birden çok işlemde ayrı alt kutular kullan.
   - [ ] **E01.6** · Bağlanan işlemler için ilgili başarı/ret/hata-kurtarma senaryosunu ve klavye/mobil davranışını doğrula. Gerçek ortam gerektiren açık kontrolleri kendi işlev maddesine bağla.
@@ -210,7 +227,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 - [ ] **E02** · **Kayıt** — çizim `data-view="a-kayit"` · İşlev P01.1 · Route `/signup` · Rol/kapsam: Anonim · Hazır kaynak: signup-02; Field, Input, Checkbox, Alert · Bağ: Signup-check → native kayıt; otomatik işletme vaadi yok.
   - [ ] **E02.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
   - [ ] **E02.2** · Yukarıda eşlenen hazır kaynakları mevcut proje envanteriyle karşılaştır. Eksik olanın resmi registry/CLI kaynağını, sürümünü ve React Aria/Rhea uyumunu doğrula; kurulu bileşeni yeniden üretme. K02/K03 varsa seçim ölçütünü uygula.
-  - [ ] **E02.3** · Seçilen hazır kaynaklarla sayfanın görsel kompozisyonunu oluştur. Metin, tema, ikon ve yerleşimi çizime göre uygula. Elle UI bileşeni yazma.
+  - [ ] **E02.3** · `src/routes/signup.tsx` üzerinden `src/features/auth/signup-page.tsx` sayfasını aç. Resmî `signup-02` bloğundan gelen `signup-form.tsx` dosyasını sayfanın yanında tut. Hazır bloğun metnini, temasını ve yerleşimini çizime uyarla.
   - [ ] **E02.4** · Aynı viewport, tema ve durumdaki çizimle tarayıcı karşılaştırması yap. Açıklanmamış görsel farkları düzelt, karşılaştırma sonucunu kaydet.
   - [ ] **E02.5** · Sayfanın gerçek işlevlerini ilgili P alt maddelerine göre tek tek bağla. Her işlemde yetkili okuma → kullanıcı eylemi → sonucu yeniden okuma yolunu tamamla. Birden çok işlemde ayrı alt kutular kullan.
   - [ ] **E02.6** · Bağlanan işlemler için ilgili başarı/ret/hata-kurtarma senaryosunu ve klavye/mobil davranışını doğrula. Gerçek ortam gerektiren açık kontrolleri kendi işlev maddesine bağla.
@@ -593,7 +610,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 | Taramada kaynak okundu; uygulamada T01 | Aşağıdaki tarama kaydı, ürün sözleşmesi, WF/API haritası | Yalnız sürüm farkı ve aktif tüketici denetimi |
 
 - [x] **T02.1** · Ürün kapsamı F01–F33, 46 ekran, P01–P17 ve Starter/Business farkları önden eşlendi. Kanıt: bu dosyanın tarama kaydı ve E satırları; başlangıç kaynak SHA’sı `1249532c0abe8d340b268b3d5dff33a547fea9e5`. Bu iş kaynak incelemesidir; canlı kabul değildir.
-- [ ] **T02.2** · İlk sayfa öncesi native SDK, yayınlanmış Edge/Worker ve makine kaynağından gelen tipleri bağımsız build'e bağla. `@ftksaas/api-contracts` private pakettir, workspace bağımlılıkları vardır; dış klasöre `file:/link:/workspace:` bağlantı ekleme. Kanonik üretilmiş `src` dosyalarının gereken bütün göreli bağımlılıklarını uygulama içi üretilmiş snapshot olarak kaynak SHA/hash iziyle taşı; elle DTO türetme. Import kapanışını ve üretim bundle’ında private/server kodu bulunmadığını doğrula. Güncelleme yalnız kanonik üretimden yapılır; snapshot ikinci sözleşme sahibi değildir.
+- [ ] **T02.2** · Mevcut `src/lib/supabase.ts` istemcisini kullan. Ortak Edge/Worker taşıma kodunu `src/lib/` içinde tut ve makine kaynağından gelen tipleri bağımsız build'e bağla. `@ftksaas/api-contracts` private pakettir, workspace bağımlılıkları vardır; dış klasöre `file:/link:/workspace:` bağlantı ekleme. Kanonik üretilmiş `src` dosyalarının gereken bütün göreli bağımlılıklarını uygulama içi üretilmiş snapshot olarak kaynak SHA/hash iziyle taşı; elle DTO türetme. Import kapanışını ve üretim bundle’ında private/server kodu bulunmadığını doğrula. Güncelleme yalnız kanonik üretimden yapılır; snapshot ikinci sözleşme sahibi değildir.
 - [ ] **T02.3** · Rol bazlı test hesaplarının erişimini, güncel public env değerlerini ve gerçek build/yayın ortamını doğrula. Uygulama altındaki CI şablonları etkin workflow değildir. Dış kapsam değişikliği gerekiyorsa ihtiyacı kaydet; bu görev kök CI, backend, DNS veya production dağıtım yetkisi vermez. Yerel önizleme ve izinli development kabulüyle bağımsız sayfalara devam et.
 
 ### T03 · Salt okunur tasarım referansını kullanıma hazırla
