@@ -76,7 +76,9 @@
     "mfaChooseFactor": "Doğrulama uygulamasını seç.",
     "mfaFactorNumber": "Doğrulama uygulaması {{number}}",
     "mfaReadError": "Kod doğrulandı. Hesap bilgileri yenilenemedi. Yeniden dene.",
-    "mfaLoadError": "Doğrulama bilgileri okunamadı. Yeniden dene."
+    "mfaLoadError": "Doğrulama bilgileri okunamadı. Yeniden dene.",
+    "callbackInfoTitle": "Hesap doğrulaması",
+    "callbackInfo": "E-posta değişikliği yaptıysan mevcut ve yeni adresindeki onayları tamamla. Güncel durumu hesabında kontrol edebilirsin."
   },
   "security": {
     "profile": "Profil",
@@ -224,5 +226,19 @@
     "unlinkError": "Bağlantı kaldırma doğrulanamadı. Güncel giriş yöntemlerini kontrol et.",
     "confirm": "Google bağlantısını kaldır",
     "unlinkNamedDescription": "{{email}} Google hesabıyla artık giriş yapamazsın. Diğer bağlı giriş yöntemini kullanabilirsin."
+  },
+  "emailChange": {
+    "title": "E-postayı değiştir",
+    "description": "Değişiklik için mevcut ve yeni adresindeki onay adımlarını tamamla.",
+    "current": "Güncel e-posta",
+    "pending": "Bekleyen e-posta",
+    "pendingHint": "Bu adres henüz güncel doğrulanmış e-postan değildir.",
+    "newEmail": "Yeni e-posta",
+    "request": "Değişim isteği gönder",
+    "resend": "Bekleyen adrese yeniden gönder",
+    "requested": "Değişim isteği işlendi. Güncel ve bekleyen adresi kontrol et.",
+    "resent": "Yeniden gönderme isteği işlendi. Onay iletisini kontrol et.",
+    "error": "E-posta işlemi doğrulanamadı. Güncel ve bekleyen adresi kontrol edip yeniden deneyebilirsin.",
+    "acceptedReadError": "İstek işlendi. Güncel hesap bilgileri yenilenemedi."
   }
 }

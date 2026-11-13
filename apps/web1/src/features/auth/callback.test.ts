@@ -118,3 +118,26 @@ it("does not turn a normal OAuth session into a recovery session by changing nex
   ).rejects.toThrow("RECOVERY_REQUIRED");
   expect(account).not.toHaveBeenCalled();
 });
+
+it.each([
+  "?error_code=otp_expired",
+  "#error_code=otp_expired",
+  "?error_description=native_denial",
+  "#error_description=native_denial",
+])(
+  "classifies standalone native error fields as failure rather than a no-code confirmation: %s",
+  async (suffix) => {
+    const { captureAuthCallback, capturedCallback } = await import("./callback");
+    window.history.replaceState({}, "", `/auth/callback${suffix}`);
+    try {
+      captureAuthCallback();
+      expect(capturedCallback().providerError).toBe(true);
+      expect(window.location.search).toBe("");
+      expect(window.location.hash).toBe("");
+      await expect(completeCallback(capturedCallback())).rejects.toThrow("AUTH_CALLBACK_INVALID");
+      expect(auth.exchangeCodeForSession).not.toHaveBeenCalled();
+    } finally {
+      window.history.replaceState({}, "", "/");
+    }
+  },
+);

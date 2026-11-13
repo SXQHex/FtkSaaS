@@ -494,3 +494,78 @@ test("native Google linking returns through the existing callback and selected u
   await captureAuth(page, "e10-google-last-long-email", testInfo);
   expect(errors).toEqual([]);
 });
+
+test("native email request preserves profile drafts and separates pending/no-code confirmation from a completed PKCE exchange", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByLabel("Görünen ad", { exact: true }).fill("Unsaved profile draft");
+  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  const request = dialog.getByRole("button", { name: "Değişim isteği gönder", exact: true });
+  await expect(page.getByLabel("Güncel e-posta", { exact: true })).toHaveValue(
+    "fixture@example.invalid",
+  );
+  await captureAuth(page, "e10-email-new", testInfo);
+  await page.getByLabel("Yeni e-posta", { exact: true }).fill("invalid");
+  await request.click();
+  await expect(page.getByText("Geçerli bir e-posta adresi gir.")).toBeVisible();
+  expect(calls.emailUpdate).toBe(0);
+  await page.getByLabel("Yeni e-posta", { exact: true }).fill("next@example.invalid");
+  calls.rejectNextEmailUpdate = true;
+  await request.click();
+  await expect(page.getByText("E-posta işlemi doğrulanamadı.", { exact: false })).toBeVisible();
+  await expect(page.getByLabel("Yeni e-posta", { exact: true })).toHaveValue(
+    "next@example.invalid",
+  );
+  await expect(request).toBeEnabled();
+  calls.blockProfileReads = true;
+  await request.click();
+  await expect(page.getByText("İstek işlendi. Güncel hesap bilgileri yenilenemedi.")).toBeVisible();
+  await expect(request).toBeDisabled();
+  const writes = calls.emailUpdate;
+  calls.blockProfileReads = false;
+  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(page.getByLabel("Güncel e-posta", { exact: true })).toHaveValue(
+    "fixture@example.invalid",
+  );
+  await expect(page.getByLabel("Bekleyen e-posta", { exact: true })).toHaveValue(
+    "next@example.invalid",
+  );
+  expect(calls.emailUpdate).toBe(writes);
+  await captureAuth(page, "e10-email-pending", testInfo);
+  await dialog.getByRole("button", { name: "Bekleyen adrese yeniden gönder", exact: true }).click();
+  await expect(
+    page.getByText("Yeniden gönderme isteği işlendi. Onay iletisini kontrol et."),
+  ).toBeVisible();
+  expect(calls.emailResend).toBe(1);
+  await dialog.getByLabel("Kapat", { exact: true }).click();
+  await expect(page.getByLabel("Görünen ad", { exact: true })).toHaveValue("Unsaved profile draft");
+  expect(calls.profileKeys).toHaveLength(0);
+  await page.goto("/auth/callback?message=email_change_confirmation_sent");
+  await expect(page).toHaveURL(`${origin}/auth/callback`);
+  await expect(page.getByRole("heading", { name: "Hesap doğrulaması" })).toBeVisible();
+  expect(calls.exchange).toBe(1);
+  await captureAuth(page, "e10-email-no-code", testInfo);
+  await page.getByRole("link", { name: "Hesabım", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByLabel("E-posta", { exact: false })).toHaveValue("fixture@example.invalid");
+  calls.completeEmailChangeOnExchange = true;
+  await page.goto("/auth/callback?code=fixture-email-approved");
+  await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByLabel("E-posta", { exact: false })).toHaveValue("next@example.invalid");
+  expect(calls.exchange).toBe(2);
+  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  await expect(page.getByLabel("Güncel e-posta", { exact: true })).toHaveValue(
+    "next@example.invalid",
+  );
+  await expect(page.getByLabel("Bekleyen e-posta", { exact: true })).toHaveCount(0);
+  expect(errors).toEqual([]);
+});

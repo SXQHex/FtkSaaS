@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { readProfile, saveProfile, profileChange, type ProfileSnapshot } from "./profile";
+import { EmailChange } from "./email-change";
 import { ProfilePhotoRow } from "./profile-photo-row";
 import type { PhotoDraft } from "./profile-photo";
 import { BackendError } from "../../lib/backend";
@@ -103,10 +104,10 @@ export function ProfileForm({
         intent.current = undefined;
         setWriteKnown(false);
       }
-      return true;
+      return next;
     } catch {
       setReadFailed(true);
-      return false;
+      return undefined;
     } finally {
       setReading(false);
     }
@@ -280,6 +281,10 @@ export function ProfileForm({
                         type="email"
                         readOnly
                         value={identity.email ?? ""}
+                      />
+                      <EmailChange
+                        disabled={submitting || reading || writeKnown || preparingPhoto}
+                        onRefresh={async () => (await refresh(false))?.account.identity}
                       />
                       {identity.pending_email && (
                         <FieldDescription>

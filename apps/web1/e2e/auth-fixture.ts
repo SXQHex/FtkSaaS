@@ -25,6 +25,7 @@ const fixtureUser = {
   user_metadata: {},
   created_at: "2026-11-13T00:00:00Z",
   email_confirmed_at: "2026-11-13T00:00:00Z",
+  new_email: undefined as string | undefined,
   identities: [
     {
       identity_id: id,
@@ -86,6 +87,10 @@ export async function mockNative(page: Page, mfa = false) {
   const calls = {
     exchange: 0,
     password: 0,
+    emailUpdate: 0,
+    emailResend: 0,
+    rejectNextEmailUpdate: false,
+    completeEmailChangeOnExchange: false,
     identityLink: 0,
     identityEmail: "google@example.invalid",
     identityUnlink: 0,
@@ -211,6 +216,19 @@ export async function mockNative(page: Page, mfa = false) {
       });
     if (url.pathname === "/auth/v1/token") {
       calls.exchange++;
+      if (
+        url.searchParams.get("grant_type") === "pkce" &&
+        calls.completeEmailChangeOnExchange &&
+        user.new_email
+      ) {
+        user.email = user.new_email;
+        user.new_email = undefined;
+        user.identities = user.identities.map((identity) =>
+          identity.provider === "email"
+            ? { ...identity, identity_data: { ...identity.identity_data, email: user.email } }
+            : identity,
+        );
+      }
       if (url.searchParams.get("grant_type") === "password") {
         passwordSignIns++;
         elevated = false;
@@ -229,6 +247,12 @@ export async function mockNative(page: Page, mfa = false) {
     }
     if (url.pathname === "/auth/v1/resend") {
       calls.resend++;
+      const request = route.request().postDataJSON();
+      if (request.type === "email_change") {
+        calls.emailResend++;
+        expect(request.email).toBe(user.new_email);
+        expect(new URL(url.searchParams.get("redirect_to")!).pathname).toBe("/auth/callback");
+      }
       return route.fulfill({ json: {} });
     }
     if (url.pathname === "/auth/v1/reauthenticate") {
@@ -240,8 +264,23 @@ export async function mockNative(page: Page, mfa = false) {
         return route.fulfill({ status: 503, json: { msg: "temporary failure" } });
       if (calls.onlyGoogleIdentity) user.identities = [googleIdentity];
       if (route.request().method() === "PUT") {
-        calls.password++;
         const request = route.request().postDataJSON();
+        if (request.email !== undefined) {
+          calls.emailUpdate++;
+          expect(new URL(url.searchParams.get("redirect_to")!).pathname).toBe("/auth/callback");
+          expect(request).not.toHaveProperty("data");
+          if (calls.rejectNextEmailUpdate) {
+            calls.rejectNextEmailUpdate = false;
+            return route.fulfill({
+              status: 400,
+              headers: { "x-supabase-api-version": "2024-01-01" },
+              json: { code: "email_exists", msg: "email_exists" },
+            });
+          }
+          user.new_email = request.email;
+          return route.fulfill({ json: user });
+        }
+        calls.password++;
         if (
           calls.rejectCurrentPassword ||
           (calls.passwordNeedsCode && (!request.nonce || calls.rejectPasswordCode))
@@ -645,9 +684,9 @@ export async function mockNative(page: Page, mfa = false) {
               given_name: profile.given_name,
               family_name: profile.family_name,
               unverified_phone: profile.unverified_phone,
-              email: fixtureUser.email,
+              email: user.email,
               phone: null,
-              pending_email: null,
+              pending_email: user.new_email ?? null,
               pending_phone: null,
               email_verified_at: fixtureUser.email_confirmed_at,
               phone_verified_at: null,
