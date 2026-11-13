@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { readAccount } from "../../lib/account";
 import { readFactors, readSecurityHistory } from "./security";
 import { getSupabaseClient } from "../../lib/supabase";
+import { GoogleIdentities } from "./google-identities";
 import { PasswordChange } from "./password-change";
 import { readSessions } from "./sessions";
 import { TotpRemove } from "./totp-remove";
@@ -108,7 +109,7 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
         <CardContent>
           <ItemGroup>
             <Item role="listitem" className="px-0 py-3">
-              <ItemContent>
+              <ItemContent className="min-w-0 basis-full sm:basis-auto">
                 <ItemTitle>{t(($) => $.auth.password)}</ItemTitle>
                 <ItemDescription>{t(($) => $.passwordChange.rowDescription)}</ItemDescription>
               </ItemContent>
@@ -200,6 +201,13 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
                 </ItemActions>
               </Item>
             ))}
+            <GoogleIdentities
+              accountId={accountId}
+              onChanged={async () => {
+                await queries.invalidateQueries({ queryKey: ["account-profile", accountId] });
+                await onChanged();
+              }}
+            />
           </ItemGroup>
         </CardContent>
       </Card>
