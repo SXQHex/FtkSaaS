@@ -17,7 +17,7 @@ test.beforeEach(async ({ context }) => {
 test("opens the Turkish application with fresh state", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "tr");
-  await expect(page.getByRole("heading", { name: "FtkSaaS V2", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "FtkSaaS", exact: true })).toBeVisible();
   await expect(
     page.getByText("Vite + React + TanStack Router + React Aria", { exact: true }),
   ).toBeVisible();
@@ -46,7 +46,7 @@ test("has no automatically detectable accessibility violations on the home page"
   page,
 }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "FtkSaaS V2", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "FtkSaaS", exact: true })).toBeVisible();
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });
