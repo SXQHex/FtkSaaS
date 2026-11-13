@@ -106,7 +106,7 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
                 <ItemTitle>
                   {t(($) => $.auth.mfaTitle)}{" "}
                   {factors.data && (
-                    <Badge variant="secondary">
+                    <Badge variant={verified.length ? "success" : "secondary"}>
                       {verified.length
                         ? t(($) => $.security.enabled)
                         : t(($) => $.security.disabled)}

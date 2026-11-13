@@ -1,3 +1,4 @@
+import { ProfilePanel } from "../account/profile-panel";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { MonitorIcon, ShieldIcon, UserIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/tabs";
@@ -7,17 +8,8 @@ import { useState } from "react";
 import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "../../components/ui/card";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
-import { Field, FieldLabel } from "../../components/ui/field";
-import { Input } from "../../components/ui/input";
 import { getSupabaseClient } from "../../lib/supabase";
 
 // E10 is implemented in slices; editable profile, identity and session actions remain open.
@@ -85,20 +77,7 @@ export function AccountPage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent id="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle>{account.display_name}</CardTitle>
-              <CardDescription>
-                {t(($) => $.auth.welcome, { name: account.display_name })}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Field>
-                <FieldLabel htmlFor="display-name">{t(($) => $.auth.displayName)}</FieldLabel>
-                <Input id="display-name" readOnly value={account.display_name} />
-              </Field>
-            </CardContent>
-          </Card>
+          <ProfilePanel accountId={account.id} />
         </TabsContent>
         <TabsContent id="security">
           <SecurityPanel accountId={account.id} />

@@ -156,5 +156,28 @@
     "othersError": "Oturum kapatma doğrulanamadı. Güncel listeyi kontrol edip yeniden dene.",
     "confirmOthers": "Diğer oturumları kapat",
     "continue": "Devam et"
+  },
+  "profile": {
+    "description": "Adın ve iletişim bilgilerin stüdyo ekibine görünür.",
+    "givenName": "Ad",
+    "familyName": "Soyad",
+    "contactPhone": "İletişim telefonu",
+    "verified": "Doğrulandı",
+    "unverified": "Doğrulanmadı",
+    "nameLength": "Ad ve soyad en fazla 100 karakter olabilir.",
+    "displayRequired": "Görünen adını gir.",
+    "phoneInvalid": "Telefonu ülke koduyla ve boşluksuz yaz (ör. +905320000000).",
+    "pendingEmail": "Onay bekleyen e-posta: {{value}}",
+    "pendingPhone": "Onay bekleyen telefon: {{value}}",
+    "conflict": "Profil başka bir yerde değişti. Taslağın korunuyor; güncel değerleri yükleyip yeniden onayla.",
+    "loadCurrent": "Güncel verileri yükle",
+    "writeUnknown": "Kaydetme doğrulanamadı. Aynı değerlerle yeniden deneyebilir veya güncel verileri yükleyebilirsin.",
+    "readError": "Profil bilgileri okunamadı.",
+    "savedReadError": "Profil kaydedildi. Güncel bilgiler yenilenemedi.",
+    "saved": "Değişiklikler kaydedildi.",
+    "unsaved": "Kaydedilmemiş değişiklikler var.",
+    "unchanged": "Değişiklik yok.",
+    "save": "Değişiklikleri kaydet",
+    "accountPhone": "Hesap telefonu"
   }
 }
