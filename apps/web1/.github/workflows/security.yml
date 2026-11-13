@@ -1,6 +1,6 @@
 # INACTIVE TEMPLATE: GitHub only loads workflows from the repository-root .github/workflows.
 # Paths below already target the monorepo root; see README before activation.
-name: V2 dependency security template
+name: web1 dependency security template
 on:
   pull_request:
     branches: [main]
@@ -10,7 +10,7 @@ on:
     - cron: "17 6 * * 1"
 permissions: {}
 concurrency:
-  group: web1-v2-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
+  group: web1-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
   cancel-in-progress: true
 defaults:
   run:
@@ -25,7 +25,7 @@ env:
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/apps/web1/.playwright-browsers
 jobs:
   audit:
-    name: V2 npm audit (${{ matrix.scope }})
+    name: web1 npm audit (${{ matrix.scope }})
     if: github.event.action != 'edited' || github.event.changes.base != null
     permissions:
       contents: read
@@ -64,7 +64,7 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: web1-v2-audit-${{ matrix.scope }}-${{ github.run_id }}-${{ github.run_attempt }}
+          name: web1-audit-${{ matrix.scope }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: apps/web1/test-reports/audit-${{ matrix.scope }}.json
           if-no-files-found: error
           retention-days: 7
@@ -74,5 +74,5 @@ jobs:
           AUDIT_SCOPE: ${{ matrix.scope }}
           AUDIT_OUTCOME: ${{ steps.audit.outcome }}
         run: |
-          printf '### V2 dependency audit (%s)\nAudit step: `%s`\n' "$AUDIT_SCOPE" "$AUDIT_OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          printf '### web1 dependency audit (%s)\nAudit step: `%s`\n' "$AUDIT_SCOPE" "$AUDIT_OUTCOME" >> "$GITHUB_STEP_SUMMARY"
           printf 'Unresolved findings block security acceptance. Skipped audits are not success.\n' >> "$GITHUB_STEP_SUMMARY"

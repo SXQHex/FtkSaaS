@@ -19,7 +19,7 @@ describe("HomePage", () => {
       </I18nextProvider>,
     );
 
-    expect(screen.getByRole("heading", { name: "FtkSaaS V2" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "FtkSaaS" })).toBeInTheDocument();
 
     expect(screen.getByRole("status")).toHaveTextContent("Tıklama sayısı: 0");
 

@@ -3,7 +3,7 @@ export default interface Resources {
   "common": {
     "app": {
       "description": "Vite + React + TanStack Router + React Aria",
-      "title": "FtkSaaS V2"
+      "title": "FtkSaaS"
     },
     "demo": {
       "action": "Test Et",

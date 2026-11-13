@@ -45,7 +45,7 @@ PY
 `apps/web1` içinde, uygulamadan ayrı portta:
 
 ```sh
-python3 -m http.server 4174 --bind 127.0.0.1 --directory design-reference
+python3 -m http.server 4184 --bind 127.0.0.1 --directory design-reference
 ```
 
-Tarayıcıda `http://127.0.0.1:4174` açılır. Tema, rol ve ekran seçimi demo görünümünü gösterir; gerçek erişim hakkı sağlamaz. Aynı viewport/tema/durumda uygulamayla karşılaştır; kabulü ilgili E maddesinde kaydet.
+Tarayıcıda `http://127.0.0.1:4184` açılır. Tema, rol ve ekran seçimi demo görünümünü gösterir; gerçek erişim hakkı sağlamaz. Aynı viewport/tema/durumda uygulamayla karşılaştır; kabulü ilgili E maddesinde kaydet.

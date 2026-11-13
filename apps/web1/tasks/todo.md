@@ -1,6 +1,6 @@
 # FtkSaaS · Frontend geliştirme ve kabul listesi
 
-**Sıradaki iş** · T01.1 — `apps/web1` temelini temiz kurulumla doğrula.  
+**Sıradaki iş** · T02.2 — bağımsız statik istemcide ilk Auth/Edge okumasını hazırlayıp E01 giriş sayfasına geç.
 **Aktif hedef** · Çalışan Pro kabulü.  
 **Sonraki teslimler** · Starter → Business; bu goal kapsamında başlatılmaz.  
 **Çalışma alanı** · `apps/web1`, kendi npm kurulumu, testleri ve yayın süreci olan bağımsız uygulamadır. Üç plan aynı uygulamayı ve ortak backend sözleşmelerini kullanır.
@@ -13,9 +13,9 @@ Bu çalışmanın hedefi yalnız Pro işlevlerini uygulamak ve gerçek backend i
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan | Sayfa/işlev | Durum | Son doğrulama veya engel | Sonraki eylem |
-|---|---|---|---|---|---|
-| T01.1 | Pro hazırlık | Yerel temel | Sırada | Kurulum bu çalışma için doğrulanmadı | Güncel uygulama kurallarına göre temiz kurulumu doğrula |
+| Aktif adım | Plan         | Sayfa/işlev                      | Durum  | Son doğrulama veya engel                                                | Sonraki eylem                                                          |
+| ---------- | ------------ | -------------------------------- | ------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| T02.2      | Pro hazırlık | Auth/Edge bağlantısı → E01 giriş | Sırada | Bu değişiklikte araç zinciri, build, tarayıcı ve referanslar doğrulandı | T02.2 kapsamında ilk okumanın tiplerini ve public env bağlantısını kur |
 
 Her başarılı dilimden veya somut engelden sonra bu satırı güncelle. Yeni oturumda önce satırı, aktif sayfanın alt adımlarını ve yalnız ilgili sözleşme/kodu oku. Tamamlanmış maddeleri yeni kaynağa etkisi gerektirmedikçe yeniden uygulama. Mevcut Git değişikliklerini incele, başkasının çalışmasını koru.
 
@@ -31,22 +31,22 @@ Her başarılı dilimden veya somut engelden sonra bu satırı güncelle. Yeni o
 
 ### İş seçimi ve bağımlılıklar
 
-| Sıra | Yapılacak sayfa veya dilim | Gerçek önkoşul |
-|---|---|---|
-| 0 | T01 → T02 → T03 | Güncel repo, yerel kurulum, çizim kaynakları |
-| 1 | E01 → E02 → E03 → E04 → E05 → E06 | Her akış için mevcut Auth/transport desteği ve gereken test hesabı. Eksik dış bağımlılıkta hazır görsel adımları tamamla, entegrasyonu engelli kaydet. |
-| 2 | E10 ve E32’nin hesap/güvenlik dilimleri → E09 | Native oturum. Hesap silme sonucu, izinli silme/durum akışını izler. |
-| 3 | P02’nin asgari rol/merkez gezinmesi → E12’nin kurulum/kaynak/ekip dilimleri → E13 | Mevcut veya UI üzerinden oluşturulabilen yetkili organizasyon/merkez |
-| 4 | E15 → E07 → E08 → E16 | Kişi ve davet oluşturma dilimi. Davet sayfalarının gerçek kabulü test daveti hazırlandıktan sonra yapılır. |
-| 5 | E22’nin gerekli belge kaynağı → E23’ün anlaşma dilimi → E17 | İlgili kişi/eğitmen ve kaynaklar. Dijital anlaşma için WF14’ün kendi belge kaynağını doğrula. |
-| 6 | E19 → E20 → E18’in rezervasyon ve yoklama dilimleri → E23’ün hakediş/ödeme dilimi | Uygun ürün, öğrenci, seans, gereken belge ve anlaşma. Gerekli P17 ayarı ilk tüketici işlemde bağlanır. |
-| 7 | E14’ün hak/finans dilimleri → E21 → E24 → E25 → E26 → E27 → E28 → E29 → E30 → E31 → E32’nin kalan dilimleri → E11 | İlgili ders günü ve kişisel erişim kayıtları |
-| 8 | E33 → E34 → E35 → E36 → E37 → E38 | CRM/public için gereken kaynaklar ve public transport, etkinlikte ilgili kayıt/finans akışı |
-| 9 | E39 → E40 → E41 → E42’nin kalan dilimleri → E43 → E44 | İlgili kaynak olayları, worker/dosya hizmetleri ve güncel yetki |
-| Ortak | E45/E46 | İlk sayfanın durum görünümüne ihtiyacı olduğunda gereken hazır durum bileşenini burada doğrula. |
-| Pro kapanışı | Açık Pro E/P maddeleri → G-PRO maddeleri | Kaynak, build ve gerçek ortam kanıtları |
-| Sonraki teslim: Starter | S01 → S02 → S03 → S04 → S05 → G-STARTER maddeleri | G-PRO-05 ve bu teslimin ayrıca başlatılması |
-| Sonraki teslim: Business | B01 → B02 → B03 → B04 → B05 → B06 → G-BUSINESS maddeleri | G-STARTER, sonradan sağlanacak Business ekranları ve bu teslimin ayrıca başlatılması |
+| Sıra                     | Yapılacak sayfa veya dilim                                                                                        | Gerçek önkoşul                                                                                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0                        | T01 → T02 → T03                                                                                                   | Güncel repo, yerel kurulum, çizim kaynakları                                                                                                           |
+| 1                        | E01 → E02 → E03 → E04 → E05 → E06                                                                                 | Her akış için mevcut Auth/transport desteği ve gereken test hesabı. Eksik dış bağımlılıkta hazır görsel adımları tamamla, entegrasyonu engelli kaydet. |
+| 2                        | E10 ve E32’nin hesap/güvenlik dilimleri → E09                                                                     | Native oturum. Hesap silme sonucu, izinli silme/durum akışını izler.                                                                                   |
+| 3                        | P02’nin asgari rol/merkez gezinmesi → E12’nin kurulum/kaynak/ekip dilimleri → E13                                 | Mevcut veya UI üzerinden oluşturulabilen yetkili organizasyon/merkez                                                                                   |
+| 4                        | E15 → E07 → E08 → E16                                                                                             | Kişi ve davet oluşturma dilimi. Davet sayfalarının gerçek kabulü test daveti hazırlandıktan sonra yapılır.                                             |
+| 5                        | E22’nin gerekli belge kaynağı → E23’ün anlaşma dilimi → E17                                                       | İlgili kişi/eğitmen ve kaynaklar. Dijital anlaşma için WF14’ün kendi belge kaynağını doğrula.                                                          |
+| 6                        | E19 → E20 → E18’in rezervasyon ve yoklama dilimleri → E23’ün hakediş/ödeme dilimi                                 | Uygun ürün, öğrenci, seans, gereken belge ve anlaşma. Gerekli P17 ayarı ilk tüketici işlemde bağlanır.                                                 |
+| 7                        | E14’ün hak/finans dilimleri → E21 → E24 → E25 → E26 → E27 → E28 → E29 → E30 → E31 → E32’nin kalan dilimleri → E11 | İlgili ders günü ve kişisel erişim kayıtları                                                                                                           |
+| 8                        | E33 → E34 → E35 → E36 → E37 → E38                                                                                 | CRM/public için gereken kaynaklar ve public transport, etkinlikte ilgili kayıt/finans akışı                                                            |
+| 9                        | E39 → E40 → E41 → E42’nin kalan dilimleri → E43 → E44                                                             | İlgili kaynak olayları, worker/dosya hizmetleri ve güncel yetki                                                                                        |
+| Ortak                    | E45/E46                                                                                                           | İlk sayfanın durum görünümüne ihtiyacı olduğunda gereken hazır durum bileşenini burada doğrula.                                                        |
+| Pro kapanışı             | Açık Pro E/P maddeleri → G-PRO maddeleri                                                                          | Kaynak, build ve gerçek ortam kanıtları                                                                                                                |
+| Sonraki teslim: Starter  | S01 → S02 → S03 → S04 → S05 → G-STARTER maddeleri                                                                 | G-PRO-05 ve bu teslimin ayrıca başlatılması                                                                                                            |
+| Sonraki teslim: Business | B01 → B02 → B03 → B04 → B05 → B06 → G-BUSINESS maddeleri                                                          | G-STARTER, sonradan sağlanacak Business ekranları ve bu teslimin ayrıca başlatılması                                                                   |
 
 Kısmi sayfa çalışmasında biten alt adımlar işaretli kalır. Örneğin E23 anlaşmalarıyla programı mümkün kıldıktan sonra E17’ye geç, E23 hakedişini yoklama hazır olduğunda bitir. Sayfanın üst kutusu bütün uygulanabilir alt işler doğrulanınca kapanır. E numarası çizim kimliğidir, mutlak yürütme sırası yukarıdaki tablodan gelir.
 
@@ -82,68 +82,70 @@ Aktif goal, E01–E46 kapsamındaki Pro ekranlarının uygulanabilir alt işleri
 
 ### Hazır kaynak kararı ve seçim sınırları
 
-| Kod | Kaynak / kullanım | Bu taramanın sonucu | Uygulamada yapılacak dar kontrol |
-|---|---|---|---|
-| K01 | [shadcn bileşenleri](https://ui.shadcn.com/docs/components), [login blokları](https://ui.shadcn.com/blocks/login), [signup blokları](https://ui.shadcn.com/blocks/signup), [sidebar blokları](https://ui.shadcn.com/blocks/sidebar) | Ana kaynak mevcut `aria-rhea`, React Aria, Lucide düzeni. E01 `login-02`, E02 `signup-02`; kabuk için Sidebar/Sheet, Breadcrumb, Command, DropdownMenu, Avatar, Tooltip, ScrollArea. Tam sidebar bloğunu görseli değiştirecek şekilde zorla alma; hazır parçalarla çizimdeki kompozisyonu koru. | Resmi shadcn rehberini repo içinden oku; CLI/registry ile gerçek uyumlu varyantı incele/ekle. Projenin preset'ini veya primitive tabanını değiştirme. Listedeki isimlerin tümü başlangıçta kurulu değildir. |
-| K02 | [FullCalendar React](https://fullcalendar.io/docs/react), [plugin listesi](https://fullcalendar.io/docs/plugin-index), [lisans](https://fullcalendar.io/license); mevcut Syncfusion Community seçeneği | Shadcn Calendar/DatePicker yalnız tarih seçimi sağlar; ders haftası/olay sürükleme/zaman ızgarası için yeterli değildir. FullCalendar Standard hazır adaydır, kurulum ve görsel eşitlik doğrulanmadı. Syncfusion için önce mevcut lisans ve modül kapsamını doğrula. | E17.2'de hafta/gün, responsive, erişilebilir olay açma, saat dilimi, çizimdeki kaynak kolonları ve gerekli sürükleme/resize davranışını matrise bağla. Standard'ın karşılamadığı kaynak görünümünü özel grid yazarak tamamlama; lisanslı hazır seçeneği değerlendir. Uygun seçeneği kaydet, ücretli modülü yetkisiz ekleme. İş çakışması/tekrar kurallarını backend belirler. |
-| K03 | [Dice UI Kanban Base](https://www.diceui.com/docs/components/base/kanban), [Radix varyantı](https://www.diceui.com/docs/components/radix/kanban) | E33 için gerçek hazır pano adayı bulundu; React Aria varyantı ve proje uyumu bu incelemeyle doğrulanmış değildir. | E33.2'de registry içeriği, lisans, bağımlılık/primitive uyumu, klavye ve dokunmatik davranışı incelenir. Mevcut primitive tabanı değiştirilmez. Uygun hazır kaynak yoksa pano alt parçası engeldir; elle drag/drop bileşeni yazma. Diğer CRM dilimleri sürdürülebilir. |
-| K04 | Resmi Chart/Tablo/Dosya parçaları; resmi Turnstile widget | E20/E23/E27/E41/E43 tabloları çizimde gereken yerde kullanılır; genel yerleşim card-first kalır. Grafik resmi Chart kaynağından, dosya seçimi Field/Input ile sağlanabilir. Public bot doğrulaması hazır resmi widget kullanır. | Resmi Aria Chart/Sheet/InputOTP varyantını ve gerçek importları kontrol et. Belge görüntüleme için formatın hazır tarayıcı görüntüleyicisini/uyumlu hazır kütüphaneyi kullan; özel editör/uploader üretme. Dosya/rapor için API imzalı yol ve yetki korunur. |
+| Kod | Kaynak / kullanım                                                                                                                                                                                                                   | Bu taramanın sonucu                                                                                                                                                                                                                                                                             | Uygulamada yapılacak dar kontrol                                                                                                                                                                                                                                                                                                                                              |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| K01 | [shadcn bileşenleri](https://ui.shadcn.com/docs/components), [login blokları](https://ui.shadcn.com/blocks/login), [signup blokları](https://ui.shadcn.com/blocks/signup), [sidebar blokları](https://ui.shadcn.com/blocks/sidebar) | Ana kaynak mevcut `aria-rhea`, React Aria, Lucide düzeni. E01 `login-02`, E02 `signup-02`; kabuk için Sidebar/Sheet, Breadcrumb, Command, DropdownMenu, Avatar, Tooltip, ScrollArea. Tam sidebar bloğunu görseli değiştirecek şekilde zorla alma; hazır parçalarla çizimdeki kompozisyonu koru. | Repo kökündeki `.agents/skills/shadcn/SKILL.md` rehberini oku; CLI/registry ile gerçek uyumlu varyantı incele/ekle. Projenin preset'ini veya primitive tabanını değiştirme. Listedeki isimlerin tümü başlangıçta kurulu değildir.                                                                                                                                             |
+| K02 | [FullCalendar React](https://fullcalendar.io/docs/react), [plugin listesi](https://fullcalendar.io/docs/plugin-index), [lisans](https://fullcalendar.io/license); mevcut Syncfusion Community seçeneği                              | Shadcn Calendar/DatePicker yalnız tarih seçimi sağlar; ders haftası/olay sürükleme/zaman ızgarası için yeterli değildir. FullCalendar Standard hazır adaydır, kurulum ve görsel eşitlik doğrulanmadı. Syncfusion için önce mevcut lisans ve modül kapsamını doğrula.                            | E17.2'de hafta/gün, responsive, erişilebilir olay açma, saat dilimi, çizimdeki kaynak kolonları ve gerekli sürükleme/resize davranışını matrise bağla. Standard'ın karşılamadığı kaynak görünümünü özel grid yazarak tamamlama; lisanslı hazır seçeneği değerlendir. Uygun seçeneği kaydet, ücretli modülü yetkisiz ekleme. İş çakışması/tekrar kurallarını backend belirler. |
+| K03 | [Dice UI Kanban Base](https://www.diceui.com/docs/components/base/kanban), [Radix varyantı](https://www.diceui.com/docs/components/radix/kanban)                                                                                    | E33 için gerçek hazır pano adayı bulundu; React Aria varyantı ve proje uyumu bu incelemeyle doğrulanmış değildir.                                                                                                                                                                               | E33.2'de registry içeriği, lisans, bağımlılık/primitive uyumu, klavye ve dokunmatik davranışı incelenir. Mevcut primitive tabanı değiştirilmez. Uygun hazır kaynak yoksa pano alt parçası engeldir; elle drag/drop bileşeni yazma. Diğer CRM dilimleri sürdürülebilir.                                                                                                        |
+| K04 | Resmi Chart/Tablo/Dosya parçaları; resmi Turnstile widget                                                                                                                                                                           | E20/E23/E27/E41/E43 tabloları çizimde gereken yerde kullanılır; genel yerleşim card-first kalır. Grafik resmi Chart kaynağından, dosya seçimi Field/Input ile sağlanabilir. Public bot doğrulaması hazır resmi widget kullanır.                                                                 | Resmi Aria Chart/Sheet/InputOTP varyantını ve gerçek importları kontrol et. Belge görüntüleme için formatın hazır tarayıcı görüntüleyicisini/uyumlu hazır kütüphaneyi kullan; özel editör/uploader üretme. Dosya/rapor için API imzalı yol ve yetki korunur.                                                                                                                  |
 
 Bütün sayfalarda ortak hazır durum parçaları E45/E46'dan gelir. Sheet/Drawer, Dialog/AlertDialog, Popover/Combobox, Command, Tabs ve DropdownMenu davranışlarını CSS sınıflarıyla yeniden yazma. Resmi kaynağı kurup görünümünü uyarlamak ve bu parçaları sayfada birleştirmek serbesttir. Uygun hazır bileşen yoksa bu dosyada somut eksik olarak kalır.
+
+**İlk Auth sayfasının kaynağı doğrulandı.** Resmî [login-02](https://ui.shadcn.com/r/styles/aria-rhea/login-02.json) ve [signup-02](https://ui.shadcn.com/r/styles/aria-rhea/signup-02.json) kayıtları projenin `aria-rhea` stilinde bir sayfa ve bir form sağlıyor. Her iki kaydın bağımlılıkları `button`, `input`, `label` ve `field`. E01/E02'de projenin kilitli CLI sürümüyle hedef dosya farkını incele. Bloğun sayfa yerleşimini ve formunu koruyarak registry'nin `app/login/page.tsx` ve `app/signup/page.tsx` girişlerini projenin TanStack Router route'larına uyarla. Form alanlarının ve izinli giriş yöntemlerinin kaynağı P01'dir. Tarayıcıda görsel ve gerçek Auth kabulü E01/E02'de yapılır.
 
 ### İşlevlerin ekranlara tamamlanan eşlemesi
 
 Bu tablo gezinme/uygulama izidir; plan erişimi ve DTO'nun ikinci tanımı değildir. Normatif plan matrisi ve güncel action/permission bilgisi ortak sözleşmeden okunur.
 
-| Özellik | Ekran / ortak tüketici | İşlev işi | Özel farkın kabulü |
-|---|---|---|---|
-| F01 | E12 | P03 | S01; B01 |
-| F02 | E12, E17, E42 | P03, P06, P17 | S01/S02; B01 |
-| F03 | E12, E42 ve ilk ayar tüketicisi | P17 | B01 |
-| F04 | E01–E10, E12–E16, ortak kabuk | P01, P02, P03, P04 | B01/B02/B06 |
-| F05 | E12, E42 | P03, P17 | S04; B01 |
-| F06 | E10, E24–E32 | P01, P11 | S03 |
-| F07 | E13–E16, E33, E41 | P04, P12, P16 | S03; B02 |
-| F08 | E17, E25, E28, E34 | P06, P11, P12 | S01/S02 |
-| F09 | E21, E31 | P06 | S02 |
-| F10 | E17, E18, E28 | P06, P09 | S02 |
-| F11 | E18, E28, E29 | P09, P11 | S03 |
-| F12 | E18, E29, E39 | P09, P14 | S04 |
-| F13 | E12, E17, E18, E23 | P03, P05, P06 | S02/S04 |
-| F14 | E17, E18, E24–E26 | P06, P10 | S02 |
-| F15 | E14, E19, E28–E30 | P07, P09, P10 | S02; B03 |
-| F16 | E14, E19, E30 | P07 | S02; B03 |
-| F17 | E14, E19 | P07 | S04/S05 |
-| F18 | E19/E20/E41 Business genişletmeleri | B03, B04 | B03–B06; ayrı çizim eksik |
-| F19 | E14, E19, E20, E30, E38 | P07, P08, P13 | S02; B04 |
-| F20 | E23, E27, E38 | P05, P10, P13 | S02/S04 |
-| F21 | E33, E35, E41 | P12 | S03/S04; B02 |
-| F22 | E33, E19 | P12, P07 | S04 |
-| F23 | E33, E39, E40 | P12, P14 | S04; B02 |
-| F24 | E33, E40 | P12, P14 | S04; B02 |
-| F25 | E34–E36 | P12 | S03; B02 |
-| F26 | E15, E39, E42 | P04, P14 | S03/S04 |
-| F27 | E39, E40, E42 | P14, P17 | S04 |
-| F28 | E20, E23, E27, E41 | P16 | S03; B05 |
-| F29 | E37, E38 | P13 | S04 |
-| F30 | E22, E32 ve gereken işlem diyalogları | P15 | S03 |
-| F31 | E41 | P16 | S03 |
-| F32 | E12, E42 ve limitli işlemler | P03, P17 | S01/S05; B01/B05/B06 |
-| F33 | E43 ve bütün yazma akışları | P02, P07, P08, P10, P17 | G kabulü; tekrar/yanıt kaybı |
+| Özellik | Ekran / ortak tüketici                | İşlev işi               | Özel farkın kabulü           |
+| ------- | ------------------------------------- | ----------------------- | ---------------------------- |
+| F01     | E12                                   | P03                     | S01; B01                     |
+| F02     | E12, E17, E42                         | P03, P06, P17           | S01/S02; B01                 |
+| F03     | E12, E42 ve ilk ayar tüketicisi       | P17                     | B01                          |
+| F04     | E01–E10, E12–E16, ortak kabuk         | P01, P02, P03, P04      | B01/B02/B06                  |
+| F05     | E12, E42                              | P03, P17                | S04; B01                     |
+| F06     | E10, E24–E32                          | P01, P11                | S03                          |
+| F07     | E13–E16, E33, E41                     | P04, P12, P16           | S03; B02                     |
+| F08     | E17, E25, E28, E34                    | P06, P11, P12           | S01/S02                      |
+| F09     | E21, E31                              | P06                     | S02                          |
+| F10     | E17, E18, E28                         | P06, P09                | S02                          |
+| F11     | E18, E28, E29                         | P09, P11                | S03                          |
+| F12     | E18, E29, E39                         | P09, P14                | S04                          |
+| F13     | E12, E17, E18, E23                    | P03, P05, P06           | S02/S04                      |
+| F14     | E17, E18, E24–E26                     | P06, P10                | S02                          |
+| F15     | E14, E19, E28–E30                     | P07, P09, P10           | S02; B03                     |
+| F16     | E14, E19, E30                         | P07                     | S02; B03                     |
+| F17     | E14, E19                              | P07                     | S04/S05                      |
+| F18     | E19/E20/E41 Business genişletmeleri   | B03, B04                | B03–B06; ayrı çizim eksik    |
+| F19     | E14, E19, E20, E30, E38               | P07, P08, P13           | S02; B04                     |
+| F20     | E23, E27, E38                         | P05, P10, P13           | S02/S04                      |
+| F21     | E33, E35, E41                         | P12                     | S03/S04; B02                 |
+| F22     | E33, E19                              | P12, P07                | S04                          |
+| F23     | E33, E39, E40                         | P12, P14                | S04; B02                     |
+| F24     | E33, E40                              | P12, P14                | S04; B02                     |
+| F25     | E34–E36                               | P12                     | S03; B02                     |
+| F26     | E15, E39, E42                         | P04, P14                | S03/S04                      |
+| F27     | E39, E40, E42                         | P14, P17                | S04                          |
+| F28     | E20, E23, E27, E41                    | P16                     | S03; B05                     |
+| F29     | E37, E38                              | P13                     | S04                          |
+| F30     | E22, E32 ve gereken işlem diyalogları | P15                     | S03                          |
+| F31     | E41                                   | P16                     | S03                          |
+| F32     | E12, E42 ve limitli işlemler          | P03, P17                | S01/S05; B01/B05/B06         |
+| F33     | E43 ve bütün yazma akışları           | P02, P07, P08, P10, P17 | G kabulü; tekrar/yanıt kaybı |
 
 ### Çizim ile gerçek ürün arasındaki tespitler
 
-| Tespit | Etkilenen iş | Bağlayıcı uygulama yönü |
-|---|---|---|
-| Kayıt sayfasındaki “stüdyonu oluştur/kart gerekmez” anlatımı kayıtla otomatik işletme yaratıldığı izlenimi veriyor. | E02, P01.1, P03.1 | Native hesap kaydı, hesap/rol okuması ve yetkili işletme oluşturma ayrı işlemlerdir. Metni gerçek akışa uydur; görünüm istisnasını kaydet. |
-| Demo MFA kurtarma kodu, önizleme/davet süreleri, yeniden gönderim sınırı ve 1 MB görsel limitleri sabit. | E06/E10/E12/E15/E32 | Native sağlayıcı ve yayımlanmış DTO/ayar geçerli. Desteklenmeyen recovery-code UX'i çalışıyormuş gibi sunma; süre/limit uydurma. |
-| Abonelik çiziminde örnek ₺990 ve sabit gelecek fatura tarihi var. | E42, P17 | Güncel abonelik/plan/etkili tarih backend'den okunur. Çizim tutarı üretim fiyatı değildir. |
-| Satış, dondurma, iptal/iade, yoklama ve hakediş demo JS'sinde hesaplanıyor. | E14/E17–E20/E23/E27/E30/E38 | Yetkili önizleme → açık kullanıcı işlemi → uygulama → yeniden okuma. Aynı iş anahtarıyla tekrar ikinci etki yaratmaz; finans değeri istemcide yeniden türetilmez. |
-| Bildirim, otomasyon ve belge görselleri bütün sağlayıcı işlerinin kanıtı değil. | E22/E23/E32/E39/E40 | Cron/teslim backend'de; dil ve metin kaynağı güncel WF11/WF12/WF14/S17'ye uyar. Tarayıcıdan alınan metni yetkili sözleşme gibi imzalatma. |
-| Gezinme hash tabanlı ve rol değiştirme demo seçicisidir. | P02 ve bütün E sayfaları | TanStack route, native session ve canlı rol/merkez kapsamı; URL yenileme, geri dönüş ve cache ayrımı. Demo rol seçimi yetki vermez. |
-| Ortak komut araması ve birden çok Sheet/Dialog ana ekran dışında tanımlı. | P02, E14/E17–E23/E33/E38/E41 | İlgili eylemde açılan her panel ve iç durum, aynı sayfanın görsel/işlev kabulüne dahildir. İç içe odak/escape/klavye hazır bileşenden gelir. |
-| Business merkez kapsamı, ortak başvuru/kişi, kullanıma açık merkezler ve hesaplaşma için ayrı çizim yok. | B01–B06 | Business ekranları sonradan sağlanacak. Şimdi route, ekran veya kompozisyon üretme; Business geliştirmesi için Pro kabulünü bekletme. |
-| Yardım ve durum kataloğu örnekleri gerçek destek/operasyon hizmeti değildir. | E44–E46 | Geçerli içerik/kanala bağla; sahte gönderildi/başarılı sonucu verme. Durum kataloğu geliştirme kaynağıdır. |
+| Tespit                                                                                                              | Etkilenen iş                 | Bağlayıcı uygulama yönü                                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kayıt sayfasındaki “stüdyonu oluştur/kart gerekmez” anlatımı kayıtla otomatik işletme yaratıldığı izlenimi veriyor. | E02, P01.1, P03.1            | Native hesap kaydı, hesap/rol okuması ve yetkili işletme oluşturma ayrı işlemlerdir. Metni gerçek akışa uydur; görünüm istisnasını kaydet.                        |
+| Demo MFA kurtarma kodu, önizleme/davet süreleri, yeniden gönderim sınırı ve 1 MB görsel limitleri sabit.            | E06/E10/E12/E15/E32          | Native sağlayıcı ve yayımlanmış DTO/ayar geçerli. Desteklenmeyen recovery-code UX'i çalışıyormuş gibi sunma; süre/limit uydurma.                                  |
+| Abonelik çiziminde örnek ₺990 ve sabit gelecek fatura tarihi var.                                                   | E42, P17                     | Güncel abonelik/plan/etkili tarih backend'den okunur. Çizim tutarı üretim fiyatı değildir.                                                                        |
+| Satış, dondurma, iptal/iade, yoklama ve hakediş demo JS'sinde hesaplanıyor.                                         | E14/E17–E20/E23/E27/E30/E38  | Yetkili önizleme → açık kullanıcı işlemi → uygulama → yeniden okuma. Aynı iş anahtarıyla tekrar ikinci etki yaratmaz; finans değeri istemcide yeniden türetilmez. |
+| Bildirim, otomasyon ve belge görselleri bütün sağlayıcı işlerinin kanıtı değil.                                     | E22/E23/E32/E39/E40          | Cron/teslim backend'de; dil ve metin kaynağı güncel WF11/WF12/WF14/S17'ye uyar. Tarayıcıdan alınan metni yetkili sözleşme gibi imzalatma.                         |
+| Gezinme hash tabanlı ve rol değiştirme demo seçicisidir.                                                            | P02 ve bütün E sayfaları     | TanStack route, native session ve canlı rol/merkez kapsamı; URL yenileme, geri dönüş ve cache ayrımı. Demo rol seçimi yetki vermez.                               |
+| Ortak komut araması ve birden çok Sheet/Dialog ana ekran dışında tanımlı.                                           | P02, E14/E17–E23/E33/E38/E41 | İlgili eylemde açılan her panel ve iç durum, aynı sayfanın görsel/işlev kabulüne dahildir. İç içe odak/escape/klavye hazır bileşenden gelir.                      |
+| Business merkez kapsamı, ortak başvuru/kişi, kullanıma açık merkezler ve hesaplaşma için ayrı çizim yok.            | B01–B06                      | Business ekranları sonradan sağlanacak. Şimdi route, ekran veya kompozisyon üretme; Business geliştirmesi için Pro kabulünü bekletme.                             |
+| Yardım ve durum kataloğu örnekleri gerçek destek/operasyon hizmeti değildir.                                        | E44–E46                      | Geçerli içerik/kanala bağla; sahte gönderildi/başarılı sonucu verme. Durum kataloğu geliştirme kaynağıdır.                                                        |
 
 ### Statik SPA bağlantısında mevcut durum
 
@@ -182,13 +184,13 @@ Görsel karşılaştırmada kaynak çizimi ve uygulamayı aynı viewport, tema, 
 
 Her aktif sayfanın altına şu alanları doldur. Durum ve kanıt ilerledikçe aynı kaydı güncelle.
 
-| Alan | Kaydedilecek bilgi |
-|---|---|
-| Çizim ve hedef | Dosya/bölüm, route, rol, plan ve karşılaştırma viewport/tema/durumları |
-| Hazır kaynak | Blok/bileşen adı, resmî veya seçilmiş registry URL’si, sürüm, React Aria/Rhea uyumu |
-| Aktif işlem | E alt adımı ve varsa tek P/S/B alt maddesi, okuma → eylem → yeniden okuma sırası |
-| Doğrulama | Kaynak/build, test/ortam sonucu, referans ve uygulama karşılaştırması |
-| Fark veya engel | İzinli farkın gerekçesi veya eksik girdinin devam koşulu |
+| Alan            | Kaydedilecek bilgi                                                                  |
+| --------------- | ----------------------------------------------------------------------------------- |
+| Çizim ve hedef  | Dosya/bölüm, route, rol, plan ve karşılaştırma viewport/tema/durumları              |
+| Hazır kaynak    | Blok/bileşen adı, resmî veya seçilmiş registry URL’si, sürüm, React Aria/Rhea uyumu |
+| Aktif işlem     | E alt adımı ve varsa tek P/S/B alt maddesi, okuma → eylem → yeniden okuma sırası    |
+| Doğrulama       | Kaynak/build, test/ortam sonucu, referans ve uygulama karşılaştırması               |
+| Fark veya engel | İzinli farkın gerekçesi veya eksik girdinin devam koşulu                            |
 
 ### Sayfa envanteri
 
@@ -574,18 +576,20 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 
 ### T01 · Mevcut temeli çalıştır
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
-| — | Başlangıç | Yerel kurulum ve kalite çıktısı |
+| Önkoşul | Sözleşme  | Doğrulama                       |
+| ------- | --------- | ------------------------------- |
+| —       | Başlangıç | Yerel kurulum ve kalite çıktısı |
 
-- [ ] **T01.1** · README’ye göre Node/npm ve uygulamaya özel cache/geçici dizinlerle temiz kurulum yap. `npm ci --ignore-scripts` yalnız uygulamanın kilit dosyasını kullanarak tamamlanır.
-- [ ] **T01.2** · Playwright tarayıcısını kur ve `npm run verify` çalıştır. Kaynak SHA’sı ile sonucu kaydet. Hata varsa ilk başarısız komutu ve nedenini işaretle.
-- [ ] **T01.3** · Uygulamanın build çıktısını önizle. İlk ekran tarayıcıdan açılır ve yenilemede tekrar yüklenir.
+- [x] **T01.1** · README’ye göre Node/npm ve uygulamaya özel cache/geçici dizinlerle temiz kurulum yap. `npm ci --ignore-scripts` yalnız uygulamanın kilit dosyasını kullanarak tamamlanır.
+- [x] **T01.2** · Playwright tarayıcısını kur ve `npm run verify` çalıştır. Kaynak SHA’sı ile sonucu kaydet. Hata varsa ilk başarısız komutu ve nedenini işaretle.
+- [x] **T01.3** · Uygulamanın build çıktısını önizle. İlk ekran tarayıcıdan açılır ve yenilemede tekrar yüklenir.
+
+**Başlangıç doğrulaması** · 13 Kasım 2026, Linux, Node 24.22.1 / npm 11.9.0. Taban `91af14abc2584af9977fe64e40e5e01e9fbeaa2a` ve bu hazırlık düzeltmeleriyle temiz kurulum, tam `npm run verify` (10 birim, 4 Playwright testi, production build) ve build önizlemesinde açılış/yenileme geçti. Dört özgün referans byte düzeyinde eşleşti. Ayrı yerel portta 47 çizim görünümü açıldı. Bu ortamda Playwright'ın kilitlediği Chrome for Testing 158.0.8127.18 headless shell resmi Google dağıtımından alındı. MSW testleri Node ortam proxy'si kapalı çalıştırıldı. Yeni VS Code checkout'unda uygulama README'sine göre yerel kurulumu yap, ardından devam kaydındaki ilk işten ilerle.
 
 ### T02 · Tamamlanan ürün taramasının uygulama hazırlığı
 
-| Önkoşul | Kaynak | Doğrulama |
-|---|---|---|
+| Önkoşul                                | Kaynak                                                   | Doğrulama                                     |
+| -------------------------------------- | -------------------------------------------------------- | --------------------------------------------- |
 | Taramada kaynak okundu; uygulamada T01 | Aşağıdaki tarama kaydı, ürün sözleşmesi, WF/API haritası | Yalnız sürüm farkı ve aktif tüketici denetimi |
 
 - [x] **T02.1** · Ürün kapsamı F01–F33, 46 ekran, P01–P17 ve Starter/Business farkları önden eşlendi. Kanıt: bu dosyanın tarama kaydı ve E satırları; başlangıç kaynak SHA’sı `1249532c0abe8d340b268b3d5dff33a547fea9e5`. Bu iş kaynak incelemesidir; canlı kabul değildir.
@@ -595,7 +599,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 ### T03 · Salt okunur tasarım referansını kullanıma hazırla
 
 - [x] **T03.1** · Özgün HTML/CSS/JS ve arşiv tarandı, 47 `data-view` içinden 46 ekran eşlendi; `taslak` ürün ekranı sayılmadı. Dört dosyanın arşiv içeriğiyle birebir eşitliği doğrulandı. Hazır kaynak adayları bütün E satırlarına işlendi. Kaynak kimlikleri ve SHA-256 değerleri [referans kaydında](../design-reference/README.md).
-- [ ] **T03.2** · Uygulamaya başlamadan referans hash'lerini doğrula. Referansı yalnız yerel HTTP önizlemesiyle ayrı portta aç; `src`/`public` altına taşıma veya bundle'a import etme. Kaynak dosyalarını biçimlendirme/yeniden yazma. Referans demo JS’si test backend'i değildir.
+- [x] **T03.2** · Uygulamaya başlamadan referans hash'lerini doğrula. Referansı yalnız yerel HTTP önizlemesiyle ayrı portta aç; `src`/`public` altına taşıma veya bundle'a import etme. Kaynak dosyalarını biçimlendirme/yeniden yazma. Referans demo JS’si test backend'i değildir.
 - [ ] **T03.3** · Aktif sayfada kullanılan token, tipografi ve durumları hazır tema/bileşenlere uygula. Ortak ilk ihtiyaçta kabuk K01'i kur. E01’de `login-02` ile başla; tüm ürünü yeniden tasarlama veya bütün bileşenleri peşinen kurma.
 
 <a id="pro"></a>
@@ -606,8 +610,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P01 · Kimlik, hesap ve güvenlik
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                | Sözleşme                                                                              | Doğrulama                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------- |
 | T02.2 · ekran için ilgili T03 eşlemesi | F04, F06 · [WF01](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf01) | Native Auth ve hesap akışları |
 
 - [ ] **P01.1** · E-posta ile kayıtta sözleşmedeki ön kontrolü ve native doğrulama dönüşünü bağla. Yeni doğrulanmış hesap giriş yapabilir, bağlı merkez ve rolü backend’den okunur.
@@ -621,8 +625,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P02 · Rol, organizasyon ve gezinme
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul         | Sözleşme                                                                                                                                                                    | Doğrulama                            |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | P01 giriş akışı | F04, F06, F32, F33 · [WF00](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf00), [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02) | Ayrı hesaplar ve tarayıcı bağlamları |
 
 - [ ] **P02.1** · Yönetici ve öğrenci kabuklarını güncel rol/kapsamdan aç. Eğitmen için atandığı derslere erişim, öğrenci için kendi kayıtları görünür.
@@ -631,9 +635,9 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P03 · Tek merkez kurulumu, kaynak ve ekip
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
-| P02 | F01, F02, F05, F13 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12) | Yönetici ve sınırlı personel oturumları |
+| Önkoşul | Sözleşme                                                                                                                                                                                                                                                | Doğrulama                               |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| P02     | F01, F02, F05, F13 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12) | Yönetici ve sınırlı personel oturumları |
 
 - [ ] **P03.1** · Organizasyon ve ilk merkez kurulumunu tamamla. Yeniden girişte merkez doğru kapsamda açılır, Pro hesap ikinci aktif merkez açamaz.
 - [ ] **P03.2** · Birden çok oda ve disiplin tanımla. Güncel seçim listelerinde gerçek kaynaklar ve tanımlı kapasite görünür.
@@ -643,8 +647,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P04 · Kişi, öğrencilik ve davet
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul        | Sözleşme                                                                                                                                                          | Doğrulama                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
 | P03 ilk merkez | F04, F07 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04) | Kişi detayı, ilişki ve finans/hak geçmişi okumaları |
 
 - [ ] **P04.1** · Kişi oluştur ve detayını düzenle. İletişim bilgisinin kaydı ile öğrencilik ilişkisinin açılması ayrı sonuçlar olarak görünür.
@@ -654,8 +658,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P05 · Eğitmen anlaşması ve görevlendirme
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul  | Sözleşme                                                                                                                                                          | Doğrulama                            |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | P03, P04 | F13, F20 · [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF14](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf14) | Anlaşma sürümü ve program önizlemesi |
 
 - [ ] **P05.1** · Eğitmen, disiplin, yürürlük ve ücret şartlarını seçip anlaşmayı yayımla. Güncel listede yayımlanan sürüm ve tarihler okunur.
@@ -665,8 +669,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P06 · Program, takvim ve özel ders
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                  | Sözleşme                                                                                                                                                                              | Doğrulama                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | P03, ücretli atamada P05 | F02, F08, F09, F10, F13, F14 · [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06) | Takvimde seans, kaynak, saat ve durum okumaları |
 
 - [ ] **P06.1** · Tekrarlayan grup programını önizle ve yayımla. Tekrar tarihleri, oda, disiplin ve atanan eğitmen takvimde doğru görünür.
@@ -677,8 +681,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P15 · Sürümlü belge ve açık onay
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                           | Sözleşme                                                                              | Doğrulama                                 |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------- |
 | P02 · ilk satış, rezervasyon veya katılım bağlamı | F30, F33 · [WF11](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf11) | Gerçek sürüm, kişi, işlem ve geçmiş kaydı |
 
 - [ ] **P15.1** · Yetkili kullanıcı belge kaynağını hazırlar, etkiyi önizler ve sürümü yayımlar. Yeni sürüm yetkili listeden geri okunur.
@@ -688,8 +692,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P07 · Ürün, satış ve paket hakları
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                                | Sözleşme                                                                                        | Doğrulama                      |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------ |
 | P04 · program bağlantısı için P06 · gereken onayda P15 | F15, F16, F17, F19 · [WF05](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf05) | Satış, hak ve finans okumaları |
 
 - [ ] **P07.1** · Ders sayılı ve süreli/sınırsız ürünü yayımla. Satış seçicisinde doğru ürün sürümü, kapsam ve geçerlilik görünür.
@@ -700,8 +704,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P08 · Manuel tahsilat ve öğrenci alacağı
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul   | Sözleşme                                                                              | Doğrulama                                       |
+| --------- | ------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | P07 satış | F19, F33 · [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08) | Finans ekranı ve kaynak hareket karşılaştırması |
 
 - [ ] **P08.1** · Borçlu satışa kısmi tahsilat gir. 1.000 TL borca 400 TL tahsilat örneğinde kalan borç 600 TL görünür.
@@ -711,8 +715,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P09 · Rezervasyon, bekleme ve teklif
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                              | Sözleşme                                                                                                                                                                    | Doğrulama                                    |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | P06, P07 · borçlu senaryoda P08 · gereken onayda P15 | F09, F11, F12, F15 · [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06), [WF19](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf19) | İki öğrenci oturumu ve yetkili liste okuması |
 
 - [ ] **P09.1** · Yönetici ve öğrenci kendi izinli yollarından rezervasyon oluşturup iptal eder. Kontenjan ile ayrılmış/kullanılabilir hak yeniden okumada tutarlıdır.
@@ -723,8 +727,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P10 · Yoklama, hakediş ve eğitmen ödemesi
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul  | Sözleşme                                                                                                                                                               | Doğrulama                                               |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | P05, P09 | F14, F15, F20 · [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF14](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf14) | Aynı seans için yoklama, hak ve hakediş karşılaştırması |
 
 - [ ] **P10.1** · Eğitmen kendi seansında hazır/gelmedi durumlarını taslak kaydeder. Taslakta kapanışa ait tüketim oluşmaz.
@@ -734,8 +738,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P11 · Günlük paneller ve kişisel takvim
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul            | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                   |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | P06, P08, P09, P10 | F06, F08, F11 · [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08), [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09) | Öğrenci, eğitmen ve gerçek takvim istemcisi |
 
 - [ ] **P11.1** · Öğrenci kendi yaklaşan dersini, haklarını ve borcunu görür. Rezervasyon iptali paneli yeniler.
@@ -744,8 +748,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P12 · Manuel CRM, deneme ve public başvuru
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                         | Sözleşme                                                                                                                                                                         | Doğrulama                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | P04 · deneme için P06, P07, P09 | F07, F21, F22, F23, F25 · [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | Aday, öğrenci ve public ziyaretçi akışları |
 
 - [ ] **P12.1** · Telefon veya WhatsApp’tan gelen adayı elle kaydet, not ve takip tarihi ekle. Tarihli takip işi aynı kişi ve merkezle yeniden açılır.
@@ -756,8 +760,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P13 · Etkinlik, atölye ve Pratik
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                 | Sözleşme                                                                              | Doğrulama                                     |
+| --------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------- |
 | P06, P07, P08, P10 · gereken onayda P15 | F29, F30 · [WF15](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf15) | Etkinlik kaydı, katılım ve finans hareketleri |
 
 - [ ] **P13.1** · Kontenjanlı atölye yayımla, uygun katılımcıyı kaydet. Liste ve boş yer sayısı güncellenir, dolu etkinlikte izin dışı kayıt reddedilir.
@@ -766,8 +770,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P14 · Bildirimler, hatırlatmalar ve CRM otomasyonu
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                           | Sözleşme                                                                                                                                                                                                                                                                                                                       | Doğrulama                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
 | P09 veya P13 olayı · CRM için P12 | F24, F26, F27 · [WF11](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf11), [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16), [WF20](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf20) | Inbox, iş sonucu ve yetkili test alıcısında teslim |
 
 - [ ] **P14.1** · Ders değişikliğiyle uygulama içi bildirim üret. Doğru kişinin gelen kutusunda okunmuş işareti yenilemede korunur.
@@ -777,8 +781,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P16 · Rapor, CSV ve kontrollü içe aktarma
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                     | Sözleşme                                                                              | Doğrulama                                             |
+| ------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | P07, P08, P10 · yetkili dosya ve iş hizmeti | F28, F31 · [WF10](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf10) | Rapor/hareket mutabakatı ve örnek içe aktarma dosyası |
 
 - [ ] **P16.1** · Dönem ve merkez seçerek hak, borç, tahsilat ve hakediş raporlarını aç. Seçili test hareketleriyle rapor toplamlarını karşılaştır.
@@ -788,8 +792,8 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 ### P17 · İşletme ayarları, abonelik ve yaşam döngüsü
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                                                 | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                       |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | P02 · ayarın ilk tüketicisi · kapanışta ilgili kayıtlar | F03, F32, F33 · [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13), [WF17](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf17) | Güncel ayar, abonelik ve etkilenen gerçek işlem |
 
 - [ ] **P17.1** · İlgili akış geliştirilirken program, rezervasyon, etkinlik, finans ve CRM/otomasyon ayarlarını yetkili ekrana bağla. Seçilen değerin etkisini ilgili kullanıcı işlemiyle doğrula, kanıtı ayar grubuyla ilişkilendir.
@@ -820,8 +824,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### S01 · Starter kaynak ve öğrenci limitleri
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul  | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                                 |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | G-PRO-05 | F01, F08, F32 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04) | Starter yetkilisi ve limit sınırındaki test organizasyonu |
 
 - [ ] **S01.1** · Tek aktif merkez, oda, disiplin ve eğitmenle kurulum yap. Her türde ikinci aktif kaynak girişimi reddedilir, ilk kayıt kullanılabilir kalır.
@@ -830,9 +834,9 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### S02 · Starter stüdyoda bir ders günü
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
-| S01 | F09, F10, F11, F13, F14, F15, F16, F19 · [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF05](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf05), [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06), [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08) | Aynı öğrenci ve seans üzerinden son okumalar |
+| Önkoşul | Sözleşme                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Doğrulama                                    |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| S01     | F09, F10, F11, F13, F14, F15, F16, F19 · [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF05](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf05), [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06), [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08) | Aynı öğrenci ve seans üzerinden son okumalar |
 
 - [ ] **S02.1** · Tek disiplinli sabit programı ve özel ders talebini tamamla. Programdaki bütün dersler doğru oda, disiplin ve eğitmene bağlıdır.
 - [ ] **S02.2** · Ders sayılı ve süreli/sınırsız paketleri ilgili disiplinle göster. Paket adı disiplinle başlar, satıştan sonra hak ve borç doğru okunur.
@@ -841,8 +845,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### S03 · Starter öğrenci, aday ve destek akışları
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                         | Sözleşme                                                                                                                                                                                                                                                                                                                                           | Doğrulama                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
 | S01 · ders günü verisi için S02 | F06, F21, F25, F26, F28, F30, F31 · [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF10](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf10), [WF11](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf11), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | Starter öğrenci, eğitmen, yönetici ve public ziyaretçi |
 
 - [ ] **S03.1** · Öğrenci kendi rezervasyonunu oluşturur veya iptal eder. Eğitmen günlük panelden aynı seansı açabilir.
@@ -853,9 +857,9 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### S04 · Starter üst plan erişim retleri
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
-| S01 | F05, F12, F17, F18, F20, F22–F24, F26, F27, F29 · [WF00](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf00) | Her satır için gezinme, doğrudan URL ve backend yetki sonucu |
+| Önkoşul | Sözleşme                                                                                                                     | Doğrulama                                                    |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| S01     | F05, F12, F17, F18, F20, F22–F24, F26, F27, F29 · [WF00](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf00) | Her satır için gezinme, doğrudan URL ve backend yetki sonucu |
 
 - [ ] **S04.1** · Bağımsız personel yönetimi, ücret anlaşması ve eğitmen hakedişi işlemlerini kontrol et. Starter oturumu kapalı işlemleri çalıştıramaz.
 - [ ] **S04.2** · Bekleme/teklif, paket dondurma/değişimi ve bağımsız etkinliği kontrol et. İşlem reddedildiğinde haklar ve rezervasyonlar korunur.
@@ -864,8 +868,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### S05 · Pro’dan Starter’a geçiş
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul  | Sözleşme                                                                                                                                                                    | Doğrulama                                                      |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | P17, S01 | F03, F17, F32, F33 · [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13) | Dönem sınırından önce ve sonra aynı kayıtların karşılaştırması |
 
 - [ ] **S05.1** · Çok kaynaklı Pro organizasyonunu Starter’a daraltırken kullanılacak kaynakları seç. Geçişin etkili tarihi ve seçilen kaynaklar güncel okumada görünür.
@@ -885,8 +889,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### B01 · Merkezler, yönetici kapsamı ve politikalar
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul   | Sözleşme                                                                                                                                                                                                                                                     | Doğrulama                                         |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
 | G-STARTER | F01, F03, F04, F05, F32 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13) | Organizasyon ve merkez bazlı ayrı test oturumları |
 
 - [ ] **B01.1** · A ve B merkezlerini oluştur. Merkez değişince oda, disiplin, görev ve sorgular doğru merkeze geçer.
@@ -895,9 +899,9 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### B02 · Birleşik kişi ve CRM
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
-| B01 | F04, F07, F21, F25 · [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | A, B ve organizasyon gelen kutularının karşılaştırılması |
+| Önkoşul | Sözleşme                                                                                                                                                                                                                                                | Doğrulama                                                |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| B01     | F04, F07, F21, F25 · [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | A, B ve organizasyon gelen kutularının karşılaştırılması |
 
 - [ ] **B02.1** · Organizasyon gelen kutusundaki başvuruyu yetkili merkeze yönlendir veya izinli aktarımı yap. Kaynak ve karar geçmişi korunur.
 - [ ] **B02.2** · Merkezlerin ilgili kayıtları için yetkili kişi birleştirmesini tamamla. Tek organizasyon kişisi ve Abone No üzerinden ilişkiler izlenir.
@@ -905,8 +909,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### B03 · Merkezler arası kullanım hakkı
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul                               | Sözleşme                                                                                                                                                                                                                                                                                                                       | Doğrulama                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------- |
 | B01 ve Pro satış/rezervasyon akışları | F15, F16, F18 · [WF05](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf05), [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06), [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF18](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf18) | A’da satılan paketin B’de kullanımı |
 
 - [ ] **B03.1** · Yalnız A’da geçerli paketle B’de kullanım dene. Ret sonrası öğrencinin kredi ve bakiye hareketleri aynı kalır.
@@ -915,9 +919,9 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### B04 · Merkezler arası hesaplaşma
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
-| B03 | F18, F19, F33 · [WF18](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf18) | A ve B için bağımsız finans yetkileri ve bakiye okumaları |
+| Önkoşul | Sözleşme                                                                                   | Doğrulama                                                 |
+| ------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| B03     | F18, F19, F33 · [WF18](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf18) | A ve B için bağımsız finans yetkileri ve bakiye okumaları |
 
 - [ ] **B04.1** · A’nın yetkilisi güncel A→B hareketi için talep oluşturur. Talep beklerken bakiyeler korunur, A yetkilisinin B adına karar yetkisi ayrıca denetlenir.
 - [ ] **B04.2** · B’nin yetkilisi talebi onaylar. Her iki merkezin hareket ve bakiye sonuçları aynı talebe bağlanır, yanıt kaybında yeniden gönderim ikinci hareket üretmez.
@@ -926,8 +930,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### B05 · Birleşik rapor ve öğrenci kotası
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul       | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
 | B02, B03, B04 | F18, F28, F32 · [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF10](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf10), [WF18](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf18) | Merkez ve organizasyon raporları, sınır testi |
 
 - [ ] **B05.1** · Merkez ve organizasyon raporlarını aynı dönem, filtre ve para birimiyle karşılaştır. Merkezler arası kullanım ve ilgili toplamlar kaynak hareketlerle tutar.
@@ -936,8 +940,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ### B06 · Plan daralması ve erişim değişikliği
 
-| Önkoşul | Sözleşme | Doğrulama |
-|---|---|---|
+| Önkoşul            | Sözleşme                                                                                                                                                                                                                                                | Doğrulama                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | B01, B03, P17, S05 | F03, F18, F32, F33 · [WF00](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf00), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13), [WF18](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf18) | Geçiş öncesi/sonrası geçmiş ve aktif izin karşılaştırması |
 
 - [ ] **B06.1** · Business→Pro ve Business→Starter geçişlerini ayrı test organizasyonlarında çalıştır. Seçilen kaynaklar, yürürlük ve yeni işlem izinleri hedef plana uyar.
