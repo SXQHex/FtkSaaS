@@ -75,6 +75,10 @@ export async function mockNative(page: Page, mfa = false) {
   const calls = {
     exchange: 0,
     password: 0,
+    passwordNeedsCode: false,
+    passwordCodeSends: 0,
+    rejectCurrentPassword: false,
+    rejectPasswordCode: false,
     recover: 0,
     resend: 0,
     enroll: 0,
@@ -168,8 +172,38 @@ export async function mockNative(page: Page, mfa = false) {
       calls.resend++;
       return route.fulfill({ json: {} });
     }
+    if (url.pathname === "/auth/v1/reauthenticate") {
+      calls.passwordCodeSends++;
+      return route.fulfill({ json: {} });
+    }
     if (url.pathname === "/auth/v1/user") {
-      if (route.request().method() === "PUT") calls.password++;
+      if (route.request().method() === "PUT") {
+        calls.password++;
+        const request = route.request().postDataJSON();
+        if (
+          calls.rejectCurrentPassword ||
+          (calls.passwordNeedsCode && (!request.nonce || calls.rejectPasswordCode))
+        ) {
+          const code = calls.rejectCurrentPassword
+            ? "current_password_invalid"
+            : calls.rejectPasswordCode
+              ? "reauthentication_not_valid"
+              : "reauthentication_needed";
+          calls.rejectCurrentPassword = false;
+          calls.rejectPasswordCode = false;
+          return route.fulfill({
+            status: 400,
+            headers: { "x-supabase-api-version": "2024-01-01" },
+            json: { code, msg: code },
+          });
+        }
+        if (request.current_password !== undefined || request.nonce) {
+          expect(request.password).toBe("fixture-new-password");
+          expect(request.current_password).toBe("fixture-current-password");
+          otherActive = false;
+          previousActive = false;
+        }
+      }
       return route.fulfill({ json: user });
     }
     if (url.pathname === "/functions/v1/backend-v1/management_state_get_v1") {

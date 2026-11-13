@@ -80,6 +80,26 @@ export default interface Resources {
       "success": "Örnek gönderildi.",
       "title": "Form altyapısı örneği"
     },
+    "passwordChange": {
+      "code": "Güvenlik kodu",
+      "codeDescription": "Güvenlik kodunu kayıtlı e-posta veya telefonuna gönderebilirsin. Kod mevcut parolanın yerine geçmez.",
+      "codeError": "Kod geçersiz, süresi dolmuş veya kullanılmış. Yeni kod iste.",
+      "confirm": "Yeni parola tekrar",
+      "current": "Mevcut parola",
+      "currentError": "Mevcut parola eksik veya hatalı. Kod kullandıysan yeni kod iste.",
+      "description": "Değişince diğer cihazlardaki oturumlar kapanır.",
+      "enterCode": "Kayıtlı adresine gelen güvenlik kodunu yaz.",
+      "firstPassword": "İlk parolanı belirliyorsan boş bırak.",
+      "needed": "Bu oturum için güvenlik kodu gerekiyor. Kod göndermeyi seç.",
+      "policyError": "Yeni parola sağlayıcının kurallarını karşılamıyor veya mevcut parolayla aynı.",
+      "resend": "Yeni kod gönder",
+      "rowDescription": "Mevcut parolanı doğrulayarak yeni parola belirle.",
+      "send": "Kod gönder",
+      "sendError": "Kod gönderimi doğrulanamadı. Yeniden deneyebilirsin.",
+      "sent": "Kod gönderme isteği kabul edildi. Gelen kodu yaz.",
+      "title": "Parolayı değiştir",
+      "unknownError": "Parola değişimi doğrulanamadı. Yeni parolanla giriş yaparak sonucu kontrol edebilirsin."
+    },
     "photo": {
       "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",
       "hint": "PNG, JPEG veya WebP, en fazla 1 MiB.",
