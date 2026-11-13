@@ -18,7 +18,8 @@
         "apps/backend/tests/ci-api-suites.test.mjs",
         "apps/backend/tests/deployment-cli-unit.mjs",
         "apps/backend/tests/edge-bundle-unit.mjs",
-        "apps/backend/tests/discipline-presentation-unit.mjs"
+        "apps/backend/tests/discipline-presentation-unit.mjs",
+        "apps/backend/tests/browser-cors-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -279,7 +280,11 @@
         "packages/api-contracts/src/runtime.ts",
         "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql",
         "apps/backend/scripts/ci/manual-full.mjs",
-        "apps/backend/scripts/ci/agent-tooling.mjs"
+        "apps/backend/scripts/ci/agent-tooling.mjs",
+        "apps/backend/transports/browser-cors.mjs",
+        "apps/backend/scripts/build-spa-assets.mjs",
+        "apps/backend/scripts/build-spa-ingress.mjs",
+        "apps/backend/transports/spa-validators.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -289,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "bb04ee07a9574b1479976cfb07e9b92f59565fe5224212c6e5111a3ff3c9b090",
-        "reason": "Reviewed source ownership hash refresh for the XREQ029 native regression; original unit, runner, deadlines and every old assertion retained. No CI policy or selection change."
+        "fingerprint": "65927b897d8fa952469e8a2fd98302ea0bbe6cddd4e2e28cdfc6b3091fc2791e",
+        "reason": "Canonical public standalone validator üretimi, origin/redirect native ortak HTTP ve test sahipliği incelendi"
       }
     },
     {
@@ -307,7 +312,8 @@
         "apps/backend/tests/account-signup-acceptance.mjs",
         "apps/backend/tests/auth-password-security-unit.mjs",
         "apps/backend/tests/hosted-password-runner-unit.mjs",
-        "apps/backend/tests/hosted-recovery-runner-unit.mjs"
+        "apps/backend/tests/hosted-recovery-runner-unit.mjs",
+        "apps/backend/tests/spa-ingress-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
@@ -365,7 +371,8 @@
         "apps/backend/database/organization-security-native-proof.sql",
         "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql",
         "apps/backend/scripts/acceptance/s08-hosted-password.mjs",
-        "apps/backend/scripts/acceptance/s08-hosted-recovery.mjs"
+        "apps/backend/scripts/acceptance/s08-hosted-recovery.mjs",
+        "apps/backend/transports/spa-ingress-worker.mjs"
       ],
       "operations": [
         "account_get_v1",
@@ -377,8 +384,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "d185c1b173329ca85c7532bb72907d164202b92dad798b35e659542e5430bc04",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "9138cca8c2789c466ee64fb5356ae4344427da3c9245594e9c5fa6d08694c3fa",
+        "reason": "Sentetik HMAC literal test anahtarları crypto randomBytes ile üretiliyor; native/signup assertion ve davranışları korunuyor"
       }
     },
     {
@@ -485,8 +492,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "b949adcad5c052e8ba74b3306923a3e55a3e5aec8bbde2f30cfde77d7ac00a34",
-        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
+        "fingerprint": "b8cfca3ac634a4ba1939a30ef138dabc638b4f7379ebdb1fe46783a0c5f1c64a",
+        "reason": "Registry test kökü yalnız yeni SPA public kabul importunu ekliyor; mevcut kurulum/domain test gövdeleri ve WF02 rehberi değişmedi"
       }
     },
     {
@@ -679,8 +686,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "286be608bc0b3ea9c2138cc2307fbabf1c44b96535ab7f0f73abcde9cad4d260",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "1f543bb65415ba5134a5d03b9165d3996fdf699bfe14b879b619b735f401d3c7",
+        "reason": "Registry köküne public transport testi eklendi; kişi/rol/domain davranışı ve mevcut WF04 test assertionları değişmedi"
       }
     },
     {
@@ -1040,7 +1047,9 @@
         "apps/backend/tests/hosted-calendar-runner-unit.mjs",
         "apps/backend/tests/discipline-presentation-acceptance.mjs",
         "apps/backend/tests/s14-public-runner-unit.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/spa-ingress-unit.mjs",
+        "apps/backend/tests/spa-public-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1088,7 +1097,9 @@
         "apps/backend/database/discipline-presentation.sql",
         "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql",
         "apps/backend/database/settings-application-forms.sql",
-        "apps/backend/scripts/acceptance/s14-hosted-public.mjs"
+        "apps/backend/scripts/acceptance/s14-hosted-public.mjs",
+        "apps/backend/transports/spa-ingress-worker.mjs",
+        "apps/backend/transports/public-calendar-gateway.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1102,8 +1113,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "06fb150f6957792597c15c1b1bcd39c9146f0c436fa48e31977383c1ca3cf753",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "8b5b946200c23f5ef0bf66c8849b4951e1dec1df778be2006605b68228ec301f",
+        "reason": "Yalnız public transport test anahtarlarının runtime üretimi değişti; CAPTCHA/rate/tenant/replay assertionları aynen korundu"
       }
     },
     {

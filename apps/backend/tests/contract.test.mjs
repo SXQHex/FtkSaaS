@@ -29,6 +29,8 @@ import './crm-application-contract-unit.mjs';
 import './auth-password-security-unit.mjs';
 import './invitation-delivery-unit.mjs';
 import './account-signup-adapter.mjs';
+import './browser-cors-unit.mjs';
+import './spa-ingress-unit.mjs';
 import './calendar-feed-unit.mjs';
 import './p06-parser.mjs';
 import './settings-media-unit.mjs';

@@ -165,3 +165,4 @@ import './sale-change-inventory-acceptance.mjs';
 import './sharing-consent-acceptance.mjs';
 import './content-catalog-acceptance.mjs';
 import './content-documents-acceptance.mjs';
+import './spa-public-acceptance.mjs';

@@ -4,6 +4,8 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
+**13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleri sırasında yürür. Bu paket sonrası mevcut G03 sırası korunur. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
+
 **13 Kasım içerik kataloğu görevi:** [S17](remaining-work.md#s17) mevcut sıra içindeki backend teslimini tamamladı; kalan açık işlerin sırası aşağıdadır. Kaynak/CI/main/development kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu), frontend çağrı/gösterim bağımlılığı [XREQ-045](../../../docs/requests.md#xreq-045) sahibindedir. Frontend kabulü backend işini yeniden açmaz.
 
 Kabul edilmiş Pro ortak temeli ve [G01](remaining-work.md#g01) Starter kısıt kabulü ardından sıradaki paket [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir. Tamamlanmış Pro kabulünün kanıt sahibi [G02 uzlaştırmasıdır](00-FtkSaaS-yeni-sohbet-devir.md#g02-bagli-zincir-incelemesi).

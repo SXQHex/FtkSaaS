@@ -2,8 +2,9 @@ import {calendarFeed} from './calendar-feed.ts';
 import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,calendarAppUrl} from './calendar-token.ts';
 import {lifecycleReauth} from './lifecycle-auth.ts';
 import {accountSignupCheck} from './account-signup.ts';
+import {browserCors,applyBrowserCors} from '../../../transports/browser-cors.mjs';
 import {invitationTick} from './invitation-delivery.ts';
-import {crmIntakeTargets,publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
+import {crmIntakeTargets,publicIngress,verifyPublicBot,publicBotHostnames} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
 import {verifySettingsImage} from './settings-image.ts';
@@ -12,10 +13,9 @@ import implementation from "./implemented.json" with {type:"json"};
 import { v7 } from "uuid";
 import * as validators from "./validators.js";
 const implemented=new Set(implementation.operations);
-const json=(x:unknown,status=200,noStore=false)=>{const response=new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","access-control-allow-origin":"*",...(noStore?{'cache-control':'private, no-store'}:{})}});noteGatewayError(response,x);return response;};
+const json=(x:unknown,status=200,noStore=false)=>{const response=new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json",...(noStore?{'cache-control':'private, no-store'}:{})}});noteGatewayError(response,x);return response;};
 const failure=(code:string,status=400,unexpected=false)=>{const payload={ok:false,error:{code,retryable:code==="TEMPORARY_FAILURE"||code==="OPERATION_IN_PROGRESS",trace_id:v7()}},response=json(payload,status);if(unexpected)noteGatewayError(response,payload,true);return response;};
 const handleRequest=async(req:Request):Promise<Response>=>{
- if(req.method==="OPTIONS")return new Response("",{headers:{"access-control-allow-origin":"*","access-control-allow-headers":"authorization,apikey,content-type,x-ftk-client-ip,x-ftk-ingress-time,x-ftk-ingress-signature,x-ftk-bot-proof","access-control-allow-methods":"POST,OPTIONS"}});
  if(req.method!=="POST")return failure("VALIDATION_FAILED");
  try{
   const operation=new URL(req.url).pathname.split("/").filter(Boolean).at(-1)!;
@@ -55,7 +55,7 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    };
    let aux:Record<string,unknown>|null=null;
    if(operation==='public_application_submit_v1'){
-    if(!env('FTK_TURNSTILE_SECRET')||!publicBotHostname(env))return failure('SERVICE_UNAVAILABLE',503);
+    if(!env('FTK_TURNSTILE_SECRET')||!publicBotHostnames(env).length)return failure('SERVICE_UNAVAILABLE',503);
     const ingress=await publicIngress(req,body,env);if(!ingress)return failure('SERVICE_UNAVAILABLE',503);
     if(request.form_id){
      let targets:Record<string,string>;try{targets=crmIntakeTargets(request.contact_intake??request.intake);}catch{return failure('VALIDATION_FAILED');}
@@ -182,7 +182,9 @@ const handleRequest=async(req:Request):Promise<Response>=>{
  }catch{return failure("TEMPORARY_FAILURE",503,true);}
 };
 Deno.serve(async req=>{
+ const cors=browserCors(req,{FTK_BROWSER_ORIGINS:Deno.env.get('FTK_BROWSER_ORIGINS')});
+ if(cors.response)return cors.response;
  const response=await handleRequest(req),operation=new URL(req.url).pathname.split('/').filter(Boolean).at(-1);
  await reportGatewayError(response,operation&&implemented.has(operation)?operation:undefined,name=>Deno.env.get(name));
- return response;
+ return applyBrowserCors(response,cors.headers);
 });

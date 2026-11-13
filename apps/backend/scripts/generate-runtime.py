@@ -15,6 +15,7 @@ def visit(x):
  elif isinstance(x,list):
   for v in x:visit(v)
 for o in ops:visit(o)
+visit({'$ref':'#/$defs/FailureEnvelope'})
 runtime={'$schema':p['$schema'],'$defs':{n:p['$defs'][n] for n in sorted(needed)},'x-contract':{'operations':ops}}
 sql=['begin;']
 for o in ops:

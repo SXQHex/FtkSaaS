@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "7fc33711a5107ed7b71850fc0a22eb96ca75247bc5e1c36d448484cb417965b7",
+      "sha256": "c1e6695d98eef21796b82160f644641b4f1c2123ca61eca43a35b9fb55e58e65",
       "shared": [
         [
           12,
@@ -1149,6 +1149,11 @@
           "line": 167,
           "path": "apps/backend/tests/content-documents-acceptance.mjs",
           "sha256": "0aaee1ce58afdf2b7f7da34a0d1efdd46b077d767be62102f7f754a1868d0588"
+        },
+        {
+          "line": 168,
+          "path": "apps/backend/tests/spa-public-acceptance.mjs",
+          "sha256": "d8a977949582899122d2bb7b5973d45e04975b9e954ca337df98245be990e519"
         }
       ],
       "estimated_seconds": 1356.24

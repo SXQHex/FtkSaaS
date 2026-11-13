@@ -1,9 +1,8 @@
 // Public transport only. Business authorization, CAPTCHA and quotas stay in Edge/RPC.
-import fs from 'node:fs';
+import {failure_envelope as validFailure} from '../transports/spa-validators.mjs';
 import {newUuidV7} from './uuid.mjs';
 import {signPublicApplication,publicSubmitPath} from './p04-public-ingress.mjs';
 const base='https://gwyprhenabtpkbojephw.supabase.co';
-const codes=new Set(JSON.parse(fs.readFileSync(new URL('../../../packages/api-contracts/schema/contract.json',import.meta.url),'utf8')).$defs.SafeError.properties.code.enum);
 const uuid=x=>typeof x==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x);
 const json=(code,status)=>Response.json({ok:false,error:{code,retryable:code==='TEMPORARY_FAILURE',trace_id:newUuidV7()}},{status,headers:{'cache-control':'no-store'}});
 async function boundedBody(body){
@@ -15,24 +14,30 @@ function publicEnvelope(x,status){
  if(!x||typeof x!=='object'||Array.isArray(x))return null;
  if(status===200&&x.ok===true&&Object.keys(x).length===3&&uuid(x.trace_id)&&x.data?.accepted===true&&Object.keys(x.data).length===1)return {ok:true,data:{accepted:true},trace_id:x.trace_id};
  const e=x.error;
- if(x.ok===false&&Object.keys(x).length===2&&e&&Object.keys(e).every(k=>['code','retryable','trace_id','retry_after_ms','field_paths'].includes(k))&&codes.has(e.code)&&typeof e.retryable==='boolean'&&uuid(e.trace_id))return {ok:false,error:{code:e.code,retryable:e.retryable,trace_id:e.trace_id}};
+ if(validFailure(x))return {ok:false,error:{code:e.code,retryable:e.retryable,trace_id:e.trace_id}};
  return null;
 }
 // Optional prepareBody is supplied by trusted server code, after bounded parsing
 // and origin checks, before the exact outgoing bytes are signed.
 export async function handlePublicApplication(req,env=process.env,fetcher=fetch,prepareBody){
  if(req.method!=='POST')return json('VALIDATION_FAILED',405);
- const host=env.FTK_PUBLIC_APPLICATION_HOSTNAME,secret=env.FTK_PUBLIC_INGRESS_SECRET,key=env.FTK_PUBLIC_ANON_KEY;
- if(!host||host.includes('/')||!secret||!key)return json('SERVICE_UNAVAILABLE',503);
- const url=new URL(req.url);let backend;
- try{backend=new URL(env.FTK_PUBLIC_BACKEND_ORIGIN??base);if(backend.protocol!=='https:'||backend.origin!==(env.FTK_PUBLIC_BACKEND_ORIGIN??base))throw Error();}catch{return json('SERVICE_UNAVAILABLE',503);}
+ const host=env.FTK_PUBLIC_APPLICATION_HOSTNAME;
+ if(!host||host.includes('/')||!env.FTK_PUBLIC_INGRESS_SECRET||!env.FTK_PUBLIC_ANON_KEY)return json('SERVICE_UNAVAILABLE',503);
+ const url=new URL(req.url);
  if(url.protocol!=='https:'||url.hostname!==host||req.headers.get('origin')!=='https://'+host)return json('FORBIDDEN',403);
+ return forwardPublicApplication(req,env,fetcher,req.headers.get('x-vercel-forwarded-for'),prepareBody);
+}
+export async function forwardPublicApplication(req,env,fetcher,clientIp,prepareBody){
+ if(req.method!=='POST')return json('VALIDATION_FAILED',405);
+ const secret=env.FTK_PUBLIC_INGRESS_SECRET,key=env.FTK_PUBLIC_ANON_KEY;
+ if(!secret||!key)return json('SERVICE_UNAVAILABLE',503);
+ let backend;
+ try{backend=new URL(env.FTK_PUBLIC_BACKEND_ORIGIN??base);if(backend.protocol!=='https:'||backend.origin!==(env.FTK_PUBLIC_BACKEND_ORIGIN??base))throw Error();}catch{return json('SERVICE_UNAVAILABLE',503);}
  if(!/^application\/json(?:\s*;|$)/i.test(req.headers.get('content-type')??''))return json('VALIDATION_FAILED',400);
  let body;try{body=await boundedBody(req.body);const input=JSON.parse(body);if(prepareBody)body=JSON.stringify(prepareBody(input));}catch(e){return json('VALIDATION_FAILED',e.message==='SIZE'?413:400);}
  try{
-  // Vercel overwrites this connection header. External proxy mode is unsupported.
-  // Caller x-ftk-*, cookies and authorization are never forwarded.
-  const signed=signPublicApplication(body,req.headers.get('x-vercel-forwarded-for'),secret);
+  // Only the hosting adapter supplies connection metadata. Caller headers stay local.
+  const signed=signPublicApplication(body,clientIp,secret);
   const res=await fetcher(backend.origin+publicSubmitPath,{method:'POST',headers:{...signed,apikey:key,authorization:'Bearer '+key,'content-type':'application/json'},body,signal:AbortSignal.timeout(15000),redirect:'error'});
   const output=publicEnvelope(JSON.parse(await boundedBody(res.body)),res.status);if(!output)throw Error('ENVELOPE');
   return Response.json(output,{status:res.status,headers:{'cache-control':'no-store','x-content-type-options':'nosniff'}});
