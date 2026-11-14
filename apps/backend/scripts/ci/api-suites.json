@@ -1160,7 +1160,7 @@
     },
     {
       "path": "apps/backend/tests/room-role-registry.test.mjs",
-      "sha256": "90156be5c8c44812654e2c87baef12ee207fe99cfdcbe17b0263f7aed9fa8544",
+      "sha256": "3634def02a20d24a539334dc27a6116dce97a612e6305065cf06627a688d69b7",
       "shared": [
         [
           2,
@@ -1183,6 +1183,11 @@
           "line": 1,
           "path": "apps/backend/tests/starter-instructor-acceptance.mjs",
           "sha256": "c751eb4f6f337cc95bef8227a9e4f38d43e296e27d49ffbdfe2fae1b650eb7ab"
+        },
+        {
+          "line": 311,
+          "path": "apps/backend/tests/studio-setup-status-acceptance.mjs",
+          "sha256": "c01b3a3e076ab2098271d31e03679b965a95fa1a7431078b2d2833c1c74486d6"
         }
       ],
       "estimated_seconds": 211

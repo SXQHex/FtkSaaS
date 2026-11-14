@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "65927b897d8fa952469e8a2fd98302ea0bbe6cddd4e2e28cdfc6b3091fc2791e",
-        "reason": "Canonical public standalone validator üretimi, origin/redirect native ortak HTTP ve test sahipliği incelendi"
+        "fingerprint": "0a5cb06dbb92102b0eb06cc6135a5d5464b0b7833c462332a50c11aeadb11152",
+        "reason": "E12 typed additive request/output and generated validator changes reviewed; live Auth/MFA/transport unchanged."
       }
     },
     {
@@ -404,7 +404,8 @@
         "apps/backend/tests/starter-instructor-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
         "apps/backend/tests/permission-preparation-acceptance.mjs",
-        "apps/backend/tests/discipline-presentation-acceptance.mjs"
+        "apps/backend/tests/discipline-presentation-acceptance.mjs",
+        "apps/backend/tests/studio-setup-status-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -466,7 +467,9 @@
         "apps/backend/supabase/migrations/20261107093756_account_self_context.sql",
         "apps/backend/database/discipline-presentation.sql",
         "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql",
-        "apps/backend/database/settings-discipline-effects.sql"
+        "apps/backend/database/settings-discipline-effects.sql",
+        "apps/backend/database/center-setup-status.sql",
+        "apps/backend/supabase/migrations/20261114120000_center_setup_status.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -492,8 +495,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "b8cfca3ac634a4ba1939a30ef138dabc638b4f7379ebdb1fe46783a0c5f1c64a",
-        "reason": "Registry test kökü yalnız yeni SPA public kabul importunu ekliyor; mevcut kurulum/domain test gövdeleri ve WF02 rehberi değişmedi"
+        "fingerprint": "6edb0a9c9ae35c7518c319cdc5d751f0282d3cd36501c747a34b5554e23b030b",
+        "reason": "E12 manager scoped summary and exact verified instructor binding reviewed with source and native acceptance fixtures; no role write change."
       }
     },
     {

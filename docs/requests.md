@@ -733,3 +733,15 @@ S10 paketinde katalogv22 ve typed ayar/medya sözleşmesi güncellenir. [WF12](w
 **Frontend entegrasyon talebi:** Dijital belgeli satışta ilk sale_preview.id değerini `context.purchase_preview_id` olarak belge okuma/onayına taşı; son sale_preview çağrısında aynı satın alma parametreleri ve `document_purchase_id` ile devam et. Yanlış/stale/invalid kaynakta ilgili belge/preview yeniden okunur; farklı işlem onayı veya sahte başarı kullanılamaz. Onay sonrası gereksinim/anlaşma/işlem yeniden okunur. Abone No onay isteğine kopyalanmaz; kullanıcıya göstermek için mevcut yetkili person/finance/report okumasından alınır. Paylaşım bildiriminin gerçek dili/kimliği mevcut ayrı alan kararlarında gösterilir; hash/revision kanıtı backend'in seçtiği bildirime aittir.
 
 Backend kaynak/native/CI durumu [tek durum kaydındadır](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu). Bu kayıt frontend uygulaması/kabulü veya karşı alan adına onay değildir; backend işi frontend ekranını beklemez.
+
+
+<a id="xreq-046"></a>
+## XREQ-046 E12 merkez kurulumu ve doğrulanmış eğitmen bağı
+
+### Backend tüketici devri — 14 Kasım 2026
+
+[WF02](workflows.md#wf02) typed çağrı ve sınırların sahibidir. Kurulum kartı `centers_list_v1` isteğine açık `org_id`, `center_id`, `include_setup_status:true`, `page:{}` gönderir; tek merkezde `setup_status.document_published/member_invitation_sent/as_of` okur. Kişi/dosya/davet kimliği keşfetmesi veya kişi listesi taraması gerekmez. Canlı CM gerekir; bayrak yoksa eski merkez listesi korunur. Gönderim sağlayıcı onayıdır; sıraya alınmış davet tamamlandı sayılmaz.
+
+Eğitmen için mevcut F04 `management_state_get_v1` role_assign selector'ının öğe üstü `account_access_granted` alanı kullanılır; F05 sahibi `roles_list_v1` aynı alanı verir. Aktif görev tek başına hesap yetkisi değildir. True ise aynı aktif rolü yeniden atama; false ise normal hesap daveti/bağlama ve `role_assign_v1` yolunu tamamlayıp tekrar oku. False tek başına bir hata nedeni veya yeniden davet gerekliliği değildir. Hesap/MFA/oturum kimliği/token açılmaz; komut mevcut canlı kontrollerini yeniden uygular.
+
+**Frontend kabul ölçütü:** Boş/eski kurulum verisini başarıya çevirmeden gerçek özeti göster; yetki/kapsam reddini tamamlandı sayma. Aktif offline görev ile bağlı aktif rolü ayır; bağlı rol için duplicate komut üretme. İşlem sonrası fresh read yap. Bu kayıt frontend kod değişikliği/onayı değildir. Kaynak/CI/deploy/kabul aşamaları [backend durum sahibindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#e12-guvenli-okuma).
