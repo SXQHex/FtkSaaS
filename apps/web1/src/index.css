@@ -66,6 +66,9 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.58 0 0);
   --ring: oklch(0.42 0 0);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-ring: var(--ring);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-accent: oklch(0.94 0 0);
@@ -133,6 +136,21 @@
   --success: oklch(0.74 0.15 150);
   --now: oklch(0.704 0.191 22.216);
   color-scheme: dark;
+}
+
+:root[data-contrast="high"] {
+  --border: var(--foreground);
+  --input: var(--foreground);
+  --muted-foreground: var(--foreground);
+  --sidebar-border: var(--sidebar-foreground);
+}
+@media (prefers-contrast: more) {
+  :root[data-contrast="system"] {
+    --border: var(--foreground);
+    --input: var(--foreground);
+    --muted-foreground: var(--foreground);
+    --sidebar-border: var(--sidebar-foreground);
+  }
 }
 
 @layer base {
@@ -251,7 +269,7 @@
 }
 .account-tabs > [data-slot="tabs-list"] {
   position: sticky;
-  top: 24px;
+  top: 80px;
   width: 100%;
 }
 @media (max-width: 900px) {
