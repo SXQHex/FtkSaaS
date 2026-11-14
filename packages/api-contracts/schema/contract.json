@@ -3492,6 +3492,9 @@
               "type": "null"
             }
           ]
+        },
+        "setup_status": {
+          "$ref": "#/$defs/CenterSetupStatus"
         }
       },
       "required": [
@@ -3541,6 +3544,10 @@
               "type": "null"
             }
           ]
+        },
+        "account_access_granted": {
+          "type": "boolean",
+          "description": "True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority."
         }
       },
       "required": [
@@ -7347,6 +7354,10 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_setup_status": {
+          "type": "boolean",
+          "description": "Opt-in manager-only setup summary. Requires center_id; returns only that center. Omitted/false preserves the original list."
         }
       },
       "required": [
@@ -26342,6 +26353,10 @@
         },
         "merge_approval": {
           "$ref": "#/$defs/MergeApprovalDiscovery"
+        },
+        "account_access_granted": {
+          "type": "boolean",
+          "description": "True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority."
         }
       },
       "required": [
@@ -58351,6 +58366,27 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "CenterSetupStatus": {
+      "type": "object",
+      "properties": {
+        "document_published": {
+          "type": "boolean"
+        },
+        "member_invitation_sent": {
+          "type": "boolean"
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "document_published",
+        "member_invitation_sent",
+        "as_of"
+      ],
+      "additionalProperties": false,
+      "description": "Current effective publication in organization/center scope with ready file; invitation means a provider-confirmed successful center account-invitation delivery, including later accepted/expired/revoked invitations. No recipient or entity identifiers."
     }
   },
   "x-contract": {
@@ -61779,7 +61815,8 @@
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/centers_list_v1",
         "runtime_limits": [
-          "single-page projection; cursor pagination pending"
+          "single-page projection; cursor pagination pending",
+          "include_setup_status=true requires explicit center_id and live center manager authority; returns only that accessible center with identifier-free setup_status."
         ],
         "required_features": [
           "F01"
@@ -62614,7 +62651,8 @@
         "runtime_limits": [
           "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open.",
           "Lists stored role assignments; ownership is read from organization.owner_person_id, not synthesized as a role assignment.",
-          "Only created_at_asc sorting is supported; cursors bind actor and request scope; live permissions are rechecked."
+          "Only created_at_asc sorting is supported; cursors bind actor and request scope; live permissions are rechecked.",
+          "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged."
         ],
         "required_features": [
           "F04"
@@ -82141,7 +82179,8 @@
           "role_assign_v1 selector supports instructor only, explicit matching center/scope and live center manager authority; optional person_id discovers active/inactive assignment IDs and row versions. No account link IDs or general F05 personnel listing.",
           "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window.",
           "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
-          "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission."
+          "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission.",
+          "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -103513,7 +103552,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 160,
+      "migration_count": 161,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

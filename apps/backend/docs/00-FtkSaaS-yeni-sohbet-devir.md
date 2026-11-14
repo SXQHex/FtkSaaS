@@ -1,5 +1,13 @@
 # Güncel kaynak ve kabul
 
+<a id="e12-guvenli-okuma"></a>
+## E12 kurulum ve eğitmen bağı — 14 Kasım 2026
+
+Kaynak adayı: `centers_list_v1(include_setup_status:true,center_id)` yalnız canlı CM için tek merkezde kişisel veri içermeyen `setup_status` verir. Belge yürürlükte/hazır yayın; davet sağlayıcı onaylı geçmiş gönderimdir. Kuyruk başarı sayılmaz. `roles_list_v1` ve instructor `management_state_get_v1` öğelerinde `account_access_granted` tam atamanın aktif doğrulanmış hesap bağı ve canlı hesap/Auth durumunu gösterir; aktif offline görev false kalır. Hesap kimliği/token, oturum veya MFA garantisi dönmez; yazma/duplicate/replay kuralları değişmedi. Çağrı ve kabul ölçütü [WF02](../../../docs/workflows.md#wf02), tüketici devri [XREQ-046](../../../docs/requests.md#xreq-046).
+
+161. migration append edildi; bağımsız kaynak incelemesinde engelleyici bulgu yok. `pnpm verify` (402 + 149 + 10 test; 561 geçti, sıfır skip), generated/typecheck/governance ve kalite/floor kontrolü geçti. Sığ checkout eksik iki tarihsel Git nesnesi getirilerek mevcut doğrulama testi düzeltmesiz geçti. Yerel native başlangıcı GitHub ve S3 slim-services artifact DNS hatasında durdu; DB/API kabulü çalıştırılmaya denendi fakat ortam oluşmadığı için geçmedi. Bu kaynak teslimi CI, merge, development deploy veya canlı E12 kabulü değildir; G03 sırası değişmedi.
+
+
 <a id="statik-spa"></a>
 ## Statik SPA transport dilimi — 13 Kasım 2026
 

@@ -308,3 +308,4 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   await db.end();
  }
 });
+import './studio-setup-status-acceptance.mjs';
