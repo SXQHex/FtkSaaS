@@ -316,5 +316,46 @@
     "unavailableDescription": "Davet süresi dolmuş, iptal edilmiş veya başka bir hesaba ait olabilir. Davetin gönderildiği hesapla tekrar dene. Yeni bağlantı gerekiyorsa stüdyoyla iletişime geç.",
     "checkAccount": "Doğru hesabı kontrol et",
     "help": "Bağlantı hakkında yardım"
+  },
+  "accountDeletion": {
+    "title": "Hesabı sil",
+    "description": "Silmeden önce güncel etkileri ve engelleri gör.",
+    "openPreview": "Silme önizlemesini aç",
+    "previewTitle": "Hesap silme önizlemesi",
+    "previewDescription": "Güncel etkiler ve engeller",
+    "loading": "Önizleme yükleniyor.",
+    "failed": "Önizleme alınamadı. Yeniden dene.",
+    "ownerBlock": "Önce stüdyo sahipliğini devretmelisin.",
+    "blocked": "Silme öncesinde çözülmesi gereken bir engel var.",
+    "noBlockers": "Önizlemede silmeyi engelleyen bir kayıt bildirilmedi.",
+    "accountEffect": "Hesap",
+    "otherEffect": "İlgili kayıt",
+    "physicalErasure": "Silme talebinin alınması bütün verilerin fiziksel olarak silindiği anlamına gelmez.",
+    "readOnly": "Bu önizleme hesabını değiştirmez.",
+    "expires": "Önizleme geçerliliği: {{value}}",
+    "close": "Kapat",
+    "actions": {
+      "create": "Oluşturma",
+      "cancel": "İptal",
+      "reserve": "Ayırma",
+      "consume": "Kullanma",
+      "release": "Serbest bırakma",
+      "adjust": "Düzeltme",
+      "close": "Kapatma",
+      "unlink": "Bağlantıyı kaldırma",
+      "delete": "Silme",
+      "reverse": "Geri alma"
+    },
+    "impact": {
+      "active_account_links": "Aktif hesap bağlantıları",
+      "open_sessions": "Planlı dersler",
+      "open_requests": "Açık talepler",
+      "active_reservations": "Aktif rezervasyonlar",
+      "active_event_registrations": "Aktif etkinlik kayıtları",
+      "open_debts": "Açık borç kayıtları",
+      "student_credit_accounts": "Öğrenci alacak hesapları"
+    },
+    "closePreview": "Önizlemeyi kapat",
+    "effectsRegion": "Önizleme etkileri ve engeller"
   }
 }

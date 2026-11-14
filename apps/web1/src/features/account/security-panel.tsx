@@ -10,6 +10,7 @@ import { PasswordChange } from "./password-change";
 import { readSessions } from "./sessions";
 import { TotpRemove } from "./totp-remove";
 import { TotpSetup } from "./totp-setup";
+import { DeletionPreviewPanel } from "./deletion-preview-panel";
 import {
   Card,
   CardHeader,
@@ -211,6 +212,7 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
           </ItemGroup>
         </CardContent>
       </Card>
+      <DeletionPreviewPanel key={accountId} accountId={accountId} />
       <Card>
         <CardHeader>
           <CardTitle>
