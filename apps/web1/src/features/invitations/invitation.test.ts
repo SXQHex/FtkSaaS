@@ -5,7 +5,7 @@ const { native } = vi.hoisted(() => ({ native: { getSession: vi.fn() } }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
 import {
   captureInvitation,
-  readInvitation,
+  inspectInvitation,
   createAcceptanceIntent,
   acceptInvitation,
   readAcceptanceStatus,
@@ -87,7 +87,13 @@ it("captures only one fragment token, scrubs the URL and survives reload", () =>
   expect(location.pathname).toBe("/invite");
   expect(location.hash).toBe("");
   expect(location.search).toBe("");
-  expect(readInvitation()?.token).toBe("fixture-invite");
+  expect(inspectInvitation()).toEqual({
+    intent: undefined,
+    acknowledged: false,
+    conflictingLink: false,
+    finalized: false,
+  });
+  expect(JSON.parse(sessionStorage.getItem("ftk-invitation")!).token).toBe("fixture-invite");
   expect(captureInvitation()).toBe("restored");
 });
 it.each(["/invite?token=query-secret", "/invite#token=", "/invite#token=one&token=two"])(
@@ -96,7 +102,7 @@ it.each(["/invite?token=query-secret", "/invite#token=", "/invite#token=one&toke
     window.history.replaceState({}, "", url);
     expect(captureInvitation()).toBe("invalid");
     expect(location.href).not.toContain("token");
-    expect(readInvitation()).toBeUndefined();
+    expect(inspectInvitation()).toBeUndefined();
   },
 );
 it("keeps the same account-bound key across reload and refuses another account", () => {
@@ -106,7 +112,9 @@ it("keeps the same account-bound key across reload and refuses another account",
   expect(intent.operationKey).toMatch(/^[a-f0-9]{8}-[a-f0-9]{4}-7/);
   expect(() => createAcceptanceIntent(other)).toThrow("INVITE_ACCOUNT_CHANGED");
   expect(capture("another-token")).toBe("pending");
-  expect(readInvitation()?.token).toBe("fixture-invite");
+  expect(captureInvitation()).toBe("restored");
+  expect(inspectInvitation()?.conflictingLink).toBe(true);
+  expect(JSON.parse(sessionStorage.getItem("ftk-invitation")!).token).toBe("fixture-invite");
 });
 it("returns to invite only after explicit authentication action and only once", () => {
   capture();
@@ -202,3 +210,104 @@ it("does not replace malformed saved intent with a new key or dispatch a command
   expect(requests).toEqual([]);
   expect(location.hash).toBe("");
 });
+it("releases a definite first rejection so the user can authenticate as the invited account", async () => {
+  capture();
+  const intent = createAcceptanceIntent(actor);
+  server.use(
+    http.post("https://backend.invalid/functions/v1/backend-v1/account_access_accept_v1", () =>
+      HttpResponse.json(
+        { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: actor } },
+        { status: 403 },
+      ),
+    ),
+  );
+  await expect(acceptInvitation(intent)).rejects.toMatchObject({ code: "FORBIDDEN" });
+  const next = createAcceptanceIntent(other);
+  expect(next.accountId).toBe(other);
+  expect(next.operationKey).not.toBe(intent.operationKey);
+});
+it("does not release the original binding after an uncertain attempt then a denial", async () => {
+  capture();
+  const intent = createAcceptanceIntent(actor);
+  rejectNext = true;
+  await expect(acceptInvitation(intent)).rejects.toThrow();
+  server.use(
+    http.post("https://backend.invalid/functions/v1/backend-v1/account_access_accept_v1", () =>
+      HttpResponse.json(
+        { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: actor } },
+        { status: 403 },
+      ),
+    ),
+  );
+  await expect(acceptInvitation(intent)).rejects.toMatchObject({ code: "FORBIDDEN" });
+  expect(createAcceptanceIntent(actor)).toEqual(intent);
+  expect(() => createAcceptanceIntent(other)).toThrow("INVITE_ACCOUNT_CHANGED");
+});
+it("blocks a second mutation after an acknowledged success", async () => {
+  capture();
+  const intent = createAcceptanceIntent(actor);
+  await acceptInvitation(intent);
+  expect(inspectInvitation()?.acknowledged).toBe(true);
+  await expect(acceptInvitation(intent)).rejects.toThrow("INVITE_ALREADY_ACKNOWLEDGED");
+  expect(requests.filter((r) => r.operation === "account_access_accept_v1")).toHaveLength(1);
+  expect(capture("next-invitation")).toBe("captured");
+  expect(inspectInvitation()?.intent).toBeUndefined();
+});
+it("does not block an unrelated account route when an invite record is corrupt", () => {
+  sessionStorage.setItem("ftk-invitation", "invalid");
+  expect(takeInvitationReturn()).toBe(false);
+  expect(() => inspectInvitation()).toThrow("INVITE_STORAGE_INVALID");
+});
+it("allows another invitation after an authoritative succeeded receipt", async () => {
+  capture();
+  const intent = createAcceptanceIntent(actor);
+  rejectNext = true;
+  await expect(acceptInvitation(intent)).rejects.toThrow();
+  server.use(
+    http.post("https://backend.invalid/functions/v1/backend-v1/operation_status_get_v1", () =>
+      HttpResponse.json({
+        ok: true,
+        data: {
+          operation: "account_access_accept_v1",
+          key: intent.operationKey,
+          status: "succeeded",
+          result_available: true,
+          result_reference: { type: "account_links", id: other },
+        },
+        trace_id: actor,
+      }),
+    ),
+  );
+  await readAcceptanceStatus(intent);
+  expect(inspectInvitation()?.acknowledged).toBe(true);
+  expect(capture("next-invitation")).toBe("captured");
+  expect(inspectInvitation()?.intent).toBeUndefined();
+});
+it.each(["failed_final", "result_expired"])(
+  "handles replacement after %s without retrying a final operation",
+  async (status) => {
+    capture();
+    const intent = createAcceptanceIntent(actor);
+    rejectNext = true;
+    await expect(acceptInvitation(intent)).rejects.toThrow();
+    server.use(
+      http.post("https://backend.invalid/functions/v1/backend-v1/operation_status_get_v1", () =>
+        HttpResponse.json({
+          ok: true,
+          data: {
+            operation: "account_access_accept_v1",
+            key: intent.operationKey,
+            status,
+            result_available: false,
+            result_reference: null,
+          },
+          trace_id: actor,
+        }),
+      ),
+    );
+    await readAcceptanceStatus(intent);
+    expect(inspectInvitation()?.acknowledged).toBe(false);
+    expect(capture("next-invitation")).toBe(status === "failed_final" ? "captured" : "pending");
+    if (status === "result_expired") expect(createAcceptanceIntent(actor)).toEqual(intent);
+  },
+);

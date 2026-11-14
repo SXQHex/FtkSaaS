@@ -7,6 +7,7 @@ import { I18nProvider } from "react-aria-components/I18nProvider";
 
 import { i18n } from "./i18n";
 import { captureAuthCallback } from "./features/auth/callback";
+import { captureInvitation } from "./features/invitations/invitation";
 import { routeTree } from "./routeTree.gen";
 import "./index.css";
 
@@ -20,6 +21,16 @@ const queryClient = new QueryClient({
 });
 
 captureAuthCallback();
+captureInvitation();
+// Hash-only navigation can reuse this document. Scrub before Router history listeners
+// observe it, then remount with the captured private invitation rather than a URL token.
+function captureInvitationNavigation() {
+  if (window.location.pathname !== "/invite" || !window.location.hash) return;
+  captureInvitation();
+  window.location.reload();
+}
+window.addEventListener("popstate", captureInvitationNavigation, { capture: true });
+window.addEventListener("hashchange", captureInvitationNavigation, { capture: true });
 
 const router = createRouter({
   routeTree,

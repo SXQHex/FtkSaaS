@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { createBackend } from "../../lib/backend";
+import { BackendError, createBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 
 const storageKey = "ftk-invitation";
@@ -10,11 +10,15 @@ const stateSchema = z.object({
   token: z.string().min(1),
   returnAfterAuth: z.boolean(),
   intent: intentSchema.optional(),
+  attempted: z.boolean().optional(),
+  acknowledged: z.boolean().optional(),
+  finalized: z.boolean().optional(),
+  conflictingLink: z.boolean().optional(),
 });
 export type AcceptanceIntent = z.infer<typeof intentSchema>;
 type InvitationState = z.infer<typeof stateSchema>;
 
-export function readInvitation(): InvitationState | undefined {
+function readInvitation(): InvitationState | undefined {
   const raw = sessionStorage.getItem(storageKey);
   if (!raw) return;
   try {
@@ -22,6 +26,17 @@ export function readInvitation(): InvitationState | undefined {
   } catch {
     throw new Error("INVITE_STORAGE_INVALID");
   }
+}
+export function inspectInvitation() {
+  const state = readInvitation();
+  return (
+    state && {
+      intent: state.intent,
+      acknowledged: !!state.acknowledged,
+      finalized: !!state.finalized,
+      conflictingLink: !!state.conflictingLink,
+    }
+  );
 }
 function save(state: InvitationState) {
   sessionStorage.setItem(storageKey, JSON.stringify(state));
@@ -45,12 +60,21 @@ export function captureInvitation():
     const previous = readInvitation();
     if (!hash && !query.has("token")) return previous ? "restored" : "invalid";
     const token = !query.has("token") && tokens.length === 1 ? tokens[0] : undefined;
-    if (previous?.intent && token !== previous.token) return "pending";
+    if (
+      previous?.intent &&
+      !previous.acknowledged &&
+      !previous.finalized &&
+      token !== previous.token
+    ) {
+      save({ ...previous, conflictingLink: true });
+      return "pending";
+    }
     if (!token) {
       sessionStorage.removeItem(storageKey);
       return "invalid";
     }
     if (previous?.token !== token) save({ version: 1, token, returnAfterAuth: false });
+    else if (previous.conflictingLink) save({ ...previous, conflictingLink: false });
     return "captured";
   } catch {
     return "unavailable";
@@ -63,10 +87,16 @@ export function requestInvitationAuth() {
   save({ ...state, returnAfterAuth: true });
 }
 export function takeInvitationReturn() {
-  const state = readInvitation();
-  if (!state?.returnAfterAuth) return false;
-  save({ ...state, returnAfterAuth: false });
-  return true;
+  try {
+    const state = readInvitation();
+    if (!state?.returnAfterAuth) return false;
+    save({ ...state, returnAfterAuth: false });
+    return true;
+  } catch {
+    // A broken invite must not prevent an unrelated account from opening.
+    // The invite route retains the record and presents its explicit recovery state.
+    return false;
+  }
 }
 export function createAcceptanceIntent(accountId: string): AcceptanceIntent {
   const state = readInvitation();
@@ -106,19 +136,75 @@ async function requireIntent(intent: AcceptanceIntent) {
 }
 export async function acceptInvitation(intent: AcceptanceIntent) {
   const { state, backend } = await requireIntent(intent);
-  return backend.call("account_access_accept_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    operation_key: intent.operationKey,
-    token: state.token,
-  });
+  if (state.acknowledged) throw new Error("INVITE_ALREADY_ACKNOWLEDGED");
+  if (state.finalized) throw new Error("INVITE_ALREADY_FINAL");
+  save({ ...state, attempted: true });
+  try {
+    const result = await backend.call("account_access_accept_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      operation_key: intent.operationKey,
+      token: state.token,
+    });
+    save({ ...state, attempted: true, acknowledged: true });
+    return result;
+  } catch (error) {
+    // Only a definite first-attempt rejection can release an actor binding.
+    // A later denial cannot establish whether an earlier uncertain write committed.
+    if (
+      !state.attempted &&
+      error instanceof BackendError &&
+      !error.retryable &&
+      ["FORBIDDEN", "INVITATION_UNAVAILABLE", "ACCOUNT_LINK_CONFLICT"].includes(error.code)
+    ) {
+      const current = readInvitation();
+      if (current?.intent?.operationKey === intent.operationKey)
+        save({ version: 1, token: state.token, returnAfterAuth: false });
+    }
+    throw error;
+  }
 }
 export async function readAcceptanceStatus(intent: AcceptanceIntent) {
-  const { backend } = await requireIntent(intent);
-  return backend.call("operation_status_get_v1", {
+  const { state, backend } = await requireIntent(intent);
+  const result = await backend.call("operation_status_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
     operation: "account_access_accept_v1",
     key: intent.operationKey,
   });
+  if (result.status === "succeeded") save({ ...state, attempted: true, acknowledged: true });
+  if (result.status === "failed_final") save({ ...state, attempted: true, finalized: true });
+  return result;
+}
+export async function readAcceptedContext(intent: AcceptanceIntent) {
+  const { backend } = await requireIntent(intent);
+  const organizations = [];
+  let cursor: string | undefined;
+  do {
+    const page = await backend.call("organizations_list_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      page: { limit: 50, ...(cursor ? { cursor } : {}) },
+    });
+    for (const organization of page.items) {
+      const centers = [];
+      let centerCursor: string | undefined;
+      do {
+        const result = await backend.call("centers_list_v1", {
+          client_api_version: 1,
+          request_id: uuidv7(),
+          org_id: organization.id,
+          page: { limit: 50, ...(centerCursor ? { cursor: centerCursor } : {}) },
+        });
+        centers.push(...result.items);
+        centerCursor = result.next_cursor ?? undefined;
+      } while (centerCursor);
+      organizations.push({
+        name: organization.name,
+        centers: centers.filter((c) => c.accessible).map((c) => c.name),
+      });
+    }
+    cursor = page.next_cursor ?? undefined;
+  } while (cursor);
+  return organizations;
 }
