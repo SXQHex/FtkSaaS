@@ -5,9 +5,10 @@ import {
   readStudioInstructors,
   readStudioPrograms,
 } from "./studio-reads";
+import { readStudioSetup } from "./setup";
 import type { ResourceRef } from "../../lib/api-contracts/generated";
 
-export async function readStudioSnapshot(scope: StudioScope) {
+export async function readStudioSnapshot(scope: StudioScope, canReadPlan = false) {
   const [resources, instructors] = await Promise.all([
     readStudioResources(scope),
     readStudioInstructors(scope),
@@ -28,7 +29,7 @@ export async function readStudioSnapshot(scope: StudioScope) {
       )
       .map((id) => ({ kind: "person" as const, id })),
   ];
-  const [agreements, programs, closures] = await Promise.all([
+  const [agreements, programs, closures, setup] = await Promise.all([
     Promise.all(personIds.map((id) => readStudioAgreements(scope, id))),
     Promise.all(
       resources.classes.map(async (item) => ({
@@ -37,10 +38,12 @@ export async function readStudioSnapshot(scope: StudioScope) {
       })),
     ),
     Promise.all(closureResources.map((resource) => readStudioClosures(scope, resource))),
+    readStudioSetup(scope, resources, instructors, canReadPlan),
   ]);
   return {
     resources,
     instructors,
+    setup,
     agreements: agreements.flat(),
     programs,
     closures: closures.flat(),

@@ -39,8 +39,12 @@ function versionOf(item: ManagementStateView, entityType: string) {
   return version;
 }
 
-async function management(scope: StudioScope, selector: ManagementSelector) {
-  const backend = await studioBackend(scope);
+async function management(
+  scope: StudioScope,
+  selector: ManagementSelector,
+  client?: Awaited<ReturnType<typeof studioBackend>>,
+) {
+  const backend = client ?? (await studioBackend(scope));
   return studioPages((cursor) =>
     backend.call("management_state_get_v1", {
       client_api_version: 1,
@@ -132,8 +136,13 @@ export function readStudioPrograms(scope: StudioScope, classId: string) {
 export async function readStudioAvailability(
   scope: StudioScope,
   resource: ResourceRef,
+  client?: Awaited<ReturnType<typeof studioBackend>>,
 ): Promise<AvailabilityRecord[]> {
-  const items = await management(scope, { operation: "availability_save_v1", key: { resource } });
+  const items = await management(
+    scope,
+    { operation: "availability_save_v1", key: { resource } },
+    client,
+  );
   return items.map((item) => {
     // Rules have their own version. An exception's center version cannot be used here.
     const version = versionOf(item, "availability_rules");
