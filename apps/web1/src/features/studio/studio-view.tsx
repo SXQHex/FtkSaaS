@@ -152,7 +152,7 @@ export function StudioView({
     </Badge>
   );
   return (
-    <main
+    <div
       className="studio-view flex min-w-0 w-full max-w-[76rem] flex-col gap-4 px-4 pt-5 pb-12 min-[901px]:px-8"
       aria-busy={state === "loading"}
     >
@@ -208,7 +208,12 @@ export function StudioView({
           <CardContent>
             <Progress
               aria-label={t(($) => $.studio.setup)}
-              isIndeterminate={!data.setup.length || unknown > 0}
+              isIndeterminate={!data.setup.length}
+              valueLabel={t(($) => $.studio.setupProgress, {
+                complete: completed,
+                total: data.setup.length,
+                unknown,
+              })}
               value={data.setup.length ? (completed / data.setup.length) * 100 : undefined}
             />
             <ul className="mt-3.5 grid gap-x-6 min-[721px]:grid-cols-2">
@@ -770,6 +775,6 @@ export function StudioView({
       ) : (
         <StudioSheets selection={selection} onClose={() => setSelection(undefined)} data={data} />
       )}
-    </main>
+    </div>
   );
 }

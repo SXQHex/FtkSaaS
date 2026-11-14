@@ -386,6 +386,7 @@ export function InstructorEnrollmentSheet({
                     <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
                       <div className="flex items-start gap-3">
                         <Checkbox
+                          id="instructor-grant"
                           name="accepted"
                           aria-labelledby="instructor-grant-label"
                           isRequired
@@ -401,7 +402,7 @@ export function InstructorEnrollmentSheet({
                           }
                         />
                         <div>
-                          <FieldLabel id="instructor-grant-label">
+                          <FieldLabel id="instructor-grant-label" htmlFor="instructor-grant">
                             {t(($) => $.studio.acceptInstructorRole)}
                           </FieldLabel>
                           <FieldDescription id="instructor-grant-description" variant="hint">

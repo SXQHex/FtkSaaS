@@ -896,6 +896,7 @@
     "setupProductCount_one": "Bu merkezi kapsayan {{count}} yayımlı paket",
     "setupProductCount_other": "Bu merkezi kapsayan {{count}} yayımlı paket",
     "setupUnknownCount_one": "{{count}} durum bilinmiyor",
-    "setupUnknownCount_other": "{{count}} durum bilinmiyor"
+    "setupUnknownCount_other": "{{count}} durum bilinmiyor",
+    "setupProgress": "{{total}} adımdan {{complete}} tanesi doğrulandı; {{unknown}} adımın durumu bilinmiyor."
   }
 }

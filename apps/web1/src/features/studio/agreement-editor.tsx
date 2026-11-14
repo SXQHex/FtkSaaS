@@ -593,6 +593,7 @@ export function StudioAgreementEditor({
                 </Field>
                 <Field orientation="horizontal" data-invalid={notice === "approval-required"}>
                   <Checkbox
+                    id="agreement-approval"
                     name="accepted"
                     isSelected={draft.accepted}
                     onChange={(accepted) => change({ accepted })}
@@ -603,7 +604,7 @@ export function StudioAgreementEditor({
                     aria-describedby="agreement-impact-description"
                   />
                   <div>
-                    <FieldLabel id="agreement-approval-label">
+                    <FieldLabel id="agreement-approval-label" htmlFor="agreement-approval">
                       {t(($) => $.studio.impactAccepted)}
                     </FieldLabel>
                     <FieldDescription id="agreement-impact-description" variant="hint">

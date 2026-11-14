@@ -778,6 +778,7 @@ export default interface Resources {
         "program": "İlk seans ya da seri"
       },
       "setupProductCount": "Bu merkezi kapsayan {{count}} yayımlı paket" | "Bu merkezi kapsayan {{count}} yayımlı paket",
+      "setupProgress": "{{total}} adımdan {{complete}} tanesi doğrulandı; {{unknown}} adımın durumu bilinmiyor.",
       "setupReadUnavailable": "Bu durum güncel kaynaktan okunamadı.",
       "setupRoomCount": "{{count}} açık salon" | "{{count}} açık salon",
       "setupSeriesKnown": "Kayıtlı etkin seri tanımı var.",
