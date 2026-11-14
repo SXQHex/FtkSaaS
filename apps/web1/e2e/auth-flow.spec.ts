@@ -1,3 +1,4 @@
+import type { FailureEnvelope } from "../src/lib/api-contracts/generated.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { origin, captureAuth, mockNative } from "./auth-fixture.js";
@@ -795,4 +796,161 @@ test("minimum saved font scale and 320 CSS pixel reflow keep the same WCAG 2.2 A
     });
   }
   expect(calls.settingsPatches).toEqual([{ font_scale: null }]);
+});
+
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`verification validation and explicit retry after rate limit ${colorScheme}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ colorScheme });
+    await mockNative(page);
+    let attempts = 0;
+    await page.route("**/auth/v1/resend*", async (route) => {
+      attempts++;
+      expect(route.request().postDataJSON()).toMatchObject({
+        type: "signup",
+        email: "fixture@example.invalid",
+      });
+      if (attempts === 1) {
+        return route.fulfill({
+          status: 429,
+          json: { code: "over_email_send_rate_limit", msg: "Rate limit exceeded" },
+        });
+      }
+      return route.fulfill({ json: {} });
+    });
+    await page.goto("/verify-email");
+    const resend = page.getByRole("button", { name: "Yeniden gönder" });
+    await resend.click();
+    const email = page.getByLabel("E-posta");
+    await email.fill("invalid");
+    await resend.click();
+    await expect(email).toHaveAttribute("aria-invalid", "true");
+    await expect(email).toHaveAccessibleDescription("Geçerli bir e-posta adresi gir.");
+    expect(attempts).toBe(0);
+    await email.fill("fixture@example.invalid");
+    await resend.click();
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(email).toHaveValue("fixture@example.invalid");
+    expect(attempts).toBe(1);
+    expect((await scanAccessibility(page, "verification-rate-limit")).violations).toEqual([]);
+    await expect(resend).toBeEnabled();
+    await resend.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("status")).toContainText("Uygun bir kayıt varsa");
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(email).toHaveValue("fixture@example.invalid");
+    expect(attempts).toBe(2);
+    expect((await scanAccessibility(page, "verification-retry-result")).violations).toEqual([]);
+  });
+}
+
+test("signup validates policy, stops existing accounts and requests native confirmation once", async ({
+  page,
+}, testInfo) => {
+  await mockNative(page);
+  let status = "account_exists";
+  let checks = 0;
+  let signups = 0;
+  await page.route("**/api/auth/signup-check", async (route) => {
+    checks++;
+    expect(route.request().postDataJSON()).toMatchObject({
+      client_api_version: 1,
+      email: "signup@example.invalid",
+    });
+    expect(route.request().headers()["authorization"]).toBeUndefined();
+    if (status === "temporary")
+      return route.fulfill({
+        status: 503,
+        json: {
+          ok: false,
+          error: {
+            code: "SERVICE_UNAVAILABLE",
+            retryable: true,
+            trace_id: "019a7fd0-0000-7000-8000-000000000001",
+          },
+        } satisfies FailureEnvelope,
+      });
+    return route.fulfill({ json: { ok: true, data: { status }, trace_id: "signup-trace" } });
+  });
+  await page.route("**/auth/v1/signup*", async (route) => {
+    signups++;
+    expect(route.request().postDataJSON()).toMatchObject({
+      email: "signup@example.invalid",
+      password: "Fixture123",
+      data: { display_name: "Test Student" },
+    });
+    return route.fulfill({
+      json: {
+        user: {
+          id: "00000000-0000-4000-8000-000000000001",
+          aud: "authenticated",
+          email: "signup@example.invalid",
+          identities: [{ provider: "email" }],
+          created_at: "2026-11-14T00:00:00Z",
+        },
+        session: null,
+      },
+    });
+  });
+  await page.goto("/signup");
+  await captureAuth(page, "e02", testInfo);
+  await page.getByLabel("Ad soyad", { exact: true }).fill("Test Student");
+  await page.getByLabel("E-posta", { exact: true }).fill("signup@example.invalid");
+  const password = page.getByLabel("Parola", { exact: true });
+  const submit = page.getByRole("button", { name: "Hesap oluştur", exact: true });
+  await page.getByLabel("Parola tekrar", { exact: true }).fill("Fixture123");
+  await password.fill("weak");
+  await submit.click();
+  await expect(password).toHaveJSProperty(
+    "validationMessage",
+    "En az 8 karakter, büyük harf, küçük harf ve sayı içerir.",
+  );
+  expect(checks).toBe(0);
+  await password.fill("Fixture123");
+  await page.getByLabel("Parola tekrar", { exact: true }).fill("different");
+  await submit.click();
+  await expect(page.getByLabel("Parola tekrar", { exact: true })).toHaveJSProperty(
+    "validationMessage",
+    "Parolalar eşleşmiyor.",
+  );
+  expect(checks).toBe(0);
+  await page.getByLabel("Parola tekrar", { exact: true }).fill("Fixture123");
+  await submit.click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Bu e-posta adresiyle ilişkili bir hesap zaten var.",
+  );
+  expect(checks).toBe(1);
+  expect(signups).toBe(0);
+  expect((await scanAccessibility(page, "signup-existing-account")).violations).toEqual([]);
+  status = "temporary";
+  await submit.click();
+  await expect(page.getByRole("alert")).toContainText("Kayıt tamamlanamadı");
+  expect(checks).toBe(2);
+  expect(signups).toBe(0);
+  status = "available";
+  await submit.click();
+  await expect(page).toHaveURL(`${origin}/verify-email`);
+  await expect(page.getByRole("heading", { name: "E-postanı doğrula" })).toBeVisible();
+  expect(checks).toBe(3);
+  expect(signups).toBe(1);
+});
+
+test("signup Google uses shared OAuth without submitting password registration", async ({
+  page,
+}) => {
+  const calls = await mockNative(page);
+  let signups = 0;
+  await page.route("**/auth/v1/signup*", async (route) => {
+    signups++;
+    return route.fulfill({ json: {} });
+  });
+  await page.goto("/signup");
+  await page.getByRole("button", { name: "Google ile kayıt ol" }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  expect(calls.exchange).toBe(1);
+  expect(signups).toBe(0);
+  expect(calls.resend).toBe(0);
 });
