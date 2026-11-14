@@ -745,3 +745,13 @@ Backend kaynak/native/CI durumu [tek durum kaydındadır](../apps/backend/docs/0
 Eğitmen için mevcut F04 `management_state_get_v1` role_assign selector'ının öğe üstü `account_access_granted` alanı kullanılır; F05 sahibi `roles_list_v1` aynı alanı verir. Aktif görev tek başına hesap yetkisi değildir. True ise aynı aktif rolü yeniden atama; false ise normal hesap daveti/bağlama ve `role_assign_v1` yolunu tamamlayıp tekrar oku. False tek başına bir hata nedeni veya yeniden davet gerekliliği değildir. Hesap/MFA/oturum kimliği/token açılmaz; komut mevcut canlı kontrollerini yeniden uygular.
 
 **Frontend kabul ölçütü:** Boş/eski kurulum verisini başarıya çevirmeden gerçek özeti göster; yetki/kapsam reddini tamamlandı sayma. Aktif offline görev ile bağlı aktif rolü ayır; bağlı rol için duplicate komut üretme. İşlem sonrası fresh read yap. Bu kayıt frontend kod değişikliği/onayı değildir. Kaynak/CI/deploy/kabul aşamaları [backend durum sahibindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#e12-guvenli-okuma).
+
+
+<a id="xreq-047"></a>
+## XREQ-047 Kişi alanları için güvenli kaynak ve yazılabilirlik
+
+### Backend tüketici devri — 14 Kasım 2026
+
+[WF04](workflows.md#wf04) typed alan ve çağrı kurallarının sahibidir. `PersonView`/`PersonSummary.field_policy` ad alanlarını, görünür `contacts[].field_policy` satır düzeyini ayırır: `{source:person|account_profile|native_auth,person_update_writable:boolean}`. Native/hesap kaynakları false; yerel ayrı given_name/family_name mevcut yazma sözleşmesinde desteklenmediğinden false kalır. Kaynak, aktif alan kontrolünü anlatır; yalnız doğrulama tarihinden veya hesap kimliğinden tahmin edilmez.
+
+**Frontend kabul ölçütü:** Hesap adı/native iletişimi salt okunur göster; mevcut yazma yetkisi de varsa yerel yazılabilir alanları aç. Metadata yoksa yazılabilir varsayma. Tam contacts patch'inde salt okunur kind/value satırlarını koru; yanıt metadata'sını veya verified_at alanını komuta gönderme. Ad, iletişim veya hesap bağı işleminden sonra yeniden oku. Hesap kimliği/token açılması veya frontend kod değişikliği bu teslimin parçası değildir. Kaynak/CI/deploy/kabul aşamaları [backend durum sahibindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#kisi-alan-kaynagi).
