@@ -180,6 +180,7 @@ export async function mockStudio(page: Page) {
         "instructor_agreements_list_v1",
         "management_state_get_v1",
         "room_save_v1",
+        "class_save_v1",
         "availability_save_v1",
         "availability_exception_save_v1",
         "instructor_agreement_publish_v1",
@@ -450,6 +451,16 @@ export async function mockStudio(page: Page) {
           version,
         });
       }
+    } else if (op === "class_save_v1") {
+      const lesson = state.lessons.find((lesson) => lesson.id === r.class_id);
+      if (!lesson) throw new Error("Fixture expects an existing class");
+      if (lesson.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
+      lesson.name = String(r.name);
+      lesson.disciplineId = String(r.discipline_id);
+      lesson.externalOpen = Boolean(r.external_open);
+      if (r.waitlist_enabled !== undefined) lesson.waitlist = Boolean(r.waitlist_enabled);
+      primary = lesson.id;
+      version = ++lesson.version;
     } else if (op === "availability_save_v1") {
       const rule = state.rules.find((rule) => rule.id === r.rule_id);
       if (rule) {
