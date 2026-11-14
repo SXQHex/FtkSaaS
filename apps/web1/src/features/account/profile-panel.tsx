@@ -371,7 +371,7 @@ export function ProfileForm({
             )}
           </form.Subscribe>
         </CardContent>
-        <CardFooter className="flex-wrap justify-between gap-3">
+        <CardFooter className="flex-wrap justify-between gap-x-3 gap-y-2 pt-3!">
           <form.Subscribe
             selector={(state) => ({ dirty: state.isDirty, pending: state.isSubmitting })}
           >

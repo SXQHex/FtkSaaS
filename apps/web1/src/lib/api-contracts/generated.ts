@@ -4451,6 +4451,7 @@ Success_content_catalog_save?: SuccessContentCatalogSave
 RenderedDocument?: RenderedDocument
 ManagementSelector_content_catalog_save_v1?: ManagementSelectorContentCatalogSaveV1
 ManagementProjection_content_catalog_save_v1?: ManagementProjectionContentCatalogSaveV1
+CenterSetupStatus?: CenterSetupStatus
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6964,6 +6965,18 @@ state: RecordState
 accessible: Bool
 version: PositiveInt
 organization_logo?: (SettingsMediaAsset | null)
+setup_status?: CenterSetupStatus
+}
+/**
+ * Current effective publication in organization/center scope with ready file; invitation means a provider-confirmed successful center account-invitation delivery, including later accepted/expired/revoked invitations. No recipient or entity identifiers.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CenterSetupStatus".
+ */
+export interface CenterSetupStatus {
+document_published: boolean
+member_invitation_sent: boolean
+as_of: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6983,6 +6996,10 @@ scope_center_id: (string | null)
 state: RecordState
 version: PositiveInt
 subscriber_number?: (SubscriberNumber | null)
+/**
+ * True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority.
+ */
+account_access_granted?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8924,6 +8941,10 @@ request_id: string
 org_id: string
 center_id?: (string | null)
 page: Page
+/**
+ * Opt-in manager-only setup summary. Requires center_id; returns only that center. Omitted/false preserves the original list.
+ */
+include_setup_status?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17797,6 +17818,10 @@ management_attention?: "instructor_required"
 sale_change_record?: SaleChangeInventoryRecord
 retained_resource?: DowngradeRetainedResource
 merge_approval?: MergeApprovalDiscovery
+/**
+ * True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority.
+ */
+account_access_granted?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

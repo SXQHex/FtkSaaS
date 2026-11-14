@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState, type Ref } from "react";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
@@ -30,14 +30,21 @@ import { NativeSelect, NativeSelectOption } from "../../components/ui/native-sel
 import { Separator } from "../../components/ui/separator";
 
 type Notice = "ready" | "saved" | "unknown" | "conflict" | "saved-unread";
+export interface AppearanceActions {
+  toggleTheme: () => void;
+}
 export function AppearancePanel({
   snapshot,
   readError,
   onRefresh,
+  ref,
+  onDisabledChange,
 }: {
   snapshot?: AppearanceSnapshot;
   readError: boolean;
   onRefresh: () => Promise<AppearanceSnapshot>;
+  ref?: Ref<AppearanceActions>;
+  onDisabledChange?: (disabled: boolean) => void;
 }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
@@ -55,8 +62,8 @@ export function AppearancePanel({
     if (document.activeElement !== document.body) return;
     const recovery = card.current?.querySelector<HTMLElement>("[data-recovery]:not(:disabled)");
     const control = card.current?.querySelector<HTMLElement>(
-      lastField.current === "font_scale"
-        ? "#appearance-scale:not(:disabled)"
+      lastField.current !== "theme"
+        ? `#appearance-${lastField.current === "font_scale" ? "scale" : lastField.current}:not(:disabled)`
         : '[role="radio"][aria-checked="true"]:not(:disabled)',
     );
     const target =
@@ -87,7 +94,13 @@ export function AppearancePanel({
     if (locked.current || !snapshot) return;
     if (next) {
       if (notice !== "ready" && notice !== "saved") return;
-      if (!snapshot.writable[next.field] || next.value === snapshot.values[next.field]) return;
+      if (
+        !snapshot.writable[next.field] ||
+        (next.value === snapshot.values[next.field] &&
+          (next.field !== "timezone_name" ||
+            snapshot.values.timezone_mode === (next.value === null ? "auto" : "manual")))
+      )
+        return;
     }
     const current = next ? { change: next, version: snapshot.version, key: uuidv7() } : intent;
     if (!current || !snapshot.writable[current.change.field]) return;
@@ -122,6 +135,19 @@ export function AppearancePanel({
   }
   const disabled =
     busy || readError || readFailed || !snapshot || !["ready", "saved"].includes(notice);
+  useEffect(() => {
+    onDisabledChange?.(disabled || !snapshot?.writable.theme);
+  }, [disabled, snapshot?.writable.theme, onDisabledChange]);
+  useImperativeHandle(ref, () => ({
+    toggleTheme() {
+      if (disabled || !snapshot?.writable.theme) return;
+      const dark =
+        snapshot.values.theme === "dark" ||
+        (snapshot.values.theme === "system" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+      void write({ field: "theme", value: dark ? "light" : "dark" });
+    },
+  }));
   const scale =
     intent?.change.field === "font_scale" ? intent.change.value : snapshot?.values.font_scale;
   const scales = [
@@ -175,6 +201,101 @@ export function AppearancePanel({
                   </ToggleGroup>
                 </ItemActions>
               </Item>
+              {(
+                [
+                  { field: "language", label: "language" },
+                  { field: "timezone_name", label: "timezone" },
+                  { field: "week_start", label: "weekStart" },
+                ] as const
+              ).map(({ field, label }) => (
+                <div key={field} className="flex flex-col gap-3">
+                  <Separator />
+                  <Item className="p-0">
+                    <ItemContent className="min-w-[min(100%,18rem)]">
+                      <ItemTitle>
+                        <label htmlFor={`appearance-${field}`}>
+                          {t(($) => $.appearance[label])}
+                        </label>
+                      </ItemTitle>
+                      <ItemDescription id={`appearance-${field}-hint`}>
+                        {t(($) => $.appearance[`${label}Hint`])}
+                      </ItemDescription>
+                    </ItemContent>
+                    <ItemActions className="max-w-full">
+                      <NativeSelect
+                        id={`appearance-${field}`}
+                        className="w-44 max-w-full"
+                        aria-describedby={`appearance-${field}-hint`}
+                        disabled={disabled || !snapshot.writable[field]}
+                        value={
+                          field === "timezone_name"
+                            ? snapshot.values.timezone_mode === "auto"
+                              ? "auto"
+                              : (snapshot.values.timezone_name ?? "auto")
+                            : snapshot.values[field]
+                        }
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          if (field === "language") void write({ field, value });
+                          else if (field === "timezone_name")
+                            void write({ field, value: value === "auto" ? null : value });
+                          else if (value === "monday" || value === "sunday")
+                            void write({ field, value });
+                        }}
+                      >
+                        {field === "language" ? (
+                          <>
+                            <NativeSelectOption value="auto">
+                              {t(($) => $.appearance.automatic)}
+                            </NativeSelectOption>
+                            {!["auto", "tr", "en"].includes(snapshot.values.language) && (
+                              <NativeSelectOption value={snapshot.values.language}>
+                                {snapshot.values.language}
+                              </NativeSelectOption>
+                            )}
+                            <NativeSelectOption value="tr">
+                              {t(($) => $.appearance.turkish)}
+                            </NativeSelectOption>
+                            <NativeSelectOption value="en">
+                              {t(($) => $.appearance.english)}
+                            </NativeSelectOption>
+                          </>
+                        ) : field === "timezone_name" ? (
+                          <>
+                            <NativeSelectOption value="auto">
+                              {t(($) => $.appearance.automatic)}
+                            </NativeSelectOption>
+                            {[
+                              ...new Set([
+                                ...(snapshot.values.timezone_name
+                                  ? [snapshot.values.timezone_name]
+                                  : []),
+                                "UTC",
+                                ...Intl.supportedValuesOf("timeZone"),
+                              ]),
+                            ]
+                              .sort()
+                              .map((zone) => (
+                                <NativeSelectOption key={zone} value={zone}>
+                                  {zone}
+                                </NativeSelectOption>
+                              ))}
+                          </>
+                        ) : (
+                          <>
+                            <NativeSelectOption value="monday">
+                              {t(($) => $.appearance.monday)}
+                            </NativeSelectOption>
+                            <NativeSelectOption value="sunday">
+                              {t(($) => $.appearance.sunday)}
+                            </NativeSelectOption>
+                          </>
+                        )}
+                      </NativeSelect>
+                    </ItemActions>
+                  </Item>
+                </div>
+              ))}
               <Separator />
               <Item className="p-0">
                 <ItemContent className="min-w-[min(100%,18rem)]">
@@ -210,6 +331,38 @@ export function AppearancePanel({
                         }).format(value)}
                       </NativeSelectOption>
                     ))}
+                  </NativeSelect>
+                </ItemActions>
+              </Item>
+              <Separator />
+              <Item className="p-0">
+                <ItemContent className="min-w-[min(100%,18rem)]">
+                  <ItemTitle>
+                    <label htmlFor="appearance-contrast">{t(($) => $.appearance.contrast)}</label>
+                  </ItemTitle>
+                  <ItemDescription id="appearance-contrast-hint">
+                    {t(($) => $.appearance.contrastHint)}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions className="max-w-full">
+                  <NativeSelect
+                    id="appearance-contrast"
+                    className="w-44 max-w-full"
+                    aria-describedby="appearance-contrast-hint"
+                    disabled={disabled || !snapshot.writable.contrast}
+                    value={snapshot.values.contrast}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (value === "system" || value === "high")
+                        void write({ field: "contrast", value });
+                    }}
+                  >
+                    <NativeSelectOption value="system">
+                      {t(($) => $.appearance.standardContrast)}
+                    </NativeSelectOption>
+                    <NativeSelectOption value="high">
+                      {t(($) => $.appearance.highContrast)}
+                    </NativeSelectOption>
                   </NativeSelect>
                 </ItemActions>
               </Item>

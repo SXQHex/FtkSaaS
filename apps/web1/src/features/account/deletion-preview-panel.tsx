@@ -93,14 +93,14 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
   }
   return (
     <>
-      <Card>
-        <CardHeader>
+      <Card className="flex-row flex-wrap items-center gap-x-4 gap-y-3">
+        <CardHeader className="min-w-0 flex-1 basis-64">
           <CardTitle>
             <h2>{t(($) => $.accountDeletion.title)}</h2>
           </CardTitle>
           <CardDescription>{t(($) => $.accountDeletion.description)}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="max-w-full shrink-0">
           <Button
             variant="destructive"
             size="sm"

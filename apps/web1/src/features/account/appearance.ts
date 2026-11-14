@@ -6,15 +6,20 @@ export type ThemeChoice = NonNullable<UserSettingsValues["theme"]>;
 interface AppearanceValues {
   theme: ThemeChoice;
   font_scale: number | null;
+  language: string;
+  week_start: "monday" | "sunday";
+  contrast: "system" | "high";
+  timezone_mode: "auto" | "manual";
+  timezone_name: string | null;
 }
 export interface AppearanceSnapshot {
   values: AppearanceValues;
   version: number;
   writable: Record<keyof AppearanceValues, boolean>;
 }
-export type AppearanceChange =
-  | { field: "theme"; value: ThemeChoice }
-  | { field: "font_scale"; value: number | null };
+export type AppearanceChange = {
+  [K in Exclude<keyof AppearanceValues, "timezone_mode">]: { field: K; value: AppearanceValues[K] };
+}[Exclude<keyof AppearanceValues, "timezone_mode">];
 export interface AppearanceIntent {
   change: AppearanceChange;
   version: number;
@@ -37,7 +42,15 @@ export async function readAppearance(): Promise<AppearanceSnapshot> {
     settings.version < 0
   )
     throw new Error("APPEARANCE_UNAVAILABLE");
-  const { theme, font_scale: fontScale } = settings.values;
+  const {
+    theme,
+    font_scale: fontScale,
+    language,
+    week_start,
+    contrast,
+    timezone_mode,
+    timezone_name,
+  } = settings.values;
   if (theme !== "system" && theme !== "light" && theme !== "dark")
     throw new Error("APPEARANCE_UNAVAILABLE");
   if (
@@ -48,14 +61,45 @@ export async function readAppearance(): Promise<AppearanceSnapshot> {
       fontScale > 2)
   )
     throw new Error("APPEARANCE_UNAVAILABLE");
+  if (
+    typeof language !== "string" ||
+    !/^(auto|[a-z]{2,8}(-[a-z0-9]{1,8})*)$/.test(language) ||
+    language.length > 35 ||
+    (week_start !== "monday" && week_start !== "sunday") ||
+    (contrast !== "system" && contrast !== "high") ||
+    (timezone_mode !== "auto" && timezone_mode !== "manual") ||
+    (timezone_name !== null && typeof timezone_name !== "string") ||
+    (timezone_mode === "manual" && !timezone_name)
+  )
+    throw new Error("APPEARANCE_UNAVAILABLE");
   function writable(key: keyof AppearanceValues) {
     const fields = catalog.fields.filter((field) => field.key === key);
-    return fields.length === 1 && fields[0].writable && fields[0].consumer === "frontend";
+    return (
+      fields.length === 1 &&
+      fields[0].writable &&
+      fields[0].consumer === (key === "language" ? "user_content_language" : "frontend")
+    );
   }
   return {
-    values: { theme, font_scale: fontScale },
+    values: {
+      theme,
+      font_scale: fontScale,
+      language,
+      week_start,
+      contrast,
+      timezone_mode,
+      timezone_name,
+    },
     version: settings.version,
-    writable: { theme: writable("theme"), font_scale: writable("font_scale") },
+    writable: {
+      theme: writable("theme"),
+      font_scale: writable("font_scale"),
+      language: writable("language"),
+      week_start: writable("week_start"),
+      contrast: writable("contrast"),
+      timezone_mode: writable("timezone_mode"),
+      timezone_name: writable("timezone_mode") && writable("timezone_name"),
+    },
   };
 }
 export function saveAppearance(intent: AppearanceIntent) {
@@ -66,6 +110,9 @@ export function saveAppearance(intent: AppearanceIntent) {
     scope: "user",
     expected_version: intent.version,
     operation_key: intent.key,
-    patch: change.field === "theme" ? { theme: change.value } : { font_scale: change.value },
+    patch:
+      change.field === "timezone_name"
+        ? { timezone_mode: change.value === null ? "auto" : "manual", timezone_name: change.value }
+        : { [change.field]: change.value },
   });
 }

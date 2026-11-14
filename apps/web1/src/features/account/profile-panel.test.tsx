@@ -52,7 +52,7 @@ const next: ProfileSnapshot = {
 };
 it("validates the unverified phone separately from native verified contacts", async () => {
   render(<ProfileForm latest={base} onRefresh={vi.fn()} />);
-  await userEvent.type(screen.getByLabelText("İletişim telefonu", { exact: false }), "05320000000");
+  await userEvent.type(screen.getByLabelText("Telefon", { exact: false }), "05320000000");
   await userEvent.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
   expect(
     await screen.findByText("Telefonu ülke koduyla ve boşluksuz yaz (ör. +905320000000)."),

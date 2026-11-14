@@ -13,6 +13,7 @@ import type {
   SuccessManagementStateGet,
   SuccessAccountProfileUpdate,
   SuccessAccountGet,
+  SuccessOrganizationsList,
   SuccessSettingsGet,
   SuccessSettingsCatalogGet,
   SuccessSettingsUpdate,
@@ -410,6 +411,10 @@ export async function mockNative(page: Page, mfa = false) {
               theme: calls.theme,
               font_scale: calls.fontScale,
               language: "tr",
+              week_start: "monday",
+              contrast: "system",
+              timezone_mode: "auto",
+              timezone_name: null,
               optional_analytics: false,
             },
             overridden_fields: [],
@@ -770,6 +775,15 @@ export async function mockNative(page: Page, mfa = false) {
       elevated = true;
       user.factors = user.factors.map((factor) => ({ ...factor, status: "verified" }));
       return route.fulfill({ json: session() });
+    }
+    if (url.pathname === "/functions/v1/backend-v1/organizations_list_v1") {
+      return route.fulfill({
+        json: {
+          ok: true,
+          data: { items: [], next_cursor: null, as_of: "2026-11-14T06:00:00Z" },
+          trace_id: id,
+        } satisfies SuccessOrganizationsList,
+      });
     }
     if (url.pathname === "/functions/v1/backend-v1/account_get_v1") {
       calls.account++;
