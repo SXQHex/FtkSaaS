@@ -149,3 +149,69 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
     terms: { components: [{ kind: "session_fixed", amount_minor: "26000" }] },
   });
 });
+
+test("Studio flow: scoped setup distinguishes ready documents and missing confirmed delivery", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  state.setupStatus = {
+    document_published: true,
+    member_invitation_sent: false,
+    as_of: "2026-11-14T12:00:00Z",
+  };
+  const setupRequests: Record<string, unknown>[] = [];
+  page.on("request", (request) => {
+    if (
+      new URL(request.url()).pathname.endsWith("/centers_list_v1") &&
+      request.method() === "POST"
+    ) {
+      const body = request.postDataJSON();
+      if (body.include_setup_status) setupRequests.push(body);
+    }
+  });
+  await openStudio(page);
+  await expect(
+    page.getByText("Yürürlükte, dosyası hazır bir belge yayını var.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Bu merkezde sağlayıcı onaylı hesap daveti gönderimi yok.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "62.5");
+  expect(setupRequests.length).toBeGreaterThan(0);
+  expect(
+    setupRequests.every(
+      (request) => request.org_id === studioIds.org && request.center_id === studioIds.center,
+    ),
+  ).toBe(true);
+  expect(state.writes).toEqual([]);
+});
+
+test("Studio flow: a verified active assignment cannot submit a duplicate grant", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  state.accountLinked = true;
+  state.roles[0]!.accountAccessGranted = true;
+  await openStudio(page);
+  await page.getByRole("button", { name: "Eğitmen ekle", exact: true }).click();
+  let dialog = page.getByRole("dialog");
+  await dialog.getByRole("radio", { name: "Mevcut kişi", exact: true }).click();
+  await dialog.getByRole("button", { name: "Kişi ara", exact: true }).click();
+  await dialog.locator("#existing-instructor-person").selectOption(studioIds.instructor);
+  await dialog.getByRole("button", { name: "Kuruluma devam et", exact: true }).click();
+  dialog = page.getByRole("dialog");
+  await expect(
+    dialog.getByText("Doğrulanmış hesaba eğitmen yetkisi bağlı", { exact: true }),
+  ).toBeVisible();
+  await expect(dialog.locator("#instructor-role-grant")).toHaveCount(0);
+  await expect(
+    dialog.getByRole("button", { name: "Bağlı hesaba rolü uygula", exact: true }),
+  ).toHaveCount(0);
+  expect(state.writes).toEqual([]);
+  state.roles[0]!.accountAccessGranted = false;
+  await dialog.getByRole("button", { name: "Hesap bağını kontrol et", exact: true }).click();
+  await expect(dialog.getByText("Görev etkin", { exact: true })).toBeVisible();
+  await expect(dialog.locator("#instructor-role-grant")).toBeVisible();
+  await expect(dialog.getByRole("checkbox")).not.toBeChecked();
+  expect(state.writes).toEqual([]);
+});

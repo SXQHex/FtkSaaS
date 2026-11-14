@@ -2,6 +2,7 @@ import { expect, type Page, type Route } from "@playwright/test";
 import type {
   AgreementVersionView,
   AvailabilityRule,
+  CenterSetupStatus,
   DisciplineView,
   ManagementStateView,
   PersonView,
@@ -84,6 +85,8 @@ export async function mockStudio(page: Page) {
   const native = await mockNative(page);
   const state = {
     native,
+    setupStatus: undefined as CenterSetupStatus | undefined,
+    accountLinked: false,
     rooms: [
       { id: I.room, name: "Ana salon", capacity: 20 as number | null, active: true, version: 2 },
     ],
@@ -99,7 +102,15 @@ export async function mockStudio(page: Page) {
       },
     ],
     people: [structuredClone(originalPerson)],
-    roles: [{ id: I.role, personId: I.instructor, active: true, version: 2 }],
+    roles: [
+      {
+        id: I.role,
+        personId: I.instructor,
+        active: true,
+        version: 2,
+        accountAccessGranted: null as boolean | null,
+      },
+    ],
     rules: [
       {
         id: I.availability,
@@ -165,6 +176,7 @@ export async function mockStudio(page: Page) {
         "disciplines_list_v1",
         "products_list_v1",
         "person_get_v1",
+        "people_list_v1",
         "instructor_agreements_list_v1",
         "management_state_get_v1",
         "room_save_v1",
@@ -206,9 +218,11 @@ export async function mockStudio(page: Page) {
             state: "active",
             accessible: true,
             version: state.centerVersion,
+            ...(r.include_setup_status ? { setup_status: state.setupStatus } : {}),
           },
         ]),
       );
+    if (op === "people_list_v1") return send(route, list(state.people));
     if (op === "roles_list_v1")
       return send(
         route,
@@ -313,8 +327,8 @@ export async function mockStudio(page: Page) {
           list(
             state.roles
               .filter((role) => !k.person_id || k.person_id === role.personId)
-              .map((role) =>
-                item("role_assignments", role.id, role.version, role.active, {
+              .map((role) => ({
+                ...item("role_assignments", role.id, role.version, role.active, {
                   operation: "role_assign_v1",
                   values: {
                     person_id: role.personId,
@@ -322,7 +336,25 @@ export async function mockStudio(page: Page) {
                     scope: { center_id: I.center },
                   },
                 }),
-              ),
+                ...(role.accountAccessGranted === null
+                  ? {}
+                  : { account_access_granted: role.accountAccessGranted }),
+              })),
+          ),
+        );
+      if (r.operation === "account_access_revoke_v1") return send(route, list([]));
+      if (r.operation === "account_link_remove_v1")
+        return send(
+          route,
+          list(
+            state.accountLinked
+              ? [
+                  item("account_links", uid(19), 1, true, {
+                    operation: "account_link_remove_v1",
+                    values: { person_id: I.instructor, link_id: uid(19) },
+                  }),
+                ]
+              : [],
           ),
         );
       if (r.operation === "program_preview_v1") return send(route, list([]));

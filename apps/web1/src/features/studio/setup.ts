@@ -48,6 +48,8 @@ export async function readStudioSetup(
               client_api_version: 1,
               request_id: uuidv7(),
               org_id: scope.orgId,
+              center_id: scope.centerId,
+              include_setup_status: true,
               page: { limit: 50, ...(cursor ? { cursor } : {}) },
             })
             .then((page) => ({ items: page.items, next_cursor: page.next_cursor ?? null })),
@@ -69,6 +71,7 @@ export async function readStudioSetup(
         .toPlainDate()
         .toString();
       return {
+        setupStatus: selected.setup_status ?? null,
         name: selected.name,
         timezone: selected.timezone,
         address: settings.values.address ?? null,
@@ -158,9 +161,10 @@ export async function readStudioSetup(
       ready: readyPeople,
       unread: people.length - knownRules.length,
     },
-    // The contract has no safe center-wide discovery for these two facts.
-    // No scan of all people, fake file ID, or guessed completion is substituted.
-    documents: null,
-    invitations: null,
+    // Omitted metadata is unknown; only the manager-scoped summary proves it.
+    documents:
+      center.state === "known" ? (center.value.setupStatus?.document_published ?? null) : null,
+    invitations:
+      center.state === "known" ? (center.value.setupStatus?.member_invitation_sent ?? null) : null,
   };
 }

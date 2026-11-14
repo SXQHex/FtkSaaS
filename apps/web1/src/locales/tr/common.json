@@ -897,6 +897,11 @@
     "setupProductCount_other": "Bu merkezi kapsayan {{count}} yayımlı paket",
     "setupUnknownCount_one": "{{count}} durum bilinmiyor",
     "setupUnknownCount_other": "{{count}} durum bilinmiyor",
-    "setupProgress": "{{total}} adımdan {{complete}} tanesi doğrulandı; {{unknown}} adımın durumu bilinmiyor."
+    "setupProgress": "{{total}} adımdan {{complete}} tanesi doğrulandı; {{unknown}} adımın durumu bilinmiyor.",
+    "instructorAccountAccessGranted": "Doğrulanmış hesaba eğitmen yetkisi bağlı",
+    "setupDocumentPublished": "Yürürlükte, dosyası hazır bir belge yayını var.",
+    "setupDocumentMissing": "Yürürlükte ve dosyası hazır bir belge yayını yok.",
+    "setupInvitationSent": "Bu merkezde sağlayıcının onayladığı bir hesap daveti gönderimi var.",
+    "setupInvitationMissing": "Bu merkezde sağlayıcı onaylı hesap daveti gönderimi yok."
   }
 }

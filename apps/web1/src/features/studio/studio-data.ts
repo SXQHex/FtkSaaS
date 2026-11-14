@@ -203,7 +203,12 @@ export function studioViewData(
       {
         key: "documents",
         label: t(($) => $.studio.setupLabels.documents),
-        description: t(($) => $.studio.setupDocumentUnknown),
+        description:
+          setup.documents === null
+            ? t(($) => $.studio.setupDocumentUnknown)
+            : setup.documents
+              ? t(($) => $.studio.setupDocumentPublished)
+              : t(($) => $.studio.setupDocumentMissing),
         complete: setup.documents,
         href: `${base}/documents`,
         route: "/o/$orgId/c/$centerId/documents",
@@ -221,7 +226,12 @@ export function studioViewData(
       {
         key: "invitation",
         label: t(($) => $.studio.setupLabels.invitation),
-        description: t(($) => $.studio.setupInvitationUnknown),
+        description:
+          setup.invitations === null
+            ? t(($) => $.studio.setupInvitationUnknown)
+            : setup.invitations
+              ? t(($) => $.studio.setupInvitationSent)
+              : t(($) => $.studio.setupInvitationMissing),
         complete: setup.invitations,
         href: `${base}/access`,
         route: "/o/$orgId/c/$centerId/access",

@@ -167,7 +167,12 @@ export function InstructorEnrollmentSheet({
     if (accepted?.kind === "grant") {
       if (
         next.activeLink !== true ||
-        !next.roles.some((role) => role.assignmentId === accepted.roleId && role.active)
+        !next.roles.some(
+          (role) =>
+            role.assignmentId === accepted.roleId &&
+            role.active &&
+            role.accountAccessGranted === true,
+        )
       ) {
         // The acknowledged operation is historical fact; a later removal must
         // be shown as current state, never retried as another role grant.
@@ -324,9 +329,11 @@ export function InstructorEnrollmentSheet({
               >
                 <span>{t(($) => $.studio.instructorRoleStep)}</span>
                 <Badge variant="outline">
-                  {state.activeRole
-                    ? t(($) => $.studio.instructorDutyActive)
-                    : t(($) => $.studio.pending)}
+                  {state.accountAccessGranted === true
+                    ? t(($) => $.studio.instructorAccountAccessGranted)
+                    : state.activeRole
+                      ? t(($) => $.studio.instructorDutyActive)
+                      : t(($) => $.studio.pending)}
                 </Badge>
               </li>
             </ol>
@@ -365,12 +372,12 @@ export function InstructorEnrollmentSheet({
             >
               {t(($) => $.studio.checkAccountLink)}
             </Button>
-            {state.activeRole && (
+            {state.activeRole && state.accountAccessGranted !== true && (
               <p className="text-sm text-muted-foreground">
                 {t(($) => $.studio.existingInstructorDutyHint)}
               </p>
             )}
-            {state.activeLink !== false && (
+            {state.activeLink !== false && state.accountAccessGranted !== true && (
               <form
                 id="instructor-role-grant"
                 ref={formElement}

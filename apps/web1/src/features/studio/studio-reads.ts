@@ -13,6 +13,7 @@ export interface InstructorRecord {
   assignmentId: string;
   version: number;
   active: boolean;
+  accountAccessGranted: boolean | null;
   person: PersonView;
 }
 export interface AvailabilityRecord {
@@ -96,6 +97,7 @@ export async function readStudioInstructors(
       assignmentId: item.entity!.id,
       version,
       active: item.state === "active",
+      accountAccessGranted: item.account_access_granted ?? null,
       personId: item.current.values.person_id,
     };
   });

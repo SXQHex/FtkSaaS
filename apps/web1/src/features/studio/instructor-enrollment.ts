@@ -103,6 +103,11 @@ export async function readInstructorEnrollment(scope: StudioScope, personId: str
     pendingInvitations: invitations.filter((item) => item.state === "pending").length,
     // This is duty membership, not proof of native access for a legacy offline row.
     activeRole: roles.some((item) => item.active),
+    accountAccessGranted: roles.some((item) => item.active && item.accountAccessGranted === true)
+      ? true
+      : roles.some((item) => item.active && item.accountAccessGranted === null)
+        ? null
+        : false,
   };
 }
 export type InstructorEnrollment = Awaited<ReturnType<typeof readInstructorEnrollment>>;
@@ -116,6 +121,8 @@ export function enrollmentIntent(
   state: InstructorEnrollment,
   kind: EnrollmentIntent["kind"],
 ): EnrollmentIntent {
+  if (kind === "grant" && state.accountAccessGranted === true)
+    throw new Error("ENROLLMENT_CHANGED");
   if ((kind === "invite" && state.activeLink) || (kind === "grant" && state.activeLink === false))
     throw new Error("ENROLLMENT_CHANGED");
   return { scope: { ...state.scope }, personId: state.person.id, kind, key: uuidv7() };
