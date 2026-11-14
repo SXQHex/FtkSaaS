@@ -823,6 +823,15 @@
     "availabilitySaved": "Uygunluk kuralları güncel kaynaktan okundu. Mevcut seanslar otomatik değiştirilmedi.",
     "availabilityWriteHint": "Kurallar ayrı adımlarda kaydedilir. Mevcut seanslar otomatik değiştirilmez. Kaydedilmiş bir kuralın son gününü kaldırma desteği bekleniyor.",
     "newAvailabilityPeriod": "Yeni geçerlilik dönemi",
-    "availabilityProgress": "{{total}} komuttan {{done}} tanesi kabul edildi."
+    "availabilityProgress": "{{total}} komuttan {{done}} tanesi kabul edildi.",
+    "closureTimezone": "Aşağıdaki günler {{timezone}} merkez saat dilimine göre, başlangıç ve bitiş günleri dahil tüm gündür. Mevcut seanslar otomatik değiştirilmez.",
+    "closureStartOffset": "Başlangıç gece yarısı için UTC ofseti",
+    "closureEndOffset": "Bitiş gününden sonraki gece yarısı için UTC ofseti",
+    "closureAmbiguous": "Saat değişimi nedeniyle gece yarısı iki kez oluşuyor. Her istenen sınır için gerçek UTC ofsetini açıkça seç ve yeniden kaydet.",
+    "closureDateUnavailable": "Seçilen aralığın gece yarısı bu saat diliminde bulunmuyor. Tarihleri değiştir; sistem saati sessizce başka güne kaydırmaz.",
+    "closureInvalid": "Geçerli hedef, başlangıç/bitiş günü ve gerekçe seç. Bitiş başlangıçtan önce olamaz; seçilen UTC ofseti merkez saat diliminde geçerli olmalıdır.",
+    "closureConflict": "Merkezin yapılandırma sürümü değişmiş. Taslağı sıfırlayıp güncel durumu yükle; ardından kapanışı yeniden hazırla.",
+    "closureRejected": "Kapanış reddedildi. Güncel durumu yükleyip yeniden hazırla; mevcut seanslar değiştirilmedi.",
+    "closureSavedUnread": "Kapanış kaydı kabul edildi; son okuma tamamlanamadı. Tekrar kaydetmeden yalnız güncel durumu oku."
   }
 }

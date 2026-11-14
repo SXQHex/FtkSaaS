@@ -8,6 +8,7 @@ import { StudioView, type StudioViewData } from "./studio-view";
 import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
 import { StudioInstructorEditor } from "./instructor-editor";
 import type { InstructorEditState } from "./instructor-edit";
+import { StudioClosureEditor } from "./closure-editor";
 import { StudioResourceEditor } from "./resource-editor";
 import { StudioAvailabilityReader } from "./availability-reader";
 import { readStudioSnapshot, type StudioSnapshot } from "./management-snapshot";
@@ -313,6 +314,31 @@ function StudioContent({
                 const result = await query.refetch({ throwOnError: true });
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
                 return result.data;
+              }}
+            />
+          );
+        if (selection.kind === "closure" && !selection.id)
+          return (
+            <StudioClosureEditor
+              scope={scope}
+              data={{
+                ...capturedData,
+                rooms: capturedData.rooms.filter((room) => room.active),
+                instructors: capturedData.instructors.filter((person) =>
+                  editor.snapshot.instructors.some(
+                    (item) =>
+                      item.person.id === person.id &&
+                      item.person.relationships.some(
+                        (relation) =>
+                          relation.center_id === scope.centerId && relation.state === "active",
+                      ),
+                  ),
+                ),
+              }}
+              onClose={onClose}
+              onLockChange={publishLock}
+              onRefresh={async () => {
+                await query.refetch({ throwOnError: true });
               }}
             />
           );

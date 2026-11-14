@@ -28,6 +28,15 @@ import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import type { StudioViewData } from "./studio-view";
 import { StudioResourceForm } from "./resource-form";
 import { resourceDraft } from "./studio";
+import type { ClosureDraft } from "./closure";
+
+interface ClosureControl {
+  enabled: boolean;
+  onSubmit: (draft: ClosureDraft) => void;
+  notice?: ReactNode;
+  timezone?: string;
+  offsets?: { startOffsets: string[]; endOffsets: string[] };
+}
 
 export type StudioSheetSelection = {
   kind: "instructor" | "class" | "room" | "closure" | "agreement";
@@ -42,6 +51,7 @@ export function StudioSheets({
   preventClose = false,
   readOnlyInstructor = false,
   instructorNotice,
+  closureControl,
 }: {
   selection?: StudioSheetSelection;
   onClose: () => void;
@@ -50,6 +60,7 @@ export function StudioSheets({
   preventClose?: boolean;
   readOnlyInstructor?: boolean;
   instructorNotice?: string;
+  closureControl?: ClosureControl;
 }) {
   if (!selection) return null;
   if (selection.kind === "room" || selection.kind === "class") {
@@ -84,6 +95,7 @@ export function StudioSheets({
       preventClose={preventClose}
       readOnlyInstructor={readOnlyInstructor}
       instructorNotice={instructorNotice}
+      closureControl={closureControl}
     />
   );
 }
@@ -96,6 +108,7 @@ function StudioSheetForm({
   preventClose,
   readOnlyInstructor,
   instructorNotice,
+  closureControl,
 }: {
   selection: StudioSheetSelection;
   onClose: () => void;
@@ -104,6 +117,7 @@ function StudioSheetForm({
   preventClose: boolean;
   readOnlyInstructor: boolean;
   instructorNotice?: string;
+  closureControl?: ClosureControl;
 }) {
   const { t } = useTranslation();
   const [closureScope, setClosureScope] = useState("room");
@@ -150,9 +164,28 @@ function StudioSheetForm({
       <form
         id="studio-editor"
         className="min-h-0 flex-1 overflow-y-auto px-5 py-5"
-        onSubmit={(event) => event.preventDefault()}
+        aria-label={titles[selection.kind]}
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!closureControl?.enabled || selection.kind !== "closure" || selection.id) return;
+          const values = new FormData(event.currentTarget);
+          const text = (key: string) => {
+            const value = values.get(key);
+            return typeof value === "string" ? value : "";
+          };
+          closureControl.onSubmit({
+            kind: closureScope === "room" ? "room" : "person",
+            target: text("target"),
+            from: text("from"),
+            to: text("to"),
+            reason: text("reason"),
+            startOffset: text("startOffset"),
+            endOffset: text("endOffset"),
+          });
+        }}
       >
         <FieldGroup className="gap-4">
+          {closureControl?.notice}
           {instructorNotice && (
             <p role="status" className="text-sm text-muted-foreground">
               {instructorNotice}
@@ -259,7 +292,16 @@ function StudioSheetForm({
                 </div>
               </>
             ) : (
-              <>
+              <FieldSet
+                className="gap-4"
+                disabled={closureControl ? !closureControl.enabled : false}
+              >
+                <FieldLegend className="sr-only">{t(($) => $.studio.addClosure)}</FieldLegend>
+                {closureControl?.timezone && (
+                  <p className="text-xs text-muted-foreground">
+                    {t(($) => $.studio.closureTimezone, { timezone: closureControl.timezone })}
+                  </p>
+                )}
                 <Field className="gap-2">
                   <FieldLabel id="closure-scope-label">{t(($) => $.studio.scope)}</FieldLabel>
                   <ToggleGroup
@@ -269,7 +311,11 @@ function StudioSheetForm({
                     disallowEmptySelection
                     aria-labelledby="closure-scope-label"
                     selectedKeys={new Set([closureScope])}
-                    onSelectionChange={(keys) => setClosureScope(String([...keys][0]))}
+                    isDisabled={closureControl ? !closureControl.enabled : false}
+                    onSelectionChange={(keys) => {
+                      if (!closureControl || closureControl.enabled)
+                        setClosureScope(String([...keys][0]));
+                    }}
                   >
                     <ToggleGroupItem id="center" isDisabled>
                       {t(($) => $.studio.title)}
@@ -291,6 +337,7 @@ function StudioSheetForm({
                         : t(($) => $.studio.instructor)}
                     </FieldLabel>
                     <NativeSelect
+                      key={closureScope}
                       className="w-full"
                       id="closure-target"
                       name="target"
@@ -316,6 +363,33 @@ function StudioSheetForm({
                     <Input type="date" id="closure-to" name="to" required />
                   </Field>
                 </FieldGroup>
+                {closureControl?.offsets &&
+                  (["startOffsets", "endOffsets"] as const).map(
+                    (key) =>
+                      closureControl.offsets![key].length > 0 && (
+                        <Field key={key} className="gap-1.5">
+                          <FieldLabel htmlFor={`closure-${key}`}>
+                            {key === "startOffsets"
+                              ? t(($) => $.studio.closureStartOffset)
+                              : t(($) => $.studio.closureEndOffset)}
+                          </FieldLabel>
+                          <NativeSelect
+                            id={`closure-${key}`}
+                            name={key === "startOffsets" ? "startOffset" : "endOffset"}
+                            defaultValue=""
+                            required
+                            className="w-full"
+                          >
+                            <option value="">{t(($) => $.studio.choose)}</option>
+                            {closureControl.offsets![key].map((offset) => (
+                              <option key={offset} value={offset}>
+                                {offset}
+                              </option>
+                            ))}
+                          </NativeSelect>
+                        </Field>
+                      ),
+                  )}
                 <Field className="gap-1.5">
                   <FieldLabel htmlFor="closure-reason">{t(($) => $.studio.reason)}</FieldLabel>
                   <NativeSelect
@@ -335,7 +409,11 @@ function StudioSheetForm({
                 </Field>
                 <FieldSet className="gap-3">
                   <FieldLegend variant="label">{t(($) => $.studio.affectedSessions)}</FieldLegend>
-                  <RadioGroup aria-label={t(($) => $.studio.affectedSessions)} defaultValue="keep">
+                  <RadioGroup
+                    aria-label={t(($) => $.studio.affectedSessions)}
+                    defaultValue="keep"
+                    isDisabled={closureControl ? !closureControl.enabled : false}
+                  >
                     <ItemGroup>
                       <Item
                         role="listitem"
@@ -405,7 +483,7 @@ function StudioSheetForm({
                   </div>
                   <Switch aria-labelledby="closure-notify-label" isDisabled />
                 </Field>
-              </>
+              </FieldSet>
             ))}
           {selection.kind === "agreement" && (
             <>
@@ -636,7 +714,7 @@ function StudioSheetForm({
           {t(($) => $.studio.cancel)}
         </Button>
         {!closure && (
-          <Button type="submit" form="studio-editor" isDisabled>
+          <Button type="submit" form="studio-editor" isDisabled={!closureControl?.enabled}>
             {selection.kind === "agreement"
               ? t(($) => $.studio.publishVersion)
               : selection.kind === "closure"
