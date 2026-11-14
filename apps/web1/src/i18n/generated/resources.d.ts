@@ -18,10 +18,15 @@ export default interface Resources {
       "blocked": "Silme öncesinde çözülmesi gereken bir engel var.",
       "close": "Kapat",
       "closePreview": "Önizlemeyi kapat",
+      "completeTitle": "Silme tamamlandı",
+      "confirmError": "Devam etmek için SİL yaz.",
+      "confirmFailed": "Doğrulama veya silme onayı tamamlanamadı. Güncel etkileri yeniden görmek için önizlemeyi kapatıp aç.",
+      "confirmLabel": "Onaylamak için SİL yaz",
       "description": "Silmeden önce güncel etkileri ve engelleri gör.",
       "effectsRegion": "Önizleme etkileri ve engeller",
       "expires": "Önizleme geçerliliği: {{value}}",
       "failed": "Önizleme alınamadı. Yeniden dene.",
+      "freshHelp": "Parolanla yeniden doğrula. Google ile yeni giriş yaptıysan bu alanı boş bırakabilirsin; oturumunun güncelliği sunucuda doğrulanır.",
       "impact": {
         "active_account_links": "Aktif hesap bağlantıları",
         "active_event_registrations": "Aktif etkinlik kayıtları",
@@ -31,16 +36,55 @@ export default interface Resources {
         "open_sessions": "Planlı dersler",
         "student_credit_accounts": "Öğrenci alacak hesapları"
       },
+      "jobStates": {
+        "cancelled": "İş adımı iptal edildi.",
+        "failed": "İş adımı başarısız oldu.",
+        "pending": "İş sırada.",
+        "retry_wait": "İş yeniden denemeyi bekliyor.",
+        "running": "İş çalışıyor.",
+        "succeeded": "İş adımı tamamlandı."
+      },
       "loading": "Önizleme yükleniyor.",
+      "loginForStatus": "Durumu görmek için isteği başlattığın hesapla yeniden giriş yap. Bu cihazda o hesaba ait takip bilgisi bulunmalıdır.",
       "noBlockers": "Önizlemede silmeyi engelleyen bir kayıt bildirilmedi.",
+      "noPrivacyProof": "Fiziksel silmeye ilişkin tamamlanma kanıtı henüz yok.",
+      "openMfa": "İki adımlı doğrulamayı tamamla",
       "openPreview": "Silme önizlemesini aç",
       "otherEffect": "İlgili kayıt",
       "ownerBlock": "Önce stüdyo sahipliğini devretmelisin.",
+      "pendingScopes": "Tamamlanması beklenen alanlar",
       "physicalErasure": "Silme talebinin alınması bütün verilerin fiziksel olarak silindiği anlamına gelmez.",
       "previewDescription": "Güncel etkiler ve engeller",
       "previewTitle": "Hesap silme önizlemesi",
+      "privacyStates": {
+        "completed": "Silme talebinin tamamlanması bildirildi.",
+        "failed": "Silme talebi tamamlanamadı.",
+        "partial": "Silme süreci kısmen tamamlandı.",
+        "requested": "Silme talebi alındı.",
+        "running": "Silme süreci devam ediyor."
+      },
+      "profileStates": {
+        "completed": "Profil aşaması tamamlandı; diğer alanların durumu ayrıca izlenir.",
+        "held": "Profil silme aşamasında saklama engeli var.",
+        "unbound": "Profil silme aşamasının işletim bağlantısı bekleniyor."
+      },
       "readOnly": "Bu önizleme hesabını değiştirmez.",
-      "title": "Hesabı sil"
+      "recover": "Aynı isteği kurtar",
+      "refreshStatus": "Durumu yenile",
+      "resultDescription": "Silme talebinin güncel durumunu buradan takip edebilirsin.",
+      "resultTitle": "Hesap silme takibi",
+      "revokesSessions": "Onayladığında bütün oturumların kapanır ve normal hesap erişimin sona erer.",
+      "scopes": {
+        "auth": "Kimlik ve oturumlar",
+        "backups": "Yedekler",
+        "database": "Veritabanı",
+        "exports": "Dışa aktarımlar",
+        "storage": "Dosyalar"
+      },
+      "statusFailed": "Durum okunamadı. Oturumun kapanmışsa yeniden giriş yap; yeni bir silme isteği oluşturma.",
+      "submit": "Hesabı sil",
+      "title": "Hesabı sil",
+      "uncertain": "Önceki onayın sonucu belirsiz. Güncel girişinle aynı isteği kurtarabilirsin; yeni bir işlem oluşturulmaz."
     },
     "app": {
       "description": "Vite + React + TanStack Router + React Aria",

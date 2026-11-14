@@ -1,6 +1,7 @@
-import { afterEach, expect, it, vi } from "vitest";
+import { beforeEach, afterEach, expect, it, vi } from "vitest";
 const { native, account, recovery } = vi.hoisted(() => ({
   native: {
+    getSession: vi.fn(),
     listFactors: vi.fn(),
     challengeAndVerify: vi.fn(),
     getAuthenticatorAssuranceLevel: vi.fn(),
@@ -8,10 +9,18 @@ const { native, account, recovery } = vi.hoisted(() => ({
   account: vi.fn(),
   recovery: vi.fn(),
 }));
-vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: { mfa: native } }) }));
+vi.mock("../../lib/supabase", () => ({
+  getSupabaseClient: () => ({ auth: { mfa: native, getSession: native.getSession } }),
+}));
 vi.mock("../../lib/account", () => ({ readAccount: account }));
 vi.mock("./password-recovery", () => ({ hasRecoverySession: recovery }));
 import { continueAfterMfa, verifyTotp } from "./mfa";
+beforeEach(() =>
+  native.getSession.mockResolvedValue({
+    data: { session: { user: { id: "019a7b00-0000-7000-8000-000000000001" } } },
+    error: null,
+  }),
+);
 afterEach(() => vi.resetAllMocks());
 function factors() {
   native.listFactors.mockResolvedValue({

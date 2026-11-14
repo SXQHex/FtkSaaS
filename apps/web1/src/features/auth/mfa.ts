@@ -1,5 +1,6 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
+import { hasDeletionReceipt } from "../account/deletion";
 import { hasRecoverySession } from "./password-recovery";
 
 export async function readTotpFactors() {
@@ -25,6 +26,10 @@ async function requireAal2() {
 
 export async function continueAfterMfa() {
   await requireAal2();
+  const { data, error } = await getSupabaseClient().auth.getSession();
+  if (error) throw error;
+  if (data.session && hasDeletionReceipt(data.session.user.id) && !(await hasRecoverySession()))
+    return "/account/deletion" as const;
   await readAccount();
   return (await hasRecoverySession()) ? "/reset-password" : "/account";
 }

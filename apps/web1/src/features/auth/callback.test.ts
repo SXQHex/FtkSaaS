@@ -25,7 +25,7 @@ it.each(["https://evil.invalid", "//evil.invalid", "/account?redirect=evil", "/u
 );
 it("exchanges a code once even if the route is requested twice", async () => {
   auth.exchangeCodeForSession.mockResolvedValue({
-    data: { session: {}, redirectType: null },
+    data: { session: { user: { id: "019a7b00-0000-7000-8000-000000000001" } }, redirectType: null },
     error: null,
   });
   auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({
@@ -51,7 +51,7 @@ it("does not accept provider errors or a missing code as a signed-in result", as
 });
 it("keeps account reads closed when native AAL2 is still required", async () => {
   auth.exchangeCodeForSession.mockResolvedValue({
-    data: { session: {}, redirectType: null },
+    data: { session: { user: { id: "019a7b00-0000-7000-8000-000000000001" } }, redirectType: null },
     error: null,
   });
   auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({

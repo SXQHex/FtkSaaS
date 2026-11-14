@@ -15,7 +15,10 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 it("reads the current account only after native authentication", async () => {
-  native.signInWithPassword.mockResolvedValue({ data: { session: {} }, error: null });
+  native.signInWithPassword.mockResolvedValue({
+    data: { session: { user: { id: "019a7b00-0000-7000-8000-000000000001" } } },
+    error: null,
+  });
   native.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({
     data: { currentLevel: "aal1", nextLevel: "aal1" },
     error: null,
@@ -27,7 +30,10 @@ it("reads the current account only after native authentication", async () => {
   expect(account).toHaveBeenCalledOnce();
 });
 it("keeps account data closed while AAL2 is required", async () => {
-  native.signInWithPassword.mockResolvedValue({ data: { session: {} }, error: null });
+  native.signInWithPassword.mockResolvedValue({
+    data: { session: { user: { id: "019a7b00-0000-7000-8000-000000000001" } } },
+    error: null,
+  });
   native.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({
     data: { currentLevel: "aal1", nextLevel: "aal2" },
     error: null,

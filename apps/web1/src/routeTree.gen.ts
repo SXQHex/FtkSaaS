@@ -18,6 +18,7 @@ import { Route as MfaRouteImport } from './routes/mfa'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
 
@@ -66,6 +67,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
   path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountDeletionRoute = AccountDeletionRouteImport.update({
+  id: '/account_/deletion',
+  path: '/account/deletion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
 }
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/account_/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite_/expired': typeof InviteExpiredRoute
 }
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/account/deletion'
     | '/auth/callback'
     | '/invite/expired'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/account/deletion'
     | '/auth/callback'
     | '/invite/expired'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/account_/deletion'
     | '/auth/callback'
     | '/invite_/expired'
   fileRoutesById: FileRoutesById
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  AccountDeletionRoute: typeof AccountDeletionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
 }
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account_/deletion': {
+      id: '/account_/deletion'
+      path: '/account/deletion'
+      fullPath: '/account/deletion'
+      preLoaderRoute: typeof AccountDeletionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  AccountDeletionRoute: AccountDeletionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   InviteExpiredRoute: InviteExpiredRoute,
 }

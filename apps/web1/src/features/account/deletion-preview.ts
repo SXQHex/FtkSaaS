@@ -1,8 +1,12 @@
 import { v7 as uuidv7 } from "uuid";
 import { createBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
+import { prepareDeletion } from "./deletion";
 
-export async function readDeletionPreview(accountId: string) {
+export async function readDeletionPreview(
+  accountId: string,
+  onPrepared?: (confirm: () => Promise<void>) => void,
+) {
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error) throw error;
   if (!data.session) throw new Error("AUTH_REQUIRED");
@@ -21,6 +25,8 @@ export async function readDeletionPreview(accountId: string) {
     client_api_version: 1,
     request_id: uuidv7(),
   });
+  if (onPrepared && preview.blockers.length === 0)
+    onPrepared(prepareDeletion(data.session.user.id, accountId, preview));
   // Expose display data only. Apply tokens/proofs never enter UI caches.
   return {
     blockers: preview.blockers.map((blocker) => blocker.code),

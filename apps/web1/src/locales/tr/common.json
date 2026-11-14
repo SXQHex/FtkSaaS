@@ -356,6 +356,50 @@
       "student_credit_accounts": "Öğrenci alacak hesapları"
     },
     "closePreview": "Önizlemeyi kapat",
-    "effectsRegion": "Önizleme etkileri ve engeller"
+    "effectsRegion": "Önizleme etkileri ve engeller",
+    "confirmLabel": "Onaylamak için SİL yaz",
+    "confirmError": "Devam etmek için SİL yaz.",
+    "freshHelp": "Parolanla yeniden doğrula. Google ile yeni giriş yaptıysan bu alanı boş bırakabilirsin; oturumunun güncelliği sunucuda doğrulanır.",
+    "confirmFailed": "Doğrulama veya silme onayı tamamlanamadı. Güncel etkileri yeniden görmek için önizlemeyi kapatıp aç.",
+    "openMfa": "İki adımlı doğrulamayı tamamla",
+    "revokesSessions": "Onayladığında bütün oturumların kapanır ve normal hesap erişimin sona erer.",
+    "submit": "Hesabı sil",
+    "resultTitle": "Hesap silme takibi",
+    "completeTitle": "Silme tamamlandı",
+    "resultDescription": "Silme talebinin güncel durumunu buradan takip edebilirsin.",
+    "loginForStatus": "Durumu görmek için isteği başlattığın hesapla yeniden giriş yap. Bu cihazda o hesaba ait takip bilgisi bulunmalıdır.",
+    "statusFailed": "Durum okunamadı. Oturumun kapanmışsa yeniden giriş yap; yeni bir silme isteği oluşturma.",
+    "uncertain": "Önceki onayın sonucu belirsiz. Güncel girişinle aynı isteği kurtarabilirsin; yeni bir işlem oluşturulmaz.",
+    "recover": "Aynı isteği kurtar",
+    "refreshStatus": "Durumu yenile",
+    "pendingScopes": "Tamamlanması beklenen alanlar",
+    "noPrivacyProof": "Fiziksel silmeye ilişkin tamamlanma kanıtı henüz yok.",
+    "jobStates": {
+      "pending": "İş sırada.",
+      "running": "İş çalışıyor.",
+      "retry_wait": "İş yeniden denemeyi bekliyor.",
+      "succeeded": "İş adımı tamamlandı.",
+      "failed": "İş adımı başarısız oldu.",
+      "cancelled": "İş adımı iptal edildi."
+    },
+    "privacyStates": {
+      "requested": "Silme talebi alındı.",
+      "running": "Silme süreci devam ediyor.",
+      "partial": "Silme süreci kısmen tamamlandı.",
+      "completed": "Silme talebinin tamamlanması bildirildi.",
+      "failed": "Silme talebi tamamlanamadı."
+    },
+    "scopes": {
+      "database": "Veritabanı",
+      "auth": "Kimlik ve oturumlar",
+      "storage": "Dosyalar",
+      "exports": "Dışa aktarımlar",
+      "backups": "Yedekler"
+    },
+    "profileStates": {
+      "unbound": "Profil silme aşamasının işletim bağlantısı bekleniyor.",
+      "held": "Profil silme aşamasında saklama engeli var.",
+      "completed": "Profil aşaması tamamlandı; diğer alanların durumu ayrıca izlenir."
+    }
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { XIcon } from "lucide-react";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { DeletionConfirmation } from "./deletion-confirmation";
 import { readDeletionPreview } from "./deletion-preview";
 import { BackendError } from "../../lib/backend";
 import {
@@ -36,6 +37,8 @@ const impactKeys = [
 export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const confirm = useRef<(() => Promise<void>) | undefined>(undefined);
+  const [applying, setApplying] = useState(false);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -49,6 +52,8 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
     if (open && !pending) (failed ? retryButton : closeButton).current?.focus();
   }, [open, pending, failed]);
   function close() {
+    if (applying) return;
+    confirm.current = undefined;
     revision.current++;
     busy.current = false;
     setOpen(false);
@@ -63,8 +68,11 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
     setPending(true);
     setFailed(false);
     setView(undefined);
+    confirm.current = undefined;
     try {
-      const result = await readDeletionPreview(accountId);
+      const result = await readDeletionPreview(accountId, (action) => {
+        if (current === revision.current) confirm.current = action;
+      });
       if (current === revision.current) setView(result);
     } catch (error) {
       if (current !== revision.current) return;
@@ -107,6 +115,8 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
       </Card>
       <Sheet
         isOpen={open}
+        isDismissable={!applying}
+        isKeyboardDismissDisabled={applying}
         onOpenChange={(value) => {
           if (!value) close();
         }}
@@ -120,6 +130,7 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
           <Button
             variant="ghost"
             size="icon-sm"
+            isDisabled={applying}
             aria-label={t(($) => $.accountDeletion.closePreview)}
             onPress={close}
           >
@@ -197,6 +208,15 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
                   ))}
                 </ItemGroup>
               )}
+              {view.blockers.length === 0 && (
+                <DeletionConfirmation
+                  confirm={() => {
+                    if (!confirm.current) return Promise.reject(new Error("PREVIEW_REQUIRED"));
+                    return confirm.current();
+                  }}
+                  onPending={setApplying}
+                />
+              )}
               <p className="text-muted-foreground">{t(($) => $.accountDeletion.physicalErasure)}</p>
               <p className="text-muted-foreground">
                 {t(($) => $.accountDeletion.expires, {
@@ -216,7 +236,7 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
               {t(($) => $.auth.retry)}
             </Button>
           )}
-          <Button ref={closeButton} variant="outline" onPress={close}>
+          <Button isDisabled={applying} ref={closeButton} variant="outline" onPress={close}>
             {t(($) => $.accountDeletion.close)}
           </Button>
         </SheetFooter>
