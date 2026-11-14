@@ -31,7 +31,7 @@ export function ResetPasswordPage() {
     });
   const form = useForm({
     defaultValues: { password: "", confirm: "" },
-    validationLogic: revalidateLogic({ mode: "blur", modeAfterSubmission: "change" }),
+    validationLogic: revalidateLogic({ mode: "submit", modeAfterSubmission: "change" }),
     validators: { onDynamic: schema },
     onSubmit: async ({ value }) => {
       setFailed(false);
