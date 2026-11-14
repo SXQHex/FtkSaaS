@@ -812,6 +812,17 @@
     "existingInstructorDutyHint": "Mevcut eğitmen görevi tek başına hesaba giriş yetkisini kanıtlamaz. Gerekliyse rolü bağlı hesaba ayrıca uygula; ders görevlendirmelerini ayrı düzenleyebilirsin.",
     "enrollmentChangedAfterWrite": "İşlem kaydedildi; hesap bağı veya rol daha sonra değişti. Güncel durumu kontrol edip gereken adımı seç.",
     "accountLinkFound": "Bağ bulundu",
-    "enrollmentAlreadyLinked": "Bu kişi için hesap bağı zaten var. Güncel durumu yükleyip rol adımını kontrol et."
+    "enrollmentAlreadyLinked": "Bu kişi için hesap bağı zaten var. Güncel durumu yükleyip rol adımını kontrol et.",
+    "availabilityBoundaryHint": "Başlangıç günü dahildir; bitiş günü dahil değildir. Bitiş boşsa kural ileri tarihlere devam eder.",
+    "availabilityTimeHint": "Saatler merkez saat dilimindedir. Bitişi SS:dd veya SS:dd:ss olarak yaz; gece yarısı için 24:00 kullan. Geceyi aşan aralığı iki güne böl.",
+    "availabilityInvalid": "Geçerli bir başlangıç günü ve en az bir açık gün/saat aralığı gir. Her başlangıç bitişten önce, bitiş günü başlangıç gününden sonra olmalıdır.",
+    "availabilityRemoveUnsupported": "Kaydedilmiş bir kuralın son gününü kaldırma işlemi şu anda desteklenmiyor. Saatini, dönemini veya kalan günlerini değiştirebilirsin.",
+    "availabilityConflict": "Bir kuralın sürümü değişmiş. Kaydedilmiş adımlar korunur; güncel kuralları yükleyip taslağı yeniden hazırla.",
+    "availabilityRejected": "İşlem reddedildi. Kaydedilmiş adımlar geri alınmadı; güncel kuralları yükleyerek kalan değişikliği yeniden hazırla.",
+    "availabilitySavedUnread": "Uygunluk komutları kabul edildi; son okuma tamamlanamadı. Yalnız güncel durumu tekrar oku.",
+    "availabilitySaved": "Uygunluk kuralları güncel kaynaktan okundu. Mevcut seanslar otomatik değiştirilmedi.",
+    "availabilityWriteHint": "Kurallar ayrı adımlarda kaydedilir. Mevcut seanslar otomatik değiştirilmez. Kaydedilmiş bir kuralın son gününü kaldırma desteği bekleniyor.",
+    "newAvailabilityPeriod": "Yeni geçerlilik dönemi",
+    "availabilityProgress": "{{total}} komuttan {{done}} tanesi kabul edildi."
   }
 }

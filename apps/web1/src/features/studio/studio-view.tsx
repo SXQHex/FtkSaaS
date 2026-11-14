@@ -95,6 +95,7 @@ export function StudioView({
   availabilityContent,
   editorControl,
   noticeContent,
+  interactionLocked = false,
 }: {
   data: StudioViewData;
   state: "loading" | "ready" | "error";
@@ -103,6 +104,7 @@ export function StudioView({
   onRetry: () => void;
   availabilityContent?: ReactNode;
   noticeContent?: ReactNode;
+  interactionLocked?: boolean;
   editorControl?: {
     selection?: StudioSheetSelection;
     onChange: (selection?: StudioSheetSelection) => void;
@@ -153,7 +155,10 @@ export function StudioView({
             {t(($) => $.studio.settingsSuffix)}
           </p>
         </div>
-        <Button isDisabled={state !== "ready"} onPress={() => setSelection({ kind: "instructor" })}>
+        <Button
+          isDisabled={state !== "ready" || interactionLocked}
+          onPress={() => setSelection({ kind: "instructor" })}
+        >
           <UserPlusIcon />
           {t(($) => $.studio.addInstructor)}
         </Button>
@@ -232,7 +237,12 @@ export function StudioView({
           </CardContent>
         </Card>
       )}
-      <Tabs defaultSelectedKey="instructors" keyboardActivation="manual" className="min-w-0 gap-4">
+      <Tabs
+        isDisabled={interactionLocked}
+        defaultSelectedKey="instructors"
+        keyboardActivation="manual"
+        className="min-w-0 gap-4"
+      >
         <div className="-m-1 min-w-0 overflow-x-auto p-1">
           <TabsList
             aria-label={t(($) => $.studio.sections)}

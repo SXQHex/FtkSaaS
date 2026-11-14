@@ -168,11 +168,13 @@ function StudioContent({
   const [observedInstructors, setObservedInstructors] = useState<
     Record<string, InstructorEditState>
   >({});
+  const [interactionLocked, setInteractionLocked] = useState(false);
   const observeInstructor = useCallback((state: InstructorEditState) => {
     setObservedInstructors((current) => ({ ...current, [state.person.id]: state }));
   }, []);
   const publishLock = useCallback(
     (value: boolean) => {
+      setInteractionLocked(value);
       onLockChange(value);
     },
     [onLockChange],
@@ -198,6 +200,7 @@ function StudioContent({
   return (
     <StudioView
       data={data}
+      interactionLocked={interactionLocked}
       state={query.isError ? "error" : query.isPending ? "loading" : "ready"}
       settingsHref={`${base}/settings`}
       earningsHref={`${base}/earnings`}
@@ -233,7 +236,14 @@ function StudioContent({
         },
       }}
       availabilityContent={
-        <StudioAvailabilityReader scope={scope} instructors={data.instructors} />
+        <StudioAvailabilityReader
+          scope={scope}
+          instructors={data.instructors}
+          onLockChange={publishLock}
+          onRefresh={async () => {
+            await query.refetch({ throwOnError: true });
+          }}
+        />
       }
       renderEditor={(selection, onClose) => {
         if (!editor) return null;
