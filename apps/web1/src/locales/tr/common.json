@@ -731,6 +731,27 @@
     "revokeReloadPreview": "Güncel etkiyi yükle",
     "revokeConfirm": "Rolü kaldır",
     "classAssignmentsUnknown": "Bu görünümde sınıf görevlendirmeleri gösterilemiyor.",
-    "revokeReasonLabel": "Kaldırma gerekçesi"
+    "revokeReasonLabel": "Kaldırma gerekçesi",
+    "instructorEmailInvalid": "Geçerli bir e-posta adresi gir.",
+    "instructorImpactRequired": "Sınıf görevlendirmesi etkisini onayla.",
+    "instructorSaved": "İşlemler kaydedildi; güncel bilgiler yüklendi.",
+    "instructorConflict": "Bir kayıt başka bir işlemle değişti. Kaydedilmiş adımlar geri alınmaz. Güncel bilgileri yüklemek taslağını değiştirir; ardından kalan değişiklikleri yeniden seç.",
+    "instructorRejected": "Bir işlem tamamlanamadı. Önceki başarılı adımlar korunur. Güncel bilgileri yüklemek taslağını değiştirir; ardından erişimini ve kalan değişiklikleri kontrol et.",
+    "instructorSavedUnread": "Bütün adımlar kaydedildi; güncel bilgiler okunamadı. Yalnız bilgileri yeniden yükle.",
+    "instructorContactHint": "Bu alan kişi iletişimidir; uygulamaya giriş e-postasını değiştirmez. Diğer iletişim bilgileri korunur.",
+    "instructorAssignmentHint": "Burada etkin dersler gösterilir. Ders eklemek ilgili eğitmen disiplin bağını da etkinleştirir. Görev değişikliği gelecekteki, sınıftan görev miras alan seanslara uygulanabilir. Ayrı görevlendirmeler ve geçmiş korunur.",
+    "instructorAcceptImpact": "Sınıf ve disiplin bağlarındaki değişiklikleri ve gelecek seanslara etkisini onaylıyorum.",
+    "instructorRoleSeparate": "Eğitmen rolünü kaldırmak ayrı etki onayı gerektirir. Profil değişikliklerini önce kaydet veya geri al.",
+    "instructorStepsSaved_one": "{{count}} işlem adımı kaydedildi.",
+    "instructorStepsSaved_other": "{{count}} işlem adımı kaydedildi.",
+    "instructorStepLabels": {
+      "profile": "Kişi profili",
+      "discipline": "Eğitmen disiplin bağı",
+      "class": "Ders görevlendirmesi"
+    },
+    "instructorStepRecorded": "Kaydedildi",
+    "instructorStepUnknown": "Sonuç doğrulanamadı",
+    "instructorStepFailed": "Tamamlanamadı",
+    "instructorContactUnavailable": "Bu görünümde iletişim bilgilerini düzenleme erişimi yok."
   }
 }

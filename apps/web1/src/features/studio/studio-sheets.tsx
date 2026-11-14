@@ -41,6 +41,7 @@ export function StudioSheets({
   footerActions,
   preventClose = false,
   readOnlyInstructor = false,
+  instructorNotice,
 }: {
   selection?: StudioSheetSelection;
   onClose: () => void;
@@ -48,6 +49,7 @@ export function StudioSheets({
   footerActions?: ReactNode;
   preventClose?: boolean;
   readOnlyInstructor?: boolean;
+  instructorNotice?: string;
 }) {
   if (!selection) return null;
   if (selection.kind === "room" || selection.kind === "class") {
@@ -81,6 +83,7 @@ export function StudioSheets({
       footerActions={footerActions}
       preventClose={preventClose}
       readOnlyInstructor={readOnlyInstructor}
+      instructorNotice={instructorNotice}
     />
   );
 }
@@ -92,6 +95,7 @@ function StudioSheetForm({
   footerActions,
   preventClose,
   readOnlyInstructor,
+  instructorNotice,
 }: {
   selection: StudioSheetSelection;
   onClose: () => void;
@@ -99,6 +103,7 @@ function StudioSheetForm({
   footerActions?: ReactNode;
   preventClose: boolean;
   readOnlyInstructor: boolean;
+  instructorNotice?: string;
 }) {
   const { t } = useTranslation();
   const [closureScope, setClosureScope] = useState("room");
@@ -148,6 +153,11 @@ function StudioSheetForm({
         onSubmit={(event) => event.preventDefault()}
       >
         <FieldGroup className="gap-4">
+          {instructorNotice && (
+            <p role="status" className="text-sm text-muted-foreground">
+              {instructorNotice}
+            </p>
+          )}
           {selection.kind === "instructor" && (
             <>
               <Field className="gap-1.5">

@@ -6,7 +6,8 @@ import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { StudioView, type StudioViewData } from "./studio-view";
 import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
-import { InstructorRevoke } from "./instructor-revoke";
+import { StudioInstructorEditor } from "./instructor-editor";
+import type { InstructorEditState } from "./instructor-edit";
 import { StudioResourceEditor } from "./resource-editor";
 import { StudioAvailabilityReader } from "./availability-reader";
 import { readStudioSnapshot, type StudioSnapshot } from "./management-snapshot";
@@ -151,10 +152,14 @@ function StudioContent({
     selection: StudioSheetSelection;
     snapshot: StudioSnapshot;
   }>();
-  const [editorLocked, setEditorLocked] = useState(false);
+  const [observedInstructors, setObservedInstructors] = useState<
+    Record<string, InstructorEditState>
+  >({});
+  const observeInstructor = useCallback((state: InstructorEditState) => {
+    setObservedInstructors((current) => ({ ...current, [state.person.id]: state }));
+  }, []);
   const publishLock = useCallback(
     (value: boolean) => {
-      setEditorLocked(value);
       onLockChange(value);
     },
     [onLockChange],
@@ -175,7 +180,7 @@ function StudioContent({
   }, [query.error, router]);
   // Failed live reads do not render cached private lists as current authority.
   const snapshot = query.isError ? undefined : query.data;
-  const data = snapshot ? studioViewData(snapshot, t) : empty;
+  const data = snapshot ? studioViewData(snapshot, t, observedInstructors) : empty;
   const base = `/o/${encodeURIComponent(scope.orgId)}/c/${encodeURIComponent(scope.centerId)}`;
   return (
     <StudioView
@@ -220,36 +225,24 @@ function StudioContent({
             />
           );
         }
-        const target =
-          selection.kind === "instructor" && selection.id
-            ? (editor.snapshot.instructors.find(
-                (item) => item.person.id === selection.id && item.active,
-              ) ?? editor.snapshot.instructors.find((item) => item.person.id === selection.id))
-            : undefined;
-        return (
-          <StudioSheets
-            selection={selection}
-            data={capturedData}
-            onClose={onClose}
-            preventClose={editorLocked}
-            readOnlyInstructor={Boolean(target)}
-            footerActions={
-              target && (
-                <InstructorRevoke
-                  scope={scope}
-                  target={target}
-                  onLockChange={publishLock}
-                  onComplete={onClose}
-                  onRefresh={async () => {
-                    const result = await query.refetch({ throwOnError: true });
-                    if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
-                    return result.data;
-                  }}
-                />
-              )
-            }
-          />
-        );
+        if (selection.kind === "instructor" && selection.id)
+          return (
+            <StudioInstructorEditor
+              key={`${scope.accountId}:${scope.orgId}:${scope.centerId}:${selection.id}`}
+              scope={scope}
+              personId={selection.id}
+              previewData={capturedData}
+              onObserved={observeInstructor}
+              onLockChange={publishLock}
+              onClose={onClose}
+              onRefresh={async () => {
+                const result = await query.refetch({ throwOnError: true });
+                if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
+                return result.data;
+              }}
+            />
+          );
+        return <StudioSheets selection={selection} data={capturedData} onClose={onClose} />;
       }}
     />
   );

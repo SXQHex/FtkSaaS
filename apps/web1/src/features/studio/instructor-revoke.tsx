@@ -49,12 +49,14 @@ export function InstructorRevoke({
   onRefresh,
   onComplete,
   onLockChange,
+  disabled: externallyDisabled = false,
 }: {
   scope: StudioScope;
   target: InstructorRecord;
   onRefresh: () => Promise<StudioSnapshot>;
   onComplete: () => void;
   onLockChange: (value: boolean) => void;
+  disabled?: boolean;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -216,7 +218,7 @@ export function InstructorRevoke({
     <>
       <Button
         variant="destructive"
-        isDisabled={!target.active || busy}
+        isDisabled={externallyDisabled || !target.active || busy}
         onPress={() => {
           void loadPreview();
         }}

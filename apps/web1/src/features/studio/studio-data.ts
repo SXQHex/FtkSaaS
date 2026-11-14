@@ -1,3 +1,4 @@
+import type { InstructorEditState } from "./instructor-edit";
 import type { TFunction } from "i18next";
 import type { StudioSnapshot } from "./management-snapshot";
 import type { StudioViewData } from "./studio-view";
@@ -18,7 +19,11 @@ function money(minor: string, currency: string) {
     .join("");
 }
 
-export function studioViewData(snapshot: StudioSnapshot, t: TFunction): StudioViewData {
+export function studioViewData(
+  snapshot: StudioSnapshot,
+  t: TFunction,
+  details: Record<string, InstructorEditState> = {},
+): StudioViewData {
   const { resources } = snapshot;
   const people = new Map(snapshot.instructors.map((item) => [item.person.id, item.person]));
   const activePeople = new Set(
@@ -31,15 +36,43 @@ export function studioViewData(snapshot: StudioSnapshot, t: TFunction): StudioVi
     ...[...people.values()].map((item) => [item.id, item.display_name] as const),
   ]);
   return {
-    instructors: [...people.values()].map((person) => ({
-      id: person.id,
-      name: person.display_name,
-      email: person.contacts?.find((item) => item.kind === "email")?.value ?? null,
-      active: activePeople.has(person.id),
-      classes: [],
-      classIds: [],
-      weeklySessions: null,
-    })),
+    instructors: [...people.values()].map((person) => {
+      const detail = details[person.id];
+      const currentRoles = snapshot.instructors.filter((role) => role.person.id === person.id);
+      const currentClasses = resources.classes.filter((lesson) => lesson.active);
+      const known =
+        detail &&
+        detail.person.version === person.version &&
+        detail.roles.length === currentRoles.length &&
+        detail.roles.every((role) =>
+          currentRoles.some(
+            (current) =>
+              current.assignmentId === role.assignmentId &&
+              current.version === role.version &&
+              current.active === role.active,
+          ),
+        ) &&
+        detail.classes.filter((lesson) => lesson.active).length === currentClasses.length &&
+        currentClasses.every((lesson) =>
+          detail.classes.some(
+            (current) => current.id === lesson.id && current.version === lesson.version,
+          ),
+        );
+      const classIds = known
+        ? (detail.assignments
+            ?.filter((assignment) => assignment.active)
+            .map((assignment) => assignment.classId) ?? [])
+        : [];
+      return {
+        id: person.id,
+        name: person.display_name,
+        email: person.contacts?.find((item) => item.kind === "email")?.value ?? null,
+        active: activePeople.has(person.id),
+        classIds,
+        classes: classIds.map((id) => resources.classes.find((lesson) => lesson.id === id)!.name),
+        weeklySessions: null,
+      };
+    }),
     rooms: resources.rooms.map((item) => ({ ...item, usage: null, classes: [] })),
     roomLimit: null,
     classes: resources.classes.map((item) => {
