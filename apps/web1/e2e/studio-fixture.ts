@@ -6,6 +6,9 @@ import type {
   DisciplineView,
   ManagementStateView,
   PersonView,
+  PersonPatch,
+  InstructorRevocationPreview,
+  ContactView,
 } from "../src/lib/api-contracts/generated.js";
 import { mockNative, origin } from "./auth-fixture.js";
 
@@ -131,6 +134,14 @@ export async function mockStudio(page: Page) {
       interval: { starts_at: string; ends_at: string };
     }[],
     agreements: [structuredClone(initialAgreement)],
+    assignments: [] as {
+      id: string;
+      classId: string;
+      personId: string;
+      active: boolean;
+      version: number;
+    }[],
+    unknownOperation: null as string | null,
     centerVersion: 7,
     writes: [] as Write[],
     effects: [] as string[],
@@ -181,6 +192,13 @@ export async function mockStudio(page: Page) {
         "management_state_get_v1",
         "room_save_v1",
         "class_save_v1",
+        "person_update_v1",
+        "person_create_v1",
+        "account_access_send_v1",
+        "role_assign_v1",
+        "class_assignment_set_v1",
+        "role_revoke_preview_v1",
+        "role_revoke_v1",
         "availability_save_v1",
         "availability_exception_save_v1",
         "instructor_agreement_publish_v1",
@@ -223,6 +241,18 @@ export async function mockStudio(page: Page) {
           },
         ]),
       );
+    if (op === "role_revoke_preview_v1") {
+      const role = state.roles.find((role) => role.id === r.assignment_id && role.active);
+      if (!role || role.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
+      return send(route, {
+        id: uid(40),
+        token: "fixture-impact-token",
+        expires_at: "2035-01-01T00:00:00Z",
+        assignment_id: role.id,
+        assignment_version: role.version,
+        sessions: [],
+      } satisfies InstructorRevocationPreview);
+    }
     if (op === "people_list_v1") return send(route, list(state.people));
     if (op === "roles_list_v1")
       return send(
@@ -352,7 +382,7 @@ export async function mockStudio(page: Page) {
               ? [
                   item("account_links", uid(19), 1, true, {
                     operation: "account_link_remove_v1",
-                    values: { person_id: I.instructor, link_id: uid(19) },
+                    values: { person_id: String(k.person_id), link_id: uid(19) },
                   }),
                 ]
               : [],
@@ -397,7 +427,25 @@ export async function mockStudio(page: Page) {
           ),
         );
       }
-      if (r.operation === "class_assignment_set_v1")
+      if (r.operation === "class_assignment_set_v1") {
+        const assignment = state.assignments.find(
+          (item) => item.classId === k.class_id && item.personId === k.person_id,
+        );
+        if (assignment)
+          return send(
+            route,
+            list([
+              item("class_assignments", assignment.id, assignment.version, assignment.active, {
+                operation: "class_assignment_set_v1",
+                values: {
+                  class_id: assignment.classId,
+                  person_id: assignment.personId,
+                  duty: "instructor",
+                  state: assignment.active ? "active" : "inactive",
+                },
+              }),
+            ]),
+          );
         return send(
           route,
           list([
@@ -419,6 +467,7 @@ export async function mockStudio(page: Page) {
             } satisfies ManagementStateView,
           ]),
         );
+      }
       throw new Error(`Unexpected Studio selector: ${String(r.operation)}`);
     }
     const key = String(r.operation_key);
@@ -428,6 +477,10 @@ export async function mockStudio(page: Page) {
     if (state.nextWrite === "conflict") {
       state.nextWrite = "normal";
       return fail(route, "VERSION_CONFLICT");
+    }
+    if (op === "account_access_send_v1") {
+      state.effects.push(op);
+      return send(route, { job_id: uid(++serial), state: "pending" });
     }
     let primary = uid(++serial),
       version = 1;
@@ -451,6 +504,68 @@ export async function mockStudio(page: Page) {
           version,
         });
       }
+    } else if (op === "person_create_v1") {
+      state.people.push({
+        id: primary,
+        version,
+        display_name: String(r.display_name),
+        contacts: r.contacts as ContactView[],
+        relationships: [],
+        discipline_relationships: [],
+      });
+    } else if (op === "role_assign_v1") {
+      const role = state.roles.find((role) => role.personId === r.person_id && role.active);
+      if (!role || role.accountAccessGranted === true || !state.accountLinked)
+        return fail(route, "VERSION_CONFLICT");
+      role.accountAccessGranted = true;
+      primary = role.id;
+      version = ++role.version;
+    } else if (op === "person_update_v1") {
+      const person = state.people.find((person) => person.id === r.person_id)!;
+      if (person.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
+      const patch = r.patch as PersonPatch;
+      if (patch.display_name !== undefined) person.display_name = patch.display_name;
+      if (patch.contacts)
+        person.contacts = patch.contacts.map((contact) => ({
+          ...contact,
+          ...(person.contacts?.find(
+            (old) => old.kind === contact.kind && old.value === contact.value,
+          )?.verified_at
+            ? {
+                verified_at: person.contacts.find(
+                  (old) => old.kind === contact.kind && old.value === contact.value,
+                )!.verified_at,
+              }
+            : {}),
+        }));
+      primary = person.id;
+      version = ++person.version;
+    } else if (op === "class_assignment_set_v1") {
+      const existing = state.assignments.find(
+        (item) => item.classId === r.class_id && item.personId === r.person_id,
+      );
+      if (existing) {
+        if (existing.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
+        existing.active = r.state === "active";
+        primary = existing.id;
+        version = ++existing.version;
+      } else {
+        expect(r.expected_version).toBeUndefined();
+        state.assignments.push({
+          id: primary,
+          classId: String(r.class_id),
+          personId: String(r.person_id),
+          active: r.state === "active",
+          version,
+        });
+      }
+    } else if (op === "role_revoke_v1") {
+      const role = state.roles.find((role) => role.id === r.assignment_id)!;
+      if (role.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
+      expect(r.impact_approval).toEqual({ id: uid(40), token: "fixture-impact-token" });
+      role.active = false;
+      primary = role.id;
+      version = ++role.version;
     } else if (op === "class_save_v1") {
       const lesson = state.lessons.find((lesson) => lesson.id === r.class_id);
       if (!lesson) throw new Error("Fixture expects an existing class");
@@ -520,7 +635,8 @@ export async function mockStudio(page: Page) {
     };
     receipts.set(key, receipt);
     state.effects.push(op);
-    if (state.nextWrite === "unknown") {
+    if (state.nextWrite === "unknown" || state.unknownOperation === op) {
+      state.unknownOperation = null;
       state.nextWrite = "normal";
       return route.abort("failed");
     }
