@@ -60,6 +60,7 @@ export function VerifyEmailPage() {
                     <FieldLabel htmlFor="verify-email">{t(($) => $.auth.email)}</FieldLabel>
                     <Input
                       id="verify-email"
+                      autoFocus
                       name="email"
                       type="email"
                       autoComplete="email"
