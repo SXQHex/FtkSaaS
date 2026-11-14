@@ -57,11 +57,9 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(page.getByLabel("E-posta", { exact: true })).toBeFocused();
       await expect(page.getByLabel("E-posta", { exact: true })).toBeInViewport({ ratio: 1 });
       expect(
-        await page
-          .getByLabel("E-posta", { exact: true })
-          .evaluate(
-            "el => ({typeMismatch:el.validity.typeMismatch,message:el.validationMessage.length>0})",
-          ),
+        await page.evaluate(
+          "({typeMismatch:document.querySelector('#email').validity.typeMismatch,message:document.querySelector('#email').validationMessage.length>0})",
+        ),
       ).toEqual({ typeMismatch: true, message: true });
       await expect(page).toHaveURL("http://127.0.0.1:4173/signup");
     });
