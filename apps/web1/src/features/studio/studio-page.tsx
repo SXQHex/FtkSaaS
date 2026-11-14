@@ -2,12 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { readWorkspace } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { StudioView, type StudioViewData } from "./studio-view";
 import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
 import { StudioInstructorEditor } from "./instructor-editor";
 import type { InstructorEditState } from "./instructor-edit";
+import { StudioAgreementEditor } from "./agreement-editor";
 import { StudioClosureEditor } from "./closure-editor";
 import { StudioResourceEditor } from "./resource-editor";
 import { StudioAvailabilityReader } from "./availability-reader";
@@ -180,9 +182,20 @@ function StudioContent({
     },
     [onLockChange],
   );
+  const workspace = useQuery({
+    queryKey: ["workspace", scope.accountId, scope.orgId],
+    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
+    // WorkspaceLayout owns the live read; this observer reuses its result.
+    enabled: false,
+    retry: false,
+  });
+  const canReadPlan =
+    !workspace.isError &&
+    workspace.data?.selected?.id === scope.orgId &&
+    Boolean(workspace.data.roles.some((role) => role.role === "owner" && role.state === "active"));
   const query = useQuery({
-    queryKey: ["studio", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readStudioSnapshot(scope),
+    queryKey: ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan],
+    queryFn: () => readStudioSnapshot(scope, canReadPlan),
     retry: false,
   });
   useEffect(() => {
@@ -196,7 +209,17 @@ function StudioContent({
   }, [query.error, router]);
   // Failed live reads do not render cached private lists as current authority.
   const snapshot = query.isError ? undefined : query.data;
-  const data = snapshot ? studioViewData(snapshot, t, observedInstructors) : empty;
+  const mapped = snapshot ? studioViewData(snapshot, t, observedInstructors) : empty;
+  const data = {
+    ...mapped,
+    setup: mapped.setup.map((item) => ({
+      ...item,
+      available:
+        item.available !== false &&
+        (!item.route ||
+          Object.values(router.routesById).some((route) => route.fullPath === item.route)),
+    })),
+  };
   const base = `/o/${encodeURIComponent(scope.orgId)}/c/${encodeURIComponent(scope.centerId)}`;
   return (
     <StudioView
@@ -335,6 +358,23 @@ function StudioContent({
                   ),
                 ),
               }}
+              onClose={onClose}
+              onLockChange={publishLock}
+              onRefresh={async () => {
+                await query.refetch({ throwOnError: true });
+              }}
+            />
+          );
+        if (selection.kind === "agreement")
+          return (
+            <StudioAgreementEditor
+              key={`${scope.accountId}:${scope.orgId}:${scope.centerId}:${selection.id ?? "new"}`}
+              scope={scope}
+              selectedId={selection.id}
+              personId={
+                editor.snapshot.agreements.find((item) => item.id === selection.id)?.person_id
+              }
+              data={capturedData}
               onClose={onClose}
               onLockChange={publishLock}
               onRefresh={async () => {

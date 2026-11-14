@@ -74,13 +74,23 @@ export interface StudioViewData {
   instructors: StudioInstructor[];
   rooms: StudioRoom[];
   roomLimit: number | null;
+  roomsUnlimited?: boolean;
   classes: StudioClass[];
   closures: StudioClosure[];
   agreements: StudioAgreement[];
   disciplines: { id: string; name: string }[];
   compatibility: { classId: string; roomId: string; allowed: boolean; writable: boolean }[];
   availability: Record<string, AvailabilityDraft>;
-  setup: { key: string; label: string; description?: string; complete: boolean; href?: string }[];
+  setup: {
+    key: string;
+    label: string;
+    description?: string;
+    complete: boolean | null;
+    href?: string;
+    route?: string;
+    available?: boolean;
+    tab?: "resources" | "availability";
+  }[];
 }
 
 // Domain composition only: all controls, tables, tabs and overlays use the installed registry.
@@ -112,6 +122,7 @@ export function StudioView({
   renderEditor?: (selection: StudioSheetSelection, onClose: () => void) => ReactNode;
 }) {
   const { t } = useTranslation();
+  const [selectedTab, setSelectedTab] = useState("instructors");
   const [filter, setFilter] = useState("all");
   const [setupHidden, setSetupHidden] = useState(false);
   const [localSelection, setLocalSelection] = useState<StudioSheetSelection>();
@@ -121,7 +132,8 @@ export function StudioView({
   const instructors = data.instructors.filter(
     (item) => filter === "all" || item.active === (filter === "active"),
   );
-  const completed = data.setup.filter((item) => item.complete).length;
+  const completed = data.setup.filter((item) => item.complete === true).length;
+  const unknown = data.setup.filter((item) => item.complete === null).length;
   const empty =
     state === "loading"
       ? t(($) => $.studio.loading)
@@ -185,6 +197,7 @@ export function StudioView({
             </div>
             <span className="text-xs text-muted-foreground tabular-nums">
               {data.setup.length ? `${completed}/${data.setup.length}` : "—"}
+              {unknown > 0 && ` · ${t(($) => $.studio.setupUnknownCount, { count: unknown })}`}
             </span>
             {data.setup.length > 0 && completed === data.setup.length && (
               <Button variant="ghost" size="sm" onPress={() => setSetupHidden(true)}>
@@ -195,7 +208,7 @@ export function StudioView({
           <CardContent>
             <Progress
               aria-label={t(($) => $.studio.setup)}
-              isIndeterminate={!data.setup.length}
+              isIndeterminate={!data.setup.length || unknown > 0}
               value={data.setup.length ? (completed / data.setup.length) * 100 : undefined}
             />
             <ul className="mt-3.5 grid gap-x-6 min-[721px]:grid-cols-2">
@@ -209,7 +222,7 @@ export function StudioView({
                     variant={item.complete ? "default" : "outline"}
                     className="size-4.5 shrink-0 rounded-full p-0"
                   >
-                    {item.complete && <CheckIcon />}
+                    {item.complete === true ? <CheckIcon /> : item.complete === null ? "?" : null}
                   </Badge>
                   <span className="mr-auto grid min-w-0 gap-0.5">
                     <span
@@ -223,13 +236,40 @@ export function StudioView({
                       <span className="text-xs text-muted-foreground">{item.description}</span>
                     )}
                   </span>
-                  {!item.complete && item.href && (
-                    <LinkButton href={item.href} variant="outline" size="sm">
+                  {item.complete !== true && item.tab && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      isDisabled={interactionLocked}
+                      onPress={() => {
+                        const tab = item.tab!;
+                        setSelectedTab(tab);
+                        requestAnimationFrame(() =>
+                          document
+                            .querySelector<HTMLElement>(`[data-studio-tab="${tab}"]`)
+                            ?.focus(),
+                        );
+                      }}
+                    >
+                      {t(($) => $.studio.finishSetup)}
+                    </Button>
+                  )}
+                  {item.complete !== true && item.href && (
+                    <LinkButton
+                      href={item.href}
+                      variant="outline"
+                      size="sm"
+                      isDisabled={interactionLocked || item.available === false}
+                    >
                       {t(($) => $.studio.finishSetup)}
                     </LinkButton>
                   )}
                   <span className="sr-only">
-                    {item.complete ? t(($) => $.studio.complete) : t(($) => $.studio.pending)}
+                    {item.complete === null
+                      ? t(($) => $.studio.setupStatusUnknown)
+                      : item.complete
+                        ? t(($) => $.studio.complete)
+                        : t(($) => $.studio.pending)}
                   </span>
                 </li>
               ))}
@@ -239,7 +279,10 @@ export function StudioView({
       )}
       <Tabs
         isDisabled={interactionLocked}
-        defaultSelectedKey="instructors"
+        selectedKey={selectedTab}
+        onSelectionChange={(key) => {
+          if (!interactionLocked) setSelectedTab(String(key));
+        }}
         keyboardActivation="manual"
         className="min-w-0 gap-4"
       >
@@ -249,8 +292,12 @@ export function StudioView({
             className="h-9! gap-0.5 rounded-lg [&_[data-slot=tabs-trigger]]:flex-none [&_[data-slot=tabs-trigger]]:rounded-md [&_[data-slot=tabs-trigger]]:px-3 [&_[data-slot=tabs-trigger]]:data-selected:after:bottom-0 [&_[data-slot=tabs-trigger]]:data-selected:after:border-b-2 [&_[data-slot=tabs-trigger]]:data-selected:after:opacity-0 [&_[data-slot=tabs-trigger]]:forced-colors:data-selected:after:opacity-100"
           >
             <TabsTrigger id="instructors">{t(($) => $.studio.instructors)}</TabsTrigger>
-            <TabsTrigger id="resources">{t(($) => $.studio.resources)}</TabsTrigger>
-            <TabsTrigger id="availability">{t(($) => $.studio.availability)}</TabsTrigger>
+            <TabsTrigger id="resources" data-studio-tab="resources">
+              {t(($) => $.studio.resources)}
+            </TabsTrigger>
+            <TabsTrigger id="availability" data-studio-tab="availability">
+              {t(($) => $.studio.availability)}
+            </TabsTrigger>
             <TabsTrigger id="closures">{t(($) => $.studio.closures)}</TabsTrigger>
             <TabsTrigger id="agreements">{t(($) => $.studio.agreements)}</TabsTrigger>
           </TabsList>
@@ -430,6 +477,11 @@ export function StudioView({
                           limit: data.roomLimit,
                         })}
                   </p>
+                  {data.roomsUnlimited === true && (
+                    <p className="text-xs text-muted-foreground">
+                      {t(($) => $.studio.roomsUnlimited)}
+                    </p>
+                  )}
                 </div>
                 <Button
                   isDisabled={state !== "ready"}

@@ -24,7 +24,17 @@ export function studioViewData(
   t: TFunction,
   details: Record<string, InstructorEditState> = {},
 ): StudioViewData {
-  const { resources } = snapshot;
+  const { resources, setup } = snapshot;
+  const base = `/o/${encodeURIComponent(setup.scope.orgId)}/c/${encodeURIComponent(setup.scope.centerId)}`;
+  const center = setup.center.state === "known" ? setup.center.value : null;
+  const plan = setup.plan.state === "known" ? setup.plan.value : null;
+  const validInstructors = setup.instructors.ready;
+  const instructorsKnown = validInstructors !== null && setup.instructors.unread === 0;
+  const hasSeries = snapshot.programs.some((entry) =>
+    entry.items.some(
+      (item) => item.exists && item.entity?.type === "program_versions" && item.state === "active",
+    ),
+  );
   const people = new Map(snapshot.instructors.map((item) => [item.person.id, item.person]));
   const activePeople = new Set(
     snapshot.instructors.filter((item) => item.active).map((item) => item.person.id),
@@ -74,7 +84,8 @@ export function studioViewData(
       };
     }),
     rooms: resources.rooms.map((item) => ({ ...item, usage: null, classes: [] })),
-    roomLimit: null,
+    roomLimit: plan?.roomLimit ?? null,
+    roomsUnlimited: plan?.roomsUnlimited,
     classes: resources.classes.map((item) => {
       const programs = snapshot.programs
         .find((entry) => entry.classId === item.id)
@@ -132,6 +143,89 @@ export function studioViewData(
       .map(({ id, name }) => ({ id, name })),
     compatibility: [],
     availability: {},
-    setup: [],
+    setup: [
+      {
+        key: "details",
+        label: t(($) => $.studio.setupLabels.details),
+        description: center
+          ? t(($) => $.studio.setupDetailsDescription, { timezone: center.timezone })
+          : t(($) => $.studio.setupReadUnavailable),
+        complete:
+          center?.address == null
+            ? null
+            : Boolean(center.name.trim() && center.timezone && center.address.trim()),
+        href: `${base}/settings`,
+        route: "/o/$orgId/c/$centerId/settings",
+        available: Boolean(center?.addressWritable),
+      },
+      {
+        key: "room",
+        label: t(($) => $.studio.rooms),
+        description: t(($) => $.studio.setupRoomCount, { count: setup.activeRooms }),
+        complete: setup.activeRooms > 0,
+        tab: "resources",
+      },
+      {
+        key: "class",
+        label: t(($) => $.studio.classTypes),
+        description: t(($) => $.studio.setupClassCount, { count: setup.activeClasses }),
+        complete: setup.activeClasses > 0,
+        tab: "resources",
+      },
+      {
+        key: "instructors",
+        label: t(($) => $.studio.setupLabels.instructors),
+        description: instructorsKnown
+          ? t(($) => $.studio.setupAvailabilityCount, {
+              ready: validInstructors,
+              total: setup.instructors.count,
+            })
+          : t(($) => $.studio.setupReadUnavailable),
+        complete:
+          setup.instructors.count === 0
+            ? false
+            : instructorsKnown
+              ? validInstructors === setup.instructors.count
+              : null,
+        tab: "availability",
+      },
+      {
+        key: "products",
+        label: t(($) => $.studio.setupLabels.products),
+        description:
+          setup.products.state === "known"
+            ? t(($) => $.studio.setupProductCount, { count: setup.products.value })
+            : t(($) => $.studio.setupReadUnavailable),
+        complete: setup.products.state === "known" ? setup.products.value > 0 : null,
+        href: `${base}/products`,
+        route: "/o/$orgId/c/$centerId/products",
+      },
+      {
+        key: "documents",
+        label: t(($) => $.studio.setupLabels.documents),
+        description: t(($) => $.studio.setupDocumentUnknown),
+        complete: setup.documents,
+        href: `${base}/documents`,
+        route: "/o/$orgId/c/$centerId/documents",
+      },
+      {
+        key: "program",
+        label: t(($) => $.studio.setupLabels.program),
+        description: hasSeries
+          ? t(($) => $.studio.setupSeriesKnown)
+          : t(($) => $.studio.setupSingleSessionUnknown),
+        complete: hasSeries ? true : null,
+        href: `${base}/schedule`,
+        route: "/o/$orgId/c/$centerId/schedule",
+      },
+      {
+        key: "invitation",
+        label: t(($) => $.studio.setupLabels.invitation),
+        description: t(($) => $.studio.setupInvitationUnknown),
+        complete: setup.invitations,
+        href: `${base}/access`,
+        route: "/o/$orgId/c/$centerId/access",
+      },
+    ],
   };
 }
