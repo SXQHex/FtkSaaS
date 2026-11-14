@@ -94,6 +94,7 @@ export function StudioView({
   renderEditor,
   availabilityContent,
   editorControl,
+  noticeContent,
 }: {
   data: StudioViewData;
   state: "loading" | "ready" | "error";
@@ -101,6 +102,7 @@ export function StudioView({
   earningsHref: string;
   onRetry: () => void;
   availabilityContent?: ReactNode;
+  noticeContent?: ReactNode;
   editorControl?: {
     selection?: StudioSheetSelection;
     onChange: (selection?: StudioSheetSelection) => void;
@@ -156,6 +158,7 @@ export function StudioView({
           {t(($) => $.studio.addInstructor)}
         </Button>
       </header>
+      {noticeContent}
       {state === "error" && (
         <Alert variant="destructive">
           <AlertDescription className="flex flex-wrap items-center justify-between gap-3">

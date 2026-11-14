@@ -13,9 +13,13 @@ import { StudioAvailabilityReader } from "./availability-reader";
 import { readStudioSnapshot, type StudioSnapshot } from "./management-snapshot";
 import { studioViewData } from "./studio-data";
 import type { StudioScope } from "./studio";
+import { NewInstructorPerson } from "./new-instructor-person";
+import { InstructorEnrollmentSheet } from "./instructor-enrollment-sheet";
+import type { JobRef } from "../../lib/api-contracts/generated";
 import type { AccountView } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
+import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 
 const empty: StudioViewData = {
@@ -152,6 +156,15 @@ function StudioContent({
     selection: StudioSheetSelection;
     snapshot: StudioSnapshot;
   }>();
+  const [pendingInstructor, setPendingInstructor] = useState<{ personId: string; job?: JobRef }>();
+  const selectEnrollmentPerson = useCallback((personId: string) => {
+    setPendingInstructor((current) => (current?.personId === personId ? current : { personId }));
+  }, []);
+  const recordEnrollmentJob = useCallback((personId: string, job: JobRef) => {
+    setPendingInstructor((current) =>
+      current?.personId === personId ? { ...current, job } : current,
+    );
+  }, []);
   const [observedInstructors, setObservedInstructors] = useState<
     Record<string, InstructorEditState>
   >({});
@@ -191,6 +204,24 @@ function StudioContent({
       onRetry={() => {
         void query.refetch();
       }}
+      noticeContent={
+        pendingInstructor && (
+          <Alert role="status">
+            <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+              {t(($) => $.studio.resumeInstructorSetup)}
+              <Button
+                variant="outline"
+                isDisabled={!snapshot}
+                onPress={() => {
+                  if (snapshot) setEditor({ selection: { kind: "instructor" }, snapshot });
+                }}
+              >
+                {t(($) => $.studio.continueEnrollment)}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )
+      }
       editorControl={{
         selection: editor?.selection,
         onChange: (selection) => {
@@ -222,6 +253,39 @@ function StudioContent({
                 return result.data.resources;
               }}
               onClose={onClose}
+            />
+          );
+        }
+        if (selection.kind === "instructor" && !selection.id) {
+          if (!pendingInstructor)
+            return (
+              <NewInstructorPerson
+                scope={scope}
+                onSelected={selectEnrollmentPerson}
+                onClose={onClose}
+                onLockChange={publishLock}
+              />
+            );
+          return (
+            <InstructorEnrollmentSheet
+              key={`${scope.accountId}:${scope.orgId}:${scope.centerId}:${pendingInstructor.personId}`}
+              scope={scope}
+              personId={pendingInstructor.personId}
+              initialJob={pendingInstructor.job}
+              onJob={(job) => recordEnrollmentJob(pendingInstructor.personId, job)}
+              onChooseAnother={() => setPendingInstructor(undefined)}
+              onClose={onClose}
+              onLockChange={publishLock}
+              onReady={async (personId, isCurrent) => {
+                const result = await query.refetch({ throwOnError: true });
+                if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
+                if (!isCurrent()) return;
+                setPendingInstructor(undefined);
+                setEditor({
+                  selection: { kind: "instructor", id: personId },
+                  snapshot: result.data,
+                });
+              }}
             />
           );
         }
