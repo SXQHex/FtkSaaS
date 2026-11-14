@@ -6,6 +6,7 @@ import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { StudioView, type StudioViewData } from "./studio-view";
 import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
+import { InstructorRevoke } from "./instructor-revoke";
 import { StudioResourceEditor } from "./resource-editor";
 import { StudioAvailabilityReader } from "./availability-reader";
 import { readStudioSnapshot, type StudioSnapshot } from "./management-snapshot";
@@ -150,6 +151,14 @@ function StudioContent({
     selection: StudioSheetSelection;
     snapshot: StudioSnapshot;
   }>();
+  const [editorLocked, setEditorLocked] = useState(false);
+  const publishLock = useCallback(
+    (value: boolean) => {
+      setEditorLocked(value);
+      onLockChange(value);
+    },
+    [onLockChange],
+  );
   const query = useQuery({
     queryKey: ["studio", scope.accountId, scope.orgId, scope.centerId],
     queryFn: () => readStudioSnapshot(scope),
@@ -201,7 +210,7 @@ function StudioContent({
               selection={{ kind: selection.kind, id: selection.id }}
               resources={editor.snapshot.resources}
               classMeta={capturedData.classes.find((item) => item.id === selection.id)}
-              onLockChange={onLockChange}
+              onLockChange={publishLock}
               onRefresh={async () => {
                 const result = await query.refetch({ throwOnError: true });
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
@@ -211,7 +220,36 @@ function StudioContent({
             />
           );
         }
-        return <StudioSheets selection={selection} data={capturedData} onClose={onClose} />;
+        const target =
+          selection.kind === "instructor" && selection.id
+            ? (editor.snapshot.instructors.find(
+                (item) => item.person.id === selection.id && item.active,
+              ) ?? editor.snapshot.instructors.find((item) => item.person.id === selection.id))
+            : undefined;
+        return (
+          <StudioSheets
+            selection={selection}
+            data={capturedData}
+            onClose={onClose}
+            preventClose={editorLocked}
+            readOnlyInstructor={Boolean(target)}
+            footerActions={
+              target && (
+                <InstructorRevoke
+                  scope={scope}
+                  target={target}
+                  onLockChange={publishLock}
+                  onComplete={onClose}
+                  onRefresh={async () => {
+                    const result = await query.refetch({ throwOnError: true });
+                    if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
+                    return result.data;
+                  }}
+                />
+              )
+            }
+          />
+        );
       }}
     />
   );

@@ -54,7 +54,10 @@ async function management(scope: StudioScope, selector: ManagementSelector) {
   );
 }
 
-export async function readStudioInstructors(scope: StudioScope): Promise<InstructorRecord[]> {
+export async function readStudioInstructors(
+  scope: StudioScope,
+  personId?: string,
+): Promise<InstructorRecord[]> {
   const backend = await studioBackend(scope);
   const assignments = await studioPages((cursor) =>
     backend.call("management_state_get_v1", {
@@ -65,7 +68,11 @@ export async function readStudioInstructors(scope: StudioScope): Promise<Instruc
       operation: "role_assign_v1",
       selector: {
         operation: "role_assign_v1",
-        key: { role: "instructor", scope: { center_id: scope.centerId } },
+        key: {
+          role: "instructor",
+          scope: { center_id: scope.centerId },
+          ...(personId ? { person_id: personId } : {}),
+        },
       },
       page: { limit: 50, ...(cursor ? { cursor } : {}) },
     }),
@@ -77,6 +84,7 @@ export async function readStudioInstructors(scope: StudioScope): Promise<Instruc
       item.current.values.role !== "instructor" ||
       item.current.values.scope?.center_id !== scope.centerId ||
       !item.current.values.person_id ||
+      (personId !== undefined && item.current.values.person_id !== personId) ||
       (item.state !== "active" && item.state !== "inactive")
     )
       throw new Error("STUDIO_UNAVAILABLE");

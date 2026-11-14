@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { XIcon } from "lucide-react";
 import {
@@ -38,10 +38,16 @@ export function StudioSheets({
   selection,
   onClose,
   data,
+  footerActions,
+  preventClose = false,
+  readOnlyInstructor = false,
 }: {
   selection?: StudioSheetSelection;
   onClose: () => void;
   data: StudioViewData;
+  footerActions?: ReactNode;
+  preventClose?: boolean;
+  readOnlyInstructor?: boolean;
 }) {
   if (!selection) return null;
   if (selection.kind === "room" || selection.kind === "class") {
@@ -72,6 +78,9 @@ export function StudioSheets({
       selection={selection}
       onClose={onClose}
       data={data}
+      footerActions={footerActions}
+      preventClose={preventClose}
+      readOnlyInstructor={readOnlyInstructor}
     />
   );
 }
@@ -80,10 +89,16 @@ function StudioSheetForm({
   selection,
   onClose,
   data,
+  footerActions,
+  preventClose,
+  readOnlyInstructor,
 }: {
   selection: StudioSheetSelection;
   onClose: () => void;
   data: StudioViewData;
+  footerActions?: ReactNode;
+  preventClose: boolean;
+  readOnlyInstructor: boolean;
 }) {
   const { t } = useTranslation();
   const [closureScope, setClosureScope] = useState("room");
@@ -104,9 +119,10 @@ function StudioSheetForm({
     <Sheet
       isOpen
       onOpenChange={(open) => {
-        if (!open) onClose();
+        if (!open && !preventClose) onClose();
       }}
-      isDismissable
+      isDismissable={!preventClose}
+      isKeyboardDismissDisabled={preventClose}
       showCloseButton={false}
     >
       <SheetHeader className="relative pr-14">
@@ -117,6 +133,7 @@ function StudioSheetForm({
             : t(($) => $.studio.sheetDescription)}
         </SheetDescription>
         <SheetClose
+          isDisabled={preventClose}
           aria-label={t(($) => $.studio.close)}
           variant="ghost"
           size="icon-sm"
@@ -139,6 +156,7 @@ function StudioSheetForm({
                   id="instructor-name"
                   name="name"
                   defaultValue={instructor?.name ?? ""}
+                  readOnly={readOnlyInstructor}
                   autoComplete="name"
                   required
                 />
@@ -150,13 +168,18 @@ function StudioSheetForm({
                   id="instructor-email"
                   name="email"
                   defaultValue={instructor?.email ?? ""}
+                  readOnly={readOnlyInstructor}
                   autoComplete="email"
                   required
                 />
               </Field>
               <FieldSet className="gap-3">
                 <FieldLegend variant="label">{t(($) => $.studio.teachingDisciplines)}</FieldLegend>
-                {data.classes.length ? (
+                {readOnlyInstructor ? (
+                  <FieldDescription variant="hint">
+                    {t(($) => $.studio.classAssignmentsUnknown)}
+                  </FieldDescription>
+                ) : data.classes.length ? (
                   <ItemGroup>
                     {data.classes.map((item) => (
                       <Item
@@ -196,6 +219,7 @@ function StudioSheetForm({
                 </div>
                 <Switch
                   name="active"
+                  isDisabled={readOnlyInstructor}
                   aria-labelledby="instructor-active-label"
                   defaultSelected={instructor?.active ?? true}
                 />
@@ -597,7 +621,8 @@ function StudioSheetForm({
         </FieldGroup>
       </form>
       <SheetFooter className="flex-wrap">
-        <Button variant="outline" onPress={onClose}>
+        {footerActions}
+        <Button variant="outline" isDisabled={preventClose} onPress={onClose}>
           {t(($) => $.studio.cancel)}
         </Button>
         {!closure && (

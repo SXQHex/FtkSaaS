@@ -715,6 +715,22 @@
     "chooseAvailabilityPeriod": "Bir geçerlilik dönemi seç.",
     "noAvailabilityRules": "Bu eğitmen için uygunluk tanımlanmamış. Uygunluk olmadan program oluşturulamaz.",
     "availabilityReadOnly": "Uygunluk değişikliği bu görünümde kullanılamıyor.",
-    "noEndDate": "Bitiş yok"
+    "noEndDate": "Bitiş yok",
+    "revokeInstructor": "Eğitmen rolünü kaldır",
+    "revokeDescription": "{{name}} için seçili merkezdeki eğitmen rolü kaldırılacak. Önce etkilenen seansları incele.",
+    "revokeReasonRequired": "Kaldırma gerekçesini gir.",
+    "revokeAcceptanceRequired": "Güncel seans etkisini inceleyip onayla.",
+    "revokeReadError": "Güncel rol veya seans etkisi okunamadı. Rol artık aktif olmayabilir; listeyi kontrol et veya önizlemeyi yeniden yükle.",
+    "revokeStale": "Rol veya seans etkisi değişti ya da önizlemenin süresi doldu. Güncel önizlemeyi yükleyip tekrar onayla.",
+    "revokeSavedUnread": "Eğitmen rolü kaldırıldı; güncel liste okunamadı. Yalnız listeyi yeniden yükle.",
+    "revokeNeedsInstructor": "Bu seansa yeniden eğitmen atamak gerekiyor.",
+    "revokeOtherInstructorsRemain": "Seansın diğer eğitmen görevlendirmeleri korunur.",
+    "revokeNoAffectedSessions": "Bu önizlemede etkilenen gelecek seans bulunmuyor.",
+    "revokeAcceptImpact": "Güncel seans etkisini inceledim ve seçili rolün kaldırılmasını onaylıyorum.",
+    "revokeSessionsKept": "Seanslar otomatik iptal edilmez. Geçmiş kayıtlar ve hesap bağı korunur.",
+    "revokeReloadPreview": "Güncel etkiyi yükle",
+    "revokeConfirm": "Rolü kaldır",
+    "classAssignmentsUnknown": "Bu görünümde sınıf görevlendirmeleri gösterilemiyor.",
+    "revokeReasonLabel": "Kaldırma gerekçesi"
   }
 }
