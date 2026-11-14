@@ -1,5 +1,7 @@
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
+import { reviewStudioAccessibility } from "./studio-accessibility-review.js";
+import { writeFile } from "node:fs/promises";
 import { mockStudio, openStudio, studioIds } from "./studio-fixture.js";
 
 async function newRoom(page: import("@playwright/test").Page) {
@@ -213,5 +215,8 @@ test("Studio flow: a verified active assignment cannot submit a duplicate grant"
   await expect(dialog.getByText("Görev etkin", { exact: true })).toBeVisible();
   await expect(dialog.locator("#instructor-role-grant")).toBeVisible();
   await expect(dialog.getByRole("checkbox")).not.toBeChecked();
+  const review = await reviewStudioAccessibility(page, "studio-verified-binding-grant-label");
+  expect(review.violations).toEqual([]);
+  await writeFile(".tmp/e12-grant-manual-review.json", JSON.stringify(review, null, 2));
   expect(state.writes).toEqual([]);
 });

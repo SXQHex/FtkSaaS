@@ -407,7 +407,9 @@ export function InstructorEnrollmentSheet({
                               ? "instructor-grant-error"
                               : "instructor-grant-description"
                           }
-                        />
+                        >
+                          <span className="sr-only">{t(($) => $.studio.acceptInstructorRole)}</span>
+                        </Checkbox>
                         <div>
                           <FieldLabel id="instructor-grant-label" htmlFor="instructor-grant">
                             {t(($) => $.studio.acceptInstructorRole)}

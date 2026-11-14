@@ -1,5 +1,5 @@
 import { test, expect } from "./test.js";
-import { scanAccessibility } from "./accessibility.js";
+import { reviewStudioAccessibility } from "./studio-accessibility-review.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
 import { writeFile } from "node:fs/promises";
 
@@ -20,6 +20,13 @@ test("Studio drawing: complete tabs and live form composition, responsive AA", a
     "aria-valuetext",
     /3 adımın durumu bilinmiyor/,
   );
+  const reviews: Awaited<ReturnType<typeof reviewStudioAccessibility>>[] = [];
+  async function scanAccessibility(page: import("@playwright/test").Page, name: string) {
+    const review = await reviewStudioAccessibility(page, name);
+    reviews.push(review);
+    await writeFile(".tmp/e12-manual-review.json", JSON.stringify(reviews, null, 2));
+    return review;
+  }
   const layout: { width: number; theme: string; state: string; overflow: boolean }[] = [];
   const measure = async (state: string, width: number, theme: string) => {
     const overflow = await page.evaluate<boolean>(

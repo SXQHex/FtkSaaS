@@ -602,7 +602,9 @@ export function StudioAgreementEditor({
                     isInvalid={notice === "approval-required"}
                     aria-labelledby="agreement-approval-label"
                     aria-describedby="agreement-impact-description"
-                  />
+                  >
+                    <span className="sr-only">{t(($) => $.studio.impactAccepted)}</span>
+                  </Checkbox>
                   <div>
                     <FieldLabel id="agreement-approval-label" htmlFor="agreement-approval">
                       {t(($) => $.studio.impactAccepted)}
