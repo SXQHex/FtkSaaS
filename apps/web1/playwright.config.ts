@@ -23,10 +23,10 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "chromium", testIgnore: "**/auth-flow.spec.ts", use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium", testIgnore: "**/auth-*.spec.ts", use: { ...devices["Desktop Chrome"] } },
     {
       name: "auth-chromium",
-      testMatch: "**/auth-flow.spec.ts",
+      testMatch: "**/auth-*.spec.ts",
       use: { ...devices["Desktop Chrome"], baseURL: "http://127.0.0.1:4175" },
     },
   ],
