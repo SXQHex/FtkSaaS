@@ -29,3 +29,28 @@ it("reports a successful password save truthfully when the account reread fails"
   expect(read).toHaveBeenCalledOnce();
   expect(screen.queryByLabelText("Yeni parola")).not.toBeInTheDocument();
 });
+it("clears stale required errors after empty keyboard traversal and submits matching values once", async () => {
+  save.mockResolvedValue(undefined);
+  read.mockResolvedValue({});
+  const user = userEvent.setup();
+  render(<ResetPasswordPage />);
+  await user.tab();
+  await user.tab();
+  await user.tab();
+  await user.tab();
+  await user.tab({ shift: true });
+  await user.tab({ shift: true });
+  await user.type(screen.getByLabelText("Yeni parola"), "Fixture123");
+  await user.tab();
+  await user.type(screen.getByLabelText("Parola tekrar"), "Different123");
+  await user.keyboard("{Enter}");
+  expect(screen.getByLabelText("Parola tekrar")).toHaveAccessibleDescription(
+    "Parolalar eşleşmiyor.",
+  );
+  expect(save).not.toHaveBeenCalled();
+  await user.clear(screen.getByLabelText("Parola tekrar"));
+  await user.type(screen.getByLabelText("Parola tekrar"), "Fixture123");
+  await user.keyboard("{Enter}");
+  expect(await screen.findByText("Parolan kaydedildi.")).toBeVisible();
+  expect(save).toHaveBeenCalledExactlyOnceWith("Fixture123");
+});

@@ -68,6 +68,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.1.0",
+    "axe-core": "^4.14.0",
     "i18next-cli": "^1.87.0",
     "jsdom": "^31.0.0",
     "knip": "^6.45.1",

@@ -23,10 +23,10 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "chromium", testIgnore: "**/auth-flow.spec.ts", use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium", testIgnore: "**/auth-*.spec.ts", use: { ...devices["Desktop Chrome"] } },
     {
       name: "auth-chromium",
-      testMatch: "**/auth-flow.spec.ts",
+      testMatch: "**/auth-*.spec.ts",
       use: { ...devices["Desktop Chrome"], baseURL: "http://127.0.0.1:4175" },
     },
   ],
@@ -39,7 +39,7 @@ export default defineConfig({
         VITE_SUPABASE_URL: "http://127.0.0.1:4175",
         VITE_SUPABASE_PUBLISHABLE_KEY: "public-test-key",
         VITE_APP_ORIGIN: "http://127.0.0.1:4175",
-        VITE_PUBLIC_GATEWAY_URL: "",
+        VITE_PUBLIC_GATEWAY_URL: "http://127.0.0.1:4175",
         VITE_TURNSTILE_SITE_KEY: "",
       },
     },

@@ -15,25 +15,32 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           <div className="auth-form-width">{children}</div>
         </div>
       </div>
-      <aside className="auth-pitch" aria-hidden="true">
-        <div>
-          <h2>{t(($) => $.auth.pitch)}</h2>
-          <ul>
-            <li>
-              <CalendarIcon />
-              {t(($) => $.auth.calendarPitch)}
-            </li>
-            <li>
-              <WalletIcon />
-              {t(($) => $.auth.financePitch)}
-            </li>
-            <li>
-              <UsersIcon />
-              {t(($) => $.auth.memberPitch)}
-            </li>
-          </ul>
-        </div>
-      </aside>
+      <AuthPitch />
     </main>
+  );
+}
+
+export function AuthPitch() {
+  const { t } = useTranslation();
+  return (
+    <aside className="auth-pitch" aria-hidden="true">
+      <div>
+        <h2>{t(($) => $.auth.pitch)}</h2>
+        <ul>
+          <li>
+            <CalendarIcon />
+            {t(($) => $.auth.calendarPitch)}
+          </li>
+          <li>
+            <WalletIcon />
+            {t(($) => $.auth.financePitch)}
+          </li>
+          <li>
+            <UsersIcon />
+            {t(($) => $.auth.memberPitch)}
+          </li>
+        </ul>
+      </div>
+    </aside>
   );
 }

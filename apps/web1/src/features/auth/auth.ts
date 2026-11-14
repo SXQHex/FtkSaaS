@@ -1,5 +1,6 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
+import { hasDeletionReceipt } from "../account/deletion";
 
 export async function loginWithPassword(values: { email: string; password: string }) {
   const { data, error } = await getSupabaseClient().auth.signInWithPassword(values);
@@ -9,6 +10,7 @@ export async function loginWithPassword(values: { email: string; password: strin
   if (assurance.error) throw assurance.error;
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
     return "/mfa" as const;
+  if (hasDeletionReceipt(data.session.user.id)) return "/account/deletion" as const;
   await readAccount();
   return "/account" as const;
 }

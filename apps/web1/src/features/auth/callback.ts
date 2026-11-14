@@ -1,5 +1,6 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
+import { hasDeletionReceipt } from "../account/deletion";
 import { rememberRecoverySession, requireRecoverySession } from "./password-recovery";
 
 export function safeNext(next: unknown) {
@@ -17,7 +18,9 @@ export function captureAuthCallback() {
   captured = {
     code: search.get("code") ?? undefined,
     flowId: search.get("sb_flow_id") ?? undefined,
-    providerError: search.has("error") || fragment.has("error"),
+    providerError: ["error", "error_code", "error_description"].some(
+      (field) => search.has(field) || fragment.has(field),
+    ),
     next: safeNext(search.get("next")),
   };
   window.history.replaceState(window.history.state, "", "/auth/callback");
@@ -52,6 +55,8 @@ export function completeCallback(input: CallbackInput): Promise<string> {
     if (assurance.error) throw assurance.error;
     if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
       return "/mfa";
+    if (next !== "/reset-password" && hasDeletionReceipt(data.session.user.id))
+      return "/account/deletion";
     await readAccount();
     return next;
   })();

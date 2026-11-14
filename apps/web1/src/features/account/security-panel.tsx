@@ -1,12 +1,16 @@
 import { useRef, useState } from "react";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { readAccount } from "../../lib/account";
 import { readFactors, readSecurityHistory } from "./security";
 import { getSupabaseClient } from "../../lib/supabase";
+import { GoogleIdentities } from "./google-identities";
+import { PasswordChange } from "./password-change";
+import { readSessions } from "./sessions";
 import { TotpRemove } from "./totp-remove";
 import { TotpSetup } from "./totp-setup";
+import { DeletionPreviewPanel } from "./deletion-preview-panel";
 import {
   Card,
   CardHeader,
@@ -31,6 +35,8 @@ import { Skeleton } from "../../components/ui/skeleton";
 export function SecurityPanel({ accountId }: { accountId: string }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const queries = useQueryClient();
+  const needsSessionsRead = useRef(false);
   const needsNativeRefresh = useRef(false);
   const [changed, setChanged] = useState(false);
   const [refreshError, setRefreshError] = useState(false);
@@ -53,10 +59,12 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
       }
       await Promise.all([
         readAccount(),
+        ...(needsSessionsRead.current ? [readSessions()] : []),
         factors.refetch({ throwOnError: true }),
         history.refetch({ throwOnError: true }),
       ]);
       await router.invalidate();
+      needsSessionsRead.current = false;
     } catch {
       setRefreshError(true);
     } finally {
@@ -101,12 +109,27 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
         </CardHeader>
         <CardContent>
           <ItemGroup>
+            <Item role="listitem" className="px-0 py-3">
+              <ItemContent className="min-w-0 basis-full sm:basis-auto">
+                <ItemTitle>{t(($) => $.auth.password)}</ItemTitle>
+                <ItemDescription>{t(($) => $.passwordChange.rowDescription)}</ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <PasswordChange
+                  onChanged={async () => {
+                    queries.removeQueries({ queryKey: ["account-sessions", accountId] });
+                    needsSessionsRead.current = true;
+                    await onChanged();
+                  }}
+                />
+              </ItemActions>
+            </Item>
             <Item role="listitem" className="px-0 py-0">
               <ItemContent className="basis-full sm:basis-auto">
                 <ItemTitle>
                   {t(($) => $.auth.mfaTitle)}{" "}
                   {factors.data && (
-                    <Badge variant="secondary">
+                    <Badge variant={verified.length ? "success" : "secondary"}>
                       {verified.length
                         ? t(($) => $.security.enabled)
                         : t(($) => $.security.disabled)}
@@ -179,9 +202,17 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
                 </ItemActions>
               </Item>
             ))}
+            <GoogleIdentities
+              accountId={accountId}
+              onChanged={async () => {
+                await queries.invalidateQueries({ queryKey: ["account-profile", accountId] });
+                await onChanged();
+              }}
+            />
           </ItemGroup>
         </CardContent>
       </Card>
+      <DeletionPreviewPanel key={accountId} accountId={accountId} />
       <Card>
         <CardHeader>
           <CardTitle>
