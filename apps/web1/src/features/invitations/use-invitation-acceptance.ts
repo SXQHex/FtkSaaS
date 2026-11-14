@@ -19,6 +19,7 @@ export function useInvitationAcceptance(
   const { t } = useTranslation();
   const lock = useRef(false);
   const [busy, setBusy] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
   const [phase, setPhase] = useState<"accept" | "check" | "replay" | "read" | "done" | "final">(
     invitation?.acknowledged
       ? "read"
@@ -62,6 +63,7 @@ export function useInvitationAcceptance(
     lock.current = true;
     setBusy(true);
     setNotice("");
+    setUnavailable(false);
     let reading = phase === "read";
     try {
       const intent = createAcceptanceIntent(account.id);
@@ -95,6 +97,7 @@ export function useInvitationAcceptance(
         setNotice(t(($) => $.invitation.unknown));
       } else if (!hasIntent()) {
         setPhase("accept");
+        setUnavailable(error instanceof BackendError && error.code === "INVITATION_UNAVAILABLE");
         setNotice(
           error instanceof BackendError && error.code === "INVITATION_UNAVAILABLE"
             ? t(($) => $.invitation.unavailable)
@@ -111,5 +114,5 @@ export function useInvitationAcceptance(
       setBusy(false);
     }
   }
-  return { busy, phase, notice, organizations, differentAccount, authenticate, act };
+  return { busy, phase, notice, unavailable, organizations, differentAccount, authenticate, act };
 }

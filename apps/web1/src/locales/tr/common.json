@@ -311,6 +311,10 @@
     "account": "Hesabıma git",
     "retry": "Yeniden dene",
     "conflictingLink": "Önceki davetin sonucu bekliyor. Bu ekrandaki işlemler önceki davete aittir. Sonucu kontrol ettikten sonra yeni bağlantıyı yeniden aç.",
-    "loadError": "Davet hesabı okunamadı. Bağlantını kontrol edip yeniden dene."
+    "loadError": "Davet hesabı okunamadı. Bağlantını kontrol edip yeniden dene.",
+    "unavailableTitle": "Bu davet kullanılamıyor",
+    "unavailableDescription": "Davet süresi dolmuş, iptal edilmiş veya başka bir hesaba ait olabilir. Davetin gönderildiği hesapla tekrar dene. Yeni bağlantı gerekiyorsa stüdyoyla iletişime geç.",
+    "checkAccount": "Doğru hesabı kontrol et",
+    "help": "Bağlantı hakkında yardım"
   }
 }

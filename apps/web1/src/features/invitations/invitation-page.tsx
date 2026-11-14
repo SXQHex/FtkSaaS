@@ -32,7 +32,7 @@ function InvitationContent({
   invitation: ReturnType<typeof inspectInvitation>;
 }) {
   const { t } = useTranslation();
-  const { busy, phase, notice, organizations, differentAccount, authenticate, act } =
+  const { busy, phase, notice, unavailable, organizations, differentAccount, authenticate, act } =
     useInvitationAcceptance(account, invitation);
   return (
     <AuthLayout>
@@ -147,6 +147,11 @@ function InvitationContent({
             <Alert role="alert">
               <AlertDescription>{notice}</AlertDescription>
             </Alert>
+          )}
+          {unavailable && (
+            <LinkButton href="/invite/expired" variant="outline">
+              {t(($) => $.invitation.help)}
+            </LinkButton>
           )}
         </CardContent>
         {!account && (
