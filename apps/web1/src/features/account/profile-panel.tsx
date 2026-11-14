@@ -228,7 +228,7 @@ export function ProfileForm({
                           data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
                         >
                           <FieldLabel
-                            className="w-full items-center"
+                            className="w-full flex-wrap items-center"
                             htmlFor={`profile-${descriptor.name}`}
                           >
                             {descriptor.label}
@@ -267,7 +267,7 @@ export function ProfileForm({
                   ))}
                   {identity && (
                     <Field className="gap-1 pb-1 min-[901px]:col-span-2">
-                      <FieldLabel className="w-full items-center" htmlFor="profile-email">
+                      <FieldLabel className="w-full flex-wrap items-center" htmlFor="profile-email">
                         {t(($) => $.auth.email)}
                         {identity.email && identity.email_verified_at && (
                           <Badge variant="success" className="ml-auto">
@@ -295,7 +295,10 @@ export function ProfileForm({
                   )}
                   {identity && (identity.phone || identity.pending_phone) && (
                     <Field className="gap-1">
-                      <FieldLabel className="w-full items-center" htmlFor="profile-native-phone">
+                      <FieldLabel
+                        className="w-full flex-wrap items-center"
+                        htmlFor="profile-native-phone"
+                      >
                         {t(($) => $.profile.accountPhone)}
                       </FieldLabel>
                       <Input
@@ -385,7 +388,7 @@ export function ProfileForm({
                           : t(($) => $.profile.unchanged)
                         : ""}
                   </span>
-                  <div className="flex gap-2">
+                  <div className="flex max-w-full flex-wrap gap-2">
                     <Button
                       variant="outline"
                       isDisabled={pending || reading || writeKnown || preparingPhoto || !dirty}

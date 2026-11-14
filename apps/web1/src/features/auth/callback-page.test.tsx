@@ -23,5 +23,6 @@ it.each([
     render(<CallbackPage />);
     expect(screen.queryByRole("heading", { name: "Hesap doğrulaması" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Hesabım" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Bağlantı tamamlanamadı", level: 1 })).toBeVisible();
   },
 );

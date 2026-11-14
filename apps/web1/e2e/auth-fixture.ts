@@ -1,7 +1,7 @@
 import type { UserIdentity } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { expect, type Locator, type Page, type TestInfo } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import { scanAccessibility } from "./accessibility.js";
 import type {
   FailureEnvelope,
   SettingsMediaAsset,
@@ -75,7 +75,7 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo, 
         )
         .toBe(0);
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
-      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      expect((await scanAccessibility(page, name)).violations).toEqual([]);
       const body = await page.screenshot({
         path: `.tmp/${name}-app-${viewport.width}-${colorScheme}.png`,
       });
@@ -91,12 +91,15 @@ export async function mockNative(page: Page, mfa = false) {
   const calls = {
     theme: "system" as "system" | "light" | "dark",
     themeWritable: true,
-    themeWriteGate: undefined as Promise<void> | undefined,
-    themeVersion: 0,
-    themeKeys: [] as string[],
-    rejectNextTheme: false,
-    conflictNextTheme: false,
-    blockThemeReads: false,
+    fontScale: null as number | null,
+    scaleWritable: true,
+    settingsPatches: [] as { theme?: string; font_scale?: number | null }[],
+    settingsWriteGate: undefined as Promise<void> | undefined,
+    settingsVersion: 0,
+    settingsKeys: [] as string[],
+    rejectNextSettings: false,
+    conflictNextSettings: false,
+    blockSettingsReads: false,
     exchange: 0,
     password: 0,
     emailUpdate: 0,
@@ -372,8 +375,14 @@ export async function mockNative(page: Page, mfa = false) {
                 consumer: "frontend",
                 writable: calls.themeWritable,
               },
+              {
+                key: "font_scale",
+                group: "appearance",
+                consumer: "frontend",
+                writable: calls.scaleWritable,
+              },
             ],
-            defaults: { theme: "system" },
+            defaults: { theme: "system", font_scale: null },
             brand_packages: [],
             limitations: [],
           },
@@ -382,7 +391,7 @@ export async function mockNative(page: Page, mfa = false) {
     }
     if (url.pathname === "/functions/v1/backend-v1/settings_get_v1") {
       expect(route.request().postDataJSON().scope).toBe("user");
-      if (calls.blockThemeReads)
+      if (calls.blockSettingsReads)
         return route.fulfill({
           status: 503,
           json: {
@@ -396,8 +405,13 @@ export async function mockNative(page: Page, mfa = false) {
           trace_id: id,
           data: {
             scope: "user",
-            version: calls.themeVersion,
-            values: { theme: calls.theme, language: "tr", optional_analytics: false },
+            version: calls.settingsVersion,
+            values: {
+              theme: calls.theme,
+              font_scale: calls.fontScale,
+              language: "tr",
+              optional_analytics: false,
+            },
             overridden_fields: [],
             as_of: fixtureUser.created_at,
           },
@@ -407,15 +421,17 @@ export async function mockNative(page: Page, mfa = false) {
     if (url.pathname === "/functions/v1/backend-v1/settings_update_v1") {
       const request = route.request().postDataJSON();
       expect(request.scope).toBe("user");
-      expect(Object.keys(request.patch)).toEqual(["theme"]);
-      calls.themeKeys.push(request.operation_key);
-      if (calls.themeWriteGate) {
-        const gate = calls.themeWriteGate;
-        calls.themeWriteGate = undefined;
+      expect(Object.keys(request.patch).length).toBe(1);
+      expect(["theme", "font_scale"]).toContain(Object.keys(request.patch)[0]);
+      calls.settingsPatches.push(request.patch);
+      calls.settingsKeys.push(request.operation_key);
+      if (calls.settingsWriteGate) {
+        const gate = calls.settingsWriteGate;
+        calls.settingsWriteGate = undefined;
         await gate;
       }
-      if (calls.rejectNextTheme) {
-        calls.rejectNextTheme = false;
+      if (calls.rejectNextSettings) {
+        calls.rejectNextSettings = false;
         return route.fulfill({
           status: 503,
           json: {
@@ -424,9 +440,9 @@ export async function mockNative(page: Page, mfa = false) {
           } satisfies FailureEnvelope,
         });
       }
-      if (calls.conflictNextTheme) {
-        calls.conflictNextTheme = false;
-        calls.themeVersion += 4;
+      if (calls.conflictNextSettings) {
+        calls.conflictNextSettings = false;
+        calls.settingsVersion += 4;
         calls.theme = "light";
         return route.fulfill({
           json: {
@@ -435,9 +451,10 @@ export async function mockNative(page: Page, mfa = false) {
           } satisfies FailureEnvelope,
         });
       }
-      expect(request.expected_version).toBe(calls.themeVersion);
-      calls.theme = request.patch.theme;
-      calls.themeVersion += 2;
+      expect(request.expected_version).toBe(calls.settingsVersion);
+      if (Object.hasOwn(request.patch, "theme")) calls.theme = request.patch.theme;
+      else calls.fontScale = request.patch.font_scale;
+      calls.settingsVersion += 2;
       return route.fulfill({
         json: {
           ok: true,

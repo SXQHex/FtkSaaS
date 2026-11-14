@@ -1,5 +1,5 @@
 import { AppearancePanel } from "../account/appearance-panel";
-import { useAccountTheme } from "../account/use-account-theme";
+import { useAccountAppearance } from "../account/use-account-appearance";
 import { ProfilePanel } from "../account/profile-panel";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { MonitorIcon, ShieldIcon, UserIcon } from "lucide-react";
@@ -18,7 +18,7 @@ import { getSupabaseClient } from "../../lib/supabase";
 export function AccountPage() {
   const mobile = useIsMobile();
   const account = useLoaderData({ from: "/account" });
-  const theme = useAccountTheme(account.id);
+  const appearance = useAccountAppearance(account.id);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const router = useRouter();
@@ -86,11 +86,11 @@ export function AccountPage() {
         >
           <ProfilePanel accountId={account.id} />
           <AppearancePanel
-            snapshot={theme.data}
-            readError={theme.isError}
+            snapshot={appearance.data}
+            readError={appearance.isError}
             onRefresh={async () => {
-              const result = await theme.refetch({ throwOnError: true });
-              if (!result.data) throw new Error("THEME_UNAVAILABLE");
+              const result = await appearance.refetch({ throwOnError: true });
+              if (!result.data) throw new Error("APPEARANCE_UNAVAILABLE");
               return result.data;
             }}
           />
@@ -111,6 +111,7 @@ export function AccountErrorPage() {
   const router = useRouter();
   return (
     <main className="mx-auto flex max-w-sm flex-col gap-4 p-6">
+      <h1 className="text-2xl font-semibold">{t(($) => $.auth.account)}</h1>
       <Alert variant="destructive">
         <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
       </Alert>

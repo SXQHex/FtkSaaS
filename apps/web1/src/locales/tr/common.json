@@ -78,7 +78,8 @@
     "mfaReadError": "Kod doğrulandı. Hesap bilgileri yenilenemedi. Yeniden dene.",
     "mfaLoadError": "Doğrulama bilgileri okunamadı. Yeniden dene.",
     "callbackInfoTitle": "Hesap doğrulaması",
-    "callbackInfo": "E-posta değişikliği yaptıysan mevcut ve yeni adresindeki onayları tamamla. Güncel durumu hesabında kontrol edebilirsin."
+    "callbackInfo": "E-posta değişikliği yaptıysan mevcut ve yeni adresindeki onayları tamamla. Güncel durumu hesabında kontrol edebilirsin.",
+    "callbackErrorTitle": "Bağlantı tamamlanamadı"
   },
   "security": {
     "profile": "Profil",
@@ -250,12 +251,15 @@
     "light": "Açık",
     "dark": "Koyu",
     "readonly": "Bu ayar şu anda değiştirilemiyor.",
-    "saved": "Tema tercihi kaydedildi.",
+    "saved": "Görünüm tercihi kaydedildi.",
     "unknown": "İşlemin sonucu doğrulanamadı. Aynı isteği yeniden deneyebilir veya güncel tercihi yükleyebilirsin.",
     "retryWrite": "Aynı isteği yeniden dene",
     "reload": "Güncel tercihi yükle",
     "conflict": "Tercih başka bir işlemle değişti. Güncel değeri yükleyip yeniden seç.",
-    "savedReadError": "Tema kaydedildi. Güncel tercih okunamadı.",
-    "readError": "Görünüm tercihi okunamadı."
+    "savedReadError": "Tercih kaydedildi. Güncel görünüm okunamadı.",
+    "readError": "Görünüm tercihi okunamadı.",
+    "scale": "Ölçek",
+    "scaleHint": "Yazı ve ögeleri büyütür.",
+    "deviceScale": "Cihaz / sistem"
   }
 }

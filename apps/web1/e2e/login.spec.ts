@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "./test.js";
+import { scanAccessibility } from "./accessibility.js";
 
 for (const viewport of [
   { width: 1440, height: 900 },
@@ -29,7 +29,7 @@ for (const viewport of [
       await page.keyboard.press("Enter");
       await expect(page.getByLabel("E-posta")).toHaveAttribute("aria-invalid", "true");
       await expect(page.getByText("Geçerli bir e-posta adresi gir.")).toBeVisible();
-      const results = await new AxeBuilder({ page }).analyze();
+      const results = await scanAccessibility(page);
       expect(results.violations).toEqual([]);
       expect(errors).toEqual([]);
       await testInfo.attach(`login-${viewport.width}-${colorScheme}`, {

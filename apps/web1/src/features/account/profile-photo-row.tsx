@@ -136,7 +136,7 @@ export function ProfilePhotoRow({
           if (file) void select(file);
         }}
       />
-      <div className="flex gap-2">
+      <div className="flex max-w-full flex-wrap gap-2">
         <Button
           variant="outline"
           size="sm"

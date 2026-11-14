@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "./test.js";
+import { scanAccessibility } from "./accessibility.js";
 
 test.beforeEach(async ({ context }) => {
   // This foundation needs only the local Vite server; fail any external HTTP request.
@@ -47,6 +47,6 @@ test("has no automatically detectable accessibility violations on the home page"
 }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "FtkSaaS", exact: true })).toBeVisible();
-  const results = await new AxeBuilder({ page }).analyze();
+  const results = await scanAccessibility(page);
   expect(results.violations).toEqual([]);
 });

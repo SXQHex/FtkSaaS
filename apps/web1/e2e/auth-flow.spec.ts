@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./test.js";
+import { scanAccessibility } from "./accessibility.js";
 import { origin, captureAuth, mockNative } from "./auth-fixture.js";
 
 test("native recovery callback survives URL cleaning, reload and password save", async ({
@@ -586,20 +587,20 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   const system = page.getByRole("radio", { name: "Sistem", exact: true });
   await expect(system).toHaveAttribute("aria-checked", "true");
   await page.getByLabel("Görünen ad", { exact: true }).fill("Unsaved appearance draft");
-  calls.rejectNextTheme = true;
+  calls.rejectNextSettings = true;
   let releaseWrite: () => void = () => {
     throw new Error("Write gate not initialized");
   };
-  calls.themeWriteGate = new Promise<void>((resolve) => {
+  calls.settingsWriteGate = new Promise<void>((resolve) => {
     releaseWrite = resolve;
   });
   await dark.click();
-  await expect.poll(() => calls.themeKeys.length).toBe(1);
+  await expect.poll(() => calls.settingsKeys.length).toBe(1);
   await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
   await expect(page.getByRole("radiogroup", { name: "Tema" })).not.toBeVisible();
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await expect(dark).toBeDisabled();
-  expect(calls.themeKeys).toHaveLength(1);
+  expect(calls.settingsKeys).toHaveLength(1);
   releaseWrite();
   await expect(
     page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
@@ -612,14 +613,14 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   await expect(light).toBeDisabled();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
   await page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
-  await expect(page.getByText("Tema tercihi kaydedildi.")).toBeVisible();
-  expect(calls.themeKeys[1]).toBe(calls.themeKeys[0]);
+  await expect(page.getByText("Görünüm tercihi kaydedildi.")).toBeVisible();
+  expect(calls.settingsKeys[1]).toBe(calls.settingsKeys[0]);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.getByLabel("Görünen ad", { exact: true })).toHaveValue(
     "Unsaved appearance draft",
   );
   expect(calls.profileKeys).toHaveLength(0);
-  calls.conflictNextTheme = true;
+  calls.conflictNextSettings = true;
   await light.click();
   await expect(page.getByText("Tercih başka bir işlemle değişti.", { exact: false })).toBeVisible();
   await expect(dark).toBeDisabled();
@@ -627,17 +628,17 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   await expect(dark).toBeEnabled();
   await dark.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(calls.themeKeys[3]).not.toBe(calls.themeKeys[2]);
-  calls.blockThemeReads = true;
+  expect(calls.settingsKeys[3]).not.toBe(calls.settingsKeys[2]);
+  calls.blockSettingsReads = true;
   await light.click();
-  await expect(page.getByText("Tema kaydedildi. Güncel tercih okunamadı.")).toBeVisible();
+  await expect(page.getByText("Tercih kaydedildi. Güncel görünüm okunamadı.")).toBeVisible();
   await expect(dark).toBeDisabled();
   await expect(page.getByRole("button", { name: "Yeniden dene", exact: true })).toBeEnabled();
-  const writes = calls.themeKeys.length;
-  calls.blockThemeReads = false;
+  const writes = calls.settingsKeys.length;
+  calls.blockSettingsReads = false;
   await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  expect(calls.themeKeys).toHaveLength(writes);
+  expect(calls.settingsKeys).toHaveLength(writes);
   await page.reload();
   await expect(light).toHaveAttribute("aria-checked", "true");
   await page.emulateMedia({ colorScheme: "dark" });
@@ -661,4 +662,137 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
   expect(errors).toEqual([]);
+});
+
+test("font scale preserves exact pending intents, system choice, keyboard access and reflow at 200 percent", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  const scale = page.getByRole("combobox", { name: "Ölçek", exact: true });
+  await expect(scale).toHaveValue("system");
+  await scale.focus();
+  await expect(scale).toBeFocused();
+  calls.rejectNextSettings = true;
+  await scale.selectOption("1.25");
+  await expect(
+    page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
+  ).toBeVisible();
+  await expect(scale).toBeDisabled();
+  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
+  expect(calls.settingsKeys[1]).toBe(calls.settingsKeys[0]);
+  expect(calls.settingsPatches[1]).toEqual({ font_scale: 1.25 });
+  expect(calls.settingsPatches[0]).toEqual(calls.settingsPatches[1]);
+  await page.reload();
+  await expect(scale).toHaveValue("1.25");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
+  await scale.selectOption("2");
+  await expect(page.locator("html")).toHaveCSS("zoom", "2");
+  await expect(scale).toBeEnabled();
+  await captureAuth(
+    page,
+    "e10-appearance-scale-200",
+    testInfo,
+    page
+      .locator('[data-slot="card"]')
+      .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
+  );
+  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  const emailDialog = page.getByRole("dialog");
+  await expect(emailDialog.getByLabel("Yeni e-posta", { exact: true })).toBeVisible();
+  expect((await scanAccessibility(page, "email-sheet-200-percent")).violations).toEqual([]);
+  const dialogBounds = await emailDialog.boundingBox();
+  expect(dialogBounds).not.toBeNull();
+  expect(dialogBounds!.x).toBeGreaterThanOrEqual(0);
+  expect(dialogBounds!.x + dialogBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  await page.screenshot({ path: ".tmp/e10-appearance-scale-sheet-200-390-dark.png" });
+  await emailDialog.getByLabel("Kapat", { exact: true }).click();
+  await scale.focus();
+  await expect(scale).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.getByRole("radio", { name: "Koyu", exact: true })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(scale).toBeFocused();
+  const focusedBounds = await scale.boundingBox();
+  expect(focusedBounds).not.toBeNull();
+  expect(focusedBounds!.x).toBeGreaterThanOrEqual(0);
+  expect(focusedBounds!.y).toBeGreaterThanOrEqual(0);
+  expect(focusedBounds!.x + focusedBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  expect(focusedBounds!.y + focusedBounds!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  // Native OS option menus are not driven by Chromium keyboard events on macOS.
+  // The SDK-recommended selection API tests the write; native menu keyboard acceptance stays separate.
+  await scale.selectOption("1.5");
+  await expect(scale).toHaveValue("1.5");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
+  await expect(scale).toBeEnabled();
+  await expect(scale).toBeFocused();
+  calls.blockSettingsReads = true;
+  await scale.selectOption("system");
+  await expect(page.getByText("Tercih kaydedildi. Güncel görünüm okunamadı.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Yeniden dene", exact: true })).toBeEnabled();
+  const writes = calls.settingsKeys.length;
+  calls.blockSettingsReads = false;
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(scale).toHaveValue("system");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  expect(calls.settingsKeys).toHaveLength(writes);
+  expect(calls.settingsPatches.at(-1)).toEqual({ font_scale: null });
+  await captureAuth(
+    page,
+    "e10-appearance-scale-system",
+    testInfo,
+    page
+      .locator('[data-slot="card"]')
+      .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
+  );
+  await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/login`);
+  await expect(page.locator("html")).not.toHaveAttribute("data-theme");
+  expect(await page.locator("html").evaluate((element) => element.style.zoom)).toBe("");
+  expect(errors).toEqual([]);
+});
+
+test("minimum saved font scale and 320 CSS pixel reflow keep the same WCAG 2.2 AA checks", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  calls.fontScale = 0.75;
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  const scale = page.getByRole("combobox", { name: "Ölçek", exact: true });
+  await expect(scale).toHaveValue("0.75");
+  await expect(page.locator("html")).toHaveCSS("zoom", "0.75");
+  await captureAuth(
+    page,
+    "e10-appearance-scale-75",
+    testInfo,
+    page
+      .locator('[data-slot="card"]')
+      .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
+  );
+  await scale.selectOption("system");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  await expect(scale).toBeEnabled();
+  await page.setViewportSize({ width: 320, height: 844 });
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    expect((await scanAccessibility(page, "account-320-reflow")).violations).toEqual([]);
+    expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
+    await page.screenshot({
+      path: `.tmp/e10-appearance-reflow-320-${colorScheme}.png`,
+      fullPage: true,
+    });
+  }
+  expect(calls.settingsPatches).toEqual([{ font_scale: null }]);
 });
