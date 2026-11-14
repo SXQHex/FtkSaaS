@@ -38,6 +38,14 @@ Kaynak revizyonu: `e62c9435fff729a175f38983dee73b2cb4f6a069`. [Resmî kaynak](ht
 
 Skill, shadcn CLI ile hazır bileşen/blok arama, kurma, kompozisyon ve tema çalışmalarını yönlendirir. Yerel komutlar uygulamanın çalışma dizininde, kendi paket yöneticisiyle yürütülür. Projenin mevcut React Aria/Rhea temeli ve kullanıcının hazır UI bileşeni kullanma kararı esas alınır. CLI, registry veya preset işlemleri için geçerli alan talimatları uygulanır.
 
+## Resmî Modern Web Guidance skill’i
+
+14 Kasım 2026 tarihinde `GoogleChrome/modern-web-guidance` deposunun `4dd968349e54ca45a05dd5c818fb035c9054b022` revizyonundaki resmî `SKILL.md`, değiştirilmeden `.agents/skills/modern-web-guidance` altına alındı. Apache-2.0 lisansı aynı klasörde korunur. [Resmî kaynak](https://github.com/GoogleChrome/modern-web-guidance/tree/4dd968349e54ca45a05dd5c818fb035c9054b022/skills/modern-web-guidance).
+
+Bu kurulum yalnız ajan talimatıdır: skill’in tarif ettiği arama ve rehber okuma komutları gerektiğinde `modern-web-guidance` CLI üzerinden çalışır. CLI, yaklaşık 16 MB arama verisi ve tarayıcı uzantısı skill’i repoya kopyalanmadı; uygulama bağımlılığı veya otomatik güncelleme kurulmadı. Güncelleme bu kaynak kaydıyla birlikte bilinçli olarak yapılır. CLI kullanımı ağ erişimi ve Node.js gerektirir; bu ekleme komutların çalıştırıldığı veya çevrimdışı aramanın kurulduğu anlamına gelmez.
+
+Modern web önerileri mevcut React Aria/Rhea bileşenlerini, erişilebilirlik kontrollerini, tip güvenliğini veya proje sözleşmelerini aşmaz. Skill içindeki genel `any`, build hedefi ve bağımlılık önerileri mevcut kalite kurallarını değiştirme yetkisi vermez. Rehber proje araçlarıdır; üretim kodu, belge sicili, build veya CI girdilerine eklenmez.
+
 ## İçerik
 
 | Skill | Dosya sayısı |
@@ -63,6 +71,7 @@ Skill, shadcn CLI ile hazır bileşen/blok arama, kurma, kompozisyon ve tema ça
 | `incremental-implementation` | 5 |
 | `interview-me` | 4 |
 | `k8s-catch-up` | 102 |
+| `modern-web-guidance` | 2 |
 | `observability-and-instrumentation` | 5 |
 | `performance-optimization` | 6 |
 | `planning-and-task-breakdown` | 5 |
