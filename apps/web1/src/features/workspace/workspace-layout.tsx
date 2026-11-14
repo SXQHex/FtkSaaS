@@ -25,6 +25,16 @@ import {
   BreadcrumbPage,
   BreadcrumbLink,
 } from "../../components/ui/breadcrumb";
+export interface WorkspaceSelection {
+  organizationId?: string;
+  centerId?: string;
+}
+export interface WorkspaceScopeControl extends WorkspaceSelection {
+  locked?: boolean;
+  onOrganization: (id: string) => void;
+  onCenter: (id: string) => void;
+  onResolved?: (selection: WorkspaceSelection) => void;
+}
 function NavigationTrigger() {
   const { t } = useTranslation();
   const { isMobile, openMobile, open } = useSidebar();
@@ -43,19 +53,25 @@ export function WorkspaceLayout({
   onSignOut,
   children,
   onThemeChange,
+  scopeControl,
+  pageTitle,
 }: {
   accountId: string;
   name: string;
   pending: boolean;
   onSignOut: () => void;
-  children: ReactNode;
+  children: ReactNode | ((selection: WorkspaceSelection) => ReactNode);
+  scopeControl?: WorkspaceScopeControl;
+  pageTitle?: string;
   onThemeChange?: () => void;
 }) {
   const { t } = useTranslation();
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const [organizationId, setOrganizationId] = useState<string>();
-  const [selectedCenterId, setSelectedCenterId] = useState<string>();
+  const [localOrganizationId, setOrganizationId] = useState<string>();
+  const [localCenterId, setSelectedCenterId] = useState<string>();
+  const organizationId = scopeControl ? scopeControl.organizationId : localOrganizationId;
+  const selectedCenterId = scopeControl ? scopeControl.centerId : localCenterId;
   const [preferredView, setPreferredView] = useState<NavigationView>();
   const scope = useQuery({
     queryKey: ["workspace", accountId, organizationId ?? null],
@@ -76,6 +92,11 @@ export function WorkspaceLayout({
     (selectedCenterId && view?.centers.some((center) => center.id === selectedCenterId)
       ? selectedCenterId
       : undefined) ?? (view?.centers.length === 1 ? view.centers[0]?.id : undefined);
+  const resolvedOrganizationId = view?.selected?.id;
+  const onResolved = scopeControl?.onResolved;
+  useEffect(() => {
+    onResolved?.({ organizationId: resolvedOrganizationId, centerId });
+  }, [onResolved, resolvedOrganizationId, centerId]);
   const roles =
     view?.roles.filter(
       (role) => role.scope_center_id === null || role.scope_center_id === centerId,
@@ -111,6 +132,7 @@ export function WorkspaceLayout({
         key={accountId}
         name={name}
         pending={pending}
+        scopeLocked={scopeControl?.locked}
         onSignOut={onSignOut}
         view={view}
         loading={scope.isPending}
@@ -118,12 +140,18 @@ export function WorkspaceLayout({
         onRefresh={() => void scope.refetch()}
         centerId={centerId}
         onOrganization={(id) => {
-          setOrganizationId(id);
-          setSelectedCenterId(undefined);
+          if (scopeControl?.locked) return;
+          if (scopeControl) scopeControl.onOrganization(id);
+          else {
+            setOrganizationId(id);
+            setSelectedCenterId(undefined);
+          }
           setPreferredView(undefined);
         }}
         onCenter={(id) => {
-          setSelectedCenterId(id);
+          if (scopeControl?.locked) return;
+          if (scopeControl) scopeControl.onCenter(id);
+          else setSelectedCenterId(id);
           setPreferredView(undefined);
         }}
         groups={groups}
@@ -147,7 +175,7 @@ export function WorkspaceLayout({
               </BreadcrumbItem>
               <BreadcrumbItem className="min-w-0">
                 <BreadcrumbPage className="block min-w-0 truncate">
-                  {t(($) => $.auth.account)}
+                  {pageTitle ?? t(($) => $.auth.account)}
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -215,7 +243,9 @@ export function WorkspaceLayout({
             </LinkButton>
           </div>
         </header>
-        {children}
+        {typeof children === "function"
+          ? children({ organizationId: resolvedOrganizationId, centerId })
+          : children}
       </SidebarInset>
     </SidebarProvider>
   );

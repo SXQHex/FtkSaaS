@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function AppSidebar({
   name,
   pending,
+  scopeLocked,
   onSignOut,
   view,
   loading,
@@ -34,6 +35,7 @@ export function AppSidebar({
 }: {
   name: string;
   pending: boolean;
+  scopeLocked?: boolean;
   onSignOut: () => void;
   view?: Awaited<ReturnType<typeof readWorkspace>>;
   loading: boolean;
@@ -74,6 +76,7 @@ export function AppSidebar({
             selected={view.selected}
             centers={view.centers}
             centerId={centerId}
+            disabled={scopeLocked}
             onOrganization={onOrganization}
             onCenter={onCenter}
           />

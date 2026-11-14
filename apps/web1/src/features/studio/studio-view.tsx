@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckIcon, PlusIcon, UserPlusIcon } from "lucide-react";
 import { Button, LinkButton } from "../../components/ui/button";
@@ -91,17 +91,28 @@ export function StudioView({
   settingsHref,
   earningsHref,
   onRetry,
+  renderEditor,
+  availabilityContent,
+  editorControl,
 }: {
   data: StudioViewData;
   state: "loading" | "ready" | "error";
   settingsHref: string;
   earningsHref: string;
   onRetry: () => void;
+  availabilityContent?: ReactNode;
+  editorControl?: {
+    selection?: StudioSheetSelection;
+    onChange: (selection?: StudioSheetSelection) => void;
+  };
+  renderEditor?: (selection: StudioSheetSelection, onClose: () => void) => ReactNode;
 }) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("all");
   const [setupHidden, setSetupHidden] = useState(false);
-  const [selection, setSelection] = useState<StudioSheetSelection>();
+  const [localSelection, setLocalSelection] = useState<StudioSheetSelection>();
+  const selection = editorControl ? editorControl.selection : localSelection;
+  const setSelection = editorControl ? editorControl.onChange : setLocalSelection;
   const [compatibility, setCompatibility] = useState<Record<string, boolean>>({});
   const instructors = data.instructors.filter(
     (item) => filter === "all" || item.active === (filter === "active"),
@@ -140,7 +151,7 @@ export function StudioView({
             {t(($) => $.studio.settingsSuffix)}
           </p>
         </div>
-        <Button onPress={() => setSelection({ kind: "instructor" })}>
+        <Button isDisabled={state !== "ready"} onPress={() => setSelection({ kind: "instructor" })}>
           <UserPlusIcon />
           {t(($) => $.studio.addInstructor)}
         </Button>
@@ -176,7 +187,8 @@ export function StudioView({
           <CardContent>
             <Progress
               aria-label={t(($) => $.studio.setup)}
-              value={data.setup.length ? (completed / data.setup.length) * 100 : 0}
+              isIndeterminate={!data.setup.length}
+              value={data.setup.length ? (completed / data.setup.length) * 100 : undefined}
             />
             <ul className="mt-3.5 grid gap-x-6 min-[721px]:grid-cols-2">
               {data.setup.map((item) => (
@@ -330,7 +342,12 @@ export function StudioView({
                     {t(($) => $.studio.classDescription)}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" onPress={() => setSelection({ kind: "class" })}>
+                <Button
+                  isDisabled={state !== "ready"}
+                  variant="outline"
+                  size="sm"
+                  onPress={() => setSelection({ kind: "class" })}
+                >
                   <PlusIcon />
                   {t(($) => $.studio.addClass)}
                 </Button>
@@ -401,7 +418,12 @@ export function StudioView({
                         })}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" onPress={() => setSelection({ kind: "room" })}>
+                <Button
+                  isDisabled={state !== "ready"}
+                  variant="outline"
+                  size="sm"
+                  onPress={() => setSelection({ kind: "room" })}
+                >
                   <PlusIcon />
                   {t(($) => $.studio.addRoom)}
                 </Button>
@@ -486,20 +508,24 @@ export function StudioView({
                           const key = `${item.id}:${room.id}`;
                           return (
                             <TableCell key={room.id} className="text-center last:text-center">
-                              <Checkbox
-                                className="mx-auto"
-                                aria-label={`${item.name}, ${room.name}`}
-                                isDisabled={
-                                  !pair?.writable ||
-                                  (item.capacity !== null &&
-                                    room.capacity !== null &&
-                                    item.capacity > room.capacity)
-                                }
-                                isSelected={compatibility[key] ?? pair?.allowed ?? false}
-                                onChange={(value) =>
-                                  setCompatibility((current) => ({ ...current, [key]: value }))
-                                }
-                              />
+                              {pair ? (
+                                <Checkbox
+                                  className="mx-auto"
+                                  aria-label={`${item.name}, ${room.name}`}
+                                  isDisabled={
+                                    !pair?.writable ||
+                                    (item.capacity !== null &&
+                                      room.capacity !== null &&
+                                      item.capacity > room.capacity)
+                                  }
+                                  isSelected={compatibility[key] ?? pair?.allowed ?? false}
+                                  onChange={(value) =>
+                                    setCompatibility((current) => ({ ...current, [key]: value }))
+                                  }
+                                />
+                              ) : (
+                                "—"
+                              )}
                             </TableCell>
                           );
                         })}
@@ -532,10 +558,12 @@ export function StudioView({
           </div>
         </TabsContent>
         <TabsContent id="availability">
-          <AvailabilityPanel
-            instructors={data.instructors}
-            initialByInstructor={data.availability}
-          />
+          {availabilityContent ?? (
+            <AvailabilityPanel
+              instructors={data.instructors}
+              initialByInstructor={data.availability}
+            />
+          )}
         </TabsContent>
         <TabsContent id="closures">
           <Card>
@@ -546,7 +574,10 @@ export function StudioView({
                   {t(($) => $.studio.closuresDescription)}
                 </p>
               </div>
-              <Button onPress={() => setSelection({ kind: "closure" })}>
+              <Button
+                isDisabled={state !== "ready"}
+                onPress={() => setSelection({ kind: "closure" })}
+              >
                 <PlusIcon />
                 {t(($) => $.studio.addClosure)}
               </Button>
@@ -660,6 +691,7 @@ export function StudioView({
               <Button
                 variant="outline"
                 size="sm"
+                isDisabled={state !== "ready"}
                 onPress={() => setSelection({ kind: "agreement" })}
               >
                 {t(($) => $.studio.prepareAgreement)}
@@ -668,7 +700,11 @@ export function StudioView({
           </Card>
         </TabsContent>
       </Tabs>
-      <StudioSheets selection={selection} onClose={() => setSelection(undefined)} data={data} />
+      {selection && renderEditor ? (
+        renderEditor(selection, () => setSelection(undefined))
+      ) : (
+        <StudioSheets selection={selection} onClose={() => setSelection(undefined)} data={data} />
+      )}
     </main>
   );
 }

@@ -21,12 +21,14 @@ export function TeamSwitcher({
   centers,
   centerId,
   onOrganization,
+  disabled = false,
   onCenter,
 }: {
   organizations: OrganizationView[];
   selected?: OrganizationView;
   centers: CenterView[];
   centerId?: string;
+  disabled?: boolean;
   onOrganization: (id: string) => void;
   onCenter: (id: string) => void;
 }) {
@@ -42,7 +44,11 @@ export function TeamSwitcher({
     <SidebarMenu className="group-data-[collapsible=icon]:items-center">
       <SidebarMenuItem>
         <DropdownMenuTrigger>
-          <SidebarMenuButton className="px-2" size="lg" isDisabled={organizations.length === 0}>
+          <SidebarMenuButton
+            className="px-2"
+            size="lg"
+            isDisabled={disabled || organizations.length === 0}
+          >
             <div
               data-workspace-logo
               className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-[8px] bg-primary text-xs font-semibold text-primary-foreground"

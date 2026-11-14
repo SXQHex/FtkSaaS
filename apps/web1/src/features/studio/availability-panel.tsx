@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { PlusIcon, XIcon } from "lucide-react";
 import { Card, CardHeader, CardContent, CardFooter } from "../../components/ui/card";
@@ -31,22 +31,39 @@ const emptyWeek = (): DayDraft[] => weekdays.map(() => ({ enabled: false, interv
 export function AvailabilityPanel({
   instructors,
   initialByInstructor,
+  readOnly = false,
+  loading = false,
+  onSelectInstructor,
+  notice,
+  periodControl,
+  valuesKnown = true,
 }: {
   instructors: StudioInstructor[];
   initialByInstructor: Record<string, AvailabilityDraft>;
+  readOnly?: boolean;
+  loading?: boolean;
+  onSelectInstructor?: (id: string) => void;
+  notice?: string;
+  periodControl?: ReactNode;
+  valuesKnown?: boolean;
 }) {
   const { t } = useTranslation();
   const [instructorId, setInstructorId] = useState("");
-  const [week, setWeek] = useState(emptyWeek);
+  const [edited, setEdited] = useState<AvailabilityDraft>();
   const [sequence, setSequence] = useState(0);
-  const [dirty, setDirty] = useState(false);
-  const [validFrom, setValidFrom] = useState("");
-  const [validUntil, setValidUntil] = useState("");
+  const dirty = Boolean(edited);
+  const baseline = initialByInstructor[instructorId];
+  const week = edited?.days ?? baseline?.days ?? emptyWeek();
+  const validFrom = edited?.validFrom ?? baseline?.validFrom ?? "";
+  const validUntil = edited?.validUntil ?? baseline?.validUntil ?? "";
   const instructor = instructors.find((item) => item.id === instructorId);
-  const enabled = Boolean(instructor?.active);
+  const enabled = Boolean(instructor?.active) && !readOnly && !loading;
+  const setWeek = (next: DayDraft[] | ((current: DayDraft[]) => DayDraft[])) =>
+    setEdited({ days: typeof next === "function" ? next(week) : next, validFrom, validUntil });
+  const setValidFrom = (value: string) => setEdited({ days: week, validFrom: value, validUntil });
+  const setValidUntil = (value: string) => setEdited({ days: week, validFrom, validUntil: value });
   const changeDay = (index: number, next: DayDraft) => {
     setWeek((current) => current.map((day, i) => (i === index ? next : day)));
-    setDirty(true);
   };
   return (
     <Card>
@@ -66,11 +83,8 @@ export function AvailabilityPanel({
             disabled={dirty}
             onChange={(event) => {
               setInstructorId(event.target.value);
-              const initial = initialByInstructor[event.target.value];
-              setWeek(initial?.days ?? emptyWeek());
-              setValidFrom(initial?.validFrom ?? "");
-              setValidUntil(initial?.validUntil ?? "");
-              setDirty(false);
+              onSelectInstructor?.(event.target.value);
+              setEdited(undefined);
             }}
           >
             <option value="">{t(($) => $.studio.chooseInstructor)}</option>
@@ -82,10 +96,16 @@ export function AvailabilityPanel({
           </NativeSelect>
         </Field>
       </CardHeader>
+      {periodControl}
       <CardContent className="flex flex-col gap-4">
         {instructor && !instructor.active && (
           <Alert>
             <AlertDescription>{t(($) => $.studio.inactiveAvailability)}</AlertDescription>
+          </Alert>
+        )}
+        {notice && (
+          <Alert role="status">
+            <AlertDescription>{notice}</AlertDescription>
           </Alert>
         )}
         <FieldGroup className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-4">
@@ -102,7 +122,6 @@ export function AvailabilityPanel({
               value={validFrom}
               onChange={(event) => {
                 setValidFrom(event.target.value);
-                setDirty(true);
               }}
             />
           </Field>
@@ -118,7 +137,6 @@ export function AvailabilityPanel({
               value={validUntil}
               onChange={(event) => {
                 setValidUntil(event.target.value);
-                setDirty(true);
               }}
             />
           </Field>
@@ -208,7 +226,7 @@ export function AvailabilityPanel({
                   ))}
                   {!draft.enabled && (
                     <span className="py-2 text-xs text-muted-foreground">
-                      {t(($) => $.studio.notAvailable)}
+                      {valuesKnown ? t(($) => $.studio.notAvailable) : "—"}
                     </span>
                   )}
                   <Button
@@ -247,7 +265,6 @@ export function AvailabilityPanel({
                     : day,
                 ),
               );
-              setDirty(true);
             }}
           >
             {t(($) => $.studio.copyMonday)}
@@ -270,11 +287,7 @@ export function AvailabilityPanel({
             size="sm"
             isDisabled={!dirty}
             onPress={() => {
-              const initial = initialByInstructor[instructorId];
-              setWeek(initial?.days ?? emptyWeek());
-              setValidFrom(initial?.validFrom ?? "");
-              setValidUntil(initial?.validUntil ?? "");
-              setDirty(false);
+              setEdited(undefined);
             }}
           >
             {t(($) => $.studio.undo)}

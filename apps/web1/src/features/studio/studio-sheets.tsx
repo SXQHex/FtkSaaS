@@ -26,6 +26,8 @@ import { Item, ItemGroup, ItemMedia, ItemContent } from "../../components/ui/ite
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import type { StudioViewData } from "./studio-view";
+import { StudioResourceForm } from "./resource-form";
+import { resourceDraft } from "./studio";
 
 export type StudioSheetSelection = {
   kind: "instructor" | "class" | "room" | "closure" | "agreement";
@@ -42,6 +44,28 @@ export function StudioSheets({
   data: StudioViewData;
 }) {
   if (!selection) return null;
+  if (selection.kind === "room" || selection.kind === "class") {
+    const room = data.rooms.find((item) => item.id === selection.id);
+    const lesson = data.classes.find((item) => item.id === selection.id);
+    return (
+      <StudioResourceForm
+        key={`${selection.kind}:${selection.id ?? "new"}`}
+        selection={{ kind: selection.kind, id: selection.id }}
+        initial={{
+          ...resourceDraft(),
+          name: (selection.kind === "room" ? room?.name : lesson?.name) ?? "",
+          capacity: room?.capacity == null ? "" : String(room.capacity),
+          active: room?.active ?? true,
+          disciplineId: lesson?.disciplineId ?? "",
+          externalOpen: lesson?.externalOpen ?? false,
+          waitlist: lesson?.waitlist ?? false,
+        }}
+        disciplines={data.disciplines}
+        classMeta={lesson}
+        onClose={onClose}
+      />
+    );
+  }
   return (
     <StudioSheetForm
       key={`${selection.kind}:${selection.id ?? "new"}`}
@@ -174,168 +198,6 @@ function StudioSheetForm({
                   name="active"
                   aria-labelledby="instructor-active-label"
                   defaultSelected={instructor?.active ?? true}
-                />
-              </Field>
-            </>
-          )}
-          {selection.kind === "class" && (
-            <>
-              <Field className="gap-1.5">
-                <FieldLabel htmlFor="class-name">{t(($) => $.studio.className)}</FieldLabel>
-                <Input
-                  id="class-name"
-                  name="name"
-                  defaultValue={lesson?.name ?? ""}
-                  autoComplete="off"
-                  required
-                />
-              </Field>
-              <FieldGroup className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-4">
-                <Field className="gap-1.5">
-                  <FieldLabel htmlFor="class-duration">{t(($) => $.studio.duration)}</FieldLabel>
-                  <NativeSelect
-                    className="w-full"
-                    id="class-duration"
-                    name="duration"
-                    defaultValue={lesson?.duration ?? ""}
-                    disabled
-                  >
-                    <option value="">—</option>
-                    {[45, 60, 75, 90, 120].map((value) => (
-                      <option value={value} key={value}>
-                        {t(($) => $.studio.minutes, { count: value })}
-                      </option>
-                    ))}
-                  </NativeSelect>
-                </Field>
-                <Field className="gap-1.5">
-                  <FieldLabel htmlFor="class-capacity">{t(($) => $.studio.capacity)}</FieldLabel>
-                  <Input
-                    type="number"
-                    min={1}
-                    id="class-capacity"
-                    name="capacity"
-                    defaultValue={lesson?.capacity ?? ""}
-                    disabled
-                  />
-                </Field>
-              </FieldGroup>
-              <Field className="gap-1.5">
-                <FieldLabel htmlFor="class-room">{t(($) => $.studio.defaultRoom)}</FieldLabel>
-                <NativeSelect
-                  className="w-full"
-                  id="class-room"
-                  name="room"
-                  defaultValue=""
-                  disabled
-                >
-                  <option value="">{lesson?.room ?? t(($) => $.studio.chooseRoom)}</option>
-                  {data.rooms.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </NativeSelect>
-                <FieldDescription variant="hint">
-                  {t(($) => $.studio.programFieldsHint)}
-                </FieldDescription>
-              </Field>
-              <Field className="gap-1.5">
-                <FieldLabel htmlFor="class-discipline">{t(($) => $.studio.discipline)}</FieldLabel>
-                <NativeSelect
-                  className="w-full"
-                  id="class-discipline"
-                  name="discipline"
-                  defaultValue={lesson?.disciplineId ?? ""}
-                  required
-                >
-                  <option value="">{t(($) => $.studio.chooseDiscipline)}</option>
-                  {data.disciplines.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </NativeSelect>
-              </Field>
-              <Field orientation="horizontal">
-                <div className="flex-1">
-                  <FieldLabel id="class-active-label">{t(($) => $.studio.externalOpen)}</FieldLabel>
-                  <FieldDescription variant="hint">
-                    {t(($) => $.studio.externalOpenDescription)}
-                  </FieldDescription>
-                </div>
-                <Switch
-                  name="externalOpen"
-                  aria-labelledby="class-active-label"
-                  defaultSelected={lesson?.externalOpen ?? false}
-                />
-              </Field>
-              <Field orientation="horizontal">
-                <div className="flex-1">
-                  <FieldLabel id="class-waitlist-label">{t(($) => $.studio.waitlist)}</FieldLabel>
-                  <FieldDescription variant="hint">
-                    {t(($) => $.studio.waitlistDescription)}
-                  </FieldDescription>
-                </div>
-                <Switch
-                  name="waitlist"
-                  aria-labelledby="class-waitlist-label"
-                  defaultSelected={lesson?.waitlist ?? false}
-                />
-              </Field>
-            </>
-          )}
-          {selection.kind === "room" && (
-            <>
-              <Field className="gap-1.5">
-                <FieldLabel htmlFor="room-name">{t(($) => $.studio.roomName)}</FieldLabel>
-                <Input
-                  id="room-name"
-                  name="name"
-                  defaultValue={room?.name ?? ""}
-                  autoComplete="off"
-                  required
-                />
-              </Field>
-              <FieldGroup className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-4">
-                <Field className="gap-1.5">
-                  <FieldLabel htmlFor="room-capacity">{t(($) => $.studio.capacity)}</FieldLabel>
-                  <Input
-                    type="number"
-                    min={1}
-                    id="room-capacity"
-                    name="capacity"
-                    defaultValue={room?.capacity ?? ""}
-                    required
-                  />
-                </Field>
-                <Field className="gap-1.5">
-                  <FieldLabel htmlFor="room-usage">{t(($) => $.studio.usage)}</FieldLabel>
-                  <NativeSelect
-                    className="w-full"
-                    id="room-usage"
-                    name="usage"
-                    disabled
-                    defaultValue=""
-                  >
-                    <option value="">—</option>
-                  </NativeSelect>
-                  <FieldDescription variant="hint">
-                    {t(($) => $.studio.roomUsageHint)}
-                  </FieldDescription>
-                </Field>
-              </FieldGroup>
-              <Field orientation="horizontal">
-                <div className="flex-1">
-                  <FieldLabel id="room-active-label">{t(($) => $.studio.open)}</FieldLabel>
-                  <FieldDescription variant="hint">
-                    {t(($) => $.studio.roomActiveDescription)}
-                  </FieldDescription>
-                </div>
-                <Switch
-                  name="active"
-                  aria-labelledby="room-active-label"
-                  defaultSelected={room?.active ?? true}
                 />
               </Field>
             </>
