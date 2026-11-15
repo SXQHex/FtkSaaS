@@ -1051,5 +1051,54 @@
     "savedUnread": "İşlem kaydedildi; güncel durum henüz okunamadı. Yazıyı tekrarlamadan yeniden oku.",
     "saved": "İşlem kaydedildi; güncel bilgiler yüklendi.",
     "writing": "İşlem gönderiliyor…"
+  },
+  "peopleMerge": {
+    "title": "Kişileri birleştir",
+    "description": "Aynı kişiye ait iki kaydı tek kayıtta topla. Birleşim etkisini güncel önizlemeden incele.",
+    "unknown": "Bilgi okunamadı",
+    "filterLabel": "Birleştirme durumu",
+    "filters": {
+      "pending": "Bekleyen",
+      "completed": "Tamamlanan"
+    },
+    "listLabel": "Birleştirme istekleri",
+    "loading": "Birleştirme istekleri yükleniyor…",
+    "readError": "Birleştirme istekleri okunamadı. Yeniden dene.",
+    "empty": {
+      "pending": "Bekleyen birleştirme isteği yok.",
+      "completed": "Tamamlanan birleştirme yok."
+    },
+    "selectPrompt": "İncelemek için bir kayıt çifti seç.",
+    "completed": "Birleştirme tamamlandı.",
+    "keepLabel": "Kalacak kayıt",
+    "keepRecord": "Kayıt {{number}} kalsın",
+    "field": "Alan",
+    "record": "Kayıt {{number}}",
+    "kept": "Kalacak",
+    "fields": {
+      "name": "Ad soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "account": "Hesap",
+      "createdBy": "Kaydı açan",
+      "status": "Durum",
+      "rights": "Hak",
+      "reservations": "Rezervasyon",
+      "payments": "Ödemeler",
+      "debt": "Açık borç",
+      "documents": "Belge kabulü"
+    },
+    "impactTitle": "Birleştirince",
+    "impactDescription": "Kalacak kayıt ve bağlı geçmiş, sunucunun güncel önizlemesine göre korunur.",
+    "previewRequired": "Kayıtları birleştirmeden önce güncel etki önizlemesini al.",
+    "reason": "Gerekçe",
+    "reasonHelp": "Zorunlu. Bu alandaki açıklama tek başına sunucuda geçmiş kaydı oluşturmaz.",
+    "reviewed": "Etkiyi okudum",
+    "irreversible": "Birleştirme geri alınamaz. Bağlı geçmiş korunur.",
+    "notDuplicate": "Kopya değil",
+    "preview": "Etkiyi önizle",
+    "apply": "Kayıtları birleştir",
+    "dismissUnavailable": "Kopya değil kararı için kalıcı bir kayıt işlemi henüz desteklenmiyor.",
+    "comparisonLabel": "Birleştirilecek kayıtların karşılaştırması"
   }
 }

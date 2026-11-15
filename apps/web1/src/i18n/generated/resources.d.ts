@@ -449,6 +449,55 @@ export default interface Resources {
       "unknown": "Henüz okunmadı",
       "writeRejected": "İşlem reddedildi. Güncel kaynağı yükleyip yeniden değerlendir."
     },
+    "peopleMerge": {
+      "apply": "Kayıtları birleştir",
+      "comparisonLabel": "Birleştirilecek kayıtların karşılaştırması",
+      "completed": "Birleştirme tamamlandı.",
+      "description": "Aynı kişiye ait iki kaydı tek kayıtta topla. Birleşim etkisini güncel önizlemeden incele.",
+      "dismissUnavailable": "Kopya değil kararı için kalıcı bir kayıt işlemi henüz desteklenmiyor.",
+      "empty": {
+        "completed": "Tamamlanan birleştirme yok.",
+        "pending": "Bekleyen birleştirme isteği yok."
+      },
+      "field": "Alan",
+      "fields": {
+        "account": "Hesap",
+        "createdBy": "Kaydı açan",
+        "debt": "Açık borç",
+        "documents": "Belge kabulü",
+        "email": "E-posta",
+        "name": "Ad soyad",
+        "payments": "Ödemeler",
+        "phone": "Telefon",
+        "reservations": "Rezervasyon",
+        "rights": "Hak",
+        "status": "Durum"
+      },
+      "filterLabel": "Birleştirme durumu",
+      "filters": {
+        "completed": "Tamamlanan",
+        "pending": "Bekleyen"
+      },
+      "impactDescription": "Kalacak kayıt ve bağlı geçmiş, sunucunun güncel önizlemesine göre korunur.",
+      "impactTitle": "Birleştirince",
+      "irreversible": "Birleştirme geri alınamaz. Bağlı geçmiş korunur.",
+      "keepLabel": "Kalacak kayıt",
+      "keepRecord": "Kayıt {{number}} kalsın",
+      "kept": "Kalacak",
+      "listLabel": "Birleştirme istekleri",
+      "loading": "Birleştirme istekleri yükleniyor…",
+      "notDuplicate": "Kopya değil",
+      "preview": "Etkiyi önizle",
+      "previewRequired": "Kayıtları birleştirmeden önce güncel etki önizlemesini al.",
+      "readError": "Birleştirme istekleri okunamadı. Yeniden dene.",
+      "reason": "Gerekçe",
+      "reasonHelp": "Zorunlu. Bu alandaki açıklama tek başına sunucuda geçmiş kaydı oluşturmaz.",
+      "record": "Kayıt {{number}}",
+      "reviewed": "Etkiyi okudum",
+      "selectPrompt": "İncelemek için bir kayıt çifti seç.",
+      "title": "Kişileri birleştir",
+      "unknown": "Bilgi okunamadı"
+    },
     "photo": {
       "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",
       "hint": "PNG, JPEG veya WebP, en fazla 1 MiB.",
