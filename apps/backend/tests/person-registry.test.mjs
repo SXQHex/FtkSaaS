@@ -378,3 +378,5 @@ import './crm-segment-worker-acceptance.mjs';
 import './crm-followup-acceptance.mjs';
 import './person-field-policy-acceptance.mjs';
 import './student-status-filter-acceptance.mjs';
+
+import './web1-review-acceptance.mjs';

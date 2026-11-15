@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b9f56069824d08a8e425081b485093839de06461a188c02a156cfe0430b97a21",
-        "reason": "Reviewed P07 fixture calendar correction: exact period-based proration and prepaid balance assertions; typed protocol and runtime behavior unchanged."
+        "fingerprint": "40f513c939df22627f135310cc2b1f8353da576c8bc7cbc6c51783f555ebde2f",
+        "reason": "Final schema and generated artifact review includes conditional required-property closure, physical lifecycle columns, current UUID field paths and opt-in selected-person summary. Canonical/standalone request rejection and legacy compatibility tested; no policy/gate changes."
       }
     },
     {
@@ -405,7 +405,10 @@
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
         "apps/backend/tests/permission-preparation-acceptance.mjs",
         "apps/backend/tests/discipline-presentation-acceptance.mjs",
-        "apps/backend/tests/studio-setup-status-acceptance.mjs"
+        "apps/backend/tests/studio-setup-status-acceptance.mjs",
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/web1-review-acceptance.mjs",
+        "apps/backend/tests/fixtures/web1-review-lifecycle.sql"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -469,7 +472,8 @@
         "apps/backend/supabase/migrations/20261108230214_discipline_presentation.sql",
         "apps/backend/database/settings-discipline-effects.sql",
         "apps/backend/database/center-setup-status.sql",
-        "apps/backend/supabase/migrations/20261114120000_center_setup_status.sql"
+        "apps/backend/supabase/migrations/20261114120000_center_setup_status.sql",
+        "apps/backend/database/availability-lifecycle.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -495,8 +499,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "6edb0a9c9ae35c7518c319cdc5d751f0282d3cd36501c747a34b5554e23b030b",
-        "reason": "E12 manager scoped summary and exact verified instructor binding reviewed with source and native acceptance fixtures; no role write change."
+        "fingerprint": "f8de3dfa910d5ab4d2665fc3291c4a58ad214dad9afe6fe8d15649d7b5a22060",
+        "reason": "Final SQL fixture preserves existing session snapshots, rule/closure source data and unrelated versions; explicit retire/cancel replay, stale/foreign scope and inactive history checks included. Guide describes exact source/aggregate versions and no auto-cancellation."
       }
     },
     {
@@ -595,8 +599,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "368cd3daf4ef21ddd0f9f20580b71b8ca6cfc1011bb20671a78e839bce4f52a1",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "bb7dd84150892d6fbe3d1420e169f000f85b88c17bb2b885b559b943263aefb3",
+        "reason": "Reviewed additive availability retire/cancel API semantics and active-only availability checks; existing scheduling/conflict/preview rules unchanged and lifecycle consumer documented in WF02. No session mutation or implicit cancellation."
       }
     },
     {
@@ -619,7 +623,10 @@
         "apps/backend/tests/person-field-policy-acceptance.mjs",
         "apps/backend/tests/person-field-policy-unit.mjs",
         "apps/backend/tests/student-status-filter-acceptance.mjs",
-        "apps/backend/tests/student-status-filter-unit.mjs"
+        "apps/backend/tests/student-status-filter-unit.mjs",
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/web1-review-acceptance.mjs",
+        "apps/backend/tests/fixtures/web1-review-lifecycle.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -680,7 +687,11 @@
         "apps/backend/database/student-status-filter.sql",
         "apps/backend/supabase/migrations/20261115014502_student_status_filter.sql",
         "apps/backend/database/member-page-summary.sql",
-        "apps/backend/database/access-directory.sql"
+        "apps/backend/database/access-directory.sql",
+        "apps/backend/database/person-merge-review.sql",
+        "apps/backend/database/account-person-directory.sql",
+        "apps/backend/supabase/migrations/20261115035110_web1_review_lifecycle.sql",
+        "apps/backend/database/person-detail-summary.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -699,8 +710,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "17378579ac3f794c87acc08cf666eecdc2e12297548d5903d2be16aae315c8d2",
-        "reason": "Final directory review: read_at consistent effective expiry/status/actionability within page; created-at cursor cutoff remains separate. All three source modules, typed/native fixtures and rights/privacy gates reviewed."
+        "fingerprint": "bc1dd105c8f3f6fa2b6f3607b90ad3f24822570a42de1d5c3efbabe09dd92422",
+        "reason": "Final independently reviewed scope/capability/privacy behavior: exact visible contact suggestions, immutable reason/decision time, center-pinned nonduplicate preview/apply, retained alias history, never-linked people and grouped invitations. Selected person_get summary reuses unchanged native rights/finance/session guards; no currency guess or history fanout."
       }
     },
     {
@@ -1126,8 +1137,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "84970f5ef624631014e7a2ff996325693cffe944fd9a700e4eb159b66aeeca19",
-        "reason": "Shared person registry test root adds the combined three-request acceptance import only; public/calendar source behavior unchanged."
+        "fingerprint": "48e4de9d4505f88c4f9801eeab8caefef609f8c7432776f1740791bf31ed2977",
+        "reason": "Reviewed shared person-registry suite change: only one owned Web1 acceptance import added; public/ICS source and scenarios unchanged, no gateway/Auth/provider change; existing guide remains valid."
       }
     },
     {
@@ -1644,8 +1655,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "6e6e1363c50b594003e000196ccf864d1c92e40e628733bca1eecd986b9b155e",
-        "reason": "Shared person registry root adds combined member/access read acceptance import only; CRM behavior unchanged."
+        "fingerprint": "290b0094cc3af3b550c22bc1c9b2bd2cee8cb680c9d0ba50567217cebf7c466e",
+        "reason": "Reviewed shared person-registry suite change: new owned Web1 review/lifecycle acceptance import only; lead/intake/consent/CRM runtime and existing scenarios unchanged; guide remains valid."
       }
     },
     {

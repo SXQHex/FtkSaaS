@@ -14,6 +14,19 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] Gerçek Cloudflare IP/OPTIONS/yanlış origin/sahte başlık, gerçek widget submit/replay ve eski tüketici birlikte çalışma kabulü.
 - [x] Backend tarafında native Google/doğrulama/kurtarma callback config readback, ICS URL hedefi ve seans API yetkisinin bağımsız test istemcisiyle doğrulanması; kesin kurulu URL/public env ile frontend coder devri. Frontend ekran/route geliştirmesi backend kapanış koşulu değildir; kaynak/ortam sonucu yalnız devir sahibindedir.
 
+## Web1 ek backend talepleri — 15 Kasım
+
+Kullanıcı W1-BE-01–05 dosyasındaki kalan açıkların kapatılmasını istedi. İş bu görevde [G03 sırasından](production-queue.md) önce yürür; yeni ayrı yol haritası değildir.
+
+- [x] W1-BE-01/02: merkez öğrencilik filtresi ve yetkili sayfa özeti kaynak/native CI/main/development teslimi. Kanıt [üye listesi devrinde](00-FtkSaaS-yeni-sohbet-devir.md#ogrencilik-durum-filtresi); frontend kabulü ayrıdır.
+- [x] W1-BE-03 kaynak/yerel doğrulama: mevcut XREQ-049 directory desteğinin üstüne hiç bağlantısı olmayan kişileri de kapsayan typed kişi görünümü; filtre/cursor/sayaç ve eski selector regresyonu.
+- [x] W1-BE-04 kaynak/yerel doğrulama / [XREQ-050](../../../docs/requests.md#xreq-050): gerekçeli merge/kalıcı merkez kopya-değil kararı ve kesin iletişim eşleşmesiyle typed öneri/geçmiş. Kabul: görünürlük/alias, reason/preview/idempotency, onay/cursor ve kaynak sonrası yeniden okuma.
+- [x] W1-BE-05 kaynak/yerel doğrulama / [XREQ-051](../../../docs/requests.md#xreq-051): son uygunluk kuralını retire ve seçili kapanışı cancel. Kabul: yalnız seçili kayıt/sürüm/audit, yanlış merkez/stale/replay reddi ve mevcut seansların korunması.
+
+- [ ] W1-BE-03–05 aday full clean → main kaynak kabulü → development dağıtım doğrulaması. Kaynak hazır oluşu bu teslim kapısını kapatmaz.
+
+Kesin akış/DTO sınırı WF02/WF04 sahibindedir. Kaynak, test, main/development ve frontend kabulü ayrı tutulur; kapanış yalnız kendi kanıtıyla yapılır.
+
 ## Backend çalışma modeli
 
 Tek backend uygulaması geliştirilir. Pro ortak işlevlerin tamamlandığı ana kabul kapsamıdır. Starter aynı uygulamanın plan hakları, limitler ve yetkilerle kısıtlanmış halidir; ortak ders, kişi, satış, ödeme, yoklama, rapor ve Auth akışları için ikinci implementasyon yapılmaz. Business aynı temele çok merkez ve merkezler arası işlevler ekler. Plan özellikleri ve sayısal limitlerin normatif sahibi [ürün sözleşmesidir](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md); uygulama/kabul sırası [üretim kuyruğunda](production-queue.md) tutulur.
