@@ -116,3 +116,33 @@ export function scheduleSessionPanel(
     effects: [],
   };
 }
+
+/** Safe native blocker codes reuse the same translated errors as rejected commands. */
+export function scheduleBackendError(code: string, t: TFunction) {
+  return code === "POLICY_NOT_CONFIGURED"
+    ? t(($) => $.schedule.errors.configuration)
+    : code === "CAPACITY_FULL"
+      ? t(($) => $.schedule.errors.capacity)
+      : code === "RESOURCE_CONFLICT"
+        ? t(($) => $.schedule.errors.conflict)
+        : code === "RESERVATION_EXISTS"
+          ? t(($) => $.schedule.errors.reservation)
+          : [
+                "PLAN_FEATURE_UNAVAILABLE",
+                "PLAN_LIMIT_REACHED",
+                "BILLING_OPERATION_RESTRICTED",
+              ].includes(code)
+            ? t(($) => $.schedule.errors.plan)
+            : code === "DOCUMENT_REQUIRED"
+              ? t(($) => $.schedule.errors.document)
+              : [
+                    "ENTITLEMENT_UNAVAILABLE",
+                    "INSUFFICIENT_STUDENT_CREDIT",
+                    "CREDIT_LIMIT_EXCEEDED",
+                    "QUOTA_EXCEEDED",
+                  ].includes(code)
+                ? t(($) => $.schedule.errors.entitlement)
+                : ["VERSION_CONFLICT", "PREVIEW_STALE"].includes(code)
+                  ? t(($) => $.schedule.stale)
+                  : t(($) => $.schedule.rejected);
+}

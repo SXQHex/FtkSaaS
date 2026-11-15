@@ -645,7 +645,7 @@ export default interface Resources {
       "errors": {
         "capacity": "Seçilen kapasite veya kaynak kontenjanı işlemi karşılamıyor.",
         "configuration": "Gerekli yapılandırma tamamlanmamış. Merkez ayarlarını ve geçerli anlaşmaları kontrol et.",
-        "conflict": "Seçilen saat, salon veya eğitmen başka bir kayıtla çakışıyor.",
+        "conflict": "Seçilen saat, salon veya eğitmen uygunluk kurallarını karşılamıyor ya da başka bir kayıtla çakışıyor.",
         "document": "Gerekli belge koşulu karşılanmıyor.",
         "entitlement": "Hak veya kredi koşulu bu işleme izin vermiyor.",
         "plan": "Plan veya abonelik bu işleme izin vermiyor.",

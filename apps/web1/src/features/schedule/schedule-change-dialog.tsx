@@ -38,6 +38,7 @@ export function ScheduleChangeDialog({
   notify,
   affectedLabel,
   notice,
+  error,
   locked = false,
   onScope,
   onReason,
@@ -54,6 +55,7 @@ export function ScheduleChangeDialog({
   notify: boolean;
   affectedLabel: string | null;
   notice?: string;
+  error?: string;
   locked?: boolean;
   onScope?: (scope: "single" | "this_and_future") => void;
   onReason?: (reason: string) => void;
@@ -83,7 +85,7 @@ export function ScheduleChangeDialog({
       </DialogHeader>
       <ItemGroup className="gap-2">
         {rows.map((row) => (
-          <Item key={row.id} size="sm" variant="outline">
+          <Item key={row.id} role="listitem" size="sm" variant="outline">
             <ItemContent>
               <ItemTitle>{row.title}</ItemTitle>
               <ItemDescription>
@@ -153,6 +155,11 @@ export function ScheduleChangeDialog({
           />
         </Field>
       </form>
+      {error && (
+        <Alert role="alert" variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       {notice && (
         <Alert role="status">
           <AlertDescription>{notice}</AlertDescription>

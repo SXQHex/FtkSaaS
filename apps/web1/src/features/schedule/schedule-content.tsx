@@ -28,6 +28,7 @@ import {
 } from "./schedule-read";
 import {
   scheduleEvents,
+  scheduleBackendError,
   scheduleSessionDraft,
   scheduleSessionPanel,
 } from "./schedule-presentation";
@@ -257,35 +258,7 @@ export function ScheduleContent({
           : t(($) => $.schedule.timeAmbiguous),
       );
     } else if (failure instanceof BackendError) {
-      const code = failure.code;
-      setError(
-        code === "POLICY_NOT_CONFIGURED"
-          ? t(($) => $.schedule.errors.configuration)
-          : code === "CAPACITY_FULL"
-            ? t(($) => $.schedule.errors.capacity)
-            : code === "RESOURCE_CONFLICT"
-              ? t(($) => $.schedule.errors.conflict)
-              : code === "RESERVATION_EXISTS"
-                ? t(($) => $.schedule.errors.reservation)
-                : [
-                      "PLAN_FEATURE_UNAVAILABLE",
-                      "PLAN_LIMIT_REACHED",
-                      "BILLING_OPERATION_RESTRICTED",
-                    ].includes(code)
-                  ? t(($) => $.schedule.errors.plan)
-                  : code === "DOCUMENT_REQUIRED"
-                    ? t(($) => $.schedule.errors.document)
-                    : [
-                          "ENTITLEMENT_UNAVAILABLE",
-                          "INSUFFICIENT_STUDENT_CREDIT",
-                          "CREDIT_LIMIT_EXCEEDED",
-                          "QUOTA_EXCEEDED",
-                        ].includes(code)
-                      ? t(($) => $.schedule.errors.entitlement)
-                      : ["VERSION_CONFLICT", "PREVIEW_STALE"].includes(code)
-                        ? t(($) => $.schedule.stale)
-                        : t(($) => $.schedule.rejected),
-      );
+      setError(scheduleBackendError(failure.code, t));
     } else
       setError(
         failure instanceof Error && failure.message === "SCHEDULE_PREVIEW_STALE"
@@ -364,7 +337,7 @@ export function ScheduleContent({
         const next = await previewScheduleProgram(fresh, createDraft);
         if (mounted.current) {
           setReview(next);
-          setNotice(t(($) => $.schedule.previewReady));
+          setNotice(next.preview.blockers.length ? undefined : t(($) => $.schedule.previewReady));
         }
       }
     });
@@ -436,7 +409,7 @@ export function ScheduleContent({
       }
       if (mounted.current) {
         setReview(next);
-        setNotice(t(($) => $.schedule.previewReady));
+        setNotice(next.preview.blockers.length ? undefined : t(($) => $.schedule.previewReady));
       }
     });
   }
@@ -575,6 +548,15 @@ export function ScheduleContent({
       detail: `${format(item.interval.starts_at)} – ${format(item.interval.ends_at)}`,
       blocked: review.preview.blockers.length > 0,
     })) ?? [];
+  const previewError =
+    error ??
+    (review?.preview.blockers.length
+      ? [
+          ...new Set(
+            review.preview.blockers.map((blocker) => scheduleBackendError(blocker.code, t)),
+          ),
+        ].join(" ")
+      : undefined);
   const canApply = Boolean(
     review && !review.preview.blockers.length && command.state === "ready" && !locked,
   );
@@ -688,7 +670,7 @@ export function ScheduleContent({
         preview={previewRows}
         locked={locked}
         notice={message}
-        error={error}
+        error={previewError}
         onClose={() => {
           if (!locked) {
             setCreateOpen(false);
@@ -733,7 +715,7 @@ export function ScheduleContent({
                 ? t(($) => $.schedule.rosterUnavailable)
                 : message
           }
-          error={error}
+          error={previewError}
           canFuture
           canEdit={Boolean(selected.resources)}
           cancelled={selected.session.state === "cancelled"}
@@ -807,6 +789,7 @@ export function ScheduleContent({
         notify={false}
         affectedLabel={review?.preview.sessions ? String(review.preview.sessions.length) : null}
         notice={t(($) => $.schedule.batchHint)}
+        error={previewError}
         locked={locked}
         onScope={(value) => {
           setChangeScope(value);

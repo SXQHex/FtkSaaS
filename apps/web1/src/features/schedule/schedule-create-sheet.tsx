@@ -383,7 +383,7 @@ export function ScheduleCreateSheet({
             <h3 className="text-sm font-medium">{t(($) => $.schedule.resultingSessions)}</h3>
             <ItemGroup className="gap-0">
               {preview.map((row) => (
-                <Item key={row.id} variant="outline" size="sm">
+                <Item key={row.id} role="listitem" variant="outline" size="sm">
                   <ItemContent>
                     <ItemTitle>{row.title}</ItemTitle>
                     <ItemDescription className={row.blocked ? "text-destructive" : undefined}>

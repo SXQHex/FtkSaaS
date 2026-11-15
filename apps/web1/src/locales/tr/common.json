@@ -1332,7 +1332,7 @@
     "errors": {
       "configuration": "Gerekli yapılandırma tamamlanmamış. Merkez ayarlarını ve geçerli anlaşmaları kontrol et.",
       "capacity": "Seçilen kapasite veya kaynak kontenjanı işlemi karşılamıyor.",
-      "conflict": "Seçilen saat, salon veya eğitmen başka bir kayıtla çakışıyor.",
+      "conflict": "Seçilen saat, salon veya eğitmen uygunluk kurallarını karşılamıyor ya da başka bir kayıtla çakışıyor.",
       "reservation": "Mevcut rezervasyonlar bu değişikliği engelliyor. Güncel etkiyi incele.",
       "plan": "Plan veya abonelik bu işleme izin vermiyor.",
       "document": "Gerekli belge koşulu karşılanmıyor.",

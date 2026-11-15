@@ -5,8 +5,9 @@ import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 
-async function scheduleFixture(page: Page, withSession = false) {
-  await mockStudio(page);
+async function scheduleFixture(page: Page, withSession = false, verifiedInstructor = false) {
+  const fixture = await mockStudio(page);
+  if (verifiedInstructor) fixture.roles[0]!.accountAccessGranted = true;
   let session: SessionView | undefined;
   const writes: string[] = [];
   const reads: string[] = [];
@@ -150,4 +151,108 @@ test("missing editor policy keeps session details and independent cancellation a
   );
   await page.keyboard.press("Escape");
   await expect(panel).toHaveCount(0);
+});
+
+test("blocked program preview explains the native reason and clears it when the draft changes", async ({
+  page,
+}) => {
+  const state = await scheduleFixture(page, false, true);
+  let previews = 0;
+  await page.route("**/functions/v1/backend-v1/program_preview_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    expect(request.class_id).toBe(I.lesson);
+    expect(request.schedule.room_id).toBe(I.room);
+    previews++;
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          id: "019a7b00-0000-7000-8000-000000000093",
+          token: "synthetic-preview-token",
+          scope_hash: "synthetic-preview-scope",
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+          dependencies: { versions: [] },
+          effects: [],
+          blockers: [{ code: "RESOURCE_CONFLICT", retryable: false, trace_id: I.role }],
+          sessions: [
+            {
+              session_id: "019a7b00-0000-7000-8000-000000000094",
+              interval: {
+                starts_at: "2026-11-17T08:17:00Z",
+                ends_at: "2026-11-17T08:47:00Z",
+              },
+            },
+          ],
+        },
+      },
+    });
+  });
+  await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
+  await panel.locator("#schedule-create-class").selectOption(I.lesson);
+  await panel.locator("#schedule-create-instructor").selectOption(I.instructor);
+  await panel.locator("#schedule-create-room").selectOption(I.room);
+  await panel.locator("#schedule-create-capacity").fill("2");
+  await panel.locator("#schedule-create-date").fill("2026-11-17");
+  await panel.locator("#schedule-create-time").fill("11:17");
+  await panel.locator("#schedule-create-duration").fill("30");
+  await panel.locator("#schedule-create-weeks").fill("1");
+  await panel.getByRole("button", { name: "Sal", exact: true }).click();
+  await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
+  await expect(panel.getByRole("alert")).toHaveText(
+    "Seçilen saat, salon veya eğitmen uygunluk kurallarını karşılamıyor ya da başka bir kayıtla çakışıyor.",
+  );
+  await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toHaveCount(0);
+  expect(previews).toBe(1);
+  expect(state.writes).toEqual([]);
+  await page.setViewportSize({ width: 320, height: 900 });
+  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
+  expect((await scanAccessibility(page, "blocked-program-preview")).violations).toEqual([]);
+  await panel.locator("#schedule-create-time").fill("12:17");
+  await expect(panel.getByRole("alert")).toHaveCount(0);
+  await expect(panel.getByRole("region", { name: "Oluşacak seanslar", exact: true })).toHaveCount(
+    0,
+  );
+  expect(state.writes).toEqual([]);
+});
+
+test("a blocked cancellation explains its reason inside the active session sheet", async ({
+  page,
+}) => {
+  const state = await scheduleFixture(page, true);
+  await page.route("**/functions/v1/backend-v1/session_cancel_preview_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    expect(request.reason).toBe("Sentetik iptal gerekçesi");
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          id: "019a7b00-0000-7000-8000-000000000095",
+          token: "synthetic-cancel-preview",
+          scope_hash: "synthetic-cancel-scope",
+          expires_at: new Date(Date.now() + 60_000).toISOString(),
+          dependencies: {
+            versions: [{ entity: { type: "sessions", id: request.session_id }, version: 3 }],
+          },
+          effects: [{ entity: { type: "sessions", id: request.session_id }, action: "cancel" }],
+          blockers: [{ code: "RESERVATION_EXISTS", retryable: false, trace_id: I.role }],
+        },
+      },
+    });
+  });
+  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await panel.getByRole("button", { name: "Seansı iptal et", exact: true }).click();
+  await panel.locator("#schedule-session-reason").fill("Sentetik iptal gerekçesi");
+  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await expect(panel.getByRole("alert")).toHaveText(
+    "Mevcut rezervasyonlar bu değişikliği engelliyor. Güncel etkiyi incele.",
+  );
+  await expect(
+    panel.getByRole("button", { name: "Değişiklikleri uygula", exact: true }),
+  ).toHaveCount(0);
+  expect(state.writes).toEqual([]);
 });
