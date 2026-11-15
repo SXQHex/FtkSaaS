@@ -1,7 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { createBackend } from "../../lib/backend";
-import { getSupabaseClient } from "../../lib/supabase";
+import { scopedBackend as studioBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   ClassWaitlistImpact,
   DisciplineView,
@@ -10,11 +9,8 @@ import type {
   RoomDeactivationEffects,
 } from "../../lib/api-contracts/generated";
 
-export interface StudioScope {
-  accountId: string;
-  orgId: string;
-  centerId: string;
-}
+export { studioBackend };
+export type StudioScope = ClientScope;
 export type ResourceKind = "room" | "class";
 export interface ResourceDraft {
   name: string;
@@ -82,26 +78,6 @@ export function resourceSchema(
       if (kind === "class" && !value.disciplineId)
         context.addIssue({ code: "custom", path: ["disciplineId"], message: messages.discipline });
     });
-}
-
-// Pin one native bearer across an operation and validate the domain account.
-// A stale editor must never submit its draft as a newly selected native account.
-export async function studioBackend(scope: StudioScope) {
-  const { data, error } = await getSupabaseClient().auth.getSession();
-  if (error) throw error;
-  if (!data.session) throw new Error("AUTH_REQUIRED");
-  const bearer = data.session.access_token;
-  const backend = createBackend({
-    functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    getAccessToken: async () => bearer,
-  });
-  const account = await backend.call("account_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-  });
-  if (account.id !== scope.accountId) throw new Error("ACCOUNT_CHANGED");
-  return backend;
 }
 
 export async function studioPages<T>(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchIcon, LinkIcon, MergeIcon, UploadIcon, UserPlusIcon, XIcon } from "lucide-react";
 import { Button } from "../../components/ui/button";
@@ -24,7 +24,13 @@ import {
   SheetFooter,
   SheetClose,
 } from "../../components/ui/sheet";
-import { Field, FieldGroup, FieldLabel, FieldDescription } from "../../components/ui/field";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+} from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { Switch } from "../../components/ui/switch";
 import { Pagination, PaginationContent, PaginationItem } from "../../components/ui/pagination";
@@ -35,7 +41,7 @@ export interface PeopleRow {
   id: string;
   name: string;
   email: string | null;
-  state: "active" | "inactive" | "unknown";
+  state: "active" | "inactive" | "none" | "unknown";
   entitlement: {
     label: string;
     available?: number;
@@ -71,6 +77,9 @@ export function PeopleView({
   mergeCount,
   onProfile,
   onAllocate,
+  filterUnavailable = false,
+  interactionLocked = false,
+  noticeContent,
 }: {
   rows: PeopleRow[];
   state: "loading" | "ready" | "error";
@@ -81,7 +90,7 @@ export function PeopleView({
   hasPrevious: boolean;
   hasNext: boolean;
   onSearch: (value: string) => void;
-  onFilter: (value: PeopleFilter) => void;
+  onFilter?: (value: PeopleFilter) => void;
   onSelect: (id: string) => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -91,6 +100,9 @@ export function PeopleView({
   mergeCount?: number;
   onProfile?: (id: string) => void;
   onAllocate?: (id: string) => void;
+  filterUnavailable?: boolean;
+  interactionLocked?: boolean;
+  noticeContent?: ReactNode;
 }) {
   const { t } = useTranslation();
   const [summaryOpen, setSummaryOpen] = useState(false);
@@ -144,7 +156,7 @@ export function PeopleView({
     </>
   );
   return (
-    <div className="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
+    <div className="flex min-w-0 flex-col gap-4 p-4 sm:p-6" inert={interactionLocked}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t(($) => $.people.title)}</h1>
@@ -170,6 +182,10 @@ export function PeopleView({
           </Button>
         </div>
       </div>
+      {noticeContent}
+      {filterUnavailable && (
+        <p className="text-xs text-muted-foreground">{t(($) => $.people.filterUnavailable)}</p>
+      )}
       {state === "error" && (
         <Alert variant="destructive">
           <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
@@ -201,12 +217,16 @@ export function PeopleView({
               selectionMode="single"
               disallowEmptySelection
               selectedKeys={new Set([filter])}
-              onSelectionChange={(keys) => onFilter(String([...keys][0]) as PeopleFilter)}
+              onSelectionChange={(keys) => onFilter?.(String([...keys][0]) as PeopleFilter)}
               aria-label={t(($) => $.people.status)}
             >
               <ToggleGroupItem id="all">{t(($) => $.people.all)}</ToggleGroupItem>
-              <ToggleGroupItem id="active">{t(($) => $.people.states.active)}</ToggleGroupItem>
-              <ToggleGroupItem id="inactive">{t(($) => $.people.states.inactive)}</ToggleGroupItem>
+              <ToggleGroupItem id="active" isDisabled={filterUnavailable}>
+                {t(($) => $.people.states.active)}
+              </ToggleGroupItem>
+              <ToggleGroupItem id="inactive" isDisabled={filterUnavailable}>
+                {t(($) => $.people.states.inactive)}
+              </ToggleGroupItem>
             </ToggleGroup>
           </CardHeader>
           <CardContent className="min-w-0 pb-1">
@@ -390,6 +410,13 @@ export function PeopleEntrySheet({
   personCreated = false,
   invitationNotice,
   onSendInvitation,
+  locked = false,
+  nameError,
+  emailError,
+  onNameBlur,
+  onEmailBlur,
+  formRef,
+  recoveryActions,
 }: {
   open: boolean;
   onClose: () => void;
@@ -402,6 +429,13 @@ export function PeopleEntrySheet({
   personCreated?: boolean;
   invitationNotice?: string;
   onSendInvitation?: () => void;
+  locked?: boolean;
+  nameError?: string;
+  emailError?: string;
+  onNameBlur?: () => void;
+  onEmailBlur?: () => void;
+  formRef?: RefObject<HTMLFormElement | null>;
+  recoveryActions?: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
@@ -409,17 +443,17 @@ export function PeopleEntrySheet({
       showCloseButton={false}
       isOpen={open}
       onOpenChange={(value) => {
-        if (!value && !busy) onClose();
+        if (!value && !busy && !locked) onClose();
       }}
-      isDismissable={!busy}
-      isKeyboardDismissDisabled={busy}
+      isDismissable={!busy && !locked}
+      isKeyboardDismissDisabled={busy || locked}
     >
       <SheetHeader className="relative pr-14">
         <SheetClose
           variant="ghost"
           size="icon-sm"
           className="absolute top-4 right-4"
-          isDisabled={busy}
+          isDisabled={busy || locked}
           aria-label={t(($) => $.studio.close)}
         >
           <XIcon />
@@ -429,44 +463,55 @@ export function PeopleEntrySheet({
       </SheetHeader>
       <form
         id="people-entry"
+        ref={formRef}
+        aria-label={t(($) => $.people.invite)}
+        aria-busy={busy}
+        method="post"
+        noValidate
         className="min-h-0 flex-1 overflow-y-auto px-5 py-4"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!personCreated && !busy) onSubmit?.();
+          if (!personCreated && !busy && !locked) onSubmit?.();
         }}
       >
         <FieldGroup className="gap-4">
           {personCreated && (
-            <Alert>
+            <Alert role="status">
               <AlertDescription>{t(($) => $.people.personCreated)}</AlertDescription>
             </Alert>
           )}
           {invitationNotice && (
-            <Alert role="status">
+            <Alert role="status" id="people-entry-notice" tabIndex={-1}>
               <AlertDescription>{invitationNotice}</AlertDescription>
             </Alert>
           )}
-          <Field>
+          <Field data-invalid={Boolean(nameError)}>
             <FieldLabel htmlFor="people-name">
               {t(($) => $.people.fullName)} <span aria-hidden="true">*</span>
             </FieldLabel>
             <Input
               id="people-name"
+              onBlur={onNameBlur}
+              aria-invalid={Boolean(nameError)}
+              aria-describedby={nameError ? "people-name-error" : undefined}
               name="display_name"
               readOnly={personCreated}
               required
               autoComplete="name"
               value={name}
               onChange={(event) => onName(event.target.value)}
-              disabled={busy}
+              disabled={busy || locked}
             />
+            {nameError && <FieldError id="people-name-error">{nameError}</FieldError>}
           </Field>
-          <Field>
+          <Field data-invalid={Boolean(emailError)}>
             <FieldLabel htmlFor="people-email">
               {t(($) => $.people.email)} <span aria-hidden="true">*</span>
             </FieldLabel>
             <Input
               id="people-email"
+              onBlur={onEmailBlur}
+              aria-invalid={Boolean(emailError)}
               name="email"
               readOnly={personCreated}
               required
@@ -477,9 +522,12 @@ export function PeopleEntrySheet({
               spellCheck={false}
               value={email}
               onChange={(event) => onEmail(event.target.value)}
-              disabled={busy}
-              aria-describedby="people-entry-hint"
+              disabled={busy || locked}
+              aria-describedby={
+                emailError ? "people-email-error people-entry-hint" : "people-entry-hint"
+              }
             />
+            {emailError && <FieldError id="people-email-error">{emailError}</FieldError>}
             <FieldDescription id="people-entry-hint">
               {t(($) => $.people.entryHint)}
             </FieldDescription>
@@ -500,16 +548,21 @@ export function PeopleEntrySheet({
           </Field>
         </FieldGroup>
       </form>
+      {recoveryActions && <div className="px-5 pb-3">{recoveryActions}</div>}
       <SheetFooter>
-        <Button variant="outline" isDisabled={busy} onPress={onClose}>
+        <Button variant="outline" isDisabled={busy || locked} onPress={onClose}>
           {t(($) => $.people.cancel)}
         </Button>
         {personCreated ? (
-          <Button isDisabled={busy || !onSendInvitation} onPress={onSendInvitation}>
+          <Button
+            id="people-send-invitation"
+            isDisabled={busy || locked || !onSendInvitation}
+            onPress={onSendInvitation}
+          >
             {t(($) => $.people.sendInvitation)}
           </Button>
         ) : (
-          <Button type="submit" form="people-entry" isDisabled={busy || !onSubmit}>
+          <Button type="submit" form="people-entry" isDisabled={busy || locked || !onSubmit}>
             {t(($) => $.people.createPerson)}
           </Button>
         )}

@@ -21,6 +21,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
+import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
 
 const IndexRoute = IndexRouteImport.update({
@@ -83,6 +84,11 @@ const InviteExpiredRoute = InviteExpiredRouteImport.update({
   path: '/invite/expired',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdPeopleRoute = OOrgIdCCenterIdPeopleRouteImport.update({
+  id: '/o/$orgId/c/$centerId/people',
+  path: '/o/$orgId/c/$centerId/people',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdStudioRoute = OOrgIdCCenterIdStudioRouteImport.update({
   id: '/o/$orgId/c/$centerId/studio',
   path: '/o/$orgId/c/$centerId/studio',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
 }
 export interface FileRoutesByTo {
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
 }
 export interface FileRoutesById {
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/account_/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite_/expired': typeof InviteExpiredRoute
+  '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
 }
 export interface FileRouteTypes {
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/account/deletion'
     | '/auth/callback'
     | '/invite/expired'
+    | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/account/deletion'
     | '/auth/callback'
     | '/invite/expired'
+    | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
   id:
     | '__root__'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/account_/deletion'
     | '/auth/callback'
     | '/invite_/expired'
+    | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
   fileRoutesById: FileRoutesById
 }
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   AccountDeletionRoute: typeof AccountDeletionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
+  OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
 }
 
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteExpiredRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/people': {
+      id: '/o/$orgId/c/$centerId/people'
+      path: '/o/$orgId/c/$centerId/people'
+      fullPath: '/o/$orgId/c/$centerId/people'
+      preLoaderRoute: typeof OOrgIdCCenterIdPeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/studio': {
       id: '/o/$orgId/c/$centerId/studio'
       path: '/o/$orgId/c/$centerId/studio'
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountDeletionRoute: AccountDeletionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   InviteExpiredRoute: InviteExpiredRoute,
+  OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
 }
 export const routeTree = rootRouteImport

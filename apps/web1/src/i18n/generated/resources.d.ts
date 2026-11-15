@@ -319,6 +319,8 @@ export default interface Resources {
       "cancel": "Vazgeç",
       "contactHidden": "Paylaşılmıyor",
       "createPerson": "Kişiyi oluştur",
+      "createdUnread": "Kişi kaydedildi; güncel kayıt henüz okunamadı. Oluşturmayı tekrarlamadan yeniden oku.",
+      "creating": "Kişi kaydediliyor…",
       "debt": "Borç",
       "description": "Üyelerin hakları, sıradaki dersleri ve açık borçları.",
       "email": "E-posta",
@@ -327,10 +329,13 @@ export default interface Resources {
       "entitlementFor": "{{name}} kullanılabilir hak",
       "entryDescription": "Önce kişi bilgilerini kaydet. Hesap daveti ayrı bir onayla gönderilir.",
       "entryHint": "Kişi oluşturmak giriş hesabı, davet veya öğrencilik oluşturmaz.",
+      "filterUnavailable": "Aktif/Pasif filtreleri şu anda kullanılamıyor.",
       "fullName": "Ad soyad",
       "import": "İçe aktar",
       "invitations": "Davetler ve hesaplar",
       "invite": "Üye davet et",
+      "inviting": "Davet isteği gönderiliyor…",
+      "jobUnread": "Davet işi oluşturuldu; güncel durum okunamadı. Daveti tekrar göndermeden yeniden oku.",
       "loading": "Üyeler yükleniyor…",
       "low": "Az kaldı",
       "member": "Üye",
@@ -343,6 +348,7 @@ export default interface Resources {
       "previous": "Önceki",
       "profile": "Profili aç",
       "readError": "Üyeler okunamadı. Güncel kaynağı yeniden yükle.",
+      "refresh": "Güncel durumu oku",
       "retry": "Yeniden dene",
       "search": "Üye ara",
       "selectPerson": "Özetini görmek için bir üye seç.",
@@ -351,13 +357,15 @@ export default interface Resources {
       "states": {
         "active": "Aktif",
         "inactive": "Pasif",
+        "none": "Öğrencilik yok",
         "unknown": "Durum okunamadı"
       },
       "status": "Durum",
       "summary": "Üye özeti",
       "summaryDescription": "Seçili kişinin güncel hak ve iletişim bilgileri.",
       "title": "Üyeler",
-      "unknown": "Henüz okunmadı"
+      "unknown": "Henüz okunmadı",
+      "writeRejected": "İşlem reddedildi. Güncel kaynağı yükleyip yeniden değerlendir."
     },
     "photo": {
       "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",

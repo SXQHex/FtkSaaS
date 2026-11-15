@@ -925,7 +925,8 @@
     "states": {
       "active": "Aktif",
       "inactive": "Pasif",
-      "unknown": "Durum okunamadı"
+      "unknown": "Durum okunamadı",
+      "none": "Öğrencilik yok"
     },
     "member": "Üye",
     "entitlement": "Hak",
@@ -959,6 +960,13 @@
     "cancel": "Vazgeç",
     "createPerson": "Kişiyi oluştur",
     "personCreated": "Kişi kaydedildi. Davet için ayrıca onay ver.",
-    "sendInvitation": "Daveti gönder"
+    "sendInvitation": "Daveti gönder",
+    "filterUnavailable": "Aktif/Pasif filtreleri şu anda kullanılamıyor.",
+    "creating": "Kişi kaydediliyor…",
+    "createdUnread": "Kişi kaydedildi; güncel kayıt henüz okunamadı. Oluşturmayı tekrarlamadan yeniden oku.",
+    "writeRejected": "İşlem reddedildi. Güncel kaynağı yükleyip yeniden değerlendir.",
+    "inviting": "Davet isteği gönderiliyor…",
+    "jobUnread": "Davet işi oluşturuldu; güncel durum okunamadı. Daveti tekrar göndermeden yeniden oku.",
+    "refresh": "Güncel durumu oku"
   }
 }
