@@ -24,6 +24,7 @@ import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdScheduleRouteImport } from './routes/o.$orgId.c.$centerId.schedule'
+import { Route as OOrgIdCCenterIdSettingsRouteImport } from './routes/o.$orgId.c.$centerId.settings'
 import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
 import { Route as OOrgIdCCenterIdPeopleMergeRouteImport } from './routes/o.$orgId.c.$centerId.people_.merge'
 
@@ -102,6 +103,11 @@ const OOrgIdCCenterIdScheduleRoute = OOrgIdCCenterIdScheduleRouteImport.update({
   path: '/o/$orgId/c/$centerId/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdSettingsRoute = OOrgIdCCenterIdSettingsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/settings',
+  path: '/o/$orgId/c/$centerId/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdStudioRoute = OOrgIdCCenterIdStudioRouteImport.update({
   id: '/o/$orgId/c/$centerId/studio',
   path: '/o/$orgId/c/$centerId/studio',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
+  '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
   '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
 }
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
+  '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
   '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
 }
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
+  '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
   '/o/$orgId/c/$centerId/people_/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
 }
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/schedule'
+    | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
     | '/o/$orgId/c/$centerId/people/merge'
   fileRoutesByTo: FileRoutesByTo
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/schedule'
+    | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
     | '/o/$orgId/c/$centerId/people/merge'
   id:
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/schedule'
+    | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
     | '/o/$orgId/c/$centerId/people_/merge'
   fileRoutesById: FileRoutesById
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdScheduleRoute: typeof OOrgIdCCenterIdScheduleRoute
+  OOrgIdCCenterIdSettingsRoute: typeof OOrgIdCCenterIdSettingsRoute
   OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
   OOrgIdCCenterIdPeopleMergeRoute: typeof OOrgIdCCenterIdPeopleMergeRoute
 }
@@ -359,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdScheduleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/settings': {
+      id: '/o/$orgId/c/$centerId/settings'
+      path: '/o/$orgId/c/$centerId/settings'
+      fullPath: '/o/$orgId/c/$centerId/settings'
+      preLoaderRoute: typeof OOrgIdCCenterIdSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/studio': {
       id: '/o/$orgId/c/$centerId/studio'
       path: '/o/$orgId/c/$centerId/studio'
@@ -392,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdScheduleRoute: OOrgIdCCenterIdScheduleRoute,
+  OOrgIdCCenterIdSettingsRoute: OOrgIdCCenterIdSettingsRoute,
   OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
   OOrgIdCCenterIdPeopleMergeRoute: OOrgIdCCenterIdPeopleMergeRoute,
 }

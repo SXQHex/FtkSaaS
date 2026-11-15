@@ -1,0 +1,309 @@
+import { useCallback, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { readWorkspace } from "../workspace/workspace";
+import { BackendError } from "../../lib/backend";
+import type { ClientScope } from "../../lib/scoped-backend";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Alert, AlertDescription } from "../../components/ui/alert";
+import { SettingsView, type SettingsViewData } from "./settings-view";
+import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
+import { DisciplineEditor } from "./discipline-editor";
+import { readOrganizationSettingsCatalog } from "./settings-reader";
+
+export function SettingsContent({
+  scope,
+  onLockChange,
+  preservePending = false,
+}: {
+  scope: ClientScope;
+  onLockChange: (locked: boolean) => void;
+  preservePending?: boolean;
+}) {
+  const router = useRouter();
+  const workspace = useQuery({
+    queryKey: ["workspace", scope.accountId, scope.orgId],
+    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
+    enabled: false,
+    retry: false,
+  });
+  const current =
+    (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
+      ? workspace.data
+      : undefined;
+  const organization = current?.selected,
+    center = current?.centers.find((item) => item.id === scope.centerId && item.accessible);
+  const catalog = useQuery({
+    queryKey: ["settings-organization-catalog", scope.accountId, scope.orgId],
+    queryFn: () => readOrganizationSettingsCatalog(scope),
+    enabled: Boolean(organization && center && !workspace.isError),
+    retry: false,
+  });
+  useEffect(() => {
+    const error = catalog.error;
+    if (
+      (error instanceof BackendError &&
+        ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
+      (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
+    )
+      void router.invalidate();
+  }, [catalog.error, router]);
+  if (!organization || !center)
+    return (
+      <div className="p-6">
+        <SettingsView data={{}} />
+      </div>
+    );
+  const roles = current.roles.filter(
+    (role) => role.state === "active" && role.person_id === organization.self_context?.person_id,
+  );
+  // Owner is stored on the organization, not necessarily as a role-assignment row.
+  // Native organization field access represents Owner/OM settings scope; each domain writer still rechecks its own gates.
+  const organizationCatalog =
+    !catalog.isError && catalog.data?.state === "known" ? catalog.data.catalog : undefined;
+  const canOrganization = Boolean(organizationCatalog);
+  const canWriteOrganization =
+    organizationCatalog?.fields.some((field) => field.key === "address" && field.writable) === true;
+  const canCenter = roles.some(
+    (role) => role.role === "center_manager" && role.scope_center_id === scope.centerId,
+  );
+  return (
+    <SettingsManagement
+      key={`${scope.accountId}:${scope.orgId}:${scope.centerId}`}
+      scope={scope}
+      organizationLabel={organization.name}
+      centerLabel={center.name}
+      canOrganization={canOrganization}
+      canWriteOrganization={canWriteOrganization}
+      readOnly={workspace.isError}
+      organizationLoading={catalog.isPending || catalog.isFetching}
+      canCenter={canCenter}
+      onLockChange={onLockChange}
+    />
+  );
+}
+
+function SettingsManagement({
+  scope,
+  organizationLabel,
+  centerLabel,
+  canOrganization,
+  canWriteOrganization,
+  readOnly,
+  organizationLoading,
+  canCenter,
+  onLockChange,
+}: {
+  scope: ClientScope;
+  organizationLabel: string;
+  centerLabel: string;
+  canOrganization: boolean;
+  canWriteOrganization: boolean;
+  readOnly: boolean;
+  organizationLoading: boolean;
+  canCenter: boolean;
+  onLockChange: (locked: boolean) => void;
+}) {
+  const { t } = useTranslation(),
+    router = useRouter(),
+    queries = useQueryClient();
+  const [level, setLevel] = useState<DisciplineLevel>(canCenter ? "center" : "organization");
+  const [selection, setSelection] = useState<{ id?: string }>(),
+    [locked, setLocked] = useState(false);
+  const publishLock = useCallback(
+    (value: boolean) => {
+      setLocked(value);
+      onLockChange(value);
+    },
+    [onLockChange],
+  );
+  const accessLost = useCallback(
+    (failure: unknown) => {
+      const code =
+        failure instanceof BackendError
+          ? failure.code
+          : failure instanceof Error
+            ? failure.message
+            : undefined;
+      if (
+        !code ||
+        !["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED", "FORBIDDEN"].includes(code)
+      )
+        return false;
+      setSelection(undefined);
+      if (code === "FORBIDDEN")
+        void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
+      else {
+        queries.clear();
+        void router.invalidate();
+      }
+      return true;
+    },
+    [queries, router, scope.accountId, scope.orgId],
+  );
+  const allowed = level === "organization" ? canOrganization : canCenter;
+  const writable = !readOnly && (level === "organization" ? canWriteOrganization : canCenter);
+  const query = useQuery({
+    queryKey: [
+      "settings-disciplines",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      level,
+      canOrganization,
+    ],
+    queryFn: async () => {
+      if (level === "organization")
+        return { items: await readDisciplineCatalog(scope, "organization"), centerItems: null };
+      const [local, global] = await Promise.all([
+        readDisciplineCatalog(scope, "center"),
+        canOrganization ? readDisciplineCatalog(scope, "organization") : Promise.resolve(null),
+      ]);
+      return { items: global ?? local, centerItems: local };
+    },
+    enabled: allowed,
+    retry: false,
+  });
+  useEffect(() => {
+    if (
+      query.error instanceof BackendError &&
+      ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(query.error.code)
+    )
+      void router.invalidate();
+    else if (
+      query.error instanceof Error &&
+      ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(query.error.message)
+    )
+      void router.invalidate();
+  }, [query.error, router]);
+  const source = query.isError || query.isFetching ? undefined : query.data;
+  const data: SettingsViewData = {
+    tables: source
+      ? {
+          disciplines: {
+            columns:
+              level === "organization"
+                ? ["name", "organizationState", "action"]
+                : ["name", "organizationState", "centerState", "action"],
+            rows: source.items.map((item) => {
+              const local = source.centerItems?.find((row) => row.id === item.id)?.presentation
+                .center;
+              const state = (active: boolean) => (
+                <Badge variant={active ? "secondary" : "outline"}>
+                  {active ? t(($) => $.settings.on) : t(($) => $.settings.off)}
+                </Badge>
+              );
+              const available = writable && (level === "organization" || item.state === "active");
+              return {
+                id: item.id,
+                cells: [
+                  item.name,
+                  state(item.state === "active"),
+                  ...(level === "center"
+                    ? [
+                        local
+                          ? state(local.state === "active")
+                          : t(($) => $.settings.disciplineStatus.notInCenterList),
+                      ]
+                    : []),
+                  <div key="action" className="flex flex-col items-start gap-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      isDisabled={locked || !available}
+                      onPress={() => setSelection({ id: item.id })}
+                    >
+                      {t(($) => $.settings.disciplineStatus.edit)}
+                    </Button>
+                    {!available && level === "center" && (
+                      <p className="text-xs text-muted-foreground">
+                        {t(($) => $.settings.disciplineStatus.masterInactive)}
+                      </p>
+                    )}
+                  </div>,
+                ],
+              };
+            }),
+          },
+        }
+      : undefined,
+  };
+  async function refresh() {
+    // A master change also invalidates center projections that were read before it.
+    // Mark every cached projection stale, then read the active scope only once.
+    await queries.invalidateQueries({
+      queryKey: ["settings-disciplines", scope.accountId, scope.orgId],
+      refetchType: "none",
+    });
+    const result = await query.refetch();
+    if (result.error) throw result.error;
+    await queries.invalidateQueries({
+      queryKey: ["studio", scope.accountId, scope.orgId],
+    });
+  }
+  return (
+    <div className="flex flex-col gap-4 p-4 md:p-6">
+      {((!allowed && !(level === "organization" && organizationLoading)) || query.isError) && (
+        <Alert role="alert" variant="destructive">
+          <AlertDescription>
+            {allowed
+              ? t(($) => $.settings.disciplineStatus.readError)
+              : t(($) => $.settings.disciplineStatus.unavailable)}
+            {allowed && (
+              <Button
+                type="button"
+                variant="outline"
+                isDisabled={query.isFetching || locked}
+                onPress={() => {
+                  void query.refetch();
+                }}
+              >
+                {t(($) => $.settings.disciplineStatus.reload)}
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+      <SettingsView
+        data={data}
+        locked={locked}
+        scope={{
+          selected: level,
+          organizationLabel,
+          centerLabel,
+          organizationAvailable: canOrganization,
+          centerAvailable: canCenter,
+        }}
+        onScope={(next) => {
+          if (!locked) {
+            setSelection(undefined);
+            setLevel(next);
+          }
+        }}
+        availableActions={writable && source && level === "organization" ? ["discipline"] : []}
+        onAction={(action) => {
+          if (!locked && action.kind === "discipline" && level === "organization") setSelection({});
+        }}
+      />
+      {selection && (
+        <DisciplineEditor
+          key={`${scope.accountId}:${scope.orgId}:${scope.centerId}:${level}:${selection.id ?? "new"}`}
+          scope={scope}
+          level={level}
+          id={selection.id}
+          scopeLabel={level === "organization" ? organizationLabel : centerLabel}
+          onClose={() => {
+            if (!locked) setSelection(undefined);
+          }}
+          onRefresh={refresh}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+          canWrite={writable && !query.isError && !query.isFetching}
+        />
+      )}
+    </div>
+  );
+}
