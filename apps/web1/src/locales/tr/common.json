@@ -816,12 +816,12 @@
     "availabilityBoundaryHint": "Başlangıç günü dahildir; bitiş günü dahil değildir. Bitiş boşsa kural ileri tarihlere devam eder.",
     "availabilityTimeHint": "Saatler merkez saat dilimindedir. Bitişi SS:dd veya SS:dd:ss olarak yaz; gece yarısı için 24:00 kullan. Geceyi aşan aralığı iki güne böl.",
     "availabilityInvalid": "Geçerli bir başlangıç günü ve en az bir açık gün/saat aralığı gir. Her başlangıç bitişten önce, bitiş günü başlangıç gününden sonra olmalıdır.",
-    "availabilityRemoveUnsupported": "Kaydedilmiş bir kuralın son gününü kaldırma işlemi şu anda desteklenmiyor. Saatini, dönemini veya kalan günlerini değiştirebilirsin.",
+    "availabilityRemoveUnsupported": "Kalıcı kuralın tamamını kapatmak için taslak değişikliklerini geri alıp “Kalıcı kuralı kapat” menüsünü kullan.",
     "availabilityConflict": "Bir kuralın sürümü değişmiş. Kaydedilmiş adımlar korunur; güncel kuralları yükleyip taslağı yeniden hazırla.",
     "availabilityRejected": "İşlem reddedildi. Kaydedilmiş adımlar geri alınmadı; güncel kuralları yükleyerek kalan değişikliği yeniden hazırla.",
     "availabilitySavedUnread": "Uygunluk komutları kabul edildi; son okuma tamamlanamadı. Yalnız güncel durumu tekrar oku.",
     "availabilitySaved": "Uygunluk kuralları güncel kaynaktan okundu. Mevcut seanslar otomatik değiştirilmedi.",
-    "availabilityWriteHint": "Kurallar ayrı adımlarda kaydedilir. Mevcut seanslar otomatik değiştirilmez. Kaydedilmiş bir kuralın son gününü kaldırma desteği bekleniyor.",
+    "availabilityWriteHint": "Saat ve dönem düzenlemesi ile kalıcı kuralı kapatma ayrı işlemlerdir. Mevcut seanslar otomatik değiştirilmez.",
     "newAvailabilityPeriod": "Yeni geçerlilik dönemi",
     "availabilityProgress": "{{total}} komuttan {{done}} tanesi kabul edildi.",
     "closureTimezone": "Aşağıdaki günler {{timezone}} merkez saat dilimine göre, başlangıç ve bitiş günleri dahil tüm gündür. Mevcut seanslar otomatik değiştirilmez.",
@@ -910,6 +910,18 @@
       "account_profile": "Hesap profilinden gelir; hesap sahibi Hesabım sayfasından günceller.",
       "native_auth": "Giriş hesabından gelir; kişi kaydında değiştirilemez.",
       "unknown": "Alan kaynağı henüz doğrulanamadı; güncel bilgileri yeniden yükle."
+    },
+    "lifecycle": {
+      "retire": "Kalıcı kuralı kapat",
+      "chooseRule": "Kapatılacak uygunluk kuralı",
+      "cancelClosure": "Kapanışı iptal et",
+      "ruleDescription": "Seçili kaydedilmiş kural, kapsadığı bütün hafta günleriyle kapatılacak. Son kural kapanırsa yeni planlama için yeniden uygunluk tanımlamak gerekir. Mevcut seanslar değişmez.",
+      "closureDescription": "Yalnız seçili kapanış kaydı iptal edilecek. Diğer kapanışlar ve mevcut seanslar değişmez. Eski kayıt ve işlem geçmişi korunur.",
+      "reasonRequired": "Bu işlem için bir gerekçe yaz.",
+      "closed": "Kapalı",
+      "cancelled": "İptal edildi",
+      "timezone": "Saat dilimi",
+      "reason": "İşlem gerekçesi"
     }
   },
   "people": {
