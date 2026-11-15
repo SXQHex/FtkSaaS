@@ -149,6 +149,7 @@ function PeopleContent({
   onLockChange: (value: boolean) => void;
 }) {
   const router = useRouter();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [queryText, setQueryText] = useState("");
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
@@ -238,7 +239,15 @@ function PeopleContent({
         onRetry={() => {
           void query.refetch();
         }}
-        actions={{}}
+        actions={{
+          merge: () => {
+            if (!locked)
+              void navigate({
+                to: "/o/$orgId/c/$centerId/people/merge",
+                params: { orgId: scope.orgId, centerId: scope.centerId },
+              });
+          },
+        }}
         onInvite={() => {
           setEntryGeneration((value) => value + 1);
           setEntryStarted(true);

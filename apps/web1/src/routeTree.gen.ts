@@ -23,6 +23,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
+import { Route as OOrgIdCCenterIdPeopleMergeRouteImport } from './routes/o.$orgId.c.$centerId.people_.merge'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,6 +95,12 @@ const OOrgIdCCenterIdStudioRoute = OOrgIdCCenterIdStudioRouteImport.update({
   path: '/o/$orgId/c/$centerId/studio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdPeopleMergeRoute =
+  OOrgIdCCenterIdPeopleMergeRouteImport.update({
+    id: '/o/$orgId/c/$centerId/people_/merge',
+    path: '/o/$orgId/c/$centerId/people/merge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/invite/expired': typeof InviteExpiredRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +134,7 @@ export interface FileRoutesByTo {
   '/invite/expired': typeof InviteExpiredRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +152,7 @@ export interface FileRoutesById {
   '/invite_/expired': typeof InviteExpiredRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/people_/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/invite/expired'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/people/merge'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/invite/expired'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/people/merge'
   id:
     | '__root__'
     | '/'
@@ -193,6 +205,7 @@ export interface FileRouteTypes {
     | '/invite_/expired'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/people_/merge'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +223,7 @@ export interface RootRouteChildren {
   InviteExpiredRoute: typeof InviteExpiredRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
+  OOrgIdCCenterIdPeopleMergeRoute: typeof OOrgIdCCenterIdPeopleMergeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdStudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/people_/merge': {
+      id: '/o/$orgId/c/$centerId/people_/merge'
+      path: '/o/$orgId/c/$centerId/people/merge'
+      fullPath: '/o/$orgId/c/$centerId/people/merge'
+      preLoaderRoute: typeof OOrgIdCCenterIdPeopleMergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -330,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteExpiredRoute: InviteExpiredRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
+  OOrgIdCCenterIdPeopleMergeRoute: OOrgIdCCenterIdPeopleMergeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

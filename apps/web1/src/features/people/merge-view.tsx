@@ -98,6 +98,8 @@ export function MergeView({
   onApply,
   onDismiss,
   onRetry,
+  completedAvailable = true,
+  listActions,
 }: {
   items: MergeListItem[];
   selectedId?: string;
@@ -123,6 +125,8 @@ export function MergeView({
   onApply?: () => void;
   onDismiss?: () => void;
   onRetry?: () => void;
+  completedAvailable?: boolean;
+  listActions?: ReactNode;
 }) {
   const { t } = useTranslation();
   const unknown = t(($) => $.peopleMerge.unknown);
@@ -158,7 +162,11 @@ export function MergeView({
               aria-label={t(($) => $.peopleMerge.filterLabel)}
             >
               {(["pending", "completed"] as const).map((key) => (
-                <ToggleGroupItem key={key} id={key}>
+                <ToggleGroupItem
+                  key={key}
+                  id={key}
+                  isDisabled={key === "completed" && !completedAvailable}
+                >
                   {t(($) => $.peopleMerge.filters[key])}
                 </ToggleGroupItem>
               ))}
@@ -235,8 +243,9 @@ export function MergeView({
               </Empty>
             )}
           </CardContent>
-          <CardFooter className="mt-0">
+          <CardFooter className="mt-0 flex flex-col items-start gap-2">
             <p className="text-xs text-muted-foreground">{pendingLabel ?? unknown}</p>
+            {listActions}
           </CardFooter>
         </Card>
         <div className="flex min-w-0 flex-col gap-4" aria-busy={state === "loading"}>
