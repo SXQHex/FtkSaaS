@@ -1952,5 +1952,129 @@
     "currentDebt": "Güncel kalan borç",
     "offsetHint": "Üye alacağını yalnız seçili borca mahsup et. Nakit hareketi oluşturulmaz. Borç sürümü ve alacak kayıt sırasında yeniden denetlenir.",
     "debtAdjustHint": "Tutar yeni toplam değil, borca uygulanacak artış veya azalış farkıdır. Nakit tahsilat/iade değildir. Güncel borç ve olası alacak etkisi işlemden sonra kaynaktan okunur."
+  },
+  "memberProfile": {
+    "back": "Üyeler",
+    "joined": "Üye: {{date}}",
+    "unknown": "—",
+    "readRequired": "Bilgi henüz alınmadı.",
+    "available": "Kullanılabilir hak",
+    "upcoming": "Yaklaşan rezervasyon",
+    "debt": "Açık borç",
+    "attendance": "Son 90 gün yoklama",
+    "sections": "Üye bölümleri",
+    "tabs": {
+      "rights": "Haklar",
+      "reservations": "Rezervasyon ve yoklama",
+      "payments": "Ödemeler"
+    },
+    "current": "Mevcut haklar",
+    "noEntitlement": "Bu kapsamda okunmuş hak yok.",
+    "counts": {
+      "available": "kullanılabilir",
+      "reserved": "ayrılmış",
+      "consumed": "kullanılmış"
+    },
+    "timedHint": "Süreli kullanım hakkı; kullanım koşulları paket bilgilerinde gösterilir.",
+    "negative": "Negatif limit",
+    "negativeFields": {
+      "limit": "Ders limiti",
+      "used": "Kullanıldı",
+      "unitValue": "Ders değeri"
+    },
+    "ledger": "Hak hareketleri",
+    "past": "Geçmiş haklar",
+    "noRecords": "Kayıt yok.",
+    "reservationHistory": "Rezervasyon ve yoklama geçmişi",
+    "paymentHistory": "Ödeme kayıtları",
+    "filter": "Filtre",
+    "filters": {
+      "all": "Tümü",
+      "upcoming": "Yaklaşan",
+      "past": "Geçmiş"
+    },
+    "columns": {
+      "lesson": "Ders",
+      "reservation": "Rezervasyon",
+      "attendance": "Yoklama",
+      "credit": "Hak",
+      "actions": "İşlemler",
+      "date": "Tarih",
+      "kind": "İşlem",
+      "detail": "Yöntem / kalem",
+      "amount": "Tutar"
+    },
+    "contact": "Kişi bilgileri",
+    "contactHint": "Alanların kaynağı ve düzenleme yetkisi kişi kaydından okunur. Hesap alanlarını yalnız hesap sahibi değiştirir.",
+    "actions": {
+      "allocate": "Paket / hak tahsis et",
+      "renew": "Paketi yenile",
+      "change": "Paketi değiştir",
+      "freeze": "Dondur",
+      "unfreeze": "Dondurmayı bitir",
+      "extend": "Süreyi uzat",
+      "adjust": "Hakkı düzelt",
+      "negative": "Düzenle",
+      "terminate": "Sonlandır",
+      "collect": "Tahsilat al",
+      "deactivate": "Pasifleştir",
+      "activate": "Üyeyi etkinleştir",
+      "cancelReservation": "İptal et"
+    },
+    "close": "Kapat",
+    "cancel": "Vazgeç",
+    "backToEdit": "Geri",
+    "confirm": "Uygula",
+    "review": "Etkiyi incele",
+    "effects": "Etki",
+    "effectsRequired": "İşlem etkisi henüz kaynaktan okunmadı.",
+    "accepted": "Etkiyi okudum",
+    "product": "Paket",
+    "noProducts": "Bu kapsamda uygun paketler henüz alınmadı.",
+    "dateHint": "Başlangıç ve bitiş açıkça seçilir; geçerlilik ve gün sınırları önizlemede doğrulanır.",
+    "fields": {
+      "startDate": "Başlangıç",
+      "endDate": "Bitiş",
+      "disciplineId": "Disiplin"
+    },
+    "choose": "Seç…",
+    "direction": "İşlem",
+    "addCredit": "Hak ekle",
+    "removeCredit": "Hak çıkar",
+    "limitLabel": "Limit (ders, 0 kapalı)",
+    "quantityLabel": "Ders sayısı",
+    "reservationChoices": "Gelecek rezervasyonlar",
+    "inventoryRequired": "Gelecek rezervasyonlar yüklenmeden paket değişikliği incelenemez.",
+    "noFutureReservations": "Bu satışa bağlı gelecek rezervasyon yok.",
+    "keepReservation": "Kesin kalsın",
+    "cancelReservation": "İptal et",
+    "reason": "Gerekçe",
+    "reasonHint": "Gerekçe zorunludur ve işlem geçmişinde korunur.",
+    "paymentPlan": "Ödeme",
+    "paymentChoices": {
+      "debt": "Borç olarak kaydet",
+      "collect": "Satıştan sonra tahsilatı aç"
+    },
+    "paymentDetails": {
+      "debt": "Satışın borç etkisi önizlemede gösterilir.",
+      "collect": "Satış tamamlanınca ayrı tahsilat işlemini aç. Henüz ödeme alınmaz."
+    },
+    "nativeEffectsHint": "Hak, borç ve rezervasyon etkileri önizlemeden okunur. Tahsilat ve nakit iade ayrı işlemlerdir.",
+    "stateHint": "Geçmiş kayıtlar korunur. Yetki ve açık rezervasyon koşulları işlem sırasında doğrulanır.",
+    "titles": {
+      "allocate": "Paket / hak tahsis et",
+      "renew": "Paketi yenile",
+      "change": "Paketi değiştir",
+      "freeze": "Hakkı dondur",
+      "unfreeze": "Dondurmayı bitir",
+      "extend": "Süreyi uzat",
+      "adjust": "Hakkı düzelt",
+      "negative": "Negatif limit",
+      "terminate": "Hakkı sonlandır",
+      "activate": "Üyeyi etkinleştir",
+      "deactivate": "Üyeyi pasifleştir",
+      "cancelReservation": "Rezervasyonu iptal et"
+    },
+    "cancelFreeze": "Dondurmayı iptal et"
   }
 }
