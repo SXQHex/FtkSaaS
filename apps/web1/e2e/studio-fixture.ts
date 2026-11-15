@@ -124,6 +124,7 @@ export async function mockStudio(page: Page) {
         id: I.availability,
         personId: I.instructor,
         version: 3,
+        active: true,
         rule: {
           weekdays: [1, 3] as [number, ...number[]],
           local_start: "18:00:00",
@@ -132,9 +133,16 @@ export async function mockStudio(page: Page) {
           valid_until: null,
         } satisfies AvailabilityRule,
       },
-    ] as { id: string; personId: string; version: number; rule: AvailabilityRule }[],
+    ] as {
+      id: string;
+      personId: string;
+      version: number;
+      active: boolean;
+      rule: AvailabilityRule;
+    }[],
     closures: [] as {
       id: string;
+      state: "active" | "cancelled";
       resource: { kind: "person" | "room"; id: string };
       interval: { starts_at: string; ends_at: string };
     }[],
@@ -400,9 +408,11 @@ export async function mockStudio(page: Page) {
           route,
           list(
             state.rules
-              .filter((rule) => rule.personId === resource.id)
+              .filter(
+                (rule) => rule.personId === resource.id && (!k.rule_id || k.rule_id === rule.id),
+              )
               .map((rule) =>
-                item("availability_rules", rule.id, rule.version, true, {
+                item("availability_rules", rule.id, rule.version, rule.active, {
                   operation: "availability_save_v1",
                   values: { rule_id: rule.id, resource, rule: rule.rule },
                 }),
@@ -423,8 +433,9 @@ export async function mockStudio(page: Page) {
               .map((closure) => ({
                 ...item("availability_exceptions", closure.id, 1, true, {
                   operation: "availability_exception_save_v1",
-                  values: { resource, interval: closure.interval },
+                  values: { resource, interval: closure.interval, exception_id: closure.id },
                 }),
+                state: closure.state,
                 versions: [
                   { entity: { type: "centers", id: I.center }, version: state.centerVersion },
                 ],
@@ -600,7 +611,13 @@ export async function mockStudio(page: Page) {
       const rule = state.rules.find((rule) => rule.id === r.rule_id);
       if (rule) {
         if (rule.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
-        rule.rule = r.rule as AvailabilityRule;
+        if (!rule.active) return fail(route, "VERSION_CONFLICT");
+        if (r.action === "retire") {
+          expect(r.resource).toEqual({ kind: "person", id: rule.personId });
+          expect(typeof r.reason === "string" && Boolean(r.reason.trim())).toBe(true);
+          expect(r.rule).toBeUndefined();
+          rule.active = false;
+        } else rule.rule = r.rule as AvailabilityRule;
         rule.version++;
         primary = rule.id;
         version = rule.version;
@@ -609,19 +626,30 @@ export async function mockStudio(page: Page) {
         state.rules.push({
           id: primary,
           personId: (r.resource as { id: string }).id,
+          active: true,
           version,
           rule: r.rule as AvailabilityRule,
         });
       }
     } else if (op === "availability_exception_save_v1") {
       if (r.expected_version !== state.centerVersion) return fail(route, "VERSION_CONFLICT");
+      if (r.action === "cancel") {
+        const closure = state.closures.find((item) => item.id === r.exception_id);
+        if (!closure || closure.state !== "active") return fail(route, "VERSION_CONFLICT");
+        expect(r.resource).toEqual(closure.resource);
+        expect(typeof r.reason === "string" && Boolean(r.reason.trim())).toBe(true);
+        expect(r.interval).toBeUndefined();
+        closure.state = "cancelled";
+        primary = closure.id;
+      } else
+        state.closures.push({
+          id: primary,
+          state: "active",
+          resource: r.resource as { kind: "person" | "room"; id: string },
+          interval: r.interval as { starts_at: string; ends_at: string },
+        });
       state.centerVersion++;
       version = state.centerVersion;
-      state.closures.push({
-        id: primary,
-        resource: r.resource as { kind: "person" | "room"; id: string },
-        interval: r.interval as { starts_at: string; ends_at: string },
-      });
     } else if (op === "instructor_agreement_publish_v1") {
       const predecessor = r.supersedes_id
         ? state.agreements.find((agreement) => agreement.id === r.supersedes_id)

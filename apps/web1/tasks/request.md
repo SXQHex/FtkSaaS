@@ -10,7 +10,7 @@
 | W1-BE-02 | E13 · P04     | Görünür kişi sayfası için hak, para birimine göre borç ve en yakın ders özeti | Backend karşılandı (PR311); E13 bağlantısı/testleri geçti, gerçek kabul açık.               |
 | W1-BE-03 | E15 · P04.3   | Merkez geneli davet/hesap bağlantısı keşfi, filtreler ve sayaçlar             | Kaynak karşılandı (PR311/312); kişi dizini gerçek development’ta503 veriyor, inceleme açık. |
 | W1-BE-04 | E16 · P04.4   | Birleştirme gerekçesi, öneri/geçmiş keşfi ve kalıcı kopya-değil kararı        | Backend karşılandı (PR312); E16 kalan tüketici bağlantısı/kabulü açık.                      |
-| W1-BE-05 | E12 · P03.3   | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                   | Backend karşılandı (PR312); E12 retire/cancel tüketimi/kabulü açık.                         |
+| W1-BE-05 | E12 · P03.3   | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                   | Backend karşılandı (PR312); E12 retire/cancel bağlandı; gerçek kabul TODO’da açık.          |
 
 ## Bütün talepler için ortak sınır
 
@@ -83,7 +83,7 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 
 ## W1-BE-05 · Uygunluk ve kapanış yaşam döngüsü
 
-**Karşılandı (PR312):** `availability_save_v1(action:retire,rule_id,resource,expected_version,reason)` gerçek kural row version’ıyla; `availability_exception_save_v1(action:cancel,exception_id,resource,expected_version,reason)` gerçek merkez aggregate sürümüyle çalışır. Reader active/inactive ve active/cancelled durumlarını verir. Eski saat/hafta/tarih veya gizli gerekçe açılmaz; seanslara otomatik yan etki yoktur. E12 tüketimi/gerçek kabulü açıktır.
+**Karşılandı (PR312):** `availability_save_v1(action:retire,rule_id,resource,expected_version,reason)` gerçek kural row version’ıyla; `availability_exception_save_v1(action:cancel,exception_id,resource,expected_version,reason)` gerçek merkez aggregate sürümüyle çalışır. Reader active/inactive ve active/cancelled durumlarını verir. Eski saat/hafta/tarih veya gizli gerekçe açılmaz; seanslara otomatik yan etki yoktur. E12 retire/cancel tüketimi hazır onaylar ve sürümlü yazar/yeniden okumayla bağlandı; gerçek kabul TODO’da açıktır.
 
 **Talep açılırken kaynak:** Haftalık uygunluk ekleme/sürümlü güncelleme ve merkez aggregate version ile kapanış append destekleniyor. Son kalıcı uygunluk kuralını kapatma ve mevcut kapanışı iptal etme komutu mevcut tüketim sözleşmesinde yok. [Uygunluk adaptörü](../src/features/studio/availability-edit.ts), [kapanış adaptörü](../src/features/studio/closure.ts), [WF02](../../../docs/workflows.md#wf02)/[WF03](../../../docs/workflows.md#wf03).
 

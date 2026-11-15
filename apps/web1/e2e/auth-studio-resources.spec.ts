@@ -36,6 +36,7 @@ test("Studio resource: split availability retries only the unknown step and pres
     id: "019a7b00-0000-7000-8000-000000000030",
     personId: studioIds.instructor,
     version: 6,
+    active: true,
     rule: {
       weekdays: [5] as [number, ...number[]],
       local_start: "10:00:00",
