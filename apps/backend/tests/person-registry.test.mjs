@@ -376,3 +376,4 @@ import './crm-lifecycle-acceptance.mjs';
 import './crm-followup-projections-acceptance.mjs';
 import './crm-segment-worker-acceptance.mjs';
 import './crm-followup-acceptance.mjs';
+import './person-field-policy-acceptance.mjs';

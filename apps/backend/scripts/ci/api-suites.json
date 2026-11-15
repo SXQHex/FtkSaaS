@@ -536,7 +536,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "b1563475f9ea64b992aa1726836f94c02719681645d9b5b2c753b4fe85e782d4",
+      "sha256": "1f8701f46283981a5e1c05d3ab12b70da74680476a338eec229aa3ffddb3141f",
       "shared": [
         [
           7,
@@ -622,6 +622,11 @@
           "line": 378,
           "path": "apps/backend/tests/crm-followup-acceptance.mjs",
           "sha256": "976c83144aa9cd17ec09d9f86e290c6e0b86d0f10b7a777873dd87a580bd338f"
+        },
+        {
+          "line": 379,
+          "path": "apps/backend/tests/person-field-policy-acceptance.mjs",
+          "sha256": "125d689dfd3f905398fd7718e736a277dc516e91d2d88700fa23ca0829370cac"
         }
       ],
       "estimated_seconds": 651.01

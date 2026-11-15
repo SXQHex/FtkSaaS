@@ -1,11 +1,19 @@
 # Güncel kaynak ve kabul
 
+<a id="kisi-alan-kaynagi"></a>
+## Kişi alan kaynağı ve yazılabilirliği — 14 Kasım 2026
+
+Kaynak adayı: `PersonView`/`PersonSummary.field_policy` ad alanlarının, görünür `contacts[].field_policy` iletişim satırının mevcut kontrol kaynağını ve `person_update_writable` sınırını verir. Korumalı hesap/native alanı false; yerel alanın yazma yetkisi, plan, merkez ve sürüm kontrolü ayrıca gerekir. `given_name/family_name` kişi yazma sözleşmesinde desteklenmediğinden false kalır. Aynı görünür iletişim değerindeki alias kopyası native korumayı gizleyemez. Account/link/Auth kimliği/token dönmez; mevcut guard, yazma ve replay davranışı değişmedi. Typed tüketim ve tam contacts değişimi [WF04](../../../docs/workflows.md#wf04), entegrasyon [XREQ-047](../../../docs/requests.md#xreq-047).
+
+162. migration append edildi. Bağımsız kaynak incelemesinin SQL argüman çözümleme bulgusu positional parametrelerle düzeltildi; son incelemede engelleyici bulgu yok. Yeni typed sözleşme unit testi ile `pnpm verify` 562/562 (403+149+10), sıfır skip geçti; generated/typecheck/governance ve kalite/floor doğrulaması başarılı. Yerel native başlangıcı GitHub/S3 slim-services DNS hatasında durdu; focused API testi ortam oluşmadığı için çalışamadı, gerçek DB/API kabulü açık. Kaynak, aday CI, merge, development deploy ve canlı ekran kabulü ayrı aşamalardır; bu adayın son dört aşaması henüz doğrulanmadı. G03 sırası değişmedi.
+
+
 <a id="e12-guvenli-okuma"></a>
 ## E12 kurulum ve eğitmen bağı — 14 Kasım 2026
 
-Kaynak adayı: `centers_list_v1(include_setup_status:true,center_id)` yalnız canlı CM için tek merkezde kişisel veri içermeyen `setup_status` verir. Belge yürürlükte/hazır yayın; davet sağlayıcı onaylı geçmiş gönderimdir. Kuyruk başarı sayılmaz. `roles_list_v1` ve instructor `management_state_get_v1` öğelerinde `account_access_granted` tam atamanın aktif doğrulanmış hesap bağı ve canlı hesap/Auth durumunu gösterir; aktif offline görev false kalır. Hesap kimliği/token, oturum veya MFA garantisi dönmez; yazma/duplicate/replay kuralları değişmedi. Çağrı ve kabul ölçütü [WF02](../../../docs/workflows.md#wf02), tüketici devri [XREQ-046](../../../docs/requests.md#xreq-046).
+Kaynak: `centers_list_v1(include_setup_status:true,center_id)` yalnız canlı CM için tek merkezde kişisel veri içermeyen `setup_status` verir. Belge yürürlükte/hazır yayın; davet sağlayıcı onaylı geçmiş gönderimdir. Kuyruk başarı sayılmaz. `roles_list_v1` ve instructor `management_state_get_v1` öğelerinde `account_access_granted` tam atamanın aktif doğrulanmış hesap bağı ve canlı hesap/Auth durumunu gösterir; aktif offline görev false kalır. Hesap kimliği/token, oturum veya MFA garantisi dönmez; yazma/duplicate/replay kuralları değişmedi. Çağrı ve kabul ölçütü [WF02](../../../docs/workflows.md#wf02), tüketici devri [XREQ-046](../../../docs/requests.md#xreq-046).
 
-161. migration append edildi; bağımsız kaynak incelemesinde engelleyici bulgu yok. `pnpm verify` (402 + 149 + 10 test; 561 geçti, sıfır skip), generated/typecheck/governance ve kalite/floor kontrolü geçti. Sığ checkout eksik iki tarihsel Git nesnesi getirilerek mevcut doğrulama testi düzeltmesiz geçti. Yerel native başlangıcı GitHub ve S3 slim-services artifact DNS hatasında durdu; DB/API kabulü çalıştırılmaya denendi fakat ortam oluşmadığı için geçmedi. Bu kaynak teslimi CI, merge, development deploy veya canlı E12 kabulü değildir; G03 sırası değişmedi.
+161. migration append edildi; bağımsız kaynak incelemesinde engelleyici bulgu yok. `pnpm verify` (402 + 149 + 10 test; 561 geçti, sıfır skip), generated/typecheck/governance ve kalite/floor kontrolü geçti. Sığ checkout eksik iki tarihsel Git nesnesi getirilerek mevcut doğrulama testi düzeltmesiz geçti. Yerel native başlangıcı GitHub ve S3 slim-services artifact DNS hatasında durdu; DB/API kabulü çalıştırılmaya denendi fakat ortam oluşmadığı için geçmedi. PR309 main `c06b8bfd73828fb1fd895bc6296b6143f9fdf9e6` üzerinde birleşti; aynı main için [main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/43604478438) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43604523306) başarılı olarak doğrulandı. Bu sonuç frontend ekran kabulü değildir; G03 sırası değişmedi.
 
 
 <a id="statik-spa"></a>

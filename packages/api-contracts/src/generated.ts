@@ -630,6 +630,19 @@ configuration_requirement?: ScheduleConfigurationRequirement
  */
 export type SubscriberNumber = string
 /**
+ * Current controlling source and intrinsic person_update_v1 field mutability. Not actor authorization, historical provenance, verification proof or login status. No identity/credentials. Account-owned fields are always false; writes recheck live authority.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonFieldPolicy".
+ */
+export type PersonFieldPolicy = ({
+source: "person"
+person_update_writable: boolean
+} | {
+source: ("account_profile" | "native_auth")
+person_update_writable: false
+})
+/**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ContentLanguage".
  */
@@ -4452,6 +4465,8 @@ RenderedDocument?: RenderedDocument
 ManagementSelector_content_catalog_save_v1?: ManagementSelectorContentCatalogSaveV1
 ManagementProjection_content_catalog_save_v1?: ManagementProjectionContentCatalogSaveV1
 CenterSetupStatus?: CenterSetupStatus
+PersonFieldPolicy?: PersonFieldPolicy
+PersonNameFieldPolicy?: PersonNameFieldPolicy
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5365,6 +5380,7 @@ export interface ContactView {
 kind: ContactKind
 value: Text
 verified_at?: (Instant | null)
+field_policy?: PersonFieldPolicy
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7044,6 +7060,18 @@ linked_person_ids?: string[]
 given_name?: (string | null)
 family_name?: (string | null)
 subscriber_number?: (SubscriberNumber | null)
+field_policy?: PersonNameFieldPolicy
+}
+/**
+ * Separate given_name/family_name have no person_update_v1 input and remain false even for local persons.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonNameFieldPolicy".
+ */
+export interface PersonNameFieldPolicy {
+display_name: PersonFieldPolicy
+given_name: PersonFieldPolicy
+family_name: PersonFieldPolicy
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7066,6 +7094,7 @@ linked_person_ids?: string[]
 given_name?: (string | null)
 family_name?: (string | null)
 subscriber_number?: (SubscriberNumber | null)
+field_policy?: PersonNameFieldPolicy
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
