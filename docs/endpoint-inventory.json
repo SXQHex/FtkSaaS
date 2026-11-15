@@ -454,7 +454,9 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+      ]
     },
     {
       "name": "availability_exception_save_v1",
@@ -479,7 +481,9 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+      ]
     },
     {
       "name": "policies_get_v1",
@@ -894,7 +898,8 @@
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
         "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
         "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity.",
-        "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens."
+        "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens.",
+        "include_member_summary true requires explicit center and reuses the exact separately authorized rights/currency debt/next-lesson summary for one selected person; omitted preserves the legacy response."
       ]
     },
     {
@@ -1027,7 +1032,9 @@
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+      ]
     },
     {
       "name": "person_merge_approve_v1",
@@ -1073,7 +1080,9 @@
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+      ]
     },
     {
       "name": "calendar_get_v1",
@@ -4953,7 +4962,8 @@
         "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
         "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission.",
         "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged.",
-        "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token."
+        "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token.",
+        "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
       ]
     },
     {
