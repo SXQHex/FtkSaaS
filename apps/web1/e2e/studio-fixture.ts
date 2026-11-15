@@ -33,6 +33,11 @@ const originalPerson: PersonView = {
   display_name: "Örnek Eğitmen",
   version: 3,
   contacts: [],
+  field_policy: {
+    display_name: { source: "person", person_update_writable: true },
+    given_name: { source: "person", person_update_writable: false },
+    family_name: { source: "person", person_update_writable: false },
+  },
   relationships: [{ center_id: I.center, kind: "instructor", state: "active" }],
   discipline_relationships: [
     {
@@ -509,7 +514,11 @@ export async function mockStudio(page: Page) {
         id: primary,
         version,
         display_name: String(r.display_name),
-        contacts: r.contacts as ContactView[],
+        field_policy: structuredClone(originalPerson.field_policy),
+        contacts: (r.contacts as ContactView[]).map((contact) => ({
+          ...contact,
+          field_policy: { source: "person", person_update_writable: true },
+        })),
         relationships: [],
         discipline_relationships: [],
       });
@@ -524,19 +533,30 @@ export async function mockStudio(page: Page) {
       const person = state.people.find((person) => person.id === r.person_id)!;
       if (person.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");
       const patch = r.patch as PersonPatch;
+      if (
+        patch.display_name !== undefined &&
+        person.field_policy?.display_name.person_update_writable !== true
+      )
+        return fail(route, "FORBIDDEN");
+      if (
+        patch.contacts &&
+        person.contacts?.some(
+          (old) =>
+            old.field_policy?.person_update_writable !== true &&
+            !patch.contacts!.some((next) => next.kind === old.kind && next.value === old.value),
+        )
+      )
+        return fail(route, "FORBIDDEN");
       if (patch.display_name !== undefined) person.display_name = patch.display_name;
       if (patch.contacts)
         person.contacts = patch.contacts.map((contact) => ({
           ...contact,
-          ...(person.contacts?.find(
+          ...person.contacts?.find(
             (old) => old.kind === contact.kind && old.value === contact.value,
-          )?.verified_at
-            ? {
-                verified_at: person.contacts.find(
-                  (old) => old.kind === contact.kind && old.value === contact.value,
-                )!.verified_at,
-              }
-            : {}),
+          ),
+          field_policy: person.contacts?.find(
+            (old) => old.kind === contact.kind && old.value === contact.value,
+          )?.field_policy ?? { source: "person", person_update_writable: true },
         }));
       primary = person.id;
       version = ++person.version;

@@ -1,5 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
+import {
+  instructorEmailContact,
+  instructorEmailPolicy,
+  writablePersonField,
+} from "./instructor-identity";
 import { useTranslation } from "react-i18next";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { XIcon } from "lucide-react";
@@ -13,6 +18,7 @@ import {
   saveInstructorEditStep,
   type InstructorEditIntent,
   type InstructorEditState,
+  type InstructorEditDraft,
 } from "./instructor-edit";
 import { InstructorRevoke } from "./instructor-revoke";
 import { StudioSheets } from "./studio-sheets";
@@ -37,6 +43,7 @@ import {
   FieldLegend,
 } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
+import { NativeSelect } from "../../components/ui/native-select";
 import { Checkbox } from "../../components/ui/checkbox";
 import { Switch } from "../../components/ui/switch";
 import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle } from "../../components/ui/item";
@@ -162,6 +169,7 @@ function InstructorEditForm({
 }) {
   const { t } = useTranslation();
   const [base, setBase] = useState(initial);
+  const [defaultValues, setDefaultValues] = useState(() => instructorEditDraft(initial));
   const [notice, setNotice] = useState<Notice>("ready");
   const [busy, setBusy] = useState(false);
   const [completed, setCompleted] = useState(0);
@@ -204,7 +212,7 @@ function InstructorEditForm({
   }, [busy, disabled, notice]);
   const form = useForm({
     formId: "studio-instructor-profile",
-    defaultValues: instructorEditDraft(base),
+    defaultValues,
     validationLogic: revalidateLogic({ mode: "blur", modeAfterSubmission: "change" }),
     validators: {
       onDynamic: instructorEditSchema(base, {
@@ -227,7 +235,7 @@ function InstructorEditForm({
       try {
         const intent = instructorEditIntent(scope, base, value);
         if (!intent.steps.length) {
-          form.reset(instructorEditDraft(base));
+          resetDraft(instructorEditDraft(base));
           setNotice("ready");
           return;
         }
@@ -240,6 +248,13 @@ function InstructorEditForm({
       }
     },
   });
+
+  function resetDraft(values: InstructorEditDraft) {
+    // reset(values) also updates TanStack's defaults. Keep the React options in
+    // sync so its next update cannot restore a previously selected contact.
+    setDefaultValues(values);
+    form.reset(values);
+  }
 
   function draftChanged() {
     if (notice === "saved") {
@@ -258,7 +273,7 @@ function InstructorEditForm({
       const next = await onRefresh();
       if (!mounted.current) return;
       setBase(next);
-      form.reset(instructorEditDraft(next));
+      resetDraft(instructorEditDraft(next));
       setPlan([]);
       queue.current = undefined;
       accepted.current = false;
@@ -272,10 +287,11 @@ function InstructorEditForm({
     }
   }
   async function reread() {
+    const selectedEmail = form.state.values.email;
     const next = await onRefresh();
     if (!mounted.current) return;
     setBase(next);
-    form.reset(instructorEditDraft(next));
+    resetDraft(instructorEditDraft(next, selectedEmail));
     setPlan([]);
     queue.current = undefined;
     accepted.current = false;
@@ -393,6 +409,7 @@ function InstructorEditForm({
                 </FieldLabel>
                 <Input
                   id="instructor-name"
+                  readOnly={!writablePersonField(base.person.field_policy?.display_name)}
                   name="name"
                   autoComplete="name"
                   required
@@ -406,53 +423,112 @@ function InstructorEditForm({
                   aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
                   aria-describedby={
                     field.state.meta.isTouched && !field.state.meta.isValid
-                      ? "instructor-name-error"
-                      : undefined
+                      ? "instructor-name-error instructor-name-source"
+                      : "instructor-name-source"
                   }
                 />
+                <FieldDescription id="instructor-name-source" variant="hint">
+                  {t(
+                    ($) =>
+                      $.studio.personFieldSource[
+                        base.person.field_policy?.display_name.source ?? "unknown"
+                      ],
+                  )}
+                </FieldDescription>
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <FieldError id="instructor-name-error" errors={field.state.meta.errors} />
                 )}
               </Field>
             )}
           </form.Field>
-          <form.Field name="email">
+          <form.Field name="emailContactIndex">
             {(field) => (
-              <Field
-                className="gap-1.5"
-                data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-              >
-                <FieldLabel htmlFor="instructor-email">{t(($) => $.studio.email)}</FieldLabel>
-                <Input
-                  id="instructor-email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+              <Field className="gap-1.5">
+                <FieldLabel htmlFor="instructor-email-choice">
+                  {t(($) => $.studio.chooseContactEmail)}
+                </FieldLabel>
+                <NativeSelect
+                  id="instructor-email-choice"
+                  name="emailContactIndex"
+                  className="w-full"
+                  value={field.state.value === null ? "new" : String(field.state.value)}
                   disabled={disabled || !base.person.contacts}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
                   onChange={(event) => {
+                    const index = event.target.value === "new" ? null : Number(event.target.value);
+                    field.handleChange(index);
+                    form.setFieldValue(
+                      "email",
+                      instructorEmailContact(base.person, index)?.value ?? "",
+                    );
                     draftChanged();
-                    field.handleChange(event.target.value);
                   }}
-                  aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-                  aria-describedby={
-                    field.state.meta.isTouched && !field.state.meta.isValid
-                      ? "instructor-email-error instructor-email-hint"
-                      : "instructor-email-hint"
-                  }
-                />
-                <FieldDescription id="instructor-email-hint" variant="hint">
-                  {base.person.contacts
-                    ? t(($) => $.studio.instructorContactHint)
-                    : t(($) => $.studio.instructorContactUnavailable)}
-                </FieldDescription>
-                {field.state.meta.isTouched && !field.state.meta.isValid && (
-                  <FieldError id="instructor-email-error" errors={field.state.meta.errors} />
-                )}
+                >
+                  {base.person.contacts?.map(
+                    (contact, index) =>
+                      contact.kind === "email" && (
+                        <option key={index} value={String(index)}>
+                          {contact.value}
+                        </option>
+                      ),
+                  )}
+                  <option value="new">{t(($) => $.studio.newLocalContactEmail)}</option>
+                </NativeSelect>
               </Field>
             )}
           </form.Field>
+          <form.Subscribe selector={(state) => state.values.emailContactIndex}>
+            {(contactIndex) => (
+              <form.Field name="email">
+                {(field) => (
+                  <Field
+                    className="gap-1.5"
+                    data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
+                    <FieldLabel htmlFor="instructor-email">{t(($) => $.studio.email)}</FieldLabel>
+                    <Input
+                      id="instructor-email"
+                      name="email"
+                      type="email"
+                      readOnly={
+                        !writablePersonField(instructorEmailPolicy(base.person, contactIndex))
+                      }
+                      autoComplete="email"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      disabled={disabled || !base.person.contacts}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => {
+                        draftChanged();
+                        field.handleChange(event.target.value);
+                      }}
+                      aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                      aria-describedby={
+                        field.state.meta.isTouched && !field.state.meta.isValid
+                          ? "instructor-email-error instructor-email-hint"
+                          : "instructor-email-hint"
+                      }
+                    />
+                    <FieldDescription id="instructor-email-hint" variant="hint">
+                      {t(
+                        ($) =>
+                          $.studio.personFieldSource[
+                            instructorEmailPolicy(base.person, contactIndex)?.source ?? "unknown"
+                          ],
+                      )}{" "}
+                      {base.person.contacts
+                        ? t(($) => $.studio.instructorContactHint)
+                        : t(($) => $.studio.instructorContactUnavailable)}
+                    </FieldDescription>
+                    {field.state.meta.isTouched && !field.state.meta.isValid && (
+                      <FieldError id="instructor-email-error" errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )}
+              </form.Field>
+            )}
+          </form.Subscribe>
           <form.Field name="classIds">
             {(field) => (
               <FieldSet className="gap-3">
@@ -651,7 +727,7 @@ function InstructorEditForm({
           variant="outline"
           isDisabled={disabled}
           onPress={() => {
-            form.reset(instructorEditDraft(base));
+            resetDraft(instructorEditDraft(base));
             setCompleted(0);
             setNotice("ready");
           }}

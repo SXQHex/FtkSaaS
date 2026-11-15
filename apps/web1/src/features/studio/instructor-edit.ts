@@ -2,11 +2,18 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { readInstructorEditor, type InstructorEditorState } from "./instructor-editor-state";
 import { readStudioResources, studioBackend, type ClassRecord, type StudioScope } from "./studio";
+import {
+  instructorEmailContact,
+  instructorEmailIndex,
+  instructorEmailPolicy,
+  writablePersonField,
+} from "./instructor-identity";
 import type { PersonPatch } from "../../lib/api-contracts/generated";
 
 export interface InstructorEditDraft {
   name: string;
   email: string;
+  emailContactIndex: number | null;
   classIds: string[];
   impactAccepted: boolean;
 }
@@ -34,10 +41,15 @@ export async function loadInstructorEditor(
   return { ...state, scope: { ...scope }, classes: resources.classes };
 }
 
-export function instructorEditDraft(base: InstructorEditState): InstructorEditDraft {
+export function instructorEditDraft(
+  base: InstructorEditState,
+  selectedEmail?: string,
+): InstructorEditDraft {
+  const emailContactIndex = instructorEmailIndex(base.person, selectedEmail);
   return {
     name: base.person.display_name,
-    email: base.person.contacts?.find((item) => item.kind === "email")?.value ?? "",
+    email: instructorEmailContact(base.person, emailContactIndex)?.value ?? "",
+    emailContactIndex,
     classIds: base.assignments?.filter((item) => item.active).map((item) => item.classId) ?? [],
     impactAccepted: false,
   };
@@ -58,6 +70,7 @@ export function instructorEditSchema(
     .object({
       name: z.string().trim().min(1, messages.name),
       email: z.union([z.literal(""), z.email(messages.email)]),
+      emailContactIndex: z.number().int().nonnegative().nullable(),
       classIds: z.array(z.string()),
       impactAccepted: z.boolean(),
     })
@@ -85,10 +98,24 @@ export function instructorEditIntent(
   }).parse(draft);
   const steps: InstructorEditStep[] = [];
   const patch: PersonPatch = {};
-  if (value.name !== base.person.display_name) patch.display_name = value.name;
-  const originalEmail = base.person.contacts?.find((item) => item.kind === "email");
+  if (value.name !== base.person.display_name) {
+    if (!writablePersonField(base.person.field_policy?.display_name))
+      throw new Error("PERSON_FIELD_READONLY");
+    patch.display_name = value.name;
+  }
+  const originalEmail = instructorEmailContact(base.person, value.emailContactIndex);
   if (value.email !== (originalEmail?.value ?? "")) {
     if (!base.person.contacts) throw new Error("CONTACTS_UNAVAILABLE");
+    if (!writablePersonField(instructorEmailPolicy(base.person, value.emailContactIndex)))
+      throw new Error("PERSON_FIELD_READONLY");
+    if (
+      value.email &&
+      base.person.contacts.some(
+        (contact) =>
+          contact !== originalEmail && contact.kind === "email" && contact.value === value.email,
+      )
+    )
+      throw new Error("CONTACT_ALREADY_EXISTS");
     // The form edits the displayed contact only. Other email/phone values and
     // their existing verification remain on the backend's unchanged contact rows.
     patch.contacts = base.person.contacts

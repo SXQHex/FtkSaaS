@@ -902,6 +902,14 @@
     "setupDocumentPublished": "Yürürlükte, dosyası hazır bir belge yayını var.",
     "setupDocumentMissing": "Yürürlükte ve dosyası hazır bir belge yayını yok.",
     "setupInvitationSent": "Bu merkezde sağlayıcının onayladığı bir hesap daveti gönderimi var.",
-    "setupInvitationMissing": "Bu merkezde sağlayıcı onaylı hesap daveti gönderimi yok."
+    "setupInvitationMissing": "Bu merkezde sağlayıcı onaylı hesap daveti gönderimi yok.",
+    "chooseContactEmail": "İletişim e-postası seç",
+    "newLocalContactEmail": "Yeni yerel e-posta ekle",
+    "personFieldSource": {
+      "person": "Yerel kişi alanı.",
+      "account_profile": "Hesap profilinden gelir; hesap sahibi Hesabım sayfasından günceller.",
+      "native_auth": "Giriş hesabından gelir; kişi kaydında değiştirilemez.",
+      "unknown": "Alan kaynağı henüz doğrulanamadı; güncel bilgileri yeniden yükle."
+    }
   }
 }

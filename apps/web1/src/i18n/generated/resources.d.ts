@@ -480,6 +480,7 @@ export default interface Resources {
       "choose": "Seç",
       "chooseAnotherPerson": "Başka kişi seç",
       "chooseAvailabilityPeriod": "Bir geçerlilik dönemi seç.",
+      "chooseContactEmail": "İletişim e-postası seç",
       "chooseDiscipline": "Disiplin seç",
       "chooseInstructor": "Eğitmen seç",
       "choosePerson": "Bir kişi seç",
@@ -651,6 +652,7 @@ export default interface Resources {
       "newAgreementChain": "Yeni bağımsız anlaşma zinciri",
       "newAvailabilityPeriod": "Yeni geçerlilik dönemi",
       "newInstructorDescription": "Önce yeni bir kişi oluştur veya mevcut kişiyi seç. Hesap bağı ve eğitmen rolü sonraki adımlarda ayrıca tamamlanır.",
+      "newLocalContactEmail": "Yeni yerel e-posta ekle",
       "newPerson": "Yeni kişi",
       "newPersonHint": "Bu adım yalnız kişi kaydı oluşturur. Yeni giriş hesabı veya eğitmen rolü kendiliğinden oluşturulmaz. Zaten kayıtlı kişiyi yeniden oluşturmak yerine mevcut kişi seçimini kullan.",
       "newVersionHint": "Eğitmeni seçerek yeni sürüm hazırla.",
@@ -690,6 +692,12 @@ export default interface Resources {
       "period": "Dönem",
       "personChoice": "Kişi kaynağı",
       "personCreateFailed": "Kişi oluşturulamadı. Bilgileri ve erişimini kontrol edip yeniden dene.",
+      "personFieldSource": {
+        "account_profile": "Hesap profilinden gelir; hesap sahibi Hesabım sayfasından günceller.",
+        "native_auth": "Giriş hesabından gelir; kişi kaydında değiştirilemez.",
+        "person": "Yerel kişi alanı.",
+        "unknown": "Alan kaynağı henüz doğrulanamadı; güncel bilgileri yeniden yükle."
+      },
       "personRecordStep": "Kişi kaydı",
       "predecessorResetsDraft": "Başka sürümü veya yeni zinciri seçmek ücret/tarih/gerekçe taslağını ve etki onayını sıfırlar. Yeni zincir mevcut yürürlükle bağımsız çakışamaz.",
       "prepareAgreement": "Anlaşma hazırla",
