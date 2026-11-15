@@ -15,8 +15,9 @@ function validationSchema(schema){
  return result;
 }
 for(const [name,schema] of Object.entries(contract.$defs))contract.$defs[name]=validationSchema(schema);
-// Intern identical nested object/array schemas before compilation. Ajv shares
-// named refs; inline copies otherwise generate one validator per scope. Only
+// Intern identical nested object/array/compound schemas before compilation. Ajv shares
+// named refs; inline copies otherwise generate one validator per scope. Repeated
+// compound/nullable unions are shared too, preserving every branch. Only
 // schema positions are visited, so user property names and enum data stay data.
 const nestedMaps=['properties','patternProperties','$defs','definitions','dependentSchemas'];
 const nestedLists=['allOf','anyOf','oneOf','prefixItems'];
@@ -30,7 +31,7 @@ function children(schema,visit){
  return out;
 }
 const occurrences=new Map();
-const count=schema=>{children(schema,count);if(schema&&typeof schema==='object'&&!Array.isArray(schema)&&(schema.type==='object'||schema.type==='array')){const key=JSON.stringify(schema);if(key.length>200)occurrences.set(key,(occurrences.get(key)??0)+1);}return schema;};
+const count=schema=>{children(schema,count);if(schema&&typeof schema==='object'&&!Array.isArray(schema)){const key=JSON.stringify(schema),compound=Array.isArray(schema.anyOf)||Array.isArray(schema.oneOf);if(((schema.type==='object'||schema.type==='array')&&key.length>200)||(compound&&key.length>40))occurrences.set(key,(occurrences.get(key)??0)+1);}return schema;};
 for(const schema of Object.values(contract.$defs))count(schema);
 const shared=new Map([...occurrences].filter(([,count])=>count>1).map(([key],i)=>[key,'__shared_validation_'+i]));
 for(const name of shared.values())assert(!Object.hasOwn(contract.$defs,name),'Internal validation name collision');

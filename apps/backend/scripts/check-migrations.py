@@ -272,3 +272,5 @@ assert next(Path('supabase/migrations').glob('*_s10_offer_duration_required.sql'
 assert next(Path('supabase/migrations').glob('*_center_setup_status.sql')).read_text()==Path('database/center-setup-status.sql').read_text(),'Center setup status source drift'
 
 assert next(Path('supabase/migrations').glob('*_person_field_policy.sql')).read_text()==Path('database/person-field-policy.sql').read_text(),'Person field policy source drift'
+
+assert next(Path('supabase/migrations').glob('*_student_status_filter.sql')).read_text()==Path('database/student-status-filter.sql').read_text()+Path('database/member-page-summary.sql').read_text()+Path('database/access-directory.sql').read_text(),'Member list and access directory source drift'

@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6b0fd93fe12fa9b79bcd40ab76ae70cf222ff4f8d0b13430f4b4a3b9fa66af57",
-        "reason": "Reviewed final person-policy acceptance inventory hash, typed validators and unit import; transport/auth/CI executable policy unchanged."
+        "fingerprint": "5e685c0d0cc084459048cad4ffd4e15d81b7bf0bbbe20662f50bc24b512a63ab",
+        "reason": "Final typed request/response and exact-source inventory reviewed; compound-schema interning preserves all JSON rules and deep canonical equivalence, bringing Edge JSON upload under unchanged 4MB gate."
       }
     },
     {
@@ -617,7 +617,9 @@
         "apps/backend/tests/people-self-scale-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/person-field-policy-acceptance.mjs",
-        "apps/backend/tests/person-field-policy-unit.mjs"
+        "apps/backend/tests/person-field-policy-unit.mjs",
+        "apps/backend/tests/student-status-filter-acceptance.mjs",
+        "apps/backend/tests/student-status-filter-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -674,7 +676,11 @@
         "apps/backend/database/merge-approval-discovery.sql",
         "apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql",
         "apps/backend/database/person-field-policy.sql",
-        "apps/backend/supabase/migrations/20261114175838_person_field_policy.sql"
+        "apps/backend/supabase/migrations/20261114175838_person_field_policy.sql",
+        "apps/backend/database/student-status-filter.sql",
+        "apps/backend/supabase/migrations/20261115014502_student_status_filter.sql",
+        "apps/backend/database/member-page-summary.sql",
+        "apps/backend/database/access-directory.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -693,8 +699,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "e09e5a10354d30911a27d55745338849d7111e80f2ebc1b28c3db4b539ee7302",
-        "reason": "Reviewed final alias-duplicate native snapshot fixture and exact contact/name guard predicates; no writer change, no permissions inferred from metadata."
+        "fingerprint": "17378579ac3f794c87acc08cf666eecdc2e12297548d5903d2be16aae315c8d2",
+        "reason": "Final directory review: read_at consistent effective expiry/status/actionability within page; created-at cursor cutoff remains separate. All three source modules, typed/native fixtures and rights/privacy gates reviewed."
       }
     },
     {
@@ -1120,8 +1126,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "7e6c65e4892b1e56036608263e4604743acdb00649cc139db270465c1711ff94",
-        "reason": "Shared person registry root adds the new field policy acceptance import only; public intake and calendar source behavior and guide remain unchanged."
+        "fingerprint": "84970f5ef624631014e7a2ff996325693cffe944fd9a700e4eb159b66aeeca19",
+        "reason": "Shared person registry test root adds the combined three-request acceptance import only; public/calendar source behavior unchanged."
       }
     },
     {
@@ -1638,8 +1644,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "11a4c734d601263653dc67d73d8fb7196713c1a013aaad1f7fc46dbd9f4a202f",
-        "reason": "Shared person registry root adds field policy acceptance import; CRM writes/intake/automation behavior and guide remain unchanged."
+        "fingerprint": "6e6e1363c50b594003e000196ccf864d1c92e40e628733bca1eecd986b9b155e",
+        "reason": "Shared person registry root adds combined member/access read acceptance import only; CRM behavior unchanged."
       }
     },
     {
