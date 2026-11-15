@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "92ba5f4926c6539a95e3462ea29f31d02de5925dbc4c417d429b27515a7688eb",
-        "reason": "Reviewed final canonical callable/read-path/feature links and exact append migration; three service-only wrappers match existing guards. Original wrappers and unrelated flow behavior unchanged; SQL/typed negative acceptance retained."
+        "fingerprint": "492e803343ba88dc27b04149a84a2c6d5419320ba51b2b6250c9a47d2e78ebdb",
+        "reason": "Reviewed exact P01 assertion-change record and suite hash/range: one product-name expectation follows approved rename, existing sold/fallback identity assertions retained and historical name/price checks added. No gate, scope or threshold changed."
       }
     },
     {
@@ -841,8 +841,8 @@
         "product_state_set_v1"
       ],
       "review": {
-        "fingerprint": "b1a87902b313d23420df3819a01ecc39d42df085039c6e82150cfe56cee324d8",
-        "reason": "Reviewed final canonical callable/read-path/feature links and exact append migration; three service-only wrappers match existing guards. Original wrappers and unrelated flow behavior unchanged; SQL/typed negative acceptance retained."
+        "fingerprint": "2b44e3199597e41c659ff899039c5ab30cc8486aeea1211c7eac1a397a0d411d",
+        "reason": "Reviewed catalog rename contract and immutable published_name source: latest name changes; sold original name/price and future-version fallback remain frozen. Existing identity/sale assertions retained."
       }
     },
     {
@@ -927,8 +927,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "6782cb1d0a767187186325e12412c34a05fe4fc2890e91bafea0c7bcba193520",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "d9c9921e58b6a94f47c1cbc6b173ccedef047eeed2545caca8f8fe3966f696c2",
+        "reason": "Reviewed unchanged reservation allocation and source selection; P01 retains sold version identity and strengthens immutable name/price and future-effective fallback checks."
       }
     },
     {

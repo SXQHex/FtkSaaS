@@ -461,7 +461,7 @@
     },
     {
       "path": "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
-      "sha256": "203d1b6f77cde8f27f45019e3ff44246385e3ee46e77c89714778c0e97d078a6",
+      "sha256": "b7f6f09f196456a76eaf1c3eb0d436ec29f0549bfab515272bfc2ec33b83c792",
       "shared": [
         [
           1,
@@ -474,7 +474,7 @@
           "ranges": [
             [
               7,
-              188
+              190
             ]
           ]
         }
