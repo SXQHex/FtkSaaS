@@ -64,7 +64,7 @@ Kanıt: `.tmp/access-hosted-result.json` (iki503, readErrorVisible:true, explici
 
 ## W1-BE-04 · Birleştirme gerekçesi ve çizimdeki keşif/karar akışı
 
-**Karşılandı (PR312):** Preview gerekçesi sabitlenir, apply/audit sonucuna taşınır. Merkez review directory suggested/completed/not_duplicate durumlarını ve sayaçlarını keşfeder. Kesin normalize e-posta/telefon adayları iletişim görünürlüğüyle sınırlıdır; kopya-değil kararı mevcut preview → açık onay → apply yolundadır. Seçili iki kişiye `person_get_v1(include_member_summary:true)` projeksiyonu desteklenir. E16 tüketici bağlantısı ve odaklı kaynak/sentetik testleri tamamlandı; gerçek development kabulü [TODO](todo.md) içinde açıktır.
+**Karşılandı (PR312):** Preview gerekçesi sabitlenir, apply/audit sonucuna taşınır. Merkez review directory suggested/completed/not_duplicate durumlarını ve sayaçlarını keşfeder. Kesin normalize e-posta/telefon adayları iletişim görünürlüğüyle sınırlıdır; kopya-değil kararı mevcut preview → açık onay → apply yolundadır. Seçili iki kişiye `person_get_v1(include_member_summary:true)` projeksiyonu desteklenir. E16 tüketici bağlantısı ve odaklı kaynak/sentetik testleri tamamlandı; dört gerçek development dizin okuması geçti; gerçek çift/yazma kabulü [TODO](todo.md) içinde açıktır.
 
 **Talep açılırken kaynak:** `person_merge_preview_v1` açık source_id/target_id ile çalışır; approve/apply girdileri preview capability ve operation_key kullanır, gerekçe alanı taşımaz. Merkez `person_merge_approve_v1` discovery’si güncel onaylanabilir preview’ları verir; otomatik kopya önerisi veya tüm tamamlanan birleşimler değildir. [WF04](../../../docs/workflows.md#wf04), [merge adaptörleri](../src/features/people/merge.ts), [ekran](../src/features/people/merge-view.tsx).
 
