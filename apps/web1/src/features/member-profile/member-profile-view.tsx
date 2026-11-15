@@ -426,7 +426,12 @@ export function MemberProfileView({
                           <TableCell>{row.credit}</TableCell>
                           <TableCell>
                             {row.onCancel && (
-                              <Button size="sm" variant="ghost" onPress={row.onCancel}>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                aria-label={`${t(($) => $.memberProfile.actions.cancelReservation)} · ${row.lesson} · ${row.date}`}
+                                onPress={row.onCancel}
+                              >
                                 {t(($) => $.memberProfile.actions.cancelReservation)}
                               </Button>
                             )}

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { MemberProfileView, type ProfileTab } from "./member-profile-view";
 import { readMemberReservations, memberReservationRows } from "./reservations";
+import { CancelReservation } from "./cancel-reservation";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -45,8 +46,10 @@ export function MemberProfileContent({
     [collect, setCollect] = useState(false),
     [locked, setLocked] = useState(false),
     [commandInvalid, setInvalid] = useState(false),
+    [cancelTarget, setCancelTarget] = useState<{ id: string; sessionId: string; label: string }>(),
     [reservationIndex, setReservationIndex] = useState(0),
     [reservationCursors, setReservationCursors] = useState<(string | undefined)[]>([undefined]);
+  const reservationRetry = useRef<HTMLButtonElement>(null);
   const workspace = useQuery({
       queryKey: ["workspace", scope.accountId, scope.orgId],
       queryFn: () => readWorkspace(scope.accountId, scope.orgId),
@@ -259,6 +262,30 @@ export function MemberProfileContent({
   const closedSales = new Set(
     rights.data?.filter((x) => x.state === "closed").map((x) => x.sale_id) ?? [],
   );
+  const reservationRows =
+    center && reservations.data && !reservations.isError
+      ? memberReservationRows(
+          reservations.data.items,
+          center.timezone,
+          disciplines.isError ? [] : (disciplines.data ?? []),
+          t,
+        ).map((row) => {
+          const source = reservations.data.items.find((x) => x.reservation.id === row.id)!;
+          return {
+            ...row,
+            ...(source.reservation.state === "active" && sourceAvailable && !locked
+              ? {
+                  onCancel: () =>
+                    setCancelTarget({
+                      id: row.id,
+                      sessionId: source.reservation.session_id,
+                      label: `${p?.display_name ?? ""} · ${row.lesson} · ${row.date}`,
+                    }),
+                }
+              : {}),
+          };
+        })
+      : null;
   return (
     <>
       <MemberProfileView
@@ -351,16 +378,7 @@ export function MemberProfileContent({
               }
             : null
         }
-        reservations={
-          center && reservations.data && !reservations.isError
-            ? memberReservationRows(
-                reservations.data.items,
-                center.timezone,
-                disciplines.isError ? [] : (disciplines.data ?? []),
-                t,
-              )
-            : null
-        }
+        reservations={reservationRows}
         reservationFilter={filter}
         onReservationFilter={setFilter}
         reservationFiltersAvailable={false}
@@ -409,6 +427,7 @@ export function MemberProfileContent({
                 {t(($) => $.memberProfile.reservationNext)}
               </Button>
               <Button
+                ref={reservationRetry}
                 size="sm"
                 variant="outline"
                 isDisabled={locked || reservations.isFetching}
@@ -501,6 +520,30 @@ export function MemberProfileContent({
           )
         }
       />
+      {cancelTarget && (sourceAvailable || preservePending) && (
+        <CancelReservation
+          key={cancelTarget.id}
+          scope={scope}
+          personId={personId}
+          reservationId={cancelTarget.id}
+          sessionId={cancelTarget.sessionId}
+          label={cancelTarget.label}
+          sourceAvailable={sourceAvailable}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onClose={(saved) => {
+            setCancelTarget(undefined);
+            if (saved) requestAnimationFrame(() => reservationRetry.current?.focus());
+          }}
+          onRefresh={async (result) => {
+            queries.setQueryData(rightsKey, result.rights);
+            await reservations.refetch({ throwOnError: true });
+            void queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
+          }}
+        />
+      )}
       {sale && center && (sourceAvailable || preservePending) && (
         <SaleEditor
           key={`${personId}:sale`}

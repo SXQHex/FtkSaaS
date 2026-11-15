@@ -2161,6 +2161,16 @@
       "active": "Kesin",
       "cancelled": "İptal",
       "completed": "Tamamlandı"
-    }
+    },
+    "cancelReading": "İptal yetkisi ve güncel rezervasyon okunuyor…",
+    "cancelUnavailable": "Bu rezervasyon için iptal yetkisi veya güncel kaynak doğrulanamadı.",
+    "cancelPolicyHint": "İptal politikası kayıt sırasında uygulanır. Güncel hak sonucu işlemden sonra okunur.",
+    "cancelReasonError": "İptal gerekçesini gir.",
+    "cancelWriting": "Rezervasyon iptal ediliyor…",
+    "cancelSaved": "Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.",
+    "cancelUnread": "İptal alındı; güncel kayıtlar henüz okunamadı.",
+    "cancelStale": "Rezervasyon değişti. Güncel kaydı yeniden oku ve tekrar onayla.",
+    "cancelRejected": "Rezervasyon iptal edilemedi. Güncel kaydı ve iptal koşullarını kontrol et.",
+    "cancelReload": "İptal bilgisini yeniden oku"
   }
 }

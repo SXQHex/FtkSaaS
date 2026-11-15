@@ -505,6 +505,9 @@ export function MemberStateDialog({
   reason,
   notice,
   pending,
+  readOnly = false,
+  completed = false,
+  reasonError,
   onReason,
   onClose,
   onConfirm,
@@ -514,14 +517,22 @@ export function MemberStateDialog({
   reason: string;
   notice?: ReactNode;
   pending: boolean;
+  readOnly?: boolean;
+  completed?: boolean;
+  reasonError?: string;
   onReason: (value: string) => void;
   onClose: () => void;
   onConfirm?: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(),
+    reasonInput = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (reasonError) reasonInput.current?.focus();
+  }, [reasonError]);
   return (
     <AlertDialog
       isOpen
+      className="max-h-[calc(100dvh-2rem)] [grid-template-rows:auto_minmax(0,1fr)_auto]"
       isKeyboardDismissDisabled={pending}
       onOpenChange={(open) => {
         if (!open && !pending) onClose();
@@ -531,36 +542,70 @@ export function MemberStateDialog({
         <AlertDialogTitle>{t(($) => $.memberProfile.titles[action])}</AlertDialogTitle>
         <AlertDialogDescription>{name}</AlertDialogDescription>
       </AlertDialogHeader>
-      <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5">
-        {notice}
-        {action !== "activate" && (
-          <Field>
-            <FieldLabel htmlFor="member-state-reason">
-              {t(($) => $.memberProfile.reason)}
-            </FieldLabel>
-            <Textarea
-              id="member-state-reason"
-              name="reason"
-              required
-              disabled={pending}
-              value={reason}
-              onChange={(event) => onReason(event.target.value)}
-            />
-            <FieldDescription>{t(($) => $.memberProfile.stateHint)}</FieldDescription>
-          </Field>
-        )}
+      <div
+        role="region"
+        aria-label={t(($) => $.memberProfile.titles[action])}
+        tabIndex={0}
+        className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 [overscroll-behavior:contain]"
+      >
+        <form
+          id="member-state-form"
+          method="post"
+          noValidate
+          aria-label={t(($) => $.memberProfile.titles[action])}
+          className="flex flex-col gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!pending) onConfirm?.();
+          }}
+        >
+          {notice}
+          {action !== "activate" && (
+            <Field data-invalid={Boolean(reasonError)}>
+              <FieldLabel htmlFor="member-state-reason">
+                {t(($) => $.memberProfile.reason)}
+              </FieldLabel>
+              <Textarea
+                ref={reasonInput}
+                id="member-state-reason"
+                name="reason"
+                required
+                disabled={pending || readOnly}
+                aria-invalid={Boolean(reasonError)}
+                aria-describedby={
+                  reasonError
+                    ? "member-state-reason-hint member-state-reason-error"
+                    : "member-state-reason-hint"
+                }
+                value={reason}
+                onChange={(event) => onReason(event.target.value)}
+              />
+              <FieldDescription id="member-state-reason-hint">
+                {t(($) => $.memberProfile.stateHint)}
+              </FieldDescription>
+              <FieldError id="member-state-reason-error">{reasonError}</FieldError>
+            </Field>
+          )}
+        </form>
       </div>
       <AlertDialogFooter>
         <Button variant="outline" autoFocus isDisabled={pending} onPress={onClose}>
-          {t(($) => $.memberProfile.cancel)}
+          {t(($) => (completed ? $.memberProfile.close : $.memberProfile.cancel))}
         </Button>
-        <Button
-          variant={action === "activate" ? "default" : "destructive"}
-          isDisabled={!onConfirm || pending || (action !== "activate" && !reason.trim())}
-          onPress={onConfirm}
-        >
-          {t(($) => $.memberProfile.actions[action])}
-        </Button>
+        {!completed && (
+          <Button
+            variant={action === "activate" ? "default" : "destructive"}
+            isDisabled={
+              !onConfirm ||
+              pending ||
+              (action !== "activate" && action !== "cancelReservation" && !reason.trim())
+            }
+            type="submit"
+            form="member-state-form"
+          >
+            {t(($) => $.memberProfile.actions[action])}
+          </Button>
+        )}
       </AlertDialogFooter>
     </AlertDialog>
   );

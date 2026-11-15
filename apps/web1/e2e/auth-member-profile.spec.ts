@@ -409,11 +409,24 @@ test("a native forbidden custom price cannot become an apply or bypass the provi
 
 async function reservationSetup(
   page: Page,
-  options: { denied?: boolean; failNext?: boolean } = {},
+  options: {
+    denied?: boolean;
+    failNext?: boolean;
+    active?: boolean;
+    cancelDenied?: boolean;
+    cancelUnknown?: boolean;
+    cancelUnread?: boolean;
+    cancelStale?: boolean;
+  } = {},
 ) {
   const state = await setup(page, { openSale: false }),
     reads: Record<string, unknown>[] = [];
-  let failed = false;
+  let failed = false,
+    cancelled = false,
+    version = 2,
+    unreadFailed = false;
+  const cancelWrites: Record<string, unknown>[] = [],
+    cancelReceipts: Record<string, unknown>[] = [];
   const reservationId = "019a7b00-0000-7000-8000-000000000083",
     secondId = "019a7b00-0000-7000-8000-000000000084";
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
@@ -426,7 +439,11 @@ async function reservationSetup(
       reads.push(req);
       expect(req.person_id).toBe(I.instructor);
       expect(req.page.limit).toBe(20);
-      expect(req.page.sort).toBe("created_at_desc");
+      if (!req.session_id) expect(req.page.sort).toBe("created_at_desc");
+      if (options.cancelUnread && cancelled && req.session_id && !unreadFailed) {
+        unreadFailed = true;
+        return reject("TEMPORARY_FAILURE");
+      }
       expect(req).not.toHaveProperty("interval");
       if (options.failNext && req.page.cursor && !failed) {
         failed = true;
@@ -438,14 +455,60 @@ async function reservationSetup(
             id: req.page.cursor ? secondId : reservationId,
             session_id: I.lesson,
             person_id: I.instructor,
-            state: req.page.cursor ? "cancelled" : "completed",
+            state:
+              req.page.cursor || cancelled ? "cancelled" : options.active ? "active" : "completed",
             mode: "flexible",
-            version: 2,
+            version,
           },
         ],
-        next_cursor: req.page.cursor ? null : "native-second",
+        next_cursor: req.page.cursor || req.session_id ? null : "native-second",
         as_of: "2026-11-16T10:00:00Z",
       });
+    }
+    if (op === "management_state_get_v1" && req.operation === "reservation_cancel_v1") {
+      if (options.cancelDenied) return reject("FORBIDDEN");
+      expect(req.selector.key.reservation_id).toBe(reservationId);
+      return send({
+        items: [
+          {
+            operation: "reservation_cancel_v1",
+            state: "active",
+            as_of: "2026-11-16T10:00:00Z",
+            entity: { type: "reservations", id: reservationId },
+            exists: true,
+            current: {
+              operation: "reservation_cancel_v1",
+              values: { reservation_id: reservationId },
+            },
+            versions: [{ entity: { type: "reservations", id: reservationId }, version }],
+          },
+        ],
+        next_cursor: null,
+        as_of: "2026-11-16T10:00:00Z",
+      });
+    }
+    if (op === "reservation_cancel_v1") {
+      cancelWrites.push(req);
+      expect(req.reservation_id).toBe(reservationId);
+      expect(req.reason).toBe("Synthetic cancellation reason");
+      if (options.cancelStale && cancelWrites.length === 1) {
+        version++;
+        return reject("VERSION_CONFLICT");
+      }
+      if (cancelled) {
+        const first = cancelWrites[0]!;
+        expect({ ...req, request_id: null }).toEqual({ ...first, request_id: null });
+      } else {
+        expect(req.expected_version).toBe(version);
+        cancelled = true;
+        version++;
+      }
+      if (options.cancelUnknown && cancelWrites.length === 1) return route.abort("failed");
+      return send({ primary_id: reservationId, changed: [], jobs: [] });
+    }
+    if (op === "operation_status_get_v1" && req.operation === "reservation_cancel_v1") {
+      cancelReceipts.push(req);
+      return reject("NOT_FOUND");
     }
     if (op === "session_get_v1")
       return send({
@@ -455,8 +518,8 @@ async function reservationSetup(
         format: "group",
         starts_at: "2026-11-16T10:00:00Z",
         ends_at: "2026-11-16T11:00:00Z",
-        state: "occurred",
-        attendance_state: "closed",
+        state: options.active ? "planned" : "occurred",
+        attendance_state: options.active ? "open" : "closed",
         assignments: [],
         version: 4,
         capacity: {
@@ -473,7 +536,7 @@ async function reservationSetup(
       return send({
         session_id: I.lesson,
         session_version: 4,
-        closure_state: "closed",
+        closure_state: options.active ? "open" : "closed",
         revision: 1,
         entries: [
           {
@@ -501,6 +564,8 @@ async function reservationSetup(
   return {
     ...state,
     reads,
+    cancelWrites,
+    cancelReceipts,
     grid: page.getByRole("grid", { name: "Rezervasyon ve yoklama geçmişi", exact: true }),
   };
 }
@@ -571,4 +636,133 @@ test("reservation page read errors do not relabel stale rows as the next page an
   await page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }).click();
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
   expect(writes).toHaveLength(0);
+});
+
+async function openCancellation(page: Page, options: Parameters<typeof reservationSetup>[1] = {}) {
+  const state = await reservationSetup(page, { ...options, active: true });
+  const opener = state.grid.getByRole("button", { name: /^İptal et/ });
+  await opener.click();
+  const dialog = page.getByRole("alertdialog", { name: "Rezervasyonu iptal et", exact: true });
+  await expect(dialog).toBeVisible();
+  return { ...state, dialog, opener };
+}
+test("reservation cancellation validates reason, uses the native version and rereads the cancelled row", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 600 });
+  const { dialog, grid, cancelWrites } = await openCancellation(page);
+  const confirm = dialog.getByRole("button", { name: "İptal et", exact: true });
+  await expect(confirm).toBeEnabled();
+  await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
+  await confirm.click();
+  await expect(dialog.getByLabel("Gerekçe", { exact: true })).toBeFocused();
+  await expect(dialog.getByLabel("Gerekçe", { exact: true })).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
+  expect(cancelWrites).toHaveLength(0);
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Synthetic cancellation reason");
+  expect((await scanAccessibility(page, "cancel-reservation-edit")).violations).toEqual([]);
+  await confirm.click();
+  await expect(
+    dialog.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(cancelWrites).toHaveLength(1);
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
+  await expect(grid.getByRole("button", { name: /^İptal et/ })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }),
+  ).toBeFocused();
+  expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+test("reservation cancellation denies a missing native action grant without losing the readable row", async ({
+  page,
+}) => {
+  const { dialog, opener, cancelWrites } = await openCancellation(page, { cancelDenied: true });
+  await expect(
+    dialog.getByText("Bu rezervasyon için iptal yetkisi veya güncel kaynak doğrulanamadı.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "İptal et", exact: true })).toBeDisabled();
+  expect(cancelWrites).toHaveLength(0);
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(opener).toBeFocused();
+});
+test("reservation cancellation keeps the frozen key after an unknown result and failed receipt read", async ({
+  page,
+}) => {
+  const { dialog, cancelWrites, cancelReceipts } = await openCancellation(page, {
+    cancelUnknown: true,
+  });
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Synthetic cancellation reason");
+  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await expect(
+    dialog.getByText("Sonuç henüz doğrulanamadı. Aynı işlemle devam et.", { exact: true }),
+  ).toBeVisible();
+  await expect(dialog.getByLabel("Gerekçe", { exact: true })).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(
+    dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
+  ).toBeEnabled();
+  expect(cancelReceipts).toHaveLength(1);
+  await dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+  await expect(
+    dialog.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(cancelWrites).toHaveLength(2);
+  expect(cancelWrites[0]!.operation_key).toBe(cancelWrites[1]!.operation_key);
+  expect(cancelWrites[0]!.request_id).not.toBe(cancelWrites[1]!.request_id);
+});
+test("reservation cancellation recovers an ACK reread failure without writing again", async ({
+  page,
+}) => {
+  const { dialog, cancelWrites } = await openCancellation(page, { cancelUnread: true });
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Synthetic cancellation reason");
+  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await expect(
+    dialog.getByText("İptal alındı; güncel kayıtlar henüz okunamadı.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
+  ).toHaveCount(0);
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(
+    dialog.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(cancelWrites).toHaveLength(1);
+});
+test("reservation cancellation needs a fresh source and explicit confirmation after a version conflict", async ({
+  page,
+}) => {
+  const { dialog, cancelWrites } = await openCancellation(page, { cancelStale: true });
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Synthetic cancellation reason");
+  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await expect(
+    dialog.getByText("Rezervasyon değişti. Güncel kaydı yeniden oku ve tekrar onayla.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "İptal bilgisini yeniden oku", exact: true }).click();
+  const confirm = dialog.getByRole("button", { name: "İptal et", exact: true });
+  await expect(confirm).toBeEnabled();
+  expect(cancelWrites).toHaveLength(1);
+  await confirm.click();
+  await expect(
+    dialog.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(cancelWrites).toHaveLength(2);
+  expect(cancelWrites[0]!.operation_key).not.toBe(cancelWrites[1]!.operation_key);
+  expect(cancelWrites[1]!.expected_version).toBe(3);
 });
