@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { FinanceView, type FinanceTab, type FinanceMovementRow } from "./finance-view";
+import { CreditRefundEditor } from "./credit-refund-editor";
 import { CorrectionEditor } from "./correction-editor";
 import { FinanceActionSheet } from "./finance-action-sheet";
 import {
@@ -57,6 +58,7 @@ export function FinanceContent({
     [pageIndex, setPageIndex] = useState(0),
     [collect, setCollect] = useState(false),
     [correctionId, setCorrectionId] = useState<string>(),
+    [creditRefund, setCreditRefund] = useState(false),
     [locked, setLocked] = useState(false),
     [invalid, setInvalid] = useState(false);
   const workspace = useQuery({
@@ -327,7 +329,10 @@ export function FinanceContent({
                   person: personLabel,
                   amount: formatMinorAmount(source.credit_available_minor, source.currency),
                   debt: null,
-                  actions: [],
+                  actions:
+                    !workspace.isError && !locked && BigInt(source.credit_available_minor) > 0n
+                      ? [{ kind: "credit-refund" as const, onPress: () => setCreditRefund(true) }]
+                      : [],
                 },
               ]
             : []
@@ -411,6 +416,22 @@ export function FinanceContent({
           </div>
         }
       />
+      {creditRefund && selection && center && (
+        <CreditRefundEditor
+          key={`${selection.personId}:${selection.currency}`}
+          scope={scope}
+          selection={selection}
+          timezone={center.timezone}
+          personLabel={personLabel}
+          sourceAvailable={!workspace.isError}
+          onClose={() => setCreditRefund(false)}
+          onRefresh={async () => {
+            await finance.refetch({ throwOnError: true });
+          }}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+        />
+      )}
       {correctionId && selection && center && (
         <CorrectionEditor
           key={`${selection.personId}:${selection.currency}:${correctionId}`}

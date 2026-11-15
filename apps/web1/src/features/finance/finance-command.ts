@@ -10,14 +10,40 @@ import {
   readCorrectionResult,
   type CorrectionIntent,
 } from "./correction";
-export type FinanceIntent = CollectionIntent | CorrectionIntent;
-export const writeFinance = (intent: FinanceIntent) =>
-  intent.operation === "collection_record_v1" ? writeCollection(intent) : writeCorrection(intent);
-export const readFinanceReceipt = (intent: FinanceIntent) =>
-  intent.operation === "collection_record_v1"
-    ? readCollectionReceipt(intent)
-    : readCorrectionReceipt(intent);
-export const readFinanceResult = (intent: FinanceIntent, id?: string) =>
-  intent.operation === "collection_record_v1"
-    ? readCollectionResult(intent, id)
-    : readCorrectionResult(intent, id);
+import {
+  writeCreditRefund,
+  readCreditRefundReceipt,
+  readCreditRefundResult,
+  type CreditRefundIntent,
+} from "./credit-refund";
+export type FinanceIntent = CollectionIntent | CorrectionIntent | CreditRefundIntent;
+export function writeFinance(intent: FinanceIntent) {
+  switch (intent.operation) {
+    case "collection_record_v1":
+      return writeCollection(intent);
+    case "collection_correct_apply_v1":
+      return writeCorrection(intent);
+    case "student_credit_refund_v1":
+      return writeCreditRefund(intent);
+  }
+}
+export function readFinanceReceipt(intent: FinanceIntent) {
+  switch (intent.operation) {
+    case "collection_record_v1":
+      return readCollectionReceipt(intent);
+    case "collection_correct_apply_v1":
+      return readCorrectionReceipt(intent);
+    case "student_credit_refund_v1":
+      return readCreditRefundReceipt(intent);
+  }
+}
+export function readFinanceResult(intent: FinanceIntent, id?: string) {
+  switch (intent.operation) {
+    case "collection_record_v1":
+      return readCollectionResult(intent, id);
+    case "collection_correct_apply_v1":
+      return readCorrectionResult(intent, id);
+    case "student_credit_refund_v1":
+      return readCreditRefundResult(intent, id);
+  }
+}

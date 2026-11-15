@@ -1932,6 +1932,14 @@
     "creditInsufficient": "Üye alacağı bu düzeltme için yetersiz.",
     "currencyMismatch": "İşlem ve kaynak para birimleri uyuşmuyor.",
     "planRestricted": "Plan veya abonelik bu işleme izin vermiyor.",
-    "conditionsRejected": "Önizleme koşulları sağlanmıyor."
+    "conditionsRejected": "Önizleme koşulları sağlanmıyor.",
+    "creditRefundReadError": "İade yetkisi veya güncel alacak okunamadı. Yeniden dene.",
+    "creditRefundWriting": "Nakit iade kaydediliyor…",
+    "creditRefundSaved": "Nakit iade hareketi ve güncel alacak doğrulandı.",
+    "creditRefundUnread": "İade alındı; güncel finans henüz okunamadı.",
+    "creditRefundRejected": "İade uygulanamadı. Güncel alacağı kontrol edip yeniden incele.",
+    "creditRefundHint": "Bu işlem gerçekleşen nakit iadeyi kaydeder ve üye alacağını azaltır. Satışı veya borcu değiştirmez. Güncel bakiye kayıt sırasında yeniden denetlenir.",
+    "creditRefundAuthorityUnavailable": "Bu kişi için nakit iade yetkisi doğrulanamadı.",
+    "creditRefundInsufficient": "Üye alacağı iade tutarı için yetersiz."
   }
 }
