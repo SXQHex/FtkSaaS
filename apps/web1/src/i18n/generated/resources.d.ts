@@ -570,6 +570,14 @@ export default interface Resources {
       },
       "addCredit": "Hak ekle",
       "attendance": "Son 90 gün yoklama",
+      "attendanceDraft": "Taslak · {{result}}",
+      "attendanceNoEntry": "Yoklama kaydı yok",
+      "attendanceResults": {
+        "attended": "Geldi",
+        "blocked": "Engelli",
+        "no_show": "Gelmedi",
+        "unmarked": "İşaretlenmedi"
+      },
       "available": "Kullanılabilir hak",
       "back": "Üyeler",
       "backToEdit": "Geri",
@@ -662,7 +670,19 @@ export default interface Resources {
       "reasonHint": "Gerekçe zorunludur ve işlem geçmişinde korunur.",
       "removeCredit": "Hak çıkar",
       "reservationChoices": "Gelecek rezervasyonlar",
+      "reservationFiltersUnavailable": "Yaklaşan ve geçmiş filtreleri şu anda kullanılamıyor. Tüm kayıtlar sayfalar halinde gösterilir.",
       "reservationHistory": "Rezervasyon ve yoklama geçmişi",
+      "reservationNext": "Sonraki rezervasyonlar",
+      "reservationPageCount": "Bu sayfada {{count}} rezervasyon" | "Bu sayfada {{count}} rezervasyon" | "Bu sayfada {{count}} rezervasyon",
+      "reservationPartial": "Bazı ders veya yoklama bilgileri alınamadı. Bilinmeyen bilgi — ile gösterilir.",
+      "reservationPrevious": "Önceki rezervasyonlar",
+      "reservationReadError": "Rezervasyonlar alınamadı. Yeniden dene.",
+      "reservationRetry": "Rezervasyonları yeniden oku",
+      "reservationStates": {
+        "active": "Kesin",
+        "cancelled": "İptal",
+        "completed": "Tamamlandı"
+      },
       "review": "Etkiyi incele",
       "rightKinds": {
         "credits": "Kredili paket",

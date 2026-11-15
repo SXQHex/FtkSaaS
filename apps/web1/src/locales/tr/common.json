@@ -2139,6 +2139,28 @@
     "catalogQuota": "{{limit}} · {{period}} kullanım sınırı",
     "saleListPrice": "Paketin liste fiyatı",
     "unknownScopeCenter": "Belirli merkez (adı alınamadı)",
-    "unknownScopeDiscipline": "Belirli disiplin (adı alınamadı)"
+    "unknownScopeDiscipline": "Belirli disiplin (adı alınamadı)",
+    "attendanceDraft": "Taslak · {{result}}",
+    "attendanceNoEntry": "Yoklama kaydı yok",
+    "attendanceResults": {
+      "attended": "Geldi",
+      "blocked": "Engelli",
+      "no_show": "Gelmedi",
+      "unmarked": "İşaretlenmedi"
+    },
+    "reservationFiltersUnavailable": "Yaklaşan ve geçmiş filtreleri şu anda kullanılamıyor. Tüm kayıtlar sayfalar halinde gösterilir.",
+    "reservationNext": "Sonraki rezervasyonlar",
+    "reservationPageCount": "Bu sayfada {{count}} rezervasyon",
+    "reservationPageCount_one": "Bu sayfada {{count}} rezervasyon",
+    "reservationPageCount_other": "Bu sayfada {{count}} rezervasyon",
+    "reservationPartial": "Bazı ders veya yoklama bilgileri alınamadı. Bilinmeyen bilgi — ile gösterilir.",
+    "reservationPrevious": "Önceki rezervasyonlar",
+    "reservationReadError": "Rezervasyonlar alınamadı. Yeniden dene.",
+    "reservationRetry": "Rezervasyonları yeniden oku",
+    "reservationStates": {
+      "active": "Kesin",
+      "cancelled": "İptal",
+      "completed": "Tamamlandı"
+    }
   }
 }
