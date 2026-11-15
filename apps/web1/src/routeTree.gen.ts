@@ -21,6 +21,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
+import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
 import { Route as OOrgIdCCenterIdPeopleMergeRouteImport } from './routes/o.$orgId.c.$centerId.people_.merge'
@@ -85,6 +86,11 @@ const InviteExpiredRoute = InviteExpiredRouteImport.update({
   path: '/invite/expired',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
+  id: '/o/$orgId/c/$centerId/access',
+  path: '/o/$orgId/c/$centerId/access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdPeopleRoute = OOrgIdCCenterIdPeopleRouteImport.update({
   id: '/o/$orgId/c/$centerId/people',
   path: '/o/$orgId/c/$centerId/people',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
   '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
   '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/account_/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/invite_/expired': typeof InviteExpiredRoute
+  '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
   '/o/$orgId/c/$centerId/people_/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/account/deletion'
     | '/auth/callback'
     | '/invite/expired'
+    | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
     | '/o/$orgId/c/$centerId/people/merge'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/account/deletion'
     | '/auth/callback'
     | '/invite/expired'
+    | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
     | '/o/$orgId/c/$centerId/people/merge'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/account_/deletion'
     | '/auth/callback'
     | '/invite_/expired'
+    | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/studio'
     | '/o/$orgId/c/$centerId/people_/merge'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   AccountDeletionRoute: typeof AccountDeletionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
+  OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
   OOrgIdCCenterIdPeopleMergeRoute: typeof OOrgIdCCenterIdPeopleMergeRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteExpiredRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/access': {
+      id: '/o/$orgId/c/$centerId/access'
+      path: '/o/$orgId/c/$centerId/access'
+      fullPath: '/o/$orgId/c/$centerId/access'
+      preLoaderRoute: typeof OOrgIdCCenterIdAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/people': {
       id: '/o/$orgId/c/$centerId/people'
       path: '/o/$orgId/c/$centerId/people'
@@ -349,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountDeletionRoute: AccountDeletionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   InviteExpiredRoute: InviteExpiredRoute,
+  OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
   OOrgIdCCenterIdPeopleMergeRoute: OOrgIdCCenterIdPeopleMergeRoute,

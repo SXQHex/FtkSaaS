@@ -76,6 +76,8 @@ export function AccessView({
   accounts,
   summary,
   state,
+  invitationState = state,
+  accountState = state,
   invitationFilter,
   accountFilter,
   search,
@@ -94,6 +96,8 @@ export function AccessView({
   accounts: AccessAccountRow[];
   summary: AccessSummary;
   state: "ready" | "loading" | "error";
+  invitationState?: "ready" | "loading" | "error";
+  accountState?: "ready" | "loading" | "error";
   invitationFilter: InvitationFilter;
   accountFilter: AccountFilter;
   search: string;
@@ -165,7 +169,10 @@ export function AccessView({
               <p className="text-xs text-muted-foreground">{item.label}</p>
             </CardHeader>
             <CardContent>
-              <p className="text-[22px] leading-[1.3] font-semibold tabular-nums">
+              <data
+                value={summary[item.key] ?? ""}
+                className="block text-[22px] leading-[1.3] font-semibold tabular-nums"
+              >
                 {summary[item.key] ?? unknown}
                 {item.key === "linked" && summary.totalMembers && (
                   <span className="text-sm font-normal text-muted-foreground">
@@ -173,7 +180,7 @@ export function AccessView({
                     / {summary.totalMembers}
                   </span>
                 )}
-              </p>
+              </data>
               <p className="mt-0.5 text-xs text-muted-foreground">{item.description}</p>
             </CardContent>
           </Card>
@@ -231,7 +238,7 @@ export function AccessView({
               </ToggleGroup>
               <Table
                 aria-label={t(($) => $.access.invitations)}
-                aria-busy={state === "loading"}
+                aria-busy={invitationState === "loading"}
                 className="min-w-[44rem] [&_[data-slot=table-cell]]:py-3"
               >
                 <TableHeader>
@@ -244,13 +251,13 @@ export function AccessView({
                   </TableHead>
                 </TableHeader>
                 <TableBody
-                  items={state === "ready" ? invitations : []}
+                  items={invitationState === "ready" ? invitations : []}
                   renderEmptyState={() =>
                     empty(
                       t(($) =>
-                        state === "loading"
+                        invitationState === "loading"
                           ? $.access.loading
-                          : state === "error"
+                          : invitationState === "error"
                             ? $.access.readError
                             : $.access.noInvitations,
                       ),
@@ -261,8 +268,10 @@ export function AccessView({
                     <TableRow id={item.id}>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span>{item.email ?? t(($) => $.access.contactUnavailable)}</span>
-                          {item.personName && (
+                          <span>
+                            {item.email ?? item.personName ?? t(($) => $.access.contactUnavailable)}
+                          </span>
+                          {item.email && item.personName && (
                             <span className="text-xs text-muted-foreground">{item.personName}</span>
                           )}
                         </div>
@@ -309,6 +318,7 @@ export function AccessView({
                                 variant="ghost"
                                 size="sm"
                                 isDisabled={!onAction || !item.canResend}
+                                aria-label={`${t(($) => $.access.resend)} — ${item.personName ?? unknown}`}
                                 onPress={() => onAction?.({ kind: "resend", invitation: item })}
                               >
                                 {t(($) => $.access.resend)}
@@ -326,6 +336,7 @@ export function AccessView({
                                 variant="ghost"
                                 size="sm"
                                 isDisabled={!onAction || !item.canRevoke}
+                                aria-label={`${t(($) => $.access.cancelInvitation)} — ${item.personName ?? unknown}`}
                                 onPress={() => onAction?.({ kind: "cancel", invitation: item })}
                               >
                                 {t(($) => $.access.cancelInvitation)}
@@ -386,7 +397,7 @@ export function AccessView({
               </div>
               <Table
                 aria-label={t(($) => $.access.accounts)}
-                aria-busy={state === "loading"}
+                aria-busy={accountState === "loading"}
                 className="min-w-[44rem] [&_[data-slot=table-cell]]:py-[11px]"
               >
                 <TableHeader>
@@ -399,13 +410,13 @@ export function AccessView({
                   </TableHead>
                 </TableHeader>
                 <TableBody
-                  items={state === "ready" ? accounts : []}
+                  items={accountState === "ready" ? accounts : []}
                   renderEmptyState={() =>
                     empty(
                       t(($) =>
-                        state === "loading"
+                        accountState === "loading"
                           ? $.access.loading
-                          : state === "error"
+                          : accountState === "error"
                             ? $.access.readError
                             : $.people.empty,
                       ),
@@ -466,6 +477,7 @@ export function AccessView({
                             variant="ghost"
                             size="sm"
                             isDisabled={!onAction || !item.canRemove}
+                            aria-label={`${t(($) => $.access.unlink)} — ${item.name}`}
                             onPress={() => onAction?.({ kind: "unlink", account: item })}
                           >
                             {t(($) => $.access.unlink)}
@@ -475,6 +487,7 @@ export function AccessView({
                             variant={item.binding === "pending" ? "ghost" : "outline"}
                             size="sm"
                             isDisabled={!onAction || !item.canInvite}
+                            aria-label={`${t(($) => (item.binding === "pending" ? $.access.resendInvitation : $.access.sendLinkInvitation))} — ${item.name}`}
                             onPress={() => onAction?.({ kind: "invite", account: item })}
                           >
                             {t(($) =>

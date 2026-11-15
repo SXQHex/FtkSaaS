@@ -244,6 +244,13 @@ function PeopleContent({
           void query.refetch();
         }}
         actions={{
+          invitations: () => {
+            if (!locked)
+              void navigate({
+                to: "/o/$orgId/c/$centerId/access",
+                params: { orgId: scope.orgId, centerId: scope.centerId },
+              });
+          },
           merge: () => {
             if (!locked)
               void navigate({
