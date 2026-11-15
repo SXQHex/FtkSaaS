@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Text } from "react-aria-components";
 import {
@@ -28,6 +29,8 @@ export interface ScheduleCreateDraft {
   weeks: string;
   weekdays: string[];
   offset: string;
+  format?: "group" | "private";
+  offsets?: Record<string, string>;
 }
 export interface SchedulePreviewRow {
   id: string;
@@ -52,6 +55,7 @@ export function ScheduleCreateSheet({
   rooms,
   instructors,
   offsetChoices = [],
+  offsetRequests = [],
   preview = [],
   notice,
   error,
@@ -60,6 +64,7 @@ export function ScheduleCreateSheet({
   onDraft,
   onSubmit,
   onApply,
+  recoveryActions,
 }: {
   open: boolean;
   timezone: string;
@@ -68,6 +73,7 @@ export function ScheduleCreateSheet({
   rooms: ScheduleChoice[];
   instructors: ScheduleChoice[];
   offsetChoices?: ScheduleChoice[];
+  offsetRequests?: { date: string; choices: ScheduleChoice[] }[];
   preview?: SchedulePreviewRow[];
   notice?: string;
   error?: string;
@@ -76,6 +82,7 @@ export function ScheduleCreateSheet({
   onDraft?: (draft: ScheduleCreateDraft) => void;
   onSubmit?: () => void;
   onApply?: () => void;
+  recoveryActions?: ReactNode;
 }) {
   const { t } = useTranslation();
   const set = <K extends keyof ScheduleCreateDraft>(key: K, value: ScheduleCreateDraft[K]) =>
@@ -194,6 +201,32 @@ export function ScheduleCreateSheet({
                   ))}
                 </NativeSelect>
               </Field>
+              {draft.mode === "single" && (
+                <Field>
+                  <FieldLabel htmlFor="schedule-create-format">
+                    {t(($) => $.schedule.format)}
+                  </FieldLabel>
+                  <NativeSelect
+                    id="schedule-create-format"
+                    name="format"
+                    required
+                    value={draft.format ?? ""}
+                    disabled={locked || !onDraft}
+                    onChange={(event) => {
+                      const format = event.target.value;
+                      if (format === "group" || format === "private") set("format", format);
+                    }}
+                  >
+                    <NativeSelectOption value="">{t(($) => $.schedule.choose)}</NativeSelectOption>
+                    <NativeSelectOption value="group">
+                      {t(($) => $.schedule.formats.group)}
+                    </NativeSelectOption>
+                    <NativeSelectOption value="private">
+                      {t(($) => $.schedule.formats.private)}
+                    </NativeSelectOption>
+                  </NativeSelect>
+                </Field>
+              )}
               <Field>
                 <FieldLabel htmlFor="schedule-create-capacity">
                   {t(($) => $.schedule.capacity)}
@@ -293,7 +326,31 @@ export function ScheduleCreateSheet({
                 </ToggleGroup>
               </Field>
             )}
-            {offsetChoices.length > 0 && (
+            {offsetRequests.map((request) => (
+              <Field key={request.date}>
+                <FieldLabel htmlFor={`schedule-offset-${request.date}`}>
+                  {t(($) => $.schedule.offsetForDate, { date: request.date })}
+                </FieldLabel>
+                <NativeSelect
+                  id={`schedule-offset-${request.date}`}
+                  required
+                  value={draft.offsets?.[request.date] ?? ""}
+                  disabled={locked || !onDraft}
+                  onChange={(event) =>
+                    set("offsets", { ...draft.offsets, [request.date]: event.target.value })
+                  }
+                >
+                  <NativeSelectOption value="">{t(($) => $.schedule.choose)}</NativeSelectOption>
+                  {request.choices.map((choice) => (
+                    <NativeSelectOption key={choice.id} value={choice.id}>
+                      {choice.label}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+                <FieldDescription>{t(($) => $.schedule.offsetHint)}</FieldDescription>
+              </Field>
+            ))}
+            {offsetRequests.length === 0 && offsetChoices.length > 0 && (
               <Field>
                 <FieldLabel htmlFor="schedule-create-offset">
                   {t(($) => $.schedule.offset)}
@@ -338,6 +395,7 @@ export function ScheduleCreateSheet({
             </ItemGroup>
           </section>
         )}
+        {recoveryActions}
         {error && (
           <Alert variant="destructive" role="alert" className="mt-4">
             <AlertDescription>{error}</AlertDescription>

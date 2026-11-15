@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Text } from "react-aria-components";
 import {
@@ -44,6 +45,7 @@ export function ScheduleChangeDialog({
   onClose,
   onPreview,
   onApply,
+  recoveryActions,
 }: {
   open: boolean;
   rows: ScheduleChangeRow[];
@@ -59,6 +61,7 @@ export function ScheduleChangeDialog({
   onClose: () => void;
   onPreview?: () => void;
   onApply?: () => void;
+  recoveryActions?: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
@@ -155,6 +158,7 @@ export function ScheduleChangeDialog({
           <AlertDescription>{notice}</AlertDescription>
         </Alert>
       )}
+      {recoveryActions}
       <DialogFooter>
         <Button variant="outline" autoFocus onPress={onClose} isDisabled={locked}>
           {t(($) => $.people.cancel)}

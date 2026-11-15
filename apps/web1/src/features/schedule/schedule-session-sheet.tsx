@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Text } from "react-aria-components";
 import {
@@ -44,6 +45,7 @@ export interface ScheduleSessionDraft {
   replacementDate: string;
   replacementTime: string;
   replacementRoomId: string;
+  replacementOffset?: string;
   offset: string;
   selectedPeople: string[];
   addPersonId: string;
@@ -70,13 +72,17 @@ export function ScheduleSessionSheet({
   notice,
   error,
   canFuture = false,
+  canEdit = true,
   onClose,
   onMode,
   onDraft,
   onPreview,
   onApply,
+  recoveryActions,
   onDetail,
   onNotify,
+  cancelled = false,
+  onReplacement,
 }: {
   open: boolean;
   mode: SchedulePanelMode;
@@ -91,13 +97,17 @@ export function ScheduleSessionSheet({
   notice?: string;
   error?: string;
   canFuture?: boolean;
+  canEdit?: boolean;
   onClose: () => void;
   onMode?: (mode: SchedulePanelMode) => void;
   onDraft?: (draft: ScheduleSessionDraft) => void;
   onPreview?: () => void;
   onApply?: () => void;
+  recoveryActions?: ReactNode;
   onDetail?: () => void;
   onNotify?: (notify: boolean) => void;
+  cancelled?: boolean;
+  onReplacement?: () => void;
 }) {
   const { t } = useTranslation();
   const set = <K extends keyof ScheduleSessionDraft>(key: K, value: ScheduleSessionDraft[K]) =>
@@ -129,7 +139,12 @@ export function ScheduleSessionSheet({
           <SheetDescription>{panel.subtitle}</SheetDescription>
         </Text>
       </SheetHeader>
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+      <div
+        className="min-h-0 flex-1 overflow-y-auto px-5 py-4"
+        role="region"
+        aria-label={t(($) => $.schedule.panelTitles[mode])}
+        tabIndex={0}
+      >
         {mode === "view" ? (
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
@@ -141,7 +156,7 @@ export function ScheduleSessionSheet({
             </div>
             <ItemGroup className="gap-0">
               {panel.facts.map((fact, index) => (
-                <Item key={index} size="sm" variant="outline">
+                <Item key={index} role="listitem" size="sm" variant="outline">
                   <ItemContent>
                     <ItemDescription>{fact.label}</ItemDescription>
                     <ItemTitle>{fact.value}</ItemTitle>
@@ -164,7 +179,7 @@ export function ScheduleSessionSheet({
               {panel.roster?.length ? (
                 <ItemGroup>
                   {panel.roster.map((person) => (
-                    <Item key={person.id} size="sm">
+                    <Item key={person.id} role="listitem" size="sm">
                       <ItemContent>
                         <ItemTitle>{person.name}</ItemTitle>
                         <ItemDescription>{person.detail}</ItemDescription>
@@ -392,6 +407,7 @@ export function ScheduleSessionSheet({
                 <Textarea
                   id="schedule-session-reason"
                   name="reason"
+                  readOnly={cancelled}
                   required
                   value={draft.reason}
                   disabled={locked || !onDraft}
@@ -408,11 +424,13 @@ export function ScheduleSessionSheet({
                     <Textarea
                       id="schedule-session-note"
                       name="note"
+                      readOnly
                       value={draft.note}
                       disabled={locked || !onDraft}
                       onChange={(event) => set("note", event.target.value)}
                       className="max-h-48 resize-y! rounded-md border-input! bg-transparent!"
                     />
+                    <FieldDescription>{t(($) => $.schedule.noteUnavailable)}</FieldDescription>
                   </Field>
                   <Field orientation="horizontal">
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -480,6 +498,30 @@ export function ScheduleSessionSheet({
                       </Field>
                     </FieldGroup>
                   )}
+                  {draft.replacement && offsetChoices.length > 0 && (
+                    <Field>
+                      <FieldLabel htmlFor="schedule-replacement-offset">
+                        {t(($) => $.schedule.offset)}
+                      </FieldLabel>
+                      <NativeSelect
+                        id="schedule-replacement-offset"
+                        required
+                        value={draft.replacementOffset ?? ""}
+                        disabled={locked || !onDraft}
+                        onChange={(event) => set("replacementOffset", event.target.value)}
+                      >
+                        <NativeSelectOption value="">
+                          {t(($) => $.schedule.choose)}
+                        </NativeSelectOption>
+                        {offsetChoices.map((offset) => (
+                          <NativeSelectOption key={offset.id} value={offset.id}>
+                            {offset.label}
+                          </NativeSelectOption>
+                        ))}
+                      </NativeSelect>
+                      <FieldDescription>{t(($) => $.schedule.offsetHint)}</FieldDescription>
+                    </Field>
+                  )}
                 </>
               )}
               <Field orientation="horizontal">
@@ -506,7 +548,7 @@ export function ScheduleSessionSheet({
             <h3 className="text-sm font-medium">{t(($) => $.schedule.effect)}</h3>
             <ItemGroup>
               {panel.effects.map((effect) => (
-                <Item key={effect.id} size="sm" variant="outline">
+                <Item key={effect.id} role="listitem" size="sm" variant="outline">
                   <ItemContent>
                     <ItemTitle>{effect.title}</ItemTitle>
                     <ItemDescription>{effect.detail}</ItemDescription>
@@ -516,6 +558,7 @@ export function ScheduleSessionSheet({
             </ItemGroup>
           </section>
         )}
+        {recoveryActions}
         {error && (
           <Alert variant="destructive" role="alert" className="mt-4">
             <AlertDescription>{error}</AlertDescription>
@@ -528,22 +571,32 @@ export function ScheduleSessionSheet({
         )}
       </div>
       <SheetFooter className="flex-row flex-wrap gap-2">
-        <Button variant="outline" onPress={onClose} isDisabled={locked}>
+        <Button
+          variant="outline"
+          autoFocus={mode === "cancel"}
+          onPress={onClose}
+          isDisabled={locked}
+        >
           {t(($) => $.people.cancel)}
         </Button>
+        {onReplacement && (
+          <Button onPress={onReplacement} isDisabled={locked}>
+            {t(($) => $.schedule.replacementAction)}
+          </Button>
+        )}
         {mode === "view" ? (
           <>
             <Button
               variant="outline"
               onPress={() => onMode?.("instructor")}
-              isDisabled={locked || !onMode}
+              isDisabled={locked || !onMode || !canEdit}
             >
               {t(($) => $.schedule.panelTitles.instructor)}
             </Button>
             <Button
               variant="outline"
               onPress={() => onMode?.("edit")}
-              isDisabled={locked || !onMode}
+              isDisabled={locked || !onMode || !canEdit}
             >
               {t(($) => $.schedule.panelTitles.edit)}
             </Button>

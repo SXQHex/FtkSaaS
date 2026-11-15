@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import { type CalendarOptions, useCalendarController } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
 import interactionPlugin from "@fullcalendar/react/interaction";
@@ -21,6 +21,24 @@ const defaultAvailableViews = [
 const navLinkDayClick = "timeGridDay";
 const navLinkWeekClick = "timeGridWeek";
 
+function scrollToInitialHour(scroll: HTMLElement, root: HTMLElement, targetClass?: string) {
+  const target = targetClass ? root.getElementsByClassName(targetClass)[0] : undefined;
+  if (!target) return;
+  const header = root.querySelector('[role="rowgroup"]');
+  // The SDK finishes sizing its auto-height rows after its mount callback.
+  // Initial position only. Keyboard, touch and wheel scrolling remain native.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (!scroll.isConnected || !target.isConnected) return;
+      scroll.scrollTop =
+        target.getBoundingClientRect().top -
+        scroll.getBoundingClientRect().top +
+        scroll.scrollTop -
+        (header?.getBoundingClientRect().height ?? 0);
+    });
+  });
+}
+
 export interface EventCalendarProps extends Omit<
   CalendarOptions,
   "class" | "className" | "headerToolbar" | "footerToolbar"
@@ -31,6 +49,9 @@ export interface EventCalendarProps extends Omit<
   beforeViews?: ReactNode;
   toolbarDisabled?: boolean;
   viewMinWidths?: Record<string, string>;
+  scrollRegionLabel?: string;
+  viewScrollHeight?: string;
+  initialScrollTargetClass?: string;
   addButton?: {
     isPrimary?: boolean;
     text?: string;
@@ -46,6 +67,9 @@ export function EventCalendar({
   beforeViews,
   toolbarDisabled,
   viewMinWidths,
+  scrollRegionLabel,
+  viewScrollHeight,
+  initialScrollTargetClass,
   className,
   height,
   contentHeight,
@@ -54,6 +78,15 @@ export function EventCalendar({
   ...restOptions
 }: EventCalendarProps) {
   const controller = useCalendarController();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const attachScroll = useCallback(
+    (scroll: HTMLDivElement | null) => {
+      scrollRef.current = scroll;
+      // The SDK mounts before its containing div's ref is attached on the initial render.
+      if (scroll) scrollToInitialHour(scroll, scroll, initialScrollTargetClass);
+    },
+    [initialScrollTargetClass],
+  );
 
   const hasBorderX = !(restOptions.borderlessX ?? restOptions.borderless);
   const hasBorderBottom = !(restOptions.borderlessBottom ?? restOptions.borderless);
@@ -74,7 +107,17 @@ export function EventCalendar({
         disabled={toolbarDisabled}
       />
       {beforeViews}
-      <div className="grow min-h-0 min-w-0 overflow-x-auto">
+      <div
+        ref={attachScroll}
+        className={cn(
+          "grow min-h-0 min-w-0",
+          viewScrollHeight ? "overflow-auto" : "overflow-x-auto",
+        )}
+        style={{ height: viewScrollHeight, flexGrow: viewScrollHeight ? 0 : undefined }}
+        role={scrollRegionLabel ? "region" : undefined}
+        aria-label={scrollRegionLabel}
+        tabIndex={scrollRegionLabel ? 0 : undefined}
+      >
         <div
           style={{
             minWidth: viewMinWidths?.[controller.view?.type ?? availableViews[0]!],
@@ -98,6 +141,11 @@ export function EventCalendar({
             plugins={[...plugins, ...userPlugins]}
             popoverCloseContent={() => <EventCalendarCloseIcon />}
             {...restOptions}
+            viewDidMount={(info) => {
+              restOptions.viewDidMount?.(info);
+              const scroll = scrollRef.current;
+              if (scroll) scrollToInitialHour(scroll, info.el, initialScrollTargetClass);
+            }}
           />
         </div>
       </div>

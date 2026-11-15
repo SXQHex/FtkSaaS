@@ -11,6 +11,7 @@
 | W1-BE-03 | E15 · P04.3   | Merkez geneli davet/hesap bağlantısı keşfi, filtreler ve sayaçlar             | Kaynak karşılandı (PR311/312); kişi dizini gerçek development’ta503 veriyor, inceleme açık. |
 | W1-BE-04 | E16 · P04.4   | Birleştirme gerekçesi, öneri/geçmiş keşfi ve kalıcı kopya-değil kararı        | Backend karşılandı (PR312); E16 kalan tüketici bağlantısı/kabulü açık.                      |
 | W1-BE-05 | E12 · P03.3   | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                   | Backend karşılandı (PR312); E12 retire/cancel bağlandı; gerçek kabul TODO’da açık.          |
+| W1-BE-06 | E17 · P06     | Sabit grup öğrenci üyeliğinin keşif ve ekle/çıkar native eşlemesi             | Backend değerlendirmesi bekleniyor; form açıklamalı salt okunur.                            |
 
 ## Bütün talepler için ortak sınır
 
@@ -90,3 +91,13 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** Bu iki çizim eylemi için güvenli typed yaşam döngüsü desteği veya bu sürümde açıklamalı salt okunur bırakılacaklarına dair ürün/kapsam kararı. Uygulama yapılacaksa gerçek kayıt kimliği ve yetkili sürüm okuması, ayrı açık kullanıcı eylemi, gerekçe gereksinimi, idempotent yazı ve son durum okuması belirtilmeli. Son kural boş weekdays veya sahte tarih aralığıyla kapatılmayacak; mevcut gizli gerekçe okuyucuya açılmayacak.
 
 **Doğrulama beklentisi:** Yalnız seçili kaynak/kayıt etkilenmeli; diğer kurallar/kapanışlar ve sürümleri korunmalı; stale version/yanlış merkez reddedilmeli. Kapanış değişikliği mevcut seansları otomatik iptal etmemeli. Desteklenmeyen silme/reset veya private tablo/RPC kullanılmayacak.
+
+## W1-BE-06 · Programdaki sabit grup üyeliğinin native eşlemesi
+
+**Frontend talebi:** E17 çizimindeki sabit grup üyesi listesi, kişi ekleme/çıkarma ve sonraki program oluşumlarına etkisi için mevcut doğru native akışın/sözleşmenin belirtilmesi veya eksik typed desteğin tamamlanması gerekiyor. `class_assignment_set_v1` eğitmen/asistan duty’sidir; öğrenci üyeliği değildir. `reservation_create_v1` gerçek session_id/person_id/source_sale_id ve priority/flexible mode ister; tekil rezervasyonları kalıcı sınıf üyeliği olarak göstermeyeceğiz.
+
+**Kaynak:** [WF03](../../../docs/workflows.md#wf03), [WF06](../../../docs/workflows.md#wf06), [F10 ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [hazır program paneli](../src/features/schedule/schedule-session-sheet.tsx).
+
+**İhtiyaç:** Seçili merkez/sınıf/program için cursor’lı, yetkili ve güvenli üyelik keşfi; exact kayıt/sürüm, üyelik durumunun anlamı, açık ekle/çıkar işlemi ve varsa gelecekteki oluşum/rezervasyon etkisinin preview/onay/yeniden okuma sırası. Mevcut başka native akış bu hedefi karşılıyorsa yeni model/API yerine onun typed eşlemesi yeterlidir. Hak, borç, belge, rezervasyon koruması ve canlı yetki kapıları korunmalı; satış/hak otomatik seçilmemeli, mevcut kesin rezervasyonlar sessizce değiştirilmemeli.
+
+**Frontend durumu:** E17’nin bağımsız takvim/seans/program işlemleri sürüyor. Sabit grup formu kaynak desteği gelene kadar açıklamalı salt okunur kalacak; yerel sahte üyelik, class duty veya geçmiş taramasıyla doldurulmayacak. Backend değerlendirmesi/ürün kararı bekleniyor.

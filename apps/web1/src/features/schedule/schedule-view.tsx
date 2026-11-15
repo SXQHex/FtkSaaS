@@ -36,7 +36,7 @@ export interface ScheduleEvent {
   end: string;
   room: string | null;
   instructor: string | null;
-  state: "planned" | "occurred" | "cancelled";
+  state: "planned" | "occurred" | "cancelled" | null;
   canChange: boolean;
   reserved: number | null;
   capacity: number | null;
@@ -196,6 +196,7 @@ export function ScheduleView({
   const content = useCallback(
     (info: EventDisplayInfo) => {
       const event = lookup.get(info.event.id);
+      const eventState = event?.state;
       return (
         <span className="relative flex min-w-0 flex-col overflow-hidden px-1.5 py-0.5 text-left">
           <span className="shrink-0 text-[10px]/2.5 tabular-nums text-muted-foreground">
@@ -227,7 +228,10 @@ export function ScheduleView({
                 )}
               </span>
               <span className="sr-only">
-                {event.instructor} {t(($) => $.schedule.sessionStates[event.state])}
+                {event.instructor}{" "}
+                {eventState
+                  ? t(($) => $.schedule.sessionStates[eventState])
+                  : t(($) => $.schedule.eventLabel)}
                 {event.draft ? `, ${t(($) => $.schedule.draft)}` : ""}
               </span>
             </>
@@ -251,106 +255,116 @@ export function ScheduleView({
       </header>
       <Card className="min-w-0 gap-0 pt-3">
         <CardContent className="px-0">
-          {state === "error" ? (
+          {state === "error" && (
             <Empty>
               <EmptyDescription role="status">{t(($) => $.schedule.readError)}</EmptyDescription>
               <Button variant="outline" onPress={onRetry} isDisabled={locked || !onRetry}>
                 {t(($) => $.people.refresh)}
               </Button>
             </Empty>
-          ) : (
-            <Suspense
-              fallback={
-                <Skeleton className="mx-5 h-[34rem]" aria-label={t(($) => $.schedule.loading)} />
-              }
-            >
-              <Calendar
-                key={timezone}
-                className="min-w-0 gap-3"
-                initialDate={initialDate}
-                now={now}
-                timeZone={timezone}
-                locale={locale}
-                availableViews={availableViews}
-                borderless
-                contentHeight="max(22rem, calc(100dvh - 17rem))"
-                viewMinWidths={viewMinWidths}
-                eventMinHeight={26}
-                firstDay={1}
-                titleFormat={{ year: "numeric", month: "long", day: "numeric" }}
-                dayHeaderContent={dayHeader}
-                allDaySlot={false}
-                slotDuration="00:30:00"
-                slotMinHeight={28}
-                slotHeaderInterval="01:00:00"
-                slotHeaderFormat={{ hour: "2-digit", minute: "2-digit", hour12: false }}
-                scrollTime="09:00:00"
-                nowIndicator
-                eventInteractive
-                editable={Boolean(onDraftChange) && !locked && state === "ready"}
-                eventResizableFromStart={false}
-                eventDurationEditable={Boolean(onDraftChange) && !locked && state === "ready"}
-                events={calendarEvents}
-                eventContent={content}
-                eventClass="rounded-md border border-border border-l-[3px] border-l-primary focus-visible:outline-2 focus-visible:outline-foreground"
-                dayLaneClass={(info) => cn("border-l", info.isDisabled && "bg-muted/50")}
-                eventClick={select}
-                eventDrop={change}
-                eventResize={change}
-                datesSet={datesSet}
-                todayHint={t(($) => $.schedule.today)}
-                prevHint={t(($) => $.schedule.previous)}
-                nextHint={t(($) => $.schedule.next)}
-                viewHint={(label) => label}
-                beforeViews={
-                  availability && (
-                    <p role="status" className="px-5 text-xs text-muted-foreground">
-                      {availability.summary}
-                    </p>
-                  )
-                }
-                toolbarDisabled={locked || state !== "ready"}
-                toolbarContent={
-                  <>
-                    <NativeSelect
-                      size="sm"
-                      value={room}
-                      aria-label={t(($) => $.schedule.room)}
-                      disabled={locked || !onRoom}
-                      onChange={(event) => onRoom?.(event.target.value)}
-                      className="w-38 max-w-full"
-                    >
-                      <NativeSelectOption value="">
-                        {t(($) => $.schedule.allRooms)}
-                      </NativeSelectOption>
-                      {rooms.map((item) => (
-                        <NativeSelectOption key={item.id} value={item.id}>
-                          {item.label}
-                        </NativeSelectOption>
-                      ))}
-                    </NativeSelect>
-                    <NativeSelect
-                      size="sm"
-                      value={instructor}
-                      aria-label={t(($) => $.schedule.instructor)}
-                      disabled={locked || !onInstructor}
-                      onChange={(event) => onInstructor?.(event.target.value)}
-                      className="w-38 max-w-full"
-                    >
-                      <NativeSelectOption value="">
-                        {t(($) => $.schedule.allInstructors)}
-                      </NativeSelectOption>
-                      {instructors.map((item) => (
-                        <NativeSelectOption key={item.id} value={item.id}>
-                          {item.label}
-                        </NativeSelectOption>
-                      ))}
-                    </NativeSelect>
-                  </>
-                }
-              />
-            </Suspense>
           )}
+          <Suspense
+            fallback={
+              <Skeleton className="mx-5 h-[34rem]" aria-label={t(($) => $.schedule.loading)} />
+            }
+          >
+            <Calendar
+              key={timezone}
+              className="min-w-0 gap-3"
+              initialDate={initialDate}
+              now={now}
+              timeZone={timezone}
+              locale={locale}
+              availableViews={availableViews}
+              borderless
+              contentHeight="auto"
+              viewScrollHeight="max(22rem, calc(100dvh - 17rem))"
+              tableHeaderSticky
+              viewMinWidths={viewMinWidths}
+              scrollRegionLabel={t(($) => $.schedule.daysScroll)}
+              initialScrollTargetClass="web1-calendar-initial-hour"
+              slotLaneClass={(info) =>
+                cn(
+                  "border",
+                  info.isMinor && "border-dotted",
+                  info.time?.milliseconds === 9 * 60 * 60 * 1000 && "web1-calendar-initial-hour",
+                )
+              }
+              eventMinHeight={26}
+              firstDay={1}
+              titleFormat={{ year: "numeric", month: "long", day: "numeric" }}
+              dayHeaderContent={dayHeader}
+              allDaySlot={false}
+              slotDuration="00:30:00"
+              slotMinHeight={28}
+              slotHeaderInterval="01:00:00"
+              slotHeaderFormat={{ hour: "2-digit", minute: "2-digit", hour12: false }}
+              scrollTime="09:00:00"
+              nowIndicator
+              eventInteractive
+              editable={Boolean(onDraftChange) && !locked && state === "ready"}
+              eventResizableFromStart={false}
+              eventDurationEditable={Boolean(onDraftChange) && !locked && state === "ready"}
+              events={calendarEvents}
+              eventContent={content}
+              eventClass="rounded-md border border-border border-l-[3px] border-l-primary focus-visible:outline-2 focus-visible:outline-foreground"
+              dayLaneClass={(info) => cn("border-l", info.isDisabled && "bg-muted/50")}
+              eventClick={select}
+              eventDrop={change}
+              eventResize={change}
+              datesSet={datesSet}
+              todayHint={t(($) => $.schedule.today)}
+              prevHint={t(($) => $.schedule.previous)}
+              nextHint={t(($) => $.schedule.next)}
+              viewHint={(label) => label}
+              beforeViews={
+                availability && (
+                  <p role="status" className="px-5 text-xs text-muted-foreground">
+                    {availability.summary}
+                  </p>
+                )
+              }
+              toolbarDisabled={locked || state !== "ready"}
+              toolbarContent={
+                <>
+                  <NativeSelect
+                    size="sm"
+                    value={room}
+                    aria-label={t(($) => $.schedule.room)}
+                    disabled={locked || !onRoom}
+                    onChange={(event) => onRoom?.(event.target.value)}
+                    className="w-38 max-w-full"
+                  >
+                    <NativeSelectOption value="">
+                      {t(($) => $.schedule.allRooms)}
+                    </NativeSelectOption>
+                    {rooms.map((item) => (
+                      <NativeSelectOption key={item.id} value={item.id}>
+                        {item.label}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelect>
+                  <NativeSelect
+                    size="sm"
+                    value={instructor}
+                    aria-label={t(($) => $.schedule.instructor)}
+                    disabled={locked || !onInstructor}
+                    onChange={(event) => onInstructor?.(event.target.value)}
+                    className="w-38 max-w-full"
+                  >
+                    <NativeSelectOption value="">
+                      {t(($) => $.schedule.allInstructors)}
+                    </NativeSelectOption>
+                    {instructors.map((item) => (
+                      <NativeSelectOption key={item.id} value={item.id}>
+                        {item.label}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelect>
+                </>
+              }
+            />
+          </Suspense>
           {state === "loading" && (
             <p role="status" className="px-5 py-2 text-sm text-muted-foreground">
               {t(($) => $.schedule.loading)}

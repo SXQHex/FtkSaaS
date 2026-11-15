@@ -1,6 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
+import { BackendError } from "../../lib/backend";
 import type {
   CalendarItem,
   Interval,
@@ -153,4 +154,56 @@ export async function readScheduleRange(
     );
   }
   return { entries, reads: pages.map(({ resource, asOf }) => ({ resource, asOf })) };
+}
+
+export async function readScheduleEditor(scope: ClientScope, sessionId: string) {
+  const backend = await scopedBackend(scope);
+  const [session, page] = await Promise.all([
+    backend.call("session_get_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      session_id: sessionId,
+    }),
+    backend
+      .call("management_state_get_v1", {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        operation: "session_change_preview_v1",
+        selector: {
+          operation: "session_change_preview_v1",
+          key: { session_id: sessionId, scope: "single" },
+        },
+        page: { limit: 1 },
+      })
+      .catch((error: unknown) => {
+        // Missing scheduling policy must not hide an independently readable session.
+        // No empty resource list or writable editor is inferred from that failure.
+        if (error instanceof BackendError && error.code === "POLICY_NOT_CONFIGURED") return null;
+        throw error;
+      }),
+  ]);
+  sessionIdentity(session, sessionId);
+  if (!page) return { session, resources: null };
+  const item = page.items[0];
+  const versions = item?.versions.filter(
+    (entry) => entry.entity.type === "sessions" && entry.entity.id === sessionId,
+  );
+  if (
+    page.items.length !== 1 ||
+    page.next_cursor ||
+    !item?.exists ||
+    item.entity?.type !== "sessions" ||
+    item.entity.id !== sessionId ||
+    item.current?.operation !== "session_change_preview_v1" ||
+    item.current.values.session_id !== sessionId ||
+    versions?.length !== 1 ||
+    versions[0]?.version !== session.version ||
+    !Array.isArray(item.current.values.patch?.resources)
+  )
+    throw new Error("SCHEDULE_EDITOR_UNAVAILABLE");
+  return { session, resources: item.current.values.patch.resources };
 }
