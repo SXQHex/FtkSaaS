@@ -967,7 +967,16 @@
     "writeRejected": "İşlem reddedildi. Güncel kaynağı yükleyip yeniden değerlendir.",
     "inviting": "Davet isteği gönderiliyor…",
     "jobUnread": "Davet işi oluşturuldu; güncel durum okunamadı. Daveti tekrar göndermeden yeniden oku.",
-    "refresh": "Güncel durumu oku"
+    "refresh": "Güncel durumu oku",
+    "rowSummary": {
+      "restricted": "Bu bilgiyi görme yetkin yok",
+      "notEnabled": "Bu özellik planda açık değil",
+      "credits": "{{amount}} kredi",
+      "timedPackages_one": "{{count}} süreli paket",
+      "timedPackages_other": "{{count}} süreli paket",
+      "noDebt": "Borç yok",
+      "noLesson": "Yaklaşan ders yok"
+    }
   },
   "access": {
     "title": "Davetler ve hesaplar",

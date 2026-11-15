@@ -7,10 +7,12 @@ import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { PeopleView, type PeopleRow } from "./people-view";
+import { PeopleView, type PeopleFilter } from "./people-view";
 import { PersonEntry } from "./person-entry";
-import { readPeoplePage, type PeopleScope } from "./people";
-import type { AccountView, PersonSummary, PersonView } from "../../lib/api-contracts/generated";
+import { readPeoplePage, readPeopleCenter, type PeopleScope } from "./people";
+import type { AccountView, PersonView } from "../../lib/api-contracts/generated";
+
+import { peopleRow } from "./people-summary";
 
 export function PeopleRoutePage() {
   const account = useLoaderData({ from: "/o/$orgId/c/$centerId/people" });
@@ -118,29 +120,6 @@ function PeoplePage({
     </WorkspaceLayout>
   );
 }
-function row(person: PersonSummary, centerId: string): PeopleRow {
-  const relationships = person.relationships.filter(
-    (item) => item.center_id === centerId && item.kind === "student",
-  );
-  const states = new Set(relationships.map((item) => item.state));
-  const state =
-    states.size === 0
-      ? "none"
-      : states.size === 1
-        ? relationships[0]?.state === "active"
-          ? "active"
-          : "inactive"
-        : "unknown";
-  return {
-    id: person.id,
-    name: person.display_name,
-    email: person.contacts?.find((contact) => contact.kind === "email")?.value ?? null,
-    state,
-    entitlement: null,
-    nextSession: null,
-    debt: null,
-  };
-}
 function PeopleContent({
   scope,
   onLockChange,
@@ -150,6 +129,8 @@ function PeopleContent({
 }) {
   const router = useRouter();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [filter, setFilter] = useState<PeopleFilter>("all");
   const [search, setSearch] = useState("");
   const [queryText, setQueryText] = useState("");
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
@@ -169,12 +150,27 @@ function PeopleContent({
     return () => clearTimeout(timer);
   }, [search]);
   const query = useQuery({
-    queryKey: ["people", scope.accountId, scope.orgId, scope.centerId, queryText, cursors[index]],
-    queryFn: () => readPeoplePage(scope, queryText, cursors[index]),
+    queryKey: [
+      "people",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      queryText,
+      "with-member-summary",
+      filter,
+      cursors[index],
+    ],
+    queryFn: () =>
+      readPeoplePage(scope, queryText, cursors[index], filter === "all" ? undefined : filter, true),
+    retry: false,
+  });
+  const center = useQuery({
+    queryKey: ["people-center", scope.accountId, scope.orgId, scope.centerId],
+    queryFn: () => readPeopleCenter(scope),
     retry: false,
   });
   useEffect(() => {
-    const error = query.error;
+    const error = query.error ?? center.error;
     const code =
       error instanceof BackendError
         ? error.code
@@ -183,7 +179,7 @@ function PeopleContent({
           : undefined;
     if (code && ["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED"].includes(code))
       void router.invalidate();
-  }, [query.error, router]);
+  }, [query.error, center.error, router]);
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -200,7 +196,9 @@ function PeopleContent({
   );
   const rows = query.isError
     ? []
-    : (query.data?.items ?? []).map((person) => row(person, scope.centerId));
+    : (query.data?.items ?? []).map((person) =>
+        peopleRow(person, scope.centerId, t, center.data?.timezone),
+      );
   return (
     <>
       <PeopleView
@@ -213,8 +211,14 @@ function PeopleContent({
               : "ready"
         }
         search={search}
-        filter="all"
-        filterUnavailable
+        filter={filter}
+        onFilter={(value) => {
+          if (locked) return;
+          setFilter(value);
+          setCursors([undefined]);
+          setIndex(0);
+          setSelectedId(undefined);
+        }}
         onSearch={(value) => {
           if (!locked) setSearch(value);
         }}

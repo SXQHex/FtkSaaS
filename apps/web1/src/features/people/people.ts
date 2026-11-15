@@ -25,7 +25,13 @@ export function personCreateIntent(
     key: uuidv7(),
   };
 }
-export async function readPeoplePage(scope: PeopleScope, query: string, cursor?: string) {
+export async function readPeoplePage(
+  scope: PeopleScope,
+  query: string,
+  cursor?: string,
+  status?: "active" | "inactive",
+  includeSummary = false,
+) {
   const backend = await scopedBackend(scope);
   return backend.call("people_list_v1", {
     client_api_version: 1,
@@ -33,6 +39,8 @@ export async function readPeoplePage(scope: PeopleScope, query: string, cursor?:
     org_id: scope.orgId,
     center_id: scope.centerId,
     ...(query.trim() ? { query: query.trim() } : {}),
+    ...(status ? { student_status: status } : {}),
+    ...(includeSummary ? { include_member_summary: true } : {}),
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
 }
@@ -97,4 +105,16 @@ export async function readPersonInvitationJob(scope: PeopleScope, job: JobRef) {
     center_id: scope.centerId,
     job_id: job.job_id,
   });
+}
+
+export async function readPeopleCenter(scope: PeopleScope) {
+  const backend = await scopedBackend(scope);
+  const page = await backend.call("centers_list_v1", {
+    client_api_version: 1,
+    request_id: uuidv7(),
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    page: { limit: 1 },
+  });
+  return page.items.find((center) => center.id === scope.centerId && center.accessible) ?? null;
 }

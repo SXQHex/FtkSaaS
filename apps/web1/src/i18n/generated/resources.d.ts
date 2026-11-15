@@ -432,6 +432,14 @@ export default interface Resources {
       "readError": "Üyeler okunamadı. Güncel kaynağı yeniden yükle.",
       "refresh": "Güncel durumu oku",
       "retry": "Yeniden dene",
+      "rowSummary": {
+        "credits": "{{amount}} kredi",
+        "noDebt": "Borç yok",
+        "noLesson": "Yaklaşan ders yok",
+        "notEnabled": "Bu özellik planda açık değil",
+        "restricted": "Bu bilgiyi görme yetkin yok",
+        "timedPackages": "{{count}} süreli paket" | "{{count}} süreli paket"
+      },
       "search": "Üye ara",
       "selectPerson": "Özetini görmek için bir üye seç.",
       "sendInvitation": "Daveti gönder",
