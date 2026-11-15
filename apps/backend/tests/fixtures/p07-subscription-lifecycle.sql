@@ -57,7 +57,9 @@ begin
  answer:=private.execute_operation('subscription_upgrade_quote_v1',jsonb_build_object('client_api_version',1,'request_id',w[40],'operation_key',w[41],'org_id',u[5],'target_plan_id',w[32]),u[1],w[1],pg_temp.bank(512),null);
  if answer#>>'{error,code}' is distinct from 'VALIDATION_FAILED' then raise exception 'BILLING_PERIOD_CONVERSION_ALLOWED %',answer;end if;
  answer:=pg_temp.invoke('subscription_upgrade_quote_v1',jsonb_build_object('org_id',u[5],'target_plan_id',w[31]),u[1],w[1]);quote_id:=(answer->>'id')::uuid;due:=(answer->>'amount_minor')::bigint;
- if due not between 154 and 155 then raise exception 'PRORATION_WRONG %',answer;end if;
+ -- Fifteen elapsed days do not imply a 31-day calendar month. Assert the
+ -- exact unconsumed price difference for this fixture's real billing period.
+ if due <> 300-floor(300*extract(epoch from interval '15 days')/extract(epoch from original_end-(now()-interval '15 days'))) then raise exception 'PRORATION_WRONG %',answer;end if;
  answer:=pg_temp.invoke('saas_payment_submit_v1',jsonb_build_object('org_id',u[5],'quote_id',quote_id,'amount_minor',(due-1)::text,'currency','TRY','reference','partial','occurred_at',clock_timestamp()),u[1],w[1]);payment_id:=(answer->>'primary_id')::uuid;
  perform pg_temp.invoke('saas_payment_verify_v1',jsonb_build_object('org_id',u[5],'payment_id',payment_id,'accepted',true),u[1],w[1]);
  if (select plan_version_id from core.saas_subscriptions where id=sub_id)<>w[30] then raise exception 'PARTIAL_PAYMENT_UPGRADED';end if;
@@ -78,7 +80,7 @@ begin
   if answer->>'amount_minor'<>'0' then raise exception 'PREPAID_ZERO_QUOTE_WRONG %',answer;end if;
   answer:=pg_temp.invoke('saas_payment_submit_v1',jsonb_build_object('org_id',u[5],'quote_id',answer->'id','amount_minor','0','currency','TRY','reference','zero confirmation','occurred_at',clock_timestamp()),u[1],w[1]);payment_id:=(answer->>'primary_id')::uuid;
   perform pg_temp.invoke('saas_payment_verify_v1',jsonb_build_object('org_id',u[5],'payment_id',payment_id,'accepted',true),u[1],w[1]);
-  if not exists(select 1 from private.p07_payment_origins x where x.payment_id=(answer->>'primary_id')::uuid and kind='quote_confirmation') or (select plan_version_id from core.saas_subscriptions where id=sub_id)<>w[31] or private.p07_funds(u[5],'TRY') not between 845 and 846 then raise exception 'ZERO_QUOTE_DOUBLE_CASH_OR_NO_UPGRADE';end if;
+  if not exists(select 1 from private.p07_payment_origins x where x.payment_id=(answer->>'primary_id')::uuid and kind='quote_confirmation') or (select plan_version_id from core.saas_subscriptions where id=sub_id)<>w[31] or private.p07_funds(u[5],'TRY')<>1000-due then raise exception 'ZERO_QUOTE_DOUBLE_CASH_OR_NO_UPGRADE';end if;
   raise exception 'P07_ZERO_CASE_ROLLBACK';
  exception when SQLSTATE 'P0001' then if SQLERRM<>'P07_ZERO_CASE_ROLLBACK' then raise;end if;
  end;

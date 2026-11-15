@@ -536,7 +536,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "1f8701f46283981a5e1c05d3ab12b70da74680476a338eec229aa3ffddb3141f",
+      "sha256": "43a17c15264ab080c413d2f4af9d4916074936cf4c3e5cfe3b20857d21c4f34d",
       "shared": [
         [
           7,
@@ -627,6 +627,11 @@
           "line": 379,
           "path": "apps/backend/tests/person-field-policy-acceptance.mjs",
           "sha256": "125d689dfd3f905398fd7718e736a277dc516e91d2d88700fa23ca0829370cac"
+        },
+        {
+          "line": 380,
+          "path": "apps/backend/tests/student-status-filter-acceptance.mjs",
+          "sha256": "ec05d86bc9d357f9f998673a9e37ff9dfb6d0eb9ca637c6b0e9aec23d6eb8890"
         }
       ],
       "estimated_seconds": 651.01

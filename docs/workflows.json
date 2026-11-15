@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6b0fd93fe12fa9b79bcd40ab76ae70cf222ff4f8d0b13430f4b4a3b9fa66af57",
-        "reason": "Reviewed final person-policy acceptance inventory hash, typed validators and unit import; transport/auth/CI executable policy unchanged."
+        "fingerprint": "b9f56069824d08a8e425081b485093839de06461a188c02a156cfe0430b97a21",
+        "reason": "Reviewed P07 fixture calendar correction: exact period-based proration and prepaid balance assertions; typed protocol and runtime behavior unchanged."
       }
     },
     {
@@ -617,7 +617,9 @@
         "apps/backend/tests/people-self-scale-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/person-field-policy-acceptance.mjs",
-        "apps/backend/tests/person-field-policy-unit.mjs"
+        "apps/backend/tests/person-field-policy-unit.mjs",
+        "apps/backend/tests/student-status-filter-acceptance.mjs",
+        "apps/backend/tests/student-status-filter-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -674,7 +676,11 @@
         "apps/backend/database/merge-approval-discovery.sql",
         "apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql",
         "apps/backend/database/person-field-policy.sql",
-        "apps/backend/supabase/migrations/20261114175838_person_field_policy.sql"
+        "apps/backend/supabase/migrations/20261114175838_person_field_policy.sql",
+        "apps/backend/database/student-status-filter.sql",
+        "apps/backend/supabase/migrations/20261115014502_student_status_filter.sql",
+        "apps/backend/database/member-page-summary.sql",
+        "apps/backend/database/access-directory.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -693,8 +699,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "e09e5a10354d30911a27d55745338849d7111e80f2ebc1b28c3db4b539ee7302",
-        "reason": "Reviewed final alias-duplicate native snapshot fixture and exact contact/name guard predicates; no writer change, no permissions inferred from metadata."
+        "fingerprint": "17378579ac3f794c87acc08cf666eecdc2e12297548d5903d2be16aae315c8d2",
+        "reason": "Final directory review: read_at consistent effective expiry/status/actionability within page; created-at cursor cutoff remains separate. All three source modules, typed/native fixtures and rights/privacy gates reviewed."
       }
     },
     {
@@ -1120,8 +1126,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "7e6c65e4892b1e56036608263e4604743acdb00649cc139db270465c1711ff94",
-        "reason": "Shared person registry root adds the new field policy acceptance import only; public intake and calendar source behavior and guide remain unchanged."
+        "fingerprint": "84970f5ef624631014e7a2ff996325693cffe944fd9a700e4eb159b66aeeca19",
+        "reason": "Shared person registry test root adds the combined three-request acceptance import only; public/calendar source behavior unchanged."
       }
     },
     {
@@ -1449,8 +1455,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "f606c047022cefe9618f4e9961c2b243a4b77cba42e47c4469d47cb5c2e49ddc",
-        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
+        "fingerprint": "051da633e519e7094584805c95f4feb99c370a36c89868d9d68f11b3c4cc6b0d",
+        "reason": "Reviewed subscription fixture against p07 quote/payment SQL: actual calendar period replaces 31-day assumption; exact due, partial credit, zero confirmation and allocation checks preserved; no runtime or guide change."
       }
     },
     {
@@ -1638,8 +1644,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "11a4c734d601263653dc67d73d8fb7196713c1a013aaad1f7fc46dbd9f4a202f",
-        "reason": "Shared person registry root adds field policy acceptance import; CRM writes/intake/automation behavior and guide remain unchanged."
+        "fingerprint": "6e6e1363c50b594003e000196ccf864d1c92e40e628733bca1eecd986b9b155e",
+        "reason": "Shared person registry root adds combined member/access read acceptance import only; CRM behavior unchanged."
       }
     },
     {
@@ -1727,8 +1733,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "1befd6b9de89dc533d0d7d020e361ef5ca823e208876a073de27bab1cbcedfdc",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "c519d9772bc81975c7bec099e6858867f98f1b24b3e4c5fea575704929c39d21",
+        "reason": "Reviewed P07 fixture-only calendar correction; payment amount and unused-funds assertions are exact; lifecycle and platform permission scenarios unchanged, guide remains valid."
       }
     },
     {
