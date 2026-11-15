@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5e685c0d0cc084459048cad4ffd4e15d81b7bf0bbbe20662f50bc24b512a63ab",
-        "reason": "Final typed request/response and exact-source inventory reviewed; compound-schema interning preserves all JSON rules and deep canonical equivalence, bringing Edge JSON upload under unchanged 4MB gate."
+        "fingerprint": "b9f56069824d08a8e425081b485093839de06461a188c02a156cfe0430b97a21",
+        "reason": "Reviewed P07 fixture calendar correction: exact period-based proration and prepaid balance assertions; typed protocol and runtime behavior unchanged."
       }
     },
     {
@@ -1455,8 +1455,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "f606c047022cefe9618f4e9961c2b243a4b77cba42e47c4469d47cb5c2e49ddc",
-        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
+        "fingerprint": "051da633e519e7094584805c95f4feb99c370a36c89868d9d68f11b3c4cc6b0d",
+        "reason": "Reviewed subscription fixture against p07 quote/payment SQL: actual calendar period replaces 31-day assumption; exact due, partial credit, zero confirmation and allocation checks preserved; no runtime or guide change."
       }
     },
     {
@@ -1733,8 +1733,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "1befd6b9de89dc533d0d7d020e361ef5ca823e208876a073de27bab1cbcedfdc",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "c519d9772bc81975c7bec099e6858867f98f1b24b3e4c5fea575704929c39d21",
+        "reason": "Reviewed P07 fixture-only calendar correction; payment amount and unused-funds assertions are exact; lifecycle and platform permission scenarios unchanged, guide remains valid."
       }
     },
     {
