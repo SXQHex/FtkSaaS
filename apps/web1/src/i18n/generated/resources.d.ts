@@ -30,6 +30,7 @@ export default interface Resources {
         "resend": "Daveti yeniden gönder",
         "unlink": "{{name}} hesabının bağlantısını kaldır"
       },
+      "actionUnavailable": "Bu işlem şu anda kullanılamıyor. Güncel kayıt ve yetkini kontrol et.",
       "actions": "İşlemler",
       "cancelInvitation": "İptal et",
       "closed": "Kapanan",
@@ -64,18 +65,23 @@ export default interface Resources {
       "pendingInvitations": "Bekleyen davet",
       "readError": "Davetler ve hesap bağlantıları okunamadı. Güncel bilgileri yeniden yükle.",
       "reason": "Gerekçe",
+      "reasonRequired": "Bağlantıyı kaldırmak için bir gerekçe yaz.",
       "resend": "Yeniden gönder",
       "resendInvitation": "Daveti yeniden gönder",
       "resentCount": "{{count}} kez yeniden gönderildi" | "{{count}} kez yeniden gönderildi",
+      "saved": "İşlem kaydedildi; güncel bilgiler yüklendi.",
+      "savedUnread": "İşlem kaydedildi; güncel durum henüz okunamadı. Yazıyı tekrarlamadan yeniden oku.",
       "sections": "Bölümler",
       "sendLinkInvitation": "Bağlama daveti gönder",
       "sent": "Gönderildi",
+      "stale": "Kayıt değişti. Güncel bilgileri yükleyip işlemi yeniden onayla.",
       "title": "Davetler ve hesaplar",
       "unknown": "Henüz okunmadı",
       "unlink": "Bağlantıyı kaldır",
       "unlinkedDescription": "Bağlama daveti gerekir",
       "unlinkedMembers": "Hesap bağlantısı olmayan",
-      "validity": "Geçerlilik"
+      "validity": "Geçerlilik",
+      "writing": "İşlem gönderiliyor…"
     },
     "accountDeletion": {
       "accountEffect": "Hesap",

@@ -1,12 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import {
-  readPerson,
-  personInvitationIntent,
-  sendPersonInvitation,
-  type PersonInvitationIntent,
-} from "../people/people";
+import { readPerson, sendPersonInvitation, type PersonInvitationIntent } from "../people/people";
 import type { PersonView, ManagementStateView, JobRef } from "../../lib/api-contracts/generated";
 import type { AccessAction } from "./access-view";
 
@@ -42,7 +37,10 @@ export async function readAccessAction(
       selection,
       person,
       target: null,
-      actionable: Boolean(person.contacts?.some((contact) => contact.kind === "email")),
+      // Visible contacts are not authority to send, and missing contact
+      // visibility must not override an allowed server-provided action.
+      actionable:
+        selection.kind === "resend" ? selection.invitation.canResend : selection.account.canInvite,
       version: null,
       targetId: null,
     };
@@ -89,6 +87,11 @@ export async function readAccessAction(
       version: null,
       targetId,
     };
+  if (
+    target.current.operation === "account_access_revoke_v1" &&
+    target.current.values.center_id !== scope.centerId
+  )
+    throw new Error("ACCESS_TARGET_UNAVAILABLE");
   const values = target.current.values;
   const returnedId =
     "invitation_id" in values
@@ -121,7 +124,10 @@ export async function readAccessAction(
 export function accessWriteIntent(base: AccessActionBase, reason: string): AccessWriteIntent {
   if (!base.actionable) throw new Error("ACCESS_ACTION_UNAVAILABLE");
   if (base.selection.kind === "invite" || base.selection.kind === "resend")
-    return { kind: "invite", invitation: personInvitationIntent(base.scope, base.person) };
+    return {
+      kind: "invite",
+      invitation: { scope: { ...base.scope }, personId: base.person.id, key: uuidv7() },
+    };
   if (!base.version || !base.targetId) throw new Error("ACCESS_TARGET_UNAVAILABLE");
   const validReason =
     base.selection.kind === "unlink"

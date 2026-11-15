@@ -1044,6 +1044,12 @@
       "unlink": "Bağlantıyı kaldır",
       "resend": "Daveti gönder",
       "invite": "Daveti gönder"
-    }
+    },
+    "reasonRequired": "Bağlantıyı kaldırmak için bir gerekçe yaz.",
+    "actionUnavailable": "Bu işlem şu anda kullanılamıyor. Güncel kayıt ve yetkini kontrol et.",
+    "stale": "Kayıt değişti. Güncel bilgileri yükleyip işlemi yeniden onayla.",
+    "savedUnread": "İşlem kaydedildi; güncel durum henüz okunamadı. Yazıyı tekrarlamadan yeniden oku.",
+    "saved": "İşlem kaydedildi; güncel bilgiler yüklendi.",
+    "writing": "İşlem gönderiliyor…"
   }
 }

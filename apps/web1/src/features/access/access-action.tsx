@@ -26,6 +26,8 @@ export function AccessActionDialog({
   error,
   notice,
   recoveryActions,
+  reading = false,
+  readOnly = false,
 }: {
   selection: AccessAction;
   onClose: () => void;
@@ -37,6 +39,8 @@ export function AccessActionDialog({
   error?: string;
   notice?: string;
   recoveryActions?: ReactNode;
+  reading?: boolean;
+  readOnly?: boolean;
 }) {
   const { t } = useTranslation();
   const name =
@@ -69,7 +73,7 @@ export function AccessActionDialog({
       <form
         id="access-action"
         aria-label={t(($) => $.access.actionTitles[selection.kind], { name })}
-        aria-busy={busy}
+        aria-busy={busy || reading}
         method="post"
         onSubmit={(event) => {
           event.preventDefault();
@@ -88,6 +92,7 @@ export function AccessActionDialog({
                 name="reason"
                 value={reason}
                 onChange={(event) => onReason(event.target.value)}
+                readOnly={readOnly}
                 required
                 disabled={busy || locked}
                 aria-invalid={Boolean(error)}
@@ -98,7 +103,7 @@ export function AccessActionDialog({
           </FieldGroup>
         )}
         {notice && (
-          <Alert role="status" className="mt-3">
+          <Alert id="access-action-notice" role="status" tabIndex={-1} className="mt-3">
             <AlertDescription>{notice}</AlertDescription>
           </Alert>
         )}
