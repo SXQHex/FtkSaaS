@@ -37,7 +37,7 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { ItemGroup, Item, ItemContent, ItemTitle, ItemDescription } from "../../components/ui/item";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 
-export type MergeFilter = "pending" | "completed";
+export type MergeFilter = "pending" | "completed" | "not_duplicate" | "approvals";
 export interface MergeListItem {
   id: string;
   name: string;
@@ -100,6 +100,8 @@ export function MergeView({
   onRetry,
   completedAvailable = true,
   listActions,
+  applyLabel,
+  reviewHint,
 }: {
   items: MergeListItem[];
   selectedId?: string;
@@ -127,6 +129,8 @@ export function MergeView({
   onRetry?: () => void;
   completedAvailable?: boolean;
   listActions?: ReactNode;
+  applyLabel?: string;
+  reviewHint?: string;
 }) {
   const { t } = useTranslation();
   const unknown = t(($) => $.peopleMerge.unknown);
@@ -151,17 +155,24 @@ export function MergeView({
           <CardHeader className="pb-4">
             <ToggleGroup
               variant="segmented"
+              className="grid w-full grid-cols-2"
               selectionMode="single"
               disallowEmptySelection
               selectedKeys={[filter]}
               onSelectionChange={(keys) => {
                 const key = [...keys][0];
-                if (key === "pending" || key === "completed") onFilter?.(key);
+                if (
+                  key === "pending" ||
+                  key === "completed" ||
+                  key === "not_duplicate" ||
+                  key === "approvals"
+                )
+                  onFilter?.(key);
               }}
               isDisabled={locked || !onFilter}
               aria-label={t(($) => $.peopleMerge.filterLabel)}
             >
-              {(["pending", "completed"] as const).map((key) => (
+              {(["pending", "completed", "not_duplicate", "approvals"] as const).map((key) => (
                 <ToggleGroupItem
                   key={key}
                   id={key}
@@ -427,6 +438,7 @@ export function MergeView({
                           id="merge-reason"
                           name="reason"
                           rows={2}
+                          maxLength={2000}
                           required
                           value={reason}
                           disabled={locked || !onReason}
@@ -458,7 +470,7 @@ export function MergeView({
                         >
                           <span>{t(($) => $.peopleMerge.reviewed)}</span>
                           <span className="text-xs font-normal text-muted-foreground">
-                            {t(($) => $.peopleMerge.irreversible)}
+                            {reviewHint ?? t(($) => $.peopleMerge.irreversible)}
                           </span>
                         </FieldLabel>
                       </Field>
@@ -480,14 +492,9 @@ export function MergeView({
                       form="person-merge"
                       isDisabled={!onApply || !canApply || locked}
                     >
-                      {t(($) => $.peopleMerge.apply)}
+                      {applyLabel ?? t(($) => $.peopleMerge.apply)}
                     </Button>
                   </div>
-                  {!onDismiss && (
-                    <p className="w-full text-xs text-muted-foreground">
-                      {t(($) => $.peopleMerge.dismissUnavailable)}
-                    </p>
-                  )}
                 </CardFooter>
               </Card>
             </>
