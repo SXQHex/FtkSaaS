@@ -3,6 +3,7 @@ import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { ReservationView, RequestReservationCancel } from "../../lib/api-contracts/generated";
 import { readProfileRights } from "./profile-read";
+import { readProfileReservation } from "./reservations";
 
 export interface CancellationBase {
   scope: ClientScope;
@@ -13,34 +14,6 @@ export interface CancellationIntent {
   base: CancellationBase;
   operation: "reservation_cancel_v1";
   request: Omit<RequestReservationCancel, "request_id">;
-}
-async function reservation(scope: ClientScope, personId: string, id: string, sessionId: string) {
-  const backend = await scopedBackend(scope),
-    cursors = new Set<string>();
-  let cursor: string | undefined;
-  do {
-    const page = await backend.call("reservation_list_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: scope.orgId,
-      center_id: scope.centerId,
-      person_id: personId,
-      session_id: sessionId,
-      page: { limit: 20, ...(cursor ? { cursor } : {}) },
-    });
-    if (page.items.some((row) => row.person_id !== personId || row.session_id !== sessionId))
-      throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
-    const matches = page.items.filter((row) => row.id === id);
-    if (matches.length > 1) throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
-    if (matches[0]) {
-      z.number().int().positive().safe().parse(matches[0].version);
-      return matches[0];
-    }
-    cursor = page.next_cursor ?? undefined;
-    if (cursor && cursors.has(cursor)) throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
-    if (cursor) cursors.add(cursor);
-  } while (cursor);
-  throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
 }
 export async function readCancellation(
   scope: ClientScope,
@@ -73,7 +46,7 @@ export async function readCancellation(
     versions.length !== 1
   )
     throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
-  const row = await reservation(scope, personId, id, sessionId);
+  const row = await readProfileReservation(scope, personId, id, sessionId);
   if (row.version !== versions[0]!.version || row.state !== "active")
     throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
   return { scope: { ...scope }, personId, reservation: row };
@@ -126,7 +99,7 @@ export async function readCancellationReceipt(intent: CancellationIntent) {
 export async function readCancellationResult(intent: CancellationIntent, id?: string) {
   const { scope, personId, reservation: before } = intent.base;
   if (id !== before.id) throw new Error("PROFILE_CANCELLATION_RESULT_UNAVAILABLE");
-  const row = await reservation(scope, personId, before.id, before.session_id);
+  const row = await readProfileReservation(scope, personId, before.id, before.session_id);
   if (row.state !== "cancelled" || row.version <= before.version)
     throw new Error("PROFILE_CANCELLATION_RESULT_UNAVAILABLE");
   const backend = await scopedBackend(scope);

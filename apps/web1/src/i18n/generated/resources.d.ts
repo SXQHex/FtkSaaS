@@ -712,15 +712,26 @@ export default interface Resources {
         "completed": "Tamamlandı"
       },
       "review": "Etkiyi incele",
+      "rightErrors": {
+        "endDate": "Mevcut bitişten sonraki geçerli bir tarih seç.",
+        "quantity": "Pozitif tam sayı ders adedi gir.",
+        "reason": "İşlem gerekçesini gir."
+      },
       "rightKinds": {
         "credits": "Kredili paket",
         "timed": "Süreli paket"
       },
+      "rightReadError": "Güncel hak veya işlem önizlemesi okunamadı. Yetkini ve koşulları kontrol edip yeniden incele.",
+      "rightReading": "Güncel hak ve rezervasyon etkisi okunuyor.",
+      "rightRejected": "Hak işlemi reddedildi. Geri dönüp güncel koşulları yeniden incele.",
+      "rightSaved": "Hak işlemi kaydedildi; güncel haklar ve etkilenen rezervasyonlar okundu.",
+      "rightStale": "Hak veya önizleme değişti. Geri dönüp güncel kaynağı yeniden incele ve onayla.",
       "rightStates": {
         "active": "Etkin",
         "closed": "Kapandı",
         "suspended": "Donduruldu"
       },
+      "rightUnread": "Hak işlemi kaydedildi; güncel sonuç henüz okunamadı. Tekrar yazmadan sonucu oku.",
       "saleAuthorityUnavailable": "Bu kişi için satış yetkisi doğrulanamadı.",
       "saleBlocked": "Satış önizlemesindeki koşullar nedeniyle uygulanamıyor.",
       "saleConsumedDeficit": "Geçmiş eksik hak",

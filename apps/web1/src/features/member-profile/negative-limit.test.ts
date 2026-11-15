@@ -79,7 +79,16 @@ beforeEach(() => {
     if (op === "entitlements_get_v1") return [];
     if (op === "reservation_list_v1")
       return {
-        items: [{ id: reservation, session_id: session, person_id: person, state: "active" }],
+        items: [
+          {
+            id: reservation,
+            session_id: session,
+            person_id: person,
+            state: "active",
+            version: 3,
+            mode: "flexible",
+          },
+        ],
         next_cursor: null,
       };
     throw new Error("UNEXPECTED_OPERATION");

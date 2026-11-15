@@ -7,6 +7,7 @@ import { readMemberReservations, memberReservationRows } from "./reservations";
 import { CancelReservation } from "./cancel-reservation";
 import { readNegativeLimit } from "./negative-limit";
 import { NegativeLimitEditor } from "./negative-limit-editor";
+import { RightAdjustmentEditor } from "./right-adjustment-editor";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -51,6 +52,13 @@ export function MemberProfileContent({
     [commandInvalid, setInvalid] = useState(false),
     [negativeDiscipline, setNegativeDiscipline] = useState(""),
     [editNegative, setEditNegative] = useState(false),
+    [rightTarget, setRightTarget] = useState<{
+      action: "adjust" | "extend";
+      saleId: string;
+      label: string;
+      endDate: string;
+      timezone: string;
+    }>(),
     [cancelTarget, setCancelTarget] = useState<{ id: string; sessionId: string; label: string }>(),
     [reservationIndex, setReservationIndex] = useState(0),
     [reservationCursors, setReservationCursors] = useState<(string | undefined)[]>([undefined]);
@@ -277,7 +285,37 @@ export function MemberProfileContent({
     })) ?? null;
   const presentedRights =
     !rights.isError && rights.data
-      ? entitlementRows(rights.data, catalog.isError ? [] : (catalog.data ?? []), t)
+      ? (entitlementRows(rights.data, catalog.isError ? [] : (catalog.data ?? []), t)?.map(
+          (row) => {
+            const source = rights.data.find((x) => x.sale_id === row.id)!;
+            return {
+              ...row,
+              actions: row.actions.map((action) =>
+                action.kind === "adjust" || action.kind === "extend"
+                  ? {
+                      ...action,
+                      disabled:
+                        !sourceAvailable ||
+                        locked ||
+                        rights.isFetching ||
+                        source.state !== "active" ||
+                        source.sale_state !== "active" ||
+                        !source.account_id ||
+                        !source.version,
+                      onPress: () =>
+                        setRightTarget({
+                          action: action.kind as "adjust" | "extend",
+                          saleId: row.id,
+                          label: row.name,
+                          endDate: source.end_date,
+                          timezone: source.timezone,
+                        }),
+                    }
+                  : action,
+              ),
+            };
+          },
+        ) ?? null)
       : null;
   const closedSales = new Set(
     rights.data?.filter((x) => x.state === "closed").map((x) => x.sale_id) ?? [],
@@ -610,6 +648,39 @@ export function MemberProfileContent({
           )
         }
       />
+      {rightTarget && (sourceAvailable || preservePending) && (
+        <RightAdjustmentEditor
+          key={`${rightTarget.saleId}:${rightTarget.action}`}
+          scope={scope}
+          personId={personId}
+          personLabel={p?.display_name ?? ""}
+          action={rightTarget.action}
+          saleId={rightTarget.saleId}
+          sourceLabel={rightTarget.label}
+          endDate={rightTarget.endDate}
+          timezone={rightTarget.timezone}
+          sourceAvailable={sourceAvailable}
+          onClose={() => setRightTarget(undefined)}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onRefresh={async (result) => {
+            queries.setQueryData(rightsKey, result.rights);
+            await queries.invalidateQueries({
+              queryKey: [
+                "profile-reservations",
+                scope.accountId,
+                scope.orgId,
+                scope.centerId,
+                personId,
+              ],
+            });
+            await person.refetch({ throwOnError: true });
+            void queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
+          }}
+        />
+      )}
       {editNegative &&
         center &&
         negativeLimit.data &&

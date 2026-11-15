@@ -6,6 +6,7 @@ import type {
   ReservationProtectionPreview,
 } from "../../lib/api-contracts/generated";
 import { readProfileRights } from "./profile-read";
+import { readProfileReservation } from "./reservations";
 
 const count = z.number().int().nonnegative().safe();
 export const negativeLimitDraft = z.object({
@@ -186,25 +187,14 @@ export async function readNegativeLimitResult(intent: NegativeLimitIntent, id?: 
   )
     throw new Error("PROFILE_NEGATIVE_RESULT_UNAVAILABLE");
   const rights = await readProfileRights(intent.scope, review.personId);
-  const backend = await scopedBackend(intent.scope);
   for (const item of review.preview.affected) {
-    const page = await backend.call("reservation_list_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: intent.scope.orgId,
-      center_id: intent.scope.centerId,
-      person_id: review.personId,
-      session_id: item.session_id,
-      page: { limit: 200 },
-    });
-    const row = page.items.find((x) => x.id === item.reservation_id);
-    if (
-      !row ||
-      row.person_id !== review.personId ||
-      row.session_id !== item.session_id ||
-      row.state !== "active"
-    )
-      throw new Error("PROFILE_NEGATIVE_RESULT_UNAVAILABLE");
+    const row = await readProfileReservation(
+      intent.scope,
+      review.personId,
+      item.reservation_id,
+      item.session_id,
+    );
+    if (row.state !== "active") throw new Error("PROFILE_NEGATIVE_RESULT_UNAVAILABLE");
   }
   return { limit, rights };
 }

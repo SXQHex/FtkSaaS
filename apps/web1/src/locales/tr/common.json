@@ -1977,6 +1977,17 @@
     },
     "timedHint": "Süreli kullanım hakkı; kullanım koşulları paket bilgilerinde gösterilir.",
     "negative": "Negatif limit",
+    "rightErrors": {
+      "quantity": "Pozitif tam sayı ders adedi gir.",
+      "reason": "İşlem gerekçesini gir.",
+      "endDate": "Mevcut bitişten sonraki geçerli bir tarih seç."
+    },
+    "rightReadError": "Güncel hak veya işlem önizlemesi okunamadı. Yetkini ve koşulları kontrol edip yeniden incele.",
+    "rightSaved": "Hak işlemi kaydedildi; güncel haklar ve etkilenen rezervasyonlar okundu.",
+    "rightUnread": "Hak işlemi kaydedildi; güncel sonuç henüz okunamadı. Tekrar yazmadan sonucu oku.",
+    "rightStale": "Hak veya önizleme değişti. Geri dönüp güncel kaynağı yeniden incele ve onayla.",
+    "rightRejected": "Hak işlemi reddedildi. Geri dönüp güncel koşulları yeniden incele.",
+    "rightReading": "Güncel hak ve rezervasyon etkisi okunuyor.",
     "negativeErrors": {
       "disciplineId": "Geçerli bir disiplin seç.",
       "quantity": "Limiti 0 veya pozitif tam sayı olarak gir.",

@@ -28,6 +28,7 @@ async function setup(
     rejectDiscount?: boolean;
     scoped?: boolean;
     openSale?: boolean;
+    existingRights?: boolean;
   } = {},
 ) {
   await mockStudio(page);
@@ -95,9 +96,11 @@ async function setup(
         kind: p.terms.kind,
         booking_mode: "flexible",
         version: 1,
+        account_id: debtId,
+        sale_state: "active",
         sale_version: 1,
       };
-      return send(saved ? [row] : []);
+      return send(saved || options.existingRights ? [row] : []);
     }
     if (op === "finance_get_v1") {
       expect(req.person_id).toBe(I.instructor);
@@ -947,3 +950,240 @@ for (const mode of ["unknown", "unread"] as const)
       expect(writes[0]!.request_id).not.toBe(writes[1]!.request_id);
     }
   });
+
+async function rightSetup(
+  page: Page,
+  options: {
+    action?: "adjust" | "extend";
+    unknown?: boolean;
+    unread?: boolean;
+    stale?: boolean;
+  } = {},
+) {
+  await setup(page, { openSale: false, existingRights: true });
+  const writes: Record<string, unknown>[] = [],
+    previews: Record<string, unknown>[] = [];
+  const row: EntitlementView = {
+    sale_id: saleId,
+    account_id: debtId,
+    person_id: I.instructor,
+    product_version_id: versionId,
+    start_date: "2026-11-15",
+    end_date: "2026-11-22",
+    timezone: "Europe/Istanbul",
+    state: "active",
+    kind: "credits",
+    booking_mode: "flexible",
+    version: 1,
+    sale_version: 1,
+    sale_state: "active",
+    available: 8,
+    reserved: 0,
+    consumed: 0,
+    deficit: 0,
+    quotas: [],
+    deficit_scopes: [],
+  };
+  let saved = false,
+    unread = false;
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1),
+      req = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "entitlements_get_v1") {
+      if (options.unread && saved && !unread) {
+        unread = true;
+        return route.abort("failed");
+      }
+      return send([row]);
+    }
+    if (op === "reservation_impact_preview_v1") {
+      previews.push(req);
+      expect(req.change.sale_id).toBe(saleId);
+      const result: ReservationProtectionPreview = {
+        change: req.change,
+        preview: {
+          id: previews.length === 1 ? previewId : secondPreviewId,
+          token: `synthetic-right-capability-${previews.length}`,
+          scope_hash: "synthetic",
+          dependencies: { versions: [], policy_hashes: [], permission_hash: "synthetic" },
+          effects: [
+            {
+              entity: {
+                type: req.change.kind === "credit_adjust" ? "entitlement_accounts" : "sales",
+                id: req.change.kind === "credit_adjust" ? debtId : saleId,
+              },
+              action: "adjust",
+            },
+          ],
+          blockers: [],
+          expires_at: "2099-01-01T00:00:00Z",
+        },
+        affected: [],
+        preserves_reservations: true,
+        waives_independent_blocks: false,
+      };
+      return send(result);
+    }
+    if (op === "credit_adjust_v1" || op === "entitlement_extend_v1") {
+      writes.push(req);
+      expect(req.sale_id).toBe(saleId);
+      expect(req.accepted_reservation_ids).toEqual([]);
+      if (options.stale && writes.length === 1) {
+        row.version = 2;
+        return route.fulfill({
+          json: {
+            ok: false,
+            error: { code: "VERSION_CONFLICT", retryable: false, trace_id: I.role },
+          },
+        });
+      }
+      if (!saved) {
+        row.version!++;
+        if (op === "credit_adjust_v1") row.available = 10;
+        else {
+          row.end_date = req.end_date;
+          row.sale_version!++;
+        }
+        saved = true;
+      }
+      if (options.unknown && writes.length === 1) return route.abort("failed");
+      return send({ primary_id: debtId, changed: [], jobs: [] });
+    }
+    if (op === "reservation_impact_apply_v1")
+      throw new Error("ALTERNATIVE_IMPACT_WRITER_MUST_NOT_RUN");
+    if (op === "operation_status_get_v1")
+      return route.fulfill({
+        json: { ok: false, error: { code: "NOT_FOUND", retryable: false, trace_id: I.role } },
+      });
+    return route.fallback();
+  });
+  const action = options.action ?? "adjust",
+    label = action === "adjust" ? "Hakkı düzelt" : "Süreyi uzat";
+  await page.getByRole("button", { name: label, exact: true }).click();
+  const panel = page.getByRole("dialog", { name: label, exact: true });
+  await expect(panel).toBeVisible();
+  return { panel, writes, previews, row };
+}
+async function rightReview(page: Page, options: Parameters<typeof rightSetup>[1] = {}) {
+  const state = await rightSetup(page, options),
+    { panel } = state;
+  if (options.action === "extend")
+    await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-25");
+  else await panel.getByLabel("Ders sayısı", { exact: true }).fill("2");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic right adjustment reason");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByRole("heading", { name: "Etki", exact: true })).toBeFocused();
+  return state;
+}
+test("right adjustment rejects zero, reviews the native source and updates rights after explicit approval", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  const { panel, writes, previews } = await rightSetup(page);
+  await panel.getByLabel("Ders sayısı", { exact: true }).fill("0");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByLabel("Ders sayısı", { exact: true })).toBeFocused();
+  expect(previews).toHaveLength(0);
+  await panel.getByLabel("Ders sayısı", { exact: true }).fill("2");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic right adjustment reason");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  const confirm = panel.getByRole("button", { name: "Uygula", exact: true });
+  await expect(confirm).toBeDisabled();
+  expect(writes).toHaveLength(0);
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await confirm.click();
+  await expect(
+    panel.getByText("Hak işlemi kaydedildi; güncel haklar ve etkilenen rezervasyonlar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(writes).toHaveLength(1);
+  expect(writes[0]).toMatchObject({
+    quantity: 2,
+    direction: "increase",
+    impact_approval: { id: previewId, token: "synthetic-right-capability-1" },
+  });
+  expect(writes[0]).not.toHaveProperty("expected_version");
+  expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+test("right extension rejects the existing date and binds the new date to the native account version", async ({
+  page,
+}) => {
+  const { panel, writes, previews } = await rightSetup(page, { action: "extend" });
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic extension reason");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByLabel("Bitiş", { exact: true })).toBeFocused();
+  expect(previews).toHaveLength(0);
+  await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-25");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await expect(
+    panel.getByText("Hak işlemi kaydedildi; güncel haklar ve etkilenen rezervasyonlar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(writes).toHaveLength(1);
+  expect(writes[0]).toMatchObject({ end_date: "2026-11-25", expected_version: 1 });
+  expect(writes[0]).not.toHaveProperty("quantity");
+});
+for (const mode of ["unknown", "unread"] as const)
+  test(`right adjustment ${mode} result retains its reviewed intent and never repeats an acknowledged writer`, async ({
+    page,
+  }) => {
+    const { panel, writes } = await rightReview(page, {
+      action: mode === "unread" ? "extend" : "adjust",
+      [mode]: true,
+    });
+    await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+    await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+    await expect(
+      panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(panel).toBeVisible();
+    await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+    if (mode === "unknown")
+      await panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+    await expect(
+      panel.getByText("Hak işlemi kaydedildi; güncel haklar ve etkilenen rezervasyonlar okundu.", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    expect(writes).toHaveLength(mode === "unknown" ? 2 : 1);
+    if (mode === "unknown") {
+      expect({ ...writes[0], request_id: null }).toEqual({ ...writes[1], request_id: null });
+      expect(writes[0]!.request_id).not.toBe(writes[1]!.request_id);
+    }
+  });
+test("right extension conflict requires a fresh native version, preview and explicit confirmation", async ({
+  page,
+}) => {
+  const { panel, writes, previews } = await rightReview(page, { action: "extend", stale: true });
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await expect(
+    panel.getByText(
+      "Hak veya önizleme değişti. Geri dönüp güncel kaynağı yeniden incele ve onayla.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await panel.getByRole("button", { name: "Geri", exact: true }).click();
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
+  ).not.toBeChecked();
+  expect(writes).toHaveLength(1);
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await expect(
+    panel.getByText("Hak işlemi kaydedildi; güncel haklar ve etkilenen rezervasyonlar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(previews).toHaveLength(2);
+  expect(writes).toHaveLength(2);
+  expect(writes[1]!.expected_version).toBe(2);
+  expect(writes[0]!.operation_key).not.toBe(writes[1]!.operation_key);
+});

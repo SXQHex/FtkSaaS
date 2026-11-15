@@ -176,3 +176,37 @@ export function memberReservationRows(
     credit: t(($) => $.memberProfile.unknown),
   }));
 }
+
+export async function readProfileReservation(
+  scope: ClientScope,
+  personId: string,
+  id: string,
+  sessionId: string,
+) {
+  const backend = await scopedBackend(scope),
+    cursors = new Set<string>();
+  let cursor: string | undefined;
+  do {
+    const page = await backend.call("reservation_list_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      person_id: personId,
+      session_id: sessionId,
+      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    });
+    if (page.items.some((row) => row.person_id !== personId || row.session_id !== sessionId))
+      throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
+    const matches = page.items.filter((row) => row.id === id);
+    if (matches.length > 1) throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
+    if (matches[0]) {
+      z.number().int().positive().safe().parse(matches[0].version);
+      return matches[0];
+    }
+    cursor = page.next_cursor ?? undefined;
+    if (cursor && cursors.has(cursor)) throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
+    if (cursor) cursors.add(cursor);
+  } while (cursor);
+  throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
+}
