@@ -87,31 +87,35 @@ function ProductsPage({
         onResolved: resolveScope,
       }}
     >
-      {(selection) => (
-        <>
-          {signOutFailed && (
-            <Alert variant="destructive">
-              <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
-            </Alert>
-          )}
-          {selection.organizationId && selection.centerId ? (
-            <ProductsContent
-              key={`${account.id}:${selection.organizationId}:${selection.centerId}`}
-              scope={{
-                accountId: account.id,
-                orgId: selection.organizationId,
-                centerId: selection.centerId,
-              }}
-              onLockChange={setLocked}
-            />
-          ) : (
-            <div className="p-6">
-              <h1 className="text-2xl font-semibold">{t(($) => $.products.title)}</h1>
-              <p className="mt-3 text-muted-foreground">{t(($) => $.studio.chooseScope)}</p>
-            </div>
-          )}
-        </>
-      )}
+      {(resolvedSelection) => {
+        const selection = locked ? { organizationId: orgId, centerId } : resolvedSelection;
+        return (
+          <>
+            {signOutFailed && (
+              <Alert variant="destructive">
+                <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
+              </Alert>
+            )}
+            {selection.organizationId && selection.centerId ? (
+              <ProductsContent
+                key={`${account.id}:${selection.organizationId}:${selection.centerId}`}
+                scope={{
+                  accountId: account.id,
+                  orgId: selection.organizationId,
+                  centerId: selection.centerId,
+                }}
+                onLockChange={setLocked}
+                preservePending={locked}
+              />
+            ) : (
+              <div className="p-6">
+                <h1 className="text-2xl font-semibold">{t(($) => $.products.title)}</h1>
+                <p className="mt-3 text-muted-foreground">{t(($) => $.studio.chooseScope)}</p>
+              </div>
+            )}
+          </>
+        );
+      }}
     </WorkspaceLayout>
   );
 }

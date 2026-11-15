@@ -22,6 +22,7 @@ import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
+import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdProductsRouteImport } from './routes/o.$orgId.c.$centerId.products'
 import { Route as OOrgIdCCenterIdScheduleRouteImport } from './routes/o.$orgId.c.$centerId.schedule'
@@ -94,6 +95,11 @@ const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
   path: '/o/$orgId/c/$centerId/access',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdFinanceRoute = OOrgIdCCenterIdFinanceRouteImport.update({
+  id: '/o/$orgId/c/$centerId/finance',
+  path: '/o/$orgId/c/$centerId/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdPeopleRoute = OOrgIdCCenterIdPeopleRouteImport.update({
   id: '/o/$orgId/c/$centerId/people',
   path: '/o/$orgId/c/$centerId/people',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/invite/expired': typeof InviteExpiredRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/invite_/expired': typeof InviteExpiredRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/invite/expired'
     | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
     | '/o/$orgId/c/$centerId/schedule'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/invite/expired'
     | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
     | '/o/$orgId/c/$centerId/schedule'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/invite_/expired'
     | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
     | '/o/$orgId/c/$centerId/schedule'
@@ -270,6 +282,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
+  OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdProductsRoute: typeof OOrgIdCCenterIdProductsRoute
   OOrgIdCCenterIdScheduleRoute: typeof OOrgIdCCenterIdScheduleRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdAccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/finance': {
+      id: '/o/$orgId/c/$centerId/finance'
+      path: '/o/$orgId/c/$centerId/finance'
+      fullPath: '/o/$orgId/c/$centerId/finance'
+      preLoaderRoute: typeof OOrgIdCCenterIdFinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/people': {
       id: '/o/$orgId/c/$centerId/people'
       path: '/o/$orgId/c/$centerId/people'
@@ -430,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   InviteExpiredRoute: InviteExpiredRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
+  OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdProductsRoute: OOrgIdCCenterIdProductsRoute,
   OOrgIdCCenterIdScheduleRoute: OOrgIdCCenterIdScheduleRoute,

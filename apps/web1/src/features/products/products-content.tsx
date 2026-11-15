@@ -18,9 +18,11 @@ import { Button } from "../../components/ui/button";
 export function ProductsContent({
   scope,
   onLockChange,
+  preservePending = false,
 }: {
   scope: ClientScope;
   onLockChange: (locked: boolean) => void;
+  preservePending?: boolean;
 }) {
   const { t } = useTranslation(),
     router = useRouter();
@@ -34,21 +36,23 @@ export function ProductsContent({
     retry: false,
   });
   const current =
-    !workspace.isError &&
+    (!workspace.isError || preservePending) &&
     workspace.data?.selected?.id === scope.orgId &&
     workspace.data.centers.some((row) => row.id === scope.centerId && row.accessible)
       ? workspace.data
       : undefined;
-  const canWrite = Boolean(
-    current?.roles.some(
-      (role) =>
-        role.state === "active" &&
-        role.person_id === current.selected?.self_context?.person_id &&
-        (role.role === "owner" ||
-          role.role === "org_manager" ||
-          (role.role === "center_manager" && role.scope_center_id === scope.centerId)),
-    ),
-  );
+  const canWrite =
+    !workspace.isError &&
+    Boolean(
+      current?.roles.some(
+        (role) =>
+          role.state === "active" &&
+          role.person_id === current.selected?.self_context?.person_id &&
+          (role.role === "owner" ||
+            role.role === "org_manager" ||
+            (role.role === "center_manager" && role.scope_center_id === scope.centerId)),
+      ),
+    );
   const query = useQuery({
     queryKey: ["products", scope.accountId, scope.orgId, scope.centerId, cursors[pageIndex]],
     queryFn: () => readProductsPage(scope, cursors[pageIndex]),
