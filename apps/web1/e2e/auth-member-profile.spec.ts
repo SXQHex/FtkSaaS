@@ -22,6 +22,8 @@ async function setup(
     unknown?: boolean;
     unread?: boolean;
     stale?: boolean;
+    discounted?: boolean;
+    rejectDiscount?: boolean;
   } = {},
 ) {
   await mockStudio(page);
@@ -99,7 +101,7 @@ async function setup(
           ? [
               {
                 id: debtId,
-                remaining_minor: "100000",
+                remaining_minor: options.discounted ? "75000" : "100000",
                 due_at: "2026-11-15T00:00:00Z",
                 center_id: I.center,
                 version: 1,
@@ -111,6 +113,7 @@ async function setup(
     }
     if (op === "sale_preview_v1") {
       previews.push(req);
+      if (options.rejectDiscount && req.net_minor !== undefined) return reject("FORBIDDEN");
       expect(req).toMatchObject({
         person_id: I.instructor,
         product_version_id: versionId,
@@ -118,7 +121,8 @@ async function setup(
         end_date: "2026-11-22",
       });
       expect(req).not.toHaveProperty("payment");
-      expect(req).not.toHaveProperty("net_minor");
+      if (options.discounted) expect(req.net_minor).toBe("75000");
+      else expect(req).not.toHaveProperty("net_minor");
       const result: SalePreview = {
         id: previews.length === 1 ? previewId : secondPreviewId,
         token: previews.length === 1 ? "synthetic-capability-1" : "synthetic-capability-2",
@@ -139,7 +143,7 @@ async function setup(
           timezone: "Europe/Istanbul",
           valid_from: "2026-11-14T21:00:00Z",
           valid_until: "2026-11-22T21:00:00Z",
-          debt_minor: "100000",
+          debt_minor: options.discounted ? "75000" : "100000",
           currency: "TRY",
           granted: options.timed ? 0 : 8,
           available: options.timed ? 0 : 8,
@@ -190,6 +194,8 @@ async function review(page: Page, options: Parameters<typeof setup>[1] = {}) {
   ).toBeChecked();
   await panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-15");
   await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-22");
+  if (options?.discounted)
+    await panel.getByLabel("Satış bedeli (alt birim, isteğe bağlı)", { exact: true }).fill("75000");
   await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
   await expect(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeVisible();
   return state;
@@ -309,4 +315,71 @@ test("stale sale needs a new native preview and a fresh explicit approval", asyn
   expect(previews).toHaveLength(2);
   expect(writes[0]!.operation_key).not.toBe(writes[1]!.operation_key);
   expect(writes[0]!.preview).not.toEqual(writes[1]!.preview);
+});
+
+test("discounted timed sale reviews native debt, resets approval on edit and displays immutable quota without buckets", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  const { panel, previews, writes } = await review(page, { timed: true, discounted: true });
+  await expect(panel.getByText("₺1.000,00", { exact: true })).toBeVisible();
+  await expect(panel.getByText("₺750,00", { exact: true })).toBeVisible();
+  await expect(panel.getByText("2 · Haftalık", { exact: true })).toBeVisible();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await expect(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();
+  await panel.getByRole("button", { name: "Geri", exact: true }).click();
+  const price = panel.getByLabel("Satış bedeli (alt birim, isteğe bağlı)", { exact: true });
+  await price.fill("-1");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(price).toBeFocused();
+  await expect(price).toHaveAttribute("aria-invalid", "true");
+  await expect(price).toHaveAttribute(
+    "aria-describedby",
+    "member-netMinor-hint member-netMinor-error",
+  );
+  expect(previews).toHaveLength(1);
+  expect(writes).toHaveLength(0);
+  await price.fill("75000");
+  await expect(price).toHaveAttribute("aria-invalid", "false");
+  await expect(price).toHaveAttribute("aria-describedby", "member-netMinor-hint");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
+  ).not.toBeChecked();
+  await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toBeDisabled();
+  expect((await scanAccessibility(page, "discounted-timed-review")).violations).toEqual([]);
+  await approve(panel);
+  await expect(
+    panel.getByText("Satış ve güncel hak/finans doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  expect(writes).toHaveLength(1);
+  expect(previews).toHaveLength(2);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await expect(page.getByText("2 · Haftalık kullanım sınırı", { exact: true })).toBeVisible();
+  await expect(
+    page.locator("[data-profile-metrics]").getByText("₺750,00", { exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+
+test("a native forbidden custom price cannot become an apply or bypass the provider price policy", async ({
+  page,
+}) => {
+  const { panel, writes, previews } = await setup(page, { timed: true, rejectDiscount: true });
+  await panel.getByRole("radio", { name: "Sentetik haftalık paket", exact: true }).press("Space");
+  await expect(
+    panel.getByRole("radio", { name: "Sentetik haftalık paket", exact: true }),
+  ).toBeChecked();
+  await panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-15");
+  await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-22");
+  await panel.getByLabel("Satış bedeli (alt birim, isteğe bağlı)", { exact: true }).fill("75000");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByText("Bu kişi için satış yetkisi doğrulanamadı.", { exact: true }),
+  ).toBeVisible();
+  expect(previews).toHaveLength(1);
+  expect(writes).toHaveLength(0);
+  await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toHaveCount(0);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Örnek Eğitmen", exact: true })).toBeVisible();
 });

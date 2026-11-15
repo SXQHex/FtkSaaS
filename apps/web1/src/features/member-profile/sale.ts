@@ -45,6 +45,7 @@ export async function previewSale(
       startDate: z.iso.date(),
       endDate: z.iso.date(),
       collectAfterSale: z.boolean(),
+      netMinor: z.union([z.literal(""), money]),
     })
     .parse(draft);
   if (value.productVersionId !== product.version_id)
@@ -60,6 +61,7 @@ export async function previewSale(
     product_version_id: value.productVersionId,
     start_date: value.startDate,
     end_date: value.endDate,
+    ...(value.netMinor === "" ? {} : { net_minor: value.netMinor }),
   };
   const backend = await scopedBackend(scope),
     preview = await backend.call("sale_preview_v1", { ...request, request_id: uuidv7() });
@@ -75,7 +77,8 @@ export async function previewSale(
     sale.timezone !== timezone ||
     sale.kind !== product.terms.kind ||
     sale.booking_mode !== product.terms.booking_mode ||
-    sale.currency !== product.terms.currency
+    sale.currency !== product.terms.currency ||
+    (value.netMinor !== "" && sale.debt_minor !== value.netMinor)
   )
     throw new Error("PROFILE_SALE_PREVIEW_UNAVAILABLE");
   money.parse(sale.debt_minor);

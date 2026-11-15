@@ -2080,7 +2080,8 @@
     "saleErrors": {
       "productVersionId": "Uygun bir paket sürümü seç.",
       "startDate": "Geçerli başlangıç tarihi seç.",
-      "endDate": "Geçerli bitiş tarihi seç."
+      "endDate": "Geçerli bitiş tarihi seç.",
+      "netMinor": "Geçerli bir bedeli 0 veya pozitif tam sayı olarak, alt birimle gir."
     },
     "saleInvalid": "Alanları kontrol edip önizlemeyi yeniden al.",
     "saleAuthorityUnavailable": "Bu kişi için satış yetkisi doğrulanamadı.",
@@ -2132,6 +2133,10 @@
     "rightKinds": {
       "credits": "Kredili paket",
       "timed": "Süreli paket"
-    }
+    },
+    "netMinor": "Satış bedeli (alt birim, isteğe bağlı)",
+    "netMinorHint": "Boş bırakırsan paketin liste fiyatı kullanılır. Farklı bedeli para biriminin alt birimiyle gir; örneğin TRY için 100000 = 1.000,00 ₺. Kaydedilecek borcu sonraki adımda incele.",
+    "catalogQuota": "{{limit}} · {{period}} kullanım sınırı",
+    "saleListPrice": "Paketin liste fiyatı"
   }
 }

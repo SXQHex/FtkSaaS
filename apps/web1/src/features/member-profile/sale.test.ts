@@ -200,3 +200,32 @@ it("keeps every native catalog cursor page instead of iterating the empty accumu
   expect(await readProfileCatalog(scope)).toEqual([product, other]);
   expect(call.mock.calls[1]![1].page.cursor).toBe("next");
 });
+
+it("keeps explicit net price exact including zero and rejects malformed or int64-overflow before native preview", async () => {
+  for (const netMinor of ["0", "75000", "9007199254740993", "9223372036854775807"]) {
+    const projected = preview();
+    projected.sale.debt_minor = netMinor;
+    call.mockResolvedValue(projected);
+    const review = await previewSale(scope, personId, "Europe/Istanbul", product, {
+      ...draft(),
+      netMinor,
+    });
+    expect(review.request.net_minor).toBe(netMinor);
+    expect(review.preview.sale.debt_minor).toBe(netMinor);
+    expect(call.mock.lastCall![1].net_minor).toBe(netMinor);
+  }
+  call.mockClear();
+  for (const netMinor of ["-1", "1.5", "01", " ", "1e3", "9223372036854775808"]) {
+    await expect(
+      previewSale(scope, personId, "Europe/Istanbul", product, { ...draft(), netMinor }),
+    ).rejects.toThrow();
+  }
+  expect(call).not.toHaveBeenCalled();
+});
+
+it("rejects a native projection that silently ignores the explicitly requested net price", async () => {
+  call.mockResolvedValue(preview());
+  await expect(
+    previewSale(scope, personId, "Europe/Istanbul", product, { ...draft(), netMinor: "75000" }),
+  ).rejects.toThrow("PROFILE_SALE_PREVIEW_UNAVAILABLE");
+});

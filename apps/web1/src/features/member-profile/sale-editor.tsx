@@ -83,7 +83,12 @@ export function SaleEditor({
         const fields: Partial<Record<keyof MemberDraft, string>> = {};
         for (const issue of failure.issues) {
           const field = issue.path[0];
-          if (field === "productVersionId" || field === "startDate" || field === "endDate")
+          if (
+            field === "productVersionId" ||
+            field === "startDate" ||
+            field === "endDate" ||
+            field === "netMinor"
+          )
             fields[field] = t(($) => $.memberProfile.saleErrors[field]);
         }
         setErrors(fields);
@@ -119,6 +124,18 @@ export function SaleEditor({
           value: `${review.preview.sale.start_date} – ${review.preview.sale.end_date}`,
           detail: review.preview.sale.timezone,
         },
+        ...(review.request.net_minor != null
+          ? [
+              {
+                id: "list-price",
+                label: t(($) => $.memberProfile.saleListPrice),
+                value: formatMinorAmount(
+                  review.product.terms.price_minor,
+                  review.product.terms.currency,
+                ),
+              },
+            ]
+          : []),
         {
           id: "debt",
           label: t(($) => $.memberProfile.saleDebt),

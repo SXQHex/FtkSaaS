@@ -576,6 +576,7 @@ export default interface Resources {
       "cancel": "Vazgeç",
       "cancelFreeze": "Dondurmayı iptal et",
       "cancelReservation": "İptal et",
+      "catalogQuota": "{{limit}} · {{period}} kullanım sınırı",
       "choose": "Seç…",
       "close": "Kapat",
       "columns": {
@@ -634,6 +635,8 @@ export default interface Resources {
         "unitValue": "Ders değeri",
         "used": "Kullanıldı"
       },
+      "netMinor": "Satış bedeli (alt birim, isteğe bağlı)",
+      "netMinorHint": "Boş bırakırsan paketin liste fiyatı kullanılır. Farklı bedeli para biriminin alt birimiyle gir; örneğin TRY için 100000 = 1.000,00 ₺. Kaydedilecek borcu sonraki adımda incele.",
       "noEntitlement": "Bu kapsamda okunmuş hak yok.",
       "noFutureReservations": "Bu satışa bağlı gelecek rezervasyon yok.",
       "noProducts": "Bu kapsamda uygun paketler henüz alınmadı.",
@@ -684,10 +687,12 @@ export default interface Resources {
       "saleDocumentRequired": "Üyenin gerekli belgeleri kendi hesabından kabul etmesi gerekiyor. Onaydan sonra yeni satış önizlemesi alınmalı.",
       "saleErrors": {
         "endDate": "Geçerli bitiş tarihi seç.",
+        "netMinor": "Geçerli bir bedeli 0 veya pozitif tam sayı olarak, alt birimle gir.",
         "productVersionId": "Uygun bir paket sürümü seç.",
         "startDate": "Geçerli başlangıç tarihi seç."
       },
       "saleInvalid": "Alanları kontrol edip önizlemeyi yeniden al.",
+      "saleListPrice": "Paketin liste fiyatı",
       "salePreparing": "Güncel paket ve satış etkisi alınıyor…",
       "salePreviewError": "Satış önizlemesi alınamadı. Güncel kişi ve paket koşullarını kontrol et.",
       "saleRejected": "Satış uygulanamadı. Güncel koşulları yeniden incele.",

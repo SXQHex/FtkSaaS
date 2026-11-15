@@ -193,6 +193,31 @@ export function MemberActionSheet({
                   <FieldError id="member-product-error">{errors?.productVersionId}</FieldError>
                 </FieldSet>
               )}
+              {action === "allocate" && (
+                <Field data-invalid={Boolean(errors?.netMinor)}>
+                  <FieldLabel htmlFor="member-netMinor">
+                    {t(($) => $.memberProfile.netMinor)}
+                  </FieldLabel>
+                  <FieldDescription id="member-netMinor-hint">
+                    {t(($) => $.memberProfile.netMinorHint)}
+                  </FieldDescription>
+                  <Input
+                    id="member-netMinor"
+                    name="netMinor"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]+"
+                    maxLength={19}
+                    autoComplete="off"
+                    value={draft.netMinor}
+                    disabled={pending || readOnly}
+                    aria-invalid={Boolean(errors?.netMinor)}
+                    aria-describedby={`member-netMinor-hint${errors?.netMinor ? " member-netMinor-error" : ""}`}
+                    onChange={(event) => set("netMinor", event.target.value)}
+                  />
+                  <FieldError id="member-netMinor-error">{errors?.netMinor}</FieldError>
+                </Field>
+              )}
               {(dateStart || dateEnd) && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {[

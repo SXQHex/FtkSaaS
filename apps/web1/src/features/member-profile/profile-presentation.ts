@@ -33,6 +33,16 @@ export function entitlementRows(
       note:
         [
           ...(row.deficit ? [t(($) => $.memberProfile.deficit, { count: row.deficit })] : []),
+          ...(row.kind === "timed" && product?.terms.kind === "timed"
+            ? [
+                product.terms.quota
+                  ? t(($) => $.memberProfile.catalogQuota, {
+                      limit: product.terms.quota.limit,
+                      period: t(($) => $.products[product.terms.quota!.period]),
+                    })
+                  : t(($) => $.memberProfile.saleUnlimited),
+              ]
+            : []),
           ...row.quotas.map(
             (q) =>
               `${new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeZone: row.timezone }).format(new Date(q.starts_at))} – ${new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeZone: row.timezone }).format(new Date(q.ends_at))}: ${t(($) => $.memberProfile.quotaUsage, { limit: q.limit, reserved: q.reserved, consumed: q.consumed })}`,

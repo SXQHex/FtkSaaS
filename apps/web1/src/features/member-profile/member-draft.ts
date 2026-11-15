@@ -3,6 +3,7 @@ export interface MemberDraft {
   startDate: string;
   endDate: string;
   quantity: string;
+  netMinor: string;
   direction: "increase" | "decrease";
   disciplineId: string;
   reason: string;
@@ -14,6 +15,7 @@ export const emptyMemberDraft = (): MemberDraft => ({
   startDate: "",
   endDate: "",
   quantity: "",
+  netMinor: "",
   direction: "increase",
   disciplineId: "",
   reason: "",
