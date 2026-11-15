@@ -251,8 +251,6 @@ test("a blocked cancellation explains its reason inside the active session sheet
   await expect(panel.getByRole("alert")).toHaveText(
     "Mevcut rezervasyonlar bu değişikliği engelliyor. Güncel etkiyi incele.",
   );
-  await expect(
-    panel.getByRole("button", { name: "Değişiklikleri uygula", exact: true }),
-  ).toHaveCount(0);
+  await expect(panel.getByRole("button", { name: "Onayla ve uygula", exact: true })).toHaveCount(0);
   expect(state.writes).toEqual([]);
 });
