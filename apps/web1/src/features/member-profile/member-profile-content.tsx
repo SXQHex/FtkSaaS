@@ -3,6 +3,7 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { MemberProfileView, type ProfileTab } from "./member-profile-view";
+import { readMemberReservations, memberReservationRows } from "./reservations";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -43,7 +44,9 @@ export function MemberProfileContent({
     [sale, setSale] = useState(false),
     [collect, setCollect] = useState(false),
     [locked, setLocked] = useState(false),
-    [commandInvalid, setInvalid] = useState(false);
+    [commandInvalid, setInvalid] = useState(false),
+    [reservationIndex, setReservationIndex] = useState(0),
+    [reservationCursors, setReservationCursors] = useState<(string | undefined)[]>([undefined]);
   const workspace = useQuery({
       queryKey: ["workspace", scope.accountId, scope.orgId],
       queryFn: () => readWorkspace(scope.accountId, scope.orgId),
@@ -74,6 +77,19 @@ export function MemberProfileContent({
     queryKey: ["profile-disciplines", scope.accountId, scope.orgId, scope.centerId],
     queryFn: () => readProfileDisciplines(scope),
     enabled: Boolean(center && person.data),
+    retry: false,
+  });
+  const reservations = useQuery({
+    queryKey: [
+      "profile-reservations",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      personId,
+      reservationCursors[reservationIndex],
+    ],
+    queryFn: () => readMemberReservations(scope, personId, reservationCursors[reservationIndex]),
+    enabled: Boolean(center && person.data && tab === "reservations"),
     retry: false,
   });
   const financeKey = (code: string, cursor?: string) => [
@@ -112,7 +128,14 @@ export function MemberProfileContent({
   const queryAccessLost =
     authLost(person.error) ||
     (person.error instanceof BackendError && person.error.code === "FORBIDDEN") ||
-    [workspace.error, rights.error, catalog.error, disciplines.error, finance.error].some(authLost);
+    [
+      workspace.error,
+      rights.error,
+      catalog.error,
+      disciplines.error,
+      finance.error,
+      reservations.error,
+    ].some(authLost);
   const invalid = commandInvalid || queryAccessLost;
   useEffect(() => {
     if (queryAccessLost) void router.invalidate();
@@ -328,9 +351,83 @@ export function MemberProfileContent({
               }
             : null
         }
-        reservations={null}
+        reservations={
+          center && reservations.data && !reservations.isError
+            ? memberReservationRows(
+                reservations.data.items,
+                center.timezone,
+                disciplines.isError ? [] : (disciplines.data ?? []),
+                t,
+              )
+            : null
+        }
         reservationFilter={filter}
         onReservationFilter={setFilter}
+        reservationFiltersAvailable={false}
+        reservationFooter={
+          <div className="mt-3 flex flex-col gap-3">
+            <p className="text-xs text-muted-foreground">
+              {t(($) => $.memberProfile.reservationFiltersUnavailable)}
+            </p>
+            {(reservations.isError || reservations.data?.partial) && (
+              <Alert variant={reservations.isError ? "destructive" : "default"}>
+                <AlertDescription>
+                  {t(($) =>
+                    reservations.isError
+                      ? $.memberProfile.reservationReadError
+                      : $.memberProfile.reservationPartial,
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                isDisabled={locked || reservations.isFetching || reservationIndex === 0}
+                onPress={() => setReservationIndex((i) => i - 1)}
+              >
+                {t(($) => $.memberProfile.reservationPrevious)}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                isDisabled={
+                  locked ||
+                  reservations.isFetching ||
+                  reservations.isError ||
+                  !reservations.data?.nextCursor
+                }
+                onPress={() => {
+                  const cursor = reservations.data?.nextCursor;
+                  if (cursor) {
+                    setReservationCursors((old) => [...old.slice(0, reservationIndex + 1), cursor]);
+                    setReservationIndex((i) => i + 1);
+                  }
+                }}
+              >
+                {t(($) => $.memberProfile.reservationNext)}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                isDisabled={locked || reservations.isFetching}
+                onPress={() => {
+                  void reservations.refetch();
+                }}
+              >
+                {t(($) => $.memberProfile.reservationRetry)}
+              </Button>
+              {!reservations.isError && reservations.data && (
+                <span className="text-xs text-muted-foreground">
+                  {t(($) => $.memberProfile.reservationPageCount, {
+                    count: reservations.data.items.length,
+                  })}
+                </span>
+              )}
+            </div>
+          </div>
+        }
         payments={
           f
             ? f.movements.items.map((row) => ({

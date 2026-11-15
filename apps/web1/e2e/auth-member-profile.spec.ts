@@ -25,6 +25,7 @@ async function setup(
     discounted?: boolean;
     rejectDiscount?: boolean;
     scoped?: boolean;
+    openSale?: boolean;
   } = {},
 ) {
   await mockStudio(page);
@@ -182,9 +183,11 @@ async function setup(
   await expect(page).toHaveURL(origin + "/account");
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
   await expect(page.getByRole("heading", { name: "Örnek Eğitmen", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Paket / hak tahsis et", exact: true }).click();
   const panel = page.getByRole("dialog");
-  await expect(panel).toHaveAccessibleName("Paket / hak tahsis et");
+  if (options.openSale !== false) {
+    await page.getByRole("button", { name: "Paket / hak tahsis et", exact: true }).click();
+    await expect(panel).toHaveAccessibleName("Paket / hak tahsis et");
+  }
   return { writes, previews, panel };
 }
 async function review(page: Page, options: Parameters<typeof setup>[1] = {}) {
@@ -402,4 +405,170 @@ test("a native forbidden custom price cannot become an apply or bypass the provi
   await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toHaveCount(0);
   await panel.getByRole("button", { name: "Kapat", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Örnek Eğitmen", exact: true })).toBeVisible();
+});
+
+async function reservationSetup(
+  page: Page,
+  options: { denied?: boolean; failNext?: boolean } = {},
+) {
+  const state = await setup(page, { openSale: false }),
+    reads: Record<string, unknown>[] = [];
+  let failed = false;
+  const reservationId = "019a7b00-0000-7000-8000-000000000083",
+    secondId = "019a7b00-0000-7000-8000-000000000084";
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1),
+      req = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    const reject = (code: string) =>
+      route.fulfill({ json: { ok: false, error: { code, retryable: false, trace_id: I.role } } });
+    if (op === "reservation_list_v1") {
+      reads.push(req);
+      expect(req.person_id).toBe(I.instructor);
+      expect(req.page.limit).toBe(20);
+      expect(req.page.sort).toBe("created_at_desc");
+      expect(req).not.toHaveProperty("interval");
+      if (options.failNext && req.page.cursor && !failed) {
+        failed = true;
+        return reject("TEMPORARY_FAILURE");
+      }
+      return send({
+        items: [
+          {
+            id: req.page.cursor ? secondId : reservationId,
+            session_id: I.lesson,
+            person_id: I.instructor,
+            state: req.page.cursor ? "cancelled" : "completed",
+            mode: "flexible",
+            version: 2,
+          },
+        ],
+        next_cursor: req.page.cursor ? null : "native-second",
+        as_of: "2026-11-16T10:00:00Z",
+      });
+    }
+    if (op === "session_get_v1")
+      return send({
+        id: I.lesson,
+        class_id: null,
+        discipline_id: I.discipline,
+        format: "group",
+        starts_at: "2026-11-16T10:00:00Z",
+        ends_at: "2026-11-16T11:00:00Z",
+        state: "occurred",
+        attendance_state: "closed",
+        assignments: [],
+        version: 4,
+        capacity: {
+          total: 8,
+          held: 0,
+          remaining: 8,
+          category_held: null,
+          category_remaining: null,
+          room_capacity: null,
+        },
+      });
+    if (op === "attendance_get_v1") {
+      if (options.denied) return reject("FORBIDDEN");
+      return send({
+        session_id: I.lesson,
+        session_version: 4,
+        closure_state: "closed",
+        revision: 1,
+        entries: [
+          {
+            reservation_id: reservationId,
+            person_id: I.instructor,
+            result: "attended",
+            version: 1,
+            protected: false,
+            eligibility_snapshot: null,
+          },
+          {
+            reservation_id: reservationId,
+            person_id: I.role,
+            result: "no_show",
+            version: 1,
+            protected: false,
+            eligibility_snapshot: null,
+          },
+        ],
+      });
+    }
+    return route.fallback();
+  });
+  await page.getByRole("tab", { name: "Rezervasyon ve yoklama", exact: true }).click();
+  return {
+    ...state,
+    reads,
+    grid: page.getByRole("grid", { name: "Rezervasyon ve yoklama geçmişi", exact: true }),
+  };
+}
+test("mobile member reservations preserve native cursor pages, current member attendance and keyboard scrolling", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  const { grid, reads, writes } = await reservationSetup(page);
+  await expect(grid.getByText("Tango · Grup dersi", { exact: true })).toBeVisible();
+  await expect(grid.getByText("Geldi", { exact: true })).toBeVisible();
+  await expect(grid.getByText("Gelmedi", { exact: true })).toHaveCount(0);
+  await expect(grid.getByText(/13:00/)).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Yaklaşan", exact: true })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: "Geçmiş", exact: true })).toBeDisabled();
+  const region = page.getByRole("region", { name: "Rezervasyon ve yoklama geçmişi", exact: true });
+  await region.focus();
+  await expect(region).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  expect((await scanAccessibility(page, "member-reservation-first-page")).violations).toEqual([]);
+  await page.getByRole("button", { name: "Sonraki rezervasyonlar", exact: true }).click();
+  await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
+  await expect(grid.getByText("Tamamlandı", { exact: true })).toHaveCount(0);
+  await expect(grid.getByText("Yoklama kaydı yok", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Sonraki rezervasyonlar", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Önceki rezervasyonlar", exact: true }).click();
+  await expect(grid.getByText("Tamamlandı", { exact: true })).toBeVisible();
+  expect(reads.some((r) => (r.page as { cursor?: string }).cursor === "native-second")).toBe(true);
+  expect(writes).toHaveLength(0);
+  expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+test("denied attendance stays unknown while authorized reservation and lesson remain visible", async ({
+  page,
+}) => {
+  const options = { denied: true };
+  const { grid, writes } = await reservationSetup(page, options);
+  await expect(grid.getByText("Tango · Grup dersi", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(
+      "Bazı ders veya yoklama bilgileri alınamadı. Bilinmeyen bilgi — ile gösterilir.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(grid.getByText("Geldi", { exact: true })).toHaveCount(0);
+  await expect(grid.getByText("Yoklama kaydı yok", { exact: true })).toHaveCount(0);
+  options.denied = false;
+  await page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }).click();
+  await expect(grid.getByText("Geldi", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(
+      "Bazı ders veya yoklama bilgileri alınamadı. Bilinmeyen bilgi — ile gösterilir.",
+      { exact: true },
+    ),
+  ).toHaveCount(0);
+  expect(writes).toHaveLength(0);
+});
+test("reservation page read errors do not relabel stale rows as the next page and can retry", async ({
+  page,
+}) => {
+  const { grid, writes } = await reservationSetup(page, { failNext: true });
+  await expect(grid.getByText("Tamamlandı", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki rezervasyonlar", exact: true }).click();
+  await expect(
+    page.getByText("Rezervasyonlar alınamadı. Yeniden dene.", { exact: true }),
+  ).toBeVisible();
+  await expect(grid.getByText("Tamamlandı", { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }).click();
+  await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
+  expect(writes).toHaveLength(0);
 });

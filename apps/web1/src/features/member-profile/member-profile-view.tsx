@@ -97,6 +97,8 @@ export function MemberProfileView({
   notice,
   loading = false,
   paymentPagination,
+  reservationFooter,
+  reservationFiltersAvailable = true,
 }: {
   name: string;
   initials: string;
@@ -132,6 +134,8 @@ export function MemberProfileView({
   notice?: ReactNode;
   loading?: boolean;
   paymentPagination?: ReactNode;
+  reservationFooter?: ReactNode;
+  reservationFiltersAvailable?: boolean;
 }) {
   const { t } = useTranslation();
   const revealSelectedTab = useCallback((element: HTMLDivElement | null) => {
@@ -371,20 +375,34 @@ export function MemberProfileView({
                     }}
                   >
                     {(["all", "upcoming", "past"] as const).map((key) => (
-                      <ToggleGroupItem key={key} id={key}>
+                      <ToggleGroupItem
+                        key={key}
+                        id={key}
+                        isDisabled={!reservationFiltersAvailable && key !== "all"}
+                      >
                         {t(($) => $.memberProfile.filters[key])}
                       </ToggleGroupItem>
                     ))}
                   </ToggleGroup>
                 </div>
-                <div className="min-w-0 overflow-x-auto">
-                  <Table aria-label={t(($) => $.memberProfile.reservationHistory)}>
+                <div
+                  role="region"
+                  aria-label={t(($) => $.memberProfile.reservationHistory)}
+                  tabIndex={0}
+                  className="min-w-0 overflow-x-auto"
+                >
+                  <Table
+                    aria-label={t(($) => $.memberProfile.reservationHistory)}
+                    className="min-w-[34rem]"
+                  >
                     <TableHeader>
                       <TableHead isRowHeader>{t(($) => $.memberProfile.columns.lesson)}</TableHead>
                       <TableHead>{t(($) => $.memberProfile.columns.reservation)}</TableHead>
                       <TableHead>{t(($) => $.memberProfile.columns.attendance)}</TableHead>
                       <TableHead>{t(($) => $.memberProfile.columns.credit)}</TableHead>
-                      <TableHead aria-label={t(($) => $.memberProfile.columns.actions)} />
+                      <TableHead>
+                        <span className="sr-only">{t(($) => $.memberProfile.columns.actions)}</span>
+                      </TableHead>
                     </TableHeader>
                     <TableBody
                       renderEmptyState={() =>
@@ -418,6 +436,7 @@ export function MemberProfileView({
                     </TableBody>
                   </Table>
                 </div>
+                {reservationFooter}
               </div>
             </TabsContent>
             <TabsContent id="payments">
