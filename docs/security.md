@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `387df0eec6c178c95a80af69a88f68b6d99a6be3930a7c78d18835337662c6e4`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `aca69200ae99e4d56ebabf432c5bdfe4699a73e1940d442826ba4ce1a9586ea7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -29,8 +29,10 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [availability-policies-wrappers.sql](../apps/backend/database/availability-policies-wrappers.sql) | `7e0f2c94567ad109adb054c6f37aa0c5e927bbdb6abcf03f552e93b0e3ae79f7` |
 | [availability-policies.sql](../apps/backend/database/availability-policies.sql) | `5b14e9077c2305f880a79630ce0ea01612120b285229ece6f0c02d0c906228f3` |
 | [canonical-settings-scope.sql](../apps/backend/database/canonical-settings-scope.sql) | `b61f1241d9c5fad01c7d0884137f905cba9f74e9fd2b05a7af6ace80426a405e` |
+| [capacity-recovery.sql](../apps/backend/database/capacity-recovery.sql) | `a246cb9df1f28a6f7a53811fa481388fa650a21c73264d61b29bacf3c715f298` |
 | [center-setup-status.sql](../apps/backend/database/center-setup-status.sql) | `94e4c3e4f92775d96701afa920cc510701c1139a66dbc7f9204fc54aeae70ebc` |
 | [class-duty-management.sql](../apps/backend/database/class-duty-management.sql) | `0324c08549d2fb98a7604a496d6e8b418141870a140c25a3798132368984242a` |
+| [class-student-discovery.sql](../apps/backend/database/class-student-discovery.sql) | `fc923dee522e8a5421954ce1f85682b42e62c12ff17c3f37f36da43b64662b3d` |
 | [commercial-plan-limits.sql](../apps/backend/database/commercial-plan-limits.sql) | `b5dd6eb0f8d30806ff9828b39d084b7344194a02477394e28b3ce2e75fa1ed37` |
 | [content-catalog-api.sql](../apps/backend/database/content-catalog-api.sql) | `5ce209977842d152158a6a8ed855c8b3432dda54ff8929bdc2cfad518f3d96e5` |
 | [content-catalog.sql](../apps/backend/database/content-catalog.sql) | `60cda678c17c0521b6c4ca443126e998f4d242300d68ed96df199b1f1c44c7c6` |
@@ -57,11 +59,13 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [discipline-read-scope.sql](../apps/backend/database/discipline-read-scope.sql) | `f7774115ddad91158c603090113fe4a95aedeb6dae98d520eea6fe44efaba7cd` |
 | [dispatch.sql](../apps/backend/database/dispatch.sql) | `131e712372565b2180592490f793f4f922eb7ce416deff56b3bc5ff3d1cf5036` |
 | [email-delivery-events.sql](../apps/backend/database/email-delivery-events.sql) | `c2bf9cbe60885dc70b3336534ce0688ce6c9c452f38281dfeee8c3377ed4e275` |
+| [entitlement-ledger-read.sql](../apps/backend/database/entitlement-ledger-read.sql) | `a4d5958c5563f4aa4129f5ca3fabc9852b2bb6807dd067111ca226d6cfa33d4d` |
 | [event-actual-start.sql](../apps/backend/database/event-actual-start.sql) | `568f4ab764c76a5e229343ca4e8e23773b903c5d8f283b5e6096f77eebb60258` |
 | [event-cancellation-dispatch.sql](../apps/backend/database/event-cancellation-dispatch.sql) | `266d1384d5f750ef3d440c8ac970198e6543253c4fceee7830093a70b0dacbff` |
 | [event-capacity-practice.sql](../apps/backend/database/event-capacity-practice.sql) | `0562a2fa7b22721d78e93490051b2bda49f139826836d4f0a984528dfc9ab2f7` |
 | [event-payment-dispatch.sql](../apps/backend/database/event-payment-dispatch.sql) | `27b6c4e9a8c0cf4b7e52ad60cd0594ddccc45d31b264ce9b362c7ab76a980e5b` |
 | [event-payment-schema.sql](../apps/backend/database/event-payment-schema.sql) | `b3a2217b900cc782995d1d4d17b4100b2dff3554b56295ba04bd748a9abb5d87` |
+| [finance-directory.sql](../apps/backend/database/finance-directory.sql) | `9c8414e1ad1236cb3fa5243209c0ac1f4aa270a072c8fdbe6087b543be7057db` |
 | [frontend-settings-wrappers.sql](../apps/backend/database/frontend-settings-wrappers.sql) | `e1063a60b9928149a528adc595dfa36e16baeb913aa9b2702021eb3523c86528` |
 | [frontend-settings.sql](../apps/backend/database/frontend-settings.sql) | `0adf8101fa535de52c0066d6580399599e77e83587f304b647d9ac1895cbf06d` |
 | [instructor-center-lifecycle.sql](../apps/backend/database/instructor-center-lifecycle.sql) | `d8e82033aacff591ec61b9dab110b8c37fcec91293ad66cae249eb169162df35` |
@@ -155,6 +159,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [planned-start-decision-clock.sql](../apps/backend/database/planned-start-decision-clock.sql) | `79a88d9324f14d5ed8949be693d332d33a6add45743f2207221cdb2ec285918c` |
 | [pro-upgrade-brand-discovery.sql](../apps/backend/database/pro-upgrade-brand-discovery.sql) | `66c777294677bf4d709db2dc10f183f0dd89a7f7183050c1c04621f496e6f470` |
 | [pro-workflow-preparations.sql](../apps/backend/database/pro-workflow-preparations.sql) | `46506ab21f24582a0c8c69cc4af1ebb59916b3546dff156d2149288f5c60cd03` |
+| [product-management.sql](../apps/backend/database/product-management.sql) | `3df94f518802a2520082ef2efd45854b1b9e4c16af93c5e7fd085c8feb2745f4` |
 | [program-configuration-requirements.sql](../apps/backend/database/program-configuration-requirements.sql) | `1902c23b1a4842b8fc775ac6141a2d1575381183b1d6eb7d702803375f4a72af` |
 | [program-session-lifecycle-wrappers.sql](../apps/backend/database/program-session-lifecycle-wrappers.sql) | `43231fb97b73b4ba09fef899cdbed8917efff85b7bafc4c74f18a0e85ffe2281` |
 | [program-session-lifecycle.sql](../apps/backend/database/program-session-lifecycle.sql) | `65efcea9fc3c6d9bd42b61a2b24f266543b14580faab64be22500e81be091b58` |
@@ -168,14 +173,16 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `e5ed680543deed59a8b42c62451e8b972b4e7d22f0529e28e772f83305a1f96f` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `641bb46e091f67689b8e6d08d55f0dd61a0840ca7cb15b6a5c5720009a115065` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [sale-change-inventory.sql](../apps/backend/database/sale-change-inventory.sql) | `0985f3a2ddc067265966ad61dd2144578f5605a50a8f10393e642faf4cf1f8c2` |
+| [sale-discount.sql](../apps/backend/database/sale-discount.sql) | `13ffc19f37e0f8f00eca54fac0995bbc914ad5689d820f9a87a43b579d0604a0` |
 | [sale-preview-impact.sql](../apps/backend/database/sale-preview-impact.sql) | `f3b934c9c44258eaef82ffc51ce85f2956d6782f39792744baf88d5f2f4c8ca3` |
 | [schedule-reads-wrappers.sql](../apps/backend/database/schedule-reads-wrappers.sql) | `12b3a79f852e099bde79aaa2bf7e23656463645b4886eb56ab4e3fb7f52b5fbf` |
 | [schedule-reads.sql](../apps/backend/database/schedule-reads.sql) | `12c4e4957ff70ac6bd082239908d451a10debe4c5ff3aac6c9760cab882d42f0` |
 | [session-capacity.sql](../apps/backend/database/session-capacity.sql) | `11554b9292cb11e96322ed9f4d5eb66a06a41820d65a3e0187eb10175b835bc6` |
+| [session-management-reads.sql](../apps/backend/database/session-management-reads.sql) | `63083f3f03c5ad390c26780360789f74eacab11bd5ff540e7a68c1bc8bf161dc` |
 | [settings-application-forms.sql](../apps/backend/database/settings-application-forms.sql) | `5aaa1d652f01b3a60fd4b5ed24d2758713664c3583d52fc5dd14cc6413b4671e` |
 | [settings-calendar-exceptions.sql](../apps/backend/database/settings-calendar-exceptions.sql) | `1a2c84ac1d4bc00a74d07f5597486a332773877656dfa00165e6829914238272` |
 | [settings-discipline-effects.sql](../apps/backend/database/settings-discipline-effects.sql) | `244ddeeaabe34d53264bcc920d42b93908e5bd913f6f398b7b940c156d78fadb` |
@@ -360,3 +367,6 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261114175838_person_field_policy.sql](../apps/backend/supabase/migrations/20261114175838_person_field_policy.sql) | `4a1a29c7d55a29149867cff2ee0c3030af7ad68c48a5634608dc0a00e2af2e07` |
 | [20261115014502_student_status_filter.sql](../apps/backend/supabase/migrations/20261115014502_student_status_filter.sql) | `24a80453acdf465de4593f201af9600797daa0d8ec3f6a4bb6128d9e95b60dce` |
 | [20261115035110_web1_review_lifecycle.sql](../apps/backend/supabase/migrations/20261115035110_web1_review_lifecycle.sql) | `4316f70932f193a89c39e1c419a8df1f487345b691d747affd3e1b164871771e` |
+| [20261115213357_native_read_recovery.sql](../apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql) | `ee8a4233aa32d3b64f06ea163848f0a0024e3ffc1816ce8ea0be276eb586951c` |
+| [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
+| [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

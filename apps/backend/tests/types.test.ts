@@ -31,3 +31,12 @@ export type FilePreviewAccepted = Assert<PreviewBase & {file_id: string} extends
 export type DigitalPreviewAccepted = Assert<PreviewBase & {digital_content: DigitalDocumentContent} extends Preview ? true : false>;
 export type BothPreviewSourcesRejected = Assert<PreviewBase & {file_id: string;digital_content: DigitalDocumentContent} extends Preview ? false : true>;
 export type MissingPreviewSourceRejected = Assert<PreviewBase extends Preview ? false : true>;
+
+// Additive discovery APIs must not widen the legacy client's result types.
+import type {FinanceView,Page_ProductView,ProductTerms,FinanceDirectoryView,ProductManagementView} from '@ftksaas/api-contracts';
+type Same<A,B> = [A] extends [B] ? [B] extends [A] ? true : false : false;
+export type LegacyFinanceResponse = Assert<Same<Operations['finance_get_v1']['response']['data'],FinanceView>>;
+export type LegacyCatalogResponse = Assert<Same<Operations['products_list_v1']['response']['data'],Page_ProductView>>;
+export type PublicationStillRequiresTerms = Assert<Same<Operations['product_publish_v1']['request']['terms'],ProductTerms>>;
+export type CenterFinanceResponse = Assert<Same<Operations['finance_directory_get_v1']['response']['data'],FinanceDirectoryView>>;
+export type ManagedCatalogResponse = Assert<Same<Operations['products_management_list_v1']['response']['data'],ProductManagementView>>;

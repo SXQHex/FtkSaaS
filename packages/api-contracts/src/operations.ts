@@ -225,4 +225,7 @@ export interface Operations {
   instructor_agreement_accept_v1: {request: T.RequestInstructorAgreementAccept; response: T.SuccessInstructorAgreementAccept};
   content_catalog_get_v1: {request: T.RequestContentCatalogGet; response: T.SuccessContentCatalogGet};
   content_catalog_save_v1: {request: T.RequestContentCatalogSave; response: T.SuccessContentCatalogSave};
+  finance_directory_get_v1: {request: T.RequestFinanceDirectoryGet; response: T.SuccessFinanceDirectoryGet};
+  products_management_list_v1: {request: T.RequestProductsManagementList; response: T.SuccessProductsManagementList};
+  product_state_set_v1: {request: T.RequestProductStateSet; response: T.SuccessProductStateSet};
 }
