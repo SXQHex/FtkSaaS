@@ -94,7 +94,9 @@ export function MemberActionSheet({
   const { t } = useTranslation(),
     form = useRef<HTMLFormElement>(null);
   useEffect(() => {
-    if (errors && Object.keys(errors).length)
+    if (errors?.productVersionId)
+      form.current?.querySelector<HTMLInputElement>('input[type="radio"]')?.focus();
+    else if (errors && Object.keys(errors).length)
       form.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
   }, [errors]);
   const set = <K extends keyof MemberDraft>(key: K, value: MemberDraft[K]) =>
@@ -135,13 +137,19 @@ export function MemberActionSheet({
           <XIcon />
         </Button>
       </SheetHeader>
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5 [scrollbar-gutter:stable] [overscroll-behavior:contain]">
+      <div
+        role="region"
+        aria-label={title}
+        tabIndex={0}
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5 [scrollbar-gutter:stable] [overscroll-behavior:contain]"
+      >
         {notice}
         {stage === "edit" ? (
           <form
             ref={form}
             id="member-lifecycle-form"
             method="post"
+            noValidate
             aria-label={title}
             onSubmit={(event) => {
               event.preventDefault();
@@ -158,6 +166,7 @@ export function MemberActionSheet({
                     onChange={(value) => set("productVersionId", value)}
                     isDisabled={pending || readOnly}
                     isInvalid={Boolean(errors?.productVersionId)}
+                    aria-describedby={errors?.productVersionId ? "member-product-error" : undefined}
                   >
                     {products.map((row) => (
                       <Field key={row.id} orientation="horizontal">
@@ -181,7 +190,7 @@ export function MemberActionSheet({
                   {products.length === 0 && (
                     <FieldDescription>{t(($) => $.memberProfile.noProducts)}</FieldDescription>
                   )}
-                  <FieldError>{errors?.productVersionId}</FieldError>
+                  <FieldError id="member-product-error">{errors?.productVersionId}</FieldError>
                 </FieldSet>
               )}
               {(dateStart || dateEnd) && (

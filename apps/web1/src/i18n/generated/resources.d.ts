@@ -592,14 +592,21 @@ export default interface Resources {
       "confirm": "Uygula",
       "contact": "Kişi bilgileri",
       "contactHint": "Alanların kaynağı ve düzenleme yetkisi kişi kaydından okunur. Hesap alanlarını yalnız hesap sahibi değiştirir.",
+      "contactKinds": {
+        "email": "E-posta",
+        "phone": "Telefon"
+      },
       "counts": {
         "available": "kullanılabilir",
         "consumed": "kullanılmış",
         "reserved": "ayrılmış"
       },
+      "currencyHint": "Ödeme kayıtlarını açık para birimiyle getir. Farklı para birimleri birleştirilmez.",
+      "currencyInvalid": "Üç büyük harften oluşan para birimini gir.",
       "current": "Mevcut haklar",
       "dateHint": "Başlangıç ve bitiş açıkça seçilir; geçerlilik ve gün sınırları önizlemede doğrulanır.",
       "debt": "Açık borç",
+      "deficit": "Bu kişi/kapsamda {{count}} eksik hak" | "Bu kişi/kapsamda {{count}} eksik hak",
       "direction": "İşlem",
       "effects": "Etki",
       "effectsRequired": "İşlem etkisi henüz kaynaktan okunmadı.",
@@ -614,6 +621,7 @@ export default interface Resources {
         "past": "Geçmiş",
         "upcoming": "Yaklaşan"
       },
+      "financeScope": "Finans görünümü",
       "inventoryRequired": "Gelecek rezervasyonlar yüklenmeden paket değişikliği incelenemez.",
       "joined": "Üye: {{date}}",
       "keepReservation": "Kesin kalsın",
@@ -642,7 +650,10 @@ export default interface Resources {
       "paymentHistory": "Ödeme kayıtları",
       "paymentPlan": "Ödeme",
       "product": "Paket",
+      "profileReadError": "Profil bilgilerinin bir bölümü alınamadı. İlgili işlemler güncel bilgi alınana kadar kapalıdır.",
+      "profileUnavailable": "Bu kişi kapsamına erişim yok. Güncel hesabı ve merkezi kontrol et.",
       "quantityLabel": "Ders sayısı",
+      "quotaUsage": "{{limit}} ders kotası · {{reserved}} ayrılmış · {{consumed}} kullanılmış",
       "readRequired": "Bilgi henüz alınmadı.",
       "reason": "Gerekçe",
       "reasonHint": "Gerekçe zorunludur ve işlem geçmişinde korunur.",
@@ -650,14 +661,57 @@ export default interface Resources {
       "reservationChoices": "Gelecek rezervasyonlar",
       "reservationHistory": "Rezervasyon ve yoklama geçmişi",
       "review": "Etkiyi incele",
+      "rightKinds": {
+        "credits": "Kredili paket",
+        "timed": "Süreli paket"
+      },
+      "rightStates": {
+        "active": "Etkin",
+        "closed": "Kapandı",
+        "suspended": "Donduruldu"
+      },
+      "saleAuthorityUnavailable": "Bu kişi için satış yetkisi doğrulanamadı.",
+      "saleBlocked": "Satış önizlemesindeki koşullar nedeniyle uygulanamıyor.",
+      "saleConsumedDeficit": "Geçmiş eksik hak",
+      "saleCounts": {
+        "available": "Kullanılabilir",
+        "consumed": "Kullanılmış",
+        "granted": "Yeni hak",
+        "reserved": "Ayrılmış"
+      },
+      "saleDates": "Geçerlilik",
+      "saleDebt": "Oluşacak borç",
+      "saleDocumentRequired": "Üyenin gerekli belgeleri kendi hesabından kabul etmesi gerekiyor. Onaydan sonra yeni satış önizlemesi alınmalı.",
+      "saleErrors": {
+        "endDate": "Geçerli bitiş tarihi seç.",
+        "productVersionId": "Uygun bir paket sürümü seç.",
+        "startDate": "Geçerli başlangıç tarihi seç."
+      },
+      "saleInvalid": "Alanları kontrol edip önizlemeyi yeniden al.",
+      "salePreparing": "Güncel paket ve satış etkisi alınıyor…",
+      "salePreviewError": "Satış önizlemesi alınamadı. Güncel kişi ve paket koşullarını kontrol et.",
+      "saleRejected": "Satış uygulanamadı. Güncel koşulları yeniden incele.",
+      "saleReservedDeficit": "Ayrılmış eksik hak",
+      "saleSaved": "Satış ve güncel hak/finans doğrulandı.",
+      "saleSettles": "Karşılanır",
+      "saleSourceChanged": "Önizlemede değişir",
+      "saleSourceEffect": "İlgili kayıt etkisi",
+      "saleStale": "Önizleme güncel değil veya süresi doldu. Yeni önizleme alıp yeniden onayla.",
+      "saleTimed": "Süreli kullanım",
+      "saleUnlimited": "Ders kotası yok",
+      "saleUnread": "Satış alındı; güncel hak/finans henüz okunamadı.",
+      "saleUnsettled": "Bekler",
+      "saleWriting": "Satış uygulanıyor…",
       "sections": "Üye bölümleri",
       "stateHint": "Geçmiş kayıtlar korunur. Yetki ve açık rezervasyon koşulları işlem sırasında doğrulanır.",
+      "studentUnknown": "Öğrencilik durumu bilinmiyor",
       "tabs": {
         "payments": "Ödemeler",
         "reservations": "Rezervasyon ve yoklama",
         "rights": "Haklar"
       },
       "timedHint": "Süreli kullanım hakkı; kullanım koşulları paket bilgilerinde gösterilir.",
+      "title": "Üye profili",
       "titles": {
         "activate": "Üyeyi etkinleştir",
         "adjust": "Hakkı düzelt",
@@ -673,7 +727,9 @@ export default interface Resources {
         "unfreeze": "Dondurmayı bitir"
       },
       "unknown": "—",
-      "upcoming": "Yaklaşan rezervasyon"
+      "unverified": "Doğrulanmadı",
+      "upcoming": "Yaklaşan rezervasyon",
+      "verified": "Doğrulandı"
     },
     "passwordChange": {
       "code": "Güvenlik kodu",

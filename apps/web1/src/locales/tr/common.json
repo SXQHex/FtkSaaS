@@ -2075,6 +2075,63 @@
       "deactivate": "Üyeyi pasifleştir",
       "cancelReservation": "Rezervasyonu iptal et"
     },
-    "cancelFreeze": "Dondurmayı iptal et"
+    "cancelFreeze": "Dondurmayı iptal et",
+    "title": "Üye profili",
+    "saleErrors": {
+      "productVersionId": "Uygun bir paket sürümü seç.",
+      "startDate": "Geçerli başlangıç tarihi seç.",
+      "endDate": "Geçerli bitiş tarihi seç."
+    },
+    "saleInvalid": "Alanları kontrol edip önizlemeyi yeniden al.",
+    "saleAuthorityUnavailable": "Bu kişi için satış yetkisi doğrulanamadı.",
+    "salePreviewError": "Satış önizlemesi alınamadı. Güncel kişi ve paket koşullarını kontrol et.",
+    "saleStale": "Önizleme güncel değil veya süresi doldu. Yeni önizleme alıp yeniden onayla.",
+    "saleDates": "Geçerlilik",
+    "saleDebt": "Oluşacak borç",
+    "saleCounts": {
+      "granted": "Yeni hak",
+      "available": "Kullanılabilir",
+      "reserved": "Ayrılmış",
+      "consumed": "Kullanılmış"
+    },
+    "saleTimed": "Süreli kullanım",
+    "saleUnlimited": "Ders kotası yok",
+    "saleConsumedDeficit": "Geçmiş eksik hak",
+    "saleReservedDeficit": "Ayrılmış eksik hak",
+    "saleSettles": "Karşılanır",
+    "saleUnsettled": "Bekler",
+    "saleSourceEffect": "İlgili kayıt etkisi",
+    "saleSourceChanged": "Önizlemede değişir",
+    "saleWriting": "Satış uygulanıyor…",
+    "saleSaved": "Satış ve güncel hak/finans doğrulandı.",
+    "saleUnread": "Satış alındı; güncel hak/finans henüz okunamadı.",
+    "saleRejected": "Satış uygulanamadı. Güncel koşulları yeniden incele.",
+    "salePreparing": "Güncel paket ve satış etkisi alınıyor…",
+    "saleBlocked": "Satış önizlemesindeki koşullar nedeniyle uygulanamıyor.",
+    "saleDocumentRequired": "Üyenin gerekli belgeleri kendi hesabından kabul etmesi gerekiyor. Onaydan sonra yeni satış önizlemesi alınmalı.",
+    "rightStates": {
+      "active": "Etkin",
+      "suspended": "Donduruldu",
+      "closed": "Kapandı"
+    },
+    "deficit_one": "Bu kişi/kapsamda {{count}} eksik hak",
+    "deficit_other": "Bu kişi/kapsamda {{count}} eksik hak",
+    "quotaUsage": "{{limit}} ders kotası · {{reserved}} ayrılmış · {{consumed}} kullanılmış",
+    "profileUnavailable": "Bu kişi kapsamına erişim yok. Güncel hesabı ve merkezi kontrol et.",
+    "profileReadError": "Profil bilgilerinin bir bölümü alınamadı. İlgili işlemler güncel bilgi alınana kadar kapalıdır.",
+    "financeScope": "Finans görünümü",
+    "currencyInvalid": "Üç büyük harften oluşan para birimini gir.",
+    "currencyHint": "Ödeme kayıtlarını açık para birimiyle getir. Farklı para birimleri birleştirilmez.",
+    "contactKinds": {
+      "email": "E-posta",
+      "phone": "Telefon"
+    },
+    "verified": "Doğrulandı",
+    "unverified": "Doğrulanmadı",
+    "studentUnknown": "Öğrencilik durumu bilinmiyor",
+    "rightKinds": {
+      "credits": "Kredili paket",
+      "timed": "Süreli paket"
+    }
   }
 }

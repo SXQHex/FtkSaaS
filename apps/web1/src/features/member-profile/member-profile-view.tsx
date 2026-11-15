@@ -34,7 +34,7 @@ export type MemberAction =
   | "cancelReservation";
 export interface ProfileAction {
   kind: MemberAction;
-  onPress: () => void;
+  onPress?: () => void;
   disabled?: boolean;
   label?: string;
 }
@@ -48,7 +48,7 @@ export interface ProfileEntitlement {
   period: string;
   state: string;
   kind: "credit" | "timed";
-  counts?: { granted: number; available: number; reserved: number; consumed: number };
+  counts?: { total?: number; available: number; reserved: number; consumed: number };
   note?: string;
   actions: ProfileAction[];
 }
@@ -96,6 +96,7 @@ export function MemberProfileView({
   back,
   notice,
   loading = false,
+  paymentPagination,
 }: {
   name: string;
   initials: string;
@@ -130,6 +131,7 @@ export function MemberProfileView({
   back: () => void;
   notice?: ReactNode;
   loading?: boolean;
+  paymentPagination?: ReactNode;
 }) {
   const { t } = useTranslation();
   const revealSelectedTab = useCallback((element: HTMLDivElement | null) => {
@@ -149,7 +151,7 @@ export function MemberProfileView({
               : "outline"
         }
         size={small ? "sm" : "default"}
-        isDisabled={action.disabled}
+        isDisabled={action.disabled || !action.onPress}
         onPress={action.onPress}
       >
         {action.kind === "allocate" && <PlusIcon />}
@@ -191,21 +193,26 @@ export function MemberProfileView({
         <div className="flex flex-wrap gap-2">{buttons(headerActions)}</div>
       </div>
       {notice}
-      <dl className="grid min-w-0 grid-cols-2 gap-3 @min-[901px]/profile:grid-cols-4">
+      <div
+        data-profile-metrics
+        className="grid min-w-0 grid-cols-2 gap-3 @min-[901px]/profile:grid-cols-4"
+      >
         {(Object.keys(labels) as (keyof typeof labels)[]).map((key) => (
           <Card key={key}>
-            <CardContent className="flex min-w-0 flex-col gap-2 p-4">
-              <dt className="text-sm text-muted-foreground">{labels[key]}</dt>
-              <dd className="text-2xl font-semibold tabular-nums wrap-anywhere">
-                {metrics[key].value ?? t(($) => $.memberProfile.unknown)}
-              </dd>
-              <dd className="text-xs text-muted-foreground wrap-anywhere">
-                {metrics[key].detail ?? t(($) => $.memberProfile.readRequired)}
-              </dd>
+            <CardContent className="p-4">
+              <dl className="flex min-w-0 flex-col gap-2">
+                <dt className="text-sm text-muted-foreground">{labels[key]}</dt>
+                <dd className="text-2xl font-semibold tabular-nums wrap-anywhere">
+                  {metrics[key].value ?? t(($) => $.memberProfile.unknown)}
+                </dd>
+                <dd className="text-xs text-muted-foreground wrap-anywhere">
+                  {metrics[key].detail ?? t(($) => $.memberProfile.readRequired)}
+                </dd>
+              </dl>
             </CardContent>
           </Card>
         ))}
-      </dl>
+      </div>
       <div className="grid min-w-0 items-start gap-4 @min-[901px]/profile:grid-cols-[minmax(0,1fr)_20rem]">
         <Card className="min-w-0 gap-0 py-0">
           <Tabs selectedKey={tab} onSelectionChange={(key) => onTab(key as ProfileTab)}>
@@ -265,11 +272,11 @@ export function MemberProfileView({
                       <div className="my-2 flex flex-wrap gap-2">{buttons(row.actions, true)}</div>
                       {row.kind === "credit" && row.counts ? (
                         <>
-                          {row.counts.granted > 0 && (
+                          {row.counts.total !== undefined && row.counts.total > 0 && (
                             <Progress
                               aria-label={t(($) => $.memberProfile.available)}
                               value={row.counts.available}
-                              maxValue={row.counts.granted}
+                              maxValue={row.counts.total}
                             />
                           )}
                           <dl className="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm tabular-nums">
@@ -452,6 +459,7 @@ export function MemberProfileView({
                     </TableBody>
                   </Table>
                 </div>
+                {paymentPagination}
                 <dl className="mt-3 flex justify-between gap-3 border-t pt-3 text-sm">
                   <dt>{t(($) => $.memberProfile.debt)}</dt>
                   <dd className="font-semibold tabular-nums">
