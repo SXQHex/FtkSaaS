@@ -4,11 +4,15 @@ import { PlusIcon, XIcon } from "lucide-react";
 import { Card, CardHeader, CardContent, CardFooter } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "../../components/ui/field";
-import { NativeSelect } from "../../components/ui/native-select";
+import {
+  NativeSelect,
+  NativeSelectOptGroup,
+  NativeSelectOption,
+} from "../../components/ui/native-select";
 import { Input } from "../../components/ui/input";
 import { Switch } from "../../components/ui/switch";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import type { StudioInstructor } from "./studio-view";
+import type { StudioInstructor, StudioRoom } from "./studio-view";
 
 const weekdays = [
   "monday",
@@ -30,6 +34,7 @@ const emptyWeek = (): DayDraft[] => weekdays.map(() => ({ enabled: false, interv
 
 export function AvailabilityPanel({
   instructors,
+  rooms = [],
   initialByInstructor,
   readOnly = false,
   loading = false,
@@ -44,6 +49,7 @@ export function AvailabilityPanel({
   onDirtyChange,
 }: {
   instructors: StudioInstructor[];
+  rooms?: Pick<StudioRoom, "id" | "name" | "active">[];
   initialByInstructor: Record<string, AvailabilityDraft>;
   readOnly?: boolean;
   loading?: boolean;
@@ -71,8 +77,10 @@ export function AvailabilityPanel({
   const week = edited?.days ?? baseline?.days ?? emptyWeek();
   const validFrom = edited?.validFrom ?? baseline?.validFrom ?? "";
   const validUntil = edited?.validUntil ?? baseline?.validUntil ?? "";
-  const instructor = instructors.find((item) => item.id === instructorId);
-  const enabled = Boolean(instructor?.active) && !readOnly && !loading && !locked;
+  const resource =
+    instructors.find((item) => item.id === instructorId) ??
+    rooms.find((item) => `room:${item.id}` === instructorId);
+  const enabled = Boolean(resource?.active) && !readOnly && !loading && !locked;
   const setWeek = (next: DayDraft[] | ((current: DayDraft[]) => DayDraft[])) =>
     setEdited({ days: typeof next === "function" ? next(week) : next, validFrom, validUntil });
   const setValidFrom = (value: string) => setEdited({ days: week, validFrom: value, validUntil });
@@ -100,10 +108,11 @@ export function AvailabilityPanel({
           </div>
           <Field className="w-full gap-1 sm:w-48">
             <FieldLabel htmlFor="availability-instructor">
-              {t(($) => $.studio.instructor)}
+              {t(($) => $.studio.availabilityResource)}
             </FieldLabel>
             <NativeSelect
               id="availability-instructor"
+              name="resource"
               className="w-full"
               value={instructorId}
               disabled={dirty || locked}
@@ -113,18 +122,31 @@ export function AvailabilityPanel({
                 setEdited(undefined);
               }}
             >
-              <option value="">{t(($) => $.studio.chooseInstructor)}</option>
-              {instructors.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
+              <NativeSelectOption value="">
+                {t(($) => $.studio.chooseAvailabilityResource)}
+              </NativeSelectOption>
+              <NativeSelectOptGroup label={t(($) => $.studio.instructors)}>
+                {instructors.map((item) => (
+                  <NativeSelectOption key={item.id} value={item.id}>
+                    {item.name}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelectOptGroup>
+              {rooms.length > 0 && (
+                <NativeSelectOptGroup label={t(($) => $.studio.rooms)}>
+                  {rooms.map((item) => (
+                    <NativeSelectOption key={item.id} value={`room:${item.id}`}>
+                      {item.name}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelectOptGroup>
+              )}
             </NativeSelect>
           </Field>
         </CardHeader>
         {periodControl}
         <CardContent className="flex flex-col gap-4">
-          {instructor && !instructor.active && (
+          {resource && !resource.active && (
             <Alert>
               <AlertDescription>{t(($) => $.studio.inactiveAvailability)}</AlertDescription>
             </Alert>

@@ -560,8 +560,22 @@ export function ScheduleContent({
   const canApply = Boolean(
     review && !review.preview.blockers.length && command.state === "ready" && !locked,
   );
+  // A missing edit projection must not hide resources already read for
+  // this exact calendar/session version. They remain read-only context.
+  const selectedCalendarEntry = calendar.data?.entries.find(
+    (entry) =>
+      entry.type === "session" &&
+      entry.session.id === selected?.session.id &&
+      entry.session.version === selected.session.version,
+  );
   const panel = selected
-    ? scheduleSessionPanel(selected.session, selected.resources, source, t, sessionTitle)
+    ? scheduleSessionPanel(
+        selected.session,
+        selected.resources ?? selectedCalendarEntry?.item.resources ?? null,
+        source,
+        t,
+        sessionTitle,
+      )
     : undefined;
   if (panel && review)
     panel.effects = review.preview.effects.map((item, index) => ({
@@ -709,11 +723,19 @@ export function ScheduleContent({
           offsetChoices={offsetRequests[0]?.choices}
           locked={locked}
           notice={
-            !selected.resources
-              ? t(($) => $.schedule.editorUnavailable)
-              : mode === "roster"
-                ? t(($) => $.schedule.rosterUnavailable)
-                : message
+            [
+              selected.session.state === "cancelled"
+                ? t(($) => $.schedule.sessionStates.cancelled)
+                : null,
+              message ??
+                (mode === "roster"
+                  ? t(($) => $.schedule.rosterUnavailable)
+                  : !selected.resources && mode !== "cancel"
+                    ? t(($) => $.schedule.editorUnavailable)
+                    : null),
+            ]
+              .filter(Boolean)
+              .join(" · ") || undefined
           }
           error={previewError}
           canFuture

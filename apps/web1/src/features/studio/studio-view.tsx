@@ -632,6 +632,7 @@ export function StudioView({
           {availabilityContent ?? (
             <AvailabilityPanel
               instructors={data.instructors}
+              rooms={data.rooms}
               initialByInstructor={data.availability}
             />
           )}

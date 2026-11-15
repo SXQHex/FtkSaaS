@@ -82,3 +82,102 @@ test("Studio resource: split availability retries only the unknown step and pres
     rule: { weekdays: [1], local_start: "19:00:00" },
   });
 });
+
+test("Studio room availability preserves its resource across a lost acknowledgement and source reload", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  const originalInstructorRules = structuredClone(state.rules);
+  const ruleId = "019a7b00-0000-7000-8000-000000000096";
+  let roomRule: Record<string, unknown> | undefined;
+  const writes: Record<string, unknown>[] = [];
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const operation = new URL(route.request().url()).pathname.split("/").at(-1),
+      request = route.request().postDataJSON();
+    const send = (data: unknown) =>
+      route.fulfill({ json: { ok: true, data, trace_id: studioIds.role } });
+    if (
+      operation === "management_state_get_v1" &&
+      request.operation === "availability_save_v1" &&
+      request.selector.key.resource.kind === "room"
+    ) {
+      expect(request.selector.key.resource.id).toBe(studioIds.room);
+      return send({
+        items: roomRule
+          ? [
+              {
+                operation: "availability_save_v1",
+                exists: true,
+                state: "active",
+                entity: { type: "availability_rules", id: ruleId },
+                versions: [{ entity: { type: "availability_rules", id: ruleId }, version: 1 }],
+                current: {
+                  operation: "availability_save_v1",
+                  values: {
+                    resource: { kind: "room", id: studioIds.room },
+                    rule_id: ruleId,
+                    rule: roomRule,
+                  },
+                },
+              },
+            ]
+          : [],
+        next_cursor: null,
+      });
+    }
+    if (operation === "availability_save_v1" && request.resource.kind === "room") {
+      expect(request.resource.id).toBe(studioIds.room);
+      expect(request).not.toHaveProperty("rule_id");
+      expect(request).not.toHaveProperty("expected_version");
+      writes.push(request);
+      if (writes.length === 1) {
+        roomRule = structuredClone(request.rule);
+        return route.abort();
+      }
+      expect(request.operation_key).toBe(writes[0]!.operation_key);
+      expect(request.rule).toEqual(roomRule);
+      return send({
+        primary_id: ruleId,
+        operation_id: studioIds.role,
+        version: 1,
+        replayed: true,
+        related: [],
+      });
+    }
+    return route.fallback();
+  });
+  await openStudio(page);
+  await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
+  const resource = page.getByLabel("Kaynak", { exact: true });
+  await resource.selectOption(`room:${studioIds.room}`);
+  await page.locator("#availability-valid-from").fill("2026-11-16");
+  await page.locator("#availability-valid-until").fill("2026-11-30");
+  await page.getByRole("switch", { name: "Pazartesi", exact: true }).press("Space");
+  await expect(page.getByRole("switch", { name: "Pazartesi", exact: true })).toBeChecked();
+  await page.getByRole("button", { name: "Saat aralığı ekle", exact: true }).first().click();
+  await page.locator('input[id^="availability-monday-"][id$="-from"]').fill("11:00:00");
+  await page.locator('input[id^="availability-monday-"][id$="-to"]').fill("12:00:00");
+  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  const retry = page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
+  await expect(retry).toBeVisible();
+  await expect(resource).toBeDisabled();
+  await retry.click();
+  await expect(
+    page.getByText(
+      "Uygunluk kuralları güncel kaynaktan okundu. Mevcut seanslar otomatik değiştirilmedi.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(writes).toHaveLength(2);
+  expect(state.rules).toEqual(originalInstructorRules);
+  expect(state.writes).toEqual([]);
+  await page.setViewportSize({ width: 320, height: 900 });
+  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
+  expect((await scanAccessibility(page, "room-availability-saved-mobile")).violations).toEqual([]);
+  await resource.selectOption(studioIds.instructor);
+  await page.locator("#availability-period").selectOption(JSON.stringify(["2026-11-01", null]));
+  await expect(page.locator('input[id^="availability-monday-"][id$="-from"]')).toHaveValue(
+    "18:00:00",
+  );
+  expect(writes).toHaveLength(2);
+});

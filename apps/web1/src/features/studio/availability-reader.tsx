@@ -13,7 +13,7 @@ import {
   type AvailabilityIntent,
 } from "./availability-edit";
 import type { StudioScope } from "./studio";
-import type { StudioInstructor } from "./studio-view";
+import type { StudioInstructor, StudioRoom } from "./studio-view";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { NativeSelect } from "../../components/ui/native-select";
 import { ResourceLifecycleController } from "./resource-lifecycle-controller";
@@ -46,6 +46,7 @@ type Notice =
 export function StudioAvailabilityReader({
   scope,
   instructors,
+  rooms,
   onLockChange,
   onRefresh,
   timezone,
@@ -53,12 +54,13 @@ export function StudioAvailabilityReader({
   scope: StudioScope;
   timezone?: string;
   instructors: StudioInstructor[];
+  rooms: StudioRoom[];
   onLockChange: (value: boolean) => void;
   onRefresh: () => Promise<void>;
 }) {
   const { t } = useTranslation();
   const [retiringId, setRetiringId] = useState<string>();
-  const [personId, setPersonId] = useState("");
+  const [resourceKey, setResourceKey] = useState("");
   const [periodId, setPeriodId] = useState("");
   const [base, setBase] = useState<AvailabilityBase>();
   const [revision, setRevision] = useState(0);
@@ -76,15 +78,32 @@ export function StudioAvailabilityReader({
   const generation = useRef(0);
   const errorSummary = useRef<HTMLDivElement>(null);
   const preventLeave = mutating || notice === "unknown" || notice === "saved-unread";
-  const selected = instructors.some((item) => item.id === personId);
-  const rows = selected ? base?.records : undefined;
+  const choices = [
+    ...instructors.map((item) => ({
+      key: item.id,
+      name: item.name,
+      resource: { kind: "person" as const, id: item.id },
+    })),
+    ...rooms.map((item) => ({
+      key: `room:${item.id}`,
+      name: item.name,
+      resource: { kind: "room" as const, id: item.id },
+    })),
+  ];
+  const selected = choices.find((item) => item.key === resourceKey);
+  const rows =
+    selected &&
+    base?.resource.kind === selected.resource.kind &&
+    base.resource.id === selected.resource.id
+      ? base.records
+      : undefined;
   const periods = [...new Set(rows?.map(availabilityPeriod) ?? [])];
   const original = rows?.filter((item) => availabilityPeriod(item) === periodId) ?? [];
   const valuesKnown = Boolean(rows && (periodId === "new" || original.length));
   const editable = Boolean(
     valuesKnown && !busy && ["ready", "saved", "invalid", "remove-unsupported"].includes(notice),
   );
-  const initialByInstructor = valuesKnown ? { [personId]: availabilityDraft(original) } : {};
+  const initialByInstructor = valuesKnown ? { [resourceKey]: availabilityDraft(original) } : {};
   useLayoutEffect(() => {
     mounted.current = true;
     return () => {
@@ -101,10 +120,13 @@ export function StudioAvailabilityReader({
     enableBeforeUnload: preventLeave,
     disabled: !preventLeave,
   });
-  async function selectPerson(id: string) {
+  async function selectResource(id: string) {
     if (preventLeave) return;
+    const choice = choices.find((item) => item.key === id);
+    if (id && !choice) return;
     const current = ++generation.current;
-    setPersonId(id);
+    setRetiringId(undefined);
+    setResourceKey(id);
     setPeriodId("");
     setBase(undefined);
     setProgress({ done: 0, total: 0 });
@@ -118,7 +140,7 @@ export function StudioAvailabilityReader({
     setBusy(true);
     setNotice("loading");
     try {
-      const result = await loadAvailability(scope, id);
+      const result = await loadAvailability(scope, choice!.resource);
       if (!mounted.current || current !== generation.current) return;
       setBase(result);
       setPeriodId(result.records.length ? "" : "new");
@@ -132,7 +154,9 @@ export function StudioAvailabilityReader({
   }
   async function finishRead(discard = false) {
     const current = generation.current;
-    const next = await loadAvailability(scope, personId);
+    const resource = pending.current?.resource ?? base?.resource;
+    if (!resource) throw new Error("STUDIO_UNAVAILABLE");
+    const next = await loadAvailability(scope, resource);
     if (!discard && accepted.current.some((id) => !next.records.some((item) => item.id === id)))
       throw new Error("STUDIO_UNAVAILABLE");
     await onRefresh();
@@ -216,7 +240,7 @@ export function StudioAvailabilityReader({
   async function reload() {
     if (lock.current) return;
     if (!base) {
-      await selectPerson(personId);
+      await selectResource(resourceKey);
       return;
     }
     lock.current = true;
@@ -231,7 +255,7 @@ export function StudioAvailabilityReader({
       if (mounted.current) setBusy(false);
     }
   }
-  const message = !personId
+  const message = !resourceKey
     ? undefined
     : notice === "loading"
       ? t(($) => $.studio.loading)
@@ -259,9 +283,10 @@ export function StudioAvailabilityReader({
   return (
     <>
       <AvailabilityPanel
-        key={`${personId}:${periodId}:${revision}`}
-        selectedInstructor={personId}
+        key={`${resourceKey}:${periodId}:${revision}`}
+        selectedInstructor={resourceKey}
         instructors={instructors}
+        rooms={rooms}
         initialByInstructor={initialByInstructor}
         readOnly={!editable}
         locked={preventLeave || busy}
@@ -269,7 +294,7 @@ export function StudioAvailabilityReader({
         valuesKnown={valuesKnown}
         onDirtyChange={setDirty}
         onSelectInstructor={(id) => {
-          void selectPerson(id);
+          void selectResource(id);
         }}
         onSave={(draft) => {
           void write(draft);
@@ -371,17 +396,15 @@ export function StudioAvailabilityReader({
           </div>
         }
       />
-      {retiringId && (
+      {retiringId && base && selected && (
         <ResourceLifecycleController
-          key={`${scope.accountId}:${personId}:${retiringId}`}
+          key={`${scope.accountId}:${resourceKey}:${retiringId}`}
           scope={scope}
           selection={{
             kind: "rule",
             id: retiringId,
-            resource: { kind: "person", id: personId },
-            label:
-              instructors.find((item) => item.id === personId)?.name ??
-              t(($) => $.studio.unavailableResource),
+            resource: { ...base.resource },
+            label: selected.name,
           }}
           timezone={timezone}
           onClose={() => setRetiringId(undefined)}

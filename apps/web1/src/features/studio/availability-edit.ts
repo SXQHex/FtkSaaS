@@ -2,28 +2,28 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { studioBackend, type StudioScope } from "./studio";
 import { readStudioAvailability, type AvailabilityRecord } from "./studio-reads";
-import type { AvailabilityRule } from "../../lib/api-contracts/generated";
+import type { AvailabilityRule, ResourceRef } from "../../lib/api-contracts/generated";
 import type { AvailabilityDraft } from "./availability-panel";
 
 export interface AvailabilityBase {
   scope: StudioScope;
-  personId: string;
+  resource: ResourceRef;
   records: AvailabilityRecord[];
 }
 export interface AvailabilityIntent {
   scope: StudioScope;
-  personId: string;
+  resource: ResourceRef;
   steps: { key: string; id?: string; version?: number; rule: AvailabilityRule }[];
 }
 
 export async function loadAvailability(
   scope: StudioScope,
-  personId: string,
+  resource: ResourceRef,
 ): Promise<AvailabilityBase> {
   return {
     scope: { ...scope },
-    personId,
-    records: await readStudioAvailability(scope, { kind: "person", id: personId }),
+    resource: { ...resource },
+    records: await readStudioAvailability(scope, resource),
   };
 }
 
@@ -149,7 +149,7 @@ export function availabilityIntent(
   // Shrink/update existing rules before appending split/new rules. Each step
   // is independently acknowledged; this plan does not promise atomicity.
   steps.sort((left, right) => Number(Boolean(right.id)) - Number(Boolean(left.id)));
-  return { scope: { ...base.scope }, personId: base.personId, steps };
+  return { scope: { ...base.scope }, resource: { ...base.resource }, steps };
 }
 
 export async function saveAvailabilityStep(intent: AvailabilityIntent, index: number) {
@@ -162,7 +162,7 @@ export async function saveAvailabilityStep(intent: AvailabilityIntent, index: nu
     org_id: intent.scope.orgId,
     center_id: intent.scope.centerId,
     operation_key: step.key,
-    resource: { kind: "person", id: intent.personId },
+    resource: { ...intent.resource },
     rule: step.rule,
     ...(step.id ? { rule_id: step.id, expected_version: step.version } : {}),
   });

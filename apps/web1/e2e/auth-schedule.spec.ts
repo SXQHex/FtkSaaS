@@ -96,7 +96,14 @@ async function scheduleFixture(page: Page, withSession = false, verifiedInstruct
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/schedule`);
   await expect(page.getByRole("button", { name: "Seans ekle", exact: true })).toBeEnabled();
   await expect.poll(() => reads.includes("calendar_get_v1")).toBe(true);
-  return { writes, reads };
+  return {
+    writes,
+    reads,
+    fixture,
+    get session() {
+      return session;
+    },
+  };
 }
 
 test("empty mobile week keeps all days and hours reachable with the native keyboard scroll", async ({
@@ -140,10 +147,15 @@ test("missing editor policy keeps session details and independent cancellation a
     panel.getByRole("heading", { name: "Sentetik program seansı", exact: true }),
   ).toBeVisible();
   await expect(
-    panel.getByText(/Düzenleme için gereken program yapılandırması eksik/),
+    panel.getByText(
+      "Seans ayrıntıları okunabiliyor; düzenleme için gereken güncel kaynak şu anda alınamıyor.",
+      { exact: true },
+    ),
   ).toBeVisible();
   await expect(panel.getByRole("button", { name: "Seansı düzenle", exact: true })).toBeDisabled();
   await expect(panel.getByRole("button", { name: "Seansı iptal et", exact: true })).toBeEnabled();
+  await expect(panel.getByText(state.fixture.rooms[0]!.name, { exact: true })).toBeVisible();
+  await expect(panel.getByText("Tango", { exact: true })).toBeVisible();
   expect(state.reads).toContain("editor-policy-rejection");
   expect(state.writes).toEqual([]);
   expect((await scanAccessibility(page, "read-only-session-policy-rejection")).violations).toEqual(
@@ -252,5 +264,22 @@ test("a blocked cancellation explains its reason inside the active session sheet
     "Mevcut rezervasyonlar bu değişikliği engelliyor. Güncel etkiyi incele.",
   );
   await expect(panel.getByRole("button", { name: "Onayla ve uygula", exact: true })).toHaveCount(0);
+  expect(state.writes).toEqual([]);
+});
+
+test("a newer detail version does not borrow resources from a stale calendar row", async ({
+  page,
+}) => {
+  const state = await scheduleFixture(page, true);
+  expect(state.session).toBeDefined();
+  state.session!.version = 4;
+  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await expect(
+    panel.getByRole("heading", { name: "Sentetik program seansı", exact: true }),
+  ).toBeVisible();
+  await expect(panel.getByText(state.fixture.rooms[0]!.name, { exact: true })).toHaveCount(0);
+  await expect(panel.getByText("Tango", { exact: true })).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Seansı düzenle", exact: true })).toBeDisabled();
   expect(state.writes).toEqual([]);
 });

@@ -264,6 +264,7 @@ function StudioContent({
         <StudioAvailabilityReader
           scope={scope}
           instructors={data.instructors}
+          rooms={data.rooms}
           timezone={
             snapshot?.setup.center.state === "known"
               ? snapshot.setup.center.value.timezone

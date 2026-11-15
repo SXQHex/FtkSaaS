@@ -102,6 +102,12 @@ export function scheduleSessionPanel(
       t(($) => $.schedule.formats[session.format]),
     ],
     facts: [
+      {
+        label: t(($) => $.studio.discipline),
+        value:
+          sources.resources.disciplines.find((item) => item.id === session.discipline_id)?.name ??
+          unknown,
+      },
       { label: t(($) => $.schedule.room), value: rooms || unknown },
       { label: t(($) => $.schedule.instructor), value: teachers || unknown },
       {

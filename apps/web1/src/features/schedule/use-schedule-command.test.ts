@@ -33,37 +33,40 @@ beforeEach(() => {
   result.mockResolvedValue(undefined);
 });
 
-it("does not treat a failed receipt read as rejection of an unknown write or discard its key", async () => {
-  write
-    .mockRejectedValueOnce(new BackendError())
-    .mockResolvedValue({ primary_id: "fixture-session" });
-  receipt.mockRejectedValue(
-    new BackendError({ code: "NOT_FOUND", retryable: false, trace_id: "synthetic-trace" }),
-  );
-  const refresh = vi.fn(async () => {});
-  const hook = renderHook(() =>
-    useScheduleCommand({ onAccessLost: () => false, onRefresh: refresh }),
-  );
-  await act(async () => {
-    await hook.result.current.start(value);
-  });
-  expect(hook.result.current.state).toBe("unknown");
-  await act(async () => {
-    await hook.result.current.readReceipt();
-  });
-  expect(hook.result.current.state).toBe("unknown");
-  expect(hook.result.current.locked).toBe(true);
-  await act(async () => {
-    await hook.result.current.retry();
-  });
-  expect(hook.result.current.state).toBe("saved");
-  expect(write.mock.calls.map(([intent]) => intent.request.operation_key)).toEqual([
-    "fixture-key",
-    "fixture-key",
-  ]);
-  expect(refresh).toHaveBeenCalledTimes(1);
-  await act(async () => {
-    await hook.result.current.retry();
-  });
-  expect(write).toHaveBeenCalledTimes(2);
-});
+it.each(["NOT_FOUND", "VALIDATION_FAILED"] as const)(
+  "keeps an unknown write and its key after a %s receipt read",
+  async (code) => {
+    write
+      .mockRejectedValueOnce(new BackendError())
+      .mockResolvedValue({ primary_id: "fixture-session" });
+    receipt.mockRejectedValue(
+      new BackendError({ code, retryable: false, trace_id: "synthetic-trace" }),
+    );
+    const refresh = vi.fn(async () => {});
+    const hook = renderHook(() =>
+      useScheduleCommand({ onAccessLost: () => false, onRefresh: refresh }),
+    );
+    await act(async () => {
+      await hook.result.current.start(value);
+    });
+    expect(hook.result.current.state).toBe("unknown");
+    await act(async () => {
+      await hook.result.current.readReceipt();
+    });
+    expect(hook.result.current.state).toBe("unknown");
+    expect(hook.result.current.locked).toBe(true);
+    await act(async () => {
+      await hook.result.current.retry();
+    });
+    expect(hook.result.current.state).toBe("saved");
+    expect(write.mock.calls.map(([intent]) => intent.request.operation_key)).toEqual([
+      "fixture-key",
+      "fixture-key",
+    ]);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      await hook.result.current.retry();
+    });
+    expect(write).toHaveBeenCalledTimes(2);
+  },
+);

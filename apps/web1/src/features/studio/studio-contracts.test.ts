@@ -18,7 +18,7 @@ const person = "019a7b00-0000-7000-8000-000000000006",
   discipline = "019a7b00-0000-7000-8000-000000000009";
 const base: AvailabilityBase = {
   scope,
-  personId: person,
+  resource: { kind: "person", id: person },
   records: [
     {
       id: "019a7b00-0000-7000-8000-000000000011",

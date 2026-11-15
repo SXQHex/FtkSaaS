@@ -17,7 +17,7 @@ test("Studio lifecycle: explicit last-rule retirement, same-key recovery, versio
   const originalClosure = structuredClone(state.closures[0]!.interval);
   await openStudio(page);
   await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
-  await page.getByLabel("Eğitmen", { exact: true }).selectOption(I.instructor);
+  await page.getByLabel("Kaynak", { exact: true }).selectOption(I.instructor);
   await page
     .getByLabel("Geçerlilik dönemi", { exact: true })
     .selectOption(JSON.stringify(["2026-11-01", null]));
