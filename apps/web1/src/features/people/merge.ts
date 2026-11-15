@@ -1,4 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
+import { readMergeDirectory } from "./merge-directory";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   PersonView,
@@ -14,6 +15,8 @@ export interface MergePair {
 export interface MergeSnapshot extends MergePair {
   scope: ClientScope;
   preview: Preview;
+  reason: string;
+  decision: "merge" | "not_duplicate";
 }
 export type MergeIntent = {
   scope: ClientScope;
@@ -21,7 +24,10 @@ export type MergeIntent = {
   sourceId: string;
   targetId: string;
   preview: { id: string; token: string };
-} & ({ kind: "apply" } | { kind: "approve"; approvalCenterId: string });
+} & (
+  | { kind: "apply"; decision: "merge" | "not_duplicate"; reason: string }
+  | { kind: "approve"; approvalCenterId: string }
+);
 const request = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   request_id: uuidv7(),
@@ -36,8 +42,16 @@ async function pairRead(
 ): Promise<MergePair> {
   if (!sourceId || !targetId || sourceId === targetId) throw new Error("MERGE_PAIR_UNAVAILABLE");
   const [source, target] = await Promise.all([
-    backend.call("person_get_v1", { ...request(scope), person_id: sourceId }),
-    backend.call("person_get_v1", { ...request(scope), person_id: targetId }),
+    backend.call("person_get_v1", {
+      ...request(scope),
+      person_id: sourceId,
+      include_member_summary: true,
+    }),
+    backend.call("person_get_v1", {
+      ...request(scope),
+      person_id: targetId,
+      include_member_summary: true,
+    }),
   ]);
   if (source.id !== sourceId || target.id !== targetId) throw new Error("MERGE_PAIR_UNAVAILABLE");
   return { source, target };
@@ -49,20 +63,27 @@ export async function previewMerge(
   scope: ClientScope,
   sourceId: string,
   targetId: string,
+  reason: string,
+  decision: "merge" | "not_duplicate" = "merge",
 ): Promise<MergeSnapshot> {
   if (!sourceId || !targetId || sourceId === targetId) throw new Error("MERGE_PAIR_UNAVAILABLE");
   const backend = await scopedBackend(scope);
+  if (!reason.trim() || reason.trim().length > 2000) throw new Error("MERGE_REASON_REQUIRED");
   const preview = await backend.call("person_merge_preview_v1", {
     ...request(scope),
     source_id: sourceId,
     target_id: targetId,
+    reason: reason.trim(),
+    decision,
   });
   const summary = preview.merge_summary;
   if (
     !summary ||
     summary.source_id !== sourceId ||
     summary.target_id !== targetId ||
-    summary.linked_history !== true ||
+    summary.linked_history !== (decision === "merge") ||
+    summary.reason !== reason.trim() ||
+    summary.decision !== decision ||
     !preview.id ||
     !preview.token ||
     !Number.isFinite(Date.parse(preview.expires_at))
@@ -80,7 +101,7 @@ export async function previewMerge(
   }
   if (summary.required_approval_center_ids.some((id) => !summary.affected_center_ids.includes(id)))
     throw new Error("MERGE_PREVIEW_UNAVAILABLE");
-  return { scope: { ...scope }, ...pair, preview };
+  return { scope: { ...scope }, ...pair, preview, reason: reason.trim(), decision };
 }
 function approvalRead(
   item: {
@@ -163,6 +184,8 @@ export function mergeApplyIntent(snapshot: MergeSnapshot): MergeIntent {
     key: uuidv7(),
     sourceId: snapshot.source.id,
     targetId: snapshot.target.id,
+    decision: snapshot.decision,
+    reason: snapshot.reason,
     preview: { id: snapshot.preview.id, token: snapshot.preview.token },
   };
 }
@@ -245,8 +268,37 @@ export async function readMergeResult(intent: MergeIntent) {
   const person = await backend.call("person_get_v1", {
     ...request(intent.scope),
     person_id: intent.targetId,
+    include_member_summary: true,
   });
-  if (person.id !== intent.targetId || !person.linked_person_ids?.includes(intent.sourceId))
+  if (
+    person.id !== intent.targetId ||
+    (intent.decision !== "not_duplicate" && !person.linked_person_ids?.includes(intent.sourceId))
+  )
     throw new Error("MERGE_REREAD_UNAVAILABLE");
+  if (intent.decision === "not_duplicate") {
+    let cursor: string | undefined;
+    const seen = new Set<string>();
+    do {
+      const page = await readMergeDirectory(
+        intent.scope,
+        "not_duplicate",
+        person.display_name,
+        cursor,
+      );
+      const decision = page.items.find(
+        (row) =>
+          [row.source.id, row.target.id].includes(intent.sourceId) &&
+          [row.source.id, row.target.id].includes(intent.targetId),
+      );
+      if (decision) {
+        if (decision.reason !== intent.reason) throw new Error("MERGE_REREAD_UNAVAILABLE");
+        return person;
+      }
+      cursor = page.next_cursor ?? undefined;
+      if (cursor && seen.has(cursor)) throw new Error("MERGE_REREAD_UNAVAILABLE");
+      if (cursor) seen.add(cursor);
+    } while (cursor);
+    throw new Error("MERGE_REREAD_UNAVAILABLE");
+  }
   return person;
 }
