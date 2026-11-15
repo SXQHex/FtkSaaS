@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { MemberProfileView, type ProfileTab } from "./member-profile-view";
 import { readMemberReservations, memberReservationRows } from "./reservations";
 import { CancelReservation } from "./cancel-reservation";
+import { readNegativeLimit } from "./negative-limit";
+import { NegativeLimitEditor } from "./negative-limit-editor";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -18,6 +20,7 @@ import { formatMinorAmount } from "../../lib/money";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
 import { Field, FieldLabel, FieldError } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
+import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 export function MemberProfileContent({
@@ -46,6 +49,8 @@ export function MemberProfileContent({
     [collect, setCollect] = useState(false),
     [locked, setLocked] = useState(false),
     [commandInvalid, setInvalid] = useState(false),
+    [negativeDiscipline, setNegativeDiscipline] = useState(""),
+    [editNegative, setEditNegative] = useState(false),
     [cancelTarget, setCancelTarget] = useState<{ id: string; sessionId: string; label: string }>(),
     [reservationIndex, setReservationIndex] = useState(0),
     [reservationCursors, setReservationCursors] = useState<(string | undefined)[]>([undefined]);
@@ -95,6 +100,20 @@ export function MemberProfileContent({
     enabled: Boolean(center && person.data && tab === "reservations"),
     retry: false,
   });
+  const negativeKey = [
+    "profile-negative-limit",
+    scope.accountId,
+    scope.orgId,
+    scope.centerId,
+    personId,
+    negativeDiscipline,
+  ];
+  const negativeLimit = useQuery({
+    queryKey: negativeKey,
+    queryFn: () => readNegativeLimit(scope, personId, negativeDiscipline),
+    enabled: Boolean(center && person.data && negativeDiscipline),
+    retry: false,
+  });
   const financeKey = (code: string, cursor?: string) => [
     "finance",
     scope.accountId,
@@ -138,6 +157,7 @@ export function MemberProfileContent({
       disciplines.error,
       finance.error,
       reservations.error,
+      negativeLimit.error,
     ].some(authLost);
   const invalid = commandInvalid || queryAccessLost;
   useEffect(() => {
@@ -262,6 +282,7 @@ export function MemberProfileContent({
   const closedSales = new Set(
     rights.data?.filter((x) => x.state === "closed").map((x) => x.sale_id) ?? [],
   );
+  const selectedNegativeDiscipline = disciplines.data?.find((x) => x.id === negativeDiscipline);
   const reservationRows =
     center && reservations.data && !reservations.isError
       ? memberReservationRows(
@@ -368,16 +389,85 @@ export function MemberProfileContent({
             .map((x) => ({ id: x.id, title: x.name, date: x.period, detail: x.state })) ?? null
         }
         ledger={null}
-        negative={
-          rights.data?.some((x) => x.kind === "credits" && x.state !== "closed")
-            ? {
-                limit: t(($) => $.memberProfile.unknown),
-                used: t(($) => $.memberProfile.unknown),
-                unitValue: null,
-                action: { kind: "negative", disabled: true },
-              }
-            : null
-        }
+        negative={{
+          limit:
+            negativeLimit.isError || negativeLimit.data?.effective_limit == null
+              ? t(($) => $.memberProfile.unknown)
+              : String(negativeLimit.data.effective_limit),
+          used:
+            negativeLimit.data && !negativeLimit.isError
+              ? t(($) => $.memberProfile.negativeDeficit, {
+                  reserved: negativeLimit.data.reserved_deficit,
+                  consumed: negativeLimit.data.consumed_deficit,
+                })
+              : t(($) => $.memberProfile.unknown),
+          unitValue: null,
+          action: {
+            kind: "negative",
+            disabled:
+              !sourceAvailable ||
+              locked ||
+              !negativeLimit.data ||
+              negativeLimit.isError ||
+              negativeLimit.isFetching ||
+              negativeLimit.data.personal_override_enabled !== true,
+            onPress: () => setEditNegative(true),
+          },
+          selector: (
+            <>
+              <Field>
+                <FieldLabel htmlFor="profile-negative-discipline">
+                  {t(($) => $.memberProfile.fields.disciplineId)}
+                </FieldLabel>
+                <NativeSelect
+                  id="profile-negative-discipline"
+                  name="negativeDiscipline"
+                  value={negativeDiscipline}
+                  disabled={locked || disciplines.isError || !disciplines.data?.length}
+                  onChange={(event) => setNegativeDiscipline(event.target.value)}
+                >
+                  <NativeSelectOption value="">
+                    {t(($) => $.memberProfile.choose)}
+                  </NativeSelectOption>
+                  {(!disciplines.isError ? (disciplines.data ?? []) : []).map((row) => (
+                    <NativeSelectOption key={row.id} value={row.id}>
+                      {row.name}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </Field>
+              {negativeLimit.data?.personal_override_enabled !== true &&
+                negativeLimit.isSuccess && (
+                  <p className="text-sm text-muted-foreground">
+                    {t(($) =>
+                      negativeLimit.data?.personal_override_enabled === false
+                        ? $.memberProfile.personalLimitDisabled
+                        : $.memberProfile.negativeReadError,
+                    )}
+                  </p>
+                )}
+              {negativeLimit.isFetching && (
+                <p role="status">{t(($) => $.memberProfile.negativeReading)}</p>
+              )}
+              {negativeLimit.isError && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    {t(($) => $.memberProfile.negativeReadError)}
+                    <Button
+                      variant="outline"
+                      isDisabled={locked || negativeLimit.isFetching}
+                      onPress={() => {
+                        void negativeLimit.refetch();
+                      }}
+                    >
+                      {t(($) => $.finance.retry)}
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </>
+          ),
+        }}
         reservations={reservationRows}
         reservationFilter={filter}
         onReservationFilter={setFilter}
@@ -520,6 +610,32 @@ export function MemberProfileContent({
           )
         }
       />
+      {editNegative &&
+        center &&
+        negativeLimit.data &&
+        selectedNegativeDiscipline &&
+        (sourceAvailable || preservePending) && (
+          <NegativeLimitEditor
+            scope={scope}
+            personId={personId}
+            personLabel={p?.display_name ?? ""}
+            discipline={selectedNegativeDiscipline}
+            initialLimit={negativeLimit.data.override ?? negativeLimit.data.effective_limit}
+            timezone={center.timezone}
+            sourceAvailable={sourceAvailable}
+            onClose={() => setEditNegative(false)}
+            onLockChange={changeLock}
+            onAccessLost={accessLost}
+            onRefresh={async (result) => {
+              queries.setQueryData(negativeKey, result.limit);
+              queries.setQueryData(rightsKey, result.rights);
+              await person.refetch({ throwOnError: true });
+              void queries.invalidateQueries({
+                queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+              });
+            }}
+          />
+        )}
       {cancelTarget && (sourceAvailable || preservePending) && (
         <CancelReservation
           key={cancelTarget.id}

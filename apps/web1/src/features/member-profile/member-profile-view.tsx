@@ -121,6 +121,7 @@ export function MemberProfileView({
     used: string;
     unitValue: string | null;
     action?: ProfileAction;
+    selector?: ReactNode;
   } | null;
   reservations: ProfileReservation[] | null;
   reservationFilter: "all" | "upcoming" | "past";
@@ -306,6 +307,7 @@ export function MemberProfileView({
                     <h2 className="font-semibold">{t(($) => $.memberProfile.negative)}</h2>
                     {negative?.action && buttons([negative.action], true)}
                   </div>
+                  {negative?.selector}
                   {negative ? (
                     <dl className="flex flex-wrap gap-4 text-sm">
                       {(["limit", "used", "unitValue"] as const).map((key) => (

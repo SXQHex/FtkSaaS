@@ -4,6 +4,8 @@ import type {
   ProductView,
   SalePreview,
   EntitlementView,
+  NegativeLimitsView,
+  ReservationProtectionPreview,
 } from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
@@ -766,3 +768,182 @@ test("reservation cancellation needs a fresh source and explicit confirmation af
   expect(cancelWrites[0]!.operation_key).not.toBe(cancelWrites[1]!.operation_key);
   expect(cancelWrites[1]!.expected_version).toBe(3);
 });
+
+async function negativeSetup(
+  page: Page,
+  options: { disabled?: boolean; unknown?: boolean; unread?: boolean } = {},
+) {
+  await setup(page, { openSale: false });
+  const writes: Record<string, unknown>[] = [],
+    previews: Record<string, unknown>[] = [];
+  let saved = false,
+    unread = false;
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1),
+      req = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "negative_limits_get_v1") {
+      expect(req).toMatchObject({
+        person_id: I.instructor,
+        discipline_id: I.discipline,
+        center_id: I.center,
+        include_delegation: true,
+      });
+      if (options.unread && saved && !unread) {
+        unread = true;
+        return route.abort("failed");
+      }
+      const row: NegativeLimitsView = {
+        person_id: I.instructor,
+        center_id: I.center,
+        discipline_id: I.discipline,
+        version: 1,
+        override: saved ? 2 : null,
+        default_limit: 0,
+        upper_limit: 4,
+        effective_limit: saved ? 2 : 0,
+        reserved_deficit: 0,
+        consumed_deficit: 0,
+        policy_version_ids: [],
+        override_version: saved ? 1 : null,
+        personal_override_enabled: !options.disabled,
+      };
+      return send(row);
+    }
+    if (op === "reservation_impact_preview_v1") {
+      previews.push(req);
+      const result: ReservationProtectionPreview = {
+        change: req.change,
+        preview: {
+          id: previewId,
+          token: "synthetic-limit-capability",
+          scope_hash: "synthetic",
+          dependencies: { versions: [], policy_hashes: [], permission_hash: "synthetic" },
+          effects: [],
+          blockers: [],
+          expires_at: "2099-01-01T00:00:00Z",
+        },
+        affected: [],
+        preserves_reservations: true,
+        waives_independent_blocks: false,
+      };
+      return send(result);
+    }
+    if (op === "negative_limit_set_v1") {
+      writes.push(req);
+      saved = true;
+      expect(req).toMatchObject({
+        person_id: I.instructor,
+        discipline_id: I.discipline,
+        allowed_negative_credits: 2,
+        expected_version: 1,
+        accepted_reservation_ids: [],
+        impact_approval: { id: previewId, token: "synthetic-limit-capability" },
+      });
+      if (options.unknown && writes.length === 1) return route.abort("failed");
+      return send({ primary_id: debtId, changed: [], jobs: [] });
+    }
+    if (op === "operation_status_get_v1")
+      return route.fulfill({
+        json: { ok: false, error: { code: "NOT_FOUND", retryable: false, trace_id: I.role } },
+      });
+    if (op === "reservation_impact_apply_v1") throw new Error("ALTERNATIVE_WRITER_MUST_NOT_RUN");
+    return route.fallback();
+  });
+  await page.getByLabel("Disiplin", { exact: true }).selectOption(I.discipline);
+  const section = page
+    .getByRole("heading", { name: "Negatif limit", exact: true })
+    .locator("..")
+    .locator("..");
+  const edit = section.getByRole("button", { name: "Düzenle", exact: true });
+  if (!options.disabled) await expect(edit).toBeEnabled();
+  return {
+    writes,
+    previews,
+    edit,
+    section,
+    panel: page.getByRole("dialog", { name: "Negatif limit", exact: true }),
+  };
+}
+async function reviewNegative(page: Page, options: Parameters<typeof negativeSetup>[1] = {}) {
+  const state = await negativeSetup(page, options);
+  await state.edit.click();
+  await state.panel.getByLabel("Limit (ders, 0 kapalı)", { exact: true }).fill("2");
+  await state.panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic personal limit reason");
+  await state.panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    state.panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
+  ).toBeVisible();
+  return state;
+}
+test("negative limit preserves native zero, validates fields, reviews effects and saves only after explicit approval", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  const { edit, panel, writes, previews } = await negativeSetup(page);
+  await edit.click();
+  await expect(panel.getByLabel("Limit (ders, 0 kapalı)", { exact: true })).toHaveValue("0");
+  await panel.getByLabel("Limit (ders, 0 kapalı)", { exact: true }).fill("1.5");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByLabel("Limit (ders, 0 kapalı)", { exact: true })).toBeFocused();
+  expect(previews).toHaveLength(0);
+  await panel.getByLabel("Limit (ders, 0 kapalı)", { exact: true }).fill("2");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic personal limit reason");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByRole("heading", { name: "Etki", exact: true })).toBeFocused();
+  const confirm = panel.getByRole("button", { name: "Uygula", exact: true });
+  await expect(confirm).toBeDisabled();
+  expect(writes).toHaveLength(0);
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await confirm.click();
+  await expect(
+    panel.getByText(
+      "Negatif limit kaydedildi; güncel limit, haklar ve etkilenen rezervasyonlar okundu.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(writes).toHaveLength(1);
+  await expect(confirm).toBeDisabled();
+  expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+test("negative limit does not bypass a disabled organization delegation", async ({ page }) => {
+  const { section, edit, writes, previews } = await negativeSetup(page, { disabled: true });
+  await expect(edit).toBeDisabled();
+  await expect(
+    section.getByText(
+      "Organizasyon kişisel negatif limit değişikliğine izin vermiyor. Mevcut politika geçerlidir.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(writes).toHaveLength(0);
+  expect(previews).toHaveLength(0);
+});
+for (const mode of ["unknown", "unread"] as const)
+  test(`negative limit ${mode} result recovers without changing the reviewed intent`, async ({
+    page,
+  }) => {
+    const { panel, writes } = await reviewNegative(page, { [mode]: true });
+    await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+    await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+    await expect(
+      panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(panel).toBeVisible();
+    if (mode === "unknown") {
+      await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+      await panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+    } else
+      await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+    await expect(
+      panel.getByText(
+        "Negatif limit kaydedildi; güncel limit, haklar ve etkilenen rezervasyonlar okundu.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    expect(writes).toHaveLength(mode === "unknown" ? 2 : 1);
+    if (mode === "unknown") {
+      expect({ ...writes[0], request_id: null }).toEqual({ ...writes[1], request_id: null });
+      expect(writes[0]!.request_id).not.toBe(writes[1]!.request_id);
+    }
+  });

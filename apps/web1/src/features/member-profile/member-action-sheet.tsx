@@ -92,7 +92,11 @@ export function MemberActionSheet({
   onAccepted: (value: boolean) => void;
 }) {
   const { t } = useTranslation(),
-    form = useRef<HTMLFormElement>(null);
+    form = useRef<HTMLFormElement>(null),
+    reviewHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (stage === "review") reviewHeading.current?.focus();
+  }, [stage]);
   useEffect(() => {
     if (errors?.productVersionId)
       form.current?.querySelector<HTMLInputElement>('input[type="radio"]')?.focus();
@@ -438,7 +442,9 @@ export function MemberActionSheet({
         ) : (
           <>
             <section aria-label={t(($) => $.memberProfile.effects)}>
-              <h3 className="mb-3 text-sm font-semibold">{t(($) => $.memberProfile.effects)}</h3>
+              <h3 ref={reviewHeading} tabIndex={-1} className="mb-3 text-sm font-semibold">
+                {t(($) => $.memberProfile.effects)}
+              </h3>
               <ItemGroup>
                 {effects.map((row) => (
                   <Item key={row.id} role="listitem" variant="outline">
