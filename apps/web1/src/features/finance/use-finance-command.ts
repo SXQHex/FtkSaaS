@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
 import { BackendError } from "../../lib/backend";
 import {
-  writeCollection,
-  readCollectionReceipt,
-  readCollectionResult,
-  type CollectionIntent,
-} from "./finance";
+  writeFinance,
+  readFinanceReceipt,
+  readFinanceResult,
+  type FinanceIntent,
+} from "./finance-command";
 import type { FinanceView } from "../../lib/api-contracts/generated";
 
-export function useCollectionCommand({
+export function useFinanceCommand({
   onRefresh,
   onAccessLost,
 }: {
@@ -21,7 +21,7 @@ export function useCollectionCommand({
   >("ready");
   const [busy, setBusy] = useState(false),
     [unavailable, setUnavailable] = useState(false);
-  const intent = useRef<CollectionIntent | undefined>(undefined),
+  const intent = useRef<FinanceIntent | undefined>(undefined),
     acknowledged = useRef(false),
     primary = useRef<string | undefined>(undefined),
     executing = useRef(false),
@@ -52,7 +52,7 @@ export function useCollectionCommand({
   }
   async function reread() {
     if (!intent.current || !acknowledged.current) return;
-    const result = await readCollectionResult(intent.current, primary.current);
+    const result = await readFinanceResult(intent.current, primary.current);
     if (!mounted.current || terminal.current) return;
     await onRefresh(result);
     if (mounted.current && !terminal.current) setState("saved");
@@ -95,7 +95,7 @@ export function useCollectionCommand({
     setState("writing");
     try {
       if (!acknowledged.current) {
-        const result = await writeCollection(intent.current);
+        const result = await writeFinance(intent.current);
         primary.current = result.primary_id;
         acknowledged.current = true;
       }
@@ -109,7 +109,7 @@ export function useCollectionCommand({
       if (mounted.current) setBusy(false);
     }
   }
-  async function start(next: CollectionIntent) {
+  async function start(next: FinanceIntent) {
     if (!mounted.current || terminal.current || executing.current || intent.current) return;
     intent.current = structuredClone(next);
     acknowledged.current = false;
@@ -122,7 +122,7 @@ export function useCollectionCommand({
     setBusy(true);
     try {
       if (!acknowledged.current) {
-        const receipt = await readCollectionReceipt(intent.current);
+        const receipt = await readFinanceReceipt(intent.current);
         if (receipt.status === "succeeded" || receipt.status === "result_expired") {
           acknowledged.current = true;
           primary.current = receipt.result_reference?.id;

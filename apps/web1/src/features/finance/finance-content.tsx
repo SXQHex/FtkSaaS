@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { FinanceView, type FinanceTab, type FinanceMovementRow } from "./finance-view";
+import { CorrectionEditor } from "./correction-editor";
 import { FinanceActionSheet } from "./finance-action-sheet";
 import {
   readFinancePage,
@@ -13,7 +14,7 @@ import {
   type FinanceSelection,
   type CollectionIntent,
 } from "./finance";
-import { useCollectionCommand } from "./use-collection-command";
+import { useFinanceCommand } from "./use-finance-command";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { readWorkspace } from "../workspace/workspace";
 import { readPeoplePage } from "../people/people";
@@ -55,6 +56,7 @@ export function FinanceContent({
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [pageIndex, setPageIndex] = useState(0),
     [collect, setCollect] = useState(false),
+    [correctionId, setCorrectionId] = useState<string>(),
     [locked, setLocked] = useState(false),
     [invalid, setInvalid] = useState(false);
   const workspace = useQuery({
@@ -157,7 +159,10 @@ export function FinanceContent({
           ? `${t(($) => (row.payment!.method === "cash" ? $.finance.cash : row.payment!.method === "card_pos" ? $.finance.card : $.finance.bank))}${row.payment.reference ? ` · ${row.payment.reference}` : ""}`
           : t(($) => $.finance.unknown),
         amount: formatMinorAmount(row.amount_minor, row.currency),
-        actions: [],
+        actions:
+          row.kind === "collection" && !workspace.isError && !locked
+            ? [{ kind: "correct" as const, onPress: () => setCorrectionId(row.id) }]
+            : [],
       }))
     : [];
   const context = (
@@ -406,6 +411,23 @@ export function FinanceContent({
           </div>
         }
       />
+      {correctionId && selection && center && (
+        <CorrectionEditor
+          key={`${selection.personId}:${selection.currency}:${correctionId}`}
+          scope={scope}
+          selection={selection}
+          timezone={center.timezone}
+          id={correctionId}
+          personLabel={personLabel}
+          sourceAvailable={!workspace.isError}
+          onClose={() => setCorrectionId(undefined)}
+          onRefresh={async () => {
+            await finance.refetch({ throwOnError: true });
+          }}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+        />
+      )}
       {collect && selection && center && (
         <CollectionEditor
           key={`${selection.personId}:${selection.currency}`}
@@ -455,7 +477,7 @@ function CollectionEditor({
     [errors, setErrors] = useState<Partial<Record<keyof ReturnType<typeof financeDraft>, string>>>(
       {},
     );
-  const command = useCollectionCommand({
+  const command = useFinanceCommand({
     onAccessLost,
     onRefresh: async () => {
       await onRefresh();

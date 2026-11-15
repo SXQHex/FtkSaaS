@@ -5,12 +5,39 @@ import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 const cashId = "019a7b00-0000-7000-8000-000000000061",
-  debtId = "019a7b00-0000-7000-8000-000000000062";
-async function setup(page: Page, options: { unknown?: boolean; allowed?: boolean } = {}) {
+  debtId = "019a7b00-0000-7000-8000-000000000062",
+  correctionId = "019a7b00-0000-7000-8000-000000000063",
+  previewId = "019a7b00-0000-7000-8000-000000000064";
+async function setup(
+  page: Page,
+  options: {
+    unknown?: boolean;
+    allowed?: boolean;
+    withCollection?: boolean;
+    correctionUnknown?: boolean;
+    stale?: boolean;
+    blocked?: boolean;
+  } = {},
+) {
   const studio = await mockStudio(page),
     writes: Record<string, unknown>[] = [],
     reads: Record<string, unknown>[] = [];
-  let movement: CashSummary | undefined;
+  let movement: CashSummary | undefined = options.withCollection
+    ? {
+        id: cashId,
+        kind: "collection",
+        amount_minor: "40000",
+        currency: "TRY",
+        occurred_at: "2026-11-15T11:30:00Z",
+        center_id: I.center,
+        version: 1,
+        previous_id: null,
+        payment: { method: "cash" },
+      }
+    : undefined;
+  let correction: CashSummary | undefined, prepared: Record<string, unknown> | undefined;
+  const corrections: Record<string, unknown>[] = [],
+    previews: Record<string, unknown>[] = [];
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON(),
@@ -27,13 +54,13 @@ async function setup(page: Page, options: { unknown?: boolean; allowed?: boolean
           {
             id: debtId,
             due_at: "2026-11-15T00:00:00Z",
-            remaining_minor: movement ? "60000" : "100000",
+            remaining_minor: correction ? "70000" : movement ? "60000" : "100000",
             center_id: I.center,
             version: movement ? 2 : 1,
           },
         ],
         movements: {
-          items: movement ? [movement] : [],
+          items: movement ? [movement, ...(correction ? [correction] : [])] : [],
           next_cursor: null,
           as_of: new Date().toISOString(),
         },
@@ -63,6 +90,83 @@ async function setup(page: Page, options: { unknown?: boolean; allowed?: boolean
         next_cursor: null,
         as_of: new Date().toISOString(),
       });
+    }
+    if (op === "management_state_get_v1" && req.operation === "collection_correct_preview_v1") {
+      expect(req.selector).toEqual({
+        operation: "collection_correct_preview_v1",
+        key: { cash_movement_id: cashId },
+      });
+      return send({
+        items: [
+          {
+            operation: req.operation,
+            exists: true,
+            entity: { type: "cash_movements", id: cashId },
+            state: null,
+            versions: [{ entity: { type: "cash_movements", id: cashId }, version: 1 }],
+            current: { operation: req.operation, values: { cash_movement_id: cashId } },
+          },
+        ],
+        next_cursor: null,
+        as_of: new Date().toISOString(),
+      });
+    }
+    if (op === "collection_correct_preview_v1") {
+      previews.push(req);
+      prepared = req.correction;
+      expect(req.cash_movement_id).toBe(cashId);
+      return send({
+        id: previewId,
+        token: "synthetic-preview-capability",
+        scope_hash: "synthetic",
+        dependencies: { versions: [], policy_hashes: [], permission_hash: "synthetic" },
+        effects: [
+          {
+            entity: { type: "cash_movements", id: cashId },
+            action: "adjust",
+            reason: req.reason,
+            amount_minor: req.correction.amount_minor,
+            currency: req.correction.currency,
+          },
+          {
+            entity: { type: "debts", id: debtId },
+            action: "reverse",
+            amount_minor: req.correction.amount_minor,
+            currency: "TRY",
+          },
+          {
+            entity: { type: "people", id: I.instructor },
+            action: "reverse",
+            amount_minor: "0",
+            currency: "TRY",
+          },
+        ],
+        blockers: options.blocked
+          ? [{ code: "INSUFFICIENT_STUDENT_CREDIT", retryable: false, trace_id: I.role }]
+          : [],
+        expires_at: "2099-01-01T00:00:00Z",
+      });
+    }
+    if (op === "collection_correct_apply_v1") {
+      corrections.push(req);
+      expect(req.preview).toEqual({ id: previewId, token: "synthetic-preview-capability" });
+      if (options.stale)
+        return route.fulfill({
+          json: { ok: false, error: { code: "PREVIEW_STALE", retryable: false, trace_id: I.role } },
+        });
+      if (options.correctionUnknown && corrections.length === 1) return route.abort();
+      correction = {
+        id: correctionId,
+        kind: "correction_out",
+        amount_minor: String(prepared!.amount_minor),
+        currency: "TRY",
+        occurred_at: String(prepared!.occurred_at),
+        center_id: I.center,
+        version: 1,
+        previous_id: cashId,
+        payment: null,
+      };
+      return send({ primary_id: correctionId, changed: [], jobs: [] });
     }
     if (op === "collection_record_v1") {
       writes.push(req);
@@ -100,7 +204,7 @@ async function setup(page: Page, options: { unknown?: boolean; allowed?: boolean
   await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
   await expect.poll(() => reads.length).toBeGreaterThan(0);
   await expect(page.getByRole("grid", { name: "Hareketler", exact: true })).toBeVisible();
-  return { studio, writes, reads };
+  return { studio, writes, reads, corrections, previews };
 }
 async function fillCollection(page: Page) {
   await page.getByRole("button", { name: "Tahsilat al", exact: true }).click();
@@ -197,5 +301,140 @@ test("an unknown collection keeps the frozen key after receipt validation failur
   expect(state.writes).toHaveLength(2);
   expect(state.writes[0]!.operation_key).toBe(state.writes[1]!.operation_key);
   expect(state.writes[0]!.amount_minor).toBe(state.writes[1]!.amount_minor);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+});
+
+async function fillCorrection(page: Page) {
+  await page.getByRole("button", { name: "Düzelt", exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await expect(panel).toHaveAccessibleName("Tahsilatı düzelt");
+  await expect(panel.getByLabel("Düzeltme farkı (alt birim)", { exact: true })).toBeEnabled();
+  await panel.getByLabel("Düzeltme farkı (alt birim)", { exact: true }).fill("10000");
+  await panel.getByLabel("İşlem tarihi ve saati", { exact: true }).fill("2026-11-15T15:00");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik tahsilat farkı");
+  return panel;
+}
+test("native correction previews a directed difference and rereads the linked child without rewriting the root", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  const state = await setup(page, { withCollection: true });
+  const panel = await fillCorrection(page);
+  await expect(panel.getByRole("radio", { name: "Nakit", exact: true })).toBeDisabled();
+  expect((await scanAccessibility(page, "correction-editor")).violations).toEqual([]);
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
+  ).toBeDisabled();
+  expect(state.corrections).toHaveLength(0);
+  expect(state.previews[0]).toMatchObject({
+    cash_movement_id: cashId,
+    correction: {
+      amount_minor: "10000",
+      direction: "decrease",
+      currency: "TRY",
+      occurred_at: "2026-11-15T12:00:00Z",
+    },
+    reason: "Sentetik tahsilat farkı",
+  });
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  expect((await scanAccessibility(page, "correction-review")).violations).toEqual([]);
+  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await expect(
+    panel.getByText("Bağlı düzeltme ve güncel finans doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  expect(state.writes).toHaveLength(0);
+  expect(state.corrections).toHaveLength(1);
+  await expect(
+    page
+      .getByRole("grid", { name: "Hareketler", exact: true })
+      .getByText("₺400,00", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("grid", { name: "Hareketler", exact: true })
+      .getByText("₺100,00", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: /Açık borçlar/ }).click();
+  await expect(
+    page
+      .getByRole("grid", { name: "Açık borçlar", exact: true })
+      .getByText("₺700,00", { exact: true }),
+  ).toBeVisible();
+});
+test("blocked correction has no apply action", async ({ page }) => {
+  const state = await setup(page, { withCollection: true, blocked: true });
+  const panel = await fillCorrection(page);
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByText("Bu düzeltme uygulanamıyor. Koşulları kontrol edip yeni önizleme al.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await expect(
+    panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
+  ).toBeDisabled();
+  expect(state.corrections).toHaveLength(0);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+});
+test("unknown correction keeps the reviewed capability/key after a failed receipt read", async ({
+  page,
+}) => {
+  const state = await setup(page, { withCollection: true, correctionUnknown: true });
+  const panel = await fillCorrection(page);
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await expect(
+    panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
+  ).toBeEnabled();
+  await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(
+    panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
+  ).toBeEnabled();
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeVisible();
+  await panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+  await expect(
+    panel.getByText("Bağlı düzeltme ve güncel finans doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  expect(state.corrections).toHaveLength(2);
+  expect(state.corrections[0]!.operation_key).toBe(state.corrections[1]!.operation_key);
+  expect(state.corrections[0]!.preview).toEqual(state.corrections[1]!.preview);
+  expect(state.previews).toHaveLength(1);
+  expect(state.writes).toHaveLength(0);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+});
+
+test("a stale correction apply cannot be repeated until a fresh preview and approval", async ({
+  page,
+}) => {
+  const state = await setup(page, { withCollection: true, stale: true });
+  const panel = await fillCorrection(page);
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await expect(
+    panel.getByText("Önizleme güncel değil veya süresi doldu. Geri dönüp yeni önizleme al.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
+  ).toBeDisabled();
+  expect(state.corrections).toHaveLength(1);
+  await panel.getByRole("button", { name: "Geri", exact: true }).click();
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
+  ).not.toBeChecked();
+  await expect(
+    panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
+  ).toBeDisabled();
+  expect(state.previews).toHaveLength(2);
+  expect(state.corrections).toHaveLength(1);
+  expect(state.writes).toHaveLength(0);
   await panel.getByRole("button", { name: "Kapat", exact: true }).click();
 });

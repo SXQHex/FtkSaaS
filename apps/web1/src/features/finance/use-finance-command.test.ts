@@ -8,11 +8,11 @@ const { write, receipt, result } = vi.hoisted(() => ({
   result: vi.fn(),
 }));
 vi.mock("@tanstack/react-router", () => ({ useBlocker: vi.fn() }));
-vi.mock("./finance", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("./finance")>()),
-  writeCollection: write,
-  readCollectionReceipt: receipt,
-  readCollectionResult: result,
+vi.mock("./finance-command", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./finance-command")>()),
+  writeFinance: write,
+  readFinanceReceipt: receipt,
+  readFinanceResult: result,
 }));
 const value: CollectionIntent = {
   scope: { accountId: "fixture-account", orgId: "fixture-org", centerId: "fixture-center" },
@@ -30,7 +30,7 @@ const value: CollectionIntent = {
     payment: { method: "cash" },
   },
 };
-import { useCollectionCommand } from "./use-collection-command";
+import { useFinanceCommand } from "./use-finance-command";
 beforeEach(() => {
   vi.resetAllMocks();
   result.mockResolvedValue({ version: 1 });
@@ -45,7 +45,7 @@ it("does not treat a failed receipt read as rejection of an unknown write or dis
   );
   const refresh = vi.fn(async () => {});
   const hook = renderHook(() =>
-    useCollectionCommand({ onAccessLost: () => false, onRefresh: refresh }),
+    useFinanceCommand({ onAccessLost: () => false, onRefresh: refresh }),
   );
   await act(async () => {
     await hook.result.current.start(value);
@@ -76,7 +76,7 @@ it("rereads an acknowledged result without executing its writer again", async ()
   result.mockRejectedValueOnce(new BackendError()).mockResolvedValue({ version: 1 });
   const refresh = vi.fn(async () => {});
   const hook = renderHook(() =>
-    useCollectionCommand({ onAccessLost: () => false, onRefresh: refresh }),
+    useFinanceCommand({ onAccessLost: () => false, onRefresh: refresh }),
   );
   await act(async () => {
     await hook.result.current.start(value);

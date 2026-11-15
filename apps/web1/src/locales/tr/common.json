@@ -1904,7 +1904,9 @@
       "personId": "Bir kişi seç.",
       "method": "Tahsilat yöntemini seç.",
       "reference": "Kart/POS veya havale için işlem referansını gir.",
-      "occurredAt": "Merkez saat diliminde geçerli ve tek anlamlı tarih/saat seç."
+      "occurredAt": "Merkez saat diliminde geçerli ve tek anlamlı tarih/saat seç.",
+      "reason": "Düzeltme gerekçesini gir.",
+      "direction": "Artış veya azalış yönünü seç."
     },
     "count_one": "Bu sayfada {{count}} kayıt",
     "count_other": "Bu sayfada {{count}} kayıt",
@@ -1915,6 +1917,21 @@
       "credit-refund": "Nakit iade",
       "offset": "Borca mahsup",
       "adjust": "Borcu düzelt"
-    }
+    },
+    "originalCollection": "İlk tahsilat",
+    "linkedCorrectionHint": "Düzeltme ilk tahsilata bağlı yeni hareket oluşturur. Eski kayıt ve ödeme yöntemi korunur; güncel borç ve alacak işlemden sonra yeniden okunur.",
+    "previewError": "Düzeltme etkisi alınamadı. Güncel kaydı kontrol edip tekrar dene.",
+    "previewStale": "Önizleme güncel değil veya süresi doldu. Geri dönüp yeni önizleme al.",
+    "previewBlocked": "Bu düzeltme uygulanamıyor. Koşulları kontrol edip yeni önizleme al.",
+    "correctionWriting": "Düzeltme kaydediliyor…",
+    "correctionSaved": "Bağlı düzeltme ve güncel finans doğrulandı.",
+    "correctionUnread": "Düzeltme alındı; güncel finans henüz okunamadı.",
+    "correctionRejected": "Düzeltme uygulanamadı. Güncel kaydı kontrol et.",
+    "reverseAllocation": "Ödeme dağıtımını geri al",
+    "allocateCorrection": "Ödemeyi borca dağıt",
+    "creditInsufficient": "Üye alacağı bu düzeltme için yetersiz.",
+    "currencyMismatch": "İşlem ve kaynak para birimleri uyuşmuyor.",
+    "planRestricted": "Plan veya abonelik bu işleme izin vermiyor.",
+    "conditionsRejected": "Önizleme koşulları sağlanmıyor."
   }
 }
