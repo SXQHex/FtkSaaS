@@ -732,6 +732,8 @@ export default interface Resources {
         "unfreeze": "Dondurmayı bitir"
       },
       "unknown": "—",
+      "unknownScopeCenter": "Belirli merkez (adı alınamadı)",
+      "unknownScopeDiscipline": "Belirli disiplin (adı alınamadı)",
       "unverified": "Doğrulanmadı",
       "upcoming": "Yaklaşan rezervasyon",
       "verified": "Doğrulandı"

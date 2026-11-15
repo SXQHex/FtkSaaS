@@ -24,6 +24,7 @@ async function setup(
     stale?: boolean;
     discounted?: boolean;
     rejectDiscount?: boolean;
+    scoped?: boolean;
   } = {},
 ) {
   await mockStudio(page);
@@ -44,14 +45,23 @@ async function setup(
       freeze: { enabled: false, extends_validity: false },
       refund: { method: options.timed ? "time_ratio" : "credit_ratio" },
       quota: options.timed ? { period: "week", limit: 2 } : null,
-      scopes: [
-        {
-          scope_kind: "center_all_disciplines",
-          discipline_id: null,
-          center_id: I.center,
-          usage_targets: ["lesson"],
-        },
-      ],
+      scopes: options.scoped
+        ? [
+            {
+              scope_kind: "center_discipline",
+              discipline_id: I.discipline,
+              center_id: I.center,
+              usage_targets: ["lesson"],
+            },
+          ]
+        : [
+            {
+              scope_kind: "center_all_disciplines",
+              discipline_id: null,
+              center_id: I.center,
+              usage_targets: ["lesson"],
+            },
+          ],
     },
   };
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
@@ -321,9 +331,19 @@ test("discounted timed sale reviews native debt, resets approval on edit and dis
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
-  const { panel, previews, writes } = await review(page, { timed: true, discounted: true });
+  const { panel, previews, writes } = await review(page, {
+    timed: true,
+    discounted: true,
+    scoped: true,
+  });
   await expect(panel.getByText("₺1.000,00", { exact: true })).toBeVisible();
   await expect(panel.getByText("₺750,00", { exact: true })).toBeVisible();
+  await expect(
+    panel.getByText(
+      "Esnek; 2 · Haftalık kullanım sınırı; Fixture Center · Tango · Grup ve özel dersler",
+      { exact: true },
+    ),
+  ).toBeVisible();
   await expect(panel.getByText("2 · Haftalık", { exact: true })).toBeVisible();
   await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
   await expect(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();

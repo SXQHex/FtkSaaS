@@ -4,6 +4,11 @@ import { z } from "zod";
 import { MemberActionSheet, type MemberEffect } from "./member-action-sheet";
 import { emptyMemberDraft, type MemberDraft } from "./member-draft";
 import { previewSale, saleIntent, type SaleReview, type SaleResult } from "./sale";
+import {
+  saleProductDetail,
+  saleProductConditions,
+  type SaleProductNames,
+} from "./sale-product-details";
 import { readProfileCatalog } from "./profile-read";
 import { useSaleCommand } from "./use-sale-command";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -18,6 +23,7 @@ export function SaleEditor({
   personLabel,
   timezone,
   products,
+  productNames,
   sourceAvailable,
   onClose,
   onRefresh,
@@ -30,6 +36,7 @@ export function SaleEditor({
   personLabel: string;
   timezone: string;
   products: ProductView[];
+  productNames: SaleProductNames;
   sourceAvailable: boolean;
   onClose: () => void;
   onRefresh: (result: SaleResult) => Promise<void>;
@@ -119,6 +126,11 @@ export function SaleEditor({
           value: review.product.terms.name,
         },
         {
+          id: "conditions",
+          label: t(($) => $.products.scopes),
+          value: saleProductConditions(review.product, productNames, t),
+        },
+        {
           id: "dates",
           label: t(($) => $.memberProfile.saleDates),
           value: `${review.preview.sale.start_date} – ${review.preview.sale.end_date}`,
@@ -203,7 +215,7 @@ export function SaleEditor({
       products={products.map((row) => ({
         id: row.version_id,
         name: row.terms.name,
-        detail: formatMinorAmount(row.terms.price_minor, row.terms.currency),
+        detail: saleProductDetail(row, productNames, t),
       }))}
       disciplines={[]}
       reservations={[]}

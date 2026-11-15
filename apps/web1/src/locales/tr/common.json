@@ -2137,6 +2137,8 @@
     "netMinor": "Satış bedeli (alt birim, isteğe bağlı)",
     "netMinorHint": "Boş bırakırsan paketin liste fiyatı kullanılır. Farklı bedeli para biriminin alt birimiyle gir; örneğin TRY için 100000 = 1.000,00 ₺. Kaydedilecek borcu sonraki adımda incele.",
     "catalogQuota": "{{limit}} · {{period}} kullanım sınırı",
-    "saleListPrice": "Paketin liste fiyatı"
+    "saleListPrice": "Paketin liste fiyatı",
+    "unknownScopeCenter": "Belirli merkez (adı alınamadı)",
+    "unknownScopeDiscipline": "Belirli disiplin (adı alınamadı)"
   }
 }

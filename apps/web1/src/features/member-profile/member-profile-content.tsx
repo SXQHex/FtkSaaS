@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { MemberProfileView, type ProfileTab } from "./member-profile-view";
 import { SaleEditor } from "./sale-editor";
-import { readProfileRights, readProfileCatalog } from "./profile-read";
+import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
 import { readPerson } from "../people/people";
 import { readWorkspace } from "../workspace/workspace";
@@ -70,6 +70,12 @@ export function MemberProfileContent({
     enabled: Boolean(center && person.data),
     retry: false,
   });
+  const disciplines = useQuery({
+    queryKey: ["profile-disciplines", scope.accountId, scope.orgId, scope.centerId],
+    queryFn: () => readProfileDisciplines(scope),
+    enabled: Boolean(center && person.data),
+    retry: false,
+  });
   const financeKey = (code: string, cursor?: string) => [
     "finance",
     scope.accountId,
@@ -106,7 +112,7 @@ export function MemberProfileContent({
   const queryAccessLost =
     authLost(person.error) ||
     (person.error instanceof BackendError && person.error.code === "FORBIDDEN") ||
-    [workspace.error, rights.error, catalog.error, finance.error].some(authLost);
+    [workspace.error, rights.error, catalog.error, disciplines.error, finance.error].some(authLost);
   const invalid = commandInvalid || queryAccessLost;
   useEffect(() => {
     if (queryAccessLost) void router.invalidate();
@@ -135,6 +141,7 @@ export function MemberProfileContent({
         person.isError ||
         rights.isError ||
         catalog.isError ||
+        disciplines.isError ||
         finance.isError) && (
         <Alert variant="destructive">
           <AlertDescription>
@@ -150,6 +157,7 @@ export function MemberProfileContent({
                     person.refetch(),
                     rights.refetch(),
                     catalog.refetch(),
+                    disciplines.refetch(),
                     ...(currency ? [finance.refetch()] : []),
                   ]);
                 }}
@@ -404,6 +412,10 @@ export function MemberProfileContent({
           personLabel={p?.display_name ?? t(($) => $.memberProfile.title)}
           timezone={center.timezone}
           products={catalog.isError ? [] : (catalog.data ?? [])}
+          productNames={{
+            centers: workspace.isError ? [] : (workspace.data?.centers ?? []),
+            disciplines: disciplines.isError ? [] : (disciplines.data ?? []),
+          }}
           sourceAvailable={sourceAvailable && !catalog.isError && !rights.isError}
           onClose={() => setSale(false)}
           onLockChange={changeLock}

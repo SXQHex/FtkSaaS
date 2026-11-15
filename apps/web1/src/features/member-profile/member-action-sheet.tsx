@@ -174,6 +174,7 @@ export function MemberActionSheet({
                           id={`member-product-${row.id}`}
                           value={row.id}
                           aria-labelledby={`member-product-label-${row.id}`}
+                          aria-describedby={`member-product-detail-${row.id}`}
                         />
                         <div className="min-w-0">
                           <FieldLabel
@@ -182,7 +183,9 @@ export function MemberActionSheet({
                           >
                             {row.name}
                           </FieldLabel>
-                          <FieldDescription>{row.detail}</FieldDescription>
+                          <FieldDescription id={`member-product-detail-${row.id}`}>
+                            {row.detail}
+                          </FieldDescription>
                         </div>
                       </Field>
                     ))}
@@ -340,7 +343,9 @@ export function MemberActionSheet({
                         <FieldLabel htmlFor={`member-reservation-${row.id}`}>
                           {row.label}
                         </FieldLabel>
-                        <FieldDescription>{row.detail}</FieldDescription>
+                        <FieldDescription id={`member-product-detail-${row.id}`}>
+                          {row.detail}
+                        </FieldDescription>
                         <NativeSelect
                           id={`member-reservation-${row.id}`}
                           value={draft.reservations[row.id] ?? ""}

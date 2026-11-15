@@ -1,7 +1,11 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import type { EntitlementView, ProductView } from "../../lib/api-contracts/generated";
+import type {
+  EntitlementView,
+  ProductView,
+  DisciplineView,
+} from "../../lib/api-contracts/generated";
 import { getTemporal } from "../../lib/temporal";
 import { readProductsPage } from "../products/products";
 
@@ -55,6 +59,33 @@ export async function readProfileCatalog(scope: ClientScope): Promise<ProductVie
     }
     cursor = page.next_cursor ?? undefined;
     if (cursor && cursors.has(cursor)) throw new Error("PROFILE_PRODUCT_SOURCE_UNAVAILABLE");
+    if (cursor) cursors.add(cursor);
+  } while (cursor);
+  return rows;
+}
+
+export async function readProfileDisciplines(scope: ClientScope): Promise<DisciplineView[]> {
+  const backend = await scopedBackend(scope),
+    rows: DisciplineView[] = [],
+    ids = new Set<string>(),
+    cursors = new Set<string>();
+  let cursor: string | undefined;
+  do {
+    const page = await backend.call("disciplines_list_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      page: { limit: 50, ...(cursor ? { cursor } : {}) },
+    });
+    for (const row of page.items) {
+      z.uuid().parse(row.id);
+      if (ids.has(row.id)) throw new Error("PROFILE_DISCIPLINE_SOURCE_UNAVAILABLE");
+      ids.add(row.id);
+      rows.push(row);
+    }
+    cursor = page.next_cursor ?? undefined;
+    if (cursor && cursors.has(cursor)) throw new Error("PROFILE_DISCIPLINE_SOURCE_UNAVAILABLE");
     if (cursor) cursors.add(cursor);
   } while (cursor);
   return rows;

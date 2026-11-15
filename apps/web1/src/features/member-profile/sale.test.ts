@@ -3,7 +3,7 @@ import type { ProductView, SalePreview, EntitlementView } from "../../lib/api-co
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: vi.fn(async () => ({ call })) }));
 import { previewSale, saleIntent, writeSale, readSaleReceipt, readSaleResult } from "./sale";
-import { readProfileRights, readProfileCatalog } from "./profile-read";
+import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { emptyMemberDraft } from "./member-draft";
 const scope = {
     accountId: "019a7b00-0000-7000-8000-000000000002",
@@ -228,4 +228,24 @@ it("rejects a native projection that silently ignores the explicitly requested n
   await expect(
     previewSale(scope, personId, "Europe/Istanbul", product, { ...draft(), netMinor: "75000" }),
   ).rejects.toThrow("PROFILE_SALE_PREVIEW_UNAVAILABLE");
+});
+
+it("reads native discipline name cursor pages and rejects a repeated cursor rather than looping", async () => {
+  const a = { id: saleId, name: "Sentetik A", state: "active", version: 1 },
+    b = { ...a, id: previewId, name: "Sentetik B" };
+  call
+    .mockResolvedValueOnce({ items: [a], next_cursor: "next" })
+    .mockResolvedValueOnce({ items: [b], next_cursor: null });
+  expect(await readProfileDisciplines(scope)).toEqual([a, b]);
+  expect(call.mock.calls[1]![1]).toMatchObject({
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    page: { cursor: "next" },
+  });
+  call
+    .mockResolvedValueOnce({ items: [a], next_cursor: "repeat" })
+    .mockResolvedValueOnce({ items: [b], next_cursor: "repeat" });
+  await expect(readProfileDisciplines(scope)).rejects.toThrow(
+    "PROFILE_DISCIPLINE_SOURCE_UNAVAILABLE",
+  );
 });
