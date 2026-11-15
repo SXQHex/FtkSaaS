@@ -830,6 +830,271 @@ export default interface Resources {
       "unknownDevice": "Bilinmeyen cihaz",
       "updated": "Oturum bilgileri yenilendi."
     },
+    "settings": {
+      "accentColor": "Vurgu rengi",
+      "acceptReview": "Kapsamı ve güncel etkileri okudum, bu değişikliği onaylıyorum.",
+      "addDiscipline": "Disiplin ekle",
+      "applyReview": "Onaylanan değişiklikleri uygula",
+      "brandExampleAction": "Rezervasyon yap",
+      "brandExampleDescription": "Üye sayfası ve e-posta başlığı böyle görünür.",
+      "brandPreview": "Marka önizlemesi",
+      "cancelSubscription": "Aboneliği iptal et",
+      "cards": {
+        "ay-genel": {
+          "description": "Üyelere gönderilen e-postalarda ve davetlerde görünür.",
+          "title": "Stüdyo bilgileri"
+        },
+        "ay-hat": {
+          "description": "Üyelere giden otomatik hatırlatmalar. Bu bölüm tek çubukla kaydedilir.",
+          "title": "Üye hatırlatmaları"
+        },
+        "ay-izin": {
+          "description": "Merkez yöneticisi tüm merkez işlemlerini yapar. Personel izinlerini buradan ayarla. Ekip ve plan yalnız Sahip'tedir.",
+          "title": "İzin matrisi"
+        },
+        "ay-kural": {
+          "description": "Yeni kurallar yalnızca bundan sonraki rezervasyonlara uygulanır.",
+          "title": "Rezervasyon kuralları"
+        },
+        "ay-marka": {
+          "description": "Üye sayfası, herkese açık sayfa ve e-postalarda görünür. Yönetim arayüzünün rengi değişmez.",
+          "title": "Marka"
+        },
+        "ay-salon": {
+          "description": "Oda sınırı, seans kontenjanının aşamayacağı üst değerdir.",
+          "title": "Salonlar"
+        },
+        "ay-yayin": {
+          "description": "Giriş yapmadan görülen ders programı, etkinlikler ve başvuru formu.",
+          "title": "Herkese açık sayfa"
+        },
+        "bildirim-0": {
+          "description": "Ayarlar anında uygulanır, ayrıca kaydetmen gerekmez.",
+          "title": "E-posta bildirimleri"
+        },
+        "ekip-0": {
+          "description": "Rol ve izinler kişiye bağlıdır. Eğitmenler Stüdyo sayfasında yönetilir.",
+          "title": "Ekip üyeleri"
+        },
+        "gecmis-0": {
+          "description": "Ayarlarda kimin neyi ne zaman değiştirdiği.",
+          "title": "Değişiklik geçmişi"
+        },
+        "plan-0": {
+          "description": "Stüdyo planı, aylık faturalanır.",
+          "title": "Plan ve kullanım"
+        },
+        "plan-1": {
+          "description": "Ödeme yöntemi ve geçmiş faturalar.",
+          "title": "Fatura ve ödeme"
+        },
+        "plan-2": {
+          "description": "Dönem sonuna kadar kullanmaya devam edersin, verilerin silinmez.",
+          "title": "Aboneliği iptal et"
+        },
+        "politika-0": {
+          "description": "Üyelerin tabi olduğu kurallar. Her değişiklik yeni sürüm olarak yayımlanır ve yalnız sonraki rezervasyon ve satışlara uygulanır.",
+          "title": "Politikalar"
+        },
+        "sablon-0": {
+          "description": "Otomasyon ve hatırlatmalarda kullanılan metinler. Yalnız hatırlatma ve işlemsel şablonlar vardır, kampanya postası yoktur.",
+          "title": "E-posta şablonları"
+        }
+      },
+      "changePlan": "Planı değiştir",
+      "channels": "Kanallar",
+      "colorHint": "Organizasyonun marka renkleri. Yönetim arayüzünün sistem renkleri değişmez.",
+      "columns": {
+        "action": "Eylem",
+        "active": "Açık",
+        "automation": "Kullanan otomasyon",
+        "capacity": "Oda sınırı",
+        "centerState": "Bu merkez",
+        "change": "Değişiklik",
+        "futureSessions": "Gelecek seanslar",
+        "invoice": "Fatura",
+        "kind": "Tür",
+        "name": "Ad",
+        "organizationState": "Organizasyon",
+        "permission": "İzin",
+        "person": "Kişi",
+        "policy": "Politika",
+        "roles": "Roller",
+        "room": "Salon",
+        "section": "Bölüm",
+        "state": "Durum",
+        "summary": "Özet",
+        "template": "Şablon",
+        "total": "Tutar",
+        "version": "Yürürlükteki sürüm",
+        "when": "Zaman"
+      },
+      "copyLink": "Bağlantıyı kopyala",
+      "description": "Stüdyonun bilgileri, rezervasyon kuralları, bildirimleri ve ekibi.",
+      "dirty": "Kaydedilmemiş değişiklikler var",
+      "discard": "Vazgeç",
+      "disciplineDescription": "Organizasyon disiplinleri ve bu merkezdeki etkinlikleri. Yeni ders ve program seçimlerine kaynak olur.",
+      "disciplineEditor": {
+        "allowLocal": "Merkez yerel açıklama kullanabilir",
+        "allowLocalHint": "İzin kapatıldığında saklanmış yerel açıklamalar korunur.",
+        "centerActive": "Bu merkezde etkin",
+        "clearHint": "Kapalıyken açıklama kaldırılır. Boş metin ayrı bir seçimdir.",
+        "color": "Renk",
+        "description": "Organizasyon tanımını ve bu merkezdeki kullanımını ayrı ayrı yönet.",
+        "descriptionField": "Açıklama",
+        "icon": "Simge",
+        "inheritHint": "Kapalıyken organizasyon açıklaması kullanılır. Açık ve boş açıklama, bilinçli yerel boş metindir.",
+        "localDescription": "Yerel açıklama kullan",
+        "name": "Disiplin adı",
+        "newRecord": "Yeni kayıt",
+        "order": "Görüntüleme sırası",
+        "organizationActive": "Organizasyonda etkin",
+        "organizationName": "Ad organizasyondan gelir; merkez bu adı değiştiremez.",
+        "presentation": "Sunum bilgileri",
+        "presentationHint": "Üye ve herkese açık sayfalarda kullanılacak sunum.",
+        "publicHint": "Organizasyon, merkez ve yayın kapıları birlikte uygulanır.",
+        "publicVisible": "Herkese açık sunuma dahil et",
+        "stateHint": "Pasifleştirme öncesinde güncel açık işler ve korunacak referanslar incelenir.",
+        "title": "Disiplin",
+        "useDescription": "Açıklama tanımla",
+        "version": "Sürüm {{version}}"
+      },
+      "disciplines": "Disiplinler",
+      "edit": "Düzenle",
+      "empty": "Bu bölümde kayıt yok.",
+      "fields": {
+        "ay-acilis": "Rezervasyon açılışı",
+        "ay-ad": "Stüdyo adı",
+        "ay-adres": "Adres",
+        "ay-bekleme": "Bekleme listesi",
+        "ay-c-app": "Uygulama içi",
+        "ay-c-mail": "E-posta",
+        "ay-c-sms": "SMS",
+        "ay-c-wa": "WhatsApp",
+        "ay-gec": "Geç iptalde hakkı düşür",
+        "ay-gelmedi": "Gelmeyen üyenin hakkı düşsün",
+        "ay-h-ders": "Yaklaşan ders",
+        "ay-h-ders-n": "Yaklaşan ders zamanı",
+        "ay-h-etkinlik": "Etkinlik",
+        "ay-h-etkinlik-n": "Etkinlik zamanı",
+        "ay-h-paket": "Paket bitişi",
+        "ay-h-paket-n": "Paket bitişi zamanı",
+        "ay-h-vade": "Vade ve açık borç",
+        "ay-h-vade-n": "Vade ve açık borç zamanı",
+        "ay-iptal": "Ücretsiz iptal süresi",
+        "ay-n-0": "Yeni rezervasyon ve iptaller",
+        "ay-n-1": "Dolan seanslar",
+        "ay-n-2": "Açık borç uyarıları",
+        "ay-n-3": "Üye mesajları",
+        "ay-n-4": "Günlük özet",
+        "ay-posta": "İletişim e-postası",
+        "ay-py-cons": "İletişim onayı cümlesi",
+        "ay-py-ders": "Ders programını göster",
+        "ay-py-egt": "Eğitmen adlarını göster",
+        "ay-py-etk": "Etkinlikleri göster",
+        "ay-py-form": "Başvuru formunu aç",
+        "ay-py-on": "Sayfayı yayınla",
+        "ay-py-slug": "Sayfa adresi",
+        "ay-py-yer": "Doluluk gösterimi",
+        "ay-q-a": "Başlangıç",
+        "ay-q-b": "Bitiş",
+        "ay-q-on": "Sessiz saatleri uygula",
+        "ay-q-tz": "Saat dilimi",
+        "ay-sube": "Şube",
+        "ay-teklif": "Yer teklifi süresi",
+        "ay-tel": "Telefon",
+        "ay-tz": "Saat dilimi",
+        "ay-yoklama": "Yoklamayı kapat",
+        "hs-f": "Bölüm"
+      },
+      "inheritedHint": "Bu değer üst kapsamdan devralındı.",
+      "invite": "Kişi davet et",
+      "logoHint": "Logo, üye sayfası ve e-postalarda görünür.",
+      "nextInvoice": "Sonraki fatura",
+      "off": "Kapalı",
+      "on": "Açık",
+      "paymentEditor": {
+        "amount": "Ödenen tutar",
+        "amountHint": "Gönderdiğin gerçek tutarı yaz.",
+        "currency": "Para birimi",
+        "currencyHint": "Güncel abonelik veya seçilen teklifin para birimi.",
+        "description": "Yaptığın manuel ödemeyi bildir. Bildirim, ödeme doğrulaması veya plan değişikliği değildir.",
+        "reference": "Ödeme referansı",
+        "review": "Ödeme bildirimini incele",
+        "time": "Ödeme zamanı (UTC)",
+        "timeHint": "Tarih ve saati UTC olarak gir. Yerel saatle karıştırma.",
+        "title": "Ödeme bildirimi"
+      },
+      "permissionUnavailable": "Güncel yetki durumu okunamadı.",
+      "permissions": "İzin matrisi",
+      "planEditor": {
+        "choose": "Plan seç",
+        "effects": "Plan değişikliğinin etkisi",
+        "review": "Teklifi incele",
+        "title": "Planı değiştir"
+      },
+      "policyEditor": {
+        "choose": "Bir değer seç",
+        "effects": "Değişikliklerin etkisi",
+        "history": "Sürüm geçmişi",
+        "review": "Yayın önizlemesine geç"
+      },
+      "preview": "Sayfayı önizle",
+      "primaryColor": "Ana renk",
+      "publicationHint": "Önizleme kayıtlı ayarları gösterir. Kaydedilmemiş değişiklikler ziyaretçilere yansımaz.",
+      "quietHours": "Sessiz saatler",
+      "reminderPreview": "Gönderim önizlemesi",
+      "removeLogo": "Kaldır",
+      "reportPayment": "Ödeme bildir",
+      "reset": "Varsayılana sıfırla",
+      "review": "İncele",
+      "reviewEmpty": "Önizlemede listelenen değişiklik yok.",
+      "roomHint": "Oda sınırı, seans kontenjanının aşamayacağı üst değerdir.",
+      "save": "Değişiklikleri kaydet",
+      "saved": "Tüm değişiklikler kaydedildi",
+      "secondaryColor": "İkincil renk",
+      "sectionsLabel": "Ayar bölümleri",
+      "subscriptionActive": "Abonelik etkin.",
+      "systemNotifications": "Zorunlu işlem bildirimlerinin teslim kuralları kaynak sözleşmesine bağlıdır.",
+      "tabs": {
+        "bildirim": "Bildirimler",
+        "ekip": "Ekip",
+        "gecmis": "Geçmiş",
+        "genel": "Genel",
+        "kurallar": "Rezervasyon",
+        "plan": "Plan",
+        "politika": "Politikalar",
+        "sablon": "Şablonlar",
+        "salonlar": "Salonlar",
+        "yayin": "Yayın"
+      },
+      "teamEditor": {
+        "effects": "Erişim ve açık iş etkileri",
+        "email": "E-posta",
+        "name": "Ad soyad",
+        "review": "Değişiklikleri önizle",
+        "roles": "Roller",
+        "staffType": "Personel türü"
+      },
+      "teamHint": "Eğitmenler Stüdyo sayfasında yönetilir. Roller ve izinler ayrı işlemlerdir.",
+      "templateEditor": {
+        "body": "Metin",
+        "preview": "Önizleme",
+        "save": "Şablonu kaydet",
+        "subject": "Konu",
+        "variables": "Değişken ekle",
+        "variablesHint": "Bu şablon için izin verilen değişkenler."
+      },
+      "timezoneHint": "Ders saatleri bu saat diliminde gösterilir ve hesaplanır.",
+      "title": "Ayarlar",
+      "unavailable": "Bu bölümün verisi henüz okunamadı.",
+      "unknown": "Bilgi okunamadı",
+      "unlimited": "Sınırsız",
+      "unread": "Değer henüz okunmadı.",
+      "unsetHint": "Değer tanımlı değil.",
+      "upload": "Logo yükle",
+      "usage": "Plan ve kullanım"
+    },
     "studio": {
       "acceptInstructorRole": "Seçili kişiye bu merkezde eğitmen rolü vermeyi onaylıyorum.",
       "accountLinkFound": "Bağ bulundu",
