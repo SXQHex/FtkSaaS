@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
 import { BackendError } from "../../lib/backend";
-import { writeSale, readSaleReceipt, readSaleResult, type SaleIntent } from "./sale";
-import type { SaleResult } from "./sale";
+import type { Mutation, OperationStatusView } from "../../lib/api-contracts/generated";
 
-export function useSaleCommand({
+export function useMemberCommand<Intent, Result>({
+  write,
+  readReceipt,
+  readResult,
   onRefresh,
   onAccessLost,
 }: {
-  onRefresh: (result: SaleResult) => Promise<void>;
+  write: (intent: Intent) => Promise<Mutation>;
+  readReceipt: (intent: Intent) => Promise<OperationStatusView>;
+  readResult: (intent: Intent, id?: string) => Promise<Result>;
+  onRefresh: (result: Result) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
 }) {
   const [state, setState] = useState<
@@ -16,7 +21,7 @@ export function useSaleCommand({
   >("ready");
   const [busy, setBusy] = useState(false),
     [unavailable, setUnavailable] = useState(false);
-  const intent = useRef<SaleIntent | undefined>(undefined),
+  const intent = useRef<Intent | undefined>(undefined),
     acknowledged = useRef(false),
     primary = useRef<string | undefined>(undefined),
     executing = useRef(false),
@@ -47,7 +52,7 @@ export function useSaleCommand({
   }
   async function reread() {
     if (!intent.current || !acknowledged.current) return;
-    const result = await readSaleResult(intent.current, primary.current);
+    const result = await readResult(intent.current, primary.current);
     if (!mounted.current || terminal.current) return;
     await onRefresh(result);
     if (mounted.current && !terminal.current) setState("saved");
@@ -90,7 +95,7 @@ export function useSaleCommand({
     setState("writing");
     try {
       if (!acknowledged.current) {
-        const result = await writeSale(intent.current);
+        const result = await write(intent.current);
         primary.current = result.primary_id;
         acknowledged.current = true;
       }
@@ -104,20 +109,20 @@ export function useSaleCommand({
       if (mounted.current) setBusy(false);
     }
   }
-  async function start(next: SaleIntent) {
+  async function start(next: Intent) {
     if (!mounted.current || terminal.current || executing.current || intent.current) return;
     intent.current = structuredClone(next);
     acknowledged.current = false;
     primary.current = undefined;
     await execute();
   }
-  async function readReceipt() {
+  async function recoverReceipt() {
     if (terminal.current || executing.current || !intent.current) return;
     executing.current = true;
     setBusy(true);
     try {
       if (!acknowledged.current) {
-        const receipt = await readSaleReceipt(intent.current);
+        const receipt = await readReceipt(intent.current);
         if (receipt.status === "succeeded" || receipt.status === "result_expired") {
           acknowledged.current = true;
           primary.current = receipt.result_reference?.id;
@@ -150,5 +155,14 @@ export function useSaleCommand({
     acknowledged.current = false;
     setState("ready");
   }
-  return { state, busy, locked, start, retry: execute, readReceipt, reset, unavailable };
+  return {
+    state,
+    busy,
+    locked,
+    start,
+    retry: execute,
+    readReceipt: recoverReceipt,
+    reset,
+    unavailable,
+  };
 }

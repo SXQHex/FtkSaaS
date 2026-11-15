@@ -10,7 +10,12 @@ import {
   type NegativeLimitReview,
   type NegativeLimitResult,
 } from "./negative-limit";
-import { useNegativeLimitCommand } from "./use-negative-limit-command";
+import { useMemberCommand } from "./use-member-command";
+import {
+  writeNegativeLimit,
+  readNegativeLimitReceipt,
+  readNegativeLimitResult,
+} from "./negative-limit";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -51,7 +56,10 @@ export function NegativeLimitEditor({
     [error, setError] = useState<string>(),
     [errors, setErrors] = useState<Partial<Record<keyof MemberDraft, string>>>({});
   const mounted = useRef(true),
-    command = useNegativeLimitCommand({
+    command = useMemberCommand({
+      write: writeNegativeLimit,
+      readReceipt: readNegativeLimitReceipt,
+      readResult: readNegativeLimitResult,
       onRefresh,
       onAccessLost: (failure) =>
         !(failure instanceof BackendError && failure.code === "FORBIDDEN") && onAccessLost(failure),

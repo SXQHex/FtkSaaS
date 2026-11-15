@@ -10,7 +10,8 @@ import {
   type SaleProductNames,
 } from "./sale-product-details";
 import { readProfileCatalog } from "./profile-read";
-import { useSaleCommand } from "./use-sale-command";
+import { useMemberCommand } from "./use-member-command";
+import { writeSale, readSaleReceipt, readSaleResult } from "./sale";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { ProductView } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
@@ -59,7 +60,13 @@ export function SaleEditor({
       mounted.current = false;
     };
   }, []);
-  const command = useSaleCommand({ onAccessLost, onRefresh });
+  const command = useMemberCommand({
+    write: writeSale,
+    readReceipt: readSaleReceipt,
+    readResult: readSaleResult,
+    onAccessLost,
+    onRefresh,
+  });
   const locked = preparing || command.locked;
   useEffect(() => {
     onLockChange(locked);
