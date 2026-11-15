@@ -968,5 +968,82 @@
     "inviting": "Davet isteği gönderiliyor…",
     "jobUnread": "Davet işi oluşturuldu; güncel durum okunamadı. Daveti tekrar göndermeden yeniden oku.",
     "refresh": "Güncel durumu oku"
+  },
+  "access": {
+    "title": "Davetler ve hesaplar",
+    "description": "Yeni üye davetleri ve üyelerin giriş hesapları. Hesap, üyenin kendi e-postasıyla açılır.",
+    "unknown": "Henüz okunmadı",
+    "linkedMembers": "Hesabı bağlı üye",
+    "linkedDescription": "Kuruluşla bağlantısı var",
+    "pendingInvitations": "Bekleyen davet",
+    "pendingDescription": "Henüz kabul edilmedi",
+    "expiredInvitations": "Süresi dolan",
+    "expiredDescription": "Geçerlilik süresi sona erdi",
+    "unlinkedMembers": "Hesap bağlantısı olmayan",
+    "unlinkedDescription": "Bağlama daveti gerekir",
+    "sections": "Bölümler",
+    "invitations": "Davetler",
+    "accounts": "Hesap bağlantıları",
+    "invitationStatus": "Davet durumu",
+    "open": "Açık",
+    "closed": "Kapanan",
+    "invitedPerson": "Davet edilen",
+    "sent": "Gönderildi",
+    "validity": "Geçerlilik",
+    "actions": "İşlemler",
+    "contactUnavailable": "İletişim bilgisi görünmüyor",
+    "resentCount_one": "{{count}} kez yeniden gönderildi",
+    "resentCount_other": "{{count}} kez yeniden gönderildi",
+    "invitationStates": {
+      "pending": "Bekliyor",
+      "expired": "Süresi doldu",
+      "accepted": "Kabul etti",
+      "revoked": "İptal edildi",
+      "unknown": "Durum okunamadı"
+    },
+    "resend": "Yeniden gönder",
+    "resendInvitation": "Daveti yeniden gönder",
+    "copyLink": "Davet bağlantısını kopyala",
+    "copyUnavailable": "Davet bağlantısı yalnızca davet e-postasında bulunur.",
+    "cancelInvitation": "İptal et",
+    "invitationFooter": "Her davetin geçerliliği kendi satırında gösterilir.",
+    "accountStatus": "Hesap durumu",
+    "notLinked": "Bağlı değil",
+    "account": "Hesap",
+    "linkedAt": "Bağlandı",
+    "lastSignin": "Son giriş",
+    "notShared": "Paylaşılmıyor",
+    "accountStates": {
+      "linked": "Bağlı",
+      "pending": "Davet bekliyor",
+      "unlinked": "Bağlantı yok",
+      "unknown": "Durum okunamadı"
+    },
+    "unlink": "Bağlantıyı kaldır",
+    "sendLinkInvitation": "Bağlama daveti gönder",
+    "accountFooter": "Giriş hesabının e-postası ve telefonu hesap sahibi tarafından yönetilir. Burada kuruluşla hesap bağlantısı yönetilir.",
+    "pagination": "Davet ve hesap sayfaları",
+    "readError": "Davetler ve hesap bağlantıları okunamadı. Güncel bilgileri yeniden yükle.",
+    "loading": "Güncel bilgiler yükleniyor…",
+    "noInvitations": "Bu süzgece uygun davet yok.",
+    "reason": "Gerekçe",
+    "actionTitles": {
+      "cancel": "Daveti iptal et",
+      "unlink": "{{name}} hesabının bağlantısını kaldır",
+      "resend": "Daveti yeniden gönder",
+      "invite": "Bağlama daveti gönder"
+    },
+    "actionDescriptions": {
+      "cancel": "Bu davet bağlantısı iptal edilecek. Devam etmek istiyor musun?",
+      "unlink": "Seçili kişinin bu kuruluşla hesap bağlantısı kaldırılacak. Bu işlem giriş hesabını silmez. Gerekçeyi yazıp onayla.",
+      "resend": "Seçili kişiye yeni bir davet gönderimi başlatılacak. Sonuçta gösterilen posta durumunu kontrol et.",
+      "invite": "Seçili kişiye kuruluşla hesabını bağlaması için e-posta daveti gönderilecek. Öğrencilik ve roller ayrıca yönetilir."
+    },
+    "actionLabels": {
+      "cancel": "Daveti iptal et",
+      "unlink": "Bağlantıyı kaldır",
+      "resend": "Daveti gönder",
+      "invite": "Daveti gönder"
+    }
   }
 }
