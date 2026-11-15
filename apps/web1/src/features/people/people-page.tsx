@@ -224,6 +224,13 @@ function PeopleContent({
         }}
         selectedId={selectedId}
         onSelect={setSelectedId}
+        onProfile={(personId) => {
+          if (!locked)
+            void navigate({
+              to: "/o/$orgId/c/$centerId/people/$personId",
+              params: { orgId: scope.orgId, centerId: scope.centerId, personId },
+            });
+        }}
         activeSummary=""
         hasPrevious={index > 0}
         hasNext={Boolean(query.data?.next_cursor)}
