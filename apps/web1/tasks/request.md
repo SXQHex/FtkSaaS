@@ -1,16 +1,16 @@
 # Web1 · Backend talepleri
 
-15 Kasım 2026 · Frontend talep kaydı. Bu dosya açık backend ihtiyaçlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. Buradaki ihtiyaçlar backend tarafından onaylanmış veya uygulanmış sayılmaz. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+15 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. Buradaki ihtiyaçlar backend tarafından onaylanmış veya uygulanmış sayılmaz. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
-İncelenen main: `d66efa0a456363efb2dd43fb8a9eea61da8b7efe`. Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Son fetch’te yeni backend commit’i görülmedi. Sonradan gelen destek, güncel typed sözleşme ve gerçek ortam kanıtıyla yeniden değerlendirilir.
+İncelenen main: `f0b9449fac4d25047834ca12c28ded6e76482e88` (PR311 dala alındı). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Kullanıcı W1-BE-01–03 desteğinin tamamlandığını bildirdi; yeni typed sözleşme yerel snapshot’a alındı. Aynı main kaynağında [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43673450868), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43673450968) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43673486444) başarılı. Bunlar frontend ekranlarının entegrasyon veya gerçek kabul kanıtı değildir.
 
-| Kimlik   | Ekran / işlev | İhtiyaç                                                                       | Frontend tarafından bilinen durum                                             |
-| -------- | ------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| W1-BE-01 | E13 · P04     | Merkez öğrencilik durumuna göre cursor’lı kişi filtresi                       | Kullanıcı backend coder’a ileteceğini teyit etti; destek gelişi doğrulanmadı. |
-| W1-BE-02 | E13 · P04     | Görünür kişi sayfası için hak, para birimine göre borç ve en yakın ders özeti | Kullanıcı ek talebi ileteceğini teyit etti; destek gelişi doğrulanmadı.       |
-| W1-BE-03 | E15 · P04.3   | Merkez geneli davet/hesap bağlantısı keşfi, filtreler ve sayaçlar             | Kullanıcı ileteceğini teyit etti; destek gelişi doğrulanmadı.                 |
-| W1-BE-04 | E16 · P04.4   | Birleştirme gerekçesi, öneri/geçmiş keşfi ve kalıcı kopya-değil kararı        | Kullanıcı üzerinden soru gönderildi; değerlendirme/uygulama teyidi alınmadı.  |
-| W1-BE-05 | E12 · P03.3   | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                   | Backend desteği veya salt okunur kapsam kararı bekleniyor.                    |
+| Kimlik   | Ekran / işlev | İhtiyaç                                                                       | Frontend tarafından bilinen durum                                            |
+| -------- | ------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| W1-BE-01 | E13 · P04     | Merkez öğrencilik durumuna göre cursor’lı kişi filtresi                       | Backend talebi karşılandı (PR311); frontend entegrasyonu/kabulü açık.        |
+| W1-BE-02 | E13 · P04     | Görünür kişi sayfası için hak, para birimine göre borç ve en yakın ders özeti | Backend talebi karşılandı (PR311); frontend entegrasyonu/kabulü açık.        |
+| W1-BE-03 | E15 · P04.3   | Merkez geneli davet/hesap bağlantısı keşfi, filtreler ve sayaçlar             | Backend talebi karşılandı (PR311); frontend entegrasyonu/kabulü açık.        |
+| W1-BE-04 | E16 · P04.4   | Birleştirme gerekçesi, öneri/geçmiş keşfi ve kalıcı kopya-değil kararı        | Kullanıcı üzerinden soru gönderildi; değerlendirme/uygulama teyidi alınmadı. |
+| W1-BE-05 | E12 · P03.3   | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                   | Backend desteği veya salt okunur kapsam kararı bekleniyor.                   |
 
 ## Bütün talepler için ortak sınır
 
@@ -22,7 +22,9 @@
 
 ## W1-BE-01 · Merkez öğrencilik durumu filtresi
 
-**Mevcut kaynak:** `RequestPeopleList` yalnız query/relationship/page ve org/center kapsamı taşır; kişi satırındaki ilişkiler durum gösterir. Liste isteğinde merkez öğrenciliği için active/inactive filtresi yoktur. [Typed kaynak](../src/lib/api-contracts/generated.ts), [istemci okuyucu](../src/features/people/people.ts), [WF04](../../../docs/workflows.md#wf04).
+**Karşılandı:** `people_list_v1.student_status` açık merkezde active/inactive filtresi sağlar; cursor kapsamına dahildir. Öğrencilik bulunmaması pasif sayılmaz. WF04 ve generated tipler güncel; E13’e bağlama ve kabul açıktır.
+
+**Talep açılırken kaynak:** `RequestPeopleList` yalnız query/relationship/page ve org/center kapsamı taşır; kişi satırındaki ilişkiler durum gösterir. Liste isteğinde merkez öğrenciliği için active/inactive filtresi yoktur. [Typed kaynak](../src/lib/api-contracts/generated.ts), [istemci okuyucu](../src/features/people/people.ts), [WF04](../../../docs/workflows.md#wf04).
 
 **İhtiyaç:** Seçili merkezin öğrencilik durumunu filtreleyen typed liste girdisi. Durum filtresi cursor’ın kapsamına dahil olmalı ve aramayla birlikte çalışmalı. Öğrencilik ilişkisi olmayan kişi ile pasif öğrenci birbirine karıştırılmamalı; hangi durumların seçilebildiği backend sözleşmesinde açık olmalı. Mevcut kişi listesi ve diğer tüketiciler korunmalı.
 
@@ -32,7 +34,9 @@
 
 ## W1-BE-02 · Kişi sayfası özetleri
 
-**Mevcut kaynak:** `PersonSummary` hak, borç veya sıradaki dersi taşımıyor. `finance_get_v1` kişi+para birimi ister; `ReservationView` ders başlangıcını taşımaz. [Typed kaynak](../src/lib/api-contracts/generated.ts), [mevcut tablo tüketicisi](../src/features/people/people-page.tsx).
+**Karşılandı:** `include_member_summary:true` yalnız dönen kişi sayfasına ayrı rights/debt/next_lesson durumları ve as_of ekler. Available/restricted/not_enabled ayrıdır; kredi ve minor tutarlar ondalık string, borç para birimine göre ayrıdır. E13 gösterimi ve kabul açıktır.
+
+**Talep açılırken kaynak:** `PersonSummary` hak, borç veya sıradaki dersi taşımıyor. `finance_get_v1` kişi+para birimi ister; `ReservationView` ders başlangıcını taşımaz. [Typed kaynak](../src/lib/api-contracts/generated.ts), [mevcut tablo tüketicisi](../src/features/people/people-page.tsx).
 
 **İhtiyaç:** Görünür cursor sayfasındaki kişiler için mevcut hak/finans/rezervasyon yetkilerini ayrı ayrı koruyan typed özet. Hak türü ve kullanılabilirliği, borcun gerçek para birimi ve en yakın dersin gerçek başlangıcı/kapsamı anlaşılır olmalı. Yetkisiz veya okunamayan alan, gerçek sıfır/borç yok/gelecek ders yok sonucundan ayrılmalı. Süreli/sınırsız hak sayısal krediye çevrilmemeli; farklı para birimleri tek tutarda toplanmamalı. Kesin özet alanları ve uygun en yakın ders seçimi backend sözleşmesinden gelmeli.
 
@@ -42,7 +46,9 @@
 
 ## W1-BE-03 · Merkez geneli davet ve hesap bağlantısı keşfi
 
-**Mevcut kaynak:** `management_state_get_v1` için `account_access_revoke_v1` selector’ı önceden bilinen person_id veya invitation_id, `account_link_remove_v1` selector’ı person_id veya link_id ister. Kişi kapsamlı discovery seçili kaydın domain kimliği, state, version, actionable ve davette expires_at bilgisini sağlar; merkezi baştan keşfetmez. [WF04](../../../docs/workflows.md#wf04), [seçili kayıt adaptörü](../src/features/access/access.ts), [ekran](../src/features/access/access-view.tsx).
+**Karşılandı:** Mevcut management okuyucusunda `directory:center` selector’ı, arama/durum/cursor, access_detail ve access_summary desteği geldi. Gönderim oluşturma tarihiyle karıştırılmaz; resend entitlement değildir. Gerçek desteklenen durumlar WF04’ten alınacak, çizimdeki bağlı-değil kapsamı otomatik varsayılmayacak. E15 route/entegrasyon ve kabul açıktır.
+
+**Talep açılırken kaynak:** `management_state_get_v1` için `account_access_revoke_v1` selector’ı önceden bilinen person_id veya invitation_id, `account_link_remove_v1` selector’ı person_id veya link_id ister. Kişi kapsamlı discovery seçili kaydın domain kimliği, state, version, actionable ve davette expires_at bilgisini sağlar; merkezi baştan keşfetmez. [WF04](../../../docs/workflows.md#wf04), [seçili kayıt adaptörü](../src/features/access/access.ts), [ekran](../src/features/access/access-view.tsx).
 
 **İhtiyaç:** Çizimdeki iki merkez listesi için typed keşif: davetler ve kişi/hesap bağlantı durumu. Davet açık/kapanan/tüm; bağlantı bağlı/bağlı değil/tüm ve kişi araması, cursor kapsamına dahil olmalı. Sayaçlar yalnız mevcut sayfanın sayısı diye sunulmamalı; yetkili kapsamın hangi kümesini saydığı açık olmalı. Hesap bağlantısı bulunmayan görünür kişiler de ilgili listeye erişilebilir olmalı.
 
@@ -63,7 +69,7 @@ Gönderim tarihi, geçerlilik, yeniden gönderilebilirlik/varsa kalan hak ve gü
 - “Kopya değil” kararının kalıcı kaydı ve tekrar önerilmemesi hedefinin backend tarafından değerlendirilmesi; açık kullanıcı kararı, mevcut kişi/merkez yetkisi ve güvenli tekrar/yeniden okuma davranışı.
 - Karşılaştırma alanlarının, birleşim etkisinin ve gerekli merkez onaylarının güvenli projeksiyonu. Hak/borç gibi ortak özet ihtiyacı W1-BE-02 ile birlikte ele alınabilir; doğrulanmış veri yoksa sıfır veya yerel hesaplama kullanılmaz.
 
-Otomatik benzerlik/öneri algoritması ve kalıcı kopya-değil davranışı mevcut makine sözleşmesinde uygulanmış ürün kuralı sayılmıyor. Bu parçalar ürün kararı gerektiriyorsa backend sahibi açık değerlendirme/karşı öneri sunmalı; frontend benzer e-posta/telefon üzerinden otomatik birleşim yapmaz.
+Frontend önerisi: normalize edilmiş e-posta veya telefon birebir eşleşmesinden aday üretmek; ad benzerliğiyle öneri üretmemek ve elle çift seçimini korumak. Bu kapsam kullanıcıya önerildi; henüz açık kullanıcı onayı veya backend uygulaması sayılmaz. Öneri otomatik birleştirme değildir: kullanıcı karşılaştırır ve mevcut yetkili preview/onay/apply akışında açıkça karar verir. Normalizasyonun kesin kuralları, aday görünürlüğü ve kalıcı kopya-değil davranışı backend değerlendirmesinde netleşmeli; frontend kendi eşleştirme algoritmasını kurmaz.
 
 **Korunacak davranış:** Geçmiş kimlikleri ve merkez sahipliği bağlantılı korunur. Fiziksel silme, borçları istemcide toplama, çakışan rezervasyonu otomatik tekilleştirip hak iade etme varsayılmaz. Başlatanın apply token’ı ile diğer merkezin onay capability’si ayrıdır. Mevcut hesap/rezervasyon/kaynak blocker’ları, canlı yetki, scope hash ve preview süresi aşılmaz.
 
