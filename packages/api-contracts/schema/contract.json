@@ -3130,7 +3130,23 @@
               }
             },
             "linked_history": {
-              "const": true
+              "type": "boolean"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ReviewReason"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "decision": {
+              "enum": [
+                "merge",
+                "not_duplicate"
+              ]
             }
           },
           "required": [
@@ -3140,7 +3156,35 @@
             "required_approval_center_ids",
             "linked_history"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "decision": {
+                    "const": "not_duplicate"
+                  }
+                },
+                "required": [
+                  "decision"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "linked_history": {
+                    "const": false
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "linked_history": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
         },
         "lifecycle_impact": {
           "$ref": "#/$defs/LifecycleImpact"
@@ -3750,6 +3794,9 @@
         },
         "field_policy": {
           "$ref": "#/$defs/PersonNameFieldPolicy"
+        },
+        "member_summary": {
+          "$ref": "#/$defs/MemberPageSummary"
         }
       },
       "required": [
@@ -7658,6 +7705,15 @@
         },
         "rule": {
           "$ref": "#/$defs/AvailabilityRule"
+        },
+        "action": {
+          "enum": [
+            "save",
+            "retire"
+          ]
+        },
+        "reason": {
+          "$ref": "#/$defs/ReviewReason"
         }
       },
       "required": [
@@ -7665,11 +7721,57 @@
         "request_id",
         "org_id",
         "operation_key",
-        "resource",
-        "rule"
+        "resource"
       ],
       "additionalProperties": false,
-      "x-invariant": "Existing target needs expected_version; create rejects expected_version. No silent upsert."
+      "x-invariant": "Legacy save behavior preserved; explicit retire uses selected source, live manager/resource/feature guards, exact source/aggregate version and reason; no time fabrication or session mutation.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "retire"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "required": [
+              "rule_id",
+              "expected_version",
+              "reason",
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "rule_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "rule": false,
+              "expected_version": {
+                "$ref": "#/$defs/PositiveInt"
+              },
+              "reason": {
+                "$ref": "#/$defs/ReviewReason"
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "rule"
+            ],
+            "properties": {
+              "rule": {
+                "$ref": "#/$defs/AvailabilityRule"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_availability_save": {
       "type": "object",
@@ -7727,6 +7829,15 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "action": {
+          "enum": [
+            "save",
+            "cancel"
+          ]
+        },
+        "exception_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -7736,10 +7847,58 @@
         "operation_key",
         "expected_version",
         "resource",
-        "interval",
         "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "cancel"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "required": [
+              "exception_id",
+              "expected_version",
+              "reason",
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "exception_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "interval": false,
+              "reason": {
+                "$ref": "#/$defs/ReviewReason"
+              },
+              "expected_version": {
+                "$ref": "#/$defs/PositiveInt"
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "interval"
+            ],
+            "properties": {
+              "exception_id": false,
+              "interval": {
+                "$ref": "#/$defs/Interval"
+              }
+            }
+          }
+        }
+      ],
+      "x-invariant": "Legacy save behavior preserved; explicit cancel uses selected source, live manager/resource/feature guards, exact source/aggregate version and reason; no time fabrication or session mutation."
     },
     "Success_availability_exception_save": {
       "type": "object",
@@ -8761,6 +8920,9 @@
         },
         "person_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_member_summary": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -8769,7 +8931,31 @@
         "org_id",
         "person_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "include_member_summary": {
+                "const": true
+              }
+            },
+            "required": [
+              "include_member_summary"
+            ]
+          },
+          "then": {
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "center_id"
+            ]
+          }
+        }
+      ]
     },
     "Success_person_get": {
       "type": "object",
@@ -9069,6 +9255,15 @@
         },
         "target_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "reason": {
+          "$ref": "#/$defs/ReviewReason"
+        },
+        "decision": {
+          "enum": [
+            "merge",
+            "not_duplicate"
+          ]
         }
       },
       "required": [
@@ -9078,7 +9273,35 @@
         "source_id",
         "target_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "const": "not_duplicate"
+              }
+            },
+            "required": [
+              "decision"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id",
+              "reason"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "reason": {
+                "$ref": "#/$defs/ReviewReason"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_person_merge_preview": {
       "type": "object",
@@ -9189,6 +9412,9 @@
         },
         "preview": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "reason": {
+          "$ref": "#/$defs/ReviewReason"
         }
       },
       "required": [
@@ -18856,6 +19082,12 @@
               "type": "null"
             }
           ]
+        },
+        "state": {
+          "enum": [
+            "active",
+            "inactive"
+          ]
         }
       },
       "required": [
@@ -18868,7 +19100,8 @@
         "weekdays",
         "local_start",
         "local_end",
-        "valid_from"
+        "valid_from",
+        "state"
       ],
       "additionalProperties": false
     },
@@ -18904,6 +19137,12 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "cancelled"
+          ]
         }
       },
       "required": [
@@ -18915,7 +19154,8 @@
         "resource_id",
         "starts_at",
         "ends_at",
-        "reason"
+        "reason",
+        "state"
       ],
       "additionalProperties": false
     },
@@ -19382,6 +19622,48 @@
         },
         "state": {
           "$ref": "#/$defs/ApprovalState"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decided_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "enum": [
+            "merge",
+            "not_duplicate"
+          ]
+        },
+        "decision_center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "affected_center_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
         }
       },
       "required": [
@@ -19391,7 +19673,12 @@
         "source_person_id",
         "target_person_id",
         "preview_id",
-        "state"
+        "state",
+        "reason",
+        "decided_at",
+        "decision",
+        "decision_center_id",
+        "affected_center_ids"
       ],
       "additionalProperties": false
     },
@@ -26431,6 +26718,9 @@
         },
         "access_detail": {
           "$ref": "#/$defs/AccessDirectoryDetail"
+        },
+        "merge_review": {
+          "$ref": "#/$defs/MergeReviewDetail"
         }
       },
       "required": [
@@ -31758,6 +32048,46 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "person_merge_preview_v1"
+              },
+              "selector": {
+                "properties": {
+                  "key": {
+                    "properties": {
+                      "directory": {
+                        "const": "center"
+                      }
+                    },
+                    "required": [
+                      "directory"
+                    ]
+                  }
+                },
+                "required": [
+                  "key"
+                ]
+              }
+            },
+            "required": [
+              "operation",
+              "selector"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            }
+          }
         }
       ]
     },
@@ -32776,6 +33106,9 @@
             },
             "interval": {
               "$ref": "#/$defs/Interval"
+            },
+            "exception_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [],
@@ -37879,7 +38212,10 @@
                     "pending",
                     "expired",
                     "accepted",
-                    "revoked"
+                    "revoked",
+                    "open",
+                    "closed",
+                    "all"
                   ]
                 }
               },
@@ -37969,6 +38305,34 @@
               },
               "required": [
                 "directory"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "center"
+                },
+                "view": {
+                  "const": "people"
+                },
+                "query": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "status": {
+                  "enum": [
+                    "all",
+                    "linked",
+                    "unlinked"
+                  ]
+                }
+              },
+              "required": [
+                "directory",
+                "view"
               ],
               "additionalProperties": false
             }
@@ -38082,20 +38446,48 @@
           "const": "person_merge_preview_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "source_id": {
-              "$ref": "#/$defs/FtkUuid"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "source_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "target_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "source_id",
+                "target_id"
+              ],
+              "additionalProperties": false
             },
-            "target_id": {
-              "$ref": "#/$defs/FtkUuid"
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "center"
+                },
+                "status": {
+                  "enum": [
+                    "suggested",
+                    "completed",
+                    "not_duplicate",
+                    "all"
+                  ]
+                },
+                "query": {
+                  "type": "string",
+                  "maxLength": 200
+                }
+              },
+              "required": [
+                "directory"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "source_id",
-            "target_id"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -41838,6 +42230,9 @@
         },
         "access_summary": {
           "$ref": "#/$defs/AccessDirectorySummary"
+        },
+        "merge_review_summary": {
+          "$ref": "#/$defs/MergeReviewSummary"
         }
       },
       "required": [
@@ -55836,6 +56231,16 @@
           "items": {
             "$ref": "#/$defs/Effect"
           }
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReviewReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -58801,7 +59206,9 @@
                   "expired",
                   "accepted",
                   "revoked",
-                  "active"
+                  "active",
+                  "linked",
+                  "unlinked"
                 ]
               },
               "count": {
@@ -58950,8 +59357,166 @@
             "created_at"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "person_account"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "created_at": {
+              "$ref": "#/$defs/Instant"
+            },
+            "linked": {
+              "type": "boolean"
+            },
+            "can_send_invitation": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "person_id",
+            "display_name",
+            "created_at",
+            "linked",
+            "can_send_invitation"
+          ],
+          "additionalProperties": false
         }
       ]
+    },
+    "ReviewReason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "\\S"
+    },
+    "MergeReviewPerson": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "id",
+        "display_name",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "MergeReviewDetail": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "suggested",
+            "completed",
+            "not_duplicate"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/MergeReviewPerson"
+        },
+        "target": {
+          "$ref": "#/$defs/MergeReviewPerson"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReviewReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "recorded_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "matching_kinds": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "email",
+              "phone"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "state",
+        "source",
+        "target",
+        "reason",
+        "recorded_at",
+        "matching_kinds"
+      ],
+      "additionalProperties": false
+    },
+    "MergeReviewSummary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "filtered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_state": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "enum": [
+                  "suggested",
+                  "completed",
+                  "not_duplicate"
+                ]
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "state",
+              "count"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "total",
+        "filtered",
+        "by_state"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -62760,6 +63325,7 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
@@ -62837,7 +63403,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_availability_save"
           }
-        }
+        },
+        "runtime_limits": [
+          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+        ]
       },
       {
         "name": "availability_exception_save_v1",
@@ -62864,6 +63433,7 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
@@ -62942,7 +63512,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_availability_exception_save"
           }
-        }
+        },
+        "runtime_limits": [
+          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+        ]
       },
       {
         "name": "policies_get_v1",
@@ -64619,7 +65192,8 @@
           "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
           "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
           "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity.",
-          "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens."
+          "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens.",
+          "include_member_summary true requires explicit center and reuses the exact separately authorized rights/currency debt/next-lesson summary for one selected person; omitted preserves the legacy response."
         ],
         "required_features": [
           "F06",
@@ -65194,7 +65768,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_person_merge_preview"
           }
-        }
+        },
+        "runtime_limits": [
+          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+        ]
       },
       {
         "name": "person_merge_approve_v1",
@@ -65404,7 +65981,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_person_merge_apply"
           }
-        }
+        },
+        "runtime_limits": [
+          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+        ]
       },
       {
         "name": "calendar_get_v1",
@@ -82750,7 +83330,8 @@
           "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
           "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission.",
           "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged.",
-          "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token."
+          "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token.",
+          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -87945,6 +88526,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/AcceptanceContext/properties/purchase_preview_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationTrigger/properties/recipient_person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/AutomationDefinition/properties/segment_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -88353,6 +88946,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/NotificationPayload/properties/content_template_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/NotificationView/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -88408,6 +89007,12 @@
       },
       {
         "path": "#/$defs/JobStatusView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/JobStatusView/properties/content_template_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -88893,6 +89498,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_availability_save/allOf/0/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_availability_save/allOf/0/then/properties/rule_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_availability_save/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -88918,6 +89535,24 @@
       },
       {
         "path": "#/$defs/Request_availability_exception_save/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_availability_exception_save/properties/exception_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_availability_exception_save/allOf/0/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_availability_exception_save/allOf/0/then/properties/exception_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -89409,6 +90044,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_person_get/allOf/0/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_person_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -89578,6 +90219,12 @@
       },
       {
         "path": "#/$defs/Request_person_merge_preview/properties/target_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_person_merge_preview/allOf/0/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -90862,6 +91509,12 @@
       },
       {
         "path": "#/$defs/Request_sale_preview/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_sale_preview/properties/document_purchase_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -92199,6 +92852,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_automation_save/properties/retry_job/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_automation_save/allOf/0/then/properties/automation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_automation_save/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -93238,6 +93903,84 @@
       },
       {
         "path": "#/$defs/Request_document_accept/properties/document_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/properties/rendered_document_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/0/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/0/properties/document_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/0/properties/rendered_document_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/1/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/1/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/1/properties/document_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_accept/anyOf/1/properties/rendered_document_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -94624,6 +95367,18 @@
       },
       {
         "path": "#/$defs/Table_merge_requests/properties/preview_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_merge_requests/properties/decision_center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_merge_requests/properties/affected_center_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -96615,6 +97370,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Table_public_applications/properties/import_row_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Table_privacy_requests/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -96796,6 +97557,12 @@
       },
       {
         "path": "#/$defs/Request_disciplines_list/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_disciplines_list/properties/center_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -98655,6 +99422,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/154/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_management_state_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -98968,6 +99741,12 @@
       },
       {
         "path": "#/$defs/ManagementProjection_availability_save_v1/properties/values/properties/rule_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_availability_exception_save_v1/properties/values/properties/exception_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -100029,13 +100808,13 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_person_merge_preview_v1/properties/key/properties/source_id",
+        "path": "#/$defs/ManagementSelector_person_merge_preview_v1/properties/key/oneOf/0/properties/source_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_person_merge_preview_v1/properties/key/properties/target_id",
+        "path": "#/$defs/ManagementSelector_person_merge_preview_v1/properties/key/oneOf/0/properties/target_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -101721,6 +102500,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/CenterSettingsValues/properties/agreement_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/event_templates/items/properties/defaults/properties/terms/properties/allowed_product_version_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -101740,6 +102531,24 @@
       },
       {
         "path": "#/$defs/OrganizationSettingsValues/properties/package_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/agreement_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/event_templates/items/properties/defaults/properties/terms/properties/allowed_product_version_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/application_form_rules/items/properties/form_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -101884,6 +102693,18 @@
       },
       {
         "path": "#/$defs/Success_settings_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_update/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_update/properties/operation_key",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -102435,6 +103256,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_media_get/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_media_get/oneOf/0/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -102490,6 +103317,36 @@
       },
       {
         "path": "#/$defs/Request_media_get/oneOf/2/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/asset_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/3/properties/event_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -102777,6 +103634,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/ResolvedDomainPreparation/oneOf/2/properties/agreement_request/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_settings_preparation_resolve/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -102981,12 +103844,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Table_public_applications/properties/import_row_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/SaleDeficitEffect/properties/deficit_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -103023,12 +103880,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_automation_save/properties/retry_job/properties/id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/AutomationJobView/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -103047,43 +103898,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_automation_save/allOf/0/then/properties/automation_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ResolvedDomainPreparation/oneOf/2/properties/agreement_request/properties/discipline_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/AgreementPreparationTemplate/properties/discipline_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/CenterSettingsValues/properties/agreement_templates/items/properties/discipline_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/agreement_templates/items/properties/discipline_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -103155,18 +103970,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/CenterSettingsValues/properties/event_templates/items/properties/defaults/properties/terms/properties/allowed_product_version_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/event_templates/items/properties/defaults/properties/terms/properties/allowed_product_version_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/DigitalDocumentAcceptance/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -103180,6 +103983,12 @@
       },
       {
         "path": "#/$defs/DigitalDocumentAcceptance/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalDocumentAcceptance/properties/rendered_document_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -103239,6 +104048,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_instructor_agreement_accept/properties/rendered_document_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/DigitalAgreementAcceptance/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -103258,6 +104073,12 @@
       },
       {
         "path": "#/$defs/DigitalAgreementAcceptance/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DigitalAgreementAcceptance/properties/rendered_document_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -103287,12 +104108,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_disciplines_list/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/DisciplinePresentationView/properties/center/anyOf/0/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -103305,24 +104120,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/AutomationTrigger/properties/recipient_person_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/CrmFormRulesSnapshot/properties/form_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/application_form_rules/items/properties/form_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/SettingsDeactivationEffects/properties/items/items/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -103330,6 +104127,12 @@
       },
       {
         "path": "#/$defs/SettingsWorkCalendarImpact/properties/sessions/items/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFormRulesSnapshot/properties/form_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -103371,37 +104174,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_media_get/properties/event_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_media_get/oneOf/3/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_media_get/oneOf/3/properties/asset_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_media_get/oneOf/3/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_media_get/oneOf/3/properties/person_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_media_get/oneOf/3/properties/event_id",
+        "path": "#/$defs/SharingNoticeView/properties/rendered_document_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -103420,60 +104193,6 @@
       },
       {
         "path": "#/$defs/SharingConsentEvidence/properties/account_link_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/AcceptanceContext/properties/purchase_preview_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/NotificationPayload/properties/content_template_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/JobStatusView/properties/content_template_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_sale_preview/properties/document_purchase_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/properties/rendered_document_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/DigitalDocumentAcceptance/properties/rendered_document_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_instructor_agreement_accept/properties/rendered_document_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/DigitalAgreementAcceptance/properties/rendered_document_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/SharingNoticeView/properties/rendered_document_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -103569,79 +104288,19 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_document_accept/anyOf/0/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/0/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/0/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/0/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/0/properties/document_version_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/0/properties/rendered_document_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/1/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/1/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/1/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/1/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/1/properties/document_version_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_document_accept/anyOf/1/properties/rendered_document_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/MemberNextLesson/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AccessDirectoryDetail/oneOf/2/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MergeReviewPerson/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -104128,7 +104787,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 163,
+      "migration_count": 164,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

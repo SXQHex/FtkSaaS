@@ -617,7 +617,9 @@ affected_center_ids: string[]
  * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 required_approval_center_ids: string[]
-linked_history: true
+linked_history: boolean
+reason?: (ReviewReason | null)
+decision?: ("merge" | "not_duplicate")
 }
 lifecycle_impact?: LifecycleImpact
 configuration_requirement?: ScheduleConfigurationRequirement
@@ -629,6 +631,11 @@ configuration_requirement?: ScheduleConfigurationRequirement
  * via the `definition` "SubscriberNumber".
  */
 export type SubscriberNumber = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReviewReason".
+ */
+export type ReviewReason = string
 /**
  * Current controlling source and intrinsic person_update_v1 field mutability. Not actor authorization, historical provenance, verification proof or login status. No identity/credentials. Account-owned fields are always false; writes recheck live authority.
  *
@@ -786,6 +793,61 @@ kind: "unlimited"
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_availability_save".
+ */
+export type RequestAvailabilitySave = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version?: PositiveInt
+rule_id?: (string | null)
+resource: ResourceRef
+rule?: AvailabilityRule
+action?: ("save" | "retire")
+reason?: ReviewReason
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_availability_exception_save".
+ */
+export type RequestAvailabilityExceptionSave = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version: PositiveInt
+resource: ResourceRef
+interval?: Interval
+reason: Text
+action?: ("save" | "cancel")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+exception_id?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_policy_publish".
  */
 export type RequestPolicyPublish = {
@@ -839,6 +901,53 @@ student_status?: ("active" | "inactive")
  * Opt-in summaries for only the final visible cursor page. Requires explicit selected center. Each component preserves native reader permission/feature gates; restricted/not_enabled is never zero.
  */
 include_member_summary?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_person_get".
+ */
+export type RequestPersonGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+include_member_summary?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_person_merge_preview".
+ */
+export type RequestPersonMergePreview = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id: string
+reason?: ReviewReason
+decision?: ("merge" | "not_duplicate")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1684,6 +1793,16 @@ kind: "account_link"
  */
 display_name: (Text | null)
 created_at: Instant
+} | {
+kind: "person_account"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: string
+created_at: Instant
+linked: boolean
+can_send_invitation: boolean
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4576,6 +4695,10 @@ MemberPageSummary?: MemberPageSummary
 AccessDirectorySummary?: AccessDirectorySummary
 AccessDeliveryVisibility?: AccessDeliveryVisibility
 AccessDirectoryDetail?: AccessDirectoryDetail
+ReviewReason?: ReviewReason
+MergeReviewPerson?: MergeReviewPerson
+MergeReviewDetail?: MergeReviewDetail
+MergeReviewSummary?: MergeReviewSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7242,6 +7365,7 @@ given_name?: (string | null)
 family_name?: (string | null)
 subscriber_number?: (SubscriberNumber | null)
 field_policy?: PersonNameFieldPolicy
+member_summary?: MemberPageSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9244,30 +9368,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_availability_save".
- */
-export interface RequestAvailabilitySave {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version?: PositiveInt
-rule_id?: (string | null)
-resource: ResourceRef
-rule: AvailabilityRule
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_availability_save".
  */
 export interface SuccessAvailabilitySave {
@@ -9277,30 +9377,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_availability_exception_save".
- */
-export interface RequestAvailabilityExceptionSave {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: PositiveInt
-resource: ResourceRef
-interval: Interval
-reason: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9764,26 +9840,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_person_get".
- */
-export interface RequestPersonGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_person_get".
  */
 export interface SuccessPersonGet {
@@ -9941,30 +9997,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_person_merge_preview".
- */
-export interface RequestPersonMergePreview {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-source_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-target_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_person_merge_preview".
  */
 export interface SuccessPersonMergePreview {
@@ -10032,6 +10064,7 @@ center_id?: (string | null)
  */
 operation_key: string
 preview: PreviewToken
+reason?: ReviewReason
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14821,6 +14854,7 @@ local_start: LocalTime
 local_end: LocalTime
 valid_from: Date
 valid_until?: (Date | null)
+state: ("active" | "inactive")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14849,6 +14883,7 @@ resource_id: string
 starts_at: Instant
 ends_at: Instant
 reason: Text
+state: ("active" | "cancelled")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15093,6 +15128,14 @@ target_person_id: string
  */
 preview_id: string
 state: ApprovalState
+reason: (string | null)
+decided_at: (Instant | null)
+decision: ("merge" | "not_duplicate")
+decision_center_id: (string | null)
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+affected_center_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17980,6 +18023,7 @@ merge_approval?: MergeApprovalDiscovery
  */
 account_access_granted?: boolean
 access_detail?: AccessDirectoryDetail
+merge_review?: MergeReviewDetail
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18173,6 +18217,10 @@ operation: "availability_exception_save_v1"
 values: {
 resource?: ResourceRef
 interval?: Interval
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+exception_id?: string
 }
 }
 /**
@@ -20668,6 +20716,31 @@ approved: boolean
 }[]
 linked_history: true
 effects: Effect[]
+reason?: (ReviewReason | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeReviewDetail".
+ */
+export interface MergeReviewDetail {
+state: ("suggested" | "completed" | "not_duplicate")
+source: MergeReviewPerson
+target: MergeReviewPerson
+reason: (ReviewReason | null)
+recorded_at: (Instant | null)
+matching_kinds: ("email" | "phone")[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeReviewPerson".
+ */
+export interface MergeReviewPerson {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+display_name: string
+version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21172,7 +21245,7 @@ person_id: string
 } | {
 directory: "center"
 query?: string
-status?: ("pending" | "expired" | "accepted" | "revoked")
+status?: ("pending" | "expired" | "accepted" | "revoked" | "open" | "closed" | "all")
 })
 }
 /**
@@ -21205,6 +21278,11 @@ person_id: string
 directory: "center"
 query?: string
 status?: ("active" | "revoked")
+} | {
+directory: "center"
+view: "people"
+query?: string
+status?: ("all" | "linked" | "unlinked")
 })
 }
 /**
@@ -21262,7 +21340,7 @@ person_id: string
  */
 export interface ManagementSelectorPersonMergePreviewV1 {
 operation: "person_merge_preview_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -21271,7 +21349,11 @@ source_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 target_id: string
-}
+} | {
+directory: "center"
+status?: ("suggested" | "completed" | "not_duplicate" | "all")
+query?: string
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22990,6 +23072,7 @@ next_cursor: (OpaqueToken | null)
 as_of: Instant
 sale_change_context?: EntityVersion
 access_summary?: AccessDirectorySummary
+merge_review_summary?: MergeReviewSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22999,8 +23082,20 @@ export interface AccessDirectorySummary {
 total: Count
 filtered: Count
 by_state: {
-state: ("pending" | "expired" | "accepted" | "revoked" | "active")
+state: ("pending" | "expired" | "accepted" | "revoked" | "active" | "linked" | "unlinked")
 count: Count
+}[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeReviewSummary".
+ */
+export interface MergeReviewSummary {
+total: number
+filtered: number
+by_state: {
+state: ("suggested" | "completed" | "not_duplicate")
+count: number
 }[]
 }
 /**

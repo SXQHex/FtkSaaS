@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `457767a054925476ca9a140e236c325e38611c00308cd4f46e05ea57747a813b`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `387df0eec6c178c95a80af69a88f68b6d99a6be3930a7c78d18835337662c6e4`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 163. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 164. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -171,3 +171,4 @@ Sıralı migration: 163. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261114120000_center_setup_status.sql](../apps/backend/supabase/migrations/20261114120000_center_setup_status.sql) | `94e4c3e4f92775d96701afa920cc510701c1139a66dbc7f9204fc54aeae70ebc` |
 | [20261114175838_person_field_policy.sql](../apps/backend/supabase/migrations/20261114175838_person_field_policy.sql) | `4a1a29c7d55a29149867cff2ee0c3030af7ad68c48a5634608dc0a00e2af2e07` |
 | [20261115014502_student_status_filter.sql](../apps/backend/supabase/migrations/20261115014502_student_status_filter.sql) | `24a80453acdf465de4593f201af9600797daa0d8ec3f6a4bb6128d9e95b60dce` |
+| [20261115035110_web1_review_lifecycle.sql](../apps/backend/supabase/migrations/20261115035110_web1_review_lifecycle.sql) | `4316f70932f193a89c39e1c419a8df1f487345b691d747affd3e1b164871771e` |
