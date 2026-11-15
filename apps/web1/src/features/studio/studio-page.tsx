@@ -10,6 +10,7 @@ import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
 import { StudioInstructorEditor } from "./instructor-editor";
 import type { InstructorEditState } from "./instructor-edit";
 import { StudioAgreementEditor } from "./agreement-editor";
+import { ClosureLifecycleDetails } from "./closure-lifecycle-details";
 import { StudioClosureEditor } from "./closure-editor";
 import { StudioResourceEditor } from "./resource-editor";
 import { StudioAvailabilityReader } from "./availability-reader";
@@ -263,6 +264,11 @@ function StudioContent({
         <StudioAvailabilityReader
           scope={scope}
           instructors={data.instructors}
+          timezone={
+            snapshot?.setup.center.state === "known"
+              ? snapshot.setup.center.value.timezone
+              : undefined
+          }
           onLockChange={publishLock}
           onRefresh={async () => {
             await query.refetch({ throwOnError: true });
@@ -365,6 +371,28 @@ function StudioContent({
               }}
             />
           );
+        if (selection.kind === "closure" && selection.id) {
+          const record = editor.snapshot.closures.find((item) => item.id === selection.id);
+          if (record)
+            return (
+              <ClosureLifecycleDetails
+                key={`${scope.accountId}:${record.id}`}
+                scope={scope}
+                record={record}
+                data={capturedData}
+                timezone={
+                  editor.snapshot.setup.center.state === "known"
+                    ? editor.snapshot.setup.center.value.timezone
+                    : undefined
+                }
+                onClose={onClose}
+                onLockChange={publishLock}
+                onRefresh={async () => {
+                  await query.refetch({ throwOnError: true });
+                }}
+              />
+            );
+        }
         if (selection.kind === "agreement")
           return (
             <StudioAgreementEditor

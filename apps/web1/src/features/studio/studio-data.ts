@@ -97,10 +97,13 @@ export function studioViewData(
       scope: names.get(item.resource.id) ?? t(($) => $.studio.unavailableResource),
       reason: t(($) => $.studio.reasonNotShared),
       affectedSessions: null,
+      cancelled: item.state === "cancelled",
       status:
-        new Date(item.interval.ends_at).getTime() <= Date.now()
-          ? t(($) => $.studio.past)
-          : t(($) => $.studio.active),
+        item.state === "cancelled"
+          ? t(($) => $.studio.lifecycle.cancelled)
+          : new Date(item.interval.ends_at).getTime() <= Date.now()
+            ? t(($) => $.studio.past)
+            : t(($) => $.studio.active),
       past: new Date(item.interval.ends_at).getTime() <= Date.now(),
     })),
     agreements: snapshot.agreements.map((item) => ({

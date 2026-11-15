@@ -59,6 +59,7 @@ export interface StudioClosure {
   affectedSessions: number | null;
   status: string;
   past: boolean;
+  cancelled?: boolean;
 }
 export interface StudioAgreement {
   id: string;
@@ -682,7 +683,9 @@ export function StudioView({
                         {item.affectedSessions ?? "—"}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={item.past ? "secondary" : "outline"}>{item.status}</Badge>
+                        <Badge variant={item.past || item.cancelled ? "secondary" : "outline"}>
+                          {item.status}
+                        </Badge>
                       </TableCell>
                     </TableRow>
                   )}
@@ -693,8 +696,8 @@ export function StudioView({
               <span>
                 {state === "ready"
                   ? t(($) => $.studio.closureCount, {
-                      count: data.closures.filter((item) => !item.past).length,
-                      past: data.closures.filter((item) => item.past).length,
+                      count: data.closures.filter((item) => !item.past && !item.cancelled).length,
+                      past: data.closures.filter((item) => item.past && !item.cancelled).length,
                     })
                   : empty}
               </span>

@@ -25,6 +25,7 @@ export interface ClosureRecord {
   id: string;
   resource: ResourceRef;
   interval: Interval;
+  state: "active" | "cancelled";
   // The API intentionally does not expose the saved reason. Do not substitute
   // a fabricated reason or treat an omitted value as an empty saved reason.
 }
@@ -145,19 +146,23 @@ export async function readStudioAvailability(
     { operation: "availability_save_v1", key: { resource } },
     client,
   );
-  return items.map((item) => {
-    // Rules have their own version. An exception's center version cannot be used here.
-    const version = versionOf(item, "availability_rules");
-    if (
-      item.current?.operation !== "availability_save_v1" ||
-      item.current.values.resource?.kind !== resource.kind ||
-      item.current.values.resource.id !== resource.id ||
-      !item.current.values.rule ||
-      item.current.values.rule_id !== item.entity?.id
-    )
-      throw new Error("STUDIO_UNAVAILABLE");
-    return { id: item.entity!.id, version, rule: item.current.values.rule };
-  });
+  if (items.some((item) => item.state !== "active" && item.state !== "inactive"))
+    throw new Error("STUDIO_UNAVAILABLE");
+  return items
+    .filter((item) => item.state === "active")
+    .map((item) => {
+      // Rules have their own version. An exception's center version cannot be used here.
+      const version = versionOf(item, "availability_rules");
+      if (
+        item.current?.operation !== "availability_save_v1" ||
+        item.current.values.resource?.kind !== resource.kind ||
+        item.current.values.resource.id !== resource.id ||
+        !item.current.values.rule ||
+        item.current.values.rule_id !== item.entity?.id
+      )
+        throw new Error("STUDIO_UNAVAILABLE");
+      return { id: item.entity!.id, version, rule: item.current.values.rule };
+    });
 }
 
 export async function readStudioClosures(
@@ -170,6 +175,7 @@ export async function readStudioClosures(
   });
   return items.map((item) => {
     if (
+      (item.state !== "active" && item.state !== "cancelled") ||
       !item.exists ||
       item.entity?.type !== "availability_exceptions" ||
       item.current?.operation !== "availability_exception_save_v1" ||
@@ -182,6 +188,7 @@ export async function readStudioClosures(
       id: item.entity.id,
       resource: item.current.values.resource,
       interval: item.current.values.interval,
+      state: item.state,
     };
   });
 }

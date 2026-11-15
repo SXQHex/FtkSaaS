@@ -16,8 +16,20 @@ import type { StudioScope } from "./studio";
 import type { StudioInstructor } from "./studio-view";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { NativeSelect } from "../../components/ui/native-select";
+import { ResourceLifecycleController } from "./resource-lifecycle-controller";
+import { AvailabilityRetireMenu } from "./resource-lifecycle-dialog";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+
+const weekdayNames = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
 
 type Notice =
   | "ready"
@@ -36,13 +48,16 @@ export function StudioAvailabilityReader({
   instructors,
   onLockChange,
   onRefresh,
+  timezone,
 }: {
   scope: StudioScope;
+  timezone?: string;
   instructors: StudioInstructor[];
   onLockChange: (value: boolean) => void;
   onRefresh: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const [retiringId, setRetiringId] = useState<string>();
   const [personId, setPersonId] = useState("");
   const [periodId, setPeriodId] = useState("");
   const [base, setBase] = useState<AvailabilityBase>();
@@ -242,108 +257,140 @@ export function StudioAvailabilityReader({
                           ? t(($) => $.studio.chooseAvailabilityPeriod)
                           : t(($) => $.studio.availabilityWriteHint);
   return (
-    <AvailabilityPanel
-      key={`${personId}:${periodId}:${revision}`}
-      selectedInstructor={personId}
-      instructors={instructors}
-      initialByInstructor={initialByInstructor}
-      readOnly={!editable}
-      locked={preventLeave || busy}
-      loading={busy}
-      valuesKnown={valuesKnown}
-      onDirtyChange={setDirty}
-      onSelectInstructor={(id) => {
-        void selectPerson(id);
-      }}
-      onSave={(draft) => {
-        void write(draft);
-      }}
-      notice={message}
-      periodControl={
-        <div className="flex flex-wrap items-end gap-3 px-5 pb-3">
-          {base && (
-            <Field className="w-full gap-1.5 sm:max-w-sm">
-              <FieldLabel htmlFor="availability-period">
-                {t(($) => $.studio.availabilityPeriod)}
-              </FieldLabel>
-              <NativeSelect
-                id="availability-period"
-                className="w-full"
-                value={periodId}
-                disabled={
-                  dirty ||
-                  busy ||
-                  preventLeave ||
-                  !["ready", "saved", "invalid", "remove-unsupported"].includes(notice)
-                }
-                onChange={(event) => {
-                  setPeriodId(event.target.value);
-                  setNotice("ready");
+    <>
+      <AvailabilityPanel
+        key={`${personId}:${periodId}:${revision}`}
+        selectedInstructor={personId}
+        instructors={instructors}
+        initialByInstructor={initialByInstructor}
+        readOnly={!editable}
+        locked={preventLeave || busy}
+        loading={busy}
+        valuesKnown={valuesKnown}
+        onDirtyChange={setDirty}
+        onSelectInstructor={(id) => {
+          void selectPerson(id);
+        }}
+        onSave={(draft) => {
+          void write(draft);
+        }}
+        notice={message}
+        periodControl={
+          <div className="flex flex-wrap items-end gap-3 px-5 pb-3">
+            {base && (
+              <Field className="w-full gap-1.5 sm:max-w-sm">
+                <FieldLabel htmlFor="availability-period">
+                  {t(($) => $.studio.availabilityPeriod)}
+                </FieldLabel>
+                <NativeSelect
+                  id="availability-period"
+                  className="w-full"
+                  value={periodId}
+                  disabled={
+                    dirty ||
+                    busy ||
+                    preventLeave ||
+                    !["ready", "saved", "invalid", "remove-unsupported"].includes(notice)
+                  }
+                  onChange={(event) => {
+                    setPeriodId(event.target.value);
+                    setNotice("ready");
+                  }}
+                >
+                  <option value="">{t(($) => $.studio.chooseAvailabilityPeriod)}</option>
+                  {periods.map((period) => {
+                    const [from, until] = JSON.parse(period) as [string, string | null];
+                    return (
+                      <option key={period} value={period}>
+                        {from} – {until ?? t(($) => $.studio.noEndDate)}
+                      </option>
+                    );
+                  })}
+                  <option value="new">{t(($) => $.studio.newAvailabilityPeriod)}</option>
+                </NativeSelect>
+              </Field>
+            )}
+            {original.length > 0 && (
+              <AvailabilityRetireMenu
+                disabled={!editable || dirty || preventLeave}
+                records={original.map((item) => ({
+                  id: item.id,
+                  label: `${item.rule.weekdays.map((day) => (weekdayNames[day - 1] ? t(($) => $.studio.days[weekdayNames[day - 1]!]) : t(($) => $.studio.unavailableResource))).join(", ")} · ${item.rule.local_start}–${item.rule.local_end}`,
+                }))}
+                onSelect={setRetiringId}
+              />
+            )}
+            {["read-error", "rejected", "conflict", "saved-unread"].includes(notice) && (
+              <Button
+                variant="outline"
+                isDisabled={busy}
+                onPress={() => {
+                  void reload();
                 }}
               >
-                <option value="">{t(($) => $.studio.chooseAvailabilityPeriod)}</option>
-                {periods.map((period) => {
-                  const [from, until] = JSON.parse(period) as [string, string | null];
-                  return (
-                    <option key={period} value={period}>
-                      {from} – {until ?? t(($) => $.studio.noEndDate)}
-                    </option>
-                  );
-                })}
-                <option value="new">{t(($) => $.studio.newAvailabilityPeriod)}</option>
-              </NativeSelect>
-            </Field>
-          )}
-          {["read-error", "rejected", "conflict", "saved-unread"].includes(notice) && (
-            <Button
-              variant="outline"
-              isDisabled={busy}
-              onPress={() => {
-                void reload();
-              }}
-            >
-              {notice === "conflict" || notice === "rejected"
-                ? t(($) => $.studio.loadLatest)
-                : t(($) => $.studio.retryRead)}
-            </Button>
-          )}
-          {notice === "unknown" && (
-            <Button
-              variant="outline"
-              isDisabled={busy}
-              onPress={() => {
-                void write();
-              }}
-            >
-              {t(($) => $.studio.retrySameRequest)}
-            </Button>
-          )}
-        </div>
-      }
-      footerContent={
-        <div
-          ref={errorSummary}
-          tabIndex={-1}
-          className="max-w-full focus-visible:outline-2 focus-visible:outline-ring"
-          role="status"
-        >
-          {[
-            "invalid",
-            "remove-unsupported",
-            "conflict",
-            "rejected",
-            "unknown",
-            "saved-unread",
-          ].includes(notice) && <p className="text-sm">{message}</p>}
-          {progress.total > 0 && (
-            <Alert>
-              <AlertDescription>
-                {t(($) => $.studio.availabilityProgress, progress)}
-              </AlertDescription>
-            </Alert>
-          )}
-        </div>
-      }
-    />
+                {notice === "conflict" || notice === "rejected"
+                  ? t(($) => $.studio.loadLatest)
+                  : t(($) => $.studio.retryRead)}
+              </Button>
+            )}
+            {notice === "unknown" && (
+              <Button
+                variant="outline"
+                isDisabled={busy}
+                onPress={() => {
+                  void write();
+                }}
+              >
+                {t(($) => $.studio.retrySameRequest)}
+              </Button>
+            )}
+          </div>
+        }
+        footerContent={
+          <div
+            ref={errorSummary}
+            tabIndex={-1}
+            className="max-w-full focus-visible:outline-2 focus-visible:outline-ring"
+            role="status"
+          >
+            {[
+              "invalid",
+              "remove-unsupported",
+              "conflict",
+              "rejected",
+              "unknown",
+              "saved-unread",
+            ].includes(notice) && <p className="text-sm">{message}</p>}
+            {progress.total > 0 && (
+              <Alert>
+                <AlertDescription>
+                  {t(($) => $.studio.availabilityProgress, progress)}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        }
+      />
+      {retiringId && (
+        <ResourceLifecycleController
+          key={`${scope.accountId}:${personId}:${retiringId}`}
+          scope={scope}
+          selection={{
+            kind: "rule",
+            id: retiringId,
+            resource: { kind: "person", id: personId },
+            label:
+              instructors.find((item) => item.id === personId)?.name ??
+              t(($) => $.studio.unavailableResource),
+          }}
+          timezone={timezone}
+          onClose={() => setRetiringId(undefined)}
+          onLockChange={onLockChange}
+          onRefresh={async () => {
+            await finishRead(true);
+          }}
+        />
+      )}
+    </>
   );
 }
