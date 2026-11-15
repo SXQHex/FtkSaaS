@@ -104,7 +104,7 @@ export function SettingsReviewDialog({
         </FieldLabel>
       </Field>
       {recoveryActions}
-      <DialogFooter>
+      <DialogFooter className="flex-wrap">
         <Button autoFocus type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.settings.discard)}
         </Button>

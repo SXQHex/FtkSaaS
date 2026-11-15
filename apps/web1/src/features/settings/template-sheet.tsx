@@ -195,7 +195,7 @@ export function TemplateSheet({
           {recoveryActions}
         </FieldGroup>
       </form>
-      <SheetFooter>
+      <SheetFooter className="flex-wrap">
         <Button type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.settings.discard)}
         </Button>
