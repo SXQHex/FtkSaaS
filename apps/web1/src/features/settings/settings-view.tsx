@@ -164,6 +164,14 @@ export type SettingsAction =
     };
 export interface SettingsViewProps {
   data: SettingsViewData;
+  scope?: {
+    selected: "organization" | "center";
+    organizationLabel: string;
+    centerLabel: string;
+    organizationAvailable: boolean;
+    centerAvailable: boolean;
+  };
+  onScope?: (scope: "organization" | "center") => void;
   section?: SettingsSection;
   locked?: boolean;
   onSection?: (section: SettingsSection) => void;
@@ -180,7 +188,7 @@ export interface SettingsViewProps {
 function SettingsTable({ data, label }: { data?: SettingsTableData; label: string }) {
   const { t } = useTranslation();
   return (
-    <Table aria-label={label} className="min-w-[30rem]">
+    <Table aria-label={label} className={data?.rows.length ? "min-w-[30rem]" : undefined}>
       <TableHeader>
         {(data?.columns ?? (["name", "state"] as ColumnKey[])).map((key, index) => (
           <TableHead key={key} id={key} isRowHeader={index === 0}>
@@ -226,6 +234,8 @@ export function SettingsView({
   onLogo,
   logoAccept,
   onPermission,
+  scope,
+  onScope,
 }: SettingsViewProps) {
   const { t } = useTranslation(),
     mobile = useIsMobile(),
@@ -605,7 +615,10 @@ export function SettingsView({
     </FieldGroup>
   );
   const permissions = (
-    <Table aria-label={t(($) => $.settings.permissions)} className="min-w-[30rem]">
+    <Table
+      aria-label={t(($) => $.settings.permissions)}
+      className={data.permissions?.people.length ? "min-w-[30rem]" : undefined}
+    >
       <TableHeader>
         <TableHead id="permission" isRowHeader>
           {t(($) => $.settings.columns.permission)}
@@ -656,6 +669,32 @@ export function SettingsView({
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">{t(($) => $.settings.title)}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t(($) => $.settings.description)}</p>
+        {scope && (
+          <Field className="mt-4 max-w-md">
+            <FieldLabel htmlFor={`${prefix}-scope`}>{t(($) => $.settings.scopeLabel)}</FieldLabel>
+            <NativeSelect
+              id={`${prefix}-scope`}
+              name="settings_scope"
+              value={scope.selected}
+              disabled={locked || !onScope}
+              aria-describedby={`${prefix}-scope-hint`}
+              onChange={(event) => {
+                if (event.target.value === "organization" || event.target.value === "center")
+                  onScope?.(event.target.value);
+              }}
+            >
+              <NativeSelectOption value="organization" disabled={!scope.organizationAvailable}>
+                {scope.organizationLabel}
+              </NativeSelectOption>
+              <NativeSelectOption value="center" disabled={!scope.centerAvailable}>
+                {scope.centerLabel}
+              </NativeSelectOption>
+            </NativeSelect>
+            <FieldDescription id={`${prefix}-scope-hint`}>
+              {t(($) => $.settings.scopeHint)}
+            </FieldDescription>
+          </Field>
+        )}
       </header>
       <Tabs
         selectedKey={current}

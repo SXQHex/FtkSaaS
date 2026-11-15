@@ -24,6 +24,7 @@ import { Switch } from "../../components/ui/switch";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+import { Empty, EmptyDescription } from "../../components/ui/empty";
 
 export interface DisciplineDraft {
   name: string;
@@ -51,6 +52,7 @@ export function DisciplineSheet({
   onClose,
   submitLabel,
   recoveryActions,
+  loaded = true,
 }: {
   open: boolean;
   scope: "organization" | "center";
@@ -67,10 +69,11 @@ export function DisciplineSheet({
   onClose: () => void;
   submitLabel?: string;
   recoveryActions?: ReactNode;
+  loaded?: boolean;
 }) {
   const { t } = useTranslation(),
     id = useId();
-  const disabled = locked || !writable || !onDraft;
+  const disabled = locked || !loaded || !writable || !onDraft;
   const change = (patch: Partial<DisciplineDraft>) => onDraft?.({ ...draft, ...patch });
   return (
     <Sheet
@@ -107,171 +110,196 @@ export function DisciplineSheet({
           if (!disabled && onSubmit) onSubmit();
         }}
       >
-        <FieldGroup className="gap-5">
-          <Field>
-            <FieldLabel htmlFor={`${id}-name`}>
-              {t(($) => $.settings.disciplineEditor.name)}
-            </FieldLabel>
-            <Input
-              id={`${id}-name`}
-              name="name"
-              required
-              value={draft.name}
-              readOnly={scope === "center"}
-              disabled={locked || (scope === "organization" && disabled)}
-              onChange={(event) => change({ name: event.target.value })}
-            />
-            {scope === "center" && (
-              <FieldDescription>
-                {t(($) => $.settings.disciplineEditor.organizationName)}
-              </FieldDescription>
-            )}
-          </Field>
-          <Field orientation="horizontal">
-            <FieldContent>
-              <FieldLabel id={`${id}-state-label`}>
-                {scope === "organization"
-                  ? t(($) => $.settings.disciplineEditor.organizationActive)
-                  : t(($) => $.settings.disciplineEditor.centerActive)}
-              </FieldLabel>
-              <FieldDescription>{t(($) => $.settings.disciplineEditor.stateHint)}</FieldDescription>
-            </FieldContent>
-            <Switch
-              name="state"
-              aria-labelledby={`${id}-state-label`}
-              isSelected={draft.state === "active"}
-              isDisabled={disabled}
-              onChange={(active) => change({ state: active ? "active" : "inactive" })}
-            />
-          </Field>
-          <FieldSet>
-            <FieldLegend>{t(($) => $.settings.disciplineEditor.presentation)}</FieldLegend>
-            <FieldDescription>
-              {t(($) => $.settings.disciplineEditor.presentationHint)}
-            </FieldDescription>
-            <Field orientation="horizontal">
-              <FieldContent>
-                <FieldLabel id={`${id}-description-label`}>
-                  {scope === "center"
-                    ? t(($) => $.settings.disciplineEditor.localDescription)
-                    : t(($) => $.settings.disciplineEditor.useDescription)}
-                </FieldLabel>
-                <FieldDescription>
-                  {scope === "center"
-                    ? t(($) => $.settings.disciplineEditor.inheritHint)
-                    : t(($) => $.settings.disciplineEditor.clearHint)}
-                </FieldDescription>
-              </FieldContent>
-              <Switch
-                name="description_enabled"
-                aria-labelledby={`${id}-description-label`}
-                isSelected={draft.description !== null}
-                isDisabled={disabled || !descriptionWritable}
-                onChange={(enabled) => change({ description: enabled ? "" : null })}
-              />
-            </Field>
+        {!loaded ? (
+          <Empty role={error ? "alert" : "status"}>
+            <EmptyDescription>{error ?? notice ?? t(($) => $.settings.unread)}</EmptyDescription>
+            {recoveryActions}
+          </Empty>
+        ) : (
+          <FieldGroup className="gap-5">
             <Field>
-              <FieldLabel htmlFor={`${id}-description`}>
-                {t(($) => $.settings.disciplineEditor.descriptionField)}
+              <FieldLabel htmlFor={`${id}-name`}>
+                {t(($) => $.settings.disciplineEditor.name)}
               </FieldLabel>
-              <Textarea
-                id={`${id}-description`}
-                name="description"
-                value={draft.description ?? ""}
-                disabled={disabled || !descriptionWritable || draft.description === null}
-                onChange={(event) => change({ description: event.target.value })}
+              <Input
+                id={`${id}-name`}
+                name="name"
+                autoFocus
+                required
+                value={draft.name}
+                readOnly={scope === "center"}
+                disabled={locked || (scope === "organization" && disabled)}
+                onChange={(event) => change({ name: event.target.value })}
               />
+              {scope === "center" && (
+                <FieldDescription>
+                  {t(($) => $.settings.disciplineEditor.organizationName)}
+                </FieldDescription>
+              )}
             </Field>
-            {scope === "organization" && (
-              <>
-                <Field>
-                  <FieldLabel htmlFor={`${id}-color`}>
-                    {t(($) => $.settings.disciplineEditor.color)}
-                  </FieldLabel>
-                  <Input
-                    id={`${id}-color`}
-                    name="color"
-                    value={draft.color ?? ""}
-                    pattern="#[0-9a-fA-F]{6}"
-                    placeholder="#RRGGBB"
-                    autoCapitalize="none"
-                    spellCheck={false}
-                    disabled={disabled}
-                    onChange={(event) => change({ color: event.target.value || null })}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor={`${id}-icon`}>
-                    {t(($) => $.settings.disciplineEditor.icon)}
-                  </FieldLabel>
-                  <Input
-                    id={`${id}-icon`}
-                    name="icon"
-                    value={draft.icon ?? ""}
-                    autoCapitalize="none"
-                    spellCheck={false}
-                    disabled={disabled}
-                    onChange={(event) => change({ icon: event.target.value || null })}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor={`${id}-order`}>
-                    {t(($) => $.settings.disciplineEditor.order)}
-                  </FieldLabel>
-                  <Input
-                    id={`${id}-order`}
-                    name="display_order"
-                    value={draft.displayOrder}
-                    inputMode="numeric"
-                    pattern="-?[0-9]+"
-                    disabled={disabled}
-                    onChange={(event) => change({ displayOrder: event.target.value })}
-                  />
-                </Field>
-                <Field orientation="horizontal">
-                  <FieldContent>
-                    <FieldLabel id={`${id}-allow-label`}>
-                      {t(($) => $.settings.disciplineEditor.allowLocal)}
-                    </FieldLabel>
-                    <FieldDescription>
-                      {t(($) => $.settings.disciplineEditor.allowLocalHint)}
-                    </FieldDescription>
-                  </FieldContent>
-                  <Switch
-                    name="allow_center_description"
-                    aria-labelledby={`${id}-allow-label`}
-                    isSelected={draft.allowCenterDescription}
-                    isDisabled={disabled}
-                    onChange={(value) => change({ allowCenterDescription: value })}
-                  />
-                </Field>
-              </>
-            )}
             <Field orientation="horizontal">
               <FieldContent>
-                <FieldLabel id={`${id}-public-label`}>
-                  {t(($) => $.settings.disciplineEditor.publicVisible)}
+                <FieldLabel id={`${id}-state-label`}>
+                  {scope === "organization"
+                    ? t(($) => $.settings.disciplineEditor.organizationActive)
+                    : t(($) => $.settings.disciplineEditor.centerActive)}
                 </FieldLabel>
                 <FieldDescription>
-                  {t(($) => $.settings.disciplineEditor.publicHint)}
+                  {t(($) => $.settings.disciplineEditor.stateHint)}
                 </FieldDescription>
               </FieldContent>
               <Switch
-                name="public_visible"
-                aria-labelledby={`${id}-public-label`}
-                isSelected={draft.publicVisible}
+                name="state"
+                aria-labelledby={`${id}-state-label`}
+                isSelected={draft.state === "active"}
                 isDisabled={disabled}
-                onChange={(value) => change({ publicVisible: value })}
+                onChange={(active) => change({ state: active ? "active" : "inactive" })}
               />
             </Field>
-          </FieldSet>
-          {(notice || error) && (
-            <Alert role={error ? "alert" : "status"}>
-              <AlertDescription>{error ?? notice}</AlertDescription>
-            </Alert>
-          )}
-          {recoveryActions}
-        </FieldGroup>
+            <FieldSet>
+              <FieldLegend>{t(($) => $.settings.disciplineEditor.presentation)}</FieldLegend>
+              <FieldDescription>
+                {t(($) => $.settings.disciplineEditor.presentationHint)}
+              </FieldDescription>
+              <Field orientation="horizontal">
+                <FieldContent>
+                  <FieldLabel id={`${id}-description-label`}>
+                    {scope === "center"
+                      ? t(($) => $.settings.disciplineEditor.localDescription)
+                      : t(($) => $.settings.disciplineEditor.useDescription)}
+                  </FieldLabel>
+                  <FieldDescription>
+                    {scope === "center"
+                      ? t(($) => $.settings.disciplineEditor.inheritHint)
+                      : t(($) => $.settings.disciplineEditor.clearHint)}
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  name="description_enabled"
+                  aria-labelledby={`${id}-description-label`}
+                  isSelected={draft.description !== null}
+                  isDisabled={disabled || !descriptionWritable}
+                  onChange={(enabled) => change({ description: enabled ? "" : null })}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor={`${id}-description`}>
+                  {t(($) => $.settings.disciplineEditor.descriptionField)}
+                </FieldLabel>
+                <Textarea
+                  id={`${id}-description`}
+                  name="description"
+                  maxLength={2000}
+                  value={draft.description ?? ""}
+                  disabled={disabled || !descriptionWritable || draft.description === null}
+                  onChange={(event) => change({ description: event.target.value })}
+                />
+              </Field>
+              {scope === "organization" && (
+                <>
+                  <Field>
+                    <FieldLabel htmlFor={`${id}-color`}>
+                      {t(($) => $.settings.disciplineEditor.color)}
+                    </FieldLabel>
+                    <FieldDescription id={`${id}-color-hint`}>
+                      {t(($) => $.settings.disciplineEditor.colorHint)}
+                    </FieldDescription>
+                    <Input
+                      id={`${id}-color`}
+                      name="color"
+                      value={draft.color ?? ""}
+                      pattern="#[0-9a-fA-F]{6}"
+                      aria-describedby={`${id}-color-hint`}
+                      placeholder="#RRGGBB"
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      disabled={disabled}
+                      onChange={(event) => change({ color: event.target.value || null })}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor={`${id}-icon`}>
+                      {t(($) => $.settings.disciplineEditor.icon)}
+                    </FieldLabel>
+                    <FieldDescription id={`${id}-icon-hint`}>
+                      {t(($) => $.settings.disciplineEditor.iconHint)}
+                    </FieldDescription>
+                    <Input
+                      id={`${id}-icon`}
+                      name="icon"
+                      maxLength={64}
+                      pattern={"[a-z][a-z0-9_\\-]*"}
+                      aria-describedby={`${id}-icon-hint`}
+                      value={draft.icon ?? ""}
+                      autoCapitalize="none"
+                      spellCheck={false}
+                      disabled={disabled}
+                      onChange={(event) => change({ icon: event.target.value || null })}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor={`${id}-order`}>
+                      {t(($) => $.settings.disciplineEditor.order)}
+                    </FieldLabel>
+                    <Input
+                      id={`${id}-order`}
+                      name="display_order"
+                      value={draft.displayOrder}
+                      type="number"
+                      min={0}
+                      max={2147483647}
+                      step={1}
+                      inputMode="numeric"
+                      required
+                      disabled={disabled}
+                      onChange={(event) => change({ displayOrder: event.target.value })}
+                    />
+                  </Field>
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldLabel id={`${id}-allow-label`}>
+                        {t(($) => $.settings.disciplineEditor.allowLocal)}
+                      </FieldLabel>
+                      <FieldDescription>
+                        {t(($) => $.settings.disciplineEditor.allowLocalHint)}
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      name="allow_center_description"
+                      aria-labelledby={`${id}-allow-label`}
+                      isSelected={draft.allowCenterDescription}
+                      isDisabled={disabled}
+                      onChange={(value) => change({ allowCenterDescription: value })}
+                    />
+                  </Field>
+                </>
+              )}
+              <Field orientation="horizontal">
+                <FieldContent>
+                  <FieldLabel id={`${id}-public-label`}>
+                    {t(($) => $.settings.disciplineEditor.publicVisible)}
+                  </FieldLabel>
+                  <FieldDescription>
+                    {t(($) => $.settings.disciplineEditor.publicHint)}
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  name="public_visible"
+                  aria-labelledby={`${id}-public-label`}
+                  isSelected={draft.publicVisible}
+                  isDisabled={disabled}
+                  onChange={(value) => change({ publicVisible: value })}
+                />
+              </Field>
+            </FieldSet>
+            {(notice || error) && (
+              <Alert role={error ? "alert" : "status"}>
+                <AlertDescription>{error ?? notice}</AlertDescription>
+              </Alert>
+            )}
+            {recoveryActions}
+          </FieldGroup>
+        )}
       </form>
       <SheetFooter className="flex-wrap">
         <Button variant="outline" type="button" isDisabled={locked} onPress={onClose}>

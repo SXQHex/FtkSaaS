@@ -1404,7 +1404,7 @@
       },
       "plan-0": {
         "title": "Plan ve kullanım",
-        "description": "Stüdyo planı, aylık faturalanır."
+        "description": "Güncel plan, dönem ve kullanım limitleri."
       },
       "plan-1": {
         "title": "Fatura ve ödeme",
@@ -1558,7 +1558,9 @@
       "allowLocal": "Merkez yerel açıklama kullanabilir",
       "allowLocalHint": "İzin kapatıldığında saklanmış yerel açıklamalar korunur.",
       "publicVisible": "Herkese açık sunuma dahil et",
-      "publicHint": "Organizasyon, merkez ve yayın kapıları birlikte uygulanır."
+      "publicHint": "Organizasyon, merkez ve yayın kapıları birlikte uygulanır.",
+      "colorHint": "İsteğe bağlı. # ile başlayan altı haneli renk kodu.",
+      "iconHint": "İsteğe bağlı, en çok 64 karakter. Küçük harfle başlar; küçük harf, sayı, alt çizgi ve kısa çizgi kullanılır."
     },
     "on": "Açık",
     "off": "Kapalı",
@@ -1604,6 +1606,46 @@
       "time": "Ödeme zamanı (UTC)",
       "timeHint": "Tarih ve saati UTC olarak gir. Yerel saatle karıştırma.",
       "review": "Ödeme bildirimini incele"
+    },
+    "scopeLabel": "Ayar kapsamı",
+    "scopeHint": "Organizasyon ve merkez ayarları ayrı kaydedilir. Seçili kapsama ait değerler gösterilir.",
+    "disciplineStatus": {
+      "reading": "Disiplin kaynağı okunuyor.",
+      "readError": "Disiplin kaynağı okunamadı. Güncel kaynağı yeniden yükle.",
+      "writing": "Değişiklik kaydediliyor.",
+      "unknown": "Yazının sonucu henüz bilinmiyor. Aynı işlemin sonucunu kontrol et.",
+      "pending": "İşlem sonucu henüz kesinleşmedi. İşlem durumunu yeniden oku.",
+      "saved-unread": "Yazı kabul edildi; güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+      "saved": "Güncel disiplin kaydı yeniden okunarak doğrulandı.",
+      "stale": "Kaynak veya etki değişti. Değerleri yeniden yükleyip değişikliği tekrar incele.",
+      "rejected": "Değişiklik kabul edilmedi. Güncel kaynağı yeniden yükle.",
+      "noChanges": "Kaydedilecek değişiklik yok.",
+      "openOperations": "Açık işler var. İlgili iş akışlarından çözüp etkiyi yeniden oku.",
+      "prepareError": "Değerler veya güncel etkiler doğrulanamadı. Alanları kontrol edip kaynağı yeniden yükle.",
+      "retrySame": "Aynı işlemi tekrar dene",
+      "readResult": "İşlem sonucunu oku",
+      "reload": "Kaynağı yeniden yükle",
+      "reviewTitle": "Disiplin değişikliğini incele",
+      "reviewDescription": "Seçili kapsamı, değişen alanları ve güncel etkileri incele. Pasifleştirme geçmiş kayıtları silmez veya işleri kendiliğinden iptal etmez.",
+      "truncated": "Etki listesi kısaltılmıştır. Kaynaktaki toplamları incele; bütün referanslar bu pencerede listelenmez.",
+      "state": "Durum",
+      "noValue": "Yok",
+      "inheritedDescription": "Organizasyon açıklaması kullanılır",
+      "notInCenterList": "Merkez listesinde yok",
+      "edit": "Düzenle",
+      "masterInactive": "Önce organizasyon tanımını etkinleştir.",
+      "unavailable": "Bu kapsamın disiplin yönetimine erişilemiyor."
+    },
+    "disciplineEffects": {
+      "sessions": "Seanslar",
+      "reservations": "Rezervasyonlar",
+      "requests": "Talepler",
+      "waitlist": "Bekleme listesi",
+      "offers": "Teklifler",
+      "classes": "Sınıflar",
+      "programs": "Programlar",
+      "products": "Ürünler",
+      "sales": "Satışlar"
     }
   }
 }
