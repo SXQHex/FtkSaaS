@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "0a5cb06dbb92102b0eb06cc6135a5d5464b0b7833c462332a50c11aeadb11152",
-        "reason": "E12 typed additive request/output and generated validator changes reviewed; live Auth/MFA/transport unchanged."
+        "fingerprint": "6b0fd93fe12fa9b79bcd40ab76ae70cf222ff4f8d0b13430f4b4a3b9fa66af57",
+        "reason": "Reviewed final person-policy acceptance inventory hash, typed validators and unit import; transport/auth/CI executable policy unchanged."
       }
     },
     {
@@ -615,7 +615,9 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/commercial-plan-acceptance.mjs",
         "apps/backend/tests/people-self-scale-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/person-field-policy-acceptance.mjs",
+        "apps/backend/tests/person-field-policy-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -670,7 +672,9 @@
         "apps/backend/database/upper-plan-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
         "apps/backend/database/merge-approval-discovery.sql",
-        "apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql"
+        "apps/backend/supabase/migrations/20261108003318_merge_approval_discovery.sql",
+        "apps/backend/database/person-field-policy.sql",
+        "apps/backend/supabase/migrations/20261114175838_person_field_policy.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -689,8 +693,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1f543bb65415ba5134a5d03b9165d3996fdf699bfe14b879b619b735f401d3c7",
-        "reason": "Registry köküne public transport testi eklendi; kişi/rol/domain davranışı ve mevcut WF04 test assertionları değişmedi"
+        "fingerprint": "e09e5a10354d30911a27d55745338849d7111e80f2ebc1b28c3db4b539ee7302",
+        "reason": "Reviewed final alias-duplicate native snapshot fixture and exact contact/name guard predicates; no writer change, no permissions inferred from metadata."
       }
     },
     {
@@ -1116,8 +1120,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "8b5b946200c23f5ef0bf66c8849b4951e1dec1df778be2006605b68228ec301f",
-        "reason": "Yalnız public transport test anahtarlarının runtime üretimi değişti; CAPTCHA/rate/tenant/replay assertionları aynen korundu"
+        "fingerprint": "7e6c65e4892b1e56036608263e4604743acdb00649cc139db270465c1711ff94",
+        "reason": "Shared person registry root adds the new field policy acceptance import only; public intake and calendar source behavior and guide remain unchanged."
       }
     },
     {
@@ -1634,8 +1638,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "c4a03aaea4b25e0333b31ec14dbe137cf1644ae5eb979bc783dad43652ef941f",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "11a4c734d601263653dc67d73d8fb7196713c1a013aaad1f7fc46dbd9f4a202f",
+        "reason": "Shared person registry root adds field policy acceptance import; CRM writes/intake/automation behavior and guide remain unchanged."
       }
     },
     {

@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `b75971c9c71c8fe8ed0c109e9a0509f949e3ba47de1668aa00942a43d554d043`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0f584e3e804ad7dde5ec2eb5fca4d1563f7d4089157eb749865ce913dc00feca`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -138,6 +138,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [people-registry-scaling.sql](../apps/backend/database/people-registry-scaling.sql) | `a924e70856a67e8321314ef624cd9f71b1196c836a6688b42321392d5cf709fe` |
 | [permission-and-plan-discovery.sql](../apps/backend/database/permission-and-plan-discovery.sql) | `b6e1b7c9ce82bfe0e4da9f6674eb1af3482d2b3599cb4ded75ec6470889fe5c3` |
 | [permission-preparations.sql](../apps/backend/database/permission-preparations.sql) | `606010aa3442de731307a5a96ce19b8adb862b4f479970740cef6d2d5830fe58` |
+| [person-field-policy.sql](../apps/backend/database/person-field-policy.sql) | `4a1a29c7d55a29149867cff2ee0c3030af7ad68c48a5634608dc0a00e2af2e07` |
 | [person-management-discovery.sql](../apps/backend/database/person-management-discovery.sql) | `6d70a3e8323dcccb3d272df0d1e4421ea4e6587d7e85d40ec66d920fcc75c573` |
 | [person-registry-wrappers.sql](../apps/backend/database/person-registry-wrappers.sql) | `767bcaf0917db6a7ceb9b20a40b6319b2e28dbc443b23ddf03a5c67beb8fd99c` |
 | [person-registry.sql](../apps/backend/database/person-registry.sql) | `18df3a588d91093ef7b640ed6c8421295ff62a12d2e9c544aeb65aa8089f1815` |
@@ -350,3 +351,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261113090100_content_delivery.sql](../apps/backend/supabase/migrations/20261113090100_content_delivery.sql) | `87dc5df00dee5b676bd699c8a99a9b5566cd53bf19c8c5b4c35d947867e256f3` |
 | [20261113090200_content_documents.sql](../apps/backend/supabase/migrations/20261113090200_content_documents.sql) | `e3e870e545b151cc852a69d576b9db96acc9b254b6982bb48d2da06826ae9a45` |
 | [20261114120000_center_setup_status.sql](../apps/backend/supabase/migrations/20261114120000_center_setup_status.sql) | `94e4c3e4f92775d96701afa920cc510701c1139a66dbc7f9204fc54aeae70ebc` |
+| [20261114175838_person_field_policy.sql](../apps/backend/supabase/migrations/20261114175838_person_field_policy.sql) | `4a1a29c7d55a29149867cff2ee0c3030af7ad68c48a5634608dc0a00e2af2e07` |

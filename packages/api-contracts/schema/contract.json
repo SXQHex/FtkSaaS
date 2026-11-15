@@ -3338,6 +3338,9 @@
               "type": "null"
             }
           ]
+        },
+        "field_policy": {
+          "$ref": "#/$defs/PersonFieldPolicy"
         }
       },
       "required": [
@@ -3666,6 +3669,9 @@
               "type": "null"
             }
           ]
+        },
+        "field_policy": {
+          "$ref": "#/$defs/PersonNameFieldPolicy"
         }
       },
       "required": [
@@ -3738,6 +3744,9 @@
               "type": "null"
             }
           ]
+        },
+        "field_policy": {
+          "$ref": "#/$defs/PersonNameFieldPolicy"
         }
       },
       "required": [
@@ -58387,6 +58396,68 @@
       ],
       "additionalProperties": false,
       "description": "Current effective publication in organization/center scope with ready file; invitation means a provider-confirmed successful center account-invitation delivery, including later accepted/expired/revoked invitations. No recipient or entity identifiers."
+    },
+    "PersonFieldPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "source": {
+              "const": "person"
+            },
+            "person_update_writable": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "source",
+            "person_update_writable"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "enum": [
+                "account_profile",
+                "native_auth"
+              ]
+            },
+            "person_update_writable": {
+              "const": false
+            }
+          },
+          "required": [
+            "source",
+            "person_update_writable"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Current controlling source and intrinsic person_update_v1 field mutability. Not actor authorization, historical provenance, verification proof or login status. No identity/credentials. Account-owned fields are always false; writes recheck live authority."
+    },
+    "PersonNameFieldPolicy": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "$ref": "#/$defs/PersonFieldPolicy"
+        },
+        "given_name": {
+          "$ref": "#/$defs/PersonFieldPolicy"
+        },
+        "family_name": {
+          "$ref": "#/$defs/PersonFieldPolicy"
+        }
+      },
+      "required": [
+        "display_name",
+        "given_name",
+        "family_name"
+      ],
+      "additionalProperties": false,
+      "description": "Separate given_name/family_name have no person_update_v1 input and remain false even for local persons."
     }
   },
   "x-contract": {
@@ -63950,7 +64021,8 @@
           "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
           "Pagination supports created_at_asc; cursor is bound to filters and scope.",
           "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
-          "query matches display name or exact decimal subscriber number, including old merge aliases; original tenant/center/actor/Starter scope precedes pagination. Subscriber numbers never grant access."
+          "query matches display name or exact decimal subscriber number, including old merge aliases; original tenant/center/actor/Starter scope precedes pagination. Subscriber numbers never grant access.",
+          "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens."
         ],
         "required_features": [
           "F07"
@@ -64050,7 +64122,8 @@
         "runtime_limits": [
           "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
           "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
-          "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity."
+          "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity.",
+          "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens."
         ],
         "required_features": [
           "F06",
@@ -103552,7 +103625,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 161,
+      "migration_count": 162,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
