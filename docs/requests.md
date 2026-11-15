@@ -755,3 +755,25 @@ Eğitmen için mevcut F04 `management_state_get_v1` role_assign selector'ının 
 [WF04](workflows.md#wf04) typed alan ve çağrı kurallarının sahibidir. `PersonView`/`PersonSummary.field_policy` ad alanlarını, görünür `contacts[].field_policy` satır düzeyini ayırır: `{source:person|account_profile|native_auth,person_update_writable:boolean}`. Native/hesap kaynakları false; yerel ayrı given_name/family_name mevcut yazma sözleşmesinde desteklenmediğinden false kalır. Kaynak, aktif alan kontrolünü anlatır; yalnız doğrulama tarihinden veya hesap kimliğinden tahmin edilmez.
 
 **Frontend kabul ölçütü:** Hesap adı/native iletişimi salt okunur göster; mevcut yazma yetkisi de varsa yerel yazılabilir alanları aç. Metadata yoksa yazılabilir varsayma. Tam contacts patch'inde salt okunur kind/value satırlarını koru; yanıt metadata'sını veya verified_at alanını komuta gönderme. Ad, iletişim veya hesap bağı işleminden sonra yeniden oku. Hesap kimliği/token açılması veya frontend kod değişikliği bu teslimin parçası değildir. Kaynak/CI/deploy/kabul aşamaları [backend durum sahibindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#kisi-alan-kaynagi).
+
+
+<a id="xreq-048"></a>
+## XREQ-048 Üyeler listesi durum filtresi ve sayfa özeti
+
+### Backend tüketici devri — 15 Kasım 2026
+
+[WF04](workflows.md#wf04) filtresi `people_list_v1(student_status:active|inactive,center_id)` ile typed sunulur. Opsiyonel relationship yalnız student/null/atlanmış olabilir. Aktif ilişki eski pasif tarihçeye üstün gelir; hiç öğrenciliği olmayan kişi pasif sayılmaz. Merkezdeki canonical kişi/alias öğrenciliği sayfalama öncesi değerlendirilir; ad/ilişki filtreleriyle birlikte cursor kapsamındadır.
+
+Üye tablosu sütunları için aynı isteğe `include_member_summary:true` eklenir. Dönen sayfanın görünür satırlarında `member_summary.as_of`, `rights`, `debt`, `next_lesson` vardır. Native hak kullanılabilirliği kredi string toplamı ve ayrı süreli paket sayısıdır; borç gerçek currency başına tam remaining_minor string'dir; sıradaki görünür aktif rezervasyon seansının kimliği ve UTC saatleri sunulur. `restricted/not_enabled` sıfır/boş başarı değildir; available sıfır/[]/null gerçek izinli boşluğu anlatır. Ayrı native hak/finans/seans izinleri ve Starter kapsamları korunur; kişinin listede görünmesi ek finans yetkisi vermez. Hesap kimliği/token veya bütün kişi/rezervasyon geçmişlerini tarama gerekmez. Alan ve sınırların ayrıntısı WF04 sahibindedir.
+
+**Frontend kabul ölçütü:** Üyeler ekranında Aktif/Pasif değişince cursor ve birikmiş sayfaları sıfırla, açık merkezle yeni ilk sayfayı al. Aynı filtreyle next_cursor zincirini tüket; yalnız mevcut sayfayı istemcide süzme. Öğrencilik filtresi kişi veya paket dondurma durumu diye gösterilmez. Geçersiz/eski cursor veya yetki reddi eksik başarıya çevrilmez. Kaynak/CI/deploy/kabul aşamaları [backend durum sahibindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#ogrencilik-durum-filtresi).
+
+
+<a id="xreq-049"></a>
+## XREQ-049 Merkez geneli davet ve hesap bağlantısı keşfi
+
+### Backend tüketici devri — 15 Kasım 2026
+
+Bu, XREQ-048'deki iki üye listesi desteğine ek üçüncü istektir. [WF04](workflows.md#wf04) sahibi olan mevcut `management_state_get_v1` içinde account_access_revoke_v1 ve account_link_remove_v1 selector.key.directory=center, opsiyonel query/status, açık merkez ve page ile iki bağımsız typed liste sunulur. Önceden person_id/invitation_id/link_id bilinmez. Dönen entity/versions/current.values komutlar için gerçek kimlik/sürümü sağlar; access_detail gösterim, access_summary yetkili arama kümesinin toplam/durum/filtre sayaçlarıdır.
+
+**Frontend kabul ölçütü:** Her liste kendi arama/durum/cursor state'ini taşır; değişimde birikmiş sayfa sıfırlanır. Kişileri veya rezervasyon geçmişini tarama. Native account/Auth kimliği, e-posta/token isteme. display_name=null ve delivery.restricted bilinmeyendir; created_at gönderim tarihi değildir, sent_at null ise tarih uydurma. can_resend yalnız fresh komut ön kontrolüdür; açık yeniden gönderim niyetiyle mevcut account_access_send çağrısı ve yeniden okuma kullanılır. Mevcut native yetki/merkez/Starter sınırları korunur; bağlantı kaldırmada ek merkez reddi aşılmaz. Frontend yerelde çalışabilir; bu backend okuması Vercel yayını gerektirmez. Kaynak/CI/deploy/kabul aşamaları [backend durum kaydındadır](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#ogrencilik-durum-filtresi).

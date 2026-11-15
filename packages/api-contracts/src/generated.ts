@@ -648,6 +648,44 @@ person_update_writable: false
  */
 export type ContentLanguage = string
 /**
+ * Currently usable selected-center credits at as_of, applying native sale/account/validity/freeze rules; no booking guarantee. Timed packages with available quota counted separately only when F16 is enabled, never as credits.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberRightsSummary".
+ */
+export type MemberRightsSummary = (MemberSummaryUnavailable | {
+status: "available"
+available_credits: MemberSummaryInteger
+available_timed_packages?: Count
+})
+/**
+ * Exact aggregate nonnegative integer; never convert through floating-point.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberSummaryInteger".
+ */
+export type MemberSummaryInteger = string
+/**
+ * Positive outstanding debt per actual currency using native claim-aware debt_remaining. No currency default, FX or cross-currency sum. Empty available list means no debt in this center.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberDebtSummary".
+ */
+export type MemberDebtSummary = (MemberSummaryUnavailable | {
+status: "available"
+by_currency: MemberDebtCurrency[]
+})
+/**
+ * Earliest visible future planned/unstarted lesson with active reservation in selected center. Null means no such visible lesson, not a hidden-data assertion.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonSummary".
+ */
+export type MemberLessonSummary = (MemberSummaryUnavailable | {
+status: "available"
+lesson: (MemberNextLesson | null)
+})
+/**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "DisciplineRelationshipKind".
  */
@@ -774,6 +812,33 @@ impact_approval?: PreviewToken
  * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 accepted_reservation_ids?: string[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_people_list".
+ */
+export type RequestPeopleList = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+query?: (Text | null)
+relationship?: (RelationshipKind | null)
+page: Page
+/**
+ * Optional current student membership in explicit selected center; applied before pagination. Inactive requires student history and no active student relationship in canonical alias group. Omit for original behavior.
+ */
+student_status?: ("active" | "inactive")
+/**
+ * Opt-in summaries for only the final visible cursor page. Requires explicit selected center. Each component preserves native reader permission/feature gates; restricted/not_enabled is never zero.
+ */
+include_member_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1598,6 +1663,39 @@ export type SettlementProposal = (SettlementPaymentProposal | SettlementOffsetPr
  * via the `definition` "SettingsCenterWorkCalendarValue".
  */
 export type SettingsCenterWorkCalendarValue = (CenterWorkCalendar | null)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccessDirectoryDetail".
+ */
+export type AccessDirectoryDetail = ({
+kind: "invitation"
+/**
+ * Only native person_get visibility may disclose/search the name; null is redacted.
+ */
+display_name: (Text | null)
+created_at: Instant
+expires_at: Instant
+can_resend: boolean
+delivery: AccessDeliveryVisibility
+} | {
+kind: "account_link"
+/**
+ * Only native person_get visibility may disclose/search the name; null is redacted.
+ */
+display_name: (Text | null)
+created_at: Instant
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccessDeliveryVisibility".
+ */
+export type AccessDeliveryVisibility = ({
+visibility: "restricted"
+} | {
+visibility: "available"
+state: (("pending" | "running" | "retry_wait" | "succeeded" | "failed" | "cancelled") | null)
+sent_at: (Instant | null)
+})
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Target_policy_publish_protected".
@@ -4467,6 +4565,17 @@ ManagementProjection_content_catalog_save_v1?: ManagementProjectionContentCatalo
 CenterSetupStatus?: CenterSetupStatus
 PersonFieldPolicy?: PersonFieldPolicy
 PersonNameFieldPolicy?: PersonNameFieldPolicy
+MemberSummaryInteger?: MemberSummaryInteger
+MemberSummaryUnavailable?: MemberSummaryUnavailable
+MemberRightsSummary?: MemberRightsSummary
+MemberDebtCurrency?: MemberDebtCurrency
+MemberDebtSummary?: MemberDebtSummary
+MemberNextLesson?: MemberNextLesson
+MemberLessonSummary?: MemberLessonSummary
+MemberPageSummary?: MemberPageSummary
+AccessDirectorySummary?: AccessDirectorySummary
+AccessDeliveryVisibility?: AccessDeliveryVisibility
+AccessDirectoryDetail?: AccessDirectoryDetail
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7061,6 +7170,7 @@ given_name?: (string | null)
 family_name?: (string | null)
 subscriber_number?: (SubscriberNumber | null)
 field_policy?: PersonNameFieldPolicy
+member_summary?: MemberPageSummary
 }
 /**
  * Separate given_name/family_name have no person_update_v1 input and remain false even for local persons.
@@ -7072,6 +7182,43 @@ export interface PersonNameFieldPolicy {
 display_name: PersonFieldPolicy
 given_name: PersonFieldPolicy
 family_name: PersonFieldPolicy
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberPageSummary".
+ */
+export interface MemberPageSummary {
+as_of: Instant
+rights: MemberRightsSummary
+debt: MemberDebtSummary
+next_lesson: MemberLessonSummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberSummaryUnavailable".
+ */
+export interface MemberSummaryUnavailable {
+status: ("restricted" | "not_enabled")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberDebtCurrency".
+ */
+export interface MemberDebtCurrency {
+currency: Currency
+remaining_minor: MemberSummaryInteger
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberNextLesson".
+ */
+export interface MemberNextLesson {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+starts_at: Instant
+ends_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9602,25 +9749,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_people_list".
- */
-export interface RequestPeopleList {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-query?: (Text | null)
-relationship?: (RelationshipKind | null)
-page: Page
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17851,6 +17979,7 @@ merge_approval?: MergeApprovalDiscovery
  * True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority.
  */
 account_access_granted?: boolean
+access_detail?: AccessDirectoryDetail
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21040,6 +21169,10 @@ invitation_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
+} | {
+directory: "center"
+query?: string
+status?: ("pending" | "expired" | "accepted" | "revoked")
 })
 }
 /**
@@ -21068,6 +21201,10 @@ link_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
+} | {
+directory: "center"
+query?: string
+status?: ("active" | "revoked")
 })
 }
 /**
@@ -22852,6 +22989,19 @@ items: ManagementStateView[]
 next_cursor: (OpaqueToken | null)
 as_of: Instant
 sale_change_context?: EntityVersion
+access_summary?: AccessDirectorySummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccessDirectorySummary".
+ */
+export interface AccessDirectorySummary {
+total: Count
+filtered: Count
+by_state: {
+state: ("pending" | "expired" | "accepted" | "revoked" | "active")
+count: Count
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

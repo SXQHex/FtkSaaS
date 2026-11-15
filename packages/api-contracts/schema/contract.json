@@ -3672,6 +3672,9 @@
         },
         "field_policy": {
           "$ref": "#/$defs/PersonNameFieldPolicy"
+        },
+        "member_summary": {
+          "$ref": "#/$defs/MemberPageSummary"
         }
       },
       "required": [
@@ -8645,6 +8648,18 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "student_status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "inactive"
+          ],
+          "description": "Optional current student membership in explicit selected center; applied before pagination. Inactive requires student history and no active student relationship in canonical alias group. Omit for original behavior."
+        },
+        "include_member_summary": {
+          "type": "boolean",
+          "description": "Opt-in summaries for only the final visible cursor page. Requires explicit selected center. Each component preserves native reader permission/feature gates; restricted/not_enabled is never zero."
         }
       },
       "required": [
@@ -8653,7 +8668,54 @@
         "org_id",
         "page"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "student_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "type": "string"
+              },
+              "relationship": {
+                "enum": [
+                  "student",
+                  null
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "include_member_summary": {
+                "const": true
+              }
+            },
+            "required": [
+              "include_member_summary"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_people_list": {
       "type": "object",
@@ -26366,6 +26428,9 @@
         "account_access_granted": {
           "type": "boolean",
           "description": "True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority."
+        },
+        "access_detail": {
+          "$ref": "#/$defs/AccessDirectoryDetail"
         }
       },
       "required": [
@@ -31654,6 +31719,42 @@
                     "const": "content_catalog_save_v1"
                   }
                 }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "key": {
+                    "properties": {
+                      "directory": {
+                        "const": "center"
+                      }
+                    },
+                    "required": [
+                      "directory"
+                    ]
+                  }
+                },
+                "required": [
+                  "key"
+                ]
+              }
+            },
+            "required": [
+              "selector"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "type": "string"
               }
             }
           }
@@ -37760,6 +37861,32 @@
                 "person_id"
               ],
               "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "center"
+                },
+                "query": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "expired",
+                    "accepted",
+                    "revoked"
+                  ]
+                }
+              },
+              "required": [
+                "directory"
+              ],
+              "additionalProperties": false
             }
           ]
         }
@@ -37818,6 +37945,30 @@
               },
               "required": [
                 "person_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "center"
+                },
+                "query": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "revoked"
+                  ]
+                }
+              },
+              "required": [
+                "directory"
               ],
               "additionalProperties": false
             }
@@ -41684,6 +41835,9 @@
         },
         "sale_change_context": {
           "$ref": "#/$defs/EntityVersion"
+        },
+        "access_summary": {
+          "$ref": "#/$defs/AccessDirectorySummary"
         }
       },
       "required": [
@@ -58458,6 +58612,346 @@
       ],
       "additionalProperties": false,
       "description": "Separate given_name/family_name have no person_update_v1 input and remain false even for local persons."
+    },
+    "MemberSummaryInteger": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$",
+      "maxLength": 40,
+      "description": "Exact aggregate nonnegative integer; never convert through floating-point."
+    },
+    "MemberSummaryUnavailable": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "restricted",
+            "not_enabled"
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "MemberRightsSummary": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/MemberSummaryUnavailable"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "available"
+            },
+            "available_credits": {
+              "$ref": "#/$defs/MemberSummaryInteger"
+            },
+            "available_timed_packages": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "status",
+            "available_credits"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Currently usable selected-center credits at as_of, applying native sale/account/validity/freeze rules; no booking guarantee. Timed packages with available quota counted separately only when F16 is enabled, never as credits."
+    },
+    "MemberDebtCurrency": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "remaining_minor": {
+          "$ref": "#/$defs/MemberSummaryInteger"
+        }
+      },
+      "required": [
+        "currency",
+        "remaining_minor"
+      ],
+      "additionalProperties": false
+    },
+    "MemberDebtSummary": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/MemberSummaryUnavailable"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "available"
+            },
+            "by_currency": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/MemberDebtCurrency"
+              }
+            }
+          },
+          "required": [
+            "status",
+            "by_currency"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Positive outstanding debt per actual currency using native claim-aware debt_remaining. No currency default, FX or cross-currency sum. Empty available list means no debt in this center."
+    },
+    "MemberNextLesson": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "ends_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "session_id",
+        "starts_at",
+        "ends_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonSummary": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/MemberSummaryUnavailable"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "available"
+            },
+            "lesson": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/MemberNextLesson"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "status",
+            "lesson"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Earliest visible future planned/unstarted lesson with active reservation in selected center. Null means no such visible lesson, not a hidden-data assertion."
+    },
+    "MemberPageSummary": {
+      "type": "object",
+      "properties": {
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "rights": {
+          "$ref": "#/$defs/MemberRightsSummary"
+        },
+        "debt": {
+          "$ref": "#/$defs/MemberDebtSummary"
+        },
+        "next_lesson": {
+          "$ref": "#/$defs/MemberLessonSummary"
+        }
+      },
+      "required": [
+        "as_of",
+        "rights",
+        "debt",
+        "next_lesson"
+      ],
+      "additionalProperties": false
+    },
+    "AccessDirectorySummary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/Count"
+        },
+        "filtered": {
+          "$ref": "#/$defs/Count"
+        },
+        "by_state": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "expired",
+                  "accepted",
+                  "revoked",
+                  "active"
+                ]
+              },
+              "count": {
+                "$ref": "#/$defs/Count"
+              }
+            },
+            "required": [
+              "state",
+              "count"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "total",
+        "filtered",
+        "by_state"
+      ],
+      "additionalProperties": false
+    },
+    "AccessDeliveryVisibility": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "visibility": {
+              "const": "restricted"
+            }
+          },
+          "required": [
+            "visibility"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "visibility": {
+              "const": "available"
+            },
+            "state": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "pending",
+                    "running",
+                    "retry_wait",
+                    "succeeded",
+                    "failed",
+                    "cancelled"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "sent_at": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Instant"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "visibility",
+            "state",
+            "sent_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AccessDirectoryDetail": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "invitation"
+            },
+            "display_name": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Text"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only native person_get visibility may disclose/search the name; null is redacted."
+            },
+            "created_at": {
+              "$ref": "#/$defs/Instant"
+            },
+            "expires_at": {
+              "$ref": "#/$defs/Instant"
+            },
+            "can_resend": {
+              "type": "boolean"
+            },
+            "delivery": {
+              "$ref": "#/$defs/AccessDeliveryVisibility"
+            }
+          },
+          "required": [
+            "kind",
+            "display_name",
+            "created_at",
+            "expires_at",
+            "can_resend",
+            "delivery"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "account_link"
+            },
+            "display_name": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Text"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only native person_get visibility may disclose/search the name; null is redacted."
+            },
+            "created_at": {
+              "$ref": "#/$defs/Instant"
+            }
+          },
+          "required": [
+            "kind",
+            "display_name",
+            "created_at"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "x-contract": {
@@ -64022,7 +64516,9 @@
           "Pagination supports created_at_asc; cursor is bound to filters and scope.",
           "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
           "query matches display name or exact decimal subscriber number, including old merge aliases; original tenant/center/actor/Starter scope precedes pagination. Subscriber numbers never grant access.",
-          "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens."
+          "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens.",
+          "student_status=active|inactive requires explicit nonnull center_id and relationship omitted/null/student. Filters canonical selected-center student membership before cursor/limit on normal and self routes; active overrides inactive history, nonstudents excluded. Whole-request cursor scope binds status and all existing filters; omit for original behavior.",
+          "include_member_summary=true requires explicit center_id; enrich only the final returned page after pagination. Rights reuse current availability and separate timed packages; debt groups exact remaining by actual currency; next lesson preserves reservation/session row visibility. Per-component restricted/not_enabled states never imply zero; current native reader permissions/features preserved."
         ],
         "required_features": [
           "F07"
@@ -82253,7 +82749,8 @@
           "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window.",
           "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
           "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission.",
-          "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged."
+          "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged.",
+          "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -103142,6 +103639,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberNextLesson/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -103625,7 +104128,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 162,
+      "migration_count": 163,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
