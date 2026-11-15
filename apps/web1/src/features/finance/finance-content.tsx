@@ -500,7 +500,7 @@ export function FinanceContent({
     </>
   );
 }
-function CollectionEditor({
+export function CollectionEditor({
   scope,
   selection,
   timezone,
