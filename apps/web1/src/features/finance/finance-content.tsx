@@ -4,6 +4,8 @@ import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { FinanceView, type FinanceTab, type FinanceMovementRow } from "./finance-view";
+import { DebtEditor } from "./debt-editor";
+import type { DebtAction } from "./debt-command";
 import { CreditRefundEditor } from "./credit-refund-editor";
 import { CorrectionEditor } from "./correction-editor";
 import { FinanceActionSheet } from "./finance-action-sheet";
@@ -59,6 +61,7 @@ export function FinanceContent({
     [collect, setCollect] = useState(false),
     [correctionId, setCorrectionId] = useState<string>(),
     [creditRefund, setCreditRefund] = useState(false),
+    [debtAction, setDebtAction] = useState<{ id: string; action: DebtAction; label: string }>(),
     [locked, setLocked] = useState(false),
     [invalid, setInvalid] = useState(false);
   const workspace = useQuery({
@@ -317,7 +320,18 @@ export function FinanceContent({
                 person: personLabel,
                 lastSale: null,
                 amount: formatMinorAmount(row.remaining_minor, source.currency),
-                actions: [],
+                actions:
+                  !workspace.isError && !locked
+                    ? (["offset", "adjust"] as const).map((action) => ({
+                        kind: action,
+                        onPress: () =>
+                          setDebtAction({
+                            id: row.id,
+                            action,
+                            label: `${personLabel} · ${formatDate(row.due_at)}`,
+                          }),
+                      }))
+                    : [],
               }))
             : []
         }
@@ -416,6 +430,24 @@ export function FinanceContent({
           </div>
         }
       />
+      {debtAction && selection && center && (
+        <DebtEditor
+          key={`${selection.personId}:${selection.currency}:${debtAction.id}:${debtAction.action}`}
+          scope={scope}
+          selection={selection}
+          id={debtAction.id}
+          action={debtAction.action}
+          debtLabel={debtAction.label}
+          personLabel={personLabel}
+          sourceAvailable={!workspace.isError}
+          onClose={() => setDebtAction(undefined)}
+          onRefresh={async () => {
+            await finance.refetch({ throwOnError: true });
+          }}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+        />
+      )}
       {creditRefund && selection && center && (
         <CreditRefundEditor
           key={`${selection.personId}:${selection.currency}`}

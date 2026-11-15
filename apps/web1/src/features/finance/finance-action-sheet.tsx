@@ -245,7 +245,7 @@ export function FinanceActionSheet({
                 />
                 <FieldError id="finance-currency-error">{errors?.currency}</FieldError>
               </Field>
-              {(collect || correction || action === "credit-refund") && (
+              {(collect || correction) && (
                 <FieldSet>
                   <FieldLegend>{t(($) => $.finance.method)}</FieldLegend>
                   <ToggleGroup
@@ -263,9 +263,7 @@ export function FinanceActionSheet({
                     }
                   >
                     <ToggleGroupItem id="cash">{t(($) => $.finance.cash)}</ToggleGroupItem>
-                    <ToggleGroupItem id="card_pos" isDisabled={action === "credit-refund"}>
-                      {t(($) => $.finance.card)}
-                    </ToggleGroupItem>
+                    <ToggleGroupItem id="card_pos">{t(($) => $.finance.card)}</ToggleGroupItem>
                     <ToggleGroupItem id="bank_transfer">{t(($) => $.finance.bank)}</ToggleGroupItem>
                   </ToggleGroup>
                   <FieldError id="finance-method-error">{errors?.method}</FieldError>
@@ -336,7 +334,7 @@ export function FinanceActionSheet({
                   </ToggleGroup>
                 </FieldSet>
               )}
-              {collect || offset ? (
+              {collect ? (
                 <Field>
                   <FieldLabel htmlFor="finance-note">{t(($) => $.finance.note)}</FieldLabel>
                   <Input
@@ -348,7 +346,7 @@ export function FinanceActionSheet({
                   />
                   <FieldDescription>{t(($) => $.finance.optional)}</FieldDescription>
                 </Field>
-              ) : (
+              ) : !offset ? (
                 <Field data-invalid={invalid("reason")}>
                   <FieldLabel htmlFor="finance-reason">{t(($) => $.finance.reason)}</FieldLabel>
                   <Textarea
@@ -370,7 +368,7 @@ export function FinanceActionSheet({
                   </FieldDescription>
                   <FieldError id="finance-reason-error">{errors?.reason}</FieldError>
                 </Field>
-              )}
+              ) : null}
             </FieldGroup>
           </form>
         ) : (

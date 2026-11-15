@@ -16,7 +16,8 @@ import {
   readCreditRefundResult,
   type CreditRefundIntent,
 } from "./credit-refund";
-export type FinanceIntent = CollectionIntent | CorrectionIntent | CreditRefundIntent;
+import { writeDebt, readDebtReceipt, readDebtResult, type DebtIntent } from "./debt-command";
+export type FinanceIntent = CollectionIntent | CorrectionIntent | CreditRefundIntent | DebtIntent;
 export function writeFinance(intent: FinanceIntent) {
   switch (intent.operation) {
     case "collection_record_v1":
@@ -25,6 +26,9 @@ export function writeFinance(intent: FinanceIntent) {
       return writeCorrection(intent);
     case "student_credit_refund_v1":
       return writeCreditRefund(intent);
+    case "student_credit_offset_v1":
+    case "debt_adjust_v1":
+      return writeDebt(intent);
   }
 }
 export function readFinanceReceipt(intent: FinanceIntent) {
@@ -35,6 +39,9 @@ export function readFinanceReceipt(intent: FinanceIntent) {
       return readCorrectionReceipt(intent);
     case "student_credit_refund_v1":
       return readCreditRefundReceipt(intent);
+    case "student_credit_offset_v1":
+    case "debt_adjust_v1":
+      return readDebtReceipt(intent);
   }
 }
 export function readFinanceResult(intent: FinanceIntent, id?: string) {
@@ -45,5 +52,8 @@ export function readFinanceResult(intent: FinanceIntent, id?: string) {
       return readCorrectionResult(intent, id);
     case "student_credit_refund_v1":
       return readCreditRefundResult(intent, id);
+    case "student_credit_offset_v1":
+    case "debt_adjust_v1":
+      return readDebtResult(intent, id);
   }
 }

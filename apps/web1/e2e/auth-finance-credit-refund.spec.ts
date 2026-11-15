@@ -97,6 +97,8 @@ async function setup(
   await page.getByRole("button", { name: "Nakit iade", exact: true }).click();
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName("Nakit iade");
+  await expect(panel.getByRole("radio")).toHaveCount(0);
+  await expect(panel.getByLabel("İşlem referansı", { exact: true })).toHaveCount(0);
   await panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true }).fill("10000");
   await panel.getByLabel("İşlem tarihi ve saati", { exact: true }).fill("2026-11-15T15:00");
   await panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic cash refund");
