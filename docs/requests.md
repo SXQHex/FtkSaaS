@@ -43,6 +43,8 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-033 | Backend; açık kullanıcı kararı | Frontend | [FD04](contracts/02-FtkSaaS-teknik-sozlesme.md#fd04--bildirim-hatırlatma-ve-pazarlama-kabul-edildi), [bildirim tüketicisi](settings.md#bildirim-kullanılabilirliği), [WF11](workflows.md#wf11) / [WF20](workflows.md#wf20) | Backend olay/şablon kimliği ve temel şablonundan kullanıcının tercih ettiği dilde içerik; açık tarayıcı gerektirmeyen e-posta entegrasyonu; retry/erişim/tercih kapılarının korunması. | Frontend uygulaması ve kabulü bekleniyor | 8 Kasım kullanıcı kararı; mevcut API ve temel şablon kaynakları aşağıda devredildi. Backend yeni dil/çeviri çalışması yapmaz. |
 
+| XREQ-053 | Backend değerlendirmesi; Web1 W1-BE-19 / E27 | Backend; tüketici frontend | [WF14](workflows.md#wf14) | Native self anlaşma/ödeme keşfi ve dönem/para birimi toplamları; kullanıcının ek kararıyla yeni ödeme yöntemi kaydı. | Aday uygulama/test; CI/main/development açık | Backend kapsam kararı 16 Kasım kullanıcı yetkisi; frontend kabulü verilmedi. [Değerlendirme](#xreq-053). |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -799,3 +801,13 @@ Bu, XREQ-048'deki iki üye listesi desteğine ek üçüncü istektir. W1-BE-03 d
 W1-BE-13/14 için kullanıcı onaylı destek kaynak adayındadır; yayımlanmış kabulü değildir. `reservation_list_v1` zaman filtresinin kesin çağrı/cursor sınırı [WF06](workflows.md#wf06), `freeze_cancel_preview_v1` / `freeze_cancel_apply_v1` etkisi ve yeniden okuma sırası [WF05](workflows.md#wf05) sahibindedir. W1-BE-11 hak hareketi talebi bu kayıtla genişletilmez.
 
 **Frontend kabul ölçütü:** Filtre değişiminde cursor ve birikmiş sayfaları bırak; zaman ayrımını ders başlangıcı ve backend’in sabit sınırıyla tüket, görünür sayfayı süzme veya bütün geçmişi tarama. Dondurma iptalinde backend preview’ının geçerlilik ve korunmuş rezervasyon etkisini gösterip açık onay al; aynı intent’in key/payload’ını yeniden denemede koru. Stale, rol/plan reddi veya destek henüz yayımlanmamışsa sahte başarı/erken bitiş üretme. ACK sonrası native hak/satış ve rezervasyon okumalarını yenile. Frontend adına uygulama veya kabul kapanışı verilmez; backend kaynak/CI/dağıtım/hosted sonuçları [devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#uye-profili-zaman-iptal) izlenir.
+
+## XREQ-053 Web1 eğitmenin kendi anlaşma ve ödeme keşfi
+
+### Backend değerlendirmesi — 16 Kasım 2026
+
+Frontend talebi `apps/web1/tasks/request.md` W1-BE-19 sahibindedir. Native `earnings_list_v1` mevcut hakediş satırları/düzeltmeleri ve bunlara bağlı ödeme özetlerini verir; bir ödeme başka dönemde oluşturulmuş hakedişe bağlı olduğunda ödeme dönemi geçmişini keşfetmez. `instructor_agreement_get_v1` bilinen kimlik için uygundur; `instructor_agreements_list_v1` yönetim yetkisi genel eğitmene açılmaz. Bu nedenle bağımsız özne keşfi gerçek backend eksiğidir; mevcut ödeme/düzeltme writer'ları yeniden kurulmaz.
+
+Kullanıcı mevcut yöntemsiz kayda yalnız etiket koymayı yeterli bulmadı; yeni ödemelerde yöntem kaydetmeyi de açıkça istedi. Aday kaynak mevcut manuel yöntem sözleşmesini ödeme/düzeltme komutlarına ekler, geçmişe yöntem atamaz. Native self okuyucunun çağrısı, cursor/dönem/toplam/yöntem ve alias sınırı yalnız [WF14](workflows.md#wf14) sahibindedir. Değişmez anlaşma gerçeklerini ve mevcut get/accept akışını korur; canonical özne geçmiş alias anlaşmasını tüketebilir.
+
+Kaynak/test/aday CI/main/development/hosted sonuçları [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-w19) tutulur. Frontend kodu/todo/kabul değiştirilmedi ve karşı alan adına onay verilmedi.

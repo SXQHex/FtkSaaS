@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `03f51a29d22b54d309126d1647b8019a6ae3d0c0bd15d46c8058f1156cc011d8`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `35d6993cd8f0c5116cb400097c4849ed077570d0ab5e6ee36fc3a4d028c562c9`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 169. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 170. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -177,3 +177,4 @@ Sıralı migration: 169. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261116111008_session_waitlist_rights.sql](../apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql) | `4a263ba01bdc512c091d16450d2ff66fd36d83c1c94dbe171bbd4c66ad8b5fc2` |
 | [20261116135202_lesson_request_status_summary.sql](../apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql) | `419f6512c40825581dc0c337f4e3e87be7eea069056b48a65ec0699a31d96239` |
 | [20261116143645_assigned_session_room_labels.sql](../apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql) | `d4ad8b4b0d33f987d54c0e628c77a64e9ea410da41e15a78f0c3e49a8d2525bc` |
+| [20261116194343_instructor_self_account.sql](../apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql) | `147cefb1afa6618de42b6e47b96a2317a1abbc55a87581865a15dbc634887bc9` |
