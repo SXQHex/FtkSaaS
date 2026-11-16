@@ -1,5 +1,6 @@
 import './calendar-preferences-acceptance.mjs';
 import './personal-calendar-acceptance.mjs';
+import './member-profile-lifecycle-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
@@ -62,6 +63,31 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  const list=(u,b={})=>must(u,'reservation_list_v1',scope({page:{},...b}));
  const get=(u,s,b={})=>must(u,'session_get_v1',scope({session_id:s,...b}));
  const ids=x=>x.items.map(v=>v.id);
+ await t.test('member time partitions filter the full authorized set before paging and retain their cutoff',async()=>{
+  const p=key(),at=Date.now(),createdSessions=[],createdReservations=[],previousCount=reservations.length;
+  await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Time filter learner','active')",[p,org]);
+  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now())",[key(),org,c1,p]);
+  try{
+   for(const [start,end] of [[-7200000,-3600000],[-1800000,1800000],[3600000,7200000],[10800000,14400000]]){
+    const s=await session(c1,new Date(at+start).toISOString(),new Date(at+end).toISOString());createdSessions.push(s);createdReservations.push(await reservation(s,p));
+   }
+   const base={center_id:c1,person_id:p,page:{limit:1,sort:'starts_at_asc'}},seen=[];
+   const first=await list(cm.u,{...base,time_filter:'upcoming'});seen.push(...ids(first));assert(first.next_cursor);
+   const second=await list(cm.u,{...base,time_filter:'upcoming',page:{...base.page,cursor:first.next_cursor}});seen.push(...ids(second));assert.equal(second.as_of,first.as_of);
+   assert.deepEqual(seen,createdReservations.slice(2));assert.equal(second.next_cursor,null);
+   assert.deepEqual(ids(await list(cm.u,{...base,time_filter:'past',page:{limit:200,sort:'starts_at_asc'}})),createdReservations.slice(0,2));
+   assert.deepEqual(ids(await list(cm.u,{...base,time_filter:'all',page:{limit:200,sort:'starts_at_asc'}})),createdReservations);
+   assert.deepEqual(ids(await list(cm.u,{...base,page:{limit:200,sort:'starts_at_asc'}})),createdReservations);
+   for(const change of [{time_filter:'past'},{time_filter:'all'},{person_id:student.p}])await fail(cm.u,'reservation_list_v1',{...base,time_filter:'upcoming',...change,page:{...base.page,cursor:first.next_cursor}},'VALIDATION_FAILED');
+   await fail(owner,'reservation_list_v1',{...base,time_filter:'upcoming',page:{...base.page,cursor:first.next_cursor}},'VALIDATION_FAILED');
+   assert.deepEqual(ids(await list(student.u,{...base,time_filter:'all'})),[]);
+   const overlap={starts_at:new Date(at).toISOString(),ends_at:new Date(at+900000).toISOString()};
+   assert.deepEqual(ids(await list(cm.u,{...base,interval:overlap,time_filter:'past'})),[createdReservations[1]]);
+   assert.deepEqual(ids(await list(cm.u,{...base,interval:overlap,time_filter:'upcoming'})),[]);
+  }finally{
+   await db.query('delete from core.reservations where id=any($1)',[createdReservations]);await db.query('delete from core.sessions where id=any($1)',[createdSessions]);reservations.splice(previousCount);
+  }
+ });
  await t.test('student sees own active and historical records, never another roster',async()=>{
   assert.deepEqual(ids(await list(student.u)).sort(),[r1,cancelled].sort());
   assert.deepEqual(ids(await list(student.u,{person_id:otherStudent.p})),[]);

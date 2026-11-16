@@ -440,6 +440,10 @@ Bu bölüm önceki sürümde açık gösterilen O1 hükümlerini tamamlar.
 
 Yalnız merkez yöneticisi sonuç önizlemesiyle yapar. Süre uzatan üründe yalnız fiilen kullanılan dondurma süresi kadar uzatma korunur; süre uzatmayan üründe bitiş değişmez. İptal edilmiş rezervasyonlar geri açılmaz; yeni kayıt güncel kontenjan/hak kontrolüne tabidir. Geçmişe dönük erken bitirme yoktur; hatalı kayıt gerekçeli düzeltmeyle ele alınır.
 
+### Henüz başlamamış dondurmayı iptal
+
+Merkez yöneticisi mevcut plan ve satışın dondurma koşulları altında ayrı sonuç önizlemesi/onayıyla yalnız henüz başlamamış planlı aralığı tamamen iptal eder. Kaydın tarihçesi ve kesin rezervasyonlar korunur; aralık yeni uygunluğu, çakışmayı veya dondurma kotasını kısıtlamaz. Yalnız bu dondurmanın eklediği geçerlilik çıkarılır; bağımsız uzatma korunur. Süre uzatmayan üründe bitiş değişmez. Başlamış aralık bu komutla iptal edilmez; desteklenen erken bitiş ayrı akıştır.
+
 ### Paket/ürün değişimi
 
 Eski satış sonlandırılır, bağlantılı yeni satış oluşturulur. Kullanım ve hareket geçmişi korunur. Kalan hak otomatik yeni ürün kredisine dönüşmez; eski satış koşuluyla parasal hesaplaşma çıkarılır. Oluşan alacak yeni satışa açık mahsupla uygulanabilir. Eski paketin gelecek rezervasyonları önizlenir; yönetici seçimiyle yeni ürünün uygun olduğu kayıtlar yer kaybetmeden atomik olarak yeni hakka bağlanır. Yeni ürünün karşılamadığı rezervasyonlar açıkça iptal edilmeden değişim tamamlanmaz. Fark borç/alacak olarak izlenir, otomatik nakit iade yapılmaz.
