@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı; açık backend talebi yoktur. E18’de yeni desteğin frontend tüketimi sürer. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı; açık backend talebi yoktur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `1df2e01c40fd625b0def974fe3347da65032fcfd` (PR315 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721918), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721867) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43863802374) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -20,8 +20,8 @@
 | W1-BE-12 | E14 · P07.2             | Yetkili indirimli native satış                                                   | PR313 sale.discount + sale_discount_percent_upper eşlemesi mevcut; açık yetki/politika gerekir, otomatik grant yok.                            |
 | W1-BE-13 | E14 · P09               | Başlangıca göre rezervasyon zaman filtresi                                       | Backend karşılandı (PR314): time_filter sunucu/cursor kapsamında; E14 filtre bağlantısı ve yerel kabulü tamam.                                 |
 | W1-BE-14 | E14 · P07.4             | Planlanmış dondurmayı tamamen iptal etme                                         | Backend karşılandı (PR314): ayrı cancel preview/apply E14’e bağlı; ekran kabulünün sahibi TODO/E14.                                            |
-| W1-BE-15 | E18 · P10/WF19          | Seans geneli bekleme listesi ve teklif geçmişi keşfi                             | Backend karşılandı (PR315): seans entries/offers dizini mevcut; E18 tüketimi sürüyor.                             |
-| W1-BE-16 | E18 · P09/WF06          | Rezervasyona bağlı gerçek paket/hak özeti                                        | Backend karşılandı (PR315): include_source_summary gerçek kaynak/hak özetini sağlar; E18 tüketimi sürüyor.                          |
+| W1-BE-15 | E18 · P10/WF19          | Seans geneli bekleme listesi ve teklif geçmişi keşfi                             | Backend karşılandı (PR315): seans entries/offers dizini mevcut; E18 tüketiyor; kabul sahibi TODO/E18.                                          |
+| W1-BE-16 | E18 · P09/WF06          | Rezervasyona bağlı gerçek paket/hak özeti                                        | Backend karşılandı (PR315): include_source_summary gerçek kaynak/hak özetini sağlar; E18 tüketiyor; kabul sahibi TODO/E18.                     |
 
 ## Bütün talepler için ortak sınır
 

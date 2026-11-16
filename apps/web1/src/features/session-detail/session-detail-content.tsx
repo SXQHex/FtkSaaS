@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { SessionDetailView, SessionParticipants } from "./session-detail-view";
+import { SessionWaitlistController } from "./session-waitlist-controller";
 import { SessionAttendanceController } from "./session-attendance-controller";
 import { SessionBookingEditor } from "./session-booking-editor";
 import {
@@ -20,7 +21,6 @@ import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { CardContent } from "../../components/ui/card";
 import { Skeleton } from "../../components/ui/skeleton";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
@@ -44,8 +44,9 @@ export function SessionDetailContent({
     [booking, setBooking] = useState(false),
     [bookingLocked, setBookingLocked] = useState(false),
     [cancelLocked, setCancelLocked] = useState(false),
+    [waitlistLocked, setWaitlistLocked] = useState(false),
     [attendanceLocked, setAttendanceLocked] = useState(false);
-  const locked = bookingLocked || cancelLocked || attendanceLocked;
+  const locked = bookingLocked || cancelLocked || attendanceLocked || waitlistLocked;
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [page, setPage] = useState(0),
     [search, setSearch] = useState(""),
@@ -224,329 +225,369 @@ export function SessionDetailContent({
       })) ?? [])
     : [];
   return (
-    <SessionAttendanceController
+    <SessionWaitlistController
       scope={scope}
       session={native}
-      attendance={currentAttendance}
-      names={
-        new Map(
-          selectedRows.flatMap((row) =>
-            row.person ? [[row.reservation.person_id, row.person.display_name] as const] : [],
-          ),
-        )
-      }
-      instructors={teacherRows}
       timezone={center?.timezone}
-      disabled={booking || Boolean(cancel) || !center}
-      onLockChange={setAttendanceLocked}
+      ownPersonId={
+        workspace.isError ? undefined : workspace.data?.selected?.self_context?.person_id
+      }
+      disabled={booking || Boolean(cancel) || attendanceLocked || !center}
+      onLockChange={setWaitlistLocked}
       onAccessLost={accessLost}
       onRefresh={refresh}
-      onRetry={() => {
-        void attendance.refetch();
-      }}
     >
-      {(attendanceUi) => (
-        <SessionDetailView
-          title={title}
-          badges={[
-            t(($) => $.schedule.sessionStates[native.state]),
-            t(($) => $.schedule.formats[native.format]),
-            t(($) =>
-              native.attendance_state === "open" ? $.sessionDetail.open : $.sessionDetail.closed,
-            ),
-          ]}
-          scheduleHref={`/o/${scope.orgId}/c/${scope.centerId}/schedule`}
-          capacity={native.capacity}
-          facts={[
-            { label: t(($) => $.sessionDetail.date), value: date },
-            {
-              label: t(($) => $.sessionDetail.time),
-              value: time
-                ? `${time.format(new Date(native.starts_at))} – ${time.format(new Date(native.ends_at))}`
-                : unknown,
-            },
-            {
-              label: t(($) => $.sessionDetail.duration),
-              value: t(($) => $.sessionDetail.minutes, {
-                minutes: Math.round(
-                  (Date.parse(native.ends_at) - Date.parse(native.starts_at)) / 60000,
-                ),
-              }),
-            },
-            {
-              label: t(($) => $.sessionDetail.room),
-              value: !rooms.isError
-                ? rooms.data?.map((row) => row.name).join(" · ") || unknown
-                : unknown,
-            },
-          ]}
-          instructors={
-            !instructors.isError
-              ? (instructors.data?.instructors.map((row) => ({
-                  id: row.id,
-                  name: row.person?.display_name ?? unknown,
-                })) ?? [])
-              : []
+      {(waitlistUi) => (
+        <SessionAttendanceController
+          scope={scope}
+          session={native}
+          attendance={currentAttendance}
+          names={
+            new Map(
+              selectedRows.flatMap((row) =>
+                row.person ? [[row.reservation.person_id, row.person.display_name] as const] : [],
+              ),
+            )
           }
-          actions={{
-            locked: blocked,
-            start: attendanceUi.onStart,
-            edit:
-              native.state === "planned"
-                ? () => {
-                    void navigate({
-                      to: "/o/$orgId/c/$centerId/schedule",
-                      params: { orgId: scope.orgId, centerId: scope.centerId },
-                      search: { session: sessionId, action: "edit" },
-                    });
-                  }
-                : undefined,
-            cancel:
-              native.state === "planned"
-                ? () => {
-                    void navigate({
-                      to: "/o/$orgId/c/$centerId/schedule",
-                      params: { orgId: scope.orgId, centerId: scope.centerId },
-                      search: { session: sessionId, action: "cancel" },
-                    });
-                  }
-                : undefined,
-            instructor:
-              native.state === "planned"
-                ? () => {
-                    void navigate({
-                      to: "/o/$orgId/c/$centerId/schedule",
-                      params: { orgId: scope.orgId, centerId: scope.centerId },
-                      search: { session: sessionId, action: "instructor" },
-                    });
-                  }
-                : undefined,
+          instructors={teacherRows}
+          timezone={center?.timezone}
+          disabled={booking || Boolean(cancel) || waitlistLocked || !center}
+          onLockChange={setAttendanceLocked}
+          onAccessLost={accessLost}
+          onRefresh={refresh}
+          onRetry={() => {
+            void attendance.refetch();
           }}
-          participants={
-            <SessionParticipants
-              rows={selectedRows.map((row) => {
-                const entry = currentAttendance?.entries.find(
-                  (item) =>
-                    item.reservation_id === row.reservation.id &&
-                    item.person_id === row.reservation.person_id,
-                );
-                const name = row.person?.display_name ?? unknown;
-                return {
-                  id: row.reservation.id,
-                  name,
-                  category: row.reservation.booking_category
-                    ? t(($) => $.sessionDetail[row.reservation.booking_category!])
-                    : t(($) => $.sessionDetail.noCategory),
-                  rights: unknown,
-                  reservation: t(($) => $.memberProfile.reservationStates[row.reservation.state]),
-                  attendance: !currentAttendance
-                    ? unknown
-                    : !entry
-                      ? t(($) => $.memberProfile.attendanceNoEntry)
-                      : native.attendance_state === "closed"
-                        ? t(($) => $.memberProfile.attendanceResults[entry.result])
-                        : t(($) => $.memberProfile.attendanceDraft, {
-                            result: t(($) => $.memberProfile.attendanceResults[entry.result]),
-                          }),
-                  action:
-                    row.reservation.state === "active" ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        isDisabled={blocked || booking || Boolean(cancel)}
-                        onPress={() =>
-                          setCancel({
-                            id: row.reservation.id,
-                            personId: row.reservation.person_id,
-                            name,
-                          })
-                        }
-                      >
-                        {t(($) => $.sessionDetail.cancelReservation, { name })}
-                      </Button>
-                    ) : undefined,
-                };
-              })}
-              search={search}
-              onSearch={setSearch}
-              onQuery={() => {
-                if (blocked) return;
-                setQuery(search.trim());
-                setPeopleCursors([undefined]);
-                setPeoplePage(0);
-                changePerson();
-                if (query === search.trim()) void people.refetch();
+        >
+          {(attendanceUi) => (
+            <SessionDetailView
+              title={title}
+              badges={[
+                t(($) => $.schedule.sessionStates[native.state]),
+                t(($) => $.schedule.formats[native.format]),
+                t(($) =>
+                  native.attendance_state === "open"
+                    ? $.sessionDetail.open
+                    : $.sessionDetail.closed,
+                ),
+              ]}
+              scheduleHref={`/o/${scope.orgId}/c/${scope.centerId}/schedule`}
+              capacity={native.capacity}
+              facts={[
+                { label: t(($) => $.sessionDetail.date), value: date },
+                {
+                  label: t(($) => $.sessionDetail.time),
+                  value: time
+                    ? `${time.format(new Date(native.starts_at))} – ${time.format(new Date(native.ends_at))}`
+                    : unknown,
+                },
+                {
+                  label: t(($) => $.sessionDetail.duration),
+                  value: t(($) => $.sessionDetail.minutes, {
+                    minutes: Math.round(
+                      (Date.parse(native.ends_at) - Date.parse(native.starts_at)) / 60000,
+                    ),
+                  }),
+                },
+                {
+                  label: t(($) => $.sessionDetail.room),
+                  value: !rooms.isError
+                    ? rooms.data?.map((row) => row.name).join(" · ") || unknown
+                    : unknown,
+                },
+              ]}
+              instructors={
+                !instructors.isError
+                  ? (instructors.data?.instructors.map((row) => ({
+                      id: row.id,
+                      name: row.person?.display_name ?? unknown,
+                    })) ?? [])
+                  : []
+              }
+              actions={{
+                locked: blocked,
+                start: attendanceUi.onStart,
+                edit:
+                  native.state === "planned"
+                    ? () => {
+                        void navigate({
+                          to: "/o/$orgId/c/$centerId/schedule",
+                          params: { orgId: scope.orgId, centerId: scope.centerId },
+                          search: { session: sessionId, action: "edit" },
+                        });
+                      }
+                    : undefined,
+                cancel:
+                  native.state === "planned"
+                    ? () => {
+                        void navigate({
+                          to: "/o/$orgId/c/$centerId/schedule",
+                          params: { orgId: scope.orgId, centerId: scope.centerId },
+                          search: { session: sessionId, action: "cancel" },
+                        });
+                      }
+                    : undefined,
+                instructor:
+                  native.state === "planned"
+                    ? () => {
+                        void navigate({
+                          to: "/o/$orgId/c/$centerId/schedule",
+                          params: { orgId: scope.orgId, centerId: scope.centerId },
+                          search: { session: sessionId, action: "instructor" },
+                        });
+                      }
+                    : undefined,
               }}
-              onAdd={native.state === "planned" && !blocked ? () => setBooking(true) : undefined}
-              locked={blocked}
-              filteredPerson={person?.name}
-              onClear={() => changePerson()}
-              notice={
-                <>
-                  {reservations.isError && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{t(($) => $.sessionDetail.readFailed)}</AlertDescription>
-                    </Alert>
-                  )}
-                  {query !== undefined && (
-                    <div className="flex flex-col gap-3">
-                      <Field>
-                        <FieldLabel htmlFor="session-person-filter">
-                          {t(($) => $.sessionDetail.peopleCandidates)}
-                        </FieldLabel>
-                        <NativeSelect
-                          id="session-person-filter"
-                          className="w-full"
-                          value={person?.id ?? ""}
-                          disabled={blocked || people.isFetching || people.isError}
-                          onChange={(event) => {
-                            const row = people.data?.items.find(
-                              (item) => item.id === event.target.value,
-                            );
-                            changePerson(row ? { id: row.id, name: row.display_name } : undefined);
-                          }}
-                        >
-                          <NativeSelectOption value="">
-                            {t(($) => $.sessionDetail.choosePerson)}
-                          </NativeSelectOption>
-                          {!people.isError &&
-                            people.data?.items.map((row) => (
-                              <NativeSelectOption key={row.id} value={row.id}>
-                                {row.display_name}
-                              </NativeSelectOption>
-                            ))}
-                        </NativeSelect>
-                      </Field>
-                      <p className="text-xs text-muted-foreground">
-                        {t(($) => $.sessionDetail.chooseSearchPerson)}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          isDisabled={blocked || peoplePage === 0 || people.isFetching}
-                          onPress={() => {
-                            changePerson();
-                            setPeoplePage((value) => value - 1);
-                          }}
-                        >
-                          {t(($) => $.sessionDetail.previous)}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          isDisabled={
-                            blocked ||
-                            people.isFetching ||
-                            people.isError ||
-                            !people.data?.next_cursor
-                          }
-                          onPress={() => {
-                            const cursor = people.data?.next_cursor;
-                            if (cursor) {
-                              changePerson();
-                              setPeopleCursors((old) => [...old.slice(0, peoplePage + 1), cursor]);
-                              setPeoplePage((value) => value + 1);
+              participants={
+                <SessionParticipants
+                  rows={selectedRows.map((row) => {
+                    const entry = currentAttendance?.entries.find(
+                      (item) =>
+                        item.reservation_id === row.reservation.id &&
+                        item.person_id === row.reservation.person_id,
+                    );
+                    const name = row.person?.display_name ?? unknown;
+                    return {
+                      id: row.reservation.id,
+                      name,
+                      category: row.reservation.booking_category
+                        ? t(($) => $.sessionDetail[row.reservation.booking_category!])
+                        : t(($) => $.sessionDetail.noCategory),
+                      rights: (() => {
+                        const summary = row.reservation.source_summary;
+                        if (!summary) return unknown;
+                        if (summary.status !== "available")
+                          return t(($) => $.sessionDetail.sourceStatuses[summary.status]);
+                        return t(($) => $.sessionDetail.assignedSource, {
+                          name: summary.product_name,
+                          available:
+                            summary.kind === "timed"
+                              ? t(($) => $.sessionDetail.timedRight)
+                              : t(($) => $.sessionDetail.credits, {
+                                  available: summary.available_credits ?? unknown,
+                                }),
+                          state: t(($) => $.sessionDetail.sourceSaleStates[summary.sale_state]),
+                          start: summary.start_date,
+                          end: summary.end_date,
+                        });
+                      })(),
+                      reservation: t(
+                        ($) => $.memberProfile.reservationStates[row.reservation.state],
+                      ),
+                      attendance: !currentAttendance
+                        ? unknown
+                        : !entry
+                          ? t(($) => $.memberProfile.attendanceNoEntry)
+                          : native.attendance_state === "closed"
+                            ? t(($) => $.memberProfile.attendanceResults[entry.result])
+                            : t(($) => $.memberProfile.attendanceDraft, {
+                                result: t(($) => $.memberProfile.attendanceResults[entry.result]),
+                              }),
+                      action:
+                        row.reservation.state === "active" ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            isDisabled={blocked || booking || Boolean(cancel)}
+                            onPress={() =>
+                              setCancel({
+                                id: row.reservation.id,
+                                personId: row.reservation.person_id,
+                                name,
+                              })
                             }
-                          }}
-                        >
-                          {t(($) => $.sessionDetail.next)}
-                        </Button>
-                      </div>
-                      {people.isError && (
+                          >
+                            {t(($) => $.sessionDetail.cancelReservation, { name })}
+                          </Button>
+                        ) : undefined,
+                    };
+                  })}
+                  search={search}
+                  onSearch={setSearch}
+                  onQuery={() => {
+                    if (blocked) return;
+                    setQuery(search.trim());
+                    setPeopleCursors([undefined]);
+                    setPeoplePage(0);
+                    changePerson();
+                    if (query === search.trim()) void people.refetch();
+                  }}
+                  onAdd={
+                    native.state === "planned" && !blocked ? () => setBooking(true) : undefined
+                  }
+                  locked={blocked}
+                  filteredPerson={person?.name}
+                  onClear={() => changePerson()}
+                  notice={
+                    <>
+                      {reservations.isError && (
                         <Alert variant="destructive">
                           <AlertDescription>
                             {t(($) => $.sessionDetail.readFailed)}
                           </AlertDescription>
                         </Alert>
                       )}
-                    </div>
+                      {query !== undefined && (
+                        <div className="flex flex-col gap-3">
+                          <Field>
+                            <FieldLabel htmlFor="session-person-filter">
+                              {t(($) => $.sessionDetail.peopleCandidates)}
+                            </FieldLabel>
+                            <NativeSelect
+                              id="session-person-filter"
+                              className="w-full"
+                              value={person?.id ?? ""}
+                              disabled={blocked || people.isFetching || people.isError}
+                              onChange={(event) => {
+                                const row = people.data?.items.find(
+                                  (item) => item.id === event.target.value,
+                                );
+                                changePerson(
+                                  row ? { id: row.id, name: row.display_name } : undefined,
+                                );
+                              }}
+                            >
+                              <NativeSelectOption value="">
+                                {t(($) => $.sessionDetail.choosePerson)}
+                              </NativeSelectOption>
+                              {!people.isError &&
+                                people.data?.items.map((row) => (
+                                  <NativeSelectOption key={row.id} value={row.id}>
+                                    {row.display_name}
+                                  </NativeSelectOption>
+                                ))}
+                            </NativeSelect>
+                          </Field>
+                          <p className="text-xs text-muted-foreground">
+                            {t(($) => $.sessionDetail.chooseSearchPerson)}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              isDisabled={blocked || peoplePage === 0 || people.isFetching}
+                              onPress={() => {
+                                changePerson();
+                                setPeoplePage((value) => value - 1);
+                              }}
+                            >
+                              {t(($) => $.sessionDetail.previous)}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              isDisabled={
+                                blocked ||
+                                people.isFetching ||
+                                people.isError ||
+                                !people.data?.next_cursor
+                              }
+                              onPress={() => {
+                                const cursor = people.data?.next_cursor;
+                                if (cursor) {
+                                  changePerson();
+                                  setPeopleCursors((old) => [
+                                    ...old.slice(0, peoplePage + 1),
+                                    cursor,
+                                  ]);
+                                  setPeoplePage((value) => value + 1);
+                                }
+                              }}
+                            >
+                              {t(($) => $.sessionDetail.next)}
+                            </Button>
+                          </div>
+                          {people.isError && (
+                            <Alert variant="destructive">
+                              <AlertDescription>
+                                {t(($) => $.sessionDetail.readFailed)}
+                              </AlertDescription>
+                            </Alert>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  }
+                  pagination={
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        isDisabled={blocked || page === 0 || reservations.isFetching}
+                        onPress={() => setPage((value) => value - 1)}
+                      >
+                        {t(($) => $.sessionDetail.previous)}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        isDisabled={
+                          blocked ||
+                          reservations.isFetching ||
+                          reservations.isError ||
+                          !reservations.data?.next_cursor
+                        }
+                        onPress={() => {
+                          const cursor = reservations.data?.next_cursor;
+                          if (cursor) {
+                            setCursors((old) => [...old.slice(0, page + 1), cursor]);
+                            setPage((value) => value + 1);
+                          }
+                        }}
+                      >
+                        {t(($) => $.sessionDetail.next)}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        isDisabled={blocked || reservations.isFetching}
+                        onPress={() => {
+                          void reservations.refetch();
+                        }}
+                      >
+                        {t(($) => $.sessionDetail.retry)}
+                      </Button>
+                    </>
+                  }
+                />
+              }
+              attendance={attendanceUi.panel}
+              waitlist={waitlistUi.panel}
+              overlays={
+                <>
+                  {attendanceUi.overlays}
+                  {waitlistUi.overlay}
+                  {booking && (
+                    <SessionBookingEditor
+                      scope={scope}
+                      session={native}
+                      title={title}
+                      onClose={() => setBooking(false)}
+                      onLockChange={setBookingLocked}
+                      onAccessLost={accessLost}
+                      onRefresh={refresh}
+                    />
+                  )}
+                  {cancel && (
+                    <CancelReservation
+                      scope={scope}
+                      personId={cancel.personId}
+                      reservationId={cancel.id}
+                      sessionId={sessionId}
+                      label={cancel.name}
+                      sourceAvailable={Boolean(center && !reservations.isError)}
+                      onClose={() => setCancel(undefined)}
+                      onLockChange={setCancelLocked}
+                      onAccessLost={accessLost}
+                      onRefresh={refresh}
+                    />
                   )}
                 </>
               }
-              pagination={
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    isDisabled={blocked || page === 0 || reservations.isFetching}
-                    onPress={() => setPage((value) => value - 1)}
-                  >
-                    {t(($) => $.sessionDetail.previous)}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    isDisabled={
-                      blocked ||
-                      reservations.isFetching ||
-                      reservations.isError ||
-                      !reservations.data?.next_cursor
-                    }
-                    onPress={() => {
-                      const cursor = reservations.data?.next_cursor;
-                      if (cursor) {
-                        setCursors((old) => [...old.slice(0, page + 1), cursor]);
-                        setPage((value) => value + 1);
-                      }
-                    }}
-                  >
-                    {t(($) => $.sessionDetail.next)}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    isDisabled={blocked || reservations.isFetching}
-                    onPress={() => {
-                      void reservations.refetch();
-                    }}
-                  >
-                    {t(($) => $.sessionDetail.retry)}
-                  </Button>
-                </>
-              }
             />
-          }
-          attendance={attendanceUi.panel}
-          waitlist={
-            <CardContent>
-              <Alert>
-                <AlertDescription>{t(($) => $.sessionDetail.waitlistUnavailable)}</AlertDescription>
-              </Alert>
-            </CardContent>
-          }
-          overlays={
-            <>
-              {attendanceUi.overlays}
-              {booking && (
-                <SessionBookingEditor
-                  scope={scope}
-                  session={native}
-                  title={title}
-                  onClose={() => setBooking(false)}
-                  onLockChange={setBookingLocked}
-                  onAccessLost={accessLost}
-                  onRefresh={refresh}
-                />
-              )}
-              {cancel && (
-                <CancelReservation
-                  scope={scope}
-                  personId={cancel.personId}
-                  reservationId={cancel.id}
-                  sessionId={sessionId}
-                  label={cancel.name}
-                  sourceAvailable={Boolean(center && !reservations.isError)}
-                  onClose={() => setCancel(undefined)}
-                  onLockChange={setCancelLocked}
-                  onAccessLost={accessLost}
-                  onRefresh={refresh}
-                />
-              )}
-            </>
-          }
-        />
+          )}
+        </SessionAttendanceController>
       )}
-    </SessionAttendanceController>
+    </SessionWaitlistController>
   );
 }

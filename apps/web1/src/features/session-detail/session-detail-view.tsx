@@ -66,6 +66,7 @@ export interface SessionOfferRow {
   name: string;
   state: string;
   expires: string;
+  action?: ReactNode;
 }
 export function SessionDetailView({
   title,
@@ -566,6 +567,9 @@ export function SessionWaitlist({
   disabled,
   onAdd,
   pagination,
+  offerPagination,
+  entriesAvailable = true,
+  offersAvailable = true,
   locked,
 }: {
   rows: SessionWaitRow[];
@@ -574,6 +578,9 @@ export function SessionWaitlist({
   disabled?: boolean;
   onAdd?: () => void;
   pagination?: ReactNode;
+  offerPagination?: ReactNode;
+  entriesAvailable?: boolean;
+  offersAvailable?: boolean;
   locked?: boolean;
 }) {
   const { t } = useTranslation();
@@ -601,60 +608,67 @@ export function SessionWaitlist({
             </EmptyDescription>
           </Empty>
         )}
-        <Table aria-label={t(($) => $.sessionDetail.waitlist)} className="min-w-[35rem]">
-          <TableHeader>
-            <TableHead>{t(($) => $.sessionDetail.position)}</TableHead>
-            <TableHead isRowHeader>{t(($) => $.sessionDetail.person)}</TableHead>
-            <TableHead>{t(($) => $.sessionDetail.joined)}</TableHead>
-            <TableHead>{t(($) => $.sessionDetail.state)}</TableHead>
-            <TableHead>{t(($) => $.sessionDetail.actions)}</TableHead>
-          </TableHeader>
-          <TableBody
-            renderEmptyState={() => (
-              <Empty>
-                <EmptyDescription>{t(($) => $.sessionDetail.emptyWaitlist)}</EmptyDescription>
-              </Empty>
-            )}
-          >
-            {rows.map((row) => (
-              <TableRow key={row.id} id={row.id}>
-                <TableCell>{row.position}</TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.joined}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{row.state}</Badge>
-                </TableCell>
-                <TableCell>{row.action}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {entriesAvailable && (
+          <Table aria-label={t(($) => $.sessionDetail.waitlist)} className="min-w-[35rem]">
+            <TableHeader>
+              <TableHead>{t(($) => $.sessionDetail.position)}</TableHead>
+              <TableHead isRowHeader>{t(($) => $.sessionDetail.person)}</TableHead>
+              <TableHead>{t(($) => $.sessionDetail.joined)}</TableHead>
+              <TableHead>{t(($) => $.sessionDetail.state)}</TableHead>
+              <TableHead>{t(($) => $.sessionDetail.actions)}</TableHead>
+            </TableHeader>
+            <TableBody
+              renderEmptyState={() => (
+                <Empty>
+                  <EmptyDescription>{t(($) => $.sessionDetail.emptyWaitlist)}</EmptyDescription>
+                </Empty>
+              )}
+            >
+              {rows.map((row) => (
+                <TableRow key={row.id} id={row.id}>
+                  <TableCell>{row.position}</TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.joined}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{row.state}</Badge>
+                  </TableCell>
+                  <TableCell>{row.action}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
         {pagination && <div className="flex flex-wrap gap-2">{pagination}</div>}
-        <h3 className="font-medium">{t(($) => $.sessionDetail.offerHistory)}</h3>
-        <Table aria-label={t(($) => $.sessionDetail.offerHistory)} className="min-w-[28rem]">
-          <TableHeader>
-            <TableHead isRowHeader>{t(($) => $.sessionDetail.person)}</TableHead>
-            <TableHead>{t(($) => $.sessionDetail.result)}</TableHead>
-            <TableHead>{t(($) => $.sessionDetail.expires)}</TableHead>
-          </TableHeader>
-          <TableBody
-            renderEmptyState={() => (
-              <Empty>
-                <EmptyDescription>{t(($) => $.sessionDetail.emptyHistory)}</EmptyDescription>
-              </Empty>
-            )}
-          >
-            {offers.map((offer) => (
-              <TableRow key={offer.id} id={offer.id}>
-                <TableCell>{offer.name}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{offer.state}</Badge>
-                </TableCell>
-                <TableCell>{offer.expires}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <h2 className="font-medium">{t(($) => $.sessionDetail.offerHistory)}</h2>
+        {offersAvailable && (
+          <Table aria-label={t(($) => $.sessionDetail.offerHistory)} className="min-w-[28rem]">
+            <TableHeader>
+              <TableHead isRowHeader>{t(($) => $.sessionDetail.person)}</TableHead>
+              <TableHead>{t(($) => $.sessionDetail.result)}</TableHead>
+              <TableHead>{t(($) => $.sessionDetail.expires)}</TableHead>
+              <TableHead>{t(($) => $.sessionDetail.actions)}</TableHead>
+            </TableHeader>
+            <TableBody
+              renderEmptyState={() => (
+                <Empty>
+                  <EmptyDescription>{t(($) => $.sessionDetail.emptyHistory)}</EmptyDescription>
+                </Empty>
+              )}
+            >
+              {offers.map((offer) => (
+                <TableRow key={offer.id} id={offer.id}>
+                  <TableCell>{offer.name}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{offer.state}</Badge>
+                  </TableCell>
+                  <TableCell>{offer.expires}</TableCell>
+                  <TableCell className="py-6">{offer.action}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+        {offerPagination}
       </CardContent>
       <CardFooter>
         <CardDescription>{t(($) => $.sessionDetail.offerNote)}</CardDescription>

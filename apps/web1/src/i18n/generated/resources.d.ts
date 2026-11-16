@@ -1464,6 +1464,7 @@ export default interface Resources {
       "addDescription": "Seçili seans için kişi ve hak kaynağını açıkça seç. İşlem sonucu yeniden okunur.",
       "addParticipant": "Katılımcı ekle",
       "addWaitlist": "Listeye ekle",
+      "assignedSource": "{{name}} · {{available}} · {{state}} · {{start}} – {{end}}",
       "attendance": "Yoklama",
       "attendanceEffect": "Yoklamayı kapatınca hak tüketimi uygulanır.",
       "attendanceEmpty": "Görünür yoklama kaydı yok.",
@@ -1514,6 +1515,7 @@ export default interface Resources {
       "chooseSale": "Hak kaynağını seç",
       "chooseSearchPerson": "Aramadan bir kişiyi seç; o kişinin bu seanstaki rezervasyonları okunur.",
       "clearPerson": "Tüm katılımcılar",
+      "close": "Kapat",
       "closeAttendance": "Yoklamayı kapat",
       "closeDescription": "İşaretleri ve gerçekleşen eğitmenleri kontrol et. Hak tüketimi ve ilgili etkiler native işlemle uygulanır.",
       "closeReview": "Yoklama sonuçlarını ve gerçekleşen eğitmenleri kontrol ettim.",
@@ -1521,6 +1523,7 @@ export default interface Resources {
       "closed": "Yoklama kapalı",
       "completed": "Tamamlandı",
       "confirm": "Onayla",
+      "converted": "Rezervasyona dönüştü",
       "correctionReason": "Düzeltme gerekçesi",
       "correctionReview": "Düzeltme etkilerini kontrol ettim.",
       "createReservation": "Rezervasyon oluştur",
@@ -1547,6 +1550,7 @@ export default interface Resources {
       "expired": "Süresi doldu",
       "expires": "Son geçerlilik",
       "female": "Kadın",
+      "fifoNote": "Kayıtlar giriş sırasındadır. Sayfalama genel sıra numarası veya toplam sağlamaz.",
       "filteredPerson": "Seçilen kişi: {{name}}",
       "flexible": "Esnek",
       "group": "Grup dersi",
@@ -1564,6 +1568,12 @@ export default interface Resources {
       "noChanges": "Değişiklik yok.",
       "notAvailable": "Bu işlem için güncel yetkili kaynak gerekli.",
       "occurred": "Gerçekleşti",
+      "offerActions": {
+        "accept": "Teklifi kabul et",
+        "join": "Bekleme listesine ekle",
+        "leave": "Bekleme listesinden çıkar",
+        "reject": "Teklifi reddet"
+      },
       "offerHistory": "Sonuçlanan teklifler",
       "offerNote": "Tekliflerin süresi ve sonucu native kaynaktan okunur. Üye kabulü, reddi ve süre dolumu yönetici tarafından taklit edilmez.",
       "offered": "Teklif edildi",
@@ -1605,6 +1615,16 @@ export default interface Resources {
       "shared_private": "Paylaşımlı özel ders",
       "sourceChanged": "Seans veya seçilen hak kaynağı değişti. Güncel seçimi inceleyip yeniden onayla.",
       "sourceError": "Kişi, seans veya hak kaynağı okunamadı. Güncel kaynağı yeniden oku.",
+      "sourceSaleStates": {
+        "active": "Aktif",
+        "expired": "Süresi doldu",
+        "terminated": "Sonlandırıldı"
+      },
+      "sourceStatuses": {
+        "not_enabled": "Hak özeti bu planda kullanılamıyor",
+        "restricted": "Hak bilgisi için yetki yok",
+        "unassigned": "Atanmış paket yok"
+      },
       "startAttendance": "Yoklamayı başlat",
       "startDescription": "Onayladığında şu an seansın fiilî başlangıcı olarak kaydedilir. Planlı saat, gerçekleşmiş başlangıç yerine kullanılmaz.",
       "startReview": "Seansın şu an başladığını onaylıyorum.",
@@ -1620,7 +1640,16 @@ export default interface Resources {
       "waitlistDisabled": "Bekleme listesi kapalı",
       "waitlistDisabledHint": "Bekleyen kayıtların durumu korunur. Yeni kayıt için güncel native politika uygulanır.",
       "waitlistReview": "Seçili kişi ve seansı kontrol ettim. Bekleme kaydı kesin rezervasyon değildir.",
-      "waitlistUnavailable": "Seans geneli bekleme ve teklif listesi için native keşif kaynağı bekleniyor.",
+      "waitlistStates": {
+        "pending": "İşlem tamamlanmadı; yeni işlem göndermeden sonucu oku.",
+        "ready": "",
+        "rejected": "İşlem reddedildi. Güncel izin ve koşulları kontrol et.",
+        "saved": "İşlem kaydedildi ve güncel sonuç okundu.",
+        "saved-unread": "İşlem alındı; güncel sonuç henüz okunamadı. Yeniden yazmadan sonucu oku.",
+        "stale": "Kaynak değişti; yeniden oku ve onayla.",
+        "unknown": "Sonuç bilinmiyor; aynı isteği yeniden dene veya işlem durumunu oku.",
+        "writing": "İşlem kaydediliyor…"
+      },
       "withdrawn": "Geri çekildi"
     },
     "sessions": {

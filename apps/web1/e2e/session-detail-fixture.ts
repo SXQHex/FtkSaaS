@@ -157,11 +157,41 @@ export async function mockSessionDetail(
         return reject("TEMPORARY_FAILURE");
       }
       return send({
-        items: reservation ? [reservation] : [],
+        items: reservation
+          ? [
+              {
+                ...reservation,
+                ...(req.include_source_summary
+                  ? {
+                      source_summary: {
+                        status: "available",
+                        as_of: new Date().toISOString(),
+                        source_sale_id: S.sale,
+                        product_version_id: I.lesson,
+                        product_name: "Satın alınmış paket",
+                        kind: "credits",
+                        booking_mode: "flexible",
+                        sale_state: "active",
+                        state: "active",
+                        start_date: "2026-11-01",
+                        end_date: "2099-12-01",
+                        timezone: "Europe/Istanbul",
+                        available_credits: "7",
+                        reserved: "1",
+                        consumed: "0",
+                        sale_version: 2,
+                      },
+                    }
+                  : {}),
+              },
+            ]
+          : [],
         next_cursor: null,
         as_of: new Date().toISOString(),
       });
     }
+    if (operation === "management_state_get_v1" && req.operation === "waitlist_join_v1")
+      return send({ items: [], next_cursor: null, as_of: new Date().toISOString() });
     if (operation === "attendance_get_v1") {
       if (options.attendanceDenied) return reject("FORBIDDEN");
       attendance.session_version = session.version;
