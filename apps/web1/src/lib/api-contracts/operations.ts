@@ -230,4 +230,5 @@ export interface Operations {
   product_state_set_v1: {request: T.RequestProductStateSet; response: T.SuccessProductStateSet};
   freeze_cancel_preview_v1: {request: T.RequestFreezeCancelPreview; response: T.SuccessFreezeCancelPreview};
   freeze_cancel_apply_v1: {request: T.RequestFreezeCancelApply; response: T.SuccessFreezeCancelApply};
+  instructor_account_get_v1: {request: T.RequestInstructorAccountGet; response: T.SuccessInstructorAccountGet};
 }

@@ -2751,9 +2751,9 @@
       "remaining": "Kalan"
     },
     "metricHints": {
-      "earned": "Seçili dönemde kaydedilen net hakediş",
-      "paid": "Hakedişlere uygulanmış net ödemeler",
-      "remaining": "Kaynakta görünen kalan tutar"
+      "earned": "Seçili dönemde oluşturulan net hakediş ve düzeltmeler",
+      "paid": "Seçili dönemde gerçekleşen net ödeme ve düzeltmeler",
+      "remaining": "Bu dönemde oluşturulan kök hakedişlerin güncel kalanı"
     },
     "agreement": "Geçerli anlaşman",
     "agreementHint": "Ücret değişikliği yeni sürüm olarak yöneticide yayımlanır; eski seanslar eski ücretle kalır.",
@@ -2782,7 +2782,7 @@
     "previous": "Önceki",
     "next": "Sonraki",
     "retry": "Yeniden oku",
-    "sourceLimits": "Dönem toplamları, tüm dönem seçimi, ödeme geçmişi ve geçerli anlaşma kaynağı henüz kullanılamıyor.",
+    "sourceLimits": "Ödeme ve hakediş dönemleri ayrı izlenir; kalan, hakediş eksi ödeme olarak hesaplanmaz.",
     "sessionEarning": "Seans hakedişi",
     "otherEarning": "Diğer hakediş",
     "recordDate": "Hakediş kayıt tarihi",
@@ -2795,7 +2795,24 @@
       "event_fee": "Etkinlik ücreti",
       "lesson_agreement": "Özel ders anlaşması"
     },
-    "loading": "Hakedişler okunuyor…"
+    "loading": "Hakedişler okunuyor…",
+    "allLinesUnavailable": "Tüm dönem özeti ve ödeme geçmişi görüntülenebilir. Seans satırlarını görmek için bir ay seç.",
+    "noAgreement": "Geçerli anlaşma bulunmuyor.",
+    "agreementTerms": "Anlaşma koşulları",
+    "agreementVersion": "Sürüm {{version}} · {{date}} tarihinden beri",
+    "moreAgreements": "Sonraki anlaşmalar",
+    "previousAgreements": "Önceki anlaşmalar",
+    "payment": "Ödeme",
+    "unknownMethod": "Yöntem kaydedilmemiş",
+    "methods": {
+      "cash": "Nakit",
+      "bank_transfer": "Banka havalesi",
+      "card_pos": "POS"
+    },
+    "emptyTotals": "Bu dönemde parasal kayıt yok.",
+    "balanceHint": "Fazla ödeme: {{amount}}",
+    "allPeriodHint": "Tüm dönemler; tarih sınırı uygulanmaz.",
+    "agreementChoice": "Anlaşma {{number}} · sürüm {{version}}"
   },
   "memberClasses": {
     "title": "Dersler",

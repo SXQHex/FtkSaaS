@@ -2,7 +2,7 @@
 
 16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–18 için backend kaynak desteği karşılandı. Açık talepler W1-BE-19–29’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
-İncelenen main: `09592e7afe9609e5422274db76d70254ee597419` (PR318 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43954641493), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43956470346) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43954762253) başarılıdır. PR318 tüketici dala ve yerel typed snapshot’a henüz alınmadı. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
+İncelenen main: `09592e7afe9609e5422274db76d70254ee597419` (PR318 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43954641493), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43956470346) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43954762253) başarılıdır. PR318 tüketici dala alındı; yerel typed snapshot kanonik üreticiden güncellendi. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
 | Kimlik   | Ekran / işlev             | İhtiyaç                                                                          | Frontend tarafından bilinen durum                                                                                                              |
 | -------- | ------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -24,7 +24,7 @@
 | W1-BE-16 | E18 · P09/WF06            | Rezervasyona bağlı gerçek paket/hak özeti                                        | Backend karşılandı (PR315): include_source_summary gerçek kaynak/hak özetini sağlar; E18 tüketiyor; kabul sahibi TODO/E18.                     |
 | W1-BE-17 | E21 · P06.5/WF06          | Özel ders taleplerinin native durum filtresi ve merkez sayaçları                 | PR316 main/development teslimi doğrulandı; frontend tüketimi ve yerel kabulü TODO/E21’de tamamlandı.                                                                                |
 | W1-BE-18 | E24–E26 · P11.2/WF03/WF07 | Atanmış seansın eğitmene görünür salon etiketi                                   | Backend karşılandı (PR317): opt-in room_labels yalnız canlı atanmış seanslarda; tüketici kabulü TODO/E24–E26 sahibinde. |
-| W1-BE-19 | E27 · P10/P11.2 | Kendi geçerli anlaşma/ödeme keşfi ve dönem toplamları | Backend karşılandı (PR318): native self anlaşma/ödeme keşfi ve dönem toplamları; E27 tüketimi bekliyor. |
+| W1-BE-19 | E27 · P10/P11.2 | Kendi geçerli anlaşma/ödeme keşfi ve dönem toplamları | PR318 çekirdeği karşılandı; tüketimi sürüyor. Tüm dönem seans satırları için aralıksız okuma eşlemesi açık. |
 | W1-BE-20 | E28/E29 · P09/P11.1 | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası | Backend karşılandı (PR318): opt-in öğrenci grup/özel ders keşfi; E28/E29 tüketimi bekliyor. |
 | W1-BE-21 | E29 · P09/P11.1 | Öğrencinin kendi merkezindeki bekleme/teklif keşfi | Açık: bilinen seans veya kayıt gerektirmeyen özne keşfi isteniyor. |
 | W1-BE-22 | E30 · P07/P08/P11.1 | Satın alınan paket bilgisi ve ödeme para birimi keşfi | Açık: hak/hareket ve açık borç özeti mevcut; kalan eşleme isteniyor. |
@@ -35,6 +35,7 @@
 | W1-BE-27 | E38 · P13/WF15 | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı | Açık: mevcut typed keşif eşlemesi veya izinli okuma desteği isteniyor. |
 | W1-BE-28 | E39 · P14/WF11 | Kendi inbox arama/iş durumu, toplu/ters okundu ve kaynak eylemi eşlemesi | Açık: native liste ve sürümlü okundu var; çizimin kalan güvenli eşlemesi isteniyor. |
 | W1-BE-29 | E40 · P14.4/WF16 | Çizimin segment, tetikleme, eylem ve son işler eşlemesi | Açık: native save/disable/retry var; kalan çizim eşlemesi ve güvenli özet/keşif gerekiyor. |
+| W1-BE-30 | E41 · P16/WF10 | Çizimin satış/doluluk/hakediş raporu ve import görünür alanları | Açık: mevcut rapor türleri gerçek; eksik çizim eşlemesi ve güvenli özet gerekiyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -197,9 +198,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 
 ## W1-BE-19 · Eğitmenin kendi hakediş özeti ve ödeme keşfi
 
-**Durum:** Backend karşılandı: [PR318](https://github.com/SXQHex/FtkSaaS/pull/318) main’de. Aynı kaynak/CI/development kanıtı üst kayıttadır; frontend tüketimi ve E27 ekran kabulü henüz tamamlanmadı.
+**Durum:** [PR318](https://github.com/SXQHex/FtkSaaS/pull/318) native keşif/toplam/ödeme çekirdeğini karşılıyor ve frontend bu dilimi tüketiyor. Aynı kaynak/CI/development üst kayıtta; tüm dönem seans satırı eşlemesi aşağıda açık, E27 tam kabulü henüz tamamlanmadı.
 
 **Backend kaynak karşılığı:** `instructor_account_get_v1` native self için geçerli anlaşma ve ödeme tarihiyle cursor geçmişi/dönem toplamlarını keşfeder. Ödeme yöntemi desteği ve mevcut anlaşma get/render/accept/get zinciri korunur. Kesin parametre, dönem/para birimi, canonical özne ve yetki sınırının sahibi [WF14](../../../docs/workflows.md#wf14); backend değerlendirmesi [XREQ-053](../../../docs/requests.md#xreq-053). Yönetim ödeme/yayın yetkisi açılmaz; mevcut sayfa bütün filtre toplamı sayılmaz. Frontend kabulünün sahibi [TODO/E27](todo.md#sayfa-kabulu).
+
+**Kalan çizim eşlemesi:** Yeni self okuyucusunda interval atlanarak tüm dönem toplam/ödeme alınabiliyor; `earnings_list_v1` ise halen zorunlu interval istiyor ve yeni okuyucunun view seçenekleri agreements/payments. Çizimdeki “Tüm dönem → Seans satırları” için mevcut typed aralıksız satır kaynağı/eşlemesi gerekiyor. Yapay başlangıç/bitiş veya bütün ayları tarama kullanılmayacak. Diğer yeni keşif/toplam/ödeme alanları bağımsız tüketiliyor; bu kalan iş nedeniyle E27 üst kabulü henüz kapatılmaz.
 
 ## W1-BE-20 · Öğrencinin rezervasyon yapabileceği ders keşfi
 
@@ -282,3 +285,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** Çizimdeki bu koşulların, yetkili anlık segment eşleşmesi/sayısı/örnekleri ve kullanan otomasyon keşfinin, segmente giriş/haftalık tetikleme ile elle önizle+onayla çalıştırmanın mevcut typed eşlemesini belirtin. Native task aksiyonunda çizimdeki yönetici sorumlusu, güvenli şablon seçimi/mesaj kaynağı ve segment/otomasyon silme eşlemesi de gerekiyor. Kapsam geneli son işler için zaman/başlatan, hedef/kabul/teslim ayrımı ve mevcut izinli retry bilgisini taşıyan güvenli cursor kaynağı isteniyor. Bunlardan güncel ürün/WF sınırında desteklenmeyen varsa backend sahibi çizimle uygulanacak sınırı açıkça belirtmeli; yeni endpoint şart koşulmuyor.
 
 **Sınır:** Göreli günü istemcide bir defalık mutlak tarihe çevirerek kayan koşul diye kaydetmeyiz. Bütün kişileri/borçları/geçmiş işleri tarayıp segment veya gönderim raporu üretmeyiz. read_at/iş succeeded değerinden teslim veya kaynak işinin tamamlandığı türetilmez. Rol, plan, şablon ve alıcı sınırları korunur; worker yetkisi, serbest cron, kampanya veya otomatik tahsilat açılmaz. Aç/kapat silme yerine sunulmaz; disabled tanım elle çalıştırılabilir diye varsayılmaz. Bağımsız save/disable/native retry entegrasyonu sürer; frontend kabulünün sahibi TODO/E40’tır.
+
+## W1-BE-30 · Rapor çiziminin kalan native eşlemesi
+
+**Mevcut kaynak:** WF10 `report_get_v1` tam filtre toplamı/cursor, export/job/file ve import upload/preview/apply zincirini sağlar. Mevcut ReportKind satış raporu değildir; collections_debts tahsilat/refund/due_at aralığındaki borçları, earnings yalnız accrual satırlarını verir. Tahsilat ciro yerine, accrual ödenen/kalan yerine kullanılmaz. ReportRow görünür kişi/ders/paket adı taşımaz; öğrenci ImportRowView kişi/ad/iletişim önizlemesi içermez.
+
+**İhtiyaç:** Haftalık brüt satış cirosu/paket satışları, ders bazında doluluk/kapalı yoklama oranı, tahsilatın üye/eğitmen/paket kırılımı ve instructor paid/remaining/closed-session özetinin mevcut typed eşlemesini belirtin. Import için çizimdeki satır adı/iletişimi, uyarı/mükerrer ve tüm dosya durum filtresi; dosya/row limitini yüklemeden önce okuyacak güvenli kaynak ve hesap/merkez kapsamındaki import işi keşfi de gerekiyorsa eşlenmeli. Mevcut native yolların desteklemediği çizim işlemi varsa backend sahibi uygulanacak sınırı açıklamalı; yeni endpoint şart koşulmuyor.
+
+**Sınır:** Cursor sayfası global toplam sayılmaz; bütün kişileri/satışları/işleri tarayıp rapor üretilmez, para birimleri birleştirilmez. Signed upload ve JWT/POST indirme yolu, canlı F30/F31 ve kişi/merkez sınırları korunur. Export veya import ACK tamamlanma değildir; native worker sonucu ve domain yeniden okuması ayrıdır. Native rapor/export/import çekirdeği bağımsız bağlanır; kabul sahibi TODO/E41’dir.

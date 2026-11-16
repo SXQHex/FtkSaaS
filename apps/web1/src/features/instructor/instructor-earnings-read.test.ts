@@ -65,3 +65,125 @@ it("rejects duplicate identities and a repeated native cursor", async () => {
   await expect(readInstructorEarningPage(scope, id(4), interval)).rejects.toThrow();
   await expect(readInstructorEarningPage(scope, id(4), interval, "same")).rejects.toThrow();
 });
+
+import { readInstructorAccount } from "./instructor-earnings-read";
+const totals = [
+  {
+    currency: "TRY",
+    earned_minor: "9007199254740993",
+    paid_minor: "-500",
+    remaining_minor: "700",
+    overpaid_minor: "0",
+  },
+];
+const ledger = {
+  id: id(11),
+  root_payment_id: id(11),
+  version: 4,
+  direction: "increase",
+  amount_minor: "500",
+  currency: "TRY",
+  occurred_at: "2026-11-05T10:00:00Z",
+  method: "bank_transfer",
+  previous_id: null,
+};
+const accountPage = {
+  view: "payments",
+  items: [ledger],
+  next_cursor: null,
+  as_of: "2026-11-16T12:00:00Z",
+  totals,
+};
+it("omits the interval for all-period native payments and uses real self with its own cursor", async () => {
+  mock.call.mockResolvedValue(accountPage);
+  const value = await readInstructorAccount(scope, id(4), "payments", undefined, "next");
+  expect(value.totals).toEqual(totals);
+  expect(value.payments).toEqual([ledger]);
+  expect(mock.call).toHaveBeenCalledWith(
+    "instructor_account_get_v1",
+    expect.objectContaining({
+      person_id: id(4),
+      center_id: scope.centerId,
+      view: "payments",
+      page: { limit: 20, cursor: "next" },
+    }),
+  );
+  expect(mock.call.mock.calls[0]![1]).not.toHaveProperty("interval");
+});
+it("keeps actual payment time, signed totals and unknown historical methods", async () => {
+  mock.call.mockResolvedValue({
+    ...accountPage,
+    items: [
+      {
+        ...ledger,
+        id: id(12),
+        root_payment_id: ledger.id,
+        previous_id: ledger.id,
+        direction: "decrease",
+        method: null,
+      },
+    ],
+  });
+  const value = await readInstructorAccount(scope, id(4), "payments", interval);
+  expect(value.payments[0]).toMatchObject({
+    direction: "decrease",
+    method: null,
+    root_payment_id: ledger.id,
+  });
+  expect(value.totals[0]).toMatchObject({ paid_minor: "-500", remaining_minor: "700" });
+});
+it("rejects wrong views, repeated cursors, duplicate currencies and out-of-period payments", async () => {
+  for (const value of [
+    { ...accountPage, view: "agreements" },
+    { ...accountPage, next_cursor: "same" },
+    { ...accountPage, totals: [totals[0], totals[0]] },
+    { ...accountPage, items: [{ ...ledger, occurred_at: interval.ends_at }] },
+    { ...accountPage, items: [ledger, ledger] },
+    { ...accountPage, items: [{ ...ledger, root_payment_id: id(99) }] },
+  ]) {
+    mock.call.mockResolvedValue(value);
+    await expect(
+      readInstructorAccount(scope, id(4), "payments", interval, "same"),
+    ).rejects.toThrow();
+  }
+});
+it("retains an immutable agreement alias authorized by the native self reader", async () => {
+  const agreement = {
+    id: id(15),
+    version: 3,
+    person_id: id(99),
+    center_id: scope.centerId,
+    discipline_id: id(16),
+    format: "group",
+    valid: { starts_at: "2026-01-01T00:00:00Z", ends_at: null },
+    terms: {
+      model: "session_fixed",
+      currency: "TRY",
+      components: [{ kind: "session_fixed", amount_minor: "50000" }],
+      room_fee: { kind: "free", order: "before_instructor_share" },
+    },
+    supersedes_id: null,
+    published_at: "2026-01-01T00:00:00Z",
+  };
+  mock.call.mockResolvedValue({ ...accountPage, view: "agreements", items: [agreement] });
+  expect((await readInstructorAccount(scope, id(4), "agreements")).agreements[0]).toMatchObject({
+    person_id: id(99),
+    version: 3,
+  });
+  mock.call.mockResolvedValue({
+    ...accountPage,
+    view: "agreements",
+    items: [{ ...agreement, center_id: id(99) }],
+  });
+  await expect(readInstructorAccount(scope, id(4), "agreements")).rejects.toThrow(
+    "INSTRUCTOR_ACCOUNT_UNAVAILABLE",
+  );
+  mock.call.mockResolvedValue({
+    ...accountPage,
+    view: "agreements",
+    items: [{ ...agreement, valid: { ...agreement.valid, ends_at: "2026-10-01T00:00:00Z" } }],
+  });
+  await expect(readInstructorAccount(scope, id(4), "agreements")).rejects.toThrow(
+    "INSTRUCTOR_ACCOUNT_UNAVAILABLE",
+  );
+});
