@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `434ccad902cd794c334f283cf737db550778d5676a6f3a4de763620821ed09c1`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `403e433d917c8cfab638b1694e50c320fed01c8ebd391aff030e4b092d4117c7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -64,6 +64,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [event-actual-start.sql](../apps/backend/database/event-actual-start.sql) | `568f4ab764c76a5e229343ca4e8e23773b903c5d8f283b5e6096f77eebb60258` |
 | [event-cancellation-dispatch.sql](../apps/backend/database/event-cancellation-dispatch.sql) | `266d1384d5f750ef3d440c8ac970198e6543253c4fceee7830093a70b0dacbff` |
 | [event-capacity-practice.sql](../apps/backend/database/event-capacity-practice.sql) | `0562a2fa7b22721d78e93490051b2bda49f139826836d4f0a984528dfc9ab2f7` |
+| [event-directory-finance.sql](../apps/backend/database/event-directory-finance.sql) | `1725a152086d357f97b8ea9235bab99a7ba8a84da4700958472d2e7eeed37d25` |
 | [event-payment-dispatch.sql](../apps/backend/database/event-payment-dispatch.sql) | `27b6c4e9a8c0cf4b7e52ad60cd0594ddccc45d31b264ce9b362c7ab76a980e5b` |
 | [event-payment-schema.sql](../apps/backend/database/event-payment-schema.sql) | `b3a2217b900cc782995d1d4d17b4100b2dff3554b56295ba04bd748a9abb5d87` |
 | [finance-directory.sql](../apps/backend/database/finance-directory.sql) | `9c8414e1ad1236cb3fa5243209c0ac1f4aa270a072c8fdbe6087b543be7057db` |
@@ -379,6 +380,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261116143645_assigned_session_room_labels.sql](../apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql) | `d4ad8b4b0d33f987d54c0e628c77a64e9ea410da41e15a78f0c3e49a8d2525bc` |
 | [20261116194343_instructor_self_account.sql](../apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql) | `147cefb1afa6618de42b6e47b96a2317a1abbc55a87581865a15dbc634887bc9` |
 | [20261116201341_member_lesson_discovery.sql](../apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql) | `f4bd89d2108fb70dd77e2da0a6821da8c7681ef0cdf7e377b81d98cae2776b4c` |
+| [20261116210335_event_directory_finance.sql](../apps/backend/supabase/migrations/20261116210335_event_directory_finance.sql) | `1725a152086d357f97b8ea9235bab99a7ba8a84da4700958472d2e7eeed37d25` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

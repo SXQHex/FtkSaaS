@@ -5316,6 +5316,9 @@
           "items": {
             "$ref": "#/$defs/SharedLessonParticipant"
           }
+        },
+        "active_registration_count": {
+          "$ref": "#/$defs/Count"
         }
       },
       "required": [
@@ -6499,6 +6502,9 @@
         },
         "as_of": {
           "$ref": "#/$defs/Instant"
+        },
+        "summary": {
+          "$ref": "#/$defs/EventDirectorySummary"
         }
       },
       "required": [
@@ -16615,6 +16621,25 @@
               "type": "null"
             }
           ]
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "status": {
+          "enum": [
+            "all",
+            "published",
+            "draft",
+            "occurred",
+            "cancelled"
+          ]
+        },
+        "include_summary": {
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -16624,7 +16649,31 @@
         "interval",
         "page"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "include_summary": {
+                "const": true
+              }
+            },
+            "required": [
+              "include_summary"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_event_list": {
       "type": "object",
@@ -25722,6 +25771,10 @@
         },
         "event_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_payment_summary": {
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -25923,6 +25976,9 @@
               "type": "null"
             }
           ]
+        },
+        "payment_summary": {
+          "$ref": "#/$defs/EventRegistrationPaymentSummary"
         }
       },
       "required": [
@@ -61961,6 +62017,221 @@
         "own_waitlist"
       ],
       "additionalProperties": false
+    },
+    "EventRegistrationDebt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "preparation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "net_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "paid_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "remaining_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "credited_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "cancelled_minor": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "preparation_id",
+        "currency",
+        "amount_minor",
+        "net_minor",
+        "paid_minor",
+        "remaining_minor",
+        "credited_minor",
+        "cancelled_minor"
+      ],
+      "additionalProperties": false
+    },
+    "EventRegistrationPaymentSummary": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "no_cash_due",
+            "restricted",
+            "missing"
+          ]
+        },
+        "amount_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Currency"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "net_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "paid_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "remaining_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "credited_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cancelled_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "debts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EventRegistrationDebt"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "amount_minor",
+        "currency",
+        "net_minor",
+        "paid_minor",
+        "remaining_minor",
+        "credited_minor",
+        "cancelled_minor",
+        "debts"
+      ],
+      "additionalProperties": false
+    },
+    "EventPendingPayments": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "remaining_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "registration_count": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "currency",
+        "remaining_minor",
+        "registration_count"
+      ],
+      "additionalProperties": false
+    },
+    "EventDirectorySummary": {
+      "type": "object",
+      "properties": {
+        "published": {
+          "$ref": "#/$defs/Count"
+        },
+        "draft": {
+          "$ref": "#/$defs/Count"
+        },
+        "occurred": {
+          "$ref": "#/$defs/Count"
+        },
+        "cancelled": {
+          "$ref": "#/$defs/Count"
+        },
+        "published_active_registrations": {
+          "$ref": "#/$defs/Count"
+        },
+        "unresolved_payment_registrations": {
+          "$ref": "#/$defs/Count"
+        },
+        "pending_payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EventPendingPayments"
+          }
+        }
+      },
+      "required": [
+        "published",
+        "draft",
+        "occurred",
+        "cancelled",
+        "published_active_registrations",
+        "unresolved_payment_registrations",
+        "pending_payments"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -80638,7 +80909,10 @@
           "Q_D01_event_labels_same_org_not_grants",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "scope_filter_before_pagination"
+          "scope_filter_before_pagination",
+          "optional_bound_title_status_filters",
+          "summary_requires_explicit_managed_center_and_finance_features",
+          "scope_query_before_summary_status_cursor_limit"
         ],
         "audit": false,
         "notification": "none",
@@ -84980,7 +85254,10 @@
           "Q_D01_no_event_negative_credit",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "authorized_projection_only"
+          "authorized_projection_only",
+          "opt_in_registration_payment_source",
+          "visible_registration_and_target_financial_read_scope",
+          "frozen_registration_price_not_current_event_terms"
         ],
         "audit": false,
         "notification": "none",
@@ -107925,6 +108202,24 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_list/allOf/0/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventRegistrationDebt/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventRegistrationDebt/properties/preparation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -108414,7 +108709,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 171,
+      "migration_count": 172,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

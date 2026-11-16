@@ -169,5 +169,6 @@
   "20261116135202_lesson_request_status_summary.sql": "419f6512c40825581dc0c337f4e3e87be7eea069056b48a65ec0699a31d96239",
   "20261116143645_assigned_session_room_labels.sql": "d4ad8b4b0d33f987d54c0e628c77a64e9ea410da41e15a78f0c3e49a8d2525bc",
   "20261116194343_instructor_self_account.sql": "147cefb1afa6618de42b6e47b96a2317a1abbc55a87581865a15dbc634887bc9",
-  "20261116201341_member_lesson_discovery.sql": "f4bd89d2108fb70dd77e2da0a6821da8c7681ef0cdf7e377b81d98cae2776b4c"
+  "20261116201341_member_lesson_discovery.sql": "f4bd89d2108fb70dd77e2da0a6821da8c7681ef0cdf7e377b81d98cae2776b4c",
+  "20261116210335_event_directory_finance.sql": "1725a152086d357f97b8ea9235bab99a7ba8a84da4700958472d2e7eeed37d25"
 }
