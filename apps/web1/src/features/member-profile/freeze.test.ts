@@ -1,5 +1,10 @@
 import { beforeEach, it, expect, vi } from "vitest";
-import type { EntitlementView, Preview, TableFreezes } from "../../lib/api-contracts/generated";
+import type {
+  EntitlementView,
+  Preview,
+  TableFreezes,
+  FreezeCancellationPreview,
+} from "../../lib/api-contracts/generated";
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: vi.fn(async () => ({ call })) }));
 import {
@@ -193,4 +198,147 @@ it("ends an already-started interval by the selected date and rejects another ro
     result_reference: { type: "freezes", id: id(99) },
   });
   await expect(readFreezeReceipt(intent)).rejects.toThrow("PROFILE_FREEZE_RECEIPT_UNAVAILABLE");
+});
+
+function cancelQuote(days = 2): FreezeCancellationPreview {
+  row.freezes = [record()];
+  return {
+    ...preview,
+    effects: [
+      { entity: { type: "freezes", id: freezeId }, action: "cancel" },
+      { entity: { type: "sales", id: sale }, action: "adjust", quantity: days },
+    ],
+    freeze_cancellation: {
+      freeze_id: freezeId,
+      sale_id: sale,
+      state: "cancelled",
+      removed_extension_days: days,
+      previous_end_date: row.end_date,
+      end_date: days ? "2099-01-29" : row.end_date,
+      valid_until: days ? "2099-01-28T21:00:00Z" : "2099-01-30T21:00:00Z",
+      preserves_reservations: true,
+    },
+  };
+}
+function useCancelQuote(quote: FreezeCancellationPreview) {
+  const original = call.getMockImplementation()!;
+  call.mockImplementation(async (op, request) =>
+    op === "freeze_cancel_preview_v1"
+      ? quote
+      : op === "freeze_cancel_apply_v1"
+        ? { primary_id: freezeId, changed: [], jobs: [] }
+        : original(op, request),
+  );
+}
+it("cancels the exact future freeze with only a reason and immutable native validity impact", async () => {
+  const quote = cancelQuote();
+  useCancelQuote(quote);
+  const review = await previewFreeze(
+    scope,
+    person,
+    sale,
+    "cancelFreeze",
+    { reason: " Synthetic cancel ", endDate: "not-collected" },
+    freezeId,
+  );
+  expect(review.request).toEqual({
+    client_api_version: 1,
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    freeze_id: freezeId,
+    reason: "Synthetic cancel",
+  });
+  expect(review.cancellation).toEqual(quote.freeze_cancellation);
+  const intent = freezeIntent(review);
+  expect(intent.operation).toBe("freeze_cancel_apply_v1");
+  expect(intent.request).not.toHaveProperty("end_date");
+  expect(intent.request).not.toHaveProperty("expected_version");
+  await writeFreeze(intent);
+  expect(
+    call.mock.calls.some(([op]) => op === "freeze_end_preview_v1" || op === "freeze_end_apply_v1"),
+  ).toBe(false);
+});
+it("accepts native zero extension removal without recomputing an earlier end date", async () => {
+  const quote = cancelQuote(0);
+  useCancelQuote(quote);
+  const review = await previewFreeze(
+    scope,
+    person,
+    sale,
+    "cancelFreeze",
+    { reason: "Synthetic" },
+    freezeId,
+  );
+  expect(review.cancellation?.removed_extension_days).toBe(0);
+  expect(review.cancellation?.end_date).toBe(row.end_date);
+});
+it("rejects started intervals, unrelated cancellation impacts and expired review before apply", async () => {
+  const quote = cancelQuote();
+  useCancelQuote(quote);
+  row.freezes![0].starts_at = "2000-01-01T00:00:00Z";
+  await expect(
+    previewFreeze(scope, person, sale, "cancelFreeze", { reason: "Synthetic" }, freezeId),
+  ).rejects.toThrow("PROFILE_FREEZE_CANCEL_UNAVAILABLE");
+  row.freezes = [record()];
+  quote.freeze_cancellation.sale_id = id(99);
+  await expect(
+    previewFreeze(scope, person, sale, "cancelFreeze", { reason: "Synthetic" }, freezeId),
+  ).rejects.toThrow("PROFILE_FREEZE_PREVIEW_UNAVAILABLE");
+  quote.freeze_cancellation.sale_id = sale;
+  const review = await previewFreeze(
+    scope,
+    person,
+    sale,
+    "cancelFreeze",
+    { reason: "Synthetic" },
+    freezeId,
+  );
+  review.preview.expires_at = "2000-01-01T00:00:00Z";
+  expect(() => freezeIntent(review)).toThrow("PROFILE_FREEZE_PREVIEW_UNAVAILABLE");
+});
+it("requires cancelled state, preserved planned interval and native new validity on result read", async () => {
+  const quote = cancelQuote();
+  useCancelQuote(quote);
+  const review = await previewFreeze(
+      scope,
+      person,
+      sale,
+      "cancelFreeze",
+      { reason: "Synthetic" },
+      freezeId,
+    ),
+    intent = freezeIntent(review);
+  row = {
+    ...row,
+    version: 2,
+    sale_version: 2,
+    end_date: quote.freeze_cancellation.end_date,
+    freezes: [
+      { ...record(), version: 2, state: "cancelled", actual_end: null, extension_until: null },
+    ],
+  };
+  expect((await readFreezeResult(intent, freezeId)).rights[0].freezes![0].state).toBe("cancelled");
+  expect((await readFreezeResult(intent)).rights[0].freezes![0].id).toBe(freezeId);
+  row.freezes![0].actual_end = "2099-01-12T00:00:00Z";
+  await expect(readFreezeResult(intent, freezeId)).rejects.toThrow(
+    "PROFILE_FREEZE_RESULT_UNAVAILABLE",
+  );
+  row.freezes![0].actual_end = null;
+  row.freezes![0].planned_end = "2099-01-14T21:00:00Z";
+  await expect(readFreezeResult(intent, freezeId)).rejects.toThrow(
+    "PROFILE_FREEZE_RESULT_UNAVAILABLE",
+  );
+});
+
+it("keeps first-invalid date focus ordering before the reason on the existing freeze form", async () => {
+  let failure: unknown;
+  try {
+    await previewFreeze(scope, person, sale, "freeze", { startDate: "", endDate: "", reason: "" });
+  } catch (error) {
+    failure = error;
+  }
+  expect(failure).toMatchObject({
+    issues: [{ path: ["startDate"] }, { path: ["endDate"] }, { path: ["reason"] }],
+  });
+  expect(call).not.toHaveBeenCalled();
 });

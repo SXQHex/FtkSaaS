@@ -585,6 +585,7 @@ export default interface Resources {
         "activate": "Üyeyi etkinleştir",
         "adjust": "Hakkı düzelt",
         "allocate": "Paket / hak tahsis et",
+        "cancelFreeze": "Planlanmış dondurmayı iptal et",
         "cancelReservation": "İptal et",
         "change": "Paketi değiştir",
         "collect": "Tahsilat al",
@@ -669,7 +670,8 @@ export default interface Resources {
         "upcoming": "Yaklaşan"
       },
       "financeScope": "Finans görünümü",
-      "freezeCancelUnavailable": "Planlanmış dondurmanın tamamen iptali henüz desteklenmiyor.",
+      "freezeCancelImpact": "Kaldırılan uzatma: {{days}} gün. Yeni geçerlilik: {{until}}. Kesin rezervasyonlar korunur.",
+      "freezeCancelUnavailable": "Başlamamış dondurma için ayrı iptal işlemini kullan.",
       "freezeErrors": {
         "endDate": "Başlangıçtan sonraki geçerli bitiş tarihini seç.",
         "reason": "İşlem gerekçesini gir.",
@@ -854,6 +856,7 @@ export default interface Resources {
         "activate": "Üyeyi etkinleştir",
         "adjust": "Hakkı düzelt",
         "allocate": "Paket / hak tahsis et",
+        "cancelFreeze": "Planlanmış dondurmayı iptal et",
         "cancelReservation": "Rezervasyonu iptal et",
         "change": "Paketi değiştir",
         "deactivate": "Üyeyi pasifleştir",

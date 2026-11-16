@@ -55,7 +55,7 @@ export function MemberProfileContent({
     [negativeDiscipline, setNegativeDiscipline] = useState(""),
     [editNegative, setEditNegative] = useState(false),
     [freezeTarget, setFreezeTarget] = useState<{
-      action: "freeze" | "unfreeze";
+      action: "freeze" | "unfreeze" | "cancelFreeze";
       saleId: string;
       freezeId?: string;
       label: string;
@@ -337,20 +337,20 @@ export function MemberProfileContent({
                   state: t(($) => $.memberProfile.freezeStates[freeze.state]),
                   ...(open
                     ? {
-                        note: future
-                          ? t(($) => $.memberProfile.freezeCancelUnavailable)
-                          : undefined,
                         action: {
-                          kind: "unfreeze" as const,
+                          kind: future ? ("cancelFreeze" as const) : ("unfreeze" as const),
                           label: t(($) =>
                             future
                               ? $.memberProfile.cancelFreeze
                               : $.memberProfile.actions.unfreeze,
                           ),
-                          disabled: !freezeReady || future || !freeze.version,
+                          disabled:
+                            !freezeReady ||
+                            !freeze.version ||
+                            (future && freeze.state !== "scheduled"),
                           onPress: () =>
                             setFreezeTarget({
-                              action: "unfreeze",
+                              action: future ? "cancelFreeze" : "unfreeze",
                               saleId: row.id,
                               freezeId: freeze.id,
                               label: row.name,

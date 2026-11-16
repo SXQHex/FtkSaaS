@@ -29,7 +29,7 @@ export function FreezeEditor({
   scope: ClientScope;
   personId: string;
   personLabel: string;
-  action: "freeze" | "unfreeze";
+  action: "freeze" | "unfreeze" | "cancelFreeze";
   saleId: string;
   freezeId?: string;
   sourceLabel: string;
@@ -121,6 +121,12 @@ export function FreezeEditor({
               : command.state === "rejected"
                 ? t(($) => $.memberProfile.freezeRejected)
                 : undefined;
+  const formatInstant = (value: string) =>
+    new Intl.DateTimeFormat("tr-TR", {
+      timeZone: timezone,
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(value));
   const effects: MemberEffect[] = review
     ? [
         { id: "source", label: t(($) => $.memberProfile.product), value: sourceLabel },
@@ -130,14 +136,27 @@ export function FreezeEditor({
           value:
             "dates" in review.request
               ? `${review.request.dates.start_date} – ${review.request.dates.end_date}`
-              : review.request.end_date,
+              : "end_date" in review.request
+                ? review.request.end_date
+                : `${formatInstant(review.freeze!.starts_at)} – ${formatInstant(review.freeze!.planned_end)}`,
           detail: timezone,
         },
         {
           id: "validity",
           label: t(($) => $.memberProfile.freezeValidity),
-          value: review.before.end_date,
-          detail: t(($) => $.memberProfile.freezeValidityHint),
+          value: review.cancellation
+            ? `${review.cancellation.previous_end_date} → ${review.cancellation.end_date}`
+            : review.before.end_date,
+          detail: review.cancellation
+            ? t(($) => $.memberProfile.freezeCancelImpact, {
+                days: review.cancellation.removed_extension_days,
+                until: new Intl.DateTimeFormat("tr-TR", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                  timeZone: timezone,
+                }).format(new Date(review.cancellation.valid_until)),
+              })
+            : t(($) => $.memberProfile.freezeValidityHint),
         },
         { id: "reason", label: t(($) => $.memberProfile.reason), value: review.request.reason },
         {
@@ -192,7 +211,12 @@ export function FreezeEditor({
         !review.preview.blockers.length &&
         command.state === "ready"
           ? () => {
-              void command.start(freezeIntent(review));
+              try {
+                void command.start(freezeIntent(review));
+              } catch {
+                setError(t(($) => $.memberProfile.freezeStale));
+                setAccepted(false);
+              }
             }
           : undefined
       }

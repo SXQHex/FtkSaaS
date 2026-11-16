@@ -2005,7 +2005,7 @@
     "freezePeriods": "Dondurma dönemleri",
     "freezeValidity": "Mevcut geçerlilik bitişi",
     "freezeValidityHint": "Paketin dondurma koşulları uygulanır. İşlem sonrası güncel geçerlilik gösterilir.",
-    "freezeCancelUnavailable": "Planlanmış dondurmanın tamamen iptali henüz desteklenmiyor.",
+    "freezeCancelUnavailable": "Başlamamış dondurma için ayrı iptal işlemini kullan.",
     "freezeNotInProduct": "Bu paket sürümünde dondurma hakkı yok.",
     "freezeStates": {
       "scheduled": "Planlandı",
@@ -2095,7 +2095,8 @@
       "collect": "Tahsilat al",
       "deactivate": "Pasifleştir",
       "activate": "Üyeyi etkinleştir",
-      "cancelReservation": "İptal et"
+      "cancelReservation": "İptal et",
+      "cancelFreeze": "Planlanmış dondurmayı iptal et"
     },
     "close": "Kapat",
     "cancel": "Vazgeç",
@@ -2149,7 +2150,8 @@
       "terminate": "Hakkı sonlandır",
       "activate": "Üyeyi etkinleştir",
       "deactivate": "Üyeyi pasifleştir",
-      "cancelReservation": "Rezervasyonu iptal et"
+      "cancelReservation": "Rezervasyonu iptal et",
+      "cancelFreeze": "Planlanmış dondurmayı iptal et"
     },
     "cancelFreeze": "Dondurmayı iptal et",
     "title": "Üye profili",
@@ -2271,7 +2273,8 @@
       "event": "Etkinlik kaydı",
       "record": "Kaynak kaydı"
     },
-    "ledgerNoSource": "Bu kişi için görünür hak kaynağı yok."
+    "ledgerNoSource": "Bu kişi için görünür hak kaynağı yok.",
+    "freezeCancelImpact": "Kaldırılan uzatma: {{days}} gün. Yeni geçerlilik: {{until}}. Kesin rezervasyonlar korunur."
   },
   "scheduleRoster": {
     "scope": "{{interval}} · {{timezone}}. Bu aralıkta oluşmuş derslerin öncelikli rezervasyonları gösterilir. Gelecek programlara otomatik kayıt yapılmaz.",

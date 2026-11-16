@@ -1538,19 +1538,18 @@ test("freeze review validates dates and preserves native reserved rights and tim
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Dondurmayı iptal et", exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
 });
-test("freeze scheduled cancellation stays explicitly unavailable without sending a shortening command", async ({
+test("freeze scheduled cancellation opens a separate reason-only sheet without sending a shortening command", async ({
   page,
 }) => {
   const { writes, previews } = await freezeSetup(page, { existing: "scheduled" });
-  await expect(
-    page.getByRole("button", { name: "Dondurmayı iptal et", exact: true }),
-  ).toBeDisabled();
-  await expect(
-    page.getByText("Planlanmış dondurmanın tamamen iptali henüz desteklenmiyor.", { exact: true }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "Dondurmayı iptal et", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Planlanmış dondurmayı iptal et", exact: true });
+  await expect(panel.getByLabel("Gerekçe", { exact: true })).toBeVisible();
+  await expect(panel.getByLabel("Başlangıç", { exact: true })).toHaveCount(0);
+  await expect(panel.getByLabel("Bitiş", { exact: true })).toHaveCount(0);
   expect(writes).toHaveLength(0);
   expect(previews).toHaveLength(0);
 });
