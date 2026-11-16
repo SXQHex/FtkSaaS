@@ -10,6 +10,9 @@ import { NegativeLimitEditor } from "./negative-limit-editor";
 import { RightAdjustmentEditor } from "./right-adjustment-editor";
 import { FreezeEditor } from "./freeze-editor";
 import { ProfileLedger } from "./profile-ledger";
+import { StudentStateEditor } from "./student-state";
+import { SaleLifecycleEditor } from "./sale-lifecycle-editor";
+import type { SaleLifecycleAction } from "./sale-lifecycle";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -49,6 +52,8 @@ export function MemberProfileContent({
     [index, setIndex] = useState(0),
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [sale, setSale] = useState(false),
+    [studentAction, setStudentAction] = useState<"activate" | "deactivate">(),
+    [lifecycle, setLifecycle] = useState<{ action: SaleLifecycleAction; saleId?: string }>(),
     [collect, setCollect] = useState(false),
     [locked, setLocked] = useState(false),
     [commandInvalid, setInvalid] = useState(false),
@@ -396,7 +401,18 @@ export function MemberProfileContent({
                             timezone: source.timezone,
                           }),
                       }
-                    : action,
+                    : action.kind === "terminate"
+                      ? {
+                          ...action,
+                          disabled:
+                            !sourceAvailable ||
+                            locked ||
+                            rights.isFetching ||
+                            source.sale_state !== "active",
+                          onPress: () =>
+                            setLifecycle({ action: "terminate", saleId: source.sale_id }),
+                        }
+                      : action,
               ),
             };
           },
@@ -466,20 +482,40 @@ export function MemberProfileContent({
             : null
         }
         actions={[
-          { kind: "renew", disabled: true },
-          { kind: "change", disabled: true },
-          ...(p?.relationships.some((x) => x.center_id === scope.centerId && x.kind === "student")
+          ...(["renew", "change"] as const).map((action) => ({
+            kind: action,
+            disabled:
+              !sourceAvailable ||
+              locked ||
+              rights.isError ||
+              !rights.data?.length ||
+              catalog.isError ||
+              !catalog.data,
+            onPress: () => setLifecycle({ action }),
+          })),
+          ...(p
             ? [
                 {
                   kind: p.relationships.some(
-                    (x) =>
-                      x.center_id === scope.centerId &&
-                      x.kind === "student" &&
-                      x.state === "active",
+                    (row) =>
+                      row.center_id === scope.centerId &&
+                      row.kind === "student" &&
+                      row.state === "active",
                   )
                     ? ("deactivate" as const)
                     : ("activate" as const),
-                  disabled: true,
+                  disabled: !sourceAvailable || locked,
+                  onPress: () =>
+                    setStudentAction(
+                      p.relationships.some(
+                        (row) =>
+                          row.center_id === scope.centerId &&
+                          row.kind === "student" &&
+                          row.state === "active",
+                      )
+                        ? "deactivate"
+                        : "activate",
+                    ),
                 },
               ]
             : []),
@@ -920,6 +956,78 @@ export function MemberProfileContent({
             setCurrencyDraft(code);
             setSale(false);
             setCollect(true);
+          }}
+        />
+      )}
+      {studentAction && (sourceAvailable || preservePending) && (
+        <StudentStateEditor
+          scope={scope}
+          personId={personId}
+          name={p?.display_name ?? ""}
+          action={studentAction}
+          sourceAvailable={sourceAvailable}
+          onClose={() => setStudentAction(undefined)}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onRefresh={async (current) => {
+            queries.setQueryData(personKey, current);
+            await queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
+            void rights.refetch();
+          }}
+        />
+      )}
+      {lifecycle && center && (sourceAvailable || preservePending) && (
+        <SaleLifecycleEditor
+          key={`${personId}:${lifecycle.action}:${lifecycle.saleId ?? "choose"}`}
+          scope={scope}
+          personId={personId}
+          personLabel={p?.display_name ?? ""}
+          action={lifecycle.action}
+          initialSaleId={lifecycle.saleId}
+          sources={
+            rights.isError
+              ? []
+              : (rights.data ?? []).filter(
+                  (row) => lifecycle.action === "renew" || row.sale_state === "active",
+                )
+          }
+          products={catalog.isError ? [] : (catalog.data ?? [])}
+          productNames={{
+            centers: workspace.isError ? [] : (workspace.data?.centers ?? []),
+            disciplines: disciplines.isError ? [] : (disciplines.data ?? []),
+          }}
+          sourceAvailable={
+            sourceAvailable &&
+            !rights.isError &&
+            (lifecycle.action === "terminate" || !catalog.isError)
+          }
+          onClose={() => setLifecycle(undefined)}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onRefresh={async (result) => {
+            queries.setQueryData(rightsKey, result.rows);
+            if (result.finance) {
+              queries.setQueryData(financeKey(result.finance.currency), result.finance);
+              setCurrency(result.finance.currency);
+              setCurrencyDraft(result.finance.currency);
+              setIndex(0);
+              setCursors([undefined]);
+            }
+            await queries.invalidateQueries({
+              queryKey: [
+                "profile-reservations",
+                scope.accountId,
+                scope.orgId,
+                scope.centerId,
+                personId,
+              ],
+            });
+            await person.refetch({ throwOnError: true });
+            void queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
           }}
         />
       )}

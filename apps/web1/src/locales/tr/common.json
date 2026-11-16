@@ -2274,7 +2274,44 @@
       "record": "Kaynak kaydı"
     },
     "ledgerNoSource": "Bu kişi için görünür hak kaynağı yok.",
-    "freezeCancelImpact": "Kaldırılan uzatma: {{days}} gün. Yeni geçerlilik: {{until}}. Kesin rezervasyonlar korunur."
+    "freezeCancelImpact": "Kaldırılan uzatma: {{days}} gün. Yeni geçerlilik: {{until}}. Kesin rezervasyonlar korunur.",
+    "lifecycle": {
+      "required": "Bu alan zorunludur.",
+      "source": "Kaynak paket / satış",
+      "effect": "Önizleme etkisi",
+      "gap": "Dönemler arası boşluk (gün)",
+      "overlap": "Dönem çakışması (gün)",
+      "debtReduction": "Borçtan düşülecek tutar",
+      "creditAdded": "Üye alacağına eklenecek tutar",
+      "expires": "Onayın son geçerliliği",
+      "sourceError": "Kaynak veya önizleme okunamadı ya da değişti. Güncel kaynağı oku ve yeniden incele.",
+      "eventsBlock": "Bu satışa bağlı gelecek etkinlik kaydı var. Paket değişiminden önce etkinlik kaydı ayrıca iptal edilmeli ve envanter yeniden okunmalı.",
+      "readInventory": "Güncel bağlı kayıtları oku",
+      "note": "Yenileme yeni bir bağlı satış oluşturur; eski haklar aktarılmaz. Sonlandırma serbest kalan hakkı kapatır. Bu işlemler nakit iade değildir.",
+      "states": {
+        "ready": "",
+        "writing": "İşlem uygulanıyor…",
+        "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+        "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+        "saved-unread": "İşlem alındı; güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+        "saved": "İşlem ve güncel hak, bağlı kayıtlar ile ilgili finans okundu.",
+        "stale": "Önizleme eskidi. Yeniden incele ve onayla.",
+        "rejected": "İşlem reddedildi. Güncel koşulları kontrol edip yeniden incele."
+      },
+      "eventCancellation": "Etkinlik kaydını iptal et",
+      "eventPolicy": "İptal koşullarına göre ayrılmış hak iade edilebilir veya tüketilebilir. Sonuç etkinlik ve hak kaynağından yeniden okunur.",
+      "eventConfirm": "Bu etkinlik kaydını, iptal koşullarının hak etkisini kabul ederek iptal ediyorum."
+    },
+    "studentStates": {
+      "ready": "",
+      "writing": "İşlem uygulanıyor…",
+      "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+      "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+      "saved-unread": "İşlem alındı; güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+      "saved": "Öğrencilik durumu kaydedildi ve merkez ilişkisi yeniden okundu.",
+      "stale": "Önizleme eskidi. Yeniden incele ve onayla.",
+      "rejected": "İşlem reddedildi. Güncel koşulları kontrol edip yeniden incele."
+    }
   },
   "scheduleRoster": {
     "scope": "{{interval}} · {{timezone}}. Bu aralıkta oluşmuş derslerin öncelikli rezervasyonları gösterilir. Gelecek programlara otomatik kayıt yapılmaz.",

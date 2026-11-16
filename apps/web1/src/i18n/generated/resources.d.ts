@@ -719,6 +719,33 @@ export default interface Resources {
         "sale": "Satış"
       },
       "ledgerValues": "Miktar {{quantity}} · Bakiye farkı {{delta}}",
+      "lifecycle": {
+        "creditAdded": "Üye alacağına eklenecek tutar",
+        "debtReduction": "Borçtan düşülecek tutar",
+        "effect": "Önizleme etkisi",
+        "eventCancellation": "Etkinlik kaydını iptal et",
+        "eventConfirm": "Bu etkinlik kaydını, iptal koşullarının hak etkisini kabul ederek iptal ediyorum.",
+        "eventPolicy": "İptal koşullarına göre ayrılmış hak iade edilebilir veya tüketilebilir. Sonuç etkinlik ve hak kaynağından yeniden okunur.",
+        "eventsBlock": "Bu satışa bağlı gelecek etkinlik kaydı var. Paket değişiminden önce etkinlik kaydı ayrıca iptal edilmeli ve envanter yeniden okunmalı.",
+        "expires": "Onayın son geçerliliği",
+        "gap": "Dönemler arası boşluk (gün)",
+        "note": "Yenileme yeni bir bağlı satış oluşturur; eski haklar aktarılmaz. Sonlandırma serbest kalan hakkı kapatır. Bu işlemler nakit iade değildir.",
+        "overlap": "Dönem çakışması (gün)",
+        "readInventory": "Güncel bağlı kayıtları oku",
+        "required": "Bu alan zorunludur.",
+        "source": "Kaynak paket / satış",
+        "sourceError": "Kaynak veya önizleme okunamadı ya da değişti. Güncel kaynağı oku ve yeniden incele.",
+        "states": {
+          "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+          "ready": "",
+          "rejected": "İşlem reddedildi. Güncel koşulları kontrol edip yeniden incele.",
+          "saved": "İşlem ve güncel hak, bağlı kayıtlar ile ilgili finans okundu.",
+          "saved-unread": "İşlem alındı; güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+          "stale": "Önizleme eskidi. Yeniden incele ve onayla.",
+          "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+          "writing": "İşlem uygulanıyor…"
+        }
+      },
       "limitLabel": "Limit (ders, 0 kapalı)",
       "linkedLedger": "Önceki harekete bağlı",
       "nativeEffectsHint": "Hak, borç ve rezervasyon etkileri önizlemeden okunur. Tahsilat ve nakit iade ayrı işlemlerdir.",
@@ -844,6 +871,16 @@ export default interface Resources {
       "saleWriting": "Satış uygulanıyor…",
       "sections": "Üye bölümleri",
       "stateHint": "Geçmiş kayıtlar korunur. Yetki ve açık rezervasyon koşulları işlem sırasında doğrulanır.",
+      "studentStates": {
+        "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+        "ready": "",
+        "rejected": "İşlem reddedildi. Güncel koşulları kontrol edip yeniden incele.",
+        "saved": "Öğrencilik durumu kaydedildi ve merkez ilişkisi yeniden okundu.",
+        "saved-unread": "İşlem alındı; güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+        "stale": "Önizleme eskidi. Yeniden incele ve onayla.",
+        "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+        "writing": "İşlem uygulanıyor…"
+      },
       "studentUnknown": "Öğrencilik durumu bilinmiyor",
       "tabs": {
         "payments": "Ödemeler",

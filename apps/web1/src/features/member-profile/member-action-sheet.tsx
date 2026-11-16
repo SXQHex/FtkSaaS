@@ -58,6 +58,7 @@ export function MemberActionSheet({
   accepted,
   errors,
   notice,
+  sourceSelection,
   pending = false,
   readOnly = false,
   freezePlanned = false,
@@ -81,6 +82,7 @@ export function MemberActionSheet({
   accepted: boolean;
   errors?: Partial<Record<keyof MemberDraft, string>>;
   notice?: ReactNode;
+  sourceSelection?: ReactNode;
   pending?: boolean;
   readOnly?: boolean;
   freezePlanned?: boolean;
@@ -161,6 +163,7 @@ export function MemberActionSheet({
             }}
           >
             <FieldGroup>
+              {sourceSelection}
               {sale && (
                 <FieldSet>
                   <FieldLegend>{t(($) => $.memberProfile.product)}</FieldLegend>
