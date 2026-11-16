@@ -25,6 +25,7 @@ import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$
 import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdProductsRouteImport } from './routes/o.$orgId.c.$centerId.products'
+import { Route as OOrgIdCCenterIdRequestsRouteImport } from './routes/o.$orgId.c.$centerId.requests'
 import { Route as OOrgIdCCenterIdScheduleRouteImport } from './routes/o.$orgId.c.$centerId.schedule'
 import { Route as OOrgIdCCenterIdSettingsRouteImport } from './routes/o.$orgId.c.$centerId.settings'
 import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
@@ -112,6 +113,11 @@ const OOrgIdCCenterIdProductsRoute = OOrgIdCCenterIdProductsRouteImport.update({
   path: '/o/$orgId/c/$centerId/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdRequestsRoute = OOrgIdCCenterIdRequestsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/requests',
+  path: '/o/$orgId/c/$centerId/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdScheduleRoute = OOrgIdCCenterIdScheduleRouteImport.update({
   id: '/o/$orgId/c/$centerId/schedule',
   path: '/o/$orgId/c/$centerId/schedule',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/requests'
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/requests'
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/requests'
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdProductsRoute: typeof OOrgIdCCenterIdProductsRoute
+  OOrgIdCCenterIdRequestsRoute: typeof OOrgIdCCenterIdRequestsRoute
   OOrgIdCCenterIdScheduleRoute: typeof OOrgIdCCenterIdScheduleRoute
   OOrgIdCCenterIdSettingsRoute: typeof OOrgIdCCenterIdSettingsRoute
   OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
@@ -433,6 +446,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/requests': {
+      id: '/o/$orgId/c/$centerId/requests'
+      path: '/o/$orgId/c/$centerId/requests'
+      fullPath: '/o/$orgId/c/$centerId/requests'
+      preLoaderRoute: typeof OOrgIdCCenterIdRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/schedule': {
       id: '/o/$orgId/c/$centerId/schedule'
       path: '/o/$orgId/c/$centerId/schedule'
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdProductsRoute: OOrgIdCCenterIdProductsRoute,
+  OOrgIdCCenterIdRequestsRoute: OOrgIdCCenterIdRequestsRoute,
   OOrgIdCCenterIdScheduleRoute: OOrgIdCCenterIdScheduleRoute,
   OOrgIdCCenterIdSettingsRoute: OOrgIdCCenterIdSettingsRoute,
   OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
