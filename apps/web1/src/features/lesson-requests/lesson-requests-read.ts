@@ -9,6 +9,7 @@ import type {
 } from "../../lib/api-contracts/generated";
 import { getTemporal } from "../../lib/temporal";
 import { readScheduleSession } from "../schedule/schedule-read";
+import type { RequestFilter } from "./lesson-requests-view";
 const positive = z.number().int().positive().safe(),
   instant = z.iso.datetime({ offset: true });
 const common = (scope: ClientScope) => ({
@@ -82,18 +83,34 @@ export async function readLessonRequest(scope: ClientScope, id: string) {
     throw new Error("LESSON_REQUEST_SOURCE_UNAVAILABLE");
   return requestDetail(page.items[0]!, scope, "lesson_request_reject_v1", id);
 }
-export async function readLessonRequests(scope: ClientScope, cursor?: string) {
+export async function readLessonRequests(
+  scope: ClientScope,
+  cursor?: string,
+  status: RequestFilter = "pending",
+) {
   const backend = await scopedBackend(scope);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),
     operation: "lesson_request_create_v1",
-    selector: { operation: "lesson_request_create_v1", key: {} },
+    selector: { operation: "lesson_request_create_v1", key: { status, include_summary: true } },
     page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
   if (page.items.length > 20 || (cursor && page.next_cursor === cursor))
     throw new Error("LESSON_REQUEST_PAGE_UNAVAILABLE");
   const details = page.items.map((row) => requestDetail(row, scope, "lesson_request_create_v1"));
+  const count = z.number().int().nonnegative().safe();
+  const summary = z
+    .object({ pending: count, alternative_offered: count, approved: count, rejected: count })
+    .parse(page.lesson_request_summary);
+  if (
+    details.some((row) =>
+      status === "resolved"
+        ? !["approved", "rejected", "withdrawn", "expired"].includes(row.state)
+        : status !== "all" && row.state !== status,
+    )
+  )
+    throw new Error("LESSON_REQUEST_FILTER_UNAVAILABLE");
   if (new Set(details.map((row) => row.id)).size !== details.length)
     throw new Error("LESSON_REQUEST_PAGE_UNAVAILABLE");
   const ids = [
@@ -133,6 +150,7 @@ export async function readLessonRequests(scope: ClientScope, cursor?: string) {
         : undefined,
     })),
     next_cursor: page.next_cursor,
+    summary,
   };
 }
 export async function requestInterval(request: LessonRequestView) {

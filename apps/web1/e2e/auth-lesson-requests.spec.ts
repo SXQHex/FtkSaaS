@@ -8,7 +8,7 @@ import type {
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 const requestId = "019a7b00-0000-7000-8000-000000000070";
-async function fixture(page: Page, mode: "normal" | "unknown" | "denied" = "normal") {
+async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "directory" = "normal") {
   await mockStudio(page);
   const detail: LessonRequestView = {
     id: requestId,
@@ -90,7 +90,77 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "denied" = "norm
         request_detail: detail,
         versions: [{ entity: { type: "lesson_requests", id: requestId }, version: detail.version }],
       };
-      return send({ items: [row], next_cursor: null, as_of: detail.created_at });
+      if (req.operation !== "lesson_request_create_v1")
+        return send({ items: [row], next_cursor: null, as_of: detail.created_at });
+      const status = req.selector.key.status;
+      expect(req.selector.key.include_summary).toBe(true);
+      const states =
+        mode === "directory"
+          ? ([
+              "pending",
+              "pending",
+              "alternative_offered",
+              "approved",
+              "rejected",
+              "withdrawn",
+              "expired",
+            ] as const)
+          : [detail.state];
+      const entries = states
+        .map((state, index) => ({
+          ...row,
+          entity: {
+            type: "lesson_requests",
+            id:
+              mode === "directory"
+                ? `019a7b00-0000-7000-8000-${String(80 + index).padStart(12, "0")}`
+                : detail.id,
+          },
+          state,
+          request_detail: {
+            ...detail,
+            state,
+            id:
+              mode === "directory"
+                ? `019a7b00-0000-7000-8000-${String(80 + index).padStart(12, "0")}`
+                : detail.id,
+          },
+          versions: [
+            {
+              entity: {
+                type: "lesson_requests",
+                id:
+                  mode === "directory"
+                    ? `019a7b00-0000-7000-8000-${String(80 + index).padStart(12, "0")}`
+                    : detail.id,
+              },
+              version: detail.version,
+            },
+          ],
+        }))
+        .filter(
+          (entry) =>
+            status === "all" ||
+            (status === "resolved"
+              ? ["approved", "rejected", "withdrawn", "expired"].includes(entry.state)
+              : entry.state === status),
+        );
+      const offset = req.page.cursor ? 1 : 0;
+      return send({
+        items: mode === "directory" ? entries.slice(offset, offset + 1) : entries,
+        next_cursor:
+          mode === "directory" && offset === 0 && entries.length > 1 ? `${status}:next` : null,
+        as_of: detail.created_at,
+        lesson_request_summary:
+          mode === "directory"
+            ? { pending: 25, alternative_offered: 12, approved: 9, rejected: 4 }
+            : {
+                pending: detail.state === "pending" ? 1 : 0,
+                alternative_offered: detail.state === "alternative_offered" ? 1 : 0,
+                approved: detail.state === "approved" ? 1 : 0,
+                rejected: detail.state === "rejected" ? 1 : 0,
+              },
+      });
     }
     if (op === "person_get_v1" && req.person_id === I.self)
       return send({
@@ -207,19 +277,22 @@ async function open(page: Page) {
   await expect(sheet.getByRole("button", { name: "Reddet", exact: true })).toBeEnabled();
   return sheet;
 }
-test("native request list preserves exact credits and disables unsupported global filters", async ({
+test("native request list preserves exact credits and uses scoped status and summary", async ({
   page,
 }) => {
   const state = await fixture(page);
   await expect(
     page.getByText("9007199254740993 kredi · 1 süreli paket", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("radio", { name: "Bekleyen", exact: true })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: "Bekleyen", exact: true })).toBeEnabled();
   expect(
     state.reads.some(
       (row) =>
         JSON.stringify(row.selector) ===
-        JSON.stringify({ operation: "lesson_request_create_v1", key: {} }),
+        JSON.stringify({
+          operation: "lesson_request_create_v1",
+          key: { status: "pending", include_summary: true },
+        }),
     ),
   ).toBe(true);
   await open(page);
@@ -354,3 +427,37 @@ for (const mode of ["existing", "create"] as const) {
     await expect(sheet.getByText("Bu ayrıntıyı görme yetkisi yok.", { exact: true })).toBeVisible();
   });
 }
+
+test("status change resets native cursor and keeps server counters independent of the visible row", async ({
+  page,
+}) => {
+  const state = await fixture(page, "directory");
+  await expect(page.getByText("25", { exact: true })).toBeVisible();
+  await expect(page.getByText("12", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect
+    .poll(() => state.reads.some((r) => (r.page as { cursor?: string })?.cursor === "pending:next"))
+    .toBe(true);
+  await page.getByRole("radio", { name: "Sonuçlanan", exact: true }).click();
+  await expect(page.getByRole("gridcell", { name: "Onaylanan", exact: true })).toBeVisible();
+  const resolved = state.reads.filter(
+    (r) => (r.selector as { key: { status?: string } }).key.status === "resolved",
+  );
+  expect(resolved.at(-1)).toMatchObject({
+    selector: { key: { status: "resolved", include_summary: true } },
+    page: { sort: "created_at_asc", limit: 20 },
+  });
+  expect(resolved.at(-1)!.page).not.toHaveProperty("cursor");
+  await expect(page.getByText("25", { exact: true })).toBeVisible();
+  await page.getByRole("radio", { name: "Alternatif önerildi", exact: true }).click();
+  await expect(
+    page.getByRole("gridcell", { name: "Alternatif önerildi", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Önceki", exact: true })).toBeDisabled();
+  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
+  await expect
+    .poll(() =>
+      state.reads.some((r) => (r.selector as { key: { status?: string } }).key.status === "all"),
+    )
+    .toBe(true);
+});

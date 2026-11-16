@@ -6,7 +6,7 @@ import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { LessonRequestView } from "../../lib/api-contracts/generated";
 import { readWorkspace } from "../workspace/workspace";
-import { LessonRequestsView, type RequestRow } from "./lesson-requests-view";
+import { LessonRequestsView, type RequestRow, type RequestFilter } from "./lesson-requests-view";
 import { LessonRequestEditor } from "./lesson-request-editor";
 import { readLessonRequests } from "./lesson-requests-read";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -26,6 +26,7 @@ export function LessonRequestsContent({
     queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [pageIndex, setPageIndex] = useState(0);
+  const [filter, setFilter] = useState<RequestFilter>("pending");
   const [locked, setLocked] = useState(false);
   // The selected snapshot outlives list refreshes, including unknown writer outcomes.
   const [selected, setSelected] = useState<{ detail: LessonRequestView; name: string }>();
@@ -41,9 +42,9 @@ export function LessonRequestsContent({
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
       : undefined;
   const query = useQuery({
-    queryKey: [...prefix, cursors[pageIndex]],
+    queryKey: [...prefix, filter, cursors[pageIndex]],
     queryFn: async () => {
-      const result = await readLessonRequests(scope, cursors[pageIndex]);
+      const result = await readLessonRequests(scope, cursors[pageIndex], filter);
       if (result.next_cursor && cursors.slice(0, pageIndex + 1).includes(result.next_cursor))
         throw new Error("LESSON_REQUEST_PAGE_UNAVAILABLE");
       return result;
@@ -119,13 +120,28 @@ export function LessonRequestsContent({
           };
         })
       : null;
+  function summaryCount(key: "pending" | "alternative_offered" | "approved" | "rejected") {
+    return !query.isError && query.data
+      ? new Intl.NumberFormat("tr-TR").format(query.data.summary[key])
+      : null;
+  }
   return (
     <>
       <LessonRequestsView
-        filter="all"
-        onFilter={() => {}}
-        filtersAvailable={false}
-        counts={{ pending: null, alternative_offered: null, approved: null, rejected: null }}
+        filter={filter}
+        onFilter={(value) => {
+          if (locked || value === filter) return;
+          setFilter(value);
+          setCursors([undefined]);
+          setPageIndex(0);
+        }}
+        filtersAvailable
+        counts={{
+          pending: summaryCount("pending"),
+          alternative_offered: summaryCount("alternative_offered"),
+          approved: summaryCount("approved"),
+          rejected: summaryCount("rejected"),
+        }}
         rows={rows}
         locked={locked}
         onOpen={(id) => {
@@ -136,9 +152,6 @@ export function LessonRequestsContent({
         }}
         notice={
           <>
-            <Alert>
-              <AlertDescription>{t(($) => $.lessonRequests.directoryLimit)}</AlertDescription>
-            </Alert>
             {(query.isError || !center) && (
               <Alert variant="destructive">
                 <AlertDescription>{t(($) => $.lessonRequests.sourceError)}</AlertDescription>

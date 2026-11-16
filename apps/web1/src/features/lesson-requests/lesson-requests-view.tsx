@@ -120,7 +120,12 @@ export function LessonRequestsView({
             ))}
           </ToggleGroup>
         </CardContent>
-        <CardContent className="min-w-0 [&_[data-slot=table-container]]:max-h-[min(65vh,32rem)]">
+        <CardContent
+          role="region"
+          tabIndex={0}
+          aria-label={t(($) => $.lessonRequests.title)}
+          className="min-w-0 focus-visible:outline-2 focus-visible:outline-ring [&_[data-slot=table-container]]:max-h-[min(65vh,32rem)]"
+        >
           {rows === null ? (
             <p role="status" className="py-8 text-sm text-muted-foreground">
               {t(($) => $.lessonRequests.unread)}
