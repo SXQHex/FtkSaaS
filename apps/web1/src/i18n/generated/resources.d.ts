@@ -817,6 +817,18 @@ export default interface Resources {
       "windowException": "Süre istisnası iste (native yetki ve politika gerekir)",
       "windowReason": "İstisna gerekçesi"
     },
+    "memberClasses": {
+      "cancel": "Vazgeç",
+      "chooseDay": "Gün seç",
+      "description": "Kayıt olmak için hak seç, iptal süresini gör.",
+      "empty": "Bu gün ders yok.",
+      "fixedGroup": "Sabit grup",
+      "nextWeek": "Sonraki hafta",
+      "previousWeek": "Önceki hafta",
+      "thisWeek": "Bu hafta",
+      "title": "Dersler",
+      "unread": "Güncel ders listesi okunamadı."
+    },
     "memberProfile": {
       "accepted": "Etkiyi okudum",
       "actions": {

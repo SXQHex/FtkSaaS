@@ -2795,5 +2795,17 @@
       "lesson_agreement": "Özel ders anlaşması"
     },
     "loading": "Hakedişler okunuyor…"
+  },
+  "memberClasses": {
+    "title": "Dersler",
+    "description": "Kayıt olmak için hak seç, iptal süresini gör.",
+    "thisWeek": "Bu hafta",
+    "previousWeek": "Önceki hafta",
+    "nextWeek": "Sonraki hafta",
+    "chooseDay": "Gün seç",
+    "fixedGroup": "Sabit grup",
+    "empty": "Bu gün ders yok.",
+    "unread": "Güncel ders listesi okunamadı.",
+    "cancel": "Vazgeç"
   }
 }
