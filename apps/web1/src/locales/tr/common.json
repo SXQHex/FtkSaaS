@@ -1975,7 +1975,8 @@
     "saleRefundReduction": "Satış borcu azaltımı",
     "saleRefundHint": "Tutarı sağlayıcı hesaplar. Satış iadesi nakit ödeme oluşturmaz ve hakları değiştirmez; güncel borç ve alacak işlemden sonra yeniden okunur.",
     "saleRefundRightsRestricted": "Hak okuması bu oturumda kullanılamıyor.",
-    "reasonRequired": "Gerekçe gir."
+    "reasonRequired": "Gerekçe gir.",
+    "self": "Kendim"
   },
   "memberProfile": {
     "back": "Üyeler",

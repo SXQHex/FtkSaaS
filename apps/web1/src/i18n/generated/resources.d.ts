@@ -483,6 +483,7 @@ export default interface Resources {
       "sections": "Finans bölümleri",
       "selectedCredit": "Seçili kişinin alacağı",
       "selectedScope": "Seçili kapsam",
+      "self": "Kendim",
       "source": "Kaynak kayıt",
       "sourceError": "Kaynak okunamadı. Tekrar dene.",
       "sourceScope": "Bu görünüm yalnız seçili kişi ve para birimidir. Merkez toplamı değildir.",

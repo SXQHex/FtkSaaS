@@ -111,7 +111,24 @@ export function FinanceContent({
     enabled: Boolean(center) && !locked,
     retry: false,
   });
-  const selectedPerson = people.data?.items.find((row) => row.id === draftSelection.personId);
+  const selfContext = current?.selected?.self_context;
+  const selfId = selfContext?.centers.some(
+    (row) => row.center_id === scope.centerId && (row.student || row.instructor || row.assistant),
+  )
+    ? selfContext.person_id
+    : undefined;
+  const visiblePeople = people.isError ? [] : (people.data?.items ?? []);
+  const knownPeople = [
+    ...(initialContext?.selection
+      ? [{ id: initialContext.selection.personId, display_name: initialContext.label }]
+      : []),
+    ...(selfId && selfId !== initialContext?.selection?.personId
+      ? [{ id: selfId, display_name: t(($) => $.finance.self) }]
+      : []),
+  ].filter((row) => !visiblePeople.some((person) => person.id === row.id));
+  const selectedPerson = [...visiblePeople, ...knownPeople].find(
+    (row) => row.id === draftSelection.personId,
+  );
   const [personLabel, setPersonLabel] = useState(initialContext?.label ?? "");
   const finance = useQuery({
     queryKey: [
@@ -243,14 +260,14 @@ export function FinanceContent({
                 id="finance-selected-person"
                 name="selectedPerson"
                 value={draftSelection.personId}
-                disabled={locked || people.isFetching || people.isError}
+                disabled={locked || ((people.isFetching || people.isError) && !knownPeople.length)}
                 required
                 onChange={(event) =>
                   setDraftSelection((old) => ({ ...old, personId: event.target.value }))
                 }
               >
                 <NativeSelectOption value="">{t(($) => $.finance.choose)}</NativeSelectOption>
-                {people.data?.items.map((row) => (
+                {[...visiblePeople, ...knownPeople].map((row) => (
                   <NativeSelectOption key={row.id} value={row.id}>
                     {row.display_name}
                   </NativeSelectOption>
@@ -365,7 +382,12 @@ export function FinanceContent({
                   id: source.person_id,
                   person: personLabel,
                   amount: formatMinorAmount(source.credit_available_minor, source.currency),
-                  debt: null,
+                  debt: formatMinorAmount(
+                    source.debts
+                      .reduce((sum, row) => sum + BigInt(row.remaining_minor), 0n)
+                      .toString(),
+                    source.currency,
+                  ),
                   actions:
                     !workspace.isError && !locked && BigInt(source.credit_available_minor) > 0n
                       ? [{ kind: "credit-refund" as const, onPress: () => setCreditRefund(true) }]
