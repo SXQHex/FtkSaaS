@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useEffect, useRef, useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { DocumentGate } from "../../lib/api-contracts/generated";
 import {
@@ -73,6 +73,11 @@ export function DocumentSheet({
   const { t } = useTranslation(),
     id = useId(),
     disabled = locked || readOnly;
+  const form = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (errors && Object.keys(errors).length)
+      form.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [errors]);
   const set = <K extends keyof DocumentDraft>(key: K, value: DocumentDraft[K]) =>
     onDraft({ ...draft, [key]: value });
   return (
@@ -90,6 +95,7 @@ export function DocumentSheet({
         <SheetDescription>{t(($) => $.documents.editorDescriptions[mode])}</SheetDescription>
       </SheetHeader>
       <form
+        ref={form}
         id={id}
         method="post"
         aria-label={t(($) => $.documents.editorTitle)}
@@ -184,6 +190,8 @@ export function DocumentSheet({
               <Field key={gate} orientation="horizontal" data-invalid={Boolean(errors?.gates)}>
                 <Checkbox
                   id={`${id}-${gate}`}
+                  aria-invalid={Boolean(errors?.gates)}
+                  aria-describedby={errors?.gates ? `${id}-gates-error` : undefined}
                   isSelected={draft.gates.includes(gate)}
                   isDisabled={disabled}
                   onChange={(selected) =>
@@ -203,7 +211,7 @@ export function DocumentSheet({
                 </div>
               </Field>
             ))}
-            {errors?.gates && <FieldError>{errors.gates}</FieldError>}
+            {errors?.gates && <FieldError id={`${id}-gates-error`}>{errors.gates}</FieldError>}
           </FieldSet>
           {mode === "version" && (
             <FieldSet>

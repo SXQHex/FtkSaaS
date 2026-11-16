@@ -72,7 +72,7 @@ export function DocumentsView({
   };
   pendingCount?: string;
   onAdd: () => void;
-  onOpen: (id: string) => void;
+  onOpen?: (id: string) => void;
   notice?: ReactNode;
   pagination?: ReactNode;
   locked?: boolean;
@@ -179,7 +179,7 @@ export function DocumentsView({
                           key={row.id}
                           id={row.id}
                           onAction={() => {
-                            if (!locked) onOpen(row.id);
+                            if (!locked) onOpen?.(row.id);
                           }}
                           className="cursor-pointer"
                         >

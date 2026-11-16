@@ -438,6 +438,7 @@ export default interface Resources {
       "acceptanceTab": "Kabul durumu",
       "acceptanceUnread": "Kabul durumu okunamadı.",
       "add": "Belge yükle",
+      "blocked": "Yayın önizlemesinde engel var. Güncel bilgileri yeniden oku.",
       "cancel": "Vazgeç",
       "columns": {
         "acceptance": "Kabul",
@@ -450,6 +451,7 @@ export default interface Resources {
         "version": "Sürüm"
       },
       "description": "Üyelerin kabul etmesi gereken metinler. Yeni sürüm yayınlamadan önce etkisini görürsün.",
+      "directoryUnavailable": "Merkez belge ve kabul listesi şu anda okunamıyor. Yeni belge yükleyebilir ve yayımlayabilirsin.",
       "documentsUnread": "Belge listesi okunamadı.",
       "editorDescriptions": {
         "draft": "Taslak, henüz yayınlanmadı.",
@@ -500,11 +502,19 @@ export default interface Resources {
       "name": "Belge adı",
       "needTitle": "Üye hangi işlemden önce kabul etmeli",
       "oldVersion": "Eski sürümü kabul etti ({{version}})",
+      "operationError": "İşlem doğrulanamadı. Güncel yetkini ve işlem sonucunu kontrol et.",
       "preview": "Etkiyi göster",
+      "previewExpiry": "Önizleme son geçerlilik zamanı: {{time}}",
+      "protectedCount": "Mevcut kaydı korunacak işlem: {{count}}",
       "publish": "Yayınla",
+      "publishedVersion": "{{version}} sürümü yayımlandı ve sunucudan yeniden doğrulandı.",
       "renewAll": "Tüm üyelerden yeniden kabul iste",
       "renewAllHint": "Eski sürümü kabul etmiş olmak yetmez.",
       "renewal": "Yeni sürümde kabul",
+      "requiredFile": "En fazla 2 MiB boyutunda, boş olmayan PDF veya düz metin dosyası seç.",
+      "requiredGates": "En az bir işlem seç.",
+      "requiredName": "1–500 karakterlik belge adı gir.",
+      "requiredVersion": "1–500 karakterlik sürüm etiketi gir.",
       "review": "Etkiyi okudum",
       "reviewHint": "Yayınlayınca bu etki uygulanır.",
       "selfOnly": "Kabulü yalnızca üyenin kendisi verir; yönetici adına onaylanamaz.",
@@ -515,6 +525,8 @@ export default interface Resources {
       "tabsLabel": "Belge bölümleri",
       "title": "Belgeler",
       "unknown": "—",
+      "uploadUnknown": "Yükleme sonucu belirsiz. Aynı isteği yeniden dene veya sunucudaki dosyayı doğrula.",
+      "verifyUpload": "Yüklenen dosyayı doğrula",
       "versionLabel": "Sürüm etiketi"
     },
     "emailChange": {

@@ -229,6 +229,8 @@ export const runtimeOperationNames = [
   "product_state_set_v1",
   "freeze_cancel_preview_v1",
   "freeze_cancel_apply_v1",
-  "instructor_account_get_v1"
+  "instructor_account_get_v1",
+  "member_finance_currencies_get_v1",
+  "member_document_contexts_get_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];
