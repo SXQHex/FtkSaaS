@@ -37,7 +37,11 @@ function sessionIdentity(session: SessionView, id: string) {
     throw new Error("SCHEDULE_SESSION_UNAVAILABLE");
   return session;
 }
-export async function readScheduleSession(scope: ClientScope, id: string) {
+export async function readScheduleSession(
+  scope: ClientScope,
+  id: string,
+  includeRoomLabels = false,
+) {
   const backend = await scopedBackend(scope);
   return sessionIdentity(
     await backend.call("session_get_v1", {
@@ -46,6 +50,7 @@ export async function readScheduleSession(scope: ClientScope, id: string) {
       org_id: scope.orgId,
       center_id: scope.centerId,
       session_id: id,
+      ...(includeRoomLabels ? { include_room_labels: true } : {}),
     }),
     id,
   );

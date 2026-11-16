@@ -9,6 +9,7 @@ import { getTemporal } from "../../lib/temporal";
 import { formatMinorAmount } from "../../lib/money";
 import {
   instructorPeriod,
+  instructorRoomLabel,
   readInstructorCalendar,
   readInstructorEarnings,
   readInstructorAttendance,
@@ -176,7 +177,11 @@ export function InstructorTodayContent({
           count: (Date.parse(session.ends_at) - Date.parse(session.starts_at)) / 60000,
         }),
         context: [
-          t(($) => $.instructorToday.roomUnread),
+          instructorRoomLabel(
+            session,
+            t(($) => $.instructorToday.roomUnread),
+            t(($) => $.instructorToday.roomUnassigned),
+          ),
           center!.name,
           t(($) => $.instructorToday.members, { count: session.capacity.held }),
           day === source?.period.today

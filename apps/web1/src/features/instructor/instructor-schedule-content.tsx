@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { Interval } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
-import { instructorPeriod, readInstructorCalendar } from "./instructor-read";
+import { instructorPeriod, instructorRoomLabel, readInstructorCalendar } from "./instructor-read";
 import { useInstructorScope } from "./use-instructor-scope";
 import { InstructorScheduleView } from "./instructor-schedule-view";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -132,6 +132,11 @@ export function InstructorScheduleContent({
           id: session.id,
           title: [
             item.title,
+            instructorRoomLabel(
+              session,
+              t(($) => $.instructorToday.roomUnread),
+              t(($) => $.instructorToday.roomUnassigned),
+            ),
             session.state === "cancelled" ? t(($) => $.instructorToday.states.cancelled) : "",
           ]
             .filter(Boolean)

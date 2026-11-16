@@ -28,23 +28,27 @@ test("instructor today and weekly navigation retain center scope and open only t
   page,
 }) => {
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
+  await expect(page.getByText("Atanmış salon", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Bugünkü derslerime dön", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
+  await expect(page.getByText(/Atanmış salon/).first()).toBeVisible();
   const weekButton = page.getByRole("button", { name: "Haftalık programım", exact: true });
   await expect(weekButton).toBeEnabled();
   const beforeWeekReads = state.calendarReads.length;
   await weekButton.click();
   await expect(page).toHaveURL(`${origin}/instructor/schedule?org=${I.org}&center=${I.center}`);
   await expect(page).toHaveTitle("Programım · Fethiye Tango");
-  await expect(page.getByText("Sentetik seans", { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik seans · Atanmış salon", { exact: true })).toBeVisible();
   expect(state.calendarReads.length - beforeWeekReads).toBe(1);
   await page.getByRole("button", { name: "Sonraki hafta", exact: true }).click();
-  await expect(page.getByText("Sentetik seans", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Sentetik seans · Atanmış salon", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Önceki hafta", exact: true }).click();
-  await page.getByText("Sentetik seans", { exact: true }).click();
+  await page.getByText("Sentetik seans · Atanmış salon", { exact: true }).click();
   await expect(page).toHaveURL(
     `${origin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`,
   );
+  expect(state.calendarReads.every((req) => req.include_room_labels === true)).toBe(true);
+  await expect(page.getByText("Atanmış salon", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
   expect(state.reads).not.toContain("entitlements_get_v1");
   await expect(page.getByRole("button", { name: "Üye ekle", exact: true })).toHaveCount(0);
@@ -243,6 +247,6 @@ test("weekly instructor read denial stays unknown and recovers on explicit retry
   await expect(page.getByText("Bu hafta atanmış seansın yok.", { exact: true })).toHaveCount(0);
   denied = false;
   await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
-  await expect(page.getByText("Sentetik seans", { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik seans · Atanmış salon", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });

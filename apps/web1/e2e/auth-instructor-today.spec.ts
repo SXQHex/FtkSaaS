@@ -111,8 +111,13 @@ async function fixture(
         as_of: "2026-11-16T12:00:00Z",
       });
     }
-    if (operation === "session_get_v1")
-      return send(sessions.find((row) => row.id === req.session_id));
+    if (operation === "session_get_v1") {
+      expect(req.include_room_labels).toBe(true);
+      return send({
+        ...sessions.find((row) => row.id === req.session_id),
+        room_labels: [{ room_id: I.room, name: "Atanmış salon" }],
+      });
+    }
     if (operation === "attendance_get_v1") {
       const session = sessions.find((row) => row.id === req.session_id)!;
       return send({
@@ -184,6 +189,7 @@ test("instructor day reads all scoped week pages and exact monthly currencies wi
   page,
 }) => {
   const { reads } = await fixture(page);
+  await expect(page.getByText(/Atanmış salon/).first()).toBeVisible();
   await expect(page.getByText("3 seans", { exact: true })).toBeVisible();
   await expect(page.getByText("2 seans", { exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik atanmış 3", { exact: true })).toBeVisible();

@@ -6,7 +6,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import { useInstructorScope } from "./use-instructor-scope";
-import { readInstructorSession } from "./instructor-read";
+import { readInstructorSession, instructorRoomLabel } from "./instructor-read";
 import { InstructorSessionView } from "./instructor-session-view";
 import { SessionAttendanceController } from "../session-detail/session-attendance-controller";
 import { scheduleInterval, ScheduleTimeError } from "../schedule/schedule-time";
@@ -239,7 +239,11 @@ export function InstructorSessionContent({
             },
             {
               label: t(($) => $.instructorSession.room),
-              value: t(($) => $.instructorSession.unknown),
+              value: instructorRoomLabel(
+                source.session,
+                t(($) => $.instructorToday.roomUnread),
+                t(($) => $.instructorToday.roomUnassigned),
+              ),
             },
             {
               label: t(($) => $.instructorSession.members),

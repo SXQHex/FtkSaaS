@@ -5,6 +5,7 @@ vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call:
 vi.mock("../schedule/schedule-read", () => ({ readScheduleSession: mock.session }));
 import {
   instructorPeriod,
+  instructorRoomLabel,
   instructorAssigned,
   readInstructorCalendar,
   readInstructorEarnings,
@@ -103,15 +104,36 @@ describe("instructor bounded self reads", () => {
     const result = await readInstructorCalendar(scope, id(6), interval);
     expect(result.map((row) => row.session.id)).toEqual([id(4)]);
     expect(mock.call).toHaveBeenCalledTimes(2);
+    expect(mock.session).toHaveBeenCalledWith(scope, id(4), true);
     for (const [operation, request] of mock.call.mock.calls) {
       expect(operation).toBe("calendar_get_v1");
       expect(request).toMatchObject({
         org_id: scope.orgId,
         center_id: scope.centerId,
         interval,
+        include_room_labels: true,
         resource: { kind: "person", id: id(6) },
       });
     }
+  });
+  it("distinguishes omitted room labels, no assigned room, and multiple native names", () => {
+    expect(instructorRoomLabel(session, "unknown", "unassigned")).toBe("unknown");
+    expect(instructorRoomLabel({ ...session, room_labels: [] }, "unknown", "unassigned")).toBe(
+      "unassigned",
+    );
+    expect(
+      instructorRoomLabel(
+        {
+          ...session,
+          room_labels: [
+            { room_id: id(20), name: "Salon A" },
+            { room_id: id(21), name: "Salon B" },
+          ],
+        },
+        "unknown",
+        "unassigned",
+      ),
+    ).toBe("Salon A · Salon B");
   });
   it("rejects repeated cursors and cross-center calendar rows", async () => {
     mock.call

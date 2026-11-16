@@ -2703,6 +2703,7 @@
     "noEarnings": "Henüz hakediş yok",
     "openAttendanceCount": "Bugünün iptal edilmemiş, kapanmamış yoklamaları",
     "roomUnread": "Salon bilgisi okunamadı",
+    "roomUnassigned": "Salon atanmamış",
     "attendanceUnread": "Yoklama okunamadı",
     "minutes_one": "{{count}} dk",
     "minutes_other": "{{count}} dk",

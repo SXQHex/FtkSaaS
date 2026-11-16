@@ -140,7 +140,12 @@ export async function mockSessionDetail(
         attendanceUnread = false;
         return route.abort();
       }
-      return send(session);
+      return send({
+        ...session,
+        ...(req.include_room_labels
+          ? { room_labels: [{ room_id: I.room, name: "Atanmış salon" }] }
+          : {}),
+      });
     }
     if (operation === "calendar_get_v1") {
       calendarReads.push(req);
@@ -159,6 +164,9 @@ export async function mockSessionDetail(
                 starts_at: session.starts_at,
                 ends_at: session.ends_at,
                 title: "Sentetik seans",
+                ...(req.include_room_labels
+                  ? { room_labels: [{ room_id: I.room, name: "Atanmış salon" }] }
+                  : {}),
                 resources: [{ kind: "room", id: I.room }],
               },
             ]

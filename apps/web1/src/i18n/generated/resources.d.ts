@@ -856,6 +856,7 @@ export default interface Resources {
       "privacy": "Eğitmen görünümünde üyelerin iletişim, ödeme ve paket bilgileri gösterilmez. Seans ve izinli yoklama kapsamı korunur.",
       "restricted": "Bu bilgiyi görme yetkisi yok.",
       "retry": "Yeniden oku",
+      "roomUnassigned": "Salon atanmamış",
       "roomUnread": "Salon bilgisi okunamadı",
       "schedule": "Haftalık programım",
       "sections": {

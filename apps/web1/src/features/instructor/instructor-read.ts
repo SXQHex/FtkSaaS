@@ -45,6 +45,11 @@ export function instructorAssigned(session: SessionView, personId: string) {
     )
   );
 }
+export function instructorRoomLabel(session: SessionView, unknown: string, unassigned: string) {
+  return session.room_labels === undefined
+    ? unknown
+    : session.room_labels.map((room) => room.name).join(" · ") || unassigned;
+}
 export type InstructorCalendar = Awaited<ReturnType<typeof readInstructorCalendar>>;
 export async function readInstructorCalendar(
   scope: ClientScope,
@@ -65,6 +70,7 @@ export async function readInstructorCalendar(
       center_id: scope.centerId,
       interval,
       resource: { kind: "person", id: personId },
+      include_room_labels: true,
       page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
     });
     if (page.items.length > 50) throw new Error("INSTRUCTOR_CALENDAR_UNAVAILABLE");
@@ -90,7 +96,7 @@ export async function readInstructorCalendar(
   for (let i = 0; i < calendar.length; i += 4) {
     const entries = await Promise.all(
       calendar.slice(i, i + 4).map(async (item) => {
-        const session = await readScheduleSession(scope, item.id);
+        const session = await readScheduleSession(scope, item.id, true);
         if (
           Date.parse(session.starts_at) !== Date.parse(item.starts_at) ||
           Date.parse(session.ends_at) !== Date.parse(item.ends_at)
@@ -189,7 +195,7 @@ export async function readInstructorSession(
 ) {
   z.uuid().parse(sessionId);
   z.uuid().parse(personId);
-  const session = await readScheduleSession(scope, sessionId);
+  const session = await readScheduleSession(scope, sessionId, true);
   const assigned =
     session.assignments.some((row) => row.person_id === personId && duties.includes(row.duty)) ||
     Boolean(
@@ -206,6 +212,7 @@ export async function readInstructorSession(
     center_id: scope.centerId,
     interval: { starts_at: session.starts_at, ends_at: session.ends_at },
     resource: { kind: "person", id: personId },
+    include_room_labels: true,
     page: { limit: 50, sort: "starts_at_asc" },
   });
   // The exact session header can lie past another overlap's first cursor page.
@@ -222,6 +229,7 @@ export async function readInstructorSession(
       center_id: scope.centerId,
       interval: { starts_at: session.starts_at, ends_at: session.ends_at },
       resource: { kind: "person", id: personId },
+      include_room_labels: true,
       page: { limit: 50, sort: "starts_at_asc", cursor },
     });
     headers.push(...page.items);
