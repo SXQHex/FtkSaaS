@@ -34,7 +34,17 @@ const impactKeys = [
   "open_debts",
   "student_credit_accounts",
 ] as const;
-export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
+export function DeletionPreviewPanel({
+  accountId,
+  variant = "account",
+  disabled = false,
+  onLockChange,
+}: {
+  accountId: string;
+  variant?: "account" | "member";
+  disabled?: boolean;
+  onLockChange?: (locked: boolean) => void;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const confirm = useRef<(() => Promise<void>) | undefined>(undefined);
@@ -48,6 +58,10 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
   const closeButton = useRef<HTMLButtonElement>(null);
   const retryButton = useRef<HTMLButtonElement>(null);
   const impact = view?.impact;
+  useEffect(() => {
+    onLockChange?.(applying);
+    return () => onLockChange?.(false);
+  }, [applying, onLockChange]);
   useEffect(() => {
     if (open && !pending) (failed ? retryButton : closeButton).current?.focus();
   }, [open, pending, failed]);
@@ -93,8 +107,12 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
   }
   return (
     <>
-      <Card className="flex-row flex-wrap items-center gap-x-4 gap-y-3">
-        <CardHeader className="min-w-0 flex-1 basis-64">
+      <Card
+        className={
+          variant === "member" ? undefined : "flex-row flex-wrap items-center gap-x-4 gap-y-3"
+        }
+      >
+        <CardHeader className={variant === "member" ? undefined : "min-w-0 flex-1 basis-64"}>
           <CardTitle>
             <h2>{t(($) => $.accountDeletion.title)}</h2>
           </CardTitle>
@@ -103,6 +121,7 @@ export function DeletionPreviewPanel({ accountId }: { accountId: string }) {
         <CardContent className="max-w-full shrink-0">
           <Button
             variant="destructive"
+            isDisabled={disabled}
             size="sm"
             onPress={() => {
               setOpen(true);

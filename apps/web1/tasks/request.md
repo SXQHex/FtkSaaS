@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı. Açık talepler W1-BE-17–22’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı. Açık talepler W1-BE-17–23’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `1df2e01c40fd625b0def974fe3347da65032fcfd` (PR315 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721918), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721867) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43863802374) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -28,6 +28,7 @@
 | W1-BE-20 | E28/E29 · P09/P11.1 | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası | Açık: mevcut rezervasyonlar yeni ders keşfi yerine geçmez. |
 | W1-BE-21 | E29 · P09/P11.1 | Öğrencinin kendi merkezindeki bekleme/teklif keşfi | Açık: bilinen seans veya kayıt gerektirmeyen özne keşfi isteniyor. |
 | W1-BE-22 | E30 · P07/P08/P11.1 | Satın alınan paket bilgisi ve ödeme para birimi keşfi | Açık: hak/hareket ve açık borç özeti mevcut; kalan eşleme isteniyor. |
+| W1-BE-23 | E32 · P05 | Kendi hesabının gerekli belgelerini gerçek işlem bağlamlarıyla keşfetme | Açık: mevcut requirements okuyucusu önceden bilinen satış/rezervasyon bağlamı istiyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -217,3 +218,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** E30 için mevcut güvenli typed eşlemeyi belirtin; yoksa kendi görünür satışları için satın alınan sürüm adı/ilk kredi toplamı ve bütün yetkili finans para birimlerini (borcu sıfır olsa da ödeme/alacak olanları) keşfedecek destek gerekir. Mevcut finance_get ve entitlement ledger cursor yolları yeniden kurulmayacak; yeni endpoint zorunlu tutulmaz. Negatif/düzeltme ve süreli hakta gerçek sınır semantiği backend sahibindedir.
 
 **Sınır:** Yalnız native self/öğrenci ve canlı merkez/plan; yönetim ürün/satış/finans kataloğuna veya private/core tablolara erişim istenmiyor. UUID'den ad, aktif katalogdan eski şart, sayımları toplayarak ilk kredi veya varsayılan TRY üretilmez. Yerel hak sayımları/hareketler/borç özeti bağımsız bağlanır; ekran kabulü [TODO/E30](todo.md#sayfa-kabulu) sahibindedir.
+
+## W1-BE-23 · Öğrenci hesabındaki gerekli belge listesi
+
+**Mevcut kaynak:** `document_requirements_get_v1`, native self kişisini çözse de `AcceptanceContext` içinde gerçek gate ve subject ister. Yayımlanmış P05 bağlamı satış/ürün sürümü, ders talebi/seans/rezervasyon veya etkinlik/kayıttır; kişi veya hesap kimliği genel belge bağlamı değildir. Bilinen işlemdeki requirements/accept yolları korunur.
+
+**İhtiyaç:** E32 Belgeler kartı için kendi canlı hesap/merkez kapsamındaki gerekli belgeleri, kabul durumunu ve gerçek işlem bağlamlarını keşfeden güvenli typed eşlemeyi belirtin; yoksa bu keşif desteği gerekir. Her satır mevcut okuma/kabul akışına doğru gate, subject ve varsa purchase_preview/rendered-document bağını taşımalı. Yeni endpoint zorunlu tutulmaz.
+
+**Sınır:** Kişi/satış/rezervasyon geçmişinin tamamını taramak, sahte genel subject üretmek veya tek kabulü başka işlem bağlamlarına taşımak istenmiyor. Belge içeriği, sürümü, snapshot/hash ve native kabul yetkileri korunmalı. Native hesap kimliği veya token açılmamalı. Bu işlev boşluğu CI kontrolü olarak Pro sonrasına ertelenmez; ekran durumu TODO/E32 sahibindedir.

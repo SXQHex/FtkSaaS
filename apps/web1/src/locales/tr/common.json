@@ -2963,5 +2963,72 @@
       "withdrawn": "Geri çekildi",
       "expired": "Süresi doldu"
     }
+  },
+  "memberAccount": {
+    "title": "Hesabım",
+    "description": "Kişi bilgilerin, belgelerin ve bildirim tercihlerin.",
+    "profileTitle": "Kişi bilgileri",
+    "profileDescription": "Hesap bilgilerini yalnızca sen düzenlersin. Telefon, doğrulanmamış iletişim bilgisidir.",
+    "documentsTitle": "Belgeler",
+    "documentsDescription": "Rezervasyon ve satın alma için kabul etmen gereken belgeler.",
+    "documentsUnavailable": "Hesap genelindeki belge listesi henüz kullanılamıyor. İşleme ait belgeler rezervasyon veya satın alma adımında sunulur.",
+    "calendarTitle": "Takvimime ekle",
+    "calendarDescription": "Rezervasyonların Google, Apple veya Outlook takviminde görünsün.",
+    "calendarPrivacy": "Bağlantıyı bilen kişiler ders saatlerini görebilir. Bağlantını yalnızca güvendiğin takvim uygulamalarıyla paylaş.",
+    "calendarPolling": "Takvim uygulamaları güncellemeleri kendi aralıklarıyla alır. Bağlantıyı iptal etmek daha önce kopyalanmış kayıtları silmez.",
+    "calendarCreate": "Takvim bağlantısı oluştur",
+    "calendarRotate": "Bağlantıyı yenile",
+    "calendarRevoke": "Bağlantıyı iptal et",
+    "calendarCopy": "Bağlantıyı kopyala",
+    "calendarLabel": "Kişisel takvim bağlantısı",
+    "calendarEmpty": "Bu stüdyo için takvim bağlantısı yok.",
+    "preferencesTitle": "Bildirim tercihlerim",
+    "preferencesDescription": "Değişiklikler anında kaydedilir.",
+    "email": "E-posta ile hatırlatmalar",
+    "emailHint": "Etkin hatırlatma türlerin için e-posta gönderimine izin ver.",
+    "inApp": "Uygulama içi hatırlatmalar",
+    "inAppHint": "Etkin hatırlatma türlerin için uygulama içi bildirim al.",
+    "package": "Paket bitiş hatırlatmaları",
+    "packageHint": "Paketinin son kullanma tarihi yaklaşınca hatırlat. Zamanlamayı stüdyo belirler.",
+    "marketing": "Stüdyo duyuruları",
+    "marketingHint": "Duyuru gönderimi yalnız hizmet tarafından destekleniyorsa açılabilir.",
+    "mandatory": "Zorunlu bildirimler",
+    "mandatoryHint": "Rezervasyon ve iptal gibi işlem bildirimleri kapatılamaz.",
+    "unavailable": "Bu ayarın güncel durumu henüz okunmadı; değişiklik yapılamaz.",
+    "security": "Hesap güvenliğini yönet",
+    "read": "Oku ve kabul et",
+    "accepted": "Kabul edildi",
+    "loading": "Hesap ayarları yükleniyor…",
+    "calendarReadFailed": "Takvim bağlantıları okunamadı.",
+    "calendarUnavailable": "Takvim bağlantısı hizmeti henüz hazır değil. Mevcut bağlantılarını iptal edebilirsin.",
+    "calendarStates": {
+      "active": "Etkin",
+      "revoked": "İptal edildi"
+    },
+    "calendarKinds": {
+      "lessons": "Dersler",
+      "duties": "Görevler"
+    },
+    "calendarConfirm": "Yenileme eski bağlantıyı kapatır. İptal edilen bağlantı artık güncelleme sağlamaz. Dış takvimdeki eski kopyalar silinmez.",
+    "calendarReview": "Bağlantının gizliliğini ve bu işlemin etkilerini okudum.",
+    "calendarNotices": {
+      "unknown": "İşlemin sonucu bilinmiyor. Yeniden deneme aynı işlem anahtarını kullanır.",
+      "saved-unread": "İşlem kaydedildi. Güncel durumu yeniden oku; yazı tekrarlanmaz.",
+      "saved": "İşlem tamamlandı ve güncel durum okundu. Bağlantıyı bu pencere kapanmadan kopyala; daha sonra tekrar gösterilmez.",
+      "stale": "Bağlantı değişti. Pencereyi kapatıp güncel satırdan yeniden incele.",
+      "rejected": "İşlem reddedildi. Güncel durumu kontrol ederek yeniden başlat."
+    },
+    "copied": "Bağlantı kopyalandı.",
+    "copyFailed": "Kopyalanamadı. Bağlantı alanından elle kopyalayabilirsin.",
+    "preferencesReadFailed": "Bildirim tercihleri okunamadı.",
+    "checkReceipt": "İşlem durumunu oku",
+    "preferenceNotices": {
+      "unknown": "Kaydetme sonucu bilinmiyor. Aynı işlem anahtarıyla yeniden dene veya işlem durumunu oku.",
+      "pending": "İşlem henüz sonuçlanmadı. Aynı işlemin durumunu kontrol et.",
+      "saved-unread": "Tercih kaydedildi. Yeniden deneme yalnız güncel durumu okur.",
+      "saved": "Tercih kaydedildi ve güncel durumu okundu.",
+      "stale": "Tercih değişti. Güncel bilgileri yükleyip yeniden seç.",
+      "rejected": "Tercih kaydedilemedi. Güncel bilgileri kontrol et."
+    }
   }
 }
