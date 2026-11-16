@@ -40,14 +40,16 @@ export function workspaceNavigation(
       ? `/o/${encodeURIComponent(orgId)}/c/${encodeURIComponent(centerId)}`
       : undefined;
   const scoped = (path: string) => (base ? `${base}/${path}` : undefined);
+  const personal = (path: string) =>
+    orgId && centerId ? `${path}?${new URLSearchParams({ org: orgId, center: centerId })}` : path;
   if (view === "instructor")
     return [
       {
         key: "work",
         items: [
-          { key: "today", url: "/instructor/today", icon: <LayoutDashboardIcon /> },
-          { key: "mySchedule", url: "/instructor/schedule", icon: <CalendarDaysIcon /> },
-          { key: "myEarnings", url: "/instructor/earnings", icon: <WalletIcon /> },
+          { key: "today", url: personal("/instructor/today"), icon: <LayoutDashboardIcon /> },
+          { key: "mySchedule", url: personal("/instructor/schedule"), icon: <CalendarDaysIcon /> },
+          { key: "myEarnings", url: personal("/instructor/earnings"), icon: <WalletIcon /> },
         ],
       },
     ];

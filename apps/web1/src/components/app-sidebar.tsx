@@ -102,7 +102,7 @@ export function AppSidebar({
                 title: t(($) => $.workspace.links[item.key]),
                 url: item.url,
                 icon: item.icon,
-                isActive: pathname === item.url,
+                isActive: pathname === item.url?.split("?")[0],
               }))}
             />
           ))}
