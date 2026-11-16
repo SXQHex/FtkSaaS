@@ -429,6 +429,94 @@ export default interface Resources {
       "action": "Test Et",
       "clickCount": "Tıklama sayısı: {{value}}"
     },
+    "documents": {
+      "acceptanceProgress": "{{name}} kabul oranı",
+      "acceptanceStates": {
+        "accepted": "Kabul etti",
+        "pending": "Bekliyor"
+      },
+      "acceptanceTab": "Kabul durumu",
+      "acceptanceUnread": "Kabul durumu okunamadı.",
+      "add": "Belge yükle",
+      "cancel": "Vazgeç",
+      "columns": {
+        "acceptance": "Kabul",
+        "document": "Belge",
+        "gates": "Gerekli olduğu işlem",
+        "member": "Üye",
+        "published": "Yayın",
+        "requiredVersion": "Gereken sürüm",
+        "state": "Durum",
+        "version": "Sürüm"
+      },
+      "description": "Üyelerin kabul etmesi gereken metinler. Yeni sürüm yayınlamadan önce etkisini görürsün.",
+      "documentsUnread": "Belge listesi okunamadı.",
+      "editorDescriptions": {
+        "draft": "Taslak, henüz yayınlanmadı.",
+        "new": "Yeni belge ilk sürüm olarak yayınlanır.",
+        "version": "Yeni sürüm yüklersen geçmiş sürümler korunur."
+      },
+      "editorTitle": "Belge yayını",
+      "emptyAcceptances": "Bu kapsamda kabul kaydı yok.",
+      "emptyDocuments": "Bu kapsamda belge yok.",
+      "file": "Dosya",
+      "fileHint": "PDF ya da düz metin, en çok 2 MiB",
+      "filterLabel": "Kabul süzgeci",
+      "filters": {
+        "all": "Tümü",
+        "pending": "Bekleyen"
+      },
+      "fixedName": "Yeni sürümde ad değişmez.",
+      "gateHints": {
+        "attendance": "Seansa katılım işaretlenirken",
+        "event_registration": "Etkinliğe kayıt olurken",
+        "reservation": "Seansa kayıt olurken",
+        "sale": "Paket ya da hak tahsis edilirken"
+      },
+      "gates": {
+        "attendance": "Yoklama",
+        "event_registration": "Etkinlik kaydı",
+        "reservation": "Rezervasyon",
+        "sale": "Satış"
+      },
+      "history": "Sürüm geçmişi",
+      "historyHint": "Satıra tıklayarak sürüm geçmişini aç ya da yeni sürüm yükle.",
+      "historyUnread": "Sürüm geçmişi okunamadı.",
+      "impact": "Yayın etkisi",
+      "keepAcceptances": "Mevcut kabuller geçerli kalsın",
+      "keepAcceptancesHint": "Yalnızca henüz kabul etmeyenler kabul eder.",
+      "metricHints": {
+        "draft": "Yayınlanmadı",
+        "lastPublished": "Yeni sürüm",
+        "pending": "En az bir belge",
+        "published": "Sürümlü"
+      },
+      "metrics": {
+        "draft": "Taslak",
+        "lastPublished": "Son yayın",
+        "pending": "Kabul bekleyen üye",
+        "published": "Yayında belge"
+      },
+      "name": "Belge adı",
+      "needTitle": "Üye hangi işlemden önce kabul etmeli",
+      "oldVersion": "Eski sürümü kabul etti ({{version}})",
+      "preview": "Etkiyi göster",
+      "publish": "Yayınla",
+      "renewAll": "Tüm üyelerden yeniden kabul iste",
+      "renewAllHint": "Eski sürümü kabul etmiş olmak yetmez.",
+      "renewal": "Yeni sürümde kabul",
+      "review": "Etkiyi okudum",
+      "reviewHint": "Yayınlayınca bu etki uygulanır.",
+      "selfOnly": "Kabulü yalnızca üyenin kendisi verir; yönetici adına onaylanamaz.",
+      "states": {
+        "draft": "Taslak",
+        "published": "Yayında"
+      },
+      "tabsLabel": "Belge bölümleri",
+      "title": "Belgeler",
+      "unknown": "—",
+      "versionLabel": "Sürüm etiketi"
+    },
     "emailChange": {
       "acceptedReadError": "İstek işlendi. Güncel hesap bilgileri yenilenemedi.",
       "current": "Güncel e-posta",

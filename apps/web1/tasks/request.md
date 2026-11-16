@@ -36,6 +36,7 @@
 | W1-BE-28 | E39 · P14/WF11 | Kendi inbox arama/iş durumu, toplu/ters okundu ve kaynak eylemi eşlemesi | Açık: native liste ve sürümlü okundu var; çizimin kalan güvenli eşlemesi isteniyor. |
 | W1-BE-29 | E40 · P14.4/WF16 | Çizimin segment, tetikleme, eylem ve son işler eşlemesi | Açık: native save/disable/retry var; kalan çizim eşlemesi ve güvenli özet/keşif gerekiyor. |
 | W1-BE-30 | E41 · P16/WF10 | Çizimin satış/doluluk/hakediş raporu ve import görünür alanları | Açık: mevcut rapor türleri gerçek; eksik çizim eşlemesi ve güvenli özet gerekiyor. |
+| W1-BE-31 | E22 · P15/WF11 | Merkez belge/sürüm dizini, kabul durumu ve özetler | Açık: yükleme/yayın/bağlamlı kabul mevcut; merkez geneli yönetim keşfi ve güvenli özet eşlemesi gerekiyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -295,3 +296,12 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** Haftalık brüt satış cirosu/paket satışları, ders bazında doluluk/kapalı yoklama oranı, tahsilatın üye/eğitmen/paket kırılımı ve instructor paid/remaining/closed-session özetinin mevcut typed eşlemesini belirtin. Import için çizimdeki satır adı/iletişimi, uyarı/mükerrer ve tüm dosya durum filtresi; dosya/row limitini yüklemeden önce okuyacak güvenli kaynak ve hesap/merkez kapsamındaki import işi keşfi de gerekiyorsa eşlenmeli. Mevcut native yolların desteklemediği çizim işlemi varsa backend sahibi uygulanacak sınırı açıklamalı; yeni endpoint şart koşulmuyor.
 
 **Sınır:** Cursor sayfası global toplam sayılmaz; bütün kişileri/satışları/işleri tarayıp rapor üretilmez, para birimleri birleştirilmez. Signed upload ve JWT/POST indirme yolu, canlı F30/F31 ve kişi/merkez sınırları korunur. Export veya import ACK tamamlanma değildir; native worker sonucu ve domain yeniden okuması ayrıdır. Native rapor/export/import çekirdeği bağımsız bağlanır; kabul sahibi TODO/E41’dir.
+
+
+## W1-BE-31 · Belge yönetimi dizini ve kabul özeti
+
+**Mevcut kaynak:** `management_state_get_v1(operation:document_upload_prepare_v1,selector.key:{})` yalnız yükleyen hesabın dosyalarını listeler. Yayın/sürüm selector'ü önceden bilinen file_id ve scope ister; bağlamlı requirements okuyucusu genel belge veya kabul dizini değildir. Bu kaynaklar merkezin tüm belgelerini/sürüm geçmişini ve kabul durumunu keşfetmez.
+
+**İhtiyaç:** E22 çizimindeki merkez geneli belge listesi (belge adı, gerçek kimlik/sürüm/etiket/yayın tarihi, işlem gereksinimleri, native yayın/taslak eşlemesi), seçili belgenin cursor'lı sürüm geçmişi ve kabul dizini için mevcut typed eşlemeyi belirtin; yoksa güvenli keşif desteği gerekir. Kabul Bekleyen/Tümü filtresi cursor kapsamında olmalı; geçerli/eski/eksik kabul ayrılmalı. Yayında/taslak belge, en az bir kabulü bekleyen tekil üye/payda, son yayın ve belge başına kabul toplamı yalnız aynı yetkili merkez kapsamından gelmeli. Sayfadaki satırlar global toplam sayılmaz. Yeni endpoint zorunlu tutulmaz.
+
+**Sınır:** Bütün kişileri/rezervasyon/satış geçmişlerini veya yükleyen hesapları tarama istenmiyor. Native belge, kişi, merkez ve F30/ayar yetkileri korunmalı; dosya URL/token veya native hesap kimliği açılmamalı. Yönetici başkası adına kabul vermez. Mevcut upload→complete→publication preview→açık etki onayı→publish ve kendi bağlamlı kabul zinciri değiştirilmez; bağımsız yerleşim/yükleme entegrasyonu sürer. Frontend kabulü TODO/E22 sahibindedir.
