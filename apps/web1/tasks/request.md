@@ -230,6 +230,8 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 
 **Mevcut kaynak:** `document_requirements_get_v1`, native self kişisini çözse de `AcceptanceContext` içinde gerçek gate ve subject ister. Yayımlanmış P05 bağlamı satış/ürün sürümü, ders talebi/seans/rezervasyon veya etkinlik/kayıttır; kişi veya hesap kimliği genel belge bağlamı değildir. Bilinen işlemdeki requirements/accept yolları korunur.
 
+**İstenen kart kapsamı:** Aktif işlemler ve süresi dolmamış satın alma önizlemeleri. Tamamlanmış/iptal edilmiş geçmiş işlemler karta dahil edilmez; mevcut kabul kayıtları korunur.
+
 **İhtiyaç:** E32 Belgeler kartı için kendi canlı hesap/merkez kapsamındaki gerekli belgeleri, kabul durumunu ve gerçek işlem bağlamlarını keşfeden güvenli typed eşlemeyi belirtin; yoksa bu keşif desteği gerekir. Her satır mevcut okuma/kabul akışına doğru gate, subject ve varsa purchase_preview/rendered-document bağını taşımalı. Yeni endpoint zorunlu tutulmaz.
 
 **Sınır:** Kişi/satış/rezervasyon geçmişinin tamamını taramak, sahte genel subject üretmek veya tek kabulü başka işlem bağlamlarına taşımak istenmiyor. Belge içeriği, sürümü, snapshot/hash ve native kabul yetkileri korunmalı. Native hesap kimliği veya token açılmamalı. Bu işlev boşluğu CI kontrolü olarak Pro sonrasına ertelenmez; ekran durumu TODO/E32 sahibindedir.

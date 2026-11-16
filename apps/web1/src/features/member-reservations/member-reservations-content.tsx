@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
+import { MemberCancellationPolicy } from "../member-classes/member-cancellation-policy";
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { memberReservationRows } from "../member-profile/reservations";
 import { readOwnReservations, type OwnReservations } from "./member-reservations-read";
@@ -122,14 +123,21 @@ export function MemberReservationsContent({
                 })
               : "—",
             title: label(row),
-            metadata: row.session
-              ? date.format(new Date(row.session.starts_at))
-              : t(($) => $.memberReservations.unknown),
+            metadata: [
+              row.session
+                ? date.format(new Date(row.session.starts_at))
+                : t(($) => $.memberReservations.unknown),
+              ...(row.lesson?.instructors ?? []),
+              ...(row.lesson?.rooms ?? []),
+            ].join(" · "),
+            policy: row.lesson ? (
+              <MemberCancellationPolicy value={row.lesson.cancellation} timezone={timezone} />
+            ) : undefined,
             hint: [
               row.reservation.source_summary?.status === "available"
                 ? row.reservation.source_summary.product_name
                 : undefined,
-              t(($) => $.memberReservations.policyUnknown),
+              !row.lesson ? t(($) => $.memberReservations.policyUnknown) : undefined,
             ]
               .filter(Boolean)
               .join(" · "),

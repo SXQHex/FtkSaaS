@@ -35,6 +35,7 @@ export interface MemberUpcomingRow {
   hint: string;
   state: string;
   action?: ReactNode;
+  policy?: ReactNode;
 }
 export interface MemberHistoryRow {
   id: string;
@@ -91,6 +92,7 @@ export function MemberReservationsView({
                 {row.metadata}
               </ItemDescription>
               <p className="text-xs text-muted-foreground">{row.hint}</p>
+              {row.policy}
               <ItemActions className="mt-2 flex-wrap @lg:hidden">
                 <Badge variant="outline">{row.state}</Badge>
                 {row.action}

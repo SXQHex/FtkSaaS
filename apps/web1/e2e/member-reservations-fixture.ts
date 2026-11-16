@@ -11,6 +11,7 @@ export async function mockOwnReservations(
     unknown?: boolean;
     ackUnread?: boolean;
     cancelDenied?: boolean;
+    staleLesson?: boolean;
   } = {},
 ) {
   await mockStudio(page);
@@ -185,6 +186,57 @@ export async function mockOwnReservations(
             title: row.id === sessions[2]!.id ? "Sentetik geçmiş ders" : "Sentetik gelecek ders",
             starts_at: row.starts_at,
             ends_at: row.ends_at,
+            ...(req.member_discovery
+              ? {
+                  capacity: row.capacity,
+                  member_lesson: {
+                    version: row.version,
+                    format: row.format,
+                    state: row.state,
+                    attendance_state: row.attendance_state,
+                    instructor_labels: ["Öğrenciye görünür eğitmen"],
+                    room_labels: ["Öğrenciye görünür salon"],
+                    booking_window: {
+                      state: "open",
+                      policy_version_id: id(980),
+                      opens_at: "2026-11-01T00:00:00Z",
+                      closes_at: row.starts_at,
+                    },
+                    cancellation: {
+                      status: "available",
+                      source: "current_policy",
+                      policy_version_id: id(981),
+                      terms: {
+                        cutoff_minutes: 30,
+                        before_cutoff: "consume",
+                        after_cutoff: "consume",
+                        no_show: "consume",
+                      },
+                      cutoff_at: "2026-11-17T14:30:00Z",
+                    },
+                    own_reservation: {
+                      ...reservations.find((r) => r.session_id === row.id)!,
+                      version: options.staleLesson
+                        ? 99
+                        : reservations.find((r) => r.session_id === row.id)!.version,
+                      cancellation: {
+                        status: "available",
+                        source: "reservation_policy",
+                        policy_version_id: id(982),
+                        terms: {
+                          cutoff_minutes: 120,
+                          before_cutoff: "release",
+                          after_cutoff: "consume",
+                          no_show: "consume",
+                        },
+                        cutoff_at: "2026-11-17T13:00:00Z",
+                      },
+                    },
+                    waitlist_enabled: true,
+                    own_waitlist: null,
+                  },
+                }
+              : {}),
           })),
         next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",

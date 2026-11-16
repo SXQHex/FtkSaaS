@@ -9,9 +9,24 @@ test("student own reservations keep separate native cursors, source package and 
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik geçmiş ders", { exact: true })).toBeVisible();
   await expect(page.getByText(/Sentetik satın alınmış paket/)).toBeVisible();
+  await expect(page.getByText(/Öğrenciye görünür eğitmen · Öğrenciye görünür salon/)).toBeVisible();
+  await expect(page.getByText("Sınırdan önce: hak iade edilir", { exact: true })).toBeVisible();
+  await expect(page.getByText("Sınırdan önce: hak tüketilir", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("İptal sınırı: 17 Kas 2026 16:00", { exact: true })).toBeVisible();
+  const discovery = state.reads.filter(
+    (row) => row.operation === "calendar_get_v1" && row.request.member_discovery,
+  );
+  expect(discovery).toHaveLength(1);
+  expect(discovery[0]!.request).not.toHaveProperty("resource");
+  expect(discovery[0]!.request.interval).toEqual({
+    starts_at: "2026-11-17T15:00:00Z",
+    ends_at: "2026-11-17T16:00:00Z",
+  });
   await expect(page.getByRole("grid", { name: "Geçmiş", exact: true })).toContainText("Geldi");
   await expect(page.getByText("Başka üyenin gizli adı", { exact: true })).toHaveCount(0);
-  await expect(page.getByText(/Gelmedi/)).toHaveCount(0);
+  await expect(
+    page.getByRole("grid", { name: "Geçmiş", exact: true }).getByText(/Gelmedi/),
+  ).toHaveCount(0);
   await expect(
     page.getByText("Güncel bekleme listesi ve teklifler okunamadı.", { exact: true }),
   ).toBeVisible();
@@ -127,4 +142,14 @@ test("student cancellation action denial leaves the readable reservation intact"
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
+});
+
+test("student reservation policy stays unknown when discovery refers to another reservation version", async ({
+  page,
+}) => {
+  await mockOwnReservations(page, { staleLesson: true });
+  await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Bu rezervasyonun iptal koşulları okunamadı/)).toBeVisible();
+  await expect(page.getByText("Sınırdan önce: hak iade edilir", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Sınırdan önce: hak tüketilir", { exact: true })).toHaveCount(0);
 });
