@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "7880939286c9bfe201355b32e14421feba290a93e3a97a189a4da5af0e201e41",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "6accb294c5ecd9e25cdf8c744ca0674110cc887e168b80d0632a2c18080aa1a0",
+        "reason": "W1-BE-20 reviewed shared optional calendar DTO/standalone validator and added unit/API test bindings; existing operations and source assertions preserved, this flow behavior unchanged."
       }
     },
     {
@@ -385,8 +385,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "93906a45a6db26c03e1a3983ffc5c4fcbb4098537d3306f63d6c6c152562fae9",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "7820993eb6fc048bd768682b6209b8e3e8ea447e9bce9c107280a20ecef00df1",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "e388adb2c487ec8c39e8b429a4c14b4a8d0dd7052b8532cf8528915a3a7f1524",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "98424d56da72a0584d62475f3ac87383194374f91573a43052cdb858c627cf13",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -526,7 +526,9 @@
         "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
         "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
         "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
-        "apps/backend/tests/web1-review-unit.mjs"
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/member-lesson-discovery-unit.mjs",
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -589,7 +591,9 @@
         "apps/backend/database/session-management-reads.sql",
         "apps/backend/database/class-student-discovery.sql",
         "apps/backend/database/assigned-session-room-labels.sql",
-        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql",
+        "apps/backend/database/member-lesson-discovery.sql",
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -612,8 +616,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "f084fe700d6ed690f0f2c84fb61958254f5c1ec52a2ca492468c348b019795a0",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "f80af39792bf80581dd050ad4c5b9840261ed8a4e3079e5133693a43c5ece4e7",
+        "reason": "W1-BE-20 reviewed native-self opt-in discovery, current writer class scope, selected Starter resources, safe labels, frozen/current policy, cursor and native tests; guide updated."
       }
     },
     {
@@ -729,8 +733,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "429441ae2d429aa6cb66e87534338626aa9c7510a73a63fce2182ca823641906",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "5742a100b7a7e4c557c40290bafc121c88921ffde89d6f82770825709b45939b",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -853,8 +857,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "212e6ba7563cf73272fe0b175152e71aeb9428dad085a249fde25bd76e19cd5a",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "579874d57de253b64263eeded3468f8129a2eeb1b9d43a44a8ad8033cce51878",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -882,7 +886,9 @@
         "apps/backend/tests/session-roster-discovery-acceptance.mjs",
         "apps/backend/tests/fixtures/session-roster-discovery.sql",
         "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
-        "apps/backend/tests/fixtures/lesson-request-status-summary.sql"
+        "apps/backend/tests/fixtures/lesson-request-status-summary.sql",
+        "apps/backend/tests/member-lesson-discovery-unit.mjs",
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -938,7 +944,9 @@
         "apps/backend/database/reservation-source-summary.sql",
         "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql",
         "apps/backend/database/lesson-request-status-summary.sql",
-        "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql"
+        "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql",
+        "apps/backend/database/member-lesson-discovery.sql",
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -953,8 +961,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "6a54923a04537a9e2f219daadf3d551a068282f63e3f6a20e217a505d366c0fa",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "6435ed9b2e80a296ee155b6c481fff1b3da7afcba090d470f3046d3790e20be8",
+        "reason": "W1-BE-20 reviewed native-self opt-in discovery, current writer class scope, selected Starter resources, safe labels, frozen/current policy, cursor and native tests; guide updated."
       }
     },
     {
@@ -1022,8 +1030,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "99ce569334c2ee111f38df5e619821aa9f87e5401b91ea4425d78f271656ed65",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "89caf9fb3dc0022e8a40b6942dc2d544a5a0e5fa033c6888277ca385c1ef2aac",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1092,8 +1100,8 @@
         "finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "9fcdd79adaa41177cb969ff005acfb598fb9c381ed8de616b2c0b413c638a7cf",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "5fb5baba54685de99b500399e74208e940ef817d6489790b0dd7eb4484ef12a8",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1195,8 +1203,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "1802e481724dab1ffcd40e1bbacf86432e079de6bab8543d44e2a9520e8be46f",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "5394f58614168b674a876d534401d3d4a7f5b7817ed6089fe540cfd571bd640f",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1255,8 +1263,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "cdb25345028d8fd8160be15ed138b080605b80f9933b7a5ddf1eede75a91006c",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "e57c3a64169adf581b9cd0d0844711fb2629eedebc31f443f991f4c97da5db9c",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1315,8 +1323,8 @@
         "content_catalog_save_v1"
       ],
       "review": {
-        "fingerprint": "bba62e73198c55880724a1fbf8b45008a83608cea72305f039aed2ccb0429ae5",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "ff2c43db36fdb48a846e825d4ac0ce9a4ea043a051c0b3af8e09f64176e0cba9",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1448,8 +1456,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "65b23237b0485a59d01c40d46d3cb3a2ef497228e421106501bb05be3bc0589f",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "7a62d30ff8c8321c87771f4b87d76eadb32d53dc445ec280ca84b53fc83fce77",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1524,8 +1532,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "5ef5315ed39ccf6a6de9f2248de284e7866fc61d49195be8bd8f724f1fd5610a",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "51a11827c580a4ef120f756acaa73d36bc2b7bcaa14e5402d90979d71d758cf7",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1541,7 +1549,8 @@
         "apps/backend/tests/earning-payment-selection-acceptance.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/agreement-preparation-acceptance.mjs",
-        "apps/backend/tests/content-documents-acceptance.mjs"
+        "apps/backend/tests/content-documents-acceptance.mjs",
+        "apps/backend/tests/instructor-account-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1564,7 +1573,9 @@
         "apps/backend/supabase/migrations/20261108033820_digital_agreement_acceptance.sql",
         "apps/backend/database/content-documents.sql",
         "apps/backend/database/content-source-guards.sql",
-        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
+        "apps/backend/database/instructor-self-account.sql",
+        "apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1574,11 +1585,12 @@
         "negcredit_valuation_set_v1",
         "instructor_agreements_list_v1",
         "instructor_agreement_get_v1",
-        "instructor_agreement_accept_v1"
+        "instructor_agreement_accept_v1",
+        "instructor_account_get_v1"
       ],
       "review": {
-        "fingerprint": "42df3dd80e3ba286eb73e4b76a3708caeef3a8b40296584a54cb72d020a836b2",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "480c125b1a8ea28934e2ee00f20fd0e0f2becdfb7a72baa721accad026ea4a53",
+        "reason": "W1-BE-19 final source and native tests reviewed; added source-to-migration/service-only invariant test, canonical alias, method and period behavior unchanged."
       }
     },
     {
@@ -1652,8 +1664,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "0f289c859c247bfe9015a70582545545aa26794bf42ca8ba203b36e0fe0038ab",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "f3f937faee0f91e9a3b6a59ff7111315e6fe90edf608e0c624c74336c1a293b2",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1713,8 +1725,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "400214d5289a0c982dd6fc325df369ee7eeb85833937f688195dec492a7cb0e5",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "9ed4df02afb59238c0cfa79f5846563abb704ee09d5797159bdea9b584726ddf",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1802,8 +1814,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "fe77df79af529ab84471cec58e8be50965cc2f908037b78ade01b6d4239a4796",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "9fadd99a5d7e69719774269aca244dd8af981843e76aa3211ddde72b88e4b17e",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1835,8 +1847,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "c3c984bbaa2b2739c7a93574baca670a0e745ebf1edfc5d0225e66e577099fd3",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "be1137c2b57ac105004128eaa9a618cf422098e6efe35bbce79ce2dca4844f5e",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     },
     {
@@ -1872,8 +1884,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "bb8a9b4824973a5a2536f8e9e8b2621ac7797115e47fe4fb45c220e3c15ca8ea",
-        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
+        "fingerprint": "145dc4aa94cd17cc5fc8a2977694c4f979912f163acd8211fde1ffa23ff91eaf",
+        "reason": "W1-BE-20 reviewed shared optional calendar DTO/standalone validator and added unit/API test bindings; existing operations and source assertions preserved, this flow behavior unchanged."
       }
     },
     {
@@ -1997,8 +2009,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "6ca15335364ba5538e2f4c1a423ee34521f9db1a836d4caa73310416baab67d8",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "1ac4030a19b9eb3f317833f7a5af881f41b0bb131608f721d2a53fcd1d0c62cf",
+        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
       }
     }
   ]

@@ -1,3 +1,5 @@
+import './member-lesson-discovery-unit.mjs';
+import './instructor-account-unit.mjs';
 import './settings-domain-closure-unit.mjs';
 import './native-account-erasure-unit.mjs';
 import './crm-pipeline-unit.mjs';

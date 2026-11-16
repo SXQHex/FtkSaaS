@@ -286,3 +286,4 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  });
  }finally{await db.end();}
 });
+import './member-lesson-discovery-acceptance.mjs';

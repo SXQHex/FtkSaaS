@@ -1,5 +1,18 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-w19"></a>
+## Web1 özne hesap ve ders keşfi — 16 Kasım 2026
+
+Bu sohbet yalnız Web1 backend ihtiyaçlarını değerlendirip gerekli desteği uygulama/push kapsamındadır. Kullanıcı en az iki ihtiyaçla PR teslimi istedi; W1-BE-19 ve20 mevcut PR318’de birlikte yürür, yeni PR açılmaz. Eski clean’in diğer işlerini beklemeden core hatasını düzeltme ve20’yi ekleyip tek push yapma açık yetkisi verildi. G03/diğer backend işleri bu sohbetin görevi değildir. Başlangıç main `39b78852b711449c64ec559dfcaea2ed385e9e14`, aynı kaynağın [main43934986183](https://github.com/SXQHex/FtkSaaS/actions/runs/43934986183), [merge43941025125](https://github.com/SXQHex/FtkSaaS/actions/runs/43941025125) ve [development43935127207](https://github.com/SXQHex/FtkSaaS/actions/runs/43935127207) success ayrı okundu. Dal codex/web1-backend-19-27 ve ayrı worktree kullanılır; frontend kodu/todo/kabulü değiştirilmedi. Kesin tüketim WF14/WF06, görev kabulü remaining-work, backend değerlendirmeleri XREQ-053/054 sahibindedir.
+
+PR318’in d052f5d95cd6fa1be361b1ff6faded83a5921156 adayı [43945712869](https://github.com/SXQHex/FtkSaaS/actions/runs/43945712869) core job133574838534 logunda170 migration temiz kurulmuş; core, docs/requests.md içindeki #xreq-053 açık anchor’ı bulunmadığı için durmuştu. Backend bu anchor’ı ve bağlı backlog anchor’ını ekledi; checker veya assertion değiştirilmedi. CI’ın çalıştırdığı gerçek docs-check komutu bütün yaşayan belgelerde tekrar geçti. Eski run’ın kalan shard’ları izlenmedi veya yeniden tetiklenmedi; yeni kaynak eski başarıyı devralmaz.
+
+W1-BE-19 mevcut native hakediş/ödeme writer’larını korur; kullanıcı onaylı yeni ödeme yöntemi kanıtını ve aktif eğitmenin kendi anlaşma/ödeme dönemini keşfeden okuyucuyu ekler. Değişmez eski kişi kimlikli geçmiş ve anlaşmanın get/render/accept/replay/get yolu canonical özneyle korunur. W1-BE-20 kullanıcı kararıyla grup ve özel dersleri kapsar; mevcut calendar_get_v1 içinde opt-in aktif öğrenci keşfidir, public yayın/roster/yönetim/finans izni açmaz. Mevcut writer’ın kapalı sınıf kapsamı, gerçek kapasite/etiketler ve güncel–rezervasyona sabit iptal koşulları ayrı okunur. İlk169 migration byte’ı değişmedi;170 ve171 yalnız bu iki ihtiyaç için append migration’dır.
+
+Son birleşik kaynakta gerçek yerel native Auth→Edge→RPC kabulü3/3, skip0: mevcut ödeme seçimi regresyonu, W1-BE-19 ve W1-BE-20.20 testi gerçek yeni rezervasyonsuz grup/özel keşfi, limit öncesi kapalı sınıf sınırı, geniş hakla ret/sınıfa özel hakla görünürlük, kendi bekleme/kayıt bağı, frozen/güncel iptal ayrımı, sınıf bekleme kapalı bayrağı, açık Starter kept_scope ile seçilmiş/seçilmemiş öğrenci ve disiplin/seans, F12 kapalı, başka merkez ve canlı ilişki kaybını doğruladı.425 contract/governance/restore testi, üretim/migration/typecheck/audit/governance, kalite/floor0bulgu ve10/10 geçti. API envanteri134 birimdir; önceki sahiplik/shard/izolasyon korunup yeni native test mevcut schedule suite’ine eklendi. Bağımsız son incelemede engelleyici bulgu yoktur.
+
+Yerel standart verify tam başarı değildir: değişmemiş Linux /proc observer testi macOS’ta memory örneği üretemedi; CI araç testleri148/149. Canonical /private/tmp aynı assertion’larla symlink etkisini kaldırır. Linux aday kabulü hâlâ gerekir; hiçbir assertion, test veya politika kapısı gevşetilmedi. Güvenli loglar .dev/pr318-combined-native.log, .dev/pr318-combined-verify.log ve .dev/pr318-combined-quality.log. Kaynak/native başarı hosted kabul sayılmaz. Yeni aday CI/main/development/hosted ayrı açık; merge veya production yetkisi kullanılmadı. Sonraki talep W1-BE-21;21–27 kapanışı verilmedi.
+
 <a id="atanmis-seans-salon"></a>
 ## Atanmış seans salon etiketi — 16 Kasım 2026
 

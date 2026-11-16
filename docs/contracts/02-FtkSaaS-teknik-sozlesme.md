@@ -176,6 +176,9 @@ Rapor ve dışa aktarım güncel veri/alan/merkez yetkilerine tabidir. Sınırl�
 
 Sınıfın dış katılıma açık/kapalı olması ile paketin öncelikli/esnek olması ayrı boyutlardır. Aynı açık sınıf düzenli ve esnek katılımcıları birlikte barındırabilir. Kapalı sınıfa, o sınıfa erişim vermeyen paketle kredi olsa da kayıt yapılamaz.
 
+16 Kasım W1-BE-20 kullanıcı kararı: merkeze bağlı öğrenci, henüz kaydolmadığı grup ve özel ders seanslarını kendi native merkez/sınıf/plan erişimi içinde keşfedebilir. Bu üye görünümü anonim public yayın değildir; ayrı yayın ayarı veya yönetim/katılımcı/finans yetkisi oluşturmaz. Dersin görünmesi hak, borç, belge, zaman ve kapasite uygunluğu veya kesin rezervasyon garantisi değildir; mevcut native komut kapıları korunur. Uygulama ve politika okuma sırası [WF06](../workflows.md#wf06) sahibindedir.
+
+
 - Öncelikli paket başlangıcından itibaren tanımlı kredileri ilgili seanslara topluca ayırır. Kalan kredi başka programa serbest kredi varsayılmaz; ayrılmış ve kullanılabilir ayrıdır.
 - Esnek paket, uygun seansa tek tek kesin kayıtla hak ayırır.
 - Satış/kesin kayıtta kapsanan seans doluysa işlem sessizce eksik rezervasyonla tamamlanmaz. Öncelikli biçim kapasite aşımı sağlamaz.

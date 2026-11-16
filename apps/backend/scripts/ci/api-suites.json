@@ -365,7 +365,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/earning-payment-selection-acceptance.mjs",
-          "sha256": "25c9aaf511f3b64bf1c1a5049953a4cc3e9c3224e81724846778562e1f1b8ba6"
+          "sha256": "52757597e4abd585ba24073e8316c83a91ef2a64f6c19d3847cd31fecfbc931a"
         }
       ],
       "estimated_seconds": 799.78
@@ -1233,7 +1233,7 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "e0b1bb85249f9ce75abcbfde57e20abbd453eedd65efec41a1d0e6bcb1a3e394",
+      "sha256": "b1d01a4294b68b863475c71508e0c2147fc9f54edacfa882f51634ec14de7bca",
       "shared": [
         [
           6,
@@ -1276,6 +1276,11 @@
           "line": 5,
           "path": "apps/backend/tests/session-roster-discovery-acceptance.mjs",
           "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
+        },
+        {
+          "line": 289,
+          "path": "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
+          "sha256": "2696ee36b0cdbfd66bf6ae363bd3638a4cbba2d7a7adff9d6a5ffc1e180817d0"
         }
       ],
       "estimated_seconds": 537.08

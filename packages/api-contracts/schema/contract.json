@@ -804,6 +804,7 @@
         "debt_adjust_v1",
         "instructor_agreement_publish_v1",
         "earnings_list_v1",
+        "instructor_account_get_v1",
         "instructor_payment_record_v1",
         "instructor_payment_correct_v1",
         "leads_list_v1",
@@ -3895,6 +3896,9 @@
           "items": {
             "$ref": "#/$defs/SessionRoomLabel"
           }
+        },
+        "member_lesson": {
+          "$ref": "#/$defs/MemberLessonDiscovery"
         }
       },
       "required": [
@@ -9562,6 +9566,11 @@
           "type": "boolean",
           "default": false,
           "description": "Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission."
+        },
+        "member_discovery": {
+          "type": "boolean",
+          "default": false,
+          "description": "Explicit native-self student discovery of accessible upcoming group and private lessons. Does not grant management or roster access."
         }
       },
       "required": [
@@ -9572,7 +9581,65 @@
         "page"
       ],
       "additionalProperties": false,
-      "x-invariant": "Preferences only narrow authorized items. interest_filter explicitly uses own member center/discipline selections. recommendation_desc uses own completed attended lessons only when history_recommendations is enabled; otherwise chronological. Preference/history changes invalidate that cursor."
+      "x-invariant": "Preferences only narrow authorized items. interest_filter explicitly uses own member center/discipline selections. recommendation_desc uses own completed attended lessons only when history_recommendations is enabled; otherwise chronological. Preference/history changes invalidate that cursor.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "member_discovery": {
+                "const": true
+              }
+            },
+            "required": [
+              "member_discovery"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "interest_filter": {
+                "const": false
+              },
+              "include_room_labels": {
+                "const": false
+              },
+              "page": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/CalendarPage"
+                  },
+                  {
+                    "properties": {
+                      "sort": {
+                        "const": "starts_at_asc"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "resource"
+                  ]
+                },
+                {
+                  "required": [
+                    "needs_instructor"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
     },
     "Success_calendar_get": {
       "type": "object",
@@ -13804,6 +13871,9 @@
         },
         "occurred_at": {
           "$ref": "#/$defs/Instant"
+        },
+        "payment": {
+          "$ref": "#/$defs/ManualCollectionPayment"
         }
       },
       "required": [
@@ -13875,6 +13945,9 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "payment": {
+          "$ref": "#/$defs/ManualCollectionPayment"
         }
       },
       "required": [
@@ -22258,6 +22331,16 @@
         },
         "direction": {
           "$ref": "#/$defs/Direction"
+        },
+        "payment_details": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ManualCollectionPayment"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -44522,6 +44605,18 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "cash",
+            "bank_transfer",
+            "card_pos",
+            null
+          ]
         }
       },
       "required": [
@@ -44560,6 +44655,18 @@
           "items": {
             "$ref": "#/$defs/P03PaymentCorrectionView"
           }
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "cash",
+            "bank_transfer",
+            "card_pos",
+            null
+          ]
         }
       },
       "required": [
@@ -61370,6 +61477,490 @@
       ],
       "additionalProperties": false,
       "x-invariant": "Exact counts over the same live authorized request scope and existing selector filters, before status/cursor/limit. A self scope counts only its visible requests. Resolved also includes withdrawn/expired; approved+rejected is not its total."
+    },
+    "InstructorAccountPageRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200,
+          "default": 50
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "Request_instructor_account_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "view": {
+          "enum": [
+            "agreements",
+            "payments"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/InstructorAccountPageRequest"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "person_id",
+        "view",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorPaymentLedgerItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "root_payment_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "method": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "cash",
+            "bank_transfer",
+            "card_pos",
+            null
+          ]
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "root_payment_id",
+        "version",
+        "direction",
+        "amount_minor",
+        "currency",
+        "occurred_at",
+        "method",
+        "previous_id"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorAccountTotal": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "earned_minor": {
+          "$ref": "#/$defs/SignedMoney"
+        },
+        "paid_minor": {
+          "$ref": "#/$defs/SignedMoney"
+        },
+        "remaining_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "overpaid_minor": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "currency",
+        "earned_minor",
+        "paid_minor",
+        "remaining_minor",
+        "overpaid_minor"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorAccountPage": {
+      "type": "object",
+      "properties": {
+        "view": {
+          "enum": [
+            "agreements",
+            "payments"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/AgreementVersionView"
+              },
+              {
+                "$ref": "#/$defs/InstructorPaymentLedgerItem"
+              }
+            ]
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InstructorAccountTotal"
+          }
+        }
+      },
+      "required": [
+        "view",
+        "items",
+        "next_cursor",
+        "as_of",
+        "totals"
+      ],
+      "additionalProperties": false
+    },
+    "Success_instructor_account_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/InstructorAccountPage"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonCancellation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "not_configured"
+          ]
+        },
+        "source": {
+          "enum": [
+            "current_policy",
+            "reservation_policy"
+          ]
+        },
+        "policy_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terms": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CancellationTerms"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cutoff_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "source",
+        "policy_version_id",
+        "terms",
+        "cutoff_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonBookingWindow": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "not_open",
+            "open",
+            "closed",
+            "not_configured"
+          ]
+        },
+        "policy_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "opens_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closes_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "policy_version_id",
+        "opens_at",
+        "closes_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonReservation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/ReservationState"
+        },
+        "mode": {
+          "$ref": "#/$defs/BookingMode"
+        },
+        "cancellation": {
+          "$ref": "#/$defs/MemberLessonCancellation"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "mode",
+        "cancellation"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonOffer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/OfferState"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonWaitlist": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/WaitState"
+        },
+        "offer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberLessonOffer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "offer"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonDiscovery": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "attendance_state": {
+          "$ref": "#/$defs/AttendanceClosure"
+        },
+        "instructor_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "room_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "booking_window": {
+          "$ref": "#/$defs/MemberLessonBookingWindow"
+        },
+        "cancellation": {
+          "$ref": "#/$defs/MemberLessonCancellation"
+        },
+        "own_reservation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberLessonReservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "waitlist_enabled": {
+          "type": "boolean"
+        },
+        "own_waitlist": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberLessonWaitlist"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "format",
+        "state",
+        "attendance_state",
+        "instructor_labels",
+        "room_labels",
+        "booking_window",
+        "cancellation",
+        "own_reservation",
+        "waitlist_enabled",
+        "own_waitlist"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -67889,7 +68480,10 @@
           "required_feature_gates_separate_from_references",
           "no_business_commit",
           "scope_filter_before_pagination",
-          "live_actor_and_scope"
+          "live_actor_and_scope",
+          "opt_in_native_self_member_discovery",
+          "accessible_class_scope_before_cursor",
+          "no_roster_finance_or_management_fields"
         ],
         "audit": false,
         "notification": "none",
@@ -90586,6 +91180,109 @@
         "runtime_limits": [
           "Scheduled freeze cancellation only before starts_at; same live entitlement.correct/CM and F17 gates as freeze ending. Existing reservations and rights ledger are preserved."
         ]
+      },
+      {
+        "name": "instructor_account_get_v1",
+        "module": "M08",
+        "features": [
+          "F20"
+        ],
+        "permission": "earnings.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_instructor_account_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_instructor_account_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read authorized earnings_list projection only; no domain/rights/earning/settlement/receipt mutation.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination",
+          "native_self_active_instructor_only",
+          "explicit_center",
+          "payment_period_independent_of_earning_period",
+          "no_payment_reference_disclosure"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A46",
+          "A47",
+          "A52",
+          "A53",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F20"
+        ],
+        "runtime_required_features": [
+          "F20"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "account_or_job_scope",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "operational_development_limited",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_instructor_account_get"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/instructor_account_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/instructor_account_get_v1",
+        "runtime_rpc": "api_v1.instructor_account_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       }
     ],
     "policy_value_map": {
@@ -107144,6 +107841,90 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_account_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_account_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_account_get/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_account_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorPaymentLedgerItem/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorPaymentLedgerItem/properties/root_payment_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorPaymentLedgerItem/properties/previous_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_instructor_account_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_get/allOf/0/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonCancellation/properties/policy_version_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonBookingWindow/properties/policy_version_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonReservation/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonOffer/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonWaitlist/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -107499,6 +108280,7 @@
         "debt_adjust_v1",
         "instructor_agreement_publish_v1",
         "earnings_list_v1",
+        "instructor_account_get_v1",
         "instructor_payment_record_v1",
         "instructor_payment_correct_v1",
         "leads_list_v1",
@@ -107632,7 +108414,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 169,
+      "migration_count": 171,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -108339,7 +109121,8 @@
         "products_management_list_v1",
         "product_state_set_v1",
         "freeze_cancel_preview_v1",
-        "freeze_cancel_apply_v1"
+        "freeze_cancel_apply_v1",
+        "instructor_account_get_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -109695,6 +110478,7 @@
           "attendance_correct_apply_v1",
           "instructor_agreement_publish_v1",
           "earnings_list_v1",
+          "instructor_account_get_v1",
           "instructor_payment_record_v1",
           "instructor_payment_correct_v1",
           "report_get_v1",
@@ -109723,6 +110507,7 @@
           "attendance_correct_apply_v1",
           "instructor_agreement_publish_v1",
           "earnings_list_v1",
+          "instructor_account_get_v1",
           "instructor_payment_record_v1",
           "instructor_payment_correct_v1",
           "report_get_v1",

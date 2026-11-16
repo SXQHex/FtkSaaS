@@ -6246,6 +6246,31 @@
       "limits": [
         "Scheduled freeze cancellation only before starts_at; same live entitlement.correct/CM and F17 gates as freeze ending. Existing reservations and rights ledger are preserved."
       ]
+    },
+    {
+      "name": "instructor_account_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_account_get_v1",
+      "permission": "earnings.read",
+      "features": [
+        "F20"
+      ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [
+        "F20"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_account_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
     }
   ]
 }
