@@ -128,11 +128,11 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
   await dialog.locator("#agreement-until").fill("2031-01-01T09:00");
   await dialog.locator("#agreement-reason").fill("Fixture ileri yürürlük sürümü");
   const approval = dialog.getByRole("checkbox");
-  await dialog.getByText("Etkiyi okudum", { exact: true }).click();
+  await approval.press("Space");
   await expect(approval).toBeChecked();
   await amount.fill("26000");
   await expect(approval).not.toBeChecked();
-  await dialog.getByText("Etkiyi okudum", { exact: true }).click();
+  await approval.press("Space");
   state.nextWrite = "unknown";
   await dialog.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
   const retry = dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
