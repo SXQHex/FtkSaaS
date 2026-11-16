@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `403e433d917c8cfab638b1694e50c320fed01c8ebd391aff030e4b092d4117c7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `a8473ab1b17e2e89a4d258a34147e4b83ce51f3eb2a1f98de8a3bafd77b637b1`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 172. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 173. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -180,3 +180,4 @@ Sıralı migration: 172. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261116194343_instructor_self_account.sql](../apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql) | `147cefb1afa6618de42b6e47b96a2317a1abbc55a87581865a15dbc634887bc9` |
 | [20261116201341_member_lesson_discovery.sql](../apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql) | `f4bd89d2108fb70dd77e2da0a6821da8c7681ef0cdf7e377b81d98cae2776b4c` |
 | [20261116210335_event_directory_finance.sql](../apps/backend/supabase/migrations/20261116210335_event_directory_finance.sql) | `1725a152086d357f97b8ea9235bab99a7ba8a84da4700958472d2e7eeed37d25` |
+| [20261116223700_member_self_discovery.sql](../apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql) | `b3b176a1291234211fcd6c266093ea16678dfaa11aec84ad3266a1244dcd0d17` |

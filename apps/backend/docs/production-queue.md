@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**17 Kasım Web1 talepleri:** Son kullanıcı sırası PR318 clean sonucunu doğrulamak, hata varsa düzeltmek; ardından W1-BE-21–29 içinden en ilgili iki açığı kapatmaktır. Bağlı etkinlik dizini ve kayıt finansı W1-BE-26/27 aynı teslim dilimi seçildi; en az iki ihtiyaçla Draft PR/push kuralı korunur. G03 genişletilmez. Görev kabulü [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance) sahibindedir. Her full clean başlangıcında kullanıcıya devir yapılır.
+**17 Kasım Web1 talepleri:** Son kullanıcı PR319 main sonrasında request.md açıklarından en ilgili üç ihtiyacı tamamlayıp push etmeyi istedi. W1-BE-21/22/23 öğrenci self keşfi aynı teslim dilimidir; üçü tamamlanınca ayrı Draft PR açılır. Belge kartı kullanıcı kararıyla aktif işlemler/açık satın alma önizlemeleriyle sınırlıdır. G03 genişletilmez; kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) sahibindedir. Her full clean başlangıcında kullanıcıya devir yapılır.
 
 **13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleriyle yürütüldü; ölçütler karşılandığından mevcut G03 sırasına dönülür. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
 

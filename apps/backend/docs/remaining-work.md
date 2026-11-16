@@ -15,7 +15,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] Backend tarafında native Google/doğrulama/kurtarma callback config readback, ICS URL hedefi ve seans API yetkisinin bağımsız test istemcisiyle doğrulanması; kesin kurulu URL/public env ile frontend coder devri. Frontend ekran/route geliştirmesi backend kapanış koşulu değildir; kaynak/ortam sonucu yalnız devir sahibindedir.
 
 <a id="w1-be-1927--web1-backend-ihtiyaçları"></a>
-## W1-BE-19–27 — Web1 backend ihtiyaçları
+## Web1 backend ihtiyaçları
 
 Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşlemeleri açıklama ve gerekli backend eksiklerini ayrı dal/Draft PR ile uygulayıp push etme yetkisi verdi. Talebin frontend metni `apps/web1/tasks/request.md` içindedir; frontend kodu/todo/kabulü salt okunur. Kendi değerlendirme/teslim devri ortak taleplerde, kaynak/ortam kanıtı 00 devir sahibindedir.
 
@@ -23,8 +23,10 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] W1-BE-20 kaynak ve native test: mevcut takvimde opt-in aktif öğrenci keşfi, kullanıcı onaylı grup/özel görünümü, native sınıf/Starter sınırı, güvenli etiket/kapasite ve gerçek politika/kendi kayıt bağları; kesin tüketim WF06.
 - [x] W1-BE-19/20 PR318 aday full clean, aynı main kaynak kabulü ve development teslimi; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-w19). Yeni hosted ve frontend kabulü ayrıdır.
 - [x] W1-BE-26/27 kaynak/native test: aynı etkinlik okuyucusunda başlık/durum/cursor ve merkez özeti; görünür kayıt için gerçek borç/hazırlık ve değişmez bedel/canlı bakiye. Kesin tüketim WF15, değerlendirmeler XREQ-055/056.
-- [ ] W1-BE-26/27 aday full clean → main kaynak kabulü → development teslimi; hosted ve frontend kabulü ayrı. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance).
-- [ ] W1-BE-21–25/28–29: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
+- [x] W1-BE-26/27 PR319 aday full clean → main kaynak kabulü → development teslimi; hosted ve frontend kabulü ayrı. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance).
+- [x] W1-BE-21/22/23 kaynak/native kabul: öz bekleme/teklif dizini, immutable satın alınan sürüm ve finans para birimi, kullanıcı onaylı aktif belge bağlamları. Kesin tüketim WF19/WF05/WF08/WF11, değerlendirme XREQ-057/058/059.
+- [ ] W1-BE-21/22/23 aday full clean → main kaynak kabulü → development teslimi; hosted ve frontend kabulü ayrı. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery).
+- [ ] W1-BE-19 tüm dönem seans satırı ek talebi ve W1-BE-24/25/28–30: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
 
 ## Web1 ek backend talepleri — 15 Kasım
 

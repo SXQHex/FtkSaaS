@@ -231,4 +231,6 @@ export interface Operations {
   freeze_cancel_preview_v1: {request: T.RequestFreezeCancelPreview; response: T.SuccessFreezeCancelPreview};
   freeze_cancel_apply_v1: {request: T.RequestFreezeCancelApply; response: T.SuccessFreezeCancelApply};
   instructor_account_get_v1: {request: T.RequestInstructorAccountGet; response: T.SuccessInstructorAccountGet};
+  member_finance_currencies_get_v1: {request: T.RequestMemberFinanceCurrenciesGet; response: T.SuccessMemberFinanceCurrenciesGet};
+  member_document_contexts_get_v1: {request: T.RequestMemberDocumentContextsGet; response: T.SuccessMemberDocumentContextsGet};
 }

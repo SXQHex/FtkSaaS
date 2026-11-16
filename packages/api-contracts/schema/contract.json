@@ -932,7 +932,9 @@
         "products_management_list_v1",
         "product_state_set_v1",
         "freeze_cancel_preview_v1",
-        "freeze_cancel_apply_v1"
+        "freeze_cancel_apply_v1",
+        "member_finance_currencies_get_v1",
+        "member_document_contexts_get_v1"
       ]
     },
     "EntityType": {
@@ -4341,6 +4343,9 @@
         },
         "movements": {
           "$ref": "#/$defs/Page_EntitlementLedgerItem"
+        },
+        "purchase_summary": {
+          "$ref": "#/$defs/PurchasedVersionSummary"
         }
       },
       "required": [
@@ -12102,6 +12107,10 @@
         },
         "ledger_page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_purchase_summary": {
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -27011,6 +27020,9 @@
               "type": "null"
             }
           ]
+        },
+        "waitlist_session": {
+          "$ref": "#/$defs/MemberWaitlistSession"
         }
       },
       "required": [
@@ -39652,6 +39664,58 @@
               "required": [
                 "directory",
                 "session_id",
+                "view"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "self"
+                },
+                "view": {
+                  "const": "entries"
+                },
+                "status": {
+                  "enum": [
+                    "all",
+                    "waiting",
+                    "offered",
+                    "converted",
+                    "left",
+                    "closed"
+                  ]
+                }
+              },
+              "required": [
+                "directory",
+                "view"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "self"
+                },
+                "view": {
+                  "const": "offers"
+                },
+                "status": {
+                  "enum": [
+                    "all",
+                    "active",
+                    "accepted",
+                    "rejected",
+                    "expired",
+                    "withdrawn"
+                  ]
+                }
+              },
+              "required": [
+                "directory",
                 "view"
               ],
               "additionalProperties": false
@@ -62230,6 +62294,227 @@
         "published_active_registrations",
         "unresolved_payment_registrations",
         "pending_payments"
+      ],
+      "additionalProperties": false
+    },
+    "MemberWaitlistSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "title": {
+          "$ref": "#/$defs/Text"
+        },
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaZone"
+        },
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "interval",
+        "timezone",
+        "state",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "PurchasedVersionSummary": {
+      "type": "object",
+      "properties": {
+        "product_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "initial_credits": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "product_name",
+        "initial_credits"
+      ],
+      "additionalProperties": false
+    },
+    "FinanceCurrencyDirectory": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "currencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Currency"
+          },
+          "uniqueItems": true
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "person_id",
+        "currencies",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "MemberDocumentContext": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/AcceptanceContext"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DocumentView"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "context",
+        "requirements"
+      ],
+      "additionalProperties": false
+    },
+    "Page_MemberDocumentContext": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MemberDocumentContext"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "Request_member_finance_currencies_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_member_finance_currencies_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/FinanceCurrencyDirectory"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_member_document_contexts_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Success_member_document_contexts_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Page_MemberDocumentContext"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
       ],
       "additionalProperties": false
     }
@@ -91560,6 +91845,204 @@
         "runtime_rpc": "api_v1.instructor_account_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": []
+      },
+      {
+        "name": "member_finance_currencies_get_v1",
+        "module": "M07",
+        "features": [
+          "F06",
+          "F19"
+        ],
+        "permission": "finance.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_member_finance_currencies_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_member_finance_currencies_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read only the live native active student self scope; no writer, rendering, acceptance or receipt mutation.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "native_self_active_student_only",
+          "explicit_center",
+          "real_owned_sources_only"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06",
+          "F19"
+        ],
+        "runtime_required_features": [
+          "F06",
+          "F19"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "account_or_job_scope",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "operational_development_limited",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_member_finance_currencies_get"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/member_finance_currencies_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/member_finance_currencies_get_v1",
+        "runtime_rpc": "api_v1.member_finance_currencies_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
+      },
+      {
+        "name": "member_document_contexts_get_v1",
+        "module": "M14",
+        "features": [
+          "F30"
+        ],
+        "permission": "person.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_member_document_contexts_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_member_document_contexts_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read only the live native active student self scope; no writer, rendering, acceptance or receipt mutation.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "native_self_active_student_only",
+          "explicit_center",
+          "real_owned_sources_only"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A39",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F30"
+        ],
+        "runtime_required_features": [
+          "F30"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "account_or_job_scope",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "operational_development_limited",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_member_document_contexts_get"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/member_document_contexts_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/member_document_contexts_get_v1",
+        "runtime_rpc": "api_v1.member_document_contexts_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       }
     ],
     "policy_value_map": {
@@ -108220,6 +108703,66 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberWaitlistSession/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FinanceCurrencyDirectory/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_member_document_contexts_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_member_document_contexts_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_member_document_contexts_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_member_finance_currencies_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_member_finance_currencies_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_member_finance_currencies_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_member_document_contexts_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_member_finance_currencies_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -108703,13 +109246,15 @@
         "products_management_list_v1",
         "product_state_set_v1",
         "freeze_cancel_preview_v1",
-        "freeze_cancel_apply_v1"
+        "freeze_cancel_apply_v1",
+        "member_finance_currencies_get_v1",
+        "member_document_contexts_get_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 172,
+      "migration_count": 173,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -109417,7 +109962,9 @@
         "product_state_set_v1",
         "freeze_cancel_preview_v1",
         "freeze_cancel_apply_v1",
-        "instructor_account_get_v1"
+        "instructor_account_get_v1",
+        "member_finance_currencies_get_v1",
+        "member_document_contexts_get_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -109812,7 +110359,8 @@
           "account_security_history_get_v1",
           "account_signup_check_v1",
           "finance_directory_get_v1",
-          "products_management_list_v1"
+          "products_management_list_v1",
+          "member_finance_currencies_get_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -109844,7 +110392,8 @@
           "account_security_history_get_v1",
           "account_signup_check_v1",
           "finance_directory_get_v1",
-          "products_management_list_v1"
+          "products_management_list_v1",
+          "member_finance_currencies_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -110682,7 +111231,8 @@
           "report_build_v1",
           "settings_preparation_resolve_v1",
           "finance_directory_get_v1",
-          "products_management_list_v1"
+          "products_management_list_v1",
+          "member_finance_currencies_get_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -110715,7 +111265,8 @@
           "report_build_v1",
           "settings_preparation_resolve_v1",
           "finance_directory_get_v1",
-          "products_management_list_v1"
+          "products_management_list_v1",
+          "member_finance_currencies_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -111234,7 +111785,8 @@
           "document_requirements_get_v1",
           "document_accept_v1",
           "file_upload_complete_v1",
-          "document_publication_preview_v1"
+          "document_publication_preview_v1",
+          "member_document_contexts_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -111246,7 +111798,8 @@
           "document_requirements_get_v1",
           "document_accept_v1",
           "file_upload_complete_v1",
-          "document_publication_preview_v1"
+          "document_publication_preview_v1",
+          "member_document_contexts_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
