@@ -1189,6 +1189,8 @@ ST-03 manuel tahsilat adayı cash/bank_transfer/card_pos yöntemini ve banka/kar
 
 ##### FD08 — belge onay dış görünürlük (kabul edildi)
 
+Öğrencinin Belgeler kartı yalnız kendi canlı merkez kapsamındaki aktif işlem bağlamlarının gereksinimlerini ve süresi dolmamış satın alma önizlemelerini keşfeder; tamamlanmış/iptal edilmiş geçmiş işlemler bu kartta listelenmez. İşleme özgü gate/subject, satın alma sabitlemesi, native kabul/yenileme ve değişmez gösterim kanıtı korunur; genel kişi belgesi veya toplu bağlam aktarımı kurulmaz. Kesin tüketim [WF11](../workflows.md#wf11) sahibindedir.
+
 | Alan | Kabul edilen seçenek/default |
 |---|---|
 | İlk belge | Yayımlanmış/zorunlu hazır belge atanmaz; org kendi şablonunu hazırlar/seçer. Başlık/dil/sürüm/içerik-dosya/kapsam/zorunluluk açık. Default taslak, açık yayın olmadan kullanıcıya gösterilmez. |

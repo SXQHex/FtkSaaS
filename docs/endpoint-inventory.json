@@ -6271,6 +6271,59 @@
       },
       "billing_class": "read",
       "limits": []
+    },
+    {
+      "name": "member_finance_currencies_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/member_finance_currencies_get_v1",
+      "permission": "finance.read",
+      "features": [
+        "F06",
+        "F19"
+      ],
+      "required_features": [
+        "F06",
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F06",
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_member_finance_currencies_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "member_document_contexts_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/member_document_contexts_get_v1",
+      "permission": "person.read",
+      "features": [
+        "F30"
+      ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [
+        "F30"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_member_document_contexts_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
     }
   ]
 }

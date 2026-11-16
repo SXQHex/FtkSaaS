@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `403e433d917c8cfab638b1694e50c320fed01c8ebd391aff030e4b092d4117c7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `a8473ab1b17e2e89a4d258a34147e4b83ce51f3eb2a1f98de8a3bafd77b637b1`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -80,6 +80,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [lesson-request-catalog.sql](../apps/backend/database/lesson-request-catalog.sql) | `44d6d95780d3854f3f24f4aa0693db9b6420307a20261df6f8ddd2962c0ee461` |
 | [member-lesson-discovery.sql](../apps/backend/database/member-lesson-discovery.sql) | `f4bd89d2108fb70dd77e2da0a6821da8c7681ef0cdf7e377b81d98cae2776b4c` |
 | [member-page-summary.sql](../apps/backend/database/member-page-summary.sql) | `27b417ca274da02c03dc180b98dd2216dbacd50106ce0d17734d9a67422f7056` |
+| [member-self-discovery.sql](../apps/backend/database/member-self-discovery.sql) | `b3b176a1291234211fcd6c266093ea16678dfaa11aec84ad3266a1244dcd0d17` |
 | [merge-approval-discovery.sql](../apps/backend/database/merge-approval-discovery.sql) | `754d0d683739619f3af8b1d058627fd7f973eb9454695ba2702a1ab838046cd1` |
 | [native-auth-signup-check.sql](../apps/backend/database/native-auth-signup-check.sql) | `6acf9d503533661d721afa98e157e59bb0c869f617ca006561024b0ee1ccc186` |
 | [notification-language-rendering.sql](../apps/backend/database/notification-language-rendering.sql) | `bb9c33f28dabb30b6484ce93a26c8e616f8db53cf11a873cfece2c164234da2d` |
@@ -179,7 +180,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `7162d2612c02ea03071d9dd211459116f0ce0c45af1708e841b9dd73f26359a0` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `02fd286522bf2cd24ccbafa999cf68a96ab2f369817692c7ef6c87d12956796b` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [sale-change-inventory.sql](../apps/backend/database/sale-change-inventory.sql) | `0985f3a2ddc067265966ad61dd2144578f5605a50a8f10393e642faf4cf1f8c2` |
@@ -381,6 +382,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261116194343_instructor_self_account.sql](../apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql) | `147cefb1afa6618de42b6e47b96a2317a1abbc55a87581865a15dbc634887bc9` |
 | [20261116201341_member_lesson_discovery.sql](../apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql) | `f4bd89d2108fb70dd77e2da0a6821da8c7681ef0cdf7e377b81d98cae2776b4c` |
 | [20261116210335_event_directory_finance.sql](../apps/backend/supabase/migrations/20261116210335_event_directory_finance.sql) | `1725a152086d357f97b8ea9235bab99a7ba8a84da4700958472d2e7eeed37d25` |
+| [20261116223700_member_self_discovery.sql](../apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql) | `b3b176a1291234211fcd6c266093ea16678dfaa11aec84ad3266a1244dcd0d17` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

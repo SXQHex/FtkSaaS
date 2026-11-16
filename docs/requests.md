@@ -48,6 +48,9 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-054 | Backend değerlendirmesi; Web1 W1-BE-20 / E28 | Backend; tüketici frontend | [WF06](workflows.md#wf06) | Henüz kaydolunmamış derslerin native self keşfi, güvenli etiketler ve gerçek politikalar. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-w19) | Kullanıcı grup ve özel dersleri birlikte seçti. [Backend değerlendirmesi](#xreq-054); frontend adına kabul verilmedi. |
 | XREQ-055 | Backend değerlendirmesi; Web1 W1-BE-26 / E37 | Backend; tüketici frontend | [WF15](workflows.md#wf15) | Etkinlik başlık/durum filtresi ve yetkili sayfadan bağımsız merkez özeti. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-055). |
 | XREQ-056 | Backend değerlendirmesi; Web1 W1-BE-27 / E38 | Backend; tüketici frontend | [WF15](workflows.md#wf15) | Görünür etkinlik kaydının gerçek borç/hazırlık bağı ve değişmez bedel/canlı bakiye projeksiyonu. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-056). |
+| XREQ-057 | Backend değerlendirmesi; Web1 W1-BE-21 | Backend; tüketici frontend | [WF19](workflows.md#wf19) | Öğrencinin merkez geneli kendi bekleme/teklif keşfi. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-057). |
+| XREQ-058 | Backend değerlendirmesi; Web1 W1-BE-22 | Backend; tüketici frontend | [WF05](workflows.md#wf05) | Satın alınan immutable sürüm ve gerçek finans para birimi keşfi. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-058). |
+| XREQ-059 | Backend değerlendirmesi; Web1 W1-BE-23 | Backend; tüketici frontend | [WF11](workflows.md#wf11) | Aktif gerçek işlem ve açık satın alma belge bağlamı keşfi. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-059). |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -842,3 +845,25 @@ W1-BE-26 için mevcut event_list_v1 aralık/disiplin/cursor ve native görünür
 ### Backend değerlendirmesi — 17 Kasım 2026
 
 W1-BE-27 için event_payment_get_v1 yalnız bilinen hazırlığı okumaya uygundur; event_payment_prepare_v1 mevcut aktif kaydın borcunu keşfetmek için kullanılamaz. Mevcut debt_ids ile tahsilat ve native iptal/öğrenci alacağı writer'ları yeterlidir, yeniden kurulmaz. Eksik olan görünür kayda ait gerçek borç/hazırlık bağı ve kaydın immutable bedeli ile güncel bakiye projeksiyonudur. Aynı event_get_v1 içinde opt-in destek eklenir; yetkisiz eğitmene finans veya salt tahsilatçının tam finance_get erişimi açılmaz. Statüler, tutar anlamları, hata ve yeniden okuma yalnız [WF15](workflows.md#wf15) sahibindedir. Kaynak/ortam sonucu [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance); karşı alan adına onay verilmez.
+
+
+<a id="xreq-057"></a>
+## XREQ-057 Web1 öğrencinin kendi bekleme/teklif keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+W1-BE-21 gerçek keşif açığıdır: bilinen person/session selector'ü ve CM seans dizini, rezervasyonu olmayan öğrencinin henüz bilmediği seanslarını bulmaz. Aynı management_state okuyucusuna self directory seçeneği eklenir; bütün takvim/bildirim taranmaz. Mevcut leave/accept/reject, worker ve receipt akışları yeniden kurulmaz. Güvenli etiket, cursor ve native rol/plan/kabul sınırı [WF19](workflows.md#wf19), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) sahibindedir.
+
+<a id="xreq-058"></a>
+## XREQ-058 Web1 satın alınan sürüm ve para birimleri
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+W1-BE-22 için mevcut hak/ledger ve currency seçilmiş finance_get yeterlidir; yeniden kurulmaz. Güncel ürün kataloğu geçmiş şart değildir, pozitif borç özeti de sıfırlanmış ödeme/alacak para birimi keşfi değildir. Mevcut entitlements_get self opt-in immutable sürüm özetiyle, para birimleri member_finance_currencies_get_v1 self okuyucusuyla keşfedilir. İlk kredi sürüm şartıdır; süreli hakta null kalır. Kesin tüketim [WF05](workflows.md#wf05)/[WF08](workflows.md#wf08), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) sahibindedir. Frontend kabulü verilmez.
+
+<a id="xreq-059"></a>
+## XREQ-059 Web1 aktif belge bağlamı keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+W1-BE-23 için doğrudan requirements/render/accept ve snapshot/purchase bağları yeterlidir; eksik olan öğrencinin gerçek gerekli işlem bağlamlarının keşfidir. Kullanıcı aktif işlemler ve süresi dolmamış satın alma önizlemelerini seçti; geçmiş işlemler kapsam dışında kalır. Karar FD08, kesin çağrı ve sınırlı kaynak kümesi [WF11](workflows.md#wf11) sahibindedir. Ayrı member_document_contexts_get_v1 self okuyucusu kullanılır; genel kişi subject'i veya başka bağlama kabul kopyası oluşturulmaz. Canonical kişi sahipliği eski değişmez işlem/kabul kanıtını korur. Kaynak/ortam [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery); frontend ekranı/kabulü değiştirilmez.

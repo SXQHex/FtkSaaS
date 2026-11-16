@@ -466,7 +466,7 @@
     },
     {
       "path": "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
-      "sha256": "b7f6f09f196456a76eaf1c3eb0d436ec29f0549bfab515272bfc2ec33b83c792",
+      "sha256": "6f9ecc4fdd539569ff19d952ba0af5fe0c3589d095773544720f3eeb21157ac9",
       "shared": [
         [
           1,
@@ -484,7 +484,13 @@
           ]
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "line": 191,
+          "path": "apps/backend/tests/member-self-discovery-acceptance.mjs",
+          "sha256": "93493aedbddaad301f4634e5a67c9ab57a74e3f1877a30f5c8f3a375f065caef"
+        }
+      ],
       "estimated_seconds": 214.02
     },
     {
