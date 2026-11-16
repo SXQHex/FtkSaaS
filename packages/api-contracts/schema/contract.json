@@ -4082,6 +4082,9 @@
               "type": "null"
             }
           ]
+        },
+        "source_summary": {
+          "$ref": "#/$defs/ReservationSourceSummary"
         }
       },
       "required": [
@@ -11089,6 +11092,11 @@
             "past"
           ],
           "description": "Optional start-time partition. The server captures a cutoff on page one and binds it to subsequent cursors. Omitted retains legacy interval-overlap behavior."
+        },
+        "include_source_summary": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only the authorized page receives the actual assigned sale and permitted current rights; no automatic package selection."
         }
       },
       "required": [
@@ -26832,6 +26840,16 @@
         },
         "group_student": {
           "$ref": "#/$defs/GroupStudentView"
+        },
+        "waitlist_display_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -39362,20 +39380,84 @@
           "const": "waitlist_join_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "person_id": {
-              "$ref": "#/$defs/FtkUuid"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "person_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "session_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "person_id",
+                "session_id"
+              ],
+              "additionalProperties": false
             },
-            "session_id": {
-              "$ref": "#/$defs/FtkUuid"
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "session"
+                },
+                "session_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "view": {
+                  "const": "entries"
+                },
+                "status": {
+                  "enum": [
+                    "all",
+                    "waiting",
+                    "offered",
+                    "converted",
+                    "left",
+                    "closed"
+                  ]
+                }
+              },
+              "required": [
+                "directory",
+                "session_id",
+                "view"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "session"
+                },
+                "session_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "view": {
+                  "const": "offers"
+                },
+                "status": {
+                  "enum": [
+                    "all",
+                    "active",
+                    "accepted",
+                    "rejected",
+                    "expired",
+                    "withdrawn"
+                  ]
+                }
+              },
+              "required": [
+                "directory",
+                "session_id",
+                "view"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "person_id",
-            "session_id"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -61077,6 +61159,113 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "ReservationSourceSummary": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "unassigned",
+                "restricted",
+                "not_enabled"
+              ]
+            },
+            "as_of": {
+              "$ref": "#/$defs/Instant"
+            }
+          },
+          "required": [
+            "status",
+            "as_of"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "available"
+            },
+            "as_of": {
+              "$ref": "#/$defs/Instant"
+            },
+            "source_sale_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "product_version_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "product_name": {
+              "$ref": "#/$defs/Text"
+            },
+            "kind": {
+              "$ref": "#/$defs/EntitlementKind"
+            },
+            "booking_mode": {
+              "$ref": "#/$defs/BookingMode"
+            },
+            "sale_state": {
+              "$ref": "#/$defs/SaleState"
+            },
+            "state": {
+              "$ref": "#/$defs/EntitlementState"
+            },
+            "start_date": {
+              "$ref": "#/$defs/Date"
+            },
+            "end_date": {
+              "$ref": "#/$defs/Date"
+            },
+            "timezone": {
+              "$ref": "#/$defs/IanaZone"
+            },
+            "available_credits": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[0-9]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reserved": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            },
+            "consumed": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            },
+            "sale_version": {
+              "$ref": "#/$defs/PositiveInt"
+            }
+          },
+          "required": [
+            "status",
+            "as_of",
+            "source_sale_id",
+            "product_version_id",
+            "product_name",
+            "kind",
+            "booking_mode",
+            "sale_state",
+            "state",
+            "start_date",
+            "end_date",
+            "timezone",
+            "available_credits",
+            "reserved",
+            "consumed",
+            "sale_version"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "x-invariant": "Assigned source is the reservation source_sale_id, never an eligible alternative or person total. Current credit balance is not booking eligibility; timed rights have null available_credits. Restricted/not_enabled never disclose sale identity. Unassigned does not infer negative credit or trial."
     }
   },
   "x-contract": {
@@ -103217,13 +103406,13 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_waitlist_join_v1/properties/key/properties/person_id",
+        "path": "#/$defs/ManagementSelector_waitlist_join_v1/properties/key/oneOf/0/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_waitlist_join_v1/properties/key/properties/session_id",
+        "path": "#/$defs/ManagementSelector_waitlist_join_v1/properties/key/oneOf/0/properties/session_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -106821,6 +107010,30 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_waitlist_join_v1/properties/key/oneOf/1/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_waitlist_join_v1/properties/key/oneOf/2/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReservationSourceSummary/oneOf/1/properties/source_sale_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReservationSourceSummary/oneOf/1/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -107309,7 +107522,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 166,
+      "migration_count": 167,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
