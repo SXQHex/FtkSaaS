@@ -1161,6 +1161,50 @@ export default interface Resources {
       "upcoming": "Yaklaşan rezervasyon",
       "verified": "Doğrulandı"
     },
+    "memberReservations": {
+      "cancel": "İptal et",
+      "chooseCenter": "Merkez",
+      "chooseOrg": "Organizasyon",
+      "date": "Tarih",
+      "description": "Yaklaşan derslerin, bekleme listesi ve geçmişin.",
+      "duration": "{{minutes}} dk",
+      "empty": {
+        "history": "Geçmiş rezervasyonun yok.",
+        "upcoming": "Yaklaşan rezervasyonun yok.",
+        "waiting": "Bekleme listesinde değilsin."
+      },
+      "history": "Geçmiş",
+      "historyHint": "Başlangıç saati geçmiş ve başlamış dersler bu bölümde görünür.",
+      "lesson": "Ders",
+      "links": {
+        "account": "Hesabım",
+        "classes": "Dersler",
+        "entitlements": "Haklarım",
+        "requests": "Özel ders",
+        "reservations": "Rezervasyonlarım"
+      },
+      "loading": "Rezervasyonlar okunuyor…",
+      "navigation": "Üye menüsü",
+      "next": "Sonraki",
+      "noScope": "Organizasyon ve merkez seç.",
+      "policyUnknown": "Ücretsiz iptal sınırı okunamadı; hak sonucu kayıt sırasında güncel politikayla belirlenir.",
+      "previous": "Önceki",
+      "retry": "Yeniden oku",
+      "shell": "Üye paneli",
+      "sourceLimits": "Bekleme listesi keşfi ve dersin eğitmen/salon/politika ayrıntıları henüz okunamıyor.",
+      "state": "Durum",
+      "title": "Rezervasyonlarım",
+      "unavailable": "Bu merkezde bağlı öğrencilik kapsamı okunamadı.",
+      "unknown": "Okunamadı",
+      "unread": {
+        "history": "Geçmiş rezervasyonlar okunamadı.",
+        "upcoming": "Yaklaşan rezervasyonlar okunamadı.",
+        "waiting": "Güncel bekleme listesi ve teklifler okunamadı."
+      },
+      "upcoming": "Yaklaşan",
+      "waiting": "Bekleme listesi",
+      "waitingHint": "Yer açılınca sıradaki üyeye süreli teklif gider."
+    },
     "passwordChange": {
       "code": "Güvenlik kodu",
       "codeDescription": "Güvenlik kodunu kayıtlı e-posta veya telefonuna gönderebilirsin. Kod mevcut parolanın yerine geçmez.",

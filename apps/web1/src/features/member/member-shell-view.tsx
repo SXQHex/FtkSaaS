@@ -6,13 +6,15 @@ export function MemberShellView({
   navigationLabel,
   links,
   actions,
+  linksDisabled = false,
   children,
 }: {
   brand: string;
   subtitle: string;
   navigationLabel: string;
-  links: { id: string; label: string; href: string; icon: ReactNode; current: boolean }[];
+  links: { id: string; label: string; href?: string; icon: ReactNode; current: boolean }[];
   actions?: ReactNode;
+  linksDisabled?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -33,6 +35,7 @@ export function MemberShellView({
             <li key={link.id} className="min-w-0">
               <LinkButton
                 href={link.href}
+                isDisabled={linksDisabled || !link.href}
                 variant={link.current ? "secondary" : "ghost"}
                 aria-current={link.current ? "page" : undefined}
                 className={`h-full w-full min-w-0 flex-col gap-1 px-1 py-2 text-center text-xs lg:flex-row lg:px-3 lg:text-sm ${link.current ? "font-bold underline decoration-2 underline-offset-4" : ""}`}

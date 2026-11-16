@@ -2807,5 +2807,49 @@
     "empty": "Bu gün ders yok.",
     "unread": "Güncel ders listesi okunamadı.",
     "cancel": "Vazgeç"
+  },
+  "memberReservations": {
+    "title": "Rezervasyonlarım",
+    "description": "Yaklaşan derslerin, bekleme listesi ve geçmişin.",
+    "upcoming": "Yaklaşan",
+    "waiting": "Bekleme listesi",
+    "waitingHint": "Yer açılınca sıradaki üyeye süreli teklif gider.",
+    "history": "Geçmiş",
+    "date": "Tarih",
+    "lesson": "Ders",
+    "state": "Durum",
+    "empty": {
+      "upcoming": "Yaklaşan rezervasyonun yok.",
+      "waiting": "Bekleme listesinde değilsin.",
+      "history": "Geçmiş rezervasyonun yok."
+    },
+    "unread": {
+      "upcoming": "Yaklaşan rezervasyonlar okunamadı.",
+      "waiting": "Güncel bekleme listesi ve teklifler okunamadı.",
+      "history": "Geçmiş rezervasyonlar okunamadı."
+    },
+    "cancel": "İptal et",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "retry": "Yeniden oku",
+    "loading": "Rezervasyonlar okunuyor…",
+    "sourceLimits": "Bekleme listesi keşfi ve dersin eğitmen/salon/politika ayrıntıları henüz okunamıyor.",
+    "unknown": "Okunamadı",
+    "duration": "{{minutes}} dk",
+    "policyUnknown": "Ücretsiz iptal sınırı okunamadı; hak sonucu kayıt sırasında güncel politikayla belirlenir.",
+    "historyHint": "Başlangıç saati geçmiş ve başlamış dersler bu bölümde görünür.",
+    "shell": "Üye paneli",
+    "navigation": "Üye menüsü",
+    "noScope": "Organizasyon ve merkez seç.",
+    "unavailable": "Bu merkezde bağlı öğrencilik kapsamı okunamadı.",
+    "chooseOrg": "Organizasyon",
+    "chooseCenter": "Merkez",
+    "links": {
+      "classes": "Dersler",
+      "reservations": "Rezervasyonlarım",
+      "entitlements": "Haklarım",
+      "requests": "Özel ders",
+      "account": "Hesabım"
+    }
   }
 }
