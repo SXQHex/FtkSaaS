@@ -2127,6 +2127,7 @@ export default interface Resources {
       "verified": "Doğrulandı"
     },
     "memberReservations": {
+      "activeOffer": "Aktif yer teklifi",
       "cancel": "İptal et",
       "chooseCenter": "Merkez",
       "chooseOrg": "Organizasyon",
@@ -2154,9 +2155,13 @@ export default interface Resources {
       "noScope": "Organizasyon ve merkez seç.",
       "policyUnknown": "Bu rezervasyonun iptal koşulları okunamadı.",
       "previous": "Önceki",
+      "queuePages": {
+        "entries": "Bekleme kayıtları",
+        "offers": "Yer teklifleri"
+      },
+      "queuePositionUnknown": "Sıra numarası paylaşılmıyor.",
       "retry": "Yeniden oku",
       "shell": "Üye paneli",
-      "sourceLimits": "Merkez genelindeki kendi bekleme kayıtların ve yer tekliflerin henüz keşfedilemiyor.",
       "state": "Durum",
       "title": "Rezervasyonlarım",
       "unavailable": "Bu merkezde bağlı öğrencilik kapsamı okunamadı.",
@@ -2168,7 +2173,8 @@ export default interface Resources {
       },
       "upcoming": "Yaklaşan",
       "waiting": "Bekleme listesi",
-      "waitingHint": "Yer açılınca sıradaki üyeye süreli teklif gider."
+      "waitingHint": "Yer açılınca sıradaki üyeye süreli teklif gider.",
+      "waitlistChanged": "Bekleme kaydı veya teklif değişti. Güncel listeyi yeniden oku."
     },
     "passwordChange": {
       "code": "Güvenlik kodu",

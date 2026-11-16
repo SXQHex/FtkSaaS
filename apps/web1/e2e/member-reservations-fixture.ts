@@ -127,6 +127,12 @@ export async function mockOwnReservations(
             as_of: "2026-11-16T12:00:00Z",
           })
         : reject();
+    if (
+      operation === "management_state_get_v1" &&
+      req.operation === "waitlist_join_v1" &&
+      req.selector?.key?.directory === "self"
+    )
+      return send({ items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
     if (operation === "reservation_list_v1") {
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);

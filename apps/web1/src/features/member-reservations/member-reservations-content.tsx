@@ -8,9 +8,11 @@ import { MemberCancellationPolicy } from "../member-classes/member-cancellation-
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { memberReservationRows } from "../member-profile/reservations";
 import { readOwnReservations, type OwnReservations } from "./member-reservations-read";
+import { readOwnWaitlist, type OwnWaitlistRow } from "./member-waitlist";
+import { MemberWaitlistEditor } from "./member-waitlist-editor";
+import type { WaitlistAction } from "../session-detail/session-waitlist";
 import { MemberReservationsView } from "./member-reservations-view";
 import { Button } from "../../components/ui/button";
-import { Alert, AlertDescription } from "../../components/ui/alert";
 export function MemberReservationsContent({
   scope,
   personId,
@@ -26,6 +28,12 @@ export function MemberReservationsContent({
     router = useRouter();
   const [upCursors, setUpCursors] = useState<(string | undefined)[]>([undefined]);
   const [pastCursors, setPastCursors] = useState<(string | undefined)[]>([undefined]);
+  const [entryCursors, setEntryCursors] = useState<(string | undefined)[]>([undefined]),
+    [offerCursors, setOfferCursors] = useState<(string | undefined)[]>([undefined]);
+  const [waitTarget, setWaitTarget] = useState<{
+    row: OwnWaitlistRow;
+    action: Exclude<WaitlistAction, "join">;
+  }>();
   const retryButton = useRef<HTMLButtonElement>(null);
   const [locked, setLocked] = useState(false);
   const [target, setTarget] = useState<{
@@ -42,6 +50,16 @@ export function MemberReservationsContent({
   const past = useQuery({
     queryKey: [...prefix, "past", pastCursors.at(-1)],
     queryFn: () => readOwnReservations(scope, personId, "past", pastCursors.at(-1)),
+    retry: false,
+  });
+  const waiting = useQuery({
+    queryKey: [...prefix, "waitlist", entryCursors.at(-1)],
+    queryFn: () => readOwnWaitlist(scope, "entries", entryCursors.at(-1)),
+    retry: false,
+  });
+  const offers = useQuery({
+    queryKey: [...prefix, "offers", offerCursors.at(-1)],
+    queryFn: () => readOwnWaitlist(scope, "offers", offerCursors.at(-1)),
     retry: false,
   });
   const accessLost = useCallback(
@@ -63,8 +81,9 @@ export function MemberReservationsContent({
     [onLockChange],
   );
   useEffect(() => {
-    for (const error of [up.error, past.error]) if (error) accessLost(error);
-  }, [up.error, past.error, accessLost]);
+    for (const error of [up.error, past.error, waiting.error, offers.error])
+      if (error) accessLost(error);
+  }, [up.error, past.error, waiting.error, offers.error, accessLost]);
   const upcoming = !up.isError ? up.data : undefined,
     history = !past.isError ? past.data : undefined;
   const date = new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeZone: timezone });
@@ -102,7 +121,12 @@ export function MemberReservationsContent({
     return row.title ?? t(($) => $.memberReservations.unknown);
   }
   async function refresh() {
-    const results = await Promise.all([up.refetch(), past.refetch()]);
+    const results = await Promise.all([
+      up.refetch(),
+      past.refetch(),
+      waiting.refetch(),
+      offers.refetch(),
+    ]);
     if (results.some((result) => result.isError))
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
   }
@@ -152,7 +176,7 @@ export function MemberReservationsContent({
                 <Button
                   variant="outline"
                   size="sm"
-                  isDisabled={locked || Boolean(target) || up.isFetching}
+                  isDisabled={locked || Boolean(target) || Boolean(waitTarget) || up.isFetching}
                   onPress={() =>
                     setTarget({
                       reservationId: row.reservation.id,
@@ -166,7 +190,105 @@ export function MemberReservationsContent({
               ) : undefined,
           })) ?? null
         }
-        waiting={null}
+        waiting={
+          waiting.isError || offers.isError || !waiting.data || !offers.data
+            ? null
+            : [...offers.data.items, ...waiting.data.items].map((row) => {
+                const dateTime = new Intl.DateTimeFormat("tr-TR", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                  timeZone: row.session.timezone,
+                });
+                const eligible =
+                  row.session.state === "planned" &&
+                  !locked &&
+                  !target &&
+                  !waitTarget &&
+                  !waiting.isFetching &&
+                  !offers.isFetching;
+                return {
+                  id: `${row.offer ? "offer" : "entry"}:${row.id}`,
+                  title: row.session.title,
+                  time: new Intl.DateTimeFormat("tr-TR", {
+                    timeStyle: "short",
+                    timeZone: row.session.timezone,
+                  }).format(new Date(row.session.interval.starts_at)),
+                  duration: t(($) => $.memberReservations.duration, {
+                    minutes:
+                      (Date.parse(row.session.interval.ends_at) -
+                        Date.parse(row.session.interval.starts_at)) /
+                      60000,
+                  }),
+                  metadata: dateTime.format(new Date(row.session.interval.starts_at)),
+                  hint: row.offer
+                    ? t(($) => $.memberClasses.offerExpires, {
+                        time: dateTime.format(new Date(row.offer.expires_at)),
+                      })
+                    : t(($) => $.memberReservations.queuePositionUnknown),
+                  state: row.offer
+                    ? t(($) => $.memberReservations.activeOffer)
+                    : t(($) => $.memberClasses.waiting),
+                  action: (
+                    <div className="flex flex-wrap gap-2">
+                      {(row.offer ? (["accept", "reject"] as const) : (["leave"] as const)).map(
+                        (action) => (
+                          <Button
+                            key={action}
+                            size="sm"
+                            variant="outline"
+                            isDisabled={
+                              !eligible ||
+                              Boolean(row.offer && Date.parse(row.offer.expires_at) <= Date.now())
+                            }
+                            onPress={() => setWaitTarget({ row, action })}
+                          >
+                            {t(($) => $.memberClasses[action])}
+                          </Button>
+                        ),
+                      )}
+                    </div>
+                  ),
+                };
+              })
+        }
+        waitingPagination={
+          <div className="flex flex-wrap gap-4">
+            {(["entries", "offers"] as const).map((view) => {
+              const query = view === "entries" ? waiting : offers,
+                cursors = view === "entries" ? entryCursors : offerCursors,
+                setCursors = view === "entries" ? setEntryCursors : setOfferCursors,
+                next = query.data?.nextCursor;
+              return (
+                <div
+                  key={view}
+                  role="group"
+                  aria-label={t(($) => $.memberReservations.queuePages[view])}
+                  className="flex flex-wrap items-center gap-2"
+                >
+                  <span className="text-xs">{t(($) => $.memberReservations.queuePages[view])}</span>
+                  <Button
+                    variant="outline"
+                    isDisabled={locked || query.isFetching || cursors.length === 1}
+                    onPress={() => setCursors((old) => old.slice(0, -1))}
+                  >
+                    {t(($) => $.memberReservations.previous)}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    isDisabled={
+                      locked || query.isFetching || query.isError || !next || cursors.includes(next)
+                    }
+                    onPress={() => {
+                      if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
+                    }}
+                  >
+                    {t(($) => $.memberReservations.next)}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        }
         history={
           historyRows?.map((row, index) => ({
             id: row.id,
@@ -179,20 +301,25 @@ export function MemberReservationsContent({
         historyPagination={pagination("past")}
         notice={
           <div className="space-y-3">
-            <Alert>
-              <AlertDescription>{t(($) => $.memberReservations.sourceLimits)}</AlertDescription>
-            </Alert>
             <p className="text-xs text-muted-foreground">
               {t(($) => $.memberReservations.historyHint)}
             </p>
-            {(up.isPending || past.isPending) && (
+            {(up.isPending || past.isPending || waiting.isPending || offers.isPending) && (
               <p role="status">{t(($) => $.memberReservations.loading)}</p>
             )}
             <Button
               ref={retryButton}
               variant="outline"
-              isDisabled={locked || up.isFetching || past.isFetching}
+              isDisabled={
+                locked ||
+                up.isFetching ||
+                past.isFetching ||
+                waiting.isFetching ||
+                offers.isFetching
+              }
               onPress={() => {
+                void waiting.refetch();
+                void offers.refetch();
                 if (up.isError) void up.refetch();
                 if (past.isError) void past.refetch();
                 if (!up.isError && !past.isError) {
@@ -206,6 +333,22 @@ export function MemberReservationsContent({
           </div>
         }
       />
+      {waitTarget && (
+        <MemberWaitlistEditor
+          key={`${waitTarget.row.id}:${waitTarget.action}`}
+          scope={scope}
+          personId={personId}
+          before={waitTarget.row}
+          action={waitTarget.action}
+          onClose={() => {
+            setWaitTarget(undefined);
+            requestAnimationFrame(() => retryButton.current?.focus());
+          }}
+          onSaved={refresh}
+          onLockChange={lock}
+          onAccessLost={accessLost}
+        />
+      )}
       {target && (
         <CancelReservation
           scope={scope}

@@ -2912,7 +2912,6 @@
     "next": "Sonraki",
     "retry": "Yeniden oku",
     "loading": "Rezervasyonlar okunuyor…",
-    "sourceLimits": "Merkez genelindeki kendi bekleme kayıtların ve yer tekliflerin henüz keşfedilemiyor.",
     "unknown": "Okunamadı",
     "duration": "{{minutes}} dk",
     "policyUnknown": "Bu rezervasyonun iptal koşulları okunamadı.",
@@ -2929,6 +2928,13 @@
       "entitlements": "Haklarım",
       "requests": "Özel ders",
       "account": "Hesabım"
+    },
+    "waitlistChanged": "Bekleme kaydı veya teklif değişti. Güncel listeyi yeniden oku.",
+    "queuePositionUnknown": "Sıra numarası paylaşılmıyor.",
+    "activeOffer": "Aktif yer teklifi",
+    "queuePages": {
+      "entries": "Bekleme kayıtları",
+      "offers": "Yer teklifleri"
     }
   },
   "memberEntitlements": {

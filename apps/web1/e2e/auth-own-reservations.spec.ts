@@ -29,8 +29,8 @@ test("student own reservations keep separate native cursors, source package and 
   ).toHaveCount(0);
   await expect(
     page.getByText("Güncel bekleme listesi ve teklifler okunamadı.", { exact: true }),
-  ).toBeVisible();
-  await expect(page.getByText("Bekleme listesinde değilsin.", { exact: true })).toHaveCount(0);
+  ).toHaveCount(0);
+  await expect(page.getByText("Bekleme listesinde değilsin.", { exact: true })).toBeVisible();
   const initial = state.reads.filter((row) => row.operation === "reservation_list_v1");
   expect(initial).toHaveLength(2);
   expect(
