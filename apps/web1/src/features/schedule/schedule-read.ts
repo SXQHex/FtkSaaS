@@ -207,3 +207,58 @@ export async function readScheduleEditor(scope: ClientScope, sessionId: string) 
     throw new Error("SCHEDULE_EDITOR_UNAVAILABLE");
   return { session, resources: item.current.values.patch.resources };
 }
+
+export async function readScheduleReplacements(scope: ClientScope, replacesId: string) {
+  const backend = await scopedBackend(scope);
+  const items: { id: string; version: number; state: SessionView["state"]; interval: Interval }[] =
+    [];
+  const ids = new Set<string>(),
+    cursors = new Set<string>();
+  let cursor: string | undefined;
+  do {
+    const page = await backend.call("management_state_get_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      operation: "replacement_session_create_v1",
+      selector: { operation: "replacement_session_create_v1", key: { replaces_id: replacesId } },
+      page: { limit: 50, ...(cursor ? { cursor } : {}) },
+    });
+    for (const item of page.items) {
+      const values =
+        item.current?.operation === "replacement_session_create_v1"
+          ? item.current.values
+          : undefined;
+      const version = item.versions.filter(
+        (row) => row.entity.type === "sessions" && row.entity.id === item.entity?.id,
+      );
+      if (
+        !item.exists ||
+        item.entity?.type !== "sessions" ||
+        ids.has(item.entity.id) ||
+        values?.replaces_id !== replacesId ||
+        !values.interval ||
+        version.length !== 1 ||
+        !Number.isSafeInteger(version[0]!.version) ||
+        version[0]!.version < 1 ||
+        (item.state !== "planned" && item.state !== "occurred" && item.state !== "cancelled") ||
+        !Number.isFinite(Date.parse(values.interval.starts_at)) ||
+        !Number.isFinite(Date.parse(values.interval.ends_at)) ||
+        Date.parse(values.interval.starts_at) >= Date.parse(values.interval.ends_at)
+      )
+        throw new Error("SCHEDULE_REPLACEMENT_UNAVAILABLE");
+      ids.add(item.entity.id);
+      items.push({
+        id: item.entity.id,
+        version: version[0]!.version,
+        state: item.state,
+        interval: values.interval,
+      });
+    }
+    cursor = page.next_cursor ?? undefined;
+    if (cursor && cursors.has(cursor)) throw new Error("SCHEDULE_CURSOR_UNAVAILABLE");
+    if (cursor) cursors.add(cursor);
+  } while (cursor);
+  return items;
+}

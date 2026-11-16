@@ -83,6 +83,9 @@ export function ScheduleSessionSheet({
   onNotify,
   cancelled = false,
   onReplacement,
+  rosterContent,
+  canRoster = true,
+  historyContent,
 }: {
   open: boolean;
   mode: SchedulePanelMode;
@@ -108,6 +111,9 @@ export function ScheduleSessionSheet({
   onNotify?: (notify: boolean) => void;
   cancelled?: boolean;
   onReplacement?: () => void;
+  rosterContent?: ReactNode;
+  canRoster?: boolean;
+  historyContent?: ReactNode;
 }) {
   const { t } = useTranslation();
   const set = <K extends keyof ScheduleSessionDraft>(key: K, value: ScheduleSessionDraft[K]) =>
@@ -171,33 +177,36 @@ export function ScheduleSessionSheet({
                   variant="outline"
                   size="sm"
                   onPress={() => onMode?.("roster")}
-                  isDisabled={locked || !onMode}
+                  isDisabled={locked || !onMode || !canRoster}
                 >
                   {t(($) => $.schedule.editRoster)}
                 </Button>
               </div>
-              {panel.roster?.length ? (
-                <ItemGroup>
-                  {panel.roster.map((person) => (
-                    <Item key={person.id} role="listitem" size="sm">
-                      <ItemContent>
-                        <ItemTitle>{person.name}</ItemTitle>
-                        <ItemDescription>{person.detail}</ItemDescription>
-                      </ItemContent>
-                    </Item>
-                  ))}
-                </ItemGroup>
-              ) : (
-                <Empty>
-                  <EmptyDescription>
-                    {panel.roster === null
-                      ? t(($) => $.schedule.unknown)
-                      : t(($) => $.schedule.emptyRoster)}
-                  </EmptyDescription>
-                </Empty>
-              )}
+              {rosterContent ??
+                (panel.roster?.length ? (
+                  <ItemGroup>
+                    {panel.roster.map((person) => (
+                      <Item key={person.id} role="listitem" size="sm">
+                        <ItemContent>
+                          <ItemTitle>{person.name}</ItemTitle>
+                          <ItemDescription>{person.detail}</ItemDescription>
+                        </ItemContent>
+                      </Item>
+                    ))}
+                  </ItemGroup>
+                ) : (
+                  <Empty>
+                    <EmptyDescription>
+                      {panel.roster === null
+                        ? t(($) => $.schedule.unknown)
+                        : t(($) => $.schedule.emptyRoster)}
+                    </EmptyDescription>
+                  </Empty>
+                ))}
             </section>
           </div>
+        ) : mode === "roster" && rosterContent ? (
+          rosterContent
         ) : (
           <form
             id="schedule-session"
@@ -543,6 +552,7 @@ export function ScheduleSessionSheet({
             </FieldGroup>
           </form>
         )}
+        {historyContent}
         {panel.effects.length > 0 && (
           <section className="mt-4 flex flex-col gap-2">
             <h3 className="text-sm font-medium">{t(($) => $.schedule.effect)}</h3>
@@ -613,7 +623,7 @@ export function ScheduleSessionSheet({
               </Button>
             )}
           </>
-        ) : (
+        ) : mode !== "roster" ? (
           <>
             <Button type="submit" form="schedule-session" isDisabled={locked || !onPreview}>
               {t(($) => $.schedule.previewEffect)}
@@ -628,7 +638,7 @@ export function ScheduleSessionSheet({
               </Button>
             )}
           </>
-        )}
+        ) : null}
       </SheetFooter>
     </Sheet>
   );

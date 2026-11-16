@@ -7,6 +7,7 @@ import {
   readScheduleReceipt,
   readScheduleResult,
   writeSchedule,
+  replacementSessionIntent,
   type ScheduleIntent,
 } from "./schedule-command";
 const scope = { accountId: "fixture-account", orgId: "fixture-org", centerId: "fixture-center" };
@@ -45,6 +46,73 @@ beforeEach(() => {
   call.mockReset();
 });
 describe("reviewed native schedule writes and rereads", () => {
+  it("reads a replacement receipt through only public operation/key fields and checks its durable source link", async () => {
+    const source: SessionView = {
+      id: "source",
+      class_id: null,
+      discipline_id: "discipline",
+      format: "group",
+      attendance_state: "open",
+      assignments: [],
+      ...interval,
+      state: "cancelled",
+      version: 3,
+      capacity: {
+        total: 12,
+        held: 0,
+        remaining: 12,
+        category_held: null,
+        category_remaining: null,
+        room_capacity: null,
+      },
+    };
+    call.mockResolvedValueOnce(source);
+    const value = await replacementSessionIntent(scope, source, interval, "room");
+    call.mockResolvedValueOnce({
+      operation: "replacement_session_create_v1",
+      key: value.request.operation_key,
+      status: "succeeded",
+      result_reference: { type: "sessions", id: "replacement" },
+    });
+    await readScheduleReceipt(value);
+    expect(call).toHaveBeenLastCalledWith("operation_status_get_v1", {
+      client_api_version: 1,
+      request_id: expect.any(String),
+      org_id: scope.orgId,
+      operation: "replacement_session_create_v1",
+      key: value.request.operation_key,
+    });
+    call.mockImplementation(async (operation) =>
+      operation === "management_state_get_v1"
+        ? {
+            items: [
+              {
+                exists: true,
+                entity: { type: "sessions", id: "replacement" },
+                state: "planned",
+                versions: [{ entity: { type: "sessions", id: "replacement" }, version: 1 }],
+                current: {
+                  operation: "replacement_session_create_v1",
+                  values: { replaces_id: source.id, interval },
+                },
+              },
+            ],
+            next_cursor: null,
+          }
+        : {
+            ...source,
+            id: "replacement",
+            state: "planned",
+            ...interval,
+            version: 1,
+            capacity: { total: 12, held: 0, remaining: 12 },
+          },
+    );
+    await readScheduleResult(value, "replacement");
+    expect(
+      call.mock.calls.filter(([operation]) => operation === "replacement_session_create_v1"),
+    ).toHaveLength(0);
+  });
   it.each(["expired", "blocked"])(
     "rejects an %s preview before creating a write intent",
     (condition) => {

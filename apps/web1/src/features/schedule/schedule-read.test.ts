@@ -3,9 +3,55 @@ import type { CalendarItem, SessionView } from "../../lib/api-contracts/generate
 import { BackendError } from "../../lib/backend";
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: vi.fn(async () => ({ call })) }));
-import { readScheduleEditor, readScheduleRange } from "./schedule-read";
+import { readScheduleEditor, readScheduleRange, readScheduleReplacements } from "./schedule-read";
 
 const scope = { accountId: "fixture-account", orgId: "fixture-org", centerId: "fixture-center" };
+it("reads a durable replacement relation through its source selector and rejects a different source", async () => {
+  const row = {
+    exists: true,
+    entity: { type: "sessions", id: "replacement" },
+    state: "planned",
+    versions: [{ entity: { type: "sessions", id: "replacement" }, version: 4 }],
+    current: {
+      operation: "replacement_session_create_v1",
+      values: {
+        replaces_id: "source",
+        interval: { starts_at: "2026-11-18T10:00:00Z", ends_at: "2026-11-18T11:00:00Z" },
+      },
+    },
+  };
+  call.mockResolvedValueOnce({ items: [row], next_cursor: null });
+  expect(await readScheduleReplacements(scope, "source")).toEqual([
+    { id: "replacement", version: 4, state: "planned", interval: row.current.values.interval },
+  ]);
+  expect(call).toHaveBeenLastCalledWith(
+    "management_state_get_v1",
+    expect.objectContaining({
+      operation: "replacement_session_create_v1",
+      selector: { operation: "replacement_session_create_v1", key: { replaces_id: "source" } },
+    }),
+  );
+  call.mockResolvedValueOnce({
+    items: [
+      {
+        ...row,
+        current: { ...row.current, values: { ...row.current.values, replaces_id: "other" } },
+      },
+    ],
+    next_cursor: null,
+  });
+  await expect(readScheduleReplacements(scope, "source")).rejects.toThrow(
+    "SCHEDULE_REPLACEMENT_UNAVAILABLE",
+  );
+});
+it("accepts a real empty replacement page but rejects a repeated relationship cursor", async () => {
+  call.mockResolvedValueOnce({ items: [], next_cursor: null });
+  expect(await readScheduleReplacements(scope, "source")).toEqual([]);
+  call.mockResolvedValue({ items: [], next_cursor: "again" });
+  await expect(readScheduleReplacements(scope, "source")).rejects.toThrow(
+    "SCHEDULE_CURSOR_UNAVAILABLE",
+  );
+});
 const interval = { starts_at: "2026-11-15T00:00:00Z", ends_at: "2026-11-16T00:00:00Z" };
 const item = (id: string, type: CalendarItem["type"] = "event"): CalendarItem => ({
   id,

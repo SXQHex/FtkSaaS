@@ -43,6 +43,8 @@ import {
 } from "./schedule-command";
 import { scheduleInterval, ScheduleTimeError, type ScheduleOffsetRequest } from "./schedule-time";
 import { useScheduleCommand } from "./use-schedule-command";
+import { ScheduleRoster } from "./schedule-roster";
+import { ScheduleReplacements } from "./schedule-replacements";
 
 type Sources = Awaited<ReturnType<typeof readScheduleSources>>;
 type Editor = Awaited<ReturnType<typeof readScheduleEditor>>;
@@ -92,6 +94,7 @@ export function ScheduleContent({
     [changeScope, setChangeScope] = useState<"single" | "this_and_future">("single"),
     [reason, setReason] = useState("");
   const [discard, setDiscard] = useState(false);
+  const [rosterLocked, setRosterLocked] = useState(false);
   const afterDiscard = useRef<(() => void) | undefined>(undefined);
   const reading = useRef(false),
     mounted = useRef(true),
@@ -102,37 +105,48 @@ export function ScheduleContent({
       mounted.current = false;
     };
   }, []);
-  function accessLost(failure: unknown, preserveQuery?: readonly unknown[]) {
-    const code =
-      failure instanceof BackendError
-        ? failure.code
-        : failure instanceof Error
-          ? failure.message
-          : undefined;
-    if (
-      !code ||
-      !["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED", "FORBIDDEN"].includes(code)
-    )
-      return false;
-    lost.current = true;
-    setSelected(undefined);
-    setSessionDraft(undefined);
-    setInitialDraft(undefined);
-    setCreateSource(undefined);
-    setCreateOpen(false);
-    setReview(undefined);
-    setDrafts({});
-    setNotice(undefined);
-    setError(undefined);
-    for (const key of ["schedule-sources", "schedule-range"])
-      queries.removeQueries({
-        queryKey: [key, scope.accountId, scope.orgId, scope.centerId],
-        predicate: (q) =>
-          !preserveQuery || JSON.stringify(q.queryKey) !== JSON.stringify(preserveQuery),
-      });
-    void router.invalidate();
-    return true;
-  }
+  const accessLost = useCallback(
+    (failure: unknown, preserveQuery?: readonly unknown[]) => {
+      const code =
+        failure instanceof BackendError
+          ? failure.code
+          : failure instanceof Error
+            ? failure.message
+            : undefined;
+      if (
+        !code ||
+        !["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED", "FORBIDDEN"].includes(code)
+      )
+        return false;
+      lost.current = true;
+      setSelected(undefined);
+      setSessionDraft(undefined);
+      setInitialDraft(undefined);
+      setCreateSource(undefined);
+      setCreateOpen(false);
+      setReview(undefined);
+      setDrafts({});
+      setNotice(undefined);
+      setError(undefined);
+      for (const key of [
+        "schedule-sources",
+        "schedule-range",
+        "schedule-group",
+        "schedule-group-people",
+        "schedule-group-rights",
+        "schedule-group-sessions",
+        "schedule-replacements",
+      ])
+        queries.removeQueries({
+          queryKey: [key, scope.accountId, scope.orgId, scope.centerId],
+          predicate: (q) =>
+            !preserveQuery || JSON.stringify(q.queryKey) !== JSON.stringify(preserveQuery),
+        });
+      void router.invalidate();
+      return true;
+    },
+    [queries, router, scope.accountId, scope.orgId, scope.centerId],
+  );
   const sources = useQuery({
     queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
     queryFn: async ({ queryKey }) => {
@@ -174,6 +188,16 @@ export function ScheduleContent({
   const command = useScheduleCommand({
     onAccessLost: accessLost,
     onRefresh: async (intent) => {
+      if (intent.operation === "replacement_session_create_v1")
+        await queries.invalidateQueries({
+          queryKey: [
+            "schedule-replacements",
+            scope.accountId,
+            scope.orgId,
+            scope.centerId,
+            intent.request.replaces_id,
+          ],
+        });
       const result = await calendar.refetch();
       if (result.error) throw result.error;
       if (intent.operation === "session_create_v1" || intent.operation === "program_apply_v1")
@@ -224,7 +248,7 @@ export function ScheduleContent({
       setError(undefined);
     },
   });
-  const locked = busy || command.locked;
+  const locked = busy || command.locked || rosterLocked;
   const dirty = Object.keys(drafts).length > 0;
   const blocker = useBlocker({
     shouldBlockFn: () => !lost.current && dirty && !command.locked,
@@ -728,11 +752,9 @@ export function ScheduleContent({
                 ? t(($) => $.schedule.sessionStates.cancelled)
                 : null,
               message ??
-                (mode === "roster"
-                  ? t(($) => $.schedule.rosterUnavailable)
-                  : !selected.resources && mode !== "cancel"
-                    ? t(($) => $.schedule.editorUnavailable)
-                    : null),
+                (!selected.resources && mode !== "cancel" && mode !== "roster"
+                  ? t(($) => $.schedule.editorUnavailable)
+                  : null),
             ]
               .filter(Boolean)
               .join(" · ") || undefined
@@ -740,6 +762,39 @@ export function ScheduleContent({
           error={previewError}
           canFuture
           canEdit={Boolean(selected.resources)}
+          canRoster={Boolean(selected.session.class_id && range)}
+          historyContent={
+            selected.session.state === "cancelled" &&
+            sources.data && (
+              <ScheduleReplacements
+                scope={scope}
+                sessionId={selected.session.id}
+                timezone={sources.data.center.timezone}
+                onAccessLost={accessLost}
+              />
+            )
+          }
+          rosterContent={
+            selected.session.class_id &&
+            range &&
+            sources.data && (
+              <ScheduleRoster
+                key={`${selected.session.id}:${range.starts_at}:${range.ends_at}:${mode === "roster"}`}
+                scope={scope}
+                classId={selected.session.class_id}
+                interval={range}
+                timezone={sources.data.center.timezone}
+                editing={mode === "roster"}
+                onLockChange={setRosterLocked}
+                onAccessLost={accessLost}
+                onRefresh={async () => {
+                  await calendar.refetch({ throwOnError: true });
+                  const fresh = await readScheduleEditor(scope, selected.session.id);
+                  if (mounted.current) setSelected(fresh);
+                }}
+              />
+            )
+          }
           cancelled={selected.session.state === "cancelled"}
           onClose={() => {
             if (!locked) {

@@ -1248,6 +1248,7 @@ export default interface Resources {
       "minutes": "Dakika",
       "newInstructor": "Yeni eğitmen",
       "next": "Sonraki dönem",
+      "noReplacements": "Bu seansa bağlı telafi kaydı yok.",
       "note": "Not (isteğe bağlı)",
       "noteUnavailable": "Ek not için ayrı bir native kayıt alanı yoktur; işlem açıklamasını gerekçeye yaz.",
       "notificationUnavailable": "Bildirim tercihi bu işlemde değiştirilemiyor.",
@@ -1279,6 +1280,7 @@ export default interface Resources {
       "rejected": "İşlem reddedildi. Güncel kaynağı okuyup yeniden incele.",
       "replacementAction": "Telafi seansını ayrıca oluştur",
       "replacementHint": "İptal işlemi telafi oluşturmaz. İptal doğrulandıktan sonra telafi için ayrı açık onay gerekir.",
+      "replacementHistory": "Bağlı telafi seansları",
       "resultingSessions": "Oluşacak seanslar",
       "retryWrite": "Aynı isteği yeniden dene",
       "reviewChanges": "Değişiklikleri önizle",
@@ -1330,6 +1332,29 @@ export default interface Resources {
       "weeks": "Hafta",
       "whichDays": "Hangi günler",
       "writeUnknown": "İşlem sonucu bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku."
+    },
+    "scheduleRoster": {
+      "accepted": "Bu kişi, satış kaynağı ve somut ders için öncelikli rezervasyon oluşturmayı onaylıyorum.",
+      "newAction": "Yeni açık işlem",
+      "readError": "Grup kaynakları okunamadı. Güncel bilgileri yeniden yükle.",
+      "remove": "Bu dersten çıkar",
+      "removeLabel": "Bu dersten çıkar — {{name}} — {{date}}",
+      "review": "Seçilen dersi ve kaynağı incele",
+      "sale": "Öncelikli satış kaynağı",
+      "scope": "{{interval}} · {{timezone}}. Bu aralıkta oluşmuş derslerin öncelikli rezervasyonları gösterilir. Gelecek programlara otomatik kayıt yapılmaz.",
+      "search": "Kişileri ara",
+      "searchHint": "Seçili merkezdeki aktif öğrenciler sunucuda aranır; seçim otomatik yapılmaz.",
+      "session": "Oluşmuş ders",
+      "states": {
+        "pending": "İşlem tamamlanmadı. Yeni kayıt göndermeden güncel sonucu oku.",
+        "ready": "",
+        "rejected": "İşlem reddedildi. Güncel kaynağı ve gösterilen izin/plan/hak koşullarını kontrol et.",
+        "saved": "Öncelikli rezervasyon, güncel haklar ve ders okundu.",
+        "saved-unread": "Kayıt alındı; güncel rezervasyon, hak ve ders henüz okunamadı. Yazıyı tekrar göndermeden yeniden oku.",
+        "stale": "Kaynak değişti. Güncel veriyi yeniden oku ve yeni onay ver.",
+        "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+        "writing": "Rezervasyon kaydediliyor…"
+      }
     },
     "security": {
       "cancel": "Vazgeç",

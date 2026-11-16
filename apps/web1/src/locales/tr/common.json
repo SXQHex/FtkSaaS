@@ -1341,7 +1341,9 @@
       "entitlement": "Hak veya kredi koşulu bu işleme izin vermiyor."
     },
     "noteUnavailable": "Ek not için ayrı bir native kayıt alanı yoktur; işlem açıklamasını gerekçeye yaz.",
-    "receiptPending": "İşlemin güncel durumunu oku. Yeni bir yazı gönderilmez."
+    "receiptPending": "İşlemin güncel durumunu oku. Yeni bir yazı gönderilmez.",
+    "replacementHistory": "Bağlı telafi seansları",
+    "noReplacements": "Bu seansa bağlı telafi kaydı yok."
   },
   "settings": {
     "title": "Ayarlar",
@@ -2236,5 +2238,28 @@
     "cancelStale": "Rezervasyon değişti. Güncel kaydı yeniden oku ve tekrar onayla.",
     "cancelRejected": "Rezervasyon iptal edilemedi. Güncel kaydı ve iptal koşullarını kontrol et.",
     "cancelReload": "İptal bilgisini yeniden oku"
+  },
+  "scheduleRoster": {
+    "scope": "{{interval}} · {{timezone}}. Bu aralıkta oluşmuş derslerin öncelikli rezervasyonları gösterilir. Gelecek programlara otomatik kayıt yapılmaz.",
+    "readError": "Grup kaynakları okunamadı. Güncel bilgileri yeniden yükle.",
+    "remove": "Bu dersten çıkar",
+    "removeLabel": "Bu dersten çıkar — {{name}} — {{date}}",
+    "search": "Kişileri ara",
+    "searchHint": "Seçili merkezdeki aktif öğrenciler sunucuda aranır; seçim otomatik yapılmaz.",
+    "sale": "Öncelikli satış kaynağı",
+    "session": "Oluşmuş ders",
+    "review": "Seçilen dersi ve kaynağı incele",
+    "accepted": "Bu kişi, satış kaynağı ve somut ders için öncelikli rezervasyon oluşturmayı onaylıyorum.",
+    "newAction": "Yeni açık işlem",
+    "states": {
+      "ready": "",
+      "writing": "Rezervasyon kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+      "pending": "İşlem tamamlanmadı. Yeni kayıt göndermeden güncel sonucu oku.",
+      "saved-unread": "Kayıt alındı; güncel rezervasyon, hak ve ders henüz okunamadı. Yazıyı tekrar göndermeden yeniden oku.",
+      "saved": "Öncelikli rezervasyon, güncel haklar ve ders okundu.",
+      "stale": "Kaynak değişti. Güncel veriyi yeniden oku ve yeni onay ver.",
+      "rejected": "İşlem reddedildi. Güncel kaynağı ve gösterilen izin/plan/hak koşullarını kontrol et."
+    }
   }
 }

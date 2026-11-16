@@ -11,7 +11,7 @@ import type {
 } from "../../lib/api-contracts/generated";
 import type { ScheduleCreateDraft } from "./schedule-create-sheet";
 import type { readScheduleSources } from "./schedule-read";
-import { readScheduleSession } from "./schedule-read";
+import { readScheduleSession, readScheduleReplacements } from "./schedule-read";
 import { programOffsetChoices, scheduleInterval } from "./schedule-time";
 
 type Sources = Awaited<ReturnType<typeof readScheduleSources>>;
@@ -335,6 +335,11 @@ export async function readScheduleResult(intent: ScheduleIntent, primaryId?: str
   ) {
     if (!primaryId) throw new Error("SCHEDULE_REREAD_UNAVAILABLE");
     expected.push({ id: primaryId, interval: intent.request.interval, state: "planned" });
+  }
+  if (intent.operation === "replacement_session_create_v1") {
+    const replacements = await readScheduleReplacements(intent.scope, intent.request.replaces_id);
+    if (!replacements.some((row) => row.id === primaryId))
+      throw new Error("SCHEDULE_REREAD_UNAVAILABLE");
   }
   for (let index = 0; index < expected.length; index += 4)
     await Promise.all(
