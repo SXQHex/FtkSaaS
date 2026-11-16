@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı. Açık talepler W1-BE-17–23’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı. Açık talepler W1-BE-17–24’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `1df2e01c40fd625b0def974fe3347da65032fcfd` (PR315 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721918), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721867) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43863802374) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -29,6 +29,7 @@
 | W1-BE-21 | E29 · P09/P11.1 | Öğrencinin kendi merkezindeki bekleme/teklif keşfi | Açık: bilinen seans veya kayıt gerektirmeyen özne keşfi isteniyor. |
 | W1-BE-22 | E30 · P07/P08/P11.1 | Satın alınan paket bilgisi ve ödeme para birimi keşfi | Açık: hak/hareket ve açık borç özeti mevcut; kalan eşleme isteniyor. |
 | W1-BE-23 | E32 · P05 | Kendi hesabının gerekli belgelerini gerçek işlem bağlamlarıyla keşfetme | Açık: mevcut requirements okuyucusu önceden bilinen satış/rezervasyon bağlamı istiyor. |
+| W1-BE-24 | E33 · P12 | CRM özet/filtre, merkez takipleri, sorumlu ve geçmiş deneme teklifi keşfi | Açık: mevcut okuyucuların güvenli typed eşlemesi veya eksik keşif desteği isteniyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -226,3 +227,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** E32 Belgeler kartı için kendi canlı hesap/merkez kapsamındaki gerekli belgeleri, kabul durumunu ve gerçek işlem bağlamlarını keşfeden güvenli typed eşlemeyi belirtin; yoksa bu keşif desteği gerekir. Her satır mevcut okuma/kabul akışına doğru gate, subject ve varsa purchase_preview/rendered-document bağını taşımalı. Yeni endpoint zorunlu tutulmaz.
 
 **Sınır:** Kişi/satış/rezervasyon geçmişinin tamamını taramak, sahte genel subject üretmek veya tek kabulü başka işlem bağlamlarına taşımak istenmiyor. Belge içeriği, sürümü, snapshot/hash ve native kabul yetkileri korunmalı. Native hesap kimliği veya token açılmamalı. Bu işlev boşluğu CI kontrolü olarak Pro sonrasına ertelenmez; ekran durumu TODO/E32 sahibindedir.
+
+## W1-BE-24 · Aday panosunun güvenli keşif okumaları
+
+**Mevcut kaynak:** `leads_list_v1(include_pipeline:true)` cursor/query ve gerçek aşama kataloğunu verir; aşama/sorumlu filtresi ve merkez geneli açık/bugün/gecikmiş/son30gün dönüşüm özeti taşımaz. `crm_activity_save_v1` yönetim selector’ı önceden bilinen lead_id/person_id ister. `crm_followup_list_v1` türleri renewal_due/inactive_student/automation_followup’tır; bütün manuel aday takiplerinin merkez listesini doğrudan eşlemiyor. `trial_offer_create_v1` selector’ı lead yanında product_version_id (ve varsa session_id), onay selector’ı bilinen offer_id ister; adayın geçmiş tekliflerini keşfetmek için yeterli değildir.
+
+**İhtiyaç:** Var olan güvenli typed eşlemeyi belirtin; yoksa yetkili merkez/atanmış personel sınırını koruyan (1) cursor’a dahil aşama/sorumlu filtresi ve çizimdeki özetler, (2) manuel aday takiplerini durum/tarih/sorumlu ile keşfetme, (3) atanabilir CRM sorumlularının güvenli ad/kişi referansı kataloğu, (4) seçili adayın geçmiş deneme teklifleri, kabul/kayıt durumu, denemeye uygun yapılandırılmış ürün sürümleri ve geçerli native onay koşullarını keşfetme desteği gerekir. `products_list_v1` genel ürün sürümlerini verir; hangi sürümün etkin native deneme konfigürasyonuna sahip olduğunu taşımaz. Yeni endpoint zorunlu tutulmaz.
+
+**Sınır:** Bütün aday/kişi/satış/geçmişi taranmaz; görünen cursor sayfası merkez toplamı veya tam filtre sonucu diye sunulmaz. Native hesap kimliği/token, yetkisiz personel veya private/core kaynak açılmaz. Aşama, base lead state, faaliyet, deneme kaydı ve öğrencilik dönüşümü ayrı kalır; teklif şartı/indirim/kabul veya otomatik davet uydurulmaz. Temel aday oluşturma/düzenleme, aşama ve bilinen adaya faaliyet gibi bağımsız dilimler mevcut native yollarla sürdürülecek.
