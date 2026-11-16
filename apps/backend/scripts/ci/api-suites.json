@@ -282,7 +282,7 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "f87c9b3de2f84f9734cc1cb4a760e3cbf101df064c40a5606d457ecfccddacc3",
+      "sha256": "493dad7d0504dad1b4d2ebf5a5e4df40402e83696b9d04f84adb23a61292df0d",
       "shared": [
         [
           3,
@@ -366,6 +366,11 @@
           "line": 2,
           "path": "apps/backend/tests/earning-payment-selection-acceptance.mjs",
           "sha256": "52757597e4abd585ba24073e8316c83a91ef2a64f6c19d3847cd31fecfbc931a"
+        },
+        {
+          "line": 417,
+          "path": "apps/backend/tests/event-directory-finance-acceptance.mjs",
+          "sha256": "362c947d82b73b4c1e9e65364ebb5eb54bc4d26d9b86158387c7aacf8f68c3ef"
         }
       ],
       "estimated_seconds": 799.78

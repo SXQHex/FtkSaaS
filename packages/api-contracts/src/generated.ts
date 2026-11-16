@@ -1392,6 +1392,28 @@ preparation_id?: (string | null)
 export type EventRegistrationResult = (EventRegistered | EventCapacityClosed)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_list".
+ */
+export type RequestEventList = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+interval: Interval
+page: Page
+discipline_id?: (string | null)
+query?: string
+status?: ("all" | "published" | "draft" | "occurred" | "cancelled")
+include_summary?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_document_version_publish".
  */
 export type RequestDocumentVersionPublish = ({
@@ -4924,6 +4946,10 @@ MemberLessonReservation?: MemberLessonReservation
 MemberLessonOffer?: MemberLessonOffer
 MemberLessonWaitlist?: MemberLessonWaitlist
 MemberLessonDiscovery?: MemberLessonDiscovery
+EventRegistrationDebt?: EventRegistrationDebt
+EventRegistrationPaymentSummary?: EventRegistrationPaymentSummary
+EventPendingPayments?: EventPendingPayments
+EventDirectorySummary?: EventDirectorySummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8613,6 +8639,7 @@ duties?: EventDutyView[]
 actual_started_at?: (Instant | null)
 actual_start_history?: ActualStartHistoryItem[]
 shared_participants?: SharedLessonParticipant[]
+active_registration_count?: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8635,6 +8662,7 @@ participant_cancellation?: (ParticipantCancellationBasis | null)
 package_eligible?: (boolean | null)
 package_eligible_at_attendance?: (boolean | null)
 subscriber_number?: (SubscriberNumber | null)
+payment_summary?: EventRegistrationPaymentSummary
 }
 /**
  * Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it.
@@ -8647,6 +8675,40 @@ cancelled_at: Instant
 planned_starts_at: Instant
 phase: ("before_planned_start" | "at_or_after_planned_start")
 rule: "planned_start_v1"
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventRegistrationPaymentSummary".
+ */
+export interface EventRegistrationPaymentSummary {
+status: ("available" | "no_cash_due" | "restricted" | "missing")
+amount_minor: (Money | null)
+currency: (Currency | null)
+net_minor: (Money | null)
+paid_minor: (Money | null)
+remaining_minor: (Money | null)
+credited_minor: (Money | null)
+cancelled_minor: (Money | null)
+debts: EventRegistrationDebt[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventRegistrationDebt".
+ */
+export interface EventRegistrationDebt {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+preparation_id: (string | null)
+currency: Currency
+amount_minor: Money
+net_minor: Money
+paid_minor: Money
+remaining_minor: Money
+credited_minor: Money
+cancelled_minor: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9075,6 +9137,29 @@ export interface Page_EventView {
 items: EventView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+summary?: EventDirectorySummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventDirectorySummary".
+ */
+export interface EventDirectorySummary {
+published: Count
+draft: Count
+occurred: Count
+cancelled: Count
+published_active_registrations: Count
+unresolved_payment_registrations: Count
+pending_payments: EventPendingPayments[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventPendingPayments".
+ */
+export interface EventPendingPayments {
+currency: Currency
+remaining_minor: Money
+registration_count: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13931,25 +14016,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_event_list".
- */
-export interface RequestEventList {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-interval: Interval
-page: Page
-discipline_id?: (string | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_event_list".
  */
 export interface SuccessEventList {
@@ -18034,6 +18100,7 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 event_id: string
+include_payment_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
