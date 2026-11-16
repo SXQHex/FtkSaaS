@@ -3059,7 +3059,7 @@
     "profileDescription": "Hesap bilgilerini yalnızca sen düzenlersin. Telefon, doğrulanmamış iletişim bilgisidir.",
     "documentsTitle": "Belgeler",
     "documentsDescription": "Rezervasyon ve satın alma için kabul etmen gereken belgeler.",
-    "documentsUnavailable": "Hesap genelindeki belge listesi henüz kullanılamıyor. İşleme ait belgeler rezervasyon veya satın alma adımında sunulur.",
+    "documentsUnavailable": "Bu hesap için aktif işlem belgeleri okunamadı. Yeniden yükle.",
     "calendarTitle": "Takvimime ekle",
     "calendarDescription": "Rezervasyonların Google, Apple veya Outlook takviminde görünsün.",
     "calendarPrivacy": "Bağlantıyı bilen kişiler ders saatlerini görebilir. Bağlantını yalnızca güvendiğin takvim uygulamalarıyla paylaş.",
@@ -3117,7 +3117,8 @@
       "saved": "Tercih kaydedildi ve güncel durumu okundu.",
       "stale": "Tercih değişti. Güncel bilgileri yükleyip yeniden seç.",
       "rejected": "Tercih kaydedilemedi. Güncel bilgileri kontrol et."
-    }
+    },
+    "documentContextHint": "Her satır kendi aktif işlemine aittir. Bir işlemdeki kabul başka bir işlemin kabulü yerine geçmez."
   },
   "leads": {
     "title": "Adaylar",

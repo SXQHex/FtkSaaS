@@ -119,7 +119,11 @@ export function AccountPreferencesView({
         {rows.map((row) => (
           <Item key={row.id} role="listitem" size="xs">
             <ItemContent className="min-w-0 basis-40">
-              <ItemTitle id={`${id}-${row.id}`}>{t(($) => $.memberAccount[row.id])}</ItemTitle>
+              <ItemTitle>
+                <FieldLabel htmlFor={`${id}-${row.id}`}>
+                  {t(($) => $.memberAccount[row.id])}
+                </FieldLabel>
+              </ItemTitle>
               <ItemDescription id={`${id}-${row.id}-hint`}>
                 {t(($) => $.memberAccount[`${row.id}Hint`])}
                 {row.selected === undefined && <> {t(($) => $.memberAccount.unavailable)}</>}
@@ -127,7 +131,7 @@ export function AccountPreferencesView({
             </ItemContent>
             <ItemActions>
               <Switch
-                aria-labelledby={`${id}-${row.id}`}
+                id={`${id}-${row.id}`}
                 aria-describedby={`${id}-${row.id}-hint`}
                 isSelected={row.selected === true}
                 isDisabled={row.disabled || row.selected === undefined || !row.onChange}

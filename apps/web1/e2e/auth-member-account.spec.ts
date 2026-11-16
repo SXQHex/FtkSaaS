@@ -22,7 +22,10 @@ test("member account places five sections and saves native email reminder prefer
   ).toBeDisabled();
   const email = page.getByRole("switch", { name: "E-posta ile hatırlatmalar", exact: true });
   await expect(email).not.toBeChecked();
-  await email.press("Space");
+  await page
+    .locator("label")
+    .filter({ hasText: /^E-posta ile hatırlatmalar$/ })
+    .click();
   await expect(
     page.getByText("Tercih kaydedildi ve güncel durumu okundu.", { exact: true }),
   ).toBeVisible();

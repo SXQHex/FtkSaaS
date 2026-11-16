@@ -113,7 +113,7 @@ export function MemberDocumentsPanel({
             </Button>
           )}
           {selected && query.data?.find((row) => row.id === selected) && (
-            <DocumentEditor
+            <MemberDocumentEditor
               key={selected}
               binding={binding}
               before={query.data.find((row) => row.id === selected)!}
@@ -136,7 +136,7 @@ export function MemberDocumentsPanel({
     </Card>
   );
 }
-function DocumentEditor({
+export function MemberDocumentEditor({
   binding,
   before,
   disabled,

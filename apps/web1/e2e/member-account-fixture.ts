@@ -40,6 +40,10 @@ export async function mockMemberAccount(
           status: 403,
           json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
         });
+    if (operation === "member_document_contexts_get_v1")
+      return denied
+        ? reject()
+        : send({ items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
     if (operation === "calendar_links_get_v1") {
       expect(request.org_id).toBeUndefined();
       expect(request.center_id).toBeUndefined();

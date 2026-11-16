@@ -23,10 +23,11 @@ export function MemberAccountRoutePage() {
       active="account"
       onScope={onScope}
     >
-      {({ scope, onLockChange }) => (
+      {({ scope, personId, onLockChange }) => (
         <MemberAccountContent
           key={`${scope.orgId}:${scope.centerId}`}
           scope={scope}
+          personId={personId}
           onLockChange={onLockChange}
         />
       )}

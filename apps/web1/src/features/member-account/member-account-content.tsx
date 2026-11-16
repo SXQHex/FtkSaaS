@@ -5,23 +5,28 @@ import { ProfilePanel } from "../account/profile-panel";
 import { DeletionPreviewPanel } from "../account/deletion-preview-panel";
 import { MemberAccountView } from "./member-account-view";
 import { MemberCalendarPanel } from "./member-calendar-panel";
+import { MemberDocumentContextsPanel } from "./member-document-contexts-panel";
 import { MemberPreferencesPanel } from "./member-preferences-panel";
 export function MemberAccountContent({
   scope,
+  personId,
   onLockChange,
 }: {
   scope: ClientScope;
+  personId: string;
   onLockChange: (locked: boolean) => void;
 }) {
   const [profile, setProfile] = useState(false),
     [calendar, setCalendar] = useState(false),
     [preferences, setPreferences] = useState(false),
-    [deletion, setDeletion] = useState(false);
+    [deletion, setDeletion] = useState(false),
+    [documents, setDocuments] = useState(false);
   const profileLock = useCallback((value: boolean) => setProfile(value), []),
     calendarLock = useCallback((value: boolean) => setCalendar(value), []),
     preferencesLock = useCallback((value: boolean) => setPreferences(value), []),
+    documentsLock = useCallback((value: boolean) => setDocuments(value), []),
     deletionLock = useCallback((value: boolean) => setDeletion(value), []);
-  const locked = profile || calendar || preferences || deletion;
+  const locked = profile || calendar || preferences || deletion || documents;
   useBlocker({
     shouldBlockFn: () => profile || deletion,
     enableBeforeUnload: profile || deletion,
@@ -34,11 +39,19 @@ export function MemberAccountContent({
   return (
     <MemberAccountView
       navigationDisabled={locked}
+      documents={
+        <MemberDocumentContextsPanel
+          scope={scope}
+          personId={personId}
+          disabled={profile || calendar || preferences || deletion}
+          onLockChange={documentsLock}
+        />
+      }
       profile={
         <ProfilePanel
           accountId={scope.accountId}
           variant="member"
-          disabled={calendar || preferences || deletion}
+          disabled={calendar || preferences || deletion || documents}
           onLockChange={profileLock}
         />
       }
@@ -46,7 +59,7 @@ export function MemberAccountContent({
         <DeletionPreviewPanel
           accountId={scope.accountId}
           variant="member"
-          disabled={profile || calendar || preferences}
+          disabled={profile || calendar || preferences || documents}
           onLockChange={deletionLock}
         />
       }
@@ -54,14 +67,14 @@ export function MemberAccountContent({
         <MemberCalendarPanel
           scope={scope}
           onLockChange={calendarLock}
-          disabled={profile || preferences || deletion}
+          disabled={profile || preferences || deletion || documents}
         />
       }
       preferences={
         <MemberPreferencesPanel
           scope={scope}
           onLockChange={preferencesLock}
-          disabled={profile || calendar || deletion}
+          disabled={profile || calendar || deletion || documents}
         />
       }
     />
