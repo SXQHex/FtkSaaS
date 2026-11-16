@@ -16,24 +16,34 @@ export function MemberClassSheet({
   description,
   children,
   action,
+  locked = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description: string;
   children: ReactNode;
+  locked?: boolean;
   action?: { label: string; disabled: boolean; onPress: () => void };
 }) {
   const { t } = useTranslation();
   return (
-    <Sheet isOpen={open} onOpenChange={onOpenChange} showCloseButton={false}>
+    <Sheet
+      isOpen={open}
+      onOpenChange={(value) => {
+        if (!locked) onOpenChange(value);
+      }}
+      isDismissable={!locked}
+      isKeyboardDismissDisabled={locked}
+      showCloseButton={false}
+    >
       <SheetHeader>
         <SheetTitle>{title}</SheetTitle>
         <SheetDescription>{description}</SheetDescription>
       </SheetHeader>
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">{children}</div>
       <SheetFooter className="flex-wrap">
-        <SheetClose>{t(($) => $.memberClasses.cancel)}</SheetClose>
+        <SheetClose isDisabled={locked}>{t(($) => $.memberClasses.cancel)}</SheetClose>
         {action && (
           <Button isDisabled={action.disabled} onPress={action.onPress}>
             {action.label}

@@ -35,6 +35,7 @@ export function MemberClassesView({
   notes,
   policy,
   notice,
+  locked = false,
 }: {
   range: string;
   days: {
@@ -52,6 +53,7 @@ export function MemberClassesView({
   notes?: ReactNode;
   policy: ReactNode;
   notice?: ReactNode;
+  locked?: boolean;
 }) {
   const { t } = useTranslation();
   return (
@@ -68,13 +70,14 @@ export function MemberClassesView({
       {notice}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Button variant="outline" onPress={() => onWeek(0)}>
+          <Button variant="outline" isDisabled={locked} onPress={() => onWeek(0)}>
             {t(($) => $.memberClasses.thisWeek)}
           </Button>
           <Button
             variant="outline"
             size="icon"
             aria-label={t(($) => $.memberClasses.previousWeek)}
+            isDisabled={locked}
             onPress={() => onWeek(-1)}
           >
             <ChevronLeftIcon aria-hidden="true" />
@@ -83,6 +86,7 @@ export function MemberClassesView({
             variant="outline"
             size="icon"
             aria-label={t(($) => $.memberClasses.nextWeek)}
+            isDisabled={locked}
             onPress={() => onWeek(1)}
           >
             <ChevronRightIcon aria-hidden="true" />
@@ -91,6 +95,7 @@ export function MemberClassesView({
         <strong className="text-sm tabular-nums">{range}</strong>
       </div>
       <ToggleGroup
+        isDisabled={locked}
         aria-label={t(($) => $.memberClasses.chooseDay)}
         selectionMode="single"
         disallowEmptySelection

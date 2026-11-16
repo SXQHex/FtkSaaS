@@ -25,7 +25,7 @@
 | W1-BE-17 | E21 · P06.5/WF06          | Özel ders taleplerinin native durum filtresi ve merkez sayaçları                 | PR316 main/development teslimi doğrulandı; frontend tüketimi ve yerel kabulü TODO/E21’de tamamlandı.                                                                                |
 | W1-BE-18 | E24–E26 · P11.2/WF03/WF07 | Atanmış seansın eğitmene görünür salon etiketi                                   | Backend karşılandı (PR317): opt-in room_labels yalnız canlı atanmış seanslarda; tüketici kabulü TODO/E24–E26 sahibinde. |
 | W1-BE-19 | E27 · P10/P11.2 | Kendi geçerli anlaşma/ödeme keşfi ve dönem toplamları | PR318 çekirdeği karşılandı; tüketimi sürüyor. Tüm dönem seans satırları için aralıksız okuma eşlemesi açık. |
-| W1-BE-20 | E28/E29 · P09/P11.1 | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası | Backend karşılandı (PR318): opt-in öğrenci grup/özel ders keşfi; E28/E29 tüketimi bekliyor. |
+| W1-BE-20 | E28/E29 · P09/P11.1 | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası | Backend karşılandı (PR318): E28 native keşif/politika tüketiliyor; E29 uyarlaması sırada. |
 | W1-BE-21 | E29 · P09/P11.1 | Öğrencinin kendi merkezindeki bekleme/teklif keşfi | Açık: bilinen seans veya kayıt gerektirmeyen özne keşfi isteniyor. |
 | W1-BE-22 | E30 · P07/P08/P11.1 | Satın alınan paket bilgisi ve ödeme para birimi keşfi | Açık: hak/hareket ve açık borç özeti mevcut; kalan eşleme isteniyor. |
 | W1-BE-23 | E32 · P05 | Kendi hesabının gerekli belgelerini gerçek işlem bağlamlarıyla keşfetme | Açık: mevcut requirements okuyucusu önceden bilinen satış/rezervasyon bağlamı istiyor. |
@@ -206,7 +206,7 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 
 ## W1-BE-20 · Öğrencinin rezervasyon yapabileceği ders keşfi
 
-**Durum:** Backend karşılandı: PR318 main’de. Kaynak/CI/development üst kayıtta doğrulandı; E28/E29 tüketimi henüz tamamlanmadı.
+**Durum:** Backend karşılandı: PR318 main’de. Kaynak/CI/development üst kayıtta doğrulandı; E28 native keşif/politika tüketimi bağlı ve otomatik çekirdek kabulü geçti. E28’in kalan frontend belge kabulü ve E29 uyarlamasının sahibi TODO’dur.
 
 **Backend kaynak karşılığı:** `calendar_get_v1(member_discovery:true)` seçili merkez ve aralıkta native aktif öğrencinin görünür grup/özel derslerini cursor ile keşfeder. `member_lesson` güvenli etiketler, gerçek seans/sürüm/kapasite, kayıt penceresi, güncel iptal koşulu ve kendi mevcut rezervasyonuna sabit koşulu ayrı verir. Kapasite/hak/belge ve canlı plan/merkez/sınıf sınırları writer’da yeniden denetlenir; discovery rezervasyon garantisi değildir. Kesin tüketim [WF06](../../../docs/workflows.md#wf06), backend değerlendirmesi [XREQ-054](../../../docs/requests.md#xreq-054) sahibindedir. Bu seansa bağlı kendi waitlist/offer bilgisi W1-BE-21’in merkez genelinde bilinmeyen kayıt keşfi yerine geçmez. Frontend kabulünün sahibi [TODO/E28–E29](todo.md#sayfa-kabulu).
 

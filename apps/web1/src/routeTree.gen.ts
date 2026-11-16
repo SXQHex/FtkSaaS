@@ -26,6 +26,7 @@ import { Route as InstructorScheduleRouteImport } from './routes/instructor.sche
 import { Route as InstructorTodayRouteImport } from './routes/instructor.today'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
 import { Route as MemberAccountRouteImport } from './routes/member.account'
+import { Route as MemberClassesRouteImport } from './routes/member.classes'
 import { Route as MemberEntitlementsRouteImport } from './routes/member.entitlements'
 import { Route as MemberPrivateLessonsRouteImport } from './routes/member.private-lessons'
 import { Route as MemberReservationsRouteImport } from './routes/member.reservations'
@@ -131,6 +132,11 @@ const InviteExpiredRoute = InviteExpiredRouteImport.update({
 const MemberAccountRoute = MemberAccountRouteImport.update({
   id: '/member/account',
   path: '/member/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemberClassesRoute = MemberClassesRouteImport.update({
+  id: '/member/classes',
+  path: '/member/classes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MemberEntitlementsRoute = MemberEntitlementsRouteImport.update({
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
   '/member/account': typeof MemberAccountRoute
+  '/member/classes': typeof MemberClassesRoute
   '/member/entitlements': typeof MemberEntitlementsRoute
   '/member/private-lessons': typeof MemberPrivateLessonsRoute
   '/member/reservations': typeof MemberReservationsRoute
@@ -303,6 +310,7 @@ export interface FileRoutesByTo {
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
   '/member/account': typeof MemberAccountRoute
+  '/member/classes': typeof MemberClassesRoute
   '/member/entitlements': typeof MemberEntitlementsRoute
   '/member/private-lessons': typeof MemberPrivateLessonsRoute
   '/member/reservations': typeof MemberReservationsRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/instructor/today': typeof InstructorTodayRoute
   '/invite_/expired': typeof InviteExpiredRoute
   '/member/account': typeof MemberAccountRoute
+  '/member/classes': typeof MemberClassesRoute
   '/member/entitlements': typeof MemberEntitlementsRoute
   '/member/private-lessons': typeof MemberPrivateLessonsRoute
   '/member/reservations': typeof MemberReservationsRoute
@@ -386,6 +395,7 @@ export interface FileRouteTypes {
     | '/instructor/today'
     | '/invite/expired'
     | '/member/account'
+    | '/member/classes'
     | '/member/entitlements'
     | '/member/private-lessons'
     | '/member/reservations'
@@ -426,6 +436,7 @@ export interface FileRouteTypes {
     | '/instructor/today'
     | '/invite/expired'
     | '/member/account'
+    | '/member/classes'
     | '/member/entitlements'
     | '/member/private-lessons'
     | '/member/reservations'
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/instructor/today'
     | '/invite_/expired'
     | '/member/account'
+    | '/member/classes'
     | '/member/entitlements'
     | '/member/private-lessons'
     | '/member/reservations'
@@ -507,6 +519,7 @@ export interface RootRouteChildren {
   InstructorTodayRoute: typeof InstructorTodayRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
   MemberAccountRoute: typeof MemberAccountRoute
+  MemberClassesRoute: typeof MemberClassesRoute
   MemberEntitlementsRoute: typeof MemberEntitlementsRoute
   MemberPrivateLessonsRoute: typeof MemberPrivateLessonsRoute
   MemberReservationsRoute: typeof MemberReservationsRoute
@@ -649,6 +662,13 @@ declare module '@tanstack/react-router' {
       path: '/member/account'
       fullPath: '/member/account'
       preLoaderRoute: typeof MemberAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member/classes': {
+      id: '/member/classes'
+      path: '/member/classes'
+      fullPath: '/member/classes'
+      preLoaderRoute: typeof MemberClassesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/member/entitlements': {
@@ -819,6 +839,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstructorTodayRoute: InstructorTodayRoute,
   InviteExpiredRoute: InviteExpiredRoute,
   MemberAccountRoute: MemberAccountRoute,
+  MemberClassesRoute: MemberClassesRoute,
   MemberEntitlementsRoute: MemberEntitlementsRoute,
   MemberPrivateLessonsRoute: MemberPrivateLessonsRoute,
   MemberReservationsRoute: MemberReservationsRoute,
