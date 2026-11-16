@@ -2652,5 +2652,71 @@
     "reload": "Listeyi yeniden oku",
     "previous": "Önceki",
     "next": "Sonraki"
+  },
+  "instructorToday": {
+    "title": "Bugün",
+    "schedule": "Haftalık programım",
+    "metrics": {
+      "today": "Bugün",
+      "pending": "Yoklama bekleyen",
+      "week": "Bu hafta"
+    },
+    "sections": {
+      "today": "Bugünkü seanslarım",
+      "next": "Bu hafta, sonraki seanslar"
+    },
+    "unread": "Güncel atanmış seanslar okunamadı.",
+    "empty": {
+      "today": "Bugün seansın yok.",
+      "next": "Bu hafta başka seansın yok."
+    },
+    "privacy": "Eğitmen görünümünde üyelerin iletişim, ödeme ve paket bilgileri gösterilmez. Seans ve izinli yoklama kapsamı korunur.",
+    "openSession": "{{action}} · {{time}} · {{title}}",
+    "attendanceHint": "Seansı açarak güncel yoklama durumunu ve izinli işlemleri incele.",
+    "unknown": "Okunamadı",
+    "earnings": "{{month}} hakedişim",
+    "earningsHint": "Bu ay kaydedilen net hakedişler",
+    "sessions": "{{count}} seans",
+    "minutes": "{{count}} dk",
+    "hours": "{{hours}} saat",
+    "timezone": "Merkez saati: {{timezone}}",
+    "open": "Aç",
+    "attendance": "Yoklama",
+    "view": "Görüntüle",
+    "states": {
+      "planned": "Planlandı",
+      "started": "Yoklama açık",
+      "closed": "Yoklama kapandı",
+      "cancelled": "İptal edildi",
+      "pending": "Yoklama bekliyor"
+    },
+    "pendingHint": "Seansı aç ve işaretle",
+    "nonePending": "Bekleyen yok",
+    "chooseScope": "Organizasyon ve merkez seç.",
+    "unavailable": "Bu merkezde bağlı eğitmen kapsamı bulunmuyor.",
+    "retry": "Yeniden oku",
+    "restricted": "Bu bilgiyi görme yetkisi yok.",
+    "notEnabled": "Bu bilgi mevcut planda kullanılamıyor.",
+    "members": "{{count}} ayrılmış yer",
+    "noEarnings": "Henüz hakediş yok",
+    "openAttendanceCount": "Bugünün iptal edilmemiş, kapanmamış yoklamaları",
+    "roomUnread": "Salon bilgisi okunamadı",
+    "attendanceUnread": "Yoklama okunamadı",
+    "minutes_one": "{{count}} dk",
+    "minutes_other": "{{count}} dk",
+    "members_one": "{{count}} ayrılmış yer",
+    "members_other": "{{count}} ayrılmış yer",
+    "sessions_one": "{{count}} seans",
+    "sessions_other": "{{count}} seans"
+  },
+  "instructorSchedule": {
+    "title": "Programım",
+    "description": "Yalnızca sana atanmış seanslar. Program değişikliğini yönetici yapar.",
+    "thisWeek": "Bu hafta",
+    "previous": "Önceki hafta",
+    "next": "Sonraki hafta",
+    "loading": "Atanmış program okunuyor…",
+    "empty": "Bu hafta atanmış seansın yok.",
+    "region": "Atanmış haftalık program"
   }
 }

@@ -544,6 +544,66 @@ export default interface Resources {
       "unlinkTitle": "Google bağlantısını kaldır",
       "unlinked": "Bağlı değil"
     },
+    "instructorSchedule": {
+      "description": "Yalnızca sana atanmış seanslar. Program değişikliğini yönetici yapar.",
+      "empty": "Bu hafta atanmış seansın yok.",
+      "loading": "Atanmış program okunuyor…",
+      "next": "Sonraki hafta",
+      "previous": "Önceki hafta",
+      "region": "Atanmış haftalık program",
+      "thisWeek": "Bu hafta",
+      "title": "Programım"
+    },
+    "instructorToday": {
+      "attendance": "Yoklama",
+      "attendanceHint": "Seansı açarak güncel yoklama durumunu ve izinli işlemleri incele.",
+      "attendanceUnread": "Yoklama okunamadı",
+      "chooseScope": "Organizasyon ve merkez seç.",
+      "earnings": "{{month}} hakedişim",
+      "earningsHint": "Bu ay kaydedilen net hakedişler",
+      "empty": {
+        "next": "Bu hafta başka seansın yok.",
+        "today": "Bugün seansın yok."
+      },
+      "hours": "{{hours}} saat",
+      "members": "{{count}} ayrılmış yer" | "{{count}} ayrılmış yer" | "{{count}} ayrılmış yer",
+      "metrics": {
+        "pending": "Yoklama bekleyen",
+        "today": "Bugün",
+        "week": "Bu hafta"
+      },
+      "minutes": "{{count}} dk" | "{{count}} dk" | "{{count}} dk",
+      "noEarnings": "Henüz hakediş yok",
+      "nonePending": "Bekleyen yok",
+      "notEnabled": "Bu bilgi mevcut planda kullanılamıyor.",
+      "open": "Aç",
+      "openAttendanceCount": "Bugünün iptal edilmemiş, kapanmamış yoklamaları",
+      "openSession": "{{action}} · {{time}} · {{title}}",
+      "pendingHint": "Seansı aç ve işaretle",
+      "privacy": "Eğitmen görünümünde üyelerin iletişim, ödeme ve paket bilgileri gösterilmez. Seans ve izinli yoklama kapsamı korunur.",
+      "restricted": "Bu bilgiyi görme yetkisi yok.",
+      "retry": "Yeniden oku",
+      "roomUnread": "Salon bilgisi okunamadı",
+      "schedule": "Haftalık programım",
+      "sections": {
+        "next": "Bu hafta, sonraki seanslar",
+        "today": "Bugünkü seanslarım"
+      },
+      "sessions": "{{count}} seans" | "{{count}} seans" | "{{count}} seans",
+      "states": {
+        "cancelled": "İptal edildi",
+        "closed": "Yoklama kapandı",
+        "pending": "Yoklama bekliyor",
+        "planned": "Planlandı",
+        "started": "Yoklama açık"
+      },
+      "timezone": "Merkez saati: {{timezone}}",
+      "title": "Bugün",
+      "unavailable": "Bu merkezde bağlı eğitmen kapsamı bulunmuyor.",
+      "unknown": "Okunamadı",
+      "unread": "Güncel atanmış seanslar okunamadı.",
+      "view": "Görüntüle"
+    },
     "invitation": {
       "accept": "Daveti kabul et",
       "accepted": "Davet kabul edildi. Hesap ve stüdyo erişimin güncellendi.",

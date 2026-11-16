@@ -114,7 +114,11 @@ export function WorkspaceLayout({
   if (instructor) modes.push("instructor");
   if (!modes.length) modes.push("account");
   const mode =
-    preferredView && modes.includes(preferredView) ? preferredView : (modes[0] ?? "account");
+    preferredView && modes.includes(preferredView)
+      ? preferredView
+      : pathname.startsWith("/instructor/") && modes.includes("instructor")
+        ? "instructor"
+        : (modes[0] ?? "account");
   const groups = workspaceNavigation(mode, view?.selected?.id, centerId);
   const roleNames = roles.map((role) => t(($) => $.workspace.roles[role.role]));
   if (instructor) roleNames.push(t(($) => $.workspace.roles.instructor));
