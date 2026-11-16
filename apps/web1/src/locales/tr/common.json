@@ -1722,7 +1722,7 @@
     "review": "Değişiklikleri incele",
     "archive": "Arşivle",
     "archiveTitle": "Paketi arşivle",
-    "archiveDescription": "Yeni satışlar kapanır. Mevcut haklar ve satış geçmişi korunur.",
+    "archiveDescription": "Bu işlem yalnız ürünün satış durumunu değiştirir. Mevcut satışlar ve haklar korunur; fiyat ve koşullar değişmez.",
     "cancel": "Vazgeç",
     "close": "Kapat",
     "count": "Bu sayfada {{count}} paket",
@@ -1747,7 +1747,7 @@
     "lessons": "Grup ve özel dersler",
     "lessonHint": "Ders kapsamı grup ve özel seansları birlikte kapsar.",
     "catalogOnly": "Arama ve durum filtresi merkezdeki ürünlere uygulanır. Özetler merkezin tamamını kapsar; tutarlar para birimine göre ayrı gösterilir.",
-    "unsupportedFields": "Geçerlilik satış sırasında belirlenir. Satış durumu, taslak ve arşiv işlemleri şu anda kullanılamıyor.",
+    "unsupportedFields": "Geçerlilik satış sırasında belirlenir. Taslak, sürüm notu ve ürün bazında negatif limit bu sözleşmede bulunmuyor.",
     "scopesPreserved": "Mevcut kapsam yeni sürümde aynen korunur.",
     "invalid": "Zorunlu alanları ve tutarları kontrol et.",
     "saved": "Paket yayınlandı ve güncel sürümü okundu.",
@@ -1757,7 +1757,7 @@
     "savedUnread": "Yayın alındı; güncel sürüm henüz okunamadı.",
     "readAgain": "Güncel kaydı oku",
     "pending": "İşlemin durumu bekleniyor.",
-    "rejected": "Paket yayınlanamadı. Güncel kaydı kontrol edip tekrar dene.",
+    "rejected": "İşlem uygulanamadı. Güncel kaydı yeniden oku ve yeni onayla devam et.",
     "reviewChanges": "Yeni paket koşulları",
     "reviewEffects": "Yeni sürüm sonraki satışlarda kullanılacak; mevcut satışların koşulları korunacak.",
     "scopePreserved": "Mevcut kapsam korunacak",
@@ -1771,7 +1771,20 @@
     "classRestricted": "Belirli sınıfla sınırlı",
     "eventRestricted": "Belirli etkinlikle sınırlı",
     "count_one": "Bu sayfada {{count}} paket",
-    "count_other": "Bu sayfada {{count}} paket"
+    "count_other": "Bu sayfada {{count}} paket",
+    "stateReason": "İşlem gerekçesi",
+    "openAction": "Satışa aç",
+    "closeAction": "Satışa kapat",
+    "historyError": "Geçmiş okunamadı. Güncel kaynağı yeniden yükle.",
+    "historyLoading": "Geçmiş yükleniyor…",
+    "historyEmpty": "Bu görünümde kayıt yok.",
+    "saleStates": {
+      "active": "Aktif",
+      "terminated": "Sonlandırılmış",
+      "expired": "Süresi dolmuş"
+    },
+    "stateSaved": "Satış durumu kaydedildi ve güncel ürün okundu.",
+    "stateUnread": "Satış durumu kaydedildi; güncel ürün henüz okunamadı."
   },
   "finance": {
     "title": "Finans",

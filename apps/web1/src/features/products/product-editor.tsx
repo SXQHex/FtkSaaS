@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { ArchiveIcon, LockKeyholeIcon, XIcon } from "lucide-react";
 import { Button } from "../../components/ui/button";
@@ -19,6 +19,7 @@ import {
   FieldDescription,
 } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Switch } from "../../components/ui/switch";
 import { Checkbox } from "../../components/ui/checkbox";
@@ -31,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogCancel,
 } from "../../components/ui/alert-dialog";
 
 export interface ProductDraft {
@@ -78,6 +80,8 @@ export function ProductEditor({
   draftLoaded = false,
   versions,
   sales,
+  historyControls,
+  confirmation,
   changes,
   effects,
   accepted,
@@ -106,6 +110,8 @@ export function ProductEditor({
   draftLoaded?: boolean;
   versions: ProductHistoryRow[] | null;
   sales: ProductHistoryRow[] | null;
+  historyControls?: ReactNode;
+  confirmation?: ReactNode;
   changes: ProductHistoryRow[];
   effects: ProductHistoryRow[];
   accepted: boolean;
@@ -180,7 +186,6 @@ export function ProductEditor({
                   name="productName"
                   autoComplete="off"
                   value={draft.name}
-                  readOnly={editing}
                   placeholder={t(($) => $.products.namePlaceholder)}
                   onChange={(e) => set("name", e.target.value)}
                   disabled={pending || readOnly}
@@ -572,13 +577,17 @@ export function ProductEditor({
             )}
             {editing && (
               <>
-                {history(
-                  t(($) => $.products.versions),
-                  versions,
-                )}
-                {history(
-                  t(($) => $.products.recentPurchases),
-                  sales,
+                {historyControls ?? (
+                  <>
+                    {history(
+                      t(($) => $.products.versions),
+                      versions,
+                    )}
+                    {history(
+                      t(($) => $.products.recentPurchases),
+                      sales,
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -663,6 +672,7 @@ export function ProductEditor({
           </>
         )}
       </SheetFooter>
+      {confirmation}
     </Sheet>
   );
 }
@@ -673,14 +683,25 @@ export function ProductArchiveDialog({
   pending = false,
   onClose,
   onConfirm,
+  title,
+  action,
+  reason,
+  onReason,
+  notice,
 }: {
   open: boolean;
   name: string;
   pending?: boolean;
   onClose: () => void;
   onConfirm?: () => void;
+  title?: string;
+  action?: string;
+  reason?: string;
+  onReason?: (value: string) => void;
+  notice?: ReactNode;
 }) {
   const { t } = useTranslation();
+  const cancel = useRef<HTMLButtonElement>(null);
   return (
     <AlertDialog
       isOpen={open}
@@ -688,20 +709,41 @@ export function ProductArchiveDialog({
         if (!value && !pending) onClose();
       }}
       isKeyboardDismissDisabled={pending}
+      // Keyboard-opened React Aria overlays reveal after keyup; choose safe focus at entry.
+      onEnter={() => cancel.current?.focus()}
     >
       <AlertDialogHeader>
-        <AlertDialogTitle>{t(($) => $.products.archiveTitle)}</AlertDialogTitle>
+        <AlertDialogTitle>{title ?? t(($) => $.products.archiveTitle)}</AlertDialogTitle>
         <AlertDialogDescription>
           {name}
           <p className="mt-2">{t(($) => $.products.archiveDescription)}</p>
         </AlertDialogDescription>
       </AlertDialogHeader>
+      {onReason && (
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="product-state-reason">
+              {t(($) => $.products.stateReason)}
+            </FieldLabel>
+            <Textarea
+              id="product-state-reason"
+              name="reason"
+              maxLength={2000}
+              required
+              value={reason ?? ""}
+              disabled={pending}
+              onChange={(event) => onReason(event.target.value)}
+            />
+          </Field>
+        </FieldGroup>
+      )}
+      {notice}
       <AlertDialogFooter>
-        <Button variant="outline" onPress={onClose} isDisabled={pending}>
+        <AlertDialogCancel ref={cancel} autoFocus onPress={onClose} isDisabled={pending}>
           {t(($) => $.products.cancel)}
-        </Button>
+        </AlertDialogCancel>
         <Button variant="destructive" onPress={onConfirm} isDisabled={!onConfirm || pending}>
-          {t(($) => $.products.archive)}
+          {action ?? t(($) => $.products.archive)}
         </Button>
       </AlertDialogFooter>
     </AlertDialog>

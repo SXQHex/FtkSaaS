@@ -9,9 +9,97 @@ import {
   readProductResult,
   readProductsPage,
   readProductsManagementPage,
+  readProductHistory,
+  productStateIntent,
   readProductReceipt,
   productTermsEqual,
 } from "./products";
+
+const managedBase = () => ({
+  ...structuredClone(base),
+  name: base.terms.name,
+  version: 4,
+  state: "active" as const,
+  created_at: "2026-11-15T00:00:00Z",
+  active_right_holders: 3,
+});
+
+it("pins lifecycle version and reason without publishing terms or mutating the source", async () => {
+  const source = managedBase();
+  const intent = productStateIntent(scope, source, "close", "  Açık gerekçe  ");
+  expect(intent.request).toMatchObject({
+    product_id: base.id,
+    expected_version: 4,
+    action: "close",
+    reason: "Açık gerekçe",
+  });
+  expect(intent.request).not.toHaveProperty("terms");
+  expect(() => productStateIntent(scope, source, "open", "gerekçe")).toThrow("PRODUCT_INVALID");
+  expect(() => productStateIntent(scope, source, "archive", " ")).toThrow();
+  call.mockResolvedValueOnce({ primary_id: base.id });
+  await writeProduct(intent);
+  expect(call).toHaveBeenLastCalledWith(
+    "product_state_set_v1",
+    expect.objectContaining(intent.request),
+  );
+  expect(source.state).toBe("active");
+});
+
+it("rereads only the selected product and requires its newer lifecycle version", async () => {
+  const intent = productStateIntent(scope, managedBase(), "archive", "Gerekçe");
+  const result = { ...managedBase(), state: "archived", version: 5 };
+  call.mockResolvedValueOnce({ view: "products", items: [result] });
+  expect(await readProductResult(intent, base.id)).toEqual(result);
+  expect(call).toHaveBeenLastCalledWith(
+    "products_management_list_v1",
+    expect.objectContaining({ product_id: base.id, status: "all", page: { limit: 1 } }),
+  );
+  call.mockResolvedValueOnce({ view: "products", items: [{ ...result, version: 4 }] });
+  await expect(readProductResult(intent, base.id)).rejects.toThrow("PRODUCT_RESULT_UNAVAILABLE");
+});
+
+it("binds version history cursors to one product and rejects another product's rows", async () => {
+  call.mockResolvedValueOnce({
+    view: "versions",
+    items: [{ id: base.version_id, product_id: base.id, terms: base.terms }],
+    next_cursor: "next",
+  });
+  await readProductHistory(scope, base.id, "versions", "cursor");
+  expect(call).toHaveBeenLastCalledWith(
+    "products_management_list_v1",
+    expect.objectContaining({
+      product_id: base.id,
+      view: "versions",
+      page: { limit: 20, cursor: "cursor" },
+    }),
+  );
+  call.mockResolvedValueOnce({
+    view: "versions",
+    items: [{ id: base.version_id, product_id: scope.centerId, terms: base.terms }],
+  });
+  await expect(readProductHistory(scope, base.id, "versions")).rejects.toThrow(
+    "PRODUCT_SOURCE_UNAVAILABLE",
+  );
+});
+
+it("publishes a renamed managed product with its product version and rereads immutable history", async () => {
+  const source = managedBase();
+  const draft = productDraft(source);
+  draft.name = "Yeni sürüm adı";
+  const intent = productIntent(scope, draft, source);
+  expect(intent.request.expected_version).toBe(4);
+  expect(intent.request.terms.name).toBe("Yeni sürüm adı");
+  expect(source.terms.name).toBe(base.terms.name);
+  call.mockResolvedValueOnce({
+    view: "versions",
+    items: [{ id: base.version_id, product_id: base.id, terms: intent.request.terms }],
+  });
+  expect(await readProductResult(intent, base.version_id)).toEqual({
+    id: base.id,
+    version_id: base.version_id,
+    terms: intent.request.terms,
+  });
+});
 
 it("uses server management filters and keeps canonical center totals separate from the page", async () => {
   const totals = { on_sale: 7, closed: 2, archived: 1, active_right_holders: 11, last_30_days: [] };

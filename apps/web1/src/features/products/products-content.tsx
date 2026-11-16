@@ -3,18 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ProductsView, type ProductRow, type ProductFilter } from "./products-view";
-import { ProductEditor, type ProductDraft } from "./product-editor";
+import { ProductEditor, ProductArchiveDialog, type ProductDraft } from "./product-editor";
+import { ProductHistory } from "./product-history";
 import {
   productDraft,
   productIntent,
+  productStateIntent,
   readProductsManagementPage,
-  type ProductIntent,
+  type ProductPublishIntent,
 } from "./products";
 import { useProductCommand } from "./use-product-command";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { readWorkspace } from "../workspace/workspace";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { ProductView } from "../../lib/api-contracts/generated";
+import type { ProductManagementEntry } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -33,7 +35,7 @@ export function ProductsContent({
     router = useRouter();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [pageIndex, setPageIndex] = useState(0);
-  const [editor, setEditor] = useState<{ base?: ProductView } | null>(null);
+  const [editor, setEditor] = useState<{ base?: ProductManagementEntry } | null>(null);
   const [search, setSearch] = useState(""),
     [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<ProductFilter>("all");
@@ -239,7 +241,7 @@ function ProductEditorController({
   onLockChange,
 }: {
   scope: ClientScope;
-  base?: ProductView;
+  base?: ProductManagementEntry;
   canWrite: boolean;
   onClose: () => void;
   onRefresh: () => Promise<void>;
@@ -250,8 +252,11 @@ function ProductEditorController({
   const [draft, setDraft] = useState<ProductDraft>(() => productDraft(base)),
     [stage, setStage] = useState<"edit" | "review">("edit"),
     [accepted, setAccepted] = useState(false),
-    [review, setReview] = useState<ProductIntent>(),
+    [review, setReview] = useState<ProductPublishIntent>(),
     [invalid, setInvalid] = useState(false);
+  const [stateAction, setStateAction] = useState<"open" | "close" | "archive">();
+  const [reason, setReason] = useState("");
+  const [historyRevision, setHistoryRevision] = useState(0);
   const disciplines = useQuery({
     queryKey: ["product-disciplines", scope.accountId, scope.orgId, scope.centerId],
     queryFn: () => readDisciplineCatalog(scope, "center"),
@@ -262,6 +267,7 @@ function ProductEditorController({
     onAccessLost,
     onRefresh: async () => {
       await onRefresh();
+      setHistoryRevision((value) => value + 1);
     },
   });
   useEffect(() => {
@@ -297,11 +303,28 @@ function ProductEditorController({
     }
   }
   const status = command.state;
+  function reloadSource() {
+    void onRefresh()
+      .then(onClose)
+      .catch((error: unknown) => {
+        if (!onAccessLost(error)) setInvalid(true);
+      });
+  }
+  const stateLabel =
+    stateAction === "open"
+      ? t(($) => $.products.openAction)
+      : stateAction === "close"
+        ? t(($) => $.products.closeAction)
+        : t(($) => $.products.archive);
   const message =
     status === "saved"
-      ? t(($) => $.products.saved)
+      ? stateAction
+        ? t(($) => $.products.stateSaved)
+        : t(($) => $.products.saved)
       : status === "saved-unread"
-        ? t(($) => $.products.savedUnread)
+        ? stateAction
+          ? t(($) => $.products.stateUnread)
+          : t(($) => $.products.savedUnread)
         : status === "unknown"
           ? t(($) => $.products.unknownWrite)
           : status === "pending"
@@ -310,109 +333,218 @@ function ProductEditorController({
               ? t(($) => $.products.rejected)
               : undefined;
   return (
-    <ProductEditor
-      open
-      editing={Boolean(base)}
-      stage={stage}
-      draft={draft}
-      support={{ validity: false, saleState: false, negativeValue: false, versionNote: false }}
-      scopesEditable={!base && canWrite}
-      unitPrice={null}
-      versions={
-        base
-          ? [{ id: base.version_id, title: t(($) => $.products.versions), detail: base.terms.name }]
-          : null
-      }
-      sales={null}
-      changes={
-        review
-          ? [
-              {
-                id: "terms",
-                title: t(($) => $.products.reviewChanges),
-                detail: `${review.request.terms.name} · ${formatMinorAmount(review.request.terms.price_minor, review.request.terms.currency)}`,
-              },
-            ]
-          : []
-      }
-      effects={[
-        {
-          id: "new",
-          title: t(($) => $.products.effects),
-          detail: t(($) => $.products.reviewEffects),
-        },
-      ]}
-      accepted={accepted}
-      disciplines={activeDisciplines.map((row) => ({ id: row.id, name: row.name }))}
-      pending={command.locked}
-      readOnly={!canWrite || status === "saved"}
-      notice={
-        <>
-          <Alert>
-            <AlertDescription>
-              {t(($) => $.products.unsupportedFields)}
-              {base && <p>{t(($) => $.products.scopesPreserved)}</p>}
-            </AlertDescription>
-          </Alert>
-          {invalid && (
-            <Alert variant="destructive">
-              <AlertDescription>{t(($) => $.products.invalid)}</AlertDescription>
-            </Alert>
-          )}
-          {message && (
+    <>
+      <ProductEditor
+        open
+        editing={Boolean(base)}
+        stage={stage}
+        draft={{ ...draft, onSale: base?.state === "active" }}
+        support={{
+          validity: false,
+          saleState: Boolean(base && canWrite),
+          negativeValue: false,
+          versionNote: false,
+        }}
+        scopesEditable={!base && canWrite}
+        unitPrice={null}
+        versions={
+          base
+            ? [
+                {
+                  id: base.version_id,
+                  title: t(($) => $.products.versions),
+                  detail: base.terms.name,
+                },
+              ]
+            : null
+        }
+        sales={null}
+        historyControls={
+          base && (
+            <ProductHistory
+              key={historyRevision}
+              scope={scope}
+              productId={base.id}
+              onAccessLost={onAccessLost}
+            />
+          )
+        }
+        changes={
+          review
+            ? [
+                {
+                  id: "terms",
+                  title: t(($) => $.products.reviewChanges),
+                  detail: `${review.request.terms.name} · ${formatMinorAmount(review.request.terms.price_minor, review.request.terms.currency)}`,
+                },
+              ]
+            : []
+        }
+        effects={[
+          {
+            id: "new",
+            title: t(($) => $.products.effects),
+            detail: t(($) => $.products.reviewEffects),
+          },
+        ]}
+        accepted={accepted}
+        disciplines={activeDisciplines.map((row) => ({ id: row.id, name: row.name }))}
+        pending={command.locked || Boolean(stateAction)}
+        readOnly={!canWrite || status === "saved"}
+        notice={
+          <>
             <Alert>
-              <AlertDescription>{message}</AlertDescription>
+              <AlertDescription>
+                {t(($) => $.products.unsupportedFields)}
+                {base && <p>{t(($) => $.products.scopesPreserved)}</p>}
+              </AlertDescription>
             </Alert>
-          )}
-          {["unknown", "pending", "saved-unread"].includes(status) && (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                isDisabled={command.busy}
-                onPress={() => {
-                  void command.readReceipt();
-                }}
-              >
-                {t(($) =>
-                  status === "saved-unread" ? $.products.readAgain : $.products.readReceipt,
-                )}
+            {invalid && (
+              <Alert variant="destructive">
+                <AlertDescription>{t(($) => $.products.invalid)}</AlertDescription>
+              </Alert>
+            )}
+            {message && (
+              <Alert>
+                <AlertDescription>{message}</AlertDescription>
+              </Alert>
+            )}
+            {["stale", "rejected"].includes(status) && (
+              <Button variant="outline" onPress={reloadSource}>
+                {t(($) => $.products.readAgain)}
               </Button>
-              {status === "unknown" && (
+            )}
+            {["unknown", "pending", "saved-unread"].includes(status) && (
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant="outline"
                   isDisabled={command.busy}
                   onPress={() => {
-                    void command.retry();
+                    void command.readReceipt();
                   }}
                 >
-                  {t(($) => $.products.retryWrite)}
+                  {t(($) =>
+                    status === "saved-unread" ? $.products.readAgain : $.products.readReceipt,
+                  )}
                 </Button>
-              )}
-            </div>
-          )}
-          {status === "saved" && <Button onPress={onClose}>{t(($) => $.products.close)}</Button>}
-        </>
-      }
-      onClose={() => {
-        if (!command.locked) onClose();
-      }}
-      onDraft={(value) => {
-        if (!command.locked) {
-          setDraft(value);
-          setReview(undefined);
-          setAccepted(false);
-          setInvalid(false);
+                {status === "unknown" && (
+                  <Button
+                    variant="outline"
+                    isDisabled={command.busy}
+                    onPress={() => {
+                      void command.retry();
+                    }}
+                  >
+                    {t(($) => $.products.retryWrite)}
+                  </Button>
+                )}
+              </div>
+            )}
+            {status === "saved" && <Button onPress={onClose}>{t(($) => $.products.close)}</Button>}
+          </>
         }
-      }}
-      onStage={changeStage}
-      onAccepted={setAccepted}
-      onPublish={
-        review && canWrite && status === "ready"
-          ? () => {
-              if (accepted) void command.start(review);
+        onClose={() => {
+          if (!command.locked) onClose();
+        }}
+        onDraft={(value) => {
+          if (!command.locked) {
+            if (base && value.onSale !== (base.state === "active")) {
+              command.reset();
+              setReason("");
+              setStateAction(value.onSale ? "open" : "close");
+              return;
             }
-          : undefined
-      }
-    />
+            setDraft(value);
+            setReview(undefined);
+            setAccepted(false);
+            setInvalid(false);
+          }
+        }}
+        onStage={changeStage}
+        onAccepted={setAccepted}
+        onArchive={
+          base && base.state !== "archived" && canWrite && status === "ready"
+            ? () => {
+                setReason("");
+                setStateAction("archive");
+              }
+            : undefined
+        }
+        onPublish={
+          review && canWrite && status === "ready"
+            ? () => {
+                if (accepted) void command.start(review);
+              }
+            : undefined
+        }
+        confirmation={
+          stateAction &&
+          base && (
+            <ProductArchiveDialog
+              open
+              name={base.name}
+              title={stateLabel}
+              action={stateLabel}
+              reason={reason}
+              onReason={setReason}
+              pending={command.locked}
+              notice={
+                <>
+                  {message && (
+                    <Alert role="status">
+                      <AlertDescription>{message}</AlertDescription>
+                    </Alert>
+                  )}
+                  {["stale", "rejected"].includes(status) && (
+                    <Button variant="outline" onPress={reloadSource}>
+                      {t(($) => $.products.readAgain)}
+                    </Button>
+                  )}
+                  {["unknown", "pending", "saved-unread"].includes(status) && (
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        isDisabled={command.busy}
+                        onPress={() => {
+                          void command.readReceipt();
+                        }}
+                      >
+                        {t(($) =>
+                          status === "saved-unread" ? $.products.readAgain : $.products.readReceipt,
+                        )}
+                      </Button>
+                      {status === "unknown" && (
+                        <Button
+                          variant="outline"
+                          isDisabled={command.busy}
+                          onPress={() => {
+                            void command.retry();
+                          }}
+                        >
+                          {t(($) => $.products.retryWrite)}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </>
+              }
+              onClose={() => {
+                if (!command.locked) {
+                  setStateAction(undefined);
+                  if (status === "saved") onClose();
+                }
+              }}
+              onConfirm={
+                canWrite && status === "ready" && reason.trim()
+                  ? () => {
+                      void command.start(productStateIntent(scope, base, stateAction, reason));
+                    }
+                  : undefined
+              }
+            />
+          )
+        }
+      />
+    </>
   );
 }
