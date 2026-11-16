@@ -1700,7 +1700,7 @@
     "quotaLimit": "Dönemde en fazla ders",
     "quotaHint": "Dönem içinde kullanılabilecek en fazla ders sayısı.",
     "allowFreeze": "Dondurmaya izin ver",
-    "freezeHint": "Üye hakkını dondurabilir, süre uzar.",
+    "freezeHint": "Üye, paket koşullarına göre hakkını dondurabilir.",
     "freezeDays": "Dondurma süresi (en fazla gün)",
     "negativeValue": "Negatif limitte ders değeri",
     "negativeHint": "Hakkı biten üyenin ek dersi bu değerle izlenir.",
@@ -1977,6 +1977,28 @@
     },
     "timedHint": "Süreli kullanım hakkı; kullanım koşulları paket bilgilerinde gösterilir.",
     "negative": "Negatif limit",
+    "freezePeriods": "Dondurma dönemleri",
+    "freezeValidity": "Mevcut geçerlilik bitişi",
+    "freezeValidityHint": "Paketin dondurma koşulları uygulanır. İşlem sonrası güncel geçerlilik gösterilir.",
+    "freezeCancelUnavailable": "Planlanmış dondurmanın tamamen iptali henüz desteklenmiyor.",
+    "freezeNotInProduct": "Bu paket sürümünde dondurma hakkı yok.",
+    "freezeStates": {
+      "scheduled": "Planlandı",
+      "active": "Etkin",
+      "ended": "Bitiş kaydedildi",
+      "cancelled": "İptal edildi"
+    },
+    "freezeErrors": {
+      "startDate": "Geçerli başlangıç tarihi seç.",
+      "endDate": "Başlangıçtan sonraki geçerli bitiş tarihini seç.",
+      "reason": "İşlem gerekçesini gir."
+    },
+    "freezeReadError": "Güncel dondurma kaynağı veya işlem önizlemesi okunamadı. Yetkini ve koşulları kontrol edip yeniden incele.",
+    "freezeReading": "Dondurma koşulları ve rezervasyon etkisi okunuyor.",
+    "freezeSaved": "Dondurma işlemi kaydedildi; güncel dönem, haklar ve korunan rezervasyonlar okundu.",
+    "freezeUnread": "Dondurma işlemi kaydedildi; güncel sonuç henüz okunamadı. Tekrar yazmadan sonucu oku.",
+    "freezeStale": "Dondurma kaynağı veya önizlemesi değişti. Geri dönüp yeniden incele ve onayla.",
+    "freezeRejected": "Dondurma işlemi reddedildi. Geri dönüp güncel koşulları incele.",
     "rightErrors": {
       "quantity": "Pozitif tam sayı ders adedi gir.",
       "reason": "İşlem gerekçesini gir.",

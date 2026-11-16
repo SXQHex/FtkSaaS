@@ -52,7 +52,7 @@ export function entitlementRows(
         row.state === "closed"
           ? []
           : ([
-              { kind: row.state === "suspended" ? "unfreeze" : "freeze", disabled: true },
+              { kind: "freeze", disabled: true },
               { kind: "extend", disabled: true },
               ...(row.kind === "credits" ? [{ kind: "adjust" as const, disabled: true }] : []),
               { kind: "terminate", disabled: true },

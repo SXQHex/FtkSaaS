@@ -6,6 +6,7 @@ import type {
   EntitlementView,
   NegativeLimitsView,
   ReservationProtectionPreview,
+  TableFreezes,
 } from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
@@ -29,6 +30,9 @@ async function setup(
     scoped?: boolean;
     openSale?: boolean;
     existingRights?: boolean;
+    freezeEnabled?: boolean;
+    existingFreeze?: "active" | "scheduled";
+    freezeBinding?: boolean;
   } = {},
 ) {
   await mockStudio(page);
@@ -46,7 +50,11 @@ async function setup(
       credits: options.timed ? null : 8,
       price_minor: "100000",
       currency: "TRY",
-      freeze: { enabled: false, extends_validity: false },
+      freeze: {
+        enabled: Boolean(options.freezeEnabled),
+        extends_validity: Boolean(options.freezeEnabled),
+        ...(options.freezeEnabled ? { max_days: 7 } : {}),
+      },
       refund: { method: options.timed ? "time_ratio" : "credit_ratio" },
       quota: options.timed ? { period: "week", limit: 2 } : null,
       scopes: options.scoped
@@ -87,8 +95,8 @@ async function setup(
         end_date: "2026-11-22",
         timezone: "Europe/Istanbul",
         state: "active",
-        available: options.timed ? 0 : 8,
-        reserved: 0,
+        available: options.timed ? 0 : options.freezeBinding ? 7 : 8,
+        reserved: options.freezeBinding ? 1 : 0,
         consumed: 0,
         deficit: 0,
         quotas: [],
@@ -98,6 +106,7 @@ async function setup(
         version: 1,
         account_id: debtId,
         sale_state: "active",
+        freezes: options.existingFreeze ? [profileFreezeRecord(options.existingFreeze)] : [],
         sale_version: 1,
       };
       return send(saved || options.existingRights ? [row] : []);
@@ -1185,5 +1194,347 @@ test("right extension conflict requires a fresh native version, preview and expl
   expect(previews).toHaveLength(2);
   expect(writes).toHaveLength(2);
   expect(writes[1]!.expected_version).toBe(2);
+  expect(writes[0]!.operation_key).not.toBe(writes[1]!.operation_key);
+});
+
+const freezeRecordId = "019a7b00-0000-7000-8000-000000000091",
+  freezeSessionId = "019a7b00-0000-7000-8000-000000000092",
+  freezeReservationId = "019a7b00-0000-7000-8000-000000000093";
+function profileFreezeRecord(mode: "active" | "scheduled"): TableFreezes {
+  return {
+    id: freezeRecordId,
+    org_id: I.org,
+    sale_id: saleId,
+    version: 1,
+    created_at: "2026-11-14T10:00:00Z",
+    starts_at: mode === "active" ? "2026-11-14T21:00:00Z" : "2026-11-17T21:00:00Z",
+    planned_end: "2026-11-20T21:00:00Z",
+    state: "scheduled",
+    preview_id: secondPreviewId,
+  };
+}
+async function freezeSetup(
+  page: Page,
+  options: {
+    existing?: "active" | "scheduled";
+    binding?: boolean;
+    unknown?: boolean;
+    unread?: boolean;
+    stale?: boolean;
+  } = {},
+) {
+  await page.clock.install({ time: new Date("2026-11-16T08:00:00Z") });
+  await setup(page, {
+    openSale: false,
+    existingRights: true,
+    freezeEnabled: true,
+    existingFreeze: options.existing,
+    freezeBinding: options.binding,
+  });
+  const writes: Record<string, unknown>[] = [],
+    previews: Record<string, unknown>[] = [];
+  const row: EntitlementView = {
+    sale_id: saleId,
+    account_id: debtId,
+    person_id: I.instructor,
+    product_version_id: versionId,
+    start_date: "2026-11-15",
+    end_date: "2026-11-22",
+    timezone: "Europe/Istanbul",
+    state: "active",
+    kind: "credits",
+    booking_mode: "flexible",
+    version: 1,
+    sale_version: 1,
+    sale_state: "active",
+    available: options.binding ? 7 : 8,
+    reserved: options.binding ? 1 : 0,
+    consumed: 0,
+    deficit: 0,
+    quotas: [],
+    deficit_scopes: [],
+    freezes: options.existing ? [profileFreezeRecord(options.existing)] : [],
+  };
+  let saved = false,
+    unread = false;
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1),
+      req = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "entitlements_get_v1") {
+      if (options.unread && saved && !unread) {
+        unread = true;
+        return route.abort("failed");
+      }
+      return send([row]);
+    }
+    if (op === "freeze_preview_v1" || op === "freeze_end_preview_v1") {
+      previews.push(req);
+      if (op === "freeze_preview_v1")
+        expect(req).toMatchObject({
+          sale_id: saleId,
+          dates: { start_date: "2026-11-18", end_date: "2026-11-20" },
+        });
+      else expect(req).toMatchObject({ freeze_id: freezeRecordId, end_date: "2026-11-20" });
+      return send({
+        id: previews.length === 1 ? previewId : secondPreviewId,
+        token: `synthetic-freeze-${previews.length}`,
+        scope_hash: "synthetic",
+        dependencies: { versions: [], policy_hashes: [], permission_hash: "synthetic" },
+        effects: [
+          {
+            entity: {
+              type: op === "freeze_preview_v1" ? "sales" : "freezes",
+              id: op === "freeze_preview_v1" ? saleId : freezeRecordId,
+            },
+            action: "adjust",
+            ...(op === "freeze_preview_v1" ? { quantity: 2 } : {}),
+          },
+          ...(options.binding
+            ? [{ entity: { type: "reservations", id: freezeReservationId }, action: "adjust" }]
+            : []),
+        ],
+        blockers: [],
+        expires_at: "2099-01-01T00:00:00Z",
+      });
+    }
+    if (op === "management_state_get_v1" && req.operation === "reservation_cancel_v1")
+      return send({
+        items: [
+          {
+            operation: req.operation,
+            exists: true,
+            state: "active",
+            as_of: "2026-11-16T08:00:00Z",
+            entity: { type: "reservations", id: freezeReservationId },
+            current: { operation: req.operation, values: { reservation_id: freezeReservationId } },
+            versions: [
+              { entity: { type: "reservations", id: freezeReservationId }, version: saved ? 4 : 3 },
+            ],
+          },
+        ],
+        next_cursor: null,
+        as_of: "2026-11-16T08:00:00Z",
+      });
+    if (op === "reservation_list_v1")
+      return send({
+        items: options.binding
+          ? [
+              {
+                id: freezeReservationId,
+                person_id: I.instructor,
+                session_id: freezeSessionId,
+                state: "active",
+                mode: "flexible",
+                version: saved ? 4 : 3,
+              },
+            ]
+          : [],
+        next_cursor: null,
+        as_of: "2026-11-16T08:00:00Z",
+      });
+    if (op === "session_get_v1")
+      return send({
+        id: freezeSessionId,
+        discipline_id: I.discipline,
+        format: "group",
+        starts_at: "2026-11-18T10:00:00Z",
+        ends_at: "2026-11-18T11:00:00Z",
+        state: "planned",
+        attendance_state: "open",
+        version: 1,
+        assignments: [],
+        class_id: null,
+        capacity: {
+          total: 8,
+          held: 1,
+          remaining: 7,
+          category_held: null,
+          category_remaining: null,
+          room_capacity: null,
+        },
+      });
+    if (op === "freeze_apply_v1" || op === "freeze_end_apply_v1") {
+      writes.push(req);
+      expect(req).not.toHaveProperty("dates");
+      expect(req).not.toHaveProperty("expected_version");
+      if (options.stale && writes.length === 1) {
+        row.version = 2;
+        return route.fulfill({
+          json: { ok: false, error: { code: "PREVIEW_STALE", retryable: false, trace_id: I.role } },
+        });
+      }
+      if (!saved) {
+        row.version!++;
+        row.sale_version!++;
+        if (op === "freeze_apply_v1") {
+          row.freezes = [
+            {
+              ...profileFreezeRecord("scheduled"),
+              planned_end: "2026-11-19T21:00:00Z",
+              preview_id: previews.length === 1 ? previewId : secondPreviewId,
+            },
+          ];
+          row.end_date = "2026-11-24";
+        } else
+          row.freezes = [
+            { ...row.freezes![0]!, version: 2, state: "ended", actual_end: "2026-11-19T21:00:00Z" },
+          ];
+        saved = true;
+      }
+      if (options.unknown && writes.length === 1) return route.abort("failed");
+      return send({ primary_id: freezeRecordId, changed: [], jobs: [] });
+    }
+    if (op === "operation_status_get_v1")
+      return route.fulfill({
+        json: { ok: false, error: { code: "NOT_FOUND", retryable: false, trace_id: I.role } },
+      });
+    return route.fallback();
+  });
+  return { writes, previews, panel: page.getByRole("dialog"), row };
+}
+async function freezeReview(page: Page, options: Parameters<typeof freezeSetup>[1] = {}) {
+  const state = await freezeSetup(page, options);
+  await page
+    .getByRole("button", { name: options.existing ? "Dondurmayı bitir" : "Dondur", exact: true })
+    .click();
+  if (!options.existing)
+    await state.panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-18");
+  await state.panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-20");
+  await state.panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic freeze reason");
+  await state.panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(state.panel.getByRole("heading", { name: "Etki", exact: true })).toBeFocused();
+  return state;
+}
+test("freeze review validates dates and preserves native reserved rights and timezone periods", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  const { panel, writes, previews, row } = await freezeSetup(page, { binding: true });
+  await page.getByRole("button", { name: "Dondur", exact: true }).click();
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByLabel("Başlangıç", { exact: true })).toBeFocused();
+  expect(previews).toHaveLength(0);
+  await panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-18");
+  await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-20");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Synthetic freeze reason");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(panel.getByText("Korunacak rezervasyonlar", { exact: true })).toBeVisible();
+  const confirm = panel.getByRole("button", { name: "Uygula", exact: true });
+  await expect(confirm).toBeDisabled();
+  expect(writes).toHaveLength(0);
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await confirm.click();
+  await expect(
+    panel.getByText(
+      "Dondurma işlemi kaydedildi; güncel dönem, haklar ve korunan rezervasyonlar okundu.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(writes).toHaveLength(1);
+  expect(row.available).toBe(7);
+  expect(row.reserved).toBe(1);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await expect(
+    page.getByText("2026-11-15 – 2026-11-24 · Europe/Istanbul", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Dondurmayı iptal et", exact: true }),
+  ).toBeDisabled();
+  expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+test("freeze scheduled cancellation stays explicitly unavailable without sending a shortening command", async ({
+  page,
+}) => {
+  const { writes, previews } = await freezeSetup(page, { existing: "scheduled" });
+  await expect(
+    page.getByRole("button", { name: "Dondurmayı iptal et", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText("Planlanmış dondurmanın tamamen iptali henüz desteklenmiyor.", { exact: true }),
+  ).toBeVisible();
+  expect(writes).toHaveLength(0);
+  expect(previews).toHaveLength(0);
+});
+test("freeze early end reviews an exact started interval and reads its native end date", async ({
+  page,
+}) => {
+  const { panel, writes, row } = await freezeReview(page, { existing: "active" });
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await expect(
+    panel.getByText(
+      "Dondurma işlemi kaydedildi; güncel dönem, haklar ve korunan rezervasyonlar okundu.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(writes).toHaveLength(1);
+  expect(row.freezes![0]!.id).toBe(freezeRecordId);
+  expect(row.freezes![0]!.state).toBe("ended");
+  expect(row.freezes![0]!.actual_end).toBe("2026-11-19T21:00:00Z");
+});
+for (const mode of ["unknown", "unread"] as const)
+  test(`freeze ${mode} result keeps the frozen key and does not replay an acknowledged command`, async ({
+    page,
+  }) => {
+    const { panel, writes } = await freezeReview(page, {
+      ...(mode === "unread" ? { existing: "active" as const } : {}),
+      [mode]: true,
+    });
+    await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+    await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+    await expect(
+      panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(panel).toBeVisible();
+    await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+    if (mode === "unknown")
+      await panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+    await expect(
+      panel.getByText(
+        "Dondurma işlemi kaydedildi; güncel dönem, haklar ve korunan rezervasyonlar okundu.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(panel).toBeInViewport();
+    expect((await scanAccessibility(page, `freeze-${mode}-recovered-panel`)).violations).toEqual(
+      [],
+    );
+    await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+    await expect(panel).toHaveCount(0);
+    expect(writes).toHaveLength(mode === "unknown" ? 2 : 1);
+    if (mode === "unknown") {
+      expect({ ...writes[0], request_id: null }).toEqual({ ...writes[1], request_id: null });
+      expect(writes[0]!.request_id).not.toBe(writes[1]!.request_id);
+    }
+  });
+test("freeze stale review requires another native preview and explicit approval", async ({
+  page,
+}) => {
+  const { panel, writes, previews } = await freezeReview(page, { stale: true });
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await expect(
+    panel.getByText(
+      "Dondurma kaynağı veya önizlemesi değişti. Geri dönüp yeniden incele ve onayla.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await panel.getByRole("button", { name: "Geri", exact: true }).click();
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
+  ).not.toBeChecked();
+  expect(writes).toHaveLength(1);
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await expect(
+    panel.getByText(
+      "Dondurma işlemi kaydedildi; güncel dönem, haklar ve korunan rezervasyonlar okundu.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(previews).toHaveLength(2);
   expect(writes[0]!.operation_key).not.toBe(writes[1]!.operation_key);
 });

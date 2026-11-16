@@ -8,6 +8,7 @@ import { CancelReservation } from "./cancel-reservation";
 import { readNegativeLimit } from "./negative-limit";
 import { NegativeLimitEditor } from "./negative-limit-editor";
 import { RightAdjustmentEditor } from "./right-adjustment-editor";
+import { FreezeEditor } from "./freeze-editor";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -52,6 +53,14 @@ export function MemberProfileContent({
     [commandInvalid, setInvalid] = useState(false),
     [negativeDiscipline, setNegativeDiscipline] = useState(""),
     [editNegative, setEditNegative] = useState(false),
+    [freezeTarget, setFreezeTarget] = useState<{
+      action: "freeze" | "unfreeze";
+      saleId: string;
+      freezeId?: string;
+      label: string;
+      timezone: string;
+      endDate: string;
+    }>(),
     [rightTarget, setRightTarget] = useState<{
       action: "adjust" | "extend";
       saleId: string;
@@ -288,30 +297,103 @@ export function MemberProfileContent({
       ? (entitlementRows(rights.data, catalog.isError ? [] : (catalog.data ?? []), t)?.map(
           (row) => {
             const source = rights.data.find((x) => x.sale_id === row.id)!;
+            const product = catalog.data?.find((x) => x.version_id === source.product_version_id);
+            const freezeReady =
+              sourceAvailable &&
+              !locked &&
+              !rights.isFetching &&
+              source.state === "active" &&
+              source.sale_state === "active" &&
+              source.version &&
+              source.freezes !== undefined;
+            const period = (value: string) =>
+              new Intl.DateTimeFormat("tr-TR", {
+                timeZone: source.timezone,
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(value));
             return {
               ...row,
+              note:
+                [
+                  row.note,
+                  product?.terms.freeze.enabled === false
+                    ? t(($) => $.memberProfile.freezeNotInProduct)
+                    : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || undefined,
+              freezes: source.freezes?.map((freeze) => {
+                const future = Date.parse(freeze.starts_at) > Date.now(),
+                  open =
+                    ["scheduled", "active"].includes(freeze.state) &&
+                    Date.parse(freeze.actual_end ?? freeze.planned_end) > Date.now();
+                return {
+                  id: freeze.id,
+                  period: `${period(freeze.starts_at)} – ${period(freeze.actual_end ?? freeze.planned_end)}`,
+                  state: t(($) => $.memberProfile.freezeStates[freeze.state]),
+                  ...(open
+                    ? {
+                        note: future
+                          ? t(($) => $.memberProfile.freezeCancelUnavailable)
+                          : undefined,
+                        action: {
+                          kind: "unfreeze" as const,
+                          label: t(($) =>
+                            future
+                              ? $.memberProfile.cancelFreeze
+                              : $.memberProfile.actions.unfreeze,
+                          ),
+                          disabled: !freezeReady || future || !freeze.version,
+                          onPress: () =>
+                            setFreezeTarget({
+                              action: "unfreeze",
+                              saleId: row.id,
+                              freezeId: freeze.id,
+                              label: row.name,
+                              timezone: source.timezone,
+                              endDate: "",
+                            }),
+                        },
+                      }
+                    : {}),
+                };
+              }),
               actions: row.actions.map((action) =>
-                action.kind === "adjust" || action.kind === "extend"
+                action.kind === "freeze"
                   ? {
                       ...action,
-                      disabled:
-                        !sourceAvailable ||
-                        locked ||
-                        rights.isFetching ||
-                        source.state !== "active" ||
-                        source.sale_state !== "active" ||
-                        !source.account_id ||
-                        !source.version,
+                      disabled: !freezeReady || product?.terms.freeze.enabled === false,
                       onPress: () =>
-                        setRightTarget({
-                          action: action.kind as "adjust" | "extend",
+                        setFreezeTarget({
+                          action: "freeze",
                           saleId: row.id,
                           label: row.name,
-                          endDate: source.end_date,
                           timezone: source.timezone,
+                          endDate: "",
                         }),
                     }
-                  : action,
+                  : action.kind === "adjust" || action.kind === "extend"
+                    ? {
+                        ...action,
+                        disabled:
+                          !sourceAvailable ||
+                          locked ||
+                          rights.isFetching ||
+                          source.state !== "active" ||
+                          source.sale_state !== "active" ||
+                          !source.account_id ||
+                          !source.version,
+                        onPress: () =>
+                          setRightTarget({
+                            action: action.kind as "adjust" | "extend",
+                            saleId: row.id,
+                            label: row.name,
+                            endDate: source.end_date,
+                            timezone: source.timezone,
+                          }),
+                      }
+                    : action,
               ),
             };
           },
@@ -648,6 +730,40 @@ export function MemberProfileContent({
           )
         }
       />
+      {freezeTarget && (sourceAvailable || preservePending) && (
+        <FreezeEditor
+          key={`${freezeTarget.saleId}:${freezeTarget.freezeId ?? "new"}`}
+          scope={scope}
+          personId={personId}
+          personLabel={p?.display_name ?? ""}
+          action={freezeTarget.action}
+          saleId={freezeTarget.saleId}
+          freezeId={freezeTarget.freezeId}
+          sourceLabel={freezeTarget.label}
+          endDate={freezeTarget.endDate}
+          timezone={freezeTarget.timezone}
+          sourceAvailable={sourceAvailable}
+          onClose={() => setFreezeTarget(undefined)}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onRefresh={async (result) => {
+            queries.setQueryData(rightsKey, result.rights);
+            await queries.invalidateQueries({
+              queryKey: [
+                "profile-reservations",
+                scope.accountId,
+                scope.orgId,
+                scope.centerId,
+                personId,
+              ],
+            });
+            await person.refetch({ throwOnError: true });
+            void queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
+          }}
+        />
+      )}
       {rightTarget && (sourceAvailable || preservePending) && (
         <RightAdjustmentEditor
           key={`${rightTarget.saleId}:${rightTarget.action}`}

@@ -641,6 +641,28 @@ export default interface Resources {
         "upcoming": "Yaklaşan"
       },
       "financeScope": "Finans görünümü",
+      "freezeCancelUnavailable": "Planlanmış dondurmanın tamamen iptali henüz desteklenmiyor.",
+      "freezeErrors": {
+        "endDate": "Başlangıçtan sonraki geçerli bitiş tarihini seç.",
+        "reason": "İşlem gerekçesini gir.",
+        "startDate": "Geçerli başlangıç tarihi seç."
+      },
+      "freezeNotInProduct": "Bu paket sürümünde dondurma hakkı yok.",
+      "freezePeriods": "Dondurma dönemleri",
+      "freezeReadError": "Güncel dondurma kaynağı veya işlem önizlemesi okunamadı. Yetkini ve koşulları kontrol edip yeniden incele.",
+      "freezeReading": "Dondurma koşulları ve rezervasyon etkisi okunuyor.",
+      "freezeRejected": "Dondurma işlemi reddedildi. Geri dönüp güncel koşulları incele.",
+      "freezeSaved": "Dondurma işlemi kaydedildi; güncel dönem, haklar ve korunan rezervasyonlar okundu.",
+      "freezeStale": "Dondurma kaynağı veya önizlemesi değişti. Geri dönüp yeniden incele ve onayla.",
+      "freezeStates": {
+        "active": "Etkin",
+        "cancelled": "İptal edildi",
+        "ended": "Bitiş kaydedildi",
+        "scheduled": "Planlandı"
+      },
+      "freezeUnread": "Dondurma işlemi kaydedildi; güncel sonuç henüz okunamadı. Tekrar yazmadan sonucu oku.",
+      "freezeValidity": "Mevcut geçerlilik bitişi",
+      "freezeValidityHint": "Paketin dondurma koşulları uygulanır. İşlem sonrası güncel geçerlilik gösterilir.",
       "inventoryRequired": "Gelecek rezervasyonlar yüklenmeden paket değişikliği incelenemez.",
       "joined": "Üye: {{date}}",
       "keepReservation": "Kesin kalsın",

@@ -51,6 +51,7 @@ export interface ProfileEntitlement {
   counts?: { total?: number; available: number; reserved: number; consumed: number };
   note?: string;
   actions: ProfileAction[];
+  freezes?: { id: string; period: string; state: string; action?: ProfileAction; note?: string }[];
 }
 export interface ProfileReservation {
   id: string;
@@ -299,6 +300,30 @@ export function MemberProfileView({
                         <p className="text-sm">{t(($) => $.memberProfile.timedHint)}</p>
                       ) : null}
                       {row.note && <p className="mt-2 text-sm text-muted-foreground">{row.note}</p>}
+                      {Boolean(row.freezes?.length) && (
+                        <section
+                          className="mt-3 space-y-2"
+                          aria-label={t(($) => $.memberProfile.freezePeriods)}
+                        >
+                          <h3 className="text-sm font-medium">
+                            {t(($) => $.memberProfile.freezePeriods)}
+                          </h3>
+                          <ItemGroup>
+                            {row.freezes!.map((freeze) => (
+                              <Item key={freeze.id} role="listitem" size="sm" variant="muted">
+                                <ItemContent>
+                                  <ItemTitle>{freeze.period}</ItemTitle>
+                                  <ItemDescription>{freeze.state}</ItemDescription>
+                                  {freeze.note && (
+                                    <p className="text-sm text-muted-foreground">{freeze.note}</p>
+                                  )}
+                                </ItemContent>
+                                {freeze.action && buttons([freeze.action], true)}
+                              </Item>
+                            ))}
+                          </ItemGroup>
+                        </section>
+                      )}
                     </ItemContent>
                   </Item>
                 ))}

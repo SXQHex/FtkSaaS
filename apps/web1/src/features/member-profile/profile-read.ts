@@ -36,6 +36,20 @@ export async function readProfileRights(
     for (const field of ["available", "reserved", "consumed", "deficit"] as const)
       z.number().int().nonnegative().safe().parse(row[field]);
     if (row.product_version_id) z.uuid().parse(row.product_version_id);
+    const freezes = new Set<string>();
+    for (const freeze of row.freezes ?? []) {
+      z.uuid().parse(freeze.id);
+      if (freeze.org_id !== scope.orgId || freeze.sale_id !== row.sale_id || freezes.has(freeze.id))
+        throw new Error("PROFILE_FREEZE_SOURCE_UNAVAILABLE");
+      freezes.add(freeze.id);
+      z.enum(["scheduled", "active", "ended", "cancelled"]).parse(freeze.state);
+      z.iso.datetime({ offset: true }).parse(freeze.starts_at);
+      z.iso.datetime({ offset: true }).parse(freeze.planned_end);
+      if (Date.parse(freeze.starts_at) >= Date.parse(freeze.planned_end))
+        throw new Error("PROFILE_FREEZE_SOURCE_UNAVAILABLE");
+      if (freeze.actual_end) z.iso.datetime({ offset: true }).parse(freeze.actual_end);
+      if (freeze.version !== undefined) z.number().int().positive().safe().parse(freeze.version);
+    }
     for (const quota of row.quotas) {
       z.iso.datetime({ offset: true }).parse(quota.starts_at);
       z.iso.datetime({ offset: true }).parse(quota.ends_at);

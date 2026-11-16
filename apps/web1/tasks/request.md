@@ -17,6 +17,8 @@
 | W1-BE-09 | E19 · P07               | Paket yönetimi durum/arama/özet/geçmiş ve satışa kapatma/arşiv eşlemesi          | Ürün katalog/yayın desteği bağlı; çizimdeki yönetim alanları için doğru typed kaynak veya runtime desteği bekleniyor.       |
 | W1-BE-10 | E20 · P08               | Merkez geneli finans hareket/borç/alacak keşfi ve para birimine ayrılmış özetler | Kişi+para birimi okuyucusu ve native tahsilat bağlı; merkez geneli çizim için doğru typed kaynak/eşleme bekleniyor.         |
 
+| W1-BE-14 | E14 · P07.4 | Planlanmış dondurmayı tamamen iptal etme | Kaynakta komut eşlemesi yok; native kısaltma iptal sayılmaz. |
+
 ## Bütün talepler için ortak sınır
 
 - Mevcut native Supabase Auth, JWT/AAL, plan/abonelik ve canlı organizasyon/merkez/kişi izinleri korunmalı. Yeni bir okuma mevcut görünürlüğü genişletmemeli.
@@ -165,3 +167,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** E14 çizimindeki Tümü/Yaklaşan/Geçmiş için bilinen kişi ve merkez kapsamındaki rezervasyon dizininde, ders başlangıcına göre ayrımı cursor kapsamına bağlayan doğru typed eşlemeyi belirtin; yoksa backend sahibi desteği tanımlasın. Görünür sayfayı istemcide süzmek veya bütün kişinin geçmişini taramak eksik/masraflı sonuç üretir. Aktör/kişi/merkez görünürlüğü korunmalı.
 
 **Kaynak:** Request_reservation_list person_id/session_id/interval/page sunar; `apps/backend/supabase/migrations/20261017043309_schedule_reads.sql` içindeki schedule_page interval koşulu `s.starts_at < hi AND s.ends_at > lo` ile kesişimdir. Devam eden seans hem geçmiş hem gelecek aralığıyla kesişebilir; yapay0001–9999 sınırı veya istemci sayfa süzmesiyle ayrım yapılmadı. Mevcut native Tümü cursor okuması, görünür seansların session_get_v1 ve yetki varsa attendance_get_v1 okuması bağımsız bağlanıyor. İki zaman filtresi açıklamalı disabled kalır. Hak sütununun gerçek hareket kaynağı W1-BE-11 sahibindedir; burada tekrar istenmiyor.
+
+## W1-BE-14 · Planlanmış dondurmayı tamamen iptal etme
+
+**İhtiyaç:** E14 çizimindeki henüz başlamamış dondurmayı iptal et eylemi için doğru native eşlemeyi belirtin; yoksa yetki/plan, preview/onay, stale ve aynı-key kuralları korunan typed destek sağlayın. İptalde hiç başlamamış aralık yeni rezervasyon uygunluğunu kısıtlamamalı; varsa eklenen geçerlilik ve mevcut kesin rezervasyon etkisi backend’den gelmeli.
+
+**Kaynak bulgusu:** `Request_freeze_end_preview` yalnız freeze_id/end_date/reason taşır. `20261020145857_p02_freeze_lifecycle.sql` içindeki `private.p02_freeze` erken bitişte `ends > starts`, `ends < planned_end`, `ends >= now` ister ve kaydı `ended` yapar; iptal dalı yoktur. Başlangıç tarihini bitiş diye gönderip bu kontrolü aşmak veya kısaltmayı tam iptal diye sunmak doğru değildir. `20261020150858_p02_runtime_guards.sql` yalnız notice ekler; iptal sağlamaz. Bu kaynak incelemesidir, hosted komut reddi testi değildir.
+
+**Frontend sınırı:** Gerçek dondurma ve desteklenen erken bitiş kendi preview/apply çiftiyle ilerler. Planlanmış tam iptal açıklamalı kapalı kalır. Yeni endpoint/alan/durum kararı bu kayıtla verilmez; mevcut freezes.cancelled durumu tek başına komut desteği sayılmaz.
