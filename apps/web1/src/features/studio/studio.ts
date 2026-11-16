@@ -155,6 +155,21 @@ function classRecord(scope: StudioScope, item: ManagementStateView): ClassRecord
   };
 }
 
+export async function readStudioRooms(scope: StudioScope) {
+  const backend = await studioBackend(scope);
+  const items = await studioPages((cursor) =>
+    backend.call("management_state_get_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      operation: "room_save_v1",
+      selector: { operation: "room_save_v1", key: { include_details: true } },
+      page: { limit: 50, ...(cursor ? { cursor } : {}) },
+    }),
+  );
+  return items.map((item) => roomRecord(scope, item));
+}
 export async function readStudioResources(scope: StudioScope) {
   const backend = await studioBackend(scope);
   const management = (selector: ManagementSelector, cursor?: string) =>
