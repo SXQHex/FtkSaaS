@@ -31,7 +31,7 @@ export function MemberLayout({
   account: AccountView;
   initial: { org?: string; center?: string };
   title: string;
-  active: "reservations" | "entitlements";
+  active: "reservations" | "entitlements" | "requests";
   onScope: (selection: { org?: string; center?: string }) => void;
   children: (context: {
     scope: ClientScope;
@@ -97,8 +97,10 @@ export function MemberLayout({
     href:
       link.id === "account"
         ? "/account"
-        : (link.id === "reservations" || link.id === "entitlements") && org && center
-          ? `/member/${link.id}?${new URLSearchParams({ org: org.id, center: center.id })}`
+        : (link.id === "reservations" || link.id === "entitlements" || link.id === "requests") &&
+            org &&
+            center
+          ? `/member/${link.id === "requests" ? "private-lessons" : link.id}?${new URLSearchParams({ org: org.id, center: center.id })}`
           : undefined,
   }));
   async function signOut() {
