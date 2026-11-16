@@ -11,16 +11,14 @@ const FormPreview = isDevelopment ? lazy(() => import("../examples/form-preview"
 
 export function RootLayout() {
   const { i18n } = useTranslation();
-  const authReady = useAuthSession();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const publicRoute = [
-    "/",
-    "/login",
-    "/signup",
-    "/verify-email",
-    "/forgot-password",
-    "/auth/callback",
-  ].includes(pathname);
+  const anonymousProgram = pathname.startsWith("/public/");
+  const authReady = useAuthSession(!anonymousProgram);
+  const publicRoute =
+    anonymousProgram ||
+    ["/", "/login", "/signup", "/verify-email", "/forgot-password", "/auth/callback"].includes(
+      pathname,
+    );
   const showExample =
     isDevelopment && new URLSearchParams(window.location.search).has("__form_example");
   return (

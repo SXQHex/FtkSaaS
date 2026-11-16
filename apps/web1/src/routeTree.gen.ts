@@ -29,6 +29,7 @@ import { Route as MemberEntitlementsRouteImport } from './routes/member.entitlem
 import { Route as MemberPrivateLessonsRouteImport } from './routes/member.private-lessons'
 import { Route as MemberReservationsRouteImport } from './routes/member.reservations'
 import { Route as InstructorSessionsSessionIdRouteImport } from './routes/instructor.sessions.$sessionId'
+import { Route as PublicSlugCalendarRouteImport } from './routes/public.$slug.calendar'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
 import { Route as OOrgIdCCenterIdLeadsRouteImport } from './routes/o.$orgId.c.$centerId.leads'
@@ -143,6 +144,11 @@ const InstructorSessionsSessionIdRoute =
     path: '/instructor/sessions/$sessionId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PublicSlugCalendarRoute = PublicSlugCalendarRouteImport.update({
+  id: '/public/$slug/calendar',
+  path: '/public/$slug/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
   id: '/o/$orgId/c/$centerId/access',
   path: '/o/$orgId/c/$centerId/access',
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/member/private-lessons': typeof MemberPrivateLessonsRoute
   '/member/reservations': typeof MemberReservationsRoute
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
+  '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByTo {
   '/member/private-lessons': typeof MemberPrivateLessonsRoute
   '/member/reservations': typeof MemberReservationsRoute
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
+  '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/member/private-lessons': typeof MemberPrivateLessonsRoute
   '/member/reservations': typeof MemberReservationsRoute
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
+  '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
@@ -333,6 +342,7 @@ export interface FileRouteTypes {
     | '/member/private-lessons'
     | '/member/reservations'
     | '/instructor/sessions/$sessionId'
+    | '/public/$slug/calendar'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/leads'
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/member/private-lessons'
     | '/member/reservations'
     | '/instructor/sessions/$sessionId'
+    | '/public/$slug/calendar'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/leads'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/member/private-lessons'
     | '/member/reservations'
     | '/instructor/sessions/$sessionId'
+    | '/public/$slug/calendar'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/leads'
@@ -436,6 +448,7 @@ export interface RootRouteChildren {
   MemberPrivateLessonsRoute: typeof MemberPrivateLessonsRoute
   MemberReservationsRoute: typeof MemberReservationsRoute
   InstructorSessionsSessionIdRoute: typeof InstructorSessionsSessionIdRoute
+  PublicSlugCalendarRoute: typeof PublicSlugCalendarRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
   OOrgIdCCenterIdLeadsRoute: typeof OOrgIdCCenterIdLeadsRoute
@@ -592,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InstructorSessionsSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/public/$slug/calendar': {
+      id: '/public/$slug/calendar'
+      path: '/public/$slug/calendar'
+      fullPath: '/public/$slug/calendar'
+      preLoaderRoute: typeof PublicSlugCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/access': {
       id: '/o/$orgId/c/$centerId/access'
       path: '/o/$orgId/c/$centerId/access'
@@ -700,6 +720,7 @@ const rootRouteChildren: RootRouteChildren = {
   MemberPrivateLessonsRoute: MemberPrivateLessonsRoute,
   MemberReservationsRoute: MemberReservationsRoute,
   InstructorSessionsSessionIdRoute: InstructorSessionsSessionIdRoute,
+  PublicSlugCalendarRoute: PublicSlugCalendarRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
   OOrgIdCCenterIdLeadsRoute: OOrgIdCCenterIdLeadsRoute,

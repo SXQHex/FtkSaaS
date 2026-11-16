@@ -3,11 +3,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { getSupabaseClient } from "../../lib/supabase";
 
-export function useAuthSession() {
+export function useAuthSession(enabled = true) {
   const [ready, setReady] = useState(true);
   const queries = useQueryClient();
   const router = useRouter();
   useEffect(() => {
+    if (!enabled) return;
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
       return;
     let previous: string | null | undefined;
@@ -45,6 +46,6 @@ export function useAuthSession() {
       mounted = false;
       data.subscription.unsubscribe();
     };
-  }, [queries, router]);
+  }, [enabled, queries, router]);
   return ready;
 }

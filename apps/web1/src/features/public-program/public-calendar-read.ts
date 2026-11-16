@@ -1,0 +1,133 @@
+import { z } from "zod";
+import { v7 as uuidv7 } from "uuid";
+import type {
+  Interval,
+  RequestPublicCalendarGet,
+  SuccessPublicCalendarGet,
+} from "../../lib/api-contracts/generated";
+import { readEnvelope } from "../../lib/backend";
+import { getTemporal } from "../../lib/temporal";
+import { formatMinorAmount } from "../../lib/money";
+import type { PublicProgramRow } from "./public-calendar-view";
+
+const instant = z.iso.datetime({ offset: true });
+const profile = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  address: z.string().optional(),
+  timezone: z.string().optional(),
+  disciplines: z.array(z.object({ id: z.uuid(), name: z.string() })).optional(),
+});
+const calendar = z.object({
+  items: z.array(
+    z.object({
+      publication_id: z.uuid(),
+      title: z.string(),
+      interval: z.object({ starts_at: instant, ends_at: instant }),
+      venue_public_label: z.string(),
+      fee_minor: z.string().regex(/^\d+$/),
+      currency: z.string().regex(/^[A-Z]{3}$/),
+      public_conditions: z.string(),
+      discipline_ids: z.array(z.uuid()),
+    }),
+  ),
+  next_cursor: z.string().min(1).nullable().optional(),
+  as_of: instant,
+  organization_profile: profile.nullish(),
+  center_profile: profile.nullish(),
+});
+export type PublicCalendarPage = z.infer<typeof calendar>;
+
+export async function publicCalendarInterval(now = Date.now()): Promise<Interval> {
+  const T = await getTemporal();
+  const start = T.Instant.fromEpochMilliseconds(now);
+  return { starts_at: start.toString(), ends_at: start.add({ hours: 14 * 24 }).toString() };
+}
+
+export async function readPublicCalendar(
+  input: { slug: string; centerId?: string; interval: Interval; cursor?: string | null },
+  signal?: AbortSignal,
+) {
+  const base = import.meta.env.VITE_PUBLIC_GATEWAY_URL?.trim();
+  if (!base) throw new Error("Public gateway yapılandırması eksik.");
+  const request: RequestPublicCalendarGet = {
+    client_api_version: 1,
+    request_id: uuidv7(),
+    slug: input.slug,
+    interval: input.interval,
+    page: { limit: 50, sort: "starts_at_asc", ...(input.cursor ? { cursor: input.cursor } : {}) },
+    ...(input.centerId ? { center_id: input.centerId } : {}),
+    include_disciplines: true,
+  };
+  const response = await fetch(`${base.replace(/\/$/, "")}/api/public/calendar`, {
+    method: "POST",
+    credentials: "omit",
+    cache: "no-store",
+    signal,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  const data = calendar.parse(await readEnvelope<SuccessPublicCalendarGet>(response));
+  const ids = new Set<string>();
+  const T = await getTemporal();
+  let previous: string | undefined;
+  for (const item of data.items) {
+    if (
+      ids.has(item.publication_id) ||
+      T.Instant.compare(item.interval.starts_at, item.interval.ends_at) >= 0 ||
+      T.Instant.compare(item.interval.starts_at, input.interval.starts_at) < 0 ||
+      T.Instant.compare(item.interval.starts_at, input.interval.ends_at) >= 0 ||
+      (previous && T.Instant.compare(previous, item.interval.starts_at) > 0)
+    )
+      throw new Error("Geçersiz public program yanıtı.");
+    ids.add(item.publication_id);
+    previous = item.interval.starts_at;
+  }
+  if (input.cursor && input.cursor === data.next_cursor)
+    throw new Error("Geçersiz program cursor yanıtı.");
+  return data;
+}
+
+export async function publicProgramRows(
+  pages: PublicCalendarPage[],
+): Promise<{ rows: PublicProgramRow[]; timezone?: string }> {
+  const T = await getTemporal();
+  const first = pages[0];
+  const timezone = first?.center_profile?.timezone ?? first?.organization_profile?.timezone;
+  const zone = timezone ?? "UTC";
+  // A missing public timezone is explicitly labelled UTC; it is never inferred from the visitor's device.
+  const ids = new Set<string>();
+  const rows = pages
+    .flatMap((page) => page.items)
+    .map((item) => {
+      if (ids.has(item.publication_id)) throw new Error("Yinelenen public program kaydı.");
+      ids.add(item.publication_id);
+      const start = T.Instant.from(item.interval.starts_at).toZonedDateTimeISO(zone);
+      const end = T.Instant.from(item.interval.ends_at).toZonedDateTimeISO(zone);
+      const time: Intl.DateTimeFormatOptions = {
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      };
+      return {
+        id: item.publication_id,
+        title: item.title,
+        day: start.toPlainDate().toString(),
+        dayLabel: start.toLocaleString("tr-TR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+        start: start.toLocaleString("tr-TR", time),
+        end: end.toLocaleString("tr-TR", time),
+        startsAt: item.interval.starts_at,
+        endsAt: item.interval.ends_at,
+        venue: item.venue_public_label,
+        conditions: item.public_conditions,
+        fee: formatMinorAmount(item.fee_minor, item.currency),
+        // The native public DTO does not classify lesson/event or expose private capacity/instructors.
+      };
+    });
+  return { rows, timezone };
+}
