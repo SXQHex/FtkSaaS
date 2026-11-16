@@ -103,25 +103,34 @@ async function eventInstant(draft: EventDraft, kind: "starts" | "ends", before?:
     )
       return before.interval[field];
   }
+  return eventWallInstant(draft.timezone, draft[kind], chosenOffset, kind);
+}
+export async function eventWallInstant(
+  timezone: string,
+  value: string,
+  offset: string,
+  label = "actual",
+) {
+  const T = await getTemporal();
   const [date, time] = z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)
-    .parse(draft[kind])
+    .parse(value)
     .split("T") as [string, string];
-  const { local, offsets } = await scheduleTimeChoices(draft.timezone, date, time);
-  if (offsets.length && !offsets.includes(chosenOffset))
+  const { local, offsets } = await scheduleTimeChoices(timezone, date, time);
+  if (offsets.length && !offsets.includes(offset))
     throw new ScheduleTimeError("SCHEDULE_TIME_AMBIGUOUS", [
-      { date: kind, choices: offsets.map((offset) => ({ id: offset, label: `UTC${offset}` })) },
+      { date: label, choices: offsets.map((offset) => ({ id: offset, label: `UTC${offset}` })) },
     ]);
   return T.ZonedDateTime.from(
     {
-      timeZone: draft.timezone,
+      timeZone: timezone,
       year: local.year,
       month: local.month,
       day: local.day,
       hour: local.hour,
       minute: local.minute,
-      ...(offsets.length ? { offset: chosenOffset } : {}),
+      ...(offsets.length ? { offset } : {}),
     },
     { disambiguation: "reject", offset: "reject", overflow: "reject" },
   )

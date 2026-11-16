@@ -10,7 +10,8 @@ export function useMemberCommand<Intent, Result>({
   onRefresh,
   onAccessLost,
 }: {
-  write: (intent: Intent) => Promise<Mutation>;
+  // Some native operations acknowledge with a typed domain view. Adapters only extract its real primary ID.
+  write: (intent: Intent) => Promise<Pick<Mutation, "primary_id">>;
   readReceipt: (intent: Intent) => Promise<OperationStatusView>;
   readResult: (intent: Intent, id?: string) => Promise<Result>;
   onRefresh: (result: Result) => Promise<void>;
