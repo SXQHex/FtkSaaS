@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. Açık backend eşleme/destek talepleri W1-BE-15 ve W1-BE-16’dır; W1-BE-01–14 için kaynak desteği mevcuttur. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `b586bfe212905b9009804b26f58ab25f41b921ee` (PR311–314 dala ve yerel typed snapshot’a alındı). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43793133914), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43793133880) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43793205419) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -15,12 +15,13 @@
 | W1-BE-07 | E17 · P06.3/.4          | Seans düzenleme ve kalıcı telafi bağı için native okuma eşlemesi                 | PR313 typed düzenleme/telafi projeksiyonları mevcut; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                      |
 | W1-BE-08 | E17 · aynı-key kurtarma | Native telafi komutu receipt okumasının typed request ile doğrulanması           | PR313 native capacity/receipt recovery düzeltmesi ve otomatik backend kabul testi mevcut; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17. |
 | W1-BE-09 | E19 · P07               | Paket yönetimi durum/arama/özet/geçmiş ve satışa kapatma/arşiv eşlemesi          | Backend karşılandı (PR313); yönetim/durum/geçmiş tüketiliyor, kabul sahibi TODO/E19.                                                           |
-| W1-BE-10 | E20 · P08               | Merkez geneli finans hareket/borç/alacak keşfi ve para birimine ayrılmış özetler | PR313 finance_directory_get_v1 mevcut; E20 merkez keşfi tüketimi sırada.                                                                       |
+| W1-BE-10 | E20 · P08               | Merkez geneli finans hareket/borç/alacak keşfi ve para birimine ayrılmış özetler | Backend karşılandı (PR313): finance_directory_get_v1 mevcut; frontend tüketimi TODO/E20 sahibinde.                                             |
 | W1-BE-11 | E14 · P04/P07           | Üyelik başlangıcı ve hak hareket defteri                                         | PR313 include_membership_date ve satışa bağlı ledger sayfası mevcut; E14 tüketimi sırada.                                                      |
 | W1-BE-12 | E14 · P07.2             | Yetkili indirimli native satış                                                   | PR313 sale.discount + sale_discount_percent_upper eşlemesi mevcut; açık yetki/politika gerekir, otomatik grant yok.                            |
 | W1-BE-13 | E14 · P09               | Başlangıca göre rezervasyon zaman filtresi                                       | Backend karşılandı (PR314): time_filter sunucu/cursor kapsamında; E14 filtre bağlantısı ve yerel kabulü tamam.                                 |
 | W1-BE-14 | E14 · P07.4             | Planlanmış dondurmayı tamamen iptal etme                                         | Backend karşılandı (PR314): freeze_cancel_preview_v1 / freeze_cancel_apply_v1 mevcut; E14 tüketimi sırada.                                     |
 | W1-BE-15 | E18 · P10/WF19          | Seans geneli bekleme listesi ve teklif geçmişi keşfi                             | Açık: mevcut typed management okuyucu bilinen kişi+seans veya entry/offer kimliği istiyor; seans geneli liste yok.                             |
+| W1-BE-16 | E18 · P09/WF06          | Rezervasyona bağlı gerçek paket/hak özeti                                        | Açık eşleme talebi: ReservationView kaynak satış kimliği taşımıyor; kişi hak toplamı rezervasyonun paketi sayılmıyor.                          |
 
 ## Bütün talepler için ortak sınır
 
@@ -62,7 +63,7 @@
 
 ## W1-BE-04 · Birleştirme gerekçesi ve çizimdeki keşif/karar akışı
 
-**Karşılandı (PR312):** Preview gerekçesi sabitlenir, apply/audit sonucuna taşınır. Merkez review directory suggested/completed/not_duplicate durumlarını ve sayaçlarını keşfeder. Kesin normalize e-posta/telefon adayları iletişim görünürlüğüyle sınırlıdır; kopya-değil kararı mevcut preview → açık onay → apply yolundadır. Seçili iki kişiye `person_get_v1(include_member_summary:true)` projeksiyonu desteklenir. E16 tüketici bağlantısı ve odaklı kaynak/sentetik testleri tamamlandı; dört gerçek development dizin okuması ve owned çiftte kopya-değil/merge/canonical geçmiş kabulü geçti; finans/çok merkez/son ekran kabulü [TODO](todo.md) içinde açıktır.
+**Karşılandı (PR312):** Preview gerekçesi sabitlenir, apply/audit sonucuna taşınır. Merkez review directory suggested/completed/not_duplicate durumlarını ve sayaçlarını keşfeder. Kesin normalize e-posta/telefon adayları iletişim görünürlüğüyle sınırlıdır; kopya-değil kararı mevcut preview → açık onay → apply yolundadır. Seçili iki kişiye `person_get_v1(include_member_summary:true)` projeksiyonu desteklenir. Frontend uygulaması, yerel kabulü ve Pro sonrası gerçek kontrollerin tek sahibi [TODO/E16](todo.md#sayfa-kabulu); burada ikinci bir ekran kabul durumu tutulmaz.
 
 **Talep açılırken kaynak:** `person_merge_preview_v1` açık source_id/target_id ile çalışır; approve/apply girdileri preview capability ve operation_key kullanır, gerekçe alanı taşımaz. Merkez `person_merge_approve_v1` discovery’si güncel onaylanabilir preview’ları verir; otomatik kopya önerisi veya tüm tamamlanan birleşimler değildir. [WF04](../../../docs/workflows.md#wf04), [merge adaptörleri](../src/features/people/merge.ts), [ekran](../src/features/people/merge-view.tsx).
 
@@ -81,7 +82,7 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 
 ## W1-BE-05 · Uygunluk ve kapanış yaşam döngüsü
 
-**Karşılandı (PR312):** `availability_save_v1(action:retire,rule_id,resource,expected_version,reason)` gerçek kural row version’ıyla; `availability_exception_save_v1(action:cancel,exception_id,resource,expected_version,reason)` gerçek merkez aggregate sürümüyle çalışır. Reader active/inactive ve active/cancelled durumlarını verir. Eski saat/hafta/tarih veya gizli gerekçe açılmaz; seanslara otomatik yan etki yoktur. E12 retire/cancel tüketimi hazır onaylar ve sürümlü yazar/yeniden okumayla bağlandı; gerçek kapanış cancel ve kalıcı kural retire kabulü geçti; ayrıntı ve kalan ekran kabulü [TODO](todo.md) sahibindedir.
+**Karşılandı (PR312):** `availability_save_v1(action:retire,rule_id,resource,expected_version,reason)` gerçek kural row version’ıyla; `availability_exception_save_v1(action:cancel,exception_id,resource,expected_version,reason)` gerçek merkez aggregate sürümüyle çalışır. Reader active/inactive ve active/cancelled durumlarını verir. Eski saat/hafta/tarih veya gizli gerekçe açılmaz; seanslara otomatik yan etki yoktur. Frontend uygulaması, yerel kabulü ve Pro sonrası gerçek kontrollerin tek sahibi [TODO/E12](todo.md#sayfa-kabulu); burada ikinci bir ekran kabul durumu tutulmaz.
 
 **Talep açılırken kaynak:** Haftalık uygunluk ekleme/sürümlü güncelleme ve merkez aggregate version ile kapanış append destekleniyor. Son kalıcı uygunluk kuralını kapatma ve mevcut kapanışı iptal etme komutu mevcut tüketim sözleşmesinde yok. [Uygunluk adaptörü](../src/features/studio/availability-edit.ts), [kapanış adaptörü](../src/features/studio/closure.ts), [WF02](../../../docs/workflows.md#wf02)/[WF03](../../../docs/workflows.md#wf03).
 
@@ -152,3 +153,9 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **Mevcut kaynak:** `ManagementSelectorWaitlistJoinV1` kişi+seans, leave entry_id, offer accept/reject offer_id ister. `p01-waitlist-workers.sql` içindeki `p01_wait_context` kişi bağlamını zorunlu çözer; `p01_wait_page` hem session_id hem person_id ile filtreler. `ManagementStateView.waitlist_detail` bilinen kişinin kayıt/tekliflerini taşır; bu seans geneli keşif değildir. Bütün kişileri taramak veya private/core tablolara erişmek çözüm olarak kullanılmaz.
 
 **Sınır:** Mevcut WF19/üst plan, canlı merkez ve rezervasyon görünürlüğü korunmalı; worker issue/expire insan istemciye açılmaz. Yönetici üye kabul/ret işlemini taklit etmez. Frontend kompozisyonu hazırdır; API ve kabulünün tek sahibi [E18](todo.md#sayfa-kabulu) kalır. Bu talep backend uygulama/onayı değildir.
+
+## W1-BE-16 · Rezervasyona bağlı paket/hak sütunu eşlemesi
+
+**İhtiyaç:** E18 katılımcı tablosunun Hak sütunu için görünür rezervasyonun gerçek kaynak satışına ve izinli güncel paket/hak özetine giden mevcut typed eşlemeyi belirtin. Yoksa yalnız görünür seans/rezervasyon satırları için mevcut kişi/merkez/plan/hak görünürlüğünü koruyan typed destek gerekir. Native hesap kimliği veya private/core erişimi istenmez.
+
+**Kaynak:** `ReservationView` id/session/person/state/mode/version/category taşır, source_sale_id taşımaz. Kişinin `entitlements_get_v1(session_id,booking_mode)` sonucu uygun hakları seçme kaynağıdır; önceden oluşmuş rezervasyonun hangi satışa bağlı olduğunu tek başına kanıtlamaz. `GroupStudentView` yalnız priority sınıf rezervasyonlarını kapsar. Bütün satış defterlerini tarayarak ters bağ kurulmaz; güncel uygun ilk paket, atanmış kaynak veya kişi hak toplamı diye sunulmaz. Bu bir eşleme/destek talebidir; backend eksiği ya da yeni endpoint kararı olarak kabul edilmez.
