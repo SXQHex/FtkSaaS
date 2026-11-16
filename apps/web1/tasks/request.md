@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–17 için backend kaynak desteği karşılandı. Açık talepler W1-BE-18–26’dır; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–17 için backend kaynak desteği karşılandı. Açık talepler W1-BE-18–27’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `7831ebe31b8b1912ba5370ef81e40ced8c97dec2` (PR316 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43922098495), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43922098694) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43922226819) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -32,6 +32,7 @@
 | W1-BE-24 | E33 · P12 | CRM özet/filtre, merkez takipleri, sorumlu ve geçmiş deneme teklifi keşfi | Açık: mevcut okuyucuların güvenli typed eşlemesi veya eksik keşif desteği isteniyor. |
 | W1-BE-25 | E34–36 · P12.5/WF09 | Public program türü/filtre, görünür doluluk ve başvuru/yayın durumu | Açık: mevcut anonim DTO eşlemesi veya güvenli typed destek isteniyor. |
 | W1-BE-26 | E37 · P13/WF15 | Etkinlik arama/durum filtresi, görünür kayıt sayısı ve merkez özetleri | Açık: native liste mevcut; güvenli typed filtre/özet eşlemesi isteniyor. |
+| W1-BE-27 | E38 · P13/WF15 | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı | Açık: mevcut typed keşif eşlemesi veya izinli okuma desteği isteniyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -257,3 +258,12 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** E37 için mevcut güvenli typed eşlemeyi belirtin; yoksa (1) cursor kapsamına dahil başlık araması ve all/published/draft/occurred/cancelled filtresi, (2) aynı yetkili merkez/ilgili dönem kapsamında yayın/taslak sayısı, yayındaki etkinliklerdeki aktif kayıt sayısı ve para birimine göre bekleyen ödeme tutarı/kayıt sayısı, (3) görünür liste satırındaki gerçek aktif kayıt adedi desteği gerekir. Öz okuma/öğrenci ile yönetim görünürlüğü aynı toplamı açmamalı. Yeni endpoint şart koşulmuyor; native occurred ile yoklama kapanışının doğru sunum eşlemesi backend sahibindedir.
 
 **Sınır:** Tüm etkinlikleri/katılımcıları/finans geçmişini tarayıp istemci toplamı üretilmez; cursor sayfasında arama/durum süzülmez. Para birimi tahmin edilmez veya farklı para birimleri toplanmaz. Mevcut kayıt/kapasite/ödeme yetkileri genişletilmez. Taslak oluşturma/düzenleme ve native tekil detay gibi bağımsız işlemler mevcut kaynakla sürdürülecek; E37’nin kaynak/entegrasyon/kabul durumu TODO sahibindedir.
+
+
+## W1-BE-27 · Etkinlik kaydının gerçek ödeme/borç kaynağı
+
+**Mevcut kaynak:** `management_state_get_v1(event_payment_prepare_v1,{event_id,person_id})` ile bulunan hazırlık kimliği ve `event_payment_get_v1` o hazırlığın immutable şart/borç/bakiye kaynağıdır. Fakat `event_payment_prepare_v1` yalnız pozitif ücretli ve tam ödeme zorunlu yayında çalışır; aktif kayıt varsa RESERVATION_EXISTS döner. Sonradan ödeme alınan veya eski hazırlıksız kayıtlar için bu komutu keşif amacıyla çalıştırmak geçerli değildir. `EventRegistrationView` gerçek borç/hazırlık kimliği, kayıt anındaki ücret/para birimi veya ödeme özeti taşımaz. `finance_get_v1` borç kimliği/bakiye verir, etkinlik kaydına bağlayan typed kaynak referansı vermez; finance directory de etkinlik hedefiyle filtrelenmiyor.
+
+**İhtiyaç:** E38’in ödeme sütunu ve yalnız bu etkinlik borcuna hedefli tahsilatı için mevcut güvenli typed eşlemeyi belirtin; yoksa bilinen event_id/registration_id ve görünür kayıtlar için gerçek borç/hazırlık referansı, immutable tutar/para birimi ve güncel kalan/ödenen/iptal bakiyesini okuma desteği gerekir. Hazırlığı olmayan ücretsiz kayıt, ödeme kaynağı gizli ve okuma hatası farklı kalmalı. Yeni endpoint şart koşulmuyor.
+
+**Sınır:** Etkinliğin güncel terms.fee_minor değeri geçmiş kaydın ücreti veya borcu değildir. Kişinin borçları sıraya/kimlik benzerliğine göre etkinliğe bağlanmaz; yeni hazırlık/borç yaratarak keşif yapılmaz. Finans/kişi/merkez yetkileri ve native debt_ids hedefli tahsilat korunur. Görünen bütün kişilerin finans geçmişini tarama istenmiyor. Hazırlıklı yeni kayıtlar ve bağımsız yayın/katılım işlemleri mevcut native kaynakla sürdürülecek; frontend kabulü TODO/E38 sahibindedir.

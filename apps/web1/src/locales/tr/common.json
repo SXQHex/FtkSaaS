@@ -3356,5 +3356,82 @@
       "stale": "Kaynak sürümü değişti. Güncel kaydı oku, şartları yeniden incele.",
       "rejected": "İşlem reddedildi. Güncel kaynağı oku ve koşulları kontrol et."
     }
+  },
+  "eventDetail": {
+    "sections": "Etkinlik bölümleri",
+    "participants": "Katılımcılar",
+    "attendance": "Yoklama",
+    "member": "Üye",
+    "rights": "Hak",
+    "payment": "Ödeme",
+    "operations": "İşlemler",
+    "extra": "Etkinlik bilgileri",
+    "capacity": "Kontenjan",
+    "duties": "Görevliler",
+    "conditions": "Koşullar",
+    "noDuties": "Görevli bulunmuyor.",
+    "unread": "Bu kaynak henüz okunamadı.",
+    "empty": "Görünür katılımcı kaydı yok.",
+    "visibleCount_one": "{{count}} kayıt listeleniyor",
+    "visibleCount_other": "{{count}} kayıt listeleniyor",
+    "actions": {
+      "edit": "Düzenle",
+      "publish": "Yayımla",
+      "unpublish": "Yayından kaldır",
+      "complete": "Etkinliği tamamla",
+      "cancel": "Etkinliği iptal et",
+      "register": "Katılımcı ekle",
+      "cancel_registration": "Kaydı iptal et",
+      "payment": "Ödemeyi incele",
+      "verify_duty": "Doğrula"
+    },
+    "planned": "Planlanan başlangıç",
+    "actual": "Fiilî başlangıç",
+    "reason": "Gerekçe",
+    "requiredReason": "Gerekçe (zorunlu, geçmişe yazılır)",
+    "review": "İşlemi ve etkilerini inceledim, onaylıyorum.",
+    "closedAttendance": "Yoklama kapalı",
+    "openAttendance": "Yoklama açık",
+    "markFor": "{{name}} için yoklama",
+    "attendanceActions": {
+      "record_start": "Fiilî başlangıcı kaydet",
+      "correct_start": "Fiilî başlangıcı düzelt",
+      "clear_start": "Fiilî başlangıcı kaldır",
+      "close_attendance": "Yoklamayı kapat",
+      "correct_attendance": "Yoklamayı düzenle"
+    },
+    "results": {
+      "unmarked": "İşaretlenmedi",
+      "attended": "Geldi",
+      "no_show": "Gelmedi",
+      "blocked": "Engellendi"
+    },
+    "registration": {
+      "step": "Adım {{step}} / 3",
+      "steps": {
+        "1": "Katılımcı ve hak seçimi",
+        "2": "Ödeme ve koşullar",
+        "3": "Kesin kayıt özeti"
+      },
+      "confirm": "Kaydı onaylıyorum",
+      "hint": "Yalnız son onayla kesin kayıt ve kontenjan işlemi yapılır. Ödeme hazırlığı veya tahsilat tek başına kayıt değildir.",
+      "back": "Geri",
+      "next": "Devam",
+      "save": "Kaydı onayla",
+      "paymentItems": "Ödeme kalemleri",
+      "prepare": "Ödeme hazırlığını oluştur",
+      "prepareHint": "Ödeme hazırlığı bir borç oluşturabilir; kesin kayıt veya kontenjan garantisi değildir. Tahsilat ayrı onaylanır ve gerçek borca bağlanır.",
+      "collection": "Tahsilat",
+      "collectNow": "Şimdi tahsil edilecek",
+      "collectLater": "Sonra tahsil edilecek",
+      "amount": "Tutar (alt birim)",
+      "method": "Yöntem",
+      "cash": "Nakit",
+      "bank": "Havale",
+      "collectedAt": "Tahsilat tarihi ve saati",
+      "reference": "Referans",
+      "note": "Not",
+      "collect": "Tahsilatı incele"
+    }
   }
 }
