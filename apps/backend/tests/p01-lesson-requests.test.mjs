@@ -1,3 +1,4 @@
+import './lesson-request-status-summary-acceptance.mjs';
 import './lesson-request-catalog-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -111,6 +112,14 @@ test('P01-B request intent, alternatives and atomic guarded approval through Aut
   await fail('lesson_request_approve_v1',body,'DOCUMENT_REQUIRED',owner,k);assert.deepEqual(await domainCounts(),before);assert.equal((await view(r.primary_id)).state,'pending');
   await db.query("insert into core.document_acceptances(id,org_id,person_id,account_id,document_version_id,accepted_at,operation_id,context) values($1,$2,$3,$4,$5,now(),$6,$7)",[key(),org,student.p,student.a.id,v,r.operation_id,{gate:'reservation',subject:{type:'lesson_requests',id:r.primary_id}}]);
   const result=await mut('lesson_request_approve_v1',body,owner,k);assert(result.related.some(v=>v.type==='sessions'));assert.equal((await view(r.primary_id)).state,'approved');
+ });
+ await t.test('status filter and center summary use the existing native management route',async()=>{
+  for(let i=0;i<2;i++)await db.query("insert into core.lesson_requests(id,org_id,center_id,person_id,format,discipline_id,requested_start,duration_minutes,state) values($1,$2,$3,$4,'private',$5,$6,60,'pending')",[key(),org,center,student.p,discipline,new Date(Date.now()+(50+i)*86400000)]);
+  const base={operation:'lesson_request_create_v1',selector:{operation:'lesson_request_create_v1',key:{status:'pending',include_summary:true}},page:{limit:1}};
+  const p=await must(owner,'management_state_get_v1',scope(base));assert.equal(p.items.length,1);assert.equal(p.items[0].state,'pending');assert(p.next_cursor);
+  const counts=(await rows("select count(*) filter(where state='pending')::int pending,count(*) filter(where state='alternative_offered')::int alternative_offered,count(*) filter(where state='approved')::int approved,count(*) filter(where state='rejected')::int rejected from core.lesson_requests where org_id=$1 and center_id=$2",[org,center]))[0];assert.deepEqual(p.lesson_request_summary,counts);
+  const all=await must(owner,'management_state_get_v1',scope({...base,selector:{...base.selector,key:{status:'resolved',include_summary:true}},page:{limit:200}}));assert.deepEqual(all.lesson_request_summary,counts);assert(all.items.every(x=>['approved','rejected','withdrawn','expired'].includes(x.state)));
+  await fail('management_state_get_v1',{...base,selector:{...base.selector,key:{status:'resolved',include_summary:true}},page:{limit:1,cursor:p.next_cursor}},'VALIDATION_FAILED');
  });
  await t.test('read cursor is scope-bound; same-key replay still requires live CM authority',async()=>{
   const operation='lesson_request_create_v1',requestBody=scope({operation,selector:{operation,key:{}},page:{limit:1}});

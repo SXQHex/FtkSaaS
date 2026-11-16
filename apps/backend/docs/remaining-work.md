@@ -50,7 +50,16 @@ Kullanıcı gerekli backend açıklarını gidermeyi ve gereksiz geliştirme yer
 - [x] Seans bekleme/teklif cursor keşfi; worker FIFO, güvenli ad, sürüm ve ayrı teklif geçmişi. Yeni komut/worker/endpoint açılmaz.
 - [x] Görünür rezervasyon sayfasında opt-in gerçek kaynak/hak özeti; ayrı hak yetkisi, gizli/kapalı/atanmamış ayrımı ve immutable sürüm adı.
 - [x] Son kaynak SQL/static test ve bağımsız inceleme; native Auth/Edge kabulü aşağıdaki aday CI aşamasındadır.
-- [ ] Aday CI → main kaynak kanıtı → development teslimi ve gerekli hosted tekrar kabulü.
+- [x] PR315 aday CI, main kaynak kanıtı ve development teslimi; kanıt devir sahibindedir.
+- [ ] Yeni hosted backend tekrar kabulü; E18 frontend kabulü ayrı kalır.
+
+## W1-BE-17 — Özel ders talep durumları ve merkez özeti
+
+Kullanıcının backend açıklarını giderme görevinin E21 ekidir; ayrı PR'da yürür. Kesin tüketim WF06, frontend kabulü kendi TODO/E21 alanındadır. Kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#ozel-ders-durum-ozet) sahibindedir.
+
+- [x] Mevcut talep okuyucusunda opt-in durum/özet; terminal dört durum eşlemesi, native görünür kapsam ve cursor bağlama.
+- [x] Son kaynak SQL/typed/static test ve bağımsız inceleme; native Auth/Edge kabulü aday CI aşamasındadır.
+- [ ] Aday CI → main kaynak kanıtı → development teslimi; gerekli hosted tekrar ve E21 kabulü ayrı.
 
 ## Backend çalışma modeli
 
