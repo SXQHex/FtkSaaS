@@ -3214,5 +3214,25 @@
     "unavailableHint": "Yayın açık olduğunda programı bu adresten görebilirsin.",
     "refreshFailed": "Program yenilenemedi.",
     "refreshHint": "Son okunan program gösteriliyor; güncel durumu tekrar kontrol et."
+  },
+  "publicApplication": {
+    "title": "Başvur",
+    "description": "Bilgilerini bırak, stüdyo sana dönsün. Üye olmak zorunda değilsin.",
+    "name": "Ad soyad (zorunlu)",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "contactHint": "E-posta veya telefondan en az biri gerekli. Telefonu uluslararası + veya 00 önekiyle yaz.",
+    "interest": "Ne ilgini çekiyor?",
+    "unsure": "Henüz bilmiyor",
+    "message": "Mesaj",
+    "messagePlaceholder": "Örn. hiç dans etmedim, hafta içi akşam grubu var mı?",
+    "messageCount": "{{length}} / 500",
+    "website": "Web sitesi",
+    "consentUnavailable": "İletişim onay metni henüz yüklenemedi.",
+    "consentHint": "Bu onay form sürümüyle birlikte kaydedilir. İstediğin zaman iletişimi durdurmasını isteyebilirsin.",
+    "submitHint": "Gönderince başvurun stüdyoya iletilir.",
+    "submit": "Başvuruyu gönder",
+    "unavailable": "Başvuru formu henüz kullanılamıyor.",
+    "unavailableHint": "Formun yayın bilgisi, geçerli onay metni ve doğrulama ayarları hazır olduğunda buradan başvurabilirsin."
   }
 }

@@ -1897,6 +1897,26 @@ export default interface Resources {
       "verified": "Doğrulandı",
       "writeUnknown": "Kaydetme doğrulanamadı. Aynı değerlerle yeniden deneyebilir veya güncel verileri yükleyebilirsin."
     },
+    "publicApplication": {
+      "consentHint": "Bu onay form sürümüyle birlikte kaydedilir. İstediğin zaman iletişimi durdurmasını isteyebilirsin.",
+      "consentUnavailable": "İletişim onay metni henüz yüklenemedi.",
+      "contactHint": "E-posta veya telefondan en az biri gerekli. Telefonu uluslararası + veya 00 önekiyle yaz.",
+      "description": "Bilgilerini bırak, stüdyo sana dönsün. Üye olmak zorunda değilsin.",
+      "email": "E-posta",
+      "interest": "Ne ilgini çekiyor?",
+      "message": "Mesaj",
+      "messageCount": "{{length}} / 500",
+      "messagePlaceholder": "Örn. hiç dans etmedim, hafta içi akşam grubu var mı?",
+      "name": "Ad soyad (zorunlu)",
+      "phone": "Telefon",
+      "submit": "Başvuruyu gönder",
+      "submitHint": "Gönderince başvurun stüdyoya iletilir.",
+      "title": "Başvur",
+      "unavailable": "Başvuru formu henüz kullanılamıyor.",
+      "unavailableHint": "Formun yayın bilgisi, geçerli onay metni ve doğrulama ayarları hazır olduğunda buradan başvurabilirsin.",
+      "unsure": "Henüz bilmiyor",
+      "website": "Web sitesi"
+    },
     "publicProgram": {
       "allLessons": "Tüm dersler",
       "apply": "Başvur",
