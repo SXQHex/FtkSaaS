@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Button, LinkButton } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { BackendError } from "../../lib/backend";
@@ -310,6 +310,19 @@ export function MergeContent({
     return null;
   }
   const notDuplicate = preview?.decision === "not_duplicate";
+  const profileLink = (personId: string) => (
+    <LinkButton
+      href={
+        router.buildLocation({
+          to: "/o/$orgId/c/$centerId/people/$personId",
+          params: { orgId: scope.orgId, centerId: scope.centerId, personId },
+        }).href
+      }
+      variant="outline"
+    >
+      {t(($) => $.people.profile)}
+    </LinkButton>
+  );
   const detail: MergeDetail | undefined = directory.isError
     ? undefined
     : history
@@ -325,6 +338,7 @@ export function MergeContent({
           effects: [],
           blockers: [],
           completed: true,
+          profileAction: history.state === "completed" ? profileLink(history.target.id) : undefined,
           notice: [
             history.state === "completed"
               ? t(($) => $.peopleMerge.completed)
@@ -387,6 +401,10 @@ export function MergeContent({
                       : t(($) => $.peopleMerge.blocked),
               ) ?? [],
             completed: command.state === "saved",
+            profileAction:
+              command.state === "saved" && preview?.decision === "merge"
+                ? profileLink(preview.target.id)
+                : undefined,
             notice: command.state === "saved" ? t(($) => $.peopleMerge.saved) : undefined,
           }
         : undefined;

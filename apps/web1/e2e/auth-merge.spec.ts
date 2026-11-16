@@ -278,6 +278,10 @@ test("Merge: pinned reason, explicit confirmation, same-key lost reply and read-
   expect(state.writes[0]?.key).toBe(state.writes[1]?.key);
   expect(state.effects).toBe(1);
   expect(state.reason).toBe("Fixture final reason");
+  await expect(page.getByRole("link", { name: "Profili aç", exact: true })).toHaveAttribute(
+    "href",
+    `/o/${I.org}/c/${I.center}/people/${I.instructor}`,
+  );
 });
 test("Merge: not-duplicate has its own preview/apply and durable scoped history, mobile AA", async ({
   page,

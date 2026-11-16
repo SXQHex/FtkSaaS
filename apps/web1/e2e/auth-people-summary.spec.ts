@@ -4,6 +4,72 @@ import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { RequestPeopleList, SuccessPeopleList } from "../src/lib/api-contracts/generated.js";
 
+test("Members: creation recovers one person, invitation acknowledgement only rereads its job", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  let jobReads = 0;
+  await page.route("**/functions/v1/backend-v1/job_status_get_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    jobReads++;
+    if (jobReads === 1) return route.abort("failed");
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.org,
+        data: {
+          id: request.job_id,
+          state: "pending",
+          progress_count: 0,
+          total_count: null,
+          result_reference: null,
+          safe_error_code: null,
+        },
+      },
+    });
+  });
+  await openStudio(page);
+  await page.goto(`${origin}/o/${I.org}/c/${I.center}/people`);
+  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.locator("#people-name").fill("Yeni Fixture Üye");
+  await dialog.locator("#people-email").fill("new-member@example.invalid");
+  state.nextWrite = "unknown";
+  await dialog.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
+  await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await expect(dialog.locator("#people-name")).toHaveAttribute("readonly", "");
+  const creates = state.writes.filter((write) => write.operation === "person_create_v1");
+  expect(creates).toHaveLength(2);
+  expect(creates[0]!.key).toBe(creates[1]!.key);
+  expect(state.people.filter((person) => person.display_name === "Yeni Fixture Üye")).toHaveLength(
+    1,
+  );
+  expect(state.effects).toEqual(["person_create_v1"]);
+  await dialog.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  const refresh = dialog.getByRole("button", { name: "Güncel durumu oku", exact: true });
+  await expect(refresh).toBeVisible();
+  await refresh.click();
+  await expect.poll(() => jobReads).toBe(2);
+  expect(state.effects).toEqual(["person_create_v1", "account_access_send_v1"]);
+  expect(state.writes.filter((write) => write.operation === "account_access_send_v1")).toHaveLength(
+    1,
+  );
+  expect(
+    state.people.find((person) => person.display_name === "Yeni Fixture Üye")!.relationships,
+  ).toEqual([]);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.emulateMedia({ colorScheme: "dark" });
+  expect(await page.evaluate<boolean>("document.documentElement.scrollWidth > innerWidth")).toBe(
+    false,
+  );
+  expect(
+    (await scanAccessibility(page, "members-created-invitation-recovery-mobile")).violations,
+  ).toEqual([]);
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+});
+
 test("Members: server status/cursor reset and exact scoped summaries, responsive AA", async ({
   page,
 }) => {
