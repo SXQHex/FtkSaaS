@@ -8,9 +8,40 @@ import {
   writeProduct,
   readProductResult,
   readProductsPage,
+  readProductsManagementPage,
   readProductReceipt,
   productTermsEqual,
 } from "./products";
+
+it("uses server management filters and keeps canonical center totals separate from the page", async () => {
+  const totals = { on_sale: 7, closed: 2, archived: 1, active_right_holders: 11, last_30_days: [] };
+  call.mockResolvedValueOnce({ view: "products", items: [], next_cursor: "next", totals });
+  const result = await readProductsManagementPage(scope, "off", "  paket  ", "cursor");
+  expect(call).toHaveBeenLastCalledWith(
+    "products_management_list_v1",
+    expect.objectContaining({
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      view: "products",
+      status: "closed",
+      query: "paket",
+      include_timed_products: true,
+      page: { limit: 20, cursor: "cursor" },
+    }),
+  );
+  expect(result.totals).toEqual(totals);
+  expect(result.next_cursor).toBe("next");
+});
+
+it("rejects a management response containing history rows instead of products", async () => {
+  call.mockResolvedValueOnce({
+    view: "products",
+    items: [{ id: base.id, product_id: base.id, terms: base.terms }],
+  });
+  await expect(readProductsManagementPage(scope, "all", "")).rejects.toThrow(
+    "PRODUCT_SOURCE_UNAVAILABLE",
+  );
+});
 const scope = {
   accountId: "019a7b00-0000-7000-8000-000000000002",
   orgId: "019a7b00-0000-7000-8000-000000000003",

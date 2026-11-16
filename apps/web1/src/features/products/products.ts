@@ -8,6 +8,39 @@ import type {
   RequestProductPublish,
 } from "../../lib/api-contracts/generated";
 import type { ProductDraft } from "./product-editor";
+import type { ProductFilter } from "./products-view";
+
+export async function readProductsManagementPage(
+  scope: ClientScope,
+  filter: ProductFilter,
+  query: string,
+  cursor?: string,
+) {
+  const backend = await scopedBackend(scope);
+  const result = await backend.call("products_management_list_v1", {
+    client_api_version: 1,
+    request_id: uuidv7(),
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    view: "products",
+    status: filter === "on" ? "on_sale" : filter === "off" ? "closed" : filter,
+    include_timed_products: true,
+    ...(query.trim() ? { query: query.trim() } : {}),
+    page: { limit: 20, ...(cursor ? { cursor } : {}) },
+  });
+  if (result.view !== "products") throw new Error("PRODUCT_SOURCE_UNAVAILABLE");
+  const ids = new Set<string>();
+  const items = result.items.map((row) => {
+    if (!("active_right_holders" in row)) throw new Error("PRODUCT_SOURCE_UNAVAILABLE");
+    z.uuid().parse(row.id);
+    z.uuid().parse(row.version_id);
+    z.number().int().positive().parse(row.version);
+    if (ids.has(row.id)) throw new Error("PRODUCT_SOURCE_UNAVAILABLE");
+    ids.add(row.id);
+    return row;
+  });
+  return { ...result, items };
+}
 
 export async function readProductsPage(scope: ClientScope, cursor?: string) {
   const backend = await scopedBackend(scope);

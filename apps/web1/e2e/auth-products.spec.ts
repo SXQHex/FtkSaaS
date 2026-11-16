@@ -7,11 +7,51 @@ import { scanAccessibility } from "./accessibility.js";
 async function productsFixture(page: Page, unknown = false) {
   await mockStudio(page);
   const writes: Record<string, unknown>[] = [];
+  const managementReads: Record<string, unknown>[] = [];
   let product: ProductView | undefined;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "products_management_list_v1") {
+      managementReads.push(req);
+      expect(req).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        view: "products",
+        include_timed_products: true,
+      });
+      return send({
+        view: "products",
+        as_of: new Date().toISOString(),
+        next_cursor: null,
+        items:
+          product &&
+          ["all", "on_sale"].includes(req.status) &&
+          (!req.query || product.terms.name.includes(req.query))
+            ? [
+                {
+                  ...product,
+                  version: 1,
+                  name: product.terms.name,
+                  created_at: "2026-11-15T00:00:00Z",
+                  state: "active",
+                  active_right_holders: 3,
+                },
+              ]
+            : [],
+        totals: {
+          on_sale: product ? 1 : 0,
+          closed: 0,
+          archived: 0,
+          active_right_holders: 3,
+          last_30_days: [
+            { currency: "TRY", sales: 2, net_minor: "9007199254740993" },
+            { currency: "USD", sales: 1, net_minor: "100" },
+          ],
+        },
+      });
+    }
     if (op === "products_list_v1") {
       expect(req.center_id).toBe(I.center);
       expect(req.include_timed_products).toBe(true);
@@ -48,7 +88,7 @@ async function productsFixture(page: Page, unknown = false) {
   await expect(page).toHaveURL(`${origin}/account`);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/products`);
   await expect(page.getByRole("button", { name: "Paket ekle", exact: true })).toBeEnabled();
-  return { writes };
+  return { writes, managementReads };
 }
 async function fillProduct(page: Page, timed = false) {
   await page.getByRole("button", { name: "Paket ekle", exact: true }).click();
@@ -71,13 +111,42 @@ async function fillProduct(page: Page, timed = false) {
   return dialog;
 }
 
+test("product management reads native center totals and sends search and lifecycle filters to the server", async ({
+  page,
+}) => {
+  const { managementReads, writes } = await productsFixture(page);
+  await expect(page.getByText(/90\.071\.992\.547\.409,93.*1,00/)).toBeVisible();
+  await page
+    .getByRole("radiogroup", { name: "Durum", exact: true })
+    .getByRole("radio", { name: "Kapalı", exact: true })
+    .click();
+  await expect.poll(() => managementReads.at(-1)?.status).toBe("closed");
+  await page.getByRole("textbox", { name: "Paket ara", exact: true }).fill("Fixture");
+  await expect.poll(() => managementReads.at(-1)?.query).toBe("Fixture");
+  expect(managementReads.at(-1)?.page).toEqual({ limit: 20 });
+  await page
+    .getByRole("radiogroup", { name: "Durum", exact: true })
+    .getByRole("radio", { name: "Arşiv", exact: true })
+    .click();
+  await expect.poll(() => managementReads.at(-1)?.status).toBe("archived");
+  expect(writes).toHaveLength(0);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.emulateMedia({ colorScheme: "dark" });
+  expect(await page.evaluate<boolean>("document.documentElement.scrollWidth > innerWidth")).toBe(
+    false,
+  );
+  expect(
+    (await scanAccessibility(page, "product-management-native-totals-mobile")).violations,
+  ).toEqual([]);
+});
+
 test("mobile product composition reviews explicit terms, publishes, and rereads the native version", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   const state = await productsFixture(page);
   await expect(page.getByRole("columnheader")).toHaveCount(6);
-  await expect(page.getByPlaceholder("Paket ara")).toBeDisabled();
+  await expect(page.getByPlaceholder("Paket ara")).toBeEnabled();
   expect((await scanAccessibility(page, "products-list")).violations).toEqual([]);
   const dialog = await fillProduct(page, true);
   await dialog.getByLabel("Dönem", { exact: true }).selectOption("week");

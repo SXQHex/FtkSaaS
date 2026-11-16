@@ -1746,7 +1746,7 @@
     "choose": "Seç",
     "lessons": "Grup ve özel dersler",
     "lessonHint": "Ders kapsamı grup ve özel seansları birlikte kapsar.",
-    "catalogOnly": "Bu liste yayınlanan etkin paketleri gösterir. Satış durumu, geçmiş ve özet bilgileri henüz alınamıyor.",
+    "catalogOnly": "Arama ve durum filtresi merkezdeki ürünlere uygulanır. Özetler merkezin tamamını kapsar; tutarlar para birimine göre ayrı gösterilir.",
     "unsupportedFields": "Geçerlilik satış sırasında belirlenir. Satış durumu, taslak ve arşiv işlemleri şu anda kullanılamıyor.",
     "scopesPreserved": "Mevcut kapsam yeni sürümde aynen korunur.",
     "invalid": "Zorunlu alanları ve tutarları kontrol et.",

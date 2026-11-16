@@ -2,9 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ProductsView, type ProductRow } from "./products-view";
+import { ProductsView, type ProductRow, type ProductFilter } from "./products-view";
 import { ProductEditor, type ProductDraft } from "./product-editor";
-import { productDraft, productIntent, readProductsPage, type ProductIntent } from "./products";
+import {
+  productDraft,
+  productIntent,
+  readProductsManagementPage,
+  type ProductIntent,
+} from "./products";
 import { useProductCommand } from "./use-product-command";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { readWorkspace } from "../workspace/workspace";
@@ -29,6 +34,17 @@ export function ProductsContent({
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [pageIndex, setPageIndex] = useState(0);
   const [editor, setEditor] = useState<{ base?: ProductView } | null>(null);
+  const [search, setSearch] = useState(""),
+    [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<ProductFilter>("all");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(search);
+      setCursors([undefined]);
+      setPageIndex(0);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
   const workspace = useQuery({
     queryKey: ["workspace", scope.accountId, scope.orgId],
     queryFn: () => readWorkspace(scope.accountId, scope.orgId),
@@ -54,8 +70,16 @@ export function ProductsContent({
       ),
     );
   const query = useQuery({
-    queryKey: ["products", scope.accountId, scope.orgId, scope.centerId, cursors[pageIndex]],
-    queryFn: () => readProductsPage(scope, cursors[pageIndex]),
+    queryKey: [
+      "products-management",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      filter,
+      searchQuery,
+      cursors[pageIndex],
+    ],
+    queryFn: () => readProductsManagementPage(scope, filter, searchQuery, cursors[pageIndex]),
     enabled: Boolean(current),
     retry: false,
   });
@@ -88,8 +112,8 @@ export function ProductsContent({
             .join("; "),
           validity: null,
           price: formatMinorAmount(row.terms.price_minor, row.terms.currency),
-          activeRights: null,
-          salesState: null,
+          activeRights: row.active_right_holders.toLocaleString("tr-TR"),
+          salesState: row.state === "active" ? "on" : row.state === "inactive" ? "off" : "archived",
         }))
       : [];
   const accessLost = useCallback(
@@ -113,10 +137,31 @@ export function ProductsContent({
     <>
       <ProductsView
         rows={rows}
-        summary={{ onSale: null, recentSales: null, recentRevenue: null, activeHolders: null }}
+        summary={
+          !query.isError && query.data
+            ? {
+                onSale: query.data.totals.on_sale.toLocaleString("tr-TR"),
+                activeHolders: query.data.totals.active_right_holders.toLocaleString("tr-TR"),
+                recentSales: query.data.totals.last_30_days
+                  .reduce((sum, row) => sum + BigInt(row.sales), 0n)
+                  .toLocaleString("tr-TR"),
+                recentRevenue:
+                  query.data.totals.last_30_days
+                    .map((row) => formatMinorAmount(row.net_minor, row.currency))
+                    .join(" · ") || null,
+              }
+            : { onSale: null, recentSales: null, recentRevenue: null, activeHolders: null }
+        }
         state={query.isError ? "error" : query.isPending ? "loading" : "ready"}
-        search=""
-        filter="all"
+        search={search}
+        filter={filter}
+        filtersAvailable
+        onSearch={setSearch}
+        onFilter={(next) => {
+          setFilter(next);
+          setCursors([undefined]);
+          setPageIndex(0);
+        }}
         count={t(($) => $.products.count, { count: rows.length })}
         notice={
           <Alert>
