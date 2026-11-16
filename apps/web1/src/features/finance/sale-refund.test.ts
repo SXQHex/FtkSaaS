@@ -49,7 +49,9 @@ const preview = (): Preview => ({
   blockers: [],
   expires_at: "2099-01-01T00:00:00Z",
 });
-beforeEach(() => call.mockReset());
+beforeEach(() => {
+  call.mockReset();
+});
 it("reads exact sale authority before requesting a reason-only provider quote", async () => {
   call.mockImplementation(async (op) =>
     op === "management_state_get_v1" ? authority() : preview(),

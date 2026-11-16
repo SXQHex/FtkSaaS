@@ -40,7 +40,9 @@ const data = (): FinanceDirectoryView => ({
   view: "credits",
   totals: [],
 });
-beforeEach(() => call.mockReset());
+beforeEach(() => {
+  call.mockReset();
+});
 it("uses center calendar-day boundaries including a DST transition without assuming 24-hour days", async () => {
   const period = await financePeriod("America/New_York", "2026-11-01", "2026-11-01");
   expect(period.interval).toEqual({
