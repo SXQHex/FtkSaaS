@@ -3469,5 +3469,60 @@
     "collectConfirm": "Tahsilatı kaydet",
     "title": "Etkinlik detayı",
     "capacityClosed": "Kayıt sırasında kontenjan doldu. Kesin kayıt yapılmadı; hazırlığın kalan borcu kapatıldı, uygun tutar öğrenci alacağına çevrildi. Güncel ödeme bakiyesi aşağıda gösterilir."
+  },
+  "inbox": {
+    "title": "Gelen kutusu",
+    "description": "Üyelerden gelen mesajlar ve işlem gerektiren uyarılar.",
+    "markAll": "Tümünü okundu yap",
+    "messages": "İletiler",
+    "search": "İletilerde ara",
+    "filter": "Süzgeç",
+    "filters": {
+      "all": "Tümü",
+      "unread": "Okunmamış",
+      "todo": "İşlem bekleyen"
+    },
+    "read": "Okundu",
+    "unread": "Okunmamış",
+    "loading": "İletiler okunuyor…",
+    "empty": "Bu kapsamda görünür ileti yok.",
+    "pageCount_one": "Bu sayfada {{count}} ileti gösteriliyor",
+    "pageCount_other": "Bu sayfada {{count}} ileti gösteriliyor",
+    "unknown": "Bilgi paylaşılmıyor",
+    "detail": "İleti ayrıntısı",
+    "reply": "Yanıt",
+    "replyPlaceholder": "Yanıtını yaz",
+    "send": "Yanıtla",
+    "complete": "İşlem tamamlandı",
+    "markUnread": "Okunmadı yap",
+    "markRead": "Okundu yap",
+    "choose": "Okumak için bir ileti seç.",
+    "readError": "Bildirim kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
+    "titleMissing": "Başlık paylaşılmıyor",
+    "bodyMissing": "Bildirim metni paylaşılmıyor",
+    "notification": "Bildirim",
+    "scope": "Kapsam",
+    "ownScope": "Kendi kuruluş bildirimlerin",
+    "deliveryJob": "E-posta işlemi",
+    "emailDelivery": "E-posta teslim durumu",
+    "scopeHint": "Kuruluş kapsamındaki kendi bildirimlerin. Saatler {{timezone}} ile gösterilir.",
+    "limitHint": "Arama, toplu işlem ve yanıt henüz kullanılamıyor. Okundu işareti kaynak işini tamamlamaz.",
+    "sourceUnavailable": "Bu bildirimin güvenli kaynak bağlantısı henüz paylaşılmıyor.",
+    "jobStates": {
+      "pending": "Bekliyor",
+      "running": "İşleniyor",
+      "retry_wait": "Yeniden denemeyi bekliyor",
+      "succeeded": "Sağlayıcıya kabul edildi",
+      "failed": "Başarısız",
+      "cancelled": "İptal"
+    },
+    "deliveryStates": {
+      "accepted": "Sağlayıcı kabul etti",
+      "delayed": "Gecikti",
+      "delivered": "Alıcı sunucusu kabul etti",
+      "bounced": "Geri döndü",
+      "complained": "Şikâyet bildirildi",
+      "failed": "Teslim başarısız"
+    }
   }
 }

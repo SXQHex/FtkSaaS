@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–18 için backend kaynak desteği karşılandı. Açık talepler W1-BE-19–27’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–18 için backend kaynak desteği karşılandı. Açık talepler W1-BE-19–28’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `39b78852b711449c64ec559dfcaea2ed385e9e14` (PR317 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43934986183), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43934986263) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43935127207) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -33,6 +33,7 @@
 | W1-BE-25 | E34–36 · P12.5/WF09 | Public program türü/filtre, görünür doluluk ve başvuru/yayın durumu | Açık: mevcut anonim DTO eşlemesi veya güvenli typed destek isteniyor. |
 | W1-BE-26 | E37 · P13/WF15 | Etkinlik arama/durum filtresi, görünür kayıt sayısı ve merkez özetleri | Açık: native liste mevcut; güvenli typed filtre/özet eşlemesi isteniyor. |
 | W1-BE-27 | E38 · P13/WF15 | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı | Açık: mevcut typed keşif eşlemesi veya izinli okuma desteği isteniyor. |
+| W1-BE-28 | E39 · P14/WF11 | Kendi inbox arama/iş durumu, toplu/ters okundu ve kaynak eylemi eşlemesi | Açık: native liste ve sürümlü okundu var; çizimin kalan güvenli eşlemesi isteniyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -268,3 +269,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 
 **Sınır:** Etkinliğin güncel terms.fee_minor değeri geçmiş kaydın ücreti veya borcu değildir. Kişinin borçları sıraya/kimlik benzerliğine göre etkinliğe bağlanmaz; yeni hazırlık/borç yaratarak keşif yapılmaz. Finans/kişi/merkez yetkileri ve native debt_ids hedefli tahsilat korunur. Görünen bütün kişilerin finans geçmişini tarama istenmiyor. Hazırlıklı yeni kayıtlar ve bağımsız yayın/katılım işlemleri mevcut native kaynakla sürdürülecek; frontend kabulü TODO/E38 sahibindedir.
 
+
+## W1-BE-28 · Kendi gelen kutusunun kalan çizim eşlemesi
+
+**Mevcut kaynak:** `notifications_list_v1` `org_id`, isteğe bağlı `center_id` ve `unread_only` kabul eder; mevcut native liste alıcı+kuruluş kapsamındadır, merkez filtresi varsayılmaz. Cursor sayfası bu kapsamda okunur. `NotificationView` sunucuda dil seçilmiş title/body, kind, subject ve read_at taşır; genel arama, işlem bekleme/tamamlanma durumu veya filtre geneli sayaç taşımaz. `notification_mark_read_v1` özgün management selector’ündeki gerçek notification sürümüyle çalışır; yalnız okundu yönündedir. `NotificationPayload.subject` tür/kimlik verir, hedefin güvenli merkez bağlamını veya eylem uygunluğunu vermez. Sözleşmede ileti yanıtlama ya da işlem tamamlandı komutu yoktur.
+
+**İhtiyaç:** Çizimdeki kalan işlevler için mevcut typed eşlemeyi belirtin; yoksa kendi alıcısı/organizasyonu sınırında arama ve işlem bekleyen filtresinin cursor kapsamına alınması, filtre geneli güvenli sayaçlar, kapsamı ve kısmi başarısı açık toplu okundu, açık ters okundu ve yetkili kaynak eylemine geçiş desteği gerekir. “İşlem tamamlandı” ve ileti yanıtı ürün kapsamındaysa native iş akışı/izin/durum eşlemesini belirtin; istemci bir bildirimi okumayı işin tamamlanması saymaz, native ileti veya e-posta gönderim yetkisi varsaymaz. Yeni endpoint şart koşulmuyor.
+
+**Sınır:** Görünür tek sayfada arama küresel arama diye sunulmaz; tüm organizasyonları/kişileri veya bildirim geçmişini tarayarak sayaç/iş listesi üretilmez. UUID’den başlık, kind’den tahmini aksiyon ve seçili merkezden hedefin gerçek merkezi türetilmez. Yalnız güvenli mevcut kaynakla kendi inbox ve sürümlü okundu akışı sürdürülür; frontend kabulünün sahibi TODO/E39’dur.

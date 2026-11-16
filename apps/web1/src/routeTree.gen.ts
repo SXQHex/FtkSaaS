@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MfaRouteImport } from './routes/mfa'
@@ -59,6 +60,11 @@ const AccountRoute = AccountRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteRoute = InviteRouteImport.update({
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/inbox': typeof InboxRoute
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
@@ -274,6 +281,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/inbox': typeof InboxRoute
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
@@ -313,6 +321,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/inbox': typeof InboxRoute
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
@@ -353,6 +362,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/forgot-password'
+    | '/inbox'
     | '/invite'
     | '/login'
     | '/mfa'
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/forgot-password'
+    | '/inbox'
     | '/invite'
     | '/login'
     | '/mfa'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/forgot-password'
+    | '/inbox'
     | '/invite'
     | '/login'
     | '/mfa'
@@ -468,6 +480,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  InboxRoute: typeof InboxRoute
   InviteRoute: typeof InviteRoute
   LoginRoute: typeof LoginRoute
   MfaRoute: typeof MfaRoute
@@ -524,6 +537,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite': {
@@ -764,6 +784,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  InboxRoute: InboxRoute,
   InviteRoute: InviteRoute,
   LoginRoute: LoginRoute,
   MfaRoute: MfaRoute,
