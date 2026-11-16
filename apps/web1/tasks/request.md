@@ -181,3 +181,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İncelenen kaynak:** `calendar_get_v1(resource:{kind:person,id:gerçek_self_person})` görünür seansları daraltır; `CalendarItem.resources` içindeki `ResourceRef` yalnız kind/id taşır. `SessionView` salon adı taşımaz. `room_save_v1` management selector’ü yönetim alanıdır; eğitmen ilişkisi oda yönetimi yetkisi diye yorumlanmaz. Görüntüleme adını UUID’den veya sabit demo salondan üretmiyoruz. Typed kaynak: [generated.ts](../src/lib/api-contracts/generated.ts); akış: [WF03](../../../docs/workflows.md#wf03), [WF07](../../../docs/workflows.md#wf07).
 
 **Frontend durumu:** Salon satırı bilinmiyor olarak korunuyor. Atanmış takvim ve kendi hakediş okuması bağımsız bağlı; kabul/ilerleme [TODO/E24](todo.md#sayfa-kabulu) sahibindedir.
+
+## W1-BE-19 · Eğitmenin kendi hakediş özeti ve ödeme keşfi
+
+**Mevcut kaynak:** `earnings_list_v1(person_id:gerçek_self,center_id,interval)` oluşturulma zamanına göre cursor satırlarını verir. Satırdaki paid/remaining/overpaid ve nested `payments` alanları korunur; bunlar bağımsız ödeme dönemi geçmişi veya bütün filtre toplamı değildir. Eski hakedişe bu ay yapılan ödeme, bu ay oluşturulmuş hakediş listesinde görünmeyebilir. `P03PaymentView` yöntem taşımaz. `instructor_agreement_get_v1` bilinen agreement_id için özneye açıktır; `instructor_agreements_list_v1` ise earnings.manage ister, genel eğitmen keşfi olarak çağrılmaz.
+
+**İhtiyaç:** E27 için mevcut yetkili typed eşlemeyi belirtin; yoksa kendi kişi/merkez kapsamındaki geçerli anlaşma keşfi, bağımsız ödeme tarihiyle cursor ödeme/düzeltme geçmişi ve güvenli yöntem etiketi, desteklenen dönemler/tüm dönem seçimi ve seçili filtrenin para birimi bazında hakediş/ödeme/kalan toplamları gerekir. Düzeltme zinciri ve dönem semantiğini backend sahibi belirler; istemci mevcut sayfayı toplam veya tam ödeme geçmişi saymaz. Yeni endpoint zorunlu tutulmaz.
+
+**Sınır:** Native self/aktif eğitmen, canlı merkez/plan ve finans görünürlüğü korunmalı. Yönetim ödeme/yayın yetkisi, private/core erişimi, bütün finans geçmişini tarama veya istemcide yeni bakiye hesabı istenmiyor. Frontend kendi hakediş cursor satırlarını bağlar; eksik kaynaklar bilinmiyor görünür. Kabulün sahibi [TODO/E27](todo.md#sayfa-kabulu).

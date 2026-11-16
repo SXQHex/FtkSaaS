@@ -20,6 +20,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as InstructorEarningsRouteImport } from './routes/instructor.earnings'
 import { Route as InstructorScheduleRouteImport } from './routes/instructor.schedule'
 import { Route as InstructorTodayRouteImport } from './routes/instructor.today'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
@@ -89,6 +90,11 @@ const AccountDeletionRoute = AccountDeletionRouteImport.update({
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstructorEarningsRoute = InstructorEarningsRouteImport.update({
+  id: '/instructor/earnings',
+  path: '/instructor/earnings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InstructorScheduleRoute = InstructorScheduleRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/earnings': typeof InstructorEarningsRoute
   '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/earnings': typeof InstructorEarningsRoute
   '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/account_/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/earnings': typeof InstructorEarningsRoute
   '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite_/expired': typeof InviteExpiredRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account/deletion'
     | '/auth/callback'
+    | '/instructor/earnings'
     | '/instructor/schedule'
     | '/instructor/today'
     | '/invite/expired'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account/deletion'
     | '/auth/callback'
+    | '/instructor/earnings'
     | '/instructor/schedule'
     | '/instructor/today'
     | '/invite/expired'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account_/deletion'
     | '/auth/callback'
+    | '/instructor/earnings'
     | '/instructor/schedule'
     | '/instructor/today'
     | '/invite_/expired'
@@ -355,6 +367,7 @@ export interface RootRouteChildren {
   VerifyEmailRoute: typeof VerifyEmailRoute
   AccountDeletionRoute: typeof AccountDeletionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  InstructorEarningsRoute: typeof InstructorEarningsRoute
   InstructorScheduleRoute: typeof InstructorScheduleRoute
   InstructorTodayRoute: typeof InstructorTodayRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
@@ -449,6 +462,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/callback'
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor/earnings': {
+      id: '/instructor/earnings'
+      path: '/instructor/earnings'
+      fullPath: '/instructor/earnings'
+      preLoaderRoute: typeof InstructorEarningsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/instructor/schedule': {
@@ -571,6 +591,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyEmailRoute: VerifyEmailRoute,
   AccountDeletionRoute: AccountDeletionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  InstructorEarningsRoute: InstructorEarningsRoute,
   InstructorScheduleRoute: InstructorScheduleRoute,
   InstructorTodayRoute: InstructorTodayRoute,
   InviteExpiredRoute: InviteExpiredRoute,

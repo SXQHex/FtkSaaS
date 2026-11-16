@@ -2738,5 +2738,62 @@
     "retry": "Seansı yeniden oku",
     "actualDay": "Fiilî başlangıç günü",
     "actualTime": "Fiilî başlangıç saati"
+  },
+  "instructorEarnings": {
+    "title": "Hakedişim",
+    "description": "Yoklaması kapanan seanslar için oluşan kayıtların. Salt okunur, değişiklikleri yönetici yapar.",
+    "period": "Dönem",
+    "all": "Tüm dönem",
+    "metrics": {
+      "earned": "Toplam hakediş",
+      "paid": "Ödenen",
+      "remaining": "Kalan"
+    },
+    "metricHints": {
+      "earned": "Seçili dönemde kaydedilen net hakediş",
+      "paid": "Hakedişlere uygulanmış net ödemeler",
+      "remaining": "Kaynakta görünen kalan tutar"
+    },
+    "agreement": "Geçerli anlaşman",
+    "agreementHint": "Ücret değişikliği yeni sürüm olarak yöneticide yayımlanır; eski seanslar eski ücretle kalır.",
+    "tabsLabel": "Hakediş bölümleri",
+    "tabs": {
+      "lines": "Seans satırları",
+      "payments": "Ödemeler"
+    },
+    "date": "Tarih",
+    "session": "Seans",
+    "basis": "Hesap",
+    "amount": "Tutar",
+    "state": "Durum",
+    "operation": "İşlem",
+    "method": "Yöntem",
+    "unread": "Güncel hakediş satırları okunamadı.",
+    "unreadPayments": "Güncel ödeme geçmişi okunamadı.",
+    "emptyLines": "Bu dönemde hakediş satırı yok.",
+    "emptyPayments": "Bu dönemde ödeme yok.",
+    "unknownAgreement": "Geçerli anlaşma kaynağı okunamadı.",
+    "noEarnings": "Hakediş kaydı yok",
+    "paid": "Ödendi",
+    "partial": "Kısmi",
+    "pending": "Bekliyor",
+    "correction": "Düzeltme",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "retry": "Yeniden oku",
+    "sourceLimits": "Dönem toplamları, tüm dönem seçimi, ödeme geçmişi ve geçerli anlaşma kaynağı henüz kullanılamıyor.",
+    "sessionEarning": "Seans hakedişi",
+    "otherEarning": "Diğer hakediş",
+    "recordDate": "Hakediş kayıt tarihi",
+    "overpaid": "Fazla ödeme",
+    "settled": "Kalan yok",
+    "sources": {
+      "sale_unit": "Satış birimi",
+      "negative_snapshot": "Negatif hak kaydı",
+      "agreement_fixed": "Sabit anlaşma",
+      "event_fee": "Etkinlik ücreti",
+      "lesson_agreement": "Özel ders anlaşması"
+    },
+    "loading": "Hakedişler okunuyor…"
   }
 }

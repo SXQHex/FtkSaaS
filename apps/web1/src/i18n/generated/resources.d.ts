@@ -544,6 +544,63 @@ export default interface Resources {
       "unlinkTitle": "Google bağlantısını kaldır",
       "unlinked": "Bağlı değil"
     },
+    "instructorEarnings": {
+      "agreement": "Geçerli anlaşman",
+      "agreementHint": "Ücret değişikliği yeni sürüm olarak yöneticide yayımlanır; eski seanslar eski ücretle kalır.",
+      "all": "Tüm dönem",
+      "amount": "Tutar",
+      "basis": "Hesap",
+      "correction": "Düzeltme",
+      "date": "Tarih",
+      "description": "Yoklaması kapanan seanslar için oluşan kayıtların. Salt okunur, değişiklikleri yönetici yapar.",
+      "emptyLines": "Bu dönemde hakediş satırı yok.",
+      "emptyPayments": "Bu dönemde ödeme yok.",
+      "loading": "Hakedişler okunuyor…",
+      "method": "Yöntem",
+      "metricHints": {
+        "earned": "Seçili dönemde kaydedilen net hakediş",
+        "paid": "Hakedişlere uygulanmış net ödemeler",
+        "remaining": "Kaynakta görünen kalan tutar"
+      },
+      "metrics": {
+        "earned": "Toplam hakediş",
+        "paid": "Ödenen",
+        "remaining": "Kalan"
+      },
+      "next": "Sonraki",
+      "noEarnings": "Hakediş kaydı yok",
+      "operation": "İşlem",
+      "otherEarning": "Diğer hakediş",
+      "overpaid": "Fazla ödeme",
+      "paid": "Ödendi",
+      "partial": "Kısmi",
+      "pending": "Bekliyor",
+      "period": "Dönem",
+      "previous": "Önceki",
+      "recordDate": "Hakediş kayıt tarihi",
+      "retry": "Yeniden oku",
+      "session": "Seans",
+      "sessionEarning": "Seans hakedişi",
+      "settled": "Kalan yok",
+      "sourceLimits": "Dönem toplamları, tüm dönem seçimi, ödeme geçmişi ve geçerli anlaşma kaynağı henüz kullanılamıyor.",
+      "sources": {
+        "agreement_fixed": "Sabit anlaşma",
+        "event_fee": "Etkinlik ücreti",
+        "lesson_agreement": "Özel ders anlaşması",
+        "negative_snapshot": "Negatif hak kaydı",
+        "sale_unit": "Satış birimi"
+      },
+      "state": "Durum",
+      "tabs": {
+        "lines": "Seans satırları",
+        "payments": "Ödemeler"
+      },
+      "tabsLabel": "Hakediş bölümleri",
+      "title": "Hakedişim",
+      "unknownAgreement": "Geçerli anlaşma kaynağı okunamadı.",
+      "unread": "Güncel hakediş satırları okunamadı.",
+      "unreadPayments": "Güncel ödeme geçmişi okunamadı."
+    },
     "instructorSchedule": {
       "description": "Yalnızca sana atanmış seanslar. Program değişikliğini yönetici yapar.",
       "empty": "Bu hafta atanmış seansın yok.",
