@@ -43,7 +43,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-033 | Backend; açık kullanıcı kararı | Frontend | [FD04](contracts/02-FtkSaaS-teknik-sozlesme.md#fd04--bildirim-hatırlatma-ve-pazarlama-kabul-edildi), [bildirim tüketicisi](settings.md#bildirim-kullanılabilirliği), [WF11](workflows.md#wf11) / [WF20](workflows.md#wf20) | Backend olay/şablon kimliği ve temel şablonundan kullanıcının tercih ettiği dilde içerik; açık tarayıcı gerektirmeyen e-posta entegrasyonu; retry/erişim/tercih kapılarının korunması. | Frontend uygulaması ve kabulü bekleniyor | 8 Kasım kullanıcı kararı; mevcut API ve temel şablon kaynakları aşağıda devredildi. Backend yeni dil/çeviri çalışması yapmaz. |
 
-| XREQ-053 | Backend değerlendirmesi; Web1 W1-BE-19 / E27 | Backend; tüketici frontend | [WF14](workflows.md#wf14) | Native self anlaşma/ödeme keşfi ve dönem/para birimi toplamları; kullanıcının ek kararıyla yeni ödeme yöntemi kaydı. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-w19) | Backend kapsam kararı 16 Kasım kullanıcı yetkisi; frontend kabulü verilmedi. [Değerlendirme](#xreq-053). |
+| XREQ-053 | Backend değerlendirmesi; Web1 W1-BE-19 / E27 | Backend; tüketici frontend | [WF14](workflows.md#wf14) | Native self anlaşma/ödeme ve aralıksız hakediş keşfi; dönem/para birimi toplamları ve yeni ödeme yöntemi kaydı. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) | Backend kapsam kararı 16 Kasım kullanıcı yetkisi; frontend kabulü verilmedi. [Değerlendirme](#xreq-053). |
 
 | XREQ-054 | Backend değerlendirmesi; Web1 W1-BE-20 / E28 | Backend; tüketici frontend | [WF06](workflows.md#wf06) | Henüz kaydolunmamış derslerin native self keşfi, güvenli etiketler ve gerçek politikalar. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-w19) | Kullanıcı grup ve özel dersleri birlikte seçti. [Backend değerlendirmesi](#xreq-054); frontend adına kabul verilmedi. |
 | XREQ-055 | Backend değerlendirmesi; Web1 W1-BE-26 / E37 | Backend; tüketici frontend | [WF15](workflows.md#wf15) | Etkinlik başlık/durum filtresi ve yetkili sayfadan bağımsız merkez özeti. | [Backend kaynak/ortam kaydı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-055). |
@@ -51,6 +51,9 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-057 | Backend değerlendirmesi; Web1 W1-BE-21 | Backend; tüketici frontend | [WF19](workflows.md#wf19) | Öğrencinin merkez geneli kendi bekleme/teklif keşfi. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-057). |
 | XREQ-058 | Backend değerlendirmesi; Web1 W1-BE-22 | Backend; tüketici frontend | [WF05](workflows.md#wf05) | Satın alınan immutable sürüm ve gerçek finans para birimi keşfi. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-058). |
 | XREQ-059 | Backend değerlendirmesi; Web1 W1-BE-23 | Backend; tüketici frontend | [WF11](workflows.md#wf11) | Aktif gerçek işlem ve açık satın alma belge bağlamı keşfi. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-059). |
+
+| XREQ-060 | Backend değerlendirmesi; Web1 W1-BE-28 | Backend; tüketici frontend | [WF11](workflows.md#wf11) | Inbox araması, gerçek kaynak durumu, kapsam özeti ve atomik tersinir seçili okuma. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-060). |
+| XREQ-061 | Backend değerlendirmesi; Web1 W1-BE-29 | Backend; tüketici frontend | [WF16](workflows.md#wf16) | Native segment eşleşme/kullanım ve gerçek iş keşfi/özetleri. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) | Kullanıcının dar native kapsam kararı; frontend adına kabul verilmedi. [Değerlendirme](#xreq-061). |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -816,9 +819,9 @@ W1-BE-13/14 için kullanıcı onaylı destek kaynak adayındadır; yayımlanmı�
 
 Frontend talebi `apps/web1/tasks/request.md` W1-BE-19 sahibindedir. Native `earnings_list_v1` mevcut hakediş satırları/düzeltmeleri ve bunlara bağlı ödeme özetlerini verir; bir ödeme başka dönemde oluşturulmuş hakedişe bağlı olduğunda ödeme dönemi geçmişini keşfetmez. `instructor_agreement_get_v1` bilinen kimlik için uygundur; `instructor_agreements_list_v1` yönetim yetkisi genel eğitmene açılmaz. Bu nedenle bağımsız özne keşfi gerçek backend eksiğidir; mevcut ödeme/düzeltme writer'ları yeniden kurulmaz.
 
-Kullanıcı mevcut yöntemsiz kayda yalnız etiket koymayı yeterli bulmadı; yeni ödemelerde yöntem kaydetmeyi de açıkça istedi. Aday kaynak mevcut manuel yöntem sözleşmesini ödeme/düzeltme komutlarına ekler, geçmişe yöntem atamaz. Native self okuyucunun çağrısı, cursor/dönem/toplam/yöntem ve alias sınırı yalnız [WF14](workflows.md#wf14) sahibindedir. Değişmez anlaşma gerçeklerini ve mevcut get/accept akışını korur; canonical özne geçmiş alias anlaşmasını tüketebilir.
+Kullanıcı mevcut yöntemsiz kayda yalnız etiket koymayı yeterli bulmadı; yeni ödemelerde yöntem kaydetmeyi de açıkça istedi. Aday kaynak mevcut manuel yöntem sözleşmesini ödeme/düzeltme komutlarına ekler, geçmişe yöntem atamaz. Yeni ek talepte eski earnings_list_v1 aralık zorunluluğu tüm dönem seans satırı keşfini karşılamıyordu; self okuyucuya earnings görünümü eklenir, yapay dönem veya ay taraması kullanılmaz. Native self okuyucunun çağrısı, cursor/dönem/toplam/yöntem ve alias sınırı yalnız [WF14](workflows.md#wf14) sahibindedir. Değişmez anlaşma gerçeklerini ve mevcut get/accept akışını korur; canonical özne geçmiş alias anlaşmasını tüketebilir.
 
-Kaynak/test/aday CI/main/development/hosted sonuçları [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-w19) tutulur. Frontend kodu/todo/kabul değiştirilmedi ve karşı alan adına onay verilmedi.
+Kaynak/test/aday CI/main/development/hosted sonuçları [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) tutulur. Frontend kodu/todo/kabul değiştirilmedi ve karşı alan adına onay verilmedi.
 
 <a id="xreq-054"></a>
 ## XREQ-054 Web1 öğrencinin yeni ders keşfi
@@ -867,3 +870,17 @@ W1-BE-22 için mevcut hak/ledger ve currency seçilmiş finance_get yeterlidir; 
 ### Backend değerlendirmesi — 17 Kasım 2026
 
 W1-BE-23 için doğrudan requirements/render/accept ve snapshot/purchase bağları yeterlidir; eksik olan öğrencinin gerçek gerekli işlem bağlamlarının keşfidir. Kullanıcı aktif işlemler ve süresi dolmamış satın alma önizlemelerini seçti; geçmiş işlemler kapsam dışında kalır. Karar FD08, kesin çağrı ve sınırlı kaynak kümesi [WF11](workflows.md#wf11) sahibindedir. Ayrı member_document_contexts_get_v1 self okuyucusu kullanılır; genel kişi subject'i veya başka bağlama kabul kopyası oluşturulmaz. Canonical kişi sahipliği eski değişmez işlem/kabul kanıtını korur. Kaynak/ortam [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery); frontend ekranı/kabulü değiştirilmez.
+
+<a id="xreq-060"></a>
+## XREQ-060 Web1 inbox ve gerçek kaynak işi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+W1-BE-28 için native liste/tekil mark-read ve kaynak komutları korunur. Eksik arama, gerçek kaynak durumu ve sayfadan bağımsız sayılar mevcut listeyi opt-in genişletir; seçili1–100 bildirim için atomik/sürümlü okunma ve geri alma komutu eklenir. Ürün kararı FD04, kesin DTO/selector/yeniden okuma ve güvenli kaynak sınırı [WF11](workflows.md#wf11) sahibindedir. Okundu işi tamamlamaz; serbest yanıt veya bağımsız görev motoru kurulmaz. Kaynak/ortam yalnız [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); frontend kabulü ayrı kalır.
+
+<a id="xreq-061"></a>
+## XREQ-061 Web1 segment ve otomasyon keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+W1-BE-29 mevcut segment/automation management okuyucusu ve sürümlü save/disable/başarısız iş retry yollarıyla kısmen karşılanır. Haftalık/segmente giriş tetikleme, elle çalıştırma, silme ve yeni segment koşulları native destek değildir; kullanıcı mevcut sınırın açıklanmasını ve eksik keşif/özetlerin tamamlanmasını seçti. Bu teslim yalnız mevcut management selector’üne kayıtlı segment eşleşmeleri, yetkili kullanım bağları ve gerçek scope-wide iş geçmişi/özeti ekler. Hedef kitle kararı FD10, native çağrı/rol/plan/cursor/sonuç ve teslim ayrımı [WF16](workflows.md#wf16) sahibindedir. Worker tetikleme/kilit/tek sonuç/lease ve retry kuralları yeniden kurulmaz. Kaynak/ortam yalnız [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); frontend kabulü ayrı kalır.

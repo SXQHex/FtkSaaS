@@ -6324,6 +6324,33 @@
       },
       "billing_class": "read",
       "limits": []
+    },
+    {
+      "name": "notifications_read_set_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/notifications_read_set_v1",
+      "permission": "notification.self",
+      "features": [
+        "F26"
+      ],
+      "required_features": [
+        "F26"
+      ],
+      "runtime_required_features": [
+        "F26"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_notifications_read_set"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
+      ]
     }
   ]
 }

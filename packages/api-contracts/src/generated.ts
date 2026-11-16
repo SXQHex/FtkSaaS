@@ -431,7 +431,7 @@ export type Permission = ("account.self" | "org.read" | "org.manage" | "org.owne
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OperationName".
  */
-export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_account_get_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "negative_limits_get_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_catalog_get_v1" | "settings_get_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "settings_history_get_v1" | "reservation_capacity_override_v1" | "account_sessions_list_v1" | "account_session_label_v1" | "account_sessions_revoke_v1" | "account_security_history_get_v1" | "media_get_v1" | "settings_template_resolve_v1" | "calendar_links_get_v1" | "calendar_link_create_v1" | "calendar_link_rotate_v1" | "calendar_link_revoke_v1" | "calendar_feed_get_v1" | "settings_preparation_resolve_v1" | "account_signup_check_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_get_v1" | "instructor_agreement_accept_v1" | "content_catalog_get_v1" | "content_catalog_save_v1" | "finance_directory_get_v1" | "products_management_list_v1" | "product_state_set_v1" | "freeze_cancel_preview_v1" | "freeze_cancel_apply_v1" | "member_finance_currencies_get_v1" | "member_document_contexts_get_v1")
+export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_account_get_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "negative_limits_get_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_catalog_get_v1" | "settings_get_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "settings_history_get_v1" | "reservation_capacity_override_v1" | "account_sessions_list_v1" | "account_session_label_v1" | "account_sessions_revoke_v1" | "account_security_history_get_v1" | "media_get_v1" | "settings_template_resolve_v1" | "calendar_links_get_v1" | "calendar_link_create_v1" | "calendar_link_rotate_v1" | "calendar_link_revoke_v1" | "calendar_feed_get_v1" | "settings_preparation_resolve_v1" | "account_signup_check_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_get_v1" | "instructor_agreement_accept_v1" | "content_catalog_get_v1" | "content_catalog_save_v1" | "finance_directory_get_v1" | "products_management_list_v1" | "product_state_set_v1" | "freeze_cancel_preview_v1" | "freeze_cancel_apply_v1" | "member_finance_currencies_get_v1" | "member_document_contexts_get_v1" | "notifications_read_set_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EntityType".
@@ -2022,12 +2022,12 @@ page?: Page
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementOperationName".
  */
-export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "reservation_capacity_override_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_accept_v1" | "content_catalog_save_v1" | "product_state_set_v1" | "freeze_cancel_preview_v1" | "freeze_cancel_apply_v1")
+export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "reservation_capacity_override_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_accept_v1" | "content_catalog_save_v1" | "product_state_set_v1" | "freeze_cancel_preview_v1" | "freeze_cancel_apply_v1" | "notifications_read_set_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector".
  */
-export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementDelegationSetV1 | ManagementSelectorSettlementAuthoritySetV1 | ManagementSelectorAttendanceStartV1 | ManagementSelectorDocumentPublicationPreviewV1 | ManagementSelectorSettingsUpdateV1 | ManagementSelectorSettingsResetPreviewV1 | ManagementSelectorSettingsResetApplyV1 | ManagementSelectorReservationCapacityOverrideV1 | ManagementSelectorRoleRevokePreviewV1 | ManagementSelectorSubscriptionPeriodChangeRequestV1 | ManagementSelectorInstructorAgreementAcceptV1 | ManagementSelectorContentCatalogSaveV1 | ManagementSelectorProductStateSetV1 | ManagementSelectorFreezeCancelPreviewV1 | ManagementSelectorFreezeCancelApplyV1)
+export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementDelegationSetV1 | ManagementSelectorSettlementAuthoritySetV1 | ManagementSelectorAttendanceStartV1 | ManagementSelectorDocumentPublicationPreviewV1 | ManagementSelectorSettingsUpdateV1 | ManagementSelectorSettingsResetPreviewV1 | ManagementSelectorSettingsResetApplyV1 | ManagementSelectorReservationCapacityOverrideV1 | ManagementSelectorRoleRevokePreviewV1 | ManagementSelectorSubscriptionPeriodChangeRequestV1 | ManagementSelectorInstructorAgreementAcceptV1 | ManagementSelectorContentCatalogSaveV1 | ManagementSelectorProductStateSetV1 | ManagementSelectorFreezeCancelPreviewV1 | ManagementSelectorFreezeCancelApplyV1 | ManagementSelectorNotificationsReadSetV1)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector_subscription_downgrade_request_v1".
@@ -4960,6 +4960,16 @@ Request_member_finance_currencies_get?: RequestMemberFinanceCurrenciesGet
 Success_member_finance_currencies_get?: SuccessMemberFinanceCurrenciesGet
 Request_member_document_contexts_get?: RequestMemberDocumentContextsGet
 Success_member_document_contexts_get?: SuccessMemberDocumentContextsGet
+NotificationSourceState?: NotificationSourceState
+NotificationInboxSummary?: NotificationInboxSummary
+NotificationReadSelection?: NotificationReadSelection
+Request_notifications_read_set?: RequestNotificationsReadSet
+Success_notifications_read_set?: SuccessNotificationsReadSet
+SegmentMatchView?: SegmentMatchView
+AutomationReference?: AutomationReference
+SegmentMatchSummary?: SegmentMatchSummary
+AutomationQueueSummary?: AutomationQueueSummary
+ManagementSelector_notifications_read_set_v1?: ManagementSelectorNotificationsReadSetV1
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8294,6 +8304,8 @@ read_at: (Instant | null)
  * Optional own-recipient transactional delivery status, read only via the notification inbox. Job success is provider acceptance; email_delivery is separate evidence.
  */
 email_job?: (JobStatusView | null)
+version?: PositiveInt
+work?: NotificationSourceState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8341,6 +8353,70 @@ policy_version: 1
 completed_at?: Instant
 removed_rows?: number
 removed_bytes?: number
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationSourceState".
+ */
+export interface NotificationSourceState {
+state: ("pending" | "completed" | "informational" | "unavailable")
+center_id: (string | null)
+selector: (ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorCrmActivitySaveV1 | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_seat_offer_accept_v1".
+ */
+export interface ManagementSelectorSeatOfferAcceptV1 {
+operation: "seat_offer_accept_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_withdraw_v1".
+ */
+export interface ManagementSelectorLessonRequestWithdrawV1 {
+operation: "lesson_request_withdraw_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_crm_activity_save_v1".
+ */
+export interface ManagementSelectorCrmActivitySaveV1 {
+operation: "crm_activity_save_v1"
+key: (({
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+} | {
+lead_id?: null
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}) & {
+lead_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9102,6 +9178,7 @@ next_cursor?: (OpaqueToken | null)
 as_of: Instant
 email_preference?: NotificationEmailPreferenceView
 reminder_email_preference?: NotificationEmailPreferenceView
+summary?: NotificationInboxSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9111,6 +9188,18 @@ export interface NotificationEmailPreferenceView {
 enabled: boolean
 version: PositiveInt
 available: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationInboxSummary".
+ */
+export interface NotificationInboxSummary {
+total: Count
+unread: Count
+pending: Count
+completed: Count
+informational: Count
+unavailable: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13141,6 +13230,10 @@ org_id: string
 center_id?: (string | null)
 page: Page
 unread_only: Bool
+query?: string
+work_state?: ("all" | "pending" | "completed" | "informational" | "unavailable")
+include_work?: boolean
+include_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18456,6 +18549,9 @@ merge_review?: MergeReviewDetail
 group_student?: GroupStudentView
 waitlist_display_name?: (Text | null)
 waitlist_session?: MemberWaitlistSession
+segment_match?: SegmentMatchView
+automation_reference?: AutomationReference
+automation_job?: AutomationJobView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19856,6 +19952,18 @@ next_attempt_at: (Instant | null)
 safe_error_code: (Text | null)
 result_reference: (EntityRef | null)
 retry_available: boolean
+created_at?: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+automation_id?: string
+automation_version?: PositiveInt
+automation_name?: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+configuration_creator_person_id?: string
+initiator_kind?: "automation"
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21261,6 +21369,30 @@ version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SegmentMatchView".
+ */
+export interface SegmentMatchView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AutomationReference".
+ */
+export interface AutomationReference {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+name: Text
+enabled: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionPreview".
  */
 export interface ReservationProtectionPreview {
@@ -22085,19 +22217,6 @@ include_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_lesson_request_withdraw_v1".
- */
-export interface ManagementSelectorLessonRequestWithdrawV1 {
-operation: "lesson_request_withdraw_v1"
-key: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-lesson_request_id: string
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector_lesson_request_reject_v1".
  */
 export interface ManagementSelectorLessonRequestRejectV1 {
@@ -22249,19 +22368,6 @@ key: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 entry_id: string
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_seat_offer_accept_v1".
- */
-export interface ManagementSelectorSeatOfferAcceptV1 {
-operation: "seat_offer_accept_v1"
-key: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-offer_id: string
 }
 }
 /**
@@ -22718,35 +22824,6 @@ person_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_crm_activity_save_v1".
- */
-export interface ManagementSelectorCrmActivitySaveV1 {
-operation: "crm_activity_save_v1"
-key: (({
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-lead_id: string
-} | {
-lead_id?: null
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
-}) & {
-lead_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-activity_id?: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id?: string
-})
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector_trial_offer_create_v1".
  */
 export interface ManagementSelectorTrialOfferCreateV1 {
@@ -22795,10 +22872,28 @@ lead_id: string
  */
 export interface ManagementSelectorSegmentSaveV1 {
 operation: "segment_save_v1"
-key: {
+key: ({
 segment_id?: (string | null)
 scope: ConfigurationScope
-}
+} | {
+scope: ConfigurationScope
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+segment_id: string
+discovery: "matches"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+execution_center_id: string
+} | {
+scope: ConfigurationScope
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+segment_id: string
+discovery: "automations"
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22806,10 +22901,19 @@ scope: ConfigurationScope
  */
 export interface ManagementSelectorAutomationSaveV1 {
 operation: "automation_save_v1"
-key: {
+key: ({
 automation_id?: (string | null)
 scope: ConfigurationScope
-}
+} | {
+scope: ConfigurationScope
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+automation_id?: string
+discovery: "jobs"
+state?: (JobState | "all")
+interval?: Interval
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23650,6 +23754,22 @@ preview_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_notifications_read_set_v1".
+ */
+export interface ManagementSelectorNotificationsReadSetV1 {
+operation: "notifications_read_set_v1"
+key: {
+/**
+ * @minItems 1
+ * @maxItems 100
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+notification_ids: [string, ...(string)[]]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_management_state_get".
  */
 export interface SuccessManagementStateGet {
@@ -23672,6 +23792,8 @@ sale_change_context?: EntityVersion
 access_summary?: AccessDirectorySummary
 merge_review_summary?: MergeReviewSummary
 lesson_request_summary?: LessonRequestSummary
+segment_summary?: SegmentMatchSummary
+automation_queue_summary?: AutomationQueueSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23706,6 +23828,31 @@ pending: Count
 alternative_offered: Count
 approved: Count
 rejected: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SegmentMatchSummary".
+ */
+export interface SegmentMatchSummary {
+audience_count: Count
+matched_count: Count
+using_automations: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AutomationQueueSummary".
+ */
+export interface AutomationQueueSummary {
+total: Count
+pending: Count
+running: Count
+retry_wait: Count
+succeeded: Count
+failed: Count
+cancelled: Count
+notifications_created: Count
+followups_created: Count
+email_delivery: "not_supported"
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -26904,7 +27051,7 @@ interval?: Interval
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id: string
-view: ("agreements" | "payments")
+view: ("agreements" | "payments" | "earnings")
 page: InstructorAccountPageRequest
 }
 /**
@@ -26944,8 +27091,8 @@ overpaid_minor: Money
  * via the `definition` "InstructorAccountPage".
  */
 export interface InstructorAccountPage {
-view: ("agreements" | "payments")
-items: (AgreementVersionView | InstructorPaymentLedgerItem)[]
+view: ("agreements" | "payments" | "earnings")
+items: (AgreementVersionView | InstructorPaymentLedgerItem | EarningView)[]
 next_cursor: (OpaqueToken | null)
 as_of: Instant
 totals: InstructorAccountTotal[]
@@ -27052,6 +27199,55 @@ page: Page
 export interface SuccessMemberDocumentContextsGet {
 ok: true
 data: Page_MemberDocumentContext
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationReadSelection".
+ */
+export interface NotificationReadSelection {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+expected_version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_notifications_read_set".
+ */
+export interface RequestNotificationsReadSet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: Bool
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+notifications: [NotificationReadSelection, ...(NotificationReadSelection)[]]
+center_id?: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_notifications_read_set".
+ */
+export interface SuccessNotificationsReadSet {
+ok: true
+data: Mutation
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
