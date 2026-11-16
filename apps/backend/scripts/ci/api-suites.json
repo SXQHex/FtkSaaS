@@ -1228,11 +1228,11 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "85dbcf12d19cfdf8bfd77af22b484eb1313f48222c5f436d9beef1804d76a70c",
+      "sha256": "3927c1eaa80a0755528ae0d3882f17146dacfb053f6e87c91e34a4941a702574",
       "shared": [
         [
-          4,
-          9
+          5,
+          10
         ]
       ],
       "parts": [
@@ -1240,8 +1240,8 @@
           "id": "schedule-reads-root-1",
           "ranges": [
             [
-              10,
-              264
+              11,
+              277
             ]
           ]
         }
@@ -1261,6 +1261,11 @@
           "line": 3,
           "path": "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
           "sha256": "cc9c4b832cb5e842823bc714dc3dd1d4548daca9f610e2c0255580530e8e944c"
+        },
+        {
+          "line": 4,
+          "path": "apps/backend/tests/session-roster-discovery-acceptance.mjs",
+          "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
         }
       ],
       "estimated_seconds": 537.08

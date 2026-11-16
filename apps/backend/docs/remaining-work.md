@@ -43,6 +43,15 @@ Kullanıcı 16 Kasım’da iki sözleşme önerisinin uygulanmasını onayladı.
 - [ ] Aday full clean → main kaynak kanıtı → development dağıtım doğrulaması.
 - [ ] Yeni hosted backend kabulü; frontend ekran kabulü ayrı kalır.
 
+## W1-BE-15/16 — Seans keşfi ve rezervasyonun gerçek kaynak hakkı
+
+Kullanıcı gerekli backend açıklarını gidermeyi ve gereksiz geliştirme yerine mevcut doğru yolları talep dosyasına yazmayı, ayrı PR ile çalışmayı onayladı. Kesin tüketim WF19/WF06; frontend E18 kabulü kendi alanında kalır. Kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#seans-kesif-hak) sahibindedir.
+
+- [x] Seans bekleme/teklif cursor keşfi; worker FIFO, güvenli ad, sürüm ve ayrı teklif geçmişi. Yeni komut/worker/endpoint açılmaz.
+- [x] Görünür rezervasyon sayfasında opt-in gerçek kaynak/hak özeti; ayrı hak yetkisi, gizli/kapalı/atanmamış ayrımı ve immutable sürüm adı.
+- [x] Son kaynak SQL/static test ve bağımsız inceleme; native Auth/Edge kabulü aşağıdaki aday CI aşamasındadır.
+- [ ] Aday CI → main kaynak kanıtı → development teslimi ve gerekli hosted tekrar kabulü.
+
 ## Backend çalışma modeli
 
 Tek backend uygulaması geliştirilir. Pro ortak işlevlerin tamamlandığı ana kabul kapsamıdır. Starter aynı uygulamanın plan hakları, limitler ve yetkilerle kısıtlanmış halidir; ortak ders, kişi, satış, ödeme, yoklama, rapor ve Auth akışları için ikinci implementasyon yapılmaz. Business aynı temele çok merkez ve merkezler arası işlevler ekler. Plan özellikleri ve sayısal limitlerin normatif sahibi [ürün sözleşmesidir](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md); uygulama/kabul sırası [üretim kuyruğunda](production-queue.md) tutulur.
