@@ -2,7 +2,11 @@ import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import type { EventPaymentPreparationView, EventView } from "../../lib/api-contracts/generated";
+import type {
+  EventPaymentPreparationView,
+  EventView,
+  EventRegistrationPaymentSummary,
+} from "../../lib/api-contracts/generated";
 import { readEvent } from "./events-read";
 const money = z
   .string()
@@ -14,7 +18,7 @@ const common = (scope: ClientScope) => ({
   center_id: scope.centerId,
 });
 export async function readDetailedEvent(scope: ClientScope, id: string): Promise<EventView> {
-  const event = await readEvent(scope, id);
+  const event = await readEvent(scope, id, true);
   if (event.actual_started_at != null)
     z.iso.datetime({ offset: true }).parse(event.actual_started_at);
   if (event.registrations !== undefined) {
@@ -32,6 +36,8 @@ export async function readDetailedEvent(scope: ClientScope, id: string): Promise
         }),
       )
       .parse(event.registrations);
+    for (const row of event.registrations)
+      if (row.payment_summary) validateRegistrationPayment(row.payment_summary);
     if (new Set(rows.map((row) => row.id)).size !== rows.length)
       throw new Error("EVENT_REGISTRATIONS_UNAVAILABLE");
   }
@@ -54,6 +60,80 @@ export async function readDetailedEvent(scope: ClientScope, id: string): Promise
       throw new Error("EVENT_DUTIES_UNAVAILABLE");
   }
   return event;
+}
+function validateRegistrationPayment(value: EventRegistrationPaymentSummary) {
+  const signedMoney = z
+    .string()
+    .regex(/^-?(0|[1-9][0-9]{0,18})$/)
+    .refine(
+      (value) => BigInt(value) >= -9223372036854775808n && BigInt(value) <= 9223372036854775807n,
+    );
+  const currency = z.string().regex(/^[A-Z]{3}$/);
+  z.object({
+    status: z.enum(["available", "no_cash_due", "missing", "restricted"]),
+    amount_minor: money.nullable(),
+    currency: currency.nullable(),
+    net_minor: signedMoney.nullable(),
+    paid_minor: money.nullable(),
+    remaining_minor: money.nullable(),
+    credited_minor: money.nullable(),
+    cancelled_minor: signedMoney.nullable(),
+    debts: z.array(
+      z.object({
+        id: z.uuid(),
+        version: z.number().int().positive().safe(),
+        preparation_id: z.uuid().nullable(),
+        currency,
+        amount_minor: money,
+        net_minor: signedMoney,
+        paid_minor: money,
+        remaining_minor: money,
+        credited_minor: money,
+        cancelled_minor: signedMoney,
+      }),
+    ),
+  }).parse(value);
+  if (
+    new Set(value.debts.map((row) => row.id)).size !== value.debts.length ||
+    value.debts.some((row) => row.currency !== value.currency)
+  )
+    throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
+  const totals = [
+    value.net_minor,
+    value.paid_minor,
+    value.remaining_minor,
+    value.credited_minor,
+    value.cancelled_minor,
+  ];
+  if (
+    value.status === "available" &&
+    (!value.debts.length ||
+      !value.currency ||
+      value.amount_minor === null ||
+      totals.some((v) => v === null))
+  )
+    throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
+  if (value.status !== "available" && value.debts.length)
+    throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
+  if (
+    value.status === "no_cash_due" &&
+    (!value.currency || value.amount_minor !== "0" || totals.some((v) => v !== "0"))
+  )
+    throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
+  if (
+    value.status === "restricted" &&
+    (value.amount_minor !== null || value.currency !== null || totals.some((v) => v !== null))
+  )
+    throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
+  if (
+    value.status === "missing" &&
+    (!value.currency ||
+      value.amount_minor === null ||
+      BigInt(value.amount_minor) <= 0n ||
+      totals.some((v) => v !== null))
+  )
+    throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
+  return value;
 }
 export function validateEventPayment(
   value: EventPaymentPreparationView,

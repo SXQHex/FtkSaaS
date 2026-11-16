@@ -19,6 +19,7 @@ export function EventPaymentPanel({
   canPrepare,
   canCollect,
   locked = false,
+  existingRegistration = false,
 }: {
   facts: { label: string; value: string }[];
   draft: EventCollectionDraft;
@@ -29,6 +30,7 @@ export function EventPaymentPanel({
   canPrepare: boolean;
   canCollect: boolean;
   locked?: boolean;
+  existingRegistration?: boolean;
 }) {
   const { t } = useTranslation();
   const set = <K extends keyof EventCollectionDraft>(key: K, value: EventCollectionDraft[K]) =>
@@ -61,7 +63,11 @@ export function EventPaymentPanel({
         </Button>
       )}
       <Alert>
-        <AlertDescription>{t(($) => $.eventDetail.registration.prepareHint)}</AlertDescription>
+        <AlertDescription>
+          {existingRegistration
+            ? t(($) => $.eventDetail.registeredCollectionHint)
+            : t(($) => $.eventDetail.registration.prepareHint)}
+        </AlertDescription>
       </Alert>
       <Field>
         <FieldLabel>{t(($) => $.eventDetail.registration.collection)}</FieldLabel>

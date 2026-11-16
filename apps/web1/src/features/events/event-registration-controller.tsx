@@ -36,22 +36,32 @@ import {
   type RegistrationTarget,
 } from "./event-registration-command";
 import { emptyEventCollection } from "./event-registration-draft";
-import {
-  Sheet,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from "../../components/ui/sheet";
 import { Field, FieldLabel, FieldDescription } from "../../components/ui/field";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 
-export function EventRegistrationController({
+import { RegisteredEventPayment } from "./registered-event-payment";
+type RegistrationControllerProps = {
+  scope: ClientScope;
+  before: EventView;
+  registrationId?: string;
+  onClose: () => void;
+  onSaved: () => Promise<void>;
+  onLockChange: (value: boolean) => void;
+  onAccessLost: (cause: unknown) => boolean;
+};
+export function EventRegistrationController(props: RegistrationControllerProps) {
+  const { registrationId, ...rest } = props;
+  return registrationId ? (
+    <RegisteredEventPayment {...rest} registrationId={registrationId} />
+  ) : (
+    <NewEventRegistrationController {...rest} />
+  );
+}
+function NewEventRegistrationController({
   scope,
   before,
-  registrationId,
   onClose,
   onSaved,
   onLockChange,
@@ -59,7 +69,6 @@ export function EventRegistrationController({
 }: {
   scope: ClientScope;
   before: EventView;
-  registrationId?: string;
   onClose: () => void;
   onSaved: () => Promise<void>;
   onLockChange: (value: boolean) => void;
@@ -86,13 +95,12 @@ export function EventRegistrationController({
       active.current = false;
     };
   }, []);
-  const registration = before.registrations?.find((row) => row.id === registrationId),
-    personId = registration?.person_id ?? person?.id,
-    name = registration?.display_name ?? person?.display_name ?? t(($) => $.events.unknown);
+  const personId = person?.id,
+    name = person?.display_name ?? t(($) => $.events.unknown);
   const rights = useQuery({
     queryKey: ["event-registration-rights", scope.accountId, scope.orgId, scope.centerId, personId],
     queryFn: () => readProfileRights(scope, personId!),
-    enabled: !!personId && !registrationId,
+    enabled: !!personId,
     retry: false,
   });
   const existing = useQuery({
@@ -103,9 +111,8 @@ export function EventRegistrationController({
       scope.centerId,
       before.id,
       personId,
-      registrationId,
     ],
-    queryFn: () => readRegistrationPayment(scope, before.id, personId!, registrationId),
+    queryFn: () => readRegistrationPayment(scope, before.id, personId!),
     enabled: !!personId,
     retry: false,
     refetchOnWindowFocus: false,
@@ -174,7 +181,7 @@ export function EventRegistrationController({
     );
   }
   async function next() {
-    if (running.current || locked || !personId || registrationId) return;
+    if (running.current || locked || !personId) return;
     running.current = true;
     setWorking(true);
     setError(undefined);
@@ -287,9 +294,7 @@ export function EventRegistrationController({
     : [
         {
           label: t(($) => $.eventDetail.fee),
-          value: registrationId
-            ? t(($) => $.eventDetail.paymentUnread)
-            : formatMinorAmount(before.terms.fee_minor, before.terms.currency),
+          value: formatMinorAmount(before.terms.fee_minor, before.terms.currency),
         },
       ];
   const paymentPanel = (
@@ -306,7 +311,6 @@ export function EventRegistrationController({
         onPrepare={() => openConfirmation("prepare")}
         onCollect={() => openConfirmation("collect")}
         canPrepare={
-          !registrationId &&
           !!personId &&
           !sale &&
           before.state === "published" &&
@@ -344,138 +348,111 @@ export function EventRegistrationController({
   );
   return (
     <>
-      {registrationId ? (
-        <Sheet
-          isOpen
-          onOpenChange={(open) => {
-            if (!open && !locked) onClose();
-          }}
-          isDismissable={!locked}
-          isKeyboardDismissDisabled={locked}
-        >
-          <SheetHeader>
-            <SheetTitle>{t(($) => $.eventDetail.actions.payment)}</SheetTitle>
-            <SheetDescription>
-              {before.name} · {name}
-            </SheetDescription>
-          </SheetHeader>
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
-            {nativeNotices}
-            {paymentPanel}
-          </div>
-          <SheetFooter>
-            <Button variant="outline" isDisabled={locked} onPress={onClose}>
-              {t(($) => $.events.editor.cancel)}
-            </Button>
-          </SheetFooter>
-        </Sheet>
-      ) : (
-        <EventRegistrationSheet
-          eventName={before.name}
-          step={step}
-          reviewed={reviewed}
-          onReviewed={setReviewed}
-          onNext={() => {
-            void next();
-          }}
-          onBack={() => {
-            if (!locked) {
-              setStep(step === 3 ? 2 : 1);
-              setReviewed(false);
-              setPreview(undefined);
-            }
-          }}
-          onClose={onClose}
-          locked={locked}
-          backDisabled={!!payment && step === 2}
-          nextDisabled={
-            !personId ||
-            existing.isFetching ||
-            registerCommand.state !== "ready" ||
-            (step === 2 &&
-              draft.choice === "now" &&
-              (!payment || BigInt(payment.remaining_minor) > 0n))
+      <EventRegistrationSheet
+        eventName={before.name}
+        step={step}
+        reviewed={reviewed}
+        onReviewed={setReviewed}
+        onNext={() => {
+          void next();
+        }}
+        onBack={() => {
+          if (!locked) {
+            setStep(step === 3 ? 2 : 1);
+            setReviewed(false);
+            setPreview(undefined);
           }
-          error={error}
-          notice={nativeNotices}
-          personPicker={
-            <LeadPersonPicker
-              scope={scope}
-              selected={person}
-              disabled={locked || !!payment}
-              onSelect={(value) => {
-                if (!locked && !payment) {
-                  setPerson(value);
-                  setSale("");
-                  setPreview(undefined);
-                  setReviewed(false);
-                  setError(undefined);
-                }
+        }}
+        onClose={onClose}
+        locked={locked}
+        backDisabled={!!payment && step === 2}
+        nextDisabled={
+          !personId ||
+          existing.isFetching ||
+          registerCommand.state !== "ready" ||
+          (step === 2 &&
+            draft.choice === "now" &&
+            (!payment || BigInt(payment.remaining_minor) > 0n))
+        }
+        error={error}
+        notice={nativeNotices}
+        personPicker={
+          <LeadPersonPicker
+            scope={scope}
+            selected={person}
+            disabled={locked || !!payment}
+            onSelect={(value) => {
+              if (!locked && !payment) {
+                setPerson(value);
+                setSale("");
+                setPreview(undefined);
+                setReviewed(false);
+                setError(undefined);
+              }
+            }}
+          />
+        }
+        salePicker={
+          <Field>
+            <FieldLabel htmlFor="event-registration-sale">
+              {t(($) => $.eventDetail.saleChoice)}
+            </FieldLabel>
+            <NativeSelect
+              id="event-registration-sale"
+              value={sale}
+              disabled={locked || !!payment || !personId || rights.isPending || rights.isError}
+              onChange={(event) => {
+                setSale(event.target.value);
+                setPreview(undefined);
+                setReviewed(false);
               }}
-            />
-          }
-          salePicker={
-            <Field>
-              <FieldLabel htmlFor="event-registration-sale">
-                {t(($) => $.eventDetail.saleChoice)}
-              </FieldLabel>
-              <NativeSelect
-                id="event-registration-sale"
-                value={sale}
-                disabled={locked || !!payment || !personId || rights.isPending || rights.isError}
-                onChange={(event) => {
-                  setSale(event.target.value);
-                  setPreview(undefined);
-                  setReviewed(false);
+            >
+              <NativeSelectOption value="">{t(($) => $.eventDetail.noSale)}</NativeSelectOption>
+              {rights.data?.map((row) => (
+                <NativeSelectOption key={row.sale_id} value={row.sale_id}>
+                  {row.start_date} – {row.end_date} ·{" "}
+                  {t(($) => $.eventDetail.availableRights, { count: row.available })}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+            <FieldDescription>{t(($) => $.eventDetail.saleHint)}</FieldDescription>
+            {rights.isError && (
+              <Button
+                variant="outline"
+                isDisabled={locked}
+                onPress={() => {
+                  void rights.refetch();
                 }}
               >
-                <NativeSelectOption value="">{t(($) => $.eventDetail.noSale)}</NativeSelectOption>
-                {rights.data?.map((row) => (
-                  <NativeSelectOption key={row.sale_id} value={row.sale_id}>
-                    {row.start_date} – {row.end_date} ·{" "}
-                    {t(($) => $.eventDetail.availableRights, { count: row.available })}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-              <FieldDescription>{t(($) => $.eventDetail.saleHint)}</FieldDescription>
-              {rights.isError && (
-                <Button
-                  variant="outline"
-                  isDisabled={locked}
-                  onPress={() => {
-                    void rights.refetch();
-                  }}
-                >
-                  {t(($) => $.studio.retry)}
-                </Button>
-              )}
-            </Field>
-          }
-          preview={
-            preview ? (
-              <EventPreviewEffects preview={preview.value} />
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                {t(($) => $.eventDetail.previewRegistrationHint)}
-              </p>
-            )
-          }
-          payment={paymentPanel}
-          summary={
-            <div className="space-y-3">
-              <p className="font-semibold">
-                {name} · {before.name}
-              </p>
-              {preview && <EventPreviewEffects preview={preview.value} />}
-              <p>
-                {payment
-                  ? formatMinorAmount(payment.remaining_minor, payment.currency)
-                  : t(($) => $.eventDetail.previewRegistrationHint)}
-              </p>
-            </div>
-          }
-        />
-      )}
+                {t(($) => $.studio.retry)}
+              </Button>
+            )}
+          </Field>
+        }
+        preview={
+          preview ? (
+            <EventPreviewEffects preview={preview.value} />
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {t(($) => $.eventDetail.previewRegistrationHint)}
+            </p>
+          )
+        }
+        payment={paymentPanel}
+        summary={
+          <div className="space-y-3">
+            <p className="font-semibold">
+              {name} · {before.name}
+            </p>
+            {preview && <EventPreviewEffects preview={preview.value} />}
+            <p>
+              {payment
+                ? formatMinorAmount(payment.remaining_minor, payment.currency)
+                : t(($) => $.eventDetail.previewRegistrationHint)}
+            </p>
+          </div>
+        }
+      />
       {confirmation && (
         <EventActionDialog
           title={

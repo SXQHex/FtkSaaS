@@ -3531,7 +3531,7 @@
     "eligible": "Paket uygun",
     "ineligible": "Paket uygun değil",
     "paymentUnread": "Ödeme kaynağı paylaşılmıyor",
-    "sourceLimit": "Hazırlıksız eski kayıtların ödeme bağı henüz sunulmuyor. Ödeme bilinmiyor olarak korunur.",
+    "sourceLimit": "Kayıt bedeli değişmezdir; borç ve ödeme bakiyeleri güncel kaynaktan okunur. Eksik veya gizli ödeme bilgisi sıfır sayılmaz.",
     "dutyUnverified": "Doğrulanmadı",
     "noActual": "Fiilî başlangıç kaydı yok",
     "registrationState": {
@@ -3555,7 +3555,19 @@
     "collectionHint": "Tahsilat yalnız gösterilen etkinlik hazırlığının gerçek borcuna yöneltilir. Kesin kayıt ve kontenjan ayrı onaylanır.",
     "collectConfirm": "Tahsilatı kaydet",
     "title": "Etkinlik detayı",
-    "capacityClosed": "Kayıt sırasında kontenjan doldu. Kesin kayıt yapılmadı; hazırlığın kalan borcu kapatıldı, uygun tutar öğrenci alacağına çevrildi. Güncel ödeme bakiyesi aşağıda gösterilir."
+    "capacityClosed": "Kayıt sırasında kontenjan doldu. Kesin kayıt yapılmadı; hazırlığın kalan borcu kapatıldı, uygun tutar öğrenci alacağına çevrildi. Güncel ödeme bakiyesi aşağıda gösterilir.",
+    "paymentStates": {
+      "available": "Ödeme kaynağı okundu.",
+      "no_cash_due": "Nakit bedel gerekmiyor.",
+      "missing": "Kaydın ödeme kaynağı eksik; bakiye bilinmiyor.",
+      "restricted": "Bu kaydın ödeme bilgilerini okuma yetkisi yok."
+    },
+    "cancelledAmount": "İptal edilen tutar",
+    "paymentChanged": "Kaydın ödeme bilgileri değişti. Güncel kaynağı yeniden oku ve işlemi tekrar incele.",
+    "registeredPaymentHint": "Tutar kaydın oluşturulduğu andaki bedeldir. Güncel etkinlik ücreti geçmiş kaydın bedelini değiştirmez.",
+    "registeredCollectionHint": "Tahsilat yalnız bu kaydın gerçek borçlarına gönderilir; yeni ödeme hazırlığı veya kayıt oluşturulmaz.",
+    "registrationFee": "Kaydın değişmez bedeli",
+    "netAmount": "Güncel net borç"
   },
   "inbox": {
     "title": "Gelen kutusu",

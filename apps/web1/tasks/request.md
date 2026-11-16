@@ -32,7 +32,7 @@
 | W1-BE-24 | E33 · P12 | CRM özet/filtre, merkez takipleri, sorumlu ve geçmiş deneme teklifi keşfi | Açık: mevcut okuyucuların güvenli typed eşlemesi veya eksik keşif desteği isteniyor. |
 | W1-BE-25 | E34–36 · P12.5/WF09 | Public program türü/filtre, görünür doluluk ve başvuru/yayın durumu | Açık: mevcut anonim DTO eşlemesi veya güvenli typed destek isteniyor. |
 | W1-BE-26 | E37 · P13/WF15 | Etkinlik arama/durum filtresi, görünür kayıt sayısı ve merkez özetleri | Backend karşılandı (PR319): native query/status, filtre geneli summary ve active_registration_count mevcut; E37 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E37 sahibinde. |
-| W1-BE-27 | E38 · P13/WF15 | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı | Backend karşılandı (PR319): event_get_v1(include_payment_summary:true) gerçek kayıt bedeli/borç/bakiye bağını sağlar; E38 tüketimi/kabulü TODO sahibinde. |
+| W1-BE-27 | E38 · P13/WF15 | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı | Backend karşılandı (PR319): event_get_v1(include_payment_summary:true) gerçek kayıt bedeli/borç/bakiye bağını sağlar; E38 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E38 sahibinde. |
 | W1-BE-28 | E39 · P14/WF11 | Kendi inbox arama/iş durumu, toplu/ters okundu ve kaynak eylemi eşlemesi | Açık: native liste ve sürümlü okundu var; çizimin kalan güvenli eşlemesi isteniyor. |
 | W1-BE-29 | E40 · P14.4/WF16 | Çizimin segment, tetikleme, eylem ve son işler eşlemesi | Açık: native save/disable/retry var; kalan çizim eşlemesi ve güvenli özet/keşif gerekiyor. |
 | W1-BE-30 | E41 · P16/WF10 | Çizimin satış/doluluk/hakediş raporu ve import görünür alanları | Açık: mevcut rapor türleri gerçek; eksik çizim eşlemesi ve güvenli özet gerekiyor. |

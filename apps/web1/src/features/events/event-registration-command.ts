@@ -19,9 +19,9 @@ import {
   financeDraft,
   writeCollection,
   readCollectionReceipt,
-  readCollectionResult,
   type CollectionIntent,
 } from "../finance/finance";
+import { confirmEventCollectionReceipt } from "./registered-event-collection";
 import type { EventCollectionDraft } from "./event-registration-draft";
 
 const common = (scope: ClientScope) => ({
@@ -251,7 +251,7 @@ export async function prepareEventCollection(
   };
 }
 export async function readEventCollectionResult(intent: EventCollectionIntent, id?: string) {
-  await readCollectionResult(intent, id);
+  await confirmEventCollectionReceipt(intent, id);
   const payment = await readEventPayment(
     intent.scope,
     intent.preparation.eventId,

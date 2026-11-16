@@ -1,6 +1,9 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
-import type { EventPaymentPreparationView } from "../src/lib/api-contracts/generated.js";
+import type {
+  EventPaymentPreparationView,
+  EventRegistrationPaymentSummary,
+} from "../src/lib/api-contracts/generated.js";
 import { mockEvents, eventId } from "./events-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
@@ -14,6 +17,11 @@ export const detailIds = {
 export async function mockEventDetail(
   page: Page,
   mode: "normal" | "unknown" | "unread" | "denied" | "capacity" = "normal",
+  options: {
+    existing?: EventRegistrationPaymentSummary["status"];
+    deniedCollection?: boolean;
+    refreshFailure?: boolean;
+  } = {},
 ) {
   const base = await mockEvents(page),
     event = base.events[0]!;
@@ -25,17 +33,87 @@ export async function mockEventDetail(
   event.terms.full_payment_required = true;
   const state = {
     event,
+    reads: [] as { op: string; request: Record<string, unknown> }[],
     payment: undefined as EventPaymentPreparationView | undefined,
     writes: [] as { op: string; request: Record<string, unknown> }[],
     effects: 0,
     failRead: false,
+    collectionReads: 0,
     unknownSent: false,
     receipts: new Map<string, { type: string; id: string }>(),
     cash: undefined as Record<string, unknown> | undefined,
   };
+  if (options.existing) {
+    const empty = {
+      amount_minor: null,
+      currency: null,
+      net_minor: null,
+      paid_minor: null,
+      remaining_minor: null,
+      credited_minor: null,
+      cancelled_minor: null,
+      debts: [],
+    };
+    const value: EventRegistrationPaymentSummary =
+      options.existing === "available"
+        ? {
+            status: "available",
+            amount_minor: "50000",
+            currency: "TRY",
+            net_minor: "50000",
+            paid_minor: "10000",
+            remaining_minor: "40000",
+            credited_minor: "0",
+            cancelled_minor: "0",
+            debts: [
+              {
+                id: detailIds.debt,
+                version: 1,
+                preparation_id: null,
+                currency: "TRY",
+                amount_minor: "50000",
+                net_minor: "50000",
+                paid_minor: "10000",
+                remaining_minor: "40000",
+                credited_minor: "0",
+                cancelled_minor: "0",
+              },
+            ],
+          }
+        : options.existing === "no_cash_due"
+          ? {
+              ...empty,
+              status: "no_cash_due",
+              amount_minor: "0",
+              currency: "TRY",
+              net_minor: "0",
+              paid_minor: "0",
+              remaining_minor: "0",
+              credited_minor: "0",
+              cancelled_minor: "0",
+            }
+          : options.existing === "missing"
+            ? { ...empty, status: "missing", amount_minor: "50000", currency: "TRY" }
+            : { ...empty, status: "restricted" };
+    event.registrations = [
+      {
+        id: detailIds.registration,
+        person_id: I.instructor,
+        display_name: "Mevcut kayıt",
+        state: "active",
+        attendance_result: "unmarked",
+        package_eligible: true,
+        version: 1,
+        payment_summary: value,
+      },
+    ];
+    event.terms.fee_minor = "99000";
+    event.terms.currency = "USD";
+  }
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!,
       r = route.request().postDataJSON();
+    state.reads.push({ op, request: r });
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
     const reject = (code: string, retryable = false) =>
       route.fulfill({
@@ -50,9 +128,42 @@ export async function mockEventDetail(
       expect(r.center_id).toBe(I.center);
     }
     if (op === "event_get_v1") {
+      if (options.existing) expect(r.include_payment_summary).toBe(true);
+      if (options.refreshFailure && state.cash && state.collectionReads++ === 1)
+        return reject("SERVICE_UNAVAILABLE", true);
       if (state.failRead) {
         state.failRead = false;
         return reject("SERVICE_UNAVAILABLE", true);
+      }
+      if (state.payment?.registration_id) {
+        const record = event.registrations?.find(
+          (row) => row.id === state.payment!.registration_id,
+        );
+        if (record)
+          record.payment_summary = {
+            status: "available",
+            amount_minor: state.payment.amount_minor,
+            currency: state.payment.currency,
+            net_minor: state.payment.amount_minor,
+            paid_minor: state.payment.paid_minor,
+            remaining_minor: state.payment.remaining_minor,
+            credited_minor: state.payment.credited_minor,
+            cancelled_minor: "0",
+            debts: [
+              {
+                id: state.payment.debt_id,
+                version: state.payment.version,
+                preparation_id: state.payment.id,
+                currency: state.payment.currency,
+                amount_minor: state.payment.amount_minor,
+                net_minor: state.payment.amount_minor,
+                paid_minor: state.payment.paid_minor,
+                remaining_minor: state.payment.remaining_minor,
+                credited_minor: state.payment.credited_minor,
+                cancelled_minor: "0",
+              },
+            ],
+          };
       }
       return send(event);
     }
@@ -160,7 +271,8 @@ export async function mockEventDetail(
       ].includes(op)
     ) {
       state.writes.push({ op, request: r });
-      if (mode === "denied") return reject("FORBIDDEN");
+      if (mode === "denied" || (op === "collection_record_v1" && options.deniedCollection))
+        return reject("FORBIDDEN");
       let primary = state.receipts.get(r.operation_key);
       if (!primary) {
         state.effects++;
@@ -224,8 +336,19 @@ export async function mockEventDetail(
         }
         if (op === "collection_record_v1") {
           expect(r.debt_ids).toEqual([detailIds.debt]);
-          state.payment!.paid_minor = r.amount_minor;
-          state.payment!.remaining_minor = "0";
+          if (options.existing) {
+            const payment = event.registrations![0]!.payment_summary!;
+            payment.paid_minor = String(BigInt(payment.paid_minor!) + BigInt(r.amount_minor));
+            payment.remaining_minor = String(
+              BigInt(payment.remaining_minor!) - BigInt(r.amount_minor),
+            );
+            payment.debts[0]!.paid_minor = payment.paid_minor;
+            payment.debts[0]!.remaining_minor = payment.remaining_minor;
+            payment.debts[0]!.version++;
+          } else {
+            state.payment!.paid_minor = r.amount_minor;
+            state.payment!.remaining_minor = "0";
+          }
           state.cash = {
             id: detailIds.cash,
             kind: "collection",

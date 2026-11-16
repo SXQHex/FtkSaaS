@@ -138,11 +138,16 @@ export async function readEventsPage(
   const items = await Promise.all(page.items.map((row) => validateEvent(row, scope)));
   return { ...page, items };
 }
-export async function readEvent(scope: ClientScope, id: string) {
+export async function readEvent(scope: ClientScope, id: string, includePaymentSummary = false) {
   z.uuid().parse(id);
   const backend = await scopedBackend(scope);
   return validateEvent(
-    await backend.call("event_get_v1", { ...common(scope), request_id: uuidv7(), event_id: id }),
+    await backend.call("event_get_v1", {
+      ...common(scope),
+      request_id: uuidv7(),
+      event_id: id,
+      ...(includePaymentSummary ? { include_payment_summary: true } : {}),
+    }),
     scope,
     id,
   );

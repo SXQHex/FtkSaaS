@@ -16,7 +16,7 @@ import { EventAttendanceView, type EventAttendanceAction } from "./event-attenda
 import { EventActionController, type EventActionSelection } from "./event-action-controller";
 import { EventEditor } from "./event-editor";
 import { readEventRooms } from "./events-read";
-import { readDetailedEvent, readRegistrationPayment } from "./event-registration-read";
+import { readDetailedEvent } from "./event-registration-read";
 import { EventRegistrationController } from "./event-registration-controller";
 
 export function EventDetailContent({
@@ -59,7 +59,7 @@ export function EventDetailContent({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  const event = !source.isError ? source.data : undefined;
+  const event = !source.isError || locked ? source.data : undefined;
   const rooms = useQuery({
     queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "rooms"],
     queryFn: () => readEventRooms(scope),
@@ -116,25 +116,6 @@ export function EventDetailContent({
       };
     },
   });
-  const payments = useQuery({
-    queryKey: [...prefix, "payments", event],
-    enabled: !!event?.registrations?.length,
-    retry: false,
-    queryFn: async () => {
-      const result = new Map<string, Awaited<ReturnType<typeof readRegistrationPayment>>>();
-      const rows = event!.registrations!;
-      for (let index = 0; index < rows.length; index += 4)
-        await Promise.all(
-          rows.slice(index, index + 4).map(async (row) => {
-            result.set(
-              row.id,
-              await readRegistrationPayment(scope, eventId, row.person_id, row.id),
-            );
-          }),
-        );
-      return result;
-    },
-  });
   const accessLost = useCallback(
     (cause: unknown) => {
       if (
@@ -151,9 +132,9 @@ export function EventDetailContent({
     [queries, router, scope.accountId],
   );
   useEffect(() => {
-    for (const cause of [workspace.error, source.error, presentation.error, payments.error])
+    for (const cause of [workspace.error, source.error, presentation.error])
       if (cause) accessLost(cause);
-  }, [workspace.error, source.error, presentation.error, payments.error, accessLost]);
+  }, [workspace.error, source.error, presentation.error, accessLost]);
   const setPending = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -162,7 +143,7 @@ export function EventDetailContent({
     [onLockChange],
   );
   async function refresh() {
-    await queries.invalidateQueries({ queryKey: prefix });
+    await queries.refetchQueries({ queryKey: prefix, exact: true }, { throwOnError: true });
     await queries.invalidateQueries({
       queryKey: ["events", scope.accountId, scope.orgId, scope.centerId],
     });
@@ -270,7 +251,7 @@ export function EventDetailContent({
         ]}
         rows={
           event.registrations?.map((row) => {
-            const payment = payments.data?.get(row.id);
+            const payment = row.payment_summary;
             return {
               id: row.id,
               name: row.display_name,
@@ -286,16 +267,18 @@ export function EventDetailContent({
                     ? t(($) => $.eventDetail.ineligible)
                     : unknown,
               payment:
-                payment?.kind === "available"
-                  ? formatMinorAmount(payment.value.remaining_minor, payment.value.currency)
-                  : t(($) => $.eventDetail.paymentUnread),
+                payment?.status === "available" || payment?.status === "no_cash_due"
+                  ? formatMinorAmount(payment.remaining_minor!, payment.currency!)
+                  : payment
+                    ? t(($) => $.eventDetail.paymentStates[payment.status])
+                    : t(($) => $.eventDetail.paymentUnread),
               attendance: t(($) => $.eventDetail.results[row.attendance_result]),
               warning:
                 row.state === "cancelled"
                   ? t(($) => $.eventDetail.registrationState.cancelled)
                   : undefined,
               cancelled: row.state !== "active",
-              paymentAvailable: payment?.kind === "available",
+              paymentAvailable: Boolean(payment && payment.status !== "restricted"),
             };
           }) ?? null
         }
@@ -402,23 +385,6 @@ export function EventDetailContent({
             <Alert>
               <AlertDescription>{t(($) => $.eventDetail.sourceLimit)}</AlertDescription>
             </Alert>
-            {payments.isError && (
-              <Alert variant="destructive">
-                <AlertDescription>
-                  {t(($) => $.eventDetail.paymentUnread)}{" "}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    isDisabled={locked}
-                    onPress={() => {
-                      void payments.refetch();
-                    }}
-                  >
-                    {t(($) => $.studio.retry)}
-                  </Button>
-                </AlertDescription>
-              </Alert>
-            )}
           </>
         }
       />

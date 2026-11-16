@@ -467,6 +467,7 @@ export default interface Resources {
         "record_start": "Fiilî başlangıcı kaydet"
       },
       "availableRights": "{{count}} kullanılabilir hak" | "{{count}} kullanılabilir hak",
+      "cancelledAmount": "İptal edilen tutar",
       "capacity": "Kontenjan",
       "capacityClosed": "Kayıt sırasında kontenjan doldu. Kesin kayıt yapılmadı; hazırlığın kalan borcu kapatıldı, uygun tutar öğrenci alacağına çevrildi. Güncel ödeme bakiyesi aşağıda gösterilir.",
       "closedAttendance": "Yoklama kapalı",
@@ -491,6 +492,7 @@ export default interface Resources {
       "ineligibleAcknowledgement": "Paket uygun olmasa da gerçekleşen katılımı gerekçeyle kaydediyorum; hak uygunluğu verilmez.",
       "markFor": "{{name}} için yoklama",
       "member": "Üye",
+      "netAmount": "Güncel net borç",
       "noActual": "Fiilî başlangıç kaydı yok",
       "noDuties": "Görevli bulunmuyor.",
       "noSale": "Paket seçilmedi",
@@ -501,12 +503,21 @@ export default interface Resources {
       "partialPayment": "Tam ödeme zorunlu değil",
       "participants": "Katılımcılar",
       "payment": "Ödeme",
+      "paymentChanged": "Kaydın ödeme bilgileri değişti. Güncel kaynağı yeniden oku ve işlemi tekrar incele.",
+      "paymentStates": {
+        "available": "Ödeme kaynağı okundu.",
+        "missing": "Kaydın ödeme kaynağı eksik; bakiye bilinmiyor.",
+        "no_cash_due": "Nakit bedel gerekmiyor.",
+        "restricted": "Bu kaydın ödeme bilgilerini okuma yetkisi yok."
+      },
       "paymentUnread": "Ödeme kaynağı paylaşılmıyor",
       "planned": "Planlanan başlangıç",
       "previewAction": "İptal etkilerini oku",
       "previewHint": "Bu etkiler sunucunun güncel önizlemesidir. İptal otomatik nakit iadesi değildir.",
       "previewRegistrationHint": "Sonraki adımda seçili kişi ve paketin güncel uygunluğu sunucudan okunur.",
       "reason": "Gerekçe",
+      "registeredCollectionHint": "Tahsilat yalnız bu kaydın gerçek borçlarına gönderilir; yeni ödeme hazırlığı veya kayıt oluşturulmaz.",
+      "registeredPaymentHint": "Tutar kaydın oluşturulduğu andaki bedeldir. Güncel etkinlik ücreti geçmiş kaydın bedelini değiştirmez.",
       "registration": {
         "amount": "Tutar (alt birim)",
         "back": "Geri",
@@ -534,6 +545,7 @@ export default interface Resources {
           "3": "Kesin kayıt özeti"
         }
       },
+      "registrationFee": "Kaydın değişmez bedeli",
       "registrationState": {
         "active": "Aktif",
         "cancelled": "İptal",
@@ -552,7 +564,7 @@ export default interface Resources {
       "saleChoice": "Kayıt için paket",
       "saleHint": "Tarih ve hak bakiyesi seçim içindir. Etkinliğe uygunluğu güncel sunucu önizlemesi belirler.",
       "sections": "Etkinlik bölümleri",
-      "sourceLimit": "Hazırlıksız eski kayıtların ödeme bağı henüz sunulmuyor. Ödeme bilinmiyor olarak korunur.",
+      "sourceLimit": "Kayıt bedeli değişmezdir; borç ve ödeme bakiyeleri güncel kaynaktan okunur. Eksik veya gizli ödeme bilgisi sıfır sayılmaz.",
       "title": "Etkinlik detayı",
       "unread": "Bu kaynak henüz okunamadı.",
       "visibleCount": "{{count}} kayıt listeleniyor" | "{{count}} kayıt listeleniyor"
