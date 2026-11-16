@@ -2247,7 +2247,31 @@
     "cancelUnread": "İptal alındı; güncel kayıtlar henüz okunamadı.",
     "cancelStale": "Rezervasyon değişti. Güncel kaydı yeniden oku ve tekrar onayla.",
     "cancelRejected": "Rezervasyon iptal edilemedi. Güncel kaydı ve iptal koşullarını kontrol et.",
-    "cancelReload": "İptal bilgisini yeniden oku"
+    "cancelReload": "İptal bilgisini yeniden oku",
+    "ledgerSale": "Hak kaynağı",
+    "readLedger": "Hareketleri göster",
+    "ledgerHint": "Seçili satışın kaynak hareketleri gösterilir. Ayırma/bırakma miktarı, bakiye değişimiyle aynı değildir.",
+    "ledgerError": "Hak hareketleri okunamadı. Kapsamı kontrol edip ilk sayfadan yeniden dene.",
+    "linkedLedger": "Önceki harekete bağlı",
+    "ledgerSource": "Kaynak: {{source}} · {{id}}",
+    "ledgerValues": "Miktar {{quantity}} · Bakiye farkı {{delta}}",
+    "ledgerKinds": {
+      "grant": "Hak tanımlama",
+      "reserve": "Hak ayırma",
+      "consume": "Hak kullanımı",
+      "release": "Ayrılan hakkı bırakma",
+      "adjust_add": "Hak ekleme",
+      "adjust_subtract": "Hak azaltma",
+      "settle_deficit": "Eksik hakkı kapatma",
+      "reverse": "Bağlı geri alma"
+    },
+    "ledgerSources": {
+      "sale": "Satış",
+      "reservation": "Rezervasyon",
+      "event": "Etkinlik kaydı",
+      "record": "Kaynak kaydı"
+    },
+    "ledgerNoSource": "Bu kişi için görünür hak kaynağı yok."
   },
   "scheduleRoster": {
     "scope": "{{interval}} · {{timezone}}. Bu aralıkta oluşmuş derslerin öncelikli rezervasyonları gösterilir. Gelecek programlara otomatik kayıt yapılmaz.",

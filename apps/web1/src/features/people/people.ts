@@ -58,7 +58,11 @@ export async function createPerson(intent: PersonCreateIntent) {
   if (!receipt.primary_id) throw new Error("PERSON_ACK_UNAVAILABLE");
   return receipt.primary_id;
 }
-export async function readPerson(scope: PeopleScope, personId: string) {
+export async function readPerson(
+  scope: PeopleScope,
+  personId: string,
+  options: { membershipDate?: boolean; memberSummary?: boolean } = {},
+) {
   const backend = await scopedBackend(scope);
   const person = await backend.call("person_get_v1", {
     client_api_version: 1,
@@ -66,7 +70,11 @@ export async function readPerson(scope: PeopleScope, personId: string) {
     org_id: scope.orgId,
     center_id: scope.centerId,
     person_id: personId,
+    ...(options.membershipDate ? { include_membership_date: true } : {}),
+    ...(options.memberSummary ? { include_member_summary: true } : {}),
   });
+  if (person.membership_started_at != null)
+    z.iso.datetime({ offset: true }).parse(person.membership_started_at);
   if (person.id !== personId) throw new Error("PERSON_READ_UNAVAILABLE");
   return person;
 }

@@ -9,6 +9,7 @@ import { readNegativeLimit } from "./negative-limit";
 import { NegativeLimitEditor } from "./negative-limit-editor";
 import { RightAdjustmentEditor } from "./right-adjustment-editor";
 import { FreezeEditor } from "./freeze-editor";
+import { ProfileLedger } from "./profile-ledger";
 import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
@@ -82,7 +83,7 @@ export function MemberProfileContent({
     rightsKey = ["profile-rights", scope.accountId, scope.orgId, scope.centerId, personId];
   const person = useQuery({
     queryKey: personKey,
-    queryFn: () => readPerson(scope, personId),
+    queryFn: () => readPerson(scope, personId, { membershipDate: true, memberSummary: true }),
     enabled: Boolean(center),
     retry: false,
   });
@@ -456,7 +457,14 @@ export function MemberProfileContent({
               )
             : t(($) => $.memberProfile.readRequired)
         }
-        joined={null}
+        joined={
+          p?.membership_started_at && center
+            ? new Intl.DateTimeFormat("tr-TR", {
+                dateStyle: "medium",
+                timeZone: center.timezone,
+              }).format(new Date(p.membership_started_at))
+            : null
+        }
         actions={[
           { kind: "renew", disabled: true },
           { kind: "change", disabled: true },
@@ -511,6 +519,25 @@ export function MemberProfileContent({
             .map((x) => ({ id: x.id, title: x.name, date: x.period, detail: x.state })) ?? null
         }
         ledger={null}
+        ledgerPanel={
+          center && (
+            <ProfileLedger
+              scope={scope}
+              personId={personId}
+              sales={
+                presentedRights?.map((row) => ({
+                  id: row.id,
+                  label: `${row.name} · ${row.period}`,
+                })) ?? []
+              }
+              available={!invalid && !rights.isError && Boolean(rights.data)}
+              revision={rights.dataUpdatedAt}
+              timezone={center.timezone}
+              onAccessLost={accessLost}
+            />
+          )
+        }
+
         negative={{
           limit:
             negativeLimit.isError || negativeLimit.data?.effective_limit == null

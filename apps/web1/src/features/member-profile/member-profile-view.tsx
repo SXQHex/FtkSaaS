@@ -87,6 +87,7 @@ export function MemberProfileView({
   entitlements,
   past,
   ledger,
+  ledgerPanel,
   negative,
   reservations,
   reservationFilter,
@@ -117,6 +118,7 @@ export function MemberProfileView({
   entitlements: ProfileEntitlement[] | null;
   past: ProfileHistory[] | null;
   ledger: ProfileHistory[] | null;
+  ledgerPanel?: ReactNode;
   negative: {
     limit: string;
     used: string;
@@ -360,26 +362,32 @@ export function MemberProfileView({
                 ).map(([key, rows]) => (
                   <section key={key} className="border-t pt-4">
                     <h2 className="mb-3 font-semibold">{t(($) => $.memberProfile[key])}</h2>
-                    <ItemGroup>
-                      {(rows ?? []).map((row) => (
-                        <Item key={row.id} role="listitem" className="px-0">
-                          <ItemContent>
-                            <ItemTitle>{row.title}</ItemTitle>
-                            <ItemDescription>{row.date}</ItemDescription>
-                          </ItemContent>
-                          <span className="text-sm tabular-nums">{row.detail}</span>
-                        </Item>
-                      ))}
-                    </ItemGroup>
-                    {rows === null && (
-                      <p className="text-sm text-muted-foreground">
-                        {t(($) => $.memberProfile.readRequired)}
-                      </p>
-                    )}
-                    {rows?.length === 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        {t(($) => $.memberProfile.noRecords)}
-                      </p>
+                    {key === "ledger" && ledgerPanel ? (
+                      ledgerPanel
+                    ) : (
+                      <>
+                        <ItemGroup>
+                          {(rows ?? []).map((row) => (
+                            <Item key={row.id} role="listitem" className="px-0">
+                              <ItemContent>
+                                <ItemTitle>{row.title}</ItemTitle>
+                                <ItemDescription>{row.date}</ItemDescription>
+                              </ItemContent>
+                              <span className="text-sm tabular-nums">{row.detail}</span>
+                            </Item>
+                          ))}
+                        </ItemGroup>
+                        {rows === null && (
+                          <p className="text-sm text-muted-foreground">
+                            {t(($) => $.memberProfile.readRequired)}
+                          </p>
+                        )}
+                        {rows?.length === 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            {t(($) => $.memberProfile.noRecords)}
+                          </p>
+                        )}
+                      </>
                     )}
                   </section>
                 ))}
