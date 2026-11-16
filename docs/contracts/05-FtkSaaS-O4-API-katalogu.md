@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-227 sözleşme operasyonu; 227 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+229 sözleşme operasyonu; 229 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -68,7 +68,7 @@
 | `lesson_request_approve_v1` | runtime / ilgili WF’yi oku | `request.resolve` | W / request | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; session_id?: FtkUuid ∣ null; session?: SessionCreate ∣ null; lesson_request_id: FtkUuid; expected_version: PositiveInt; booking_category?: BookingCategory | Success_lesson_request_approve |
 | `reservation_create_v1` | runtime / ilgili WF’yi oku | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid; source_sale_id?: FtkUuid ∣ null; mode: BookingMode; booking_category?: BookingCategory | Success_reservation_create |
 | `reservation_cancel_v1` | runtime / ilgili WF’yi oku | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; reason: Text | Success_reservation_cancel |
-| `reservation_list_v1` | runtime / ilgili WF’yi oku | `schedule.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id?: FtkUuid ∣ null; session_id?: FtkUuid ∣ null; interval?: Interval ∣ null; page: Page | Success_reservation_list |
+| `reservation_list_v1` | runtime / ilgili WF’yi oku | `schedule.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id?: FtkUuid ∣ null; session_id?: FtkUuid ∣ null; interval?: Interval ∣ null; page: Page; time_filter?: all / upcoming / past | Success_reservation_list |
 | `waitlist_join_v1` | runtime / ilgili WF’yi oku | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid; booking_category?: BookingCategory | Success_waitlist_join |
 | `waitlist_leave_v1` | runtime / ilgili WF’yi oku | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; entry_id: FtkUuid; expected_version: PositiveInt | Success_waitlist_leave |
 | `seat_offer_accept_v1` | runtime / ilgili WF’yi oku | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; offer_id: FtkUuid; expected_version: PositiveInt | Success_seat_offer_accept |
@@ -233,6 +233,8 @@
 | `finance_directory_get_v1` | runtime / ilgili WF’yi oku | `finance.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; view: movements / debts / credits; interval: Interval; page: Page; query?: string; kind?: sale / collection / refund / correction_in / correction_out / debt / credit; method?: cash / bank_transfer / card_pos | Success_finance_directory_get |
 | `products_management_list_v1` | runtime / ilgili WF’yi oku | `product.manage` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; include_timed_products?: boolean; view?: products / versions / sales; product_id?: FtkUuid; status?: all / on_sale / closed / archived; query?: string | Success_products_management_list |
 | `product_state_set_v1` | runtime / ilgili WF’yi oku | `product.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; product_id: FtkUuid; expected_version: PositiveInt; reason: string; action: open / close / archive | Success_product_state_set |
+| `freeze_cancel_preview_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; freeze_id: FtkUuid; reason: ReviewReason | Success_freeze_cancel_preview |
+| `freeze_cancel_apply_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_freeze_cancel_apply |
 
 ## Sürüm ve okuma desteği
 
@@ -467,6 +469,8 @@
 | finance_directory_get_v1 | read | none | None | implemented |  |
 | products_management_list_v1 | read | none | None | implemented |  |
 | product_state_set_v1 | command | row_version | products_management_list_v1 | implemented | products.state_and_version, audit.reason |
+| freeze_cancel_preview_v1 | preview | preview_dependencies | entitlements_get_v1 | implemented |  |
+| freeze_cancel_apply_v1 | apply | preview_dependencies | entitlements_get_v1 | implemented | freezes.cancel_planned, rights.remove_only_cancelled_extension, no_auto_rebooking |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

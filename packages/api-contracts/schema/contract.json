@@ -929,7 +929,9 @@
         "content_catalog_save_v1",
         "finance_directory_get_v1",
         "products_management_list_v1",
-        "product_state_set_v1"
+        "product_state_set_v1",
+        "freeze_cancel_preview_v1",
+        "freeze_cancel_apply_v1"
       ]
     },
     "EntityType": {
@@ -3054,6 +3056,9 @@
           "items": {
             "$ref": "#/$defs/SafeError"
           }
+        },
+        "freeze_cancellation": {
+          "$ref": "#/$defs/FreezeCancellationImpact"
         }
       },
       "required": [
@@ -3196,6 +3201,9 @@
         },
         "configuration_requirement": {
           "$ref": "#/$defs/ScheduleConfigurationRequirement"
+        },
+        "freeze_cancellation": {
+          "$ref": "#/$defs/FreezeCancellationImpact"
         }
       },
       "required": [
@@ -11072,6 +11080,15 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "time_filter": {
+          "type": "string",
+          "enum": [
+            "all",
+            "upcoming",
+            "past"
+          ],
+          "description": "Optional start-time partition. The server captures a cutoff on page one and binds it to subsequent cursors. Omitted retains legacy interval-overlap behavior."
         }
       },
       "required": [
@@ -32205,6 +32222,64 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "freeze_cancel_preview_v1"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "operation": {
+                    "const": "freeze_cancel_preview_v1"
+                  }
+                }
+              },
+              "org_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "org_id"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "freeze_cancel_apply_v1"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "operation": {
+                    "const": "freeze_cancel_apply_v1"
+                  }
+                }
+              },
+              "org_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "org_id"
+            ]
+          }
         }
       ]
     },
@@ -37559,6 +37634,12 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_product_state_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_freeze_cancel_preview_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_freeze_cancel_apply_v1"
         }
       ]
     },
@@ -37721,7 +37802,9 @@
         "subscription_period_change_request_v1",
         "instructor_agreement_accept_v1",
         "content_catalog_save_v1",
-        "product_state_set_v1"
+        "product_state_set_v1",
+        "freeze_cancel_preview_v1",
+        "freeze_cancel_apply_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -42364,6 +42447,12 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_product_state_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_freeze_cancel_preview_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_freeze_cancel_apply_v1"
         }
       ]
     },
@@ -60564,6 +60653,430 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "FreezeCancellationImpact": {
+      "type": "object",
+      "properties": {
+        "freeze_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "sale_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "state": {
+          "const": "cancelled"
+        },
+        "removed_extension_days": {
+          "$ref": "#/$defs/Count"
+        },
+        "previous_end_date": {
+          "$ref": "#/$defs/Date"
+        },
+        "end_date": {
+          "$ref": "#/$defs/Date"
+        },
+        "valid_until": {
+          "$ref": "#/$defs/Instant"
+        },
+        "preserves_reservations": {
+          "const": true
+        }
+      },
+      "required": [
+        "freeze_id",
+        "sale_id",
+        "state",
+        "removed_extension_days",
+        "previous_end_date",
+        "end_date",
+        "valid_until",
+        "preserves_reservations"
+      ],
+      "additionalProperties": false
+    },
+    "FreezeCancellationPreview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "token": {
+          "$ref": "#/$defs/OpaqueToken"
+        },
+        "scope_hash": {
+          "$ref": "#/$defs/Text"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/PreviewDependencies"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeError"
+          }
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SchedulePreviewItem"
+          }
+        },
+        "class_assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ClassAssignmentView"
+          }
+        },
+        "class_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "sale_lifecycle": {
+          "$ref": "#/$defs/SaleLifecyclePreviewDetails"
+        },
+        "import_summary": {
+          "$ref": "#/$defs/ImportPreviewSummary"
+        },
+        "merge_summary": {
+          "type": "object",
+          "properties": {
+            "source_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "target_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "affected_center_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required_approval_center_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "linked_history": {
+              "type": "boolean"
+            },
+            "reason": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ReviewReason"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "decision": {
+              "enum": [
+                "merge",
+                "not_duplicate"
+              ]
+            }
+          },
+          "required": [
+            "source_id",
+            "target_id",
+            "affected_center_ids",
+            "required_approval_center_ids",
+            "linked_history"
+          ],
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "decision": {
+                    "const": "not_duplicate"
+                  }
+                },
+                "required": [
+                  "decision"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "linked_history": {
+                    "const": false
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "linked_history": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "lifecycle_impact": {
+          "$ref": "#/$defs/LifecycleImpact"
+        },
+        "configuration_requirement": {
+          "$ref": "#/$defs/ScheduleConfigurationRequirement"
+        },
+        "freeze_cancellation": {
+          "$ref": "#/$defs/FreezeCancellationImpact"
+        }
+      },
+      "required": [
+        "id",
+        "token",
+        "scope_hash",
+        "dependencies",
+        "effects",
+        "blockers",
+        "expires_at",
+        "freeze_cancellation"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "configuration_requirement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blockers": {
+                "minItems": 1,
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "code": {
+                        "const": "POLICY_NOT_CONFIGURED"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Request_freeze_cancel_preview": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "freeze_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "reason": {
+          "$ref": "#/$defs/ReviewReason"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "freeze_id",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "Success_freeze_cancel_preview": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/FreezeCancellationPreview"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_freeze_cancel_apply": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "preview": {
+          "$ref": "#/$defs/PreviewToken"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "preview"
+      ],
+      "additionalProperties": false
+    },
+    "Success_freeze_cancel_apply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_freeze_cancel_preview_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "freeze_cancel_preview_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "freeze_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "freeze_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_freeze_cancel_preview_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "freeze_cancel_preview_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "freeze_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_freeze_cancel_apply_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "freeze_cancel_apply_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "preview_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "preview_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_freeze_cancel_apply_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "freeze_cancel_apply_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -69862,7 +70375,8 @@
             "created_at_desc",
             "starts_at_asc"
           ],
-          "as_of": "response evaluation time; no cross-page frozen snapshot"
+          "as_of": "For explicit time_filter, first-page server cutoff retained through the cursor (not a data snapshot); otherwise existing response evaluation time.",
+          "time_filter": "all: no time restriction; upcoming: session.starts_at >= first-page server cutoff; past: session.starts_at < cutoff, including ongoing sessions. Filter precedes cursor/limit and intersects existing interval and live visibility."
         },
         "required_features": [
           "F06",
@@ -89539,6 +90053,246 @@
           },
           "completed_dependencies": []
         }
+      },
+      {
+        "name": "freeze_cancel_preview_v1",
+        "module": "M06",
+        "features": [
+          "F17"
+        ],
+        "permission": "entitlement.correct",
+        "actor_source": "server_verified",
+        "transport": "P",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_freeze_cancel_preview"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_freeze_cancel_preview"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
+          "FORBIDDEN",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESOURCE_CONFLICT",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "preview",
+        "transaction_guarantee": "Dependency-bound cancellation preview with exact validity reversal and preserved confirmed reservations; no business mutation.",
+        "transition": {
+          "effect": "technical_preview_only",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_maintenance",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; relevant dependencies captured, no business commit",
+        "expected_version_subject": "preview.dependencies",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A10",
+          "A11",
+          "A12",
+          "A17",
+          "A18",
+          "A19",
+          "A20",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A49",
+          "A50",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F17"
+        ],
+        "runtime_required_features": [
+          "F17"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "preview",
+          "target_entity": "freezes",
+          "version_mode": "preview_dependencies",
+          "version_field": null,
+          "read_operation": "entitlements_get_v1",
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "planned_freeze_cancellation_pending_native_acceptance",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_freeze_cancel_preview"
+          }
+        },
+        "runtime_limits": [
+          "Scheduled freeze cancellation only before starts_at; same live entitlement.correct/CM and F17 gates as freeze ending. Existing reservations and rights ledger are preserved."
+        ]
+      },
+      {
+        "name": "freeze_cancel_apply_v1",
+        "module": "M06",
+        "features": [
+          "F17"
+        ],
+        "permission": "entitlement.correct",
+        "actor_source": "server_verified",
+        "transport": "A",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_freeze_cancel_apply"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_freeze_cancel_apply"
+        },
+        "errors": [
+          "APPROVAL_REQUIRED",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESOURCE_CONFLICT",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "sale",
+        "transaction_guarantee": "Atomically cancel an unstarted scheduled freeze, remove only its added validity days, preserve confirmed reservations and history; audit, outbox and same-key receipt.",
+        "transition": {
+          "entity": "freezes",
+          "from": [
+            "scheduled"
+          ],
+          "to": [
+            "cancelled"
+          ],
+          "condition": "Only before starts_at; current actor, center, F17, product and preview dependencies."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_maintenance",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "preview_actor_scope_dependency_versions_match",
+          "preview_not_expired_or_applied",
+          "required_feature_gates_separate_from_references",
+          "revalidate_relevant_preview_and_versions",
+          "linked_history_not_overwrite"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; preview_dependencies; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "freezes: preview_dependencies; captured sale, freeze, rights and reservation scope",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A10",
+          "A11",
+          "A12",
+          "A17",
+          "A18",
+          "A19",
+          "A20",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A49",
+          "A50",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F17"
+        ],
+        "runtime_required_features": [
+          "F17"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "apply",
+          "target_entity": "freezes",
+          "version_mode": "preview_dependencies",
+          "version_field": null,
+          "read_operation": "entitlements_get_v1",
+          "atomic_effects": [
+            "freezes.cancel_planned",
+            "rights.remove_only_cancelled_extension",
+            "no_auto_rebooking"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "planned_freeze_cancellation_pending_native_acceptance",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_freeze_cancel_apply"
+          }
+        },
+        "runtime_limits": [
+          "Scheduled freeze cancellation only before starts_at; same live entitlement.correct/CM and F17 gates as freeze ending. Existing reservations and rights ledger are preserved."
+        ]
       }
     ],
     "policy_value_map": {
@@ -100849,6 +101603,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/156/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/157/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_management_state_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -105935,6 +106701,126 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationImpact/properties/freeze_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationImpact/properties/sale_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationPreview/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationPreview/properties/merge_summary/properties/source_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationPreview/properties/merge_summary/properties/target_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationPreview/properties/merge_summary/properties/affected_center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FreezeCancellationPreview/properties/merge_summary/properties/required_approval_center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_preview/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_preview/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_preview/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_preview/properties/freeze_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_freeze_cancel_preview/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_apply/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_apply/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_apply/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_freeze_cancel_apply/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_freeze_cancel_apply/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_freeze_cancel_preview_v1/properties/key/properties/freeze_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_freeze_cancel_preview_v1/properties/values/properties/freeze_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_freeze_cancel_apply_v1/properties/key/properties/preview_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -106415,13 +107301,15 @@
         "content_catalog_save_v1",
         "finance_directory_get_v1",
         "products_management_list_v1",
-        "product_state_set_v1"
+        "product_state_set_v1",
+        "freeze_cancel_preview_v1",
+        "freeze_cancel_apply_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 165,
+      "migration_count": 166,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -107126,7 +108014,9 @@
         "content_catalog_save_v1",
         "finance_directory_get_v1",
         "products_management_list_v1",
-        "product_state_set_v1"
+        "product_state_set_v1",
+        "freeze_cancel_preview_v1",
+        "freeze_cancel_apply_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -108225,7 +109115,9 @@
           "sale_terminate_preview_v1",
           "sale_terminate_apply_v1",
           "sale_change_preview_v1",
-          "sale_change_apply_v1"
+          "sale_change_apply_v1",
+          "freeze_cancel_preview_v1",
+          "freeze_cancel_apply_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -108243,7 +109135,9 @@
           "sale_terminate_preview_v1",
           "sale_terminate_apply_v1",
           "sale_change_preview_v1",
-          "sale_change_apply_v1"
+          "sale_change_apply_v1",
+          "freeze_cancel_preview_v1",
+          "freeze_cancel_apply_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
