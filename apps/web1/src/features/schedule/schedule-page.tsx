@@ -1,5 +1,11 @@
 import { useCallback, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  useLoaderData,
+  useParams,
+  useSearch,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
@@ -7,14 +13,18 @@ import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { ScheduleContent } from "./schedule-content";
+import type { SchedulePanelMode } from "./schedule-session-sheet";
 import type { AccountView } from "../../lib/api-contracts/generated";
 
 export function ScheduleRoutePage() {
   const account = useLoaderData({ from: "/o/$orgId/c/$centerId/schedule" });
+  const search = useSearch({ from: "/o/$orgId/c/$centerId/schedule" });
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/schedule" });
   return (
     <SchedulePage
-      key={`${account.id}:${orgId}:${centerId}`}
+      key={`${account.id}:${orgId}:${centerId}:${search.session ?? ""}:${search.action ?? "view"}`}
+      initialSession={search.session}
+      initialMode={search.action ?? "view"}
       account={account}
       orgId={orgId}
       centerId={centerId}
@@ -25,10 +35,14 @@ function SchedulePage({
   account,
   orgId,
   centerId,
+  initialSession,
+  initialMode,
 }: {
   account: AccountView;
   orgId: string;
   centerId: string;
+  initialSession?: string;
+  initialMode: SchedulePanelMode;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -48,6 +62,7 @@ function SchedulePage({
           to: "/o/$orgId/c/$centerId/schedule",
           params: { orgId: selection.organizationId, centerId: selection.centerId },
           replace: true,
+          search: {},
         });
     },
     [locked, orgId, centerId, navigate],
@@ -102,6 +117,8 @@ function SchedulePage({
                 orgId: selection.organizationId,
                 centerId: selection.centerId,
               }}
+              initialSession={initialSession}
+              initialMode={initialMode}
               onLockChange={setLocked}
             />
           ) : (

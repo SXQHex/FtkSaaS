@@ -13,9 +13,9 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan | Sayfa/işlev  | Durum       | Son doğrulama veya engel                                          | Sonraki eylem                                                                |
-| ---------- | ---- | ------------ | ----------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| E18        | Pro  | Seans detayı | Toplam16/46 | Route, rezervasyon ve yoklama temel akışları yerel kabulden geçti | Kalan P06 bağları, hak sütunu ve bekleme/teklif; seans geneli keşif W1-BE-15 |
+| Aktif adım | Plan | Sayfa/işlev  | Durum       | Son doğrulama veya engel                                          | Sonraki eylem                                             |
+| ---------- | ---- | ------------ | ----------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
+| E18        | Pro  | Seans detayı | Toplam16/46 | Route, rezervasyon ve yoklama temel akışları yerel kabulden geçti | Hak sütunu ve bekleme/teklif; seans geneli keşif W1-BE-15 |
 
 Git devamı: `feat/web1-account-acceptance`, güncel base main SHA `b586bfe212905b9009804b26f58ab25f41b921ee` (PR314 dala ve yerel typed snapshot’a alındı; aynı main kaynak kanıtları ve development teslimi başarılı; W1-BE-13 E14 zaman filtresi tamam; W1-BE-14 iptal tüketimi sırada); kullanıcı yetkisiyle [PR307](https://github.com/SXQHex/FtkSaaS/pull/307) birleşti. Aday `0474891a71b7d17e26f4a48d688581eea1b6c701`/base `16af2e0180f1d0103c0eeb70e8d0cefbd6ad38f0` için [CI43562989451](https://github.com/SXQHex/FtkSaaS/actions/runs/43562989451) ve [merge doğrulaması43563030649](https://github.com/SXQHex/FtkSaaS/actions/runs/43563030649) başarılı; test edilen kaynak ağacı ile gerçek main ağacı `71e36853b9c2e93a7f3a815e972c0087fade6abf` birebir eşittir. Aynı main SHA’nın [Main proof43563101974](https://github.com/SXQHex/FtkSaaS/actions/runs/43563101974) ve [Merge proof43563101986](https://github.com/SXQHex/FtkSaaS/actions/runs/43563101986) sonuçları başarıdır. Deneysel web1 değişiminde backend full clean/CD gerekmemiştir; gerçek frontend build/browser kabulü E09 kaydındadır. Yeni resmî Modern Web Guidance becerisi her istemci değişikliğinde etkin kullanılır. PR306 daha önce birleşmiştir; tamamlanmış ekranlar tekrar uygulanmaz.
 
@@ -515,7 +515,8 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
     - [x] Korumalı seans route’u ve E17’den detay geçişi; native seans/takvim, kişi kapsamlı cursor rezervasyon ve bağımsız yoklama okuması.
     - [x] Açık kişi/satış/tür seçimiyle normal rezervasyon ve native yetkili/gerekçeli ayrı kontenjan aşımı; mevcut CancelReservation bağlandı. Aynı-key, ACK sonrası salt okuma ve değişen kaynakta yeniden onay korunur.
     - [x] Gerçek başlangıç, taslak işaretleme, açık gerçekleşen eğitmen seçimiyle kapatma ve gerekçeli preview/onay/apply düzeltmesi. Mark/block rezervasyon sürümünü; close seans sürümünü kullanır. Hak okuma reddi bağımsız gösterilir.
-    - [ ] Seans düzenle/iptal/eğitmen düğmelerinin E17 akışına bağlanması; rezervasyona bağlı gerçek paket/hak sütunu eşlemesi. Bunlar henüz tamamlanmış sayılmaz.
+    - [x] Düzenle/iptal/eğitmen düğmeleri E17’nin mevcut editörünü açar; doğrulanmış URL yalnız arayüz niyetidir. Güncel seans/sürüm/kaynak yeniden okunur, otomatik preview veya writer yoktur.38 schedule unit ve3 hedefli tarayıcı/Axe geçti (`.tmp/e18-editor-link-verification.json`).
+    - [ ] Rezervasyona bağlı gerçek paket/hak sütunu eşlemesi; kişi hak toplamı atanmış paket diye sunulmaz.
     - [ ] Bekleme join/leave ve aktörün kendi teklif kabul/ret yolları; seans geneli keşif W1-BE-15. Okunamayan liste boş veya demo sıra sayılmaz.
 
   **Yerel dilim ·16 Kasım:**7 unit ve9 ayrı tarayıcı senaryosu odaklı koşularda geçti: normal/aşım, unknown/ACK salt-okuma, stale onay, gerçek başlangıç→mark→close→correction, bağımsız okuma/yazı retleri ve E17 geçişi. Axe’ın listitem ve320px arama hedefi bulguları bileşim/yerleşimde düzeltildi;100 kural korundu. [Otomatik rapor](../test-reports/verification.md) son1 geçiş senaryosudur; önceki kapsamlar `.tmp/e18-{intermediate-browser,accessibility-browser,cross-route-first-browser}.log` içinde ayrıdır. Bu tüm ekran, hosted veya tam WCAG kabulü değildir. Yeni gerçek development writer çalıştırılmadı; ACK’li ledger’lar korunur.

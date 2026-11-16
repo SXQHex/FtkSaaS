@@ -266,3 +266,22 @@ test("schedule detail opens the protected session route without requiring editin
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
+
+for (const [action, trigger, heading] of [
+  ["edit", "Seansı düzenle", "Seansı düzenle"],
+  ["cancel", "Seansı iptal et", "Seansı iptal et"],
+  ["instructor", "Değiştir", "Eğitmeni değiştir"],
+] as const) {
+  test(`session ${action} opens the existing native schedule editor with no automatic write`, async ({
+    page,
+  }) => {
+    const state = await mockSessionDetail(page, { allowEditor: true });
+    await page.getByRole("button", { name: trigger, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`schedule\\?session=${S.session}&action=${action}$`));
+    const panel = page.getByRole("dialog");
+    await expect(panel.getByRole("heading", { name: heading, exact: true })).toBeVisible();
+    await expect(panel.getByRole("button", { name: "Etkiyi önizle", exact: true })).toBeVisible();
+    if (action === "edit") await expect(panel.getByLabel("Tarih", { exact: true })).toBeVisible();
+    expect(state.writes).toHaveLength(0);
+  });
+}

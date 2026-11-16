@@ -65,9 +65,13 @@ const emptyCreate = (date: string): ScheduleCreateDraft => ({
 export function ScheduleContent({
   scope,
   onLockChange,
+  initialSession,
+  initialMode = "view",
 }: {
   scope: ClientScope;
   onLockChange: (value: boolean) => void;
+  initialSession?: string;
+  initialMode?: SchedulePanelMode;
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
@@ -161,6 +165,60 @@ export function ScheduleContent({
     },
     retry: false,
   });
+  const initialOpened = useRef(false);
+  useEffect(() => {
+    const source = sources.data;
+    if (!initialSession || !source || initialOpened.current) return;
+    let active = true;
+    void readScheduleEditor(
+      { accountId: scope.accountId, orgId: scope.orgId, centerId: scope.centerId },
+      initialSession,
+    )
+      .then(async (editor) => {
+        const draft = await scheduleSessionDraft(
+          editor.session,
+          editor.resources,
+          source.center.timezone,
+        );
+        if (!active || lost.current) return;
+        initialOpened.current = true;
+        setSelected(editor);
+        setSessionDraft(draft);
+        setInitialDraft(draft);
+        setSessionTitle(
+          source.resources.classes.find((row) => row.id === editor.session.class_id)?.name ??
+            t(($) => $.sessionDetail.title),
+        );
+        setMode(
+          editor.session.state !== "planned" ||
+            (!editor.resources && ["edit", "instructor"].includes(initialMode))
+            ? "view"
+            : initialMode,
+        );
+      })
+      .catch((failure: unknown) => {
+        if (!active) return;
+        if (!accessLost(failure))
+          setError(
+            scheduleBackendError(
+              failure instanceof BackendError ? failure.code : "SOURCE_UNAVAILABLE",
+              t,
+            ),
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, [
+    initialSession,
+    initialMode,
+    sources.data,
+    scope.accountId,
+    scope.orgId,
+    scope.centerId,
+    accessLost,
+    t,
+  ]);
   const calendar = useQuery({
     queryKey: [
       "schedule-range",

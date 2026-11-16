@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { SessionDetailView, SessionParticipants } from "./session-detail-view";
 import { SessionAttendanceController } from "./session-attendance-controller";
@@ -38,6 +38,7 @@ export function SessionDetailContent({
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
+    navigate = useNavigate(),
     queries = useQueryClient();
   const [invalid, setInvalid] = useState(false),
     [booking, setBooking] = useState(false),
@@ -287,7 +288,40 @@ export function SessionDetailContent({
                 })) ?? [])
               : []
           }
-          actions={{ locked: blocked, start: attendanceUi.onStart }}
+          actions={{
+            locked: blocked,
+            start: attendanceUi.onStart,
+            edit:
+              native.state === "planned"
+                ? () => {
+                    void navigate({
+                      to: "/o/$orgId/c/$centerId/schedule",
+                      params: { orgId: scope.orgId, centerId: scope.centerId },
+                      search: { session: sessionId, action: "edit" },
+                    });
+                  }
+                : undefined,
+            cancel:
+              native.state === "planned"
+                ? () => {
+                    void navigate({
+                      to: "/o/$orgId/c/$centerId/schedule",
+                      params: { orgId: scope.orgId, centerId: scope.centerId },
+                      search: { session: sessionId, action: "cancel" },
+                    });
+                  }
+                : undefined,
+            instructor:
+              native.state === "planned"
+                ? () => {
+                    void navigate({
+                      to: "/o/$orgId/c/$centerId/schedule",
+                      params: { orgId: scope.orgId, centerId: scope.centerId },
+                      search: { session: sessionId, action: "instructor" },
+                    });
+                  }
+                : undefined,
+          }}
           participants={
             <SessionParticipants
               rows={selectedRows.map((row) => {

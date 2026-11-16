@@ -24,9 +24,11 @@ export async function mockSessionDetail(
     overrideDenied?: boolean;
     attendanceDenied?: boolean;
     writeDenied?: boolean;
+    allowEditor?: boolean;
   } = {},
 ) {
-  await mockStudio(page);
+  const studio = await mockStudio(page);
+  if (options.allowEditor) studio.roles[0]!.accountAccessGranted = true;
   const S = sessionIds,
     writes: { operation: string; request: Record<string, unknown> }[] = [],
     reads: string[] = [],
@@ -173,8 +175,31 @@ export async function mockSessionDetail(
       expect(req.selector.key.class_id).toBe(I.lesson);
       return send({ items: [], next_cursor: null, as_of: new Date().toISOString() });
     }
-    if (operation === "management_state_get_v1" && req.operation === "session_change_preview_v1")
-      return reject("POLICY_NOT_CONFIGURED");
+    if (operation === "management_state_get_v1" && req.operation === "session_change_preview_v1") {
+      if (!options.allowEditor) return reject("POLICY_NOT_CONFIGURED");
+      return send({
+        items: [
+          {
+            operation: req.operation,
+            entity: { type: "sessions", id: S.session },
+            exists: true,
+            state: session.state,
+            versions: [{ entity: { type: "sessions", id: S.session }, version: session.version }],
+            current: {
+              operation: req.operation,
+              values: {
+                session_id: S.session,
+                scope: "single",
+                patch: { resources: [{ kind: "room", id: I.room }] },
+              },
+            },
+            as_of: new Date().toISOString(),
+          },
+        ],
+        next_cursor: null,
+        as_of: new Date().toISOString(),
+      });
+    }
     if (
       operation === "management_state_get_v1" &&
       req.operation === "reservation_capacity_override_v1"
