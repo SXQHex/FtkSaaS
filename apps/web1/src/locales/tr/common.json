@@ -3327,7 +3327,34 @@
       "effect": "Yalnız etkinlik taslağı ve açıkça seçilen şartlar kaydedilir. Yayın, katılımcı kaydı ve yoklama ayrı işlemlerdir.",
       "review": "Şartları, görevlileri ve etkilerini inceledim.",
       "cancel": "Vazgeç",
-      "save": "Taslak kaydet"
+      "save": "Taslak kaydet",
+      "moneyHint": "Tutarları para biriminin alt birimiyle gir; TRY için kuruş kullan."
+    },
+    "month": "Dönem",
+    "reload": "Listeyi yeniden oku",
+    "directoryLimit": "Arama, durum filtreleri ve merkez özetleri henüz kullanılamıyor. Kayıt sayısı paylaşılmadığında kapasite sınırı toplam kayıt sayılmaz.",
+    "sourceError": "Etkinlik kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
+    "catalogError": "Bazı seçim kaynakları okunamadı. Yalnız izinli ve okunabilen seçenekler kullanılabilir.",
+    "unknown": "Bilgi paylaşılmıyor",
+    "unlimited": "Sınırsız",
+    "moreProducts": "Daha fazla ürün göster",
+    "existingProduct": "Mevcut ürün sürümü",
+    "existingRoom": "Mevcut salon",
+    "existingPerson": "Mevcut görevli",
+    "existingDiscipline": "Mevcut ders türü",
+    "invalid": "Alanları ve açık işlem onayını kontrol et. Tarih aralığı, kontenjan, alt birim tutarları ve iptal/iade seçimleri geçerli olmalı.",
+    "timeGap": "Seçilen saat bu saat diliminde yaşanmıyor. Başka bir saat seç.",
+    "timeAmbiguous": "Bu yerel saat iki kez yaşanıyor. İlgili UTC farkını seç.",
+    "notEditable": "Bu etkinliğin durumu veya kapanmış yoklaması taslak düzenlemeye izin vermiyor.",
+    "commandStates": {
+      "ready": "",
+      "writing": "İşlem kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor. Alanlar kilitli; önce işlem sonucunu kontrol et veya aynı işlemi tekrar dene.",
+      "pending": "İşlem sonucu henüz kesinleşmedi. Alanlar kilitli; aynı işlemin sonucunu kontrol et.",
+      "saved-unread": "İşlem kaydedildi, güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+      "saved": "İşlem kaydedildi; güncel kayıt okundu.",
+      "stale": "Kaynak sürümü değişti. Güncel kaydı oku, şartları yeniden incele.",
+      "rejected": "İşlem reddedildi. Güncel kaynağı oku ve koşulları kontrol et."
     }
   }
 }

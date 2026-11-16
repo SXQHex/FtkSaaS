@@ -316,6 +316,7 @@ export default interface Resources {
     },
     "events": {
       "add": "Etkinlik ekle",
+      "catalogError": "Bazı seçim kaynakları okunamadı. Yalnız izinli ve okunabilen seçenekler kullanılabilir.",
       "columns": {
         "date": "Tarih",
         "fee": "Ücret",
@@ -324,7 +325,18 @@ export default interface Resources {
         "state": "Durum",
         "venue": "Mekân"
       },
+      "commandStates": {
+        "pending": "İşlem sonucu henüz kesinleşmedi. Alanlar kilitli; aynı işlemin sonucunu kontrol et.",
+        "ready": "",
+        "rejected": "İşlem reddedildi. Güncel kaynağı oku ve koşulları kontrol et.",
+        "saved": "İşlem kaydedildi; güncel kayıt okundu.",
+        "saved-unread": "İşlem kaydedildi, güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+        "stale": "Kaynak sürümü değişti. Güncel kaydı oku, şartları yeniden incele.",
+        "unknown": "Sonuç bilinmiyor. Alanlar kilitli; önce işlem sonucunu kontrol et veya aynı işlemi tekrar dene.",
+        "writing": "İşlem kaydediliyor…"
+      },
       "description": "Atölyeler ve paketli Pratik geceleri. Etkinlik kontenjanı ders kontenjanından ayrıdır.",
+      "directoryLimit": "Arama, durum filtreleri ve merkez özetleri henüz kullanılamıyor. Kayıt sayısı paylaşılmadığında kapasite sınırı toplam kayıt sayılmaz.",
       "editor": {
         "address": "Adres",
         "after": "Sınırdan sonra",
@@ -355,6 +367,7 @@ export default interface Resources {
         "internal": "Salon",
         "kind": "Tür",
         "maximum": "En yüksek kontenjan",
+        "moneyHint": "Tutarları para biriminin alt birimiyle gir; TRY için kuruş kullan.",
         "name": "Başlık",
         "noPeople": "Görevli seçimi için yetkili kişi kataloğu henüz okunmadı.",
         "noProducts": "Uygun ürün sürümü kataloğu henüz okunmadı.",
@@ -378,6 +391,10 @@ export default interface Resources {
         "workshop": "Atölye"
       },
       "empty": "Bu kapsamda görünür etkinlik yok.",
+      "existingDiscipline": "Mevcut ders türü",
+      "existingPerson": "Mevcut görevli",
+      "existingProduct": "Mevcut ürün sürümü",
+      "existingRoom": "Mevcut salon",
       "filters": {
         "all": "Tümü",
         "cancelled": "İptal",
@@ -385,6 +402,7 @@ export default interface Resources {
         "occurred": "Tamamlandı",
         "published": "Yayında"
       },
+      "invalid": "Alanları ve açık işlem onayını kontrol et. Tarih aralığı, kontenjan, alt birim tutarları ve iptal/iade seçimleri geçerli olmalı.",
       "metricHints": {
         "draft": "Henüz yayınlanmadı",
         "published": "Kayıt alıyor",
@@ -397,6 +415,9 @@ export default interface Resources {
         "registrations": "Kayıtlı üye",
         "unpaid": "Bekleyen ödeme"
       },
+      "month": "Dönem",
+      "moreProducts": "Daha fazla ürün göster",
+      "notEditable": "Bu etkinliğin durumu veya kapanmış yoklaması taslak düzenlemeye izin vermiyor.",
       "practiceHint": "Paketli Pratik ücretsizdir; yalnızca izinli ürünü olan üye kayıt olur ve ders hakkı değişmez.",
       "refunds": {
         "credit_ratio": "Kullanılmayan hak oranı",
@@ -404,9 +425,15 @@ export default interface Resources {
         "time_ratio": "Kullanılmayan süre oranı",
         "used_at_unit_price": "Kullanılan birim fiyatına göre"
       },
+      "reload": "Listeyi yeniden oku",
       "search": "Etkinlik ara",
+      "sourceError": "Etkinlik kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
       "status": "Durum",
+      "timeAmbiguous": "Bu yerel saat iki kez yaşanıyor. İlgili UTC farkını seç.",
+      "timeGap": "Seçilen saat bu saat diliminde yaşanmıyor. Başka bir saat seç.",
       "title": "Etkinlikler",
+      "unknown": "Bilgi paylaşılmıyor",
+      "unlimited": "Sınırsız",
       "unread": "Etkinlik listesi henüz okunamadı."
     },
     "finance": {

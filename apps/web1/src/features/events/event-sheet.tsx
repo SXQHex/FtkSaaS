@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useId, useRef, useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Sheet,
@@ -41,6 +41,8 @@ export function EventSheet({
   startOffsets = [],
   endOffsets = [],
   errors,
+  readOnly = false,
+  productsFooter,
 }: {
   draft: EventDraft;
   onDraft: (value: EventDraft) => void;
@@ -56,9 +58,16 @@ export function EventSheet({
   startOffsets?: EventChoice[];
   endOffsets?: EventChoice[];
   errors?: string;
+  readOnly?: boolean;
+  productsFooter?: ReactNode;
 }) {
   const { t } = useTranslation();
   const formId = useId();
+  const errorRef = useRef<HTMLDivElement>(null);
+  const disabled = locked || readOnly;
+  useEffect(() => {
+    if (errors) errorRef.current?.focus();
+  }, [errors]);
   function set<K extends keyof EventDraft>(key: K, value: EventDraft[K]) {
     onDraft({ ...draft, [key]: value, reviewed: false });
   }
@@ -84,7 +93,7 @@ export function EventSheet({
           aria-label={t(($) => $.events.editor.form)}
           onSubmit={(event) => {
             event.preventDefault();
-            onSubmit();
+            if (!disabled) onSubmit();
           }}
           className="flex flex-col gap-5"
         >
@@ -95,7 +104,7 @@ export function EventSheet({
               name="name"
               autoComplete="off"
               value={draft.name}
-              disabled={locked}
+              disabled={disabled}
               onChange={(event) => set("name", event.target.value)}
               required
             />
@@ -114,15 +123,15 @@ export function EventSheet({
                   onDraft({
                     ...draft,
                     kind,
-                    ...(kind === "practice" ? { fee: "0", fullPayment: false } : {}),
+                    ...(kind === "practice" ? { fee: "0" } : {}),
                     reviewed: false,
                   });
               }}
             >
-              <ToggleGroupItem id="workshop" isDisabled={locked}>
+              <ToggleGroupItem id="workshop" isDisabled={disabled}>
                 {t(($) => $.events.editor.workshop)}
               </ToggleGroupItem>
-              <ToggleGroupItem id="practice" isDisabled={locked}>
+              <ToggleGroupItem id="practice" isDisabled={disabled}>
                 {t(($) => $.events.editor.practice)}
               </ToggleGroupItem>
             </ToggleGroup>
@@ -136,7 +145,7 @@ export function EventSheet({
                   name="discipline_ids"
                   value={row.id}
                   isSelected={draft.disciplineIds.includes(row.id)}
-                  isDisabled={locked}
+                  isDisabled={disabled}
                   onChange={(value) =>
                     set(
                       "disciplineIds",
@@ -159,7 +168,7 @@ export function EventSheet({
                   name={key}
                   type="datetime-local"
                   value={draft[key]}
-                  disabled={locked}
+                  disabled={disabled}
                   onChange={(event) =>
                     onDraft({
                       ...draft,
@@ -180,7 +189,7 @@ export function EventSheet({
                 autoCapitalize="none"
                 spellCheck={false}
                 value={draft.timezone}
-                disabled={locked}
+                disabled={disabled}
                 onChange={(event) =>
                   onDraft({
                     ...draft,
@@ -210,7 +219,7 @@ export function EventSheet({
                     id={`event-${row.key}`}
                     name={row.key}
                     value={draft[row.key]}
-                    disabled={locked}
+                    disabled={disabled}
                     onChange={(event) => set(row.key, event.target.value)}
                     className="w-full"
                   >
@@ -245,10 +254,10 @@ export function EventSheet({
                   });
               }}
             >
-              <ToggleGroupItem id="internal" isDisabled={locked}>
+              <ToggleGroupItem id="internal" isDisabled={disabled}>
                 {t(($) => $.events.editor.internal)}
               </ToggleGroupItem>
-              <ToggleGroupItem id="external" isDisabled={locked}>
+              <ToggleGroupItem id="external" isDisabled={disabled}>
                 {t(($) => $.events.editor.external)}
               </ToggleGroupItem>
             </ToggleGroup>
@@ -260,7 +269,7 @@ export function EventSheet({
                 id="event-room"
                 name="room_id"
                 value={draft.roomId}
-                disabled={locked}
+                disabled={disabled}
                 onChange={(event) => set("roomId", event.target.value)}
                 className="w-full"
               >
@@ -282,7 +291,7 @@ export function EventSheet({
                   id="event-venue-name"
                   name="venue_name"
                   value={draft.venueName}
-                  disabled={locked}
+                  disabled={disabled}
                   onChange={(event) => set("venueName", event.target.value)}
                 />
               </Field>
@@ -292,7 +301,7 @@ export function EventSheet({
                   id="event-address"
                   name="address"
                   value={draft.address}
-                  disabled={locked}
+                  disabled={disabled}
                   onChange={(event) => set("address", event.target.value)}
                 />
               </Field>
@@ -301,7 +310,7 @@ export function EventSheet({
                   id="event-unlimited"
                   name="unlimited"
                   isSelected={draft.unlimited}
-                  isDisabled={locked}
+                  isDisabled={disabled}
                   onChange={(value) => set("unlimited", value)}
                   aria-label={t(($) => $.events.editor.unlimited)}
                 />
@@ -321,7 +330,7 @@ export function EventSheet({
                     name={key}
                     inputMode="numeric"
                     value={draft[key]}
-                    disabled={locked}
+                    disabled={disabled}
                     onChange={(event) => set(key, event.target.value)}
                     required
                   />
@@ -334,7 +343,8 @@ export function EventSheet({
             onDraft={onDraft}
             products={products}
             people={people}
-            disabled={locked}
+            disabled={disabled}
+            productsFooter={productsFooter}
           />
           <Alert>
             <AlertDescription>{t(($) => $.events.editor.effect)}</AlertDescription>
@@ -344,13 +354,13 @@ export function EventSheet({
               id="event-reviewed"
               name="reviewed"
               isSelected={draft.reviewed}
-              isDisabled={locked}
+              isDisabled={disabled}
               onChange={(value) => onDraft({ ...draft, reviewed: value })}
             />
             <FieldLabel htmlFor="event-reviewed">{t(($) => $.events.editor.review)}</FieldLabel>
           </Field>
           {errors && (
-            <Alert variant="destructive" tabIndex={-1}>
+            <Alert ref={errorRef} variant="destructive" tabIndex={-1}>
               <AlertDescription>{errors}</AlertDescription>
             </Alert>
           )}
@@ -360,7 +370,7 @@ export function EventSheet({
         <Button type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.events.editor.cancel)}
         </Button>
-        <Button type="submit" form={formId} isDisabled={locked || !draft.reviewed}>
+        <Button type="submit" form={formId} isDisabled={disabled || !draft.reviewed}>
           {t(($) => $.events.editor.save)}
         </Button>
       </SheetFooter>

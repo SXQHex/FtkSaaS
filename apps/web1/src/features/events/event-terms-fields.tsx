@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Field,
@@ -22,12 +23,14 @@ export function EventTermsFields({
   products,
   people,
   disabled,
+  productsFooter,
 }: {
   draft: EventDraft;
   onDraft: (value: EventDraft) => void;
   products: EventChoice[];
   people: EventChoice[];
   disabled: boolean;
+  productsFooter?: ReactNode;
 }) {
   const { t } = useTranslation();
   function set<K extends keyof EventDraft>(key: K, value: EventDraft[K]) {
@@ -41,11 +44,12 @@ export function EventTermsFields({
           <Input
             id="event-fee"
             name="fee"
-            inputMode="decimal"
+            inputMode="numeric"
             value={draft.kind === "practice" ? "0" : draft.fee}
             disabled={disabled || draft.kind === "practice"}
             onChange={(event) => set("fee", event.target.value)}
           />
+          <FieldDescription>{t(($) => $.events.editor.moneyHint)}</FieldDescription>
         </Field>
         <Field>
           <FieldLabel htmlFor="event-currency">{t(($) => $.events.editor.currency)}</FieldLabel>
@@ -66,7 +70,7 @@ export function EventTermsFields({
           name="full_payment"
           isSelected={draft.fullPayment}
           onChange={(value) => set("fullPayment", value)}
-          isDisabled={disabled || draft.kind === "practice"}
+          isDisabled={disabled}
         />
         <FieldLabel htmlFor="event-full-payment">
           {t(($) => $.events.editor.fullPayment)}
@@ -103,6 +107,7 @@ export function EventTermsFields({
           </Field>
         ))}
       </FieldSet>
+      {productsFooter}
       <FieldSet>
         <FieldLegend variant="label">{t(($) => $.events.editor.cancellation)}</FieldLegend>
         <Field>
@@ -163,7 +168,7 @@ export function EventTermsFields({
             <Input
               id="event-used-unit"
               name="used_unit"
-              inputMode="decimal"
+              inputMode="numeric"
               value={draft.usedUnit}
               disabled={disabled}
               onChange={(event) => set("usedUnit", event.target.value)}
