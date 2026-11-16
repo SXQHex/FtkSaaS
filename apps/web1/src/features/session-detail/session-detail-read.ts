@@ -83,6 +83,7 @@ export async function readSessionParticipants(
     ...common(scope),
     request_id: uuidv7(),
     session_id: sessionId,
+    include_source_summary: true,
     ...(personId ? { person_id: personId } : {}),
     page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
@@ -235,5 +236,70 @@ export async function readPersonSessionWaitlist(
     return detail;
   });
   // This is an explicitly selected person's history, never the session directory.
+  return { items, next_cursor: page.next_cursor };
+}
+
+/** Two independent cursor chains; never infer totals or global ranks from a page. */
+export async function readSessionWaitlist(
+  scope: ClientScope,
+  sessionId: string,
+  view: "entries" | "offers",
+  cursor?: string,
+) {
+  z.uuid().parse(sessionId);
+  const backend = await scopedBackend(scope);
+  const page = await backend.call("management_state_get_v1", {
+    ...common(scope),
+    request_id: uuidv7(),
+    operation: "waitlist_join_v1",
+    selector: {
+      operation: "waitlist_join_v1",
+      key: { directory: "session", session_id: sessionId, view },
+    },
+    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+  });
+  checkedPage(page, cursor);
+  const seen = new Set<string>();
+  const items = page.items.map((row) => {
+    const entry = row.waitlist_detail;
+    const offer = entry?.offers[0];
+    const entityType = view === "entries" ? "waitlist_entries" : "seat_offers";
+    const id = view === "entries" ? entry?.id : offer?.id;
+    const version = view === "entries" ? entry?.version : offer?.version;
+    const state = view === "entries" ? entry?.state : offer?.state;
+    if (
+      !entry ||
+      !id ||
+      !row.exists ||
+      row.operation !== "waitlist_join_v1" ||
+      row.entity?.type !== entityType ||
+      row.entity.id !== id ||
+      seen.has(id) ||
+      entry.center_id !== scope.centerId ||
+      entry.session_id !== sessionId ||
+      row.state !== state ||
+      !row.waitlist_display_name?.trim() ||
+      (view === "entries" ? entry.offers.length !== 0 : entry.offers.length !== 1) ||
+      (offer &&
+        (offer.entry_id !== entry.id ||
+          offer.session_id !== sessionId ||
+          offer.person_id !== entry.person_id)) ||
+      row.versions.filter(
+        (v) => v.entity.type === entityType && v.entity.id === id && v.version === version,
+      ).length !== 1
+    )
+      throw new Error("SESSION_DETAIL_WAITLIST_UNAVAILABLE");
+    seen.add(z.uuid().parse(id));
+    z.uuid().parse(entry.person_id);
+    positive.parse(entry.version);
+    instant.parse(entry.joined_at);
+    z.enum(["waiting", "offered", "converted", "left", "closed"]).parse(entry.state);
+    if (offer) {
+      positive.parse(offer.version);
+      instant.parse(offer.expires_at);
+      z.enum(["active", "accepted", "rejected", "expired", "withdrawn"]).parse(offer.state);
+    }
+    return { id, name: row.waitlist_display_name, entry, offer };
+  });
   return { items, next_cursor: page.next_cursor };
 }

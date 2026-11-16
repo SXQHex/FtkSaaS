@@ -742,6 +742,37 @@ export type SettingsVersion = number
 export type BookingCategory = ("male" | "female")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReservationSourceSummary".
+ */
+export type ReservationSourceSummary = ({
+status: ("unassigned" | "restricted" | "not_enabled")
+as_of: Instant
+} | {
+status: "available"
+as_of: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_sale_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+product_name: Text
+kind: EntitlementKind
+booking_mode: BookingMode
+sale_state: SaleState
+state: EntitlementState
+start_date: Date
+end_date: Date
+timezone: IanaZone
+available_credits: (string | null)
+reserved: string
+consumed: string
+sale_version: PositiveInt
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManualCollectionPayment".
  */
 export type ManualCollectionPayment = {
@@ -4847,6 +4878,7 @@ ManagementSelector_freeze_cancel_preview_v1?: ManagementSelectorFreezeCancelPrev
 ManagementProjection_freeze_cancel_preview_v1?: ManagementProjectionFreezeCancelPreviewV1
 ManagementSelector_freeze_cancel_apply_v1?: ManagementSelectorFreezeCancelApplyV1
 ManagementProjection_freeze_cancel_apply_v1?: ManagementProjectionFreezeCancelApplyV1
+ReservationSourceSummary?: ReservationSourceSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7648,6 +7680,7 @@ mode: BookingMode
 version: PositiveInt
 booking_category?: (BookingCategory | null)
 subscriber_number?: (SubscriberNumber | null)
+source_summary?: ReservationSourceSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11039,6 +11072,10 @@ page: Page
  * Optional start-time partition. The server captures a cutoff on page one and binds it to subsequent cursors. Omitted retains legacy interval-overlap behavior.
  */
 time_filter?: ("all" | "upcoming" | "past")
+/**
+ * Only the authorized page receives the actual assigned sale and permitted current rights; no automatic package selection.
+ */
+include_source_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18208,6 +18245,7 @@ account_access_granted?: boolean
 access_detail?: AccessDirectoryDetail
 merge_review?: MergeReviewDetail
 group_student?: GroupStudentView
+waitlist_display_name?: (Text | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21935,7 +21973,7 @@ query?: string
  */
 export interface ManagementSelectorWaitlistJoinV1 {
 operation: "waitlist_join_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -21944,7 +21982,23 @@ person_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 session_id: string
-}
+} | {
+directory: "session"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+view: "entries"
+status?: ("all" | "waiting" | "offered" | "converted" | "left" | "closed")
+} | {
+directory: "session"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+view: "offers"
+status?: ("all" | "active" | "accepted" | "rejected" | "expired" | "withdrawn")
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
