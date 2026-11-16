@@ -36,9 +36,11 @@ export function LeadActivitiesView({
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">{t(($) => $.leads.activitiesHint)}</p>
-        <Button size="sm" variant="outline" isDisabled={disabled || !onAdd} onPress={onAdd}>
-          {t(($) => $.leads.modes.activity)}
-        </Button>
+        {onAdd && (
+          <Button size="sm" variant="outline" isDisabled={disabled} onPress={onAdd}>
+            {t(($) => $.leads.modes.activity)}
+          </Button>
+        )}
       </div>
       <Table aria-label={t(($) => $.leads.sections)}>
         <TableHeader>

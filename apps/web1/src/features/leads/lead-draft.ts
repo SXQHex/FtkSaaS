@@ -9,6 +9,7 @@ export interface LeadDraft {
   kind: "contact" | "followup" | "outcome";
   note: string;
   due: string;
+  dueOffset: string;
   outcome: string;
   productVersionId: string;
   sessionId: string;
@@ -25,6 +26,7 @@ export const emptyLeadDraft: LeadDraft = {
   kind: "contact",
   note: "",
   due: "",
+  dueOffset: "",
   outcome: "",
   productVersionId: "",
   sessionId: "",

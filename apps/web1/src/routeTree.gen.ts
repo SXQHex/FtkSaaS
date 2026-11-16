@@ -31,6 +31,7 @@ import { Route as MemberReservationsRouteImport } from './routes/member.reservat
 import { Route as InstructorSessionsSessionIdRouteImport } from './routes/instructor.sessions.$sessionId'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
+import { Route as OOrgIdCCenterIdLeadsRouteImport } from './routes/o.$orgId.c.$centerId.leads'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdProductsRouteImport } from './routes/o.$orgId.c.$centerId.products'
 import { Route as OOrgIdCCenterIdRequestsRouteImport } from './routes/o.$orgId.c.$centerId.requests'
@@ -152,6 +153,11 @@ const OOrgIdCCenterIdFinanceRoute = OOrgIdCCenterIdFinanceRouteImport.update({
   path: '/o/$orgId/c/$centerId/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdLeadsRoute = OOrgIdCCenterIdLeadsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/leads',
+  path: '/o/$orgId/c/$centerId/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdPeopleRoute = OOrgIdCCenterIdPeopleRouteImport.update({
   id: '/o/$orgId/c/$centerId/people',
   path: '/o/$orgId/c/$centerId/people',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
+  '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
   '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
+  '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
   '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
@@ -291,6 +299,7 @@ export interface FileRoutesById {
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
+  '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
   '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
@@ -326,6 +335,7 @@ export interface FileRouteTypes {
     | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
+    | '/o/$orgId/c/$centerId/leads'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
     | '/o/$orgId/c/$centerId/requests'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
+    | '/o/$orgId/c/$centerId/leads'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
     | '/o/$orgId/c/$centerId/requests'
@@ -392,6 +403,7 @@ export interface FileRouteTypes {
     | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
+    | '/o/$orgId/c/$centerId/leads'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
     | '/o/$orgId/c/$centerId/requests'
@@ -426,6 +438,7 @@ export interface RootRouteChildren {
   InstructorSessionsSessionIdRoute: typeof InstructorSessionsSessionIdRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
+  OOrgIdCCenterIdLeadsRoute: typeof OOrgIdCCenterIdLeadsRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdProductsRoute: typeof OOrgIdCCenterIdProductsRoute
   OOrgIdCCenterIdRequestsRoute: typeof OOrgIdCCenterIdRequestsRoute
@@ -593,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdFinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/leads': {
+      id: '/o/$orgId/c/$centerId/leads'
+      path: '/o/$orgId/c/$centerId/leads'
+      fullPath: '/o/$orgId/c/$centerId/leads'
+      preLoaderRoute: typeof OOrgIdCCenterIdLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/people': {
       id: '/o/$orgId/c/$centerId/people'
       path: '/o/$orgId/c/$centerId/people'
@@ -682,6 +702,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstructorSessionsSessionIdRoute: InstructorSessionsSessionIdRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
+  OOrgIdCCenterIdLeadsRoute: OOrgIdCCenterIdLeadsRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdProductsRoute: OOrgIdCCenterIdProductsRoute,
   OOrgIdCCenterIdRequestsRoute: OOrgIdCCenterIdRequestsRoute,

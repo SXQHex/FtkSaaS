@@ -89,13 +89,21 @@ export async function readLeadDetail(scope: ClientScope, personId: string, leadI
   };
 }
 export type LeadDetail = Awaited<ReturnType<typeof readLeadDetail>>;
-export async function readLeadActivities(scope: ClientScope, leadId: string, cursor?: string) {
+export async function readLeadActivities(
+  scope: ClientScope,
+  leadId: string,
+  cursor?: string,
+  activityId?: string,
+) {
   const backend = await scopedBackend(scope),
     page = await backend.call("management_state_get_v1", {
       ...base(scope),
       request_id: uuidv7(),
       operation: "crm_activity_save_v1",
-      selector: { operation: "crm_activity_save_v1", key: { lead_id: leadId } },
+      selector: {
+        operation: "crm_activity_save_v1",
+        key: { lead_id: leadId, ...(activityId ? { activity_id: activityId } : {}) },
+      },
       page: { limit: 20, ...(cursor ? { cursor } : {}) },
     });
   const items = page.items.map((item) => {
@@ -103,7 +111,11 @@ export async function readLeadActivities(scope: ClientScope, leadId: string, cur
       !item.entity ||
       item.entity.type !== "crm_activities" ||
       item.current?.operation !== "crm_activity_save_v1" ||
-      item.current.values.lead_id !== leadId
+      item.current.values.lead_id !== leadId ||
+      item.current.values.kind === undefined ||
+      item.current.values.note === undefined ||
+      item.current.values.outcome === undefined ||
+      item.current.values.due_at === undefined
     )
       throw new Error("LEAD_ACTIVITY_UNAVAILABLE");
     const versions = item.versions.filter(
@@ -155,7 +167,7 @@ export async function readApplicationsPage(
     return {
       id: item.entity.id,
       version: z.number().int().positive().parse(versions[0].version),
-      state: item.state,
+      state: z.enum(["pending", "reviewed", "closed"]).parse(item.state),
       asOf: item.as_of,
       values: item.current.values,
     };

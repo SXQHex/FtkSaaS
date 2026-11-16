@@ -59,7 +59,16 @@ export function ApplicationReviewSheet({
         <SheetTitle>{t(($) => $.leads.applicationReview)}</SheetTitle>
         <SheetDescription>{name}</SheetDescription>
       </SheetHeader>
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
+      <form
+        id="application-review-form"
+        method="post"
+        aria-label={t(($) => $.leads.applicationReview)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!disabled && !readOnly && reviewed) onSubmit?.();
+        }}
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5"
+      >
         {content}
         <Field>
           <FieldLabel htmlFor="application-action">
@@ -67,6 +76,7 @@ export function ApplicationReviewSheet({
           </FieldLabel>
           <NativeSelect
             id="application-action"
+            name="application-action"
             value={action}
             disabled={disabled || readOnly}
             onChange={(event) => {
@@ -103,6 +113,7 @@ export function ApplicationReviewSheet({
             </FieldLabel>
             <NativeSelect
               id="application-center"
+              name="application-center"
               value={center}
               disabled={disabled || readOnly}
               onChange={(event) => onCenter(event.target.value)}
@@ -120,13 +131,17 @@ export function ApplicationReviewSheet({
           {t(($) => $.leads.review)}
         </Checkbox>
         {recovery}
-      </div>
+      </form>
       <SheetFooter>
         <Button variant="outline" isDisabled={disabled} onPress={onClose}>
           {t(($) => $.leads.close)}
         </Button>
         {!readOnly && (
-          <Button isDisabled={disabled || !reviewed || !onSubmit} onPress={onSubmit}>
+          <Button
+            isDisabled={disabled || !reviewed || !onSubmit}
+            type="submit"
+            form="application-review-form"
+          >
             {t(($) => $.leads.save)}
           </Button>
         )}

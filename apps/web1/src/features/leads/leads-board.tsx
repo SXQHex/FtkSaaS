@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GripVerticalIcon } from "lucide-react";
 import {
@@ -64,12 +64,28 @@ export function LeadsBoard({
   const [preview, setPreview] = useState<Record<string, LeadRow[]>>(),
     dragging = useRef(false);
   const value = preview ?? columns;
+  const boardRef = useRef<HTMLDivElement>(null),
+    activeHandle = useRef<string | undefined>(undefined),
+    keyboardDrag = useRef(false);
+  useLayoutEffect(() => {
+    if (!keyboardDrag.current || !activeHandle.current) return;
+    const handle = boardRef.current?.querySelector<HTMLElement>(
+      `[data-lead-handle="${CSS.escape(activeHandle.current)}"]`,
+    );
+    if (handle && document.activeElement !== handle) {
+      handle
+        .closest('[data-slot="kanban-item"]')
+        ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      handle.focus({ preventScroll: true });
+    }
+  }, [preview]);
   const stageLabel = (key: string) =>
-    stages.find((stage) => stage.key === key)?.name ?? t(($) => $.leads.noStage);
+    stages.find((stage) => stage.key === key)?.name ?? t(($) => $.leads.noStageGroup);
   const itemName = (id: unknown) =>
     rows.find((row) => row.id === String(id))?.name ?? t(($) => $.leads.candidate);
   return (
     <div
+      ref={boardRef}
       role="region"
       aria-label={t(($) => $.leads.boardRegion)}
       tabIndex={0}
@@ -81,11 +97,15 @@ export function LeadsBoard({
         onValueChange={(next) => {
           if (dragging.current) setPreview(next);
         }}
-        onDragStart={() => {
+        onDragStart={(event) => {
+          activeHandle.current = String(event.active.id);
+          keyboardDrag.current = event.activatorEvent instanceof KeyboardEvent;
           dragging.current = true;
         }}
         onDragCancel={() => {
           dragging.current = false;
+          activeHandle.current = undefined;
+          keyboardDrag.current = false;
           setPreview(undefined);
         }}
         onDragEnd={(event) => {
@@ -97,6 +117,8 @@ export function LeadsBoard({
             : undefined;
           const row = rows.find((row) => row.id === event.active.id);
           dragging.current = false;
+          activeHandle.current = undefined;
+          keyboardDrag.current = false;
           setPreview(undefined);
           if (!disabled && row?.movable && key && key !== "__unassigned" && key !== row.stageKey)
             onStage?.(row.id, key);
@@ -122,7 +144,10 @@ export function LeadsBoard({
           },
         }}
       >
-        <KanbanBoard className="flex w-max min-w-full items-stretch gap-3">
+        <KanbanBoard
+          aria-orientation={undefined}
+          className="flex w-max min-w-full items-stretch gap-3"
+        >
           {Object.entries(value).map(([key, items]) => (
             <KanbanColumn
               key={key}
@@ -134,7 +159,7 @@ export function LeadsBoard({
               }
             >
               <div className="flex items-center justify-between gap-2 px-1 py-2">
-                <h3 className="min-w-0 break-words font-medium">{stageLabel(key)}</h3>
+                <h2 className="min-w-0 break-words font-medium">{stageLabel(key)}</h2>
                 <Badge variant="secondary">{items.length}</Badge>
               </div>
               {items.map((row) => (
@@ -143,7 +168,7 @@ export function LeadsBoard({
                   value={row.id}
                   disabled={disabled || !row.movable || !onStage}
                   render={<Card />}
-                  className="gap-2 p-3 has-focus-visible:ring-2 has-focus-visible:ring-ring motion-reduce:transition-none"
+                  className="gap-2 p-3 has-focus-visible:ring-2 has-focus-visible:ring-ring motion-reduce:transition-none data-dragging:opacity-100 data-disabled:opacity-100 data-disabled:pointer-events-auto"
                 >
                   <CardHeader className="flex flex-row items-start gap-1 p-0">
                     <CardTitle className="min-w-0 flex-1">
@@ -158,6 +183,7 @@ export function LeadsBoard({
                     </CardTitle>
                     {row.movable && (
                       <KanbanItemHandle
+                        data-lead-handle={row.id}
                         aria-label={t(($) => $.leads.dragLabel, { name: row.name })}
                         className="flex size-7 shrink-0 touch-none items-center justify-center rounded-md [-webkit-user-select:none] focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
                       >

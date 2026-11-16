@@ -43,11 +43,17 @@ export function LeadSheet({
   onClose,
   onSubmit,
   onMode,
+  offsets = [],
+  submitLabel,
+  assignmentWritable = false,
 }: {
   mode: LeadMode;
+  offsets?: { id: string; label: string }[];
+  submitLabel?: string;
+  assignmentWritable?: boolean;
   name?: string;
   draft: LeadDraft;
-  onDraft: (draft: LeadDraft) => void;
+  onDraft?: (draft: LeadDraft) => void;
   stages: CrmPipelineStage[];
   tags: CrmTag[];
   owners: { id: string; name: string }[];
@@ -68,7 +74,7 @@ export function LeadSheet({
   const { t } = useTranslation(),
     locked = disabled || readOnly;
   const set = <K extends keyof LeadDraft>(key: K, value: LeadDraft[K]) =>
-    onDraft({ ...draft, [key]: value });
+    onDraft?.({ ...draft, [key]: value });
   const stage = stages.find((stage) => stage.key === draft.stageKey);
   return (
     <Sheet
@@ -88,6 +94,8 @@ export function LeadSheet({
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
         <form
           id="lead-form"
+          method="post"
+          aria-label={t(($) => $.leads.modes[mode])}
           noValidate
           className="flex flex-col gap-4"
           onSubmit={(event) => {
@@ -103,10 +111,14 @@ export function LeadSheet({
                   <FieldLabel htmlFor="lead-source">{t(($) => $.leads.source)}</FieldLabel>
                   <NativeSelect
                     id="lead-source"
+                    name="lead-source"
                     value={draft.source}
                     disabled={locked}
                     onChange={(event) => set("source", event.target.value)}
                   >
+                    {!["manual", "phone", "whatsapp"].includes(draft.source) && (
+                      <NativeSelectOption value={draft.source}>{draft.source}</NativeSelectOption>
+                    )}
                     {(["manual", "phone", "whatsapp"] as const).map((source) => (
                       <NativeSelectOption key={source} value={source}>
                         {t(($) => $.leads.sources[source])}
@@ -118,6 +130,8 @@ export function LeadSheet({
                   <FieldLabel htmlFor="lead-interest">{t(($) => $.leads.interest)}</FieldLabel>
                   <Input
                     id="lead-interest"
+                    name="interest"
+                    required
                     value={draft.interest}
                     disabled={locked}
                     onChange={(event) => set("interest", event.target.value)}
@@ -130,8 +144,9 @@ export function LeadSheet({
                   <FieldLabel htmlFor="lead-owner">{t(($) => $.leads.owner)}</FieldLabel>
                   <NativeSelect
                     id="lead-owner"
+                    name="lead-owner"
                     value={draft.assignedTo}
-                    disabled={locked || !owners.length}
+                    disabled={locked || !assignmentWritable || !owners.length}
                     onChange={(event) => set("assignedTo", event.target.value)}
                   >
                     <NativeSelectOption value="">{t(($) => $.leads.unassigned)}</NativeSelectOption>
@@ -154,10 +169,11 @@ export function LeadSheet({
                 <FieldLabel htmlFor="lead-stage">{t(($) => $.leads.stage)}</FieldLabel>
                 <NativeSelect
                   id="lead-stage"
+                  name="lead-stage"
                   value={draft.stageKey}
                   disabled={locked || !stages.length}
                   onChange={(event) =>
-                    onDraft({
+                    onDraft?.({
                       ...draft,
                       stageKey: event.target.value,
                       lossReason: "",
@@ -200,6 +216,7 @@ export function LeadSheet({
                   <FieldLabel htmlFor="lead-loss">{t(($) => $.leads.lossReason)}</FieldLabel>
                   <NativeSelect
                     id="lead-loss"
+                    name="lead-loss"
                     value={draft.lossReason}
                     required
                     disabled={locked}
@@ -228,6 +245,7 @@ export function LeadSheet({
                 <FieldLabel htmlFor="lead-kind">{t(($) => $.leads.activityKind)}</FieldLabel>
                 <NativeSelect
                   id="lead-kind"
+                  name="lead-kind"
                   value={draft.kind}
                   disabled={locked}
                   onChange={(event) => {
@@ -247,20 +265,43 @@ export function LeadSheet({
                 <FieldLabel htmlFor="lead-due">{t(($) => $.leads.when)}</FieldLabel>
                 <Input
                   id="lead-due"
+                  name="lead-due"
                   type="datetime-local"
                   value={draft.due}
                   disabled={locked}
-                  onChange={(event) => set("due", event.target.value)}
+                  onChange={(event) =>
+                    onDraft?.({ ...draft, due: event.target.value, dueOffset: "", reviewed: false })
+                  }
                   aria-invalid={Boolean(errors?.due)}
                   aria-describedby="lead-due-error"
                 />
                 <FieldError id="lead-due-error">{errors?.due}</FieldError>
                 <FieldDescription>{t(($) => $.leads.timezoneHint)}</FieldDescription>
               </Field>
+              {offsets.length > 0 && (
+                <Field>
+                  <FieldLabel htmlFor="lead-offset">{t(($) => $.leads.offset)}</FieldLabel>
+                  <NativeSelect
+                    id="lead-offset"
+                    name="lead-offset"
+                    value={draft.dueOffset}
+                    disabled={locked}
+                    onChange={(event) => set("dueOffset", event.target.value)}
+                  >
+                    <NativeSelectOption value="">{t(($) => $.leads.choose)}</NativeSelectOption>
+                    {offsets.map((row) => (
+                      <NativeSelectOption key={row.id} value={row.id}>
+                        {row.label}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelect>
+                </Field>
+              )}
               <Field>
                 <FieldLabel htmlFor="lead-note">{t(($) => $.leads.note)}</FieldLabel>
                 <Textarea
                   id="lead-note"
+                  name="lead-note"
                   value={draft.note}
                   disabled={locked}
                   onChange={(event) => set("note", event.target.value)}
@@ -270,6 +311,7 @@ export function LeadSheet({
                 <FieldLabel htmlFor="lead-outcome">{t(($) => $.leads.outcome)}</FieldLabel>
                 <Input
                   id="lead-outcome"
+                  name="lead-outcome"
                   value={draft.outcome}
                   disabled={locked}
                   onChange={(event) => set("outcome", event.target.value)}
@@ -283,6 +325,7 @@ export function LeadSheet({
                 <FieldLabel htmlFor="lead-product">{t(($) => $.leads.trialProduct)}</FieldLabel>
                 <NativeSelect
                   id="lead-product"
+                  name="lead-product"
                   value={draft.productVersionId}
                   disabled={locked || !products.length}
                   onChange={(event) => set("productVersionId", event.target.value)}
@@ -300,6 +343,7 @@ export function LeadSheet({
                 <FieldLabel htmlFor="lead-session">{t(($) => $.leads.trialSession)}</FieldLabel>
                 <NativeSelect
                   id="lead-session"
+                  name="lead-session"
                   value={draft.sessionId}
                   disabled={locked || !sessions.length}
                   onChange={(event) => set("sessionId", event.target.value)}
@@ -323,6 +367,7 @@ export function LeadSheet({
               <FieldLabel htmlFor="lead-offer">{t(($) => $.leads.selectedOffer)}</FieldLabel>
               <NativeSelect
                 id="lead-offer"
+                name="lead-offer"
                 value={draft.offerId}
                 disabled={locked || !offers.length}
                 onChange={(event) => set("offerId", event.target.value)}
@@ -388,7 +433,7 @@ export function LeadSheet({
             form="lead-form"
             isDisabled={disabled || !onSubmit || (mode !== "edit" && !draft.reviewed)}
           >
-            {t(($) => $.leads.save)}
+            {submitLabel ?? t(($) => $.leads.save)}
           </Button>
         )}
       </SheetFooter>
