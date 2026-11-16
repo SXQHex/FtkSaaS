@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "492e803343ba88dc27b04149a84a2c6d5419320ba51b2b6250c9a47d2e78ebdb",
-        "reason": "Reviewed exact P01 assertion-change record and suite hash/range: one product-name expectation follows approved rename, existing sold/fallback identity assertions retained and historical name/price checks added. No gate, scope or threshold changed."
+        "fingerprint": "9bf432ef662d6ca8d3c3ca4e1f8ea31b87dccd81deaf4c664af1327c8f5ebc69",
+        "reason": "Reviewed member lifecycle test inventory delta: existing suite ownership and exclusive units preserved; only changed source ranges/hashes and the new acceptance import added. Trusted loader and common retry/approval guide remain unchanged."
       }
     },
     {
@@ -385,8 +385,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "e1b834944d2fee0dc11bd2b6ab398d31826bd63910b12c83baaa1d834d1a3a9a",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "93906a45a6db26c03e1a3983ffc5c4fcbb4098537d3306f63d6c6c152562fae9",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "426ad639abdd6ddb703fe0e894e0d8c2d4efdeb278a3443aaa799ebabf20cc44",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "dda5586c10d61b8c7c7af05b2ee6fe70cedf274f3a9e0ff22a0a4e505cd8b78b",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -607,8 +607,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "97bca65b42849aa58dd151746a3d6ba5feb8c426a11d02512543ed856f8c5d10",
-        "reason": "Reviewed final canonical callable/read-path/feature links and exact append migration; three service-only wrappers match existing guards. Original wrappers and unrelated flow behavior unchanged; SQL/typed negative acceptance retained."
+        "fingerprint": "8c46b9cdcac5c4074dcc59a406b044297679b7f8c93f1ce94ffcc09cb3fc04b2",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -724,8 +724,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "c789d887141650ab74592dcee9d0d2501731606110793216bdba932d9b5d1e81",
-        "reason": "Reviewed account directory equivalence, first recorded center membership date and canonical alias visibility regression fixtures."
+        "fingerprint": "edc59c58b3c1f90df6388a813b8f91dd83d742338f003caf1eb19a98808286cc",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -748,7 +748,10 @@
         "apps/backend/tests/sale-discount-acceptance.mjs",
         "apps/backend/tests/fixtures/sale-discount-acceptance.sql",
         "apps/backend/tests/product-class-management-acceptance.mjs",
-        "apps/backend/tests/fixtures/product-class-management-acceptance.sql"
+        "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
+        "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
+        "apps/backend/tests/fixtures/member-profile-lifecycle.sql",
+        "apps/backend/tests/web1-review-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -811,7 +814,9 @@
         "apps/backend/supabase/migrations/20261113121249_starter_sale_change_registration.sql",
         "apps/backend/database/product-management.sql",
         "apps/backend/database/sale-discount.sql",
-        "apps/backend/database/entitlement-ledger-read.sql"
+        "apps/backend/database/entitlement-ledger-read.sql",
+        "apps/backend/database/freeze-cancellation.sql",
+        "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -838,11 +843,13 @@
         "reservation_impact_apply_v1",
         "negative_limits_get_v1",
         "products_management_list_v1",
-        "product_state_set_v1"
+        "product_state_set_v1",
+        "freeze_cancel_preview_v1",
+        "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "2b44e3199597e41c659ff899039c5ab30cc8486aeea1211c7eac1a397a0d411d",
-        "reason": "Reviewed catalog rename contract and immutable published_name source: latest name changes; sold original name/price and future-version fallback remain frozen. Existing identity/sale assertions retained."
+        "fingerprint": "de36f1f1f4adc7cc0cc297e18e43e28214ecd09b8757fc98b6ae3a826c4e5bb3",
+        "reason": "W1-BE-14: reviewed existing P02 locks, live CM/F17, preview recovery, exact extension reversal, protected reservations and native cancellation tests; guide updated."
       }
     },
     {
@@ -862,7 +869,11 @@
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
         "apps/backend/tests/lesson-request-catalog-acceptance.mjs",
         "apps/backend/tests/action-management-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
+        "apps/backend/tests/fixtures/member-profile-lifecycle.sql",
+        "apps/backend/tests/schedule-reads.test.mjs",
+        "apps/backend/tests/web1-review-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -912,7 +923,9 @@
         "apps/backend/supabase/migrations/20261105170617_lesson_request_catalog.sql",
         "apps/backend/database/action-management-discovery.sql",
         "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql",
-        "apps/backend/database/lesson-request-actionability.sql"
+        "apps/backend/database/lesson-request-actionability.sql",
+        "apps/backend/database/member-time-filter.sql",
+        "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -927,8 +940,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "d9c9921e58b6a94f47c1cbc6b173ccedef047eeed2545caca8f8fe3966f696c2",
-        "reason": "Reviewed unchanged reservation allocation and source selection; P01 retains sold version identity and strengthens immutable name/price and future-effective fallback checks."
+        "fingerprint": "c7e8a46feb97c77e88064e36e2c950e8de4304da3fa916385f9622ee749025dd",
+        "reason": "W1-BE-13: reviewed start-time partition before pagination, fixed server cutoff in cursor, legacy interval and live canonical/Starter visibility, exact-boundary tests; guide updated."
       }
     },
     {
@@ -991,8 +1004,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "4a7ad8d1b9e618a7caf9285baa0e48faa306a34b80c55e704a2bf8a1bf22c2db",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "33eed92c089e84d9aea0bd6cc4fd1eafc84eeea45052e07d042d2906a8fbe5ee",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1061,8 +1074,8 @@
         "finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "d3c086a5ae02b738324ded6535e024c540042fa2697a2d44b0dd25d706296364",
-        "reason": "Reviewed final canonical callable/read-path/feature links and exact append migration; three service-only wrappers match existing guards. Original wrappers and unrelated flow behavior unchanged; SQL/typed negative acceptance retained."
+        "fingerprint": "9fcdd79adaa41177cb969ff005acfb598fb9c381ed8de616b2c0b413c638a7cf",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1164,8 +1177,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "ae3cddca270816fffc798b082c12a8f3ae845395e2c689876026536e11cb9fbd",
-        "reason": "Shared person registry root only adds three acceptance imports; public/calendar implementation and guide remain unchanged."
+        "fingerprint": "1802e481724dab1ffcd40e1bbacf86432e079de6bab8543d44e2a9520e8be46f",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1224,8 +1237,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "c7cffc4d2e913ed7714e677f2728d5c075c464a892998540dec19bdd28c7894d",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "cdb25345028d8fd8160be15ed138b080605b80f9933b7a5ddf1eede75a91006c",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1284,8 +1297,8 @@
         "content_catalog_save_v1"
       ],
       "review": {
-        "fingerprint": "12dd7a6ea0f128d573b781196723875e031417af922f8243ddbba1ce2ee5a46f",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "bba62e73198c55880724a1fbf8b45008a83608cea72305f039aed2ccb0429ae5",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1417,8 +1430,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "155bd3d71bc3b41f2098b5e48165fb9d23fa313f0cd84a8491351c4be21becd0",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "65b23237b0485a59d01c40d46d3cb3a2ef497228e421106501bb05be3bc0589f",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1493,8 +1506,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "45a12c16dcb5556576b92f383472591cc1cbb4e1971716b4fa47b35b3d6ba424",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "5ef5315ed39ccf6a6de9f2248de284e7866fc61d49195be8bd8f724f1fd5610a",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1546,8 +1559,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "2cd14f73c7f45908d829b628af4f7268cdf49c27a42e49e103260f2394ce6eb6",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "42df3dd80e3ba286eb73e4b76a3708caeef3a8b40296584a54cb72d020a836b2",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1621,8 +1634,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "ce2ab380d929b8bcbe64077678a5c65218cbd0d856603008ecbf8ce1f4c080f1",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "0f289c859c247bfe9015a70582545545aa26794bf42ca8ba203b36e0fe0038ab",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1682,8 +1695,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "7746433bdb9cdf18763b9af0fb4fba13f6cf0c02d77eb4a16afa5099d5d9474f",
-        "reason": "Shared person registry root only adds three acceptance imports; CRM sources and guide remain unchanged."
+        "fingerprint": "400214d5289a0c982dd6fc325df369ee7eeb85833937f688195dec492a7cb0e5",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1771,8 +1784,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "5c7648332e6030c664af0511955f45778b7a98734560eb9bb06d396ed526e116",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "fe77df79af529ab84471cec58e8be50965cc2f908037b78ade01b6d4239a4796",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1804,8 +1817,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "373a35e9fe0350d452f41a6878b14ae8ca6d8b7dcbb28e3b7110a5274baa2023",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "c3c984bbaa2b2739c7a93574baca670a0e745ebf1edfc5d0225e66e577099fd3",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1835,8 +1848,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "d713b68b041ff804f9153e95cfb3ece2b4c876e5af637ec4fde2997a94a5bd03",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "696a2805ff2fdf8d7a5e07094dd75e8b1c7f7d9bce90eee7512fdb02f17be18f",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     },
     {
@@ -1960,8 +1973,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "29c53e144046a7187c61ae6aaff2a359e8e10ce8107011655fa9e0e6d6427e80",
-        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
+        "fingerprint": "6ca15335364ba5538e2f4c1a423ee34521f9db1a836d4caa73310416baab67d8",
+        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
       }
     }
   ]

@@ -226,6 +226,8 @@
     "content_catalog_save_v1",
     "finance_directory_get_v1",
     "products_management_list_v1",
-    "product_state_set_v1"
+    "product_state_set_v1",
+    "freeze_cancel_preview_v1",
+    "freeze_cancel_apply_v1"
   ]
 }

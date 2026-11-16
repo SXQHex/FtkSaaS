@@ -6192,6 +6192,60 @@
       },
       "billing_class": "config",
       "limits": []
+    },
+    {
+      "name": "freeze_cancel_preview_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/freeze_cancel_preview_v1",
+      "permission": "entitlement.correct",
+      "features": [
+        "F17"
+      ],
+      "required_features": [
+        "F17"
+      ],
+      "runtime_required_features": [
+        "F17"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "planned_freeze_cancellation_pending_native_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_freeze_cancel_preview"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "Scheduled freeze cancellation only before starts_at; same live entitlement.correct/CM and F17 gates as freeze ending. Existing reservations and rights ledger are preserved."
+      ]
+    },
+    {
+      "name": "freeze_cancel_apply_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/freeze_cancel_apply_v1",
+      "permission": "entitlement.correct",
+      "features": [
+        "F17"
+      ],
+      "required_features": [
+        "F17"
+      ],
+      "runtime_required_features": [
+        "F17"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "planned_freeze_cancellation_pending_native_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_freeze_cancel_apply"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "Scheduled freeze cancellation only before starts_at; same live entitlement.correct/CM and F17 gates as freeze ending. Existing reservations and rights ledger are preserved."
+      ]
     }
   ]
 }

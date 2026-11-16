@@ -1,6 +1,32 @@
 import test from 'node:test';import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import * as v from '../supabase/functions/backend-v1/validators.js';import {newUuidV7 as key} from '../scripts/uuid.mjs';
 const scope=()=>({client_api_version:1,request_id:key(),org_id:key(),center_id:key()});
+test('Member profile migration exactly composes reviewed lifecycle sources and native wrappers',()=>{
+ const parts=['member-time-filter.sql','freeze-cancellation.sql'].map(n=>fs.readFileSync(new URL('../database/'+n,import.meta.url),'utf8').replace(/^begin;\n/,'').replace(/commit;\n$/,''));
+ const wrappers=fs.readFileSync(new URL('../database/runtime-wrappers-current.sql',import.meta.url),'utf8').split('\n').filter(l=>l.includes('freeze_cancel_')).join('\n');
+ const migration=fs.readFileSync(new URL('../supabase/migrations/20261116013944_member_time_freeze_cancel.sql',import.meta.url),'utf8');
+ assert.equal(migration,'-- W1-BE-13/14: cursor-bound start-time partitions and planned freeze cancellation.\nbegin;\n'+parts.join('')+wrappers+"\nnotify pgrst,'reload schema';\ncommit;\n");
+});
+test('Member reservation time filters are additive and never accept a client clock',()=>{
+ const base={...scope(),person_id:key(),page:{limit:1,sort:'starts_at_asc'}};
+ assert(v.request_reservation_list_v1(base));
+ for(const time_filter of ['all','upcoming','past'])assert(v.request_reservation_list_v1({...base,time_filter}));
+ for(const time_filter of ['ongoing',null,1])assert.equal(v.request_reservation_list_v1({...base,time_filter}),false);
+ assert.equal(v.request_reservation_list_v1({...base,time_filter:'past',as_of:'2031-01-01T00:00:00Z'}),false);
+});
+test('Planned freeze cancellation requires its own preview and approval, never a fabricated end date',()=>{
+ const preview={...scope(),freeze_id:key(),reason:'Cancel planned interval'};
+ assert.equal(typeof v.request_freeze_cancel_preview_v1,'function');
+ assert(v.request_freeze_cancel_preview_v1(preview));
+ for(const field of ['freeze_id','reason']){const bad={...preview};delete bad[field];assert.equal(v.request_freeze_cancel_preview_v1(bad),false);}
+ assert.equal(v.request_freeze_cancel_preview_v1({...preview,end_date:'2031-01-01'}),false);
+ assert.equal(v.request_freeze_cancel_preview_v1({...preview,reason:'   '}),false);
+ const apply={...scope(),operation_key:key(),preview:{id:key(),token:'synthetic-approval-token'}};
+ assert(v.request_freeze_cancel_apply_v1(apply));
+ assert.equal(v.request_freeze_cancel_apply_v1({...apply,freeze_id:preview.freeze_id}),false);
+ const noApproval={...apply};delete noApproval.preview;assert.equal(v.request_freeze_cancel_apply_v1(noApproval),false);
+});
 test('Availability retirement and exception cancellation require explicit source, reason and version; legacy writes remain compatible',()=>{
  const base={...scope(),operation_key:key(),resource:{kind:'room',id:key()}},rule={weekdays:[1],local_start:'09:00:00',local_end:'10:00:00',valid_from:'2026-01-01'};
  assert(v.request_availability_save_v1({...base,rule}));

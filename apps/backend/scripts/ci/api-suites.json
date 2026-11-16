@@ -662,15 +662,15 @@
     },
     {
       "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
-      "sha256": "a93d9c6f0c8427bf6388481c98da05bb528cabe1feec9c3662981ed71a588567",
+      "sha256": "e6b30d3fbcfb197cc4fe3b9d7ec53093374c1a51d230befee17a740bd7b8d627",
       "shared": [
         [
           3,
           9
         ],
         [
-          473,
-          473
+          492,
+          492
         ]
       ],
       "parts": [
@@ -679,7 +679,7 @@
           "ranges": [
             [
               10,
-              472
+              491
             ]
           ]
         },
@@ -687,8 +687,8 @@
           "id": "program-session-lifecycle-root-2",
           "ranges": [
             [
-              474,
-              593
+              493,
+              612
             ]
           ]
         }
@@ -1228,11 +1228,11 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "f6cb0902988c956d14996329cc745191c71c10b6c6a7f1e258df7ad0e55a2c9a",
+      "sha256": "85dbcf12d19cfdf8bfd77af22b484eb1313f48222c5f436d9beef1804d76a70c",
       "shared": [
         [
-          3,
-          8
+          4,
+          9
         ]
       ],
       "parts": [
@@ -1240,8 +1240,8 @@
           "id": "schedule-reads-root-1",
           "ranges": [
             [
-              9,
-              238
+              10,
+              264
             ]
           ]
         }
@@ -1256,6 +1256,11 @@
           "line": 2,
           "path": "apps/backend/tests/personal-calendar-acceptance.mjs",
           "sha256": "77acabdd6f9dcb832e779104c4d2f71a5ff24e744474132f5be2f712d66cc800"
+        },
+        {
+          "line": 3,
+          "path": "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
+          "sha256": "cc9c4b832cb5e842823bc714dc3dd1d4548daca9f610e2c0255580530e8e944c"
         }
       ],
       "estimated_seconds": 537.08

@@ -789,3 +789,13 @@ Bu, XREQ-048'deki iki üye listesi desteğine ek üçüncü istektir. W1-BE-03 d
 ## XREQ-051 Web1 uygunluk ve kapanış yaşam döngüsü
 
 **Backend teslimi (15 Kasım):** W1-BE-05 PR312 ile main/development üzerinde yayımlandı; kaynak/ortam kanıtı [backend devrindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-talep-ekleri). Mevcut `availability_save_v1` explicit retire ve `availability_exception_save_v1` explicit cancel dallarıyla genişletildi; sahte tarih/boş weekdays veya fiziksel silme kullanılmaz. Kaynak ve yetkili sürüm ile ayrı gerekçeli kullanıcı niyeti gerekir; yalnız seçili kayıt etkilenir. Eski save çağrıları, merkez/feature/yetki/idempotency kapıları ve mevcut seanslar korunur. Kesin tüketim [WF02](workflows.md#wf02), backend kaynak/ortam kanıtı kendi devrindedir. Frontend ekran kabulü ayrıdır.
+
+
+<a id="xreq-052"></a>
+## XREQ-052 Üye profili rezervasyon zamanı ve planlanmış dondurma iptali
+
+### Backend tüketici devri — 16 Kasım 2026
+
+W1-BE-13/14 için kullanıcı onaylı destek kaynak adayındadır; yayımlanmış kabulü değildir. `reservation_list_v1` zaman filtresinin kesin çağrı/cursor sınırı [WF06](workflows.md#wf06), `freeze_cancel_preview_v1` / `freeze_cancel_apply_v1` etkisi ve yeniden okuma sırası [WF05](workflows.md#wf05) sahibindedir. W1-BE-11 hak hareketi talebi bu kayıtla genişletilmez.
+
+**Frontend kabul ölçütü:** Filtre değişiminde cursor ve birikmiş sayfaları bırak; zaman ayrımını ders başlangıcı ve backend’in sabit sınırıyla tüket, görünür sayfayı süzme veya bütün geçmişi tarama. Dondurma iptalinde backend preview’ının geçerlilik ve korunmuş rezervasyon etkisini gösterip açık onay al; aynı intent’in key/payload’ını yeniden denemede koru. Stale, rol/plan reddi veya destek henüz yayımlanmamışsa sahte başarı/erken bitiş üretme. ACK sonrası native hak/satış ve rezervasyon okumalarını yenile. Frontend adına uygulama veya kabul kapanışı verilmez; backend kaynak/CI/dağıtım/hosted sonuçları [devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#uye-profili-zaman-iptal) izlenir.

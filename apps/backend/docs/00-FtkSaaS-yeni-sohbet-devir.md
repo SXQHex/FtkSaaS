@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="uye-profili-zaman-iptal"></a>
+## Üye profili zaman filtresi ve planlı iptal — 16 Kasım 2026
+
+Başlangıç main `158feaeeb3edadb3ab78c2c89d74c02d8d1f1dfb`; PR313 birleşmiş, aynı kaynağın [main43777853831](https://github.com/SXQHex/FtkSaaS/actions/runs/43777853831), [merge43777853818](https://github.com/SXQHex/FtkSaaS/actions/runs/43777853818) ve [development43777896779](https://github.com/SXQHex/FtkSaaS/actions/runs/43777896779) attempt1/success ayrı okunarak doğrulandı. Bu kanıt yeni adaya aktarılmaz. Aktif dal `feature/backend-member-time-freeze`; kullanıcı W1-BE-13/14 önerilerini uygulamamızı onayladı. Görev kabulü [backlog](remaining-work.md#w1-be-1314--üye-profili-zaman-filtresi-ve-planlı-dondurma-iptali), kesin tüketim WF05/WF06 sahibindedir. Frontend kodu/kabul kaydı değiştirilmedi.
+
+166. append migration mevcut okuyucu/lifecycle fonksiyonlarına kontrollü ek yapar; ilk165 migration değişmedi. Typed request, preview etkisi ve kurtarma karşılıkları aynı sözleşmededir; management selector kayıtları contract-only kalır, yeni kimlik kaynağı native hak okumasıdır. Yerel native start PostgreSQL17.11 açılışında AF_UNIX socket EPERM ile durdu; kurulum/artifact indirme hatası yoktur. İzole PGlite PostgreSQL motoru gerçek pgcrypto ile bütün migration’ları çalıştırır; bu Supabase Auth/REST/Edge kabulü değildir. Son kaynakta backend verify574/574 (415+149+10), skip0; üretim/typecheck/governance ve kalite/floor geçti. İzole SQL tekrarı166migration ve53typed çağrıyı doğruladı. Önceki bağımsız inceleme ve sınır mutasyonları sonrasında açık engelleyici bulgu yoktur. Yeni kabul testi CI envanterine eklendi; değişen iki suite’in hash/satır aralıkları incelenerek güncellendi, eski sahiplik ve exclusive birimleri korundu. Güvenli yerel loglar `.dev/member-verify-final.log`, `.dev/member-quality-final.log`, `.dev/member-sql-final.log` içindedir. Aday CI/main/development/hosted kapanışı henüz açık.
+
 <a id="web1-talep-ekleri"></a>
 ## Web1 backend keşif ve kurtarma ekleri — 15 Kasım 2026
 

@@ -382,6 +382,25 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const after=(await must(owner,'entitlements_get_v1',scope({person_id:student.p}))).find(x=>x.sale_id===sale);assert.equal(after.end_date,'2027-03-01');assert.equal(after.available,2);assert.equal(after.reserved,1);assert.equal(after.sale_state,'active');
   await fail('reservation_impact_preview_v1',{change:{...ext,end_date:'2026-01-01'},reason},'VALIDATION_FAILED');
  });
+ await t.test('planned freeze cancellation uses explicit preview, restores eligibility and replays the same intent',async()=>{
+  const learner=await person('planned-freeze-cancel'),day=n=>new Date(Date.now()+n*86400000).toISOString().slice(0,10);
+  const terms={name:'Cancellable freeze',kind:'credits',booking_mode:'flexible',credits:8,price_minor:'800',currency:'TRY',freeze:{enabled:true,extends_validity:true,max_days:10},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
+  const product=(await mut('product_publish_v1',{terms})).primary_id,quote=await must(owner,'sale_preview_v1',scope({person_id:learner.p,product_version_id:product,start_date:day(1),end_date:day(30)})),sale=(await mut('sale_apply_v1',{preview:token(quote)})).primary_id;
+  const sid=(await session(null,day(4)+'T12:00:00Z')).primary_id,rid=(await mut('reservation_create_v1',{session_id:sid,person_id:learner.p,mode:'flexible',source_sale_id:sale})).primary_id;
+  const preview=await must(owner,'freeze_preview_v1',scope({sale_id:sale,dates:{start_date:day(3),end_date:day(7)},reason:'Planned interval'})),frozen=(await mut('freeze_apply_v1',{preview:token(preview)})).primary_id;
+  const request={freeze_id:frozen,reason:'Cancel before start'},p=await must(owner,'freeze_cancel_preview_v1',scope(request));
+  assert.equal(p.freeze_cancellation.removed_extension_days,4);assert.equal(p.freeze_cancellation.end_date,day(30));assert.equal(p.freeze_cancellation.preserves_reservations,true);assert(p.effects.some(e=>e.entity.id===rid));
+  await fail('freeze_cancel_preview_v1',request,'FORBIDDEN',staff.u);await fail('freeze_cancel_preview_v1',{...request,center_id:c2},'NOT_FOUND');
+  const recovered=await must(owner,'preview_get_v1',{org_id:org,preview_id:p.id});assert.deepEqual(recovered.freeze_cancellation,p.freeze_cancellation);
+  const unchanged=await ledger(),body={preview:token(p)},k=key();await inject('freeze_cancel_apply_v1');await fail('freeze_cancel_apply_v1',body,'INTEGRITY_VIOLATION',owner,k);await clearFault();
+  assert.equal((await rows('select state from core.freezes where id=$1',[frozen]))[0].state,'scheduled');
+  await mut('freeze_cancel_apply_v1',body,k);assert.equal((await mut('freeze_cancel_apply_v1',body,k)).replayed,true);
+  await fail('freeze_cancel_apply_v1',{preview:{...token(p),token:'changed-token-value'}},'IDEMPOTENCY_PAYLOAD_MISMATCH',owner,k);
+  assert.deepEqual(await ledger(),unchanged);assert.equal((await rows('select state from core.reservations where id=$1',[rid]))[0].state,'active');
+  const rights=(await must(owner,'entitlements_get_v1',scope({person_id:learner.p}))).find(r=>r.sale_id===sale);assert.equal(rights.end_date,day(30));assert.equal(rights.freezes.find(r=>r.id===frozen).state,'cancelled');
+  const reopened=(await session(null,day(5)+'T12:00:00Z')).primary_id;await mut('reservation_create_v1',{session_id:reopened,person_id:learner.p,mode:'flexible',source_sale_id:sale});
+  await fail('freeze_cancel_preview_v1',request,'INVALID_STATE_TRANSITION');await fail('freeze_cancel_apply_v1',body,'PREVIEW_STALE');
+ });
  await t.test('P02 freeze and reasoned early end preserve reservations, block new rights and extend only local frozen days',async()=>{
   const learner=await person('p02-freeze-student'),terms={name:'Freeze credits',kind:'credits',booking_mode:'flexible',credits:8,price_minor:'800',currency:'TRY',freeze:{enabled:true,extends_validity:true,max_days:30},refund:{method:'credit_ratio'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
   const pv=(await mut('product_publish_v1',{terms})).primary_id,sp=await must(owner,'sale_preview_v1',scope({person_id:learner.p,product_version_id:pv,start_date:'2027-03-01',end_date:'2027-04-01'})),sold=(await mut('sale_apply_v1',{preview:token(sp)})).primary_id;

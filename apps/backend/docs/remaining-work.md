@@ -28,10 +28,20 @@ Kullanıcı son `request(1).md` dosyasındaki backend açıklarının kapatılma
 - [x] W1-BE-11 aday kaynak/SQL: ilk kayıtlı merkez öğrencilik başlangıcı ve yalnız yetkili seçili satışın append-only hak defteri; audit yetkisi verilmez.
 - [x] W1-BE-12 aday kaynak/SQL: kullanıcı onaylı ayrı sale.discount yetkisi ve org yüzdelik üst sınırı; preview/net satış/borç/iade uyumu; eksik ayar/grant kapalıdır. permission_set mevcut plan kapısı korunur.
 - [x] Son aday statik verify/kalite ve bağımsız son kaynak incelemesi; kanıt devir sahibindedir.
-- [ ] Yeni aday full clean → aynı main kaynak kabulü → development dağıtım doğrulaması.
+- [x] PR313 kaynak full clean → aynı main kaynak kabulü → development dağıtım doğrulaması; kanıt devir sahibindedir.
 - [ ] Yeni hosted backend kabulü: W1-BE-03 tam directory ve W1-BE-07/08 gerçek oturumlu seans/receipt; yeni09–12 rol/plan/merkez/negatif durumları. SQL motoru başarısı gerçek Auth/Edge kabulü yerine geçmez.
 
 Kesin akış/DTO sınırı WF03/WF04/WF05/WF08 sahibindedir. Frontend ekranı veya frontend kabulü backend kapanış kapısı değildir; yalnız kendi kanıtıyla kapanış yapılır.
+
+## W1-BE-13/14 — Üye profili zaman filtresi ve planlı dondurma iptali
+
+Kullanıcı 16 Kasım’da iki sözleşme önerisinin uygulanmasını onayladı. Kesin tüketim WF05/WF06, frontend devir ölçütleri [XREQ-052](../../../docs/requests.md#xreq-052), kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#uye-profili-zaman-iptal) sahibindedir. W1-BE-11 hak hareketi bu kapsamda yeniden açılmaz.
+
+- [x] Geriye uyumlu typed zaman filtresi; sunucu başlangıç sınırı cursor’a bağlı, filtre limit öncesi ve canlı aktör/kişi/merkez sınırında.
+- [x] Ayrı planlı iptal preview/apply; mevcut CM/F17/ürün, stale/aynı-key, yalnız ilgili geçerliliği geri alma ve kesin rezervasyon koruması.
+- [x] Son kaynak statik/SQL doğrulama ve inceleme; kanıt devir sahibindedir.
+- [ ] Aday full clean → main kaynak kanıtı → development dağıtım doğrulaması.
+- [ ] Yeni hosted backend kabulü; frontend ekran kabulü ayrı kalır.
 
 ## Backend çalışma modeli
 

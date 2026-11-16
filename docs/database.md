@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6d4c2ffbad8ed16272db28a6bff45ad565ded8da7beeb2e8036295ff5dba635b`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `297f54c75ed559f6887a0bd3bcc97e8a1ed05a2ee75284afb358b69e603e8498`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 165. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 166. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -173,3 +173,4 @@ Sıralı migration: 165. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261115014502_student_status_filter.sql](../apps/backend/supabase/migrations/20261115014502_student_status_filter.sql) | `24a80453acdf465de4593f201af9600797daa0d8ec3f6a4bb6128d9e95b60dce` |
 | [20261115035110_web1_review_lifecycle.sql](../apps/backend/supabase/migrations/20261115035110_web1_review_lifecycle.sql) | `4316f70932f193a89c39e1c419a8df1f487345b691d747affd3e1b164871771e` |
 | [20261115213357_native_read_recovery.sql](../apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql) | `ee8a4233aa32d3b64f06ea163848f0a0024e3ffc1816ce8ea0be276eb586951c` |
+| [20261116013944_member_time_freeze_cancel.sql](../apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql) | `a90ef5d50129ad2ed2aaac45ccd0aec7224df6fa52c6af08337f524c1e7ffb1c` |
