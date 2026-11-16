@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `b8d9cfed457471783a37219749949fe2e6830fdf0caee4a0e9be9101cb140dbc`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `373a5536cf51c55dd6652bde537ce9dfb1cc12009943c7096a755a40ec019e43`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 167. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 168. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -175,3 +175,4 @@ Sıralı migration: 167. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261115213357_native_read_recovery.sql](../apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql) | `ee8a4233aa32d3b64f06ea163848f0a0024e3ffc1816ce8ea0be276eb586951c` |
 | [20261116013944_member_time_freeze_cancel.sql](../apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql) | `a90ef5d50129ad2ed2aaac45ccd0aec7224df6fa52c6af08337f524c1e7ffb1c` |
 | [20261116111008_session_waitlist_rights.sql](../apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql) | `4a263ba01bdc512c091d16450d2ff66fd36d83c1c94dbe171bbd4c66ad8b5fc2` |
+| [20261116135202_lesson_request_status_summary.sql](../apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql) | `419f6512c40825581dc0c337f4e3e87be7eea069056b48a65ec0699a31d96239` |

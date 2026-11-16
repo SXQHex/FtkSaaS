@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "2f9340d39ef432466887e3bc98675fac8e0fde641fa269bddb583962d6f76c95",
-        "reason": "Reviewed additive test inventory with unchanged prior/exclusive ownership and migration metadata167. Directory dispatch preserves common auth, subscription and lifecycle gates. No protocol/worker behavior changed. Final canonical UUID paths and migration167 metadata reviewed; all new IDs remain domain UUIDs."
+        "fingerprint": "2389b622fd03ebf739a9604a46df1ef36195540505da75dd91767fe74ed8b032",
+        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "7ecde02061d097f36d7e06521bb7c4c963088ca94cc1f7d0490bc4458dafc464",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "1270e6ea709b0a4febf9d496b55370ad037fcbabac0e6b2bcef28885104fc3a1",
+        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
       }
     },
     {
@@ -724,8 +724,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "be39d75a7fa8e78d4e563ca707d30a7c9163ec204e46cc960d3d71cd57cb786d",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "04686191e8865df39d1631b7e3f4edd5f76ab8c2b2a29e7ac0d489667a82795c",
+        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
       }
     },
     {
@@ -848,8 +848,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "8fade9f41c79dd112890688eeae36d3cdbf66ad8321840f434046f405d823e60",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "f9bfe45620a4538db336eabacc1a9fc78797390baa9bfcf7632b3de5e095c322",
+        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
       }
     },
     {
@@ -875,7 +875,9 @@
         "apps/backend/tests/schedule-reads.test.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/session-roster-discovery-acceptance.mjs",
-        "apps/backend/tests/fixtures/session-roster-discovery.sql"
+        "apps/backend/tests/fixtures/session-roster-discovery.sql",
+        "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
+        "apps/backend/tests/fixtures/lesson-request-status-summary.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -929,7 +931,9 @@
         "apps/backend/database/member-time-filter.sql",
         "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql",
         "apps/backend/database/reservation-source-summary.sql",
-        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql"
+        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql",
+        "apps/backend/database/lesson-request-status-summary.sql",
+        "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -944,8 +948,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "4bb5b766e58e55d94a161e6dc13e6f6b3f47711d476d2b35924d8ec93f4c2c1e",
-        "reason": "Reviewed actual-source summary implementation/schema and final scope tests: terminated native zero, opt-in cursor, proper cross-center session fixture and alias source identity; WF06 guide states exact permission and ledger meaning."
+        "fingerprint": "12fced57d6d28eb43c7ef3ddf95c84e43356071dd001edcf76e868e3e916c3eb",
+        "reason": "Reviewed final empty-scope zeros and native alias authority regression: self alias access remains denied by the existing request command boundary, authorized CM alias scope retains exact counts. Reader code, status scope, guards and WF06 consumer guide unchanged."
       }
     },
     {
@@ -1858,8 +1862,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "c00c62c9284c69ae6738e970dd357e90f4fa90f7a9c7763f0d757c8887345c39",
-        "reason": "Reviewed shared-gate directory, full history indexes, FIFO/status cursor behavior, bounded offers, native acceptance and common lifecycle denial tests; WF19 exact consumer guide updated."
+        "fingerprint": "ea1061078f3ca5d85a7830f55c39875846ff1770bf00067a3288f4647ce2507c",
+        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
       }
     },
     {

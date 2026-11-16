@@ -165,5 +165,6 @@
   "20261115035110_web1_review_lifecycle.sql": "4316f70932f193a89c39e1c419a8df1f487345b691d747affd3e1b164871771e",
   "20261115213357_native_read_recovery.sql": "ee8a4233aa32d3b64f06ea163848f0a0024e3ffc1816ce8ea0be276eb586951c",
   "20261116013944_member_time_freeze_cancel.sql": "a90ef5d50129ad2ed2aaac45ccd0aec7224df6fa52c6af08337f524c1e7ffb1c",
-  "20261116111008_session_waitlist_rights.sql": "4a263ba01bdc512c091d16450d2ff66fd36d83c1c94dbe171bbd4c66ad8b5fc2"
+  "20261116111008_session_waitlist_rights.sql": "4a263ba01bdc512c091d16450d2ff66fd36d83c1c94dbe171bbd4c66ad8b5fc2",
+  "20261116135202_lesson_request_status_summary.sql": "419f6512c40825581dc0c337f4e3e87be7eea069056b48a65ec0699a31d96239"
 }
