@@ -720,6 +720,7 @@ capacity?: (SessionCapacityView | Capacity)
 discipline_id?: (string | null)
 discipline_ids?: EventDisciplineIds
 management_attention?: "instructor_required"
+room_labels?: SessionRoomLabel[]
 }
 /**
  * Zero/one/many org-owned labels. No entitlement or role grant.
@@ -4879,6 +4880,7 @@ ManagementProjection_freeze_cancel_preview_v1?: ManagementProjectionFreezeCancel
 ManagementSelector_freeze_cancel_apply_v1?: ManagementSelectorFreezeCancelApplyV1
 ManagementProjection_freeze_cancel_apply_v1?: ManagementProjectionFreezeCancelApplyV1
 ReservationSourceSummary?: ReservationSourceSummary
+SessionRoomLabel?: SessionRoomLabel
 LessonRequestSummary?: LessonRequestSummary
 }
 /**
@@ -7605,6 +7607,17 @@ room_capacity: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SessionRoomLabel".
+ */
+export interface SessionRoomLabel {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+room_id: string
+name: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SessionView".
  */
 export interface SessionView {
@@ -7630,6 +7643,7 @@ capacity: SessionCapacityView
 shared_participants?: SharedLessonParticipant[]
 management_attention?: "instructor_required"
 work_calendar_exception?: (WorkCalendarExceptionRecord | null)
+room_labels?: SessionRoomLabel[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10333,6 +10347,10 @@ resource?: (ResourceRef | null)
 page: CalendarPage
 interest_filter?: boolean
 needs_instructor?: Bool
+/**
+ * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
+ */
+include_room_labels?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10536,6 +10554,10 @@ center_id?: (string | null)
  */
 session_id: string
 include_work_calendar_exception?: boolean
+/**
+ * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
+ */
+include_room_labels?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

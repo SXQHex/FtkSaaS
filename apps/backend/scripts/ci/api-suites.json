@@ -1233,11 +1233,11 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "3927c1eaa80a0755528ae0d3882f17146dacfb053f6e87c91e34a4941a702574",
+      "sha256": "e0b1bb85249f9ce75abcbfde57e20abbd453eedd65efec41a1d0e6bcb1a3e394",
       "shared": [
         [
-          5,
-          10
+          6,
+          11
         ]
       ],
       "parts": [
@@ -1245,8 +1245,8 @@
           "id": "schedule-reads-root-1",
           "ranges": [
             [
-              11,
-              277
+              12,
+              288
             ]
           ]
         }
@@ -1254,21 +1254,26 @@
       "imports": [
         {
           "line": 1,
+          "path": "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
+          "sha256": "456609315449a5feef2bce5a32df6f735e2a7b6669dd750717dbb8cbd577539d"
+        },
+        {
+          "line": 2,
           "path": "apps/backend/tests/calendar-preferences-acceptance.mjs",
           "sha256": "1edc9cb92239b8313813701cfe48530644c11fe5b9d18cb072deb98f771fb3f6"
         },
         {
-          "line": 2,
+          "line": 3,
           "path": "apps/backend/tests/personal-calendar-acceptance.mjs",
           "sha256": "77acabdd6f9dcb832e779104c4d2f71a5ff24e744474132f5be2f712d66cc800"
         },
         {
-          "line": 3,
+          "line": 4,
           "path": "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
           "sha256": "cc9c4b832cb5e842823bc714dc3dd1d4548daca9f610e2c0255580530e8e944c"
         },
         {
-          "line": 4,
+          "line": 5,
           "path": "apps/backend/tests/session-roster-discovery-acceptance.mjs",
           "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
         }

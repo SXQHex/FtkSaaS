@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "2389b622fd03ebf739a9604a46df1ef36195540505da75dd91767fe74ed8b032",
-        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
+        "fingerprint": "7880939286c9bfe201355b32e14421feba290a93e3a97a189a4da5af0e201e41",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "1270e6ea709b0a4febf9d496b55370ad037fcbabac0e6b2bcef28885104fc3a1",
-        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
+        "fingerprint": "e388adb2c487ec8c39e8b429a4c14b4a8d0dd7052b8532cf8528915a3a7f1524",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -523,7 +523,10 @@
         "apps/backend/tests/native-capacity-recovery-acceptance.mjs",
         "apps/backend/tests/fixtures/native-capacity-recovery.sql",
         "apps/backend/tests/product-class-management-acceptance.mjs",
-        "apps/backend/tests/fixtures/product-class-management-acceptance.sql"
+        "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
+        "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
+        "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
+        "apps/backend/tests/web1-review-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -584,7 +587,9 @@
         "apps/backend/database/settings-sharing-events.sql",
         "apps/backend/database/capacity-recovery.sql",
         "apps/backend/database/session-management-reads.sql",
-        "apps/backend/database/class-student-discovery.sql"
+        "apps/backend/database/class-student-discovery.sql",
+        "apps/backend/database/assigned-session-room-labels.sql",
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -607,8 +612,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "82a5d82f563dade7d6a523cfbbf2f7f2dcfecfb338f228c9f482b0336a2cdf43",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "f084fe700d6ed690f0f2c84fb61958254f5c1ec52a2ca492468c348b019795a0",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -724,8 +729,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "04686191e8865df39d1631b7e3f4edd5f76ab8c2b2a29e7ac0d489667a82795c",
-        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
+        "fingerprint": "429441ae2d429aa6cb66e87534338626aa9c7510a73a63fce2182ca823641906",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -848,8 +853,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "f9bfe45620a4538db336eabacc1a9fc78797390baa9bfcf7632b3de5e095c322",
-        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
+        "fingerprint": "212e6ba7563cf73272fe0b175152e71aeb9428dad085a249fde25bd76e19cd5a",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -948,8 +953,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "12fced57d6d28eb43c7ef3ddf95c84e43356071dd001edcf76e868e3e916c3eb",
-        "reason": "Reviewed final empty-scope zeros and native alias authority regression: self alias access remains denied by the existing request command boundary, authorized CM alias scope retains exact counts. Reader code, status scope, guards and WF06 consumer guide unchanged."
+        "fingerprint": "6a54923a04537a9e2f219daadf3d551a068282f63e3f6a20e217a505d366c0fa",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -963,7 +968,10 @@
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
+        "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
+        "apps/backend/tests/web1-review-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1000,7 +1008,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/database/assigned-session-room-labels.sql",
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
       ],
       "operations": [
         "attendance_get_v1",
@@ -1012,8 +1022,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "33eed92c089e84d9aea0bd6cc4fd1eafc84eeea45052e07d042d2906a8fbe5ee",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "99ce569334c2ee111f38df5e619821aa9f87e5401b91ea4425d78f271656ed65",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -1862,8 +1872,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "ea1061078f3ca5d85a7830f55c39875846ff1770bf00067a3288f4647ce2507c",
-        "reason": "Reviewed additive shared contract/P01 read test and inventory changes for WF06 only; old assertions and ownership/exclusive policy retained. Existing flow behavior and guide remain unchanged."
+        "fingerprint": "bb8a9b4824973a5a2536f8e9e8b2621ac7797115e47fe4fb45c220e3c15ca8ea",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
