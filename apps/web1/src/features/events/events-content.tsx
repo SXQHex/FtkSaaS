@@ -7,7 +7,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { getTemporal } from "../../lib/temporal";
 import { readWorkspace } from "../workspace/workspace";
-import { EventsView, type EventRow } from "./events-view";
+import { EventsView, type EventRow, type EventFilter } from "./events-view";
 import { EventEditor } from "./event-editor";
 import { eventMonth, readEventsPage, readEventRooms } from "./events-read";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -27,7 +27,9 @@ export function EventsContent({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const [month, setMonth] = useState<string>(),
+  const [search, setSearch] = useState(""),
+    [filter, setFilter] = useState<EventFilter>("all"),
+    [month, setMonth] = useState<string>(),
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [pageIndex, setPageIndex] = useState(0),
     [locked, setLocked] = useState(false),
@@ -42,6 +44,18 @@ export function EventsContent({
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
       : undefined;
+  const canReadSummary =
+    !workspace.isError &&
+    Boolean(
+      workspace.data?.roles.some(
+        (role) =>
+          role.state === "active" &&
+          role.person_id === workspace.data?.selected?.self_context?.person_id &&
+          (role.role === "owner" ||
+            role.role === "org_manager" ||
+            (role.role === "center_manager" && role.scope_center_id === scope.centerId)),
+      ),
+    );
   const prefix = ["events", scope.accountId, scope.orgId, scope.centerId];
   const period = useQuery({
     queryKey: ["event-month", center?.timezone, month],
@@ -57,10 +71,21 @@ export function EventsContent({
     refetchOnWindowFocus: false,
   });
   const program = useQuery({
-    queryKey: [...prefix, period.data?.interval, cursors[pageIndex]],
+    queryKey: [
+      ...prefix,
+      period.data?.interval,
+      search.trim(),
+      filter,
+      canReadSummary,
+      cursors[pageIndex],
+    ],
     enabled: !!center && !!period.data,
     queryFn: async () => {
-      const page = await readEventsPage(scope, period.data!.interval, cursors[pageIndex]);
+      const page = await readEventsPage(scope, period.data!.interval, cursors[pageIndex], {
+        query: search,
+        status: filter,
+        includeSummary: canReadSummary,
+      });
       if (page.next_cursor && cursors.includes(page.next_cursor))
         throw new Error("EVENT_PAGE_UNAVAILABLE");
       return page;
@@ -116,7 +141,7 @@ export function EventsContent({
               ? (row.venue.name ?? t(($) => $.events.unknown))
               : (rooms.data?.find((room) => room.id === row.venue.room_id)?.name ??
                 t(($) => $.events.unknown)),
-          registrations: `— / ${"kind" in row.capacity ? t(($) => $.events.unlimited) : row.capacity.maximum.toLocaleString("tr-TR")}`,
+          registrations: `${row.active_registration_count === undefined ? "—" : row.active_registration_count.toLocaleString("tr-TR")} / ${"kind" in row.capacity ? t(($) => $.events.unlimited) : row.capacity.maximum.toLocaleString("tr-TR")}`,
           fee: formatMinorAmount(row.terms.fee_minor, row.terms.currency),
           state: row.state,
         };
@@ -131,16 +156,45 @@ export function EventsContent({
     },
     [onLockChange],
   );
+  const summary = !program.isError ? program.data?.summary : undefined;
   return (
     <>
       <EventsView
         rows={!program.isError && !presentation.isError ? (presentation.data ?? null) : null}
-        query=""
-        onQuery={() => {}}
-        filter="all"
-        onFilter={() => {}}
-        filtersAvailable={false}
-        summary={{ published: null, draft: null, registrations: null, unpaid: null }}
+        query={search}
+        onQuery={(value) => {
+          if (!locked) {
+            setSearch(value);
+            setCursors([undefined]);
+            setPageIndex(0);
+          }
+        }}
+        filter={filter}
+        onFilter={(value) => {
+          if (!locked) {
+            setFilter(value);
+            setCursors([undefined]);
+            setPageIndex(0);
+          }
+        }}
+        filtersAvailable
+        summary={{
+          published: summary?.published.toLocaleString("tr-TR") ?? null,
+          draft: summary?.draft.toLocaleString("tr-TR") ?? null,
+          registrations: summary?.published_active_registrations.toLocaleString("tr-TR") ?? null,
+          unpaid: summary
+            ? summary.pending_payments.length
+              ? summary.pending_payments
+                  .map(
+                    (row) =>
+                      `${formatMinorAmount(row.remaining_minor, row.currency)} · ${t(($) => $.events.pendingCount, { count: row.registration_count })}`,
+                  )
+                  .join(" / ")
+              : summary.unresolved_payment_registrations > 0
+                ? t(($) => $.events.paymentSummaryIncomplete)
+                : t(($) => $.events.noPendingPayments)
+            : null,
+        }}
         locked={locked}
         onAdd={() => {
           if (center && !locked) setSelected(null);
@@ -172,6 +226,16 @@ export function EventsContent({
             <Alert>
               <AlertDescription>{t(($) => $.events.directoryLimit)}</AlertDescription>
             </Alert>
+            {!canReadSummary && <p>{t(($) => $.events.summaryUnavailable)}</p>}
+            {summary && summary.unresolved_payment_registrations > 0 && (
+              <Alert>
+                <AlertDescription>
+                  {t(($) => $.events.unresolvedPayments, {
+                    count: summary.unresolved_payment_registrations,
+                  })}
+                </AlertDescription>
+              </Alert>
+            )}
             {(!center || period.isError || program.isError || presentation.isError) && (
               <Alert variant="destructive">
                 <AlertDescription>{t(($) => $.events.sourceError)}</AlertDescription>

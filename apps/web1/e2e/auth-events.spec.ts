@@ -1,14 +1,16 @@
 import { test, expect } from "./test.js";
 import { mockEvents, openEvent, reviewEvent } from "./events-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
-test("event list uses scoped period and leaves unsupported global summaries and filters unavailable", async ({
+test("event list uses native period, enabled filters and real directory summaries", async ({
   page,
 }) => {
   const state = await mockEvents(page);
   await expect(page.getByRole("row", { name: /Tango atölyesi/ })).toBeVisible();
-  await expect(page.getByRole("searchbox", { name: "Etkinlik ara", exact: true })).toBeDisabled();
-  await expect(page.getByRole("radio", { name: "Yayında", exact: true })).toBeDisabled();
+  await expect(page.getByRole("searchbox", { name: "Etkinlik ara", exact: true })).toBeEnabled();
+  await expect(page.getByRole("radio", { name: "Yayında", exact: true })).toBeEnabled();
   expect(state.reads[0]).toMatchObject({
+    include_summary: true,
+    status: "all",
     interval: { starts_at: "2026-10-31T21:00:00Z", ends_at: "2026-11-30T21:00:00Z" },
   });
   await page.getByLabel("Dönem", { exact: true }).fill("2026-12");
@@ -136,4 +138,66 @@ test("new package practice draft uses an external unlimited venue and never cons
     discipline_ids: [],
   });
   expect(state.effects).toBe(1);
+});
+
+test("event directory uses server filters and independent summaries while resetting every cursor", async ({
+  page,
+}) => {
+  const state = await mockEvents(page, "directory");
+  await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toBeVisible();
+  const metric = (label: string) =>
+    page
+      .locator('[data-slot="card"]')
+      .filter({ has: page.locator('[data-slot="card-description"]', { hasText: label }) })
+      .first()
+      .locator('[data-slot="card-title"]');
+  await expect(metric("Yayında")).toHaveText("11");
+  await expect(metric("Taslak")).toHaveText("10");
+  await expect(metric("Kayıtlı üye")).toHaveText("22");
+  await expect(metric("Bekleyen ödeme")).toContainText("900,00");
+  await expect(metric("Bekleyen ödeme")).toContainText("200,00");
+  await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toContainText("2 / 16");
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(page.getByRole("row", { name: /Tango 20 Atölye/ })).toBeVisible();
+  expect(state.reads.at(-1)!.page).toMatchObject({ cursor: "directory-next" });
+  await expect(metric("Yayında")).toHaveText("11");
+  await page.getByRole("radio", { name: "Yayında", exact: true }).click();
+  await expect.poll(() => state.reads.at(-1)!.status).toBe("published");
+  expect(state.reads.at(-1)!.page).not.toHaveProperty("cursor");
+  await expect(metric("Taslak")).toHaveText("10");
+  await page.getByRole("searchbox", { name: "Etkinlik ara", exact: true }).fill(" Tango 20 ");
+  await expect.poll(() => state.reads.at(-1)!.query).toBe("Tango 20");
+  await expect(page.getByRole("row", { name: /Tango 20 Atölye/ })).toBeVisible();
+  expect(state.reads.at(-1)!.page).not.toHaveProperty("cursor");
+  await page.getByRole("searchbox", { name: "Etkinlik ara", exact: true }).fill("   ");
+  await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toBeVisible();
+  await expect(page.getByRole("searchbox", { name: "Etkinlik ara", exact: true })).toHaveValue(
+    "   ",
+  );
+  expect(state.reads.filter((r) => r.query === undefined).at(-1)!).toMatchObject({
+    status: "published",
+  });
+  expect(state.writes).toHaveLength(0);
+});
+test("event directory never presents missing payment sources as zero debt", async ({ page }) => {
+  await mockEvents(page, "directory", { missingPayments: true });
+  await expect(page.getByText("Ödeme kaynağı eksik", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("1 kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Bekleyen borç yok", { exact: true })).toHaveCount(0);
+});
+test("limited event reader retains native filters without requesting manager summaries", async ({
+  page,
+}) => {
+  const state = await mockEvents(page, "directory", { limited: true });
+  await expect(
+    page.getByText("Merkez özeti bu yetki kapsamında okunamıyor.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toBeVisible();
+  expect(state.reads[0]).not.toHaveProperty("include_summary");
+  await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toContainText("— / 16");
+  await page.getByRole("radio", { name: "Yayında", exact: true }).click();
+  await expect.poll(() => state.reads.at(-1)!.status).toBe("published");
+  expect(state.reads.at(-1)!).not.toHaveProperty("include_summary");
 });

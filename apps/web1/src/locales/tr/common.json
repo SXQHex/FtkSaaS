@@ -3411,7 +3411,7 @@
     },
     "month": "Dönem",
     "reload": "Listeyi yeniden oku",
-    "directoryLimit": "Arama, durum filtreleri ve merkez özetleri henüz kullanılamıyor. Kayıt sayısı paylaşılmadığında kapasite sınırı toplam kayıt sayılmaz.",
+    "directoryLimit": "Özetler seçili dönem ve arama kapsamında, durum filtresinden bağımsızdır. Bekleyen ödeme yalnız yayındaki etkinlik kayıtlarının bağlı kalan borcudur; kesinleşmemiş ödeme hazırlıkları dahil değildir.",
     "sourceError": "Etkinlik kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
     "catalogError": "Bazı seçim kaynakları okunamadı. Yalnız izinli ve okunabilen seçenekler kullanılabilir.",
     "unknown": "Bilgi paylaşılmıyor",
@@ -3434,7 +3434,12 @@
       "saved": "İşlem kaydedildi; güncel kayıt okundu.",
       "stale": "Kaynak sürümü değişti. Güncel kaydı oku, şartları yeniden incele.",
       "rejected": "İşlem reddedildi. Güncel kaynağı oku ve koşulları kontrol et."
-    }
+    },
+    "noPendingPayments": "Bekleyen borç yok",
+    "pendingCount": "{{count}} kayıt",
+    "summaryUnavailable": "Merkez özeti bu yetki kapsamında okunamıyor.",
+    "unresolvedPayments": "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı.",
+    "paymentSummaryIncomplete": "Ödeme kaynağı eksik"
   },
   "eventDetail": {
     "sections": "Etkinlik bölümleri",

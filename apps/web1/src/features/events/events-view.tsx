@@ -81,10 +81,12 @@ export function EventsView({
       </header>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {(["published", "draft", "registrations", "unpaid"] as const).map((key) => (
-          <Card key={key}>
+          <Card key={key} className="min-w-0">
             <CardHeader>
               <CardDescription>{t(($) => $.events.metrics[key])}</CardDescription>
-              <CardTitle className="text-2xl tabular-nums">{summary[key] ?? "—"}</CardTitle>
+              <CardTitle className="text-2xl tabular-nums wrap-anywhere">
+                {summary[key] ?? "—"}
+              </CardTitle>
               <CardDescription>{t(($) => $.events.metricHints[key])}</CardDescription>
             </CardHeader>
           </Card>

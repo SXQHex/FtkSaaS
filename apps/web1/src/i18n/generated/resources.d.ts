@@ -579,7 +579,7 @@ export default interface Resources {
         "writing": "İşlem kaydediliyor…"
       },
       "description": "Atölyeler ve paketli Pratik geceleri. Etkinlik kontenjanı ders kontenjanından ayrıdır.",
-      "directoryLimit": "Arama, durum filtreleri ve merkez özetleri henüz kullanılamıyor. Kayıt sayısı paylaşılmadığında kapasite sınırı toplam kayıt sayılmaz.",
+      "directoryLimit": "Özetler seçili dönem ve arama kapsamında, durum filtresinden bağımsızdır. Bekleyen ödeme yalnız yayındaki etkinlik kayıtlarının bağlı kalan borcudur; kesinleşmemiş ödeme hazırlıkları dahil değildir.",
       "editor": {
         "address": "Adres",
         "after": "Sınırdan sonra",
@@ -660,7 +660,10 @@ export default interface Resources {
       },
       "month": "Dönem",
       "moreProducts": "Daha fazla ürün göster",
+      "noPendingPayments": "Bekleyen borç yok",
       "notEditable": "Bu etkinliğin durumu veya kapanmış yoklaması taslak düzenlemeye izin vermiyor.",
+      "paymentSummaryIncomplete": "Ödeme kaynağı eksik",
+      "pendingCount": "{{count}} kayıt",
       "practiceHint": "Paketli Pratik ücretsizdir; yalnızca izinli ürünü olan üye kayıt olur ve ders hakkı değişmez.",
       "refunds": {
         "credit_ratio": "Kullanılmayan hak oranı",
@@ -672,12 +675,14 @@ export default interface Resources {
       "search": "Etkinlik ara",
       "sourceError": "Etkinlik kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
       "status": "Durum",
+      "summaryUnavailable": "Merkez özeti bu yetki kapsamında okunamıyor.",
       "timeAmbiguous": "Bu yerel saat iki kez yaşanıyor. İlgili UTC farkını seç.",
       "timeGap": "Seçilen saat bu saat diliminde yaşanmıyor. Başka bir saat seç.",
       "title": "Etkinlikler",
       "unknown": "Bilgi paylaşılmıyor",
       "unlimited": "Sınırsız",
-      "unread": "Etkinlik listesi henüz okunamadı."
+      "unread": "Etkinlik listesi henüz okunamadı.",
+      "unresolvedPayments": "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı."
     },
     "finance": {
       "accepted": "Etkiyi okudum",

@@ -56,12 +56,24 @@ export const event: EventView = {
 };
 export async function mockEvents(
   page: Page,
-  mode: "normal" | "unknown" | "result" | "denied" | "empty" = "normal",
+  mode: "normal" | "unknown" | "result" | "denied" | "empty" | "directory" = "normal",
+  options: { limited?: boolean; missingPayments?: boolean } = {},
 ) {
   await mockStudio(page);
   await page.clock.install({ time: new Date("2026-11-16T12:00:00Z") });
   const state = {
-    events: mode === "empty" ? [] : [structuredClone(event)],
+    events:
+      mode === "empty"
+        ? []
+        : mode === "directory"
+          ? Array.from({ length: 21 }, (_, i) => ({
+              ...structuredClone(event),
+              id: `019ab7b0-0000-7000-8000-${String(200 + i).padStart(12, "0")}`,
+              name: `Tango ${i}`,
+              state: i % 2 === 0 ? ("published" as const) : ("draft" as const),
+              active_registration_count: i % 2 === 0 ? 2 : 0,
+            }))
+          : [structuredClone(event)],
     writes: [] as RequestEventSave[],
     reads: [] as Record<string, unknown>[],
     effects: 0,
@@ -93,16 +105,53 @@ export async function mockEvents(
           json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
         });
       expect(r.page).toMatchObject({ limit: 20, sort: "starts_at_asc" });
+      const scoped = state.events.filter(
+        (e) =>
+          Date.parse(e.interval.starts_at) < Date.parse(r.interval.ends_at) &&
+          Date.parse(e.interval.ends_at) > Date.parse(r.interval.starts_at) &&
+          (!r.query ||
+            e.name.toLocaleLowerCase("tr").includes(String(r.query).toLocaleLowerCase("tr"))) &&
+          (!options.limited || e.state === "published"),
+      );
+      const filtered = scoped.filter(
+        (e) => !r.status || r.status === "all" || e.state === r.status,
+      );
+      const offset = r.page.cursor ? 20 : 0;
       return send({
-        items: state.events.filter(
-          (e) =>
-            Date.parse(e.interval.starts_at) < Date.parse(r.interval.ends_at) &&
-            Date.parse(e.interval.ends_at) > Date.parse(r.interval.starts_at),
-        ),
+        items: filtered.slice(offset, offset + 20).map((e) => {
+          const projected = { ...e };
+          if (r.include_summary)
+            projected.active_registration_count = e.active_registration_count ?? 0;
+          else delete projected.active_registration_count;
+          return projected;
+        }),
         as_of: "2026-11-16T12:00:00Z",
-        next_cursor: null,
+        next_cursor: filtered.length > offset + 20 ? "directory-next" : null,
+        ...(r.include_summary
+          ? {
+              summary: {
+                published: scoped.filter((e) => e.state === "published").length,
+                draft: scoped.filter((e) => e.state === "draft").length,
+                occurred: scoped.filter((e) => e.state === "occurred").length,
+                cancelled: scoped.filter((e) => e.state === "cancelled").length,
+                published_active_registrations: scoped
+                  .filter((e) => e.state === "published")
+                  .reduce((n, e) => n + (e.active_registration_count ?? 0), 0),
+                unresolved_payment_registrations: options.missingPayments ? 1 : 0,
+                pending_payments:
+                  options.missingPayments || !scoped.some((e) => e.state === "published")
+                    ? []
+                    : [
+                        { currency: "TRY", remaining_minor: "90000", registration_count: 2 },
+                        { currency: "USD", remaining_minor: "20000", registration_count: 1 },
+                      ],
+              },
+            }
+          : {}),
       });
     }
+    if (op === "roles_list_v1" && options.limited)
+      return send({ items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
     if (op === "event_get_v1") {
       if (state.failResult > 0) {
         state.failResult--;

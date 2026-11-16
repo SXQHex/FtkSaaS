@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import type { EventView, Interval } from "../../lib/api-contracts/generated";
+import type { EventView, EventState, Interval } from "../../lib/api-contracts/generated";
 import { getTemporal } from "../../lib/temporal";
 import { studioPages } from "../studio/studio";
 import { readStudioInstructors } from "../studio/studio-reads";
@@ -93,12 +93,31 @@ export async function eventMonth(
     interval: { starts_at: start.toInstant().toString(), ends_at: end.toInstant().toString() },
   };
 }
-export async function readEventsPage(scope: ClientScope, interval: Interval, cursor?: string) {
+const directorySummary = z.object({
+  published: count,
+  draft: count,
+  occurred: count,
+  cancelled: count,
+  published_active_registrations: count,
+  unresolved_payment_registrations: count,
+  pending_payments: z.array(
+    z.object({ currency, remaining_minor: money, registration_count: count }),
+  ),
+});
+export async function readEventsPage(
+  scope: ClientScope,
+  interval: Interval,
+  cursor?: string,
+  filters: { query?: string; status?: "all" | EventState; includeSummary?: boolean } = {},
+) {
   const backend = await scopedBackend(scope);
   const page = await backend.call("event_list_v1", {
     ...common(scope),
     request_id: uuidv7(),
     interval,
+    ...(filters.query?.trim() ? { query: filters.query.trim() } : {}),
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.includeSummary ? { include_summary: true } : {}),
     page: { limit: 20, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
   });
   if (
@@ -107,6 +126,15 @@ export async function readEventsPage(scope: ClientScope, interval: Interval, cur
     new Set(page.items.map((row) => row.id)).size !== page.items.length
   )
     throw new Error("EVENT_PAGE_UNAVAILABLE");
+  if (filters.includeSummary) {
+    directorySummary.parse(page.summary);
+    if (
+      new Set(page.summary!.pending_payments.map((row) => row.currency)).size !==
+      page.summary!.pending_payments.length
+    )
+      throw new Error("EVENT_SUMMARY_UNAVAILABLE");
+    for (const row of page.items) count.parse(row.active_registration_count);
+  }
   const items = await Promise.all(page.items.map((row) => validateEvent(row, scope)));
   return { ...page, items };
 }
