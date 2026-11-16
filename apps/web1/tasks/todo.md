@@ -13,9 +13,9 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan | Sayfa/işlev         | Durum                               | Son doğrulama veya engel | Sonraki eylem                                                           |
-| ---------- | ---- | ------------------- | ----------------------------------- | ------------------------ | ----------------------------------------------------------------------- |
-| E21        | Pro  | Özel ders talepleri | Toplam19/46; E14 yerel teslim tamam | Açık backend talebi yok  | Hazır bileşen kompozisyonu → çizim karşılaştırması → native bağlantılar |
+| Aktif adım | Plan | Sayfa/işlev         | Durum                                      | Son doğrulama veya engel                 | Sonraki eylem                                        |
+| ---------- | ---- | ------------------- | ------------------------------------------ | ---------------------------------------- | ---------------------------------------------------- |
+| E21        | Pro  | Özel ders talepleri | Toplam19/46; hazır kompozisyon oluşturuldu | W1-BE-17: native durum filtresi/sayaçlar | Çizim karşılaştırması → mevcut native liste/eylemler |
 
 Git devamı: `feat/web1-account-acceptance`, güncel base main SHA `1df2e01c40fd625b0def974fe3347da65032fcfd` (PR315 dala ve yerel typed snapshot’a alındı; aynı main kaynak kanıtları ve development teslimi başarılı; backend talep durumu request.md sahibinde); kullanıcı yetkisiyle [PR307](https://github.com/SXQHex/FtkSaaS/pull/307) birleşti. Aday `0474891a71b7d17e26f4a48d688581eea1b6c701`/base `16af2e0180f1d0103c0eeb70e8d0cefbd6ad38f0` için [CI43562989451](https://github.com/SXQHex/FtkSaaS/actions/runs/43562989451) ve [merge doğrulaması43563030649](https://github.com/SXQHex/FtkSaaS/actions/runs/43563030649) başarılı; test edilen kaynak ağacı ile gerçek main ağacı `71e36853b9c2e93a7f3a815e972c0087fade6abf` birebir eşittir. Aynı main SHA’nın [Main proof43563101974](https://github.com/SXQHex/FtkSaaS/actions/runs/43563101974) ve [Merge proof43563101986](https://github.com/SXQHex/FtkSaaS/actions/runs/43563101986) sonuçları başarıdır. Deneysel web1 değişiminde backend full clean/CD gerekmemiştir; gerçek frontend build/browser kabulü E09 kaydındadır. Yeni resmî Modern Web Guidance becerisi her istemci değişikliğinde etkin kullanılır. PR306 daha önce birleşmiştir; tamamlanmış ekranlar tekrar uygulanmaz.
 
@@ -561,9 +561,9 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
   **Önceki gerçek kanıt ve tekrar yazmama:** `.tmp/e20-owned-partial-collection-result.json`, `.tmp/e20-owned-timed-close-recovery-result.json`, `.tmp/e20-owned-allocated-correction-result.json`, `.tmp/e20-owned-offset-result.json`, `.tmp/e20-owned-credit-refund-result.json` ve `.tmp/e20-owned-debt-adjust-audit-result.json` korunur. `.tmp/e20-owned-*-private.json` ACK/key/kaynak kayıtlarıdır; bu writer’ları tekrar çalıştırma. Ayrıntılı eski kaynak/inceleme kanıtı Git geçmişindedir.
 
 - [ ] **E21** · **Özel ders talepleri** — çizim `data-view="talepler"` · İşlev P06.5 · Route `/o/$orgId/c/$centerId/requests` · Rol/kapsam: Talep çözümleme izinli · Hazır kaynak: Tabs, Card, Badge, Sheet, DatePicker, Dialog · Bağ: Özel ders onay/ret/alternatif.
-  - [ ] **E21.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
-  - [ ] **E21.2** · Yukarıda eşlenen hazır kaynakları mevcut proje envanteriyle karşılaştır. Eksik olanın resmi registry/CLI kaynağını, sürümünü ve React Aria/Rhea uyumunu doğrula; kurulu bileşeni yeniden üretme. K02/K03 varsa seçim ölçütünü uygula.
-  - [ ] **E21.3** · Seçilen hazır kaynaklarla sayfanın görsel kompozisyonunu oluştur. Metin, tema, ikon ve yerleşimi çizime göre uygula. Elle UI bileşeni yazma.
+  - [x] **E21.1** · Bu taramadaki sayfa satırını esas al; yalnız aktif çizim bölümü ve ilgili WF/işlem sözleşmesini aç. Kaynak değişmişse etkilenen eşlemeyi güncelle, ürün geneli taramayı tekrarlama.
+  - [x] **E21.2** · Yukarıda eşlenen hazır kaynakları mevcut proje envanteriyle karşılaştır. Eksik olanın resmi registry/CLI kaynağını, sürümünü ve React Aria/Rhea uyumunu doğrula; kurulu bileşeni yeniden üretme. K02/K03 varsa seçim ölçütünü uygula.
+  - [x] **E21.3** · Seçilen hazır kaynaklarla sayfanın görsel kompozisyonunu oluştur. Metin, tema, ikon ve yerleşimi çizime göre uygula. Elle UI bileşeni yazma.
   - [ ] **E21.4** · Aynı viewport, tema ve durumdaki çizimle tarayıcı karşılaştırması yap. Açıklanmamış görsel farkları düzelt, karşılaştırma sonucunu kaydet.
   - [ ] **E21.5** · Sayfanın gerçek işlevlerini ilgili P alt maddelerine göre tek tek bağla. Her işlemde yetkili okuma → kullanıcı eylemi → sonucu yeniden okuma yolunu tamamla. Birden çok işlemde ayrı alt kutular kullan.
   - [ ] **E21.6** · Bağlanan işlemler için ilgili başarı/ret/hata-kurtarma senaryosunu ve klavye/mobil davranışını doğrula. Gerçek ortam gerektiren açık kontrolleri kendi işlev maddesine bağla.

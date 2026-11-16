@@ -579,6 +579,74 @@ export default interface Resources {
       "unknown": "Kabul sonucu henüz doğrulanamadı. Yeni bir işlem başlatmadan durumu kontrol et.",
       "verify": "Daveti kabul etmek için e-posta adresini doğrula."
     },
+    "lessonRequests": {
+      "alternative": "Alternatif öner",
+      "approve": "Onayla",
+      "approveNote": "Canlı takvim, hak, belge ve politika koşulları onay sırasında yeniden denetlenir. Ret halinde kesin rezervasyon oluşmaz.",
+      "approveReview": "Seansı ve onay yolunu kontrol ettim. Kesin rezervasyon oluşturulmasını onaylıyorum.",
+      "back": "Geri",
+      "choose": "Seç…",
+      "close": "Kapat",
+      "createSession": "Yeni özel ders seansı oluştur",
+      "created": "Talep",
+      "description": "Üyelerin istediği saatler. Talep, onaylanana kadar kesin rezervasyon değildir.",
+      "detailTitle": "{{name}} özel ders talebi",
+      "eligibility": "Uygunluk",
+      "empty": "Bu filtrede görünür talep yok.",
+      "existingSession": "Mevcut uygun seansı kullan",
+      "fields": {
+        "capacity": "Kontenjan",
+        "day": "Gün",
+        "mode": "Onay yolu",
+        "roomId": "Salon",
+        "sessionId": "Mevcut özel ders seansı",
+        "time": "Başlangıç"
+      },
+      "filter": "Durum",
+      "filters": {
+        "all": "Tümü",
+        "alternative_offered": "Alternatif önerildi",
+        "pending": "Bekleyen",
+        "resolved": "Sonuçlanan"
+      },
+      "instructor": "Eğitmen",
+      "intentNote": "Talep ve alternatif yanıtı yer veya hak tutmaz. Kesin rezervasyon merkez onayıyla oluşur.",
+      "metricHints": {
+        "alternative_offered": "üyenin yanıtı bekleniyor",
+        "approved": "seans oluşturuldu",
+        "pending": "karar bekliyor",
+        "rejected": "gerekçeyle bildirildi"
+      },
+      "noteUnavailable": "Not bilgisi bu kaynakta paylaşılmıyor.",
+      "openHint": "Satırı açarak talebi incele.",
+      "optionalNote": "Not (isteğe bağlı)",
+      "person": "Üye",
+      "reject": "Reddet",
+      "rejectHint": "Zorunlu; işlemle birlikte kaydedilir.",
+      "rejectReason": "Ret gerekçesi",
+      "requested": "İstenen zaman",
+      "stageTitles": {
+        "alternative": "Alternatif öner",
+        "approve": "Talebi onayla",
+        "reject": "Talebi reddet"
+      },
+      "state": "Durum",
+      "states": {
+        "alternative_offered": "Alternatif önerildi",
+        "approved": "Onaylanan",
+        "expired": "Süresi dolan",
+        "pending": "Bekleyen",
+        "rejected": "Reddedilen",
+        "withdrawn": "Geri çekilen"
+      },
+      "submit": {
+        "alternative": "Alternatifi gönder",
+        "approve": "Onayla ve rezervasyon oluştur",
+        "reject": "Reddi gönder"
+      },
+      "title": "Özel ders talepleri",
+      "unread": "Güncel yetkili kaynak okunamadı."
+    },
     "memberProfile": {
       "accepted": "Etkiyi okudum",
       "actions": {

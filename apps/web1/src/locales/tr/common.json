@@ -2549,5 +2549,73 @@
     "sourceSale": "Kaynak satış",
     "salesHint": "Dönemde kaydedilen satışların net bedeli. Nakit tahsilat değildir.",
     "collectionsHint": "Dönem tahsilatları ve bağlı giriş/çıkış düzeltmeleri. Nakit iadeler ayrı hareketlerdir."
+  },
+  "lessonRequests": {
+    "title": "Özel ders talepleri",
+    "description": "Üyelerin istediği saatler. Talep, onaylanana kadar kesin rezervasyon değildir.",
+    "filter": "Durum",
+    "filters": {
+      "pending": "Bekleyen",
+      "alternative_offered": "Alternatif önerildi",
+      "resolved": "Sonuçlanan",
+      "all": "Tümü"
+    },
+    "states": {
+      "pending": "Bekleyen",
+      "alternative_offered": "Alternatif önerildi",
+      "approved": "Onaylanan",
+      "rejected": "Reddedilen",
+      "withdrawn": "Geri çekilen",
+      "expired": "Süresi dolan"
+    },
+    "metricHints": {
+      "pending": "karar bekliyor",
+      "alternative_offered": "üyenin yanıtı bekleniyor",
+      "approved": "seans oluşturuldu",
+      "rejected": "gerekçeyle bildirildi"
+    },
+    "person": "Üye",
+    "requested": "İstenen zaman",
+    "instructor": "Eğitmen",
+    "created": "Talep",
+    "state": "Durum",
+    "unread": "Güncel yetkili kaynak okunamadı.",
+    "empty": "Bu filtrede görünür talep yok.",
+    "openHint": "Satırı açarak talebi incele.",
+    "detailTitle": "{{name}} özel ders talebi",
+    "close": "Kapat",
+    "back": "Geri",
+    "choose": "Seç…",
+    "stageTitles": {
+      "reject": "Talebi reddet",
+      "alternative": "Alternatif öner",
+      "approve": "Talebi onayla"
+    },
+    "intentNote": "Talep ve alternatif yanıtı yer veya hak tutmaz. Kesin rezervasyon merkez onayıyla oluşur.",
+    "noteUnavailable": "Not bilgisi bu kaynakta paylaşılmıyor.",
+    "eligibility": "Uygunluk",
+    "rejectReason": "Ret gerekçesi",
+    "rejectHint": "Zorunlu; işlemle birlikte kaydedilir.",
+    "fields": {
+      "day": "Gün",
+      "time": "Başlangıç",
+      "mode": "Onay yolu",
+      "sessionId": "Mevcut özel ders seansı",
+      "roomId": "Salon",
+      "capacity": "Kontenjan"
+    },
+    "existingSession": "Mevcut uygun seansı kullan",
+    "createSession": "Yeni özel ders seansı oluştur",
+    "approveNote": "Canlı takvim, hak, belge ve politika koşulları onay sırasında yeniden denetlenir. Ret halinde kesin rezervasyon oluşmaz.",
+    "approveReview": "Seansı ve onay yolunu kontrol ettim. Kesin rezervasyon oluşturulmasını onaylıyorum.",
+    "reject": "Reddet",
+    "alternative": "Alternatif öner",
+    "approve": "Onayla",
+    "submit": {
+      "reject": "Reddi gönder",
+      "alternative": "Alternatifi gönder",
+      "approve": "Onayla ve rezervasyon oluştur"
+    },
+    "optionalNote": "Not (isteğe bağlı)"
   }
 }
