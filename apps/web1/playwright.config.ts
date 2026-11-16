@@ -7,7 +7,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: true,
   retries: 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: 2,
   outputDir: "./test-results",
   reporter: [
     ["list"],

@@ -1,4 +1,5 @@
 import { test as base, expect } from "@playwright/test";
+import { verifyResponsiveLayout } from "./layout.js";
 import { scanAccessibility } from "./accessibility.js";
 
 // Every product flow receives the same final-state scan in addition to its state-specific scans.
@@ -11,6 +12,7 @@ export const test = base.extend<{ wcag22AA: true }>({
         await expect(page.locator("main")).toBeVisible();
         await expect(page.locator("main h1")).toBeVisible();
         expect((await scanAccessibility(page, "flow-final-state")).violations).toEqual([]);
+        await verifyResponsiveLayout(page);
       }
     },
     { auto: true },
