@@ -58,6 +58,7 @@ export function AutomationView({
   locked = false,
   notice,
   pagination,
+  jobsPlaceholder,
 }: {
   tab: AutomationTab;
   onTab: (value: AutomationTab) => void;
@@ -73,6 +74,7 @@ export function AutomationView({
   locked?: boolean;
   notice?: ReactNode;
   pagination?: ReactNode;
+  jobsPlaceholder?: ReactNode;
 }) {
   const { t } = useTranslation();
   const unknown = t(($) => $.automation.unknown),
@@ -260,7 +262,7 @@ export function AutomationView({
             </CardHeader>
             <CardContent>
               {jobs === null ? (
-                <p>{t(($) => $.automation.loading)}</p>
+                (jobsPlaceholder ?? <p>{t(($) => $.automation.loading)}</p>)
               ) : (
                 <div
                   role="region"

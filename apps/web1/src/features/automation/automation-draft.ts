@@ -2,7 +2,7 @@ export interface AutomationDraft {
   name: string;
   segmentId: string;
   trigger: string;
-  action: "" | "email" | "task" | "inbox";
+  action: "" | "email" | "task" | "inbox" | "followup";
   template: string;
   assignee: string;
   text: string;

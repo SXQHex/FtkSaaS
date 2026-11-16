@@ -43,6 +43,10 @@ export function AutomationSheet({
   reviewed,
   onReviewed,
   locked = false,
+  readOnly = false,
+  nativeMode = false,
+  preparationPicker,
+  workAlert = false,
 }: {
   draft: AutomationDraft;
   onDraft: (draft: AutomationDraft) => void;
@@ -63,6 +67,10 @@ export function AutomationSheet({
   reviewed: boolean;
   onReviewed: (value: boolean) => void;
   locked?: boolean;
+  readOnly?: boolean;
+  nativeMode?: boolean;
+  workAlert?: boolean;
+  preparationPicker?: ReactNode;
 }) {
   const { t } = useTranslation(),
     formId = useId(),
@@ -112,7 +120,7 @@ export function AutomationSheet({
               required
               autoComplete="off"
               autoFocus
-              disabled={locked}
+              disabled={locked || readOnly}
               onChange={(event) => set("name", event.target.value)}
               aria-invalid={!!nameError}
               aria-describedby={nameError ? "automation-name-error" : undefined}
@@ -122,6 +130,7 @@ export function AutomationSheet({
               errors={nameError ? [{ message: nameError }] : []}
             />
           </Field>
+          {preparationPicker}
           <Field>
             <FieldLabel htmlFor="automation-segment">
               {t(($) => $.automation.columns.segment)}
@@ -130,10 +139,15 @@ export function AutomationSheet({
               id="automation-segment"
               name="segment_id"
               value={draft.segmentId}
-              disabled={locked}
+              disabled={locked || readOnly}
               onChange={(event) => set("segmentId", event.target.value)}
             >
               <NativeSelectOption value="">{t(($) => $.automation.choose)}</NativeSelectOption>
+              {nativeMode && (
+                <NativeSelectOption value="__none__">
+                  {t(($) => $.automation.noSegment)}
+                </NativeSelectOption>
+              )}
               {segments.map((row) => (
                 <NativeSelectOption key={row.id} value={row.id} disabled={row.disabled}>
                   {row.name}
@@ -149,7 +163,7 @@ export function AutomationSheet({
               id="automation-trigger"
               name="trigger"
               value={draft.trigger}
-              disabled={locked}
+              disabled={locked || readOnly}
               onChange={(event) => set("trigger", event.target.value)}
             >
               <NativeSelectOption value="">{t(($) => $.automation.choose)}</NativeSelectOption>
@@ -160,6 +174,26 @@ export function AutomationSheet({
               ))}
             </NativeSelect>
           </Field>
+          {nativeMode && (
+            <Field>
+              <FieldLabel htmlFor="automation-offset">
+                {t(($) => $.automation.offsetDays)}
+              </FieldLabel>
+              <Input
+                id="automation-offset"
+                name="offset_days"
+                value={draft.offsetDays}
+                inputMode="numeric"
+                disabled={locked || readOnly || workAlert}
+                onChange={(event) => set("offsetDays", event.target.value)}
+              />
+              <FieldDescription>
+                {t(($) =>
+                  workAlert ? $.automation.workAlertTiming : $.automation.nativeTriggerHint,
+                )}
+              </FieldDescription>
+            </Field>
+          )}
           <Field>
             <FieldLabel htmlFor="automation-action">
               {t(($) => $.automation.columns.action)}
@@ -168,19 +202,30 @@ export function AutomationSheet({
               id="automation-action"
               name="action"
               value={draft.action}
-              disabled={locked}
+              disabled={locked || readOnly}
               onChange={(event) => {
                 const value = event.target.value;
-                if (value === "email" || value === "task" || value === "inbox" || value === "")
+                if (
+                  value === "email" ||
+                  value === "task" ||
+                  value === "inbox" ||
+                  value === "followup" ||
+                  value === ""
+                )
                   set("action", value);
               }}
             >
               <NativeSelectOption value="">{t(($) => $.automation.choose)}</NativeSelectOption>
               {(["email", "task", "inbox"] as const).map((key) => (
-                <NativeSelectOption key={key} value={key}>
+                <NativeSelectOption key={key} value={key} disabled={nativeMode && key !== "inbox"}>
                   {t(($) => $.automation.actions[key])}
                 </NativeSelectOption>
               ))}
+              {nativeMode && (
+                <NativeSelectOption value="followup" disabled={workAlert}>
+                  {t(($) => $.automation.followup)}
+                </NativeSelectOption>
+              )}
             </NativeSelect>
           </Field>
           {draft.action === "email" && (
@@ -192,7 +237,7 @@ export function AutomationSheet({
                 id="automation-template"
                 name="template_key"
                 value={draft.template}
-                disabled={locked || !templates.length}
+                disabled={locked || readOnly || !templates.length}
                 onChange={(event) => set("template", event.target.value)}
               >
                 <NativeSelectOption value="">{t(($) => $.automation.choose)}</NativeSelectOption>
@@ -214,7 +259,7 @@ export function AutomationSheet({
                 id="automation-assignee"
                 name="assignee_id"
                 value={draft.assignee}
-                disabled={locked || !assignees.length}
+                disabled={locked || readOnly || !assignees.length}
                 onChange={(event) => set("assignee", event.target.value)}
               >
                 <NativeSelectOption value="">{t(($) => $.automation.choose)}</NativeSelectOption>
@@ -226,10 +271,12 @@ export function AutomationSheet({
               </NativeSelect>
             </Field>
           )}
-          {(draft.action === "task" || draft.action === "inbox") && (
+          {(draft.action === "task" ||
+            draft.action === "followup" ||
+            (draft.action === "inbox" && !nativeMode)) && (
             <Field>
               <FieldLabel htmlFor="automation-text">
-                {draft.action === "task"
+                {draft.action === "task" || draft.action === "followup"
                   ? t(($) => $.automation.taskText)
                   : t(($) => $.automation.alertTitle)}
               </FieldLabel>
@@ -237,7 +284,7 @@ export function AutomationSheet({
                 id="automation-text"
                 name="text"
                 value={draft.text}
-                disabled={locked}
+                disabled={locked || readOnly}
                 autoComplete="off"
                 onChange={(event) => set("text", event.target.value)}
               />
@@ -252,7 +299,7 @@ export function AutomationSheet({
                     <Checkbox
                       id={`automation-recipient-${row.id}`}
                       isSelected={draft.recipients.includes(row.id)}
-                      isDisabled={locked || row.disabled}
+                      isDisabled={locked || readOnly || row.disabled}
                       onChange={(selected) =>
                         set(
                           "recipients",
@@ -276,7 +323,7 @@ export function AutomationSheet({
               aria-label={t(($) => $.automation.columns.enabled)}
               id="automation-enabled"
               isSelected={draft.enabled}
-              isDisabled={locked}
+              isDisabled={locked || readOnly}
               onChange={(value) => set("enabled", value)}
             />
           </Field>
@@ -289,7 +336,7 @@ export function AutomationSheet({
             <Checkbox
               id="automation-reviewed"
               isSelected={reviewed}
-              isDisabled={locked}
+              isDisabled={locked || readOnly}
               onChange={onReviewed}
             />
             <FieldLabel htmlFor="automation-reviewed">{t(($) => $.automation.review)}</FieldLabel>
@@ -306,7 +353,7 @@ export function AutomationSheet({
           <Button
             variant="ghost"
             type="button"
-            isDisabled={locked || !canDelete}
+            isDisabled={locked || readOnly || !canDelete}
             onPress={onDelete}
           >
             {t(($) => $.automation.deleteAutomation)}
@@ -315,7 +362,7 @@ export function AutomationSheet({
         <Button variant="outline" type="button" isDisabled={locked} onPress={onClose}>
           {t(($) => $.automation.cancel)}
         </Button>
-        <Button type="submit" form={formId} isDisabled={locked}>
+        <Button type="submit" form={formId} isDisabled={locked || readOnly}>
           {t(($) => $.automation.save)}
         </Button>
       </SheetFooter>

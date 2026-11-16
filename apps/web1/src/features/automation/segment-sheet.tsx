@@ -35,6 +35,7 @@ export function SegmentSheet({
   canDelete = false,
   supported,
   locked = false,
+  readOnly = false,
   reviewed,
   onReviewed,
 }: {
@@ -51,6 +52,7 @@ export function SegmentSheet({
   canDelete?: boolean;
   supported: SegmentConditionKind[];
   locked?: boolean;
+  readOnly?: boolean;
   reviewed: boolean;
   onReviewed: (value: boolean) => void;
 }) {
@@ -106,7 +108,7 @@ export function SegmentSheet({
               required
               autoComplete="off"
               autoFocus
-              disabled={locked}
+              disabled={locked || readOnly}
               onChange={(event) => change({ ...draft, name: event.target.value })}
               aria-invalid={!!nameError}
               aria-describedby={nameError ? "segment-name-error" : undefined}
@@ -142,7 +144,7 @@ export function SegmentSheet({
                           name={`condition_${condition.id}`}
                           inputMode="numeric"
                           value={condition.value}
-                          disabled={locked || !supported.includes(condition.kind)}
+                          disabled={locked || readOnly || !supported.includes(condition.kind)}
                           onChange={(event) =>
                             change({
                               ...draft,
@@ -165,7 +167,7 @@ export function SegmentSheet({
                         id={`segment-condition-${condition.id}`}
                         name={`condition_${condition.id}`}
                         value={condition.value}
-                        disabled={locked || !supported.includes(condition.kind)}
+                        disabled={locked || readOnly || !supported.includes(condition.kind)}
                         onChange={(event) =>
                           change({
                             ...draft,
@@ -194,7 +196,7 @@ export function SegmentSheet({
                       variant="ghost"
                       size="sm"
                       type="button"
-                      isDisabled={locked}
+                      isDisabled={locked || readOnly}
                       onPress={() =>
                         change({
                           ...draft,
@@ -214,7 +216,7 @@ export function SegmentSheet({
             <NativeSelect
               aria-label={t(($) => $.automation.addCondition)}
               value=""
-              disabled={locked}
+              disabled={locked || readOnly}
               onChange={(event) => {
                 const kind = event.target.value as SegmentConditionKind;
                 if (!supported.includes(kind) || draft.conditions.some((row) => row.kind === kind))
@@ -249,7 +251,7 @@ export function SegmentSheet({
             <Checkbox
               id="segment-reviewed"
               isSelected={reviewed}
-              isDisabled={locked}
+              isDisabled={locked || readOnly}
               onChange={onReviewed}
             />
             <FieldLabel htmlFor="segment-reviewed">{t(($) => $.automation.review)}</FieldLabel>
@@ -266,7 +268,7 @@ export function SegmentSheet({
           <Button
             variant="ghost"
             type="button"
-            isDisabled={locked || !canDelete}
+            isDisabled={locked || readOnly || !canDelete}
             onPress={onDelete}
           >
             {t(($) => $.automation.deleteSegment)}
@@ -275,7 +277,7 @@ export function SegmentSheet({
         <Button variant="outline" type="button" isDisabled={locked} onPress={onClose}>
           {t(($) => $.automation.cancel)}
         </Button>
-        <Button type="submit" form={formId} isDisabled={locked}>
+        <Button type="submit" form={formId} isDisabled={locked || readOnly}>
           {t(($) => $.automation.save)}
         </Button>
       </SheetFooter>
