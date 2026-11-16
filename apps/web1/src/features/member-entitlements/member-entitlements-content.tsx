@@ -6,8 +6,10 @@ import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { readEntitlementLedger } from "../member-profile/entitlement-ledger";
-import { readOwnPackages, readOwnDebt } from "./member-entitlements-read";
+import { readOwnPackages, readOwnDebt, readOwnFinanceCurrencies } from "./member-entitlements-read";
 import { MemberEntitlementsView } from "./member-entitlements-view";
+import { readFinancePage } from "../finance/finance";
+import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 export function MemberEntitlementsContent({
@@ -23,6 +25,8 @@ export function MemberEntitlementsContent({
     router = useRouter();
   const [selection, setSelection] = useState("");
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
+  const [currencySelection, setCurrencySelection] = useState(""),
+    [paymentCursors, setPaymentCursors] = useState<(string | undefined)[]>([undefined]);
   const prefix = ["member-entitlements", scope.accountId, scope.orgId, scope.centerId, personId];
   const rights = useQuery({
     queryKey: [...prefix, "rights"],
@@ -32,6 +36,21 @@ export function MemberEntitlementsContent({
   const debt = useQuery({
     queryKey: [...prefix, "debt"],
     queryFn: () => readOwnDebt(scope, personId),
+    retry: false,
+  });
+  const currencies = useQuery({
+    queryKey: [...prefix, "currencies"],
+    queryFn: () => readOwnFinanceCurrencies(scope, personId),
+    retry: false,
+  });
+  const currency = !currencies.isError
+    ? (currencies.data?.find((c) => c === currencySelection) ??
+      (currencySelection === "" && currencies.data?.length === 1 ? currencies.data[0] : undefined))
+    : undefined;
+  const payments = useQuery({
+    queryKey: [...prefix, "payments", currency, paymentCursors.at(-1)],
+    queryFn: () => readFinancePage(scope, { personId, currency: currency! }, paymentCursors.at(-1)),
+    enabled: !!currency,
     retry: false,
   });
   const sources = !rights.isError ? rights.data : undefined;
@@ -56,8 +75,9 @@ export function MemberEntitlementsContent({
     [router],
   );
   useEffect(() => {
-    for (const error of [rights.error, debt.error, ledger.error]) if (error) accessLost(error);
-  }, [rights.error, debt.error, ledger.error, accessLost]);
+    for (const error of [rights.error, debt.error, ledger.error, currencies.error, payments.error])
+      if (error) accessLost(error);
+  }, [rights.error, debt.error, ledger.error, currencies.error, payments.error, accessLost]);
   const numbers = new Intl.NumberFormat("tr-TR"),
     signed = new Intl.NumberFormat("tr-TR", { signDisplay: "exceptZero" }),
     dates = new Intl.DateTimeFormat("tr-TR", {
@@ -65,9 +85,10 @@ export function MemberEntitlementsContent({
       timeStyle: "short",
       timeZone: timezone,
     });
-  const packageRows = sources?.map((row, index) => ({
+  const packageRows = sources?.map((row) => ({
     id: row.id,
-    name: `${t(($) => $.memberEntitlements.unknownName)} (${index + 1})`,
+    name: row.name,
+    usage: row.usage,
     validity: row.validity,
     state:
       row.saleState && row.saleState !== "active"
@@ -154,13 +175,90 @@ export function MemberEntitlementsContent({
           </Button>
         </div>
       }
-      payments={null}
+      payments={
+        currencies.isError || !currencies.data
+          ? null
+          : currencies.data.length === 0
+            ? []
+            : currency && !payments.isError && payments.data
+              ? payments.data.movements.items.map((row) => ({
+                  id: row.id,
+                  date: dates.format(new Date(row.occurred_at)),
+                  title: t(($) => $.finance.movementKinds[row.kind]),
+                  amount: formatMinorAmount(row.amount_minor, row.currency),
+                }))
+              : null
+      }
+      paymentControl={
+        currencies.data && currencies.data.length > 1 && !currencies.isError ? (
+          <NativeSelect
+            className="mb-4 w-full @md:w-64"
+            aria-label={t(($) => $.memberEntitlements.chooseCurrency)}
+            value={currency ?? ""}
+            onChange={(e) => {
+              setCurrencySelection(e.target.value);
+              setPaymentCursors([undefined]);
+            }}
+          >
+            <NativeSelectOption value="">
+              {t(($) => $.memberEntitlements.chooseCurrency)}
+            </NativeSelectOption>
+            {currencies.data.map((c) => (
+              <NativeSelectOption key={c} value={c}>
+                {c}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        ) : undefined
+      }
+      paymentPagination={
+        <div
+          role="group"
+          aria-label={t(($) => $.memberEntitlements.payments)}
+          className="flex flex-wrap gap-2"
+        >
+          <Button
+            variant="outline"
+            isDisabled={!currency || payments.isFetching || paymentCursors.length === 1}
+            onPress={() => setPaymentCursors((old) => old.slice(0, -1))}
+          >
+            {t(($) => $.memberEntitlements.previous)}
+          </Button>
+          <Button
+            variant="outline"
+            isDisabled={
+              !currency ||
+              payments.isFetching ||
+              payments.isError ||
+              !payments.data?.movements.next_cursor ||
+              paymentCursors.includes(payments.data.movements.next_cursor)
+            }
+            onPress={() => {
+              const next = payments.data?.movements.next_cursor;
+              if (next && !paymentCursors.includes(next))
+                setPaymentCursors((old) => [...old, next]);
+            }}
+          >
+            {t(($) => $.memberEntitlements.next)}
+          </Button>
+        </div>
+      }
       balance={
         <>
           {balance}
-          <p className="text-xs font-normal text-muted-foreground">
-            {t(($) => $.memberEntitlements.creditUnknown)}
-          </p>
+          {currency && !payments.isError && payments.data ? (
+            <p>
+              {t(($) => $.memberEntitlements.creditAvailable, {
+                amount: formatMinorAmount(payments.data.credit_available_minor, currency),
+              })}
+            </p>
+          ) : (
+            <p className="text-xs font-normal text-muted-foreground">
+              {currencies.data?.length === 0 && !currencies.isError
+                ? t(($) => $.memberEntitlements.noFinanceHistory)
+                : t(($) => $.memberEntitlements.creditUnknown)}
+            </p>
+          )}
         </>
       }
       previous={
@@ -175,21 +273,34 @@ export function MemberEntitlementsContent({
       }
       notice={
         <div className="space-y-3">
-          <Alert>
-            <AlertDescription>{t(($) => $.memberEntitlements.sourceLimits)}</AlertDescription>
-          </Alert>
-          {(rights.isError || debt.isError || (selected && ledger.isError)) && (
+          {(rights.isError ||
+            debt.isError ||
+            currencies.isError ||
+            (currency && payments.isError) ||
+            (selected && ledger.isError)) && (
             <Alert variant="destructive">
               <AlertDescription>{t(($) => $.memberEntitlements.unread)}</AlertDescription>
             </Alert>
           )}
-          {(rights.isPending || debt.isPending || (selected && ledger.isPending)) && (
+          {(rights.isPending ||
+            debt.isPending ||
+            currencies.isPending ||
+            (currency && payments.isPending) ||
+            (selected && ledger.isPending)) && (
             <p role="status">{t(($) => $.memberEntitlements.loading)}</p>
           )}
           <Button
             variant="outline"
-            isDisabled={rights.isFetching || debt.isFetching || ledger.isFetching}
+            isDisabled={
+              rights.isFetching ||
+              debt.isFetching ||
+              ledger.isFetching ||
+              currencies.isFetching ||
+              payments.isFetching
+            }
             onPress={() => {
+              void currencies.refetch();
+              if (currency) void payments.refetch();
               void rights.refetch();
               void debt.refetch();
               if (selected) void ledger.refetch();

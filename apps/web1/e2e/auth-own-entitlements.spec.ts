@@ -7,7 +7,13 @@ import { origin } from "./auth-fixture.js";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 async function fixture(
   page: Page,
-  options: { two?: boolean; denied?: boolean; emptyDebt?: boolean } = {},
+  options: {
+    two?: boolean;
+    denied?: boolean;
+    emptyDebt?: boolean;
+    noCurrencies?: boolean;
+    currencyDenied?: boolean;
+  } = {},
 ) {
   await mockOwnReservations(page);
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
@@ -32,6 +38,7 @@ async function fixture(
       quotas: [],
       deficit_scopes: [],
       version: 1,
+      purchase_summary: { product_name: "Satın alınan sabit Tango paketi", initial_credits: 8 },
     },
   ];
   if (options.two)
@@ -53,6 +60,39 @@ async function fixture(
         status: 403,
         json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
       });
+    if (operation === "member_finance_currencies_get_v1") {
+      if (denied || options.currencyDenied) return reject();
+      return send({
+        person_id: I.self,
+        currencies: options.noCurrencies ? [] : ["TRY", "USD"],
+        as_of: "2026-11-16T12:00:00Z",
+      });
+    }
+    if (operation === "finance_get_v1") {
+      expect(req.person_id).toBe(I.self);
+      expect(req.center_id).toBe(I.center);
+      if (denied) return reject();
+      return send({
+        person_id: I.self,
+        currency: req.currency,
+        debts: [],
+        credit_available_minor: req.currency === "USD" ? "100" : "0",
+        movements: {
+          items: [
+            {
+              id: id(req.page.cursor ? 997 : 996),
+              kind: req.page.cursor ? "refund" : "collection",
+              amount_minor: req.page.cursor ? "100" : "5000",
+              currency: req.currency,
+              occurred_at: "2026-11-16T12:00:00Z",
+              center_id: I.center,
+            },
+          ],
+          next_cursor: req.page.cursor ? null : "next-payment",
+          as_of: "2026-11-16T12:00:00Z",
+        },
+      });
+    }
     if (operation === "entitlements_get_v1") {
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);
@@ -134,15 +174,17 @@ test("own rights show native counts, exact separate debt currencies and a cursor
     page.getByText("Sağdaki değer ders bakiyesindeki değişimdir.", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText(/Hak ayırma|Ayırma/)).toBeVisible();
-  await expect(page.getByRole("progressbar")).toHaveCount(0);
+  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuemax", "8");
+  await expect(page.getByText("3 / 8 ders kullanıldı", { exact: true })).toBeVisible();
+  await expect(page.getByText("Satın alınan sabit Tango paketi", { exact: true })).toBeVisible();
   await expect(page.getByText("Ödeme hareketi yok.", { exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).first().click();
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(2);
   expect(state.reads.filter((row) => row.request.ledger_sale_id).at(-1)!.request).toMatchObject({
     ledger_sale_id: id(980),
     ledger_page: { cursor: "second-ledger" },
   });
-  await expect(page.getByRole("button", { name: "Sonraki", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Sonraki", exact: true }).first()).toBeDisabled();
   expect(
     state.reads.filter((row) =>
       ["products_list_v1", "finance_get_v1", "finance_directory_get_v1"].includes(row.operation),
@@ -158,7 +200,7 @@ test("multiple owned packages require explicit selection and reset the ledger cu
   expect(state.reads.filter((row) => row.request.ledger_sale_id)).toHaveLength(0);
   await page.getByRole("combobox", { name: "Paket seç", exact: true }).selectOption(id(980));
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(1);
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).first().click();
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(2);
   await page.getByRole("combobox", { name: "Paket seç", exact: true }).selectOption(id(981));
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(3);
@@ -185,4 +227,44 @@ test("unread rights and balance remain unknown until an explicit retry", async (
   state.setDenied(false);
   await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
   await expect(page.getByText(/90.071.992.547.409,93.*borç/)).toBeVisible();
+});
+
+test("historical payment currencies and native credit remain separate with independent cursor reset", async ({
+  page,
+}) => {
+  const state = await fixture(page, { emptyDebt: true });
+  await page
+    .getByRole("combobox", { name: "Ödeme para birimi seç", exact: true })
+    .selectOption("USD");
+  const payments = page.getByRole("grid", { name: "Ödemelerim", exact: true });
+  await expect(payments).toContainText("50,00");
+  await expect(page.getByText(/Kullanılabilir alacağın:.*1,00/)).toBeVisible();
+  const pages = page.getByRole("group", { name: "Ödemelerim", exact: true });
+  await pages.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(payments).toContainText("Nakit iade");
+  expect(state.reads.filter((r) => r.operation === "finance_get_v1").at(-1)?.request).toMatchObject(
+    { currency: "USD", page: { cursor: "next-payment" } },
+  );
+  await page
+    .getByRole("combobox", { name: "Ödeme para birimi seç", exact: true })
+    .selectOption("TRY");
+  await expect(payments).toContainText("50,00");
+  const latest = state.reads.filter((r) => r.operation === "finance_get_v1").at(-1)!.request;
+  expect(latest.currency).toBe("TRY");
+  expect(latest.page).not.toHaveProperty("cursor");
+});
+test("an empty native currency directory is actual absence, while denied discovery stays unread", async ({
+  page,
+}) => {
+  await fixture(page, { noCurrencies: true, emptyDebt: true });
+  await expect(page.getByText("Bu merkezde finans hareketin yok.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Ödeme hareketi yok.", { exact: true })).toBeVisible();
+});
+test("currency discovery failure never falls back to debt currencies or TRY", async ({ page }) => {
+  const state = await fixture(page, { currencyDenied: true });
+  await expect(page.getByText("Ödeme geçmişi okunamadı.", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("combobox", { name: "Ödeme para birimi seç", exact: true }),
+  ).toHaveCount(0);
+  expect(state.reads.filter((r) => r.operation === "finance_get_v1")).toHaveLength(0);
 });

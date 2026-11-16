@@ -50,6 +50,7 @@ export function MemberEntitlementsView({
   movementPagination,
   payments,
   paymentPagination,
+  paymentControl,
   balance,
   previous,
   notice,
@@ -61,6 +62,7 @@ export function MemberEntitlementsView({
   movementPagination?: ReactNode;
   payments: MemberPaymentMovement[] | null;
   paymentPagination?: ReactNode;
+  paymentControl?: ReactNode;
   balance: ReactNode;
   previous: { id: string; name: string; validity: string; state: string }[] | null;
   notice?: ReactNode;
@@ -132,8 +134,14 @@ export function MemberEntitlementsView({
             </div>
           )}
           {source?.usage && (
-            <Progress className="mt-4" value={source.usage.consumed} maxValue={source.usage.total}>
-              <ProgressLabel>{t(($) => $.memberEntitlements.usage)}</ProgressLabel>
+            <Progress
+              className="mt-4"
+              value={Math.min(source.usage.consumed, source.usage.total)}
+              maxValue={source.usage.total}
+            >
+              <ProgressLabel>
+                {t(($) => $.memberEntitlements.usageValue, source.usage)}
+              </ProgressLabel>
             </Progress>
           )}
           {source?.note && <p className="mt-3 text-sm text-muted-foreground">{source.note}</p>}
@@ -179,6 +187,7 @@ export function MemberEntitlementsView({
           <CardDescription>{t(($) => $.memberEntitlements.paymentsHint)}</CardDescription>
         </CardHeader>
         <CardContent className="min-w-0 [&_[data-slot=table-container]]:max-h-[min(65dvh,36rem)]">
+          {paymentControl}
           <div className="mb-4 flex flex-wrap justify-between gap-2 text-sm">
             <span>{t(($) => $.memberEntitlements.balance)}</span>
             <div className="font-medium tabular-nums">{balance}</div>

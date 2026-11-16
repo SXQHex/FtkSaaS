@@ -1688,7 +1688,9 @@ export default interface Resources {
       "amount": "Tutar",
       "balance": "Bakiye",
       "balanceChange": "Sağdaki değer ders bakiyesindeki değişimdir.",
+      "chooseCurrency": "Ödeme para birimi seç",
       "choosePackage": "Paket seç",
+      "creditAvailable": "Kullanılabilir alacağın: {{amount}}",
       "creditUnknown": "Alacak ve ödeme geçmişi kaynağı okunamadı.",
       "date": "Tarih",
       "debt": "{{amount}} borç",
@@ -1713,6 +1715,7 @@ export default interface Resources {
       "movementsUnread": "Hak hareketlerini görmek için bir paket seç.",
       "next": "Sonraki",
       "noDebt": "Bu merkezde açık borcun yok.",
+      "noFinanceHistory": "Bu merkezde finans hareketin yok.",
       "operation": "İşlem",
       "packageUnread": "Paket bilgisi okunamadı.",
       "payments": "Ödemelerim",
@@ -1727,12 +1730,12 @@ export default interface Resources {
         "expired": "Sona erdi",
         "terminated": "Sonlandırıldı"
       },
-      "sourceLimits": "Satın alınan paket adı/ilk ders toplamı ve ödeme para birimi keşfi henüz okunamıyor.",
       "timed": "Süreli hak; geçerlilik ve kota koşulları uygulanır.",
       "title": "Haklarım",
       "unknownName": "Satın alınan paket adı okunamadı",
       "unread": "Güncel hak veya bakiye kaynağı okunamadı.",
-      "usage": "Kullanılan ders oranı"
+      "usage": "Kullanılan ders oranı",
+      "usageValue": "{{consumed}} / {{total}} ders kullanıldı"
     },
     "memberPrivateLessons": {
       "acceptHint": "Kabulün merkez onayını bekler; ders henüz kesinleşmez.",

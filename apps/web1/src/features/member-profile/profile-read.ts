@@ -12,6 +12,7 @@ import { readProductsPage } from "../products/products";
 export async function readProfileRights(
   scope: ClientScope,
   personId: string,
+  options: { includePurchaseSummary?: boolean } = {},
 ): Promise<EntitlementView[]> {
   z.uuid().parse(personId);
   const backend = await scopedBackend(scope);
@@ -22,6 +23,7 @@ export async function readProfileRights(
     center_id: scope.centerId,
     person_id: personId,
     include_timed_rights: true,
+    ...(options.includePurchaseSummary ? { include_purchase_summary: true } : {}),
   });
   const ids = new Set<string>(),
     T = await getTemporal();
