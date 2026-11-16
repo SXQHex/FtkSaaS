@@ -63,15 +63,17 @@ test('P01-A catalog and purchased-right reads through real Auth -> Edge -> RPC',
  await t.test('catalog shows latest effective version; sold source remains immutable',async()=>{
   const list=await catalog(),item=list.items.find(x=>x.id===productId);
   assert.equal(item.version_id,updated);assert.equal(item.terms.price_minor,'500');
-  assert.equal(item.terms.name,base.name); // Existing publisher retains the product identity name.
+  assert.equal(item.terms.name,'P01 latest'); // The latest version exposes its newly published name.
   assert(!list.items.some(x=>x.version_id===version||x.version_id===remoteVersion||x.version_id===timedVersion));
   assert.equal((await read()).find(x=>x.sale_id===sold).product_version_id,version);
+  const original=(await rows('select published_name,price_minor::text price from core.product_versions where id=$1',[version]))[0];assert.deepEqual(original,{published_name:base.name,price:'0'});
   const numbered=await must(owner,'person_get_v1',scope({person_id:self.p}));
   const rightRows=await read();assert(rightRows.length>0);assert(rightRows.every(x=>x.person_id===self.p&&x.subscriber_number===numbered.subscriber_number));
   const price=(await rows('select net_minor::text amount from core.sales where id=$1',[sold]))[0].amount;assert.equal(price,'0');
   const saved=await rows('select effective_at from core.product_versions where id=$1',[updated]);
   await db.query("update core.product_versions set effective_at=now()+interval '1 day' where id=$1",[updated]);
   assert.equal((await catalog()).items.find(x=>x.id===productId).version_id,version);
+  const fallback=(await catalog()).items.find(x=>x.id===productId);assert.equal(fallback.terms.name,base.name);assert.equal(fallback.terms.price_minor,'0');
   await db.query('update core.product_versions set effective_at=$2 where id=$1',[updated,saved[0].effective_at]);
  });
  await t.test('catalog pagination is stable on ties and binds actor, center, sort and timed selection',async()=>{

@@ -461,7 +461,7 @@
     },
     {
       "path": "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
-      "sha256": "203d1b6f77cde8f27f45019e3ff44246385e3ee46e77c89714778c0e97d078a6",
+      "sha256": "b7f6f09f196456a76eaf1c3eb0d436ec29f0549bfab515272bfc2ec33b83c792",
       "shared": [
         [
           1,
@@ -474,7 +474,7 @@
           "ranges": [
             [
               7,
-              188
+              190
             ]
           ]
         }
@@ -536,7 +536,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "556dfe396e9d12979e151b525ab53ae469a552bf5435b951eeb43ec69abec7de",
+      "sha256": "db5b564d49e3559a6f2314aa78112088d22cdff7cd51299c90d4e98f4246a83c",
       "shared": [
         [
           7,
@@ -641,6 +641,21 @@
           "line": 382,
           "path": "apps/backend/tests/web1-review-acceptance.mjs",
           "sha256": "8567815739fc679fd6d2429309d55199cced019e538f8ad30223ee7ca45e31a6"
+        },
+        {
+          "line": 383,
+          "path": "apps/backend/tests/native-capacity-recovery-acceptance.mjs",
+          "sha256": "191ee463e36daba3ea275f58c2f82e5341f731db0c53ff8e8713186caf6e2675"
+        },
+        {
+          "line": 384,
+          "path": "apps/backend/tests/sale-discount-acceptance.mjs",
+          "sha256": "f592c45a7d6af472f42dace2b9912ea39c83ef925ffacc2debd84a348c6a9776"
+        },
+        {
+          "line": 385,
+          "path": "apps/backend/tests/product-class-management-acceptance.mjs",
+          "sha256": "dba470cd42627220957fbbf580a38d8a23fe79db381fb8b8c8252c9016939828"
         }
       ],
       "estimated_seconds": 651.01

@@ -1172,7 +1172,7 @@ ST-03 availability/package hazırlıkları orgdan yeni merkeze bir kez kopyalan�
 | Standart negatif limit | Yeni org için **0**. Kullanıcı ayrıca teyit etti. Mevcut kulüp −2 ve diğer politikalar aynen korunur; mevcut org ayarları defaultla ezilmez. |
 | Kişisel istisna | Default kapalı; org açarsa yetkili merkez aktörü org sınırı içinde düzenler. Event negatif yasağı korunur. |
 | Borç engeli | Yeni orgda rezervasyon ve katılım ayrı, başlangıçta açık; mevcut borç denetimi kapsamı korunur. |
-| İndirim | Ayrı yetkisi olmayana kapalı; yetkiliye org sınırı. Yeni sayısal indirim sınırı bu kararda atanmadı. |
+| İndirim | Normal satış yetkisine ek açık merkez sale.discount izni ve organizasyon sale_discount_percent_upper IntegerPolicy (0–100) gerekir. Otomatik yönetici grantı veya varsayılan oran yoktur; ayar yapılana kadar indirim kapalıdır. Seçilen net tutar liste fiyatını aşamaz; preview/satış/borç ve sonraki net bazlı hesaplar aynı tutarı kullanır. |
 | İlk ödeme yöntemi listesi | Manuel nakit, banka transferi, kart/POS kaydı. Auto tahsilat/ödeme entegrasyonu değildir. Banka/kart referansı zorunlu; nakit isteğe bağlı. |
 | Ek onay eşiği | Ayrı alan olarak modellenebilir ama tutar defaultu yok; desteklenmeyen mekanizma etkinleştirilemez. FD11 ilk teslimde yeni genel ikinci-onay mekanizması eklemez. |
 
