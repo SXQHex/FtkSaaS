@@ -1,6 +1,7 @@
 import './calendar-preferences-acceptance.mjs';
 import './personal-calendar-acceptance.mjs';
 import './member-profile-lifecycle-acceptance.mjs';
+import './session-roster-discovery-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
@@ -87,6 +88,18 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   }finally{
    await db.query('delete from core.reservations where id=any($1)',[createdReservations]);await db.query('delete from core.sessions where id=any($1)',[createdSessions]);reservations.splice(previousCount);
   }
+ });
+ await t.test('session directory and source summaries cross native Auth Edge RPC without granting roster rights',async()=>{
+  const entry=key();
+  await db.query("insert into core.waitlist_entries(id,org_id,center_id,session_id,person_id,joined_at,state) values($1,$2,$3,$4,$5,now(),'waiting')",[entry,org,c1,s1,otherStudent.p]);
+  try{
+   const request={center_id:c1,operation:'waitlist_join_v1',selector:{operation:'waitlist_join_v1',key:{directory:'session',session_id:s1,view:'entries',status:'waiting'}},page:{limit:1}};
+   const page=await must(cm.u,'management_state_get_v1',scope(request));assert.equal(page.items[0].entity.id,entry);assert.equal(page.items[0].waitlist_detail.person_id,otherStudent.p);assert.equal(typeof page.items[0].waitlist_display_name,'string');
+   await fail(student.u,'management_state_get_v1',request,'FORBIDDEN');
+   const summary=await list(cm.u,{center_id:c1,session_id:s1,include_source_summary:true});assert(summary.items.length>0);assert(summary.items.every(x=>x.source_summary.status==='unassigned'));
+   const restricted=await list(instructor.u,{center_id:c1,session_id:s1,include_source_summary:true});assert(restricted.items.length>0);assert(restricted.items.every(x=>x.source_summary.status==='restricted'&&!('source_sale_id' in x.source_summary)));
+   assert((await list(cm.u,{center_id:c1,session_id:s1})).items.every(x=>!('source_summary' in x)));
+  }finally{await db.query('delete from core.waitlist_entries where id=$1',[entry]);}
  });
  await t.test('student sees own active and historical records, never another roster',async()=>{
   assert.deepEqual(ids(await list(student.u)).sort(),[r1,cancelled].sort());

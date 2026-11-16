@@ -55,3 +55,18 @@ test('Account directory includes never-linked people and invitation lifecycle gr
 test('Selected person comparison requests reuse opt-in native summaries with explicit center',()=>{
  const base={...scope(),person_id:key()};delete base.center_id;assert(v.request_person_get_v1(base));assert(v.request_person_get_v1({...base,include_member_summary:false}));assert.equal(v.request_person_get_v1({...base,include_member_summary:true}),false);assert(v.request_person_get_v1({...base,center_id:key(),include_member_summary:true}));
 });
+
+test('Session waitlist discovery is typed separately from known-person intent and source summaries are opt-in',()=>{
+ const base={...scope(),operation:'waitlist_join_v1',page:{limit:1}};
+ for(const view of ['entries','offers'])assert(v.request_management_state_get_v1({...base,selector:{operation:base.operation,key:{directory:'session',session_id:key(),view}}}));
+ assert(v.request_management_state_get_v1({...base,selector:{operation:base.operation,key:{person_id:key(),session_id:key()}}}));
+ assert.equal(v.request_management_state_get_v1({...base,selector:{operation:base.operation,key:{directory:'session',view:'entries'}}}),false);
+ assert(v.request_reservation_list_v1({...scope(),page:{},include_source_summary:true}));
+ assert.equal(v.request_reservation_list_v1({...scope(),page:{},include_source_summary:'true'}),false);
+});
+
+test('Session discovery append migration preserves its reviewed SQL sources',()=>{
+ const sql=['session-waitlist-directory.sql','reservation-source-summary.sql'].map(n=>fs.readFileSync(new URL('../database/'+n,import.meta.url),'utf8').replace(/^begin;\n/,'').replace(/commit;\n$/,''));
+ const migration=fs.readFileSync(new URL('../supabase/migrations/20261116111008_session_waitlist_rights.sql',import.meta.url),'utf8');
+ assert.equal(migration,'-- W1-BE-15/16: bounded session waitlist discovery and actual reservation source rights.\nbegin;\n'+sql.join('')+"notify pgrst,'reload schema';\ncommit;\n");
+});

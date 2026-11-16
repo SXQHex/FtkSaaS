@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "9bf432ef662d6ca8d3c3ca4e1f8ea31b87dccd81deaf4c664af1327c8f5ebc69",
-        "reason": "Reviewed member lifecycle test inventory delta: existing suite ownership and exclusive units preserved; only changed source ranges/hashes and the new acceptance import added. Trusted loader and common retry/approval guide remain unchanged."
+        "fingerprint": "2f9340d39ef432466887e3bc98675fac8e0fde641fa269bddb583962d6f76c95",
+        "reason": "Reviewed additive test inventory with unchanged prior/exclusive ownership and migration metadata167. Directory dispatch preserves common auth, subscription and lifecycle gates. No protocol/worker behavior changed. Final canonical UUID paths and migration167 metadata reviewed; all new IDs remain domain UUIDs."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "dda5586c10d61b8c7c7af05b2ee6fe70cedf274f3a9e0ff22a0a4e505cd8b78b",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "7ecde02061d097f36d7e06521bb7c4c963088ca94cc1f7d0490bc4458dafc464",
+        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
       }
     },
     {
@@ -607,8 +607,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8c46b9cdcac5c4074dcc59a406b044297679b7f8c93f1ce94ffcc09cb3fc04b2",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "82a5d82f563dade7d6a523cfbbf2f7f2dcfecfb338f228c9f482b0336a2cdf43",
+        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
       }
     },
     {
@@ -724,8 +724,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "edc59c58b3c1f90df6388a813b8f91dd83d742338f003caf1eb19a98808286cc",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "be39d75a7fa8e78d4e563ca707d30a7c9163ec204e46cc960d3d71cd57cb786d",
+        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
       }
     },
     {
@@ -848,8 +848,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "de36f1f1f4adc7cc0cc297e18e43e28214ecd09b8757fc98b6ae3a826c4e5bb3",
-        "reason": "W1-BE-14: reviewed existing P02 locks, live CM/F17, preview recovery, exact extension reversal, protected reservations and native cancellation tests; guide updated."
+        "fingerprint": "8fade9f41c79dd112890688eeae36d3cdbf66ad8321840f434046f405d823e60",
+        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
       }
     },
     {
@@ -873,7 +873,9 @@
         "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
         "apps/backend/tests/fixtures/member-profile-lifecycle.sql",
         "apps/backend/tests/schedule-reads.test.mjs",
-        "apps/backend/tests/web1-review-unit.mjs"
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/session-roster-discovery-acceptance.mjs",
+        "apps/backend/tests/fixtures/session-roster-discovery.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -925,7 +927,9 @@
         "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql",
         "apps/backend/database/lesson-request-actionability.sql",
         "apps/backend/database/member-time-filter.sql",
-        "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql"
+        "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql",
+        "apps/backend/database/reservation-source-summary.sql",
+        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -940,8 +944,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "c7e8a46feb97c77e88064e36e2c950e8de4304da3fa916385f9622ee749025dd",
-        "reason": "W1-BE-13: reviewed start-time partition before pagination, fixed server cutoff in cursor, legacy interval and live canonical/Starter visibility, exact-boundary tests; guide updated."
+        "fingerprint": "4bb5b766e58e55d94a161e6dc13e6f6b3f47711d476d2b35924d8ec93f4c2c1e",
+        "reason": "Reviewed actual-source summary implementation/schema and final scope tests: terminated native zero, opt-in cursor, proper cross-center session fixture and alias source identity; WF06 guide states exact permission and ledger meaning."
       }
     },
     {
@@ -1829,7 +1833,11 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p01-waitlist-workers.test.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/session-roster-discovery-acceptance.mjs",
+        "apps/backend/tests/fixtures/session-roster-discovery.sql",
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/schedule-reads.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
@@ -1839,7 +1847,9 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/settings-offer-duration-required.sql",
-        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql"
+        "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
+        "apps/backend/database/session-waitlist-directory.sql",
+        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql"
       ],
       "operations": [
         "waitlist_join_v1",
@@ -1848,8 +1858,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "696a2805ff2fdf8d7a5e07094dd75e8b1c7f7d9bce90eee7512fdb02f17be18f",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "c00c62c9284c69ae6738e970dd357e90f4fa90f7a9c7763f0d757c8887345c39",
+        "reason": "Reviewed shared-gate directory, full history indexes, FIFO/status cursor behavior, bounded offers, native acceptance and common lifecycle denial tests; WF19 exact consumer guide updated."
       }
     },
     {

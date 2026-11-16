@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="seans-kesif-hak"></a>
+## Seans bekleme/teklif keşfi ve gerçek kaynak hakkı — 16 Kasım 2026
+
+Başlangıç main b586bfe212905b9009804b26f58ab25f41b921ee; PR314 birleşmesi ve aday43790807612success ayrı doğrulandı. Yeni dal feature/backend-session-waitlist-rights; kullanıcı W1-BE-15/16 için gerekli backend desteğini ayrı PR’da tamamlamayı ve talep dosyasına backend yanıtını yazmayı onayladı. Frontend dalı birleştirilmedi; request.md tüketici kaynağı origin/feat/web1-account-acceptance üzerinden alındı, yalnız backend değerlendirmeleri eklendi. E18/frontend kabulü değiştirilmez.
+
+167. append migration mevcut management ve rezervasyon okuyucularını genişletir; yeni insan/worker komutu veya servis yoktur. Kesin tüketim WF19/WF06, görev kabulü remaining-work sahibindedir. Sözleşme RED eksik selector/opt-in alanını gösterdi; son generated unit9/9GREEN. Son kaynak backend verify576/576 (417+149+10), skip0; üretim/typecheck/audit/governance ve kalite/floor başarılı. İzole pgcrypto/PostgreSQL motoru167migration ve32typed çağrıyı geçti. FIFO tarihini ve pasif satış kredi kapısını bozan iki mutation beklenen testleri RED yaptı; transaction rollback ile özgün fonksiyonlar korundu. Bağımsız incelemenin erken dispatch ve pasif kaynak kredi bulguları giderildi; ortak lifecycle/abonelik retleri, geçerli çok merkezli kaynak gizliliği, seans sayfasındaki alias kimliği ve opt-in cursor testleri eklendi, açık engelleyici bulgu yoktur. Teklif/entry geçmişi için tam-durum indeksleri eklendi; bu ölçülmüş performans garantisi değildir. Güvenli kanıtlar .dev/session-verify-final.log, .dev/session-quality-final.log, .dev/session-sql-final.log ve .dev/session-mutations.log içindedir. Aday/main/development/hosted kapanışı henüz açık. Yerel native EPERM önceki aynı ortam engelidir; izole SQL testi gerçek Auth/REST/Edge kabulü sayılmaz.
+
 <a id="uye-profili-zaman-iptal"></a>
 ## Üye profili zaman filtresi ve planlı iptal — 16 Kasım 2026
 
