@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–17 için backend kaynak desteği karşılandı. Açık talepler W1-BE-18–25’tir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–17 için backend kaynak desteği karşılandı. Açık talepler W1-BE-18–26’dır; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `7831ebe31b8b1912ba5370ef81e40ced8c97dec2` (PR316 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43922098495), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43922098694) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43922226819) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -31,6 +31,7 @@
 | W1-BE-23 | E32 · P05 | Kendi hesabının gerekli belgelerini gerçek işlem bağlamlarıyla keşfetme | Açık: mevcut requirements okuyucusu önceden bilinen satış/rezervasyon bağlamı istiyor. |
 | W1-BE-24 | E33 · P12 | CRM özet/filtre, merkez takipleri, sorumlu ve geçmiş deneme teklifi keşfi | Açık: mevcut okuyucuların güvenli typed eşlemesi veya eksik keşif desteği isteniyor. |
 | W1-BE-25 | E34–36 · P12.5/WF09 | Public program türü/filtre, görünür doluluk ve başvuru/yayın durumu | Açık: mevcut anonim DTO eşlemesi veya güvenli typed destek isteniyor. |
+| W1-BE-26 | E37 · P13/WF15 | Etkinlik arama/durum filtresi, görünür kayıt sayısı ve merkez özetleri | Açık: native liste mevcut; güvenli typed filtre/özet eşlemesi isteniyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -247,3 +248,12 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** Mevcut güvenli typed eşlemeyi belirtin; yoksa (1) ders/etkinlik ayrımı, (2) cursor kapsamına dahil disiplin filtresi, (3) yalnız yayın politikası izin veriyorsa doluluk/adet ve eğitmen sunumu, (4) genel başvuru açıklığı ve gerçek form/yayın hedefiyle onay kaynaklarının public keşfi, (5) kapalı/geçersiz yayın ile boş gelecek programını güvenle ayıracak okuma desteği gerekir. Birden çok merkezde her öğenin gerçek saat dilimi farklıysa güvenli eşlemesi de belirtilmeli. Yeni endpoint şart koşulmuyor.
 
 **Sınır:** Anonim istemci Auth JWT/apikey göndermez; private yönetim okuyucusuna fallback yoktur. Tüm sayfalar taranarak filtre üretilmez. Tür/doluluk, profil yokluğundan kapalı yayın veya açık başvuru/onay kuralı tahmin edilmez. UTC Instant, saat dilimi yayımlanmamışsa açık UTC etiketiyle gösterilir. Mevcut public program/cursor/hata-kurtarma bağımsız bağlandı; sayfa kapanışı ve frontend kabulü TODO/E34–36 sahibindedir.
+
+
+## W1-BE-26 · Etkinlik listesi filtreleri ve özetleri
+
+**Mevcut kaynak:** `event_list_v1` merkez, UTC aralık, discipline_id ve native cursor taşır. İstekte ad araması veya event state filtresi yoktur; `Page_EventView` merkez özeti taşımaz. Mevcut rapor türlerinde bu etkinlik özeti eşlenmiyor. `EventView` kapasite sınırlarını verir; bunlar aktif kayıt sayısı değildir. Opsiyonel detay kayıtlarını veya görünür cursor sayfasını merkez toplamı saymayacağız.
+
+**İhtiyaç:** E37 için mevcut güvenli typed eşlemeyi belirtin; yoksa (1) cursor kapsamına dahil başlık araması ve all/published/draft/occurred/cancelled filtresi, (2) aynı yetkili merkez/ilgili dönem kapsamında yayın/taslak sayısı, yayındaki etkinliklerdeki aktif kayıt sayısı ve para birimine göre bekleyen ödeme tutarı/kayıt sayısı, (3) görünür liste satırındaki gerçek aktif kayıt adedi desteği gerekir. Öz okuma/öğrenci ile yönetim görünürlüğü aynı toplamı açmamalı. Yeni endpoint şart koşulmuyor; native occurred ile yoklama kapanışının doğru sunum eşlemesi backend sahibindedir.
+
+**Sınır:** Tüm etkinlikleri/katılımcıları/finans geçmişini tarayıp istemci toplamı üretilmez; cursor sayfasında arama/durum süzülmez. Para birimi tahmin edilmez veya farklı para birimleri toplanmaz. Mevcut kayıt/kapasite/ödeme yetkileri genişletilmez. Taslak oluşturma/düzenleme ve native tekil detay gibi bağımsız işlemler mevcut kaynakla sürdürülecek; E37’nin kaynak/entegrasyon/kabul durumu TODO sahibindedir.
