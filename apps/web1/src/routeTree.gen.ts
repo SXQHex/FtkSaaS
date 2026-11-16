@@ -41,6 +41,7 @@ import { Route as OOrgIdCCenterIdRequestsRouteImport } from './routes/o.$orgId.c
 import { Route as OOrgIdCCenterIdScheduleRouteImport } from './routes/o.$orgId.c.$centerId.schedule'
 import { Route as OOrgIdCCenterIdSettingsRouteImport } from './routes/o.$orgId.c.$centerId.settings'
 import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
+import { Route as OOrgIdCCenterIdEventsEventIdRouteImport } from './routes/o.$orgId.c.$centerId.events_.$eventId'
 import { Route as OOrgIdCCenterIdPeoplePersonIdRouteImport } from './routes/o.$orgId.c.$centerId.people_.$personId'
 import { Route as OOrgIdCCenterIdPeopleMergeRouteImport } from './routes/o.$orgId.c.$centerId.people_.merge'
 import { Route as OOrgIdCCenterIdSessionsSessionIdRouteImport } from './routes/o.$orgId.c.$centerId.sessions.$sessionId'
@@ -206,6 +207,12 @@ const OOrgIdCCenterIdStudioRoute = OOrgIdCCenterIdStudioRouteImport.update({
   path: '/o/$orgId/c/$centerId/studio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdEventsEventIdRoute =
+  OOrgIdCCenterIdEventsEventIdRouteImport.update({
+    id: '/o/$orgId/c/$centerId/events_/$eventId',
+    path: '/o/$orgId/c/$centerId/events/$eventId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OOrgIdCCenterIdPeoplePersonIdRoute =
   OOrgIdCCenterIdPeoplePersonIdRouteImport.update({
     id: '/o/$orgId/c/$centerId/people_/$personId',
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/events/$eventId': typeof OOrgIdCCenterIdEventsEventIdRoute
   '/o/$orgId/c/$centerId/people/$personId': typeof OOrgIdCCenterIdPeoplePersonIdRoute
   '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
   '/o/$orgId/c/$centerId/sessions/$sessionId': typeof OOrgIdCCenterIdSessionsSessionIdRoute
@@ -295,6 +303,7 @@ export interface FileRoutesByTo {
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/events/$eventId': typeof OOrgIdCCenterIdEventsEventIdRoute
   '/o/$orgId/c/$centerId/people/$personId': typeof OOrgIdCCenterIdPeoplePersonIdRoute
   '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
   '/o/$orgId/c/$centerId/sessions/$sessionId': typeof OOrgIdCCenterIdSessionsSessionIdRoute
@@ -333,6 +342,7 @@ export interface FileRoutesById {
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
   '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/events_/$eventId': typeof OOrgIdCCenterIdEventsEventIdRoute
   '/o/$orgId/c/$centerId/people_/$personId': typeof OOrgIdCCenterIdPeoplePersonIdRoute
   '/o/$orgId/c/$centerId/people_/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
   '/o/$orgId/c/$centerId/sessions/$sessionId': typeof OOrgIdCCenterIdSessionsSessionIdRoute
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/events/$eventId'
     | '/o/$orgId/c/$centerId/people/$personId'
     | '/o/$orgId/c/$centerId/people/merge'
     | '/o/$orgId/c/$centerId/sessions/$sessionId'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/events/$eventId'
     | '/o/$orgId/c/$centerId/people/$personId'
     | '/o/$orgId/c/$centerId/people/merge'
     | '/o/$orgId/c/$centerId/sessions/$sessionId'
@@ -446,6 +458,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
     | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/events_/$eventId'
     | '/o/$orgId/c/$centerId/people_/$personId'
     | '/o/$orgId/c/$centerId/people_/merge'
     | '/o/$orgId/c/$centerId/sessions/$sessionId'
@@ -484,6 +497,7 @@ export interface RootRouteChildren {
   OOrgIdCCenterIdScheduleRoute: typeof OOrgIdCCenterIdScheduleRoute
   OOrgIdCCenterIdSettingsRoute: typeof OOrgIdCCenterIdSettingsRoute
   OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
+  OOrgIdCCenterIdEventsEventIdRoute: typeof OOrgIdCCenterIdEventsEventIdRoute
   OOrgIdCCenterIdPeoplePersonIdRoute: typeof OOrgIdCCenterIdPeoplePersonIdRoute
   OOrgIdCCenterIdPeopleMergeRoute: typeof OOrgIdCCenterIdPeopleMergeRoute
   OOrgIdCCenterIdSessionsSessionIdRoute: typeof OOrgIdCCenterIdSessionsSessionIdRoute
@@ -715,6 +729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdStudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/events_/$eventId': {
+      id: '/o/$orgId/c/$centerId/events_/$eventId'
+      path: '/o/$orgId/c/$centerId/events/$eventId'
+      fullPath: '/o/$orgId/c/$centerId/events/$eventId'
+      preLoaderRoute: typeof OOrgIdCCenterIdEventsEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/people_/$personId': {
       id: '/o/$orgId/c/$centerId/people_/$personId'
       path: '/o/$orgId/c/$centerId/people/$personId'
@@ -772,6 +793,7 @@ const rootRouteChildren: RootRouteChildren = {
   OOrgIdCCenterIdScheduleRoute: OOrgIdCCenterIdScheduleRoute,
   OOrgIdCCenterIdSettingsRoute: OOrgIdCCenterIdSettingsRoute,
   OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
+  OOrgIdCCenterIdEventsEventIdRoute: OOrgIdCCenterIdEventsEventIdRoute,
   OOrgIdCCenterIdPeoplePersonIdRoute: OOrgIdCCenterIdPeoplePersonIdRoute,
   OOrgIdCCenterIdPeopleMergeRoute: OOrgIdCCenterIdPeopleMergeRoute,
   OOrgIdCCenterIdSessionsSessionIdRoute: OOrgIdCCenterIdSessionsSessionIdRoute,

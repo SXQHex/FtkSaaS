@@ -30,6 +30,8 @@ test("event edit requires review and confirms the exact draft without publishing
   expect(state.events[0]!.state).toBe("draft");
   await expect(dialog.getByLabel("Başlık", { exact: true })).toBeDisabled();
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Yeni atölye", exact: true })).toBeVisible();
+  await page.getByRole("main").getByRole("link", { name: "Etkinlikler", exact: true }).click();
   await expect(page.getByRole("row", { name: /Yeni atölye/ })).toBeVisible();
 });
 test("invalid event capacity focuses the error summary and never reaches a writer", async ({

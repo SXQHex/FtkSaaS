@@ -19,7 +19,6 @@ import type { EventState } from "../../lib/api-contracts/generated";
 export type EventDetailAction =
   | "edit"
   | "publish"
- 
   | "complete"
   | "cancel"
   | "register"

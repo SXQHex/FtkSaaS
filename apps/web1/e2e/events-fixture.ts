@@ -197,6 +197,7 @@ export async function mockEvents(
 }
 export async function openEvent(page: Page) {
   await page.getByRole("row", { name: /Tango atölyesi/ }).click();
+  await page.getByRole("button", { name: "Düzenle", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Başlık", { exact: true })).toHaveValue("Tango atölyesi");
   return dialog;

@@ -315,6 +315,7 @@ export default interface Resources {
       "title": "E-postayı değiştir"
     },
     "eventDetail": {
+      "actionHint": "Seçilen işlem ayrı kaydedilir. Sonuç yeniden okunmadan başarı gösterilmez.",
       "actions": {
         "cancel": "Etkinliği iptal et",
         "cancel_registration": "Kaydı iptal et",
@@ -327,6 +328,7 @@ export default interface Resources {
         "verify_duty": "Doğrula"
       },
       "actual": "Fiilî başlangıç",
+      "actualOffset": "Fiilî başlangıcın UTC farkı",
       "attendance": "Yoklama",
       "attendanceActions": {
         "clear_start": "Fiilî başlangıcı kaldır",
@@ -335,20 +337,46 @@ export default interface Resources {
         "correct_start": "Fiilî başlangıcı düzelt",
         "record_start": "Fiilî başlangıcı kaydet"
       },
+      "availableRights": "{{count}} kullanılabilir hak" | "{{count}} kullanılabilir hak",
       "capacity": "Kontenjan",
+      "capacityClosed": "Kayıt sırasında kontenjan doldu. Kesin kayıt yapılmadı; hazırlığın kalan borcu kapatıldı, uygun tutar öğrenci alacağına çevrildi. Güncel ödeme bakiyesi aşağıda gösterilir.",
       "closedAttendance": "Yoklama kapalı",
+      "collectConfirm": "Tahsilatı kaydet",
+      "collectionHint": "Tahsilat yalnız gösterilen etkinlik hazırlığının gerçek borcuna yöneltilir. Kesin kayıt ve kontenjan ayrı onaylanır.",
       "conditions": "Koşullar",
+      "correctedResult": "Yeni yoklama sonucu",
+      "correctionHint": "Her katılımcının düzeltmesi ayrı gerekçe ve onayla kaydedilir.",
+      "correctionPerson": "Düzeltilecek katılımcı",
+      "credited": "Alacağa çevrilen",
       "duties": "Görevliler",
+      "dutyNotPerformed": "Görev yapılmadı",
+      "dutyOutcome": "Görev sonucu",
+      "dutyPerformed": "Görev yapıldı",
+      "dutyUnverified": "Doğrulanmadı",
+      "eligible": "Paket uygun",
       "empty": "Görünür katılımcı kaydı yok.",
       "extra": "Etkinlik bilgileri",
+      "fee": "Etkinlik ücreti",
+      "fullPayment": "Kayıt için tam ödeme gerekli",
+      "ineligible": "Paket uygun değil",
+      "ineligibleAcknowledgement": "Paket uygun olmasa da gerçekleşen katılımı gerekçeyle kaydediyorum; hak uygunluğu verilmez.",
       "markFor": "{{name}} için yoklama",
       "member": "Üye",
+      "noActual": "Fiilî başlangıç kaydı yok",
       "noDuties": "Görevli bulunmuyor.",
+      "noSale": "Paket seçilmedi",
+      "notConsumption": "Paket yalnız uygunluk için; hak tüketilmez",
       "openAttendance": "Yoklama açık",
       "operations": "İşlemler",
+      "paid": "Ödenen",
+      "partialPayment": "Tam ödeme zorunlu değil",
       "participants": "Katılımcılar",
       "payment": "Ödeme",
+      "paymentUnread": "Ödeme kaynağı paylaşılmıyor",
       "planned": "Planlanan başlangıç",
+      "previewAction": "İptal etkilerini oku",
+      "previewHint": "Bu etkiler sunucunun güncel önizlemesidir. İptal otomatik nakit iadesi değildir.",
+      "previewRegistrationHint": "Sonraki adımda seçili kişi ve paketin güncel uygunluğu sunucudan okunur.",
       "reason": "Gerekçe",
       "registration": {
         "amount": "Tutar (alt birim)",
@@ -377,6 +405,12 @@ export default interface Resources {
           "3": "Kesin kayıt özeti"
         }
       },
+      "registrationState": {
+        "active": "Aktif",
+        "cancelled": "İptal",
+        "completed": "Tamamlandı"
+      },
+      "remaining": "Kalan borç",
       "requiredReason": "Gerekçe (zorunlu, geçmişe yazılır)",
       "results": {
         "attended": "Geldi",
@@ -386,7 +420,11 @@ export default interface Resources {
       },
       "review": "İşlemi ve etkilerini inceledim, onaylıyorum.",
       "rights": "Hak",
+      "saleChoice": "Kayıt için paket",
+      "saleHint": "Tarih ve hak bakiyesi seçim içindir. Etkinliğe uygunluğu güncel sunucu önizlemesi belirler.",
       "sections": "Etkinlik bölümleri",
+      "sourceLimit": "Hazırlıksız eski kayıtların ödeme bağı henüz sunulmuyor. Ödeme bilinmiyor olarak korunur.",
+      "title": "Etkinlik detayı",
       "unread": "Bu kaynak henüz okunamadı.",
       "visibleCount": "{{count}} kayıt listeleniyor" | "{{count}} kayıt listeleniyor"
     },

@@ -146,7 +146,11 @@ export function EventsContent({
           if (center && !locked) setSelected(null);
         }}
         onOpen={(id) => {
-          if (!locked) setSelected(id);
+          if (!locked)
+            void router.navigate({
+              to: "/o/$orgId/c/$centerId/events/$eventId",
+              params: { orgId: scope.orgId, centerId: scope.centerId, eventId: id },
+            });
         }}
         notice={
           <>

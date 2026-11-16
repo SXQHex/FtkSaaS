@@ -52,6 +52,7 @@ export function EventActionDialog({
     cancel = useRef<HTMLButtonElement>(null);
   return (
     <AlertDialog
+      className="max-h-[calc(100svh-2rem)] overflow-y-auto"
       isOpen
       onOpenChange={(open) => {
         if (!open && !locked) onClose();
