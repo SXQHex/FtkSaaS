@@ -173,7 +173,7 @@ export function SaleLifecycleEditor({
     } catch (failure) {
       if (mounted.current && !onAccessLost(failure)) {
         setError(true);
-        void inventory.refetch();
+        if (action === "change") void inventory.refetch();
       }
     } finally {
       if (mounted.current) setPreparing(false);

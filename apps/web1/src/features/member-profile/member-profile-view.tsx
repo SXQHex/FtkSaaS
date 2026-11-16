@@ -51,6 +51,7 @@ export interface ProfileEntitlement {
   kind: "credit" | "timed";
   counts?: { total?: number; available: number; reserved: number; consumed: number };
   note?: string;
+  policyNote?: string;
   actions: ProfileAction[];
   freezes?: { id: string; period: string; state: string; action?: ProfileAction; note?: string }[];
 }
@@ -303,6 +304,9 @@ export function MemberProfileView({
                         <p className="text-sm">{t(($) => $.memberProfile.timedHint)}</p>
                       ) : null}
                       {row.note && <p className="mt-2 text-sm text-muted-foreground">{row.note}</p>}
+                      {row.policyNote && (
+                        <p className="mt-2 text-sm text-muted-foreground">{row.policyNote}</p>
+                      )}
                       {Boolean(row.freezes?.length) && (
                         <section
                           className="mt-3 space-y-2"

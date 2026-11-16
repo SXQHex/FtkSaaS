@@ -158,7 +158,7 @@ export function MemberProfileContent({
     (error: unknown) => {
       if (
         (error instanceof BackendError &&
-          ["AUTH_REQUIRED", "SESSION_REVOKED", "FORBIDDEN"].includes(error.code)) ||
+          ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
         (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
       ) {
         setInvalid(true);
@@ -322,15 +322,10 @@ export function MemberProfileContent({
               }).format(new Date(value));
             return {
               ...row,
-              note:
-                [
-                  row.note,
-                  product?.terms.freeze.enabled === false
-                    ? t(($) => $.memberProfile.freezeNotInProduct)
-                    : undefined,
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || undefined,
+              policyNote:
+                product?.terms.freeze.enabled === false
+                  ? t(($) => $.memberProfile.freezeNotInProduct)
+                  : undefined,
               freezes: source.freezes?.map((freeze) => {
                 const future = Date.parse(freeze.starts_at) > Date.now(),
                   open =
