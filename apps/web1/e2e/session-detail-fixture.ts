@@ -25,6 +25,9 @@ export async function mockSessionDetail(
     attendanceDenied?: boolean;
     writeDenied?: boolean;
     allowEditor?: boolean;
+    instructor?: boolean;
+    attendanceUnknown?: boolean;
+    attendanceAckUnread?: boolean;
   } = {},
 ) {
   const studio = await mockStudio(page);
@@ -36,6 +39,7 @@ export async function mockSessionDetail(
       string,
       { operation: string; type: "sessions" | "reservations"; id: string }
     >();
+  const calendarReads: Record<string, unknown>[] = [];
   const start = Date.now() + (options.existing ? -20 : 60) * 60000;
   const session: SessionView = {
     id: S.session,
@@ -94,6 +98,7 @@ export async function mockSessionDetail(
     contacts: [],
     relationships: [{ center_id: I.center, kind: "student", state: "active" }],
   };
+  let attendanceUnread = false;
   let unread = false,
     corrections: Record<string, unknown>[] = [];
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
@@ -103,26 +108,65 @@ export async function mockSessionDetail(
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } }),
       reject = (code: string) =>
         route.fulfill({ json: { ok: false, error: { code, retryable: false, trace_id: I.role } } });
-    if (operation === "session_get_v1") {
-      expect(req.session_id).toBe(S.session);
-      return send(session);
-    }
-    if (operation === "calendar_get_v1")
+    if (options.instructor && operation === "organizations_list_v1")
       return send({
         items: [
           {
-            id: S.session,
-            type: "session",
-            center_id: I.center,
-            starts_at: session.starts_at,
-            ends_at: session.ends_at,
-            title: "Sentetik seans",
-            resources: [{ kind: "room", id: I.room }],
+            id: I.org,
+            name: "Fixture Studio",
+            state: "active",
+            access_mode: "normal",
+            version: 1,
+            self_context: {
+              person_id: I.instructor,
+              subscriber_number: null,
+              centers: [
+                { center_id: I.center, instructor: true, student: false, assistant: false },
+              ],
+            },
           },
         ],
         next_cursor: null,
         as_of: new Date().toISOString(),
       });
+    if (options.instructor && operation === "earnings_list_v1") {
+      expect(req.person_id).toBe(I.instructor);
+      return send({ items: [], next_cursor: null, as_of: new Date().toISOString() });
+    }
+    if (options.instructor && operation === "roles_list_v1") return reject("FORBIDDEN");
+    if (operation === "session_get_v1") {
+      expect(req.session_id).toBe(S.session);
+      if (attendanceUnread) {
+        attendanceUnread = false;
+        return route.abort();
+      }
+      return send(session);
+    }
+    if (operation === "calendar_get_v1") {
+      calendarReads.push(req);
+      if (options.instructor) expect(req.resource).toEqual({ kind: "person", id: I.instructor });
+      const visible =
+        !options.instructor ||
+        (Date.parse(session.starts_at) < Date.parse(req.interval.ends_at) &&
+          Date.parse(session.ends_at) > Date.parse(req.interval.starts_at));
+      return send({
+        items: visible
+          ? [
+              {
+                id: S.session,
+                type: "session",
+                center_id: I.center,
+                starts_at: session.starts_at,
+                ends_at: session.ends_at,
+                title: "Sentetik seans",
+                resources: [{ kind: "room", id: I.room }],
+              },
+            ]
+          : [],
+        next_cursor: null,
+        as_of: new Date().toISOString(),
+      });
+    }
     if (operation === "person_get_v1" && req.person_id === I.self) return send(person);
     if (operation === "people_list_v1")
       return send({ items: [person], next_cursor: null, as_of: new Date().toISOString() });
@@ -338,6 +382,10 @@ export async function mockSessionDetail(
       const type = operation === "attendance_mark_v1" ? "reservations" : "sessions",
         id = type === "reservations" ? S.reservation : S.session;
       receipts.set(req.operation_key, { operation, type, id });
+      if (options.attendanceAckUnread && operation === "attendance_start_v1")
+        attendanceUnread = true;
+      if (options.attendanceUnknown && operation === "attendance_start_v1")
+        return route.abort("failed");
       return send({ primary_id: id, changed: [], jobs: [] });
     }
     if (operation === "attendance_correct_preview_v1") {
@@ -354,7 +402,8 @@ export async function mockSessionDetail(
             entity: { type: "reservations", id: S.reservation },
             action: "release",
             quantity: 1,
-            reason: req.reason,
+            reason: options.instructor ? "Sentetik gizli mali açıklama" : req.reason,
+            ...(options.instructor ? { amount_minor: "999999", currency: "TRY" } : {}),
           },
         ],
         blockers: [],
@@ -384,13 +433,18 @@ export async function mockSessionDetail(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/sessions/${S.session}`);
+  await page.goto(
+    options.instructor
+      ? `${origin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`
+      : `${origin}/o/${I.org}/c/${I.center}/sessions/${S.session}`,
+  );
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   return {
     session,
     attendance,
     writes,
     reads,
+    calendarReads,
     get reservation() {
       return reservation;
     },
