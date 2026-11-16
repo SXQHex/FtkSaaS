@@ -111,9 +111,11 @@ export function MemberProfileContent({
       scope.orgId,
       scope.centerId,
       personId,
+      filter,
       reservationCursors[reservationIndex],
     ],
-    queryFn: () => readMemberReservations(scope, personId, reservationCursors[reservationIndex]),
+    queryFn: () =>
+      readMemberReservations(scope, personId, reservationCursors[reservationIndex], filter),
     enabled: Boolean(center && person.data && tab === "reservations"),
     retry: false,
   });
@@ -590,13 +592,24 @@ export function MemberProfileContent({
         }}
         reservations={reservationRows}
         reservationFilter={filter}
-        onReservationFilter={setFilter}
-        reservationFiltersAvailable={false}
+        onReservationFilter={(value) => {
+          if (locked || value === filter) return;
+          setReservationIndex(0);
+          setReservationCursors([undefined]);
+          queries.removeQueries({
+            queryKey: [
+              "profile-reservations",
+              scope.accountId,
+              scope.orgId,
+              scope.centerId,
+              personId,
+            ],
+          });
+          setFilter(value);
+        }}
+        reservationFiltersDisabled={locked}
         reservationFooter={
           <div className="mt-3 flex flex-col gap-3">
-            <p className="text-xs text-muted-foreground">
-              {t(($) => $.memberProfile.reservationFiltersUnavailable)}
-            </p>
             {(reservations.isError || reservations.data?.partial) && (
               <Alert variant={reservations.isError ? "destructive" : "default"}>
                 <AlertDescription>

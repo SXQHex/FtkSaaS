@@ -37,6 +37,7 @@ export async function readMemberReservations(
   scope: ClientScope,
   personId: string,
   cursor?: string,
+  timeFilter: "all" | "upcoming" | "past" = "all",
 ) {
   z.uuid().parse(personId);
   const backend = await scopedBackend(scope),
@@ -45,6 +46,7 @@ export async function readMemberReservations(
     ...common,
     request_id: uuidv7(),
     person_id: personId,
+    time_filter: timeFilter,
     page: { limit: 20, sort: "created_at_desc", ...(cursor ? { cursor } : {}) },
   });
   z.iso.datetime({ offset: true }).parse(page.as_of);

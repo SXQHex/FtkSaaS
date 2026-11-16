@@ -592,8 +592,8 @@ test("mobile member reservations preserve native cursor pages, current member at
   await expect(grid.getByText("Geldi", { exact: true })).toBeVisible();
   await expect(grid.getByText("Gelmedi", { exact: true })).toHaveCount(0);
   await expect(grid.getByText(/13:00/)).toBeVisible();
-  await expect(page.getByRole("radio", { name: "Yaklaşan", exact: true })).toBeDisabled();
-  await expect(page.getByRole("radio", { name: "Geçmiş", exact: true })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: "Yaklaşan", exact: true })).toBeEnabled();
+  await expect(page.getByRole("radio", { name: "Geçmiş", exact: true })).toBeEnabled();
   const region = page.getByRole("region", { name: "Rezervasyon ve yoklama geçmişi", exact: true });
   await region.focus();
   await expect(region).toBeFocused();
@@ -611,6 +611,104 @@ test("mobile member reservations preserve native cursor pages, current member at
   expect(reads.some((r) => (r.page as { cursor?: string }).cursor === "native-second")).toBe(true);
   expect(writes).toHaveLength(0);
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
+});
+test("native reservation time filters discard the previous cursor chain and reread each server partition", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  const { grid, reads, cancelWrites } = await reservationSetup(page);
+  await expect(grid.getByText("Tamamlandı", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki rezervasyonlar", exact: true }).click();
+  await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
+  const filtered: Record<string, unknown>[] = [];
+  const futureSession = "019a7b00-0000-7000-8000-000000000095";
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1),
+      req = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "reservation_list_v1") {
+      filtered.push(req);
+      expect(req).not.toHaveProperty("interval");
+      if (req.time_filter === "upcoming")
+        return send({
+          items: [
+            {
+              id: "019a7b00-0000-7000-8000-000000000096",
+              session_id: futureSession,
+              person_id: I.instructor,
+              state: "active",
+              mode: "flexible",
+              version: 2,
+            },
+          ],
+          next_cursor: req.page.cursor ? null : "future-second",
+          as_of: "2026-11-16T10:00:00Z",
+        });
+      if (req.time_filter === "past")
+        return send({ items: [], next_cursor: null, as_of: "2026-11-16T10:00:00Z" });
+      return route.fallback();
+    }
+    if (op === "session_get_v1" && req.session_id === futureSession)
+      return send({
+        id: futureSession,
+        class_id: null,
+        discipline_id: I.discipline,
+        format: "group",
+        starts_at: "2099-11-16T10:00:00Z",
+        ends_at: "2099-11-16T11:00:00Z",
+        state: "planned",
+        attendance_state: "open",
+        assignments: [],
+        version: 4,
+        capacity: {
+          total: 8,
+          held: 1,
+          remaining: 7,
+          category_held: null,
+          category_remaining: null,
+          room_capacity: null,
+        },
+      });
+    if (op === "attendance_get_v1" && req.session_id === futureSession)
+      return send({
+        session_id: futureSession,
+        session_version: 4,
+        closure_state: "open",
+        revision: 0,
+        entries: [],
+      });
+    return route.fallback();
+  });
+  await page.getByRole("radio", { name: "Yaklaşan", exact: true }).press("Space");
+  await expect(grid.getByText("Kesin", { exact: true })).toBeVisible();
+  expect(filtered[0]).toMatchObject({ time_filter: "upcoming", page: { limit: 20 } });
+  expect(filtered[0]!.page).not.toHaveProperty("cursor");
+  await page.getByRole("button", { name: "Sonraki rezervasyonlar", exact: true }).click();
+  await expect
+    .poll(() =>
+      filtered.some((req) => (req.page as { cursor?: string }).cursor === "future-second"),
+    )
+    .toBe(true);
+  await page.getByRole("radio", { name: "Geçmiş", exact: true }).press("Space");
+  await expect(grid.getByText("Kesin", { exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Önceki rezervasyonlar", exact: true }),
+  ).toBeDisabled();
+  const past = filtered.find((req) => req.time_filter === "past");
+  expect(past).toBeDefined();
+  expect(past!.page).not.toHaveProperty("cursor");
+  await page.getByRole("radio", { name: "Tümü", exact: true }).press("Space");
+  await expect(grid.getByText("Tamamlandı", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Önceki rezervasyonlar", exact: true }),
+  ).toBeDisabled();
+  expect(filtered.at(-1)).toMatchObject({ time_filter: "all" });
+  expect(filtered.at(-1)!.page).not.toHaveProperty("cursor");
+  expect(reads.some((req) => (req.page as { cursor?: string }).cursor === "native-second")).toBe(
+    true,
+  );
+  expect(cancelWrites).toHaveLength(0);
+  expect((await scanAccessibility(page, "member-native-time-filters")).violations).toEqual([]);
 });
 test("denied attendance stays unknown while authorized reservation and lesson remain visible", async ({
   page,

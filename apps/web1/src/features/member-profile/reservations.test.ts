@@ -94,6 +94,29 @@ it("reads only the requested native cursor page and discards other members and s
   expect(result.nextCursor).toBe("native-next");
   expect(result.partial).toBe(false);
 });
+it.each(["all", "upcoming", "past"] as const)(
+  "delegates %s to the native reader without filtering the returned cursor page",
+  async (filter) => {
+    // This lesson overlaps the server cutoff. The frontend must retain the
+    // backend's partition decision instead of using its own clock or end time.
+    nativeSession.starts_at = "2026-11-16T09:45:00Z";
+    nativeSession.ends_at = "2026-11-16T11:00:00Z";
+    const result = await readMemberReservations(scope, personId, "native-current", filter);
+    expect(call.mock.calls[0]).toEqual([
+      "reservation_list_v1",
+      expect.objectContaining({
+        time_filter: filter,
+        person_id: personId,
+        page: { limit: 20, sort: "created_at_desc", cursor: "native-current" },
+      }),
+    ]);
+    expect(call.mock.calls[0]![1]).not.toHaveProperty("interval");
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]!.reservation.id).toBe(id(20));
+    expect(result.asOf).toBe("2026-11-16T13:00:00+03:00");
+    expect(result.nextCursor).toBe("native-next");
+  },
+);
 it("rejects a foreign person, repeated reservation identity, session identity or changed attendance snapshot", async () => {
   rows = [{ ...row(), person_id: id(90) }];
   await expect(readMemberReservations(scope, personId)).rejects.toThrow(

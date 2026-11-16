@@ -228,4 +228,6 @@ export interface Operations {
   finance_directory_get_v1: {request: T.RequestFinanceDirectoryGet; response: T.SuccessFinanceDirectoryGet};
   products_management_list_v1: {request: T.RequestProductsManagementList; response: T.SuccessProductsManagementList};
   product_state_set_v1: {request: T.RequestProductStateSet; response: T.SuccessProductStateSet};
+  freeze_cancel_preview_v1: {request: T.RequestFreezeCancelPreview; response: T.SuccessFreezeCancelPreview};
+  freeze_cancel_apply_v1: {request: T.RequestFreezeCancelApply; response: T.SuccessFreezeCancelApply};
 }

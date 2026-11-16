@@ -99,7 +99,7 @@ export function MemberProfileView({
   loading = false,
   paymentPagination,
   reservationFooter,
-  reservationFiltersAvailable = true,
+  reservationFiltersDisabled = false,
 }: {
   name: string;
   initials: string;
@@ -137,7 +137,7 @@ export function MemberProfileView({
   loading?: boolean;
   paymentPagination?: ReactNode;
   reservationFooter?: ReactNode;
-  reservationFiltersAvailable?: boolean;
+  reservationFiltersDisabled?: boolean;
 }) {
   const { t } = useTranslation();
   const revealSelectedTab = useCallback((element: HTMLDivElement | null) => {
@@ -402,11 +402,7 @@ export function MemberProfileView({
                     }}
                   >
                     {(["all", "upcoming", "past"] as const).map((key) => (
-                      <ToggleGroupItem
-                        key={key}
-                        id={key}
-                        isDisabled={!reservationFiltersAvailable && key !== "all"}
-                      >
+                      <ToggleGroupItem key={key} id={key} isDisabled={reservationFiltersDisabled}>
                         {t(($) => $.memberProfile.filters[key])}
                       </ToggleGroupItem>
                     ))}
