@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { XIcon } from "lucide-react";
 import {
@@ -200,6 +200,7 @@ export interface RequestDraft {
   capacity: string;
   accepted: boolean;
   windowException: boolean;
+  offset: string;
 }
 export function LessonRequestSheet({
   name,
@@ -214,17 +215,20 @@ export function LessonRequestSheet({
   rooms,
   instructors,
   sessions,
+  offsets = [],
+  instructorFixed = false,
   notice,
   recovery,
   onClose,
   onSubmit,
   locked = false,
   canResolve = false,
+  canApprove = canResolve,
   errors = {},
 }: {
   name: string;
   subtitle: string;
-  state: RequestState;
+  state?: RequestState;
   stage: RequestStage;
   onStage: (stage: RequestStage) => void;
   draft: RequestDraft;
@@ -234,17 +238,40 @@ export function LessonRequestSheet({
   rooms: { id: string; name: string }[];
   instructors: { id: string; name: string }[];
   sessions: { id: string; name: string }[];
+  offsets?: { id: string; label: string }[];
+  instructorFixed?: boolean;
   notice?: ReactNode;
   recovery?: ReactNode;
   onClose: () => void;
   onSubmit?: () => void;
   locked?: boolean;
   canResolve?: boolean;
+  canApprove?: boolean;
   errors?: Partial<Record<keyof RequestDraft, string>>;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(),
+    form = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (Object.keys(errors).length)
+      form.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [errors]);
+  const stageTitles = {
+    reject: t(($) => $.lessonRequests.stageTitles.reject),
+    alternative: t(($) => $.lessonRequests.stageTitles.alternative),
+    approve: t(($) => $.lessonRequests.stageTitles.approve),
+  };
+  const submitLabels = {
+    reject: t(($) => $.lessonRequests.submit.reject),
+    alternative: t(($) => $.lessonRequests.submit.alternative),
+    approve: t(($) => $.lessonRequests.submit.approve),
+  };
   const change = <K extends keyof RequestDraft>(key: K, value: RequestDraft[K]) =>
-    onDraft({ ...draft, [key]: value, accepted: false });
+    onDraft({
+      ...draft,
+      [key]: value,
+      accepted: false,
+      ...(["day", "time"].includes(key) ? { offset: "" } : {}),
+    });
   return (
     <Sheet
       isOpen
@@ -257,9 +284,7 @@ export function LessonRequestSheet({
     >
       <SheetHeader className="relative pe-14">
         <SheetTitle>
-          {stage === "view"
-            ? t(($) => $.lessonRequests.detailTitle, { name })
-            : t(($) => $.lessonRequests.stageTitles[stage])}
+          {stage === "view" ? t(($) => $.lessonRequests.detailTitle, { name }) : stageTitles[stage]}
         </SheetTitle>
         <SheetDescription>{subtitle}</SheetDescription>
         <Button
@@ -275,9 +300,11 @@ export function LessonRequestSheet({
       </SheetHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 [overscroll-behavior:contain]">
         {notice}
+        <Badge variant="outline">
+          {state ? t(($) => $.lessonRequests.states[state]) : t(($) => $.lessonRequests.unknown)}
+        </Badge>
         {stage === "view" ? (
           <>
-            <Badge variant="outline">{t(($) => $.lessonRequests.states[state])}</Badge>
             <p className="text-sm text-muted-foreground">{t(($) => $.lessonRequests.intentNote)}</p>
             <p className="rounded-lg border p-3 text-sm">
               {note ?? t(($) => $.lessonRequests.noteUnavailable)}
@@ -286,7 +313,7 @@ export function LessonRequestSheet({
               <h3 className="mb-3 text-sm font-medium">{t(($) => $.lessonRequests.eligibility)}</h3>
               <ItemGroup>
                 {eligibility?.map((row) => (
-                  <Item key={row.id} variant="outline">
+                  <Item key={row.id} role="listitem" variant="outline">
                     <ItemContent>
                       <ItemTitle>{row.label}</ItemTitle>
                       <p className="text-sm">{row.value}</p>
@@ -302,11 +329,12 @@ export function LessonRequestSheet({
           </>
         ) : (
           <form
+            ref={form}
             id="lesson-request-action"
             method="post"
             noValidate
             className="flex flex-col gap-4"
-            aria-label={t(($) => $.lessonRequests.stageTitles[stage])}
+            aria-label={stageTitles[stage]}
             onSubmit={(event) => {
               event.preventDefault();
               if (!locked) onSubmit?.();
@@ -377,6 +405,59 @@ export function LessonRequestSheet({
                     ))}
                   </NativeSelect>
                 </Field>
+                {offsets.length > 0 && (
+                  <Field>
+                    <FieldLabel htmlFor="request-offset">
+                      {t(($) => $.lessonRequests.offset)}
+                    </FieldLabel>
+                    <NativeSelect
+                      id="request-offset"
+                      name="offset"
+                      value={draft.offset}
+                      disabled={locked}
+                      onChange={(event) => change("offset", event.target.value)}
+                    >
+                      <NativeSelectOption value="">
+                        {t(($) => $.lessonRequests.choose)}
+                      </NativeSelectOption>
+                      {offsets.map((row) => (
+                        <NativeSelectOption key={row.id} value={row.id}>
+                          {row.label}
+                        </NativeSelectOption>
+                      ))}
+                    </NativeSelect>
+                  </Field>
+                )}
+                <Field orientation="horizontal">
+                  <Checkbox
+                    id="request-window"
+                    aria-labelledby="request-window-label"
+                    isSelected={draft.windowException}
+                    isDisabled={locked}
+                    onChange={(value) => change("windowException", value)}
+                  />
+                  <FieldLabel id="request-window-label" htmlFor="request-window">
+                    {t(($) => $.lessonRequests.windowException)}
+                  </FieldLabel>
+                </Field>
+                {draft.windowException && (
+                  <Field data-invalid={Boolean(errors.reason)}>
+                    <FieldLabel htmlFor="request-window-reason">
+                      {t(($) => $.lessonRequests.windowReason)}
+                    </FieldLabel>
+                    <Textarea
+                      id="request-window-reason"
+                      name="reason"
+                      value={draft.reason}
+                      disabled={locked}
+                      required
+                      aria-invalid={Boolean(errors.reason)}
+                      aria-describedby="request-window-error"
+                      onChange={(event) => change("reason", event.target.value)}
+                    />
+                    <FieldError id="request-window-error">{errors.reason}</FieldError>
+                  </Field>
+                )}
               </>
             )}
             {stage === "alternative" && (
@@ -457,6 +538,8 @@ export function LessonRequestSheet({
                         value={draft.roomId}
                         required
                         disabled={locked}
+                        aria-invalid={Boolean(errors.roomId)}
+                        aria-describedby="request-room-error"
                         onChange={(event) => change("roomId", event.target.value)}
                       >
                         <NativeSelectOption value="">
@@ -468,6 +551,34 @@ export function LessonRequestSheet({
                           </NativeSelectOption>
                         ))}
                       </NativeSelect>
+                      <FieldError id="request-room-error">{errors.roomId}</FieldError>
+                    </Field>
+                    <Field data-invalid={Boolean(errors.instructorId)}>
+                      <FieldLabel htmlFor="request-create-instructor">
+                        {t(($) => $.lessonRequests.instructor)}
+                      </FieldLabel>
+                      <NativeSelect
+                        id="request-create-instructor"
+                        name="instructorId"
+                        value={draft.instructorId}
+                        disabled={locked || instructorFixed}
+                        required
+                        aria-invalid={Boolean(errors.instructorId)}
+                        aria-describedby="request-create-instructor-error"
+                        onChange={(event) => change("instructorId", event.target.value)}
+                      >
+                        <NativeSelectOption value="">
+                          {t(($) => $.lessonRequests.choose)}
+                        </NativeSelectOption>
+                        {instructors.map((row) => (
+                          <NativeSelectOption key={row.id} value={row.id}>
+                            {row.name}
+                          </NativeSelectOption>
+                        ))}
+                      </NativeSelect>
+                      <FieldError id="request-create-instructor-error">
+                        {errors.instructorId}
+                      </FieldError>
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="request-capacity">
@@ -480,28 +591,36 @@ export function LessonRequestSheet({
                         inputMode="numeric"
                         required
                         disabled={locked}
+                        aria-invalid={Boolean(errors.capacity)}
+                        aria-describedby="request-capacity-error"
                         onChange={(event) => change("capacity", event.target.value)}
                       />
+                      <FieldError id="request-capacity-error">{errors.capacity}</FieldError>
                     </Field>
                   </>
                 )}
                 <p className="text-sm text-muted-foreground">
                   {t(($) => $.lessonRequests.approveNote)}
                 </p>
-                <Checkbox
-                  isSelected={draft.accepted}
-                  isDisabled={locked}
-                  onChange={(value) => onDraft({ ...draft, accepted: value })}
-                >
-                  {t(($) => $.lessonRequests.approveReview)}
-                </Checkbox>
+                <Field orientation="horizontal">
+                  <Checkbox
+                    id="request-review"
+                    aria-labelledby="request-review-label"
+                    isSelected={draft.accepted}
+                    isDisabled={locked}
+                    onChange={(value) => onDraft({ ...draft, accepted: value })}
+                  />
+                  <FieldLabel id="request-review-label" htmlFor="request-review">
+                    {t(($) => $.lessonRequests.approveReview)}
+                  </FieldLabel>
+                </Field>
               </>
             )}
           </form>
         )}
         {recovery}
       </div>
-      <SheetFooter className="flex-wrap">
+      <SheetFooter key={stage} className="flex-wrap">
         {stage === "view" ? (
           <>
             <Button
@@ -518,7 +637,7 @@ export function LessonRequestSheet({
             >
               {t(($) => $.lessonRequests.alternative)}
             </Button>
-            <Button isDisabled={locked || !canResolve} onPress={() => onStage("approve")}>
+            <Button isDisabled={locked || !canApprove} onPress={() => onStage("approve")}>
               {t(($) => $.lessonRequests.approve)}
             </Button>
           </>
@@ -532,7 +651,7 @@ export function LessonRequestSheet({
               form="lesson-request-action"
               isDisabled={locked || !onSubmit || (stage === "approve" && !draft.accepted)}
             >
-              {t(($) => $.lessonRequests.submit[stage])}
+              {submitLabels[stage]}
             </Button>
           </>
         )}

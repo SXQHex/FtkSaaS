@@ -2616,6 +2616,41 @@
       "alternative": "Alternatifi gönder",
       "approve": "Onayla ve rezervasyon oluştur"
     },
-    "optionalNote": "Not (isteğe bağlı)"
+    "optionalNote": "Not (isteğe bağlı)",
+    "unknown": "Okunamadı",
+    "minutes": "dk",
+    "sourceError": "Talep veya işlem kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
+    "sourceChanged": "Talep değişti. Güncel durumu inceleyip yeni karar ver.",
+    "invalid": "Bu alanı kontrol et.",
+    "alternativeNotAccepted": "Alternatif saat henüz üye tarafından kabul edilmedi.",
+    "offsetRequired": "Bu saat iki kez oluşuyor. UTC farkını açıkça seç.",
+    "offset": "UTC farkı",
+    "windowException": "Süre istisnası iste (native yetki ve politika gerekir)",
+    "windowReason": "İstisna gerekçesi",
+    "reservation": "Kesin rezervasyon",
+    "reservationConfirmed": "Güncel rezervasyon ve seans okundu.",
+    "rights": "Haklar",
+    "rightsRead": "Güncel hak kaynağı okundu.",
+    "readSource": "Güncel talebi oku",
+    "visibility": {
+      "restricted": "Bu ayrıntıyı görme yetkisi yok.",
+      "not_enabled": "Bu ayrıntı mevcut planda kullanılamıyor."
+    },
+    "commandStates": {
+      "ready": "",
+      "writing": "İşlem kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor; aynı isteği yeniden dene veya işlem durumunu oku.",
+      "pending": "İşlem sürüyor. Yeni istek göndermeden sonucu oku.",
+      "saved-unread": "İşlem alındı; güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.",
+      "saved": "İşlem kaydedildi ve güncel talep okundu.",
+      "stale": "Kaynak değişti. Yeniden oku ve yeni karar ver.",
+      "rejected": "İşlem reddedildi; güncel koşulları kontrol et."
+    },
+    "rightsSummary": "{{credits}} kredi · {{packages}} süreli paket",
+    "noPreference": "Tercih belirtilmedi",
+    "directoryLimit": "Güncel tüm talepler listeleniyor. Durum filtreleri ve merkez sayaçları henüz kullanılamıyor.",
+    "reload": "Listeyi yeniden oku",
+    "previous": "Önceki",
+    "next": "Sonraki"
   }
 }
