@@ -24,6 +24,7 @@ import { Route as InstructorEarningsRouteImport } from './routes/instructor.earn
 import { Route as InstructorScheduleRouteImport } from './routes/instructor.schedule'
 import { Route as InstructorTodayRouteImport } from './routes/instructor.today'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
+import { Route as MemberEntitlementsRouteImport } from './routes/member.entitlements'
 import { Route as MemberReservationsRouteImport } from './routes/member.reservations'
 import { Route as InstructorSessionsSessionIdRouteImport } from './routes/instructor.sessions.$sessionId'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
@@ -113,6 +114,11 @@ const InviteExpiredRoute = InviteExpiredRouteImport.update({
   path: '/invite/expired',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MemberEntitlementsRoute = MemberEntitlementsRouteImport.update({
+  id: '/member/entitlements',
+  path: '/member/entitlements',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MemberReservationsRoute = MemberReservationsRouteImport.update({
   id: '/member/reservations',
   path: '/member/reservations',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/member/entitlements': typeof MemberEntitlementsRoute
   '/member/reservations': typeof MemberReservationsRoute
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/member/entitlements': typeof MemberEntitlementsRoute
   '/member/reservations': typeof MemberReservationsRoute
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite_/expired': typeof InviteExpiredRoute
+  '/member/entitlements': typeof MemberEntitlementsRoute
   '/member/reservations': typeof MemberReservationsRoute
   '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/instructor/schedule'
     | '/instructor/today'
     | '/invite/expired'
+    | '/member/entitlements'
     | '/member/reservations'
     | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/instructor/schedule'
     | '/instructor/today'
     | '/invite/expired'
+    | '/member/entitlements'
     | '/member/reservations'
     | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/instructor/schedule'
     | '/instructor/today'
     | '/invite_/expired'
+    | '/member/entitlements'
     | '/member/reservations'
     | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
@@ -383,6 +395,7 @@ export interface RootRouteChildren {
   InstructorScheduleRoute: typeof InstructorScheduleRoute
   InstructorTodayRoute: typeof InstructorTodayRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
+  MemberEntitlementsRoute: typeof MemberEntitlementsRoute
   MemberReservationsRoute: typeof MemberReservationsRoute
   InstructorSessionsSessionIdRoute: typeof InstructorSessionsSessionIdRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteExpiredRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/member/entitlements': {
+      id: '/member/entitlements'
+      path: '/member/entitlements'
+      fullPath: '/member/entitlements'
+      preLoaderRoute: typeof MemberEntitlementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/member/reservations': {
       id: '/member/reservations'
       path: '/member/reservations'
@@ -615,6 +635,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstructorScheduleRoute: InstructorScheduleRoute,
   InstructorTodayRoute: InstructorTodayRoute,
   InviteExpiredRoute: InviteExpiredRoute,
+  MemberEntitlementsRoute: MemberEntitlementsRoute,
   MemberReservationsRoute: MemberReservationsRoute,
   InstructorSessionsSessionIdRoute: InstructorSessionsSessionIdRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,

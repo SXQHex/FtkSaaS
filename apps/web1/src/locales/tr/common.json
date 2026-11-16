@@ -2851,5 +2851,57 @@
       "requests": "Özel ders",
       "account": "Hesabım"
     }
+  },
+  "memberEntitlements": {
+    "title": "Haklarım",
+    "description": "Paketin, kalan derslerin ve ödemelerin.",
+    "choosePackage": "Paket seç",
+    "emptyPackages": "Bu merkezde açık paket kaydı yok.",
+    "packageUnread": "Paket bilgisi okunamadı.",
+    "metrics": {
+      "available": "Kullanılabilir bakiye",
+      "reserved": "Ayrılmış",
+      "consumed": "Kullanılan"
+    },
+    "metricHints": {
+      "available": "Rezervasyon uygunluğu ayrıca denetlenir",
+      "reserved": "Yaklaşan derslerin",
+      "consumed": "Yoklaması kapanan"
+    },
+    "usage": "Kullanılan ders oranı",
+    "movements": "Hak hareketleri",
+    "movementsUnread": "Hak hareketlerini görmek için bir paket seç.",
+    "emptyMovements": "Bu pakette hak hareketi yok.",
+    "payments": "Ödemelerim",
+    "paymentsHint": "Ödemeyi stüdyoda yaparsın, kayıt burada görünür.",
+    "balance": "Bakiye",
+    "paymentsUnread": "Ödeme geçmişi okunamadı.",
+    "emptyPayments": "Ödeme hareketi yok.",
+    "date": "Tarih",
+    "operation": "İşlem",
+    "amount": "Tutar",
+    "previousPackages": "Önceki paketler",
+    "unknownName": "Satın alınan paket adı okunamadı",
+    "debt": "{{amount}} borç",
+    "noDebt": "Bu merkezde açık borcun yok.",
+    "creditUnknown": "Alacak ve ödeme geçmişi kaynağı okunamadı.",
+    "sourceLimits": "Satın alınan paket adı/ilk ders toplamı ve ödeme para birimi keşfi henüz okunamıyor.",
+    "loading": "Haklar okunuyor…",
+    "unread": "Güncel hak veya bakiye kaynağı okunamadı.",
+    "retry": "Yeniden oku",
+    "timed": "Süreli hak; geçerlilik ve kota koşulları uygulanır.",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "freeze": "Dondurma",
+    "balanceChange": "Sağdaki değer ders bakiyesindeki değişimdir.",
+    "saleStates": {
+      "active": "Aktif",
+      "terminated": "Sonlandırıldı",
+      "expired": "Sona erdi"
+    },
+    "quantity_one": "{{count}} ders",
+    "quantity_other": "{{count}} ders",
+    "deficit_one": "Kaynakta {{count}} negatif hak görünüyor.",
+    "deficit_other": "Kaynakta {{count}} negatif hak görünüyor."
   }
 }

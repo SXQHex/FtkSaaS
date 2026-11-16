@@ -31,7 +31,7 @@ export function MemberLayout({
   account: AccountView;
   initial: { org?: string; center?: string };
   title: string;
-  active: "reservations";
+  active: "reservations" | "entitlements";
   onScope: (selection: { org?: string; center?: string }) => void;
   children: (context: {
     scope: ClientScope;
@@ -97,8 +97,8 @@ export function MemberLayout({
     href:
       link.id === "account"
         ? "/account"
-        : link.id === "reservations" && org && center
-          ? `/member/reservations?${new URLSearchParams({ org: org.id, center: center.id })}`
+        : (link.id === "reservations" || link.id === "entitlements") && org && center
+          ? `/member/${link.id}?${new URLSearchParams({ org: org.id, center: center.id })}`
           : undefined,
   }));
   async function signOut() {
@@ -147,7 +147,7 @@ export function MemberLayout({
         </div>
       }
     >
-      <div className="mx-auto flex max-w-5xl flex-wrap gap-3 px-4 pt-4 md:px-6">
+      <div className="mx-auto flex max-w-5xl flex-wrap gap-3 px-4 pt-4">
         <NativeSelect
           aria-label={t(($) => $.memberReservations.chooseOrg)}
           className="w-full sm:w-56"

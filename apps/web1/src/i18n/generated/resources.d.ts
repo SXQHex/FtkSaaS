@@ -829,6 +829,56 @@ export default interface Resources {
       "title": "Dersler",
       "unread": "Güncel ders listesi okunamadı."
     },
+    "memberEntitlements": {
+      "amount": "Tutar",
+      "balance": "Bakiye",
+      "balanceChange": "Sağdaki değer ders bakiyesindeki değişimdir.",
+      "choosePackage": "Paket seç",
+      "creditUnknown": "Alacak ve ödeme geçmişi kaynağı okunamadı.",
+      "date": "Tarih",
+      "debt": "{{amount}} borç",
+      "deficit": "Kaynakta {{count}} negatif hak görünüyor." | "Kaynakta {{count}} negatif hak görünüyor.",
+      "description": "Paketin, kalan derslerin ve ödemelerin.",
+      "emptyMovements": "Bu pakette hak hareketi yok.",
+      "emptyPackages": "Bu merkezde açık paket kaydı yok.",
+      "emptyPayments": "Ödeme hareketi yok.",
+      "freeze": "Dondurma",
+      "loading": "Haklar okunuyor…",
+      "metricHints": {
+        "available": "Rezervasyon uygunluğu ayrıca denetlenir",
+        "consumed": "Yoklaması kapanan",
+        "reserved": "Yaklaşan derslerin"
+      },
+      "metrics": {
+        "available": "Kullanılabilir bakiye",
+        "consumed": "Kullanılan",
+        "reserved": "Ayrılmış"
+      },
+      "movements": "Hak hareketleri",
+      "movementsUnread": "Hak hareketlerini görmek için bir paket seç.",
+      "next": "Sonraki",
+      "noDebt": "Bu merkezde açık borcun yok.",
+      "operation": "İşlem",
+      "packageUnread": "Paket bilgisi okunamadı.",
+      "payments": "Ödemelerim",
+      "paymentsHint": "Ödemeyi stüdyoda yaparsın, kayıt burada görünür.",
+      "paymentsUnread": "Ödeme geçmişi okunamadı.",
+      "previous": "Önceki",
+      "previousPackages": "Önceki paketler",
+      "quantity": "{{count}} ders" | "{{count}} ders",
+      "retry": "Yeniden oku",
+      "saleStates": {
+        "active": "Aktif",
+        "expired": "Sona erdi",
+        "terminated": "Sonlandırıldı"
+      },
+      "sourceLimits": "Satın alınan paket adı/ilk ders toplamı ve ödeme para birimi keşfi henüz okunamıyor.",
+      "timed": "Süreli hak; geçerlilik ve kota koşulları uygulanır.",
+      "title": "Haklarım",
+      "unknownName": "Satın alınan paket adı okunamadı",
+      "unread": "Güncel hak veya bakiye kaynağı okunamadı.",
+      "usage": "Kullanılan ders oranı"
+    },
     "memberProfile": {
       "accepted": "Etkiyi okudum",
       "actions": {

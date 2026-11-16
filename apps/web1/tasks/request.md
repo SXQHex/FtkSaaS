@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı. Açık talepler W1-BE-17 (E21 durum filtresi/sayaçlar) ve W1-BE-18’dir (eğitmene görünür seansın salon etiketi kaynağı). E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+16 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. W1-BE-01–16 için backend kaynak desteği karşılandı. Açık talepler W1-BE-17–22’dir; kapsamları aşağıdaki tabloda ve kendi bölümlerinde tutulur. E18 frontend tüketimi ve kabulünün tek sahibi [TODO](todo.md) kaydıdır. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir; karşılanan talepler aşağıda kaynaklarıyla işaretlidir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `1df2e01c40fd625b0def974fe3347da65032fcfd` (PR315 dahil). Tüketici kaynak: `feat/web1-account-acceptance`, [PR308](https://github.com/SXQHex/FtkSaaS/pull/308). Aynı kaynak [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721918), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721867) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43863802374) başarılıdır. Kaynak desteği frontend tüketimi veya güncel hosted tekrar kabulü sayılmaz. Ekran durumu ve Pro teslim sonrası gerçek kontroller yalnız [TODO](todo.md) sahibindedir.
 
@@ -24,6 +24,10 @@
 | W1-BE-16 | E18 · P09/WF06            | Rezervasyona bağlı gerçek paket/hak özeti                                        | Backend karşılandı (PR315): include_source_summary gerçek kaynak/hak özetini sağlar; E18 tüketiyor; kabul sahibi TODO/E18.                     |
 | W1-BE-17 | E21 · P06.5/WF06          | Özel ders taleplerinin native durum filtresi ve merkez sayaçları                 | Açık: merkez cursor listesi mevcut; durum filtresi ve özet yok.                                                                                |
 | W1-BE-18 | E24–E26 · P11.2/WF03/WF07 | Atanmış seansın eğitmene görünür salon etiketi                                   | Açık: mevcut güvenli typed kaynak eşlemesi isteniyor.                                                                                          |
+| W1-BE-19 | E27 · P10/P11.2 | Kendi geçerli anlaşma/ödeme keşfi ve dönem toplamları | Açık: hakediş cursor satırları mevcut; eksik kaynak eşlemesi isteniyor. |
+| W1-BE-20 | E28/E29 · P09/P11.1 | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası | Açık: mevcut rezervasyonlar yeni ders keşfi yerine geçmez. |
+| W1-BE-21 | E29 · P09/P11.1 | Öğrencinin kendi merkezindeki bekleme/teklif keşfi | Açık: bilinen seans veya kayıt gerektirmeyen özne keşfi isteniyor. |
+| W1-BE-22 | E30 · P07/P08/P11.1 | Satın alınan paket bilgisi ve ödeme para birimi keşfi | Açık: hak/hareket ve açık borç özeti mevcut; kalan eşleme isteniyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -205,3 +209,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **Mevcut kaynak:** `ManagementSelectorWaitlistJoinV1` ya bilinen person_id+session_id, ya CM/reservation.write sınırlı `directory:session` ister. Bilinen entry_id/offer_id selector'leri kendi komutlarına kaynak olur; merkezde öznenin henüz bilinmeyen kayıt/tekliflerini keşfetmez. `reservation_list_v1` bekleme kaydı değildir; rezervasyon oluşmamış seansı oradan bulamayız. Bütün dersleri/kişileri veya bildirim metinlerini taramak çözüm olarak kullanılmaz. Mevcut native leave/accept/reject ve operation receipt protokolü korunur. [WF19](../../../docs/workflows.md#wf19).
 
 **Sınır:** Yalnız native self ve canlı merkez/üst-plan görünürlüğü; başka üyelerin adı/iletişimi/hesap kimliği veya worker issue/expire yetkisi açılmaz. Kabulde kapasite/hak/belge ve politika writer'da yeniden denetlenir. Dersin güvenli eğitmen/salon ve iptal politikası eşlemesi ayrıca W1-BE-20 kapsamındadır. Kendi kesin rezervasyonları ve iptali bağımsız bağlanır; ekran kabulü [TODO/E29](todo.md#sayfa-kabulu) sahibindedir.
+
+## W1-BE-22 · Öğrencinin satın alınan paket bilgisi ve ödeme para birimleri
+
+**Mevcut kaynak:** `entitlements_get_v1` kendi satış-hak kimliği, product_version_id, tür, geçerlilik, native sayımlar/kota/dondurma ve hareket defterini verir. Satın alınan sürümün immutable adı/ilk kredi toplamı yoktur. `products_list_v1` aktif ürünün güncel yürürlük sürümünü verir; tarihsel satın alma şartının yerine kullanılamaz. `person_get_v1(include_member_summary:true)` kendi merkezindeki pozitif açık borçları gerçek para birimiyle verir; bu destek kullanılacak. Borçsuz geçmiş ödemelerin veya alacağın bütün para birimlerini keşfetmez. `finance_get_v1` ise açık person_id+currency ister.
+
+**İhtiyaç:** E30 için mevcut güvenli typed eşlemeyi belirtin; yoksa kendi görünür satışları için satın alınan sürüm adı/ilk kredi toplamı ve bütün yetkili finans para birimlerini (borcu sıfır olsa da ödeme/alacak olanları) keşfedecek destek gerekir. Mevcut finance_get ve entitlement ledger cursor yolları yeniden kurulmayacak; yeni endpoint zorunlu tutulmaz. Negatif/düzeltme ve süreli hakta gerçek sınır semantiği backend sahibindedir.
+
+**Sınır:** Yalnız native self/öğrenci ve canlı merkez/plan; yönetim ürün/satış/finans kataloğuna veya private/core tablolara erişim istenmiyor. UUID'den ad, aktif katalogdan eski şart, sayımları toplayarak ilk kredi veya varsayılan TRY üretilmez. Yerel hak sayımları/hareketler/borç özeti bağımsız bağlanır; ekran kabulü [TODO/E30](todo.md#sayfa-kabulu) sahibindedir.
