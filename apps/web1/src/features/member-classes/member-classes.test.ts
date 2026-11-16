@@ -63,12 +63,10 @@ const draft = {
 };
 beforeEach(() => call.mockReset());
 it("discovers unbooked group/private lessons with opt-in scope and complete interval cursors", async () => {
-  call
-    .mockResolvedValueOnce({ items: [row], next_cursor: "next" })
-    .mockResolvedValueOnce({
-      items: [{ ...row, id: id(9), member_lesson: { ...row.member_lesson, format: "private" } }],
-      next_cursor: null,
-    });
+  call.mockResolvedValueOnce({ items: [row], next_cursor: "next" }).mockResolvedValueOnce({
+    items: [{ ...row, id: id(9), member_lesson: { ...row.member_lesson, format: "private" } }],
+    next_cursor: null,
+  });
   expect(await readMemberClasses(scope, interval)).toHaveLength(2);
   expect(call.mock.calls[0]![1]).toMatchObject({
     member_discovery: true,
@@ -120,7 +118,8 @@ it("rereads the native session/version and selected entitlement before construct
     .mockResolvedValueOnce({ items: [row], next_cursor: null })
     .mockResolvedValueOnce([
       { person_id: id(5), sale_id: id(6), state: "active", booking_mode: "priority" },
-    ]);
+    ])
+    .mockResolvedValueOnce([]);
   expect(await memberClassIntent(scope, id(5), row, "book", draft)).toMatchObject({
     kind: "booking",
     value: {
@@ -129,7 +128,9 @@ it("rereads the native session/version and selected entitlement before construct
     },
   });
   expect(
-    call.mock.calls.every(([op]) => ["calendar_get_v1", "entitlements_get_v1"].includes(op)),
+    call.mock.calls.every(([op]) =>
+      ["calendar_get_v1", "entitlements_get_v1", "document_requirements_get_v1"].includes(op),
+    ),
   ).toBe(true);
 });
 it("rejects stale versions and changed cancellation policy before any writer", async () => {

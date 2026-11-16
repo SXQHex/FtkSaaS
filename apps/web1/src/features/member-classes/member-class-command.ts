@@ -19,6 +19,7 @@ import {
   type WaitlistIntent,
 } from "../session-detail/session-waitlist";
 import type { SessionBookingDraft } from "../session-detail/session-detail-panels";
+import { readRequiredDocuments } from "../member-documents/member-documents";
 export type ClassAction = "book" | "join" | "leave" | "accept" | "reject";
 export type MemberClassIntent =
   | { kind: "booking"; value: SessionBookingIntent }
@@ -59,6 +60,17 @@ export async function memberClassIntent(
     const rights = await readBookingRights(scope, personId, before.id, draft.mode);
     const source = rights.find((row) => row.sale_id === draft.saleId);
     if (!source) throw Error("MEMBER_CLASS_RIGHT_UNAVAILABLE");
+    const documents = await readRequiredDocuments({
+      scope,
+      personId,
+      context: {
+        gate: "reservation",
+        subject: { type: "sessions", id: before.id },
+        ...(source.product_version_id ? { product_version_id: source.product_version_id } : {}),
+      },
+    });
+    if (documents.some((row) => !row.accepted))
+      throw new BackendError({ code: "DOCUMENT_REQUIRED", retryable: false, trace_id: uuidv7() });
     return { kind: "booking", value: sessionBookingIntent(scope, before.id, draft, source, false) };
   }
   if (!d.waitlist_enabled) throw Error("MEMBER_CLASS_WAITLIST_UNAVAILABLE");

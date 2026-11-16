@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -24,6 +24,7 @@ import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { Checkbox } from "../../components/ui/checkbox";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { MemberCancellationPolicy } from "./member-cancellation-policy";
+import { MemberDocumentsPanel } from "../member-documents/member-documents-panel";
 export function MemberClassEditor({
   scope,
   personId,
@@ -50,13 +51,14 @@ export function MemberClassEditor({
       query: "",
       personId,
       saleId: "",
-      mode: "priority",
+      mode: action === "accept" ? "flexible" : "priority",
       category: "",
       override: false,
       reason: "",
       reviewed: false,
     }),
     [preparing, setPreparing] = useState(false),
+    [documentsLocked, setDocumentsLocked] = useState(false),
     [error, setError] = useState<string>();
   const executing = useRef(false),
     mounted = useRef(true),
@@ -74,7 +76,12 @@ export function MemberClassEditor({
     onRefresh: onSaved,
     onAccessLost,
   });
-  const locked = preparing || command.locked,
+  const documentLock = useCallback((value: boolean) => setDocumentsLocked(value), []);
+  const acceptedDocument = useCallback(
+    () => setDraft((value) => ({ ...value, reviewed: false })),
+    [],
+  );
+  const locked = preparing || command.locked || documentsLocked,
     readOnly = locked || command.state !== "ready";
   useEffect(() => {
     onLockChange(locked);
@@ -94,7 +101,7 @@ export function MemberClassEditor({
       draft.mode,
     ],
     queryFn: () => readBookingRights(scope, personId, before.id, draft.mode),
-    enabled: action === "book",
+    enabled: action === "book" || action === "accept",
     retry: false,
   });
   useEffect(() => {
@@ -177,35 +184,42 @@ export function MemberClassEditor({
     >
       <EventCommandNotice command={command} onReload={onClose} />
       <FieldGroup>
-        {action === "book" && (
+        {(action === "book" || action === "accept") && (
           <>
-            <Field>
-              <FieldLabel htmlFor="member-class-mode">
-                {t(($) => $.memberClasses.chooseMode)}
-              </FieldLabel>
-              <NativeSelect
-                id="member-class-mode"
-                value={draft.mode}
-                disabled={readOnly}
-                onChange={(e) => {
-                  const mode = e.target.value;
-                  if (mode === "priority" || mode === "flexible")
-                    setDraft({ ...draft, mode, saleId: "", reviewed: false });
-                }}
-              >
-                <NativeSelectOption value="priority">
-                  {t(($) => $.memberClasses.modes.priority)}
-                </NativeSelectOption>
-                <NativeSelectOption value="flexible">
-                  {t(($) => $.memberClasses.modes.flexible)}
-                </NativeSelectOption>
-              </NativeSelect>
-            </Field>
+            {action === "book" && (
+              <Field>
+                <FieldLabel htmlFor="member-class-mode">
+                  {t(($) => $.memberClasses.chooseMode)}
+                </FieldLabel>
+                <NativeSelect
+                  id="member-class-mode"
+                  value={draft.mode}
+                  disabled={readOnly}
+                  onChange={(e) => {
+                    const mode = e.target.value;
+                    if (mode === "priority" || mode === "flexible")
+                      setDraft({ ...draft, mode, saleId: "", reviewed: false });
+                  }}
+                >
+                  <NativeSelectOption value="priority">
+                    {t(($) => $.memberClasses.modes.priority)}
+                  </NativeSelectOption>
+                  <NativeSelectOption value="flexible">
+                    {t(($) => $.memberClasses.modes.flexible)}
+                  </NativeSelectOption>
+                </NativeSelect>
+              </Field>
+            )}
             {!joining && (
               <Field>
                 <FieldLabel id="member-class-rights">
-                  {t(($) => $.memberClasses.chooseRight)}
+                  {action === "accept"
+                    ? t(($) => $.memberDocuments.chooseContext)
+                    : t(($) => $.memberClasses.chooseRight)}
                 </FieldLabel>
+                {action === "accept" && (
+                  <FieldDescription>{t(($) => $.memberDocuments.offerContext)}</FieldDescription>
+                )}
                 <RadioGroup
                   aria-labelledby="member-class-rights"
                   value={draft.saleId}
@@ -274,6 +288,29 @@ export function MemberClassEditor({
               ))}
             </NativeSelect>
           </Field>
+        )}
+        {((action === "book" && !joining && draft.saleId) || action === "accept") && (
+          <MemberDocumentsPanel
+            key={`${draft.mode}:${draft.saleId}`}
+            binding={{
+              scope,
+              personId,
+              context: {
+                gate: "reservation",
+                subject: { type: "sessions", id: before.id },
+                ...(sources.find((row) => row.sale_id === draft.saleId)?.product_version_id
+                  ? {
+                      product_version_id: sources.find((row) => row.sale_id === draft.saleId)!
+                        .product_version_id,
+                    }
+                  : {}),
+              },
+            }}
+            disabled={preparing || command.state !== "ready"}
+            onLockChange={documentLock}
+            onAccepted={acceptedDocument}
+            onAccessLost={onAccessLost}
+          />
         )}
         <MemberCancellationPolicy
           value={

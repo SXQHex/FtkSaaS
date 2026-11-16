@@ -1549,6 +1549,24 @@ export default interface Resources {
         "open": "Kayıt açık"
       }
     },
+    "memberDocuments": {
+      "accept": "Belgeyi kabul et",
+      "accepted": "Kabul edildi",
+      "chooseContext": "Belge incelemesi için hak",
+      "close": "Belgeyi kapat",
+      "description": "Bu işlem için gereken belgeleri okuyup ayrı ayrı kabul et. Belge kabulü rezervasyon oluşturmaz.",
+      "loading": "Belgeler yükleniyor…",
+      "none": "Bu bağlamda kabul bekleyen belge yok.",
+      "offerContext": "Seçtiğin hakkın gerektirdiği belgeleri inceleyebilirsin. Teklif kabulünde kullanılacak uygun hakkı sunucu yeniden belirler.",
+      "pdf": "PDF belgesini aç (yeni sekme)",
+      "pdfHint": "PDF yeni sekmede açılır. İçeriğini okuduktan sonra bu sekmeye dönüp kabul edebilirsin.",
+      "read": "{{name}} belgesini oku",
+      "retry": "Belgeleri yeniden yükle",
+      "review": "Belgeyi okudum, bu işlem için kabul ediyorum.",
+      "reviewError": "Güncel belgeyi oku ve kabul kutusunu işaretle. İçerik değiştiyse yeniden yükle.",
+      "title": "Gerekli belgeler",
+      "unavailable": "Belge okunamadı. Güncel içeriği yeniden yükle."
+    },
     "memberEntitlements": {
       "amount": "Tutar",
       "balance": "Bakiye",

@@ -7,6 +7,7 @@ import type {
   CalendarItem,
   MemberLessonDiscovery,
   SessionCapacityView,
+  DocumentView,
 } from "../src/lib/api-contracts/generated.js";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -29,6 +30,10 @@ async function fixture(
     denied?: boolean;
     noStudent?: boolean;
     ackUnread?: boolean;
+    documents?: boolean;
+    documentUnknown?: boolean;
+    documentAckUnread?: boolean;
+    documentContentFailure?: boolean;
   } = {},
 ) {
   await mockOwnReservations(page, { noStudent: options.noStudent });
@@ -81,6 +86,7 @@ async function fixture(
   };
   const right = {
     sale_id: id(4),
+    product_version_id: id(24),
     person_id: I.self,
     start_date: "2026-11-01",
     end_date: "2026-12-01",
@@ -93,7 +99,7 @@ async function fixture(
     quotas: [],
     deficit_scopes: [],
     kind: "credits",
-    booking_mode: "priority",
+    booking_mode: options.offer ? "flexible" : "priority",
     available_at_session: 4,
   };
   const state = {
@@ -104,6 +110,9 @@ async function fixture(
     reads: [] as { op: string; request: Record<string, unknown> }[],
     denied: !!options.denied,
     unread: false,
+    documentAccepted: false,
+    documentUnread: false,
+    documentContentFailed: false,
   };
   if (options.offer) {
     state.entry = {
@@ -169,6 +178,82 @@ async function fixture(
         status: retryable ? 503 : 403,
         json: { ok: false, error: { code, retryable, trace_id: I.role } },
       });
+    if (op === "document_requirements_get_v1") {
+      expect(r.person_id).toBe(I.self);
+      expect(r.center_id).toBe(I.center);
+      expect(r.context).toMatchObject({
+        gate: "reservation",
+        subject: { type: "sessions", id: row.id },
+      });
+      if (!options.documents) return send([]);
+      if (!r.context.product_version_id) return send([]);
+      expect(r.context.product_version_id).toBe(right.product_version_id);
+      if (r.content_file_id && options.documentContentFailure && !state.documentContentFailed) {
+        state.documentContentFailed = true;
+        return reject("SERVICE_UNAVAILABLE", true);
+      }
+      if (state.documentUnread) {
+        state.documentUnread = false;
+        return reject("SERVICE_UNAVAILABLE", true);
+      }
+      const doc: DocumentView = {
+        id: id(20),
+        version_id: id(21),
+        file: { type: "files", id: id(22) },
+        name: "Ders koşulları",
+        required_at: "reservation",
+        accepted: state.documentAccepted,
+        content_kind: "digital",
+        content_hash: r.content_file_id ? "rendered-hash" : "source-hash",
+      };
+      if (r.content_file_id) {
+        expect(r.content_file_id).toBe(id(22));
+        doc.rendered_document = {
+          id: id(23),
+          language: "tr",
+          source_version: id(21),
+          content_hash: "rendered-hash",
+          source_content_hash: "source-hash",
+          created_at: "2026-11-16T12:00:00Z",
+          content: {
+            name: "Ders koşulları",
+            language: "tr",
+            template_id: "document.synthetic",
+            template_version: "1",
+            text: "Sentetik belge metni <script>window.documentExecuted=true</script>",
+          },
+        };
+        if (state.documentAccepted)
+          doc.digital_acceptance = {
+            id: id(25),
+            account_id: I.account,
+            person_id: I.self,
+            accepted_at: "2026-11-16T12:01:00Z",
+            content_hash: "rendered-hash",
+            source_content_hash: "source-hash",
+            displayed_content: doc.rendered_document.content,
+            rendered_document_id: id(23),
+            evidence_kind: "server_document",
+          };
+      }
+      return send([doc]);
+    }
+    if (op === "document_accept_v1") {
+      expect(r.context).toEqual({
+        gate: "reservation",
+        subject: { type: "sessions", id: row.id },
+        product_version_id: right.product_version_id,
+      });
+      expect(r.rendered_document_id).toBe(id(23));
+      expect(r).not.toHaveProperty("displayed_content");
+      expect(r).not.toHaveProperty("document_version_id");
+      state.writes.push({ op, request: r });
+      state.documentAccepted = true;
+      state.documentUnread = !!options.documentAckUnread;
+      receipts.set(r.operation_key, { op, type: "document_acceptances", id: id(25) });
+      if (options.documentUnknown) return route.abort("failed");
+      return send({ operation_id: id(26), primary_id: id(25), replayed: false, related: [] });
+    }
     if (op === "calendar_get_v1") {
       expect(r.member_discovery).toBe(true);
       expect(r.center_id).toBe(I.center);
@@ -180,7 +265,7 @@ async function fixture(
     }
     if (op === "entitlements_get_v1") {
       expect(r.person_id).toBe(I.self);
-      return send(r.booking_mode && r.booking_mode !== "priority" ? [] : [right]);
+      return send(r.booking_mode && r.booking_mode !== right.booking_mode ? [] : [right]);
     }
     if (op === "session_get_v1") {
       expect(state.reservation).toBeDefined();
@@ -272,6 +357,7 @@ async function fixture(
       let type = "reservations",
         primary = id(5);
       if (op === "reservation_create_v1") {
+        if (options.documents) expect(state.documentAccepted).toBe(true);
         expect(r.person_id).toBe(I.self);
         expect(r.source_sale_id).toBe(right.sale_id);
         state.reservation = {
@@ -494,4 +580,105 @@ test("member discovery denial stays unknown until explicit retry", async ({ page
   state.denied = false;
   await page.getByRole("button", { name: "Listeyi yenile", exact: true }).click();
   await expect(page.getByText("Öğrenciye açık tango", { exact: true })).toBeVisible();
+});
+
+const documentReview = "Belgeyi okudum, bu işlem için kabul ediyorum.";
+async function openDocument(page: Page, options: Parameters<typeof fixture>[1] = {}) {
+  const state = await fixture(page, { documents: true, ...options });
+  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  const d = page.getByRole("dialog");
+  await d.getByRole("radio").first().press("Space");
+  await d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }).click();
+  return { state, d };
+}
+test("member document acceptance reads stored text and requires a new booking review without auto booking", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  const { state, d } = await openDocument(page);
+  await expect(
+    d.getByText("Sentetik belge metni <script>window.documentExecuted=true</script>", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => Object.hasOwn(globalThis, "documentExecuted"))).toBe(false);
+  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  expect(state.writes).toHaveLength(0);
+  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(d.getByRole("checkbox", { name: documentReview, exact: true })).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
+  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  await expect(d.getByRole("checkbox", { name: review, exact: true })).not.toBeChecked();
+  expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1"]);
+  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await expect.poll(() => state.reservation?.state).toBe("active");
+  expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1", "reservation_create_v1"]);
+});
+test("member unknown document acceptance locks context and recovers the native receipt with one write", async ({
+  page,
+}) => {
+  const { state, d } = await openDocument(page, { documentUnknown: true });
+  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(
+    d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+  ).toBeVisible();
+  await expect(d.getByLabel("Kayıt türü", { exact: true })).toBeDisabled();
+  await expect(d.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
+  await expect(d.getByRole("button", { name: "Kaydı onayla", exact: true })).toBeDisabled();
+  await d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1"]);
+});
+test("member acknowledged document acceptance rereads only its result", async ({ page }) => {
+  const { state, d } = await openDocument(page, { documentAckUnread: true });
+  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(
+    d.getByText("İşlem kaydedildi, güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  expect(state.reads.filter((r) => r.op === "operation_status_get_v1")).toHaveLength(0);
+});
+test("member document content failure exposes explicit retry and never offers acceptance of stale content", async ({
+  page,
+}) => {
+  const { state, d } = await openDocument(page, { documentContentFailure: true });
+  await expect(
+    d.getByText("Belge okunamadı. Güncel içeriği yeniden yükle.", { exact: true }),
+  ).toBeVisible();
+  await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+  await d.getByRole("button", { name: "Belgeleri yeniden yükle", exact: true }).click();
+  await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toBeVisible();
+});
+
+test("member offer exposes actual flexible-right document contexts without changing the native offer payload", async ({
+  page,
+}) => {
+  const state = await fixture(page, { offer: true, full: true, documents: true });
+  await page.getByRole("button", { name: "Teklifi gör", exact: true }).click();
+  const d = page.getByRole("dialog");
+  await d.getByRole("radio").first().press("Space");
+  await d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }).click();
+  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Teklifi kabul et", exact: true }).click();
+  await expect.poll(() => state.entry?.state).toBe("converted");
+  const write = state.writes.find((r) => r.op === "seat_offer_accept_v1")!;
+  expect(write.request).not.toHaveProperty("source_sale_id");
+  expect(write.request).not.toHaveProperty("product_version_id");
+  expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1", "seat_offer_accept_v1"]);
 });

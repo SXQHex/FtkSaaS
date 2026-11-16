@@ -3867,5 +3867,23 @@
     "sourceSummary": "Kaynak özeti",
     "readRows": "İçe aktarılan satırlar",
     "choose": "Seç"
+  },
+  "memberDocuments": {
+    "title": "Gerekli belgeler",
+    "description": "Bu işlem için gereken belgeleri okuyup ayrı ayrı kabul et. Belge kabulü rezervasyon oluşturmaz.",
+    "loading": "Belgeler yükleniyor…",
+    "unavailable": "Belge okunamadı. Güncel içeriği yeniden yükle.",
+    "none": "Bu bağlamda kabul bekleyen belge yok.",
+    "accepted": "Kabul edildi",
+    "read": "{{name}} belgesini oku",
+    "retry": "Belgeleri yeniden yükle",
+    "review": "Belgeyi okudum, bu işlem için kabul ediyorum.",
+    "accept": "Belgeyi kabul et",
+    "reviewError": "Güncel belgeyi oku ve kabul kutusunu işaretle. İçerik değiştiyse yeniden yükle.",
+    "close": "Belgeyi kapat",
+    "pdfHint": "PDF yeni sekmede açılır. İçeriğini okuduktan sonra bu sekmeye dönüp kabul edebilirsin.",
+    "pdf": "PDF belgesini aç (yeni sekme)",
+    "chooseContext": "Belge incelemesi için hak",
+    "offerContext": "Seçtiğin hakkın gerektirdiği belgeleri inceleyebilirsin. Teklif kabulünde kullanılacak uygun hakkı sunucu yeniden belirler."
   }
 }
