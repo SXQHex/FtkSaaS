@@ -4012,5 +4012,29 @@
     "verifyUpload": "Yüklenen dosyayı doğrula",
     "directoryUnavailable": "Merkez belge ve kabul listesi şu anda okunamıyor. Yeni belge yükleyebilir ve yayımlayabilirsin.",
     "publishedVersion": "{{version}} sürümü yayımlandı ve sunucudan yeniden doğrulandı."
+  },
+  "overview": {
+    "title": "Bugünün programı",
+    "timeline": "Bugünün dersleri",
+    "openProgram": "Programı aç",
+    "addLesson": "Ders ekle",
+    "now": "Şu an {{time}}",
+    "unread": "Bugünün programı okunamadı.",
+    "empty": "Bugün görünür ders yok.",
+    "nextLesson": "Sıradaki ders",
+    "noNextLesson": "Sıradaki ders yok.",
+    "capacity": "Kontenjan",
+    "capacityValue": "{{held}} / {{total}}, {{remaining}} yer boş",
+    "capacityProgress": "{{name}} kontenjanı",
+    "members": "Kayıtlı üyeler",
+    "participantsUnread": "Kayıtlı üyeler okunamadı.",
+    "noParticipants": "Görünür kayıtlı üye yok.",
+    "allParticipants": "Tümünü gör",
+    "openSession": "Seansı aç",
+    "openAttendance": "Yoklamayı aç",
+    "instructor": "Eğitmen",
+    "room": "Salon",
+    "loading": "Program okunuyor…",
+    "selectedLesson": "Seçili ders"
   }
 }
