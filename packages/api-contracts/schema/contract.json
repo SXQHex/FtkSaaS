@@ -696,7 +696,8 @@
         "event.attendance",
         "event.close",
         "attendance.block",
-        "reservation.capacity_override"
+        "reservation.capacity_override",
+        "sale.discount"
       ]
     },
     "OperationName": {
@@ -925,7 +926,10 @@
         "instructor_agreement_get_v1",
         "instructor_agreement_accept_v1",
         "content_catalog_get_v1",
-        "content_catalog_save_v1"
+        "content_catalog_save_v1",
+        "finance_directory_get_v1",
+        "products_management_list_v1",
+        "product_state_set_v1"
       ]
     },
     "EntityType": {
@@ -2672,7 +2676,8 @@
         "negative_valuation",
         "mandatory_document",
         "sensitive_money_upper",
-        "sensitive_credit_upper"
+        "sensitive_credit_upper",
+        "sale_discount_percent_upper"
       ]
     },
     "IntegerPolicy": {
@@ -3797,6 +3802,17 @@
         },
         "member_summary": {
           "$ref": "#/$defs/MemberPageSummary"
+        },
+        "membership_started_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "First recorded student relationship start in the requested center, including inactive canonical alias history; null when unknown."
         }
       },
       "required": [
@@ -4295,6 +4311,9 @@
               "type": "null"
             }
           ]
+        },
+        "movements": {
+          "$ref": "#/$defs/Page_EntitlementLedgerItem"
         }
       },
       "required": [
@@ -8923,6 +8942,9 @@
         },
         "include_member_summary": {
           "type": "boolean"
+        },
+        "include_membership_date": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -8942,6 +8964,28 @@
             },
             "required": [
               "include_member_summary"
+            ]
+          },
+          "then": {
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "center_id"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "include_membership_date": {
+                "const": true
+              }
+            },
+            "required": [
+              "include_membership_date"
             ]
           },
           "then": {
@@ -11708,6 +11752,9 @@
         },
         "terms": {
           "$ref": "#/$defs/ProductTerms"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -11717,7 +11764,26 @@
         "operation_key",
         "terms"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "expected_version"
+            ]
+          },
+          "then": {
+            "properties": {
+              "product_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "product_id"
+            ]
+          }
+        }
+      ]
     },
     "Success_product_publish": {
       "type": "object",
@@ -11910,6 +11976,12 @@
         },
         "booking_mode": {
           "$ref": "#/$defs/BookingMode"
+        },
+        "ledger_sale_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "ledger_page": {
+          "$ref": "#/$defs/Page"
         }
       },
       "required": [
@@ -11930,6 +12002,25 @@
             "required": [
               "session_id"
             ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "ledger_sale_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "ledger_page"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "ledger_page"
+              ]
+            }
           }
         }
       ],
@@ -20709,7 +20800,7 @@
           "$ref": "#/$defs/Text"
         },
         "state": {
-          "$ref": "#/$defs/RecordState"
+          "$ref": "#/$defs/ProductLifecycleState"
         }
       },
       "required": [
@@ -26721,6 +26812,9 @@
         },
         "merge_review": {
           "$ref": "#/$defs/MergeReviewDetail"
+        },
+        "group_student": {
+          "$ref": "#/$defs/GroupStudentView"
         }
       },
       "required": [
@@ -32088,6 +32182,29 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "product_state_set_v1"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "operation": {
+                    "const": "product_state_set_v1"
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -33879,7 +33996,7 @@
               }
             },
             "capacity": {
-              "$ref": "#/$defs/Capacity"
+              "$ref": "#/$defs/SessionCapacity"
             }
           },
           "required": [],
@@ -37439,6 +37556,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_content_catalog_save_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_product_state_set_v1"
         }
       ]
     },
@@ -37600,7 +37720,8 @@
         "role_revoke_preview_v1",
         "subscription_period_change_request_v1",
         "instructor_agreement_accept_v1",
-        "content_catalog_save_v1"
+        "content_catalog_save_v1",
+        "product_state_set_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -39093,16 +39214,56 @@
           "const": "reservation_cancel_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "reservation_id": {
-              "$ref": "#/$defs/FtkUuid"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "reservation_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "reservation_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "const": "class"
+                },
+                "class_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "program_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "interval": {
+                  "$ref": "#/$defs/Interval"
+                },
+                "status": {
+                  "enum": [
+                    "active",
+                    "cancelled",
+                    "completed",
+                    "all"
+                  ]
+                },
+                "query": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              },
+              "required": [
+                "directory",
+                "class_id",
+                "interval"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "reservation_id"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -42200,6 +42361,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_content_catalog_save_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_product_state_set_v1"
         }
       ]
     },
@@ -59517,6 +59681,889 @@
         "by_state"
       ],
       "additionalProperties": false
+    },
+    "EntitlementLedgerItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "kind": {
+          "$ref": "#/$defs/CreditMove"
+        },
+        "quantity": {
+          "$ref": "#/$defs/Int"
+        },
+        "balance_delta": {
+          "$ref": "#/$defs/Int"
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/EntityRef"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "kind",
+        "quantity",
+        "balance_delta",
+        "previous_id",
+        "source"
+      ],
+      "additionalProperties": false,
+      "description": "Append-only recorded movement. balance_delta is the pool effect; reserve/release quantities describe holds and need not change pool balance."
+    },
+    "Page_EntitlementLedgerItem": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntitlementLedgerItem"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "FinanceDirectoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "entity": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "kind": {
+          "enum": [
+            "sale",
+            "collection",
+            "refund",
+            "correction_in",
+            "correction_out",
+            "debt",
+            "credit"
+          ]
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "source_sale_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "enum": [
+            "cash",
+            "bank_transfer",
+            "card_pos",
+            null
+          ]
+        },
+        "due_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "entity",
+        "person_id",
+        "display_name",
+        "created_at",
+        "occurred_at",
+        "version",
+        "kind",
+        "amount_minor",
+        "currency",
+        "source_sale_id",
+        "product_name",
+        "method",
+        "due_at"
+      ],
+      "additionalProperties": false
+    },
+    "AggregateMinorTotal": {
+      "type": "string",
+      "pattern": "^(0|-?[1-9][0-9]*)$",
+      "description": "Exact arbitrary precision aggregate of minor units; never a JavaScript floating point number."
+    },
+    "FinanceDirectoryTotal": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "sales_minor": {
+          "$ref": "#/$defs/AggregateMinorTotal"
+        },
+        "collections_minor": {
+          "$ref": "#/$defs/AggregateMinorTotal"
+        },
+        "refunds_minor": {
+          "$ref": "#/$defs/AggregateMinorTotal"
+        },
+        "debt_minor": {
+          "$ref": "#/$defs/AggregateMinorTotal"
+        },
+        "credit_minor": {
+          "$ref": "#/$defs/AggregateMinorTotal"
+        },
+        "debt_people": {
+          "$ref": "#/$defs/Count"
+        },
+        "credit_people": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "currency",
+        "sales_minor",
+        "collections_minor",
+        "refunds_minor",
+        "debt_minor",
+        "credit_minor",
+        "debt_people",
+        "credit_people"
+      ],
+      "additionalProperties": false
+    },
+    "FinanceDirectoryView": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FinanceDirectoryEntry"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "view": {
+          "enum": [
+            "movements",
+            "debts",
+            "credits"
+          ]
+        },
+        "totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FinanceDirectoryTotal"
+          }
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor",
+        "as_of",
+        "view",
+        "totals"
+      ],
+      "additionalProperties": false
+    },
+    "GroupStudentReservation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "ends_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "source_sale_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "$ref": "#/$defs/BookingMode"
+        },
+        "state": {
+          "$ref": "#/$defs/ReservationState"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "session_id",
+        "starts_at",
+        "ends_at",
+        "source_sale_id",
+        "mode",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "GroupStudentView": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "reservations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GroupStudentReservation"
+          }
+        }
+      },
+      "required": [
+        "person_id",
+        "display_name",
+        "reservations"
+      ],
+      "additionalProperties": false
+    },
+    "ProductLifecycleState": {
+      "enum": [
+        "active",
+        "inactive",
+        "archived"
+      ]
+    },
+    "ProductManagementEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "state": {
+          "$ref": "#/$defs/ProductLifecycleState"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "terms": {
+          "$ref": "#/$defs/ProductTerms"
+        },
+        "active_right_holders": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "created_at",
+        "state",
+        "name",
+        "version_id",
+        "terms",
+        "active_right_holders"
+      ],
+      "additionalProperties": false
+    },
+    "ProductVersionHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "product_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "terms": {
+          "$ref": "#/$defs/ProductTerms"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "created_at",
+        "product_id",
+        "terms"
+      ],
+      "additionalProperties": false
+    },
+    "ProductSaleHistoryEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product_version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "product_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "net_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "state": {
+          "$ref": "#/$defs/SaleState"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "created_at",
+        "person_id",
+        "display_name",
+        "product_version_id",
+        "product_name",
+        "net_minor",
+        "currency",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "ProductPeriodTotal": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "sales": {
+          "$ref": "#/$defs/Count"
+        },
+        "net_minor": {
+          "$ref": "#/$defs/AggregateMinorTotal"
+        }
+      },
+      "required": [
+        "currency",
+        "sales",
+        "net_minor"
+      ],
+      "additionalProperties": false
+    },
+    "ProductManagementTotals": {
+      "type": "object",
+      "properties": {
+        "on_sale": {
+          "$ref": "#/$defs/Count"
+        },
+        "closed": {
+          "$ref": "#/$defs/Count"
+        },
+        "archived": {
+          "$ref": "#/$defs/Count"
+        },
+        "active_right_holders": {
+          "$ref": "#/$defs/Count"
+        },
+        "last_30_days": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProductPeriodTotal"
+          }
+        }
+      },
+      "required": [
+        "on_sale",
+        "closed",
+        "archived",
+        "active_right_holders",
+        "last_30_days"
+      ],
+      "additionalProperties": false
+    },
+    "ProductManagementView": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/ProductManagementEntry"
+              },
+              {
+                "$ref": "#/$defs/ProductVersionHistoryEntry"
+              },
+              {
+                "$ref": "#/$defs/ProductSaleHistoryEntry"
+              }
+            ]
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "view": {
+          "enum": [
+            "products",
+            "versions",
+            "sales"
+          ]
+        },
+        "totals": {
+          "$ref": "#/$defs/ProductManagementTotals"
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor",
+        "as_of",
+        "view",
+        "totals"
+      ],
+      "additionalProperties": false
+    },
+    "Request_finance_directory_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "view": {
+          "enum": [
+            "movements",
+            "debts",
+            "credits"
+          ]
+        },
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "kind": {
+          "enum": [
+            "sale",
+            "collection",
+            "refund",
+            "correction_in",
+            "correction_out",
+            "debt",
+            "credit"
+          ]
+        },
+        "method": {
+          "enum": [
+            "cash",
+            "bank_transfer",
+            "card_pos"
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "view",
+        "interval",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Success_finance_directory_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/FinanceDirectoryView"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_products_management_list": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        },
+        "include_timed_products": {
+          "type": "boolean",
+          "default": false
+        },
+        "view": {
+          "enum": [
+            "products",
+            "versions",
+            "sales"
+          ]
+        },
+        "product_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "status": {
+          "enum": [
+            "all",
+            "on_sale",
+            "closed",
+            "archived"
+          ]
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "page"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "enum": [
+                  "versions",
+                  "sales"
+                ]
+              }
+            },
+            "required": [
+              "view"
+            ]
+          },
+          "then": {
+            "required": [
+              "product_id"
+            ]
+          }
+        }
+      ]
+    },
+    "Success_products_management_list": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/ProductManagementView"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_product_state_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "product_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "action": {
+          "enum": [
+            "open",
+            "close",
+            "archive"
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "operation_key",
+        "product_id",
+        "expected_version",
+        "reason",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "Success_product_state_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_product_state_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "product_state_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "product_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false,
+      "x-runtime-status": "contract_only; use products_management_list_v1"
+    },
+    "ManagementProjection_product_state_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "product_state_set_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "action": {
+              "enum": [
+                "open",
+                "close",
+                "archive"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -59597,7 +60644,8 @@
       "calendar.self": "Own global account calendar link metadata and lifecycle; explicit nested org is checked live, never an actor selector.",
       "calendar.feed": "Public opaque personal calendar bearer link, current hash and live account/org/link/own booking or duty; service-only transport.",
       "preparation.resolve": "Live CM on the explicit destination, source scope/version and real resource/plan guards; no actor choice.",
-      "auth.signup": "Hesapsız kayıt: yalnız adres varlığı sonucu; bağlı hesap, ana adres, rol veya oturum açıklanmaz."
+      "auth.signup": "Hesapsız kayıt: yalnız adres varlığı sonucu; bağlı hesap, ana adres, rol veya oturum açıklanmaz.",
+      "sale.discount": "Existing sale.write authority plus explicit center sale.discount override; organization sale_discount_percent_upper policy required. No automatic owner/manager grant."
     },
     "tables": [
       {
@@ -65193,7 +66241,8 @@
           "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
           "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity.",
           "Person field_policy and visible contacts[].field_policy distinguish current account_profile/native_auth ownership from local person fields. person_update_writable describes field protection only; current actor authorization, version and full-replacement contacts rules remain mandatory. No account IDs or tokens.",
-          "include_member_summary true requires explicit center and reuses the exact separately authorized rights/currency debt/next-lesson summary for one selected person; omitted preserves the legacy response."
+          "include_member_summary true requires explicit center and reuses the exact separately authorized rights/currency debt/next-lesson summary for one selected person; omitted preserves the legacy response.",
+          "include_membership_date requires explicit center; membership_started_at is first recorded student relationship start including canonical inactive history, null if unknown."
         ],
         "required_features": [
           "F06",
@@ -66841,7 +67890,7 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -70261,7 +71310,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "products: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "products: optional expected_version on existing publication; legacy append remains compatible.",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -70283,7 +71332,9 @@
         "runtime_rpc": "api_v1.product_publish_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/product_publish_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "New versions use the supplied name on all plans and preserve prior immutable published_name. Optional existing products.version check does not alter legacy terms-required append requests."
+        ],
         "required_features": [
           "F15"
         ],
@@ -70312,14 +71363,14 @@
           "target_entity": "products",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "products_management_list_v1",
           "atomic_effects": [
             "products.identity",
             "product_versions.immutable",
             "product_scopes.new_version_only"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -70435,7 +71486,9 @@
         "runtime_rpc": "api_v1.sale_preview_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/sale_preview_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "Non-list net_minor requires explicit sale.discount grant and organization sale_discount_percent_upper; no default policy or grant. Preview, sale, debt and downstream refund/earning bases use the selected net amount."
+        ],
         "required_features": [
           "F15",
           "F19"
@@ -70731,7 +71784,8 @@
         "runtime_external_path": "/functions/v1/backend-v1/entitlements_get_v1",
         "runtime_limits": [
           "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending.",
-          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read.",
+          "ledger_sale_id plus ledger_page returns append-only movements only on a sale already visible in this rights result; no audit grant or broader person/center scope."
         ],
         "required_features": [
           "F06",
@@ -83331,7 +84385,8 @@
           "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission.",
           "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged.",
           "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token.",
-          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection."
+          "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection.",
+          "reservation_cancel_v1 supports only the explicit directory:class student discovery selector here; direct reservation versions remain readable through reservation_list_v1. Session change/replacement selectors expose scoped native session rows and stored replacement links."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -83396,7 +84451,10 @@
           "sale_refund_preview_v1",
           "permission_set_v1",
           "sale_change_preview_v1",
-          "instructor_agreement_accept_v1"
+          "instructor_agreement_accept_v1",
+          "session_change_preview_v1",
+          "replacement_session_create_v1",
+          "reservation_cancel_v1"
         ]
       },
       {
@@ -88137,6 +89195,350 @@
         "runtime_path": "/functions/v1/backend-v1/content_catalog_save_v1",
         "runtime_external_path": "/functions/v1/backend-v1/content_catalog_save_v1",
         "runtime_rpc": "api_v1.content_catalog_save_v1"
+      },
+      {
+        "name": "finance_directory_get_v1",
+        "module": "M07",
+        "features": [
+          "F06",
+          "F19"
+        ],
+        "permission": "finance.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_finance_directory_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_finance_directory_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read-only live-authorized center projection; no business or receipt mutation.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06",
+          "F19"
+        ],
+        "runtime_required_features": [
+          "F06",
+          "F19"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "center_scope",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "web1_native_implemented_acceptance_pending",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_finance_directory_get"
+          },
+          "completed_dependencies": []
+        },
+        "runtime_limits": [],
+        "runtime_path": "/functions/v1/backend-v1/finance_directory_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/finance_directory_get_v1",
+        "runtime_rpc": "api_v1.finance_directory_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+      },
+      {
+        "name": "products_management_list_v1",
+        "module": "M06",
+        "features": [
+          "F15",
+          "F16",
+          "F06",
+          "F19"
+        ],
+        "permission": "product.manage",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_products_management_list"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_products_management_list"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read-only live-authorized center projection; no business or receipt mutation.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination",
+          "catalog_not_purchased_right_selection",
+          "live_center_scope_before_projection",
+          "conditional_timed_read_gate"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F15",
+          "F06",
+          "F19"
+        ],
+        "runtime_required_features": [
+          "F15",
+          "F06",
+          "F19"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F16",
+            "when": "include_timed_products",
+            "mode": "required_if_selected"
+          }
+        ],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "center_scope",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "web1_native_implemented_acceptance_pending",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_products_management_list"
+          },
+          "completed_dependencies": []
+        },
+        "runtime_path": "/functions/v1/backend-v1/products_management_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/products_management_list_v1",
+        "runtime_rpc": "api_v1.products_management_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
+      },
+      {
+        "name": "product_state_set_v1",
+        "module": "M06",
+        "features": [
+          "F15",
+          "F16"
+        ],
+        "permission": "product.manage",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_product_state_set"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_product_state_set"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "single",
+        "transaction_guarantee": "One atomic, versioned catalog state change; existing sales, immutable product versions and purchased rights remain unchanged.",
+        "transition": {
+          "from": [
+            "active",
+            "inactive",
+            "archived"
+          ],
+          "to": [
+            "active",
+            "inactive",
+            "archived"
+          ],
+          "effect": "explicit_catalog_lifecycle_only"
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_config",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "same_org_center_discipline",
+          "required_feature_gates_separate_from_references"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Live CM/feature/tenant checks before receipt replay; exact products.version under organization/row lock; atomic state/version/audit/receipt, existing purchased rights unchanged.",
+        "expected_version_subject": "products",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/product_state_set_v1",
+        "runtime_rpc": "api_v1.product_state_set_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/product_state_set_v1",
+        "runtime_limits": [],
+        "required_features": [
+          "F15"
+        ],
+        "runtime_required_features": [
+          "F15"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F16",
+            "when": "selected_product_latest_version_is_timed",
+            "mode": "required_if_selected"
+          }
+        ],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "products",
+          "version_mode": "row_version",
+          "version_field": "product_id",
+          "read_operation": "products_management_list_v1",
+          "atomic_effects": [
+            "products.state_and_version",
+            "audit.reason"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "web1_native_implemented_acceptance_pending",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_product_state_set"
+          },
+          "completed_dependencies": []
+        }
       }
     ],
     "policy_value_map": {
@@ -88158,7 +89560,8 @@
       "negative_valuation": "NegativeValuationPolicy",
       "mandatory_document": "DocumentPolicy",
       "sensitive_money_upper": "IntegerPolicy",
-      "sensitive_credit_upper": "IntegerPolicy"
+      "sensitive_credit_upper": "IntegerPolicy",
+      "sale_discount_percent_upper": "IntegerPolicy"
     },
     "default_technical_config": {
       "page_default": 50,
@@ -90050,6 +91453,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_person_get/allOf/1/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_person_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -91478,6 +92887,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_product_publish/allOf/0/then/properties/product_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_product_publish/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -91581,6 +92996,12 @@
       },
       {
         "path": "#/$defs/Request_entitlements_get/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_entitlements_get/properties/ledger_sale_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -101012,7 +102433,19 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_reservation_cancel_v1/properties/key/properties/reservation_id",
+        "path": "#/$defs/ManagementSelector_reservation_cancel_v1/properties/key/oneOf/0/properties/reservation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_reservation_cancel_v1/properties/key/oneOf/1/properties/class_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_reservation_cancel_v1/properties/key/oneOf/1/properties/program_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -104304,6 +105737,204 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EntitlementLedgerItem/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EntitlementLedgerItem/properties/previous_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FinanceDirectoryEntry/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FinanceDirectoryEntry/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/FinanceDirectoryEntry/properties/source_sale_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/GroupStudentReservation/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/GroupStudentReservation/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/GroupStudentReservation/properties/source_sale_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/GroupStudentView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductManagementEntry/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductManagementEntry/properties/version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductVersionHistoryEntry/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductVersionHistoryEntry/properties/product_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductSaleHistoryEntry/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductSaleHistoryEntry/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ProductSaleHistoryEntry/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_finance_directory_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_finance_directory_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_finance_directory_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_finance_directory_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_products_management_list/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_products_management_list/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_products_management_list/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_products_management_list/properties/product_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_products_management_list/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_product_state_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_product_state_set/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_product_state_set/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_product_state_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_product_state_set/properties/product_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_product_state_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_product_state_set_v1/properties/key/properties/product_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_product_state_set_v1/properties/values/properties/product_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -104781,13 +106412,16 @@
         "instructor_agreement_get_v1",
         "instructor_agreement_accept_v1",
         "content_catalog_get_v1",
-        "content_catalog_save_v1"
+        "content_catalog_save_v1",
+        "finance_directory_get_v1",
+        "products_management_list_v1",
+        "product_state_set_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 164,
+      "migration_count": 165,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -105489,7 +107123,10 @@
         "instructor_agreement_get_v1",
         "instructor_agreement_accept_v1",
         "content_catalog_get_v1",
-        "content_catalog_save_v1"
+        "content_catalog_save_v1",
+        "finance_directory_get_v1",
+        "products_management_list_v1",
+        "product_state_set_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -105882,7 +107519,9 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_signup_check_v1"
+          "account_signup_check_v1",
+          "finance_directory_get_v1",
+          "products_management_list_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -105912,7 +107551,9 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_signup_check_v1"
+          "account_signup_check_v1",
+          "finance_directory_get_v1",
+          "products_management_list_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -106322,8 +107963,8 @@
           "attendance_correct_apply_v1",
           "class_assignment_set_v1",
           "attendance_block_v1",
-          "attendance_start_v1",
-          "management_state_get_v1"
+          "management_state_get_v1",
+          "attendance_start_v1"
         ],
         "dependencies": [
           "confirmed_reservation_protection"
@@ -106345,8 +107986,8 @@
           "attendance_correct_apply_v1",
           "class_assignment_set_v1",
           "attendance_block_v1",
-          "attendance_start_v1",
-          "management_state_get_v1"
+          "management_state_get_v1",
+          "attendance_start_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -106405,7 +108046,9 @@
           "reservation_impact_apply_v1",
           "negative_limits_get_v1",
           "reservation_capacity_override_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "products_management_list_v1",
+          "product_state_set_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -106438,7 +108081,9 @@
           "reservation_impact_apply_v1",
           "negative_limits_get_v1",
           "reservation_capacity_override_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "products_management_list_v1",
+          "product_state_set_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -106499,7 +108144,9 @@
           "entitlements_get_v1",
           "sale_renew_preview_v1",
           "sale_renew_apply_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "products_management_list_v1",
+          "product_state_set_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -106519,7 +108166,9 @@
           "entitlements_get_v1",
           "sale_renew_preview_v1",
           "sale_renew_apply_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "products_management_list_v1",
+          "product_state_set_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -106736,7 +108385,9 @@
           "import_apply_v1",
           "import_rows_process_v1",
           "report_build_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "finance_directory_get_v1",
+          "products_management_list_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -106767,7 +108418,9 @@
           "import_apply_v1",
           "import_rows_process_v1",
           "report_build_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "finance_directory_get_v1",
+          "products_management_list_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -106912,11 +108565,11 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
+          "import_preview_v1",
+          "import_apply_v1",
           "public_application_submit_v1",
           "public_application_review_v1",
           "report_build_v1",
-          "import_preview_v1",
-          "import_apply_v1",
           "settings_preparation_resolve_v1"
         ],
         "dependencies": [
@@ -106934,11 +108587,11 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
+          "import_preview_v1",
+          "import_apply_v1",
           "public_application_submit_v1",
           "public_application_review_v1",
           "report_build_v1",
-          "import_preview_v1",
-          "import_apply_v1",
           "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],

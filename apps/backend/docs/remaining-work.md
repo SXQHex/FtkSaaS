@@ -16,16 +16,22 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 
 ## Web1 ek backend talepleri — 15 Kasım
 
-Kullanıcı W1-BE-01–05 dosyasındaki kalan açıkların kapatılmasını istedi. İş bu görevde [G03 sırasından](production-queue.md) önce yürür; yeni ayrı yol haritası değildir.
+Kullanıcı son `request(1).md` dosyasındaki backend açıklarının kapatılmasını istedi. İş bu görevde [G03 sırasından](production-queue.md) önce yürür; yeni ayrı yol haritası değildir. Kaynak/ortam kanıtının tek sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#web1-talep-ekleri).
 
-- [x] W1-BE-01/02: merkez öğrencilik filtresi ve yetkili sayfa özeti kaynak/native CI/main/development teslimi. Kanıt [üye listesi devrinde](00-FtkSaaS-yeni-sohbet-devir.md#ogrencilik-durum-filtresi); frontend kabulü ayrıdır.
-- [x] W1-BE-03 kaynak/yerel doğrulama: mevcut XREQ-049 directory desteğinin üstüne hiç bağlantısı olmayan kişileri de kapsayan typed kişi görünümü; filtre/cursor/sayaç ve eski selector regresyonu.
-- [x] W1-BE-04 kaynak/yerel doğrulama / [XREQ-050](../../../docs/requests.md#xreq-050): gerekçeli merge/kalıcı merkez kopya-değil kararı ve kesin iletişim eşleşmesiyle typed öneri/geçmiş. Kabul: görünürlük/alias, reason/preview/idempotency, onay/cursor ve kaynak sonrası yeniden okuma.
-- [x] W1-BE-05 kaynak/yerel doğrulama / [XREQ-051](../../../docs/requests.md#xreq-051): son uygunluk kuralını retire ve seçili kapanışı cancel. Kabul: yalnız seçili kayıt/sürüm/audit, yanlış merkez/stale/replay reddi ve mevcut seansların korunması.
+- [x] W1-BE-01/02: merkez öğrencilik filtresi ve yetkili sayfa özeti önceki kaynak/native CI/main/development teslimi.
+- [x] W1-BE-03–05 önceki kaynak/full clean/main/development teslimi; [XREQ-049](../../../docs/requests.md#xreq-049), [XREQ-050](../../../docs/requests.md#xreq-050), [XREQ-051](../../../docs/requests.md#xreq-051). W1-BE-03'ün yeni hosted503 bulgusu aşağıdaki adayda ayrıca çözülür.
+- [x] W1-BE-03 aday kaynak/SQL: aynı yetkili kişi, filtre/cursor/sayaç sonucunu koruyan sorgu; büyük unfiltered directory yolunun hosted karşılaştırması. Kalıcı yeni hosted kabul ayrı kapıdır.
+- [x] W1-BE-06/07 aday kaynak/SQL: kabul edilmiş priority rezervasyon modelinde merkez/sınıf/program öğrenci keşfi; seansın kendi entity/sürüm/kaynak okuması ve kalıcı telafi bağı. Otomatik satış seçimi veya kalıcı ayrı üyelik kurulmaz.
+- [x] W1-BE-08 aday kaynak/SQL: eski normalize kapasite context'i için canonical receipt/preview kurtarma; aynı key ve canlı yetki korunur, yeni yazı yoktur.
+- [x] W1-BE-09 aday kaynak/SQL: typed yönetim katalog/durum/arama/cursor/KPI, sürüm ve satış geçmişi; sürümlü close/archive/open; bütün planlarda yeni published_name ve eski sürümün korunması.
+- [x] W1-BE-10 aday kaynak/SQL: ayrı merkez finans keşfi; gerçek satış/nakit/borç/alacak ve para birimine ayrılmış dönem/current toplamlar; collection-only/self/report yetkilerinden genişleme yoktur.
+- [x] W1-BE-11 aday kaynak/SQL: ilk kayıtlı merkez öğrencilik başlangıcı ve yalnız yetkili seçili satışın append-only hak defteri; audit yetkisi verilmez.
+- [x] W1-BE-12 aday kaynak/SQL: kullanıcı onaylı ayrı sale.discount yetkisi ve org yüzdelik üst sınırı; preview/net satış/borç/iade uyumu; eksik ayar/grant kapalıdır. permission_set mevcut plan kapısı korunur.
+- [x] Son aday statik verify/kalite ve bağımsız son kaynak incelemesi; kanıt devir sahibindedir.
+- [ ] Yeni aday full clean → aynı main kaynak kabulü → development dağıtım doğrulaması.
+- [ ] Yeni hosted backend kabulü: W1-BE-03 tam directory ve W1-BE-07/08 gerçek oturumlu seans/receipt; yeni09–12 rol/plan/merkez/negatif durumları. SQL motoru başarısı gerçek Auth/Edge kabulü yerine geçmez.
 
-- [ ] W1-BE-03–05 aday full clean → main kaynak kabulü → development dağıtım doğrulaması. Kaynak hazır oluşu bu teslim kapısını kapatmaz.
-
-Kesin akış/DTO sınırı WF02/WF04 sahibindedir. Kaynak, test, main/development ve frontend kabulü ayrı tutulur; kapanış yalnız kendi kanıtıyla yapılır.
+Kesin akış/DTO sınırı WF03/WF04/WF05/WF08 sahibindedir. Frontend ekranı veya frontend kabulü backend kapanış kapısı değildir; yalnız kendi kanıtıyla kapanış yapılır.
 
 ## Backend çalışma modeli
 

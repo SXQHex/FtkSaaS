@@ -284,7 +284,8 @@
         "apps/backend/transports/browser-cors.mjs",
         "apps/backend/scripts/build-spa-assets.mjs",
         "apps/backend/scripts/build-spa-ingress.mjs",
-        "apps/backend/transports/spa-validators.mjs"
+        "apps/backend/transports/spa-validators.mjs",
+        "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -294,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "40f513c939df22627f135310cc2b1f8353da576c8bc7cbc6c51783f555ebde2f",
-        "reason": "Final schema and generated artifact review includes conditional required-property closure, physical lifecycle columns, current UUID field paths and opt-in selected-person summary. Canonical/standalone request rejection and legacy compatibility tested; no policy/gate changes."
+        "fingerprint": "492e803343ba88dc27b04149a84a2c6d5419320ba51b2b6250c9a47d2e78ebdb",
+        "reason": "Reviewed exact P01 assertion-change record and suite hash/range: one product-name expectation follows approved rename, existing sold/fallback identity assertions retained and historical name/price checks added. No gate, scope or threshold changed."
       }
     },
     {
@@ -384,8 +385,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "9138cca8c2789c466ee64fb5356ae4344427da3c9245594e9c5fa6d08694c3fa",
-        "reason": "Sentetik HMAC literal test anahtarları crypto randomBytes ile üretiliyor; native/signup assertion ve davranışları korunuyor"
+        "fingerprint": "e1b834944d2fee0dc11bd2b6ab398d31826bd63910b12c83baaa1d834d1a3a9a",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -499,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "f8de3dfa910d5ab4d2665fc3291c4a58ad214dad9afe6fe8d15649d7b5a22060",
-        "reason": "Final SQL fixture preserves existing session snapshots, rule/closure source data and unrelated versions; explicit retire/cancel replay, stale/foreign scope and inactive history checks included. Guide describes exact source/aggregate versions and no auto-cancellation."
+        "fingerprint": "426ad639abdd6ddb703fe0e894e0d8c2d4efdeb278a3443aaa799ebabf20cc44",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -518,7 +519,11 @@
         "apps/backend/tests/program-configuration-acceptance.mjs",
         "apps/backend/tests/class-duty-management-acceptance.mjs",
         "apps/backend/tests/sharing-consent-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/native-capacity-recovery-acceptance.mjs",
+        "apps/backend/tests/fixtures/native-capacity-recovery.sql",
+        "apps/backend/tests/product-class-management-acceptance.mjs",
+        "apps/backend/tests/fixtures/product-class-management-acceptance.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -576,7 +581,10 @@
         "apps/backend/database/class-duty-management.sql",
         "apps/backend/supabase/migrations/20261103194514_class_duty_management.sql",
         "apps/backend/database/settings-sharing-consent.sql",
-        "apps/backend/database/settings-sharing-events.sql"
+        "apps/backend/database/settings-sharing-events.sql",
+        "apps/backend/database/capacity-recovery.sql",
+        "apps/backend/database/session-management-reads.sql",
+        "apps/backend/database/class-student-discovery.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -599,8 +607,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "bb7dd84150892d6fbe3d1420e169f000f85b88c17bb2b885b559b943263aefb3",
-        "reason": "Reviewed additive availability retire/cancel API semantics and active-only availability checks; existing scheduling/conflict/preview rules unchanged and lifecycle consumer documented in WF02. No session mutation or implicit cancellation."
+        "fingerprint": "97bca65b42849aa58dd151746a3d6ba5feb8c426a11d02512543ed856f8c5d10",
+        "reason": "Reviewed final canonical callable/read-path/feature links and exact append migration; three service-only wrappers match existing guards. Original wrappers and unrelated flow behavior unchanged; SQL/typed negative acceptance retained."
       }
     },
     {
@@ -626,7 +634,11 @@
         "apps/backend/tests/student-status-filter-unit.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/web1-review-acceptance.mjs",
-        "apps/backend/tests/fixtures/web1-review-lifecycle.sql"
+        "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
+        "apps/backend/tests/sale-discount-acceptance.mjs",
+        "apps/backend/tests/fixtures/sale-discount-acceptance.sql",
+        "apps/backend/tests/product-class-management-acceptance.mjs",
+        "apps/backend/tests/fixtures/product-class-management-acceptance.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -691,7 +703,9 @@
         "apps/backend/database/person-merge-review.sql",
         "apps/backend/database/account-person-directory.sql",
         "apps/backend/supabase/migrations/20261115035110_web1_review_lifecycle.sql",
-        "apps/backend/database/person-detail-summary.sql"
+        "apps/backend/database/person-detail-summary.sql",
+        "apps/backend/database/account-person-directory-query.sql",
+        "apps/backend/database/person-membership-date.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -710,8 +724,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "bc1dd105c8f3f6fa2b6f3607b90ad3f24822570a42de1d5c3efbabe09dd92422",
-        "reason": "Final independently reviewed scope/capability/privacy behavior: exact visible contact suggestions, immutable reason/decision time, center-pinned nonduplicate preview/apply, retained alias history, never-linked people and grouped invitations. Selected person_get summary reuses unchanged native rights/finance/session guards; no currency guess or history fanout."
+        "fingerprint": "c789d887141650ab74592dcee9d0d2501731606110793216bdba932d9b5d1e81",
+        "reason": "Reviewed account directory equivalence, first recorded center membership date and canonical alias visibility regression fixtures."
       }
     },
     {
@@ -730,7 +744,11 @@
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
         "apps/backend/tests/sale-preview-impact-acceptance.mjs",
         "apps/backend/tests/sale-change-inventory-acceptance.mjs",
-        "apps/backend/tests/content-documents-acceptance.mjs"
+        "apps/backend/tests/content-documents-acceptance.mjs",
+        "apps/backend/tests/sale-discount-acceptance.mjs",
+        "apps/backend/tests/fixtures/sale-discount-acceptance.sql",
+        "apps/backend/tests/product-class-management-acceptance.mjs",
+        "apps/backend/tests/fixtures/product-class-management-acceptance.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -790,7 +808,10 @@
         "apps/backend/database/starter-sale-change-gate.sql",
         "apps/backend/supabase/migrations/20261113120834_starter_sale_change_gate.sql",
         "apps/backend/database/starter-sale-change-registration.sql",
-        "apps/backend/supabase/migrations/20261113121249_starter_sale_change_registration.sql"
+        "apps/backend/supabase/migrations/20261113121249_starter_sale_change_registration.sql",
+        "apps/backend/database/product-management.sql",
+        "apps/backend/database/sale-discount.sql",
+        "apps/backend/database/entitlement-ledger-read.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -815,11 +836,13 @@
         "sale_renew_apply_v1",
         "reservation_impact_preview_v1",
         "reservation_impact_apply_v1",
-        "negative_limits_get_v1"
+        "negative_limits_get_v1",
+        "products_management_list_v1",
+        "product_state_set_v1"
       ],
       "review": {
-        "fingerprint": "54af0e571c52602f3489532085128825ea86d126784b06d32892fc3a0ecec387",
-        "reason": "CI43424078673 exact-source native failure exposed legacy XREQ029 expectations: Starter package-change selector must reject F17. Added exact denial and retained both historical source-context/item identity assertions after restoring Pro/Business. No runtime, assertion strength or quality policy change."
+        "fingerprint": "2b44e3199597e41c659ff899039c5ab30cc8486aeea1211c7eac1a397a0d411d",
+        "reason": "Reviewed catalog rename contract and immutable published_name source: latest name changes; sold original name/price and future-version fallback remain frozen. Existing identity/sale assertions retained."
       }
     },
     {
@@ -904,8 +927,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "c89b3d83d0297a06ddc7b8c50b24704fabc1f41367ca2b4c89a30134b6240870",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "d9c9921e58b6a94f47c1cbc6b173ccedef047eeed2545caca8f8fe3966f696c2",
+        "reason": "Reviewed unchanged reservation allocation and source selection; P01 retains sold version identity and strengthens immutable name/price and future-effective fallback checks."
       }
     },
     {
@@ -968,8 +991,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "80b00d186c2ad1c6a8d5a86f0cacd600ba8a8d8f7c967ba4ef0d7edcb6b64ac1",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "4a7ad8d1b9e618a7caf9285baa0e48faa306a34b80c55e704a2bf8a1bf22c2db",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -985,7 +1008,9 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/action-management-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/sale-discount-acceptance.mjs",
+        "apps/backend/tests/fixtures/sale-discount-acceptance.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1022,7 +1047,8 @@
         "apps/backend/database/action-management-discovery.sql",
         "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql",
         "apps/backend/database/collection-correction-discovery.sql",
-        "apps/backend/supabase/migrations/20261107022552_collection_correction_discovery.sql"
+        "apps/backend/supabase/migrations/20261107022552_collection_correction_discovery.sql",
+        "apps/backend/database/finance-directory.sql"
       ],
       "operations": [
         "finance_get_v1",
@@ -1031,11 +1057,12 @@
         "collection_correct_apply_v1",
         "student_credit_refund_v1",
         "student_credit_offset_v1",
-        "debt_adjust_v1"
+        "debt_adjust_v1",
+        "finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "2def9bdb4e85ac833c31a66707e6870751893a696e2a501c4f9ce818e56689f8",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "d3c086a5ae02b738324ded6535e024c540042fa2697a2d44b0dd25d706296364",
+        "reason": "Reviewed final canonical callable/read-path/feature links and exact append migration; three service-only wrappers match existing guards. Original wrappers and unrelated flow behavior unchanged; SQL/typed negative acceptance retained."
       }
     },
     {
@@ -1137,8 +1164,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "48e4de9d4505f88c4f9801eeab8caefef609f8c7432776f1740791bf31ed2977",
-        "reason": "Reviewed shared person-registry suite change: only one owned Web1 acceptance import added; public/ICS source and scenarios unchanged, no gateway/Auth/provider change; existing guide remains valid."
+        "fingerprint": "ae3cddca270816fffc798b082c12a8f3ae845395e2c689876026536e11cb9fbd",
+        "reason": "Shared person registry root only adds three acceptance imports; public/calendar implementation and guide remain unchanged."
       }
     },
     {
@@ -1197,8 +1224,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "be307428607145e7d9e69b1b286e83032b96ad84d7244f01e1cb9c89c27a53c9",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "c7cffc4d2e913ed7714e677f2728d5c075c464a892998540dec19bdd28c7894d",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1257,8 +1284,8 @@
         "content_catalog_save_v1"
       ],
       "review": {
-        "fingerprint": "25ea63d631defd781b261bd8d9b7d012a011b5f17d52b65cb0bfd72db1fed170",
-        "reason": "Reviewed final shared metadata and G01 test diff: two sale_change gates require F17; migration inventory160; no other operation, Auth, permission or DTO changes. Source/migration equality and generated outputs retained; this flow guide remains valid."
+        "fingerprint": "12dd7a6ea0f128d573b781196723875e031417af922f8243ddbba1ce2ee5a46f",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1390,8 +1417,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "432968041d25e5f65f208753a6038666e1db66657abde1af989453966c01fdb3",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "155bd3d71bc3b41f2098b5e48165fb9d23fa313f0cd84a8491351c4be21becd0",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1466,8 +1493,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "051da633e519e7094584805c95f4feb99c370a36c89868d9d68f11b3c4cc6b0d",
-        "reason": "Reviewed subscription fixture against p07 quote/payment SQL: actual calendar period replaces 31-day assumption; exact due, partial credit, zero confirmation and allocation checks preserved; no runtime or guide change."
+        "fingerprint": "45a12c16dcb5556576b92f383472591cc1cbb4e1971716b4fa47b35b3d6ba424",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1519,8 +1546,8 @@
         "instructor_agreement_accept_v1"
       ],
       "review": {
-        "fingerprint": "b67bddea124f128cc6bc72a2e5a7da24568e233bed018c34c7ce64895c14358e",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "2cd14f73c7f45908d829b628af4f7268cdf49c27a42e49e103260f2394ce6eb6",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1594,8 +1621,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "7a36ab3b82238a76f1078a6401d95b9435adf0bcf133b0ca90635f37f35b3f80",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "ce2ab380d929b8bcbe64077678a5c65218cbd0d856603008ecbf8ce1f4c080f1",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1655,8 +1682,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "290b0094cc3af3b550c22bc1c9b2bd2cee8cb680c9d0ba50567217cebf7c466e",
-        "reason": "Reviewed shared person-registry suite change: new owned Web1 review/lifecycle acceptance import only; lead/intake/consent/CRM runtime and existing scenarios unchanged; guide remains valid."
+        "fingerprint": "7746433bdb9cdf18763b9af0fb4fba13f6cf0c02d77eb4a16afa5099d5d9474f",
+        "reason": "Shared person registry root only adds three acceptance imports; CRM sources and guide remain unchanged."
       }
     },
     {
@@ -1744,8 +1771,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "c519d9772bc81975c7bec099e6858867f98f1b24b3e4c5fea575704929c39d21",
-        "reason": "Reviewed P07 fixture-only calendar correction; payment amount and unused-funds assertions are exact; lifecycle and platform permission scenarios unchanged, guide remains valid."
+        "fingerprint": "5c7648332e6030c664af0511955f45778b7a98734560eb9bb06d396ed526e116",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1777,8 +1804,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "24629afe21a1c70f8855a429efc37add8efe1cb121fbaa35b97a0a945d66f4af",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "373a35e9fe0350d452f41a6878b14ae8ca6d8b7dcbb28e3b7110a5274baa2023",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1808,8 +1835,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "07c4b8c85772712d3733eaf7dd860c37bb158363e179dd590b74df9f34207bd0",
-        "reason": "Reviewed changed shared generated runtime/schema/test sources: only sale_change preview/apply gain F17 and migration inventory advances to160. Auth/session/RLS/permissions and this flow behavior are unchanged; guide stays valid. G01 test and source ownership additions reviewed separately."
+        "fingerprint": "d713b68b041ff804f9153e95cfb3ece2b4c876e5af637ec4fde2997a94a5bd03",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     },
     {
@@ -1933,8 +1960,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "6543d25c8b3f64100dcfb233999563bed15ae0baf66cba9b6708811a832fad5d",
-        "reason": "Reviewed shared contract diff: only package-change preview/apply add runtime F17 and migration inventory 160. Generated wrappers retain Auth/RLS/permissions; G01 tests/source bindings reviewed. Other flow rules and guide remain unchanged."
+        "fingerprint": "29c53e144046a7187c61ae6aaff2a359e8e10ce8107011655fa9e0e6d6427e80",
+        "reason": "Read common wrapper diff and verified every original wrapper/registration byte unchanged; only three new service-only APIs appended in WF05/WF08. Existing flow operations and guide unchanged; WF02 explicit discount target exception documented."
       }
     }
   ]

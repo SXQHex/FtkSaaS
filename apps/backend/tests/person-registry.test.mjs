@@ -380,3 +380,6 @@ import './person-field-policy-acceptance.mjs';
 import './student-status-filter-acceptance.mjs';
 
 import './web1-review-acceptance.mjs';
+import './native-capacity-recovery-acceptance.mjs';
+import './sale-discount-acceptance.mjs';
+import './product-class-management-acceptance.mjs';
