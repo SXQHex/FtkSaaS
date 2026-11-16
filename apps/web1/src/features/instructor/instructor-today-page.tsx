@@ -1,117 +1,57 @@
-import { useCallback, useState } from "react";
-import { useLoaderData, useSearch, useNavigate, useRouter } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { useLoaderData, useSearch, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
-import { useAccountAppearance } from "../account/use-account-appearance";
-import { getSupabaseClient } from "../../lib/supabase";
-import { Alert, AlertDescription } from "../../components/ui/alert";
+import type { WorkspaceSelection } from "../workspace/workspace-layout";
+import { InstructorLayout } from "./instructor-layout";
 import { InstructorTodayContent } from "./instructor-today-content";
-import type { AccountView } from "../../lib/api-contracts/generated";
 export function InstructorTodayRoutePage() {
-  const account = useLoaderData({ from: "/instructor/today" });
-  const search = useSearch({ from: "/instructor/today" });
-  return (
-    <InstructorTodayPage
-      key={`${account.id}:${search.org ?? ""}:${search.center ?? ""}`}
-      account={account}
-      initial={search}
-    />
-  );
-}
-function InstructorTodayPage({
-  account,
-  initial,
-}: {
-  account: AccountView;
-  initial: { org?: string; center?: string };
-}) {
-  const { t } = useTranslation(),
-    navigate = useNavigate(),
-    router = useRouter(),
-    queries = useQueryClient();
-  const appearance = useAccountAppearance(account.id);
-  const [organizationId, setOrganizationId] = useState(initial.org);
-  const [centerId, setCenterId] = useState(initial.center);
-  const [signingOut, setSigningOut] = useState(false),
-    [signOutFailed, setSignOutFailed] = useState(false);
-  const resolveScope = useCallback(
+  const account = useLoaderData({ from: "/instructor/today" }),
+    search = useSearch({ from: "/instructor/today" }),
+    navigate = useNavigate();
+  const { t } = useTranslation();
+  const resolve = useCallback(
     (selection: WorkspaceSelection) => {
-      if (!selection.organizationId || !selection.centerId || signingOut) return;
-      if (selection.organizationId !== initial.org || selection.centerId !== initial.center)
+      if (
+        selection.organizationId &&
+        selection.centerId &&
+        (selection.organizationId !== search.org || selection.centerId !== search.center)
+      )
         void navigate({
           to: "/instructor/today",
           search: { org: selection.organizationId, center: selection.centerId },
           replace: true,
         });
     },
-    [initial.org, initial.center, signingOut, navigate],
+    [navigate, search.org, search.center],
   );
-  async function signOut() {
-    if (signingOut) return;
-    setSigningOut(true);
-    setSignOutFailed(false);
-    const { error } = await getSupabaseClient().auth.signOut({ scope: "local" });
-    if (error) {
-      setSigningOut(false);
-      setSignOutFailed(true);
-      return;
-    }
-    queries.clear();
-    await navigate({ to: "/login", replace: true });
-    await router.invalidate();
-  }
   return (
-    <WorkspaceLayout
-      accountId={account.id}
-      name={account.display_name}
-      pending={signingOut}
-      onSignOut={() => {
-        void signOut();
-      }}
-      pageTitle={t(($) => $.instructorToday.title)}
-      scopeControl={{
-        organizationId,
-        centerId,
-        locked: signingOut,
-        onOrganization: (id) => {
-          setOrganizationId(id);
-          setCenterId(undefined);
-        },
-        onCenter: setCenterId,
-        onResolved: resolveScope,
-      }}
+    <InstructorLayout
+      key={`${account.id}:${search.org ?? ""}:${search.center ?? ""}`}
+      account={account}
+      initial={search}
+      title={t(($) => $.instructorToday.title)}
+      onScope={resolve}
     >
-      {(selection) => (
-        <>
-          {signOutFailed && (
-            <Alert variant="destructive">
-              <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
-            </Alert>
-          )}
-          {selection.organizationId &&
-          selection.centerId &&
-          selection.organizationId === initial.org &&
-          selection.centerId === initial.center ? (
-            <InstructorTodayContent
-              key={`${account.id}:${selection.organizationId}:${selection.centerId}`}
-              scope={{
-                accountId: account.id,
-                orgId: selection.organizationId,
-                centerId: selection.centerId,
-              }}
-              weekStart={appearance.isError ? undefined : appearance.data?.values.week_start}
-            />
-          ) : (
-            <div className="p-6">
-              <h1 className="text-2xl font-semibold">{t(($) => $.instructorToday.title)}</h1>
-              <p className="mt-3 text-muted-foreground">
-                {t(($) => $.instructorToday.chooseScope)}
-              </p>
-            </div>
-          )}
-        </>
+      {({ scope, weekStart }) => (
+        <InstructorTodayContent
+          key={`${scope.orgId}:${scope.centerId}`}
+          scope={scope}
+          weekStart={weekStart}
+          onSchedule={() => {
+            void navigate({
+              to: "/instructor/schedule",
+              search: { org: scope.orgId, center: scope.centerId },
+            });
+          }}
+          onOpen={(sessionId) => {
+            void navigate({
+              to: "/instructor/sessions/$sessionId",
+              params: { sessionId },
+              search: { org: scope.orgId, center: scope.centerId },
+            });
+          }}
+        />
       )}
-    </WorkspaceLayout>
+    </InstructorLayout>
   );
 }

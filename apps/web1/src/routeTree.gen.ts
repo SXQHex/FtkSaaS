@@ -20,8 +20,10 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as InstructorScheduleRouteImport } from './routes/instructor.schedule'
 import { Route as InstructorTodayRouteImport } from './routes/instructor.today'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
+import { Route as InstructorSessionsSessionIdRouteImport } from './routes/instructor.sessions.$sessionId'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
@@ -89,6 +91,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstructorScheduleRoute = InstructorScheduleRouteImport.update({
+  id: '/instructor/schedule',
+  path: '/instructor/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstructorTodayRoute = InstructorTodayRouteImport.update({
   id: '/instructor/today',
   path: '/instructor/today',
@@ -99,6 +106,12 @@ const InviteExpiredRoute = InviteExpiredRouteImport.update({
   path: '/invite/expired',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstructorSessionsSessionIdRoute =
+  InstructorSessionsSessionIdRouteImport.update({
+    id: '/instructor/sessions/$sessionId',
+    path: '/instructor/sessions/$sessionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
   id: '/o/$orgId/c/$centerId/access',
   path: '/o/$orgId/c/$centerId/access',
@@ -170,8 +183,10 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
@@ -196,8 +211,10 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
@@ -223,8 +240,10 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/account_/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/schedule': typeof InstructorScheduleRoute
   '/instructor/today': typeof InstructorTodayRoute
   '/invite_/expired': typeof InviteExpiredRoute
+  '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
@@ -251,8 +270,10 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account/deletion'
     | '/auth/callback'
+    | '/instructor/schedule'
     | '/instructor/today'
     | '/invite/expired'
+    | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
@@ -277,8 +298,10 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account/deletion'
     | '/auth/callback'
+    | '/instructor/schedule'
     | '/instructor/today'
     | '/invite/expired'
+    | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
@@ -303,8 +326,10 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account_/deletion'
     | '/auth/callback'
+    | '/instructor/schedule'
     | '/instructor/today'
     | '/invite_/expired'
+    | '/instructor/sessions/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/people'
@@ -330,8 +355,10 @@ export interface RootRouteChildren {
   VerifyEmailRoute: typeof VerifyEmailRoute
   AccountDeletionRoute: typeof AccountDeletionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  InstructorScheduleRoute: typeof InstructorScheduleRoute
   InstructorTodayRoute: typeof InstructorTodayRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
+  InstructorSessionsSessionIdRoute: typeof InstructorSessionsSessionIdRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
@@ -424,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instructor/schedule': {
+      id: '/instructor/schedule'
+      path: '/instructor/schedule'
+      fullPath: '/instructor/schedule'
+      preLoaderRoute: typeof InstructorScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/instructor/today': {
       id: '/instructor/today'
       path: '/instructor/today'
@@ -436,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/invite/expired'
       fullPath: '/invite/expired'
       preLoaderRoute: typeof InviteExpiredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor/sessions/$sessionId': {
+      id: '/instructor/sessions/$sessionId'
+      path: '/instructor/sessions/$sessionId'
+      fullPath: '/instructor/sessions/$sessionId'
+      preLoaderRoute: typeof InstructorSessionsSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/o/$orgId/c/$centerId/access': {
@@ -530,8 +571,10 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyEmailRoute: VerifyEmailRoute,
   AccountDeletionRoute: AccountDeletionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  InstructorScheduleRoute: InstructorScheduleRoute,
   InstructorTodayRoute: InstructorTodayRoute,
   InviteExpiredRoute: InviteExpiredRoute,
+  InstructorSessionsSessionIdRoute: InstructorSessionsSessionIdRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
