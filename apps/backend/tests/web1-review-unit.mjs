@@ -2,6 +2,17 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as v from '../supabase/functions/backend-v1/validators.js';import {newUuidV7 as key} from '../scripts/uuid.mjs';
 const scope=()=>({client_api_version:1,request_id:key(),org_id:key(),center_id:key()});
+test('Assigned session room labels are opt-in output, never new resource write fields',()=>{
+ const base=scope();
+ assert(v.request_session_get_v1({...base,session_id:key(),include_room_labels:true}));
+ assert(v.request_calendar_get_v1({...base,interval:{starts_at:'2031-01-01T00:00:00Z',ends_at:'2031-01-02T00:00:00Z'},page:{},include_room_labels:true}));
+ assert.equal(v.request_session_get_v1({...base,session_id:key(),include_room_labels:'true'}),false);
+ const create={...base,operation_key:key(),class_id:null,discipline_id:key(),format:'group',interval:{starts_at:'2031-01-01T00:00:00Z',ends_at:'2031-01-01T01:00:00Z'},resources:[{kind:'room',id:key()}],assignments:[],capacity:{total:10}};
+ assert(v.request_session_create_v1(create));assert.equal(v.request_session_create_v1({...create,resources:[{...create.resources[0],name:'Client label'}]}),false);
+});
+test('Assigned room label migration exactly matches its reviewed source',()=>{
+ assert.equal(fs.readFileSync(new URL('../database/assigned-session-room-labels.sql',import.meta.url),'utf8'),fs.readFileSync(new URL('../supabase/migrations/20261116143645_assigned_session_room_labels.sql',import.meta.url),'utf8'));
+});
 test('Member profile migration exactly composes reviewed lifecycle sources and native wrappers',()=>{
  const parts=['member-time-filter.sql','freeze-cancellation.sql'].map(n=>fs.readFileSync(new URL('../database/'+n,import.meta.url),'utf8').replace(/^begin;\n/,'').replace(/commit;\n$/,''));
  const wrappers=fs.readFileSync(new URL('../database/runtime-wrappers-current.sql',import.meta.url),'utf8').split('\n').filter(l=>l.includes('freeze_cancel_')).join('\n');

@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="atanmis-seans-salon"></a>
+## Atanmış seans salon etiketi — 16 Kasım 2026
+
+Başlangıç main `1df2e01c40fd625b0def974fe3347da65032fcfd`; PR315'in aynı kaynağındaki aday [43859496954](https://github.com/SXQHex/FtkSaaS/actions/runs/43859496954), main [43863721918](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721918), merge [43863721867](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721867) ve development [43863802374](https://github.com/SXQHex/FtkSaaS/actions/runs/43863802374) success doğrulandı. W1-BE-17 PR316 ayrı açık teslimdir; bu dal onun kaynağını içermez. Kullanıcı açıkça W1-BE-18'e başlamamızı istedi. Dal `feature/backend-assigned-session-room-labels`; kapsam [backlog](remaining-work.md#w1-be-18--atanmış-seansın-salon-etiketi) ve frontend tüketim cevabı `apps/web1/tasks/request.md` W1-BE-18 bölümündedir. Frontend kodu/todo/kabul değişmedi.
+
+168. append migration mevcut yetki zincirinden sonra yalnız görünür çıktı sayfasını zenginleştirir; ilk167 migration korunur. Sözleşme ve tüketim WF03 sahibindedir. Yerel native Supabase AF_UNIX EPERM engeli sürer; izole PostgreSQL/pgcrypto testi Auth/REST/Edge kabulü sayılmaz. Son kaynakta standart backend verify578/578 (419+149+10), skip0; generated/typecheck/audit/governance ve kalite/floor geçti. İzole PostgreSQL/pgcrypto168 migration ve14 typed çağrıyı doğruladı; canlı atama denetimi ve aktif rezervasyon filtresi kaldırıldığında iki olumsuz mutasyon yakalandı. Son bağımsız incelemede engelleyici bulgu yok; asistan, legacy sınıf mirası ve explicit seans görevi ayrıca sınandı. API envanterinde132 birim ve eski suite sahipliği korunur. Loglar `.dev/room-label-verify.log`, `.dev/room-label-quality.log`, `.dev/room-label-sql-final.log`. Gerçek Auth→Edge→RPC testi mevcut native suite içine eklendi; yerelde native servis engeli nedeniyle bu kabul aday CI aşamasındadır. Aday CI, main, development ve hosted kabulü açık.
+
 <a id="seans-kesif-hak"></a>
 ## Seans bekleme/teklif keşfi ve gerçek kaynak hakkı — 16 Kasım 2026
 

@@ -1,3 +1,4 @@
+import './assigned-session-room-labels-acceptance.mjs';
 import './calendar-preferences-acceptance.mjs';
 import './personal-calendar-acceptance.mjs';
 import './member-profile-lifecycle-acceptance.mjs';
@@ -100,6 +101,16 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
    const restricted=await list(instructor.u,{center_id:c1,session_id:s1,include_source_summary:true});assert(restricted.items.length>0);assert(restricted.items.every(x=>x.source_summary.status==='restricted'&&!('source_sale_id' in x.source_summary)));
    assert((await list(cm.u,{center_id:c1,session_id:s1})).items.every(x=>!('source_summary' in x)));
   }finally{await db.query('delete from core.waitlist_entries where id=$1',[entry]);}
+ });
+ await t.test('assigned instructor reads real room labels without room management authority',async()=>{
+  const labels=[{room_id:room,name:'Read room'}];
+  assert.deepEqual((await get(instructor.u,s1,{center_id:c1,include_room_labels:true})).room_labels,labels);
+  assert.deepEqual((await get(assistant.u,s1,{center_id:c1,include_room_labels:true})).room_labels,labels);
+  assert(!('room_labels' in await get(owner,s1,{center_id:c1,include_room_labels:true})));
+  assert(!('room_labels' in await get(instructor.u,s1,{center_id:c1})));
+  assert(!('room_labels' in await get(student.u,s1,{center_id:c1,include_room_labels:true})));
+  const page=await cal(instructor.u,{center_id:c1,resource:{kind:'person',id:instructor.p},include_room_labels:true});assert.equal(page.items.length,1);assert.deepEqual(page.items[0].room_labels,labels);
+  await fail(instructor.u,'management_state_get_v1',{center_id:c1,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{room_id:room}}},'FORBIDDEN');
  });
  await t.test('student sees own active and historical records, never another roster',async()=>{
   assert.deepEqual(ids(await list(student.u)).sort(),[r1,cancelled].sort());

@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "2f9340d39ef432466887e3bc98675fac8e0fde641fa269bddb583962d6f76c95",
-        "reason": "Reviewed additive test inventory with unchanged prior/exclusive ownership and migration metadata167. Directory dispatch preserves common auth, subscription and lifecycle gates. No protocol/worker behavior changed. Final canonical UUID paths and migration167 metadata reviewed; all new IDs remain domain UUIDs."
+        "fingerprint": "637c034ceb4b8ddede02243f62ded4fbe337c8afe2b18d9ecc054291f13c83e2",
+        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "7ecde02061d097f36d7e06521bb7c4c963088ca94cc1f7d0490bc4458dafc464",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "1fe3fbe707d625d2f561d205853b27f0d2cfa7b5cc37d65482858e71968c6aa3",
+        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
       }
     },
     {
@@ -523,7 +523,10 @@
         "apps/backend/tests/native-capacity-recovery-acceptance.mjs",
         "apps/backend/tests/fixtures/native-capacity-recovery.sql",
         "apps/backend/tests/product-class-management-acceptance.mjs",
-        "apps/backend/tests/fixtures/product-class-management-acceptance.sql"
+        "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
+        "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
+        "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
+        "apps/backend/tests/web1-review-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -584,7 +587,9 @@
         "apps/backend/database/settings-sharing-events.sql",
         "apps/backend/database/capacity-recovery.sql",
         "apps/backend/database/session-management-reads.sql",
-        "apps/backend/database/class-student-discovery.sql"
+        "apps/backend/database/class-student-discovery.sql",
+        "apps/backend/database/assigned-session-room-labels.sql",
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -607,8 +612,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "82a5d82f563dade7d6a523cfbbf2f7f2dcfecfb338f228c9f482b0336a2cdf43",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "9b44c2065ee9974c61a03936306b489972afd63adc17e3ee7987d3463371d9c4",
+        "reason": "W1-BE-18: reviewed opt-in session/calendar labels, canonical live assignment and center/plan guards, migration equality, native Edge and SQL boundary tests; WF03 defines consumer semantics."
       }
     },
     {
@@ -724,8 +729,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "be39d75a7fa8e78d4e563ca707d30a7c9163ec204e46cc960d3d71cd57cb786d",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "cf0b845d9394bfe3eef03c1dbdf998f21ca3da88aaced174a1e514f9d2a7403e",
+        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
       }
     },
     {
@@ -848,8 +853,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "8fade9f41c79dd112890688eeae36d3cdbf66ad8321840f434046f405d823e60",
-        "reason": "Reviewed only additive shared schedule/web1 test cases for WF06/WF19 and generated contract references; existing assertions and this flow operations/guide remain unchanged."
+        "fingerprint": "89c3ed0db825f91fbad85b30616538bc86c72de6dd8c1b03e57c8c2e683f62bb",
+        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
       }
     },
     {
@@ -944,8 +949,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "4bb5b766e58e55d94a161e6dc13e6f6b3f47711d476d2b35924d8ec93f4c2c1e",
-        "reason": "Reviewed actual-source summary implementation/schema and final scope tests: terminated native zero, opt-in cursor, proper cross-center session fixture and alias source identity; WF06 guide states exact permission and ledger meaning."
+        "fingerprint": "5c388bb1ae4bee70fa40e6631118dc4da00487e30c2b5a2aa4f5ead250625388",
+        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
       }
     },
     {
@@ -959,7 +964,10 @@
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
+        "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
+        "apps/backend/tests/web1-review-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -996,7 +1004,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/database/assigned-session-room-labels.sql",
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
       ],
       "operations": [
         "attendance_get_v1",
@@ -1008,8 +1018,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "33eed92c089e84d9aea0bd6cc4fd1eafc84eeea45052e07d042d2906a8fbe5ee",
-        "reason": "W1-BE-13/14: reviewed shared wrapper diff: only two freeze cancellation entries appended, all existing entrypoints unchanged. Shared test additions cover member-time/freeze flows; this flow guide and behavior remain valid."
+        "fingerprint": "2415f4b1f13528d66c26e35d0d2f1557323b60105b7f324abbff6e7fd354a5d5",
+        "reason": "W1-BE-18: reviewed opt-in session/calendar labels, canonical live assignment and center/plan guards, migration equality, native Edge and SQL boundary tests; WF03 defines consumer semantics."
       }
     },
     {
@@ -1858,8 +1868,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "c00c62c9284c69ae6738e970dd357e90f4fa90f7a9c7763f0d757c8887345c39",
-        "reason": "Reviewed shared-gate directory, full history indexes, FIFO/status cursor behavior, bounded offers, native acceptance and common lifecycle denial tests; WF19 exact consumer guide updated."
+        "fingerprint": "50c9c6b5a3b1f96440ec801ec381d1d4af346f4f5344e3d472b4fb96aa9a980b",
+        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
       }
     },
     {

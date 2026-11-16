@@ -52,6 +52,14 @@ Kullanıcı gerekli backend açıklarını gidermeyi ve gereksiz geliştirme yer
 - [x] Son kaynak SQL/static test ve bağımsız inceleme; native Auth/Edge kabulü aşağıdaki aday CI aşamasındadır.
 - [ ] Aday CI → main kaynak kanıtı → development teslimi ve gerekli hosted tekrar kabulü.
 
+## W1-BE-18 — Atanmış seansın salon etiketi
+
+Kullanıcı ayrı PR ile gerekli backend desteğini ve talep dosyasındaki doğru tüketim yolunu istedi. Kesin sözleşme [WF03](../../../docs/workflows.md#wf03), kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#atanmis-seans-salon) sahibindedir. E24 frontend kabulü ayrı kalır.
+
+- [x] Mevcut calendar/session okuyucusunda opt-in typed güncel salon etiketi; canlı atama/rol, organizasyon/merkez ve mevcut seans görünürlüğü korunur. Yönetim keşfi veya yeni endpoint açılmaz.
+- [x] Son kaynak yerel doğrulama ve bağımsız inceleme; native kabul aday CI aşamasında.
+- [ ] Aday CI → main kaynak kanıtı → development teslimi; gerekli hosted backend kabulü.
+
 ## Backend çalışma modeli
 
 Tek backend uygulaması geliştirilir. Pro ortak işlevlerin tamamlandığı ana kabul kapsamıdır. Starter aynı uygulamanın plan hakları, limitler ve yetkilerle kısıtlanmış halidir; ortak ders, kişi, satış, ödeme, yoklama, rapor ve Auth akışları için ikinci implementasyon yapılmaz. Business aynı temele çok merkez ve merkezler arası işlevler ekler. Plan özellikleri ve sayısal limitlerin normatif sahibi [ürün sözleşmesidir](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md); uygulama/kabul sırası [üretim kuyruğunda](production-queue.md) tutulur.
