@@ -6,7 +6,7 @@ import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { FinanceContent } from "./finance-content";
+import { FinanceDirectoryContent } from "./finance-directory-content";
 import type { AccountView } from "../../lib/api-contracts/generated";
 
 export function FinanceRoutePage() {
@@ -97,7 +97,7 @@ function FinancePage({
               </Alert>
             )}
             {selection.organizationId && selection.centerId ? (
-              <FinanceContent
+              <FinanceDirectoryContent
                 key={`${account.id}:${selection.organizationId}:${selection.centerId}`}
                 scope={{
                   accountId: account.id,

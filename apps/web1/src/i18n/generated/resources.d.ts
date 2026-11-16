@@ -420,7 +420,8 @@ export default interface Resources {
         "collection": "Tahsilat",
         "correction_in": "Giriş düzeltmesi",
         "correction_out": "Çıkış düzeltmesi",
-        "refund": "Nakit iade"
+        "refund": "Nakit iade",
+        "sale": "Satış"
       },
       "movements": "Hareketler",
       "next": "Sonraki sayfa",
@@ -491,6 +492,24 @@ export default interface Resources {
       "unknown": "Bilinmiyor",
       "unknownWrite": "Sonuç henüz doğrulanamadı. Aynı işlemle devam et.",
       "writing": "Tahsilat kaydediliyor…"
+    },
+    "financeDirectory": {
+      "applyPeriod": "Dönemi göster",
+      "back": "Merkez finansına dön",
+      "collectionsHint": "Dönem tahsilatları ve bağlı giriş/çıkış düzeltmeleri. Nakit iadeler ayrı hareketlerdir.",
+      "creditDebtHint": "Borç, yalnız bu sayfadaki üyenin aynı para birimindeki izinli finans kaynağından okunur. Okunamayan değer “Bilinmiyor” olarak kalır.",
+      "end": "Bitiş günü (dahil)",
+      "pageCount": "Bu sayfada {{amount}} kayıt",
+      "perCurrencyPeople": "{{currency}}: {{amount}} kişi",
+      "period": "{{start}} – {{end}}",
+      "periodError": "Geçerli başlangıç ve bitiş günlerini seç. Dönem en fazla 366 gün olabilir.",
+      "personal": "Üye bazlı finans",
+      "readError": "Merkez finansı okunamadı. Yetkiyi ve dönemi kontrol edip yeniden deneyebilirsin.",
+      "salesHint": "Dönemde kaydedilen satışların net bedeli. Nakit tahsilat değildir.",
+      "search": "Ara",
+      "sourceSale": "Kaynak satış",
+      "start": "Başlangıç günü",
+      "totalsHint": "Dönem satış/tahsilatları ve güncel borç/alacaklar her para biriminde ayrıdır. Kişi sayıları para birimleri arasında toplanmaz."
     },
     "formExample": {
       "invalid": "En az 3 karakter girin.",

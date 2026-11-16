@@ -36,32 +36,55 @@ import { Input } from "../../components/ui/input";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 
+export interface FinanceInitialContext {
+  selection?: FinanceSelection;
+  label: string;
+  action?: "collect" | "correct" | "credit-refund" | "offset" | "adjust";
+  entityId?: string;
+}
 export function FinanceContent({
   scope,
   onLockChange,
   preservePending = false,
+  initialContext,
 }: {
   scope: ClientScope;
   onLockChange: (locked: boolean) => void;
   preservePending?: boolean;
+  initialContext?: FinanceInitialContext;
 }) {
   const { t } = useTranslation(),
     router = useRouter();
   const [tab, setTab] = useState<FinanceTab>("movements"),
-    [selection, setSelection] = useState<FinanceSelection>(),
-    [draftSelection, setDraftSelection] = useState<FinanceSelection>({
-      personId: "",
-      currency: "",
-    }),
+    [selection, setSelection] = useState<FinanceSelection | undefined>(initialContext?.selection),
+    [draftSelection, setDraftSelection] = useState<FinanceSelection>(
+      initialContext?.selection ?? {
+        personId: "",
+        currency: "",
+      },
+    ),
     [search, setSearch] = useState(""),
     [personCursors, setPersonCursors] = useState<(string | undefined)[]>([undefined]),
     [personPage, setPersonPage] = useState(0),
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [pageIndex, setPageIndex] = useState(0),
-    [collect, setCollect] = useState(false),
-    [correctionId, setCorrectionId] = useState<string>(),
-    [creditRefund, setCreditRefund] = useState(false),
-    [debtAction, setDebtAction] = useState<{ id: string; action: DebtAction; label: string }>(),
+    [collect, setCollect] = useState(initialContext?.action === "collect"),
+    [correctionId, setCorrectionId] = useState<string | undefined>(
+      initialContext?.action === "correct" ? initialContext.entityId : undefined,
+    ),
+    [creditRefund, setCreditRefund] = useState(initialContext?.action === "credit-refund"),
+    [debtAction, setDebtAction] = useState<
+      { id: string; action: DebtAction; label: string } | undefined
+    >(
+      initialContext?.entityId &&
+        (initialContext.action === "offset" || initialContext.action === "adjust")
+        ? {
+            id: initialContext.entityId,
+            action: initialContext.action,
+            label: initialContext.label,
+          }
+        : undefined,
+    ),
     [locked, setLocked] = useState(false),
     [invalid, setInvalid] = useState(false);
   const workspace = useQuery({
@@ -89,7 +112,7 @@ export function FinanceContent({
     retry: false,
   });
   const selectedPerson = people.data?.items.find((row) => row.id === draftSelection.personId);
-  const [personLabel, setPersonLabel] = useState("");
+  const [personLabel, setPersonLabel] = useState(initialContext?.label ?? "");
   const finance = useQuery({
     queryKey: [
       "finance",

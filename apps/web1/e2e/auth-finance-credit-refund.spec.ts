@@ -17,6 +17,10 @@ async function setup(
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
     const reject = (code: string, retryable = false) =>
       route.fulfill({ json: { ok: false, error: { code, retryable, trace_id: I.role } } });
+    if (op === "finance_directory_get_v1")
+      return route.fulfill({
+        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+      });
     if (op === "finance_get_v1") {
       expect(req.person_id).toBe(I.instructor);
       expect(req.currency).toBe("TRY");
@@ -90,6 +94,7 @@ async function setup(
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(origin + "/account");
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
+  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
   await page.getByRole("button", { name: "Finansı getir", exact: true }).click();

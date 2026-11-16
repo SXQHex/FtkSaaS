@@ -25,7 +25,14 @@ import { Badge } from "../../components/ui/badge";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 
 export type FinanceTab = "movements" | "debts" | "credits";
-export type FinanceFilter = "all" | "sale" | "collection" | "other";
+export type FinanceFilter =
+  | "all"
+  | "sale"
+  | "collection"
+  | "other"
+  | "refund"
+  | "correction_in"
+  | "correction_out";
 export type FinanceAction =
   | "collect"
   | "correct"
@@ -89,6 +96,8 @@ export function FinanceView({
   counts,
   notice,
   pagination,
+  nativeKinds = false,
+  onQuery,
 }: {
   tab: FinanceTab;
   onTab: (value: FinanceTab) => void;
@@ -107,6 +116,8 @@ export function FinanceView({
   counts: Record<FinanceTab, string>;
   notice?: ReactNode;
   pagination?: ReactNode;
+  nativeKinds?: boolean;
+  onQuery?: () => void;
 }) {
   const { t } = useTranslation(),
     unknown = t(($) => $.finance.unknown);
@@ -141,12 +152,14 @@ export function FinanceView({
     {
       label: t(($) => $.finance.periodSales, { period: summary.periodLabel }),
       value: summary.sales,
-      hint: t(($) => $.finance.salesHint),
+      hint: t(($) => (nativeKinds ? $.financeDirectory.salesHint : $.finance.salesHint)),
     },
     {
       label: t(($) => $.finance.periodCollections, { period: summary.periodLabel }),
       value: summary.collections,
-      hint: t(($) => $.finance.collectionsHint),
+      hint: t(($) =>
+        nativeKinds ? $.financeDirectory.collectionsHint : $.finance.collectionsHint,
+      ),
     },
     {
       label: t(($) => $.finance.openDebt),
@@ -198,11 +211,11 @@ export function FinanceView({
           onSelectionChange={(key) => onTab(key as FinanceTab)}
           className="min-w-0 gap-0"
         >
-          <CardHeader className="pb-4">
+          <CardHeader className="overflow-x-auto pb-4">
             <TabsList
               variant="line"
               aria-label={t(($) => $.finance.sections)}
-              className="max-w-full flex-wrap justify-start"
+              className="max-w-full justify-start"
             >
               <TabsTrigger id="movements">{t(($) => $.finance.movements)}</TabsTrigger>
               <TabsTrigger id="debts">
@@ -215,60 +228,125 @@ export function FinanceView({
               </TabsTrigger>
             </TabsList>
           </CardHeader>
-          <TabsContent id="movements" className="min-w-0">
+          {(nativeKinds || tab === "movements") && (
             <search
               className="flex min-w-0 flex-wrap items-center gap-3 px-5 pb-4"
               aria-label={t(($) => $.finance.filters)}
             >
-              <InputGroup className="w-full max-w-52">
-                <InputGroupAddon>
-                  <SearchIcon />
-                </InputGroupAddon>
-                <InputGroupInput
-                  name="financeSearch"
-                  value={search}
-                  aria-label={t(($) => $.finance.search)}
-                  placeholder={t(($) => $.finance.search)}
-                  disabled={!onSearch}
-                  onChange={(event) => onSearch?.(event.target.value)}
-                />
-              </InputGroup>
-              <ToggleGroup
-                variant="segmented"
-                size="segmented"
-                selectionMode="single"
-                disallowEmptySelection
-                selectedKeys={new Set([filter])}
-                className="max-w-full flex-wrap"
-                aria-label={t(($) => $.finance.operationKind)}
-                onSelectionChange={(keys) => onFilter?.(String([...keys][0]) as FinanceFilter)}
+              <form
+                className="flex min-w-0 flex-wrap items-end gap-3"
+                aria-label={t(($) => $.finance.search)}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onQuery?.();
+                }}
               >
-                <ToggleGroupItem id="all">{t(($) => $.finance.all)}</ToggleGroupItem>
-                <ToggleGroupItem id="sale" isDisabled={!onFilter}>
-                  {t(($) => $.finance.sale)}
-                </ToggleGroupItem>
-                <ToggleGroupItem id="collection" isDisabled={!onFilter}>
-                  {t(($) => $.finance.collection)}
-                </ToggleGroupItem>
-                <ToggleGroupItem id="other" isDisabled={!onFilter}>
-                  {t(($) => $.finance.other)}
-                </ToggleGroupItem>
-              </ToggleGroup>
-              <NativeSelect
-                name="methodFilter"
-                value={method}
-                aria-label={t(($) => $.finance.method)}
-                disabled={!onMethod}
-                onChange={(event) => onMethod?.(event.target.value)}
-              >
-                <NativeSelectOption value="">{t(($) => $.finance.allMethods)}</NativeSelectOption>
-                <NativeSelectOption value="cash">{t(($) => $.finance.cash)}</NativeSelectOption>
-                <NativeSelectOption value="card_pos">{t(($) => $.finance.card)}</NativeSelectOption>
-                <NativeSelectOption value="bank_transfer">
-                  {t(($) => $.finance.bank)}
-                </NativeSelectOption>
-              </NativeSelect>
+                <InputGroup className="w-full max-w-52">
+                  <InputGroupAddon>
+                    <SearchIcon />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    name="financeSearch"
+                    value={search}
+                    aria-label={t(($) => $.finance.search)}
+                    placeholder={t(($) => $.finance.search)}
+                    disabled={!onSearch}
+                    onChange={(event) => onSearch?.(event.target.value)}
+                  />
+                </InputGroup>
+                {tab === "movements" && (
+                  <>
+                    {nativeKinds ? (
+                      <NativeSelect
+                        aria-label={t(($) => $.finance.operationKind)}
+                        value={filter}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          if (
+                            value === "all" ||
+                            value === "sale" ||
+                            value === "collection" ||
+                            value === "refund" ||
+                            value === "correction_in" ||
+                            value === "correction_out"
+                          )
+                            onFilter?.(value);
+                        }}
+                      >
+                        <NativeSelectOption value="all">
+                          {t(($) => $.finance.all)}
+                        </NativeSelectOption>
+                        {(
+                          [
+                            "sale",
+                            "collection",
+                            "refund",
+                            "correction_in",
+                            "correction_out",
+                          ] as const
+                        ).map((kind) => (
+                          <NativeSelectOption key={kind} value={kind}>
+                            {t(($) => $.finance.movementKinds[kind])}
+                          </NativeSelectOption>
+                        ))}
+                      </NativeSelect>
+                    ) : (
+                      <ToggleGroup
+                        variant="segmented"
+                        size="segmented"
+                        selectionMode="single"
+                        disallowEmptySelection
+                        selectedKeys={new Set([filter])}
+                        className="max-w-full flex-wrap"
+                        aria-label={t(($) => $.finance.operationKind)}
+                        onSelectionChange={(keys) =>
+                          onFilter?.(String([...keys][0]) as FinanceFilter)
+                        }
+                      >
+                        <ToggleGroupItem id="all">{t(($) => $.finance.all)}</ToggleGroupItem>
+                        <ToggleGroupItem id="sale" isDisabled={!onFilter}>
+                          {t(($) => $.finance.sale)}
+                        </ToggleGroupItem>
+                        <ToggleGroupItem id="collection" isDisabled={!onFilter}>
+                          {t(($) => $.finance.collection)}
+                        </ToggleGroupItem>
+                        <ToggleGroupItem id="other" isDisabled={!onFilter}>
+                          {t(($) => $.finance.other)}
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    )}
+
+                    <NativeSelect
+                      name="methodFilter"
+                      value={method}
+                      aria-label={t(($) => $.finance.method)}
+                      disabled={!onMethod}
+                      onChange={(event) => onMethod?.(event.target.value)}
+                    >
+                      <NativeSelectOption value="">
+                        {t(($) => $.finance.allMethods)}
+                      </NativeSelectOption>
+                      <NativeSelectOption value="cash">
+                        {t(($) => $.finance.cash)}
+                      </NativeSelectOption>
+                      <NativeSelectOption value="card_pos">
+                        {t(($) => $.finance.card)}
+                      </NativeSelectOption>
+                      <NativeSelectOption value="bank_transfer">
+                        {t(($) => $.finance.bank)}
+                      </NativeSelectOption>
+                    </NativeSelect>
+                  </>
+                )}
+                {onQuery && (
+                  <Button type="submit" variant="outline">
+                    {t(($) => $.financeDirectory.search)}
+                  </Button>
+                )}
+              </form>
             </search>
+          )}
+          <TabsContent id="movements" className="min-w-0">
             <CardContent className="min-w-0 pb-1">
               <Table aria-label={t(($) => $.finance.movements)} className="min-w-[45rem]">
                 <TableHeader>
@@ -313,7 +391,9 @@ export function FinanceView({
               <Table aria-label={t(($) => $.finance.openDebts)} className="min-w-[34rem]">
                 <TableHeader>
                   <TableHead isRowHeader>{t(($) => $.finance.member)}</TableHead>
-                  <TableHead>{t(($) => $.finance.lastSale)}</TableHead>
+                  <TableHead>
+                    {t(($) => (nativeKinds ? $.financeDirectory.sourceSale : $.finance.lastSale))}
+                  </TableHead>
                   <TableHead className="text-right">{t(($) => $.finance.openDebt)}</TableHead>
                   <TableHead>
                     <span className="sr-only">{t(($) => $.finance.rowActions)}</span>
@@ -331,7 +411,10 @@ export function FinanceView({
                 </TableBody>
               </Table>
             </CardContent>
-            <CardFooter className="text-xs text-muted-foreground">{counts.debts}</CardFooter>
+            <CardFooter className="flex-wrap justify-between gap-2 text-xs text-muted-foreground">
+              <span>{counts.debts}</span>
+              {pagination}
+            </CardFooter>
           </TabsContent>
           <TabsContent id="credits" className="min-w-0">
             <CardContent className="min-w-0 pb-1">
@@ -359,6 +442,7 @@ export function FinanceView({
             <CardFooter className="flex-wrap justify-between gap-2 text-xs text-muted-foreground">
               <span>{counts.credits}</span>
               <span>{t(($) => $.finance.creditNote)}</span>
+              {pagination}
             </CardFooter>
           </TabsContent>
         </Tabs>

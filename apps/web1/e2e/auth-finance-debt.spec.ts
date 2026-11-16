@@ -24,6 +24,7 @@ async function setup(
       route.fulfill({ json: { ok: false, error: { code, retryable: false, trace_id: I.role } } });
     if (op === "management_state_get_v1" && req.operation === "collection_record_v1")
       return reject("FORBIDDEN");
+    if (op === "finance_directory_get_v1") return reject("FORBIDDEN");
     if (op === "finance_get_v1")
       return send({
         person_id: I.instructor,
@@ -99,6 +100,7 @@ async function setup(
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(origin + "/account");
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
+  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
   await page.getByRole("button", { name: "Finansı getir", exact: true }).click();

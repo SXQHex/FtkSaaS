@@ -1905,7 +1905,8 @@
       "collection": "Tahsilat",
       "refund": "Nakit iade",
       "correction_in": "Giriş düzeltmesi",
-      "correction_out": "Çıkış düzeltmesi"
+      "correction_out": "Çıkış düzeltmesi",
+      "sale": "Satış"
     },
     "authorityUnavailable": "Bu kişi için tahsilat yetkisi doğrulanamadı.",
     "methodImmutable": "Kayıtlı ödeme yöntemi düzeltmeyle değiştirilmez.",
@@ -2428,5 +2429,23 @@
       "stale": "Yoklama veya seans değişti. Güncel kaynağı oku ve yeniden onayla.",
       "rejected": "İşlem reddedildi. Güncel izin, plan ve yoklama koşullarını kontrol et."
     }
+  },
+  "financeDirectory": {
+    "personal": "Üye bazlı finans",
+    "back": "Merkez finansına dön",
+    "search": "Ara",
+    "start": "Başlangıç günü",
+    "end": "Bitiş günü (dahil)",
+    "applyPeriod": "Dönemi göster",
+    "periodError": "Geçerli başlangıç ve bitiş günlerini seç. Dönem en fazla 366 gün olabilir.",
+    "period": "{{start}} – {{end}}",
+    "pageCount": "Bu sayfada {{amount}} kayıt",
+    "totalsHint": "Dönem satış/tahsilatları ve güncel borç/alacaklar her para biriminde ayrıdır. Kişi sayıları para birimleri arasında toplanmaz.",
+    "readError": "Merkez finansı okunamadı. Yetkiyi ve dönemi kontrol edip yeniden deneyebilirsin.",
+    "perCurrencyPeople": "{{currency}}: {{amount}} kişi",
+    "creditDebtHint": "Borç, yalnız bu sayfadaki üyenin aynı para birimindeki izinli finans kaynağından okunur. Okunamayan değer “Bilinmiyor” olarak kalır.",
+    "sourceSale": "Kaynak satış",
+    "salesHint": "Dönemde kaydedilen satışların net bedeli. Nakit tahsilat değildir.",
+    "collectionsHint": "Dönem tahsilatları ve bağlı giriş/çıkış düzeltmeleri. Nakit iadeler ayrı hareketlerdir."
   }
 }

@@ -42,6 +42,10 @@ async function setup(
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON(),
       send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "finance_directory_get_v1")
+      return route.fulfill({
+        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+      });
     if (op === "finance_get_v1") {
       reads.push(req);
       expect(req.person_id).toBe(I.instructor);
@@ -199,6 +203,7 @@ async function setup(
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
+  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
   await page.getByRole("button", { name: "Finansı getir", exact: true }).click();

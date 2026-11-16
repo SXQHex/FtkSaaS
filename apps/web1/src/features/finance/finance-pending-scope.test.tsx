@@ -35,10 +35,10 @@ vi.mock("../workspace/workspace-layout", () => ({
     children: (selection: typeof state.selection) => ReactNode;
   }) => <section>{children(state.selection)}</section>,
 }));
-vi.mock("./finance-content", async () => {
+vi.mock("./finance-directory-content", async () => {
   const { useEffect } = await import("react");
   return {
-    FinanceContent: ({
+    FinanceDirectoryContent: ({
       scope,
       onLockChange,
       preservePending,
