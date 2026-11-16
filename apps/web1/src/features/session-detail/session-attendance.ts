@@ -54,6 +54,7 @@ export function attendanceStartIntent(
   session: SessionView,
   attendance: AttendanceView,
   reason: string,
+  actualStartedAt = new Date().toISOString(),
 ): SessionAttendanceIntent {
   const base = context(scope, session, attendance);
   if (
@@ -70,7 +71,7 @@ export function attendanceStartIntent(
       operation_key: uuidv7(),
       expected_version: session.version,
       session_id: session.id,
-      actual_started_at: new Date().toISOString(),
+      actual_started_at: z.iso.datetime({ offset: true }).parse(actualStartedAt),
       reason: z.string().trim().min(1).parse(reason),
     },
   };
@@ -235,7 +236,10 @@ export async function readSessionAttendanceReceipt(intent: SessionAttendanceInte
     throw new Error("SESSION_ATTENDANCE_RECEIPT_UNAVAILABLE");
   return receipt;
 }
-export async function readSessionAttendanceResult(intent: SessionAttendanceIntent) {
+export async function readSessionAttendanceResult(
+  intent: SessionAttendanceIntent,
+  readMemberRights = true,
+) {
   const [session, attendance] = await Promise.all([
     readScheduleSession(intent.scope, intent.sessionId),
     readSessionAttendance(intent.scope, intent.sessionId),
@@ -260,7 +264,7 @@ export async function readSessionAttendanceResult(intent: SessionAttendanceInten
   )
     throw new Error("SESSION_ATTENDANCE_RESULT_UNAVAILABLE");
   const rights: { personId: string; unavailable: boolean }[] = [];
-  for (let i = 0; i < intent.people.length; i += 4)
+  for (let i = 0; readMemberRights && i < intent.people.length; i += 4)
     await Promise.all(
       intent.people.slice(i, i + 4).map(async (personId) => {
         try {

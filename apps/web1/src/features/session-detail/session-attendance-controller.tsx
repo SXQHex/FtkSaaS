@@ -31,6 +31,8 @@ import { Button } from "../../components/ui/button";
 
 export function SessionAttendanceController({
   scope,
+  audience = "management",
+  startTime,
   session,
   attendance,
   names,
@@ -44,6 +46,8 @@ export function SessionAttendanceController({
   children,
 }: {
   scope: ClientScope;
+  audience?: "management" | "instructor";
+  startTime?: string;
   session: SessionView;
   attendance?: AttendanceView;
   names: Map<string, string>;
@@ -71,7 +75,13 @@ export function SessionAttendanceController({
     [error, setError] = useState<string>(),
     [rightsUnavailable, setRightsUnavailable] = useState(false);
   const [acceptedVersion, setAcceptedVersion] = useState(session.version);
-  const liveAccepted = accepted && acceptedVersion === session.version;
+  const [acceptedStartTime, setAcceptedStartTime] = useState<string>();
+  const liveAccepted =
+    accepted &&
+    acceptedVersion === session.version &&
+    (!startOpen ||
+      (audience === "management" && startTime === undefined) ||
+      Boolean(startTime && acceptedStartTime === startTime));
   const command = useMemberCommand({
     write: async (intent: SessionAttendanceIntent) => {
       try {
@@ -87,7 +97,7 @@ export function SessionAttendanceController({
       }
     },
     readReceipt: readSessionAttendanceReceipt,
-    readResult: readSessionAttendanceResult,
+    readResult: (intent) => readSessionAttendanceResult(intent, audience === "management"),
     onAccessLost,
     onRefresh: async (result) => {
       setRightsUnavailable(result.rightsUnavailable);
@@ -342,6 +352,7 @@ export function SessionAttendanceController({
   return children({
     panel,
     onStart:
+      (audience === "management" || Boolean(startTime)) &&
       attendance &&
       !attendance.actual_started_at &&
       attendance.closure_state === "open" &&
@@ -360,6 +371,19 @@ export function SessionAttendanceController({
       <>
         <SessionAttendanceStart
           open={startOpen}
+          actualLabel={
+            startTime && timezone
+              ? new Intl.DateTimeFormat("tr-TR", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  timeZoneName: "shortOffset",
+                  timeZone: timezone,
+                }).format(new Date(startTime))
+              : undefined
+          }
           reason={reason}
           accepted={liveAccepted}
           locked={locked}
@@ -369,6 +393,7 @@ export function SessionAttendanceController({
             setAccepted(false);
           }}
           onAccepted={(value) => {
+            setAcceptedStartTime(startTime);
             setAcceptedVersion(session.version);
             setAccepted(value);
           }}
@@ -376,10 +401,15 @@ export function SessionAttendanceController({
             if (!locked) setStartOpen(false);
           }}
           onSubmit={
-            attendance && command.state !== "saved" && !attendance.actual_started_at
+            attendance &&
+            (audience === "management" || Boolean(startTime)) &&
+            command.state !== "saved" &&
+            !attendance.actual_started_at
               ? () => {
                   if (liveAccepted)
-                    void run(() => attendanceStartIntent(scope, session, attendance, reason));
+                    void run(() =>
+                      attendanceStartIntent(scope, session, attendance, reason, startTime),
+                    );
                 }
               : undefined
           }
@@ -433,20 +463,26 @@ export function SessionAttendanceController({
             open
             title={t(($) => $.sessionDetail.previewCorrection)}
             description={review.reason}
-            rows={review.preview.effects.map((effect, i) => ({
-              id: `${effect.entity.type}:${effect.entity.id}:${i}`,
-              title: t(($) => $.sessionDetail.effectActions[effect.action]),
-              detail:
-                [
-                  effect.quantity != null ? String(effect.quantity) : null,
-                  effect.amount_minor != null && effect.currency
-                    ? formatMinorAmount(effect.amount_minor, effect.currency)
-                    : null,
-                  effect.reason,
-                ]
-                  .filter(Boolean)
-                  .join(" · ") || t(($) => $.memberProfile.nativeEffectsHint),
-            }))}
+            rows={review.preview.effects
+              .filter(
+                (effect) =>
+                  audience === "management" ||
+                  ["sessions", "reservations"].includes(effect.entity.type),
+              )
+              .map((effect, i) => ({
+                id: `${effect.entity.type}:${effect.entity.id}:${i}`,
+                title: t(($) => $.sessionDetail.effectActions[effect.action]),
+                detail:
+                  [
+                    effect.quantity != null ? String(effect.quantity) : null,
+                    audience === "management" && effect.amount_minor != null && effect.currency
+                      ? formatMinorAmount(effect.amount_minor, effect.currency)
+                      : null,
+                    audience === "management" ? effect.reason : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || t(($) => $.memberProfile.nativeEffectsHint),
+              }))}
             blockers={review.preview.blockers.map((blocker, i) => ({
               id: String(i),
               text: scheduleBackendError(blocker.code, t),

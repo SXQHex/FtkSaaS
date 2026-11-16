@@ -2530,7 +2530,9 @@
       "active": "Aktif",
       "terminated": "Sonlandırıldı",
       "expired": "Süresi doldu"
-    }
+    },
+    "startChosenDescription": "Fiilî başlangıç {{time}} olarak kaydedilecek. Gerekçeyi ve zamanı kontrol edip onayla.",
+    "startChosenReview": "Seçtiğim fiilî başlangıç zamanını onaylıyorum."
   },
   "financeDirectory": {
     "personal": "Üye bazlı finans",
@@ -2717,6 +2719,24 @@
     "next": "Sonraki hafta",
     "loading": "Atanmış program okunuyor…",
     "empty": "Bu hafta atanmış seansın yok.",
-    "region": "Atanmış haftalık program"
+    "region": "Atanmış haftalık program",
+    "summary": "{{sessions}} seans · {{hours}} saat"
+  },
+  "instructorSession": {
+    "back": "Bugünkü derslerime dön",
+    "title": "Seans ve yoklama",
+    "attendance": "Yoklama",
+    "start": "Yoklamayı başlat",
+    "explicitSave": "İşaretlemeleri açıkça kaydet; yoklama kapanışı ayrıca onaylanır.",
+    "planned": "Planlanan başlangıç",
+    "actual": "Fiilî başlangıç",
+    "room": "Salon",
+    "members": "Ayrılmış yer",
+    "unknown": "Okunamadı",
+    "notStarted": "Henüz başlatılmadı",
+    "sourceError": "Atanmış seans veya güncel yoklama okunamadı.",
+    "retry": "Seansı yeniden oku",
+    "actualDay": "Fiilî başlangıç günü",
+    "actualTime": "Fiilî başlangıç saati"
   }
 }

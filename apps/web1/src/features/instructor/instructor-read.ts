@@ -180,3 +180,90 @@ export async function readInstructorEarnings(
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([currency, amount]) => ({ currency, amount: amount.toString() }));
 }
+
+export async function readInstructorSession(
+  scope: ClientScope,
+  personId: string,
+  duties: ("instructor" | "assistant")[],
+  sessionId: string,
+) {
+  z.uuid().parse(sessionId);
+  z.uuid().parse(personId);
+  const session = await readScheduleSession(scope, sessionId);
+  const assigned =
+    session.assignments.some((row) => row.person_id === personId && duties.includes(row.duty)) ||
+    Boolean(
+      session.class_assignments?.some(
+        (row) => row.person_id === personId && duties.includes(row.duty) && row.state === "active",
+      ),
+    );
+  if (!assigned) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
+  const backend = await scopedBackend(scope);
+  const headerPage = await backend.call("calendar_get_v1", {
+    client_api_version: 1,
+    request_id: uuidv7(),
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    interval: { starts_at: session.starts_at, ends_at: session.ends_at },
+    resource: { kind: "person", id: personId },
+    page: { limit: 50, sort: "starts_at_asc" },
+  });
+  // The exact session header can lie past another overlap's first cursor page.
+  const headers = [...headerPage.items];
+  const cursors = new Set<string>();
+  let cursor = headerPage.next_cursor ?? undefined;
+  while (cursor) {
+    if (cursors.has(cursor)) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
+    cursors.add(cursor);
+    const page = await backend.call("calendar_get_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      interval: { starts_at: session.starts_at, ends_at: session.ends_at },
+      resource: { kind: "person", id: personId },
+      page: { limit: 50, sort: "starts_at_asc", cursor },
+    });
+    headers.push(...page.items);
+    cursor = page.next_cursor ?? undefined;
+  }
+  const matches = headers.filter((row) => row.type === "session" && row.id === sessionId);
+  if (
+    matches.length !== 1 ||
+    matches[0]!.center_id !== scope.centerId ||
+    Date.parse(matches[0]!.starts_at) !== Date.parse(session.starts_at) ||
+    Date.parse(matches[0]!.ends_at) !== Date.parse(session.ends_at)
+  )
+    throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
+  const attendance = await readInstructorAttendance(scope, session);
+  const ids = [
+    ...new Set([
+      personId,
+      ...session.assignments.filter((row) => row.duty === "instructor").map((row) => row.person_id),
+      ...(attendance.status === "available"
+        ? attendance.attendance.entries.map((row) => row.person_id)
+        : []),
+    ]),
+  ];
+  const names = new Map<string, string>();
+  for (let i = 0; i < ids.length; i += 4)
+    await Promise.all(
+      ids.slice(i, i + 4).map(async (id) => {
+        try {
+          const person = await backend.call("person_get_v1", {
+            client_api_version: 1,
+            request_id: uuidv7(),
+            org_id: scope.orgId,
+            center_id: scope.centerId,
+            person_id: id,
+          });
+          if (person.id !== id || !person.display_name)
+            throw new Error("INSTRUCTOR_PERSON_UNAVAILABLE");
+          names.set(id, person.display_name);
+        } catch (error) {
+          instructorReadStatus(error);
+        }
+      }),
+    );
+  return { session, header: matches[0]!, attendance, names };
+}

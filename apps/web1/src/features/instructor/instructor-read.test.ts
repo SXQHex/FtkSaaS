@@ -8,6 +8,7 @@ import {
   instructorAssigned,
   readInstructorCalendar,
   readInstructorEarnings,
+  readInstructorSession,
 } from "./instructor-read";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 const scope = { accountId: id(1), orgId: id(2), centerId: id(3) };
@@ -160,4 +161,15 @@ describe("instructor bounded self reads", () => {
     ]);
     expect(mock.call).toHaveBeenCalledTimes(2);
   });
+});
+
+it("rejects an unassigned direct session before reading calendar, attendance or names", async () => {
+  mock.session.mockResolvedValue({
+    ...session,
+    assignments: [{ person_id: id(99), duty: "instructor" }],
+  });
+  await expect(readInstructorSession(scope, id(6), ["instructor"], session.id)).rejects.toThrow(
+    "INSTRUCTOR_SESSION_UNAVAILABLE",
+  );
+  expect(mock.call).not.toHaveBeenCalled();
 });

@@ -408,6 +408,7 @@ export function SessionAttendanceClose({
 
 export function SessionAttendanceStart({
   open,
+  actualLabel,
   reason,
   accepted,
   locked,
@@ -419,6 +420,7 @@ export function SessionAttendanceStart({
   recovery,
 }: {
   open: boolean;
+  actualLabel?: string;
   reason: string;
   accepted: boolean;
   locked: boolean;
@@ -446,7 +448,9 @@ export function SessionAttendanceStart({
       <AlertDialogHeader>
         <AlertDialogTitle>{t(($) => $.sessionDetail.startAttendance)}</AlertDialogTitle>
         <AlertDialogDescription>
-          {t(($) => $.sessionDetail.startDescription)}
+          {actualLabel
+            ? t(($) => $.sessionDetail.startChosenDescription, { time: actualLabel })
+            : t(($) => $.sessionDetail.startDescription)}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <form
@@ -478,7 +482,9 @@ export function SessionAttendanceStart({
               onChange={onAccepted}
             />
             <FieldLabel htmlFor={`${id}-review`}>
-              {t(($) => $.sessionDetail.startReview)}
+              {actualLabel
+                ? t(($) => $.sessionDetail.startChosenReview)
+                : t(($) => $.sessionDetail.startReview)}
             </FieldLabel>
           </Field>
         </FieldGroup>

@@ -551,8 +551,26 @@ export default interface Resources {
       "next": "Sonraki hafta",
       "previous": "Önceki hafta",
       "region": "Atanmış haftalık program",
+      "summary": "{{sessions}} seans · {{hours}} saat",
       "thisWeek": "Bu hafta",
       "title": "Programım"
+    },
+    "instructorSession": {
+      "actual": "Fiilî başlangıç",
+      "actualDay": "Fiilî başlangıç günü",
+      "actualTime": "Fiilî başlangıç saati",
+      "attendance": "Yoklama",
+      "back": "Bugünkü derslerime dön",
+      "explicitSave": "İşaretlemeleri açıkça kaydet; yoklama kapanışı ayrıca onaylanır.",
+      "members": "Ayrılmış yer",
+      "notStarted": "Henüz başlatılmadı",
+      "planned": "Planlanan başlangıç",
+      "retry": "Seansı yeniden oku",
+      "room": "Salon",
+      "sourceError": "Atanmış seans veya güncel yoklama okunamadı.",
+      "start": "Yoklamayı başlat",
+      "title": "Seans ve yoklama",
+      "unknown": "Okunamadı"
     },
     "instructorToday": {
       "attendance": "Yoklama",
@@ -1826,6 +1844,8 @@ export default interface Resources {
         "unassigned": "Atanmış paket yok"
       },
       "startAttendance": "Yoklamayı başlat",
+      "startChosenDescription": "Fiilî başlangıç {{time}} olarak kaydedilecek. Gerekçeyi ve zamanı kontrol edip onayla.",
+      "startChosenReview": "Seçtiğim fiilî başlangıç zamanını onaylıyorum.",
       "startDescription": "Onayladığında şu an seansın fiilî başlangıcı olarak kaydedilir. Planlı saat, gerçekleşmiş başlangıç yerine kullanılmaz.",
       "startReview": "Seansın şu an başladığını onaylıyorum.",
       "state": "Durum",

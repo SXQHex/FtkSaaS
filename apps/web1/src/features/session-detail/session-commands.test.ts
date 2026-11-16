@@ -246,3 +246,32 @@ it("does not accept unchanged domain state or a receipt referencing another rese
     "SESSION_ATTENDANCE_RECEIPT_UNAVAILABLE",
   );
 });
+
+it("records an explicitly selected actual start instead of substituting browser now", () => {
+  const chosen = "2026-11-16T00:55:00Z";
+  const intent = attendanceStartIntent(
+    scope,
+    session,
+    { ...attendance, actual_started_at: null },
+    "Gerçek başlangıç düzeltmesi",
+    chosen,
+  );
+  expect(intent.request).toMatchObject({
+    actual_started_at: chosen,
+    expected_version: session.version,
+  });
+});
+it("instructor result recovery rereads native attendance without member rights readers", async () => {
+  const intent = attendanceStartIntent(
+    scope,
+    session,
+    { ...attendance, actual_started_at: null },
+    "Başladı",
+    attendance.actual_started_at!,
+  );
+  readSession.mockResolvedValue({ ...session, version: 4 });
+  readAttendance.mockResolvedValue({ ...attendance, session_version: 4 });
+  const result = await readSessionAttendanceResult(intent, false);
+  expect(result.attendance.actual_started_at).toBe(attendance.actual_started_at);
+  expect(readRights).not.toHaveBeenCalled();
+});
