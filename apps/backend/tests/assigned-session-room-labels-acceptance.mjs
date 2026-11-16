@@ -1,0 +1,22 @@
+import test from 'node:test';
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {connect} from '../scripts/db.mjs';
+import * as validators from '../supabase/functions/backend-v1/validators.js';
+
+test('Assigned session room labels preserve native assignment, role, center and opt-in boundaries',async()=>{
+ const db=await connect();
+ try{
+  await db.query('begin');
+  await db.query(fs.readFileSync(new URL('./fixtures/assigned-session-room-labels.sql',import.meta.url),'utf8'));
+  const {rows}=await db.query('select operation,request,response from pg_temp.member_responses');
+  for(const {operation,request,response} of rows){
+   if(!response.ok)continue;
+   for(const [prefix,value] of [['request',request],['success',response]]){
+    const validate=validators[prefix+'_'+operation];assert.equal(typeof validate,'function',operation);
+    assert(validate(value),prefix+' '+operation+': '+JSON.stringify(validate.errors));
+   }
+  }
+  for(const operation of ['session_get_v1','calendar_get_v1'])assert(rows.some(r=>r.operation===operation&&r.response.ok),operation+' acceptance missing');
+ }finally{await db.query('rollback');await db.end();}
+});

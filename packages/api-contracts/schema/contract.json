@@ -3889,6 +3889,12 @@
           "enum": [
             "instructor_required"
           ]
+        },
+        "room_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SessionRoomLabel"
+          }
         }
       },
       "required": [
@@ -4025,6 +4031,12 @@
               "type": "null"
             }
           ]
+        },
+        "room_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SessionRoomLabel"
+          }
         }
       },
       "required": [
@@ -9545,6 +9557,11 @@
         },
         "needs_instructor": {
           "$ref": "#/$defs/Bool"
+        },
+        "include_room_labels": {
+          "type": "boolean",
+          "default": false,
+          "description": "Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission."
         }
       },
       "required": [
@@ -9906,6 +9923,11 @@
         },
         "include_work_calendar_exception": {
           "type": "boolean"
+        },
+        "include_room_labels": {
+          "type": "boolean",
+          "default": false,
+          "description": "Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission."
         }
       },
       "required": [
@@ -61308,6 +61330,22 @@
       ],
       "x-invariant": "Assigned source is the reservation source_sale_id, never an eligible alternative or person total. Current credit balance is not booking eligibility; timed rights have null available_credits. Restricted/not_enabled never disclose sale identity. Unassigned does not infer negative credit or trial."
     },
+    "SessionRoomLabel": {
+      "type": "object",
+      "properties": {
+        "room_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "room_id",
+        "name"
+      ],
+      "additionalProperties": false
+    },
     "LessonRequestSummary": {
       "type": "object",
       "properties": {
@@ -107100,6 +107138,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SessionRoomLabel/properties/room_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -107588,7 +107632,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 168,
+      "migration_count": 169,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
