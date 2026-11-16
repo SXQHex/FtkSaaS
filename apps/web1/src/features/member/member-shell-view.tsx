@@ -18,7 +18,7 @@ export function MemberShellView({
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto grid min-h-dvh max-w-6xl grid-cols-1 grid-rows-[auto_1fr_auto] lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_1fr]">
+    <div className="mx-auto grid min-h-dvh max-w-5xl grid-cols-1 grid-rows-[auto_1fr_auto] text-sm lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_1fr]">
       <header className="flex min-w-0 flex-wrap items-center justify-between gap-3 border-b px-4 py-3 lg:col-start-1 lg:row-start-1">
         <div className="min-w-0">
           <p className="break-words font-semibold">{brand}</p>

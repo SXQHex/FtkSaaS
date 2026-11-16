@@ -106,9 +106,9 @@ export function MemberReservationsView({
     );
   }
   return (
-    <div className="@container mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-4 p-4 md:p-6">
+    <div className="@container mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-4 p-4">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-2xl leading-[1.25] font-semibold tracking-[-0.02em]">
           {t(($) => $.memberReservations.title)}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
