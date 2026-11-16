@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "637c034ceb4b8ddede02243f62ded4fbe337c8afe2b18d9ecc054291f13c83e2",
-        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
+        "fingerprint": "7880939286c9bfe201355b32e14421feba290a93e3a97a189a4da5af0e201e41",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "1fe3fbe707d625d2f561d205853b27f0d2cfa7b5cc37d65482858e71968c6aa3",
-        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
+        "fingerprint": "e388adb2c487ec8c39e8b429a4c14b4a8d0dd7052b8532cf8528915a3a7f1524",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -612,8 +612,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "9b44c2065ee9974c61a03936306b489972afd63adc17e3ee7987d3463371d9c4",
-        "reason": "W1-BE-18: reviewed opt-in session/calendar labels, canonical live assignment and center/plan guards, migration equality, native Edge and SQL boundary tests; WF03 defines consumer semantics."
+        "fingerprint": "f084fe700d6ed690f0f2c84fb61958254f5c1ec52a2ca492468c348b019795a0",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -729,8 +729,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "cf0b845d9394bfe3eef03c1dbdf998f21ca3da88aaced174a1e514f9d2a7403e",
-        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
+        "fingerprint": "429441ae2d429aa6cb66e87534338626aa9c7510a73a63fce2182ca823641906",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -853,8 +853,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "89c3ed0db825f91fbad85b30616538bc86c72de6dd8c1b03e57c8c2e683f62bb",
-        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
+        "fingerprint": "212e6ba7563cf73272fe0b175152e71aeb9428dad085a249fde25bd76e19cd5a",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -880,7 +880,9 @@
         "apps/backend/tests/schedule-reads.test.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/session-roster-discovery-acceptance.mjs",
-        "apps/backend/tests/fixtures/session-roster-discovery.sql"
+        "apps/backend/tests/fixtures/session-roster-discovery.sql",
+        "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
+        "apps/backend/tests/fixtures/lesson-request-status-summary.sql"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -934,7 +936,9 @@
         "apps/backend/database/member-time-filter.sql",
         "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql",
         "apps/backend/database/reservation-source-summary.sql",
-        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql"
+        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql",
+        "apps/backend/database/lesson-request-status-summary.sql",
+        "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -949,8 +953,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "5c388bb1ae4bee70fa40e6631118dc4da00487e30c2b5a2aa4f5ead250625388",
-        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
+        "fingerprint": "6a54923a04537a9e2f219daadf3d551a068282f63e3f6a20e217a505d366c0fa",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -1018,8 +1022,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "2415f4b1f13528d66c26e35d0d2f1557323b60105b7f324abbff6e7fd354a5d5",
-        "reason": "W1-BE-18: reviewed opt-in session/calendar labels, canonical live assignment and center/plan guards, migration equality, native Edge and SQL boundary tests; WF03 defines consumer semantics."
+        "fingerprint": "99ce569334c2ee111f38df5e619821aa9f87e5401b91ea4425d78f271656ed65",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {
@@ -1868,8 +1872,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "50c9c6b5a3b1f96440ec801ec381d1d4af346f4f5344e3d472b4fb96aa9a980b",
-        "reason": "W1-BE-18: reviewed additive shared validator/schedule test changes and generated contract references. Existing assertions, commands, permissions and this flow guide remain unchanged."
+        "fingerprint": "bb8a9b4824973a5a2536f8e9e8b2621ac7797115e47fe4fb45c220e3c15ca8ea",
+        "reason": "PR317 main synchronization: reviewed additive W1-BE-17 status/summary and W1-BE-18 room-label contracts, SQL, shared unit/native tests and inventory together; both behaviors, existing assertions and live authorization remain intact; WF03/WF06 guidance retained."
       }
     },
     {

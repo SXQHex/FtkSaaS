@@ -39140,10 +39140,48 @@
                 "disciplines",
                 "instructors"
               ]
+            },
+            "status": {
+              "enum": [
+                "all",
+                "pending",
+                "alternative_offered",
+                "resolved"
+              ],
+              "description": "Optional directory status. Resolved means approved/rejected/withdrawn/expired; not a new lifecycle state."
+            },
+            "include_summary": {
+              "type": "boolean",
+              "default": false
             }
           },
           "required": [],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "catalog"
+                ]
+              },
+              "then": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "status"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "include_summary"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         }
       },
       "required": [
@@ -42590,6 +42628,9 @@
         },
         "merge_review_summary": {
           "$ref": "#/$defs/MergeReviewSummary"
+        },
+        "lesson_request_summary": {
+          "$ref": "#/$defs/LessonRequestSummary"
         }
       },
       "required": [
@@ -61304,6 +61345,31 @@
         "name"
       ],
       "additionalProperties": false
+    },
+    "LessonRequestSummary": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "$ref": "#/$defs/Count"
+        },
+        "alternative_offered": {
+          "$ref": "#/$defs/Count"
+        },
+        "approved": {
+          "$ref": "#/$defs/Count"
+        },
+        "rejected": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "pending",
+        "alternative_offered",
+        "approved",
+        "rejected"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Exact counts over the same live authorized request scope and existing selector filters, before status/cursor/limit. A self scope counts only its visible requests. Resolved also includes withdrawn/expired; approved+rejected is not its total."
     }
   },
   "x-contract": {
@@ -107566,7 +107632,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 168,
+      "migration_count": 169,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

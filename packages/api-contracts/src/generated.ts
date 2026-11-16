@@ -4881,6 +4881,7 @@ ManagementSelector_freeze_cancel_apply_v1?: ManagementSelectorFreezeCancelApplyV
 ManagementProjection_freeze_cancel_apply_v1?: ManagementProjectionFreezeCancelApplyV1
 ReservationSourceSummary?: ReservationSourceSummary
 SessionRoomLabel?: SessionRoomLabel
+LessonRequestSummary?: LessonRequestSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21873,6 +21874,11 @@ preferred_instructor_id?: (string | null)
  */
 discipline_id?: string
 catalog?: ("disciplines" | "instructors")
+/**
+ * Optional directory status. Resolved means approved/rejected/withdrawn/expired; not a new lifecycle state.
+ */
+status?: ("all" | "pending" | "alternative_offered" | "resolved")
+include_summary?: boolean
 }
 }
 /**
@@ -23455,6 +23461,7 @@ as_of: Instant
 sale_change_context?: EntityVersion
 access_summary?: AccessDirectorySummary
 merge_review_summary?: MergeReviewSummary
+lesson_request_summary?: LessonRequestSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23479,6 +23486,16 @@ by_state: {
 state: ("suggested" | "completed" | "not_duplicate")
 count: number
 }[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LessonRequestSummary".
+ */
+export interface LessonRequestSummary {
+pending: Count
+alternative_offered: Count
+approved: Count
+rejected: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

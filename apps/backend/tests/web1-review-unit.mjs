@@ -13,6 +13,12 @@ test('Assigned session room labels are opt-in output, never new resource write f
 test('Assigned room label migration exactly matches its reviewed source',()=>{
  assert.equal(fs.readFileSync(new URL('../database/assigned-session-room-labels.sql',import.meta.url),'utf8'),fs.readFileSync(new URL('../supabase/migrations/20261116143645_assigned_session_room_labels.sql',import.meta.url),'utf8'));
 });
+test('Lesson request directory accepts status/summary only on request discovery, never selection catalogs',()=>{
+ const base={...scope(),operation:'lesson_request_create_v1',page:{limit:1}};
+ for(const status of ['all','pending','alternative_offered','resolved'])assert(v.request_management_state_get_v1({...base,selector:{operation:base.operation,key:{status,include_summary:true}}}));
+ assert(v.request_management_state_get_v1({...base,selector:{operation:base.operation,key:{}}}));
+ for(const key of [{status:'cancelled'},{catalog:'instructors',status:'pending'},{catalog:'disciplines',include_summary:true}])assert.equal(v.request_management_state_get_v1({...base,selector:{operation:base.operation,key}}),false);
+});
 test('Member profile migration exactly composes reviewed lifecycle sources and native wrappers',()=>{
  const parts=['member-time-filter.sql','freeze-cancellation.sql'].map(n=>fs.readFileSync(new URL('../database/'+n,import.meta.url),'utf8').replace(/^begin;\n/,'').replace(/commit;\n$/,''));
  const wrappers=fs.readFileSync(new URL('../database/runtime-wrappers-current.sql',import.meta.url),'utf8').split('\n').filter(l=>l.includes('freeze_cancel_')).join('\n');
@@ -80,4 +86,8 @@ test('Session discovery append migration preserves its reviewed SQL sources',()=
  const sql=['session-waitlist-directory.sql','reservation-source-summary.sql'].map(n=>fs.readFileSync(new URL('../database/'+n,import.meta.url),'utf8').replace(/^begin;\n/,'').replace(/commit;\n$/,''));
  const migration=fs.readFileSync(new URL('../supabase/migrations/20261116111008_session_waitlist_rights.sql',import.meta.url),'utf8');
  assert.equal(migration,'-- W1-BE-15/16: bounded session waitlist discovery and actual reservation source rights.\nbegin;\n'+sql.join('')+"notify pgrst,'reload schema';\ncommit;\n");
+});
+
+test('Request status append migration matches its reviewed reader source',()=>{
+ assert.equal(fs.readFileSync(new URL('../database/lesson-request-status-summary.sql',import.meta.url),'utf8'),fs.readFileSync(new URL('../supabase/migrations/20261116135202_lesson_request_status_summary.sql',import.meta.url),'utf8'));
 });
