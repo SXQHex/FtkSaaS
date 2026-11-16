@@ -14,13 +14,15 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] Gerçek Cloudflare IP/OPTIONS/yanlış origin/sahte başlık, gerçek widget submit/replay ve eski tüketici birlikte çalışma kabulü.
 - [x] Backend tarafında native Google/doğrulama/kurtarma callback config readback, ICS URL hedefi ve seans API yetkisinin bağımsız test istemcisiyle doğrulanması; kesin kurulu URL/public env ile frontend coder devri. Frontend ekran/route geliştirmesi backend kapanış koşulu değildir; kaynak/ortam sonucu yalnız devir sahibindedir.
 
+<a id="w1-be-1927--web1-backend-ihtiyaçları"></a>
 ## W1-BE-19–27 — Web1 backend ihtiyaçları
 
 Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşlemeleri açıklama ve gerekli backend eksiklerini ayrı dal/Draft PR ile uygulayıp push etme yetkisi verdi. Talebin frontend metni `apps/web1/tasks/request.md` içindedir; frontend kodu/todo/kabulü salt okunur. Kendi değerlendirme/teslim devri ortak taleplerde, kaynak/ortam kanıtı 00 devir sahibindedir.
 
 - [x] W1-BE-19 kaynak ve ilgili native test: aktif self geçerli anlaşma keşfi, ödeme tarihi cursor defteri, dönem/para birimi toplamları, kullanıcı onaylı yeni ödeme yöntemi desteği; kesin tüketim WF14.
-- [ ] W1-BE-19 aday full clean ve teslim kabulleri; yerel standart verify Linux /proc bağımlı değişmemiş observer testi nedeniyle tam başarı değildir. Kaynak/ortam kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-w19); frontend kabulü ayrıdır.
-- [ ] W1-BE-20–27: sırayla kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
+- [x] W1-BE-20 kaynak ve native test: mevcut takvimde opt-in aktif öğrenci keşfi, kullanıcı onaylı grup/özel görünümü, native sınıf/Starter sınırı, güvenli etiket/kapasite ve gerçek politika/kendi kayıt bağları; kesin tüketim WF06.
+- [ ] W1-BE-19/20 aynı PR318 aday full clean ve teslim kabulleri; yerel standart verify Linux /proc bağımlı değişmemiş observer testi nedeniyle tam başarı değildir. Kaynak/ortam kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-w19); frontend kabulü ayrıdır.
+- [ ] W1-BE-21–27: sırayla kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
 
 ## Web1 ek backend talepleri — 15 Kasım
 

@@ -721,6 +721,7 @@ discipline_id?: (string | null)
 discipline_ids?: EventDisciplineIds
 management_attention?: "instructor_required"
 room_labels?: SessionRoomLabel[]
+member_lesson?: MemberLessonDiscovery
 }
 /**
  * Zero/one/many org-owned labels. No entitlement or role grant.
@@ -982,6 +983,35 @@ source_id: string
 target_id: string
 reason?: ReviewReason
 decision?: ("merge" | "not_duplicate")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_get".
+ */
+export type RequestCalendarGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+interval: Interval
+resource?: (ResourceRef | null)
+page: CalendarPage
+interest_filter?: boolean
+needs_instructor?: Bool
+/**
+ * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
+ */
+include_room_labels?: boolean
+/**
+ * Explicit native-self student discovery of accessible upcoming group and private lessons. Does not grant management or roster access.
+ */
+member_discovery?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4888,6 +4918,12 @@ InstructorPaymentLedgerItem?: InstructorPaymentLedgerItem
 InstructorAccountTotal?: InstructorAccountTotal
 InstructorAccountPage?: InstructorAccountPage
 Success_instructor_account_get?: SuccessInstructorAccountGet
+MemberLessonCancellation?: MemberLessonCancellation
+MemberLessonBookingWindow?: MemberLessonBookingWindow
+MemberLessonReservation?: MemberLessonReservation
+MemberLessonOffer?: MemberLessonOffer
+MemberLessonWaitlist?: MemberLessonWaitlist
+MemberLessonDiscovery?: MemberLessonDiscovery
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7624,6 +7660,84 @@ name: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonDiscovery".
+ */
+export interface MemberLessonDiscovery {
+version: PositiveInt
+format: SessionFormat
+state: SessionState
+attendance_state: AttendanceClosure
+instructor_labels: Text[]
+room_labels: Text[]
+booking_window: MemberLessonBookingWindow
+cancellation: MemberLessonCancellation
+own_reservation: (MemberLessonReservation | null)
+waitlist_enabled: boolean
+own_waitlist: (MemberLessonWaitlist | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonBookingWindow".
+ */
+export interface MemberLessonBookingWindow {
+state: ("not_open" | "open" | "closed" | "not_configured")
+policy_version_id: (string | null)
+opens_at: (Instant | null)
+closes_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonCancellation".
+ */
+export interface MemberLessonCancellation {
+status: ("available" | "not_configured")
+source: ("current_policy" | "reservation_policy")
+policy_version_id: (string | null)
+terms: (CancellationTerms | null)
+cutoff_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonReservation".
+ */
+export interface MemberLessonReservation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+state: ReservationState
+mode: BookingMode
+cancellation: MemberLessonCancellation
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonWaitlist".
+ */
+export interface MemberLessonWaitlist {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+state: WaitState
+offer: (MemberLessonOffer | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonOffer".
+ */
+export interface MemberLessonOffer {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+state: OfferState
+expires_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SessionView".
  */
 export interface SessionView {
@@ -10334,31 +10448,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_calendar_get".
- */
-export interface RequestCalendarGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-interval: Interval
-resource?: (ResourceRef | null)
-page: CalendarPage
-interest_filter?: boolean
-needs_instructor?: Bool
-/**
- * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
- */
-include_room_labels?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

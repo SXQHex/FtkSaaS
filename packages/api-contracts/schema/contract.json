@@ -3896,6 +3896,9 @@
           "items": {
             "$ref": "#/$defs/SessionRoomLabel"
           }
+        },
+        "member_lesson": {
+          "$ref": "#/$defs/MemberLessonDiscovery"
         }
       },
       "required": [
@@ -9563,6 +9566,11 @@
           "type": "boolean",
           "default": false,
           "description": "Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission."
+        },
+        "member_discovery": {
+          "type": "boolean",
+          "default": false,
+          "description": "Explicit native-self student discovery of accessible upcoming group and private lessons. Does not grant management or roster access."
         }
       },
       "required": [
@@ -9573,7 +9581,65 @@
         "page"
       ],
       "additionalProperties": false,
-      "x-invariant": "Preferences only narrow authorized items. interest_filter explicitly uses own member center/discipline selections. recommendation_desc uses own completed attended lessons only when history_recommendations is enabled; otherwise chronological. Preference/history changes invalidate that cursor."
+      "x-invariant": "Preferences only narrow authorized items. interest_filter explicitly uses own member center/discipline selections. recommendation_desc uses own completed attended lessons only when history_recommendations is enabled; otherwise chronological. Preference/history changes invalidate that cursor.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "member_discovery": {
+                "const": true
+              }
+            },
+            "required": [
+              "member_discovery"
+            ]
+          },
+          "then": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "interest_filter": {
+                "const": false
+              },
+              "include_room_labels": {
+                "const": false
+              },
+              "page": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/CalendarPage"
+                  },
+                  {
+                    "properties": {
+                      "sort": {
+                        "const": "starts_at_asc"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "resource"
+                  ]
+                },
+                {
+                  "required": [
+                    "needs_instructor"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
     },
     "Success_calendar_get": {
       "type": "object",
@@ -61635,6 +61701,266 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "MemberLessonCancellation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "not_configured"
+          ]
+        },
+        "source": {
+          "enum": [
+            "current_policy",
+            "reservation_policy"
+          ]
+        },
+        "policy_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terms": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CancellationTerms"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cutoff_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "source",
+        "policy_version_id",
+        "terms",
+        "cutoff_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonBookingWindow": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "not_open",
+            "open",
+            "closed",
+            "not_configured"
+          ]
+        },
+        "policy_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "opens_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closes_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "policy_version_id",
+        "opens_at",
+        "closes_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonReservation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/ReservationState"
+        },
+        "mode": {
+          "$ref": "#/$defs/BookingMode"
+        },
+        "cancellation": {
+          "$ref": "#/$defs/MemberLessonCancellation"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "mode",
+        "cancellation"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonOffer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/OfferState"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonWaitlist": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/WaitState"
+        },
+        "offer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberLessonOffer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "state",
+        "offer"
+      ],
+      "additionalProperties": false
+    },
+    "MemberLessonDiscovery": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "attendance_state": {
+          "$ref": "#/$defs/AttendanceClosure"
+        },
+        "instructor_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "room_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "booking_window": {
+          "$ref": "#/$defs/MemberLessonBookingWindow"
+        },
+        "cancellation": {
+          "$ref": "#/$defs/MemberLessonCancellation"
+        },
+        "own_reservation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberLessonReservation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "waitlist_enabled": {
+          "type": "boolean"
+        },
+        "own_waitlist": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MemberLessonWaitlist"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "format",
+        "state",
+        "attendance_state",
+        "instructor_labels",
+        "room_labels",
+        "booking_window",
+        "cancellation",
+        "own_reservation",
+        "waitlist_enabled",
+        "own_waitlist"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -68154,7 +68480,10 @@
           "required_feature_gates_separate_from_references",
           "no_business_commit",
           "scope_filter_before_pagination",
-          "live_actor_and_scope"
+          "live_actor_and_scope",
+          "opt_in_native_self_member_discovery",
+          "accessible_class_scope_before_cursor",
+          "no_roster_finance_or_management_fields"
         ],
         "audit": false,
         "notification": "none",
@@ -107560,6 +107889,42 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_get/allOf/0/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonCancellation/properties/policy_version_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonBookingWindow/properties/policy_version_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonReservation/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonOffer/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberLessonWaitlist/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -108049,7 +108414,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 170,
+      "migration_count": 171,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

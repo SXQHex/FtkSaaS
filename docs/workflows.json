@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "cd71261929634ffcbd77810da8dac6c21b752d17df0c9d7c0256e288026159a4",
-        "reason": "W1-BE-19 final source binding reviewed: added typed service-only entrypoint and native test fixture; prior suite ownership, assertions and other flow semantics preserved."
+        "fingerprint": "6accb294c5ecd9e25cdf8c744ca0674110cc887e168b80d0632a2c18080aa1a0",
+        "reason": "W1-BE-20 reviewed shared optional calendar DTO/standalone validator and added unit/API test bindings; existing operations and source assertions preserved, this flow behavior unchanged."
       }
     },
     {
@@ -526,7 +526,9 @@
         "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
         "apps/backend/tests/assigned-session-room-labels-acceptance.mjs",
         "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
-        "apps/backend/tests/web1-review-unit.mjs"
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/member-lesson-discovery-unit.mjs",
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -589,7 +591,9 @@
         "apps/backend/database/session-management-reads.sql",
         "apps/backend/database/class-student-discovery.sql",
         "apps/backend/database/assigned-session-room-labels.sql",
-        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql",
+        "apps/backend/database/member-lesson-discovery.sql",
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -612,8 +616,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "b973307a63669f9b3e4ba02d314787692bd3e1c2be2def618c3f75efbdc4f15b",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "f80af39792bf80581dd050ad4c5b9840261ed8a4e3079e5133693a43c5ece4e7",
+        "reason": "W1-BE-20 reviewed native-self opt-in discovery, current writer class scope, selected Starter resources, safe labels, frozen/current policy, cursor and native tests; guide updated."
       }
     },
     {
@@ -882,7 +886,9 @@
         "apps/backend/tests/session-roster-discovery-acceptance.mjs",
         "apps/backend/tests/fixtures/session-roster-discovery.sql",
         "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
-        "apps/backend/tests/fixtures/lesson-request-status-summary.sql"
+        "apps/backend/tests/fixtures/lesson-request-status-summary.sql",
+        "apps/backend/tests/member-lesson-discovery-unit.mjs",
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -938,7 +944,9 @@
         "apps/backend/database/reservation-source-summary.sql",
         "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql",
         "apps/backend/database/lesson-request-status-summary.sql",
-        "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql"
+        "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql",
+        "apps/backend/database/member-lesson-discovery.sql",
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -953,8 +961,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "71307d1544167fad6e1abb558fe322387fb3455178b7a09ec7df2e9e57eab57d",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "6435ed9b2e80a296ee155b6c481fff1b3da7afcba090d470f3046d3790e20be8",
+        "reason": "W1-BE-20 reviewed native-self opt-in discovery, current writer class scope, selected Starter resources, safe labels, frozen/current policy, cursor and native tests; guide updated."
       }
     },
     {
@@ -1876,8 +1884,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "8ccdbbea5b87bc5205a36317d22c7ce6c7463ca2dd24e450d8b0e77858031ee2",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "145dc4aa94cd17cc5fc8a2977694c4f979912f163acd8211fde1ffa23ff91eaf",
+        "reason": "W1-BE-20 reviewed shared optional calendar DTO/standalone validator and added unit/API test bindings; existing operations and source assertions preserved, this flow behavior unchanged."
       }
     },
     {
