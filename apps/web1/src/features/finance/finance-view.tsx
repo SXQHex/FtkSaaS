@@ -374,7 +374,7 @@ export function FinanceView({
                       </TableCell>
                       <TableCell>{row.detail}</TableCell>
                       <TableCell className="text-right tabular-nums">{row.amount}</TableCell>
-                      <TableCell>{actions(row.actions)}</TableCell>
+                      <TableCell className="py-6">{actions(row.actions)}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -405,7 +405,7 @@ export function FinanceView({
                       <TableCell>{row.person}</TableCell>
                       <TableCell>{row.lastSale ?? unknown}</TableCell>
                       <TableCell className="text-right tabular-nums">{row.amount}</TableCell>
-                      <TableCell>{actions(row.actions)}</TableCell>
+                      <TableCell className="py-6">{actions(row.actions)}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -433,7 +433,7 @@ export function FinanceView({
                       <TableCell>{row.person}</TableCell>
                       <TableCell className="text-right tabular-nums">{row.amount}</TableCell>
                       <TableCell>{row.debt ?? unknown}</TableCell>
-                      <TableCell>{actions(row.actions)}</TableCell>
+                      <TableCell className="py-6">{actions(row.actions)}</TableCell>
                     </TableRow>
                   )}
                 </TableBody>

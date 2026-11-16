@@ -93,6 +93,7 @@ export async function readFinanceDirectory(
     if (
       row.entity.type !== type ||
       row.entity.id !== row.id ||
+      (row.kind === "sale" && row.source_sale_id !== row.id) ||
       ids.has(financeDirectoryRowKey(row)) ||
       (view === "debts" && row.kind !== "debt") ||
       (view === "credits" && row.kind !== "credit") ||

@@ -95,7 +95,7 @@ export async function mockFinanceDirectory(
             id: I.agreement,
             entity: { type: "debts", id: I.agreement },
             kind: "debt",
-            amount_minor: "60000",
+            amount_minor: totals[0].debt_minor,
             source_sale_id: I.lesson,
             product_name: "8 derslik paket",
             method: null,
@@ -167,5 +167,5 @@ export async function mockFinanceDirectory(
   await expect(page).toHaveURL(origin + "/account");
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
   await expect.poll(() => requests.length).toBeGreaterThan(0);
-  return { studio, requests, personalReads };
+  return { studio, requests, personalReads, totals };
 }

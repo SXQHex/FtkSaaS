@@ -203,32 +203,38 @@ export function FinanceActionSheet({
                   <FieldError id="finance-debt-error">{errors?.debtId}</FieldError>
                 </Field>
               )}
-              <Field data-invalid={invalid("amount")}>
-                <FieldLabel htmlFor="finance-amount">
-                  {correction
-                    ? t(($) => $.finance.correctionAmount)
-                    : t(($) => $.finance.amountMinor)}
-                </FieldLabel>
-                <FieldDescription id="finance-money-hint">
-                  {correction ? t(($) => $.finance.correctionHint) : t(($) => $.finance.moneyHint)}
-                </FieldDescription>
-                <Input
-                  id="finance-amount"
-                  name="amount"
-                  required
-                  inputMode="numeric"
-                  value={draft.amount}
-                  disabled={pending || readOnly}
-                  aria-invalid={invalid("amount")}
-                  aria-describedby={
-                    errors?.amount
-                      ? "finance-money-hint finance-amount-error"
-                      : "finance-money-hint"
-                  }
-                  onChange={(event) => set("amount", event.target.value)}
-                />
-                <FieldError id="finance-amount-error">{errors?.amount}</FieldError>
-              </Field>
+              {action !== "sale-refund" && (
+                <>
+                  <Field data-invalid={invalid("amount")}>
+                    <FieldLabel htmlFor="finance-amount">
+                      {correction
+                        ? t(($) => $.finance.correctionAmount)
+                        : t(($) => $.finance.amountMinor)}
+                    </FieldLabel>
+                    <FieldDescription id="finance-money-hint">
+                      {correction
+                        ? t(($) => $.finance.correctionHint)
+                        : t(($) => $.finance.moneyHint)}
+                    </FieldDescription>
+                    <Input
+                      id="finance-amount"
+                      name="amount"
+                      required
+                      inputMode="numeric"
+                      value={draft.amount}
+                      disabled={pending || readOnly}
+                      aria-invalid={invalid("amount")}
+                      aria-describedby={
+                        errors?.amount
+                          ? "finance-money-hint finance-amount-error"
+                          : "finance-money-hint"
+                      }
+                      onChange={(event) => set("amount", event.target.value)}
+                    />
+                    <FieldError id="finance-amount-error">{errors?.amount}</FieldError>
+                  </Field>
+                </>
+              )}
               <Field data-invalid={invalid("currency")}>
                 <FieldLabel htmlFor="finance-currency">{t(($) => $.finance.currency)}</FieldLabel>
                 <Input

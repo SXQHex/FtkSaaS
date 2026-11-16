@@ -1967,7 +1967,15 @@
     "debtRejected": "Borç işlemi uygulanamadı. Güncel kaydı yeniden incele.",
     "currentDebt": "Güncel kalan borç",
     "offsetHint": "Üye alacağını yalnız seçili borca mahsup et. Nakit hareketi oluşturulmaz. Borç sürümü ve alacak kayıt sırasında yeniden denetlenir.",
-    "debtAdjustHint": "Tutar yeni toplam değil, borca uygulanacak artış veya azalış farkıdır. Nakit tahsilat/iade değildir. Güncel borç ve olası alacak etkisi işlemden sonra kaynaktan okunur."
+    "debtAdjustHint": "Tutar yeni toplam değil, borca uygulanacak artış veya azalış farkıdır. Nakit tahsilat/iade değildir. Güncel borç ve olası alacak etkisi işlemden sonra kaynaktan okunur.",
+    "saleRefundDenied": "Bu satış için iade yetkisi doğrulanamadı.",
+    "saleRefundError": "Satış iadesi önizlemesi alınamadı. Güncel kaydı kontrol edip yeniden dene.",
+    "saleRefundSaved": "İade komutu alındı; güncel finans okundu.",
+    "saleRefundUnread": "İade komutu alındı; güncel finans henüz okunamadı. Yalnız sonucu yeniden oku.",
+    "saleRefundReduction": "Satış borcu azaltımı",
+    "saleRefundHint": "Tutarı sağlayıcı hesaplar. Satış iadesi nakit ödeme oluşturmaz ve hakları değiştirmez; güncel borç ve alacak işlemden sonra yeniden okunur.",
+    "saleRefundRightsRestricted": "Hak okuması bu oturumda kullanılamıyor.",
+    "reasonRequired": "Gerekçe gir."
   },
   "memberProfile": {
     "back": "Üyeler",

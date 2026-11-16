@@ -13,6 +13,8 @@ import {
   type DirectoryMethod,
 } from "./finance-directory";
 import { readFinancePage } from "./finance";
+import { SaleRefundEditor } from "./sale-refund-editor";
+import type { SaleRefundSource } from "./sale-refund";
 import { readWorkspace } from "../workspace/workspace";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -35,6 +37,7 @@ export function FinanceDirectoryContent({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
+  const [saleRefund, setSaleRefund] = useState<SaleRefundSource>();
   const [personal, setPersonal] = useState<FinanceInitialContext>(),
     [locked, setLocked] = useState(false);
   const [tab, setTab] = useState<FinanceTab>("movements"),
@@ -62,19 +65,23 @@ export function FinanceDirectoryContent({
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
       : undefined;
+  const accessLost = (error: unknown) => {
+    const lost =
+      (error instanceof BackendError &&
+        ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
+      (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message));
+    if (lost) {
+      queries.removeQueries({ queryKey: ["finance-directory", scope.accountId] });
+      queries.removeQueries({ queryKey: ["finance-directory-credit-debts", scope.accountId] });
+      void router.invalidate();
+    }
+    return lost;
+  };
   const guard = async <T,>(read: () => Promise<T>): Promise<T> => {
     try {
       return await read();
     } catch (error) {
-      if (
-        (error instanceof BackendError &&
-          ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
-        (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
-      ) {
-        queries.removeQueries({ queryKey: ["finance-directory", scope.accountId] });
-        queries.removeQueries({ queryKey: ["finance-directory-credit-debts", scope.accountId] });
-        void router.invalidate();
-      }
+      accessLost(error);
       throw error;
     }
   };
@@ -277,7 +284,20 @@ export function FinanceDirectoryContent({
             actions:
               row.kind === "collection"
                 ? [{ kind: "correct" as const, onPress: () => open(row, "correct") }]
-                : [],
+                : row.kind === "sale" && row.source_sale_id === row.id
+                  ? [
+                      {
+                        kind: "sale-refund" as const,
+                        onPress: () =>
+                          setSaleRefund({
+                            saleId: row.source_sale_id!,
+                            personId: row.person_id,
+                            currency: row.currency,
+                            label: `${person(row)} · ${row.product_name ?? unknown}`,
+                          }),
+                      },
+                    ]
+                  : [],
           })) ?? []
       }
       debts={
@@ -333,7 +353,7 @@ export function FinanceDirectoryContent({
         });
         resetPage();
       }}
-      onCollect={() => setPersonal({ label: "", action: "collect" })}
+      onCollect={locked ? undefined : () => setPersonal({ label: "", action: "collect" })}
       counts={counts}
       notice={
         <div className="flex min-w-0 flex-col gap-3">
@@ -409,8 +429,25 @@ export function FinanceDirectoryContent({
               {t(($) => $.financeDirectory.creditDebtHint)}
             </p>
           )}
+          {saleRefund && (
+            <SaleRefundEditor
+              scope={scope}
+              source={saleRefund}
+              sourceAvailable={Boolean(center && !workspace.isError)}
+              onClose={() => setSaleRefund(undefined)}
+              onRefresh={async () => {
+                await directory.refetch({ throwOnError: true });
+              }}
+              onLockChange={changeLock}
+              onAccessLost={accessLost}
+            />
+          )}
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onPress={() => setPersonal({ label: "" })}>
+            <Button
+              variant="outline"
+              isDisabled={locked}
+              onPress={() => setPersonal({ label: "" })}
+            >
               {t(($) => $.financeDirectory.personal)}
             </Button>
           </div>
