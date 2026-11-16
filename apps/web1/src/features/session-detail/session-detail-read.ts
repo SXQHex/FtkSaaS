@@ -10,7 +10,10 @@ import type {
 } from "../../lib/api-contracts/generated";
 import { readScheduleSession } from "../schedule/schedule-read";
 
-export async function readSessionHeader(scope: ClientScope, session: SessionView) {
+export async function readSessionHeader(
+  scope: ClientScope,
+  session: Pick<SessionView, "id" | "starts_at" | "ends_at">,
+) {
   const backend = await scopedBackend(scope),
     cursors = new Set<string>();
   let cursor: string | undefined;

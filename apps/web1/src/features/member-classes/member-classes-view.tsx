@@ -129,6 +129,7 @@ export function MemberClassesView({
             <ItemGroup className="gap-0 divide-y">
               {rows.map((row) => (
                 <Item
+                  role="listitem"
                   key={row.id}
                   className="flex-nowrap items-start gap-3 rounded-none border-0 px-0 py-4"
                 >

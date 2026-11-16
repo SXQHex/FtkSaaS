@@ -198,3 +198,21 @@ it("labels an open attendance result as draft and distinguishes actual empty att
     "Yoklama kaydı yok",
   );
 });
+it("uses server lesson order and the same opted-in source summary on continuation pages", async () => {
+  const result = await readMemberReservations(scope, personId, "own-second", "upcoming", {
+    sort: "starts_at_asc",
+    includeSourceSummary: true,
+  });
+  expect(call.mock.calls[0]).toEqual([
+    "reservation_list_v1",
+    expect.objectContaining({
+      person_id: personId,
+      center_id: scope.centerId,
+      time_filter: "upcoming",
+      include_source_summary: true,
+      page: { limit: 20, sort: "starts_at_asc", cursor: "own-second" },
+    }),
+  ]);
+  expect(result.nextCursor).toBe("native-next");
+  expect(JSON.stringify(result)).not.toContain("other@example.invalid");
+});
