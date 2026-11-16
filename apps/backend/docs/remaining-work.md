@@ -21,8 +21,10 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 
 - [x] W1-BE-19 kaynak ve ilgili native test: aktif self geçerli anlaşma keşfi, ödeme tarihi cursor defteri, dönem/para birimi toplamları, kullanıcı onaylı yeni ödeme yöntemi desteği; kesin tüketim WF14.
 - [x] W1-BE-20 kaynak ve native test: mevcut takvimde opt-in aktif öğrenci keşfi, kullanıcı onaylı grup/özel görünümü, native sınıf/Starter sınırı, güvenli etiket/kapasite ve gerçek politika/kendi kayıt bağları; kesin tüketim WF06.
-- [ ] W1-BE-19/20 aynı PR318 aday full clean ve teslim kabulleri; yerel standart verify Linux /proc bağımlı değişmemiş observer testi nedeniyle tam başarı değildir. Kaynak/ortam kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-w19); frontend kabulü ayrıdır.
-- [ ] W1-BE-21–27: sırayla kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
+- [x] W1-BE-19/20 PR318 aday full clean, aynı main kaynak kabulü ve development teslimi; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-w19). Yeni hosted ve frontend kabulü ayrıdır.
+- [x] W1-BE-26/27 kaynak/native test: aynı etkinlik okuyucusunda başlık/durum/cursor ve merkez özeti; görünür kayıt için gerçek borç/hazırlık ve değişmez bedel/canlı bakiye. Kesin tüketim WF15, değerlendirmeler XREQ-055/056.
+- [ ] W1-BE-26/27 aday full clean → main kaynak kabulü → development teslimi; hosted ve frontend kabulü ayrı. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-event-discovery-finance).
+- [ ] W1-BE-21–25/28–29: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
 
 ## Web1 ek backend talepleri — 15 Kasım
 

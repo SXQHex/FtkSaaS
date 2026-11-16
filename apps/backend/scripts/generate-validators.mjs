@@ -40,7 +40,9 @@ for(const [name,schema] of Object.entries(contract.$defs))contract.$defs[name]=i
 for(const [key,name] of shared)contract.$defs[name]=children(JSON.parse(key),intern);
 // Share referenced validators instead of duplicating them in every operation.
 // Validation rules and standalone (no runtime compiler) execution stay unchanged.
-const ajv=new Ajv({strict:false,allErrors:false,messages:false,inlineRefs:false,code:{source:true,esm:true,optimize:2}});addFormats(ajv);ajv.addSchema(contract,'contract');const exports={};
+// Ajv emits a compact required-field loop for larger objects; every required
+// field remains checked, without repeating long expressions in the upload.
+const ajv=new Ajv({strict:false,allErrors:false,messages:false,inlineRefs:false,loopRequired:10,code:{source:true,esm:true,optimize:2}});addFormats(ajv);ajv.addSchema(contract,'contract');const exports={};
 exports.failure_envelope='contract#/$defs/FailureEnvelope';
 for(const op of contract['x-contract'].operations){exports['request_'+op.name]='contract'+op.request.$ref;exports['success_'+op.name]='contract'+op.success.$ref;}
 const modules={'ajv/dist/runtime/ucs2length':['ucs','ajv/dist/runtime/ucs2length.js'],'ajv/dist/runtime/equal':['equal','ajv/dist/runtime/equal.js'],'ajv-formats/dist/formats':['formats','ajv-formats/dist/formats.js']};

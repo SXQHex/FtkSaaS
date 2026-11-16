@@ -1,3 +1,4 @@
+import './event-directory-finance-unit.mjs';
 import './member-lesson-discovery-unit.mjs';
 import './instructor-account-unit.mjs';
 import './settings-domain-closure-unit.mjs';

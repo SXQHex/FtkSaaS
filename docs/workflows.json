@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6accb294c5ecd9e25cdf8c744ca0674110cc887e168b80d0632a2c18080aa1a0",
-        "reason": "W1-BE-20 reviewed shared optional calendar DTO/standalone validator and added unit/API test bindings; existing operations and source assertions preserved, this flow behavior unchanged."
+        "fingerprint": "925d924ce422b39c6f1208bb0d9ee7def7c494815a364f7ddbf4a4e115002d09",
+        "reason": "Reviewed Ajv loopRequired:10 compact standalone generation against installed compiler source; unchanged closed schemas, authoritative parity/required-field tests and unchanged 4MB upload gate pass."
       }
     },
     {
@@ -857,8 +857,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "579874d57de253b64263eeded3468f8129a2eeb1b9d43a44a8ad8033cce51878",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "24ee55a681fa26f436daf201306fc97e085e6339a8922c24fffa6ba880ef2050",
+        "reason": "Shared contract test entry adds isolated event-directory validation import; existing source assertions and workflow operations unchanged. Optional event DTO additions consumed only in revised WF15."
       }
     },
     {
@@ -1100,8 +1100,8 @@
         "finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "5fb5baba54685de99b500399e74208e940ef817d6489790b0dd7eb4484ef12a8",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "985de288e63daf7d05b75123b2cb2ecc922a5041a9adafbcf17ea667ef766120",
+        "reason": "Shared contract test entry adds isolated event-directory validation import; existing source assertions and workflow operations unchanged. Optional event DTO additions consumed only in revised WF15."
       }
     },
     {
@@ -1589,8 +1589,8 @@
         "instructor_account_get_v1"
       ],
       "review": {
-        "fingerprint": "480c125b1a8ea28934e2ee00f20fd0e0f2becdfb7a72baa721accad026ea4a53",
-        "reason": "W1-BE-19 final source and native tests reviewed; added source-to-migration/service-only invariant test, canonical alias, method and period behavior unchanged."
+        "fingerprint": "0473628725f2bad3e7d3d2a91de468100a5e581dccab39468d44c7fd370912b3",
+        "reason": "Shared contract test entry adds isolated event-directory validation import; existing source assertions and workflow operations unchanged. Optional event DTO additions consumed only in revised WF15."
       }
     },
     {
@@ -1604,7 +1604,9 @@
         "apps/backend/tests/event-cancellation.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/sharing-consent-acceptance.mjs"
+        "apps/backend/tests/sharing-consent-acceptance.mjs",
+        "apps/backend/tests/event-directory-finance-unit.mjs",
+        "apps/backend/tests/event-directory-finance-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1641,7 +1643,9 @@
         "apps/backend/database/upper-plan-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
         "apps/backend/database/settings-sharing-consent.sql",
-        "apps/backend/database/settings-sharing-events.sql"
+        "apps/backend/database/settings-sharing-events.sql",
+        "apps/backend/database/event-directory-finance.sql",
+        "apps/backend/supabase/migrations/20261116210335_event_directory_finance.sql"
       ],
       "operations": [
         "event_save_v1",
@@ -1664,8 +1668,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "f3f937faee0f91e9a3b6a59ff7111315e6fe90edf608e0c624c74336c1a293b2",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "41645d8293ab2b7293648a27e599f511f0b1f68fcd6e82e02a56016d3926c535",
+        "reason": "W1-BE-26/27 final event SQL, native evidence and WF15 reviewed; compact-validator required-field parity test added, all original assertions and permission boundaries preserved."
       }
     },
     {
