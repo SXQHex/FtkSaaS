@@ -1,3 +1,4 @@
+import './member-self-discovery-unit.mjs';
 import './event-directory-finance-unit.mjs';
 import './member-lesson-discovery-unit.mjs';
 import './instructor-account-unit.mjs';

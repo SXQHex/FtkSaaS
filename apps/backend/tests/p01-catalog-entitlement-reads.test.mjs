@@ -188,3 +188,4 @@ test('P01-A catalog and purchased-right reads through real Auth -> Edge -> RPC',
  });
  }finally{await db.end();}
 });
+import './member-self-discovery-acceptance.mjs';

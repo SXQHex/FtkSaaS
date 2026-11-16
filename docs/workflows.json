@@ -295,8 +295,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "925d924ce422b39c6f1208bb0d9ee7def7c494815a364f7ddbf4a4e115002d09",
-        "reason": "Reviewed Ajv loopRequired:10 compact standalone generation against installed compiler source; unchanged closed schemas, authoritative parity/required-field tests and unchanged 4MB upload gate pass."
+        "fingerprint": "e4fa6f0ff8a37661efe12c20f4cd2f74eb31f5894dfb7f0010a157b1677102f4",
+        "reason": "Reviewed final registry/feature summaries for two new self readers; original metadata order retained, existing permissions/features/operations and legacy response assertions unchanged. Final native scope/canonical-evidence tests and generated source bindings reviewed."
       }
     },
     {
@@ -385,8 +385,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "7820993eb6fc048bd768682b6209b8e3e8ea447e9bce9c107280a20ecef00df1",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "156b71f42aa34a4f71592f8bc7be40332f17c0821e911200da20b162eb4f22f3",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -500,8 +500,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "98424d56da72a0584d62475f3ac87383194374f91573a43052cdb858c627cf13",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "cedf8231fa6dce71913cdff9e9d63b2f94b79825c1c9accf26ef1d1fa0159cae",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -616,8 +616,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "f80af39792bf80581dd050ad4c5b9840261ed8a4e3079e5133693a43c5ece4e7",
-        "reason": "W1-BE-20 reviewed native-self opt-in discovery, current writer class scope, selected Starter resources, safe labels, frozen/current policy, cursor and native tests; guide updated."
+        "fingerprint": "17824e085d0290cd0be52212cff00ec83601cdb6ec730988e14e242792bbc0b4",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -733,8 +733,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "5742a100b7a7e4c557c40290bafc121c88921ffde89d6f82770825709b45939b",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "874412da3e8adc99366f4bf047074d0864934215c7717c226b4351283a71e4fc",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -760,7 +760,9 @@
         "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
         "apps/backend/tests/member-profile-lifecycle-acceptance.mjs",
         "apps/backend/tests/fixtures/member-profile-lifecycle.sql",
-        "apps/backend/tests/web1-review-unit.mjs"
+        "apps/backend/tests/web1-review-unit.mjs",
+        "apps/backend/tests/member-self-discovery-unit.mjs",
+        "apps/backend/tests/member-self-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -825,7 +827,9 @@
         "apps/backend/database/sale-discount.sql",
         "apps/backend/database/entitlement-ledger-read.sql",
         "apps/backend/database/freeze-cancellation.sql",
-        "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql"
+        "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql",
+        "apps/backend/database/member-self-discovery.sql",
+        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -857,8 +861,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "24ee55a681fa26f436daf201306fc97e085e6339a8922c24fffa6ba880ef2050",
-        "reason": "Shared contract test entry adds isolated event-directory validation import; existing source assertions and workflow operations unchanged. Optional event DTO additions consumed only in revised WF15."
+        "fingerprint": "0b3676f0981f90771245380540e62d43188b380efbeda03b5cb24e7058493e64",
+        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
       }
     },
     {
@@ -961,8 +965,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "6435ed9b2e80a296ee155b6c481fff1b3da7afcba090d470f3046d3790e20be8",
-        "reason": "W1-BE-20 reviewed native-self opt-in discovery, current writer class scope, selected Starter resources, safe labels, frozen/current policy, cursor and native tests; guide updated."
+        "fingerprint": "951136868ec4ad97675621b1a51173523fbc9df6bb7f8dc9000327c121b2f200",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1030,8 +1034,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "89caf9fb3dc0022e8a40b6942dc2d544a5a0e5fa033c6888277ca385c1ef2aac",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "3f97cd67a8d733ea96d8dcda29d62215daebe51c39315bf5a5a09b88bda6a5d6",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1049,7 +1053,9 @@
         "apps/backend/tests/action-management-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/sale-discount-acceptance.mjs",
-        "apps/backend/tests/fixtures/sale-discount-acceptance.sql"
+        "apps/backend/tests/fixtures/sale-discount-acceptance.sql",
+        "apps/backend/tests/member-self-discovery-unit.mjs",
+        "apps/backend/tests/member-self-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1087,7 +1093,9 @@
         "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql",
         "apps/backend/database/collection-correction-discovery.sql",
         "apps/backend/supabase/migrations/20261107022552_collection_correction_discovery.sql",
-        "apps/backend/database/finance-directory.sql"
+        "apps/backend/database/finance-directory.sql",
+        "apps/backend/database/member-self-discovery.sql",
+        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql"
       ],
       "operations": [
         "finance_get_v1",
@@ -1097,11 +1105,12 @@
         "student_credit_refund_v1",
         "student_credit_offset_v1",
         "debt_adjust_v1",
-        "finance_directory_get_v1"
+        "finance_directory_get_v1",
+        "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "985de288e63daf7d05b75123b2cb2ecc922a5041a9adafbcf17ea667ef766120",
-        "reason": "Shared contract test entry adds isolated event-directory validation import; existing source assertions and workflow operations unchanged. Optional event DTO additions consumed only in revised WF15."
+        "fingerprint": "4318c6c71c9c7a9c692eff1f426bf8693c69bda489c88bbfbbc889b58cccdcf2",
+        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
       }
     },
     {
@@ -1203,8 +1212,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "5394f58614168b674a876d534401d3d4a7f5b7817ed6089fe540cfd571bd640f",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "ad1dad6dd3301a69ee7d1e39720a902c31e4c949cea10b205453fa3e2f2bb3ab",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1263,8 +1272,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "e57c3a64169adf581b9cd0d0844711fb2629eedebc31f443f991f4c97da5db9c",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "ee83ed56252ecafe1bcaa145c0ef9606a2b0eb91b824644b637601e5424a0fa3",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1284,7 +1293,9 @@
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/content-catalog-acceptance.mjs",
         "apps/backend/tests/content-documents-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/member-self-discovery-unit.mjs",
+        "apps/backend/tests/member-self-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1309,7 +1320,9 @@
         "apps/backend/config/content/platform-v1.json",
         "apps/backend/scripts/content-publish.mjs",
         "apps/backend/supabase/migrations/20261113090000_content_catalog.sql",
-        "apps/backend/supabase/migrations/20261113090200_content_documents.sql"
+        "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
+        "apps/backend/database/member-self-discovery.sql",
+        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1320,11 +1333,12 @@
         "document_accept_v1",
         "document_publication_preview_v1",
         "content_catalog_get_v1",
-        "content_catalog_save_v1"
+        "content_catalog_save_v1",
+        "member_document_contexts_get_v1"
       ],
       "review": {
-        "fingerprint": "ff2c43db36fdb48a846e825d4ac0ce9a4ea043a051c0b3af8e09f64176e0cba9",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "f8ce4015594d37a4b87387a4f6f68d3489b02135b27a9c109256b583fedbe8c6",
+        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
       }
     },
     {
@@ -1456,8 +1470,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "7a62d30ff8c8321c87771f4b87d76eadb32d53dc445ec280ca84b53fc83fce77",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "cef100f7f7976dcefc9c9e8d602a88c4040b6ea0c7e76c2480b8e84682acba27",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1532,8 +1546,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "51a11827c580a4ef120f756acaa73d36bc2b7bcaa14e5402d90979d71d758cf7",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "dcea8be29bced4e21b91cb1f2825daa2a400581cc012b8a25951eaae9088516b",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1589,8 +1603,8 @@
         "instructor_account_get_v1"
       ],
       "review": {
-        "fingerprint": "0473628725f2bad3e7d3d2a91de468100a5e581dccab39468d44c7fd370912b3",
-        "reason": "Shared contract test entry adds isolated event-directory validation import; existing source assertions and workflow operations unchanged. Optional event DTO additions consumed only in revised WF15."
+        "fingerprint": "d838231529293c8092fec52ee32a7dc79474011413099c9a27b026034f9595b5",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1668,8 +1682,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "41645d8293ab2b7293648a27e599f511f0b1f68fcd6e82e02a56016d3926c535",
-        "reason": "W1-BE-26/27 final event SQL, native evidence and WF15 reviewed; compact-validator required-field parity test added, all original assertions and permission boundaries preserved."
+        "fingerprint": "3833e2fd1592fb170737e763a1b7cac766dab7ed3c048a14b47c8432518150f0",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1729,8 +1743,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "9ed4df02afb59238c0cfa79f5846563abb704ee09d5797159bdea9b584726ddf",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "90e014d6121cbd76207c42c3147824a0b43d8c2d6b4baf4c986ad39c898c6c58",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1818,8 +1832,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "9fadd99a5d7e69719774269aca244dd8af981843e76aa3211ddde72b88e4b17e",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "d36767fca8edf18e7a842395cbb49ab29bdcf4c9078c05a86e5a4c496440c6bd",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1851,8 +1865,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "be1137c2b57ac105004128eaa9a618cf422098e6efe35bbce79ce2dca4844f5e",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "ac347cfcb2a677d92f0ca20c275d45a1ff188bf71de2ab0573a61599dced5495",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     },
     {
@@ -1867,7 +1881,9 @@
         "apps/backend/tests/session-roster-discovery-acceptance.mjs",
         "apps/backend/tests/fixtures/session-roster-discovery.sql",
         "apps/backend/tests/web1-review-unit.mjs",
-        "apps/backend/tests/schedule-reads.test.mjs"
+        "apps/backend/tests/schedule-reads.test.mjs",
+        "apps/backend/tests/member-self-discovery-unit.mjs",
+        "apps/backend/tests/member-self-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
@@ -1879,7 +1895,9 @@
         "apps/backend/database/settings-offer-duration-required.sql",
         "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
         "apps/backend/database/session-waitlist-directory.sql",
-        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql"
+        "apps/backend/supabase/migrations/20261116111008_session_waitlist_rights.sql",
+        "apps/backend/database/member-self-discovery.sql",
+        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql"
       ],
       "operations": [
         "waitlist_join_v1",
@@ -1888,8 +1906,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "145dc4aa94cd17cc5fc8a2977694c4f979912f163acd8211fde1ffa23ff91eaf",
-        "reason": "W1-BE-20 reviewed shared optional calendar DTO/standalone validator and added unit/API test bindings; existing operations and source assertions preserved, this flow behavior unchanged."
+        "fingerprint": "272f0e88bbb498493e1faa4d4835e5ef0471a188efa1e8d25a2431da4f1ef9d8",
+        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
       }
     },
     {
@@ -2013,8 +2031,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "1ac4030a19b9eb3f317833f7a5af881f41b0bb131608f721d2a53fcd1d0c62cf",
-        "reason": "W1-BE-19: reviewed append-only generated self-account entrypoint, optional manual payment schemas and contract tests; existing flow entrypoints, permission and guide behavior unchanged."
+        "fingerprint": "d91c63aef18c08debec3b17cf20e5d1c997c2e8969c956b103b83c26c578b0f9",
+        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
       }
     }
   ]

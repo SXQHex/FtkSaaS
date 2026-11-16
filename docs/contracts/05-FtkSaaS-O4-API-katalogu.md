@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-230 sözleşme operasyonu; 230 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+232 sözleşme operasyonu; 232 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -82,7 +82,7 @@
 | `product_publish_v1` | runtime / ilgili WF’yi oku | `product.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; product_id?: FtkUuid ∣ null; terms: ProductTerms; expected_version?: PositiveInt | Success_product_publish |
 | `sale_preview_v1` | runtime / ilgili WF’yi oku | `sale.write` | P / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; product_version_id: FtkUuid; start_date: Date; net_minor?: Money ∣ null; end_date: Date; document_purchase_id?: FtkUuid | Success_sale_preview |
 | `sale_apply_v1` | runtime / ilgili WF’yi oku | `sale.write` | A / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_sale_apply |
-| `entitlements_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; include_timed_rights?: boolean; session_id?: FtkUuid; booking_mode?: BookingMode; ledger_sale_id?: FtkUuid; ledger_page?: Page | Success_entitlements_get |
+| `entitlements_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; include_timed_rights?: boolean; session_id?: FtkUuid; booking_mode?: BookingMode; ledger_sale_id?: FtkUuid; ledger_page?: Page; include_purchase_summary?: boolean | Success_entitlements_get |
 | `entitlement_extend_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; sale_id: FtkUuid; end_date: Date; reason: Text; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_entitlement_extend |
 | `credit_adjust_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; sale_id: FtkUuid; quantity: PositiveInt; direction: Direction; reason: Text; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_credit_adjust |
 | `negative_limit_set_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; allowed_negative_credits: Count; reason: Text; discipline_id: FtkUuid; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_negative_limit_set |
@@ -236,6 +236,8 @@
 | `freeze_cancel_preview_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; freeze_id: FtkUuid; reason: ReviewReason | Success_freeze_cancel_preview |
 | `freeze_cancel_apply_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_freeze_cancel_apply |
 | `instructor_account_get_v1` | runtime / ilgili WF’yi oku | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; person_id: FtkUuid; interval?: Interval; center_id: FtkUuid; view: agreements / payments; page: InstructorAccountPageRequest | Success_instructor_account_get |
+| `member_finance_currencies_get_v1` | runtime / ilgili WF’yi oku | `finance.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid | Success_member_finance_currencies_get |
+| `member_document_contexts_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_member_document_contexts_get |
 
 ## Sürüm ve okuma desteği
 
@@ -473,6 +475,8 @@
 | freeze_cancel_preview_v1 | preview | preview_dependencies | entitlements_get_v1 | implemented |  |
 | freeze_cancel_apply_v1 | apply | preview_dependencies | entitlements_get_v1 | implemented | freezes.cancel_planned, rights.remove_only_cancelled_extension, no_auto_rebooking |
 | instructor_account_get_v1 | read | none | None | operational_development_limited |  |
+| member_finance_currencies_get_v1 | read | none | None | operational_development_limited |  |
+| member_document_contexts_get_v1 | read | none | None | operational_development_limited |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 
