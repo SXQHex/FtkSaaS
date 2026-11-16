@@ -49,7 +49,15 @@ Vite 8, React 19 ve strict TypeScript 7; dosya tabanlı TanStack Router ve TanSt
 | `npm audit`                | Tüm bağımlılıkların güvenlik denetimi                             |
 | `npm audit --omit=dev`     | Yalnız üretim bağımlılıklarının güvenlik denetimi                 |
 
-`verify` ilk başarısız kontrolde durur. Audit ayrı çalıştırılır ve bulgular varsa sıfır olmayan çıkış kodu üretir; kapatılmış veya susturulmuş değildir.
+`verify` ve `verify:ci` aynı otomatik zinciri çalıştırır: lint → format → sözlük → build (tip ve bundle kontrolü dahil) → rapor korumaları → coverage/birim → headless Playwright. Tip kontrolü build içinde bir kez yapılır; ilk başarısız adımda durulur. Her iki komut da `test-reports/verification.md` ve `verification.json` üretir; ayrı adım logları `test-reports/verification-logs/` altındadır. Rapor kapsamı, kaynak SHA’sı, kirli çalışma ağacı, test sayıları ve Axe incomplete sonuçlarını açıkça taşır. Eski test JSON’ları koşu başında temizlenir; atlanan/boş/flaky sonuç başarı sayılmaz. Audit ayrı güvenlik işinde kalır.
+
+Geliştirmede yalnız değişen dilimi aynı kontrollerle doğrulayın; kod veya bulgu değişmeden aynı test paketini tekrar çalıştırmayın:
+
+```sh
+npm run verify -- --unit src/features/member-profile --e2e e2e/auth-member-profile.spec.ts --grep "freeze "
+```
+
+Seçili dilim tam paket kabulü değildir. CI’da filtreler reddedilir ve bütün paket çalışır. Playwright yerelde tek headless worker, CI’da mevcut yapılandırmanın iki worker’ını kullanır. Gerçek sağlayıcı/hosted kabulü bu mock test zincirinden ayrı kalır; native ACK’li writer’lar otomatik yeniden çalıştırılmaz. TODO yalnız sonuç/engel ve rapor bağlantısını taşır; komut çıktısı dökümü tutmaz.
 
 ## Erişilebilirlik, analiz, Devtools ve form örneği
 

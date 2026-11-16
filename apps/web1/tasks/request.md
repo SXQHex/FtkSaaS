@@ -16,8 +16,7 @@
 | W1-BE-08 | E17 · aynı-key kurtarma | Native telafi komutu receipt okumasının typed request ile doğrulanması           | ACK200 sonrası canonical client `operation_status_get_v1` VALIDATION_FAILED döndürüyor; backend incelemesi bekleniyor.      |
 | W1-BE-09 | E19 · P07               | Paket yönetimi durum/arama/özet/geçmiş ve satışa kapatma/arşiv eşlemesi          | Ürün katalog/yayın desteği bağlı; çizimdeki yönetim alanları için doğru typed kaynak veya runtime desteği bekleniyor.       |
 | W1-BE-10 | E20 · P08               | Merkez geneli finans hareket/borç/alacak keşfi ve para birimine ayrılmış özetler | Kişi+para birimi okuyucusu ve native tahsilat bağlı; merkez geneli çizim için doğru typed kaynak/eşleme bekleniyor.         |
-
-| W1-BE-14 | E14 · P07.4 | Planlanmış dondurmayı tamamen iptal etme | Kaynakta komut eşlemesi yok; native kısaltma iptal sayılmaz. |
+| W1-BE-14 | E14 · P07.4             | Planlanmış dondurmayı tamamen iptal etme                                         | Kaynakta komut eşlemesi yok; native kısaltma iptal sayılmaz.                                                                |
 
 ## Bütün talepler için ortak sınır
 
