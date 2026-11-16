@@ -55,6 +55,7 @@ export function SessionBookingSheet({
   locked,
   notice,
   recovery,
+  peoplePagination,
 }: {
   open: boolean;
   waitlist: boolean;
@@ -70,6 +71,7 @@ export function SessionBookingSheet({
   locked?: boolean;
   notice?: ReactNode;
   recovery?: ReactNode;
+  peoplePagination?: ReactNode;
 }) {
   const { t } = useTranslation(),
     id = useId();
@@ -96,6 +98,7 @@ export function SessionBookingSheet({
       </SheetHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-4">
         <form
+          aria-label={t(($) => $.sessionDetail.personSearch)}
           onSubmit={(event) => {
             event.preventDefault();
             onSearch();
@@ -108,6 +111,10 @@ export function SessionBookingSheet({
               </FieldLabel>
               <Input
                 id={`${id}-query`}
+                name="query"
+                type="search"
+                autoCapitalize="none"
+                spellCheck={false}
                 value={draft.query}
                 onChange={(event) => set("query", event.target.value)}
                 disabled={locked}
@@ -118,133 +125,157 @@ export function SessionBookingSheet({
             </Button>
           </FieldGroup>
         </form>
+        {peoplePagination}
         {notice}
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor={`${id}-person`}>{t(($) => $.sessionDetail.person)}</FieldLabel>
-            <NativeSelect
-              id={`${id}-person`}
-              className="w-full"
-              value={draft.personId}
-              onChange={(event) =>
-                onDraft({ ...draft, personId: event.target.value, saleId: "", reviewed: false })
-              }
-              disabled={locked}
-            >
-              <NativeSelectOption value="">
-                {t(($) => $.sessionDetail.choosePerson)}
-              </NativeSelectOption>
-              {people.map((person) => (
-                <NativeSelectOption key={person.id} value={person.id}>
-                  {person.label}
+        <form
+          id={`${id}-booking`}
+          aria-label={t(($) =>
+            waitlist ? $.sessionDetail.addWaitlist : $.sessionDetail.addParticipant,
+          )}
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!locked) onSubmit?.();
+          }}
+        >
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor={`${id}-person`}>{t(($) => $.sessionDetail.person)}</FieldLabel>
+              <NativeSelect
+                id={`${id}-person`}
+                className="w-full"
+                value={draft.personId}
+                onChange={(event) =>
+                  onDraft({
+                    ...draft,
+                    personId: event.target.value,
+                    saleId: "",
+                    override: false,
+                    reason: "",
+                    reviewed: false,
+                  })
+                }
+                disabled={locked}
+              >
+                <NativeSelectOption value="">
+                  {t(($) => $.sessionDetail.choosePerson)}
                 </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </Field>
-          {!waitlist && (
-            <>
-              <Field>
-                <FieldLabel htmlFor={`${id}-sale`}>{t(($) => $.sessionDetail.sale)}</FieldLabel>
-                <NativeSelect
-                  id={`${id}-sale`}
-                  className="w-full"
-                  value={draft.saleId}
-                  onChange={(event) => set("saleId", event.target.value)}
-                  disabled={locked || !draft.personId}
-                >
-                  <NativeSelectOption value="">
-                    {t(($) => $.sessionDetail.chooseSale)}
+                {people.map((person) => (
+                  <NativeSelectOption key={person.id} value={person.id}>
+                    {person.label}
                   </NativeSelectOption>
-                  {sales.map((sale) => (
-                    <NativeSelectOption key={sale.id} value={sale.id}>
-                      {sale.label}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor={`${id}-mode`}>{t(($) => $.sessionDetail.mode)}</FieldLabel>
-                <NativeSelect
-                  id={`${id}-mode`}
-                  value={draft.mode}
-                  disabled={locked}
-                  onChange={(event) => {
-                    if (event.target.value === "flexible" || event.target.value === "priority")
-                      set("mode", event.target.value);
-                  }}
-                >
-                  <NativeSelectOption value="flexible">
-                    {t(($) => $.sessionDetail.flexible)}
-                  </NativeSelectOption>
-                  <NativeSelectOption value="priority">
-                    {t(($) => $.sessionDetail.priority)}
-                  </NativeSelectOption>
-                </NativeSelect>
-              </Field>
-            </>
-          )}
-          <Field>
-            <FieldLabel htmlFor={`${id}-category`}>{t(($) => $.sessionDetail.category)}</FieldLabel>
-            <NativeSelect
-              id={`${id}-category`}
-              value={draft.category}
-              disabled={locked}
-              onChange={(event) => {
-                const value = event.target.value;
-                if (value === "" || value === "male" || value === "female") set("category", value);
-              }}
-            >
-              <NativeSelectOption value="">
-                {t(($) => $.sessionDetail.noCategory)}
-              </NativeSelectOption>
-              <NativeSelectOption value="male">{t(($) => $.sessionDetail.male)}</NativeSelectOption>
-              <NativeSelectOption value="female">
-                {t(($) => $.sessionDetail.female)}
-              </NativeSelectOption>
-            </NativeSelect>
-          </Field>
-          {!waitlist && canOverride && (
-            <FieldSet>
-              <FieldLegend>{t(($) => $.sessionDetail.capacity)}</FieldLegend>
-              <Field orientation="horizontal">
-                <Checkbox
-                  id={`${id}-override`}
-                  isSelected={draft.override}
-                  isDisabled={locked}
-                  onChange={(value) => set("override", value)}
-                />
-                <FieldLabel htmlFor={`${id}-override`}>
-                  {t(($) => $.sessionDetail.capacityOverride)}
-                </FieldLabel>
-              </Field>
-              <FieldDescription>{t(($) => $.sessionDetail.overrideHint)}</FieldDescription>
-              {draft.override && (
+                ))}
+              </NativeSelect>
+            </Field>
+            {!waitlist && (
+              <>
                 <Field>
-                  <FieldLabel htmlFor={`${id}-reason`}>
-                    {t(($) => $.sessionDetail.reason)}
-                  </FieldLabel>
-                  <Textarea
-                    id={`${id}-reason`}
-                    value={draft.reason}
-                    disabled={locked}
-                    onChange={(event) => set("reason", event.target.value)}
-                  />
+                  <FieldLabel htmlFor={`${id}-sale`}>{t(($) => $.sessionDetail.sale)}</FieldLabel>
+                  <NativeSelect
+                    id={`${id}-sale`}
+                    className="w-full"
+                    value={draft.saleId}
+                    onChange={(event) => set("saleId", event.target.value)}
+                    disabled={locked || !draft.personId}
+                  >
+                    <NativeSelectOption value="">
+                      {t(($) => $.sessionDetail.chooseSale)}
+                    </NativeSelectOption>
+                    {sales.map((sale) => (
+                      <NativeSelectOption key={sale.id} value={sale.id}>
+                        {sale.label}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelect>
                 </Field>
-              )}
-            </FieldSet>
-          )}
-          <Field orientation="horizontal">
-            <Checkbox
-              id={`${id}-review`}
-              isSelected={draft.reviewed}
-              isDisabled={locked || !draft.personId || (!waitlist && !draft.saleId)}
-              onChange={(value) => set("reviewed", value)}
-            />
-            <FieldLabel htmlFor={`${id}-review`}>
-              {t(($) => (waitlist ? $.sessionDetail.waitlistReview : $.sessionDetail.review))}
-            </FieldLabel>
-          </Field>
-        </FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor={`${id}-mode`}>{t(($) => $.sessionDetail.mode)}</FieldLabel>
+                  <NativeSelect
+                    id={`${id}-mode`}
+                    value={draft.mode}
+                    disabled={locked}
+                    onChange={(event) => {
+                      if (event.target.value === "flexible" || event.target.value === "priority")
+                        set("mode", event.target.value);
+                    }}
+                  >
+                    <NativeSelectOption value="flexible">
+                      {t(($) => $.sessionDetail.flexible)}
+                    </NativeSelectOption>
+                    <NativeSelectOption value="priority">
+                      {t(($) => $.sessionDetail.priority)}
+                    </NativeSelectOption>
+                  </NativeSelect>
+                </Field>
+              </>
+            )}
+            <Field>
+              <FieldLabel htmlFor={`${id}-category`}>
+                {t(($) => $.sessionDetail.category)}
+              </FieldLabel>
+              <NativeSelect
+                id={`${id}-category`}
+                value={draft.category}
+                disabled={locked}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (value === "" || value === "male" || value === "female")
+                    set("category", value);
+                }}
+              >
+                <NativeSelectOption value="">
+                  {t(($) => $.sessionDetail.noCategory)}
+                </NativeSelectOption>
+                <NativeSelectOption value="male">
+                  {t(($) => $.sessionDetail.male)}
+                </NativeSelectOption>
+                <NativeSelectOption value="female">
+                  {t(($) => $.sessionDetail.female)}
+                </NativeSelectOption>
+              </NativeSelect>
+            </Field>
+            {!waitlist && canOverride && (
+              <FieldSet>
+                <FieldLegend>{t(($) => $.sessionDetail.capacity)}</FieldLegend>
+                <Field orientation="horizontal">
+                  <Checkbox
+                    id={`${id}-override`}
+                    isSelected={draft.override}
+                    isDisabled={locked}
+                    onChange={(value) => set("override", value)}
+                  />
+                  <FieldLabel htmlFor={`${id}-override`}>
+                    {t(($) => $.sessionDetail.capacityOverride)}
+                  </FieldLabel>
+                </Field>
+                <FieldDescription>{t(($) => $.sessionDetail.overrideHint)}</FieldDescription>
+                {draft.override && (
+                  <Field>
+                    <FieldLabel htmlFor={`${id}-reason`}>
+                      {t(($) => $.sessionDetail.reason)}
+                    </FieldLabel>
+                    <Textarea
+                      id={`${id}-reason`}
+                      value={draft.reason}
+                      disabled={locked}
+                      onChange={(event) => set("reason", event.target.value)}
+                    />
+                  </Field>
+                )}
+              </FieldSet>
+            )}
+            <Field orientation="horizontal">
+              <Checkbox
+                id={`${id}-review`}
+                isSelected={draft.reviewed}
+                isDisabled={locked || !draft.personId || (!waitlist && !draft.saleId)}
+                onChange={(value) => set("reviewed", value)}
+              />
+              <FieldLabel htmlFor={`${id}-review`}>
+                {t(($) => (waitlist ? $.sessionDetail.waitlistReview : $.sessionDetail.review))}
+              </FieldLabel>
+            </Field>
+          </FieldGroup>
+        </form>
         {recovery}
       </div>
       <SheetFooter className="flex-wrap">
@@ -252,6 +283,8 @@ export function SessionBookingSheet({
           {t(($) => $.sessionDetail.cancel)}
         </Button>
         <Button
+          type="submit"
+          form={`${id}-booking`}
           isDisabled={
             locked ||
             !onSubmit ||
@@ -260,7 +293,6 @@ export function SessionBookingSheet({
             (!waitlist && !draft.saleId) ||
             (!waitlist && draft.override && (!canOverride || !draft.reason.trim()))
           }
-          onPress={onSubmit}
         >
           {t(($) => (waitlist ? $.sessionDetail.joinWaitlist : $.sessionDetail.createReservation))}
         </Button>
@@ -368,6 +400,101 @@ export function SessionAttendanceClose({
         </AlertDialogCancel>
         <Button isDisabled={locked || !reviewed || !onSubmit} onPress={onSubmit}>
           {t(($) => $.sessionDetail.closeAttendance)}
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialog>
+  );
+}
+
+export function SessionAttendanceStart({
+  open,
+  reason,
+  accepted,
+  locked,
+  onReason,
+  onAccepted,
+  onClose,
+  onSubmit,
+  notice,
+  recovery,
+}: {
+  open: boolean;
+  reason: string;
+  accepted: boolean;
+  locked: boolean;
+  onReason: (value: string) => void;
+  onAccepted: (value: boolean) => void;
+  onClose: () => void;
+  onSubmit?: () => void;
+  notice?: ReactNode;
+  recovery?: ReactNode;
+}) {
+  const { t } = useTranslation(),
+    id = useId(),
+    safe = useRef<HTMLButtonElement>(null);
+  return (
+    <AlertDialog
+      isOpen={open}
+      isDismissable={!locked}
+      isKeyboardDismissDisabled={locked}
+      onOpenChange={(value) => {
+        if (!value && !locked) onClose();
+      }}
+      onEnter={() => safe.current?.focus()}
+      className="max-h-[calc(100dvh-2rem)] overflow-y-auto"
+    >
+      <AlertDialogHeader>
+        <AlertDialogTitle>{t(($) => $.sessionDetail.startAttendance)}</AlertDialogTitle>
+        <AlertDialogDescription>
+          {t(($) => $.sessionDetail.startDescription)}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <form
+        id={`${id}-start`}
+        method="post"
+        aria-label={t(($) => $.sessionDetail.startAttendance)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!locked && accepted && reason.trim()) onSubmit?.();
+        }}
+      >
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor={`${id}-reason`}>{t(($) => $.sessionDetail.reason)}</FieldLabel>
+            <Textarea
+              id={`${id}-reason`}
+              name="reason"
+              required
+              value={reason}
+              disabled={locked}
+              onChange={(event) => onReason(event.target.value)}
+            />
+          </Field>
+          <Field orientation="horizontal">
+            <Checkbox
+              id={`${id}-review`}
+              isSelected={accepted}
+              isDisabled={locked}
+              onChange={onAccepted}
+            />
+            <FieldLabel htmlFor={`${id}-review`}>
+              {t(($) => $.sessionDetail.startReview)}
+            </FieldLabel>
+          </Field>
+        </FieldGroup>
+      </form>
+      {notice}
+      {recovery}
+      <AlertDialogFooter>
+        <AlertDialogCancel ref={safe} autoFocus isDisabled={locked} onPress={onClose}>
+          {t(($) => $.sessionDetail.cancel)}
+        </AlertDialogCancel>
+        <Button
+          type="submit"
+          form={`${id}-start`}
+          isDisabled={locked || !accepted || !reason.trim() || !onSubmit}
+        >
+          {t(($) => $.sessionDetail.startAttendance)}
         </Button>
       </AlertDialogFooter>
     </AlertDialog>

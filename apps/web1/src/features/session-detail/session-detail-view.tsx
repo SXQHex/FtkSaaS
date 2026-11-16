@@ -239,7 +239,7 @@ export function SessionDetailView({
             <CardContent>
               <ItemGroup>
                 {instructors.map((person) => (
-                  <Item key={person.id} size="sm">
+                  <Item key={person.id} role="listitem" size="sm">
                     <Avatar>
                       <AvatarFallback>
                         {person.name.slice(0, 2).toLocaleUpperCase("tr")}
@@ -306,9 +306,9 @@ export function SessionParticipants({
             event.preventDefault();
             onQuery();
           }}
-          className="flex min-w-0 flex-1 items-center gap-2"
+          className="flex min-w-0 basis-full flex-wrap items-center gap-2 sm:flex-1 sm:basis-auto"
         >
-          <InputGroup className="min-w-0">
+          <InputGroup className="min-w-0 flex-1 basis-40">
             <InputGroupAddon>
               <SearchIcon aria-hidden="true" />
             </InputGroupAddon>
@@ -387,6 +387,8 @@ export interface SessionAttendanceRow {
   result: AttendanceResult;
   protected: boolean;
   detail?: string;
+  canBlock?: boolean;
+  readOnly?: boolean;
 }
 export function SessionAttendance({
   rows,
@@ -397,6 +399,7 @@ export function SessionAttendance({
   onReason,
   onResult,
   onSaveRow,
+  onBlock,
   onEdit,
   onCancel,
   onPreview,
@@ -404,6 +407,7 @@ export function SessionAttendance({
   notice,
   locked,
   correction,
+  unavailable = false,
 }: {
   rows: SessionAttendanceRow[];
   startedAt?: string;
@@ -413,6 +417,7 @@ export function SessionAttendance({
   onReason: (reason: string) => void;
   onResult?: (id: string, value: AttendanceResult) => void;
   onSaveRow?: (id: string) => void;
+  onBlock?: (id: string) => void;
   onEdit?: () => void;
   onCancel?: () => void;
   onPreview?: () => void;
@@ -420,6 +425,7 @@ export function SessionAttendance({
   notice?: ReactNode;
   locked?: boolean;
   correction?: ReactNode;
+  unavailable?: boolean;
 }) {
   const { t } = useTranslation(),
     reasonId = useId();
@@ -434,7 +440,7 @@ export function SessionAttendance({
         {notice}
         <ItemGroup>
           {rows.map((row) => (
-            <Item key={row.id} size="sm" className="flex-wrap">
+            <Item key={row.id} role="listitem" size="sm" className="flex-wrap">
               <ItemContent>
                 <ItemTitle>{row.name}</ItemTitle>
                 {row.detail && <ItemDescription>{row.detail}</ItemDescription>}
@@ -446,7 +452,7 @@ export function SessionAttendance({
                 <NativeSelect
                   aria-label={t(($) => $.sessionDetail.attendanceResult, { name: row.name })}
                   value={row.result}
-                  disabled={locked || !onResult || row.protected || (closed && !editing)}
+                  disabled={locked || !onResult || row.readOnly || (closed && !editing)}
                   onChange={(event) => {
                     const value = event.target.value;
                     if (
@@ -458,7 +464,7 @@ export function SessionAttendance({
                       onResult?.(row.id, value);
                   }}
                 >
-                  <NativeSelectOption value="unmarked">
+                  <NativeSelectOption value="unmarked" disabled>
                     {t(($) => $.sessionDetail.unmarked)}
                   </NativeSelectOption>
                   <NativeSelectOption value="attended">
@@ -467,7 +473,7 @@ export function SessionAttendance({
                   <NativeSelectOption value="no_show">
                     {t(($) => $.sessionDetail.absent)}
                   </NativeSelectOption>
-                  <NativeSelectOption value="blocked" disabled>
+                  <NativeSelectOption value="blocked" disabled={!row.canBlock}>
                     {t(($) => $.sessionDetail.blocked)}
                   </NativeSelectOption>
                 </NativeSelect>
@@ -475,17 +481,32 @@ export function SessionAttendance({
                   <Button
                     size="sm"
                     variant="outline"
-                    isDisabled={locked || !onSaveRow || row.protected}
+                    isDisabled={
+                      locked ||
+                      !onSaveRow ||
+                      row.readOnly ||
+                      !["attended", "no_show"].includes(row.result)
+                    }
                     onPress={() => onSaveRow?.(row.id)}
                   >
                     {t(($) => $.sessionDetail.mark, { name: row.name })}
+                  </Button>
+                )}
+                {!closed && row.canBlock && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    isDisabled={locked || !onBlock || row.readOnly}
+                    onPress={() => onBlock?.(row.id)}
+                  >
+                    {t(($) => $.sessionDetail.blockAttendance)}
                   </Button>
                 )}
               </ItemActions>
             </Item>
           ))}
         </ItemGroup>
-        {!rows.length && (
+        {!rows.length && !unavailable && (
           <Empty>
             <EmptyDescription>{t(($) => $.sessionDetail.attendanceEmpty)}</EmptyDescription>
           </Empty>

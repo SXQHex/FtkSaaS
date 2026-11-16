@@ -6,8 +6,39 @@ import type {
   AttendanceView,
   PersonView,
   WaitlistEntryView,
+  SessionView,
 } from "../../lib/api-contracts/generated";
 import { readScheduleSession } from "../schedule/schedule-read";
+
+export async function readSessionHeader(scope: ClientScope, session: SessionView) {
+  const backend = await scopedBackend(scope),
+    cursors = new Set<string>();
+  let cursor: string | undefined;
+  do {
+    const page = await backend.call("calendar_get_v1", {
+      ...common(scope),
+      request_id: uuidv7(),
+      interval: { starts_at: session.starts_at, ends_at: session.ends_at },
+      page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+    });
+    const matches = page.items.filter((row) => row.type === "session" && row.id === session.id);
+    if (matches.length > 1) throw new Error("SESSION_DETAIL_HEADER_UNAVAILABLE");
+    if (matches[0]) {
+      const row = matches[0];
+      if (
+        row.center_id !== scope.centerId ||
+        Date.parse(row.starts_at) !== Date.parse(session.starts_at) ||
+        Date.parse(row.ends_at) !== Date.parse(session.ends_at)
+      )
+        throw new Error("SESSION_DETAIL_HEADER_UNAVAILABLE");
+      return row;
+    }
+    cursor = page.next_cursor ?? undefined;
+    if (cursor && cursors.has(cursor)) throw new Error("SESSION_DETAIL_HEADER_UNAVAILABLE");
+    if (cursor) cursors.add(cursor);
+  } while (cursor);
+  throw new Error("SESSION_DETAIL_HEADER_UNAVAILABLE");
+}
 
 const positive = z.number().int().positive().safe();
 const nonnegative = z.number().int().nonnegative().safe();

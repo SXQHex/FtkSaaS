@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useBlocker, useRouter } from "@tanstack/react-router";
+import { useBlocker, useRouter, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -71,6 +71,7 @@ export function ScheduleContent({
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
+    navigate = useNavigate(),
     queries = useQueryClient();
   const [now] = useState(() => new Date().toISOString());
   const [range, setRange] = useState<Interval>(),
@@ -737,6 +738,17 @@ export function ScheduleContent({
       />
       {selected && sessionDraft && panel && (
         <ScheduleSessionSheet
+          onDetail={() => {
+            if (locked) return;
+            void navigate({
+              to: "/o/$orgId/c/$centerId/sessions/$sessionId",
+              params: {
+                orgId: scope.orgId,
+                centerId: scope.centerId,
+                sessionId: selected.session.id,
+              },
+            });
+          }}
           recoveryActions={recovery}
           open
           mode={mode}

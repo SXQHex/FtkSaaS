@@ -2275,7 +2275,7 @@
     "date": "Tarih",
     "time": "Saat",
     "duration": "Süre",
-    "minutes": "{{count}} dk",
+    "minutes": "{{minutes}} dk",
     "room": "Salon",
     "capacity": "Kontenjan",
     "capacityValue": "{{held}} / {{total}}",
@@ -2376,6 +2376,57 @@
     "correctionReview": "Düzeltme etkilerini kontrol ettim.",
     "addDescription": "Seçili seans için kişi ve hak kaynağını açıkça seç. İşlem sonucu yeniden okunur.",
     "flexible": "Esnek",
-    "waitlistReview": "Seçili kişi ve seansı kontrol ettim. Bekleme kaydı kesin rezervasyon değildir."
+    "waitlistReview": "Seçili kişi ve seansı kontrol ettim. Bekleme kaydı kesin rezervasyon değildir.",
+    "bookingStates": {
+      "ready": "",
+      "writing": "Rezervasyon kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+      "pending": "İşlem tamamlanmadı; yeni kayıt göndermeden sonucu oku.",
+      "saved-unread": "Kayıt alındı; güncel rezervasyon, hak ve seans henüz okunamadı. Yeniden yazmadan sonucu oku.",
+      "saved": "Rezervasyon kaydedildi; güncel rezervasyon, haklar ve seans okundu.",
+      "stale": "Kaynak değişti. Güncel kaynağı oku ve yeni onay ver.",
+      "rejected": "İşlem reddedildi. Güncel kaynak ve izin, plan veya hak koşullarını kontrol et."
+    },
+    "sourceChanged": "Seans veya seçilen hak kaynağı değişti. Güncel seçimi inceleyip yeniden onayla.",
+    "sourceError": "Kişi, seans veya hak kaynağı okunamadı. Güncel kaynağı yeniden oku.",
+    "bookingSale": "{{start}} – {{end}} · {{available}} · {{id}}",
+    "credits": "{{available}} ders",
+    "timedRight": "Süreli hak",
+    "readReceipt": "İşlem sonucunu oku",
+    "retryWrite": "Aynı isteği tekrar dene",
+    "readSources": "Güncel kaynakları oku",
+    "waitlistUnavailable": "Seans geneli bekleme ve teklif listesi için native keşif kaynağı bekleniyor.",
+    "peopleCandidates": "Eşleşen kişiler",
+    "chooseSearchPerson": "Aramadan bir kişiyi seç; o kişinin bu seanstaki rezervasyonları okunur.",
+    "cancelReservation": "İptal et — {{name}}",
+    "startDescription": "Onayladığında şu an seansın fiilî başlangıcı olarak kaydedilir. Planlı saat, gerçekleşmiş başlangıç yerine kullanılmaz.",
+    "startReview": "Seansın şu an başladığını onaylıyorum.",
+    "rightsUnavailable": "Seans ve yoklama okundu; bazı kişilerin hak bilgileri mevcut yetkiyle okunamıyor.",
+    "blockReasons": {
+      "credit_limit_exceeded": "Kredi limiti aşıldı",
+      "debt_policy": "Borç politikası"
+    },
+    "effectActions": {
+      "create": "Oluşturma",
+      "cancel": "İptal",
+      "reserve": "Ayırma",
+      "consume": "Tüketim",
+      "release": "Serbest bırakma",
+      "adjust": "Düzeltme",
+      "close": "Kapatma",
+      "unlink": "Bağı kaldırma",
+      "delete": "Silme",
+      "reverse": "Ters kayıt"
+    },
+    "attendanceStates": {
+      "ready": "",
+      "writing": "Yoklama işlemi kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
+      "pending": "İşlem tamamlanmadı; yeni yazı göndermeden sonucu oku.",
+      "saved-unread": "İşlem alındı; güncel yoklama ve seans henüz okunamadı. Yeniden yazmadan sonucu oku.",
+      "saved": "İşlem kaydedildi; güncel yoklama ve seans okundu.",
+      "stale": "Yoklama veya seans değişti. Güncel kaynağı oku ve yeniden onayla.",
+      "rejected": "İşlem reddedildi. Güncel izin, plan ve yoklama koşullarını kontrol et."
+    }
   }
 }
