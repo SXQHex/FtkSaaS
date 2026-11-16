@@ -484,11 +484,11 @@
     },
     {
       "path": "apps/backend/tests/p01-lesson-requests.test.mjs",
-      "sha256": "b28aa7a5982974f214d5e794622f0285f76cf53be3daaeae83984cdc1fe831a5",
+      "sha256": "7d09bea7049a9160b886a4fc30327c6fa06b26a3d125da4c41259f0a744f3f13",
       "shared": [
         [
-          2,
-          7
+          3,
+          8
         ]
       ],
       "parts": [
@@ -496,17 +496,22 @@
           "id": "p01-lesson-requests-root-1",
           "ranges": [
             [
-              8,
-              124
+              9,
+              133
             ]
           ]
         }
       ],
       "imports": [
         {
-          "line": 1,
+          "line": 2,
           "path": "apps/backend/tests/lesson-request-catalog-acceptance.mjs",
           "sha256": "72db9d1988b478aeddd678b6c0423eff21dcb5cf349911b283e5bf5be8374cf7"
+        },
+        {
+          "line": 1,
+          "path": "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
+          "sha256": "ad0e353f2cb96b673f11db4c71e7c68645cba8ac882b89fb46d688eddb47961d"
         }
       ],
       "estimated_seconds": 173.83
