@@ -309,3 +309,4 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
  }
 });
 import './studio-setup-status-acceptance.mjs';
+import './role-directory-filter-acceptance.mjs';

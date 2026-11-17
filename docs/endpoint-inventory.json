@@ -569,7 +569,8 @@
         "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open.",
         "Lists stored role assignments; ownership is read from organization.owner_person_id, not synthesized as a role assignment.",
         "Only created_at_asc sorting is supported; cursors bind actor and request scope; live permissions are rechecked.",
-        "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged."
+        "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged.",
+        "Optional role and state use existing Role/RecordState values, filter before limit and bind to the existing request/actor cursor. Omit filters for the legacy set; existing center and organization visibility and manager command authority remain unchanged."
       ]
     },
     {
