@@ -200,6 +200,7 @@ export interface SettingsViewProps {
   logoAccept?: string;
   resetCards?: readonly SettingsCardKey[];
   onPermission?: (personId: string, permission: string, value: boolean) => void;
+  teamActionLabel?: string;
 }
 function SettingsTable({ data, label }: { data?: SettingsTableData; label: string }) {
   const { t } = useTranslation();
@@ -258,6 +259,7 @@ export function SettingsView({
   logoAccept,
   resetCards,
   onPermission,
+  teamActionLabel,
   scope,
   onScope,
 }: SettingsViewProps) {
@@ -858,7 +860,7 @@ export function SettingsView({
                               onPress={() => action("invite")}
                             >
                               <PlusIcon data-icon="inline-start" />
-                              {t(($) => $.settings.invite)}
+                              {teamActionLabel ?? t(($) => $.settings.invite)}
                             </Button>
                           </CardAction>
                         )}

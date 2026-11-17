@@ -55,7 +55,7 @@ export function SettingsReviewDialog({
       isDismissable={!locked}
       isKeyboardDismissDisabled={locked}
       showCloseButton={false}
-      className="max-h-[calc(100dvh-2rem)] overflow-y-auto"
+      className="min-w-0 max-h-[calc(100dvh-2rem)] [&>[data-slot=dialog]]:min-h-0 [&>[data-slot=dialog]]:min-w-0 [&>[data-slot=dialog]]:max-h-[calc(100dvh-4.5rem)] [&>[data-slot=dialog]]:overflow-y-auto [&>[data-slot=dialog]]:overscroll-contain"
     >
       <DialogHeader>
         <DialogTitle>{title}</DialogTitle>

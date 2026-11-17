@@ -241,7 +241,10 @@ function SettingsManagement({
   });
   const team = useSettingsTeam({
     scope,
-    enabled: allowed && canCenter && level === "center" && !readOnly,
+    enabled: allowed && !readOnly,
+    level,
+    writable,
+    canManageManagers: canWriteOrganization,
     visible: section === "ekip",
     locked,
     onLockChange: publishLock,
@@ -286,6 +289,7 @@ function SettingsManagement({
       void router.invalidate();
   }, [query.error, router]);
   const source = query.isError || query.isFetching ? undefined : query.data;
+  const publicValues = document.source?.document.values;
   const data: SettingsViewData = {
     ...document.data,
     ...subscription.data,
@@ -293,6 +297,24 @@ function SettingsManagement({
     fields: {
       ...document.data.fields,
       ...notifications.fields,
+      ...(publicValues?.public_profile_enabled !== undefined
+        ? {
+            "ay-py-on": { value: publicValues.public_profile_enabled, writable: false },
+            "ay-py-slug": { value: scope.orgId, writable: false },
+          }
+        : {}),
+      ...(publicValues?.public_application_form !== undefined
+        ? {
+            "ay-py-form": { value: publicValues.public_application_form !== null, writable: false },
+            "ay-py-cons": {
+              value:
+                publicValues.public_application_form?.consents
+                  .map((row) => `${row.purpose} · ${row.version}`)
+                  .join("; ") ?? "",
+              writable: false,
+            },
+          }
+        : {}),
       ...policies.fields,
       "hs-f": history.filter,
       "ay-ad": { value: organizationLabel, writable: false },
@@ -408,6 +430,7 @@ function SettingsManagement({
         section={section}
         onSection={setSection}
         onPermission={team.onPermission}
+        teamActionLabel={t(($) => $.settings.teamNative.addRole)}
         onField={document.onField}
         onColor={document.onColor}
         onLogo={document.onLogo}
@@ -427,6 +450,7 @@ function SettingsManagement({
         onScope={(next) => {
           if (!locked) {
             setSelection(undefined);
+            team.reset();
             setLevel(next);
           }
         }}

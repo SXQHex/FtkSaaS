@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { PersonView } from "../../lib/api-contracts/generated";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { Button } from "../../components/ui/button";
@@ -21,20 +22,40 @@ import {
   teamReceipt,
   teamResult,
   teamPermissions,
-  type TeamRole,
+  type TeamDirectoryRole,
+  type ManagerRole,
   type TeamPermission,
   type TeamIntent,
 } from "./settings-team";
+function lostScope(error: unknown) {
+  return (
+    (error instanceof BackendError &&
+      [
+        "AUTH_REQUIRED",
+        "SESSION_REVOKED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "PLAN_FEATURE_UNAVAILABLE",
+      ].includes(error.code)) ||
+    (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
+  );
+}
 export function useSettingsTeam({
   scope,
+  level,
   enabled,
+  writable,
+  canManageManagers,
   visible,
   locked,
   onLockChange,
   onAccessLost,
 }: {
   scope: ClientScope;
+  level: "center" | "organization";
   enabled: boolean;
+  writable: boolean;
+  canManageManagers: boolean;
   visible: boolean;
   locked: boolean;
   onLockChange: (value: boolean) => void;
@@ -42,30 +63,49 @@ export function useSettingsTeam({
 }) {
   const { t } = useTranslation(),
     queries = useQueryClient();
-  const [role, setRole] = useState<TeamRole>("staff"),
-    [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
-    [index, setIndex] = useState(0),
-    [person, setPerson] = useState<PersonView>(),
-    [editor, setEditor] = useState<{ person?: PersonView }>(),
+  const [centerRole, setCenterRole] = useState<TeamDirectoryRole>("staff"),
+    [state, setState] = useState<"active" | "inactive">("active");
+  const role = level === "organization" ? "org_manager" : centerRole;
+  const roleOptions: readonly TeamDirectoryRole[] =
+    level === "organization" ? ["org_manager"] : [...teamRoles, "center_manager"];
+  const [position, setPosition] = useState<{
+    key: string;
+    cursors: (string | undefined)[];
+    index: number;
+  }>({ key: "", cursors: [undefined], index: 0 });
+  const filterKey = `${level}:${role}:${state}`;
+  const frame =
+    position.key === filterKey ? position : { key: filterKey, cursors: [undefined], index: 0 };
+  const [person, setPerson] = useState<PersonView>(),
+    [permissionKeys, setPermissionKeys] = useState<readonly TeamPermission[]>(teamPermissions),
+    [editor, setEditor] = useState<{ person?: PersonView; manager?: ManagerRole }>(),
     [review, setReview] = useState<TeamIntent>(),
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState(false);
   const page = useQuery({
-    queryKey: ["settings-team-directory", scope, role, cursors[index]],
-    queryFn: () => readTeamPage(scope, role, cursors[index]),
+    queryKey: ["settings-team-directory", scope, level, role, state, frame.cursors[frame.index]],
+    queryFn: () => readTeamPage(scope, role, frame.cursors[frame.index], level, state),
     enabled: enabled && visible,
     retry: false,
     refetchOnWindowFocus: false,
   });
   const records = enabled && !page.isError ? page.data?.records : undefined;
   const permissions = useQuery({
-    queryKey: ["settings-team-permissions", scope, person?.id],
-    queryFn: () => readTeamPermissions(scope, person!.id),
-    enabled: enabled && visible && !!person,
+    queryKey: ["settings-team-permissions", scope, person?.id, permissionKeys],
+    queryFn: () => readTeamPermissions(scope, person!.id, permissionKeys),
+    enabled: enabled && visible && level === "center" && !!person,
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const denied = lostScope(page.error) || lostScope(permissions.error);
+  useEffect(() => {
+    for (const error of [page.error, permissions.error])
+      if (lostScope(error)) {
+        onAccessLost(error);
+        break;
+      }
+  }, [page.error, permissions.error, onAccessLost]);
   async function refresh() {
     await Promise.all([
       queries.invalidateQueries(
@@ -95,12 +135,22 @@ export function useSettingsTeam({
       return () => onLockChange(false);
     }
   }, [preparing, command.locked, onLockChange]);
+  function reset() {
+    if (locked || command.locked) return;
+    setPosition({ key: "", cursors: [undefined], index: 0 });
+    setPerson(undefined);
+    setEditor(undefined);
+    setReview(undefined);
+    command.reset();
+  }
   async function changePermission(personId: string, key: string, value: boolean) {
     if (
       locked ||
       preparing ||
-      !teamPermissions.includes(key as TeamPermission) ||
-      personId !== person?.id
+      !writable ||
+      !permissionKeys.includes(key as TeamPermission) ||
+      personId !== person?.id ||
+      denied
     )
       return;
     setPreparing(true);
@@ -117,13 +167,13 @@ export function useSettingsTeam({
     }
   }
   const matrix: SettingsViewData["permissions"] =
-    enabled && person && !permissions.isError && permissions.data
+    enabled && level === "center" && person && !permissions.isError && permissions.data
       ? {
           people: [{ id: person.id, name: person.display_name }],
           rows: permissions.data.map((row) => ({
             id: row.permission,
             label: t(($) => $.settings.teamNative.permissions[row.permission]),
-            values: { [person.id]: { value: row.enabled, writable: true } },
+            values: { [person.id]: { value: row.enabled, writable } },
           })),
         }
       : undefined;
@@ -135,21 +185,40 @@ export function useSettingsTeam({
           cells: [
             row.person.display_name,
             t(($) => $.settings.teamNative.roles[row.role]),
-            `${row.state} · ${row.bound === null ? t(($) => $.settings.unknown) : row.bound ? t(($) => $.settings.teamNative.bound) : t(($) => $.settings.teamNative.unbound)}`,
+            `${t(($) => $.settings.teamNative.states[row.state])} · ${row.bound === null ? t(($) => $.settings.unknown) : row.bound ? t(($) => $.settings.teamNative.bound) : t(($) => $.settings.teamNative.unbound)}`,
             <div key="actions" className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                isDisabled={locked}
-                onPress={() => setEditor({ person: row.person })}
+                isDisabled={
+                  locked ||
+                  !writable ||
+                  ((row.role === "org_manager" || row.role === "center_manager") &&
+                    !canManageManagers)
+                }
+                onPress={() =>
+                  setEditor({
+                    person: row.person,
+                    ...(row.role === "org_manager" || row.role === "center_manager"
+                      ? { manager: row.role }
+                      : {}),
+                  })
+                }
               >
                 {t(($) => $.settings.teamNative.edit)}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                isDisabled={locked || row.state !== "active" || row.role === "assistant"}
-                onPress={() => setPerson(row.person)}
+                isDisabled={
+                  locked || row.state !== "active" || row.role === "assistant" || level !== "center"
+                }
+                onPress={() => {
+                  setPermissionKeys(
+                    row.role === "center_manager" ? ["sale.discount"] : teamPermissions,
+                  );
+                  setPerson(row.person);
+                }}
               >
                 {t(($) => $.settings.teamNative.selectPermissions)}
               </Button>
@@ -161,8 +230,8 @@ export function useSettingsTeam({
             <Button
               variant="outline"
               size="sm"
-              isDisabled={locked || index === 0 || page.isFetching}
-              onPress={() => setIndex((value) => value - 1)}
+              isDisabled={locked || frame.index === 0 || page.isFetching}
+              onPress={() => setPosition({ ...frame, index: frame.index - 1 })}
             >
               {t(($) => $.earnings.previousPage)}
             </Button>
@@ -172,10 +241,12 @@ export function useSettingsTeam({
               isDisabled={locked || !page.data?.next_cursor || page.isFetching}
               onPress={() => {
                 const next = page.data?.next_cursor;
-                if (next) {
-                  setCursors((values) => [...values.slice(0, index + 1), next]);
-                  setIndex((value) => value + 1);
-                }
+                if (next)
+                  setPosition({
+                    key: filterKey,
+                    cursors: [...frame.cursors.slice(0, frame.index + 1), next],
+                    index: frame.index + 1,
+                  });
               }}
             >
               {t(($) => $.earnings.nextPage)}
@@ -184,13 +255,24 @@ export function useSettingsTeam({
         ),
       }
     : undefined;
+  const canCreate =
+    enabled &&
+    writable &&
+    !denied &&
+    ((role !== "org_manager" && role !== "center_manager") || canManageManagers);
   return {
     table,
     matrix,
+    reset,
     onPermission: (id: string, key: string, value: boolean) =>
       void changePermission(id, key, value),
-    create: () => setEditor({}),
-    canCreate: enabled,
+    create: () => {
+      if (canCreate)
+        setEditor({
+          ...(role === "org_manager" || role === "center_manager" ? { manager: role } : {}),
+        });
+    },
+    canCreate,
     notice: visible ? (
       <div className="space-y-3">
         <Alert>
@@ -200,29 +282,53 @@ export function useSettingsTeam({
           </AlertDescription>
         </Alert>
         {enabled && (
-          <Field>
-            <FieldLabel htmlFor="team-role-filter">
-              {t(($) => $.settings.teamNative.roleFilter)}
-            </FieldLabel>
-            <NativeSelect
-              id="team-role-filter"
-              value={role}
-              disabled={locked}
-              onChange={(event) => {
-                if (teamRoles.includes(event.target.value as TeamRole)) {
-                  setRole(event.target.value as TeamRole);
-                  setCursors([undefined]);
-                  setIndex(0);
-                }
-              }}
-            >
-              {teamRoles.map((value) => (
-                <NativeSelectOption key={value} value={value}>
-                  {t(($) => $.settings.teamNative.roles[value])}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </Field>
+          <div className="flex flex-wrap gap-3">
+            <Field>
+              <FieldLabel htmlFor="team-role-filter">
+                {t(($) => $.settings.teamNative.roleFilter)}
+              </FieldLabel>
+              <NativeSelect
+                id="team-role-filter"
+                value={role}
+                disabled={locked}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (roleOptions.includes(value as TeamDirectoryRole)) {
+                    setCenterRole(value as TeamDirectoryRole);
+                    reset();
+                  }
+                }}
+              >
+                {roleOptions.map((value) => (
+                  <NativeSelectOption key={value} value={value}>
+                    {t(($) => $.settings.teamNative.roles[value])}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="team-state-filter">
+                {t(($) => $.settings.teamNative.stateFilter)}
+              </FieldLabel>
+              <NativeSelect
+                id="team-state-filter"
+                value={state}
+                disabled={locked}
+                onChange={(event) => {
+                  if (event.target.value === "active" || event.target.value === "inactive") {
+                    setState(event.target.value);
+                    reset();
+                  }
+                }}
+              >
+                {(["active", "inactive"] as const).map((value) => (
+                  <NativeSelectOption key={value} value={value}>
+                    {t(($) => $.settings.teamNative.states[value])}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </Field>
+          </div>
         )}
         {(error || page.isError || permissions.isError) && (
           <Alert variant="destructive">
@@ -245,11 +351,12 @@ export function useSettingsTeam({
     ) : null,
     dialog: (
       <>
-        {editor && enabled && (
+        {editor && enabled && !denied && (
           <SettingsTeamEditor
-            key={editor.person?.id ?? "new"}
+            key={`${editor.person?.id ?? "new"}:${editor.manager ?? "operational"}:${level}`}
             scope={scope}
             initial={editor.person}
+            manager={editor.manager}
             onClose={() => {
               if (!locked) setEditor(undefined);
             }}
@@ -258,7 +365,7 @@ export function useSettingsTeam({
             onAccessLost={onAccessLost}
           />
         )}
-        {review && enabled && review.operation === "permission_set_v1" && (
+        {review && enabled && !denied && review.operation === "permission_set_v1" && (
           <SettingsReviewDialog
             open
             title={t(($) => $.settings.teamNative.permissionTitle)}

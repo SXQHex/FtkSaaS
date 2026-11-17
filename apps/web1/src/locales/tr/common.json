@@ -1879,7 +1879,9 @@
       "roles": {
         "staff": "Personel",
         "instructor": "Eğitmen",
-        "assistant": "Asistan"
+        "assistant": "Asistan",
+        "center_manager": "Merkez yöneticisi",
+        "org_manager": "Organizasyon yöneticisi"
       },
       "roleScope": "Yalnız seçili merkezin operasyonel görevi.",
       "review": "Tek görev değişikliğini ve varsa ders etkisini inceleyip ayrı onayla. Görev ataması doğrulanmış hesap erişimi yerine geçmez.",
@@ -1894,8 +1896,8 @@
       "selectPermissions": "İzinleri seç",
       "bound": "Doğrulanmış hesaba bağlı",
       "unbound": "Hesap erişimi bağlı değil",
-      "directoryHint": "Liste seçili operasyonel görevin native sayfasıdır. İzinler yalnız açıkça seçilen personel/eğitmen için okunur. Yönetici görevlerinin keşfi ayrıca bekliyor.",
-      "roleFilter": "Operasyonel görev",
+      "directoryHint": "Görev ve durum filtreleri listenin tamamına uygulanır. Organizasyon yöneticileri organizasyon kapsamında, diğer görevler seçili merkezde okunur. Hesap daveti Hesaplar ve davetler ekranından gönderilir.",
+      "roleFilter": "Görev türü",
       "permissionTitle": "Devredilen izni değiştir",
       "permissionHint": "Tek kişinin seçili merkezdeki izni güncel kişi sürümüyle değiştirilir. Bir görev veya yönetici yetkisi verilmez.",
       "replacementNeeded": "Yeni eğitmen ataması gerekecek",
@@ -1908,8 +1910,16 @@
         "attendance.draft": "Yoklama taslağı",
         "sale.write": "Satış",
         "finance.collect": "Tahsilat",
-        "reservation.capacity_override": "Kapasite istisnası"
-      }
+        "reservation.capacity_override": "Kapasite istisnası",
+        "sale.discount": "Satış indirimi"
+      },
+      "stateFilter": "Görev durumu",
+      "states": {
+        "active": "Aktif",
+        "inactive": "Pasif"
+      },
+      "addRole": "Görev ver",
+      "bind": "{{role}} görevini hesap bağına bağla"
     },
     "notificationNative": {
       "systemContent": "Sistem bildirim içeriği",

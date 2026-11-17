@@ -34,6 +34,15 @@ test("settings creates a master and an explicitly selected center relation with 
         brand_packages: [],
         limitations: [],
       });
+    if (operation === "settings_get_v1" && r.scope === "organization")
+      return send({
+        scope: "organization",
+        version: 1,
+        values: { address: "" },
+        logo: null,
+        overridden_fields: [],
+        as_of: "2026-11-17T00:00:00Z",
+      });
     if (operation === "roles_list_v1")
       return send({
         items: [

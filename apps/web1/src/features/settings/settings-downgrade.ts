@@ -54,6 +54,7 @@ export async function readDowngradeSource(
       row.entity?.type !== "saas_subscriptions" ||
       row.current?.operation !== operation ||
       row.current.values.target_plan_id !== targetId ||
+      (centerId !== undefined && row.current.values.kept_center_id !== centerId) ||
       row.current.values.expected_version !== version
     )
       throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");

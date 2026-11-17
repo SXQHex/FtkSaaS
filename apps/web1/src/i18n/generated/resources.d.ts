@@ -4323,10 +4323,12 @@ export default interface Resources {
       },
       "teamHint": "Eğitmenler Stüdyo sayfasında yönetilir. Roller ve izinler ayrı işlemlerdir.",
       "teamNative": {
+        "addRole": "Görev ver",
         "affected": "Etkilenen dersler",
         "assignmentRemoved": "Görev kaldırılacak",
+        "bind": "{{role}} görevini hesap bağına bağla",
         "bound": "Doğrulanmış hesaba bağlı",
-        "directoryHint": "Liste seçili operasyonel görevin native sayfasıdır. İzinler yalnız açıkça seçilen personel/eğitmen için okunur. Yönetici görevlerinin keşfi ayrıca bekliyor.",
+        "directoryHint": "Görev ve durum filtreleri listenin tamamına uygulanır. Organizasyon yöneticileri organizasyon kapsamında, diğer görevler seçili merkezde okunur. Hesap daveti Hesaplar ve davetler ekranından gönderilir.",
         "edit": "Görevi düzenle",
         "error": "Ekip/izin kaynağı okunamadı veya görev durumu değişti. Güncel kaynağı okuyup yeniden incele.",
         "find": "Kişileri bul",
@@ -4342,21 +4344,29 @@ export default interface Resources {
           "person.manage": "Kişi yönetimi",
           "reservation.capacity_override": "Kapasite istisnası",
           "reservation.write": "Rezervasyon işlemleri",
+          "sale.discount": "Satış indirimi",
           "sale.write": "Satış"
         },
         "reason": "Görev kaldırma gerekçesi",
         "replacementNeeded": "Yeni eğitmen ataması gerekecek",
         "review": "Tek görev değişikliğini ve varsa ders etkisini inceleyip ayrı onayla. Görev ataması doğrulanmış hesap erişimi yerine geçmez.",
-        "roleFilter": "Operasyonel görev",
+        "roleFilter": "Görev türü",
         "roleScope": "Yalnız seçili merkezin operasyonel görevi.",
         "roles": {
           "assistant": "Asistan",
+          "center_manager": "Merkez yöneticisi",
           "instructor": "Eğitmen",
+          "org_manager": "Organizasyon yöneticisi",
           "staff": "Personel"
         },
         "search": "Mevcut kişiyi ara",
         "selectPermissions": "İzinleri seç",
         "sessionCount": "{{count}} ders" | "{{count}} ders",
+        "stateFilter": "Görev durumu",
+        "states": {
+          "active": "Aktif",
+          "inactive": "Pasif"
+        },
         "title": "Ekip rolünü düzenle",
         "unbound": "Hesap erişimi bağlı değil"
       },

@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { PersonView } from "../../lib/api-contracts/generated";
 import type { ClientScope } from "../../lib/scoped-backend";
-import { readPeoplePage, readPerson } from "../people/people";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { TeamSheet } from "./team-sheet";
@@ -13,17 +12,21 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import {
   teamRoles,
+  readTeamPeople,
+  readTeamPerson,
   readTeamPersonRoles,
   prepareTeamRole,
   writeTeam,
   teamReceipt,
   teamResult,
-  type TeamRole,
+  type TeamDirectoryRole,
+  type ManagerRole,
   type TeamIntent,
 } from "./settings-team";
 export function SettingsTeamEditor({
   scope,
   initial,
+  manager,
   onSaved,
   onClose,
   onLockChange,
@@ -31,18 +34,20 @@ export function SettingsTeamEditor({
 }: {
   scope: ClientScope;
   initial?: PersonView;
+  manager?: ManagerRole;
   onSaved: () => Promise<void>;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
   const { t } = useTranslation();
+  const roleOptions: readonly TeamDirectoryRole[] = manager ? [manager] : teamRoles;
   const [person, setPerson] = useState(initial),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState(""),
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [index, setIndex] = useState(0),
-    [changes, setChanges] = useState<Partial<Record<TeamRole, boolean>>>({}),
+    [changes, setChanges] = useState<Partial<Record<TeamDirectoryRole, boolean>>>({}),
     [reason, setReason] = useState(""),
     [review, setReview] = useState<TeamIntent>(),
     [accepted, setAccepted] = useState(false),
@@ -57,15 +62,15 @@ export function SettingsTeamEditor({
     };
   }, []);
   const people = useQuery({
-    queryKey: ["settings-team-picker", scope, query, cursors[index]],
-    queryFn: () => readPeoplePage(scope, query, cursors[index]),
+    queryKey: ["settings-team-picker", scope, manager, query, cursors[index]],
+    queryFn: () => readTeamPeople(scope, query, cursors[index], manager),
     enabled: !person && query.trim().length >= 2,
     retry: false,
     refetchOnWindowFocus: false,
   });
   const roles = useQuery({
-    queryKey: ["settings-team-person-roles", scope, person?.id],
-    queryFn: () => readTeamPersonRoles(scope, person!.id),
+    queryKey: ["settings-team-person-roles", scope, manager, person?.id],
+    queryFn: () => readTeamPersonRoles(scope, person!.id, manager),
     enabled: !!person,
     retry: false,
     refetchOnWindowFocus: false,
@@ -86,10 +91,12 @@ export function SettingsTeamEditor({
     onLockChange(locked);
     return () => onLockChange(false);
   }, [locked, onLockChange]);
-  const active = (role: TeamRole) =>
+  const active = (role: TeamDirectoryRole) =>
     current?.some(
       (row) =>
-        row.role === role && row.scope_center_id === scope.centerId && row.state === "active",
+        row.role === role &&
+        row.scope_center_id === (role === "org_manager" ? null : scope.centerId) &&
+        row.state === "active",
     ) === true;
   async function prepare() {
     if (!person || !current || Object.keys(changes).length !== 1 || locked || busy.current) return;
@@ -98,7 +105,13 @@ export function SettingsTeamEditor({
     setError(false);
     try {
       const [role, value] = Object.entries(changes)[0]!;
-      const intent = await prepareTeamRole(scope, person.id, role as TeamRole, value!, reason);
+      const intent = await prepareTeamRole(
+        scope,
+        person.id,
+        role as TeamDirectoryRole,
+        value!,
+        reason,
+      );
       if (mounted.current) {
         command.reset();
         setAccepted(false);
@@ -117,7 +130,7 @@ export function SettingsTeamEditor({
     setPreparing(true);
     setError(false);
     try {
-      const result = await readPerson(scope, id);
+      const result = await readTeamPerson(scope, id, manager);
       if (mounted.current) {
         setPerson(result);
         setChanges({});
@@ -144,7 +157,7 @@ export function SettingsTeamEditor({
           },
           ...Object.entries(changes).map(([role, value]) => ({
             id: role,
-            title: t(($) => $.settings.teamNative.roles[role as TeamRole]),
+            title: t(($) => $.settings.teamNative.roles[role as TeamDirectoryRole]),
             detail: value ? t(($) => $.settings.on) : t(($) => $.settings.off),
           })),
           ...(review.operation === "role_revoke_v1" && review.preview
@@ -209,7 +222,7 @@ export function SettingsTeamEditor({
       }}
       roles={
         person && current
-          ? teamRoles.map((role) => ({
+          ? roleOptions.map((role) => ({
               key: role,
               label: t(($) => $.settings.teamNative.roles[role]),
               description: t(($) => $.settings.teamNative.roleScope),
@@ -222,8 +235,8 @@ export function SettingsTeamEditor({
       dirty={!!person && !!current && Object.keys(changes).length === 1}
       locked={locked}
       onRole={(key, value) => {
-        if (!teamRoles.includes(key as TeamRole) || locked) return;
-        const role = key as TeamRole;
+        if (!roleOptions.includes(key as TeamDirectoryRole) || locked) return;
+        const role = key as TeamDirectoryRole;
         setChanges((previous) => {
           const next = { ...previous };
           if (value === active(role)) delete next[role];
@@ -302,6 +315,29 @@ export function SettingsTeamEditor({
               </div>
             </>
           )}
+          {!manager &&
+            current
+              ?.filter(
+                (row) =>
+                  row.scope_center_id === scope.centerId &&
+                  row.state === "active" &&
+                  row.account_access_granted === false &&
+                  teamRoles.includes(row.role as (typeof teamRoles)[number]),
+              )
+              .map((row) => (
+                <Button
+                  key={row.id}
+                  variant="outline"
+                  isDisabled={locked}
+                  onPress={() => setChanges({ [row.role]: true })}
+                >
+                  {t(($) => $.settings.teamNative.bind, {
+                    role: t(
+                      ($) => $.settings.teamNative.roles[row.role as (typeof teamRoles)[number]],
+                    ),
+                  })}
+                </Button>
+              ))}
           {person && (
             <Field>
               <FieldLabel htmlFor="team-revocation-reason">

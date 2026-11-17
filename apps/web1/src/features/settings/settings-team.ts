@@ -9,9 +9,16 @@ import type {
   RequestRoleAssign,
   RequestRoleRevoke,
   RequestPermissionSet,
+  RequestOrgManagerAssign,
+  RequestOrgManagerRevoke,
+  RequestCenterManagerAssign,
+  RequestCenterManagerRevoke,
 } from "../../lib/api-contracts/generated";
 export const teamRoles = ["staff", "instructor", "assistant"] as const;
 export type TeamRole = (typeof teamRoles)[number];
+export type ManagerRole = "org_manager" | "center_manager";
+export type TeamDirectoryRole = TeamRole | ManagerRole;
+export const directoryRoles = [...teamRoles, "center_manager", "org_manager"] as const;
 export const teamPermissions = [
   "person.manage",
   "person.activate",
@@ -21,6 +28,7 @@ export const teamPermissions = [
   "sale.write",
   "finance.collect",
   "reservation.capacity_override",
+  "sale.discount",
 ] as const satisfies readonly Permission[];
 export type TeamPermission = (typeof teamPermissions)[number];
 const common = (scope: ClientScope) => ({
@@ -28,51 +36,64 @@ const common = (scope: ClientScope) => ({
   org_id: scope.orgId,
   center_id: scope.centerId,
 });
-export async function readTeamPage(scope: ClientScope, role: TeamRole, cursor?: string) {
+const organizationCommon = (scope: ClientScope) => ({
+  client_api_version: 1 as const,
+  org_id: scope.orgId,
+});
+export async function readTeamPage(
+  scope: ClientScope,
+  role: TeamDirectoryRole,
+  cursor?: string,
+  level: "center" | "organization" = "center",
+  state: "active" | "inactive" = "active",
+) {
   const backend = await scopedBackend(scope);
-  const page = await backend.call("management_state_get_v1", {
-    ...common(scope),
+  const organization = level === "organization" || role === "org_manager";
+  const page = await backend.call("roles_list_v1", {
+    ...(organization ? organizationCommon(scope) : common(scope)),
     request_id: uuidv7(),
-    operation: "role_assign_v1",
-    selector: { operation: "role_assign_v1", key: { role, scope: { center_id: scope.centerId } } },
+    role,
+    state,
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
-  if (page.items.length > 20 || (cursor && page.next_cursor === cursor))
+  if (
+    page.items.length > 20 ||
+    (cursor && page.next_cursor === cursor) ||
+    new Set(page.items.map((row) => row.id)).size !== page.items.length
+  )
     throw Error("TEAM_SOURCE_INVALID");
   const records = page.items.map((row) => {
     if (
-      row.current?.operation !== "role_assign_v1" ||
-      row.current.values.role !== role ||
-      row.current.values.scope?.center_id !== scope.centerId ||
-      !row.current.values.person_id ||
-      row.entity?.type !== "role_assignments"
+      row.role !== role ||
+      row.state !== state ||
+      (role === "org_manager"
+        ? row.scope_center_id !== null
+        : !organization && row.scope_center_id !== scope.centerId)
     )
       throw Error("TEAM_SOURCE_INVALID");
-    const version = row.versions.filter(
-      (item) => item.entity.type === "role_assignments" && item.entity.id === row.entity!.id,
-    );
-    if (version.length !== 1) throw Error("TEAM_SOURCE_INVALID");
+    z.uuid().parse(row.id);
+    z.uuid().parse(row.person_id);
     return {
-      id: row.entity.id,
-      personId: row.current.values.person_id,
+      id: row.id,
+      personId: row.person_id,
       role,
       state: row.state,
-      version: z.number().int().positive().safe().parse(version[0]!.version),
+      version: z.number().int().positive().safe().parse(row.version),
       bound: row.account_access_granted ?? null,
     };
   });
   const people = new Map<string, Awaited<ReturnType<typeof backend.call<"person_get_v1">>>>();
   const ids = [...new Set(records.map((row) => row.personId))];
-  // Only this visible native page needs names; no center-wide people scan.
   for (let start = 0; start < ids.length; start += 4)
     await Promise.all(
       ids.slice(start, start + 4).map(async (id) => {
         const person = await backend.call("person_get_v1", {
-          ...common(scope),
+          ...(organization ? organizationCommon(scope) : common(scope)),
           request_id: uuidv7(),
           person_id: id,
         });
-        if (person.id !== id) throw Error("TEAM_SOURCE_INVALID");
+        if (person.id !== id && !person.linked_person_ids?.includes(id))
+          throw Error("TEAM_SOURCE_INVALID");
         people.set(id, person);
       }),
     );
@@ -81,13 +102,37 @@ export async function readTeamPage(scope: ClientScope, role: TeamRole, cursor?: 
     records: records.map((row) => ({ ...row, person: people.get(row.personId)! })),
   };
 }
-export async function readTeamPersonRoles(scope: ClientScope, personId: string) {
+export async function readTeamPeople(
+  scope: ClientScope,
+  query: string,
+  cursor?: string,
+  manager?: ManagerRole,
+) {
+  return (await scopedBackend(scope)).call("people_list_v1", {
+    ...(manager ? organizationCommon(scope) : common(scope)),
+    request_id: uuidv7(),
+    query: z.string().trim().min(2).max(200).parse(query),
+    page: { limit: 20, ...(cursor ? { cursor } : {}) },
+  });
+}
+export async function readTeamPerson(scope: ClientScope, id: string, manager?: ManagerRole) {
+  return (await scopedBackend(scope)).call("person_get_v1", {
+    ...(manager ? organizationCommon(scope) : common(scope)),
+    request_id: uuidv7(),
+    person_id: z.uuid().parse(id),
+  });
+}
+export async function readTeamPersonRoles(
+  scope: ClientScope,
+  personId: string,
+  manager?: ManagerRole,
+) {
   const backend = await scopedBackend(scope),
     items: RoleView[] = [];
   let cursor: string | undefined;
   do {
     const page = await backend.call("roles_list_v1", {
-      ...common(scope),
+      ...(manager === "org_manager" ? organizationCommon(scope) : common(scope)),
       request_id: uuidv7(),
       person_id: z.uuid().parse(personId),
       page: { limit: 100, ...(cursor ? { cursor } : {}) },
@@ -139,10 +184,14 @@ export async function readTeamPermission(
     version: z.number().int().positive().safe().parse(versions[0]!.version),
   };
 }
-export async function readTeamPermissions(scope: ClientScope, personId: string) {
+export async function readTeamPermissions(
+  scope: ClientScope,
+  personId: string,
+  permissions: readonly TeamPermission[] = teamPermissions,
+) {
   const backend = await scopedBackend(scope);
   return Promise.all(
-    teamPermissions.map((permission) => readTeamPermission(scope, personId, permission, backend)),
+    permissions.map((permission) => readTeamPermission(scope, personId, permission, backend)),
   );
 }
 export type TeamIntent =
@@ -161,21 +210,113 @@ export type TeamIntent =
       scope: ClientScope;
       operation: "permission_set_v1";
       request: Omit<RequestPermissionSet, "request_id">;
+    }
+  | {
+      scope: ClientScope;
+      operation: "org_manager_assign_v1";
+      request: Omit<RequestOrgManagerAssign, "request_id">;
+    }
+  | {
+      scope: ClientScope;
+      operation: "center_manager_assign_v1";
+      request: Omit<RequestCenterManagerAssign, "request_id">;
+    }
+  | {
+      scope: ClientScope;
+      operation: "org_manager_revoke_v1";
+      request: Omit<RequestOrgManagerRevoke, "request_id">;
+      assignmentId: string;
+    }
+  | {
+      scope: ClientScope;
+      operation: "center_manager_revoke_v1";
+      request: Omit<RequestCenterManagerRevoke, "request_id">;
+      assignmentId: string;
     };
-export async function prepareTeamRole(
+async function prepareManagerRole(
   scope: ClientScope,
   personId: string,
-  role: TeamRole,
+  role: ManagerRole,
   enabled: boolean,
   reason: string,
 ): Promise<TeamIntent> {
+  const current = await readTeamPersonRoles(scope, personId, role),
+    active = current.find(
+      (row) =>
+        row.role === role &&
+        row.scope_center_id === (role === "org_manager" ? null : scope.centerId) &&
+        row.state === "active",
+    );
+  if (enabled && active) throw Error("TEAM_ROLE_ALREADY_ACTIVE");
+  if (!enabled && !active) throw Error("TEAM_ROLE_NOT_ACTIVE");
+  const operation =
+    role === "org_manager"
+      ? enabled
+        ? "org_manager_assign_v1"
+        : "org_manager_revoke_v1"
+      : enabled
+        ? "center_manager_assign_v1"
+        : "center_manager_revoke_v1";
+  const scoped = role === "org_manager" ? organizationCommon(scope) : common(scope);
+  const page = await (
+    await scopedBackend(scope)
+  ).call("management_state_get_v1", {
+    ...scoped,
+    request_id: uuidv7(),
+    operation,
+    selector: { operation, key: { person_id: personId } },
+    page: { limit: 1 },
+  });
+  const row = page.items[0];
+  if (
+    page.items.length !== 1 ||
+    page.next_cursor ||
+    row?.operation !== operation ||
+    (!enabled && !row.exists) ||
+    (row.current &&
+      (row.current.operation !== operation || row.current.values.person_id !== personId))
+  )
+    throw Error("TEAM_SOURCE_INVALID");
+  const request = { ...scoped, operation_key: uuidv7(), person_id: personId };
+  if (enabled)
+    return role === "org_manager"
+      ? { scope: { ...scope }, operation: "org_manager_assign_v1", request }
+      : { scope: { ...scope }, operation: "center_manager_assign_v1", request };
+  const revoke = {
+    ...request,
+    expected_version: active!.version,
+    reason: z.string().trim().min(1).max(1000).parse(reason),
+  };
+  return role === "org_manager"
+    ? {
+        scope: { ...scope },
+        operation: "org_manager_revoke_v1",
+        request: revoke,
+        assignmentId: active!.id,
+      }
+    : {
+        scope: { ...scope },
+        operation: "center_manager_revoke_v1",
+        request: revoke,
+        assignmentId: active!.id,
+      };
+}
+export async function prepareTeamRole(
+  scope: ClientScope,
+  personId: string,
+  role: TeamDirectoryRole,
+  enabled: boolean,
+  reason: string,
+): Promise<TeamIntent> {
+  if (role === "org_manager" || role === "center_manager")
+    return prepareManagerRole(scope, personId, role, enabled, reason);
   const current = await readTeamPersonRoles(scope, personId),
     active = current.find(
       (row) =>
         row.role === role && row.scope_center_id === scope.centerId && row.state === "active",
     );
   if (enabled) {
-    if (active) throw Error("TEAM_ROLE_ALREADY_ACTIVE");
+    if (active && active.account_access_granted !== false) throw Error("TEAM_ROLE_ALREADY_ACTIVE");
     return {
       scope: { ...scope },
       operation: "role_assign_v1",
@@ -247,6 +388,14 @@ export async function writeTeam(intent: TeamIntent) {
     return backend.call(intent.operation, { ...intent.request, request_id });
   if (intent.operation === "role_revoke_v1")
     return backend.call(intent.operation, { ...intent.request, request_id });
+  if (intent.operation === "org_manager_assign_v1")
+    return backend.call(intent.operation, { ...intent.request, request_id });
+  if (intent.operation === "center_manager_assign_v1")
+    return backend.call(intent.operation, { ...intent.request, request_id });
+  if (intent.operation === "org_manager_revoke_v1")
+    return backend.call(intent.operation, { ...intent.request, request_id });
+  if (intent.operation === "center_manager_revoke_v1")
+    return backend.call(intent.operation, { ...intent.request, request_id });
   return backend.call(intent.operation, { ...intent.request, request_id });
 }
 export async function teamReceipt(intent: TeamIntent) {
@@ -281,6 +430,28 @@ export async function teamResult(intent: TeamIntent, id?: string) {
       result.enabled !== intent.request.enabled ||
       !result.overrideExists ||
       result.version <= intent.request.expected_version
+    )
+      throw Error("TEAM_RESULT_UNAVAILABLE");
+    return;
+  }
+  if (
+    intent.operation === "org_manager_assign_v1" ||
+    intent.operation === "center_manager_assign_v1" ||
+    intent.operation === "org_manager_revoke_v1" ||
+    intent.operation === "center_manager_revoke_v1"
+  ) {
+    const role = intent.operation.startsWith("org_") ? "org_manager" : "center_manager";
+    const roles = await readTeamPersonRoles(intent.scope, intent.request.person_id, role);
+    const revoke = "assignmentId" in intent;
+    if (revoke && id !== intent.assignmentId) throw Error("TEAM_RESULT_UNAVAILABLE");
+    if (
+      !roles.some(
+        (row) =>
+          row.id === id &&
+          row.role === role &&
+          row.scope_center_id === (role === "org_manager" ? null : intent.scope.centerId) &&
+          row.state === (revoke ? "inactive" : "active"),
+      )
     )
       throw Error("TEAM_RESULT_UNAVAILABLE");
     return;

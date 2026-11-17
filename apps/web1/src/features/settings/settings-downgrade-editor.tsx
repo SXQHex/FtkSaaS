@@ -56,6 +56,7 @@ export function SettingsDowngradeEditor({
   const [pages, setPages] = useState<
     Partial<Record<RetainedKind, { cursors: (string | undefined)[]; index: number }>>
   >({});
+  const [names, setNames] = useState<Record<string, string>>({});
   const busy = useRef(false),
     active = useRef(true);
   useEffect(() => {
@@ -160,9 +161,15 @@ export function SettingsDowngradeEditor({
                   id: "scope",
                   title: t(($) => $.settings.downgrade.retained),
                   detail: t(($) => $.settings.downgrade.selection, {
-                    room: review.kept.room_id ?? t(($) => $.settings.downgrade.none),
-                    discipline: review.kept.discipline_id ?? t(($) => $.settings.downgrade.none),
-                    instructor: review.kept.instructor_id ?? t(($) => $.settings.downgrade.none),
+                    room:
+                      (review.kept.room_id ? names[review.kept.room_id] : undefined) ??
+                      t(($) => $.settings.downgrade.none),
+                    discipline:
+                      (review.kept.discipline_id ? names[review.kept.discipline_id] : undefined) ??
+                      t(($) => $.settings.downgrade.none),
+                    instructor:
+                      (review.kept.instructor_id ? names[review.kept.instructor_id] : undefined) ??
+                      t(($) => $.settings.downgrade.none),
                     students: review.kept.student_person_ids.length,
                   }),
                 },
@@ -217,10 +224,24 @@ export function SettingsDowngradeEditor({
           setTarget(value);
           setCenter("");
           setKept(structuredClone(blank));
+          setNames({});
           setPages({});
         }
       }}
-      effects={null}
+      effects={
+        target &&
+        (!target.kept_center_required || centerId) &&
+        (target.plan !== "starter" ||
+          sources.every((source) => source.isSuccess && !source.isFetching))
+          ? [
+              {
+                id: "date",
+                title: t(($) => $.settings.downgrade.effective),
+                detail: date(target.effective_at),
+              },
+            ]
+          : null
+      }
       locked={locked}
       onReview={() => void prepare()}
       onClose={onClose}
@@ -239,6 +260,7 @@ export function SettingsDowngradeEditor({
                 onChange={(event) => {
                   setCenter(event.target.value);
                   setKept(structuredClone(blank));
+                  setNames({});
                   setPages({});
                 }}
               >
@@ -318,15 +340,24 @@ export function SettingsDowngradeEditor({
                   ) : (
                     <NativeSelect
                       aria-label={t(($) => $.settings.downgrade.resources[kind])}
-                      value={resources.some((row) => row.id === kept[key]) ? (kept[key] ?? "") : ""}
+                      value={kept[key] ?? ""}
                       disabled={locked || source.isPending}
-                      onChange={(event) =>
-                        setKept((previous) => ({ ...previous, [key]: event.target.value || null }))
-                      }
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        const selected = resources.find((row) => row.id === value);
+                        if (selected)
+                          setNames((previous) => ({ ...previous, [value]: selected.display_name }));
+                        setKept((previous) => ({ ...previous, [key]: value || null }));
+                      }}
                     >
                       <NativeSelectOption value="">
                         {t(($) => $.settings.downgrade.none)}
                       </NativeSelectOption>
+                      {kept[key] && !resources.some((row) => row.id === kept[key]) && (
+                        <NativeSelectOption value={kept[key]!}>
+                          {names[kept[key]!] ?? kept[key]}
+                        </NativeSelectOption>
+                      )}
                       {resources.map((row) => (
                         <NativeSelectOption key={row.id} value={row.id}>
                           {row.display_name}
@@ -339,7 +370,9 @@ export function SettingsDowngradeEditor({
                       ? t(($) => $.settings.downgrade.studentCount, {
                           count: kept.student_person_ids.length,
                         })
-                      : (kept[key] ?? t(($) => $.settings.downgrade.none))}
+                      : kept[key]
+                        ? (names[kept[key]!] ?? kept[key])
+                        : t(($) => $.settings.downgrade.none)}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button

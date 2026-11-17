@@ -39,11 +39,11 @@ export function SettingsPolicyEditor({
 }) {
   const { t } = useTranslation();
   const initial: Record<string, string> = {};
-  if (before.value.kind !== "documents")
+  if (before.value.kind !== "documents") {
     for (const [key, value] of Object.entries(before.value)) {
       if (key === "kind") continue;
-      if (key === "terms" && typeof value === "object" && value)
-        for (const [part, entry] of Object.entries(value))
+      if (key === "terms" && typeof value === "object" && value) {
+        for (const [part, entry] of Object.entries(value)) {
           if (entry === null) initial[part] = "";
           else if (
             typeof entry === "string" ||
@@ -51,8 +51,15 @@ export function SettingsPolicyEditor({
             typeof entry === "boolean"
           )
             initial[part] = String(entry);
-          else initial[key] = String(value);
+        }
+      } else if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+      )
+        initial[key] = String(value);
     }
+  }
   const [draft, setDraft] = useState(initial),
     [time, setTime] = useState(""),
     [reason, setReason] = useState(""),
