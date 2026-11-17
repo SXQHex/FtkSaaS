@@ -132,7 +132,22 @@ export function MergeContent({
     onAccessLost: accessLost,
     onRefresh: async () => {
       await queries.invalidateQueries({
-        queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+        // Aliases can carry history across centers. Revisit their native profile
+        // and balances before reusing a previously warm result in this organization.
+        predicate: ({ queryKey }) =>
+          queryKey[1] === scope.accountId &&
+          queryKey[2] === scope.orgId &&
+          [
+            "people",
+            "profile-person",
+            "profile-rights",
+            "profile-ledger",
+            "profile-reservations",
+            "profile-negative-limit",
+            "finance",
+            "person-editor",
+          ].includes(String(queryKey[0])),
+        refetchType: "none",
       });
       const result = await directory.refetch();
       if (result.error) throw result.error;

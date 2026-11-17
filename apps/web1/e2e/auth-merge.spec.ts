@@ -1,6 +1,7 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
+import { mockMemberLifecycle } from "./member-lifecycle-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type {
@@ -9,8 +10,8 @@ import type {
   ManagementStateView,
 } from "../src/lib/api-contracts/generated.js";
 const previewId = "019a7b00-0000-7000-8000-000000000081";
-async function mockMerge(page: Page) {
-  await mockStudio(page);
+async function mockMerge(page: Page, reuseStudio = false) {
+  if (!reuseStudio) await mockStudio(page);
   const state = {
     decision: "merge" as "merge" | "not_duplicate",
     reason: "",
@@ -388,4 +389,59 @@ test("Merge: a denied directory clears private selection and offers only explici
   await page.getByRole("button", { name: "Güncel durumu oku", exact: true }).click();
   await expect.poll(() => state.reads.length).toBe(2);
   expect(state.writes).toHaveLength(0);
+});
+
+test("Merge: returning to a warm canonical profile rereads old rights and debt in the same SPA document", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-11-18T08:00:00Z"));
+  const f = await mockMemberLifecycle(page);
+  const reads = { rights: 0, finance: 0 };
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1)!;
+    if (op === "entitlements_get_v1") reads.rights++;
+    if (op === "finance_get_v1") reads.finance++;
+    return route.fallback();
+  });
+  // Load finance into the existing profile as well as its initial rights snapshot.
+  await page.locator("#member-finance-currency").fill("TRY");
+  await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
+  await expect.poll(() => reads.finance).toBeGreaterThan(0);
+  await expect(page.getByText("8", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("₺1.000,00", { exact: true }).first()).toBeVisible();
+  const warmRights = reads.rights,
+    warmFinance = reads.finance;
+  const documentTime = await page.evaluate(() => performance.timeOrigin);
+  const state = await mockMerge(page, true);
+  await page
+    .getByRole("navigation", { name: "Ana menü", exact: true })
+    .getByRole("link", { name: "Üyeler", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Kişileri birleştir", exact: true }).click();
+  await selectPair(page);
+  await page.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü tarihçe birleştirme");
+  await page.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await expect(
+    page.getByText("Güncel birleşim önizlemesi yüklendi.", { exact: true }),
+  ).toBeVisible();
+  await review(page);
+  await page.getByRole("button", { name: "Kayıtları birleştir", exact: true }).click();
+  await expect(
+    page.getByText("İşlem kaydedildi ve güncel sonuç okundu.", { exact: true }).first(),
+  ).toBeVisible();
+  // The backend owns aggregation/history; this fixture models its newer canonical view.
+  f.rights[0]!.available = 15;
+  f.person.display_name = "Birleşmiş sentetik kişi";
+  await page.getByRole("link", { name: "Profili aç", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: f.person.display_name, exact: true }),
+  ).toBeVisible();
+  await expect.poll(() => reads.rights).toBeGreaterThan(warmRights);
+  await expect(page.getByText("15", { exact: true }).first()).toBeVisible();
+  await page.locator("#member-finance-currency").fill("TRY");
+  await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
+  await expect.poll(() => reads.finance).toBeGreaterThan(warmFinance);
+  await expect(page.getByText("₺1.000,00", { exact: true }).first()).toBeVisible();
+  expect(state.effects).toBe(1);
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);
 });
