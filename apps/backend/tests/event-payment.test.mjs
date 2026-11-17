@@ -418,3 +418,4 @@ import './event-directory-finance-acceptance.mjs';
 import './ledger-inbox-automation-acceptance.mjs';
 import './intake-crm-work-acceptance.mjs';
 import './public-program-discovery-acceptance.mjs';
+import './report-finance-tracking-acceptance.mjs';

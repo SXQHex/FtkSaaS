@@ -1229,6 +1229,9 @@ Web/reklam ortak CRM entegrasyonu üretim P08'dir; yukarıdaki kabul mevcut publ
 
 ##### FD10 — iş otomasyonu rapor import (kabul edildi)
 
+17 Kasım rapor/işlem ekranı kararları: haftalık brüt satış, kaydedilmiş gerçek satış bedelidir; iptal/iade düşülmeden bütün satışlar kapsanır, tahsilat ciro yerine kullanılamaz. İşlem sayaçları ayrı native kaynak kayıtlarını sayar: ilgi bekleyen süresi dolmamış current önizleme; çalışan pending/running iş; yeniden denenecek retry_wait iş; tamamlanan succeeded iş/receipt ve applied önizlemedir. Aynı akışın receipt/job/preview kayıtları birleştirilmez. Güncel API tüketimi [WF10](../workflows.md#wf10) ve [WF00](../workflows.md#wf00) sahibindedir.
+
+
 17 Kasım kullanıcı kararı: segmentin bağımsız eşleşme hedef kitlesi seçili merkezde aktif kişi durumundaki bütün öğrenci ve aday kayıtlarıdır; aktif/pasif öğrencilik ve açık/kapalı aday geçmişi dahildir. Canonical kişi bir kez değerlendirilir. Worker kendi gerçek tetikleme koşullarını ayrıca korur. Bu teslim mevcut native sınırını açıklar ve segment/iş keşfi ile özetlerini tamamlar; yeni tetikleme/eylem kararı üretmez. Kesin tüketim [WF16](../workflows.md#wf16) sahibindedir.
 
 ST-03 teknik eşleme adayı: `ImportMapping.delimiter` opsiyonel kapalı virgül/noktalı virgül seçimidir; yokluğu eski virgül davranışını korur. Seçim tahmin edilmez, eşlemenin parçası olarak preview/bağımlılık/receipt istek hash'ine girer. Quoted separator, escaped quote, CRLF ve quoted newline aynı parser kurallarını kullanır; hatalı yapı/eşleme reddedilir. Hak/borç veya kişi birleştirme defaultu üretmez. Kaynak/native kabulü [alan devrinden](../settings.md) izlenir.

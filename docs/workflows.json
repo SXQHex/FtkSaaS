@@ -20,7 +20,9 @@
         "apps/backend/tests/edge-bundle-unit.mjs",
         "apps/backend/tests/discipline-presentation-unit.mjs",
         "apps/backend/tests/browser-cors-unit.mjs",
-        "apps/backend/tests/ledger-inbox-automation-unit.mjs"
+        "apps/backend/tests/ledger-inbox-automation-unit.mjs",
+        "apps/backend/tests/report-finance-tracking-unit.mjs",
+        "apps/backend/tests/report-finance-tracking-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -287,18 +289,21 @@
         "apps/backend/scripts/build-spa-ingress.mjs",
         "apps/backend/transports/spa-validators.mjs",
         "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql",
-        "apps/backend/scripts/compact-validator-errors.mjs"
+        "apps/backend/scripts/compact-validator-errors.mjs",
+        "apps/backend/database/tracking-discovery.sql",
+        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql"
       ],
       "operations": [
         "operation_status_get_v1",
         "preview_get_v1",
         "job_status_get_v1",
         "audit_list_v1",
-        "management_state_get_v1"
+        "management_state_get_v1",
+        "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "b99b40b963b28e84ce1188f13e46628b37c0110402bd719ce181824db89779a7",
-        "reason": "Reviewed intake/CRM/source work schema, four append migrations, runtime wrapper registration and test mapping; existing operations retain native authority."
+        "fingerprint": "1ca2925e551708a5a860650da6465f9b3b1bb409bb03cabcb64d00f4a17906dd",
+        "reason": "Reviewed source-authorized center audit and own native context tracking, approved counters, three append migrations and explicit native support limits."
       }
     },
     {
@@ -387,8 +392,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "0e249c518addfccdf4ae20a3bd21f728e45537d7d23feb42ffc72206417afcd8",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "b6ea7ba1f6bbba5537e9a9fc9ec455e6c75e4ae46c535fa40f678a172cc23ca0",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -502,8 +507,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "9dafc7c864391eba9e2f9eae0263a879c450dc23cab3c6a47eab29c2bdd456e0",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "b80e49c3db50e2d9a7b5742626e4dd351f9b1f9ce89551ea654e47e0caa10d67",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -618,8 +623,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "246c2e017d5d65e5030759e83796bebadf3353014bacd26d65ef68b0a36bf825",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "7109d9f48ef28a153e522fdddac1421db0d298cefb69558b2bf3b7fa3c9f34ef",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -735,8 +740,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "c166a8b0de8f4340880d9a725f2a36b9510fe77ac3aeb6a879e237e59a88b97e",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "24ded27d70098bdc77f8f6d4dfa445760f936c8dcea48ace65daada0f2aefa27",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -863,8 +868,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "c1a13c3390c9f33aa7c34c20d08201c8be593ad50edf7bf77112fc759bd2129c",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "c68b0661fd58e6f5d0066e806075fc1828f7ab590ecce0576b81aa9d1f2c40c5",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -969,8 +974,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "68a91425f8f7493d77c4b6311d93c044c176478ed5430e0601e9dce38d383e6b",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "7a2115f30c1217ef6fea1d3bdf5d2b333b9d06fd277b6429f874c66f356c3e66",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1038,8 +1043,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "d15548c0f9317df830856b5a7be4afd0b33904ca4547f0fa42f19f7bd5b44f0a",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "c192d042dd2a5125b754d11083e75b2226bd04c8c88f31c1674a7fd55fb32a8c",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1113,8 +1118,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "d104bec5bbee663257ed4e8de83ccbf59ae15617d045f44e5d405f0feeb54547",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "0576ca6d9c21f92f87165f94bf18e20f1fdc4fca6887c1c5a2e5a93e859154a6",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1222,8 +1227,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "7ecea5f7b6fb4e3920423648ca81c7b1eaad19cb13e430620612f27c7823423e",
-        "reason": "Reviewed independent default-off publication flags, anonymous discipline/detail projection, explicit active form binding and immutable actual consent source admission."
+        "fingerprint": "9011e23fdb3eb1540b7145b776b72843c1314440531820e18acfa90783954d47",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1243,7 +1248,9 @@
         "apps/backend/tests/crm-import-fixture.mjs",
         "apps/backend/tests/crm-import-parser-unit.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/report-finance-tracking-unit.mjs",
+        "apps/backend/tests/report-finance-tracking-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1269,7 +1276,13 @@
         "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
         "apps/backend/database/crm-import-email-warnings.sql",
         "apps/backend/supabase/migrations/20261112235502_crm_import_email_warnings.sql",
-        "apps/backend/scripts/acceptance/p10-hosted-import.mjs"
+        "apps/backend/scripts/acceptance/p10-hosted-import.mjs",
+        "apps/backend/database/report-discovery.sql",
+        "apps/backend/database/import-discovery.sql",
+        "apps/backend/database/instructor-finance-directory.sql",
+        "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql",
+        "apps/backend/supabase/migrations/20261117034912_report_import_discovery.sql",
+        "apps/backend/tests/report-worker-fixture.mjs"
       ],
       "operations": [
         "report_get_v1",
@@ -1279,11 +1292,12 @@
         "import_preview_v1",
         "import_apply_v1",
         "import_rows_list_v1",
-        "file_upload_complete_v1"
+        "file_upload_complete_v1",
+        "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "1c73ec39b9e3a9b10064b42c9fec80807c136bb6c8a3ca1728521c0c7bf7ef4b",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "4f55c5cc7bbe597dc3ea24bc9eab849d096e5e60cf57efc3e4a779a88aec9f41",
+        "reason": "Reviewed four actual-fact report kinds, native financial/Starter scope, selected CSV labels, own import config/jobs and complete-file filters; existing CSV worker unchanged."
       }
     },
     {
@@ -1354,8 +1368,8 @@
         "notifications_read_set_v1"
       ],
       "review": {
-        "fingerprint": "454a6a6630241b7ef7d3c830242b19820569da4954e2c6c4fcce41d06664b3a8",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "e24759d32e1b356858a1dbc83864f88c0027d970efcde957726d63ac480a90e5",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1492,8 +1506,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "6461198e12a22b9aee993bcb84a6f6911a1baba874598cb24f046bfe6140a765",
-        "reason": "Reviewed settings catalogue v24 native authority, explicit public form binding validation and actual submitted consent evidence; existing intake admission stays native."
+        "fingerprint": "b39e19b63e7ab1be249f47f11f309e1ddeae646c8095d15e2a004bfa7460b097",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1568,8 +1582,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "8650708018a9a94ef2eb7b53984900d31d83af369ec34c3dd9c084c2fcc36983",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "b70ca25b8f39bcd15208b1ca39534cd99025a447450d2858b54ab7707a29cf43",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1588,7 +1602,9 @@
         "apps/backend/tests/content-documents-acceptance.mjs",
         "apps/backend/tests/instructor-account-unit.mjs",
         "apps/backend/tests/ledger-inbox-automation-unit.mjs",
-        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
+        "apps/backend/tests/report-finance-tracking-unit.mjs",
+        "apps/backend/tests/report-finance-tracking-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1615,7 +1631,9 @@
         "apps/backend/database/instructor-self-account.sql",
         "apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql",
         "apps/backend/database/instructor-all-period-ledger.sql",
-        "apps/backend/supabase/migrations/20261116233014_instructor_all_period_ledger.sql"
+        "apps/backend/supabase/migrations/20261116233014_instructor_all_period_ledger.sql",
+        "apps/backend/database/instructor-finance-directory.sql",
+        "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1626,11 +1644,12 @@
         "instructor_agreements_list_v1",
         "instructor_agreement_get_v1",
         "instructor_agreement_accept_v1",
-        "instructor_account_get_v1"
+        "instructor_account_get_v1",
+        "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "38f876151ba03021ceaa8667ff4aaa1979de91b850d9a631bbdc1d1b23bd0be2",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "cb4d1ce94f474e072c8330799095175b291add5dee038981405e55a30c99c492",
+        "reason": "Reviewed exact native earning projection factoring and separate managerial history discovery, canonical aliases, real root payment version/corrections and currency/period balances."
       }
     },
     {
@@ -1708,8 +1727,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "e8a80ffecea6d29f3a70538f570a9d4fc69be41caa9133267a01479d4e57f44e",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "236deac362a60c9f392079f12f78a7c1550cdb1888d13b5aabd6eb864e249f5e",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1782,8 +1801,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "bf8895d78d8d99e7da117dd046255930a63f56903d99848012ef8d14d180c06e",
-        "reason": "Reviewed scoped CRM summaries/assignees/followups/trial discovery and source-authorized pending work queue; actual source read then explicit native command."
+        "fingerprint": "52c12fd5871374dfa0138eb4d64a6d1b80c6e1a5fed8a1ec762f3fdf83f26b6a",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1871,8 +1890,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "a62e82304064366bc68988a060265d95242a78d45091e04fdd068dc6132519be",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "21b49f917f3ca40327ec4f91f3ba56f8ec4c1d195e9356cb71b8ef44a7795d5b",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1904,8 +1923,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "2244eae15cd14813d0c8579ea713bfef1cb4929e06731d2df7aca30fd25d7a9f",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "088660304c7eec4f7f8ae540207a577c16ae2d53f6b19c8d8f69e8718a226923",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -1945,8 +1964,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "0adbefbaf8f9eaf725d7538c62a508feb305c8e7d21a56a2662ba05dbb06d0c2",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "8f78affce4785a9ef90c8f0d533f480c0c49521e05d8a49e654492649c960069",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     },
     {
@@ -2070,8 +2089,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "9a3e294e18305c54fb2c70fbfc088f7f6dc2022b9b044b4ca14273d95b8b2398",
-        "reason": "Reviewed shared runtime wrapper delta: only management_work_list_v1 service-only registration added; existing functions and workflow consumer behavior unchanged."
+        "fingerprint": "63f189189a3d7b81063bb53026eba1eff91149f6a856850d81ffe666a314e7bf",
+        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
       }
     }
   ]
