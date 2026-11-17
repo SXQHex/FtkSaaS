@@ -20,6 +20,7 @@ export async function mockReports(
   } = {},
 ) {
   const writes: { op: string; r: NativeRequest }[] = [];
+  let importKind: "students" | "crm_applications" = "crm_applications";
   let failed = false,
     jobReadFailed = false,
     checksum = "",
@@ -305,11 +306,17 @@ export async function mockReports(
                 created_at: at,
                 state: applied && !applyReleased ? "pending" : "succeeded",
                 phase: applied ? "apply" : "preview",
-                progress_count: applied ? (applyReleased ? 1 : 0) : 3,
-                total_count: applied ? 1 : 3,
+                progress_count: applied
+                  ? applyReleased
+                    ? importKind === "students"
+                      ? 2
+                      : 1
+                    : 0
+                  : 3,
+                total_count: applied ? (importKind === "students" ? 2 : 1) : 3,
                 preview_id: previewId,
                 safe_error_code: null,
-                kind: "crm_applications",
+                kind: importKind,
               },
             ]
           : [],
@@ -345,8 +352,8 @@ export async function mockReports(
         await send({
           id: jobId,
           state: applied && !applyReleased ? "pending" : "succeeded",
-          progress_count: applied ? (applyReleased ? 1 : 0) : 3,
-          total_count: applied ? 1 : 3,
+          progress_count: applied ? (applyReleased ? (importKind === "students" ? 2 : 1) : 0) : 3,
+          total_count: applied ? (importKind === "students" ? 2 : 1) : 3,
           result_reference: applied
             ? applyReleased
               ? { type: "import_jobs", id: jobId }
@@ -386,13 +393,37 @@ export async function mockReports(
     if (op === "import_preview_v1") {
       writes.push({ op, r });
       imported = true;
+      importKind = r.mapping.kind;
+      if (importKind === "students")
+        Object.assign(preview.import_summary, {
+          import_kind: "students",
+          new_people: 2,
+          new_applications: 0,
+          opening_credits: 5,
+          opening_debt_totals: [{ currency: "TRY", amount_minor: "12500" }],
+          original_credit_basis_totals: [{ currency: "TRY", amount_minor: "25000" }],
+        });
       await send({ job_id: jobId, state: "pending" });
     }
     if (op === "preview_get_v1") await send(preview);
     if (op === "import_rows_list_v1") {
       const actual = rows.map((row) => ({
         ...row,
-        state: applied && applyReleased && row.row_number === 2 ? "applied" : row.state,
+        state:
+          applied &&
+          applyReleased &&
+          (row.row_number === 2 || (importKind === "students" && row.row_number === 1))
+            ? "applied"
+            : row.state,
+        ...(importKind === "students"
+          ? {
+              application: null,
+              created_references:
+                applied && applyReleased && row.row_number <= 2
+                  ? [{ type: "people", id: uid(200 + row.row_number) }]
+                  : [],
+            }
+          : {}),
       }));
       const selected = r.state
         ? actual.filter((row) => row.state === r.state)
@@ -407,7 +438,7 @@ export async function mockReports(
       await send({
         job_id: jobId,
         state: "pending",
-        selected_rows_count: r.selected_row_numbers.length,
+        ...(r.selected_row_numbers ? { selected_rows_count: r.selected_row_numbers.length } : {}),
       });
     }
     if (op === "operation_status_get_v1")
@@ -430,7 +461,7 @@ export async function mockReports(
     route.fulfill({
       status: 200,
       contentType: "text/csv; charset=utf-8",
-      body: "name,count\r\nsynthetic,3",
+      body: 'group_key,display_name,product_name,period_start,currency,count,amount_minor\r\n"gross_sales:2026-11-09","","","2026-11-09","TRY","2","9007199254740993"\r\n"gross_sales:2026-11-09","","","2026-11-09","EUR","1","1200"\r\n',
     }),
   );
   await page.goto(completionUrl("reports"));

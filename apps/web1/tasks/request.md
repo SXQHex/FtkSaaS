@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-17 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **35 talebin kaynak desteği karşılandı; açık backend sözleşme talebi yok.** W1-BE-35’in aynı kaynaklı development teslimi de başarılı. Karşılanan kapsam, aşağıdaki native destek sınırlarını da içerir; desteklenmeyen davranışlar frontend’de varmış gibi gösterilmez. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+17 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **35 talebin kaynak desteği karşılandı; açık ürün/API sözleşme talebi yok. Pro son kabulünde bulunan1 backend kabul aracı düzeltmesi W1-BE-36’da açık.** W1-BE-35’in aynı kaynaklı development teslimi de başarılı. Karşılanan kapsam, aşağıdaki native destek sınırlarını da içerir; desteklenmeyen davranışlar frontend’de varmış gibi gösterilmez. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
 İncelenen main: `3b4eaf28f469eef3f66be82aaa3dc65759313ac7` ([PR327](https://github.com/SXQHex/FtkSaaS/pull/327), 17 Kasım2026). `roles_list_v1` rol/durum filtreleri kaynakta mevcut. Aynı SHA’nın [Main acceptance44119859935](https://github.com/SXQHex/FtkSaaS/actions/runs/44119859935) ve [Backend merge verification44119859432](https://github.com/SXQHex/FtkSaaS/actions/runs/44119859432) sonuçları success; [development44119981434](https://github.com/SXQHex/FtkSaaS/actions/runs/44119981434) success, [Vercel44119981411](https://github.com/SXQHex/FtkSaaS/actions/runs/44119981411) success. Native teslim ayrıntısı [backend devrinin](https://github.com/SXQHex/FtkSaaS/blob/3b4eaf28f469eef3f66be82aaa3dc65759313ac7/apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ekip-yönetici-rolü-keşfi--17-kasım2026) sahibindedir.
 
@@ -44,6 +44,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-34 | E43 · WF00/P02/P14/P16    | Merkez denetim/işlem keşfi, filtreler ve dışa aktarma eşlemesi                   | Backend karşılandı (PR323): merkez audit keşfi ve kendi tracking_directory_get_v1 dizini mevcut. Ret logu/audit export/genel tekrar çalıştırma yok; E43 tüketimi/kabulü açık.                                                             |
 
 | W1-BE-35 | E42 · WF02/P17 | Yönetici rollerini filtreli ve cursor kapsamlı keşif | Kaynak/main/development karşılandı (PR327): native role/state filtreleri var; frontend kabulü TODO/E42 sahibinde. |
+| W1-BE-36 | P01 / G-PRO · WF01 | Native recovery kabul aracının doğru frontend callback kaynağı | Açık: mevcut backend runner ilgisiz eski origin’e sabit; beklenen callback açıkça pinlenmeli. Yeni Auth/RPC istenmiyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -246,7 +247,7 @@ Kesin cursor/dönem/bakiye ve canlı self yetki sözleşmesi [WF14](https://gith
 
 ## W1-BE-25 · Public program sunumu ve başvuru hedefi
 
-**Durum:** Backend desteği PR322 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. E34–36 frontend tüketimi/kabulü henüz yapılmadı.
+**Durum:** Backend desteği PR322 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. Frontend tüketimi ve ekran kabulünün sahibi TODO/E34–36’dır.
 
 **Tüketim:** Worker POST `/api/public/calendar` → `public_calendar_get_v1(include_details:true,discipline_id?)` gerçek tür/saat dilimi, filtre ve yayın durumunu verir. `publication_set_v1.public_details.show_occupancy/show_instructors` birbirinden bağımsız ve varsayılan kapalıdır; eski yayınlar kendiliğinden açılmaz. Genel başvuru yalnız açıkça bağlanan etkin `public_application_form` ve yayımlanmış gerçek onay kaynağı üzerinden keşfedilir; özel form veya metin tahmin edilmez. Kesin durum/DTO/izin/onay eşlemesi [WF09](https://github.com/SXQHex/FtkSaaS/blob/c1b00a1af28446ed71ba1cabd092bba65f63485a/docs/workflows.md#wf09), backend değerlendirmesi [XREQ-063](https://github.com/SXQHex/FtkSaaS/blob/c1b00a1af28446ed71ba1cabd092bba65f63485a/docs/requests.md#xreq-063) sahibindedir.
 
@@ -290,7 +291,7 @@ Kesin keşif/özet/rol/plan ve sonuç anlamları [WF16](https://github.com/SXQHe
 
 ## W1-BE-30 · Rapor çiziminin kalan native eşlemesi
 
-**Durum:** Backend desteği ve açıklanan native sınırlar PR323 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. E41 frontend tüketimi ve otomatik kabulü açık.
+**Durum:** Backend desteği ve açıklanan native sınırlar PR323 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. Frontend tüketimi ve ekran kabulünün sahibi TODO/E41’dir.
 
 **Tüketim:** `report_get_v1` ve mevcut worker/export zinciri `sales`, `session_metrics`, `collection_breakdown`, `instructor_balances` türlerini destekler. Satış; kaydedilmiş gerçek tutarı, merkez saat diliminde ISO haftayı, değişmez ürün sürümünü veya canonical kişiyi kullanır; iptal/iade varsayılan toplamdan düşülmez. Seans ölçümleri gerçek kayıt/kapasite ve kapalı yoklama pay/paydasını; tahsilat kırılımı gerçek kök neti/borç tahsislerini; hakediş raporu dönem ve bağlı kök bakiye anlamlarını verir. Toplamlar cursor öncesi ve para birimi ayrıdır. Aynı tahsilatın birden çok grupta görünmesi global adedi çoğaltmaz. Güvenli ad/ürün/seans/hafta kolonları açık export seçimiyle kullanılabilir; ACK gerçek dosya başarısı değildir.
 
@@ -300,7 +301,7 @@ Kesin keşif/özet/rol/plan ve sonuç anlamları [WF16](https://github.com/SXQHe
 
 ## W1-BE-31 · Belge yönetimi dizini ve kabul özeti
 
-**Durum:** Backend kaynak desteği PR324 ile main’e birleşti; aynı kaynak/main/development kanıtları üst kayıtta. E22 tüketimi ve otomatik kabulü açık.
+**Durum:** Backend kaynak desteği PR324 ile main’e birleşti; aynı kaynak/main/development kanıtları üst kayıtta. Frontend tüketimi ve ekran kabulünün sahibi TODO/E22’dir.
 
 **Tüketim:** `document_directory_get_v1(center_id,view:documents|versions|acceptances,page,scope?,document_id?,version_id?,acceptance_filter?,query?)` F30 ve native belge konfigürasyon yetkisini korur. Versions/acceptances gerçek document_id ister; pending yalnız eksik güncel gereksinimdir. Belge/sürüm/arama kapsamının sayfa öncesi özeti published_documents/unpublished_files/last_publication/acceptance_records ve canonical pending_members/total_members verir. Kitle aktif gerçek işlemler ve süresi dolmamış/current/unused satın alma önizlemelerindeki gereksinim sahipleridir; tarihsel kabuller paydaya eklenmez.
 
@@ -318,7 +319,7 @@ Kesin kaynak/yetki ve DTO [WF11](https://github.com/SXQHex/FtkSaaS/blob/2045b942
 
 ## W1-BE-33 · Yönetici hakediş ve ödeme keşfi
 
-**Durum:** Backend desteği ve açıklanan native sınırlar PR323 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. E23 frontend tüketimi ve otomatik kabulü açık.
+**Durum:** Backend desteği ve açıklanan native sınırlar PR323 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. Frontend tüketimi ve ekran kabulünün sahibi TODO/E23’tür.
 
 **Tüketim:** `instructor_finance_directory_get_v1(org_id,center_id,view:instructors|earnings|payments,page,person_id?,interval?)` mevcut earnings.read yönetim kapsamı, erişilebilir merkez ve F20 ile çalışır. Interval atlanınca bütün dönemler gelir. Eğitmen görünümü tarihsel anlaşma/hakediş/ödeme sahiplerini güncel görev yokluğunda kaybetmez; gerçek agreement_ids/current_agreement_ids ve dönem özetlerini verir. Satırlar gerçek seans/etkinlik adı ve hakedişin değişmez anlaşma sürümünü; ödemeler gerçek kök/düzeltme bağı, sürüm, yöntem/reference ve düzeltme gerekçesini taşır. Para birimine göre earned/paid/remaining/overpaid ve tekil kapalı ders sayısı cursor öncesi gelir; earned oluşum, paid gerçekleşme dönemi, kalan ise seçili köklerin güncel bağlı bakiyesidir.
 
@@ -326,7 +327,7 @@ Kesin kaynak/yetki ve DTO [WF11](https://github.com/SXQHex/FtkSaaS/blob/2045b942
 
 ## W1-BE-34 · Denetim ve işlem durumu ekranı
 
-**Durum:** Backend desteği ve açıklanan native sınırlar PR323 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. E43 frontend tüketimi ve otomatik kabulü açık.
+**Durum:** Backend desteği ve açıklanan native sınırlar PR323 ile main/development üzerinde karşılandı; aynı kaynak kanıtları üst kayıtta. Frontend tüketimi ve ekran kabulünün sahibi TODO/E43’tür.
 
 **Tüketim:** `audit_list_v1` subject atlanınca açık merkezde güvenli denetim keşfi, arama/modül/recorded filtresi ve isteğe bağlı dönem sunar; eski tek nesne yolu korunur. Her satır özgün nesne yetkisiyle, finans satırları ayrıca finance.read ile denetlenir. `tracking_directory_get_v1` yalnız kendi hesabının aynı merkezdeki yetkili receipt/preview ve rapor/import işlerini kind/state/query/interval ve cursor ile keşfeder. Gerçek ilerleme, nullable payda, güvenli hata ve yalnız uygun durumda next_attempt_at gelir. Sayaçlar yetkili query/interval kümesinde cursor/kind/state öncesidir; aynı akışın ayrı native kayıtları birleştirilmez. Kaynak eylemi kendi WF/getter/writer yolunda açıkça seçilir; başarı/yetki değişiminde dizin yeniden okunur.
 
@@ -339,3 +340,13 @@ Kesin kaynak/yetki ve DTO [WF11](https://github.com/SXQHex/FtkSaaS/blob/2045b942
 **Tüketim:** `roles_list_v1` mevcut `Role` ve `RecordState` değerleriyle isteğe bağlı `role`/`state` filtreleri alır; atlanan filtre o boyutu sınırlamaz. Filtreler kişi/merkez koşullarıyla limitten önce uygulanır; cursor aktör/hesap/istek kapsamına bağlıdır. Değişen filtrede ilk sayfaya dönülür; canlı yetki/plan her sayfada yeniden denetlenir.
 
 OM için organizasyon okuyucusu `center_id` atlar ve `role=org_manager` kullanır. Açık merkez yalnız kendi atamalarını döndürür; OM atamasını içermez. CM, merkez atlandığında dahi yalnız mevcut yetkili/erişilebilir merkezleri görür; filtre org erişimi veya writer yetkisi açmaz. Sahiplik organizasyon kaynağındadır; `owner` filtresi için sahte atama üretilmez. Mevcut kişi/rol referansı ilgili native ayrıntı/atama/geri alma yoluna bağlanır; Auth/hesap kimliği veya token açılmaz. Kesin sözleşme [WF02](https://github.com/SXQHex/FtkSaaS/blob/3b4eaf28f469eef3f66be82aaa3dc65759313ac7/docs/workflows.md#wf02) ve aynı SHA’daki makine şemasıdır.
+
+## W1-BE-36 · Native Auth recovery kabul aracının callback kaynağı
+
+**Durum:** Frontend talebi açık; backend onayı veya teslimi verilmiş sayılmaz. Ekranlar kapalıdır; bu ihtiyaç P01/G-PRO bütünleşik kabulündedir.
+
+**Kaynak bulgusu:** İncelenen main’de `apps/backend/scripts/acceptance/s08-hosted-recovery.mjs` içindeki `acceptExpiredRecovery` ve `acceptNativeRecovery`, callback origin’ini uygulamayla ilgisi olmayan eski bir adrese sabitliyor; birim fixture’ı da bunu tekrar ediyor. Native Auth sözleşmesi değiştirilmeden mevcut kabul aracı `https://app.fethiyetango.com` ve izinli yerel callback için kullanılamıyor. Frontend’in otomatik callback hata testleri gerçek sağlayıcının süre dolumu/PKCE kabulü olarak sunulmaz.
+
+**İstenen destek:** Backend sahibi mevcut runner’da beklenen callback origin/path/next bilgisini güvenilir, açıkça pinlenen kabul girdisinden alsın; yabancı callback reddi, token/verifier gizliliği ve mevcut parola/oturum temizliği korunsun. Native doğrulama/kurtarma için mevcut gerçek teslim/PKCE/tüketilmiş proof ve doğal süre dolumu kabulünün çalıştırılabilir otomasyon girişini belirtin; varsa mevcut kanıta bağlayın. Yoksa izole CI-native sağlayıcı fixture desteği veya mevcut development runner desteği backend kabulünün kendi sahibinde tamamlansın. Hosted reset/seed, Auth TTL zayıflatma, elle üretilmiş provider proof veya yeni Auth/RPC talep edilmiyor.
+
+**Frontend devamı:** Bağımsız P/G-PRO zincir ve import kapsamı sürer. Kesin kaynak/run/ortam kanıtı gelene kadar P01’in gerçek sağlayıcı alt kontrolü kapanmaz; sayfa kabulü tekrar açılmaz.

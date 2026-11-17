@@ -64,6 +64,7 @@ test("export unknown result replays the frozen key, survives summary refresh and
   page,
 }) => {
   const f = await mockReports(page, { unknownExport: true });
+  await expect(page.getByText(/90\.071\.992\.547\.409,93/).first()).toBeVisible();
   const dialog = await exportForm(page);
   await dialog.getByRole("button", { name: "Dışa aktarmayı başlat", exact: true }).click();
   await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
@@ -83,6 +84,26 @@ test("export unknown result replays the frozen key, survives summary refresh and
   const download = await waiting;
   expect(download.suggestedFilename()).toMatch(/^report-.*\.csv$/);
   expect(await download.failure()).toBeNull();
+  const stream = await download.createReadStream();
+  let csv = "";
+  for await (const chunk of stream) csv += chunk.toString("utf8");
+  const lines = csv.trimEnd().split("\r\n");
+  expect(lines).toHaveLength(3);
+  expect(lines[0]).toBe(
+    "group_key,display_name,product_name,period_start,currency,count,amount_minor",
+  );
+  expect(lines[1]).toBe('"gross_sales:2026-11-09","","","2026-11-09","TRY","2","9007199254740993"');
+  expect(lines[2]).toBe('"gross_sales:2026-11-09","","","2026-11-09","EUR","1","1200"');
+  expect(
+    f.requests.some(
+      (row) =>
+        row.op === "report_get_v1" &&
+        row.r.report === "sales" &&
+        JSON.stringify(row.r.filters.interval) === JSON.stringify(writes[0]!.r.filters.interval) &&
+        JSON.stringify(row.r.filters.center_ids) ===
+          JSON.stringify(writes[0]!.r.filters.center_ids),
+    ),
+  ).toBe(true);
   expect(
     f.requests
       .filter((row) => row.op === "report_file_get_v1")
@@ -160,4 +181,90 @@ test("expired native preview cannot dispatch CRM apply even after row selection 
     dialog.getByRole("button", { name: "Seçilen satırları içe aktar", exact: true }),
   ).toBeDisabled();
   expect(f.writes.some((row) => row.op === "import_apply_v1")).toBe(false);
+});
+
+test("student CSV maps opening rights and currency debts explicitly, previews invalid rows and applies through one native job", async ({
+  page,
+}) => {
+  const f = await mockReports(page);
+  await page.getByRole("tab", { name: "Dosyalar", exact: true }).click();
+  await page.getByRole("button", { name: "CSV içe aktar", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog
+    .getByRole("combobox", { name: "Aktarım türü", exact: true })
+    .selectOption("students");
+  await dialog
+    .getByRole("textbox", { name: "Kaynak kayıt kümesi", exact: true })
+    .fill("e2e-students");
+  await dialog.getByText("CSV sütunlarını eşleştir", { exact: true }).click();
+  for (const [label, column] of [
+    ["Açılış hakkı", "opening_credits"],
+    ["Açılış borcu (alt para birimi)", "opening_debt_minor"],
+    ["Para birimi", "currency"],
+    ["Paket sürümü referansı", "product_version_ref"],
+    ["Asıl paket net değeri (alt para birimi)", "opening_credit_value_minor"],
+  ]) {
+    await dialog.getByRole("textbox", { name: label, exact: true }).fill(column);
+  }
+  await dialog.getByLabel("CSV dosyası", { exact: true }).setInputFiles({
+    name: "students.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(
+      "source_key,display_name,phone,email,opening_credits,opening_debt_minor,currency,product_version_ref,opening_credit_value_minor\r\nstudent-1,Birinci sentetik,+905550000001,,5,12500,TRY," +
+        "019ab7b0-0000-7000-8000-000000000060" +
+        ",25000\r\nstudent-2,İkinci sentetik,+905550000002,,0,0,TRY,,0\r\nstudent-3,Hatalı sentetik,bad,,0,0,TRY,,0\r\n",
+    ),
+  });
+  await dialog.getByRole("button", { name: "Önizle", exact: true }).click();
+  await expect(dialog.getByText("Birinci sentetik", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("Açılış borçları: ₺125,00", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByText("Asıl paket net değerleri: ₺250,00", { exact: true }),
+  ).toBeVisible();
+  await expect(dialog.getByText(/Yeni kişi: 2.*Açılış hakkı: 5/)).toBeVisible();
+  const preview = f.writes.find((row) => row.op === "import_preview_v1")!.r;
+  expect(preview.mapping).toMatchObject({
+    kind: "students",
+    columns: expect.arrayContaining([
+      { source_column: "opening_credits", target: "opening_credits" },
+      { source_column: "opening_debt_minor", target: "opening_debt_minor" },
+      { source_column: "currency", target: "currency" },
+    ]),
+  });
+  expect(preview.source_namespace).toBe("e2e-students");
+  expect(f.writes.some((row) => row.op === "import_apply_v1")).toBe(false);
+  await dialog.getByRole("radio", { name: "Hatalı", exact: true }).click();
+  await expect(dialog.getByText("Hatalı sentetik", { exact: true })).toBeVisible();
+  await expect(dialog.getByRole("row").filter({ hasText: "Hatalı sentetik" })).toContainText(
+    "VALIDATION_FAILED",
+  );
+  await dialog
+    .getByRole("checkbox", {
+      name: "Seçili satırları ve uyarıları inceledim, içe aktarmayı onaylıyorum.",
+      exact: true,
+    })
+    .press("Space");
+  await dialog.getByRole("button", { name: "Seçilen satırları içe aktar", exact: true }).click();
+  await expect(dialog.getByText(/İş: pending/)).toBeVisible();
+  expect(f.writes.find((row) => row.op === "import_apply_v1")!.r).not.toHaveProperty(
+    "selected_row_numbers",
+  );
+  f.releaseApply();
+  await dialog.getByRole("button", { name: "İş durumunu oku", exact: true }).click();
+  await expect(dialog.getByText("İş: succeeded · 2 / 2", { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "Satırları gör", exact: true }).click();
+  await dialog.getByRole("radio", { name: "Uygulandı", exact: true }).click();
+  await expect(dialog.getByText("Birinci sentetik", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("İkinci sentetik", { exact: true })).toBeVisible();
+  expect(f.writes.filter((row) => row.op === "import_apply_v1")).toHaveLength(1);
+  expect(
+    f.requests.some((row) =>
+      [
+        "person_create_v1",
+        "finance_entry_create_v1",
+        "sale_commit_v1",
+        "import_rows_process_v1",
+      ].includes(row.op),
+    ),
+  ).toBe(false);
 });
