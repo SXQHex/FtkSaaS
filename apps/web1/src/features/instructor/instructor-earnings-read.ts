@@ -27,41 +27,75 @@ export async function instructorEarningMonths(timezone: string, now: string) {
 export async function readInstructorEarningPage(
   scope: ClientScope,
   personId: string,
-  interval: Interval,
+  interval?: Interval,
   cursor?: string,
 ) {
   z.uuid().parse(personId);
-  const backend = await scopedBackend(scope);
-  const page = await backend.call("earnings_list_v1", {
+  if (interval) {
+    instant.parse(interval.starts_at);
+    instant.parse(interval.ends_at);
+    if (Date.parse(interval.starts_at) >= Date.parse(interval.ends_at))
+      throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+  }
+  const result = await (
+    await scopedBackend(scope)
+  ).call("instructor_account_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
     org_id: scope.orgId,
     center_id: scope.centerId,
     person_id: personId,
-    interval,
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    view: "earnings",
+    ...(interval ? { interval: { ...interval } } : {}),
+    page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
+  if (
+    result.view !== "earnings" ||
+    result.items.length > 20 ||
+    (cursor && result.next_cursor === cursor)
+  )
+    throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+  instant.parse(result.as_of);
   const ids = new Set<string>();
-  for (const row of page.items) {
+  const items = result.items.map((row) => {
     if (
-      row.person_id !== personId ||
+      !("basis" in row) ||
       row.center_id !== scope.centerId ||
       ids.has(row.id) ||
-      !/^[A-Z]{3}$/.test(row.currency) ||
-      ![row.amount_minor, row.paid_minor, row.remaining_minor, row.overpaid_minor ?? "0"].every(
-        (value) => /^\d+$/.test(value),
-      ) ||
       !["add", "subtract"].includes(row.direction) ||
-      !Number.isFinite(Date.parse(row.created_at)) ||
-      Date.parse(row.created_at) < Date.parse(interval.starts_at) ||
-      Date.parse(row.created_at) >= Date.parse(interval.ends_at)
+      (interval &&
+        (Date.parse(row.created_at) < Date.parse(interval.starts_at) ||
+          Date.parse(row.created_at) >= Date.parse(interval.ends_at))) ||
+      row.basis.currency !== row.currency
     )
-      throw new Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+      throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
     ids.add(z.uuid().parse(row.id));
-  }
-  if (page.items.length > 20 || (cursor && page.next_cursor === cursor))
-    throw new Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
-  return page;
+    // The self reader resolves canonical aliases; immutable historical person IDs stay intact.
+    if (!z.uuid().safeParse(row.person_id).success) throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+    positive.parse(row.version);
+    instant.parse(row.created_at);
+    currency.parse(row.currency);
+    for (const value of [
+      row.amount_minor,
+      row.paid_minor,
+      row.remaining_minor,
+      row.overpaid_minor ?? "0",
+    ])
+      if (!money.safeParse(value).success) throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+    for (const value of [row.session_id, row.event_assignment_id, row.previous_id, row.closure_id])
+      if (value !== null) z.uuid().parse(value);
+    z.enum([
+      "sale_unit",
+      "negative_snapshot",
+      "agreement_fixed",
+      "event_fee",
+      "lesson_agreement",
+    ]).parse(row.basis.source);
+    z.number().int().nonnegative().safe().parse(row.basis.quantity);
+    z.number().int().nonnegative().safe().parse(row.basis.excluded_blocked);
+    return row;
+  });
+  return { ...result, items };
 }
 
 const currency = z.string().regex(/^[A-Z]{3}$/);

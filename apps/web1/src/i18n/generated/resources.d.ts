@@ -1377,7 +1377,6 @@ export default interface Resources {
       "agreementTerms": "Anlaşma koşulları",
       "agreementVersion": "Sürüm {{version}} · {{date}} tarihinden beri",
       "all": "Tüm dönem",
-      "allLinesUnavailable": "Tüm dönem özeti ve ödeme geçmişi görüntülenebilir. Seans satırlarını görmek için bir ay seç.",
       "allPeriodHint": "Tüm dönemler; tarih sınırı uygulanmaz.",
       "amount": "Tutar",
       "balanceHint": "Fazla ödeme: {{amount}}",

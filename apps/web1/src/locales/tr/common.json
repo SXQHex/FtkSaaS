@@ -2796,7 +2796,6 @@
       "lesson_agreement": "Özel ders anlaşması"
     },
     "loading": "Hakedişler okunuyor…",
-    "allLinesUnavailable": "Tüm dönem özeti ve ödeme geçmişi görüntülenebilir. Seans satırlarını görmek için bir ay seç.",
     "noAgreement": "Geçerli anlaşma bulunmuyor.",
     "agreementTerms": "Anlaşma koşulları",
     "agreementVersion": "Sürüm {{version}} · {{date}} tarihinden beri",

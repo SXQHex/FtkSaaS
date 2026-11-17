@@ -25,7 +25,7 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
   const { center, identity, self } = useInstructorScope(scope);
   const personId = self?.instructor ? identity?.person_id : undefined;
   const [now] = useState(() => new Date().toISOString());
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState("all");
   const [agreementId, setAgreementId] = useState("");
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [tab, setTab] = useState<"lines" | "payments">("lines");
@@ -48,11 +48,17 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
       scope.orgId,
       scope.centerId,
       personId,
-      period?.id,
-      cursor,
+      selected === "all" ? "all" : period?.id,
+      tab === "lines" ? cursor : undefined,
     ],
-    queryFn: () => readInstructorEarningPage(scope, personId!, period!.interval, cursor),
-    enabled: Boolean(center && personId && period),
+    queryFn: () =>
+      readInstructorEarningPage(
+        scope,
+        personId!,
+        period?.interval,
+        tab === "lines" ? cursor : undefined,
+      ),
+    enabled: Boolean(center && personId && (period || selected === "all") && tab === "lines"),
     retry: false,
   });
   const payments = useQuery({
@@ -128,7 +134,7 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
       : null;
   return (
     <InstructorEarningsView
-      period={period?.id ?? ""}
+      period={selected === "all" ? "all" : (period?.id ?? "")}
       periods={[
         { id: "all", label: t(($) => $.instructorEarnings.all), disabled: false },
         ...(months.data ?? []),
@@ -202,7 +208,7 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
         )
       }
       lines={
-        (selected === "all" ? undefined : rows)?.map((row) => ({
+        rows?.map((row) => ({
           id: row.id,
           date: date.format(new Date(row.created_at)),
           session: row.session_id
@@ -226,9 +232,6 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
                   ? t(($) => $.instructorEarnings.paid)
                   : t(($) => $.instructorEarnings.settled),
         })) ?? null
-      }
-      lineNotice={
-        selected === "all" ? t(($) => $.instructorEarnings.allLinesUnavailable) : undefined
       }
       payments={
         payments.isError || !payments.data
@@ -258,7 +261,6 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
           <Alert>
             <AlertDescription>{t(($) => $.instructorEarnings.sourceLimits)}</AlertDescription>
           </Alert>
-          {selected === "all" && <p>{t(($) => $.instructorEarnings.allLinesUnavailable)}</p>}
           {values
             ?.filter((row) => BigInt(row.overpaid_minor) > 0n)
             .map((row) => (
@@ -268,15 +270,12 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
                 })}
               </p>
             ))}
-          {(months.isError ||
-            (selected !== "all" && query.isError) ||
-            payments.isError ||
-            agreements.isError) && (
+          {(months.isError || query.isError || payments.isError || agreements.isError) && (
             <Alert variant="destructive">
               <AlertDescription>{t(($) => $.instructorEarnings.unread)}</AlertDescription>
             </Alert>
           )}
-          {(months.isPending || (Boolean(period) && query.isPending)) && (
+          {(months.isPending || currentQuery.isPending) && (
             <p role="status">{t(($) => $.instructorEarnings.loading)}</p>
           )}
           <Button
@@ -290,7 +289,7 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
             onPress={() => {
               if (months.isError) void months.refetch();
               else {
-                if (selected !== "all") void query.refetch();
+                if (tab === "lines") void query.refetch();
                 void payments.refetch();
                 void agreements.refetch();
               }
@@ -301,28 +300,26 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
         </div>
       }
       pagination={
-        tab === "payments" || selected !== "all" ? (
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              isDisabled={cursors.length === 1 || currentQuery.isFetching}
-              onPress={() => setCursors((old) => old.slice(0, -1))}
-            >
-              {t(($) => $.instructorEarnings.previous)}
-            </Button>
-            <Button
-              variant="outline"
-              isDisabled={
-                !next || currentQuery.isError || currentQuery.isFetching || cursors.includes(next)
-              }
-              onPress={() => {
-                if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
-              }}
-            >
-              {t(($) => $.instructorEarnings.next)}
-            </Button>
-          </div>
-        ) : undefined
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            isDisabled={cursors.length === 1 || currentQuery.isFetching}
+            onPress={() => setCursors((old) => old.slice(0, -1))}
+          >
+            {t(($) => $.instructorEarnings.previous)}
+          </Button>
+          <Button
+            variant="outline"
+            isDisabled={
+              !next || currentQuery.isError || currentQuery.isFetching || cursors.includes(next)
+            }
+            onPress={() => {
+              if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
+            }}
+          >
+            {t(($) => $.instructorEarnings.next)}
+          </Button>
+        </div>
       }
     />
   );

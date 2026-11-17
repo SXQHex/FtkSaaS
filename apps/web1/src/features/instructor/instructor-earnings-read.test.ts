@@ -15,6 +15,12 @@ const row = {
   currency: "TRY",
   direction: "add",
   created_at: "2026-11-16T12:00:00Z",
+  session_id: id(6),
+  event_assignment_id: null,
+  previous_id: null,
+  closure_id: null,
+  version: 1,
+  basis: { source: "agreement_fixed", currency: "TRY", quantity: 1, excluded_blocked: 0 },
 };
 beforeEach(() => vi.clearAllMocks());
 it("models month-only periods in the center IANA zone across DST and year rollover", async () => {
@@ -28,31 +34,37 @@ it("models month-only periods in the center IANA zone across DST and year rollov
     "2026-12",
   );
 });
+const earningPage = {
+  view: "earnings",
+  items: [row],
+  next_cursor: "next",
+  as_of: "2026-11-16T12:00:00Z",
+  totals: [],
+};
 it("keeps one cursor page, exact money strings and native self scope", async () => {
-  mock.call.mockResolvedValue({ items: [row], next_cursor: "next" });
-  expect(await readInstructorEarningPage(scope, id(4), interval, "current")).toEqual({
-    items: [row],
-    next_cursor: "next",
-  });
+  mock.call.mockResolvedValue(earningPage);
+  expect(await readInstructorEarningPage(scope, id(4), interval, "current")).toEqual(earningPage);
   expect(mock.call).toHaveBeenCalledExactlyOnceWith(
-    "earnings_list_v1",
+    "instructor_account_get_v1",
     expect.objectContaining({
       person_id: id(4),
       center_id: scope.centerId,
+      view: "earnings",
       interval,
-      page: { limit: 20, sort: "created_at_asc", cursor: "current" },
+      page: { limit: 20, cursor: "current" },
     }),
   );
 });
-it("rejects other people/centers and invalid money instead of displaying them", async () => {
+it("rejects wrong centers, malformed identities, currency mismatches and invalid money", async () => {
   for (const change of [
-    { person_id: id(9) },
+    { person_id: "invalid" },
     { center_id: id(9) },
     { paid_minor: "NaN" },
     { amount_minor: "1.5" },
     { created_at: interval.ends_at },
+    { basis: { ...row.basis, currency: "USD" } },
   ]) {
-    mock.call.mockResolvedValue({ items: [{ ...row, ...change }], next_cursor: null });
+    mock.call.mockResolvedValue({ ...earningPage, items: [{ ...row, ...change }] });
     await expect(readInstructorEarningPage(scope, id(4), interval)).rejects.toThrow(
       "INSTRUCTOR_EARNINGS_UNAVAILABLE",
     );
@@ -60,10 +72,46 @@ it("rejects other people/centers and invalid money instead of displaying them", 
 });
 it("rejects duplicate identities and a repeated native cursor", async () => {
   mock.call
-    .mockResolvedValueOnce({ items: [row, row], next_cursor: null })
-    .mockResolvedValueOnce({ items: [row], next_cursor: "same" });
-  await expect(readInstructorEarningPage(scope, id(4), interval)).rejects.toThrow();
-  await expect(readInstructorEarningPage(scope, id(4), interval, "same")).rejects.toThrow();
+    .mockResolvedValueOnce({ ...earningPage, items: [row, row], next_cursor: null })
+    .mockResolvedValueOnce({ ...earningPage, next_cursor: "same" });
+  await expect(readInstructorEarningPage(scope, id(4), interval)).rejects.toThrow(
+    "INSTRUCTOR_EARNINGS_UNAVAILABLE",
+  );
+  await expect(readInstructorEarningPage(scope, id(4), interval, "same")).rejects.toThrow(
+    "INSTRUCTOR_EARNINGS_UNAVAILABLE",
+  );
+});
+it("omits interval for all-period earnings and preserves an authorized immutable historical alias", async () => {
+  const old = { ...row, person_id: id(99), created_at: "2019-01-01T00:00:00Z" };
+  mock.call.mockResolvedValue({ ...earningPage, items: [old] });
+  expect((await readInstructorEarningPage(scope, id(4), undefined, "all-next")).items).toEqual([
+    old,
+  ]);
+  const request = mock.call.mock.calls[0]![1];
+  expect(request).toMatchObject({
+    person_id: id(4),
+    view: "earnings",
+    page: { limit: 20, cursor: "all-next" },
+  });
+  expect(request).not.toHaveProperty("interval");
+});
+it.each(["payments", "agreements"])(
+  "rejects the wrong native %s view rather than presenting it as an empty ledger",
+  async (view) => {
+    mock.call.mockResolvedValue({ ...earningPage, view, items: [] });
+    await expect(readInstructorEarningPage(scope, id(4))).rejects.toThrow(
+      "INSTRUCTOR_EARNINGS_UNAVAILABLE",
+    );
+  },
+);
+it("rejects a reversed interval before sending a native read", async () => {
+  await expect(
+    readInstructorEarningPage(scope, id(4), {
+      starts_at: interval.ends_at,
+      ends_at: interval.starts_at,
+    }),
+  ).rejects.toThrow("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+  expect(mock.call).not.toHaveBeenCalled();
 });
 
 import { readInstructorAccount } from "./instructor-earnings-read";

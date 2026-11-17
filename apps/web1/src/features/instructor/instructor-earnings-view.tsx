@@ -43,7 +43,6 @@ export function InstructorEarningsView({
   totals,
   agreement,
   lines,
-  lineNotice,
   payments,
   tab,
   onTab,
@@ -56,7 +55,6 @@ export function InstructorEarningsView({
   totals: { earned: string | null; paid: string | null; remaining: string | null };
   agreement: ReactNode;
   lines: InstructorEarningRow[] | null;
-  lineNotice?: ReactNode;
   payments: InstructorPaymentRow[] | null;
   tab: "lines" | "payments";
   onTab: (value: "lines" | "payments") => void;
@@ -130,7 +128,7 @@ export function InstructorEarningsView({
             <TabsContent id="lines">
               {lines === null ? (
                 <p className="py-8 text-sm text-muted-foreground">
-                  {lineNotice ?? t(($) => $.instructorEarnings.unread)}
+                  {t(($) => $.instructorEarnings.unread)}
                 </p>
               ) : (
                 <Table

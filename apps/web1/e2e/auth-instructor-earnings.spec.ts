@@ -13,17 +13,18 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   const requests: {
     person_id: string;
     center_id: string;
-    interval: { starts_at: string; ends_at: string };
+    interval?: { starts_at: string; ends_at: string };
     page: { cursor?: string };
   }[] = [];
-  await page.route("**/functions/v1/backend-v1/earnings_list_v1", async (route) => {
+  await page.route("**/functions/v1/backend-v1/instructor_account_get_v1", async (route) => {
     const req = route.request().postDataJSON();
+    if (req.view !== "earnings") return route.fallback();
     requests.push(req);
     expect(req.person_id).toBe(I.instructor);
     expect(req.center_id).toBe(I.center);
     const row = {
       id: id(req.page.cursor ? 992 : 991),
-      person_id: I.instructor,
+      person_id: req.interval ? I.instructor : id(998),
       center_id: I.center,
       session_id: I.lesson,
       event_assignment_id: null,
@@ -34,14 +35,21 @@ test("own earnings preserves cursor scope and currency alongside native summarie
       direction: req.page.cursor ? "subtract" : "add",
       previous_id: req.page.cursor ? id(991) : null,
       closure_id: null,
-      created_at: req.interval.starts_at,
+      created_at: req.interval?.starts_at ?? "2019-01-01T00:00:00Z",
       version: 1,
-      basis: { source: "agreement_fixed", currency: "TRY", quantity: 1, excluded_blocked: 0 },
+      basis: {
+        source: "agreement_fixed",
+        currency: req.page.cursor ? "USD" : "TRY",
+        quantity: 1,
+        excluded_blocked: 0,
+      },
     };
     await route.fulfill({
       json: {
         ok: true,
         data: {
+          view: "earnings",
+          totals: [],
           items: [row],
           next_cursor: req.page.cursor ? null : "second",
           as_of: "2026-11-16T12:00:00Z",
@@ -55,10 +63,9 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   await expect(page.getByRole("gridcell", { name: /90.071.992.547.409,93/ })).toBeVisible();
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
   expect(requests).toHaveLength(1);
-  expect(requests[0]!.interval).toEqual({
-    starts_at: "2026-10-31T21:00:00Z",
-    ends_at: "2026-11-30T21:00:00Z",
-  });
+  expect(requests[0]).not.toHaveProperty("interval");
+  await expect(page.getByRole("combobox", { name: "Dönem", exact: true })).toHaveValue("all");
+  await expect(page.getByText(/2019/).first()).toBeVisible();
   await page.getByRole("button", { name: "Sonraki", exact: true }).click();
   await expect(page.getByText("Düzeltme", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Sonraki", exact: true })).toBeDisabled();
@@ -75,6 +82,10 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   await expect(page.getByText("Güncel ödeme geçmişi okunamadı.", { exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
   await page.getByRole("tab", { name: "Seans satırları", exact: true }).click();
+  await page.getByRole("combobox", { name: "Dönem", exact: true }).selectOption("2026-11");
+  await expect
+    .poll(() => requests.at(-1)?.interval)
+    .toEqual({ starts_at: "2026-10-31T21:00:00Z", ends_at: "2026-11-30T21:00:00Z" });
   await page.setViewportSize({ width: 320, height: 950 });
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
 });
@@ -83,7 +94,8 @@ test("own earnings denied read stays unknown until explicit retry", async ({ pag
   await mockAccount(page);
   let denied = true,
     reads = 0;
-  await page.route("**/functions/v1/backend-v1/earnings_list_v1", async (route) => {
+  await page.route("**/functions/v1/backend-v1/instructor_account_get_v1", async (route) => {
+    if (route.request().postDataJSON().view !== "earnings") return route.fallback();
     reads++;
     await route.fulfill(
       denied
@@ -94,7 +106,13 @@ test("own earnings denied read stays unknown until explicit retry", async ({ pag
         : {
             json: {
               ok: true,
-              data: { items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" },
+              data: {
+                view: "earnings",
+                totals: [],
+                items: [],
+                next_cursor: null,
+                as_of: "2026-11-16T12:00:00Z",
+              },
               trace_id: I.role,
             },
           },
@@ -137,25 +155,27 @@ async function mockAccount(page: Page, populated = false) {
     expect(req.page.limit).toBe(20);
     const correction = !!req.page.cursor;
     const items =
-      req.view === "agreements"
-        ? populated
-          ? [agreement, { ...agreement, id: id(801), version: 5, person_id: id(999) }]
-          : []
-        : populated
-          ? [
-              {
-                id: id(correction ? 812 : 811),
-                root_payment_id: id(811),
-                version: correction ? 2 : 7,
-                direction: correction ? "decrease" : "increase",
-                amount_minor: correction ? "100" : "9007199254740993",
-                currency: correction ? "USD" : "TRY",
-                occurred_at: "2026-11-05T10:00:00Z",
-                method: correction ? null : "bank_transfer",
-                previous_id: correction ? id(811) : null,
-              },
-            ]
-          : [];
+      req.view === "earnings"
+        ? []
+        : req.view === "agreements"
+          ? populated
+            ? [agreement, { ...agreement, id: id(801), version: 5, person_id: id(999) }]
+            : []
+          : populated
+            ? [
+                {
+                  id: id(correction ? 812 : 811),
+                  root_payment_id: id(811),
+                  version: correction ? 2 : 7,
+                  direction: correction ? "decrease" : "increase",
+                  amount_minor: correction ? "100" : "9007199254740993",
+                  currency: correction ? "USD" : "TRY",
+                  occurred_at: "2026-11-05T10:00:00Z",
+                  method: correction ? null : "bank_transfer",
+                  previous_id: correction ? id(811) : null,
+                },
+              ]
+            : [];
     await route.fulfill({
       json: {
         ok: true,
@@ -217,13 +237,22 @@ test("own account payments use actual totals, independent cursor and unbounded n
     "Yöntem kaydedilmemiş",
   );
   await expect(page.getByRole("grid", { name: "Ödemeler", exact: true })).toContainText("-$1,00");
+  await page.getByRole("combobox", { name: "Dönem", exact: true }).selectOption("2026-11");
+  await expect(page.getByRole("grid", { name: "Ödemeler", exact: true })).toContainText(
+    "Banka havalesi",
+  );
   await page.getByRole("combobox", { name: "Dönem", exact: true }).selectOption("all");
   await expect(page.getByRole("grid", { name: "Ödemeler", exact: true })).toContainText(
     "Banka havalesi",
   );
-  const all = requests.filter((r) => r.view === "payments" && !("interval" in r));
+  const all = requests.filter(
+    (r) => r.view === "payments" && !("interval" in r) && !(r.page as { cursor?: string }).cursor,
+  );
   expect(all).toHaveLength(1);
   expect(all[0]!.page).toEqual({ limit: 20 });
+  expect(
+    requests.filter((r) => r.view === "earnings" && (r.page as { cursor?: string }).cursor),
+  ).toEqual([]);
   await page.setViewportSize({ width: 320, height: 950 });
 });
 test("own current agreements render native read-only terms and retain an authorized historical person alias", async ({
