@@ -1,6 +1,10 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import type { SessionView } from "../src/lib/api-contracts/generated.js";
+import type {
+  RequestSessionChangePreview,
+  SchedulePreviewItem,
+  SessionView,
+} from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -10,10 +14,26 @@ async function scheduleFixture(
   withSession = false,
   verifiedInstructor = false,
   managed = false,
+  series = false,
 ) {
   const fixture = await mockStudio(page);
   if (verifiedInstructor) fixture.roles[0]!.accountAccessGranted = true;
-  let session: SessionView | undefined;
+  let session: SessionView | undefined, future: SessionView | undefined;
+  if (series) {
+    const personId = "019a7b00-0000-7000-8000-000000000096";
+    fixture.people.push({
+      ...structuredClone(fixture.people[0]!),
+      id: personId,
+      display_name: "İkinci sentetik eğitmen",
+    });
+    fixture.roles.push({
+      id: "019a7b00-0000-7000-8000-000000000097",
+      personId,
+      active: true,
+      version: 1,
+      accountAccessGranted: true,
+    });
+  }
   const writes: string[] = [];
   const reads: string[] = [];
   const group = {
@@ -28,47 +48,66 @@ async function scheduleFixture(
     reservationId = "019a7b00-0000-7000-8000-000000000087";
   const groupKeys = new Set<string>();
   const changes: Record<string, unknown>[] = [];
-  let patch: { capacity?: { total: number } } | undefined;
+  const previews: RequestSessionChangePreview[] = [];
+  let reviewed: { id: string; token: string; sessions: SchedulePreviewItem[] } | undefined;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!;
     const request = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
     if (managed && operation === "session_change_preview_v1") {
-      patch = request.patch;
+      previews.push(request);
+      const affected = [
+        session!,
+        ...(request.scope === "this_and_future" && future ? [future] : []),
+      ];
+      const delta = request.patch.interval
+        ? Date.parse(request.patch.interval.starts_at) - Date.parse(session!.starts_at)
+        : 0;
+      const duration = request.patch.interval
+        ? Date.parse(request.patch.interval.ends_at) - Date.parse(request.patch.interval.starts_at)
+        : 3600000;
+      reviewed = {
+        id: `019a7b00-0000-7000-8000-${String(900 + previews.length).padStart(12, "0")}`,
+        token: `synthetic-change-${previews.length}`,
+        sessions: affected.map((row) => ({
+          session_id: row.id,
+          expected_version: row.version,
+          interval: {
+            starts_at: new Date(Date.parse(row.starts_at) + delta).toISOString(),
+            ends_at: new Date(Date.parse(row.starts_at) + delta + duration).toISOString(),
+          },
+          resources: request.patch.resources ?? [{ kind: "room", id: I.room }],
+          assignments: request.patch.assignments ?? row.assignments,
+          capacity: request.patch.capacity ?? { total: row.capacity.total },
+        })),
+      };
       return send({
-        id: "019a7b00-0000-7000-8000-000000000090",
-        token: "synthetic-change",
+        ...reviewed,
         scope_hash: "synthetic",
         expires_at: "2099-01-01T00:00:00Z",
         blockers: [],
         effects: [],
         dependencies: {
-          versions: [{ entity: { type: "sessions", id: session!.id }, version: session!.version }],
+          versions: affected.map((row) => ({
+            entity: { type: "sessions", id: row.id },
+            version: row.version,
+          })),
           policy_hashes: [],
           permission_hash: "synthetic",
         },
-        sessions: [
-          {
-            session_id: session!.id,
-            expected_version: session!.version,
-            interval: { starts_at: session!.starts_at, ends_at: session!.ends_at },
-            resources: [{ kind: "room", id: I.room }],
-            assignments: session!.assignments,
-            capacity: request.patch.capacity ?? { total: session!.capacity.total },
-          },
-        ],
       });
     }
     if (managed && operation === "session_change_apply_v1") {
       changes.push(request);
-      expect(request.preview).toEqual({
-        id: "019a7b00-0000-7000-8000-000000000090",
-        token: "synthetic-change",
-      });
-      session!.version++;
-      if (patch?.capacity) {
-        session!.capacity.total = patch.capacity.total;
-        session!.capacity.remaining = patch.capacity.total - session!.capacity.held;
+      expect(request.preview).toEqual({ id: reviewed!.id, token: reviewed!.token });
+      for (const item of reviewed!.sessions) {
+        const target = [session, future].find((row) => row?.id === item.session_id)!;
+        target.version++;
+        target.starts_at = item.interval.starts_at;
+        target.ends_at = item.interval.ends_at;
+        target.assignments = structuredClone(item.assignments);
+        target.capacity.total = item.capacity.total;
+        target.capacity.remaining = item.capacity.total - target.capacity.held;
       }
       return send({ primary_id: session!.id, changed: [], jobs: [] });
     }
@@ -119,7 +158,10 @@ async function scheduleFixture(
           attendance_state: "open",
           starts_at: new Date(start).toISOString(),
           ends_at: new Date(start + 3600000).toISOString(),
-          assignments: [{ person_id: I.instructor, duty: "instructor" }],
+          assignments: [
+            { person_id: I.instructor, duty: "instructor" },
+            ...(series ? [{ person_id: I.self, duty: "assistant" as const }] : []),
+          ],
           version: 3,
           capacity: {
             total: 12,
@@ -131,6 +173,13 @@ async function scheduleFixture(
           },
         };
       }
+      if (series && session && !future)
+        future = {
+          ...structuredClone(session),
+          id: "019a7b00-0000-7000-8000-000000000095",
+          starts_at: new Date(Date.parse(session.starts_at) + 86400000).toISOString(),
+          ends_at: new Date(Date.parse(session.ends_at) + 86400000).toISOString(),
+        };
       return send({
         items: session
           ? [
@@ -143,6 +192,19 @@ async function scheduleFixture(
                 title: "Sentetik program seansı",
                 resources: [{ kind: "room", id: I.room }],
               },
+              ...(future
+                ? [
+                    {
+                      id: future.id,
+                      type: "session",
+                      center_id: I.center,
+                      starts_at: future.starts_at,
+                      ends_at: future.ends_at,
+                      title: "İleri program seansı",
+                      resources: [{ kind: "room", id: I.room }],
+                    },
+                  ]
+                : []),
             ]
           : [],
         next_cursor: null,
@@ -151,7 +213,7 @@ async function scheduleFixture(
     }
     if (operation === "session_get_v1") {
       reads.push(operation);
-      return send(session);
+      return send(request.session_id === future?.id ? future : session);
     }
     if (
       operation === "management_state_get_v1" &&
@@ -320,26 +382,25 @@ async function scheduleFixture(
       operation === "management_state_get_v1" &&
       request.operation === "session_change_preview_v1"
     ) {
-      if (managed)
+      if (managed) {
+        const target = request.selector.key.session_id === future?.id ? future! : session!;
         return send({
           items: [
             {
               operation: "session_change_preview_v1",
-              entity: { type: "sessions", id: session!.id },
+              entity: { type: "sessions", id: target.id },
               exists: true,
-              state: session!.state,
-              versions: [
-                { entity: { type: "sessions", id: session!.id }, version: session!.version },
-              ],
+              state: target.state,
+              versions: [{ entity: { type: "sessions", id: target.id }, version: target.version }],
               current: {
                 operation: "session_change_preview_v1",
                 values: {
-                  session_id: session!.id,
+                  session_id: target.id,
                   scope: "single",
                   patch: {
-                    interval: { starts_at: session!.starts_at, ends_at: session!.ends_at },
+                    interval: { starts_at: target.starts_at, ends_at: target.ends_at },
                     resources: [{ kind: "room", id: I.room }],
-                    capacity: { total: session!.capacity.total },
+                    capacity: { total: target.capacity.total },
                   },
                 },
               },
@@ -349,6 +410,7 @@ async function scheduleFixture(
           next_cursor: null,
           as_of: new Date().toISOString(),
         });
+      }
       reads.push("editor-policy-rejection");
       return route.fulfill({
         json: {
@@ -376,7 +438,12 @@ async function scheduleFixture(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/schedule`);
+  await Promise.all([
+    page.waitForResponse(
+      (response) => response.url().endsWith("/calendar_get_v1") && response.status() === 200,
+    ),
+    page.goto(`${origin}/o/${I.org}/c/${I.center}/schedule`),
+  ]);
   await expect(page.getByRole("button", { name: "Seans ekle", exact: true })).toBeEnabled();
   await expect.poll(() => reads.includes("calendar_get_v1")).toBe(true);
   return {
@@ -385,6 +452,10 @@ async function scheduleFixture(
     fixture,
     group,
     changes,
+    previews,
+    get future() {
+      return future;
+    },
     saleId,
     get session() {
       return session;
@@ -543,6 +614,12 @@ test("cancelled session shows its native durable replacement relation", async ({
   await expect(history.getByText("Planlandı", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
   await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.reload();
+  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await expect(
+    page.getByRole("region", { name: "Bağlı telafi seansları", exact: true }).getByRole("listitem"),
+  ).toHaveCount(1);
+  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
 });
 
 test("blocked program preview explains the native reason and clears it when the draft changes", async ({
@@ -662,4 +739,67 @@ test("a newer detail version does not borrow resources from a stale calendar row
   await expect(panel.getByText("Tango", { exact: true })).toBeVisible();
   await expect(panel.getByRole("button", { name: "Seansı düzenle", exact: true })).toBeDisabled();
   expect(state.writes).toEqual([]);
+});
+
+test("time and instructor changes apply an explicitly reviewed future scope and reread both occurrences", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-11-16T06:00:00Z"));
+  const f = await scheduleFixture(page, true, true, true, true);
+  const future = f.future!;
+  const nextInstructor = "019a7b00-0000-7000-8000-000000000096";
+  const preservedAssistant = { person_id: I.self, duty: "assistant" };
+  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  let panel = page.getByRole("dialog");
+  await panel.getByRole("button", { name: "Seansı düzenle", exact: true }).click();
+  await panel.locator("#schedule-session-time").fill("15:20");
+  await panel.locator("#schedule-session-duration").fill("45");
+  await panel.locator('input[value="this_and_future"]').press("Space");
+  await panel.locator("#schedule-session-reason").fill("Kontrollü ileri oluşum saat düzenlemesi");
+  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  expect(f.changes).toHaveLength(0);
+  await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+  await expect(
+    panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
+  ).toBeVisible();
+  expect(f.previews[0]).toMatchObject({
+    scope: "this_and_future",
+    patch: { interval: { starts_at: "2026-11-16T12:20:00Z", ends_at: "2026-11-16T13:05:00Z" } },
+  });
+  expect(f.session!.starts_at).toBe("2026-11-16T12:20:00.000Z");
+  expect(future.starts_at).toBe("2026-11-17T12:20:00.000Z");
+  expect(f.session!.version).toBe(4);
+  expect(future.version).toBe(4);
+  await expect(panel).toContainText("15:20");
+  await panel.getByRole("button", { name: "Eğitmeni değiştir", exact: true }).click();
+  await panel.locator("#schedule-session-instructor").selectOption(nextInstructor);
+  await panel.locator('input[value="this_and_future"]').press("Space");
+  await panel.locator("#schedule-session-reason").fill("Kontrollü ileri oluşum eğitmen değişimi");
+  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  expect(f.changes).toHaveLength(1);
+  await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+  await expect(
+    panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
+  ).toBeVisible();
+  await expect(panel).toContainText("İkinci sentetik eğitmen");
+  for (const row of [f.session!, future]) {
+    expect(row.version).toBe(5);
+    expect(row.assignments).toEqual([
+      preservedAssistant,
+      { person_id: nextInstructor, duty: "instructor" },
+    ]);
+  }
+  expect(f.previews[1]).toMatchObject({
+    scope: "this_and_future",
+    patch: { assignments: [preservedAssistant, { person_id: nextInstructor, duty: "instructor" }] },
+  });
+  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.reload();
+  await page.getByText("İleri program seansı", { exact: true }).click();
+  panel = page.getByRole("dialog");
+  await expect(panel).toContainText("15:20");
+  await expect(panel).toContainText("İkinci sentetik eğitmen");
+  expect(f.changes).toHaveLength(2);
+  expect(f.writes).toEqual([]);
+  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
 });

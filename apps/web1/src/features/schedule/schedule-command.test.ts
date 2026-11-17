@@ -216,3 +216,50 @@ describe("reviewed native schedule writes and rereads", () => {
     expect(call).not.toHaveBeenCalled();
   });
 });
+
+it("rejects a newer matching-time session with stale duties, but accepts reordered native duties without demanding optional agreement metadata", async () => {
+  const p = preview();
+  p.sessions![0]!.assignments = [
+    { person_id: "new-instructor", duty: "instructor", agreement_id: "native-agreement" },
+    { person_id: "assistant", duty: "assistant" },
+  ];
+  const value = scheduleApplyIntent({
+    scope,
+    operation: "session_change_apply_v1",
+    preview: p,
+    sessionId: "fixture-session",
+    sourceVersion: 3,
+  });
+  const source: SessionView = {
+    id: "fixture-session",
+    class_id: null,
+    discipline_id: "fixture-discipline",
+    format: "group",
+    attendance_state: "open",
+    state: "planned",
+    version: 4,
+    ...interval,
+    assignments: [
+      { person_id: "old-instructor", duty: "instructor" },
+      { person_id: "assistant", duty: "assistant" },
+    ],
+    capacity: {
+      total: 12,
+      held: 0,
+      remaining: 12,
+      category_held: null,
+      category_remaining: null,
+      room_capacity: null,
+    },
+  };
+  call.mockResolvedValue(source);
+  await expect(readScheduleResult(value)).rejects.toThrow("SCHEDULE_REREAD_UNAVAILABLE");
+  source.assignments = [
+    { person_id: "assistant", duty: "assistant" },
+    { person_id: "new-instructor", duty: "instructor" },
+  ];
+  await expect(readScheduleResult(value)).resolves.toBeUndefined();
+  source.assignments = [{ person_id: "new-instructor", duty: "instructor" }];
+  await expect(readScheduleResult(value)).rejects.toThrow("SCHEDULE_REREAD_UNAVAILABLE");
+  expect(call.mock.calls.every(([operation]) => operation === "session_get_v1")).toBe(true);
+});

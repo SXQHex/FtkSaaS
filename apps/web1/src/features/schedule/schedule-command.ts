@@ -4,6 +4,7 @@ import { getTemporal } from "../../lib/temporal";
 import type { Operations } from "../../lib/api-contracts/operations";
 import type {
   Interval,
+  DutyInput,
   Preview,
   SessionPatch,
   SessionView,
@@ -43,6 +44,7 @@ export type ScheduleIntent = {
     id: string;
     version?: number;
     interval?: Interval;
+    assignments?: DutyInput[];
     state?: "planned" | "cancelled";
   }[];
 } & {
@@ -234,6 +236,9 @@ export function scheduleApplyIntent(review: ScheduleReview): ScheduleIntent {
                     entry.entity.type === "sessions" && entry.entity.id === item.session_id,
                 )?.version),
           interval: structuredClone(item.interval),
+          ...(review.operation === "session_change_apply_v1"
+            ? { assignments: structuredClone(item.assignments) }
+            : {}),
           state: "planned" as const,
         }));
   if (
@@ -327,6 +332,8 @@ export async function readScheduleReceipt(intent: ScheduleIntent) {
   return result;
 }
 export async function readScheduleResult(intent: ScheduleIntent, primaryId?: string) {
+  const duties = (values: DutyInput[]) =>
+    values.map((row) => `${row.person_id}:${row.duty}`).sort();
   const temporal = await getTemporal();
   const expected = [...intent.expectedSessions];
   if (
@@ -348,6 +355,9 @@ export async function readScheduleResult(intent: ScheduleIntent, primaryId?: str
         if (
           session.state !== item.state ||
           (item.version !== undefined && session.version <= item.version) ||
+          (item.assignments !== undefined &&
+            JSON.stringify(duties(session.assignments)) !==
+              JSON.stringify(duties(item.assignments))) ||
           (item.interval &&
             (!temporal.Instant.from(session.starts_at).equals(
               temporal.Instant.from(item.interval.starts_at),
