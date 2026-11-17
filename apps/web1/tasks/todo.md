@@ -865,7 +865,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 
 ## Başlangıç
 
-### T01 · Mevcut temeli çalıştır
+### T01 · Mevcut temeli çalıştır (kapalı)
 
 | Önkoşul | Sözleşme  | Doğrulama                       |
 | ------- | --------- | ------------------------------- |
@@ -929,7 +929,7 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
   - [x] Salt okunur önizleme: `deletion-preview.ts` tek native bearer ile account kimliği→typed preview; token/ID yalnız taşıma katmanında, UI görünümü güvenli alanlardan oluşur. Hazır sağ Sheet26rem, Card/Item/Badge kullanıldı; owner engeli ve gerçek lifecycle sayıları gösterilir. 14 Kasım2026 gerçek development Pro Owner önizlemesi OWNER_TRANSFER_REQUIRED verdi; apply çağrısı0. 182 birim,5 Chromium senaryosu;320px/200%, açık/koyu, text spacing, ortak WCAG2.2AA Axe, tam ileri/geri klavye ve PageDown/Home kaydırması geçti. Kanıt `.tmp/e09-preview-{all-unit,browser,build}.log`; final1440/390px karşılaştırması `.tmp/e09-preview-{app,reference}-<genişlik>-<tema>.png`. Çizimdeki statik etki metinleri yerine gerçek DTO alanları gösterilir; fiziksel silme kabulü iddia edilmez. Bağımsız son kaynak incelemesinde zorunlu bulgu yok.
   - [x] Taze native doğrulama, açık SİL onayı, aynı key/payload kayıp-ACK kurtarması ve native hesaba bağlı sonuç takibi. Gerçek development dedicated synthetic alias native kayıt/gerçek Gmail doğrulaması→izinli preview→parolayla fresh native login→apply HTTP200→sonuç route→aynı hesapla native yeniden giriş→job_status_get(org_id:null) HTTP200→reload/status200 geçti. Sunucu partial, beş pending scope ve profile_erasure:unbound verdi; bunlar tamamlandı sayılmaz. Test hesabı dışındaki hesap/kişi/organizasyon silinmedi, hosted reset/seed/cleanup yok. Yalnız kendi yeni takip oturumu native local çıkışla kapatıldı. Boolean/HTTP kanıt `.tmp/e09-hosted-result.json`; kimlik/token/parola/canlı ekran görüntüsü kaydedilmedi.
 
-### P02 · Rol, organizasyon ve gezinme
+### P02 · Rol, organizasyon ve gezinme (kapalı)
 
 | Önkoşul         | Sözleşme                                                                                                                                                                    | Doğrulama                            |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -1022,7 +1022,7 @@ P04.2 kabulü:89 birim/18 tarayıcı geçti (`auth-student-discipline`, `auth-me
 - [ ] **P07.4** · Uygun paketi dondur ve dondurmayı bitir. Geçerlilik ve etkilenen rezervasyonlar yeni okumada önizlemeyle uyuşur.
 - [ ] **P07.5** · Değişim, yenileme ve sonlandırma işlemlerini uygun satışlarda ayrı ayrı uygula. Her sonucun hak hareketleri ve eski satış geçmişi izlenebilir.
 
-### P08 · Manuel tahsilat ve öğrenci alacağı
+### P08 · Manuel tahsilat ve öğrenci alacağı (kapalı)
 
 | Önkoşul   | Sözleşme                                                                              | Doğrulama                                       |
 | --------- | ------------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -1105,7 +1105,7 @@ P11.2/.3 kabulü: `auth-instructor-flows`8/8 ve `auth-member-account`8/8, eğitm
 - [ ] **P14.3** · Yaklaşan ders veya paket bitişi hatırlatmasını test verisiyle izle. Etkili tercih, dil ve sessiz saat politikasıyla gönderim zamanı ve içerik eşleşir. Teslim hatasında yalnız izinli yeniden deneme seçeneği görünür.
 - [ ] **P14.4** · Güncel segmentten takip otomasyonu oluştur. Aynı kaynak olayı yeniden işlendiğinde yetkili merkezde tek takip görevi okunur.
 
-### P16 · Rapor, CSV ve kontrollü içe aktarma
+### P16 · Rapor, CSV ve kontrollü içe aktarma (kapalı)
 
 | Önkoşul                                     | Sözleşme                                                                              | Doğrulama                                             |
 | ------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
