@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { AutomationJobView } from "../../lib/api-contracts/generated";
+import type { AutomationJobView, JobState } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { readWorkspace } from "../workspace/workspace";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -14,6 +14,7 @@ import { AutomationView, type AutomationTab } from "./automation-view";
 import { AutomationEditor, type AutomationEditorProps } from "./automation-editor";
 import {
   readAutomations,
+  automationAt,
   readSegments,
   automationIntent,
   writeAutomation,
@@ -21,6 +22,8 @@ import {
   readAutomationResult,
   type AutomationRecord,
 } from "./automation";
+import { readAutomationQueue } from "./automation-discovery";
+import { SegmentDiscovery } from "./segment-discovery";
 import { segmentDraft } from "./automation-form";
 import { Button } from "../../components/ui/button";
 import { Field, FieldLabel } from "../../components/ui/field";
@@ -44,6 +47,14 @@ export function AutomationContent({
     [segmentCursors, setSegmentCursors] = useState<(string | undefined)[]>([undefined]),
     [segmentIndex, setSegmentIndex] = useState(0),
     [jobsFor, setJobsFor] = useState(""),
+    [jobState, setJobState] = useState<JobState | "all">("all"),
+    [jobCursors, setJobCursors] = useState<(string | undefined)[]>([undefined]),
+    [jobIndex, setJobIndex] = useState(0),
+    [discovery, setDiscovery] = useState<{
+      id: string;
+      name: string;
+      mode: "matches" | "automations";
+    }>(),
     [selection, setSelection] = useState<AutomationEditorProps["selection"]>(),
     [action, setAction] = useState<{
       before: AutomationRecord;
@@ -52,6 +63,14 @@ export function AutomationContent({
     }>(),
     [locked, setLocked] = useState(false),
     [notice, setNotice] = useState<string>();
+  const preflight = useRef(false),
+    active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
   const prefix = ["automation", scope.accountId, scope.orgId, scope.centerId];
   const workspace = useQuery({
     queryKey: ["workspace", scope.accountId, scope.orgId],
@@ -88,9 +107,18 @@ export function AutomationContent({
     refetchOnWindowFocus: false,
   });
   const jobsSource = useQuery({
-    queryKey: [...prefix, "jobs", jobsFor],
-    queryFn: () => readAutomations(scope, jobsFor),
-    enabled: !!center && !!jobsFor,
+    queryKey: [...prefix, "jobs", jobsFor, jobState, jobCursors[jobIndex]],
+    queryFn: async () => {
+      const page = await readAutomationQueue(
+        scope,
+        { automationId: jobsFor || undefined, state: jobState },
+        jobCursors[jobIndex],
+      );
+      if (page.nextCursor && jobCursors.includes(page.nextCursor))
+        throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
+      return page;
+    },
+    enabled: !!center && tab === "jobs",
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -103,6 +131,7 @@ export function AutomationContent({
       ) {
         queries.removeQueries({ queryKey: ["automation", scope.accountId] });
         queries.removeQueries({ queryKey: ["automation-segment-choices", scope.accountId] });
+        queries.removeQueries({ queryKey: ["automation-discovery", scope.accountId] });
         void router.invalidate();
         return true;
       }
@@ -123,7 +152,7 @@ export function AutomationContent({
   );
   async function refresh() {
     await Promise.all([
-      queries.invalidateQueries({ queryKey: prefix }),
+      queries.invalidateQueries({ queryKey: prefix }, { throwOnError: true }),
       queries.invalidateQueries({
         queryKey: ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId],
       }),
@@ -137,45 +166,92 @@ export function AutomationContent({
           timeZone: center.timezone,
         })
       : undefined;
-  const jobRecord = !jobsSource.isError ? jobsSource.data?.items[0] : undefined;
-  const jobRows = jobRecord?.jobs?.map((row) => ({
-    id: row.id,
-    automationId: jobRecord.id,
-    automation: jobRecord.definition.name,
-    when: row.next_attempt_at
-      ? `${t(($) => $.automation.nextAttempt)} ${format!.format(new Date(row.next_attempt_at))}`
-      : unknown,
-    initiator: unknown,
-    state: t(($) => $.automation.jobStates[row.state]),
-    targets: unknown,
-    emailAccepted:
-      jobRecord.definition.action.channel === "in_app"
-        ? t(($) => $.automation.notApplicable)
-        : unknown,
-    delivery:
-      jobRecord.definition.action.channel === "in_app"
-        ? t(($) => $.automation.notApplicable)
-        : unknown,
-    canRetry: row.retry_available && row.state === "failed",
-  }));
+  const jobRows = !jobsSource.isError
+    ? jobsSource.data?.items.map((row) => ({
+        id: row.id,
+        automationId: row.automation_id,
+        automation: row.automation_name,
+        when: format!.format(new Date(row.created_at)),
+        initiator: t(($) => $.automation.initiatorAutomation),
+        state: t(($) => $.automation.jobStates[row.state]),
+        targets: "1",
+        emailAccepted: t(($) => $.automation.notApplicable),
+        delivery: t(($) => $.automation.unsupportedDelivery),
+        canRetry: row.retry_available && row.state === "failed",
+      }))
+    : undefined;
   const pagination =
     tab === "jobs" ? (
-      <Field className="w-full max-w-sm">
-        <FieldLabel htmlFor="automation-job-target">{t(($) => $.automation.jobsFor)}</FieldLabel>
-        <NativeSelect
-          id="automation-job-target"
-          value={jobsFor}
-          disabled={locked || autos.isFetching || autos.isError}
-          onChange={(event) => setJobsFor(event.target.value)}
-        >
-          <NativeSelectOption value="">{t(($) => $.automation.choose)}</NativeSelectOption>
-          {autos.data?.items.map((row) => (
-            <NativeSelectOption key={row.id} value={row.id}>
-              {row.definition.name}
+      <div className="flex w-full flex-wrap items-end gap-3">
+        <Field className="w-full max-w-sm">
+          <FieldLabel htmlFor="automation-job-target">{t(($) => $.automation.jobsFor)}</FieldLabel>
+          <NativeSelect
+            id="automation-job-target"
+            value={jobsFor}
+            disabled={locked || autos.isFetching || autos.isError}
+            onChange={(event) => {
+              setJobsFor(event.target.value);
+              setJobCursors([undefined]);
+              setJobIndex(0);
+            }}
+          >
+            <NativeSelectOption value="">
+              {t(($) => $.automation.allAutomations)}
             </NativeSelectOption>
-          ))}
-        </NativeSelect>
-      </Field>
+            {autos.data?.items.map((row) => (
+              <NativeSelectOption key={row.id} value={row.id}>
+                {row.definition.name}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </Field>
+        <Field className="w-full max-w-xs">
+          <FieldLabel htmlFor="automation-job-state">{t(($) => $.automation.jobFilter)}</FieldLabel>
+          <NativeSelect
+            id="automation-job-state"
+            value={jobState}
+            disabled={locked}
+            onChange={(event) => {
+              setJobState(event.target.value as JobState | "all");
+              setJobCursors([undefined]);
+              setJobIndex(0);
+            }}
+          >
+            <NativeSelectOption value="all">
+              {t(($) => $.automation.allJobStates)}
+            </NativeSelectOption>
+            {(
+              ["pending", "running", "retry_wait", "succeeded", "failed", "cancelled"] as const
+            ).map((state) => (
+              <NativeSelectOption key={state} value={state}>
+                {t(($) => $.automation.jobStates[state])}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </Field>
+        <Button
+          variant="outline"
+          isDisabled={locked || jobsSource.isFetching || jobIndex === 0}
+          onPress={() => setJobIndex((value) => value - 1)}
+        >
+          {t(($) => $.people.previous)}
+        </Button>
+        <Button
+          variant="outline"
+          isDisabled={
+            locked || jobsSource.isFetching || jobsSource.isError || !jobsSource.data?.nextCursor
+          }
+          onPress={() => {
+            const next = jobsSource.data?.nextCursor;
+            if (next && !jobCursors.includes(next)) {
+              setJobCursors([...jobCursors.slice(0, jobIndex + 1), next]);
+              setJobIndex((value) => value + 1);
+            }
+          }}
+        >
+          {t(($) => $.people.next)}
+        </Button>
+      </div>
     ) : (
       <div className="flex flex-wrap gap-2">
         <Button
@@ -278,15 +354,43 @@ export function AutomationContent({
         jobs={jobRows ?? null}
         jobsPlaceholder={
           <p>
-            {!jobsFor
-              ? t(($) => $.automation.chooseJobs)
-              : jobsSource.isError
-                ? t(($) => $.automation.readError)
-                : jobRecord && jobRecord.jobs === undefined
-                  ? t(($) => $.automation.unknown)
-                  : t(($) => $.automation.loading)}
+            {jobsSource.isError ? t(($) => $.automation.readError) : t(($) => $.automation.loading)}
           </p>
         }
+        jobSummary={
+          !jobsSource.isError &&
+          jobsSource.data && (
+            <dl
+              aria-label={t(($) => $.automation.queueTitle)}
+              className="mb-3 flex flex-wrap gap-x-5 gap-y-2 text-sm"
+            >
+              {(["total", "notifications_created", "followups_created"] as const).map((key) => (
+                <div key={key} className="flex gap-2">
+                  <dt>{t(($) => $.automation.queueCounts[key])}</dt>
+                  <dd className="font-medium tabular-nums">
+                    {new Intl.NumberFormat("tr-TR").format(jobsSource.data!.summary[key])}
+                  </dd>
+                </div>
+              ))}
+              {(
+                ["pending", "running", "retry_wait", "succeeded", "failed", "cancelled"] as const
+              ).map((state) => (
+                <div key={state} className="flex gap-2">
+                  <dt>{t(($) => $.automation.jobStates[state])}</dt>
+                  <dd className="tabular-nums">
+                    {new Intl.NumberFormat("tr-TR").format(jobsSource.data!.summary[state])}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+        onDiscover={(id, mode) => {
+          if (!locked) {
+            const segment = segments.data?.items.find((row) => row.id === id);
+            if (segment) setDiscovery({ id, name: segment.name, mode });
+          }
+        }}
         locked={locked}
         pagination={pagination}
         onAdd={() => {
@@ -316,11 +420,28 @@ export function AutomationContent({
         }}
         onRun={() => {}}
         onRetry={(automationId, id) => {
-          if (!locked && jobRecord?.id === automationId) {
-            const row = jobRecord.jobs?.find((value) => value.id === id);
-            if (row?.retry_available)
-              setAction({ before: structuredClone(jobRecord), retry: structuredClone(row) });
-          }
+          if (locked || preflight.current) return;
+          const job =
+            !jobsSource.isError &&
+            jobsSource.data?.items.find(
+              (row) => row.id === id && row.automation_id === automationId,
+            );
+          if (!job || !job.retry_available) return;
+          preflight.current = true;
+          pending(true);
+          void automationAt(scope, automationId)
+            .then((before) => {
+              if (before.version !== job.automation_version)
+                throw new Error("AUTOMATION_SOURCE_UNAVAILABLE");
+              if (active.current) setAction({ before, retry: structuredClone(job) });
+            })
+            .catch((cause) => {
+              if (active.current && !accessLost(cause)) setNotice(t(($) => $.automation.readError));
+            })
+            .finally(() => {
+              preflight.current = false;
+              if (active.current) pending(false);
+            });
         }}
         notice={
           <>
@@ -353,6 +474,15 @@ export function AutomationContent({
           </>
         }
       />
+      {discovery && (
+        <SegmentDiscovery
+          key={`${discovery.id}:${discovery.mode}`}
+          scope={scope}
+          target={discovery}
+          onClose={() => setDiscovery(undefined)}
+          onAccessLost={accessLost}
+        />
+      )}
       {selection && center && (
         <AutomationEditor
           key={`${selection.kind}:${selection.before?.id ?? "new"}`}

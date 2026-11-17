@@ -361,7 +361,9 @@ export default interface Resources {
       "addCondition": "Koşul ekle",
       "addSegment": "Segment ekle",
       "alertTitle": "Uyarı başlığı",
+      "allAutomations": "Tüm otomasyonlar",
       "allConditions": "Hepsi birlikte sağlanmalı",
+      "allJobStates": "Tüm durumlar",
       "assignee": "Görev sorumlusu",
       "cancel": "Vazgeç",
       "choose": "Seç",
@@ -400,6 +402,11 @@ export default interface Resources {
       "deleteSegment": "Segmenti sil",
       "description": "Segmentlere göre üyeye hatırlatma, yönetici görevi ve uyarı. Serbest kod, kampanya postası, otomatik satış ve tahsilat yoktur.",
       "disable": "Otomasyonu kapat",
+      "disabledState": "Kapalı",
+      "discovery": {
+        "automations": "Kullanan otomasyonlar",
+        "matches": "Eşleşmeleri göster"
+      },
       "edit": "Düzenle",
       "editAutomation": "Otomasyonu düzenle",
       "editSegment": "Segmenti düzenle",
@@ -408,14 +415,17 @@ export default interface Resources {
       "empty": "Bu kapsamda görünür kayıt yok.",
       "enable": "Otomasyonu aç",
       "enabledHint": "Açık olduğunda yetkili kaynak olayları için çalışır. Kapatmak geçmiş işleri silmez.",
+      "enabledState": "Açık",
       "existingCondition": "Mevcut koşul",
       "existingRecipient": "Mevcut alıcı {{count}} (korunur)" | "Mevcut alıcı {{count}} (korunur)",
       "existingSegment": "Mevcut segment",
       "followup": "Üye için CRM takip kaydı oluştur",
       "followupHint": "Üyenin CRM takip kaydı oluşur; yönetici sorumlusu atamaz.",
       "inAppHint": "Bildirim seçilen onaylı kaynakla uygulama içinde üretilir. E-posta gönderilmez.",
+      "initiatorAutomation": "Otomasyon",
       "invalid": "Alanları, gün eşiğini, kaynağı ve açık işlem onayını kontrol et.",
       "invalidName": "Ad gerekli.",
+      "jobFilter": "İş durumu",
       "jobHint": "İş durumu, e-posta kabulü ve teslim ayrı izlenir. Yeniden deneme yalnız denenebilir olarak işaretli işler için vardır.",
       "jobStates": {
         "cancelled": "İptal",
@@ -426,14 +436,14 @@ export default interface Resources {
         "succeeded": "Tamamlandı"
       },
       "jobsFor": "Son işleri gösterilecek otomasyon",
-      "jobsLimit": "Son işler seçilen otomasyonun yetkili son 20 kaydıdır; merkez geneli rapor değildir. Başlatan ve teslim toplamı paylaşılmadığında bilinmiyor kalır.",
+      "jobsLimit": "Seçili merkezin yetkili otomasyon işleri gösterilir. İş başarısı bildirim veya takip sonucudur; e-posta teslimi değildir.",
       "loading": "Kayıtlar okunuyor…",
-      "matchUnknown": "Anlık eşleşme ve üye sayısı henüz paylaşılmıyor.",
+      "matchUnknown": "Yeni veya değiştirilmiş tanımın eşleşmesi kaydetmeden hesaplanmaz. Kayıtlı segmentin eşleşmelerini Segmentler listesinden inceleyebilirsin.",
       "matches": "Şu an eşleşen",
       "me": "Bana uyarı gönder",
       "moreSegments": "Daha fazla segment göster",
       "name": "Otomasyon adı",
-      "nativeLimit": "Tanım ve olay tabanlı çalışma bağlıdır. Haftalık/elle çalıştırma, silme, ek segment koşulları ve yönetici görevi henüz kullanılamıyor.",
+      "nativeLimit": "Bu teslimde mevcut olay tetiklemeleri, kaydet/kapat ve başarısız işi yeniden deneme kullanılır. Haftalık/segmente giriş, elle çalıştırma, silme ve yeni segment koşulları kapsam dışıdır.",
       "nativeTriggerHint": "Seçtiğin olayın eşiğini gün olarak yaz.",
       "newHint": "Yeni otomasyon kapalı başlar, istersen açarsın.",
       "nextAttempt": "Sonraki deneme:",
@@ -444,6 +454,12 @@ export default interface Resources {
       "pageCount": "Bu sayfada {{count}} otomasyon" | "Bu sayfada {{count}} otomasyon",
       "preparation": "Hazırlık şablonu",
       "preparationHint": "Kaynak seçimi yalnız açık alanları doldurur; otomatik açılmaz. Bildirim anahtarı serbest metinden üretilmez.",
+      "queueCounts": {
+        "followups_created": "Oluşturulan takip",
+        "notifications_created": "Oluşturulan bildirim",
+        "total": "Toplam iş"
+      },
+      "queueTitle": "İş özeti",
       "readError": "Otomasyon kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
       "recipients": "Uyarı alıcıları",
       "remove": "Kaldır",
@@ -454,6 +470,12 @@ export default interface Resources {
       "reviewRequired": "Kaydetmeden önce tanımı ve etkilerini inceleyip onayla.",
       "run": "Elle çalıştır",
       "save": "Kaydet",
+      "savedDefinition": "Kaydedilmiş tanım; eşleşme çalıştırma garantisi değildir.",
+      "segmentCounts": {
+        "audience_count": "Hedef kitle",
+        "matched_count": "Eşleşen",
+        "using_automations": "Kullanan otomasyon"
+      },
       "segmentDescription": "Koşulları seç, eşleşen üyeleri yetkili kaynaktan incele.",
       "segmentHint": "Koşulların hepsi birlikte sağlanır. Eşleşme kaynaktan okunmadan üye sayısı gösterilmez.",
       "segmentName": "Segment adı",
@@ -477,6 +499,7 @@ export default interface Resources {
         "unclosed_attendance": "Yoklama kapanmayınca"
       },
       "unknown": "Bilgi paylaşılmıyor",
+      "unsupportedDelivery": "Desteklenmiyor",
       "workAlertTiming": "Bu iş uyarısının zamanı merkez ayarlarından belirlenir; buradaki gün alanı kullanılmaz."
     },
     "demo": {

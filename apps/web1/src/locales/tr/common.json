@@ -3753,8 +3753,8 @@
     "noWorker": "Kaydetmek otomasyonu elle çalıştırmaz; olaylar sunucuda planlanır.",
     "invalid": "Alanları, gün eşiğini, kaynağı ve açık işlem onayını kontrol et.",
     "reviewRequired": "Kaydetmeden önce tanımı ve etkilerini inceleyip onayla.",
-    "nativeLimit": "Tanım ve olay tabanlı çalışma bağlıdır. Haftalık/elle çalıştırma, silme, ek segment koşulları ve yönetici görevi henüz kullanılamıyor.",
-    "matchUnknown": "Anlık eşleşme ve üye sayısı henüz paylaşılmıyor.",
+    "nativeLimit": "Bu teslimde mevcut olay tetiklemeleri, kaydet/kapat ve başarısız işi yeniden deneme kullanılır. Haftalık/segmente giriş, elle çalıştırma, silme ve yeni segment koşulları kapsam dışıdır.",
+    "matchUnknown": "Yeni veya değiştirilmiş tanımın eşleşmesi kaydetmeden hesaplanmaz. Kayıtlı segmentin eşleşmelerini Segmentler listesinden inceleyebilirsin.",
     "existingSegment": "Mevcut segment",
     "me": "Bana uyarı gönder",
     "existingRecipient_one": "Mevcut alıcı {{count}} (korunur)",
@@ -3780,7 +3780,7 @@
     "nextAttempt": "Sonraki deneme:",
     "notApplicable": "Uygulanmaz",
     "jobsFor": "Son işleri gösterilecek otomasyon",
-    "jobsLimit": "Son işler seçilen otomasyonun yetkili son 20 kaydıdır; merkez geneli rapor değildir. Başlatan ve teslim toplamı paylaşılmadığında bilinmiyor kalır.",
+    "jobsLimit": "Seçili merkezin yetkili otomasyon işleri gösterilir. İş başarısı bildirim veya takip sonucudur; e-posta teslimi değildir.",
     "activeMembers": "Aktif öğrenciler",
     "existingCondition": "Mevcut koşul",
     "conditionUnsupported": "Bu segmentin koşulları bu düzenleyicide değiştirilemiyor; mevcut tanım korunuyor.",
@@ -3789,7 +3789,30 @@
     "disable": "Otomasyonu kapat",
     "toggleHint": "Yalnız tanımın açık/kapalı durumu değişir. Geçmiş iş ve sonuçlar silinmez.",
     "retryHint": "Yalnız bu işin halen denenebilir sürümü yeniden kuyruğa alınır. Tanım değiştirilmez; worker ve teslim sonucu ayrıca izlenir.",
-    "chooseJobs": "Son işleri görmek için bir otomasyon seç."
+    "chooseJobs": "Son işleri görmek için bir otomasyon seç.",
+    "discovery": {
+      "matches": "Eşleşmeleri göster",
+      "automations": "Kullanan otomasyonlar"
+    },
+    "savedDefinition": "Kaydedilmiş tanım; eşleşme çalıştırma garantisi değildir.",
+    "segmentCounts": {
+      "audience_count": "Hedef kitle",
+      "matched_count": "Eşleşen",
+      "using_automations": "Kullanan otomasyon"
+    },
+    "queueTitle": "İş özeti",
+    "queueCounts": {
+      "total": "Toplam iş",
+      "notifications_created": "Oluşturulan bildirim",
+      "followups_created": "Oluşturulan takip"
+    },
+    "allAutomations": "Tüm otomasyonlar",
+    "allJobStates": "Tüm durumlar",
+    "jobFilter": "İş durumu",
+    "initiatorAutomation": "Otomasyon",
+    "unsupportedDelivery": "Desteklenmiyor",
+    "enabledState": "Açık",
+    "disabledState": "Kapalı"
   },
   "reports": {
     "title": "Raporlar",

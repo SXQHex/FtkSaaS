@@ -59,6 +59,8 @@ export function AutomationView({
   notice,
   pagination,
   jobsPlaceholder,
+  onDiscover,
+  jobSummary,
 }: {
   tab: AutomationTab;
   onTab: (value: AutomationTab) => void;
@@ -75,6 +77,8 @@ export function AutomationView({
   notice?: ReactNode;
   pagination?: ReactNode;
   jobsPlaceholder?: ReactNode;
+  onDiscover?: (id: string, mode: "matches" | "automations") => void;
+  jobSummary?: ReactNode;
 }) {
   const { t } = useTranslation();
   const unknown = t(($) => $.automation.unknown),
@@ -228,8 +232,32 @@ export function AutomationView({
                         <TableRow key={row.id} id={row.id}>
                           <TableCell>{row.name}</TableCell>
                           <TableCell>{row.conditions}</TableCell>
-                          <TableCell>{row.members}</TableCell>
-                          <TableCell>{row.usedBy}</TableCell>
+                          <TableCell>
+                            {onDiscover ? (
+                              <Button
+                                variant="ghost"
+                                isDisabled={locked}
+                                onPress={() => onDiscover(row.id, "matches")}
+                              >
+                                {t(($) => $.automation.discovery.matches)}
+                              </Button>
+                            ) : (
+                              row.members
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {onDiscover ? (
+                              <Button
+                                variant="ghost"
+                                isDisabled={locked}
+                                onPress={() => onDiscover(row.id, "automations")}
+                              >
+                                {t(($) => $.automation.discovery.automations)}
+                              </Button>
+                            ) : (
+                              row.usedBy
+                            )}
+                          </TableCell>
                           <TableCell>
                             <Button
                               variant="outline"
@@ -254,6 +282,7 @@ export function AutomationView({
           </Card>
         </TabsContent>
         <TabsContent id="jobs">
+          {jobSummary}
           <Card>
             <CardHeader className="sr-only">
               <CardTitle>

@@ -1,3 +1,4 @@
+import { readKnownAutomationJob } from "./automation-discovery";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
@@ -202,7 +203,7 @@ async function segmentAt(scope: ClientScope, id: string) {
   if (page.items.length !== 1 || page.next_cursor) throw Error("AUTOMATION_SOURCE_UNAVAILABLE");
   return page.items[0]!;
 }
-async function automationAt(scope: ClientScope, id: string) {
+export async function automationAt(scope: ClientScope, id: string) {
   const page = await readAutomations(scope, id);
   if (page.items.length !== 1 || page.next_cursor) throw Error("AUTOMATION_SOURCE_UNAVAILABLE");
   return page.items[0]!;
@@ -287,10 +288,16 @@ export async function automationIntent(
     const current = await automationAt(scope, before.id);
     if (current.version !== before.version) throw conflict();
     if (retry) {
-      const actual = current.jobs?.find((row) => row.id === retry.id);
+      const actual =
+        retry.automation_id && retry.created_at
+          ? await readKnownAutomationJob(scope, retry)
+          : current.jobs?.find((row) => row.id === retry.id);
       if (
         !actual ||
         actual.version !== retry.version ||
+        (actual.automation_id !== undefined && actual.automation_id !== current.id) ||
+        (actual.automation_version !== undefined &&
+          actual.automation_version !== current.version) ||
         !actual.retry_available ||
         actual.result_reference !== null ||
         !current.definition.enabled ||
@@ -390,7 +397,10 @@ export async function readAutomationResult(intent: AutomationIntent, id?: string
   if (!sameDefinition(value.definition, intent.request.definition))
     throw Error("AUTOMATION_RESULT_UNREAD");
   if (intent.retry) {
-    const job = value.jobs?.find((row) => row.id === intent.retry!.id);
+    const job =
+      intent.retry.automation_id && intent.retry.created_at
+        ? await readKnownAutomationJob(intent.scope, intent.retry)
+        : value.jobs?.find((row) => row.id === intent.retry!.id);
     if (value.version !== intent.before!.version || !job || job.version <= intent.retry.version)
       throw Error("AUTOMATION_RESULT_UNREAD");
   } else if (intent.before && value.version <= intent.before.version)

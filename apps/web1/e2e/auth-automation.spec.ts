@@ -11,7 +11,10 @@ const autoId = "019ab7b0-0000-7000-8000-000000000201",
   segmentId = "019ab7b0-0000-7000-8000-000000000202",
   jobId = "019ab7b0-0000-7000-8000-000000000203",
   createdId = "019ab7b0-0000-7000-8000-000000000204";
-async function fixture(page: Page, mode: "normal" | "unknown" | "stale" = "normal") {
+async function fixture(
+  page: Page,
+  mode: "normal" | "unknown" | "stale" | "segment" | "paged" | "older" = "normal",
+) {
   await mockStudio(page);
   const state = {
     version: 7,
@@ -41,7 +44,19 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "stale" = "norma
     segment: undefined as { name: string; definition: SegmentDefinition } | undefined,
     created: false,
     reads: 0,
+    discoveries: [] as Record<string, unknown>[],
+    denied: false,
   };
+  if (mode === "segment")
+    state.segment = {
+      name: "Hakkı azalanlar",
+      definition: {
+        all: [
+          { field: "active_student", operator: "eq", value: true },
+          { field: "remaining_credits", operator: "lte", value: 2 },
+        ],
+      },
+    };
   const source = { scope: "center", key: "work-alert", version: 4, center_id: I.center },
     defaults = {
       trigger: { kind: "pending_request", offset_days: 0 },
@@ -69,6 +84,93 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "stale" = "norma
       ["automation_save_v1", "segment_save_v1"].includes(r.operation)
     ) {
       expect(r.selector.key.scope).toEqual({ kind: "center", center_id: I.center });
+      if (r.selector.key.discovery) {
+        state.discoveries.push(r);
+        if (state.denied)
+          return route.fulfill({
+            status: 403,
+            json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+          });
+        if (r.selector.key.discovery === "matches")
+          return send({
+            items: [
+              {
+                operation: r.operation,
+                entity: { type: "people", id: r.page.cursor ? I.instructor : I.self },
+                exists: true,
+                state: "active",
+                versions: [],
+                current: null,
+                segment_match: {
+                  person_id: r.page.cursor ? I.instructor : I.self,
+                  display_name: r.page.cursor ? "İkinci örnek üye" : "Örnek eşleşen üye",
+                },
+              },
+            ],
+            segment_summary: { audience_count: 24, matched_count: 3, using_automations: 7 },
+            next_cursor: r.page.cursor ? null : "segment-next",
+            as_of: "2026-11-17T12:00:00Z",
+          });
+        if (r.selector.key.discovery === "automations")
+          return send({
+            items: [
+              {
+                operation: "automation_save_v1",
+                entity: { type: "automations", id: autoId },
+                exists: true,
+                state: "active",
+                versions: [{ entity: { type: "automations", id: autoId }, version: state.version }],
+                current: null,
+                automation_reference: {
+                  id: autoId,
+                  version: state.version,
+                  name: state.definition.name,
+                  enabled: state.definition.enabled,
+                },
+              },
+            ],
+            next_cursor: null,
+            as_of: "2026-11-17T12:00:00Z",
+          });
+        const jobs = state.jobs.map((job) => ({
+          ...job,
+          created_at: "2026-11-16T12:00:00.123456Z",
+          automation_id: autoId,
+          automation_version: state.version,
+          automation_name: state.definition.name,
+          configuration_creator_person_id: I.self,
+          initiator_kind: "automation",
+        }));
+        return send({
+          items: jobs
+            .filter((job) => r.selector.key.state === "all" || job.state === r.selector.key.state)
+            .map((job) => ({
+              operation: r.operation,
+              exists: true,
+              entity: { type: "outbox_jobs", id: job.id },
+              state: job.state,
+              versions: [{ entity: { type: "outbox_jobs", id: job.id }, version: job.version }],
+              current: null,
+              automation_job: job,
+            })),
+          next_cursor:
+            mode === "paged" && !r.page.cursor && !r.selector.key.interval ? "queue-next" : null,
+          as_of: "2026-11-17T12:00:00Z",
+          automation_queue_summary: {
+            total: 90,
+            pending: 20,
+            running: 10,
+            retry_wait: 10,
+            succeeded: 30,
+            failed: 10,
+            cancelled: 10,
+            notifications_created: 7,
+            followups_created: 8,
+            email_delivery: "not_supported",
+          },
+        });
+      }
+
       expect(r.page.limit).toBe(20);
       const automation = r.operation === "automation_save_v1",
         type = automation ? "automations" : "segments",
@@ -95,7 +197,7 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "stale" = "norma
                         automation_id: target,
                         scope: r.selector.key.scope,
                         definition: state.definition,
-                        recent_jobs: state.jobs,
+                        recent_jobs: mode === "older" ? [] : state.jobs,
                       }
                     : {
                         segment_id: target,
@@ -168,16 +270,24 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "stale" = "norma
 const saved = (page: Page) =>
   page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true });
 const review = "Tanımı ve etkilerini inceledim, kaydetmeyi onaylıyorum.";
-test("automation native directory keeps unavailable worker actions disabled and jobs scoped to an explicit selection", async ({
+test("automation native directory keeps unavailable worker actions disabled and reads the scope queue by default", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await fixture(page);
   await expect(page.getByRole("button", { name: "Elle çalıştır", exact: true })).toBeDisabled();
   await page.getByRole("tab", { name: "Son işler", exact: true }).click();
-  await expect(
-    page.getByText("Son işleri görmek için bir otomasyon seç.", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("grid", { name: "Son işler", exact: true })).toContainText(
+    "Başarısız",
+  );
+  expect(state.discoveries.at(-1)).toMatchObject({
+    selector: {
+      key: { scope: { kind: "center", center_id: I.center }, discovery: "jobs", state: "all" },
+    },
+  });
+  expect((state.discoveries.at(-1)!.selector as { key: object }).key).not.toHaveProperty(
+    "automation_id",
+  );
   await page.getByLabel("Son işleri gösterilecek otomasyon", { exact: true }).selectOption(autoId);
   await expect(page.getByRole("grid", { name: "Son işler", exact: true })).toContainText(
     "Başarısız",
@@ -318,4 +428,108 @@ test("automation notification preparation uses the actual template and explicit 
     trigger: { kind: "pending_request", recipient_person_ids: [I.self] },
     action: { kind: "send_reminder", channel: "in_app", template_key: "actual-alert-template" },
   });
+});
+
+test("automation segment insights read saved matches and usage on demand with authoritative totals and cursors", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  const state = await fixture(page, "segment");
+  expect(state.discoveries).toHaveLength(0);
+  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await page.getByRole("button", { name: "Eşleşmeleri göster", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toContainText("Örnek eşleşen üye");
+  await expect(dialog).toContainText("Hedef kitle");
+  await expect(dialog.getByText("24", { exact: true })).toBeVisible();
+  await expect(dialog.getByText("3", { exact: true })).toBeVisible();
+  expect(state.discoveries[0]).toMatchObject({
+    selector: {
+      operation: "segment_save_v1",
+      key: { segment_id: segmentId, discovery: "matches", execution_center_id: I.center },
+    },
+    page: { limit: 20, sort: "created_at_asc" },
+  });
+  await dialog.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(dialog).toContainText("İkinci örnek üye");
+  expect(state.discoveries.at(-1)).toMatchObject({ page: { cursor: "segment-next" } });
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("button", { name: "Kullanan otomasyonlar", exact: true }).click();
+  await expect(dialog).toContainText("Örnek takip");
+  expect(state.discoveries.at(-1)).toMatchObject({
+    selector: { key: { discovery: "automations", segment_id: segmentId } },
+  });
+  expect(state.writes).toHaveLength(0);
+});
+test("automation queue keeps native summary and resets cursor on state filter instead of aggregating a page", async ({
+  page,
+}) => {
+  const state = await fixture(page, "paged");
+  await page.getByRole("tab", { name: "Son işler", exact: true }).click();
+  await expect(page.getByText("90", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect.poll(() => state.discoveries.at(-1)?.page).toMatchObject({ cursor: "queue-next" });
+  await page.getByLabel("İş durumu", { exact: true }).selectOption("succeeded");
+  await expect
+    .poll(() => (state.discoveries.at(-1)?.selector as { key: { state: string } })?.key.state)
+    .toBe("succeeded");
+  expect(state.discoveries.at(-1)).toMatchObject({ page: { limit: 20, sort: "created_at_desc" } });
+  expect(state.discoveries.at(-1)!.page).not.toHaveProperty("cursor");
+  await expect(page.getByRole("grid", { name: "Son işler", exact: true })).toContainText(
+    "Bu kapsamda görünür kayıt yok.",
+  );
+  await expect(page.getByText("90", { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+});
+test("automation denied insight hides cached members and retries only the read", async ({
+  page,
+}) => {
+  const state = await fixture(page, "segment");
+  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await page.getByRole("button", { name: "Eşleşmeleri göster", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toContainText("Örnek eşleşen üye");
+  state.denied = true;
+  await dialog.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(dialog.getByRole("alert")).toContainText("Otomasyon kaynağı okunamadı.");
+  await expect(dialog.getByText("Örnek eşleşen üye", { exact: true })).toHaveCount(0);
+  state.denied = false;
+  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(dialog).toContainText("Örnek eşleşen üye");
+  expect(state.writes).toHaveLength(0);
+});
+
+test("automation retries an older discovered job outside recent twenty with exact microsecond reads", async ({
+  page,
+}) => {
+  const state = await fixture(page, "older");
+  await page.getByRole("tab", { name: "Son işler", exact: true }).click();
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByRole("checkbox").press("Space");
+  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(saved(page)).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  expect(state.writes[0]).toMatchObject({
+    expected_version: 7,
+    retry_job: { id: jobId, version: 12 },
+  });
+  const reads = state.discoveries.filter(
+    (r) => (r.selector as { key: { interval?: unknown } }).key.interval,
+  );
+  expect(reads).toHaveLength(2);
+  for (const read of reads)
+    expect(read).toMatchObject({
+      selector: {
+        operation: "automation_save_v1",
+        key: {
+          automation_id: autoId,
+          state: "all",
+          interval: {
+            starts_at: "2026-11-16T12:00:00.123456Z",
+            ends_at: "2026-11-16T12:00:00.123457Z",
+          },
+        },
+      },
+    });
 });
