@@ -559,7 +559,7 @@ export default interface Resources {
       "operationError": "İşlem doğrulanamadı. Güncel yetkini ve işlem sonucunu kontrol et.",
       "preview": "Etkiyi göster",
       "previewExpiry": "Önizleme son geçerlilik zamanı: {{time}}",
-      "protectedCount": "Mevcut kaydı korunacak işlem: {{count}}",
+      "protectedCount": "Mevcut kaydı korunacak işlem: {{count}}" | "Mevcut kaydı korunacak işlem: {{count}}" | "Mevcut kaydı korunacak işlem: {{count}}",
       "publish": "Yayınla",
       "publishedVersion": "{{version}} sürümü yayımlandı ve sunucudan yeniden doğrulandı.",
       "renewAll": "Tüm üyelerden yeniden kabul iste",
@@ -895,7 +895,7 @@ export default interface Resources {
       "noPendingPayments": "Bekleyen borç yok",
       "notEditable": "Bu etkinliğin durumu veya kapanmış yoklaması taslak düzenlemeye izin vermiyor.",
       "paymentSummaryIncomplete": "Ödeme kaynağı eksik",
-      "pendingCount": "{{count}} kayıt",
+      "pendingCount": "{{count}} kayıt" | "{{count}} kayıt" | "{{count}} kayıt",
       "practiceHint": "Paketli Pratik ücretsizdir; yalnızca izinli ürünü olan üye kayıt olur ve ders hakkı değişmez.",
       "refunds": {
         "credit_ratio": "Kullanılmayan hak oranı",
@@ -914,7 +914,7 @@ export default interface Resources {
       "unknown": "Bilgi paylaşılmıyor",
       "unlimited": "Sınırsız",
       "unread": "Etkinlik listesi henüz okunamadı.",
-      "unresolvedPayments": "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı."
+      "unresolvedPayments": "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı." | "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı." | "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı."
     },
     "finance": {
       "accepted": "Etkiyi okudum",
@@ -1145,6 +1145,176 @@ export default interface Resources {
       "unlinkNamedDescription": "{{email}} Google hesabıyla artık giriş yapamazsın. Diğer bağlı giriş yöntemini kullanabilirsin.",
       "unlinkTitle": "Google bağlantısını kaldır",
       "unlinked": "Bağlı değil"
+    },
+    "help": {
+      "contact": {
+        "email": "fethiyetango@gmail.com",
+        "hours": "Pazartesi–Cuma 09:00–18:00\nCumartesi 09:00–13:00",
+        "response": "Henüz belirtilmedi."
+      },
+      "copied": "Destek adresi kopyalandı.",
+      "copy": "Adresi kopyala",
+      "copyFailed": "Adres kopyalanamadı. Yukarıdaki adresi seçerek kopyalayabilirsin.",
+      "copyHelp": "Adresi kopyalayıp e-posta uygulamanda kullan.",
+      "description": "Sık sorulan sorular, kısayollar ve destek bilgisi.",
+      "email": "E-posta",
+      "empty": "Aramana uygun soru bulunamadı. Destek ekibine yazabilirsin.",
+      "groups": {
+        "account": {
+          "questions": {
+            "q1": {
+              "answer": "Hesabım sayfasındaki Görünüm bölümünden Sistem, Açık veya Koyu seç. Kullanılabilen üst çubuk tema düğmesiyle de görünümü değiştirebilirsin.",
+              "question": "Koyu temaya nasıl geçerim?"
+            },
+            "q2": {
+              "answer": "Hesabım sayfasında Oturumlar bölümünü açıp tanımadığın oturumu sonlandır. Gerekirse Güvenlik bölümünden parolanı değiştir ve diğer oturumları kontrol et.",
+              "question": "Tanımadığım bir oturum görüyorum, ne yapmalıyım?"
+            }
+          },
+          "title": "Hesap"
+        },
+        "documents": {
+          "questions": {
+            "q1": {
+              "answer": "Belgeler sayfasında Belge yükle işlemini aç. Dosyayı, sürümü ve gerekli işlem bağlamlarını seç. Yayın etkisini kontrol edip açıkça onayla; değişiklik olduysa önizlemeyi yenile.",
+              "question": "Yeni bir belge ya da sürüm nasıl yayınlarım?"
+            },
+            "q2": {
+              "answer": "Yeni sürüm yayınlama işlemindeki yeniden kabul seçimini ve güncel etkiyi kontrol et. Geçmiş kabul kanıtı korunur; sonraki işlemde hangi sürümün gerekli olduğunu o işlemin belge denetimi belirler.",
+              "question": "Yeni sürümde üyeler yeniden kabul etmek zorunda mı?"
+            },
+            "q3": {
+              "answer": "Hayır. Belge kabulünü ilgili hesap sahibi verir. Yönetim ekranında kabul durumunu görebilirsin; başka biri adına kabul oluşturulmaz.",
+              "question": "Belgeyi üye adına kabul edebilir miyim?"
+            }
+          },
+          "title": "Belgeler"
+        },
+        "finance": {
+          "questions": {
+            "q1": {
+              "answer": "Kapanan seansın sabitlenen anlaşması ve gerçek katılım bilgileri hakedişi belirler. Hakediş satırındaki kaynak ve anlaşma sürümünü kontrol et. Sonradan alınan ödeme geçmiş hakedişi yeniden fiyatlandırmaz.",
+              "question": "Eğitmen hakedişi nasıl hesaplanır?"
+            },
+            "q2": {
+              "answer": "Hakediş ekranında ilgili kök ödemenin Düzelt işlemini aç. Farkı, yönü, gerekçeyi ve ödeme yöntemini gir. Düzeltme yeni kayıt oluşturur; üye tahsilatı eğitmen ödemesi değildir.",
+              "question": "Eğitmene yaptığım ödemeyi nasıl düzeltirim?"
+            },
+            "q3": {
+              "answer": "Finans veya üye profilindeki Tahsilat al işlemini aç. Kişi, para birimi, tutar, yöntem ve zamanı kontrol et. Havale ve POS için gerçek işlem referansı gerekir; sonucu borç ve hareketlerden yeniden kontrol et.",
+              "question": "Tahsilatı nasıl kaydederim?"
+            },
+            "q4": {
+              "answer": "Satışın iade işlemini açıp güncel önizlemeyi kontrol et. Borç, üye alacağı, hak ve rezervasyon etkilerini açıkça onayla. Üye alacağı oluşması tek başına nakit ödeme yapıldığı anlamına gelmez.",
+              "question": "Satışı nasıl iade ederim?"
+            },
+            "q5": {
+              "answer": "Üye alacağı finans kayıtlarında para birimiyle gösterilir. Kullanılabilir borca mahsup veya iade işlemini açıp güncel etkiyi incele; para birimleri arasında kendiliğinden dönüşüm yapılmaz.",
+              "question": "Alacak nedir, nasıl kapatırım?"
+            },
+            "q6": {
+              "answer": "Finans kayıtlarını silmek yerine tahsilatın düzeltme işlemini kullan. Artış veya azalışı ve gerekçeyi girip önizlemeyi onayla. Özgün kayıt ve düzeltme izi korunur.",
+              "question": "Yanlış girilen tahsilatı silebilir miyim?"
+            }
+          },
+          "title": "Tahsilat ve borç"
+        },
+        "members": {
+          "questions": {
+            "q1": {
+              "answer": "Üyeler sayfasından kişi oluşturabilir veya uygun kişiye davet gönderebilirsin. Hesap açılması ve davetin kabulü ayrı işlemlerdir; listede güncel durumunu kontrol et.",
+              "question": "Yeni üyeyi nasıl eklerim?"
+            },
+            "q2": {
+              "answer": "Hesaba bağlı kimlik ve iletişim alanlarını hesap sahibi değiştirir. Yerel kişi alanları, ekranda düzenlenebilir olarak gösterildiklerinde düzenlenebilir.",
+              "question": "Üyenin adını, e-postasını ya da telefonunu değiştirebilir miyim?"
+            },
+            "q3": {
+              "answer": "Üye profilinde Paket / hak tahsis et işlemini aç. Ürün, başlangıç ve ödeme bilgilerini seç; gerekli belge ve etkileri inceleyip işlemi onayla. Sonucu güncel haklar ve finans kayıtlarından kontrol et.",
+              "question": "Üyeye paket ya da hak nasıl tahsis ederim?"
+            },
+            "q4": {
+              "answer": "Profildeki yenileme veya süre uzatma işlemini aç. Yeni ürün, tarih, gerekçe ve etki alanlarını kontrol edip önizlemeyi onayla. Süre uzatmayı yeni ders hakkı satın alma işlemiyle karıştırma.",
+              "question": "Üyenin paketini nasıl yenilerim ya da süresini uzatırım?"
+            },
+            "q5": {
+              "answer": "İşlem ekranındaki engelleri kontrol et. Belge kabulü, yetki, ürün veya ödeme koşulu eksik olabilir. Kabul edilmesi gereken belgeyi yalnız ilgili hesap sahibi kabul edebilir.",
+              "question": "Satış neden tamamlanmıyor?"
+            },
+            "q6": {
+              "answer": "Negatif limit, uygun koşullarda hak bakiyesi eksiye düşen rezervasyonlara izin veren sınırdır. Profilin Negatif limit işleminde mevcut sınırı, değerlemeyi ve etkiyi kontrol ederek gerekçeli değişiklik yap.",
+              "question": "Negatif limit nedir?"
+            },
+            "q7": {
+              "answer": "Profilin Haklar bölümünde Hakkı düzelt işlemini aç. Artış veya azalışı, miktarı ve gerekçeyi gir; önizlemeyi kontrol edip uygula. Önceki hak kayıtları korunur.",
+              "question": "Bir üyenin hakkını nasıl düzeltirim?"
+            },
+            "q8": {
+              "answer": "Pasifleştirme önizlemesindeki engelleri ve bağlı rezervasyonları kontrol et. Gerekli işlemleri kendi ekranlarında tamamlayıp önizlemeyi yenile; gösterilen etkileri gerekçeyle onayla.",
+              "question": "Üyeyi neden pasifleştiremiyorum?"
+            }
+          },
+          "title": "Üyeler ve haklar"
+        },
+        "program": {
+          "questions": {
+            "q1": {
+              "answer": "Ders programında seansı sürükleyebilir veya seansın düzenleme işlemini açabilirsin. Bekleyen değişiklikleri ve yeni saatleri kontrol et; önizlemenin etkilerini onayladıktan sonra kaydet.",
+              "question": "Seansı başka bir güne ya da saate nasıl taşırım?"
+            },
+            "q2": {
+              "answer": "Yetki, değişiklik durumu ve önizleme engellerini kontrol et. Kaynak, eğitmen, zaman veya çakışma bilgileri değişmişse güncel önizlemeyi yeniden al.",
+              "question": "Kaydet düğmesi neden kapalı?"
+            },
+            "q3": {
+              "answer": "Uygulamadan önce gösterilen bildirim etkisini kontrol et. Bildirim sonucu ile seans değişikliğinin tamamlanması ayrı durumlardır.",
+              "question": "Kaydederken üyelere bildirim gider mi?"
+            },
+            "q4": {
+              "answer": "Seans düzenleme işlemini açıp yeni kontenjanı seç. Kaynak sınırları, mevcut rezervasyonlar ve diğer engeller önizlemede doğrulanır; gösterilen etkiyi onayla.",
+              "question": "Seansın kontenjanını nasıl değiştiririm?"
+            }
+          },
+          "title": "Ders programı"
+        },
+        "reservations": {
+          "questions": {
+            "q1": {
+              "answer": "İptal ekranında gösterilen hak ve ücret etkisini kontrol et. Sonuç, seansın geçerli iptal koşullarına bağlıdır; geç veya ücretsiz iptalin etkisini varsayma.",
+              "question": "Üye iptal edince hakkı iade edilir mi?"
+            },
+            "q2": {
+              "answer": "Seans detayında Katılımcı ekle işlemini aç. Kişiyi ve kullanılacak hakkı seç, gerekli belgeleri ve rezervasyon önizlemesini kontrol et. Kontenjan ve diğer engeller giderilmeden kesin kayıt oluşmaz.",
+              "question": "Üyeyi bir seansa kendim nasıl eklerim?"
+            },
+            "q3": {
+              "answer": "Talepler sayfasında talebi aç. Gösterilen uygunluk ve engelleri inceleyip yetkine göre onayla, reddet veya alternatif öner. Talep ile kesin rezervasyon farklı durumlardır.",
+              "question": "Özel ders talebini nasıl onaylarım?"
+            },
+            "q4": {
+              "answer": "Seansın Yoklama bölümünde katılım sonuçlarını seç ve kapanış etkisini inceleyerek kaydet. Kapanmış yoklama için ayrı düzeltme işlemini ve gerekçeyi kullan; eski kayıtlar korunur.",
+              "question": "Yoklamayı nasıl alırım?"
+            }
+          },
+          "title": "Rezervasyon ve yoklama"
+        }
+      },
+      "hours": "Saatler",
+      "response": "Yanıt süresi",
+      "searchLabel": "Yardımda ara",
+      "searchPlaceholder": "Soru ara, örn. iptal, borç, hak",
+      "shortcutLabels": {
+        "close": "Açık paneli ya da diyaloğu kapat",
+        "next": "Sonraki alan veya denetime geç",
+        "search": "Sayfa ya da eylem ara ve git",
+        "select": "Odaktaki satırı veya eylemi seç"
+      },
+      "shortcuts": "Kısayollar",
+      "states": "Durum ekranları",
+      "support": "Destek",
+      "supportAndShortcuts": "Destek ve kısayollar",
+      "supportDescription": "Yardım isterken bulunduğun ekranı ve ne yapmaya çalıştığını belirt. Parola veya doğrulama kodu gönderme.",
+      "title": "Yardım"
     },
     "inbox": {
       "bodyMissing": "Bildirim metni paylaşılmıyor",
@@ -1716,7 +1886,7 @@ export default interface Resources {
     },
     "memberClasses": {
       "accept": "Teklifi kabul et",
-      "available": "{{count}} yer kaldı",
+      "available": "{{count}} yer kaldı" | "{{count}} yer kaldı" | "{{count}} yer kaldı",
       "book": "Kayıt ol",
       "booked": "Kayıtlısın",
       "cancel": "Vazgeç",
@@ -1731,10 +1901,10 @@ export default interface Resources {
       "chooseMode": "Kayıt türü",
       "chooseRight": "Hak seç",
       "confirm": "Kaydı onayla",
-      "credits": "{{count}} ders kullanılabilir",
+      "credits": "{{count}} ders kullanılabilir" | "{{count}} ders kullanılabilir" | "{{count}} ders kullanılabilir",
       "cutoff": "İptal sınırı: {{time}}",
       "description": "Kayıt olmak için hak seç, iptal süresini gör.",
-      "duration": "{{count}} dk",
+      "duration": "{{count}} dk" | "{{count}} dk" | "{{count}} dk",
       "effects": {
         "consume": "hak tüketilir",
         "release": "hak iade edilir"
