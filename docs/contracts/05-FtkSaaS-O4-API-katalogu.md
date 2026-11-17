@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-233 sözleşme operasyonu; 233 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+234 sözleşme operasyonu; 234 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -109,7 +109,7 @@
 | `earnings_list_v1` | runtime / ilgili WF’yi oku | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; interval: Interval; page: Page | Success_earnings_list |
 | `instructor_payment_record_v1` | runtime / ilgili WF’yi oku | `earnings.manage` | W / collection | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; earning_ids: FtkUuid[]; amount_minor: PositiveMoney; currency: Currency; occurred_at: Instant; payment?: ManualCollectionPayment | Success_instructor_payment_record |
 | `instructor_payment_correct_v1` | runtime / ilgili WF’yi oku | `earnings.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; payment_id: FtkUuid; correction: CashCorrection; reason: Text; payment?: ManualCollectionPayment | Success_instructor_payment_correct |
-| `leads_list_v1` | runtime / ilgili WF’yi oku | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; query?: Text ∣ null; include_pipeline?: boolean | Success_leads_list |
+| `leads_list_v1` | runtime / ilgili WF’yi oku | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; query?: Text ∣ null; include_pipeline?: boolean; stage_key?: string; assigned_to?: FtkUuid ∣ null; include_details?: boolean; include_summary?: boolean | Success_leads_list |
 | `lead_save_v1` | runtime / ilgili WF’yi oku | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; lead_id?: FtkUuid ∣ null; person_id: FtkUuid; source: Text; interest: Text; assigned_to?: FtkUuid ∣ null; pipeline?: LeadPipelineInput | Success_lead_save |
 | `crm_activity_save_v1` | runtime / ilgili WF’yi oku | `crm.daily` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; lead_id?: FtkUuid ∣ null; kind: CrmActivityKind; due_at?: Instant ∣ null; outcome?: Text ∣ null; note?: Text ∣ null; activity_id?: FtkUuid; person_id?: FtkUuid | Success_crm_activity_save |
 | `trial_offer_create_v1` | runtime / ilgili WF’yi oku | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; lead_id: FtkUuid; product_version_id: FtkUuid; session_id?: FtkUuid ∣ null; booking_category?: BookingCategory | Success_trial_offer_create |
@@ -150,7 +150,7 @@
 | `document_requirements_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id?: FtkUuid; context: AcceptanceContext; content_file_id?: FtkUuid | Success_document_requirements_get |
 | `document_accept_v1` | runtime / ilgili WF’yi oku | `document.accept` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; document_version_id?: FtkUuid; context: AcceptanceContext; rendered_document_id?: FtkUuid | Success_document_accept |
 | `publication_set_v1` | runtime / ilgili WF’yi oku | `schedule.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; session_id?: FtkUuid ∣ null; event_id?: FtkUuid ∣ null; published: Bool; public_details?: PublicPublicationDetails | Success_publication_set |
-| `public_calendar_get_v1` | runtime / ilgili WF’yi oku | `public.apply` | R / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; slug: Text; interval: Interval; page: Page; include_disciplines?: boolean | Success_public_calendar_get |
+| `public_calendar_get_v1` | runtime / ilgili WF’yi oku | `public.apply` | R / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; slug: Text; interval: Interval; page: Page; include_disciplines?: boolean; discipline_id?: FtkUuid; include_details?: boolean | Success_public_calendar_get |
 | `public_application_submit_v1` | runtime / ilgili WF’yi oku | `public.apply` | E / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; publication_id?: FtkUuid; contact?: Text; bot_proof: Secret; client_request_key: FtkUuid; form_id?: FtkUuid; intake?: CrmIntake; contact_intake?: CrmContactIntake | Success_public_application_submit |
 | `public_application_review_v1` | runtime / ilgili WF’yi oku | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; application_id: FtkUuid; action: ApplicationAction; person_id?: FtkUuid ∣ null; expected_version?: PositiveInt; target_center_id?: FtkUuid | Success_public_application_review |
 | `operation_status_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: OperationName; key: FtkUuid | Success_operation_status_get |
@@ -239,6 +239,7 @@
 | `member_finance_currencies_get_v1` | runtime / ilgili WF’yi oku | `finance.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid | Success_member_finance_currencies_get |
 | `member_document_contexts_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_member_document_contexts_get |
 | `notifications_read_set_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; read: Bool; notifications: NotificationReadSelection[]; center_id?: FtkUuid ∣ null | Success_notifications_read_set |
+| `management_work_list_v1` | runtime / ilgili WF’yi oku | `management.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind?: all / lesson_request / lesson_attendance / event_attendance / crm_followup / application_review; page: Page | Success_management_work_list |
 
 ## Sürüm ve okuma desteği
 
@@ -479,6 +480,7 @@
 | member_finance_currencies_get_v1 | read | none | None | operational_development_limited |  |
 | member_document_contexts_get_v1 | read | none | None | operational_development_limited |  |
 | notifications_read_set_v1 | command | append_or_current_scope_lock | notifications_list_v1 | implemented | notifications.versioned_batch_read_state, receipt, audit |
+| management_work_list_v1 | read | none | None | runtime_read |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

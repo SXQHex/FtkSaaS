@@ -1,5 +1,5 @@
 {
-  "version": 23,
+  "version": 24,
   "fields": [
     {
       "scope": "user",
@@ -4024,6 +4024,126 @@
       "default": [],
       "group": "M22",
       "consumer": "sharing_consent"
+    },
+    {
+      "scope": "organization",
+      "key": "public_application_form",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "form_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "consents": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "purpose": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "version": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "content_template_id": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "required": [
+                    "purpose",
+                    "version",
+                    "required",
+                    "content_template_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "form_id",
+              "consents"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "O01",
+      "consumer": "public_program_discovery"
+    },
+    {
+      "scope": "center",
+      "key": "public_application_form",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "form_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "consents": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "purpose": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "version": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 200
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "content_template_id": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "required": [
+                    "purpose",
+                    "version",
+                    "required",
+                    "content_template_id"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "form_id",
+              "consents"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "M16",
+      "consumer": "public_program_discovery"
     }
   ]
 }

@@ -234,4 +234,5 @@ export interface Operations {
   member_finance_currencies_get_v1: {request: T.RequestMemberFinanceCurrenciesGet; response: T.SuccessMemberFinanceCurrenciesGet};
   member_document_contexts_get_v1: {request: T.RequestMemberDocumentContextsGet; response: T.SuccessMemberDocumentContextsGet};
   notifications_read_set_v1: {request: T.RequestNotificationsReadSet; response: T.SuccessNotificationsReadSet};
+  management_work_list_v1: {request: T.RequestManagementWorkList; response: T.SuccessManagementWorkList};
 }
