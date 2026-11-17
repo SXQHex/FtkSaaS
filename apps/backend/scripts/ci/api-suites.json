@@ -282,7 +282,7 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "29c9a10bd9d721dd5d5b6a8ccc3d5b937b6b80b7f23ffc0389f31171dcaae2d0",
+      "sha256": "b0ba8f578367eb50be278d2b7bc803fbe71406089412c6ca1b517c34f1f6ae19",
       "shared": [
         [
           3,
@@ -376,6 +376,16 @@
           "line": 418,
           "path": "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
           "sha256": "767bf4e8cdf38285b267be2b4b41ef7c0b75a00312c1b056dd83ca4101069bc6"
+        },
+        {
+          "line": 419,
+          "path": "apps/backend/tests/intake-crm-work-acceptance.mjs",
+          "sha256": "494264792a69a0bd7a5a499bfc3c5fe2127c96f3d5dc22f015a20785d42fa9e8"
+        },
+        {
+          "line": 420,
+          "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
+          "sha256": "fc766a6002e5ebaf339ecfae436354eec50bc681a1f3b0894e7ae8e00cbded8c"
         }
       ],
       "estimated_seconds": 799.78

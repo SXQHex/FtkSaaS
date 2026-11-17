@@ -29,8 +29,10 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] W1-BE-19 ek tüm dönem hakediş satırları; W1-BE-28 inbox arama/gerçek kaynak durumu/sayaç ve atomik tersinir seçili okunma; W1-BE-29 native segment/iş keşfi ve özet kaynakları. Tüketim WF14/WF11/WF16, değerlendirme XREQ-053/060/061.
 - [x] Bu üçlünün son kaynak native/statik testleri ve bağımsız incelemesi; platforma özgü yerel verify sınırı kanıt sahibinde açıklandı.
 - [x] PR321 ilk üçlü kaynak/push ve ilk aday clean; merge öncesi talep ayrıntısı okuma senaryosu native/regresyon kabulü.
-- [ ] PR321 yeni aday full clean → kullanıcı yetkisiyle merge → aynı main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); yeni hosted ve frontend kabulü ayrı.
-- [ ] W1-BE-24/25/30/31: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
+- [x] PR321 son aday full clean → kullanıcı yetkisiyle merge → aynı main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); yeni hosted ve frontend kabulü ayrı.
+- [x] W1-BE-24/25/32 kaynak/native test: kullanıcı onaylı CRM, açık public form/program ve kaynak iş kuyruğu. Değerlendirmeler XREQ-062/063/064; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work).
+- [ ] W1-BE-24/25/32 tek Draft PR push → aday full clean → ayrıca yetkili merge/main/development teslimi; hosted ve frontend kabulü ayrı.
+- [ ] W1-BE-30/31/33/34: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
 
 ## Web1 ek backend talepleri — 15 Kasım
 

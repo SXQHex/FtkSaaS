@@ -6351,6 +6351,35 @@
       "limits": [
         "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
       ]
+    },
+    {
+      "name": "management_work_list_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/management_work_list_v1",
+      "permission": "management.inspect",
+      "features": [
+        "F09",
+        "F10",
+        "F21",
+        "F23",
+        "F25",
+        "F29"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_management_work_list"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     }
   ]
 }

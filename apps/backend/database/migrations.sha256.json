@@ -175,5 +175,9 @@
   "20261116233014_instructor_all_period_ledger.sql": "37ad84a615c8ecdb6df5f3cad5ffffce3a3e5c136f0db843a8281918e934deac",
   "20261116233015_notification_inbox_work.sql": "240bf401f1183a31c846cedf3756ab78f332461ad0ca9f1e4a959163790190d0",
   "20261116233016_automation_discovery_insights.sql": "fb130af181d556e4940793f3aed7065304d7f0b68033a51cce5c5f3a74aabc24",
-  "20261117003000_notification_request_source_authority.sql": "b5325916e572fe9241ddbf0fffc839e7c212ae6813e2127773da6aab57ab79fb"
+  "20261117003000_notification_request_source_authority.sql": "b5325916e572fe9241ddbf0fffc839e7c212ae6813e2127773da6aab57ab79fb",
+  "20261117014802_crm_discovery.sql": "0fb3af520c60e112799311fbd4e99b67f2bce389774f6a9a4f47001926c254a4",
+  "20261117014803_crm_activity_discovery.sql": "37c2f11da690a1a9ae4527323b750989710bf1868fad2ab30b9c4ebc10304696",
+  "20261117014804_public_program_discovery.sql": "63127d6665b277899dc880a1d65c263576bd7e99aab8535f74713a0560ee2df0",
+  "20261117014805_management_work_discovery.sql": "91a07172f74c8877fbb0a7aa5e9d2335f87b9d103af1a1c0355de56f59c2da25"
 }

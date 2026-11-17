@@ -1191,6 +1191,9 @@ ST-03 manuel tahsilat adayı cash/bank_transfer/card_pos yöntemini ve banka/kar
 
 ##### FD08 — belge onay dış görünürlük (kabul edildi)
 
+17 Kasım public program kararı: doluluk ve eğitmen adı yayın başına iki ayrı açık izinle gösterilir; ikisi de varsayılan kapalıdır ve mevcut yayınlar kendiliğinden açılmaz. Genel başvuru keşfi yalnız ilgili public sayfaya açıkça bağlanan etkin web formunu ve onun gerçek yayımlanmış onay kaynağını kullanır. Form/bağ/kaynak eksik veya geçersizse açık başvuru gibi sunulmaz; metin, sürüm veya onay amacı tahmin edilmez. Kesin tüketim [WF09](../workflows.md#wf09) sahibindedir.
+
+
 Öğrencinin Belgeler kartı yalnız kendi canlı merkez kapsamındaki aktif işlem bağlamlarının gereksinimlerini ve süresi dolmamış satın alma önizlemelerini keşfeder; tamamlanmış/iptal edilmiş geçmiş işlemler bu kartta listelenmez. İşleme özgü gate/subject, satın alma sabitlemesi, native kabul/yenileme ve değişmez gösterim kanıtı korunur; genel kişi belgesi veya toplu bağlam aktarımı kurulmaz. Kesin tüketim [WF11](../workflows.md#wf11) sahibindedir.
 
 | Alan | Kabul edilen seçenek/default |
@@ -1208,6 +1211,9 @@ Organizasyon belgelerinde tercih edilen dilin aynı kaynak sürümüne bağlı �
 Backend doğrulanmış iş verileriyle tam belgeyi hazırlar, gerçek dilini/kaynak sürümünü/sunucuda hesaplanan SHA-256 değerini değişmez belgeye kaydeder. Frontend kayıtlı içeriği gösterir; tarayıcı metni/hash'i doğruluk kaynağı değildir. Onay mevcut hesap/kişi UUID'si, org/ilgili merkez, değişmez belge, işlem bağlamı, sunucu zamanı ve mevcut doğrulanmış oturum UUID'sine bağlanır; access/refresh/JWT veya Abone No kopyalanmaz. Ortak içerik aynı belgeyi kullanabilir; kişiselleştirilmiş belge ayrı tamamlanır, genel hash tekilleştirmesi kurulmaz. Her onaya tam metin tekrar yazılmaz; belge kimliği sürümü belirler. Satın alma aynı işlem için sabitlenmiş belgenin onayını denetler; yeni içerik/çeviri mevcut işlem belgesini değiştirmez, açık geçersiz belge onaylanamaz. Tarihsel istemci snapshot'ları korunur ve server_document diye yeniden etiketlenmez. Saklama/hold ve mevcut paylaşım izni doğrulamaları korunur. Hash tek başına onay değildir; PDF/Storage zorunluluğu yoktur. Eğitmen onayı yayın/yürürlük/hakediş hesabından ayrı kalır; finansal şartların kaynağı mevcut anlaşma verisidir.
 
 ##### FD09 — CRM başvuru (kabul edildi)
+
+17 Kasım CRM özet kararı: son30gün dönüşüm sayısı gerçek native öğrenciye dönüştürme işlemleridir. Kazanıldı aşaması ayrı kalır; öğrencilik, satış veya nakit yerine sayılmaz. Kesin okuma ve filtre anlamı [WF16](../workflows.md#wf16) sahibindedir.
+
 
 | Alan | Kabul edilen seçenek/default |
 |---|---|
