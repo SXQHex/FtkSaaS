@@ -202,3 +202,31 @@ it("does not claim a reviewed application created a candidate without reading it
   readPerson.mockResolvedValue({ relationships: [] });
   await expect(readLeadResult(intent, before.id)).rejects.toThrow("APPLICATION_PERSON_UNREAD");
 });
+
+it("changes the assignee only when explicitly enabled and verifies the native resulting assignment", async () => {
+  detail.mockResolvedValue(before);
+  const intent = await leadSaveIntent(
+    scope,
+    before.personId,
+    { ...leadDraft(before), assignedTo: id(99) },
+    { ...catalog, stages: [...catalog.stages] },
+    before,
+    true,
+  );
+  await writeLeadIntent(intent);
+  expect(call).toHaveBeenCalledWith(
+    "lead_save_v1",
+    expect.objectContaining({ assigned_to: id(99), expected_version: before.version }),
+  );
+  detail.mockResolvedValue({ ...before, version: before.version + 1 });
+  await expect(readLeadResult(intent, before.id)).rejects.toThrow("LEAD_RESULT_UNREAD");
+  detail.mockResolvedValue({
+    ...before,
+    version: before.version + 1,
+    values: { ...before.values, assigned_to: id(99) },
+  });
+  await expect(readLeadResult(intent, before.id)).resolves.toMatchObject({
+    kind: "lead",
+    detail: { values: { assigned_to: id(99) } },
+  });
+});

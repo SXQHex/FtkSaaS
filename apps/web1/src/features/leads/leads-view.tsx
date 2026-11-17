@@ -46,6 +46,7 @@ export function LeadsView({
   owner,
   onOwner,
   owners,
+  ownerActions,
   stageFilter,
   onStageFilter,
   filtersAvailable = false,
@@ -68,6 +69,7 @@ export function LeadsView({
   owner: string;
   onOwner?: (value: string) => void;
   owners: { id: string; name: string }[];
+  ownerActions?: ReactNode;
   stageFilter: string;
   onStageFilter?: (value: string) => void;
   filtersAvailable?: boolean;
@@ -151,7 +153,10 @@ export function LeadsView({
                 </TabsTrigger>
               ))}
             </TabsList>
-            <div className="flex flex-wrap items-center gap-3">
+            <search
+              className="flex flex-wrap items-center gap-3"
+              aria-label={t(($) => $.leads.search)}
+            >
               <InputGroup className="w-full max-w-64">
                 <InputGroupAddon>
                   <SearchIcon />
@@ -159,6 +164,9 @@ export function LeadsView({
                 <InputGroupInput
                   aria-label={t(($) => $.leads.search)}
                   placeholder={t(($) => $.leads.search)}
+                  name="lead-search"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   value={search}
                   disabled={disabled || !onSearch}
                   onChange={(event) => onSearch?.(event.target.value)}
@@ -166,19 +174,24 @@ export function LeadsView({
               </InputGroup>
               <NativeSelect
                 aria-label={t(($) => $.leads.owner)}
+                name="lead-owner-filter"
                 value={owner}
                 disabled={disabled || !filtersAvailable || !onOwner}
                 onChange={(event) => onOwner?.(event.target.value)}
                 className="w-full sm:ml-auto sm:w-44"
               >
                 <NativeSelectOption value="">{t(($) => $.leads.allOwners)}</NativeSelectOption>
+                <NativeSelectOption value="unassigned">
+                  {t(($) => $.leads.unassigned)}
+                </NativeSelectOption>
                 {owners.map((row) => (
                   <NativeSelectOption key={row.id} value={row.id}>
                     {row.name}
                   </NativeSelectOption>
                 ))}
               </NativeSelect>
-            </div>
+              {ownerActions}
+            </search>
           </CardHeader>
           <TabsContent id="board" className="mt-0">
             <p className="px-5 text-xs text-muted-foreground">{t(($) => $.leads.boardHint)}</p>

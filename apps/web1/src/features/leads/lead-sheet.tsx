@@ -46,11 +46,15 @@ export function LeadSheet({
   offsets = [],
   submitLabel,
   assignmentWritable = false,
+  sessionContent,
+  trialContent,
 }: {
   mode: LeadMode;
   offsets?: { id: string; label: string }[];
   submitLabel?: string;
   assignmentWritable?: boolean;
+  sessionContent?: ReactNode;
+  trialContent?: ReactNode;
   name?: string;
   draft: LeadDraft;
   onDraft?: (draft: LeadDraft) => void;
@@ -146,7 +150,7 @@ export function LeadSheet({
                     id="lead-owner"
                     name="lead-owner"
                     value={draft.assignedTo}
-                    disabled={locked || !assignmentWritable || !owners.length}
+                    disabled={locked || !assignmentWritable}
                     onChange={(event) => set("assignedTo", event.target.value)}
                   >
                     <NativeSelectOption value="">{t(($) => $.leads.unassigned)}</NativeSelectOption>
@@ -339,6 +343,7 @@ export function LeadSheet({
                 </NativeSelect>
                 <FieldError>{errors?.productVersionId}</FieldError>
               </Field>
+              {sessionContent}
               <Field>
                 <FieldLabel htmlFor="lead-session">{t(($) => $.leads.trialSession)}</FieldLabel>
                 <NativeSelect
@@ -359,6 +364,7 @@ export function LeadSheet({
               <Field>
                 <FieldLabel>{t(($) => $.leads.trialTerms)}</FieldLabel>
                 <FieldDescription>{t(($) => $.leads.trialTermsHint)}</FieldDescription>
+                {trialContent}
               </Field>
             </FieldGroup>
           )}
@@ -381,6 +387,7 @@ export function LeadSheet({
               </NativeSelect>
               <FieldError>{errors?.offerId}</FieldError>
               <FieldDescription>{t(($) => $.leads.confirmHint)}</FieldDescription>
+              {trialContent}
             </Field>
           )}
           {mode === "convert" && (
@@ -398,6 +405,7 @@ export function LeadSheet({
             </Checkbox>
           )}
         </form>
+        {(mode === "offer" || mode === "confirm") && history}
         {mode === "edit" && name && (
           <>
             <div className="flex flex-wrap gap-2">

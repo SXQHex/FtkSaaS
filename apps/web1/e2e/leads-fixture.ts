@@ -138,18 +138,38 @@ export async function mockLeads(
       expect(req.center_id).toBe(I.center);
       expect(req.include_pipeline).toBe(true);
       if (denied) return reject();
+      expect(req.include_details).toBe(true);
+      expect(req.include_summary).toBe(true);
+      const visible = leads.filter(
+        (lead) =>
+          (!req.query ||
+            people.get(lead.person_id)?.display_name.includes(req.query) ||
+            lead.interest.includes(req.query)) &&
+          (!req.stage_key || lead.pipeline?.stage.key === req.stage_key) &&
+          (!Object.hasOwn(req, "assigned_to") || lead.assigned_to === req.assigned_to),
+      );
       return send({
         ...list(
-          leads.filter(
-            (lead) =>
-              !req.query ||
-              people.get(lead.person_id)?.display_name.includes(req.query) ||
-              lead.interest.includes(req.query),
-          ),
+          visible.map((lead) => ({
+            ...lead,
+            created_at: "2026-11-16T10:00:00Z",
+            display_name: people.get(lead.person_id)!.display_name,
+            assigned_name: lead.assigned_to
+              ? (people.get(lead.assigned_to)?.display_name ?? null)
+              : null,
+          })),
         ),
         pipeline_catalog: catalog,
+        summary: {
+          total: visible.length,
+          open_leads: visible.filter((row) => row.state === "open").length,
+          followups_today: 0,
+          overdue_followups: 0,
+          converted_last_30_days: visible.filter((row) => row.state === "converted").length,
+        },
       });
     }
+
     const entity = (
       type: string,
       value: string,
@@ -168,6 +188,20 @@ export async function mockLeads(
     if (operation === "management_state_get_v1") {
       const key = req.selector.key;
       if (req.operation === "lead_save_v1") {
+        if (key.directory === "assignees")
+          return send(
+            list([
+              {
+                ...entity("people", I.self, 1, "active", {}),
+                current: null,
+                crm_discovery: {
+                  kind: "assignee",
+                  person_id: I.self,
+                  display_name: "Örnek sorumlu",
+                },
+              },
+            ]),
+          );
         if (unread) {
           unread = false;
           return route.abort("failed");
@@ -198,6 +232,39 @@ export async function mockLeads(
           ),
         );
       }
+      if (req.operation === "crm_activity_save_v1" && key.directory === "followups")
+        return send(
+          list(
+            activities
+              .filter(
+                (row) =>
+                  row.due_at &&
+                  (!Object.hasOwn(key, "assigned_to") ||
+                    leads.find((lead) => lead.id === row.lead_id)?.assigned_to === key.assigned_to),
+              )
+              .map((row) => {
+                const lead = leads.find((lead) => lead.id === row.lead_id)!;
+                return {
+                  ...entity("crm_activities", row.id, row.version, row.state, {}),
+                  current: null,
+                  crm_discovery: {
+                    kind: "followup",
+                    activity_id: row.id,
+                    lead_id: row.lead_id,
+                    person_id: lead.person_id,
+                    display_name: people.get(lead.person_id)!.display_name,
+                    assigned_to: lead.assigned_to,
+                    assigned_name: lead.assigned_to
+                      ? (people.get(lead.assigned_to)?.display_name ?? null)
+                      : null,
+                    due_at: row.due_at,
+                    completed_at: row.state === "completed" ? "2026-11-16T12:00:00Z" : null,
+                    note: row.note,
+                  },
+                };
+              }),
+          ),
+        );
       if (req.operation === "crm_activity_save_v1")
         return send(
           list(
@@ -223,6 +290,7 @@ export async function mockLeads(
           list([
             entity("public_applications", app.id, app.version, app.state, {
               application_id: app.id,
+              received_at: "2026-11-16T11:00:00Z",
               person_id: app.person_id,
               center_id: I.center,
               intake: app.intake,

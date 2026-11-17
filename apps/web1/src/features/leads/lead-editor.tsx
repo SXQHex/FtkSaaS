@@ -10,6 +10,7 @@ import { useMemberCommand } from "../member-profile/use-member-command";
 import { readPerson } from "../people/people";
 import { getTemporal } from "../../lib/temporal";
 import { ScheduleTimeError } from "../schedule/schedule-time";
+import { LeadTrialEditor } from "./lead-trial-editor";
 import { LeadSheet } from "./lead-sheet";
 import { LeadPersonPicker } from "./lead-person-picker";
 import { LeadCommandNotice } from "./lead-command-notice";
@@ -38,11 +39,14 @@ export interface LeadTarget {
   name: string;
   mode?: LeadMode;
   stage?: string;
+  activityId?: string;
 }
 export function LeadEditor({
   scope,
   target,
   catalog,
+  owners = [],
+  assignmentWritable = false,
   timezone,
   onClose,
   onSaved,
@@ -51,6 +55,8 @@ export function LeadEditor({
   scope: ClientScope;
   target: LeadTarget | null;
   catalog?: CrmPipelineConfiguration;
+  owners?: { id: string; name: string }[];
+  assignmentWritable?: boolean;
   timezone: string;
   onClose: () => void;
   onSaved: () => Promise<void>;
@@ -58,8 +64,28 @@ export function LeadEditor({
 }) {
   const { t } = useTranslation();
   const detail = useQuery({
-    queryKey: ["lead-detail", scope.accountId, scope.orgId, scope.centerId, target?.id],
-    queryFn: () => readLeadDetail(scope, target!.personId, target!.id),
+    queryKey: [
+      "lead-detail",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      target?.id,
+      target?.activityId,
+    ],
+    queryFn: async () => {
+      const lead = await readLeadDetail(scope, target!.personId, target!.id);
+      const page = target?.activityId
+        ? await readLeadActivities(scope, lead.id, undefined, target.activityId)
+        : undefined;
+      if (page && (page.items.length !== 1 || page.items[0]?.id !== target?.activityId))
+        throw new Error("ACTIVITY_SOURCE_UNAVAILABLE");
+      const activity = page?.items[0];
+      return {
+        lead,
+        activity,
+        draft: activity ? await activityDraft(lead, activity, timezone) : undefined,
+      };
+    },
     enabled: Boolean(target),
     refetchOnMount: "always",
     refetchOnWindowFocus: false,
@@ -99,19 +125,23 @@ export function LeadEditor({
   return (
     <LeadEditorForm
       scope={scope}
-      initial={target ? detail.data : undefined}
+      initial={target ? detail.data?.lead : undefined}
+      initialActivity={target ? detail.data?.activity : undefined}
+      initialDraft={target ? detail.data?.draft : undefined}
       readError={detail.isError}
       onReadRetry={
         target
           ? async () => {
               const result = await detail.refetch({ throwOnError: true });
               if (!result.data) throw new Error("LEAD_DETAIL_UNAVAILABLE");
-              return result.data;
+              return result.data.lead;
             }
           : undefined
       }
       target={target}
       catalog={catalog}
+      owners={owners}
+      assignmentWritable={assignmentWritable}
       timezone={timezone}
       onClose={onClose}
       onSaved={onSaved}
@@ -122,8 +152,12 @@ export function LeadEditor({
 function LeadEditorForm({
   scope,
   initial,
+  initialActivity,
+  initialDraft,
   target,
   catalog,
+  owners,
+  assignmentWritable,
   timezone,
   onClose,
   onSaved,
@@ -135,8 +169,12 @@ function LeadEditorForm({
   onReadRetry?: () => Promise<LeadDetail>;
   scope: ClientScope;
   initial?: LeadDetail;
+  initialActivity?: Awaited<ReturnType<typeof readLeadActivities>>["items"][number];
+  initialDraft?: LeadDraft;
   target: LeadTarget | null;
   catalog?: CrmPipelineConfiguration;
+  owners: { id: string; name: string }[];
+  assignmentWritable: boolean;
   timezone: string;
   onClose: () => void;
   onSaved: () => Promise<void>;
@@ -147,7 +185,7 @@ function LeadEditorForm({
   const [before, setBefore] = useState(initial),
     [mode, setMode] = useState<LeadMode>(target?.mode ?? "edit"),
     [draft, setDraft] = useState<LeadDraft>(() => ({
-      ...leadDraft(initial),
+      ...(initialDraft ?? leadDraft(initial)),
       ...(target?.stage ? { stageKey: target.stage, lossReason: "" } : {}),
     }));
   const [selected, setSelected] = useState<PersonSummary | null>(null),
@@ -159,8 +197,9 @@ function LeadEditorForm({
     [errors, setErrors] = useState<Partial<Record<string, string>>>({}),
     [offsets, setOffsets] = useState<{ id: string; label: string }[]>([]),
     [activityCursor, setActivityCursor] = useState<string>();
-  const [activity, setActivity] =
-    useState<Awaited<ReturnType<typeof readLeadActivities>>["items"][number]>();
+  const [activity, setActivity] = useState<
+    Awaited<ReturnType<typeof readLeadActivities>>["items"][number] | undefined
+  >(initialActivity);
   const actionRef = useRef(false),
     errorRef = useRef<HTMLDivElement>(null);
   const history = useQuery({
@@ -243,6 +282,7 @@ function LeadEditorForm({
   }, [locked, onLockChange]);
   const canSubmit =
     command.state === "ready" &&
+    (assignmentWritable || draft.assignedTo === (before?.values.assigned_to ?? "")) &&
     !readError &&
     !command.unavailable &&
     !(mode === "offer" || mode === "confirm") &&
@@ -278,7 +318,9 @@ function LeadEditorForm({
         if (mode === "stage" && !draft.reviewed) throw new Error("LEAD_REVIEW_REQUIRED");
         if (mode === "stage" && !draft.stageKey) throw new Error("LEAD_STAGE_REQUIRED");
         if (!before) await readPerson(scope, personId);
-        await command.start(await leadSaveIntent(scope, personId, draft, catalog, before));
+        await command.start(
+          await leadSaveIntent(scope, personId, draft, catalog, before, assignmentWritable),
+        );
       } else if (mode === "activity" && before)
         await command.start(await leadActivityIntent(scope, before, draft, timezone, activity));
       else if (mode === "convert" && before)
@@ -323,22 +365,11 @@ function LeadEditorForm({
     source: LeadDetail,
   ) {
     if (!row.values.kind) throw new Error("ACTIVITY_SOURCE_UNAVAILABLE");
-    const T = await getTemporal();
-    const due = row.values.due_at
-      ? T.Instant.from(row.values.due_at).toZonedDateTimeISO(timezone)
-      : undefined;
     setActivity(row);
     setMode("activity");
     setError("");
     setErrors({});
-    setDraft({
-      ...leadDraft(source),
-      kind: row.values.kind,
-      note: row.values.note ?? "",
-      outcome: row.values.outcome ?? "",
-      due: due?.toPlainDateTime().toString({ smallestUnit: "minute" }) ?? "",
-      dueOffset: due?.offset ?? "",
-    });
+    setDraft(await activityDraft(source, row, timezone));
   }
   async function editActivity(id: string) {
     if (locked || command.state !== "ready") return;
@@ -439,6 +470,20 @@ function LeadEditorForm({
     outcome: row.values.outcome ?? null,
     owner: before?.values.assigned_to ? t(($) => $.leads.assignmentPreserved) : null,
   }));
+  if (before && (mode === "offer" || mode === "confirm"))
+    return (
+      <LeadTrialEditor
+        key={`${before.id}:${mode}`}
+        scope={scope}
+        lead={before}
+        mode={mode}
+        name={target?.name}
+        timezone={timezone}
+        onClose={onClose}
+        onSaved={onSaved}
+        onLockChange={onLockChange}
+      />
+    );
   return (
     <LeadSheet
       mode={mode}
@@ -455,10 +500,14 @@ function LeadEditorForm({
       stages={catalog?.stages ?? []}
       tags={catalog?.tags ?? []}
       owners={
-        before?.values.assigned_to
-          ? [{ id: before.values.assigned_to, name: t(($) => $.leads.assignmentPreserved) }]
-          : []
+        before?.values.assigned_to && !owners.some((row) => row.id === before.values.assigned_to)
+          ? [
+              { id: before.values.assigned_to, name: t(($) => $.leads.assignmentPreserved) },
+              ...owners,
+            ]
+          : owners
       }
+      assignmentWritable={assignmentWritable}
       products={[]}
       sessions={[]}
       offers={[]}
@@ -566,4 +615,24 @@ function LeadEditorForm({
       }
     />
   );
+}
+
+async function activityDraft(
+  source: LeadDetail,
+  row: Awaited<ReturnType<typeof readLeadActivities>>["items"][number],
+  timezone: string,
+): Promise<LeadDraft> {
+  if (!row.values.kind) throw new Error("ACTIVITY_SOURCE_UNAVAILABLE");
+  const T = await getTemporal();
+  const due = row.values.due_at
+    ? T.Instant.from(row.values.due_at).toZonedDateTimeISO(timezone)
+    : undefined;
+  return {
+    ...leadDraft(source),
+    kind: row.values.kind,
+    note: row.values.note ?? "",
+    outcome: row.values.outcome ?? "",
+    due: due?.toPlainDateTime().toString({ smallestUnit: "minute" }) ?? "",
+    dueOffset: due?.offset ?? "",
+  };
 }

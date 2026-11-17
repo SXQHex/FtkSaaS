@@ -1,3 +1,5 @@
+import { Field, FieldLabel } from "../../components/ui/field";
+import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { useTranslation } from "react-i18next";
 import {
   Table,
@@ -25,11 +27,15 @@ export function LeadActivitiesView({
   onOpen,
   onAdd,
   disabled = false,
+  outcomeLabel,
+  showOutcome = true,
 }: {
   rows: LeadActivityRow[];
   onOpen?: (id: string) => void;
   onAdd?: () => void;
   disabled?: boolean;
+  outcomeLabel?: string;
+  showOutcome?: boolean;
 }) {
   const { t } = useTranslation();
   return (
@@ -49,7 +55,7 @@ export function LeadActivitiesView({
             t(($) => $.leads.candidate),
             t(($) => $.leads.when),
             t(($) => $.leads.owner),
-            t(($) => $.leads.outcome),
+            ...(showOutcome ? [outcomeLabel ?? t(($) => $.leads.outcome)] : []),
           ].map((label, index) => (
             <TableHead id={label} isRowHeader={index === 0} key={label}>
               {label}
@@ -72,7 +78,7 @@ export function LeadActivitiesView({
               <TableCell>{row.name}</TableCell>
               <TableCell>{row.due ?? "—"}</TableCell>
               <TableCell>{row.owner ?? t(($) => $.leads.unassigned)}</TableCell>
-              <TableCell>{row.outcome ?? "—"}</TableCell>
+              {showOutcome && <TableCell>{row.outcome ?? "—"}</TableCell>}
             </TableRow>
           ))}
         </TableBody>
@@ -174,5 +180,42 @@ export function LeadHistoryView({ rows }: { rows: LeadActivityRow[] }) {
         <p className="text-sm text-muted-foreground">{t(($) => $.leads.noActivities)}</p>
       )}
     </section>
+  );
+}
+
+export type LeadFollowupKind = "manual" | "renewal_due" | "inactive_student";
+export function LeadFollowupPicker({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: LeadFollowupKind;
+  onChange: (value: LeadFollowupKind) => void;
+  disabled: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <search aria-label={t(($) => $.leads.followupKind)}>
+      <Field>
+        <FieldLabel htmlFor="lead-followup-kind">{t(($) => $.leads.followupKind)}</FieldLabel>
+        <NativeSelect
+          id="lead-followup-kind"
+          name="followup-kind"
+          value={value}
+          disabled={disabled}
+          onChange={(event) => {
+            const next = event.target.value;
+            if (next === "manual" || next === "renewal_due" || next === "inactive_student")
+              onChange(next);
+          }}
+        >
+          {(["manual", "renewal_due", "inactive_student"] as const).map((kind) => (
+            <NativeSelectOption key={kind} value={kind}>
+              {t(($) => $.leads.followupKinds[kind])}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+      </Field>
+    </search>
   );
 }

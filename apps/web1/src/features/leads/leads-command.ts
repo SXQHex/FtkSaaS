@@ -119,6 +119,7 @@ export async function leadSaveIntent(
   draft: LeadDraft,
   catalog: CrmPipelineConfiguration | undefined,
   before?: LeadDetail,
+  assignmentWritable = false,
 ): Promise<LeadIntent> {
   z.uuid().parse(personId);
   const source = z.string().trim().min(1).parse(draft.source),
@@ -138,11 +139,15 @@ export async function leadSaveIntent(
       person_id: personId,
       source,
       interest,
+      ...(assignmentWritable
+        ? { assigned_to: draft.assignedTo ? z.uuid().parse(draft.assignedTo) : null }
+        : before
+          ? { assigned_to: before.values.assigned_to }
+          : {}),
       ...(before
         ? {
             lead_id: before.id,
             expected_version: before.version,
-            assigned_to: before.values.assigned_to,
           }
         : {}),
       ...(pipeline ? { pipeline } : {}),
@@ -365,6 +370,8 @@ export async function readLeadResult(intent: LeadIntent, id?: string) {
     if (
       detail.values.source !== intent.request.source ||
       detail.values.interest !== intent.request.interest ||
+      (intent.request.assigned_to !== undefined &&
+        detail.values.assigned_to !== intent.request.assigned_to) ||
       (intent.before && detail.version <= intent.before.version) ||
       (pipeline &&
         (!actual ||
