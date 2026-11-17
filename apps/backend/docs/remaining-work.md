@@ -28,7 +28,8 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] W1-BE-21/22/23 aday full clean → main kaynak kabulü → development teslimi; hosted ve frontend kabulü ayrı. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-member-self-discovery).
 - [x] W1-BE-19 ek tüm dönem hakediş satırları; W1-BE-28 inbox arama/gerçek kaynak durumu/sayaç ve atomik tersinir seçili okunma; W1-BE-29 native segment/iş keşfi ve özet kaynakları. Tüketim WF14/WF11/WF16, değerlendirme XREQ-053/060/061.
 - [x] Bu üçlünün son kaynak native/statik testleri ve bağımsız incelemesi; platforma özgü yerel verify sınırı kanıt sahibinde açıklandı.
-- [ ] Tek Draft PR/push → aday full clean → aynı main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); yeni hosted ve frontend kabulü ayrı.
+- [x] PR321 ilk üçlü kaynak/push ve ilk aday clean; merge öncesi talep ayrıntısı okuma senaryosu native/regresyon kabulü.
+- [ ] PR321 yeni aday full clean → kullanıcı yetkisiyle merge → aynı main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); yeni hosted ve frontend kabulü ayrı.
 - [ ] W1-BE-24/25/30/31: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
 
 ## Web1 ek backend talepleri — 15 Kasım

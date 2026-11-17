@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**17 Kasım Web1 talepleri:** Kullanıcı feat/web1-account-acceptance request.md açıklarından en ilgili üç ihtiyacı kapatıp push etmeyi istedi; W1-BE-19 ek tüm dönem defteri, W1-BE-28 inbox ve W1-BE-29 segment/otomasyon keşfi aynı hesap/iş takibi dilimidir. Kullanıcının native sınır ve hedef kitle kararlarıyla üçü tamamlanınca tek ayrı Draft PR açılır. G03 genişletilmez; kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) sahibindedir. Her full clean başlangıcında kullanıcıya devir yapılır.
+**17 Kasım Web1 talepleri:** Kullanıcı feat/web1-account-acceptance request.md açıklarından en ilgili üç ihtiyacı kapatıp push etmeyi istedi; W1-BE-19 ek tüm dönem defteri, W1-BE-28 inbox ve W1-BE-29 segment/otomasyon keşfi aynı hesap/iş takibi dilimidir. Üçlü PR321 içinde teslim edilir. Kullanıcı merge yetkisi verdi; merge öncesi bildirimden yazma aksiyonu seçmek yerine gerçek talep ayrıntısını açma senaryosu doğrulanır. Yeni aday clean’den sonra aynı yetkiyle merge ve main/development kanıtı gelir. G03 genişletilmez; kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) sahibindedir. Her full clean başlangıcında kullanıcıya devir yapılır.
 
 **13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleriyle yürütüldü; ölçütler karşılandığından mevcut G03 sırasına dönülür. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
 

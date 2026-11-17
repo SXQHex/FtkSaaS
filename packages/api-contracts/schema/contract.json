@@ -39347,6 +39347,9 @@
             "include_summary": {
               "type": "boolean",
               "default": false
+            },
+            "lesson_request_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [],
@@ -39371,6 +39374,20 @@
                         "include_summary"
                       ]
                     }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "lesson_request_id"
+                ]
+              },
+              "then": {
+                "not": {
+                  "required": [
+                    "catalog"
                   ]
                 }
               }
@@ -62704,7 +62721,7 @@
               "$ref": "#/$defs/ManagementSelector_seat_offer_accept_v1"
             },
             {
-              "$ref": "#/$defs/ManagementSelector_lesson_request_withdraw_v1"
+              "$ref": "#/$defs/ManagementSelector_lesson_request_create_v1"
             },
             {
               "$ref": "#/$defs/ManagementSelector_crm_activity_save_v1"
@@ -109427,6 +109444,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_lesson_request_create_v1/properties/key/properties/lesson_request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -109919,7 +109942,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 176,
+      "migration_count": 177,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

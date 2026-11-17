@@ -8361,7 +8361,7 @@ removed_bytes?: number
 export interface NotificationSourceState {
 state: ("pending" | "completed" | "informational" | "unavailable")
 center_id: (string | null)
-selector: (ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorCrmActivitySaveV1 | null)
+selector: (ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorCrmActivitySaveV1 | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8378,15 +8378,30 @@ offer_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_lesson_request_withdraw_v1".
+ * via the `definition` "ManagementSelector_lesson_request_create_v1".
  */
-export interface ManagementSelectorLessonRequestWithdrawV1 {
-operation: "lesson_request_withdraw_v1"
+export interface ManagementSelectorLessonRequestCreateV1 {
+operation: "lesson_request_create_v1"
 key: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-lesson_request_id: string
+person_id?: string
+preferred_instructor_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+catalog?: ("disciplines" | "instructors")
+/**
+ * Optional directory status. Resolved means approved/rejected/withdrawn/expired; not a new lifecycle state.
+ */
+status?: ("all" | "pending" | "alternative_offered" | "resolved")
+include_summary?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id?: string
 }
 }
 /**
@@ -22193,26 +22208,15 @@ agreement_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_lesson_request_create_v1".
+ * via the `definition` "ManagementSelector_lesson_request_withdraw_v1".
  */
-export interface ManagementSelectorLessonRequestCreateV1 {
-operation: "lesson_request_create_v1"
+export interface ManagementSelectorLessonRequestWithdrawV1 {
+operation: "lesson_request_withdraw_v1"
 key: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-person_id?: string
-preferred_instructor_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-discipline_id?: string
-catalog?: ("disciplines" | "instructors")
-/**
- * Optional directory status. Resolved means approved/rejected/withdrawn/expired; not a new lifecycle state.
- */
-status?: ("all" | "pending" | "alternative_offered" | "resolved")
-include_summary?: boolean
+lesson_request_id: string
 }
 }
 /**

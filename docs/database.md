@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ac5204952b521df5167159c0a13cf330ad3ad46e2255bdc3a195255188074218`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9c5aeb7cb697e1e08aeb1e9cec247ca347e97c6a98e68b0f4266d8efffda522e`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 176. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 177. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -184,3 +184,4 @@ Sıralı migration: 176. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261116233014_instructor_all_period_ledger.sql](../apps/backend/supabase/migrations/20261116233014_instructor_all_period_ledger.sql) | `37ad84a615c8ecdb6df5f3cad5ffffce3a3e5c136f0db843a8281918e934deac` |
 | [20261116233015_notification_inbox_work.sql](../apps/backend/supabase/migrations/20261116233015_notification_inbox_work.sql) | `240bf401f1183a31c846cedf3756ab78f332461ad0ca9f1e4a959163790190d0` |
 | [20261116233016_automation_discovery_insights.sql](../apps/backend/supabase/migrations/20261116233016_automation_discovery_insights.sql) | `fb130af181d556e4940793f3aed7065304d7f0b68033a51cce5c5f3a74aabc24` |
+| [20261117003000_notification_request_source_authority.sql](../apps/backend/supabase/migrations/20261117003000_notification_request_source_authority.sql) | `b5325916e572fe9241ddbf0fffc839e7c212ae6813e2127773da6aab57ab79fb` |

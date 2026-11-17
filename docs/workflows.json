@@ -297,8 +297,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "9e257d9c316385966855662ef540885dd37141d41e9f031cbfa82470423537d8",
-        "reason": "W1-BE-19/28/29: reviewed opt-in self ledger, recipient-source inbox, scoped segment/job discovery and Boolean-preserving validator compaction with native negative tests; guide updated."
+        "fingerprint": "aba39d2a19fb29361d17ff7149c74c0730598931cceca7425977d0fe4808c7e9",
+        "reason": "Reviewed exact native request reader selector, its UUID classification and closed catalog exclusion; no write action selected by inbox, existing common normalization preserved."
       }
     },
     {
@@ -894,7 +894,8 @@
         "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
         "apps/backend/tests/fixtures/lesson-request-status-summary.sql",
         "apps/backend/tests/member-lesson-discovery-unit.mjs",
-        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -952,7 +953,8 @@
         "apps/backend/database/lesson-request-status-summary.sql",
         "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql",
         "apps/backend/database/member-lesson-discovery.sql",
-        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
+        "apps/backend/database/notification-request-source-authority.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -967,8 +969,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "6926ae662ec582becbbabab25acbbd473c8db66b3cba5335dfb3a9de9ded2024",
-        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
+        "fingerprint": "8079425159f6bc252aaa413af0832801a96a238da35eaf47eb0256aa447896d3",
+        "reason": "Reviewed exact request-detail read selector and inbox source visibility using the same native request page; actions remain separate, catalog mixing rejected; resolve/write/self and live loss tests added."
       }
     },
     {
@@ -1328,7 +1330,9 @@
         "apps/backend/database/member-self-discovery.sql",
         "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql",
         "apps/backend/database/notification-inbox-work.sql",
-        "apps/backend/supabase/migrations/20261116233015_notification_inbox_work.sql"
+        "apps/backend/supabase/migrations/20261116233015_notification_inbox_work.sql",
+        "apps/backend/database/notification-request-source-authority.sql",
+        "apps/backend/supabase/migrations/20261117003000_notification_request_source_authority.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1344,8 +1348,8 @@
         "notifications_read_set_v1"
       ],
       "review": {
-        "fingerprint": "0074eac4373bbe4d39ebc3396da2072ca40ec4b14925f35ef6d29598c0297b6d",
-        "reason": "W1-BE-19/28/29: reviewed opt-in self ledger, recipient-source inbox, scoped segment/job discovery and Boolean-preserving validator compaction with native negative tests; guide updated."
+        "fingerprint": "6096138030145ecc9c07c9954ed9cbb6d8107b0f77a6eb74a332e750144883c4",
+        "reason": "Reviewed exact request-detail read selector and inbox source visibility using the same native request page; actions remain separate, catalog mixing rejected; resolve/write/self and live loss tests added."
       }
     },
     {
@@ -1614,8 +1618,8 @@
         "instructor_account_get_v1"
       ],
       "review": {
-        "fingerprint": "0c3af53bf9e5f61f9030c8b1203d8237e67bf46da0fa8ee0026bbadd24412035",
-        "reason": "W1-BE-19/28/29: reviewed opt-in self ledger, recipient-source inbox, scoped segment/job discovery and Boolean-preserving validator compaction with native negative tests; guide updated."
+        "fingerprint": "e6a6016ddb73047aafc141659894aba18e1497a6b3cef178e71604882f2be924",
+        "reason": "Shared native/unit test module gains exact request-detail navigation regression; existing ledger/automation SQL and behavior unchanged."
       }
     },
     {
@@ -1758,8 +1762,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "8cfe10113c809c0911adc8294005a5dd1201a98a2db434d2de25d9d216bcfd51",
-        "reason": "W1-BE-19/28/29: reviewed opt-in self ledger, recipient-source inbox, scoped segment/job discovery and Boolean-preserving validator compaction with native negative tests; guide updated."
+        "fingerprint": "8f4c0e3057f809aa32c0a984691fdc68306763d0975f8ec0687c945bf507455b",
+        "reason": "Shared native/unit test module gains exact request-detail navigation regression; existing ledger/automation SQL and behavior unchanged."
       }
     },
     {

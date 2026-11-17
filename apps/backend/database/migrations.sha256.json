@@ -174,5 +174,6 @@
   "20261116223700_member_self_discovery.sql": "b3b176a1291234211fcd6c266093ea16678dfaa11aec84ad3266a1244dcd0d17",
   "20261116233014_instructor_all_period_ledger.sql": "37ad84a615c8ecdb6df5f3cad5ffffce3a3e5c136f0db843a8281918e934deac",
   "20261116233015_notification_inbox_work.sql": "240bf401f1183a31c846cedf3756ab78f332461ad0ca9f1e4a959163790190d0",
-  "20261116233016_automation_discovery_insights.sql": "fb130af181d556e4940793f3aed7065304d7f0b68033a51cce5c5f3a74aabc24"
+  "20261116233016_automation_discovery_insights.sql": "fb130af181d556e4940793f3aed7065304d7f0b68033a51cce5c5f3a74aabc24",
+  "20261117003000_notification_request_source_authority.sql": "b5325916e572fe9241ddbf0fffc839e7c212ae6813e2127773da6aab57ab79fb"
 }

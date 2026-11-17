@@ -27,3 +27,9 @@ test('native automation insights expose explicit execution-center segment sample
  assert(valid('Request_management_state_get',request('automation_save_v1',{scope:{kind:'center',center_id:id},discovery:'jobs',state:'failed'})));
  assert(!valid('Request_management_state_get',request('segment_save_v1',{scope:{kind:'organization'},segment_id:id,discovery:'matches'})));
 });
+test('notification request navigation is an exact native read, independent of a write action',()=>{
+ const selector={operation:'lesson_request_create_v1',key:{lesson_request_id:id}};
+ assert(valid('Request_management_state_get',{...base,operation:selector.operation,selector,page:{}}));
+ assert(valid('NotificationSourceState',{state:'pending',center_id:id,selector}));
+ assert(!valid('Request_management_state_get',{...base,operation:selector.operation,selector:{...selector,key:{...selector.key,catalog:'disciplines'}},page:{}}));
+});
