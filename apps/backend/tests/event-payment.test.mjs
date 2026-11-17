@@ -416,3 +416,5 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
 });
 import './event-directory-finance-acceptance.mjs';
 import './ledger-inbox-automation-acceptance.mjs';
+import './intake-crm-work-acceptance.mjs';
+import './public-program-discovery-acceptance.mjs';

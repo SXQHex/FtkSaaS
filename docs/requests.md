@@ -55,6 +55,10 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-060 | Backend değerlendirmesi; Web1 W1-BE-28 | Backend; tüketici frontend | [WF11](workflows.md#wf11) | Inbox araması, gerçek kaynak durumu, kapsam özeti ve atomik tersinir seçili okuma. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-060). |
 | XREQ-061 | Backend değerlendirmesi; Web1 W1-BE-29 | Backend; tüketici frontend | [WF16](workflows.md#wf16) | Native segment eşleşme/kullanım ve gerçek iş keşfi/özetleri. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation) | Kullanıcının dar native kapsam kararı; frontend adına kabul verilmedi. [Değerlendirme](#xreq-061). |
 
+| XREQ-062 | Backend değerlendirmesi; W1-BE-24 CRM keşfi | Backend; tüketici frontend | [WF16](workflows.md#wf16) | Native kaynak/rol/plan sınırında typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-062). |
+| XREQ-063 | Backend değerlendirmesi; W1-BE-25 public program/form keşfi | Backend; tüketici frontend | [WF09](workflows.md#wf09) | Native kaynak/rol/plan sınırında typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-063). |
+| XREQ-064 | Backend değerlendirmesi; W1-BE-32 bekleyen yönetim işleri | Backend; tüketici frontend | [WF16](workflows.md#wf16) | Native kaynak/rol/plan sınırında typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-064). |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -884,3 +888,24 @@ W1-BE-28 için native liste/tekil mark-read ve kaynak komutları korunur. Eksik 
 ### Backend değerlendirmesi — 17 Kasım 2026
 
 W1-BE-29 mevcut segment/automation management okuyucusu ve sürümlü save/disable/başarısız iş retry yollarıyla kısmen karşılanır. Haftalık/segmente giriş tetikleme, elle çalıştırma, silme ve yeni segment koşulları native destek değildir; kullanıcı mevcut sınırın açıklanmasını ve eksik keşif/özetlerin tamamlanmasını seçti. Bu teslim yalnız mevcut management selector’üne kayıtlı segment eşleşmeleri, yetkili kullanım bağları ve gerçek scope-wide iş geçmişi/özeti ekler. Hedef kitle kararı FD10, native çağrı/rol/plan/cursor/sonuç ve teslim ayrımı [WF16](workflows.md#wf16) sahibindedir. Worker tetikleme/kilit/tek sonuç/lease ve retry kuralları yeniden kurulmaz. Kaynak/ortam yalnız [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); frontend kabulü ayrı kalır.
+
+<a id="xreq-062"></a>
+## XREQ-062 Web1 CRM aday/takip keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+Eski lead/faaliyet/deneme writer’ları native yolu karşılar; eksik filtre, bütün kapsam özeti, sorumlu, takip ve konfigürasyonlu deneme/geçmiş keşfi mevcut okuyucularda tamamlanır. Dönüşüm kararı FD09 sahibindedir; Kazanıldı öğrencilik değildir. Kesin çağrı/DTO/yetki/hata ve yeniden okuma [WF16](workflows.md#wf16), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) sahibindedir. Frontend kaynak/todo/kabulüne yazılmadı; karşı alan adına kabul verilmedi.
+
+<a id="xreq-063"></a>
+## XREQ-063 Web1 public program ve açık form bağı
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+Eski anonim Worker/public takvim/başvuru hattı korunur. Gerçek tür/disiplin filtresi/saat dilimi ve kapalı varsayılan iki yayın izniyle güvenli sunum; explicit etkin form ve gerçek onay kaynağı keşfi eklenir. Kullanıcı kararı FD08 sahibindedir; otomatik yayın veya onay metni üretilmez. Kesin çağrı/DTO/yetki/hata ve yeniden okuma [WF09](workflows.md#wf09), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) sahibindedir. Frontend kaynak/todo/kabulüne yazılmadı; karşı alan adına kabul verilmedi.
+
+<a id="xreq-064"></a>
+## XREQ-064 Web1 bekleyen yönetim işi keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+Dar native kaynak okuyucuları ayrıntı/işlemi karşılar; seçili merkezin yetkili gerçek pending kaynaklarını tek cursor ve güvenli ayrıntı hedefiyle keşfetmek eksikti. Salt okuyucu gerçek kaynak durumlarından oluşur; bağımsız task/yanıt/tamamlama veya generic yeniden çalıştırma kurulmaz. Kesin çağrı/DTO/yetki/hata ve yeniden okuma [WF16](workflows.md#wf16), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) sahibindedir. Frontend kaynak/todo/kabulüne yazılmadı; karşı alan adına kabul verilmedi.
