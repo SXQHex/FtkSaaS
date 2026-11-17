@@ -36,6 +36,7 @@ export async function mockSettingsCompletion(
     permissions: {} as Record<string, boolean>,
     subVersion: 2,
     pending: false,
+    transitioned: false,
     kept: undefined as NativeRequest | undefined,
     failed: false,
   };
@@ -56,6 +57,7 @@ export async function mockSettingsCompletion(
   };
   const roles: NativeRequest[] = [
     staff,
+    { ...staff, id: uid(120), role: "instructor" },
     { ...staff, id: uid(121), person_id: uid(130), role: "center_manager" },
     { ...staff, id: uid(122), person_id: uid(130), role: "org_manager", scope_center_id: null },
   ];
@@ -246,21 +248,27 @@ export async function mockSettingsCompletion(
     if (op === "subscription_get_v1")
       await send({
         state: "active",
-        plan: "pro",
-        period_start: at,
-        period_end: target.effective_at,
+        plan: state.transitioned ? "starter" : "pro",
+        period_start: state.transitioned ? target.effective_at : at,
+        period_end: state.transitioned ? "2099-02-01T00:00:00Z" : target.effective_at,
         grace_until: null,
         cancel_at_period_end: false,
-        pending_change: state.pending ? { type: "saas_change_requests", id: uid(109) } : null,
+        pending_change:
+          state.pending && !state.transitioned
+            ? { type: "saas_change_requests", id: uid(109) }
+            : null,
         subscription_version: state.subVersion,
         limits: { entries: [] },
         usage: { entries: [] },
-        pending_starter_scope: state.pending ? { center_id: I.center, scope: state.kept } : null,
+        pending_starter_scope:
+          state.pending && !state.transitioned ? { center_id: I.center, scope: state.kept } : null,
         billing: {
-          current: { id: uid(110), period: "monthly", amount_minor: "100000", currency: "TRY" },
+          current: state.transitioned
+            ? target.target
+            : { id: uid(110), period: "monthly", amount_minor: "100000", currency: "TRY" },
           period_change_options: [],
           pending_period_change: null,
-          downgrade_options: [target],
+          downgrade_options: state.transitioned ? [] : [target],
           upgrade_options: [],
         },
       });

@@ -2,6 +2,8 @@ import { test, expect } from "./test.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { uid } from "./pro-completion-fixture.js";
+import { origin } from "./auth-fixture.js";
+import common from "../src/locales/tr/common.json" with { type: "json" };
 async function confirm(page: import("@playwright/test").Page) {
   const dialog = page.getByRole("dialog");
   await dialog
@@ -95,9 +97,10 @@ test("policy editing publishes a native protected change after review and keeps 
   });
   expect(write).not.toHaveProperty("center_id");
 });
-test("downgrade preserves an explicitly selected native Starter scope including zero students without changing the current plan early", async ({
+test("downgrade preserves the selected scope and period, then a stale Pro editor cannot publish after the native transition", async ({
   page,
 }) => {
+  test.setTimeout(60_000);
   const f = await mockSettingsCompletion(page);
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
@@ -136,6 +139,45 @@ test("downgrade preserves an explicitly selected native Starter scope including 
     },
   });
   expect(f.state.pending).toBe(true);
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const base = `${origin}/o/${I.org}/c/${I.center}`;
+  await expect(page.getByText("Pro", { exact: true }).first()).toBeVisible();
+  await page.goto(`${base}/studio`);
+  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
+  await page.getByRole("button", { name: /Sentetik personel/ }).click();
+  const staleEditor = page.getByRole("dialog");
+  await staleEditor.getByLabel("Tutar (en küçük para birimi)", { exact: true }).fill("25000");
+  await staleEditor.locator("#agreement-from").fill("2099-01-01T12:00");
+  await staleEditor.locator("#agreement-until").fill("2100-01-01T12:00");
+  await staleEditor.locator("#agreement-reason").fill("Sentetik eski Pro sekmesi");
+  await staleEditor.getByRole("checkbox").press("Space");
+  // A native period transition is authoritative even in an already-open editor.
+  // Backend period/limit behavior is accepted separately in native CI.
+  f.state.transitioned = true;
+  let rejected = 0;
+  await page.route("**/functions/v1/backend-v1/instructor_agreement_publish_v1", async (route) => {
+    rejected++;
+    expect(f.state.transitioned).toBe(true);
+    return route.fulfill({
+      json: {
+        ok: false,
+        error: { code: "PLAN_FEATURE_UNAVAILABLE", retryable: false, trace_id: I.role },
+      },
+    });
+  });
+  await staleEditor.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
+  await expect(staleEditor.getByRole("status")).toContainText(common.studio.agreementRejected);
+  expect(rejected).toBe(1);
+  expect(f.studio.agreements).toHaveLength(1);
+  expect(f.studio.effects).not.toContain("instructor_agreement_publish_v1");
+  await staleEditor.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.goto(`${base}/settings`);
+  await page
+    .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
+    .selectOption("organization");
+  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  await expect(page.getByText("Starter", { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Planı değiştir", exact: true })).toBeDisabled();
 });
 test("team permission unknown state blocks scope and retries exactly one frozen grant before rereading effective permissions", async ({
   page,
