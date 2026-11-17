@@ -1,3 +1,4 @@
+import { getTemporal } from "../../lib/temporal";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
@@ -33,11 +34,12 @@ export async function readEarningsDirectory(
   view: EarningsDirectoryView,
   input: { personId?: string; interval?: Interval; cursor?: string } = {},
 ) {
+  const temporal = await getTemporal();
   if (input.personId) z.uuid().parse(input.personId);
   if (input.interval) {
     instant.parse(input.interval.starts_at);
     instant.parse(input.interval.ends_at);
-    if (Date.parse(input.interval.starts_at) >= Date.parse(input.interval.ends_at))
+    if (temporal.Instant.compare(input.interval.starts_at, input.interval.ends_at) >= 0)
       throw new Error("EARNINGS_INTERVAL_INVALID");
   }
   const data = await (
@@ -118,8 +120,8 @@ export async function readEarningsDirectory(
         throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
       if (
         input.interval &&
-        (Date.parse(item.created_at) < Date.parse(input.interval.starts_at) ||
-          Date.parse(item.created_at) >= Date.parse(input.interval.ends_at))
+        (temporal.Instant.compare(item.created_at, input.interval.starts_at) < 0 ||
+          temporal.Instant.compare(item.created_at, input.interval.ends_at) >= 0)
       )
         throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
     } else {
@@ -144,8 +146,8 @@ export async function readEarningsDirectory(
         throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
       if (
         input.interval &&
-        (Date.parse(row.occurred_at) < Date.parse(input.interval.starts_at) ||
-          Date.parse(row.occurred_at) >= Date.parse(input.interval.ends_at))
+        (temporal.Instant.compare(row.occurred_at, input.interval.starts_at) < 0 ||
+          temporal.Instant.compare(row.occurred_at, input.interval.ends_at) >= 0)
       )
         throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
     }

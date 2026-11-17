@@ -4394,7 +4394,28 @@
     "effectUnread": "Etki ve bakiyeler yetkili kaynaktan okununca gösterilir.",
     "cancel": "Vazgeç",
     "savePayment": "Ödemeyi kaydet",
-    "saveCorrection": "Düzeltmeyi kaydet"
+    "saveCorrection": "Düzeltmeyi kaydet",
+    "activeAgreements": "{{count}} etkin anlaşma",
+    "activeAgreements_one": "{{count}} etkin anlaşma",
+    "activeAgreements_other": "{{count}} etkin anlaşma",
+    "agreementVersions": "{{count}} değişmez sürüm",
+    "agreementVersions_one": "{{count}} değişmez sürüm",
+    "agreementVersions_other": "{{count}} değişmez sürüm",
+    "agreementVersion": "Anlaşma v{{version}}",
+    "unnamedSession": "Seans adı yayımlanmamış",
+    "adjustmentLine": "Düzeltme",
+    "paidLine": "Kalan yok",
+    "openLine": "Kalan var",
+    "payment": "Ödeme",
+    "unknownMethod": "Yöntem kaydedilmemiş",
+    "bases": {
+      "sale_unit": "Satış birim bedeli",
+      "negative_snapshot": "Negatif hak bedeli",
+      "agreement_fixed": "Sabit anlaşma bedeli",
+      "event_fee": "Etkinlik ücreti",
+      "lesson_agreement": "Ders anlaşması"
+    },
+    "overpaidLine": "Fazla ödeme"
   },
   "audit": {
     "title": "Denetim",
