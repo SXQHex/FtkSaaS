@@ -4233,7 +4233,30 @@
     "tasksTitle": "Bekleyen işler",
     "tasksDescription": "Seçili merkezde yetkin kapsamındaki yönetim işleri. İşlemi kendi ekranında tamamla.",
     "tasksUnread": "Bekleyen yönetim işleri şu anda okunamıyor.",
-    "tasksEmpty": "Bu kapsamda bekleyen yönetim işi yok."
+    "tasksEmpty": "Bu kapsamda bekleyen yönetim işi yok.",
+    "workKinds": {
+      "lesson_request": "Özel ders talebi",
+      "lesson_attendance": "Ders yoklaması",
+      "event_attendance": "Etkinlik yoklaması",
+      "crm_followup": "CRM takibi",
+      "application_review": "Başvuru incelemesi"
+    },
+    "workPending": "Bekliyor",
+    "workDue": "Son tarih: {{date}}",
+    "workOpen": "İşi aç",
+    "workTotal_one": "Seçili merkezde {{count}} yetkili bekleyen iş",
+    "workTotal_other": "Seçili merkezde {{count}} yetkili bekleyen iş",
+    "workPage": "Sayfa {{page}}",
+    "workReload": "İş listesini yeniden oku",
+    "workReadError": "İş kaynağı okunamadı veya erişim değişti. Listeyi yeniden oku.",
+    "workChanged": "İş kaynağı değişti. Listeyi yeniden oku.",
+    "workDetail": "Bekleyen iş ayrıntısı",
+    "workDetailHint": "Güncel kaynak ve sürüm okunur. İşlem kendi akışındaki gerçek kaydı değiştirir.",
+    "workOutcome": "Takip sonucunu kaydet",
+    "workOutcomeHint": "Bu işlem mevcut CRM faaliyetini sonuçlandırır; ayrı bir görev kaydı oluşturmaz.",
+    "workFlow": "İlgili akışı aç",
+    "workPageEmpty": "Bu sayfada bekleyen yönetim işi yok.",
+    "workReview": "Sonucu incele"
   },
   "earnings": {
     "title": "Hakediş",

@@ -74,6 +74,7 @@ export function OverviewView({
   tasks = null,
   taskNotice,
   taskPagination,
+  taskEmptyMessage,
 }: {
   date: string;
   now: string;
@@ -94,6 +95,7 @@ export function OverviewView({
   tasks?: OverviewTask[] | null;
   taskNotice?: ReactNode;
   taskPagination?: ReactNode;
+  taskEmptyMessage?: string;
 }) {
   const { t } = useTranslation();
   const nowRow = (
@@ -306,7 +308,9 @@ export function OverviewView({
             <p className="text-sm text-muted-foreground">{t(($) => $.overview.tasksUnread)}</p>
           ) : tasks.length === 0 ? (
             <Empty>
-              <EmptyDescription>{t(($) => $.overview.tasksEmpty)}</EmptyDescription>
+              <EmptyDescription>
+                {taskEmptyMessage ?? t(($) => $.overview.tasksEmpty)}
+              </EmptyDescription>
             </Empty>
           ) : (
             <ItemGroup className="divide-y gap-0">
@@ -317,7 +321,7 @@ export function OverviewView({
                   className="flex-wrap rounded-none border-0 px-0"
                 >
                   <ItemContent>
-                    <ItemTitle>{task.title}</ItemTitle>
+                    <ItemTitle className="wrap-anywhere">{task.title}</ItemTitle>
                     <ItemDescription className="line-clamp-none wrap-anywhere">
                       {task.context}
                       {task.due && <> · {task.due}</>}

@@ -39,7 +39,8 @@ function OverviewPage({
   const [selectedCenterId, setCenterId] = useState<string | undefined>(centerId);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutFailed, setSignOutFailed] = useState(false);
-  const locked = signingOut;
+  const [actionLocked, setActionLocked] = useState(false);
+  const locked = signingOut || actionLocked;
   const resolveScope = useCallback(
     (selection: WorkspaceSelection) => {
       if (locked || !selection.organizationId || !selection.centerId) return;
@@ -99,6 +100,8 @@ function OverviewPage({
             {selection.organizationId && selection.centerId ? (
               <OverviewContent
                 key={`${account.id}:${selection.organizationId}:${selection.centerId}`}
+                onLockChange={setActionLocked}
+                preservePending={actionLocked}
                 scope={{
                   accountId: account.id,
                   orgId: selection.organizationId,

@@ -31,6 +31,12 @@ async function setup(page: Page, mode: "normal" | "denied" | "empty" | "past-pla
       });
     return route.fallback();
   });
+  await page.route("**/functions/v1/backend-v1/management_work_list_v1", (route) =>
+    route.fulfill({
+      status: 503,
+      json: { ok: false, error: { code: "TEMPORARY_FAILURE", retryable: true, trace_id: I.role } },
+    }),
+  );
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/overview`);
   await expect(page.getByRole("heading", { name: "Bugünün programı", exact: true })).toBeVisible();
   return {
@@ -99,6 +105,7 @@ test("overview program and participant actions retain real scoped targets", asyn
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/overview`);
   await page.getByRole("button", { name: "Programı aç", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/schedule`);
+  await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
 test("overview denied day remains unread and recovers through explicit source reading", async ({

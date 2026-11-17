@@ -2544,7 +2544,29 @@ export default interface Resources {
       "tasksUnread": "Bekleyen yönetim işleri şu anda okunamıyor.",
       "timeline": "Bugünün dersleri",
       "title": "Bugünün programı",
-      "unread": "Bugünün programı okunamadı."
+      "unread": "Bugünün programı okunamadı.",
+      "workChanged": "İş kaynağı değişti. Listeyi yeniden oku.",
+      "workDetail": "Bekleyen iş ayrıntısı",
+      "workDetailHint": "Güncel kaynak ve sürüm okunur. İşlem kendi akışındaki gerçek kaydı değiştirir.",
+      "workDue": "Son tarih: {{date}}",
+      "workFlow": "İlgili akışı aç",
+      "workKinds": {
+        "application_review": "Başvuru incelemesi",
+        "crm_followup": "CRM takibi",
+        "event_attendance": "Etkinlik yoklaması",
+        "lesson_attendance": "Ders yoklaması",
+        "lesson_request": "Özel ders talebi"
+      },
+      "workOpen": "İşi aç",
+      "workOutcome": "Takip sonucunu kaydet",
+      "workOutcomeHint": "Bu işlem mevcut CRM faaliyetini sonuçlandırır; ayrı bir görev kaydı oluşturmaz.",
+      "workPage": "Sayfa {{page}}",
+      "workPageEmpty": "Bu sayfada bekleyen yönetim işi yok.",
+      "workPending": "Bekliyor",
+      "workReadError": "İş kaynağı okunamadı veya erişim değişti. Listeyi yeniden oku.",
+      "workReload": "İş listesini yeniden oku",
+      "workReview": "Sonucu incele",
+      "workTotal": "Seçili merkezde {{count}} yetkili bekleyen iş" | "Seçili merkezde {{count}} yetkili bekleyen iş"
     },
     "passwordChange": {
       "code": "Güvenlik kodu",
