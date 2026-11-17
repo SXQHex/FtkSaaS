@@ -5149,5 +5149,27 @@
       "rejected": "Merkez oluşturulamadı. Organizasyon yetkisini ve plan sınırını kontrol et."
     },
     "authorityUnavailable": "Merkez oluşturma yetkisi okunamadı. Yeniden dene."
+  },
+  "studentDiscipline": {
+    "title": "Öğrenci disiplinleri",
+    "discipline": "Disiplin",
+    "choose": "Disiplin seç",
+    "state": "Öğrenci disiplin bağının durumu",
+    "required": "Bir disiplin seç.",
+    "review": "Disiplin bağını incele",
+    "apply": "Disiplin bağını kaydet",
+    "before": "Mevcut bağ",
+    "unbound": "Bağ yok",
+    "same": "Disiplin bağı zaten seçilen durumda. Yeni işlem gerekmedi.",
+    "sourceError": "Güncel öğrencilik veya disiplin kaynağı okunamadı. Kaynakları yeniden kontrol et.",
+    "states": {
+      "writing": "Disiplin bağı kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem sonucunu oku.",
+      "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+      "saved-unread": "İstek kabul edildi; güncel disiplin bağı henüz okunamadı. Yeniden yazmadan sonucu oku.",
+      "saved": "Disiplin bağı kaydedildi ve kişi kaynağından doğrulandı.",
+      "stale": "Disiplin bağı değişti. Yeniden inceleyip onayla.",
+      "rejected": "Disiplin bağı kaydedilemedi. Güncel kaynakları ve yetkiyi kontrol et."
+    }
   }
 }

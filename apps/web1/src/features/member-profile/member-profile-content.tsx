@@ -11,6 +11,7 @@ import { RightAdjustmentEditor } from "./right-adjustment-editor";
 import { FreezeEditor } from "./freeze-editor";
 import { ProfileLedger } from "./profile-ledger";
 import { StudentStateEditor } from "./student-state";
+import { StudentDisciplineEditor } from "./student-discipline-editor";
 import { SaleLifecycleEditor } from "./sale-lifecycle-editor";
 import type { SaleLifecycleAction } from "./sale-lifecycle";
 import { SaleEditor } from "./sale-editor";
@@ -53,6 +54,7 @@ export function MemberProfileContent({
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [sale, setSale] = useState(false),
     [studentAction, setStudentAction] = useState<"activate" | "deactivate">(),
+    [studentDiscipline, setStudentDiscipline] = useState(false),
     [lifecycle, setLifecycle] = useState<{ action: SaleLifecycleAction; saleId?: string }>(),
     [collect, setCollect] = useState(false),
     [locked, setLocked] = useState(false),
@@ -444,6 +446,31 @@ export function MemberProfileContent({
   return (
     <>
       <MemberProfileView
+        studentTools={
+          <Button
+            variant="outline"
+            isDisabled={
+              locked ||
+              !sourceAvailable ||
+              !p ||
+              disciplines.isError ||
+              disciplines.isFetching ||
+              !disciplines.data?.length ||
+              (!p.relationships.some(
+                (row) =>
+                  row.center_id === scope.centerId &&
+                  row.kind === "student" &&
+                  row.state === "active",
+              ) &&
+                !p.discipline_relationships.some(
+                  (row) => row.center_id === scope.centerId && row.kind === "student",
+                ))
+            }
+            onPress={() => setStudentDiscipline(true)}
+          >
+            {t(($) => $.studentDiscipline.title)}
+          </Button>
+        }
         name={p?.display_name ?? t(($) => $.memberProfile.title)}
         initials={
           p?.display_name
@@ -951,6 +978,23 @@ export function MemberProfileContent({
             setCurrencyDraft(code);
             setSale(false);
             setCollect(true);
+          }}
+        />
+      )}
+      {studentDiscipline && p && disciplines.data && (sourceAvailable || preservePending) && (
+        <StudentDisciplineEditor
+          scope={scope}
+          person={p}
+          disciplines={disciplines.data}
+          sourceAvailable={sourceAvailable && !disciplines.isError}
+          onClose={() => setStudentDiscipline(false)}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onRefresh={async (current) => {
+            queries.setQueryData(personKey, current);
+            await queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
           }}
         />
       )}

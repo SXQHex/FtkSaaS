@@ -4582,6 +4582,28 @@ export default interface Resources {
       "showBanner": "Üst çubuğu göster",
       "trace": "Destek kimliği:"
     },
+    "studentDiscipline": {
+      "apply": "Disiplin bağını kaydet",
+      "before": "Mevcut bağ",
+      "choose": "Disiplin seç",
+      "discipline": "Disiplin",
+      "required": "Bir disiplin seç.",
+      "review": "Disiplin bağını incele",
+      "same": "Disiplin bağı zaten seçilen durumda. Yeni işlem gerekmedi.",
+      "sourceError": "Güncel öğrencilik veya disiplin kaynağı okunamadı. Kaynakları yeniden kontrol et.",
+      "state": "Öğrenci disiplin bağının durumu",
+      "states": {
+        "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+        "rejected": "Disiplin bağı kaydedilemedi. Güncel kaynakları ve yetkiyi kontrol et.",
+        "saved": "Disiplin bağı kaydedildi ve kişi kaynağından doğrulandı.",
+        "saved-unread": "İstek kabul edildi; güncel disiplin bağı henüz okunamadı. Yeniden yazmadan sonucu oku.",
+        "stale": "Disiplin bağı değişti. Yeniden inceleyip onayla.",
+        "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem sonucunu oku.",
+        "writing": "Disiplin bağı kaydediliyor…"
+      },
+      "title": "Öğrenci disiplinleri",
+      "unbound": "Bağ yok"
+    },
     "studio": {
       "acceptInstructorRole": "Seçili kişiye bu merkezde eğitmen rolü vermeyi onaylıyorum.",
       "accountLinkFound": "Bağ bulundu",
