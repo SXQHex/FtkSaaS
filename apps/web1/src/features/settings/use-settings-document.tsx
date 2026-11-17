@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import type { SettingsImageUpload, SettingsMediaAsset } from "../../lib/api-contracts/generated";
+import { preparePhoto, readPhoto, type PhotoDraft } from "../account/profile-photo";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -9,6 +11,7 @@ import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { SettingsReviewDialog } from "./settings-review-dialog";
 import {
   readSettingsDocument,
+  parseSettingsDocumentPatch,
   settingsDocumentIntent,
   writeSettingsDocument,
   readSettingsDocumentReceipt,
@@ -21,17 +24,36 @@ import type { SettingsViewData } from "./settings-view";
 import type { SettingsFieldKey, SettingsCardKey } from "./settings-layout";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
-const fields = {
+const contactFields = {
   "ay-tel": "contact_phone",
   "ay-posta": "contact_email",
   "ay-adres": "address",
 } as const;
+const reminderFields = {
+  "ay-h-ders": "lesson_reminders_enabled",
+  "ay-h-ders-n": "lesson_reminder_hours",
+  "ay-h-paket": "package_reminders_enabled",
+  "ay-h-paket-n": "package_reminder_days",
+  "ay-h-vade": "payment_reminders_enabled",
+  "ay-h-vade-n": "payment_reminder_days",
+} as const;
+const reminderChoices = {
+  lesson_reminder_hours: [1, 3, 24],
+  package_reminder_days: [3, 7, 14],
+  payment_reminder_days: [1, 3, 7],
+} as const;
+const fields = { ...contactFields, ...reminderFields };
 const colors = {
   primaryColor: "primary_color",
   secondaryColor: "secondary_color",
   accentColor: "accent_color",
 } as const;
-type Draft = Partial<Record<keyof SettingsDocumentPatch, string | null>>;
+const groups = {
+  "ay-genel": Object.values(contactFields),
+  "ay-marka": Object.values(colors),
+  "ay-hat": Object.values(reminderFields),
+} as const;
+type Draft = Partial<Record<keyof SettingsDocumentPatch, string | boolean | null>>;
 export function useSettingsDocument({
   scope,
   level,
@@ -57,10 +79,14 @@ export function useSettingsDocument({
       source: SettingsDocumentSource;
       patch: SettingsDocumentPatch;
       card: SettingsCardKey;
+      logo?: SettingsImageUpload | null;
     }>(),
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
-    [error, setError] = useState<string>();
+    [error, setError] = useState<string>(),
+    [logoDraft, setLogoDraft] = useState<PhotoDraft>(),
+    [logoError, setLogoError] = useState<string>(),
+    [accessDenied, setAccessDenied] = useState(false);
   const draft = drafts[level];
   const setDraft = (next: Draft | ((before: Draft) => Draft)) =>
     setDrafts((previous) => ({
@@ -75,23 +101,35 @@ export function useSettingsDocument({
       active.current = false;
     };
   }, []);
+  const loseAccess = useCallback(
+    (cause: unknown) => {
+      const lost = onAccessLost(cause);
+      if (lost) setAccessDenied(true);
+      return lost;
+    },
+    [onAccessLost],
+  );
   const key = ["settings-document", scope.accountId, scope.orgId, scope.centerId, level];
   const query = useQuery({
     queryKey: key,
-    queryFn: () => readSettingsDocument(scope, level),
-    enabled,
+    queryFn: async () => {
+      try {
+        return await readSettingsDocument(scope, level);
+      } catch (cause) {
+        loseAccess(cause);
+        throw cause;
+      }
+    },
+    enabled: enabled && !accessDenied,
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  useEffect(() => {
-    if (query.error) onAccessLost(query.error);
-  }, [query.error, onAccessLost]);
   const command = useMemberCommand({
     write: writeSettingsDocument,
     readReceipt: readSettingsDocumentReceipt,
     readResult: readSettingsDocumentResult,
-    onAccessLost,
+    onAccessLost: loseAccess,
     onRefresh: async (result) => {
       queries.setQueryData(key, result);
       setDraft((previous) =>
@@ -101,6 +139,7 @@ export function useSettingsDocument({
           ),
         ),
       );
+      if (review?.logo !== undefined) setLogoDraft(undefined);
       await queries.invalidateQueries(
         { queryKey: ["workspace", scope.accountId, scope.orgId] },
         { throwOnError: true },
@@ -113,18 +152,51 @@ export function useSettingsDocument({
     return () => onLockChange(false);
   }, [locked, onLockChange]);
   const source =
-    !command.unavailable && !query.isError && !query.isFetching ? query.data : undefined;
+    !accessDenied && !command.unavailable && !query.isError && !query.isFetching
+      ? query.data
+      : undefined;
   const writable = (field: string) =>
     !readOnly &&
     !!source &&
     Object.prototype.hasOwnProperty.call(source.document.values, field) &&
     source.catalog.fields.some((row) => row.key === field && row.writable) === true;
   const values = source?.document.values;
-  function current(field: keyof SettingsDocumentPatch): string | null | undefined {
+  const asset: SettingsMediaAsset | null | undefined =
+    source?.document.scope === "organization" ? source.document.logo : undefined;
+  const logoRead = useQuery({
+    queryKey: ["settings-logo", scope.accountId, scope.orgId, asset?.id],
+    queryFn: async () => {
+      try {
+        return await readPhoto(asset!, scope);
+      } catch (cause) {
+        loseAccess(cause);
+        throw cause;
+      }
+    },
+    enabled: !!asset && level === "organization" && !accessDenied,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const logoWritable = level === "organization" && writable("address");
+  const logoBlob =
+    logoDraft === undefined
+      ? !logoRead.isError && !logoRead.isFetching
+        ? logoRead.data
+        : undefined
+      : logoDraft?.file;
+
+  function current(field: keyof SettingsDocumentPatch): string | boolean | null | undefined {
     if (!source) return undefined;
     if (Object.prototype.hasOwnProperty.call(draft, field)) return draft[field];
     const value = values && Reflect.get(values, field);
-    return typeof value === "string" || value === null ? value : undefined;
+    return typeof value === "number"
+      ? String(value)
+      : typeof value === "string" || typeof value === "boolean" || value === null
+        ? value
+        : undefined;
   }
   const fieldData: NonNullable<SettingsViewData["fields"]> = {};
   for (const [presentation, wire] of Object.entries(fields) as [
@@ -132,26 +204,53 @@ export function useSettingsDocument({
     (typeof fields)[keyof typeof fields],
   ][]) {
     const value = current(wire);
-    if (value !== undefined) fieldData[presentation] = { value, writable: writable(wire) };
+    if (value !== undefined) {
+      const choices =
+        wire in reminderChoices ? reminderChoices[wire as keyof typeof reminderChoices] : undefined;
+      fieldData[presentation] = {
+        value,
+        writable: writable(wire),
+        ...(choices
+          ? {
+              options: choices.map((count) => ({
+                id: String(count),
+                label:
+                  wire === "lesson_reminder_hours"
+                    ? t(($) => $.settings.reminderHours, { count })
+                    : t(($) => $.settings.reminderDays, { count }),
+              })),
+            }
+          : {}),
+      };
+    }
   }
   const data: SettingsViewData = {
     fields: fieldData,
     forms: {
       "ay-genel": {
         dirty: Object.keys(draft).some((key) =>
-          Object.values(fields).some((field) => field === key),
+          Object.values(contactFields).some((field) => field === key),
         ),
         pending: locked,
         read: !!source,
-        writable: Object.values(fields).some(writable),
+        writable: Object.values(contactFields).some(writable),
       },
-      "ay-marka": {
+      "ay-hat": {
         dirty: Object.keys(draft).some((key) =>
-          Object.values(colors).some((field) => field === key),
+          Object.values(reminderFields).some((field) => field === key),
         ),
         pending: locked,
+        read: !!source,
+        writable: Object.values(reminderFields).some(writable),
+      },
+      "ay-marka": {
+        dirty:
+          logoDraft !== undefined ||
+          Object.keys(draft).some((key) => Object.values(colors).some((field) => field === key)),
+        pending: locked,
         read: !!source && level === "organization",
-        writable: level === "organization" && Object.values(colors).some(writable),
+        writable:
+          level === "organization" && (logoWritable || Object.values(colors).some(writable)),
       },
     },
     brand:
@@ -160,6 +259,9 @@ export function useSettingsDocument({
       Object.values(colors).every((key) => current(key) !== undefined)
         ? {
             name: t(($) => $.settings.unknown),
+            logo:
+              logoDraft === null ? null : logoBlob || asset ? { blob: logoBlob, alt: "" } : null,
+            logoError,
             colors: (
               Object.entries(colors) as [
                 keyof typeof colors,
@@ -167,15 +269,16 @@ export function useSettingsDocument({
               ][]
             ).map(([key, wire]) => ({
               key,
-              value: current(wire) ?? null,
+              value: typeof current(wire) === "string" ? (current(wire) as string) : null,
               writable: writable(wire),
             })),
           }
         : undefined,
   };
   function onField(presentation: SettingsFieldKey, value: string | boolean) {
-    if (locked || review || typeof value !== "string" || !(presentation in fields)) return;
+    if (locked || review || !(presentation in fields)) return;
     const wire = fields[presentation as keyof typeof fields];
+    if (wire.endsWith("_enabled") ? typeof value !== "boolean" : typeof value !== "string") return;
     if (writable(wire))
       setDraft((previous) => ({
         ...previous,
@@ -189,12 +292,11 @@ export function useSettingsDocument({
   }
   function onDiscard(card: SettingsCardKey) {
     if (locked || review) return;
-    const keys =
-      card === "ay-genel"
-        ? Object.values(fields)
-        : card === "ay-marka"
-          ? Object.values(colors)
-          : [];
+    if (card === "ay-marka") {
+      setLogoDraft(undefined);
+      setLogoError(undefined);
+    }
+    const keys = card in groups ? groups[card as keyof typeof groups] : [];
     setDraft((previous) =>
       Object.fromEntries(
         Object.entries(previous).filter(([key]) => !keys.some((field) => field === key)),
@@ -203,37 +305,49 @@ export function useSettingsDocument({
     setError(undefined);
   }
   function onSave(card: SettingsCardKey) {
-    if (locked || review || !source) return;
-    const keys =
-      card === "ay-genel"
-        ? Object.values(fields)
-        : card === "ay-marka"
-          ? Object.values(colors)
-          : [];
-    const patch = Object.fromEntries(
-      Object.entries(draft).filter(
-        ([field, value]) =>
-          keys.some((key) => key === field) && value !== Reflect.get(source.document.values, field),
-      ),
-    );
-    if (!Object.keys(patch).length) {
+    if (locked || review || !source || (card === "ay-marka" && logoError)) return;
+    const keys = card in groups ? groups[card as keyof typeof groups] : [];
+    let patch: SettingsDocumentPatch;
+    try {
+      patch = parseSettingsDocumentPatch(
+        Object.fromEntries(
+          Object.entries(draft)
+            .filter(([field]) => keys.some((key) => key === field))
+            .map(([field, value]) => [field, field in reminderChoices ? Number(value) : value])
+            .filter(
+              ([field, value]) => value !== Reflect.get(source.document.values, field as string),
+            ),
+        ),
+      );
+    } catch {
+      setError(t(($) => $.settings.documentInvalid));
+      return;
+    }
+    const logo = card === "ay-marka" ? (logoDraft === null ? null : logoDraft?.upload) : undefined;
+    if (!Object.keys(patch).length && logo === undefined) {
       onDiscard(card);
       return;
     }
     command.reset();
     setAccepted(false);
     setError(undefined);
-    setReview({ source, patch, card });
+    setReview({ source, patch, card, ...(logo !== undefined ? { logo } : {}) });
   }
   async function confirm() {
     if (!review || !accepted || busy.current || locked || command.state !== "ready") return;
     busy.current = true;
     setPreparing(true);
     try {
-      const intent = await settingsDocumentIntent(scope, level, review.source, review.patch);
+      const intent = await settingsDocumentIntent(
+        scope,
+        level,
+        review.source,
+        review.patch,
+        review.logo,
+      );
       if (active.current) await command.start(intent);
     } catch (cause) {
-      if (active.current && !onAccessLost(cause))
+      if (active.current && !loseAccess(cause))
         setError(
           cause instanceof BackendError
             ? scheduleBackendError(cause.code, t)
@@ -245,7 +359,7 @@ export function useSettingsDocument({
     }
   }
   const notice: ReactNode =
-    command.unavailable || query.isError || error ? (
+    accessDenied || command.unavailable || query.isError || error || logoRead.isError ? (
       <Alert variant="destructive">
         <AlertDescription>
           {error ?? t(($) => $.settings.documentReadError)}{" "}
@@ -253,12 +367,13 @@ export function useSettingsDocument({
             variant="outline"
             isDisabled={locked}
             onPress={() => {
-              if (command.unavailable) {
+              if (accessDenied || command.unavailable) {
                 window.location.reload();
                 return;
               }
               setError(undefined);
               void query.refetch();
+              if (logoRead.isError) void logoRead.refetch();
             }}
           >
             {t(($) => $.auth.retry)}
@@ -266,29 +381,55 @@ export function useSettingsDocument({
         </AlertDescription>
       </Alert>
     ) : null;
-  const dialog = review && !command.unavailable && (
+  const reviewValue = (wire: string, value: unknown) => {
+    if (value == null) return t(($) => $.settings.unsetHint);
+    if (typeof value === "boolean")
+      return value ? t(($) => $.settings.on) : t(($) => $.settings.off);
+    if (typeof value === "number" && wire in reminderChoices)
+      return wire === "lesson_reminder_hours"
+        ? t(($) => $.settings.reminderHours, { count: value })
+        : t(($) => $.settings.reminderDays, { count: value });
+    return typeof value === "string" || typeof value === "number"
+      ? String(value)
+      : t(($) => $.settings.unknown);
+  };
+  const dialog = review && !accessDenied && !command.unavailable && (
     <SettingsReviewDialog
       open
       title={t(($) => $.settings.cards[review.card].title)}
       description={t(($) => $.settings.documentReviewHint)}
-      rows={Object.entries(review.patch).map(([wire, value]) => {
-        const presentation = Object.entries(fields).find(([, key]) => key === wire)?.[0] as
-          | keyof typeof fields
-          | undefined;
-        const color = Object.entries(colors).find(([, key]) => key === wire)?.[0] as
-          | keyof typeof colors
-          | undefined;
-        const label = presentation
-          ? t(($) => $.settings.fields[presentation])
-          : color
-            ? t(($) => $.settings[color])
-            : t(($) => $.settings.unknown);
-        return {
-          id: wire,
-          title: label,
-          detail: `${Reflect.get(review.source.document.values, wire) ?? t(($) => $.settings.unsetHint)} → ${value ?? t(($) => $.settings.unsetHint)}`,
-        };
-      })}
+      rows={[
+        ...Object.entries(review.patch).map(([wire, value]) => {
+          const presentation = Object.entries(fields).find(([, key]) => key === wire)?.[0] as
+            | keyof typeof fields
+            | undefined;
+          const color = Object.entries(colors).find(([, key]) => key === wire)?.[0] as
+            | keyof typeof colors
+            | undefined;
+          const label = presentation
+            ? t(($) => $.settings.fields[presentation])
+            : color
+              ? t(($) => $.settings[color])
+              : t(($) => $.settings.unknown);
+          return {
+            id: wire,
+            title: label,
+            detail: `${reviewValue(wire, Reflect.get(review.source.document.values, wire))} → ${reviewValue(wire, value)}`,
+          };
+        }),
+        ...(review.logo !== undefined
+          ? [
+              {
+                id: "logo",
+                title: t(($) => $.settings.logoLabel),
+                detail:
+                  review.logo === null
+                    ? t(($) => $.settings.logoRemoveReview)
+                    : t(($) => $.settings.logoUploadReview),
+              },
+            ]
+          : []),
+      ]}
       accepted={accepted}
       onAccepted={setAccepted}
       locked={locked}
@@ -321,5 +462,50 @@ export function useSettingsDocument({
       }
     />
   );
-  return { data, onField, onColor, onDiscard, onSave, notice, dialog, locked };
+  async function selectLogo(file: File) {
+    if (busy.current || locked || review || !logoWritable) return;
+    busy.current = true;
+    setPreparing(true);
+    setLogoError(undefined);
+    setError(undefined);
+    try {
+      const upload = await preparePhoto(file);
+      if (active.current) setLogoDraft({ upload, file });
+    } catch (cause) {
+      if (active.current)
+        setLogoError(
+          cause instanceof Error && cause.message === "PHOTO_SIZE"
+            ? t(($) => $.photo.sizeError)
+            : cause instanceof Error && cause.message === "PHOTO_TYPE"
+              ? t(($) => $.photo.typeError)
+              : t(($) => $.photo.fileError),
+        );
+    } finally {
+      busy.current = false;
+      if (active.current) setPreparing(false);
+    }
+  }
+  return {
+    data,
+    onField,
+    onColor,
+    onDiscard,
+    onSave,
+    notice,
+    dialog,
+    locked,
+    onLogo: logoWritable
+      ? (file: File) => {
+          void selectLogo(file);
+        }
+      : undefined,
+    logoAccept: logoWritable ? "image/png,image/jpeg,image/webp" : undefined,
+    canRemoveLogo: logoWritable && logoDraft !== null && !!(asset || logoDraft?.file),
+    onRemoveLogo: () => {
+      if (!locked && !review && logoWritable) {
+        setLogoDraft(asset ? null : undefined);
+        setLogoError(undefined);
+      }
+    },
+  };
 }

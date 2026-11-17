@@ -12,6 +12,8 @@ import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
+import { useSettingsRooms } from "./use-settings-rooms";
+import { useSettingsPolicies } from "./use-settings-policies";
 import { useSettingsDocument } from "./use-settings-document";
 import { readOrganizationSettingsCatalog } from "./settings-reader";
 
@@ -160,6 +162,21 @@ function SettingsManagement({
     onLockChange: publishLock,
     onAccessLost: accessLost,
   });
+  const rooms = useSettingsRooms({
+    scope,
+    enabled: allowed && canCenter && level === "center",
+    readOnly,
+    locked,
+    onLockChange: publishLock,
+    onAccessLost: accessLost,
+  });
+  const policies = useSettingsPolicies({
+    scope,
+    level,
+    timezone,
+    enabled: allowed,
+    onAccessLost: accessLost,
+  });
   const query = useQuery({
     queryKey: [
       "settings-disciplines",
@@ -198,61 +215,66 @@ function SettingsManagement({
     ...document.data,
     fields: {
       ...document.data.fields,
+      ...policies.fields,
       "ay-ad": { value: organizationLabel, writable: false },
       "ay-sube": { value: centerLabel, writable: false },
       "ay-tz": { value: timezone, writable: false },
     },
     brand: document.data.brand ? { ...document.data.brand, name: organizationLabel } : undefined,
-    tables: source
-      ? {
-          disciplines: {
-            columns:
-              level === "organization"
-                ? ["name", "organizationState", "action"]
-                : ["name", "organizationState", "centerState", "action"],
-            rows: source.items.map((item) => {
-              const local = source.centerItems?.find((row) => row.id === item.id)?.presentation
-                .center;
-              const state = (active: boolean) => (
-                <Badge variant={active ? "secondary" : "outline"}>
-                  {active ? t(($) => $.settings.on) : t(($) => $.settings.off)}
-                </Badge>
-              );
-              const available = writable && (level === "organization" || item.state === "active");
-              return {
-                id: item.id,
-                cells: [
-                  item.name,
-                  state(item.state === "active"),
-                  ...(level === "center"
-                    ? [
-                        local
-                          ? state(local.state === "active")
-                          : t(($) => $.settings.disciplineStatus.notInCenterList),
-                      ]
-                    : []),
-                  <div key="action" className="flex flex-col items-start gap-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      isDisabled={locked || !available}
-                      onPress={() => setSelection({ id: item.id })}
-                    >
-                      {t(($) => $.settings.disciplineStatus.edit)}
-                    </Button>
-                    {!available && level === "center" && (
-                      <p className="text-xs text-muted-foreground">
-                        {t(($) => $.settings.disciplineStatus.masterInactive)}
-                      </p>
-                    )}
-                  </div>,
-                ],
-              };
-            }),
-          },
-        }
-      : undefined,
+    tables: {
+      politika: policies.table,
+      salonlar: rooms.table,
+      ...(source
+        ? {
+            disciplines: {
+              columns:
+                level === "organization"
+                  ? ["name", "organizationState", "action"]
+                  : ["name", "organizationState", "centerState", "action"],
+              rows: source.items.map((item) => {
+                const local = source.centerItems?.find((row) => row.id === item.id)?.presentation
+                  .center;
+                const state = (active: boolean) => (
+                  <Badge variant={active ? "secondary" : "outline"}>
+                    {active ? t(($) => $.settings.on) : t(($) => $.settings.off)}
+                  </Badge>
+                );
+                const available = writable && (level === "organization" || item.state === "active");
+                return {
+                  id: item.id,
+                  cells: [
+                    item.name,
+                    state(item.state === "active"),
+                    ...(level === "center"
+                      ? [
+                          local
+                            ? state(local.state === "active")
+                            : t(($) => $.settings.disciplineStatus.notInCenterList),
+                        ]
+                      : []),
+                    <div key="action" className="flex flex-col items-start gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        isDisabled={locked || !available}
+                        onPress={() => setSelection({ id: item.id })}
+                      >
+                        {t(($) => $.settings.disciplineStatus.edit)}
+                      </Button>
+                      {!available && level === "center" && (
+                        <p className="text-xs text-muted-foreground">
+                          {t(($) => $.settings.disciplineStatus.masterInactive)}
+                        </p>
+                      )}
+                    </div>,
+                  ],
+                };
+              }),
+            },
+          }
+        : {}),
+    },
   };
   async function refresh() {
     // A master change also invalidates center projections that were read before it.
@@ -294,6 +316,8 @@ function SettingsManagement({
       <SettingsView
         onField={document.onField}
         onColor={document.onColor}
+        onLogo={document.onLogo}
+        logoAccept={document.logoAccept}
         onSave={document.onSave}
         onDiscard={document.onDiscard}
         data={data}
@@ -312,6 +336,8 @@ function SettingsManagement({
           }
         }}
         availableActions={[
+          ...(rooms.canCreate ? ["room" as const] : []),
+          ...(document.canRemoveLogo ? ["removeLogo" as const] : []),
           ...(writable && source && level === "organization" ? ["discipline" as const] : []),
           ...(writable
             ? [
@@ -323,6 +349,8 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "room") rooms.create();
+          if (action.kind === "removeLogo") document.onRemoveLogo();
           if (action.kind === "discipline" && level === "organization") setSelection({});
           if (action.kind === "renameOrganization" && level === "organization")
             setIdentity("organization");
@@ -346,6 +374,9 @@ function SettingsManagement({
           onAccessLost={accessLost}
         />
       )}
+      {rooms.notice}
+      {rooms.editor}
+      {policies.notice}
       {document.dialog}
       {selection && (
         <DisciplineEditor

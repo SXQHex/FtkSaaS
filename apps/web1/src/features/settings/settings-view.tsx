@@ -31,6 +31,7 @@ import {
   FieldGroup,
   FieldLabel,
   FieldDescription,
+  FieldError,
   FieldSet,
   FieldLegend,
   FieldContent,
@@ -42,6 +43,7 @@ import { Switch } from "../../components/ui/switch";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Progress } from "../../components/ui/progress";
+import { BlobAvatar } from "../account/profile-photo-row";
 import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 import {
@@ -82,6 +84,7 @@ type ColumnKey =
   | "room"
   | "capacity"
   | "futureSessions"
+  | "futureOperations"
   | "active"
   | "template"
   | "kind"
@@ -118,7 +121,8 @@ export interface SettingsViewData {
   tables?: Partial<Record<SettingsSection | "disciplines" | "invoices", SettingsTableData>>;
   brand?: {
     name: string;
-    logo?: { src: string; alt: string } | null;
+    logo?: { src?: string; blob?: Blob; alt: string } | null;
+    logoError?: string;
     colors: {
       key: "primaryColor" | "secondaryColor" | "accentColor";
       value: string | null;
@@ -155,6 +159,7 @@ export type SettingsAction =
       kind:
         | "invite"
         | "discipline"
+        | "room"
         | "changePlan"
         | "payment"
         | "cancelSubscription"
@@ -549,6 +554,10 @@ export function SettingsView({
       </FieldSet>
     </FieldGroup>
   );
+  function brandColor(key: "primaryColor" | "secondaryColor" | "accentColor") {
+    const value = data.brand?.colors.find((color) => color.key === key)?.value;
+    return value && /^#[0-9a-fA-F]{6}$/.test(value) ? value : undefined;
+  }
   const brand = (
     <FieldGroup className="grid gap-6 @xl:grid-cols-2">
       <FieldGroup className="gap-4">
@@ -589,13 +598,26 @@ export function SettingsView({
             name="logo"
             type="file"
             accept={logoAccept}
+            ref={(element) => {
+              element?.setCustomValidity(data.brand?.logoError ?? "");
+            }}
+            aria-invalid={!!data.brand?.logoError || undefined}
+            aria-describedby={`${prefix}-logo-hint${data.brand?.logoError ? ` ${prefix}-logo-error` : ""}`}
             disabled={locked || !onLogo || !logoAccept}
             onChange={(event) => {
               const file = event.target.files?.[0];
+              event.target.value = "";
               if (file) onLogo?.(file);
             }}
           />
-          <FieldDescription>{t(($) => $.settings.logoHint)}</FieldDescription>
+          <FieldDescription id={`${prefix}-logo-hint`}>
+            {t(($) => $.settings.logoHint)}
+          </FieldDescription>
+          {data.brand?.logoError && (
+            <FieldError id={`${prefix}-logo-error`} role="alert">
+              {data.brand.logoError}
+            </FieldError>
+          )}
           <Button
             variant="outline"
             type="button"
@@ -612,18 +634,54 @@ export function SettingsView({
       >
         <h3 className="text-sm font-medium">{t(($) => $.settings.brandPreview)}</h3>
         <Card className="gap-0 overflow-hidden py-0">
-          <CardHeader className="flex flex-row items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
-            <Avatar>
-              <AvatarImage src={data.brand?.logo?.src} alt={data.brand?.logo?.alt ?? ""} />
-              <AvatarFallback>
-                <Building2Icon />
-              </AvatarFallback>
-            </Avatar>
-            <CardTitle className="break-words text-sm font-medium">
-              {data.brand?.name ?? t(($) => $.settings.unknown)}
-            </CardTitle>
+          <CardHeader
+            className="flex flex-row items-center gap-3 bg-primary px-4 py-3"
+            style={{ backgroundColor: brandColor("primaryColor") }}
+          >
+            <div className="flex min-w-0 items-center gap-3 rounded-md bg-background p-2 text-foreground">
+              {data.brand?.logo?.blob ? (
+                <BlobAvatar
+                  blob={data.brand.logo.blob}
+                  initials={data.brand.name
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((word) => Array.from(word)[0])
+                    .join("")}
+                  size="default"
+                />
+              ) : (
+                <Avatar>
+                  <AvatarImage src={data.brand?.logo?.src} alt={data.brand?.logo?.alt ?? ""} />
+                  <AvatarFallback>
+                    <Building2Icon />
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              <CardTitle className="break-words text-sm font-medium">
+                {data.brand?.name ?? t(($) => $.settings.unknown)}
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="flex flex-col items-start gap-4 p-4">
+            <div
+              className="grid h-2 w-full grid-cols-3 overflow-hidden rounded-sm"
+              aria-hidden="true"
+            >
+              {(["primaryColor", "secondaryColor", "accentColor"] as const).map((key) => (
+                <span
+                  key={key}
+                  className={
+                    key === "primaryColor"
+                      ? "bg-primary"
+                      : key === "secondaryColor"
+                        ? "bg-secondary"
+                        : "bg-accent"
+                  }
+                  style={{ backgroundColor: brandColor(key) }}
+                />
+              ))}
+            </div>
             <CardDescription>{t(($) => $.settings.brandExampleDescription)}</CardDescription>
             <Badge className="rounded-md border-transparent bg-primary px-3 py-2 text-primary-foreground">
               {t(($) => $.settings.brandExampleAction)}
@@ -784,6 +842,18 @@ export function SettingsView({
                             >
                               <PlusIcon data-icon="inline-start" />
                               {t(($) => $.settings.invite)}
+                            </Button>
+                          </CardAction>
+                        )}
+                        {panel.key === "salonlar" && (
+                          <CardAction>
+                            <Button
+                              type="button"
+                              isDisabled={locked || !canAction("room")}
+                              onPress={() => action("room")}
+                            >
+                              <PlusIcon data-icon="inline-start" />
+                              {t(($) => $.settings.addRoom)}
                             </Button>
                           </CardAction>
                         )}
