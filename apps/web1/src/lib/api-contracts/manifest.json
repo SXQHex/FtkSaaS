@@ -1,11 +1,11 @@
 {
   "source": "packages/api-contracts/src",
-  "source_sha": "360f2a16b14e63931bdfadbd5f651114c9a8e774",
-  "schema_sha256": "841f0b598834d1b3327ba7c180e0da1f08009b9ed4c2a81710e5fcc254cd6dd2",
+  "source_sha": "df82165d0145f8ec1a6d4c42e77249dc89c1bd82",
+  "schema_sha256": "f28bb6b90084d7260dbf02bc5884a5c3a60f400c79c1ead929c757b066e5655f",
   "files": {
-    "generated.ts": "97c63fca13d510a3b308477beceefaec363e328e884d3e0845203e849249a437",
-    "operations.ts": "e7e0c394ef308c04b8c76c36d1c9a50be2723ac5a1bfae5453e83c8aaacd1bff",
-    "runtime.ts": "bb3d8072751e0e9f69951e77022f49e48e36d51cf89137326d2ae9dd2d5d2e44",
+    "generated.ts": "a90bfa748ed07d824bf5071b77222fe0d20ab5298ced6503dc7288849f15c2f9",
+    "operations.ts": "30b248f8fd30285ccc0d305867071da8eb5d34cba27cf7a1ceeda65661aaab25",
+    "runtime.ts": "9a77edadfaa740792cd022da8426e14789fde7e0acee60855c5a06e588174abf",
     "index.ts": "690c45b2a80dfceb0bcdfec050931cc9959d69d4488dc05da40985fc5ad71bfd"
   }
 }
