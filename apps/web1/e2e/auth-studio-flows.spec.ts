@@ -2,7 +2,8 @@ import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { reviewStudioAccessibility } from "./studio-accessibility-review.js";
 import { writeFile } from "node:fs/promises";
-import { mockStudio, openStudio, studioIds } from "./studio-fixture.js";
+import { mockStudio, mockStudioCalendar, openStudio, studioIds } from "./studio-fixture.js";
+import common from "../src/locales/tr/common.json" with { type: "json" };
 
 async function newRoom(page: import("@playwright/test").Page) {
   await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
@@ -117,7 +118,102 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
   page,
 }) => {
   const state = await mockStudio(page);
+  state.roles[0]!.accountAccessGranted = true;
+  state.agreements[0]!.valid.ends_at = "2029-12-31T00:00:00Z";
+  const historical = structuredClone(state.agreements[0]!);
+  const selectedAgreements: (string | null)[] = [];
+  await mockStudioCalendar(page);
+  await page.route("**/functions/v1/backend-v1/program_preview_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    expect(request).toMatchObject({
+      org_id: studioIds.org,
+      center_id: studioIds.center,
+      class_id: studioIds.lesson,
+    });
+    // The browser must request native resolution instead of pinning an obsolete agreement.
+    expect(request.schedule.assignments).toEqual([
+      { person_id: studioIds.instructor, duty: "instructor" },
+    ]);
+    const current = state.agreements.length > 1 ? state.agreements.at(-1)! : null;
+    selectedAgreements.push(current?.id ?? null);
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: studioIds.role,
+        data: {
+          id: "019a7b00-0000-7000-8000-000000000950",
+          token: "synthetic-program-review",
+          scope_hash: "synthetic-scope",
+          expires_at: "2035-01-01T00:00:00Z",
+          dependencies: {
+            versions: current
+              ? [
+                  {
+                    entity: { type: "instructor_agreements", id: current.id },
+                    version: current.version,
+                  },
+                ]
+              : [],
+            policy_hashes: [],
+            permission_hash: "synthetic-permission",
+          },
+          effects: [],
+          blockers: current
+            ? []
+            : [{ code: "POLICY_NOT_CONFIGURED", retryable: false, trace_id: studioIds.role }],
+          sessions: [
+            {
+              session_id: "019a7b00-0000-7000-8000-000000000951",
+              interval: { starts_at: "2030-01-07T08:17:00Z", ends_at: "2030-01-07T08:47:00Z" },
+              assignments: current
+                ? [
+                    {
+                      person_id: studioIds.instructor,
+                      duty: "instructor",
+                      agreement_id: current.id,
+                    },
+                  ]
+                : [],
+            },
+          ],
+        },
+      },
+    });
+  });
+  async function programReview(blocked: boolean) {
+    const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
+    await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+    await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+    const panel = page.getByRole("dialog");
+    await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
+    await panel.locator("#schedule-create-class").selectOption(studioIds.lesson);
+    await panel.locator("#schedule-create-instructor").selectOption(studioIds.instructor);
+    await panel.locator("#schedule-create-room").selectOption(studioIds.room);
+    await panel.locator("#schedule-create-capacity").fill("2");
+    await panel.locator("#schedule-create-date").fill("2030-01-07");
+    await panel.locator("#schedule-create-time").fill("11:17");
+    await panel.locator("#schedule-create-duration").fill("30");
+    await panel.locator("#schedule-create-weeks").fill("1");
+    await panel.getByRole("button", { name: "Pzt", exact: true }).click();
+    await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
+    if (blocked) {
+      await expect(panel.getByRole("alert")).toHaveText(common.schedule.errors.configuration);
+      await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toHaveCount(
+        0,
+      );
+    } else {
+      await expect(
+        panel.getByRole("button", { name: "Seriyi oluştur", exact: true }),
+      ).toBeVisible();
+      await expect(panel.getByRole("alert")).toHaveCount(0);
+    }
+    await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+  }
   await openStudio(page);
+  const documentTime = await page.evaluate(() => performance.timeOrigin);
+  await programReview(true);
+  expect(state.writes).toHaveLength(0);
   await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
   await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
   const dialog = page.getByRole("dialog");
@@ -150,6 +246,11 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
     version: 2,
     terms: { components: [{ kind: "session_fixed", amount_minor: "26000" }] },
   });
+  expect(state.agreements[0]).toEqual(historical);
+  await programReview(false);
+  expect(selectedAgreements).toEqual([null, state.agreements[1]!.id]);
+  expect(state.effects).toEqual(["instructor_agreement_publish_v1"]);
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);
 });
 
 test("Studio flow: scoped setup distinguishes ready documents and missing confirmed delivery", async ({

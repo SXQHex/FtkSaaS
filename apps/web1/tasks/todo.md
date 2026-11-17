@@ -15,7 +15,7 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 | Aktif adım      | Plan | Sayfa/işlev      | Durum                         | Son doğrulama veya engel          | Sonraki eylem                                                                                                                                                                                                                                                                     |
 | --------------- | ---- | ---------------- | ----------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili otomatik paketler başarılı | Başlangıç sırası izleniyor. P01.1 kapalı; P01.4’ün native recovery/ilk parola ve posta hedefi kabulü W1-BE-36 desteğini bekliyor, P01 bütünü kapalı değil. Bağımsız sırada **P02–P04 kapalı**; P05.1 kapalı; sıradaki uygulanabilir iş **P05.2**. Tam Pro aday doğrulaması finalde tek kez yapılır. |
+| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili otomatik paketler başarılı | Başlangıç sırası izleniyor. P01.1 kapalı; P01.4’ün native recovery/ilk parola ve posta hedefi kabulü W1-BE-36 desteğini bekliyor, P01 bütünü kapalı değil. Bağımsız sırada **P02–P04 kapalı**; P05.1/.2/.4 kapalı; sıradaki uygulanabilir iş **P05.3**. Tam Pro aday doğrulaması finalde tek kez yapılır. |
 
 Git devamı: `feat/web1-pro-completion`, [PR326](https://github.com/SXQHex/FtkSaaS/pull/326). PR327’nin main kaynağı `3b4eaf28f469eef3f66be82aaa3dc65759313ac7` dala birleştirildi ve kanonik typed snapshot üretildi; aynı kaynağın CI/development kanıtı [backend talepleri kaydında](request.md). Kalan kabul, tek toplu paralel paketle yürütülür; yalnız başarısız paket düzeltmeden sonra tekrarlanır. Backend ihtiyacı yalnız request.md’ye yazılır ve uygulanabilir bağımsız işe devam edilir.
 
@@ -1002,9 +1002,10 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 
 - [x] **P05.1** · Eğitmen, disiplin, yürürlük ve ücret şartlarını seçip anlaşmayı yayımla. Güncel listede yayımlanan sürüm ve tarihler okunur.
       P05.1 kabulü: mevcut hazır anlaşma formunda açık eğitmen/disiplin/ders türü/UTC dönem/ücret seçimi ve onayla bağımsız native yayın, liste yenileme ve kayıtlı şartları yeniden açma doğrulandı; eski sürüm değişmedi.12 ilgili birim/8 tarayıcı geçti; aynı-key kurtarma ve yeni sürüm onayının düzenlemede sıfırlanması dahil. [Otomatik rapor](../test-reports/local-verification.md).
-- [ ] **P05.2** · Anlaşmayı yeni sürümle değiştir. Eski şartlar geçmişte korunur, geçerli sürüm yeni program önizlemesine yansır.
+- [x] **P05.2** · Anlaşmayı yeni sürümle değiştir. Eski şartlar geçmişte korunur, geçerli sürüm yeni program önizlemesine yansır.
 - [ ] **P05.3** · Özne eğitmen yayımlı dijital metni görüp açıkça onaylar. Kaynak eksikken belge onayı oluşmaz, finansal şartlar sözleşmenin izin verdiği ölçüde okunur.
-- [ ] **P05.4** · Ücretli görevlendirmeyi geçersiz veya eksik anlaşmayla dene. Ret nedenini göster, geçerli anlaşmayla yeni önizleme al.
+- [x] **P05.4** · Ücretli görevlendirmeyi geçersiz veya eksik anlaşmayla dene. Ret nedenini göster, geçerli anlaşmayla yeni önizleme al.
+      P05.2/.4 kabulü:20 birim/8 tarayıcı geçti. Aynı SPA’da süresi dolmuş anlaşma native POLICY_NOT_CONFIGURED engelini gösterir ve uygulama açılmaz; yeni sürüm sonrası yeni program önizlemesi güncel anlaşmayla açılır, eski kimlik istemciden pinlenmez. Eski şartlar aynen korunur; onay düzenlemede sıfırlanır, kayıp yayın aynı anahtarla tek etkidir. Native dönem/sürüm çözümü `program-configuration-acceptance.mjs:57–68`; eski seans/hakediş şartlarının korunması `instructor-earnings.test.mjs:232–249`, [G-PRO-03.1](#pro-kabulu) aynı kaynak/run bağında. [Otomatik rapor](../test-reports/local-verification.md).
 
 ### P06 · Program, takvim ve özel ders
 
