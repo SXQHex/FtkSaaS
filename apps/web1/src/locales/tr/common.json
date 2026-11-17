@@ -3482,7 +3482,13 @@
     "unavailable": "Bu sayfa şu an yayında değil",
     "unavailableHint": "Yayın açık olduğunda programı bu adresten görebilirsin.",
     "refreshFailed": "Program yenilenemedi.",
-    "refreshHint": "Son okunan program gösteriliyor; güncel durumu tekrar kontrol et."
+    "refreshHint": "Son okunan program gösteriliyor; güncel durumu tekrar kontrol et.",
+    "stateTitle": "Yayın durumu",
+    "stateError": "Yayın durumu okunamadı.",
+    "stateErrorHint": "Bağlantıyı kontrol edip yeniden dene. Bu hata yayının kapalı olduğu anlamına gelmez.",
+    "available": "Program yayında.",
+    "availableHint": "Güncel programı ve yayımlanan başvuru seçeneklerini görebilirsin.",
+    "checkAgain": "Yayın durumunu yeniden kontrol et"
   },
   "publicApplication": {
     "title": "Başvur",
