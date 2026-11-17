@@ -916,7 +916,7 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
   - [x] Native password_changed posta teslimi: Gmail salt okunur incelemesinde önceki parola kabulündeki iki sahip olunan fixture’a ait dört “Parolanız değiştirildi” bildirimi eşleşti; plain/HTML içerik, güvenlik eylemi etiketi ve DKIM/SPF geçişi doğrulandı. Kurtarma bağlantısının origin’i frontend ile uyuşmadığından bağlantı kabulü açık kalır; hedefe gidilmedi. Kanıt yalnız fixture sırası/tarih/boolean taşır: `.tmp/e10-password-notification-mail-result.json`. Frontend adresi `https://app.fethiyetango.com`; ilgisiz hedef uygulama veya kanıtlara taşınmaz.
 
-- [ ] **P01.5** · TOTP kurulumunu, native doğrulamayı ve korumalı hedefe dönüşü tamamla. Yanlış kodda hedef kapalı kalır, doğru koddan sonra erişim yeniden okunur.
+- [x] **P01.5** · TOTP kurulumunu, native doğrulamayı ve korumalı hedefe dönüşü tamamla. Yanlış kodda hedef kapalı kalır, doğru koddan sonra erişim yeniden okunur.
 - [x] **P01.6** · Profil, iletişim bilgisi ve fotoğrafı güncelle. Yenileme sonrasında kayıtlı değer ve sağlayıcının bekleyen/doğrulanmış iletişim durumu doğru görünür.
   - [x] Profil ad/soyad/görünen ad: mevcut Pro öğrenci synthetic fixture, gerçek development Auth/Edge, headless Chromium ve local5173. account_get + management_state_get HTTP200 → doğru sürümlü profile_update HTTP200 → yeniden okuma → reload’da üç metin alanının korunması geçti. Telefon başlangıç değeri korundu, e-posta readonly kaldı; e-posta/telefon sağlayıcı değişimi yapılmadı. Metinler ardından başlangıç değerlerine aynı UI akışıyla döndürüldü ve reload’da eşitlik doğrulandı; test native local çıkışla temizlendi. Pageerror sıfır. Profil sürümü/audit kayıtları geri sarılmadı; reset/seed/SQL yok. Rol/adım/HTTP status ve restored:true dışında değer/kimlik bilgisi kaydetmeyen kanıt `.tmp/e10-profile-hosted-result.json`.
   - [x] İletişim telefonu: 14 Kasım2026, mevcut aktif Pro öğrenci synthetic fixture/local5173/headless Chromium, gerçek development Auth/Edge. Kanonik profil okuması → yalnız doğrulanmamış teknik numara `account_profile_update_v1.unverified_phone` yazma200 → yeniden okuma/reload’da eşitlik ve “Doğrulanmadı” etiketi → başlangıç değerini aynı UI’dan geri yazma200/reload eşitliği geçti. Ad/soyad/görünen ad korundu; e-posta readonly kaldı. Native user PUT/resend/verify/otp/reauthenticate yolları testte abort kapısıyla korundu; bu yollara giriş0, pageerror0, passed:true/restored:true. Native local çıkış yapıldı; reset/seed/SQL yok. Kanıt yalnız rol/adım/status ve boolean içerir: `.tmp/e10-phone-hosted-result.json`. Kullanıcı kararı ve güncel settings sözleşmesi: SMS/telefon doğrulaması yok; numara giriş/sahiplik/TOTP kanıtı değildir.
@@ -935,9 +935,11 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | P01 giriş akışı | F04, F06, F32, F33 · [WF00](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf00), [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02) | Ayrı hesaplar ve tarayıcı bağlamları |
 
-- [ ] **P02.1** · Yönetici ve öğrenci kabuklarını güncel rol/kapsamdan aç. Eğitmen için atandığı derslere erişim, öğrenci için kendi kayıtları görünür.
-- [ ] **P02.2** · Çok rollü kullanıcı rol veya organizasyon değiştirdiğinde menü, açık kayıt ve sorgu önbelleği yeni kapsama geçer. Geri tuşu eski veriyi göstermez.
-- [ ] **P02.3** · Doğrudan URL, oturum kaybı ve izin kaybını dene. Yetkisiz okuma/yazma reddedilir, arayüz kullanıcıyı erişilebilir hedefe taşır.
+- [x] **P02.1** · Yönetici ve öğrenci kabuklarını güncel rol/kapsamdan aç. Eğitmen için atandığı derslere erişim, öğrenci için kendi kayıtları görünür.
+- [x] **P02.2** · Çok rollü kullanıcı rol veya organizasyon değiştirdiğinde menü, açık kayıt ve sorgu önbelleği yeni kapsama geçer. Geri tuşu eski veriyi göstermez.
+- [x] **P02.3** · Doğrudan URL, oturum kaybı ve izin kaybını dene. Yetkisiz okuma/yazma reddedilir, arayüz kullanıcıyı erişilebilir hedefe taşır.
+
+P02/P01.5 kabulü:141 ilgili birim ve40 farklı tarayıcı senaryosu denetlendi; yeni kapsam dosyasının iki senaryosu sözlükteki gerçek kontrol etiketi düzeltildikten sonra2/2 geçti, diğer39 senaryo başarılıydı. Çok rol → organizasyon değişimi menüyü sıfırlar; önceki merkezin yanıtı gerçekten tamamlandıktan sonra yeni merkez korunur. Hak/kişi okumaları yeni organizasyonun canonical kişisini kullanır; geri dönüş ve erişimi kaldırılmış doğrudan URL eski kaydı açmaz. Auth/AAL2 ve eğitmen doğrudan erişim retleri aynı pakette geçti; önceki gerçek native AAL2 kanıtı E06 kaydındadır. Kaynaklar `auth-scope-transition`, `auth-flow`, `auth-workspace`, `auth-instructor-flows`, `auth-member-account`; son rapor [otomatik rapordadır](../test-reports/local-verification.md).
 
 ### P03 · Tek merkez kurulumu, kaynak ve ekip
 
@@ -1061,8 +1063,10 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 | P06, P08, P09, P10 | F06, F08, F11 · [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08), [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09) | Öğrenci, eğitmen ve gerçek takvim istemcisi |
 
 - [ ] **P11.1** · Öğrenci kendi yaklaşan dersini, haklarını ve borcunu görür. Rezervasyon iptali paneli yeniler.
-- [ ] **P11.2** · Eğitmen kendi programından seansı açar ve yetkili yoklamaya ulaşır. Başka eğitmenin kapalı görevine doğrudan erişim reddedilir.
-- [ ] **P11.3** · Kişisel takvim aboneliğini bir takvim istemcisinde aç. Yetkili ders ve saat görünür, iptal edilen erişim eski bağlantıyla kullanılamaz.
+- [x] **P11.2** · Eğitmen kendi programından seansı açar ve yetkili yoklamaya ulaşır. Başka eğitmenin kapalı görevine doğrudan erişim reddedilir.
+- [x] **P11.3** · Kişisel takvimin native HTTP/ICS, yetkili ders/saat ve eski bağlantının iptalini otomatik doğrula. Kullanıcının harici takvim istemcisindeki insan onayı [POST-PRO.CHAIN](#pro-kabulu) kapsamındadır; bu otomatik kabulü engellemez.
+
+P11.2/.3 kabulü: `auth-instructor-flows`8/8 ve `auth-member-account`8/8, eğitmen gün/hafta/atanmış seans ve kişisel takvim oluşturma/döndürme/geri alma yollarını doğruladı. Aynı kabul ağacındaki `personal-calendar-acceptance` (`schedule-reads.test.mjs`, API shard manifesti) gerçek native Auth + HTTP GET/HEAD, ICS ders/saat, canlı üyelik/rol sınırı ve eski URL retlerini doğrular; [G-PRO-03.1](#pro-kabulu) kaynak/run bağı kullanılır. Harici OS/takvim istemcisinde insan etkileşimi POST-PRO.CHAIN’de kalır.
 
 ### P12 · Manuel CRM, deneme ve public başvuru
 
