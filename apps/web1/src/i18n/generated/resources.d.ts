@@ -4380,15 +4380,27 @@ export default interface Resources {
         "permissionHint": "Tek kişinin seçili merkezdeki izni güncel kişi sürümüyle değiştirilir. Bir görev veya yönetici yetkisi verilmez.",
         "permissionTitle": "Devredilen izni değiştir",
         "permissions": {
-          "attendance.draft": "Yoklama taslağı",
-          "finance.collect": "Tahsilat",
-          "invite.student": "Hesap daveti",
-          "person.activate": "Öğrencilik etkinleştirme",
-          "person.manage": "Kişi yönetimi",
-          "reservation.capacity_override": "Kapasite istisnası",
-          "reservation.write": "Rezervasyon işlemleri",
-          "sale.discount": "Satış indirimi",
-          "sale.write": "Satış"
+          "attendance": {
+            "draft": "Yoklama taslağı"
+          },
+          "finance": {
+            "collect": "Tahsilat"
+          },
+          "invite": {
+            "student": "Hesap daveti"
+          },
+          "person": {
+            "activate": "Öğrencilik etkinleştirme",
+            "manage": "Kişi yönetimi"
+          },
+          "reservation": {
+            "capacity_override": "Kapasite istisnası",
+            "write": "Rezervasyon işlemleri"
+          },
+          "sale": {
+            "discount": "Satış indirimi",
+            "write": "Satış"
+          }
         },
         "reason": "Görev kaldırma gerekçesi",
         "replacementNeeded": "Yeni eğitmen ataması gerekecek",

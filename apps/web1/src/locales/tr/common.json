@@ -1903,15 +1903,27 @@
       "replacementNeeded": "Yeni eğitmen ataması gerekecek",
       "assignmentRemoved": "Görev kaldırılacak",
       "permissions": {
-        "person.manage": "Kişi yönetimi",
-        "person.activate": "Öğrencilik etkinleştirme",
-        "invite.student": "Hesap daveti",
-        "reservation.write": "Rezervasyon işlemleri",
-        "attendance.draft": "Yoklama taslağı",
-        "sale.write": "Satış",
-        "finance.collect": "Tahsilat",
-        "reservation.capacity_override": "Kapasite istisnası",
-        "sale.discount": "Satış indirimi"
+        "person": {
+          "manage": "Kişi yönetimi",
+          "activate": "Öğrencilik etkinleştirme"
+        },
+        "invite": {
+          "student": "Hesap daveti"
+        },
+        "reservation": {
+          "write": "Rezervasyon işlemleri",
+          "capacity_override": "Kapasite istisnası"
+        },
+        "attendance": {
+          "draft": "Yoklama taslağı"
+        },
+        "sale": {
+          "write": "Satış",
+          "discount": "Satış indirimi"
+        },
+        "finance": {
+          "collect": "Tahsilat"
+        }
       },
       "stateFilter": "Görev durumu",
       "states": {

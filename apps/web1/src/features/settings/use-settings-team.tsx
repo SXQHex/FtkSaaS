@@ -63,6 +63,19 @@ export function useSettingsTeam({
 }) {
   const { t } = useTranslation(),
     queries = useQueryClient();
+  const permissionLabels: Record<TeamPermission, string> = {
+    "person.manage": t(($) => $.settings.teamNative.permissions.person.manage),
+    "person.activate": t(($) => $.settings.teamNative.permissions.person.activate),
+    "invite.student": t(($) => $.settings.teamNative.permissions.invite.student),
+    "reservation.write": t(($) => $.settings.teamNative.permissions.reservation.write),
+    "attendance.draft": t(($) => $.settings.teamNative.permissions.attendance.draft),
+    "sale.write": t(($) => $.settings.teamNative.permissions.sale.write),
+    "finance.collect": t(($) => $.settings.teamNative.permissions.finance.collect),
+    "reservation.capacity_override": t(
+      ($) => $.settings.teamNative.permissions.reservation.capacity_override,
+    ),
+    "sale.discount": t(($) => $.settings.teamNative.permissions.sale.discount),
+  };
   const [centerRole, setCenterRole] = useState<TeamDirectoryRole>("staff"),
     [state, setState] = useState<"active" | "inactive">("active");
   const role = level === "organization" ? "org_manager" : centerRole;
@@ -172,7 +185,7 @@ export function useSettingsTeam({
           people: [{ id: person.id, name: person.display_name }],
           rows: permissions.data.map((row) => ({
             id: row.permission,
-            label: t(($) => $.settings.teamNative.permissions[row.permission]),
+            label: permissionLabels[row.permission],
             values: { [person.id]: { value: row.enabled, writable } },
           })),
         }
@@ -378,10 +391,7 @@ export function useSettingsTeam({
               },
               {
                 id: "permission",
-                title: t(
-                  ($) =>
-                    $.settings.teamNative.permissions[review.request.permission as TeamPermission],
-                ),
+                title: permissionLabels[review.request.permission as TeamPermission],
                 detail: review.request.enabled ? t(($) => $.settings.on) : t(($) => $.settings.off),
               },
             ]}
