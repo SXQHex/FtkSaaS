@@ -41,6 +41,8 @@
 
 | W1-BE-33 | E23 · P10/WF14 | Yönetici hakediş/ödeme keşfi, dönemler ve güvenli özetler | Açık: mevcut hakediş okuyucusu kişi+dönem istiyor; merkez geneli üç tablo/özet için typed eşleme gerekiyor. |
 
+| W1-BE-34 | E43 · WF00/P02/P14/P16 | Merkez denetim/işlem keşfi, filtreler ve dışa aktarma eşlemesi | Açık: audit nesne+dönem, receipt/job ise bilinen kimlik ister; çizimin genel dizini ve güvenli işlem eylemleri eşlenmeli. |
+
 ## Bütün talepler için ortak sınır
 
 - Mevcut native Supabase Auth, JWT/AAL, plan/abonelik ve canlı organizasyon/merkez/kişi izinleri korunmalı. Yeni bir okuma mevcut görünürlüğü genişletmemeli.
@@ -317,3 +319,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** Mevcut okuyucularla doğru typed API sırasını belirtin; eksikse aktörün seçili merkezde yetkili olduğu hakediş/ödeme kayıtlarını cursor ile keşfeden destek gerekiyor. Eğitmen ve gerçek seansın güvenli adı, geçerli/değişmez anlaşma sürümü ve hesap bağlamı, native satır durumu/ödeme-kalan, kök ödeme ve düzeltme bağı/sürümü korunmalı. Eğitmen ve native dönem filtreleri (interval atlanınca bütün dönemler) cursor kapsamına girmeli. Dört özet ve kapanan seans sayısı aynı filtrede cursor öncesi, para birimi ayrı gelmeli; sayfa satırları toplanarak veya mevcut eğitmen görevleri taranarak merkez toplamı üretilmeyecek. Eski eğitmenlere ait izinli kayıtlar görev diziniyle kaybolmamalı. Yeni endpoint şart değil.
 
 **Ödeme sınırı:** Mevcut yazarın seçili earning_ids dağıtımı, gerçek yöntem/reference ve kök sürümlü düzeltmesi korunur. SQL’de seçili bakiyeyi aşan tutar reddediliyor; çizimdeki avans onayı yeni bir native özellik varsayımı değildir ve istemcide etkinleştirilmeyecek. Çizimdeki isteğe bağlı Not için native kayıt/okuma eşlemesi varsa belirtilmeli; banka/POS reference alanı nota dönüştürülmez. Güvenli not desteği yoksa bu ürün farkı açık tutulur. Ödeme sonrası gerçek kök/düzeltme ve ilgili hakedişler yeniden okunmalı; belirsiz sonuç aynı operation_key ile kurtarılmalı.
+
+## W1-BE-34 · Denetim ve işlem durumu ekranı
+
+**Mevcut kaynak:** `audit_list_v1` zorunlu subject+interval ile yalnız o nesnenin iznini denetleyip kayıtlarını okur (`p06-tracking.sql`); organizasyonu subject seçmek bütün merkezin olaylarını açmaz. AuditView aktör gösterimi/action/subject/time ve dar diff taşır; sonuç, güvenli nesne başlığı, modül veya kaynak receipt/job ilişkisi yoktur. `operation_status_get_v1`, `preview_get_v1` ve `job_status_get_v1` önceden bilinen operation+key/preview_id/job_id ister; işlem dizini değildir. Mevcut report export türleri denetim dışa aktarımı olarak kullanılamaz.
+
+**İhtiyaç:** E43 merkez denetim tablosu için mevcut yetkileri koruyan typed keşif ve kişi/işlem/nesne araması, modül/sonuç/dönem filtre eşlemesi gerekiyor. Tümü için sahte tarih aralığı üretilmez; cursor filtre/aktör/merkeze bağlı kalmalı. Sonuç yoksa action adından başarı/ret türetilmez; mevcut logların kapsamı açık belirtilmeli. İkinci sekmede yetkili önizleme/onay/uzun işlerin keşfi, native durum/gerçek ilerleme, varsa gerçek son tarih/yeniden deneme ve cursor öncesi dört güvenli sayaç isteniyor. Yalnız kendi işini okuyabilen getter başka aktörün işini açmak için kullanılamaz. Kaynak WF’ye dönüp mevcut writer ile yapılabilen eylemler eşlenmeli; genel tekrar çalıştırma/başkasının önizleme token’ı veya yeni görev motoru istenmiyor. Dışa aktarma için desteklenen API sırası ya da açık destek sınırı belirtilmeli.
+
+**Sınır:** İstemci bütün nesneleri/kişileri/iş geçmişlerini taramaz, yerel ilerleme animasyonuyla tamamlandı üretmez, kısmi işi başarılı saymaz. Yeni cihaz/IP, saklama süresi veya ham diff/secret alanları talep edilmiyor; çizimdeki cihaz ve iki yıllık süre native kaynak yokken uydurulmayacak. Native duruma göre gerçek kaynak aksiyonu ve işlem sonrası yeniden okuma korunmalı. Yeni endpoint şart değil; eşleme/backend desteği geldikten sonra frontend entegrasyonu ve otomatik kabul tamamlanır.

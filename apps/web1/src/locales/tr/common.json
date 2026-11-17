@@ -4115,5 +4115,59 @@
     "cancel": "Vazgeç",
     "savePayment": "Ödemeyi kaydet",
     "saveCorrection": "Düzeltmeyi kaydet"
+  },
+  "audit": {
+    "title": "Denetim",
+    "description": "Kim, neyi, ne zaman yaptı ve uzun işlerin durumu. Kayıtlar değiştirilemez ve silinemez.",
+    "export": "Kaydı dışa aktar",
+    "tabsLabel": "Denetim bölümleri",
+    "records": "Denetim kaydı",
+    "operations": "İşlemler",
+    "searchLabel": "Denetim kaydında ara",
+    "searchPlaceholder": "Kişi, işlem veya nesne ara",
+    "module": "Modül",
+    "allModules": "Tüm modüller",
+    "result": "Sonuç",
+    "allResults": "Tüm sonuçlar",
+    "period": "Dönem",
+    "periods": {
+      "1": "Bugün",
+      "7": "7 gün",
+      "30": "30 gün",
+      "all": "Tümü"
+    },
+    "time": "Zaman",
+    "actor": "Kişi",
+    "action": "İşlem",
+    "subject": "Nesne",
+    "unread": "Bu kapsamın kayıtları henüz okunamadı.",
+    "empty": "Bu filtreye uyan kayıt yok.",
+    "emptyOperations": "Bu kapsamda işlem yok.",
+    "operationsDescription": "Önizleme, onay ve uzun süren işler. Kısmen tamamlanan ve yeniden denenecek işler tamamlanmış sayılmaz.",
+    "metrics": {
+      "attention": "Dikkat gerektiren",
+      "running": "Çalışıyor",
+      "retry": "Yeniden denenecek",
+      "completed": "Tamamlanan"
+    },
+    "metricHints": {
+      "attention": "Onay, kısmi ya da yeniden denenebilir",
+      "running": "İşlerin güncel durumu",
+      "retry": "Yeniden deneme bekleyen işler",
+      "completed": "Yetkili liste kapsamı"
+    },
+    "detailLabels": {
+      "id": "Kayıt",
+      "time": "Zaman",
+      "actor": "Kişi",
+      "module": "Modül",
+      "result": "Sonuç",
+      "device": "Cihaz"
+    },
+    "notProvided": "Bu bilgi sunulmuyor.",
+    "details": "Ayrıntı",
+    "noDetails": "Ek ayrıntı yok.",
+    "immutable": "Bu kayıt değiştirilemez ve silinemez.",
+    "close": "Kapat"
   }
 }

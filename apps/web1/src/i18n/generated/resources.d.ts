@@ -210,6 +210,60 @@ export default interface Resources {
       "weekStart": "Hafta başı",
       "weekStartHint": "Takvim görünümlerinde haftanın ilk günü."
     },
+    "audit": {
+      "action": "İşlem",
+      "actor": "Kişi",
+      "allModules": "Tüm modüller",
+      "allResults": "Tüm sonuçlar",
+      "close": "Kapat",
+      "description": "Kim, neyi, ne zaman yaptı ve uzun işlerin durumu. Kayıtlar değiştirilemez ve silinemez.",
+      "detailLabels": {
+        "actor": "Kişi",
+        "device": "Cihaz",
+        "id": "Kayıt",
+        "module": "Modül",
+        "result": "Sonuç",
+        "time": "Zaman"
+      },
+      "details": "Ayrıntı",
+      "empty": "Bu filtreye uyan kayıt yok.",
+      "emptyOperations": "Bu kapsamda işlem yok.",
+      "export": "Kaydı dışa aktar",
+      "immutable": "Bu kayıt değiştirilemez ve silinemez.",
+      "metricHints": {
+        "attention": "Onay, kısmi ya da yeniden denenebilir",
+        "completed": "Yetkili liste kapsamı",
+        "retry": "Yeniden deneme bekleyen işler",
+        "running": "İşlerin güncel durumu"
+      },
+      "metrics": {
+        "attention": "Dikkat gerektiren",
+        "completed": "Tamamlanan",
+        "retry": "Yeniden denenecek",
+        "running": "Çalışıyor"
+      },
+      "module": "Modül",
+      "noDetails": "Ek ayrıntı yok.",
+      "notProvided": "Bu bilgi sunulmuyor.",
+      "operations": "İşlemler",
+      "operationsDescription": "Önizleme, onay ve uzun süren işler. Kısmen tamamlanan ve yeniden denenecek işler tamamlanmış sayılmaz.",
+      "period": "Dönem",
+      "periods": {
+        "1": "Bugün",
+        "30": "30 gün",
+        "7": "7 gün",
+        "all": "Tümü"
+      },
+      "records": "Denetim kaydı",
+      "result": "Sonuç",
+      "searchLabel": "Denetim kaydında ara",
+      "searchPlaceholder": "Kişi, işlem veya nesne ara",
+      "subject": "Nesne",
+      "tabsLabel": "Denetim bölümleri",
+      "time": "Zaman",
+      "title": "Denetim",
+      "unread": "Bu kapsamın kayıtları henüz okunamadı."
+    },
     "auth": {
       "account": "Hesabım",
       "accountDescription": "Profilini, güvenliğini ve açık oturumlarını yönet.",
