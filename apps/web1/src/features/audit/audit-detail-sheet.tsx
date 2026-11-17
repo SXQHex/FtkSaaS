@@ -84,7 +84,7 @@ export function AuditDetailSheet({
         {detail.changes.length > 0 ? (
           <ItemGroup>
             {detail.changes.map((change, index) => (
-              <Item key={`${change.field}:${index}`}>
+              <Item role="listitem" key={`${change.field}:${index}`}>
                 <ItemContent>
                   <ItemTitle>{change.field}</ItemTitle>
                   <ItemDescription className="whitespace-pre-line wrap-anywhere">

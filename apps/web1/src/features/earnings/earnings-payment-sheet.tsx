@@ -175,7 +175,7 @@ export function EarningsPaymentSheet({
             <>
               <ItemGroup>
                 {history.map((row) => (
-                  <Item key={row.id}>
+                  <Item role="listitem" key={row.id}>
                     <ItemContent>
                       <ItemTitle>
                         {row.title} · {row.amount}
