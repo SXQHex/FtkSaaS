@@ -1,5 +1,5 @@
 import "../../i18n";
-import { useState } from "react";
+import { createRef, useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
@@ -9,13 +9,29 @@ vi.mock("./appearance", async (original) => ({
   saveAppearance: save,
 }));
 import { BackendError } from "../../lib/backend";
-import { AppearancePanel } from "./appearance-panel";
+import { AppearancePanel, type AppearanceActions } from "./appearance-panel";
 import type { AppearanceSnapshot } from "./appearance";
 afterEach(() => vi.resetAllMocks());
 const base: AppearanceSnapshot = {
-  values: { theme: "system", font_scale: null },
+  values: {
+    theme: "system",
+    font_scale: null,
+    language: "auto",
+    week_start: "monday",
+    contrast: "system",
+    timezone_mode: "auto",
+    timezone_name: null,
+  },
   version: 0,
-  writable: { theme: true, font_scale: true },
+  writable: {
+    theme: true,
+    font_scale: true,
+    language: true,
+    week_start: true,
+    contrast: true,
+    timezone_mode: true,
+    timezone_name: true,
+  },
 };
 function Harness({
   refresh,
@@ -37,10 +53,51 @@ function Harness({
     />
   );
 }
+it.each([
+  ["İçerik dili", "en", { field: "language", value: "en" }],
+  ["Hafta başı", "sunday", { field: "week_start", value: "sunday" }],
+  ["Saat dilimi", "Europe/Istanbul", { field: "timezone_name", value: "Europe/Istanbul" }],
+  ["Kontrast", "high", { field: "contrast", value: "high" }],
+] as const)("saves and rereads the selected preference: %s", async (label, value, change) => {
+  save.mockResolvedValue({});
+  const updated = { ...base, version: 1, values: { ...base.values, [change.field]: change.value } };
+  if (change.field === "timezone_name") updated.values.timezone_mode = "manual";
+  const refresh = vi.fn().mockResolvedValue(updated);
+  render(<Harness refresh={refresh} />);
+  await userEvent.selectOptions(screen.getByRole("combobox", { name: label }), value);
+  await screen.findByText("Görünüm tercihi kaydedildi.");
+  expect(save).toHaveBeenCalledTimes(1);
+  expect(save).toHaveBeenCalledWith(expect.objectContaining({ change, version: 0 }));
+  expect(refresh).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole("combobox", { name: label })).toHaveValue(value);
+});
+it("shares the existing write and recovery path with the toolbar theme action", async () => {
+  save.mockResolvedValue({});
+  const actions = createRef<AppearanceActions>();
+  const refresh = vi.fn().mockResolvedValue(base);
+  render(
+    <>
+      <button onClick={() => actions.current?.toggleTheme()}>Toolbar theme</button>
+      <AppearancePanel
+        ref={actions}
+        snapshot={{ ...base, values: { ...base.values, theme: "dark" } }}
+        readError={false}
+        onRefresh={refresh}
+      />
+    </>,
+  );
+  await userEvent.click(screen.getByRole("button", { name: "Toolbar theme" }));
+  await screen.findByText("Görünüm tercihi kaydedildi.");
+  expect(save).toHaveBeenCalledTimes(1);
+  expect(save).toHaveBeenCalledWith(
+    expect.objectContaining({ change: { field: "theme", value: "light" }, version: 0 }),
+  );
+  expect(refresh).toHaveBeenCalledTimes(1);
+});
 it("obeys read-only catalog permission and sends no mutation", async () => {
   render(
     <Harness
-      initial={{ ...base, writable: { theme: false, font_scale: false } }}
+      initial={{ ...base, writable: { ...base.writable, theme: false, font_scale: false } }}
       refresh={vi.fn()}
     />,
   );
@@ -112,7 +169,7 @@ it("keeps an arbitrary valid scale and independent field permissions, then resen
   const initial: AppearanceSnapshot = {
     ...base,
     values: { ...base.values, font_scale: 1.37 },
-    writable: { theme: false, font_scale: true },
+    writable: { ...base.writable, theme: false, font_scale: true },
   };
   const refresh = vi
     .fn()

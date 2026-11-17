@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MfaRouteImport } from './routes/mfa'
@@ -20,7 +22,37 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AccountDeletionRouteImport } from './routes/account_.deletion'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as InstructorEarningsRouteImport } from './routes/instructor.earnings'
+import { Route as InstructorScheduleRouteImport } from './routes/instructor.schedule'
+import { Route as InstructorTodayRouteImport } from './routes/instructor.today'
 import { Route as InviteExpiredRouteImport } from './routes/invite_.expired'
+import { Route as MemberAccountRouteImport } from './routes/member.account'
+import { Route as MemberClassesRouteImport } from './routes/member.classes'
+import { Route as MemberEntitlementsRouteImport } from './routes/member.entitlements'
+import { Route as MemberPrivateLessonsRouteImport } from './routes/member.private-lessons'
+import { Route as MemberReservationsRouteImport } from './routes/member.reservations'
+import { Route as InstructorSessionsSessionIdRouteImport } from './routes/instructor.sessions.$sessionId'
+import { Route as PublicSlugApplyRouteImport } from './routes/public.$slug.apply'
+import { Route as PublicSlugCalendarRouteImport } from './routes/public.$slug.calendar'
+import { Route as PublicSlugUnavailableRouteImport } from './routes/public.$slug.unavailable'
+import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
+import { Route as OOrgIdCCenterIdAutomationRouteImport } from './routes/o.$orgId.c.$centerId.automation'
+import { Route as OOrgIdCCenterIdDocumentsRouteImport } from './routes/o.$orgId.c.$centerId.documents'
+import { Route as OOrgIdCCenterIdEarningsRouteImport } from './routes/o.$orgId.c.$centerId.earnings'
+import { Route as OOrgIdCCenterIdEventsRouteImport } from './routes/o.$orgId.c.$centerId.events'
+import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
+import { Route as OOrgIdCCenterIdLeadsRouteImport } from './routes/o.$orgId.c.$centerId.leads'
+import { Route as OOrgIdCCenterIdOverviewRouteImport } from './routes/o.$orgId.c.$centerId.overview'
+import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
+import { Route as OOrgIdCCenterIdProductsRouteImport } from './routes/o.$orgId.c.$centerId.products'
+import { Route as OOrgIdCCenterIdRequestsRouteImport } from './routes/o.$orgId.c.$centerId.requests'
+import { Route as OOrgIdCCenterIdScheduleRouteImport } from './routes/o.$orgId.c.$centerId.schedule'
+import { Route as OOrgIdCCenterIdSettingsRouteImport } from './routes/o.$orgId.c.$centerId.settings'
+import { Route as OOrgIdCCenterIdStudioRouteImport } from './routes/o.$orgId.c.$centerId.studio'
+import { Route as OOrgIdCCenterIdEventsEventIdRouteImport } from './routes/o.$orgId.c.$centerId.events_.$eventId'
+import { Route as OOrgIdCCenterIdPeoplePersonIdRouteImport } from './routes/o.$orgId.c.$centerId.people_.$personId'
+import { Route as OOrgIdCCenterIdPeopleMergeRouteImport } from './routes/o.$orgId.c.$centerId.people_.merge'
+import { Route as OOrgIdCCenterIdSessionsSessionIdRouteImport } from './routes/o.$orgId.c.$centerId.sessions.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,6 +67,16 @@ const AccountRoute = AccountRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteRoute = InviteRouteImport.update({
@@ -77,16 +119,175 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstructorEarningsRoute = InstructorEarningsRouteImport.update({
+  id: '/instructor/earnings',
+  path: '/instructor/earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstructorScheduleRoute = InstructorScheduleRouteImport.update({
+  id: '/instructor/schedule',
+  path: '/instructor/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstructorTodayRoute = InstructorTodayRouteImport.update({
+  id: '/instructor/today',
+  path: '/instructor/today',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InviteExpiredRoute = InviteExpiredRouteImport.update({
   id: '/invite_/expired',
   path: '/invite/expired',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MemberAccountRoute = MemberAccountRouteImport.update({
+  id: '/member/account',
+  path: '/member/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemberClassesRoute = MemberClassesRouteImport.update({
+  id: '/member/classes',
+  path: '/member/classes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemberEntitlementsRoute = MemberEntitlementsRouteImport.update({
+  id: '/member/entitlements',
+  path: '/member/entitlements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemberPrivateLessonsRoute = MemberPrivateLessonsRouteImport.update({
+  id: '/member/private-lessons',
+  path: '/member/private-lessons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemberReservationsRoute = MemberReservationsRouteImport.update({
+  id: '/member/reservations',
+  path: '/member/reservations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstructorSessionsSessionIdRoute =
+  InstructorSessionsSessionIdRouteImport.update({
+    id: '/instructor/sessions/$sessionId',
+    path: '/instructor/sessions/$sessionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PublicSlugApplyRoute = PublicSlugApplyRouteImport.update({
+  id: '/public/$slug/apply',
+  path: '/public/$slug/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicSlugCalendarRoute = PublicSlugCalendarRouteImport.update({
+  id: '/public/$slug/calendar',
+  path: '/public/$slug/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicSlugUnavailableRoute = PublicSlugUnavailableRouteImport.update({
+  id: '/public/$slug/unavailable',
+  path: '/public/$slug/unavailable',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
+  id: '/o/$orgId/c/$centerId/access',
+  path: '/o/$orgId/c/$centerId/access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdAutomationRoute =
+  OOrgIdCCenterIdAutomationRouteImport.update({
+    id: '/o/$orgId/c/$centerId/automation',
+    path: '/o/$orgId/c/$centerId/automation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const OOrgIdCCenterIdDocumentsRoute =
+  OOrgIdCCenterIdDocumentsRouteImport.update({
+    id: '/o/$orgId/c/$centerId/documents',
+    path: '/o/$orgId/c/$centerId/documents',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const OOrgIdCCenterIdEarningsRoute = OOrgIdCCenterIdEarningsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/earnings',
+  path: '/o/$orgId/c/$centerId/earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdEventsRoute = OOrgIdCCenterIdEventsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/events',
+  path: '/o/$orgId/c/$centerId/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdFinanceRoute = OOrgIdCCenterIdFinanceRouteImport.update({
+  id: '/o/$orgId/c/$centerId/finance',
+  path: '/o/$orgId/c/$centerId/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdLeadsRoute = OOrgIdCCenterIdLeadsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/leads',
+  path: '/o/$orgId/c/$centerId/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdOverviewRoute = OOrgIdCCenterIdOverviewRouteImport.update({
+  id: '/o/$orgId/c/$centerId/overview',
+  path: '/o/$orgId/c/$centerId/overview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdPeopleRoute = OOrgIdCCenterIdPeopleRouteImport.update({
+  id: '/o/$orgId/c/$centerId/people',
+  path: '/o/$orgId/c/$centerId/people',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdProductsRoute = OOrgIdCCenterIdProductsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/products',
+  path: '/o/$orgId/c/$centerId/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdRequestsRoute = OOrgIdCCenterIdRequestsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/requests',
+  path: '/o/$orgId/c/$centerId/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdScheduleRoute = OOrgIdCCenterIdScheduleRouteImport.update({
+  id: '/o/$orgId/c/$centerId/schedule',
+  path: '/o/$orgId/c/$centerId/schedule',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdSettingsRoute = OOrgIdCCenterIdSettingsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/settings',
+  path: '/o/$orgId/c/$centerId/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdStudioRoute = OOrgIdCCenterIdStudioRouteImport.update({
+  id: '/o/$orgId/c/$centerId/studio',
+  path: '/o/$orgId/c/$centerId/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdEventsEventIdRoute =
+  OOrgIdCCenterIdEventsEventIdRouteImport.update({
+    id: '/o/$orgId/c/$centerId/events_/$eventId',
+    path: '/o/$orgId/c/$centerId/events/$eventId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const OOrgIdCCenterIdPeoplePersonIdRoute =
+  OOrgIdCCenterIdPeoplePersonIdRouteImport.update({
+    id: '/o/$orgId/c/$centerId/people_/$personId',
+    path: '/o/$orgId/c/$centerId/people/$personId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const OOrgIdCCenterIdPeopleMergeRoute =
+  OOrgIdCCenterIdPeopleMergeRouteImport.update({
+    id: '/o/$orgId/c/$centerId/people_/merge',
+    path: '/o/$orgId/c/$centerId/people/merge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const OOrgIdCCenterIdSessionsSessionIdRoute =
+  OOrgIdCCenterIdSessionsSessionIdRouteImport.update({
+    id: '/o/$orgId/c/$centerId/sessions/$sessionId',
+    path: '/o/$orgId/c/$centerId/sessions/$sessionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
+  '/inbox': typeof InboxRoute
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
@@ -95,12 +296,44 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/earnings': typeof InstructorEarningsRoute
+  '/instructor/schedule': typeof InstructorScheduleRoute
+  '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/member/account': typeof MemberAccountRoute
+  '/member/classes': typeof MemberClassesRoute
+  '/member/entitlements': typeof MemberEntitlementsRoute
+  '/member/private-lessons': typeof MemberPrivateLessonsRoute
+  '/member/reservations': typeof MemberReservationsRoute
+  '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
+  '/public/$slug/apply': typeof PublicSlugApplyRoute
+  '/public/$slug/calendar': typeof PublicSlugCalendarRoute
+  '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
+  '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
+  '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
+  '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
+  '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
+  '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
+  '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
+  '/o/$orgId/c/$centerId/overview': typeof OOrgIdCCenterIdOverviewRoute
+  '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
+  '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
+  '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
+  '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
+  '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/events/$eventId': typeof OOrgIdCCenterIdEventsEventIdRoute
+  '/o/$orgId/c/$centerId/people/$personId': typeof OOrgIdCCenterIdPeoplePersonIdRoute
+  '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
+  '/o/$orgId/c/$centerId/sessions/$sessionId': typeof OOrgIdCCenterIdSessionsSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
+  '/inbox': typeof InboxRoute
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
@@ -109,13 +342,45 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/account/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/earnings': typeof InstructorEarningsRoute
+  '/instructor/schedule': typeof InstructorScheduleRoute
+  '/instructor/today': typeof InstructorTodayRoute
   '/invite/expired': typeof InviteExpiredRoute
+  '/member/account': typeof MemberAccountRoute
+  '/member/classes': typeof MemberClassesRoute
+  '/member/entitlements': typeof MemberEntitlementsRoute
+  '/member/private-lessons': typeof MemberPrivateLessonsRoute
+  '/member/reservations': typeof MemberReservationsRoute
+  '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
+  '/public/$slug/apply': typeof PublicSlugApplyRoute
+  '/public/$slug/calendar': typeof PublicSlugCalendarRoute
+  '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
+  '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
+  '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
+  '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
+  '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
+  '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
+  '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
+  '/o/$orgId/c/$centerId/overview': typeof OOrgIdCCenterIdOverviewRoute
+  '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
+  '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
+  '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
+  '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
+  '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/events/$eventId': typeof OOrgIdCCenterIdEventsEventIdRoute
+  '/o/$orgId/c/$centerId/people/$personId': typeof OOrgIdCCenterIdPeoplePersonIdRoute
+  '/o/$orgId/c/$centerId/people/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
+  '/o/$orgId/c/$centerId/sessions/$sessionId': typeof OOrgIdCCenterIdSessionsSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
+  '/inbox': typeof InboxRoute
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
@@ -124,7 +389,37 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/account_/deletion': typeof AccountDeletionRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/instructor/earnings': typeof InstructorEarningsRoute
+  '/instructor/schedule': typeof InstructorScheduleRoute
+  '/instructor/today': typeof InstructorTodayRoute
   '/invite_/expired': typeof InviteExpiredRoute
+  '/member/account': typeof MemberAccountRoute
+  '/member/classes': typeof MemberClassesRoute
+  '/member/entitlements': typeof MemberEntitlementsRoute
+  '/member/private-lessons': typeof MemberPrivateLessonsRoute
+  '/member/reservations': typeof MemberReservationsRoute
+  '/instructor/sessions/$sessionId': typeof InstructorSessionsSessionIdRoute
+  '/public/$slug/apply': typeof PublicSlugApplyRoute
+  '/public/$slug/calendar': typeof PublicSlugCalendarRoute
+  '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
+  '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
+  '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
+  '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
+  '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
+  '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
+  '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
+  '/o/$orgId/c/$centerId/overview': typeof OOrgIdCCenterIdOverviewRoute
+  '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
+  '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
+  '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
+  '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
+  '/o/$orgId/c/$centerId/studio': typeof OOrgIdCCenterIdStudioRoute
+  '/o/$orgId/c/$centerId/events_/$eventId': typeof OOrgIdCCenterIdEventsEventIdRoute
+  '/o/$orgId/c/$centerId/people_/$personId': typeof OOrgIdCCenterIdPeoplePersonIdRoute
+  '/o/$orgId/c/$centerId/people_/merge': typeof OOrgIdCCenterIdPeopleMergeRoute
+  '/o/$orgId/c/$centerId/sessions/$sessionId': typeof OOrgIdCCenterIdSessionsSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,6 +427,8 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/forgot-password'
+    | '/help'
+    | '/inbox'
     | '/invite'
     | '/login'
     | '/mfa'
@@ -140,12 +437,44 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account/deletion'
     | '/auth/callback'
+    | '/instructor/earnings'
+    | '/instructor/schedule'
+    | '/instructor/today'
     | '/invite/expired'
+    | '/member/account'
+    | '/member/classes'
+    | '/member/entitlements'
+    | '/member/private-lessons'
+    | '/member/reservations'
+    | '/instructor/sessions/$sessionId'
+    | '/public/$slug/apply'
+    | '/public/$slug/calendar'
+    | '/public/$slug/unavailable'
+    | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/automation'
+    | '/o/$orgId/c/$centerId/documents'
+    | '/o/$orgId/c/$centerId/earnings'
+    | '/o/$orgId/c/$centerId/events'
+    | '/o/$orgId/c/$centerId/finance'
+    | '/o/$orgId/c/$centerId/leads'
+    | '/o/$orgId/c/$centerId/overview'
+    | '/o/$orgId/c/$centerId/people'
+    | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/requests'
+    | '/o/$orgId/c/$centerId/schedule'
+    | '/o/$orgId/c/$centerId/settings'
+    | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/events/$eventId'
+    | '/o/$orgId/c/$centerId/people/$personId'
+    | '/o/$orgId/c/$centerId/people/merge'
+    | '/o/$orgId/c/$centerId/sessions/$sessionId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
     | '/forgot-password'
+    | '/help'
+    | '/inbox'
     | '/invite'
     | '/login'
     | '/mfa'
@@ -154,12 +483,44 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account/deletion'
     | '/auth/callback'
+    | '/instructor/earnings'
+    | '/instructor/schedule'
+    | '/instructor/today'
     | '/invite/expired'
+    | '/member/account'
+    | '/member/classes'
+    | '/member/entitlements'
+    | '/member/private-lessons'
+    | '/member/reservations'
+    | '/instructor/sessions/$sessionId'
+    | '/public/$slug/apply'
+    | '/public/$slug/calendar'
+    | '/public/$slug/unavailable'
+    | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/automation'
+    | '/o/$orgId/c/$centerId/documents'
+    | '/o/$orgId/c/$centerId/earnings'
+    | '/o/$orgId/c/$centerId/events'
+    | '/o/$orgId/c/$centerId/finance'
+    | '/o/$orgId/c/$centerId/leads'
+    | '/o/$orgId/c/$centerId/overview'
+    | '/o/$orgId/c/$centerId/people'
+    | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/requests'
+    | '/o/$orgId/c/$centerId/schedule'
+    | '/o/$orgId/c/$centerId/settings'
+    | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/events/$eventId'
+    | '/o/$orgId/c/$centerId/people/$personId'
+    | '/o/$orgId/c/$centerId/people/merge'
+    | '/o/$orgId/c/$centerId/sessions/$sessionId'
   id:
     | '__root__'
     | '/'
     | '/account'
     | '/forgot-password'
+    | '/help'
+    | '/inbox'
     | '/invite'
     | '/login'
     | '/mfa'
@@ -168,13 +529,45 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/account_/deletion'
     | '/auth/callback'
+    | '/instructor/earnings'
+    | '/instructor/schedule'
+    | '/instructor/today'
     | '/invite_/expired'
+    | '/member/account'
+    | '/member/classes'
+    | '/member/entitlements'
+    | '/member/private-lessons'
+    | '/member/reservations'
+    | '/instructor/sessions/$sessionId'
+    | '/public/$slug/apply'
+    | '/public/$slug/calendar'
+    | '/public/$slug/unavailable'
+    | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/automation'
+    | '/o/$orgId/c/$centerId/documents'
+    | '/o/$orgId/c/$centerId/earnings'
+    | '/o/$orgId/c/$centerId/events'
+    | '/o/$orgId/c/$centerId/finance'
+    | '/o/$orgId/c/$centerId/leads'
+    | '/o/$orgId/c/$centerId/overview'
+    | '/o/$orgId/c/$centerId/people'
+    | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/requests'
+    | '/o/$orgId/c/$centerId/schedule'
+    | '/o/$orgId/c/$centerId/settings'
+    | '/o/$orgId/c/$centerId/studio'
+    | '/o/$orgId/c/$centerId/events_/$eventId'
+    | '/o/$orgId/c/$centerId/people_/$personId'
+    | '/o/$orgId/c/$centerId/people_/merge'
+    | '/o/$orgId/c/$centerId/sessions/$sessionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HelpRoute: typeof HelpRoute
+  InboxRoute: typeof InboxRoute
   InviteRoute: typeof InviteRoute
   LoginRoute: typeof LoginRoute
   MfaRoute: typeof MfaRoute
@@ -183,7 +576,37 @@ export interface RootRouteChildren {
   VerifyEmailRoute: typeof VerifyEmailRoute
   AccountDeletionRoute: typeof AccountDeletionRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  InstructorEarningsRoute: typeof InstructorEarningsRoute
+  InstructorScheduleRoute: typeof InstructorScheduleRoute
+  InstructorTodayRoute: typeof InstructorTodayRoute
   InviteExpiredRoute: typeof InviteExpiredRoute
+  MemberAccountRoute: typeof MemberAccountRoute
+  MemberClassesRoute: typeof MemberClassesRoute
+  MemberEntitlementsRoute: typeof MemberEntitlementsRoute
+  MemberPrivateLessonsRoute: typeof MemberPrivateLessonsRoute
+  MemberReservationsRoute: typeof MemberReservationsRoute
+  InstructorSessionsSessionIdRoute: typeof InstructorSessionsSessionIdRoute
+  PublicSlugApplyRoute: typeof PublicSlugApplyRoute
+  PublicSlugCalendarRoute: typeof PublicSlugCalendarRoute
+  PublicSlugUnavailableRoute: typeof PublicSlugUnavailableRoute
+  OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
+  OOrgIdCCenterIdAutomationRoute: typeof OOrgIdCCenterIdAutomationRoute
+  OOrgIdCCenterIdDocumentsRoute: typeof OOrgIdCCenterIdDocumentsRoute
+  OOrgIdCCenterIdEarningsRoute: typeof OOrgIdCCenterIdEarningsRoute
+  OOrgIdCCenterIdEventsRoute: typeof OOrgIdCCenterIdEventsRoute
+  OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
+  OOrgIdCCenterIdLeadsRoute: typeof OOrgIdCCenterIdLeadsRoute
+  OOrgIdCCenterIdOverviewRoute: typeof OOrgIdCCenterIdOverviewRoute
+  OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
+  OOrgIdCCenterIdProductsRoute: typeof OOrgIdCCenterIdProductsRoute
+  OOrgIdCCenterIdRequestsRoute: typeof OOrgIdCCenterIdRequestsRoute
+  OOrgIdCCenterIdScheduleRoute: typeof OOrgIdCCenterIdScheduleRoute
+  OOrgIdCCenterIdSettingsRoute: typeof OOrgIdCCenterIdSettingsRoute
+  OOrgIdCCenterIdStudioRoute: typeof OOrgIdCCenterIdStudioRoute
+  OOrgIdCCenterIdEventsEventIdRoute: typeof OOrgIdCCenterIdEventsEventIdRoute
+  OOrgIdCCenterIdPeoplePersonIdRoute: typeof OOrgIdCCenterIdPeoplePersonIdRoute
+  OOrgIdCCenterIdPeopleMergeRoute: typeof OOrgIdCCenterIdPeopleMergeRoute
+  OOrgIdCCenterIdSessionsSessionIdRoute: typeof OOrgIdCCenterIdSessionsSessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -207,6 +630,20 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite': {
@@ -265,11 +702,221 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instructor/earnings': {
+      id: '/instructor/earnings'
+      path: '/instructor/earnings'
+      fullPath: '/instructor/earnings'
+      preLoaderRoute: typeof InstructorEarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor/schedule': {
+      id: '/instructor/schedule'
+      path: '/instructor/schedule'
+      fullPath: '/instructor/schedule'
+      preLoaderRoute: typeof InstructorScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor/today': {
+      id: '/instructor/today'
+      path: '/instructor/today'
+      fullPath: '/instructor/today'
+      preLoaderRoute: typeof InstructorTodayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invite_/expired': {
       id: '/invite_/expired'
       path: '/invite/expired'
       fullPath: '/invite/expired'
       preLoaderRoute: typeof InviteExpiredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member/account': {
+      id: '/member/account'
+      path: '/member/account'
+      fullPath: '/member/account'
+      preLoaderRoute: typeof MemberAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member/classes': {
+      id: '/member/classes'
+      path: '/member/classes'
+      fullPath: '/member/classes'
+      preLoaderRoute: typeof MemberClassesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member/entitlements': {
+      id: '/member/entitlements'
+      path: '/member/entitlements'
+      fullPath: '/member/entitlements'
+      preLoaderRoute: typeof MemberEntitlementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member/private-lessons': {
+      id: '/member/private-lessons'
+      path: '/member/private-lessons'
+      fullPath: '/member/private-lessons'
+      preLoaderRoute: typeof MemberPrivateLessonsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member/reservations': {
+      id: '/member/reservations'
+      path: '/member/reservations'
+      fullPath: '/member/reservations'
+      preLoaderRoute: typeof MemberReservationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor/sessions/$sessionId': {
+      id: '/instructor/sessions/$sessionId'
+      path: '/instructor/sessions/$sessionId'
+      fullPath: '/instructor/sessions/$sessionId'
+      preLoaderRoute: typeof InstructorSessionsSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/$slug/apply': {
+      id: '/public/$slug/apply'
+      path: '/public/$slug/apply'
+      fullPath: '/public/$slug/apply'
+      preLoaderRoute: typeof PublicSlugApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/$slug/calendar': {
+      id: '/public/$slug/calendar'
+      path: '/public/$slug/calendar'
+      fullPath: '/public/$slug/calendar'
+      preLoaderRoute: typeof PublicSlugCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/$slug/unavailable': {
+      id: '/public/$slug/unavailable'
+      path: '/public/$slug/unavailable'
+      fullPath: '/public/$slug/unavailable'
+      preLoaderRoute: typeof PublicSlugUnavailableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/access': {
+      id: '/o/$orgId/c/$centerId/access'
+      path: '/o/$orgId/c/$centerId/access'
+      fullPath: '/o/$orgId/c/$centerId/access'
+      preLoaderRoute: typeof OOrgIdCCenterIdAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/automation': {
+      id: '/o/$orgId/c/$centerId/automation'
+      path: '/o/$orgId/c/$centerId/automation'
+      fullPath: '/o/$orgId/c/$centerId/automation'
+      preLoaderRoute: typeof OOrgIdCCenterIdAutomationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/documents': {
+      id: '/o/$orgId/c/$centerId/documents'
+      path: '/o/$orgId/c/$centerId/documents'
+      fullPath: '/o/$orgId/c/$centerId/documents'
+      preLoaderRoute: typeof OOrgIdCCenterIdDocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/earnings': {
+      id: '/o/$orgId/c/$centerId/earnings'
+      path: '/o/$orgId/c/$centerId/earnings'
+      fullPath: '/o/$orgId/c/$centerId/earnings'
+      preLoaderRoute: typeof OOrgIdCCenterIdEarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/events': {
+      id: '/o/$orgId/c/$centerId/events'
+      path: '/o/$orgId/c/$centerId/events'
+      fullPath: '/o/$orgId/c/$centerId/events'
+      preLoaderRoute: typeof OOrgIdCCenterIdEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/finance': {
+      id: '/o/$orgId/c/$centerId/finance'
+      path: '/o/$orgId/c/$centerId/finance'
+      fullPath: '/o/$orgId/c/$centerId/finance'
+      preLoaderRoute: typeof OOrgIdCCenterIdFinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/leads': {
+      id: '/o/$orgId/c/$centerId/leads'
+      path: '/o/$orgId/c/$centerId/leads'
+      fullPath: '/o/$orgId/c/$centerId/leads'
+      preLoaderRoute: typeof OOrgIdCCenterIdLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/overview': {
+      id: '/o/$orgId/c/$centerId/overview'
+      path: '/o/$orgId/c/$centerId/overview'
+      fullPath: '/o/$orgId/c/$centerId/overview'
+      preLoaderRoute: typeof OOrgIdCCenterIdOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/people': {
+      id: '/o/$orgId/c/$centerId/people'
+      path: '/o/$orgId/c/$centerId/people'
+      fullPath: '/o/$orgId/c/$centerId/people'
+      preLoaderRoute: typeof OOrgIdCCenterIdPeopleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/products': {
+      id: '/o/$orgId/c/$centerId/products'
+      path: '/o/$orgId/c/$centerId/products'
+      fullPath: '/o/$orgId/c/$centerId/products'
+      preLoaderRoute: typeof OOrgIdCCenterIdProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/requests': {
+      id: '/o/$orgId/c/$centerId/requests'
+      path: '/o/$orgId/c/$centerId/requests'
+      fullPath: '/o/$orgId/c/$centerId/requests'
+      preLoaderRoute: typeof OOrgIdCCenterIdRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/schedule': {
+      id: '/o/$orgId/c/$centerId/schedule'
+      path: '/o/$orgId/c/$centerId/schedule'
+      fullPath: '/o/$orgId/c/$centerId/schedule'
+      preLoaderRoute: typeof OOrgIdCCenterIdScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/settings': {
+      id: '/o/$orgId/c/$centerId/settings'
+      path: '/o/$orgId/c/$centerId/settings'
+      fullPath: '/o/$orgId/c/$centerId/settings'
+      preLoaderRoute: typeof OOrgIdCCenterIdSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/studio': {
+      id: '/o/$orgId/c/$centerId/studio'
+      path: '/o/$orgId/c/$centerId/studio'
+      fullPath: '/o/$orgId/c/$centerId/studio'
+      preLoaderRoute: typeof OOrgIdCCenterIdStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/events_/$eventId': {
+      id: '/o/$orgId/c/$centerId/events_/$eventId'
+      path: '/o/$orgId/c/$centerId/events/$eventId'
+      fullPath: '/o/$orgId/c/$centerId/events/$eventId'
+      preLoaderRoute: typeof OOrgIdCCenterIdEventsEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/people_/$personId': {
+      id: '/o/$orgId/c/$centerId/people_/$personId'
+      path: '/o/$orgId/c/$centerId/people/$personId'
+      fullPath: '/o/$orgId/c/$centerId/people/$personId'
+      preLoaderRoute: typeof OOrgIdCCenterIdPeoplePersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/people_/merge': {
+      id: '/o/$orgId/c/$centerId/people_/merge'
+      path: '/o/$orgId/c/$centerId/people/merge'
+      fullPath: '/o/$orgId/c/$centerId/people/merge'
+      preLoaderRoute: typeof OOrgIdCCenterIdPeopleMergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/sessions/$sessionId': {
+      id: '/o/$orgId/c/$centerId/sessions/$sessionId'
+      path: '/o/$orgId/c/$centerId/sessions/$sessionId'
+      fullPath: '/o/$orgId/c/$centerId/sessions/$sessionId'
+      preLoaderRoute: typeof OOrgIdCCenterIdSessionsSessionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -279,6 +926,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HelpRoute: HelpRoute,
+  InboxRoute: InboxRoute,
   InviteRoute: InviteRoute,
   LoginRoute: LoginRoute,
   MfaRoute: MfaRoute,
@@ -287,7 +936,37 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyEmailRoute: VerifyEmailRoute,
   AccountDeletionRoute: AccountDeletionRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  InstructorEarningsRoute: InstructorEarningsRoute,
+  InstructorScheduleRoute: InstructorScheduleRoute,
+  InstructorTodayRoute: InstructorTodayRoute,
   InviteExpiredRoute: InviteExpiredRoute,
+  MemberAccountRoute: MemberAccountRoute,
+  MemberClassesRoute: MemberClassesRoute,
+  MemberEntitlementsRoute: MemberEntitlementsRoute,
+  MemberPrivateLessonsRoute: MemberPrivateLessonsRoute,
+  MemberReservationsRoute: MemberReservationsRoute,
+  InstructorSessionsSessionIdRoute: InstructorSessionsSessionIdRoute,
+  PublicSlugApplyRoute: PublicSlugApplyRoute,
+  PublicSlugCalendarRoute: PublicSlugCalendarRoute,
+  PublicSlugUnavailableRoute: PublicSlugUnavailableRoute,
+  OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
+  OOrgIdCCenterIdAutomationRoute: OOrgIdCCenterIdAutomationRoute,
+  OOrgIdCCenterIdDocumentsRoute: OOrgIdCCenterIdDocumentsRoute,
+  OOrgIdCCenterIdEarningsRoute: OOrgIdCCenterIdEarningsRoute,
+  OOrgIdCCenterIdEventsRoute: OOrgIdCCenterIdEventsRoute,
+  OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
+  OOrgIdCCenterIdLeadsRoute: OOrgIdCCenterIdLeadsRoute,
+  OOrgIdCCenterIdOverviewRoute: OOrgIdCCenterIdOverviewRoute,
+  OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
+  OOrgIdCCenterIdProductsRoute: OOrgIdCCenterIdProductsRoute,
+  OOrgIdCCenterIdRequestsRoute: OOrgIdCCenterIdRequestsRoute,
+  OOrgIdCCenterIdScheduleRoute: OOrgIdCCenterIdScheduleRoute,
+  OOrgIdCCenterIdSettingsRoute: OOrgIdCCenterIdSettingsRoute,
+  OOrgIdCCenterIdStudioRoute: OOrgIdCCenterIdStudioRoute,
+  OOrgIdCCenterIdEventsEventIdRoute: OOrgIdCCenterIdEventsEventIdRoute,
+  OOrgIdCCenterIdPeoplePersonIdRoute: OOrgIdCCenterIdPeoplePersonIdRoute,
+  OOrgIdCCenterIdPeopleMergeRoute: OOrgIdCCenterIdPeopleMergeRoute,
+  OOrgIdCCenterIdSessionsSessionIdRoute: OOrgIdCCenterIdSessionsSessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

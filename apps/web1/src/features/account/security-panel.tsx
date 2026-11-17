@@ -108,8 +108,11 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <ItemGroup>
-            <Item role="listitem" className="px-0 py-3">
+          <ItemGroup className="gap-0 [&>[data-slot=item]]:rounded-none">
+            <Item
+              role="listitem"
+              className="rounded-none border-0 border-b border-border px-0 py-3"
+            >
               <ItemContent className="min-w-0 basis-full sm:basis-auto">
                 <ItemTitle>{t(($) => $.auth.password)}</ItemTitle>
                 <ItemDescription>{t(($) => $.passwordChange.rowDescription)}</ItemDescription>
@@ -124,7 +127,10 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
                 />
               </ItemActions>
             </Item>
-            <Item role="listitem" className="px-0 py-0">
+            <Item
+              role="listitem"
+              className="rounded-none border-0 border-b border-border px-0 py-3"
+            >
               <ItemContent className="basis-full sm:basis-auto">
                 <ItemTitle>
                   {t(($) => $.auth.mfaTitle)}{" "}
@@ -239,7 +245,7 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
               </AlertDescription>
             </Alert>
           ) : (
-            <ItemGroup>
+            <ItemGroup className="gap-0 [&>[data-slot=item]]:rounded-none [&>[data-slot=item]:not(:last-child)]:border-b-border">
               {history.data.pages
                 .flatMap((page) => page.items)
                 .map((event) => (

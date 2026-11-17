@@ -223,6 +223,20 @@ export const runtimeOperationNames = [
   "instructor_agreement_get_v1",
   "instructor_agreement_accept_v1",
   "content_catalog_get_v1",
-  "content_catalog_save_v1"
+  "content_catalog_save_v1",
+  "finance_directory_get_v1",
+  "products_management_list_v1",
+  "product_state_set_v1",
+  "freeze_cancel_preview_v1",
+  "freeze_cancel_apply_v1",
+  "instructor_account_get_v1",
+  "member_finance_currencies_get_v1",
+  "member_document_contexts_get_v1",
+  "notifications_read_set_v1",
+  "management_work_list_v1",
+  "instructor_finance_directory_get_v1",
+  "import_directory_get_v1",
+  "tracking_directory_get_v1",
+  "document_directory_get_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

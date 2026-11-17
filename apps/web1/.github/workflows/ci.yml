@@ -1,9 +1,10 @@
 # INACTIVE TEMPLATE: GitHub only loads workflows from the repository-root .github/workflows.
 # Paths below already target the monorepo root; see README before activation.
-name: web1 frontend CI template
+name: web1 frontend CI
 on:
   pull_request:
     branches: [main]
+    paths: ["apps/web1/**", ".github/workflows/web1.yml"]
     types: [opened, synchronize, reopened, edited]
   workflow_dispatch:
 permissions: {}
@@ -76,4 +77,7 @@ jobs:
           SOURCE_SHA: ${{ github.sha }}
         run: |
           printf '### web1 verification\nSource: `%s`\nVerification step: `%s`\n' "$SOURCE_SHA" "$VERIFY_OUTCOME" >> "$GITHUB_STEP_SUMMARY"
+          if test -f test-reports/verification.md; then
+            cat test-reports/verification.md >> "$GITHUB_STEP_SUMMARY"
+          fi
           printf 'Skipped/not-run checks are not passing test evidence. Artifacts are diagnostics, not merge receipts.\n' >> "$GITHUB_STEP_SUMMARY"

@@ -52,7 +52,7 @@ const next: ProfileSnapshot = {
 };
 it("validates the unverified phone separately from native verified contacts", async () => {
   render(<ProfileForm latest={base} onRefresh={vi.fn()} />);
-  await userEvent.type(screen.getByLabelText("İletişim telefonu", { exact: false }), "05320000000");
+  await userEvent.type(screen.getByLabelText("Telefon", { exact: false }), "05320000000");
   await userEvent.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
   expect(
     await screen.findByText("Telefonu ülke koduyla ve boşluksuz yaz (ör. +905320000000)."),
@@ -239,4 +239,26 @@ it("preserves dirty profile text while the email Sheet reads canonical pending s
   await userEvent.click(screen.getByLabelText("Kapat"));
   expect(name).toHaveValue("My draft");
   expect(screen.getByRole("button", { name: "Değişiklikleri kaydet" })).toBeEnabled();
+});
+it("member presentation preserves hidden native names when updating its visible profile fields", async () => {
+  const source = { ...base, values: { ...base.values, givenName: "Given", familyName: "Family" } };
+  save.mockResolvedValue({ version: 8 });
+  render(
+    <ProfileForm
+      latest={source}
+      onRefresh={async () => ({
+        ...source,
+        version: 8,
+        values: { ...source.values, displayName: "Member" },
+      })}
+      variant="member"
+    />,
+  );
+  expect(screen.queryByLabelText("Ad", { exact: true })).not.toBeInTheDocument();
+  expect(screen.queryByLabelText("Soyad", { exact: true })).not.toBeInTheDocument();
+  await userEvent.clear(screen.getByLabelText("Görünen ad"));
+  await userEvent.type(screen.getByLabelText("Görünen ad"), "Member");
+  await userEvent.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
+  await waitFor(() => expect(save).toHaveBeenCalled());
+  expect(save.mock.calls[0][0]).toEqual({ ...source.values, displayName: "Member" });
 });

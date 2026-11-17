@@ -51,6 +51,33 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
         manualReview: results.incomplete.map((rule) => ({
           id: rule.id,
           targets: rule.nodes.map((node) => node.target),
+          nodes: rule.nodes.map((node) => ({
+            target: node.target,
+            tag: node.html.match(/^<([a-z0-9-]+)/i)?.[1] ?? null,
+            role: node.html.match(/\brole="([^"]+)"/)?.[1] ?? null,
+            checks: [...node.any, ...node.all, ...node.none].map((check) => ({
+              id: check.id,
+              message: check.message,
+              metrics: Object.fromEntries(
+                Object.entries((check.data ?? {}) as Record<string, unknown>).filter(
+                  ([key, value]) =>
+                    [
+                      "minSize",
+                      "width",
+                      "height",
+                      "closestOffset",
+                      "contrastRatio",
+                      "expectedContrastRatio",
+                      "fontSize",
+                      "fontWeight",
+                      "fgColor",
+                      "bgColor",
+                    ].includes(key) &&
+                    (typeof value === "number" || typeof value === "string" || value === null),
+                ),
+              ),
+            })),
+          })),
         })),
       },
       null,

@@ -41,3 +41,5 @@ test-results/
 
 # Machine-readable CI reports
 test-reports/
+
+read-only/

@@ -225,4 +225,18 @@ export interface Operations {
   instructor_agreement_accept_v1: {request: T.RequestInstructorAgreementAccept; response: T.SuccessInstructorAgreementAccept};
   content_catalog_get_v1: {request: T.RequestContentCatalogGet; response: T.SuccessContentCatalogGet};
   content_catalog_save_v1: {request: T.RequestContentCatalogSave; response: T.SuccessContentCatalogSave};
+  finance_directory_get_v1: {request: T.RequestFinanceDirectoryGet; response: T.SuccessFinanceDirectoryGet};
+  products_management_list_v1: {request: T.RequestProductsManagementList; response: T.SuccessProductsManagementList};
+  product_state_set_v1: {request: T.RequestProductStateSet; response: T.SuccessProductStateSet};
+  freeze_cancel_preview_v1: {request: T.RequestFreezeCancelPreview; response: T.SuccessFreezeCancelPreview};
+  freeze_cancel_apply_v1: {request: T.RequestFreezeCancelApply; response: T.SuccessFreezeCancelApply};
+  instructor_account_get_v1: {request: T.RequestInstructorAccountGet; response: T.SuccessInstructorAccountGet};
+  member_finance_currencies_get_v1: {request: T.RequestMemberFinanceCurrenciesGet; response: T.SuccessMemberFinanceCurrenciesGet};
+  member_document_contexts_get_v1: {request: T.RequestMemberDocumentContextsGet; response: T.SuccessMemberDocumentContextsGet};
+  notifications_read_set_v1: {request: T.RequestNotificationsReadSet; response: T.SuccessNotificationsReadSet};
+  management_work_list_v1: {request: T.RequestManagementWorkList; response: T.SuccessManagementWorkList};
+  instructor_finance_directory_get_v1: {request: T.RequestInstructorFinanceDirectoryGet; response: T.SuccessInstructorFinanceDirectoryGet};
+  import_directory_get_v1: {request: T.RequestImportDirectoryGet; response: T.SuccessImportDirectoryGet};
+  tracking_directory_get_v1: {request: T.RequestTrackingDirectoryGet; response: T.SuccessTrackingDirectoryGet};
+  document_directory_get_v1: {request: T.RequestDocumentDirectoryGet; response: T.SuccessDocumentDirectoryGet};
 }

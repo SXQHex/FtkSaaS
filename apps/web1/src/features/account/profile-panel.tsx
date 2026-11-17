@@ -1,6 +1,6 @@
 import { CheckIcon } from "lucide-react";
-import { useRef, useState } from "react";
-import { revalidateLogic, useForm } from "@tanstack/react-form";
+import { useEffect, useRef, useState } from "react";
+import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -32,7 +32,17 @@ import { Badge } from "../../components/ui/badge";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Skeleton } from "../../components/ui/skeleton";
 
-export function ProfilePanel({ accountId }: { accountId: string }) {
+export function ProfilePanel({
+  accountId,
+  variant = "account",
+  disabled,
+  onLockChange,
+}: {
+  accountId: string;
+  variant?: "account" | "member";
+  disabled?: boolean;
+  onLockChange?: (locked: boolean) => void;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const profile = useQuery({
@@ -67,6 +77,9 @@ export function ProfilePanel({ accountId }: { accountId: string }) {
     <ProfileForm
       key={accountId}
       latest={profile.data}
+      variant={variant}
+      disabled={disabled}
+      onLockChange={onLockChange}
       backgroundError={profile.isError}
       onRefresh={refresh}
     />
@@ -78,8 +91,14 @@ export function ProfileForm({
   latest,
   onRefresh,
   backgroundError = false,
+  variant = "account",
+  disabled = false,
+  onLockChange,
 }: {
   latest: ProfileSnapshot;
+  variant?: "account" | "member";
+  disabled?: boolean;
+  onLockChange?: (locked: boolean) => void;
   backgroundError?: boolean;
   onRefresh: () => Promise<ProfileSnapshot>;
 }) {
@@ -116,7 +135,7 @@ export function ProfileForm({
     defaultValues: base.values,
     validationLogic: revalidateLogic({ mode: "blur", modeAfterSubmission: "change" }),
     onSubmit: async ({ value }) => {
-      if (writeKnown || preparingPhoto) return;
+      if (disabled || writeKnown || preparingPhoto) return;
       const photo = photoDraft === null ? null : photoDraft?.upload;
       setNotice("clean");
       const signature = JSON.stringify({
@@ -140,6 +159,18 @@ export function ProfileForm({
       setNotice((await refresh(true)) ? "saved" : "saved-unread");
     },
   });
+  const submitting = useStore(form.store, (state) => state.isSubmitting);
+  const locked =
+    submitting ||
+    reading ||
+    preparingPhoto ||
+    writeKnown ||
+    notice === "unknown" ||
+    notice === "saved-unread";
+  useEffect(() => {
+    onLockChange?.(locked);
+    return () => onLockChange?.(false);
+  }, [locked, onLockChange]);
   const optionalName = z.string().refine(
     (value) => Array.from(value.trim()).length <= 100,
     t(($) => $.profile.nameLength),
@@ -195,78 +226,107 @@ export function ProfileForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            <h2>{t(($) => $.security.profile)}</h2>
+            <h2>
+              {t(($) => (variant === "member" ? $.memberAccount.profileTitle : $.security.profile))}
+            </h2>
           </CardTitle>
-          <CardDescription>{t(($) => $.profile.description)}</CardDescription>
+          <CardDescription>
+            {t(($) =>
+              variant === "member" ? $.memberAccount.profileDescription : $.profile.description,
+            )}
+          </CardDescription>
         </CardHeader>
         <CardContent className="pb-0.5">
           <form.Subscribe selector={(state) => state.isSubmitting}>
             {(submitting) => (
               <>
-                <ProfilePhotoRow
-                  accountId={base.account.id}
-                  asset={base.photo}
-                  name={base.values.displayName}
-                  draft={photoDraft}
-                  onChange={(draft) => {
-                    setPhotoDraft(draft);
-                    if (notice === "saved") setNotice("clean");
-                  }}
-                  disabled={submitting || reading || writeKnown || preparingPhoto}
-                  onBusy={setPreparingPhoto}
-                />
-                <FieldGroup className="grid gap-x-4 gap-y-3 min-[901px]:grid-cols-3">
-                  {fields.map((descriptor) => (
-                    <form.Field
-                      key={descriptor.name}
-                      name={descriptor.name}
-                      validators={{ onDynamic: descriptor.validator }}
-                    >
-                      {(field) => (
-                        <Field
-                          className="gap-1 pb-1"
-                          data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-                        >
-                          <FieldLabel
-                            className="w-full flex-wrap items-center"
-                            htmlFor={`profile-${descriptor.name}`}
+                {variant === "account" && (
+                  <ProfilePhotoRow
+                    accountId={base.account.id}
+                    asset={base.photo}
+                    name={base.values.displayName}
+                    draft={photoDraft}
+                    onChange={(draft) => {
+                      setPhotoDraft(draft);
+                      if (notice === "saved") setNotice("clean");
+                    }}
+                    disabled={disabled || submitting || reading || writeKnown || preparingPhoto}
+                    onBusy={setPreparingPhoto}
+                  />
+                )}
+                <FieldGroup
+                  className={
+                    variant === "member"
+                      ? "grid gap-x-4 gap-y-3 sm:grid-cols-2"
+                      : "grid gap-x-4 gap-y-3 min-[901px]:grid-cols-3"
+                  }
+                >
+                  {fields
+                    .filter(
+                      (descriptor) =>
+                        variant === "account" ||
+                        descriptor.name === "displayName" ||
+                        descriptor.name === "phone",
+                    )
+                    .map((descriptor) => (
+                      <form.Field
+                        key={descriptor.name}
+                        name={descriptor.name}
+                        validators={{ onDynamic: descriptor.validator }}
+                      >
+                        {(field) => (
+                          <Field
+                            className="gap-1 pb-1"
+                            data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
                           >
-                            {descriptor.label}
-                            {descriptor.name === "phone" && (
-                              <Badge variant="hint" className="ml-auto">
-                                {t(($) => $.profile.unverified)}
-                              </Badge>
-                            )}
-                          </FieldLabel>
-                          <Input
-                            id={`profile-${descriptor.name}`}
-                            name={descriptor.name}
-                            type={descriptor.name === "phone" ? "tel" : "text"}
-                            autoComplete={descriptor.autocomplete}
-                            value={field.state.value}
-                            onChange={(event) => {
-                              field.handleChange(event.target.value);
-                              if (notice === "saved") setNotice("clean");
-                            }}
-                            onBlur={field.handleBlur}
-                            disabled={submitting || reading || writeKnown || preparingPhoto}
-                            aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-                            aria-describedby={
-                              field.state.meta.errors.length
-                                ? `profile-${descriptor.name}-error`
-                                : undefined
-                            }
-                          />
-                          <FieldError
-                            id={`profile-${descriptor.name}-error`}
-                            errors={field.state.meta.isTouched ? field.state.meta.errors : []}
-                          />
-                        </Field>
-                      )}
-                    </form.Field>
-                  ))}
+                            <FieldLabel
+                              className="w-full flex-wrap items-center"
+                              htmlFor={`profile-${descriptor.name}`}
+                            >
+                              {descriptor.label}
+                              {descriptor.name === "phone" && (
+                                <Badge variant="hint" className="ml-auto">
+                                  {t(($) => $.profile.unverified)}
+                                </Badge>
+                              )}
+                            </FieldLabel>
+                            <Input
+                              id={`profile-${descriptor.name}`}
+                              name={descriptor.name}
+                              type={descriptor.name === "phone" ? "tel" : "text"}
+                              autoComplete={descriptor.autocomplete}
+                              value={field.state.value}
+                              onChange={(event) => {
+                                field.handleChange(event.target.value);
+                                if (notice === "saved") setNotice("clean");
+                              }}
+                              onBlur={field.handleBlur}
+                              disabled={
+                                disabled || submitting || reading || writeKnown || preparingPhoto
+                              }
+                              aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                              aria-describedby={
+                                field.state.meta.errors.length
+                                  ? `profile-${descriptor.name}-error`
+                                  : undefined
+                              }
+                            />
+                            <FieldError
+                              id={`profile-${descriptor.name}-error`}
+                              errors={field.state.meta.isTouched ? field.state.meta.errors : []}
+                            />
+                          </Field>
+                        )}
+                      </form.Field>
+                    ))}
                   {identity && (
-                    <Field className="gap-1 pb-1 min-[901px]:col-span-2">
+                    <Field
+                      className={
+                        variant === "member"
+                          ? "gap-1 pb-1 sm:col-span-2"
+                          : "gap-1 pb-1 min-[901px]:col-span-2"
+                      }
+                    >
                       <FieldLabel className="w-full flex-wrap items-center" htmlFor="profile-email">
                         {t(($) => $.auth.email)}
                         {identity.email && identity.email_verified_at && (
@@ -283,7 +343,7 @@ export function ProfileForm({
                         value={identity.email ?? ""}
                       />
                       <EmailChange
-                        disabled={submitting || reading || writeKnown || preparingPhoto}
+                        disabled={disabled || submitting || reading || writeKnown || preparingPhoto}
                         onRefresh={async () => (await refresh(false))?.account.identity}
                       />
                       {identity.pending_email && (
@@ -293,27 +353,29 @@ export function ProfileForm({
                       )}
                     </Field>
                   )}
-                  {identity && (identity.phone || identity.pending_phone) && (
-                    <Field className="gap-1">
-                      <FieldLabel
-                        className="w-full flex-wrap items-center"
-                        htmlFor="profile-native-phone"
-                      >
-                        {t(($) => $.profile.accountPhone)}
-                      </FieldLabel>
-                      <Input
-                        id="profile-native-phone"
-                        type="tel"
-                        readOnly
-                        value={identity.phone ?? ""}
-                      />
-                      {identity.pending_phone && (
-                        <FieldDescription>
-                          {t(($) => $.profile.pendingPhone, { value: identity.pending_phone })}
-                        </FieldDescription>
-                      )}
-                    </Field>
-                  )}
+                  {variant === "account" &&
+                    identity &&
+                    (identity.phone || identity.pending_phone) && (
+                      <Field className="gap-1">
+                        <FieldLabel
+                          className="w-full flex-wrap items-center"
+                          htmlFor="profile-native-phone"
+                        >
+                          {t(($) => $.profile.accountPhone)}
+                        </FieldLabel>
+                        <Input
+                          id="profile-native-phone"
+                          type="tel"
+                          readOnly
+                          value={identity.phone ?? ""}
+                        />
+                        {identity.pending_phone && (
+                          <FieldDescription>
+                            {t(($) => $.profile.pendingPhone, { value: identity.pending_phone })}
+                          </FieldDescription>
+                        )}
+                      </Field>
+                    )}
                 </FieldGroup>
               </>
             )}
@@ -371,7 +433,7 @@ export function ProfileForm({
             )}
           </form.Subscribe>
         </CardContent>
-        <CardFooter className="flex-wrap justify-between gap-3">
+        <CardFooter className="flex-wrap justify-between gap-x-3 gap-y-2 pt-3!">
           <form.Subscribe
             selector={(state) => ({ dirty: state.isDirty, pending: state.isSubmitting })}
           >
@@ -391,7 +453,9 @@ export function ProfileForm({
                   <div className="flex max-w-full flex-wrap gap-2">
                     <Button
                       variant="outline"
-                      isDisabled={pending || reading || writeKnown || preparingPhoto || !dirty}
+                      isDisabled={
+                        disabled || pending || reading || writeKnown || preparingPhoto || !dirty
+                      }
                       onPress={() => {
                         form.reset(base.values);
                         setPhotoDraft(undefined);
@@ -403,6 +467,7 @@ export function ProfileForm({
                     <Button
                       type="submit"
                       isDisabled={
+                        disabled ||
                         pending ||
                         preparingPhoto ||
                         reading ||

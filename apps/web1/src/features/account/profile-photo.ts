@@ -1,5 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import type { SettingsImageUpload, SettingsMediaAsset } from "../../lib/api-contracts/generated";
+import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { getBackend } from "../../lib/backend";
 
 export type PhotoDraft = { upload: SettingsImageUpload; file: File } | null | undefined;
@@ -33,11 +34,14 @@ export async function preparePhoto(file: File): Promise<SettingsImageUpload> {
   });
   return { mime, data_base64: data, checksum: await checksum(decode(data)) };
 }
-export async function readPhoto(expected: SettingsMediaAsset) {
-  const { asset, data_base64 } = await getBackend().call("media_get_v1", {
+export async function readPhoto(expected: SettingsMediaAsset, organization?: ClientScope) {
+  const backend = organization ? await scopedBackend(organization) : getBackend();
+  const { asset, data_base64 } = await backend.call("media_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
-    scope: "user",
+    ...(organization
+      ? { scope: "organization" as const, org_id: organization.orgId }
+      : { scope: "user" as const }),
     asset_id: expected.id,
   });
   const bytes = decode(data_base64);

@@ -103,7 +103,7 @@ export function EmailChange({
       <Button
         variant="outline"
         size="sm"
-        className="self-start"
+        className="w-auto! self-start"
         isDisabled={disabled || busy}
         onPress={() => {
           void begin();
@@ -172,7 +172,7 @@ export function EmailChange({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="self-start"
+                      className="w-auto! self-start"
                       isDisabled={busy}
                       onPress={() => {
                         void resend();

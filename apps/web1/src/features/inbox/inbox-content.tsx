@@ -1,0 +1,410 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import type { ClientScope } from "../../lib/scoped-backend";
+import type { NotificationView } from "../../lib/api-contracts/generated";
+import { BackendError } from "../../lib/backend";
+import { useMemberCommand } from "../member-profile/use-member-command";
+import { EventCommandNotice } from "../events/event-command-notice";
+import { scheduleBackendError } from "../schedule/schedule-presentation";
+import { InboxView, type InboxRow, type InboxFilter } from "./inbox-view";
+import { readInbox, readNotificationState } from "./inbox";
+import {
+  notificationSetIntent,
+  setNotificationsRead,
+  readNotificationSetReceipt,
+  readNotificationSetResult,
+} from "./inbox-batch";
+import { readInboxSource } from "./inbox-source";
+import { readWorkspace } from "../workspace/workspace";
+import { LinkButton } from "../../components/ui/button";
+import { Button } from "../../components/ui/button";
+import { Alert, AlertDescription } from "../../components/ui/alert";
+export function InboxContent({
+  scope,
+  timezone,
+  onLockChange,
+}: {
+  scope: ClientScope;
+  timezone: string;
+  onLockChange: (value: boolean) => void;
+}) {
+  const { t } = useTranslation(),
+    queries = useQueryClient(),
+    router = useRouter();
+  const [filter, setFilter] = useState<InboxFilter>("all"),
+    [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
+    [index, setIndex] = useState(0),
+    [query, setQuery] = useState(""),
+    [draftQuery, setDraftQuery] = useState(""),
+    [checked, setChecked] = useState<string[]>([]),
+    [selected, setSelected] = useState<NotificationView>(),
+    [preparing, setPreparing] = useState(false),
+    [error, setError] = useState<string>();
+  const pending = useRef(false),
+    mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const prefix = ["inbox", scope.accountId, scope.orgId, scope.centerId];
+  const list = useQuery({
+    queryKey: [...prefix, "list", query, filter, cursors[index]],
+    queryFn: async () => {
+      const page = await readInbox(scope, filter === "unread", cursors[index], {
+        query,
+        workState: filter === "todo" ? "pending" : "all",
+      });
+      if (page.next_cursor && cursors.includes(page.next_cursor))
+        throw new Error("INBOX_CURSOR_UNAVAILABLE");
+      return page;
+    },
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const [openedSource, setOpenedSource] = useState<string>();
+  const nativeSource = useQuery({
+    queryKey: [...prefix, "work", selected?.id, selected?.work],
+    queryFn: () => readInboxSource(scope, selected!.work!),
+    enabled: !!selected?.work?.selector && openedSource === selected.id,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const workspace = useQuery({
+    queryKey: ["workspace", scope.accountId, scope.orgId],
+    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
+    enabled: false,
+    retry: false,
+  });
+  const stateKey = [...prefix, "state", selected?.id];
+  const source = useQuery({
+    queryKey: stateKey,
+    queryFn: () => readNotificationState(scope, selected!.id),
+    enabled: !!selected,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const accessLost = useCallback(
+    (cause: unknown) => {
+      if (
+        (cause instanceof BackendError &&
+          ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.code)) ||
+        (cause instanceof Error && ["ACCOUNT_CHANGED", "AUTH_REQUIRED"].includes(cause.message))
+      ) {
+        queries.removeQueries({ queryKey: ["inbox", scope.accountId] });
+        void router.invalidate();
+        return true;
+      }
+      return false;
+    },
+    [queries, router, scope.accountId],
+  );
+  useEffect(() => {
+    for (const cause of [list.error, source.error, nativeSource.error])
+      if (cause) accessLost(cause);
+  }, [list.error, source.error, nativeSource.error, accessLost]);
+  const command = useMemberCommand({
+    write: setNotificationsRead,
+    readReceipt: readNotificationSetReceipt,
+    readResult: readNotificationSetResult,
+    onAccessLost: accessLost,
+    onRefresh: async (value) => {
+      for (const row of value) queries.setQueryData([...prefix, "state", row.id], row);
+      await queries.invalidateQueries({ queryKey: [...prefix, "list"] }, { throwOnError: true });
+      setChecked([]);
+    },
+  });
+  const locked = preparing || command.locked;
+  useEffect(() => {
+    onLockChange(locked);
+    return () => onLockChange(false);
+  }, [locked, onLockChange]);
+  function reset() {
+    if (!locked) {
+      command.reset();
+      setError(undefined);
+      void source.refetch();
+      void list.refetch();
+    }
+  }
+  async function markRead(read = true, batch = false) {
+    if (pending.current || locked || command.state !== "ready") return;
+    pending.current = true;
+    setPreparing(true);
+    setError(undefined);
+    try {
+      const notifications = batch
+        ? checked.map((id) => {
+            const row = list.isError ? undefined : list.data?.items.find((item) => item.id === id);
+            if (!row?.version) throw new Error("INBOX_SELECTION_UNAVAILABLE");
+            return { id, expected_version: row.version };
+          })
+        : !source.isError && source.data
+          ? [{ id: source.data.id, expected_version: source.data.version }]
+          : [];
+      const intent = await notificationSetIntent(scope, notifications, read);
+      if (mounted.current) await command.start(intent);
+    } catch (cause) {
+      if (mounted.current && !accessLost(cause))
+        setError(
+          cause instanceof BackendError
+            ? scheduleBackendError(cause.code, t)
+            : t(($) => $.inbox.readError),
+        );
+    } finally {
+      pending.current = false;
+      if (mounted.current) setPreparing(false);
+    }
+  }
+  const format = new Intl.DateTimeFormat("tr-TR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: timezone,
+  });
+  function present(row: NotificationView): InboxRow {
+    return {
+      id: row.id,
+      title: row.payload.title || t(($) => $.inbox.titleMissing),
+      body: row.payload.body || t(($) => $.inbox.bodyMissing),
+      kind: t(($) => $.inbox.notification),
+      created: format.format(new Date(row.created_at)),
+      language: row.payload.language,
+      actionState: row.work ? t(($) => $.inbox.workStates[row.work!.state]) : undefined,
+      read:
+        row.id === selected?.id && !source.isError && source.data
+          ? source.data.state === "read"
+          : row.read_at !== null,
+      context: [
+        { label: t(($) => $.inbox.scope), value: t(($) => $.inbox.ownScope) },
+        ...(row.email_job
+          ? [
+              {
+                label: t(($) => $.inbox.deliveryJob),
+                value: t(($) => $.inbox.jobStates[row.email_job!.state]),
+              },
+              {
+                label: t(($) => $.inbox.emailDelivery),
+                value: row.email_job.email_delivery
+                  ? t(($) => $.inbox.deliveryStates[row.email_job!.email_delivery!.state])
+                  : t(($) => $.inbox.unknown),
+              },
+            ]
+          : []),
+      ],
+    };
+  }
+  return (
+    <InboxView
+      rows={list.isError ? null : (list.data?.items.map(present) ?? null)}
+      selected={!list.isError && selected ? present(selected) : null}
+      filter={filter}
+      onFilter={(value) => {
+        if (locked) return;
+        setChecked([]);
+        command.reset();
+        setSelected(undefined);
+        setFilter(value);
+        setCursors([undefined]);
+        setIndex(0);
+        setError(undefined);
+      }}
+      query={draftQuery}
+      onQuery={(value) => {
+        if (!locked) setDraftQuery(value);
+      }}
+      onSearch={() => {
+        if (locked) return;
+        command.reset();
+        setQuery(draftQuery.trim());
+        setCursors([undefined]);
+        setIndex(0);
+        setSelected(undefined);
+        setChecked([]);
+        setError(undefined);
+      }}
+      advancedAvailable
+      summary={!list.isError ? list.data?.summary : undefined}
+      checked={checked}
+      onCheck={(id, value) => {
+        if (!locked) {
+          command.reset();
+          setChecked((previous) =>
+            value ? [...new Set([...previous, id])] : previous.filter((item) => item !== id),
+          );
+        }
+      }}
+      onOpen={(id) => {
+        if (!locked) {
+          const row = list.data?.items.find((value) => value.id === id);
+          if (row) {
+            command.reset();
+            setError(undefined);
+            setSelected(row);
+          }
+        }
+      }}
+      onBack={() => {
+        if (!locked) {
+          setSelected(undefined);
+          command.reset();
+          setError(undefined);
+        }
+      }}
+      onMarkRead={() => {
+        void markRead();
+      }}
+      canMarkRead={!source.isError && source.data?.state === "unread" && command.state === "ready"}
+      onUnread={() => {
+        void markRead(false);
+      }}
+      canUnread={!source.isError && source.data?.state === "read" && command.state === "ready"}
+      canMarkAll={
+        !list.isFetching && !list.isError && checked.length > 0 && command.state === "ready"
+      }
+      onMarkAll={() => {
+        void markRead(true, true);
+      }}
+      locked={locked}
+      sourceAction={
+        selected?.work?.selector && (
+          <Button
+            variant="outline"
+            size="sm"
+            isDisabled={locked || nativeSource.isFetching}
+            onPress={() => {
+              if (openedSource === selected.id) void nativeSource.refetch();
+              else setOpenedSource(selected.id);
+            }}
+          >
+            {t(($) => $.inbox.sourceOpen)}
+          </Button>
+        )
+      }
+      notice={
+        <>
+          <EventCommandNotice command={command} onReload={reset} />
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                {error}{" "}
+                <Button variant="outline" size="sm" isDisabled={locked} onPress={reset}>
+                  {t(($) => $.auth.retry)}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          <Alert>
+            <AlertDescription>
+              {t(($) => $.inbox.scopeHint, { timezone })} {t(($) => $.inbox.limitHint)}
+            </AlertDescription>
+          </Alert>
+          {list.isError && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                {t(($) => $.inbox.readError)}{" "}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  isDisabled={locked}
+                  onPress={() => {
+                    void list.refetch();
+                  }}
+                >
+                  {t(($) => $.auth.retry)}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+        </>
+      }
+      detailNotice={
+        <>
+          {source.isError && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                {t(($) => $.inbox.readError)}{" "}
+                <Button variant="outline" size="sm" isDisabled={locked} onPress={reset}>
+                  {t(($) => $.auth.retry)}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          {(!selected?.work?.selector || nativeSource.isError) && (
+            <p className="text-sm text-muted-foreground">{t(($) => $.inbox.sourceUnavailable)}</p>
+          )}
+          {nativeSource.isFetching && <p role="status">{t(($) => $.inbox.loading)}</p>}
+          {!nativeSource.isFetching &&
+            !nativeSource.isError &&
+            openedSource === selected?.id &&
+            nativeSource.data && (
+              <section
+                className="flex min-w-0 flex-col gap-3"
+                aria-label={t(($) => $.inbox.sourceDetail)}
+              >
+                <p>
+                  {t(($) => $.inbox.sourceKinds[nativeSource.data.kind])} ·{" "}
+                  {t(($) => $.inbox.workStates[nativeSource.data.workState])}
+                </p>
+                {nativeSource.data.at && (
+                  <p className="tabular-nums">{format.format(new Date(nativeSource.data.at))}</p>
+                )}
+                {nativeSource.data.note && (
+                  <p className="whitespace-pre-wrap break-words">{nativeSource.data.note}</p>
+                )}
+                <LinkButton
+                  variant="outline"
+                  href={
+                    nativeSource.data.ownHref &&
+                    workspace.data?.selected?.self_context?.person_id === nativeSource.data.personId
+                      ? nativeSource.data.ownHref
+                      : nativeSource.data.href
+                  }
+                  isDisabled={locked}
+                >
+                  {t(($) => $.inbox.sourceFlow)}
+                </LinkButton>
+              </section>
+            )}
+        </>
+      }
+      pagination={
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            isDisabled={locked || list.isFetching || index === 0}
+            onPress={() => {
+              setSelected(undefined);
+              setChecked([]);
+              command.reset();
+              setIndex((value) => value - 1);
+            }}
+          >
+            {t(($) => $.people.previous)}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            isDisabled={locked || list.isFetching || list.isError || !list.data?.next_cursor}
+            onPress={() => {
+              const next = list.data?.next_cursor;
+              if (!next || cursors.includes(next)) return;
+              setSelected(undefined);
+              setChecked([]);
+              command.reset();
+              setCursors([...cursors.slice(0, index + 1), next]);
+              setIndex((value) => value + 1);
+            }}
+          >
+            {t(($) => $.people.next)}
+          </Button>
+        </div>
+      }
+    />
+  );
+}

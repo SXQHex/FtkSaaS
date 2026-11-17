@@ -386,7 +386,7 @@ export type FollowupKind = ("renewal_due" | "inactive_student" | "automation_fol
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReportKind".
  */
-export type ReportKind = ("collections_debts" | "lesson_attendance" | "renewal" | "occupancy" | "resource_usage" | "earnings" | "crm_conversion" | "cross_center_usage")
+export type ReportKind = ("collections_debts" | "lesson_attendance" | "renewal" | "occupancy" | "resource_usage" | "earnings" | "crm_conversion" | "cross_center_usage" | "sales" | "session_metrics" | "collection_breakdown" | "instructor_balances")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "DocumentGate".
@@ -426,12 +426,12 @@ export type CurrencyBasis = ("sale_unit" | "fixed_unit")
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Permission".
  */
-export type Permission = ("account.self" | "org.read" | "org.manage" | "org.owner" | "center.manage" | "policy.manage" | "person.read" | "person.manage" | "person.activate" | "person.merge" | "invite.student" | "invite.accept" | "schedule.read" | "schedule.manage" | "request.write" | "request.resolve" | "reservation.write" | "attendance.draft" | "attendance.close" | "attendance.correct" | "product.manage" | "sale.write" | "entitlement.correct" | "finance.read" | "finance.collect" | "finance.refund" | "earnings.manage" | "crm.daily" | "crm.manage" | "notification.self" | "report.read" | "report.export" | "import.execute" | "subscription.owner" | "saas.operator" | "event.manage" | "event.register" | "document.manage" | "document.accept" | "public.apply" | "system.worker" | "earnings.read" | "platform.owner" | "center.manager.assign" | "org.configuration" | "auth.recover" | "event.attendance" | "event.close" | "attendance.block" | "reservation.capacity_override")
+export type Permission = ("account.self" | "org.read" | "org.manage" | "org.owner" | "center.manage" | "policy.manage" | "person.read" | "person.manage" | "person.activate" | "person.merge" | "invite.student" | "invite.accept" | "schedule.read" | "schedule.manage" | "request.write" | "request.resolve" | "reservation.write" | "attendance.draft" | "attendance.close" | "attendance.correct" | "product.manage" | "sale.write" | "entitlement.correct" | "finance.read" | "finance.collect" | "finance.refund" | "earnings.manage" | "crm.daily" | "crm.manage" | "notification.self" | "report.read" | "report.export" | "import.execute" | "subscription.owner" | "saas.operator" | "event.manage" | "event.register" | "document.manage" | "document.accept" | "public.apply" | "system.worker" | "earnings.read" | "platform.owner" | "center.manager.assign" | "org.configuration" | "auth.recover" | "event.attendance" | "event.close" | "attendance.block" | "reservation.capacity_override" | "sale.discount")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OperationName".
  */
-export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "negative_limits_get_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_catalog_get_v1" | "settings_get_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "settings_history_get_v1" | "reservation_capacity_override_v1" | "account_sessions_list_v1" | "account_session_label_v1" | "account_sessions_revoke_v1" | "account_security_history_get_v1" | "media_get_v1" | "settings_template_resolve_v1" | "calendar_links_get_v1" | "calendar_link_create_v1" | "calendar_link_rotate_v1" | "calendar_link_revoke_v1" | "calendar_feed_get_v1" | "settings_preparation_resolve_v1" | "account_signup_check_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_get_v1" | "instructor_agreement_accept_v1" | "content_catalog_get_v1" | "content_catalog_save_v1")
+export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_account_get_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "negative_limits_get_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_catalog_get_v1" | "settings_get_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "settings_history_get_v1" | "reservation_capacity_override_v1" | "account_sessions_list_v1" | "account_session_label_v1" | "account_sessions_revoke_v1" | "account_security_history_get_v1" | "media_get_v1" | "settings_template_resolve_v1" | "calendar_links_get_v1" | "calendar_link_create_v1" | "calendar_link_rotate_v1" | "calendar_link_revoke_v1" | "calendar_feed_get_v1" | "settings_preparation_resolve_v1" | "account_signup_check_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_get_v1" | "instructor_agreement_accept_v1" | "content_catalog_get_v1" | "content_catalog_save_v1" | "finance_directory_get_v1" | "products_management_list_v1" | "product_state_set_v1" | "freeze_cancel_preview_v1" | "freeze_cancel_apply_v1" | "member_finance_currencies_get_v1" | "member_document_contexts_get_v1" | "notifications_read_set_v1" | "management_work_list_v1" | "instructor_finance_directory_get_v1" | "import_directory_get_v1" | "tracking_directory_get_v1" | "document_directory_get_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EntityType".
@@ -574,7 +574,7 @@ export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | 
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PolicyKey".
  */
-export type PolicyKey = ("student_cancel_private" | "student_cancel_group" | "reservation_window" | "request_window" | "negative_default" | "negative_upper" | "debt_booking" | "debt_participation" | "freeze_default" | "waitlist_offer_minutes" | "class_reminder_hours" | "entitlement_reminder_days" | "trial_repeat_limit" | "inactive_student_days" | "participation_block_credit" | "negative_valuation" | "mandatory_document" | "sensitive_money_upper" | "sensitive_credit_upper")
+export type PolicyKey = ("student_cancel_private" | "student_cancel_group" | "reservation_window" | "request_window" | "negative_default" | "negative_upper" | "debt_booking" | "debt_participation" | "freeze_default" | "waitlist_offer_minutes" | "class_reminder_hours" | "entitlement_reminder_days" | "trial_repeat_limit" | "inactive_student_days" | "participation_block_credit" | "negative_valuation" | "mandatory_document" | "sensitive_money_upper" | "sensitive_credit_upper" | "sale_discount_percent_upper")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PolicyValue".
@@ -617,10 +617,13 @@ affected_center_ids: string[]
  * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 required_approval_center_ids: string[]
-linked_history: true
+linked_history: boolean
+reason?: (ReviewReason | null)
+decision?: ("merge" | "not_duplicate")
 }
 lifecycle_impact?: LifecycleImpact
 configuration_requirement?: ScheduleConfigurationRequirement
+freeze_cancellation?: FreezeCancellationImpact
 }
 /**
  * Organization-scoped immutable student number, starting at 1001. Decimal string preserves bigint precision; never an authentication proof.
@@ -631,9 +634,65 @@ configuration_requirement?: ScheduleConfigurationRequirement
 export type SubscriberNumber = string
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReviewReason".
+ */
+export type ReviewReason = string
+/**
+ * Current controlling source and intrinsic person_update_v1 field mutability. Not actor authorization, historical provenance, verification proof or login status. No identity/credentials. Account-owned fields are always false; writes recheck live authority.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonFieldPolicy".
+ */
+export type PersonFieldPolicy = ({
+source: "person"
+person_update_writable: boolean
+} | {
+source: ("account_profile" | "native_auth")
+person_update_writable: false
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ContentLanguage".
  */
 export type ContentLanguage = string
+/**
+ * Currently usable selected-center credits at as_of, applying native sale/account/validity/freeze rules; no booking guarantee. Timed packages with available quota counted separately only when F16 is enabled, never as credits.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberRightsSummary".
+ */
+export type MemberRightsSummary = (MemberSummaryUnavailable | {
+status: "available"
+available_credits: MemberSummaryInteger
+available_timed_packages?: Count
+})
+/**
+ * Exact aggregate nonnegative integer; never convert through floating-point.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberSummaryInteger".
+ */
+export type MemberSummaryInteger = string
+/**
+ * Positive outstanding debt per actual currency using native claim-aware debt_remaining. No currency default, FX or cross-currency sum. Empty available list means no debt in this center.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberDebtSummary".
+ */
+export type MemberDebtSummary = (MemberSummaryUnavailable | {
+status: "available"
+by_currency: MemberDebtCurrency[]
+})
+/**
+ * Earliest visible future planned/unstarted lesson with active reservation in selected center. Null means no such visible lesson, not a hidden-data assertion.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonSummary".
+ */
+export type MemberLessonSummary = (MemberSummaryUnavailable | {
+status: "available"
+lesson: (MemberNextLesson | null)
+})
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "DisciplineRelationshipKind".
@@ -661,6 +720,8 @@ capacity?: (SessionCapacityView | Capacity)
 discipline_id?: (string | null)
 discipline_ids?: EventDisciplineIds
 management_attention?: "instructor_required"
+room_labels?: SessionRoomLabel[]
+member_lesson?: MemberLessonDiscovery
 }
 /**
  * Zero/one/many org-owned labels. No entitlement or role grant.
@@ -683,6 +744,37 @@ export type SettingsVersion = number
 export type BookingCategory = ("male" | "female")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReservationSourceSummary".
+ */
+export type ReservationSourceSummary = ({
+status: ("unassigned" | "restricted" | "not_enabled")
+as_of: Instant
+} | {
+status: "available"
+as_of: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_sale_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+product_name: Text
+kind: EntitlementKind
+booking_mode: BookingMode
+sale_state: SaleState
+state: EntitlementState
+start_date: Date
+end_date: Date
+timezone: IanaZone
+available_credits: (string | null)
+reserved: string
+consumed: string
+sale_version: PositiveInt
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManualCollectionPayment".
  */
 export type ManualCollectionPayment = {
@@ -700,6 +792,11 @@ export type EarningDirection = ("add" | "subtract")
  */
 export type CrmLossReason = ("unreachable" | "timing" | "price" | "alternative" | "other")
 /**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SignedMoney".
+ */
+export type SignedMoney = string
+/**
  * Utilization basis points may exceed 10000 when occupancy exceeds nominal capacity.
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -711,9 +808,9 @@ export type ReportRatioBps = number
  * @maxItems 10
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ReportColumns".
+ * via the `definition` "ReportDiscoveryColumns".
  */
-export type ReportColumns = [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]
+export type ReportDiscoveryColumns = [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number" | "period_start" | "product_version_id" | "product_name" | "display_name" | "session_id" | "session_name")]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlanLimit".
@@ -733,6 +830,61 @@ export type PlanLimitKey = ("active_students" | "instructors" | "centers" | "roo
 export type EventCapacity = (Capacity | {
 kind: "unlimited"
 })
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_availability_save".
+ */
+export type RequestAvailabilitySave = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version?: PositiveInt
+rule_id?: (string | null)
+resource: ResourceRef
+rule?: AvailabilityRule
+action?: ("save" | "retire")
+reason?: ReviewReason
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_availability_exception_save".
+ */
+export type RequestAvailabilityExceptionSave = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version: PositiveInt
+resource: ResourceRef
+interval?: Interval
+reason: Text
+action?: ("save" | "cancel")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+exception_id?: string
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_policy_publish".
@@ -761,6 +913,110 @@ impact_approval?: PreviewToken
  * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 accepted_reservation_ids?: string[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_people_list".
+ */
+export type RequestPeopleList = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+query?: (Text | null)
+relationship?: (RelationshipKind | null)
+page: Page
+/**
+ * Optional current student membership in explicit selected center; applied before pagination. Inactive requires student history and no active student relationship in canonical alias group. Omit for original behavior.
+ */
+student_status?: ("active" | "inactive")
+/**
+ * Opt-in summaries for only the final visible cursor page. Requires explicit selected center. Each component preserves native reader permission/feature gates; restricted/not_enabled is never zero.
+ */
+include_member_summary?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_person_get".
+ */
+export type RequestPersonGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+include_member_summary?: boolean
+include_membership_date?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_person_merge_preview".
+ */
+export type RequestPersonMergePreview = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id: string
+reason?: ReviewReason
+decision?: ("merge" | "not_duplicate")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_get".
+ */
+export type RequestCalendarGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+interval: Interval
+resource?: (ResourceRef | null)
+page: CalendarPage
+interest_filter?: boolean
+needs_instructor?: Bool
+/**
+ * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
+ */
+include_room_labels?: boolean
+/**
+ * Explicit native-self student discovery of accessible upcoming group and private lessons. Does not grant management or roster access.
+ */
+member_discovery?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -865,6 +1121,29 @@ reason?: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_product_publish".
+ */
+export type RequestProductPublish = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+product_id?: (string | null)
+terms: ProductTerms
+expected_version?: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SalePreview".
  */
 export type SalePreview = {
@@ -905,6 +1184,12 @@ include_timed_rights?: boolean
  */
 session_id?: string
 booking_mode?: BookingMode
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+ledger_sale_id?: string
+ledger_page?: Page
+include_purchase_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1035,7 +1320,7 @@ center_id?: (string | null)
 report: ReportKind
 filters: ReportFilters
 page: Page
-columns?: ReportColumns
+columns?: ReportDiscoveryColumns
 report_order?: ReportPreparationOrder
 group_by?: ReportPreparationGrouping
 }
@@ -1071,7 +1356,7 @@ operation_key: string
 report: ReportKind
 filters: ReportFilters
 format: ExportFormat
-columns?: ReportColumns
+columns?: ReportDiscoveryColumns
 report_order?: ReportPreparationOrder
 group_by?: ReportPreparationGrouping
 }
@@ -1111,6 +1396,28 @@ preparation_id?: (string | null)
  * via the `definition` "EventRegistrationResult".
  */
 export type EventRegistrationResult = (EventRegistered | EventCapacityClosed)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_list".
+ */
+export type RequestEventList = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+interval: Interval
+page: Page
+discipline_id?: (string | null)
+query?: string
+status?: ("all" | "published" | "draft" | "occurred" | "cancelled")
+include_summary?: boolean
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_document_version_publish".
@@ -1362,6 +1669,28 @@ export type RequestPublicApplicationSubmit1 = {
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_audit_list".
+ */
+export type RequestAuditList = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+subject?: SubjectRef
+interval?: Interval
+page: Page
+query?: string
+module?: ("M01" | "M02" | "M03" | "M04" | "M05" | "M06" | "M07" | "M08" | "M09" | "M10" | "M11" | "M12" | "M13" | "M14" | "M17" | "X")
+result?: "recorded"
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_attendance_mark".
  */
 export type RequestEventAttendanceMark = {
@@ -1444,6 +1773,11 @@ captured_at: Instant
 export type ExactMinorBasis = string
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductLifecycleState".
+ */
+export type ProductLifecycleState = ("active" | "inactive" | "archived")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Table_product_scopes".
  */
 export type TableProductScopes = {
@@ -1478,11 +1812,6 @@ usage_targets: [UsageTarget, ...(UsageTarget)[]]
 export type PackageScopeKind = ("center_discipline" | "center_all_disciplines" | "organization_discipline" | "organization_all")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "SignedMoney".
- */
-export type SignedMoney = string
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CrmApplicationSource".
  */
 export type CrmApplicationSource = (CrmIntakeSource | CrmLegacyImportSource)
@@ -1504,6 +1833,10 @@ external_lead_id?: string
 submitted_at?: (Instant | null)
 is_test?: (boolean | null)
 attribution?: CrmProviderAttribution
+/**
+ * @maxItems 20
+ */
+public_consents?: []|[PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]|[PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence, PublicFormConsentEvidence]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1569,7 +1902,7 @@ export type EventPaymentPreparationState = ("prepared" | "registered" | "capacit
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementProjection".
  */
-export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementDelegationSetV1 | ManagementProjectionSettlementAuthoritySetV1 | ManagementProjectionAttendanceStartV1 | ManagementProjectionDocumentPublicationPreviewV1 | ManagementProjectionReservationCapacityOverrideV1 | ManagementProjectionRoleRevokePreviewV1 | ManagementProjectionSubscriptionPeriodChangeRequestV1 | ManagementProjectionInstructorAgreementAcceptV1 | ManagementProjectionSettingsUpdateV1 | ManagementProjectionContentCatalogSaveV1)
+export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementDelegationSetV1 | ManagementProjectionSettlementAuthoritySetV1 | ManagementProjectionAttendanceStartV1 | ManagementProjectionDocumentPublicationPreviewV1 | ManagementProjectionReservationCapacityOverrideV1 | ManagementProjectionRoleRevokePreviewV1 | ManagementProjectionSubscriptionPeriodChangeRequestV1 | ManagementProjectionInstructorAgreementAcceptV1 | ManagementProjectionSettingsUpdateV1 | ManagementProjectionContentCatalogSaveV1 | ManagementProjectionProductStateSetV1 | ManagementProjectionFreezeCancelPreviewV1 | ManagementProjectionFreezeCancelApplyV1)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionChange".
@@ -1585,6 +1918,54 @@ export type SettlementProposal = (SettlementPaymentProposal | SettlementOffsetPr
  * via the `definition` "SettingsCenterWorkCalendarValue".
  */
 export type SettingsCenterWorkCalendarValue = (CenterWorkCalendar | null)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccessDirectoryDetail".
+ */
+export type AccessDirectoryDetail = ({
+kind: "invitation"
+/**
+ * Only native person_get visibility may disclose/search the name; null is redacted.
+ */
+display_name: (Text | null)
+created_at: Instant
+expires_at: Instant
+can_resend: boolean
+delivery: AccessDeliveryVisibility
+} | {
+kind: "account_link"
+/**
+ * Only native person_get visibility may disclose/search the name; null is redacted.
+ */
+display_name: (Text | null)
+created_at: Instant
+} | {
+kind: "person_account"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: string
+created_at: Instant
+linked: boolean
+can_send_invitation: boolean
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccessDeliveryVisibility".
+ */
+export type AccessDeliveryVisibility = ({
+visibility: "restricted"
+} | {
+visibility: "available"
+state: (("pending" | "running" | "retry_wait" | "succeeded" | "failed" | "cancelled") | null)
+sent_at: (Instant | null)
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmDiscovery".
+ */
+export type CrmDiscovery = (CrmAssigneeDiscovery | CrmFollowupDiscovery | CrmTrialHistoryDiscovery | CrmTrialProductDiscovery)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Target_policy_publish_protected".
@@ -1672,12 +2053,12 @@ page?: Page
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementOperationName".
  */
-export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "reservation_capacity_override_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_accept_v1" | "content_catalog_save_v1")
+export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "reservation_capacity_override_v1" | "role_revoke_preview_v1" | "subscription_period_change_request_v1" | "instructor_agreement_accept_v1" | "content_catalog_save_v1" | "product_state_set_v1" | "freeze_cancel_preview_v1" | "freeze_cancel_apply_v1" | "notifications_read_set_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector".
  */
-export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementDelegationSetV1 | ManagementSelectorSettlementAuthoritySetV1 | ManagementSelectorAttendanceStartV1 | ManagementSelectorDocumentPublicationPreviewV1 | ManagementSelectorSettingsUpdateV1 | ManagementSelectorSettingsResetPreviewV1 | ManagementSelectorSettingsResetApplyV1 | ManagementSelectorReservationCapacityOverrideV1 | ManagementSelectorRoleRevokePreviewV1 | ManagementSelectorSubscriptionPeriodChangeRequestV1 | ManagementSelectorInstructorAgreementAcceptV1 | ManagementSelectorContentCatalogSaveV1)
+export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementDelegationSetV1 | ManagementSelectorSettlementAuthoritySetV1 | ManagementSelectorAttendanceStartV1 | ManagementSelectorDocumentPublicationPreviewV1 | ManagementSelectorSettingsUpdateV1 | ManagementSelectorSettingsResetPreviewV1 | ManagementSelectorSettingsResetApplyV1 | ManagementSelectorReservationCapacityOverrideV1 | ManagementSelectorRoleRevokePreviewV1 | ManagementSelectorSubscriptionPeriodChangeRequestV1 | ManagementSelectorInstructorAgreementAcceptV1 | ManagementSelectorContentCatalogSaveV1 | ManagementSelectorProductStateSetV1 | ManagementSelectorFreezeCancelPreviewV1 | ManagementSelectorFreezeCancelApplyV1 | ManagementSelectorNotificationsReadSetV1)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector_subscription_downgrade_request_v1".
@@ -2004,7 +2385,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "work_calendar" | "sharing_restrictions")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "work_calendar" | "sharing_restrictions" | "public_application_form")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -2019,7 +2400,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled" | "sharing_notices" | "allow_center_sharing_restrictions")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled" | "sharing_notices" | "allow_center_sharing_restrictions" | "public_application_form")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -2043,14 +2424,14 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled" | "sharing_notices" | "allow_center_sharing_restrictions" | "sharing_restrictions")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled" | "sharing_notices" | "allow_center_sharing_restrictions" | "sharing_restrictions" | "public_application_form")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: ("user" | "member" | "center" | "organization" | "platform")
-catalog_version: 23
+catalog_version: 24
 fields: SettingsFieldDescriptor[]
 defaults: unknown
 /**
@@ -2094,6 +2475,14 @@ key: string
 version: SettingsVersion
 })
 /**
+ * @minItems 1
+ * @maxItems 10
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportColumns".
+ */
+export type ReportColumns = [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]
+/**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PreparationSourceReference".
  */
@@ -2122,23 +2511,23 @@ center_id: string
 export type SettingsCatalog1 = ({
 scope: "user"
 defaults: UserSettingsValues
-catalog_version: 23
+catalog_version: 24
 } | {
 scope: "member"
 defaults: MemberSettingsValues
-catalog_version: 23
+catalog_version: 24
 } | {
 scope: "center"
 defaults: CenterSettingsValues
-catalog_version: 23
+catalog_version: 24
 } | {
 scope: "organization"
 defaults: OrganizationSettingsValues
-catalog_version: 23
+catalog_version: 24
 } | {
 scope: "platform"
 defaults: PlatformSettingsValues
-catalog_version: 23
+catalog_version: 24
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2507,12 +2896,12 @@ export type MemberSettingsFieldKey = ("profile_visible" | "photo_visible" | "ema
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CenterSettingsFieldKey".
  */
-export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "work_calendar" | "sharing_restrictions")
+export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates" | "permission_templates" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_local_tags" | "map_url" | "directions" | "website_url" | "work_calendar" | "sharing_restrictions" | "public_application_form")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationSettingsFieldKey".
  */
-export type OrganizationSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled" | "sharing_notices" | "allow_center_sharing_restrictions")
+export type OrganizationSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "primary_color" | "secondary_color" | "accent_color" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates" | "permission_templates" | "regional_defaults" | "security_policy" | "program_templates" | "event_templates" | "collection_templates" | "crm_templates" | "automation_templates" | "crm_pipeline" | "map_url" | "directions" | "website_url" | "personal_negative_limits_enabled" | "application_form_rules" | "work_calendar" | "work_calendar_exceptions_enabled" | "sharing_notices" | "allow_center_sharing_restrictions" | "public_application_form")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlatformSettingsFieldKey".
@@ -3075,6 +3464,143 @@ text: string
 text: string
 })
 expected_revision?: number
+}
+/**
+ * Exact arbitrary precision aggregate of minor units; never a JavaScript floating point number.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AggregateMinorTotal".
+ */
+export type AggregateMinorTotal = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_products_management_list".
+ */
+export type RequestProductsManagementList = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+page: Page
+include_timed_products?: boolean
+view?: ("products" | "versions" | "sales")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_id?: string
+status?: ("all" | "on_sale" | "closed" | "archived")
+query?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "FreezeCancellationPreview".
+ */
+export type FreezeCancellationPreview = {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+token: OpaqueToken
+scope_hash: Text
+dependencies: PreviewDependencies
+effects: Effect[]
+blockers: SafeError[]
+expires_at: Instant
+sessions?: SchedulePreviewItem[]
+class_assignments?: ClassAssignmentView[]
+class_version?: PositiveInt
+sale_lifecycle?: SaleLifecyclePreviewDetails
+import_summary?: ImportPreviewSummary
+merge_summary?: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id: string
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+affected_center_ids: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+required_approval_center_ids: string[]
+linked_history: boolean
+reason?: (ReviewReason | null)
+decision?: ("merge" | "not_duplicate")
+}
+lifecycle_impact?: LifecycleImpact
+configuration_requirement?: ScheduleConfigurationRequirement
+freeze_cancellation: FreezeCancellationImpact
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementWorkKind".
+ */
+export type ManagementWorkKind = ("lesson_request" | "lesson_attendance" | "event_attendance" | "crm_followup" | "application_review")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementWorkTarget".
+ */
+export type ManagementWorkTarget = ({
+operation: "management_state_get_v1"
+selector: ManagementSelector
+} | {
+operation: "session_get_v1"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+} | {
+operation: "event_get_v1"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_document_directory_get".
+ */
+export type RequestDocumentDirectoryGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+view: ("documents" | "versions" | "acceptances")
+scope?: ("center" | "organization")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+document_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+version_id?: string
+acceptance_filter?: ("all" | "pending")
+query?: string
+page: Page
 }
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -4451,6 +4977,138 @@ Success_content_catalog_save?: SuccessContentCatalogSave
 RenderedDocument?: RenderedDocument
 ManagementSelector_content_catalog_save_v1?: ManagementSelectorContentCatalogSaveV1
 ManagementProjection_content_catalog_save_v1?: ManagementProjectionContentCatalogSaveV1
+CenterSetupStatus?: CenterSetupStatus
+PersonFieldPolicy?: PersonFieldPolicy
+PersonNameFieldPolicy?: PersonNameFieldPolicy
+MemberSummaryInteger?: MemberSummaryInteger
+MemberSummaryUnavailable?: MemberSummaryUnavailable
+MemberRightsSummary?: MemberRightsSummary
+MemberDebtCurrency?: MemberDebtCurrency
+MemberDebtSummary?: MemberDebtSummary
+MemberNextLesson?: MemberNextLesson
+MemberLessonSummary?: MemberLessonSummary
+MemberPageSummary?: MemberPageSummary
+AccessDirectorySummary?: AccessDirectorySummary
+AccessDeliveryVisibility?: AccessDeliveryVisibility
+AccessDirectoryDetail?: AccessDirectoryDetail
+ReviewReason?: ReviewReason
+MergeReviewPerson?: MergeReviewPerson
+MergeReviewDetail?: MergeReviewDetail
+MergeReviewSummary?: MergeReviewSummary
+EntitlementLedgerItem?: EntitlementLedgerItem
+Page_EntitlementLedgerItem?: Page_EntitlementLedgerItem
+FinanceDirectoryEntry?: FinanceDirectoryEntry
+AggregateMinorTotal?: AggregateMinorTotal
+FinanceDirectoryTotal?: FinanceDirectoryTotal
+FinanceDirectoryView?: FinanceDirectoryView
+GroupStudentReservation?: GroupStudentReservation
+GroupStudentView?: GroupStudentView
+ProductLifecycleState?: ProductLifecycleState
+ProductManagementEntry?: ProductManagementEntry
+ProductVersionHistoryEntry?: ProductVersionHistoryEntry
+ProductSaleHistoryEntry?: ProductSaleHistoryEntry
+ProductPeriodTotal?: ProductPeriodTotal
+ProductManagementTotals?: ProductManagementTotals
+ProductManagementView?: ProductManagementView
+Request_finance_directory_get?: RequestFinanceDirectoryGet
+Success_finance_directory_get?: SuccessFinanceDirectoryGet
+Request_products_management_list?: RequestProductsManagementList
+Success_products_management_list?: SuccessProductsManagementList
+Request_product_state_set?: RequestProductStateSet
+Success_product_state_set?: SuccessProductStateSet
+ManagementSelector_product_state_set_v1?: ManagementSelectorProductStateSetV1
+ManagementProjection_product_state_set_v1?: ManagementProjectionProductStateSetV1
+FreezeCancellationImpact?: FreezeCancellationImpact
+FreezeCancellationPreview?: FreezeCancellationPreview
+Request_freeze_cancel_preview?: RequestFreezeCancelPreview
+Success_freeze_cancel_preview?: SuccessFreezeCancelPreview
+Request_freeze_cancel_apply?: RequestFreezeCancelApply
+Success_freeze_cancel_apply?: SuccessFreezeCancelApply
+ManagementSelector_freeze_cancel_preview_v1?: ManagementSelectorFreezeCancelPreviewV1
+ManagementProjection_freeze_cancel_preview_v1?: ManagementProjectionFreezeCancelPreviewV1
+ManagementSelector_freeze_cancel_apply_v1?: ManagementSelectorFreezeCancelApplyV1
+ManagementProjection_freeze_cancel_apply_v1?: ManagementProjectionFreezeCancelApplyV1
+ReservationSourceSummary?: ReservationSourceSummary
+SessionRoomLabel?: SessionRoomLabel
+LessonRequestSummary?: LessonRequestSummary
+InstructorAccountPageRequest?: InstructorAccountPageRequest
+Request_instructor_account_get?: RequestInstructorAccountGet
+InstructorPaymentLedgerItem?: InstructorPaymentLedgerItem
+InstructorAccountTotal?: InstructorAccountTotal
+InstructorAccountPage?: InstructorAccountPage
+Success_instructor_account_get?: SuccessInstructorAccountGet
+MemberLessonCancellation?: MemberLessonCancellation
+MemberLessonBookingWindow?: MemberLessonBookingWindow
+MemberLessonReservation?: MemberLessonReservation
+MemberLessonOffer?: MemberLessonOffer
+MemberLessonWaitlist?: MemberLessonWaitlist
+MemberLessonDiscovery?: MemberLessonDiscovery
+EventRegistrationDebt?: EventRegistrationDebt
+EventRegistrationPaymentSummary?: EventRegistrationPaymentSummary
+EventPendingPayments?: EventPendingPayments
+EventDirectorySummary?: EventDirectorySummary
+MemberWaitlistSession?: MemberWaitlistSession
+PurchasedVersionSummary?: PurchasedVersionSummary
+FinanceCurrencyDirectory?: FinanceCurrencyDirectory
+MemberDocumentContext?: MemberDocumentContext
+Page_MemberDocumentContext?: Page_MemberDocumentContext
+Request_member_finance_currencies_get?: RequestMemberFinanceCurrenciesGet
+Success_member_finance_currencies_get?: SuccessMemberFinanceCurrenciesGet
+Request_member_document_contexts_get?: RequestMemberDocumentContextsGet
+Success_member_document_contexts_get?: SuccessMemberDocumentContextsGet
+NotificationSourceState?: NotificationSourceState
+NotificationInboxSummary?: NotificationInboxSummary
+NotificationReadSelection?: NotificationReadSelection
+Request_notifications_read_set?: RequestNotificationsReadSet
+Success_notifications_read_set?: SuccessNotificationsReadSet
+SegmentMatchView?: SegmentMatchView
+AutomationReference?: AutomationReference
+SegmentMatchSummary?: SegmentMatchSummary
+AutomationQueueSummary?: AutomationQueueSummary
+ManagementSelector_notifications_read_set_v1?: ManagementSelectorNotificationsReadSetV1
+CrmLeadSummary?: CrmLeadSummary
+CrmAssigneeDiscovery?: CrmAssigneeDiscovery
+CrmFollowupDiscovery?: CrmFollowupDiscovery
+CrmTrialHistoryDiscovery?: CrmTrialHistoryDiscovery
+CrmTrialProductDiscovery?: CrmTrialProductDiscovery
+CrmDiscovery?: CrmDiscovery
+PublicProgramOccupancy?: PublicProgramOccupancy
+PublicFormConsentBinding?: PublicFormConsentBinding
+PublicFormBinding?: PublicFormBinding
+PublicFormConsentSource?: PublicFormConsentSource
+PublicApplicationForm?: PublicApplicationForm
+PublicApplicationDiscovery?: PublicApplicationDiscovery
+PublicFormConsentEvidence?: PublicFormConsentEvidence
+ManagementWorkKind?: ManagementWorkKind
+ManagementWorkTarget?: ManagementWorkTarget
+ManagementWorkView?: ManagementWorkView
+ManagementWorkSummary?: ManagementWorkSummary
+Page_ManagementWorkView?: Page_ManagementWorkView
+Request_management_work_list?: RequestManagementWorkList
+Success_management_work_list?: SuccessManagementWorkList
+InstructorFinanceEarning?: InstructorFinanceEarning
+InstructorFinancePayment?: InstructorFinancePayment
+InstructorFinancePerson?: InstructorFinancePerson
+InstructorFinanceDirectory?: InstructorFinanceDirectory
+Request_instructor_finance_directory_get?: RequestInstructorFinanceDirectoryGet
+Success_instructor_finance_directory_get?: SuccessInstructorFinanceDirectoryGet
+ImportStudentPreview?: ImportStudentPreview
+ImportDirectoryItem?: ImportDirectoryItem
+ImportDirectory?: ImportDirectory
+Request_import_directory_get?: RequestImportDirectoryGet
+Success_import_directory_get?: SuccessImportDirectoryGet
+TrackingDirectoryItem?: TrackingDirectoryItem
+TrackingDirectory?: TrackingDirectory
+Request_tracking_directory_get?: RequestTrackingDirectoryGet
+Success_tracking_directory_get?: SuccessTrackingDirectoryGet
+ReportDiscoveryColumns?: ReportDiscoveryColumns
+DocumentDirectoryVersion?: DocumentDirectoryVersion
+DocumentDirectoryDocument?: DocumentDirectoryDocument
+DocumentDirectoryRequirement?: DocumentDirectoryRequirement
+DocumentDirectoryHistory?: DocumentDirectoryHistory
+DocumentDirectoryPage?: DocumentDirectoryPage
+Request_document_directory_get?: RequestDocumentDirectoryGet
+Success_document_directory_get?: SuccessDocumentDirectoryGet
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5014,6 +5672,7 @@ center_ids: string[]
 person_ids?: string[]
 currency?: (Currency | null)
 state?: (Text | null)
+breakdown?: ("week" | "product" | "person")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5143,6 +5802,27 @@ permission_hash: Text
 export interface PreviewResult {
 effects: Effect[]
 blockers: SafeError[]
+freeze_cancellation?: FreezeCancellationImpact
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "FreezeCancellationImpact".
+ */
+export interface FreezeCancellationImpact {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+freeze_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+state: "cancelled"
+removed_extension_days: Count
+previous_end_date: Date
+end_date: Date
+valid_until: Instant
+preserves_reservations: true
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5364,6 +6044,7 @@ export interface ContactView {
 kind: ContactKind
 value: Text
 verified_at?: (Instant | null)
+field_policy?: PersonFieldPolicy
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6964,6 +7645,18 @@ state: RecordState
 accessible: Bool
 version: PositiveInt
 organization_logo?: (SettingsMediaAsset | null)
+setup_status?: CenterSetupStatus
+}
+/**
+ * Current effective publication in organization/center scope with ready file; invitation means a provider-confirmed successful center account-invitation delivery, including later accepted/expired/revoked invitations. No recipient or entity identifiers.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CenterSetupStatus".
+ */
+export interface CenterSetupStatus {
+document_published: boolean
+member_invitation_sent: boolean
+as_of: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6983,6 +7676,10 @@ scope_center_id: (string | null)
 state: RecordState
 version: PositiveInt
 subscriber_number?: (SubscriberNumber | null)
+/**
+ * True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority.
+ */
+account_access_granted?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7027,6 +7724,56 @@ linked_person_ids?: string[]
 given_name?: (string | null)
 family_name?: (string | null)
 subscriber_number?: (SubscriberNumber | null)
+field_policy?: PersonNameFieldPolicy
+member_summary?: MemberPageSummary
+}
+/**
+ * Separate given_name/family_name have no person_update_v1 input and remain false even for local persons.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonNameFieldPolicy".
+ */
+export interface PersonNameFieldPolicy {
+display_name: PersonFieldPolicy
+given_name: PersonFieldPolicy
+family_name: PersonFieldPolicy
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberPageSummary".
+ */
+export interface MemberPageSummary {
+as_of: Instant
+rights: MemberRightsSummary
+debt: MemberDebtSummary
+next_lesson: MemberLessonSummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberSummaryUnavailable".
+ */
+export interface MemberSummaryUnavailable {
+status: ("restricted" | "not_enabled")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberDebtCurrency".
+ */
+export interface MemberDebtCurrency {
+currency: Currency
+remaining_minor: MemberSummaryInteger
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberNextLesson".
+ */
+export interface MemberNextLesson {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+starts_at: Instant
+ends_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7049,6 +7796,12 @@ linked_person_ids?: string[]
 given_name?: (string | null)
 family_name?: (string | null)
 subscriber_number?: (SubscriberNumber | null)
+field_policy?: PersonNameFieldPolicy
+member_summary?: MemberPageSummary
+/**
+ * First recorded student relationship start in the requested center, including inactive canonical alias history; null when unknown.
+ */
+membership_started_at?: (Instant | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7082,6 +7835,95 @@ room_capacity: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SessionRoomLabel".
+ */
+export interface SessionRoomLabel {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+room_id: string
+name: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonDiscovery".
+ */
+export interface MemberLessonDiscovery {
+version: PositiveInt
+format: SessionFormat
+state: SessionState
+attendance_state: AttendanceClosure
+instructor_labels: Text[]
+room_labels: Text[]
+booking_window: MemberLessonBookingWindow
+cancellation: MemberLessonCancellation
+own_reservation: (MemberLessonReservation | null)
+waitlist_enabled: boolean
+own_waitlist: (MemberLessonWaitlist | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonBookingWindow".
+ */
+export interface MemberLessonBookingWindow {
+state: ("not_open" | "open" | "closed" | "not_configured")
+policy_version_id: (string | null)
+opens_at: (Instant | null)
+closes_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonCancellation".
+ */
+export interface MemberLessonCancellation {
+status: ("available" | "not_configured")
+source: ("current_policy" | "reservation_policy")
+policy_version_id: (string | null)
+terms: (CancellationTerms | null)
+cutoff_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonReservation".
+ */
+export interface MemberLessonReservation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+state: ReservationState
+mode: BookingMode
+cancellation: MemberLessonCancellation
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonWaitlist".
+ */
+export interface MemberLessonWaitlist {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+state: WaitState
+offer: (MemberLessonOffer | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberLessonOffer".
+ */
+export interface MemberLessonOffer {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+state: OfferState
+expires_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SessionView".
  */
 export interface SessionView {
@@ -7107,6 +7949,7 @@ capacity: SessionCapacityView
 shared_participants?: SharedLessonParticipant[]
 management_attention?: "instructor_required"
 work_calendar_exception?: (WorkCalendarExceptionRecord | null)
+room_labels?: SessionRoomLabel[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7158,6 +8001,7 @@ mode: BookingMode
 version: PositiveInt
 booking_category?: (BookingCategory | null)
 subscriber_number?: (SubscriberNumber | null)
+source_summary?: ReservationSourceSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7285,6 +8129,8 @@ sale_version?: PositiveInt
 sale_state?: SaleState
 freezes?: TableFreezes[]
 subscriber_number?: (SubscriberNumber | null)
+movements?: Page_EntitlementLedgerItem
+purchase_summary?: PurchasedVersionSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7330,6 +8176,41 @@ extension_until?: (Instant | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 preview_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Page_EntitlementLedgerItem".
+ */
+export interface Page_EntitlementLedgerItem {
+items: EntitlementLedgerItem[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+}
+/**
+ * Append-only recorded movement. balance_delta is the pool effect; reserve/release quantities describe holds and need not change pool balance.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EntitlementLedgerItem".
+ */
+export interface EntitlementLedgerItem {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+kind: CreditMove
+quantity: Int
+balance_delta: Int
+previous_id: (string | null)
+source: EntityRef
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PurchasedVersionSummary".
+ */
+export interface PurchasedVersionSummary {
+product_name: Text
+initial_credits: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7457,6 +8338,7 @@ net_minor: Money
 currency: Currency
 occurred_at: Instant
 corrections: P03PaymentCorrectionView[]
+method?: ("cash" | "bank_transfer" | "card_pos" | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7475,6 +8357,7 @@ direction: Direction
 amount_minor: Money
 occurred_at: Instant
 reason: Text
+method?: ("cash" | "bank_transfer" | "card_pos" | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7498,6 +8381,9 @@ due_followup: (Instant | null)
 version: PositiveInt
 subscriber_number?: (SubscriberNumber | null)
 pipeline?: (LeadPipelineView | null)
+created_at?: Instant
+display_name?: Text
+assigned_name?: (Text | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7561,6 +8447,8 @@ read_at: (Instant | null)
  * Optional own-recipient transactional delivery status, read only via the notification inbox. Job success is provider acceptance; email_delivery is separate evidence.
  */
 email_job?: (JobStatusView | null)
+version?: PositiveInt
+work?: NotificationSourceState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7611,6 +8499,104 @@ removed_bytes?: number
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationSourceState".
+ */
+export interface NotificationSourceState {
+state: ("pending" | "completed" | "informational" | "unavailable")
+center_id: (string | null)
+selector: (ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorCrmActivitySaveV1 | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_seat_offer_accept_v1".
+ */
+export interface ManagementSelectorSeatOfferAcceptV1 {
+operation: "seat_offer_accept_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_create_v1".
+ */
+export interface ManagementSelectorLessonRequestCreateV1 {
+operation: "lesson_request_create_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+preferred_instructor_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+catalog?: ("disciplines" | "instructors")
+/**
+ * Optional directory status. Resolved means approved/rejected/withdrawn/expired; not a new lifecycle state.
+ */
+status?: ("all" | "pending" | "alternative_offered" | "resolved")
+include_summary?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_crm_activity_save_v1".
+ */
+export interface ManagementSelectorCrmActivitySaveV1 {
+operation: "crm_activity_save_v1"
+key: (((({
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+} | {
+lead_id?: null
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}) & {
+lead_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}) | {
+directory: "followups"
+state?: ("all" | "pending" | "completed" | "overdue" | "today")
+assigned_to?: (string | null)
+interval?: Interval
+}) & {
+lead_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+directory?: "followups"
+state?: ("all" | "pending" | "completed" | "overdue" | "today")
+assigned_to?: (string | null)
+interval?: Interval
+})
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReportRow".
  */
 export interface ReportRow {
@@ -7619,11 +8605,17 @@ center_id?: (string | null)
 person_id?: (string | null)
 currency?: (Currency | null)
 count?: (Count | null)
-amount_minor?: (Money | null)
+amount_minor?: (SignedMoney | null)
 credits?: (Count | null)
 ratio_bps?: (ReportRatioBps | null)
 basis_count?: (Count | null)
 subscriber_number?: (SubscriberNumber | null)
+period_start?: (Date | null)
+product_version_id?: (string | null)
+product_name?: (Text | null)
+display_name?: (Text | null)
+session_id?: (string | null)
+session_name?: (Text | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7632,8 +8624,10 @@ subscriber_number?: (SubscriberNumber | null)
 export interface ReportTotal {
 currency?: (Currency | null)
 count: Count
-amount_minor?: (Money | null)
+amount_minor?: (SignedMoney | null)
 group_key?: Text
+basis_count?: (Count | null)
+ratio_bps?: (ReportRatioBps | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7645,7 +8639,7 @@ as_of: Instant
 filters: ReportFilters
 rows: Page_ReportRow
 totals: ReportTotal[]
-columns?: ReportColumns
+columns?: ReportDiscoveryColumns
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7671,6 +8665,7 @@ application?: (CrmImportRowPreview | null)
  */
 field_errors?: []|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]
 source_key?: string
+student_preview?: ImportStudentPreview
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7746,6 +8741,18 @@ export interface CrmPhoneMatch {
  */
 person_id: string
 display_name: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ImportStudentPreview".
+ */
+export interface ImportStudentPreview {
+display_name: (Text | null)
+contacts: {
+kind: ("phone" | "email")
+value: string
+}[]
+warnings: ("duplicate_source_key" | "source_already_applied")[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7925,6 +8932,7 @@ duties?: EventDutyView[]
 actual_started_at?: (Instant | null)
 actual_start_history?: ActualStartHistoryItem[]
 shared_participants?: SharedLessonParticipant[]
+active_registration_count?: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7947,6 +8955,7 @@ participant_cancellation?: (ParticipantCancellationBasis | null)
 package_eligible?: (boolean | null)
 package_eligible_at_attendance?: (boolean | null)
 subscriber_number?: (SubscriberNumber | null)
+payment_summary?: EventRegistrationPaymentSummary
 }
 /**
  * Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it.
@@ -7959,6 +8968,40 @@ cancelled_at: Instant
 planned_starts_at: Instant
 phase: ("before_planned_start" | "at_or_after_planned_start")
 rule: "planned_start_v1"
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventRegistrationPaymentSummary".
+ */
+export interface EventRegistrationPaymentSummary {
+status: ("available" | "no_cash_due" | "restricted" | "missing")
+amount_minor: (Money | null)
+currency: (Currency | null)
+net_minor: (Money | null)
+paid_minor: (Money | null)
+remaining_minor: (Money | null)
+credited_minor: (Money | null)
+cancelled_minor: (Money | null)
+debts: EventRegistrationDebt[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventRegistrationDebt".
+ */
+export interface EventRegistrationDebt {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+preparation_id: (string | null)
+currency: Currency
+amount_minor: Money
+net_minor: Money
+paid_minor: Money
+remaining_minor: Money
+credited_minor: Money
+cancelled_minor: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8107,6 +9150,18 @@ fee_minor: Money
 currency: Currency
 public_conditions: Text
 discipline_ids: EventDisciplineIds
+kind?: ("lesson" | "event")
+timezone?: Text
+occupancy?: (PublicProgramOccupancy | null)
+instructors?: (Text[] | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicProgramOccupancy".
+ */
+export interface PublicProgramOccupancy {
+registered: Count
+capacity: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8134,6 +9189,11 @@ actor_display: Text
 created_at: Instant
 reason: (Text | null)
 diff: (AuditDiff | null)
+module?: (Text | null)
+result?: "recorded"
+operation_id?: (string | null)
+subject_title?: Text
+operation_state?: (Text | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8305,6 +9365,7 @@ items: LeadView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
 pipeline_catalog?: CrmPipelineConfiguration
+summary?: CrmLeadSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8325,6 +9386,17 @@ followup_days: ((1 | 3 | 7) | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmLeadSummary".
+ */
+export interface CrmLeadSummary {
+total: Count
+open_leads: Count
+followups_today: Count
+overdue_followups: Count
+converted_last_30_days: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Page_NotificationView".
  */
 export interface Page_NotificationView {
@@ -8333,6 +9405,7 @@ next_cursor?: (OpaqueToken | null)
 as_of: Instant
 email_preference?: NotificationEmailPreferenceView
 reminder_email_preference?: NotificationEmailPreferenceView
+summary?: NotificationInboxSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8342,6 +9415,18 @@ export interface NotificationEmailPreferenceView {
 enabled: boolean
 version: PositiveInt
 available: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationInboxSummary".
+ */
+export interface NotificationInboxSummary {
+total: Count
+unread: Count
+pending: Count
+completed: Count
+informational: Count
+unavailable: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8387,6 +9472,29 @@ export interface Page_EventView {
 items: EventView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+summary?: EventDirectorySummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventDirectorySummary".
+ */
+export interface EventDirectorySummary {
+published: Count
+draft: Count
+occurred: Count
+cancelled: Count
+published_active_registrations: Count
+unresolved_payment_registrations: Count
+pending_payments: EventPendingPayments[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventPendingPayments".
+ */
+export interface EventPendingPayments {
+currency: Currency
+remaining_minor: Money
+registration_count: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8408,6 +9516,8 @@ as_of: Instant
 organization_profile?: (PublicBusinessProfile | null)
 center_profile?: (PublicBusinessProfile | null)
 regional_defaults?: PublicRegionalContext
+publication_state?: ("available" | "unavailable")
+application?: PublicApplicationDiscovery
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8481,6 +9591,47 @@ time_format: ("12" | "24")
 number_format: ("tr-TR" | "en-US")
 week_start: ("monday" | "sunday")
 fallback_language: "tr"
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicApplicationDiscovery".
+ */
+export interface PublicApplicationDiscovery {
+state: ("open" | "closed" | "unavailable")
+form: (PublicApplicationForm | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicApplicationForm".
+ */
+export interface PublicApplicationForm {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+contact_requirement: ("phone" | "email" | "either")
+required_fields: ("interest" | "message" | "partner_name" | "mode" | "level")[]
+/**
+ * @minItems 1
+ * @maxItems 20
+ */
+consents: [PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]|[PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource, PublicFormConsentSource]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicFormConsentSource".
+ */
+export interface PublicFormConsentSource {
+purpose: Text
+version: Text
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+source_version: Text
+content_hash: string
+content: DigitalDocumentContent
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8924,6 +10075,10 @@ request_id: string
 org_id: string
 center_id?: (string | null)
 page: Page
+/**
+ * Opt-in manager-only setup summary. Requires center_id; returns only that center. Omitted/false preserves the original list.
+ */
+include_setup_status?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9047,30 +10202,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_availability_save".
- */
-export interface RequestAvailabilitySave {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version?: PositiveInt
-rule_id?: (string | null)
-resource: ResourceRef
-rule: AvailabilityRule
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_availability_save".
  */
 export interface SuccessAvailabilitySave {
@@ -9080,30 +10211,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_availability_exception_save".
- */
-export interface RequestAvailabilityExceptionSave {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: PositiveInt
-resource: ResourceRef
-interval: Interval
-reason: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9555,25 +10662,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_people_list".
- */
-export interface RequestPeopleList {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-query?: (Text | null)
-relationship?: (RelationshipKind | null)
-page: Page
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_people_list".
  */
 export interface SuccessPeopleList {
@@ -9583,26 +10671,6 @@ data: Page_PersonSummary
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_person_get".
- */
-export interface RequestPersonGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9763,30 +10831,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_person_merge_preview".
- */
-export interface RequestPersonMergePreview {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-source_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-target_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_person_merge_preview".
  */
 export interface SuccessPersonMergePreview {
@@ -9854,6 +10898,7 @@ center_id?: (string | null)
  */
 operation_key: string
 preview: PreviewToken
+reason?: ReviewReason
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9866,27 +10911,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_calendar_get".
- */
-export interface RequestCalendarGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-interval: Interval
-resource?: (ResourceRef | null)
-page: CalendarPage
-interest_filter?: boolean
-needs_instructor?: Bool
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10090,6 +11114,10 @@ center_id?: (string | null)
  */
 session_id: string
 include_work_calendar_exception?: boolean
+/**
+ * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
+ */
+include_room_labels?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10623,6 +11651,14 @@ person_id?: (string | null)
 session_id?: (string | null)
 interval?: (Interval | null)
 page: Page
+/**
+ * Optional start-time partition. The server captures a cutoff on page one and binds it to subsequent cursors. Omitted retains legacy interval-overlap behavior.
+ */
+time_filter?: ("all" | "upcoming" | "past")
+/**
+ * Only the authorized page receives the actual assigned sale and permitted current rights; no automatic package selection.
+ */
+include_source_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11016,28 +12052,6 @@ data: Page_ProductView
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_product_publish".
- */
-export interface RequestProductPublish {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-product_id?: (string | null)
-terms: ProductTerms
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12092,6 +13106,7 @@ earning_ids: string[]
 amount_minor: PositiveMoney
 currency: Currency
 occurred_at: Instant
+payment?: ManualCollectionPayment
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12131,6 +13146,7 @@ expected_version: PositiveInt
 payment_id: string
 correction: CashCorrection
 reason: Text
+payment?: ManualCollectionPayment
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12162,6 +13178,10 @@ center_id?: (string | null)
 page: Page
 query?: (Text | null)
 include_pipeline?: boolean
+stage_key?: string
+assigned_to?: (string | null)
+include_details?: boolean
+include_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12484,6 +13504,10 @@ org_id: string
 center_id?: (string | null)
 page: Page
 unread_only: Bool
+query?: string
+work_state?: ("all" | "pending" | "completed" | "informational" | "unavailable")
+include_work?: boolean
+include_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12762,6 +13786,9 @@ center_id?: (string | null)
  */
 job_id: string
 page: Page
+state?: ImportRowState
+query?: string
+include_details?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13378,25 +14405,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_event_list".
- */
-export interface RequestEventList {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-interval: Interval
-page: Page
-discipline_id?: (string | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_event_list".
  */
 export interface SuccessEventList {
@@ -13546,6 +14554,8 @@ venue_public_label: Text
 fee_minor: Money
 currency: Currency
 public_conditions: Text
+show_occupancy?: boolean
+show_instructors?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13574,6 +14584,11 @@ slug: Text
 interval: Interval
 page: Page
 include_disciplines?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+include_details?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13745,25 +14760,6 @@ data: JobStatusView
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_audit_list".
- */
-export interface RequestAuditList {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-subject: SubjectRef
-interval: Interval
-page: Page
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14643,6 +15639,7 @@ local_start: LocalTime
 local_end: LocalTime
 valid_from: Date
 valid_until?: (Date | null)
+state: ("active" | "inactive")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14671,6 +15668,7 @@ resource_id: string
 starts_at: Instant
 ends_at: Instant
 reason: Text
+state: ("active" | "cancelled")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14915,6 +15913,14 @@ target_person_id: string
  */
 preview_id: string
 state: ApprovalState
+reason: (string | null)
+decided_at: (Instant | null)
+decision: ("merge" | "not_duplicate")
+decision_center_id: (string | null)
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+affected_center_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15582,7 +16588,7 @@ org_id: string
  */
 center_id: string
 name: Text
-state: RecordState
+state: ProductLifecycleState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16035,6 +17041,7 @@ reason?: (Text | null)
 previous_id?: (string | null)
 operation_id?: (string | null)
 direction: Direction
+payment_details?: (ManualCollectionPayment | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16122,6 +17129,7 @@ completed_at?: (Instant | null)
 outcome?: (Text | null)
 note?: (Text | null)
 person_id?: (string | null)
+followup_due_at?: (Instant | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16937,6 +17945,20 @@ platform?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicFormConsentEvidence".
+ */
+export interface PublicFormConsentEvidence {
+purpose: Text
+version: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+source_version: Text
+content_hash: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CrmIntakeView".
  */
 export interface CrmIntakeView {
@@ -17470,6 +18492,7 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 event_id: string
+include_payment_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17797,6 +18820,19 @@ management_attention?: "instructor_required"
 sale_change_record?: SaleChangeInventoryRecord
 retained_resource?: DowngradeRetainedResource
 merge_approval?: MergeApprovalDiscovery
+/**
+ * True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority.
+ */
+account_access_granted?: boolean
+access_detail?: AccessDirectoryDetail
+merge_review?: MergeReviewDetail
+group_student?: GroupStudentView
+waitlist_display_name?: (Text | null)
+waitlist_session?: MemberWaitlistSession
+segment_match?: SegmentMatchView
+automation_reference?: AutomationReference
+automation_job?: AutomationJobView
+crm_discovery?: CrmDiscovery
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17990,6 +19026,10 @@ operation: "availability_exception_save_v1"
 values: {
 resource?: ResourceRef
 interval?: Interval
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+exception_id?: string
 }
 }
 /**
@@ -18409,7 +19449,7 @@ values: {
 replaces_id?: string
 interval?: Interval
 resources?: ResourceRef[]
-capacity?: Capacity
+capacity?: SessionCapacity
 }
 }
 /**
@@ -19193,6 +20233,18 @@ next_attempt_at: (Instant | null)
 safe_error_code: (Text | null)
 result_reference: (EntityRef | null)
 retry_available: boolean
+created_at?: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+automation_id?: string
+automation_version?: PositiveInt
+automation_name?: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+configuration_creator_person_id?: string
+initiator_kind?: "automation"
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19580,6 +20632,7 @@ routing_history?: CrmApplicationRouting[]
 phone_matches?: CrmPhoneMatch[]
 phone_matches_truncated?: boolean
 contact_intake?: CrmContactIntakeView
+received_at?: Instant
 }
 }
 /**
@@ -20315,6 +21368,44 @@ retired: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_product_state_set_v1".
+ */
+export interface ManagementProjectionProductStateSetV1 {
+operation: "product_state_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_id?: string
+action?: ("open" | "close" | "archive")
+reason?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_freeze_cancel_preview_v1".
+ */
+export interface ManagementProjectionFreezeCancelPreviewV1 {
+operation: "freeze_cancel_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+freeze_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_freeze_cancel_apply_v1".
+ */
+export interface ManagementProjectionFreezeCancelApplyV1 {
+operation: "freeze_cancel_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "LessonRequestView".
  */
 export interface LessonRequestView {
@@ -20485,6 +21576,179 @@ approved: boolean
 }[]
 linked_history: true
 effects: Effect[]
+reason?: (ReviewReason | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeReviewDetail".
+ */
+export interface MergeReviewDetail {
+state: ("suggested" | "completed" | "not_duplicate")
+source: MergeReviewPerson
+target: MergeReviewPerson
+reason: (ReviewReason | null)
+recorded_at: (Instant | null)
+matching_kinds: ("email" | "phone")[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeReviewPerson".
+ */
+export interface MergeReviewPerson {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+display_name: string
+version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "GroupStudentView".
+ */
+export interface GroupStudentView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+reservations: GroupStudentReservation[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "GroupStudentReservation".
+ */
+export interface GroupStudentReservation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+starts_at: Instant
+ends_at: Instant
+source_sale_id: (string | null)
+mode: BookingMode
+state: ReservationState
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberWaitlistSession".
+ */
+export interface MemberWaitlistSession {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+title: Text
+interval: Interval
+timezone: IanaZone
+state: SessionState
+version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SegmentMatchView".
+ */
+export interface SegmentMatchView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AutomationReference".
+ */
+export interface AutomationReference {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+name: Text
+enabled: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmAssigneeDiscovery".
+ */
+export interface CrmAssigneeDiscovery {
+kind: "assignee"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFollowupDiscovery".
+ */
+export interface CrmFollowupDiscovery {
+kind: "followup"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+assigned_to: (string | null)
+assigned_name: (Text | null)
+due_at: Instant
+completed_at: (Instant | null)
+note: (Text | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmTrialHistoryDiscovery".
+ */
+export interface CrmTrialHistoryDiscovery {
+kind: "trial_offer"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id: string
+created_at: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+session_id: (string | null)
+expires_at: Instant
+state: ("active" | "accepted" | "cancelled" | "expired")
+registration_id: (string | null)
+price_minor: Money
+currency: Currency
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmTrialProductDiscovery".
+ */
+export interface CrmTrialProductDiscovery {
+kind: "trial_product"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+product_name: Text
+offer_minutes: PositiveInt
+price_minor: Money
+currency: Currency
+offer_policy_state: ("available" | "quota_exceeded" | "policy_not_configured" | "lead_unavailable")
+confirmation_requires_session: true
+confirmation_requires_paid_entitlement: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -20986,6 +22250,10 @@ invitation_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
+} | {
+directory: "center"
+query?: string
+status?: ("pending" | "expired" | "accepted" | "revoked" | "open" | "closed" | "all")
 })
 }
 /**
@@ -21014,6 +22282,15 @@ link_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
+} | {
+directory: "center"
+query?: string
+status?: ("active" | "revoked")
+} | {
+directory: "center"
+view: "people"
+query?: string
+status?: ("all" | "linked" | "unlinked")
 })
 }
 /**
@@ -21071,7 +22348,7 @@ person_id: string
  */
 export interface ManagementSelectorPersonMergePreviewV1 {
 operation: "person_merge_preview_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -21080,7 +22357,11 @@ source_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 target_id: string
-}
+} | {
+directory: "center"
+status?: ("suggested" | "completed" | "not_duplicate" | "all")
+query?: string
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21271,25 +22552,6 @@ agreement_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_lesson_request_create_v1".
- */
-export interface ManagementSelectorLessonRequestCreateV1 {
-operation: "lesson_request_create_v1"
-key: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id?: string
-preferred_instructor_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-discipline_id?: string
-catalog?: ("disciplines" | "instructors")
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector_lesson_request_withdraw_v1".
  */
 export interface ManagementSelectorLessonRequestWithdrawV1 {
@@ -21382,12 +22644,25 @@ source_sale_id?: (string | null)
  */
 export interface ManagementSelectorReservationCancelV1 {
 operation: "reservation_cancel_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 reservation_id: string
-}
+} | {
+directory: "class"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+program_id?: string
+interval: Interval
+status?: ("active" | "cancelled" | "completed" | "all")
+query?: string
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21395,7 +22670,7 @@ reservation_id: string
  */
 export interface ManagementSelectorWaitlistJoinV1 {
 operation: "waitlist_join_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -21404,7 +22679,31 @@ person_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 session_id: string
-}
+} | {
+directory: "session"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+view: "entries"
+status?: ("all" | "waiting" | "offered" | "converted" | "left" | "closed")
+} | {
+directory: "session"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+view: "offers"
+status?: ("all" | "active" | "accepted" | "rejected" | "expired" | "withdrawn")
+} | {
+directory: "self"
+view: "entries"
+status?: ("all" | "waiting" | "offered" | "converted" | "left" | "closed")
+} | {
+directory: "self"
+view: "offers"
+status?: ("all" | "active" | "accepted" | "rejected" | "expired" | "withdrawn")
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21417,19 +22716,6 @@ key: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 entry_id: string
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_seat_offer_accept_v1".
- */
-export interface ManagementSelectorSeatOfferAcceptV1 {
-operation: "seat_offer_accept_v1"
-key: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-offer_id: string
 }
 }
 /**
@@ -21876,41 +23162,21 @@ payment_id: string
  */
 export interface ManagementSelectorLeadSaveV1 {
 operation: "lead_save_v1"
-key: {
+key: (({
 lead_id?: (string | null)
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_crm_activity_save_v1".
- */
-export interface ManagementSelectorCrmActivitySaveV1 {
-operation: "crm_activity_save_v1"
-key: (({
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-lead_id: string
 } | {
-lead_id?: null
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
+directory: "assignees"
 }) & {
 lead_id?: (string | null)
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-activity_id?: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
 person_id?: string
+directory?: "assignees"
 })
 }
 /**
@@ -21919,7 +23185,7 @@ person_id?: string
  */
 export interface ManagementSelectorTrialOfferCreateV1 {
 operation: "trial_offer_create_v1"
-key: {
+key: (({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -21929,7 +23195,24 @@ lead_id: string
  */
 product_version_id: string
 session_id?: (string | null)
-}
+} | {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+directory: ("history" | "products")
+}) & {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id?: string
+session_id?: (string | null)
+directory?: ("history" | "products")
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21963,10 +23246,28 @@ lead_id: string
  */
 export interface ManagementSelectorSegmentSaveV1 {
 operation: "segment_save_v1"
-key: {
+key: ({
 segment_id?: (string | null)
 scope: ConfigurationScope
-}
+} | {
+scope: ConfigurationScope
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+segment_id: string
+discovery: "matches"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+execution_center_id: string
+} | {
+scope: ConfigurationScope
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+segment_id: string
+discovery: "automations"
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21974,10 +23275,19 @@ scope: ConfigurationScope
  */
 export interface ManagementSelectorAutomationSaveV1 {
 operation: "automation_save_v1"
-key: {
+key: ({
 automation_id?: (string | null)
 scope: ConfigurationScope
-}
+} | {
+scope: ConfigurationScope
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+automation_id?: string
+discovery: "jobs"
+state?: (JobState | "all")
+interval?: Interval
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22779,6 +24089,61 @@ channel: ("email" | "in_app" | "document" | "report")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_product_state_set_v1".
+ */
+export interface ManagementSelectorProductStateSetV1 {
+operation: "product_state_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_freeze_cancel_preview_v1".
+ */
+export interface ManagementSelectorFreezeCancelPreviewV1 {
+operation: "freeze_cancel_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+freeze_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_freeze_cancel_apply_v1".
+ */
+export interface ManagementSelectorFreezeCancelApplyV1 {
+operation: "freeze_cancel_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_notifications_read_set_v1".
+ */
+export interface ManagementSelectorNotificationsReadSetV1 {
+operation: "notifications_read_set_v1"
+key: {
+/**
+ * @minItems 1
+ * @maxItems 100
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+notification_ids: [string, ...(string)[]]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_management_state_get".
  */
 export interface SuccessManagementStateGet {
@@ -22798,6 +24163,70 @@ items: ManagementStateView[]
 next_cursor: (OpaqueToken | null)
 as_of: Instant
 sale_change_context?: EntityVersion
+access_summary?: AccessDirectorySummary
+merge_review_summary?: MergeReviewSummary
+lesson_request_summary?: LessonRequestSummary
+segment_summary?: SegmentMatchSummary
+automation_queue_summary?: AutomationQueueSummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AccessDirectorySummary".
+ */
+export interface AccessDirectorySummary {
+total: Count
+filtered: Count
+by_state: {
+state: ("pending" | "expired" | "accepted" | "revoked" | "active" | "linked" | "unlinked")
+count: Count
+}[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MergeReviewSummary".
+ */
+export interface MergeReviewSummary {
+total: number
+filtered: number
+by_state: {
+state: ("suggested" | "completed" | "not_duplicate")
+count: number
+}[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LessonRequestSummary".
+ */
+export interface LessonRequestSummary {
+pending: Count
+alternative_offered: Count
+approved: Count
+rejected: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SegmentMatchSummary".
+ */
+export interface SegmentMatchSummary {
+audience_count: Count
+matched_count: Count
+using_automations: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AutomationQueueSummary".
+ */
+export interface AutomationQueueSummary {
+total: Count
+pending: Count
+running: Count
+retry_wait: Count
+succeeded: Count
+failed: Count
+cancelled: Count
+notifications_created: Count
+followups_created: Count
+email_delivery: "not_supported"
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23815,6 +25244,1697 @@ reason: string
  * @maxItems 4
  */
 sharing_restrictions?: []|[SharingField]|[SharingField, SharingField]|[SharingField, SharingField, SharingField]|[SharingField, SharingField, SharingField, SharingField]
+public_application_form?: ({
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+/**
+ * @minItems 1
+ * @maxItems 20
+ */
+consents: [{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]
+} | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -24146,6 +27266,1697 @@ work_calendar_exceptions_enabled?: boolean
  */
 sharing_notices?: []|[SharingNotice]|[SharingNotice, SharingNotice]|[SharingNotice, SharingNotice, SharingNotice]|[SharingNotice, SharingNotice, SharingNotice, SharingNotice]
 allow_center_sharing_restrictions?: boolean
+public_application_form?: ({
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+/**
+ * @minItems 1
+ * @maxItems 20
+ */
+consents: [{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]|[{
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}, {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}]
+} | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -24331,7 +29142,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: SettingsFieldKey
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline" | "lesson_impact_authorize" | "crm_intake_submit" | "center_work_calendar_contains" | "work_calendar_exception_assert" | "sharing_consent" | "user_content_language")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences" | "reminder_settings" | "reminder_quiet_until" | "organization_regional_context" | "organization_security_assert" | "crm_pipeline" | "lesson_impact_authorize" | "crm_intake_submit" | "center_work_calendar_contains" | "work_calendar_exception_assert" | "sharing_consent" | "user_content_language" | "public_program_discovery")
 writable: boolean
 }
 /**
@@ -25659,6 +30470,1016 @@ trace_id: string
 export interface SuccessContentCatalogSave {
 ok: true
 data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "FinanceDirectoryEntry".
+ */
+export interface FinanceDirectoryEntry {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+entity: EntityRef
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: (Text | null)
+created_at: Instant
+occurred_at: Instant
+version: PositiveInt
+kind: ("sale" | "collection" | "refund" | "correction_in" | "correction_out" | "debt" | "credit")
+amount_minor: Money
+currency: Currency
+source_sale_id: (string | null)
+product_name: (Text | null)
+method: ("cash" | "bank_transfer" | "card_pos" | null)
+due_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "FinanceDirectoryTotal".
+ */
+export interface FinanceDirectoryTotal {
+currency: Currency
+sales_minor: AggregateMinorTotal
+collections_minor: AggregateMinorTotal
+refunds_minor: AggregateMinorTotal
+debt_minor: AggregateMinorTotal
+credit_minor: AggregateMinorTotal
+debt_people: Count
+credit_people: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "FinanceDirectoryView".
+ */
+export interface FinanceDirectoryView {
+items: FinanceDirectoryEntry[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+view: ("movements" | "debts" | "credits")
+totals: FinanceDirectoryTotal[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductManagementEntry".
+ */
+export interface ProductManagementEntry {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+created_at: Instant
+state: ProductLifecycleState
+name: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+version_id: string
+terms: ProductTerms
+active_right_holders: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductVersionHistoryEntry".
+ */
+export interface ProductVersionHistoryEntry {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+created_at: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_id: string
+terms: ProductTerms
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductSaleHistoryEntry".
+ */
+export interface ProductSaleHistoryEntry {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+created_at: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: (Text | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+product_name: Text
+net_minor: Money
+currency: Currency
+state: SaleState
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductPeriodTotal".
+ */
+export interface ProductPeriodTotal {
+currency: Currency
+sales: Count
+net_minor: AggregateMinorTotal
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductManagementTotals".
+ */
+export interface ProductManagementTotals {
+on_sale: Count
+closed: Count
+archived: Count
+active_right_holders: Count
+last_30_days: ProductPeriodTotal[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProductManagementView".
+ */
+export interface ProductManagementView {
+items: (ProductManagementEntry | ProductVersionHistoryEntry | ProductSaleHistoryEntry)[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+view: ("products" | "versions" | "sales")
+totals: ProductManagementTotals
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_finance_directory_get".
+ */
+export interface RequestFinanceDirectoryGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+view: ("movements" | "debts" | "credits")
+interval: Interval
+page: Page
+query?: string
+kind?: ("sale" | "collection" | "refund" | "correction_in" | "correction_out" | "debt" | "credit")
+method?: ("cash" | "bank_transfer" | "card_pos")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_finance_directory_get".
+ */
+export interface SuccessFinanceDirectoryGet {
+ok: true
+data: FinanceDirectoryView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_products_management_list".
+ */
+export interface SuccessProductsManagementList {
+ok: true
+data: ProductManagementView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_product_state_set".
+ */
+export interface RequestProductStateSet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_id: string
+expected_version: PositiveInt
+reason: string
+action: ("open" | "close" | "archive")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_product_state_set".
+ */
+export interface SuccessProductStateSet {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_freeze_cancel_preview".
+ */
+export interface RequestFreezeCancelPreview {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+freeze_id: string
+reason: ReviewReason
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_freeze_cancel_preview".
+ */
+export interface SuccessFreezeCancelPreview {
+ok: true
+data: FreezeCancellationPreview
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_freeze_cancel_apply".
+ */
+export interface RequestFreezeCancelApply {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+preview: PreviewToken
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_freeze_cancel_apply".
+ */
+export interface SuccessFreezeCancelApply {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorAccountPageRequest".
+ */
+export interface InstructorAccountPageRequest {
+limit?: number
+cursor?: (OpaqueToken | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_instructor_account_get".
+ */
+export interface RequestInstructorAccountGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+interval?: Interval
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+view: ("agreements" | "payments" | "earnings")
+page: InstructorAccountPageRequest
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorPaymentLedgerItem".
+ */
+export interface InstructorPaymentLedgerItem {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+root_payment_id: string
+version: PositiveInt
+direction: Direction
+amount_minor: Money
+currency: Currency
+occurred_at: Instant
+method: ("cash" | "bank_transfer" | "card_pos" | null)
+previous_id: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorAccountTotal".
+ */
+export interface InstructorAccountTotal {
+currency: Currency
+earned_minor: SignedMoney
+paid_minor: SignedMoney
+remaining_minor: Money
+overpaid_minor: Money
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorAccountPage".
+ */
+export interface InstructorAccountPage {
+view: ("agreements" | "payments" | "earnings")
+items: (AgreementVersionView | InstructorPaymentLedgerItem | EarningView)[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+totals: InstructorAccountTotal[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_instructor_account_get".
+ */
+export interface SuccessInstructorAccountGet {
+ok: true
+data: InstructorAccountPage
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "FinanceCurrencyDirectory".
+ */
+export interface FinanceCurrencyDirectory {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+currencies: Currency[]
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "MemberDocumentContext".
+ */
+export interface MemberDocumentContext {
+context: AcceptanceContext
+/**
+ * @minItems 1
+ */
+requirements: [DocumentView, ...(DocumentView)[]]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Page_MemberDocumentContext".
+ */
+export interface Page_MemberDocumentContext {
+items: MemberDocumentContext[]
+next_cursor: (Text | null)
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_member_finance_currencies_get".
+ */
+export interface RequestMemberFinanceCurrenciesGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_member_finance_currencies_get".
+ */
+export interface SuccessMemberFinanceCurrenciesGet {
+ok: true
+data: FinanceCurrencyDirectory
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_member_document_contexts_get".
+ */
+export interface RequestMemberDocumentContextsGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+page: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_member_document_contexts_get".
+ */
+export interface SuccessMemberDocumentContextsGet {
+ok: true
+data: Page_MemberDocumentContext
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationReadSelection".
+ */
+export interface NotificationReadSelection {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+expected_version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_notifications_read_set".
+ */
+export interface RequestNotificationsReadSet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: Bool
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+notifications: [NotificationReadSelection, ...(NotificationReadSelection)[]]
+center_id?: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_notifications_read_set".
+ */
+export interface SuccessNotificationsReadSet {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicFormConsentBinding".
+ */
+export interface PublicFormConsentBinding {
+purpose: string
+version: string
+required: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+content_template_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicFormBinding".
+ */
+export interface PublicFormBinding {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+/**
+ * @minItems 1
+ * @maxItems 20
+ */
+consents: [PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]|[PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding, PublicFormConsentBinding]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementWorkView".
+ */
+export interface ManagementWorkView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+kind: ManagementWorkKind
+created_at: Instant
+version: PositiveInt
+title: Text
+person_id: (string | null)
+person_name: (Text | null)
+due_at: (Instant | null)
+target: ManagementWorkTarget
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementWorkSummary".
+ */
+export interface ManagementWorkSummary {
+total: Count
+lesson_request: Count
+lesson_attendance: Count
+event_attendance: Count
+crm_followup: Count
+application_review: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Page_ManagementWorkView".
+ */
+export interface Page_ManagementWorkView {
+items: ManagementWorkView[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+summary: ManagementWorkSummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_management_work_list".
+ */
+export interface RequestManagementWorkList {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+kind?: ("all" | "lesson_request" | "lesson_attendance" | "event_attendance" | "crm_followup" | "application_review")
+page: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_management_work_list".
+ */
+export interface SuccessManagementWorkList {
+ok: true
+data: Page_ManagementWorkView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorFinanceEarning".
+ */
+export interface InstructorFinanceEarning {
+kind: "earning"
+earning: EarningView
+display_name: Text
+session_name: (Text | null)
+agreement_id: (string | null)
+agreement_version: (PositiveInt | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorFinancePayment".
+ */
+export interface InstructorFinancePayment {
+kind: "payment"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+root_payment_id: string
+version: PositiveInt
+previous_id: (string | null)
+direction: ("increase" | "decrease")
+amount_minor: Money
+currency: Currency
+occurred_at: Instant
+payment: (ManualCollectionPayment | null)
+reason: (Text | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorFinancePerson".
+ */
+export interface InstructorFinancePerson {
+kind: "instructor"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+totals: InstructorAccountTotal[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+agreement_ids: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+current_agreement_ids: string[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "InstructorFinanceDirectory".
+ */
+export interface InstructorFinanceDirectory {
+view: ("instructors" | "earnings" | "payments")
+items: (InstructorFinanceEarning | InstructorFinancePayment | InstructorFinancePerson)[]
+as_of: Instant
+next_cursor: (OpaqueToken | null)
+totals: InstructorAccountTotal[]
+closed_session_count: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_instructor_finance_directory_get".
+ */
+export interface RequestInstructorFinanceDirectoryGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+view: ("instructors" | "earnings" | "payments")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+interval?: Interval
+page: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_instructor_finance_directory_get".
+ */
+export interface SuccessInstructorFinanceDirectoryGet {
+ok: true
+data: InstructorFinanceDirectory
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ImportDirectoryItem".
+ */
+export interface ImportDirectoryItem {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+job_id: string
+created_at: Instant
+state: Text
+phase: ("preview" | "apply")
+progress_count: Count
+total_count: (Count | null)
+preview_id: (string | null)
+safe_error_code: (Text | null)
+kind: ("students" | "crm_applications")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ImportDirectory".
+ */
+export interface ImportDirectory {
+items: ImportDirectoryItem[]
+as_of: Instant
+next_cursor: (OpaqueToken | null)
+limits: ({
+max_bytes: PositiveInt
+max_rows: PositiveInt
+} | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_import_directory_get".
+ */
+export interface RequestImportDirectoryGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+page: Page
+state?: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_import_directory_get".
+ */
+export interface SuccessImportDirectoryGet {
+ok: true
+data: ImportDirectory
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "TrackingDirectoryItem".
+ */
+export interface TrackingDirectoryItem {
+kind: ("operation" | "preview" | "job")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+operation: OperationName
+state: Text
+expires_at: (Instant | null)
+progress_count: (Count | null)
+total_count: (Count | null)
+safe_error_code: (Text | null)
+next_attempt_at: (Instant | null)
+result_reference: (EntityRef | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "TrackingDirectory".
+ */
+export interface TrackingDirectory {
+items: TrackingDirectoryItem[]
+as_of: Instant
+next_cursor: (OpaqueToken | null)
+summary: {
+total: Count
+previews: Count
+operations: Count
+jobs: Count
+attention: Count
+running: Count
+retry: Count
+completed: Count
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_tracking_directory_get".
+ */
+export interface RequestTrackingDirectoryGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+page: Page
+kind?: ("all" | "operation" | "preview" | "job")
+state?: Text
+query?: string
+interval?: Interval
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_tracking_directory_get".
+ */
+export interface SuccessTrackingDirectoryGet {
+ok: true
+data: TrackingDirectory
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DocumentDirectoryVersion".
+ */
+export interface DocumentDirectoryVersion {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+version_id: string
+version: (PositiveInt | null)
+version_label: Text
+published_at: Instant
+effective_at: Instant
+requirements: (DocumentRequirement[] | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DocumentDirectoryDocument".
+ */
+export interface DocumentDirectoryDocument {
+key: Text
+kind: ("document" | "unpublished_file")
+document_id: (string | null)
+file_id: (string | null)
+name: Text
+created_at: Instant
+expires_at: (Instant | null)
+state: Text
+scope: ("center" | "organization")
+read_only: boolean
+latest_version: (DocumentDirectoryVersion | null)
+version_count: (Count | null)
+required_members: Count
+pending_members: Count
+acceptance_records: (Count | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DocumentDirectoryRequirement".
+ */
+export interface DocumentDirectoryRequirement {
+key: Text
+kind: "requirement"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+context: AcceptanceContext
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+document_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+required_version_id: string
+accepted: boolean
+status: ("valid" | "outdated" | "missing")
+evidence_id: (string | null)
+evidence_version_id: (string | null)
+evidence_at: (Instant | null)
+evidence_matches_version: (boolean | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DocumentDirectoryHistory".
+ */
+export interface DocumentDirectoryHistory {
+key: Text
+kind: "history"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+acceptance_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+document_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+version_id: string
+version_label: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+accepted_at: Instant
+context: AcceptanceContext
+evidence_state: ("recorded" | "invalidated")
+evidence_kind: ("server_document" | "legacy_client" | "file")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "DocumentDirectoryPage".
+ */
+export interface DocumentDirectoryPage {
+view: ("documents" | "versions" | "acceptances")
+items: (DocumentDirectoryDocument | DocumentDirectoryVersion | DocumentDirectoryRequirement | DocumentDirectoryHistory)[]
+as_of: Instant
+next_cursor: (OpaqueToken | null)
+history_available: boolean
+summary: {
+published_documents: Count
+unpublished_files: Count
+pending_members: Count
+total_members: Count
+last_publication: (Instant | null)
+acceptance_records: Count
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_document_directory_get".
+ */
+export interface SuccessDocumentDirectoryGet {
+ok: true
+data: DocumentDirectoryPage
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */

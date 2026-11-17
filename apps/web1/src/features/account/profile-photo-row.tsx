@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { SettingsMediaAsset } from "../../lib/api-contracts/generated";
@@ -8,7 +8,15 @@ import { Input } from "../../components/ui/input";
 import { FieldDescription, FieldError } from "../../components/ui/field";
 import { preparePhoto, readPhoto, type PhotoDraft } from "./profile-photo";
 
-export function BlobAvatar({ blob, initials }: { blob?: Blob; initials: string }) {
+export function BlobAvatar({
+  blob,
+  initials,
+  size = "photo",
+}: {
+  blob?: Blob;
+  initials: string;
+  size?: ComponentProps<typeof Avatar>["size"];
+}) {
   const image = useRef<HTMLImageElement>(null);
   useEffect(() => {
     const element = image.current;
@@ -21,7 +29,7 @@ export function BlobAvatar({ blob, initials }: { blob?: Blob; initials: string }
     };
   }, [blob]);
   return (
-    <Avatar size="photo">
+    <Avatar size={size}>
       {blob && <AvatarImage ref={image} alt="" />}
       <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>

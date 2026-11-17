@@ -7,7 +7,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: true,
   retries: 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: 2,
   outputDir: "./test-results",
   reporter: [
     ["list"],
@@ -40,7 +40,7 @@ export default defineConfig({
         VITE_SUPABASE_PUBLISHABLE_KEY: "public-test-key",
         VITE_APP_ORIGIN: "http://127.0.0.1:4175",
         VITE_PUBLIC_GATEWAY_URL: "http://127.0.0.1:4175",
-        VITE_TURNSTILE_SITE_KEY: "",
+        VITE_TURNSTILE_SITE_KEY: "e2e-provider-stub-key",
       },
     },
     {
