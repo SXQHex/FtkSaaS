@@ -118,3 +118,79 @@ for(const planName of ['pro','business']){
   }finally{await db.end();}
  });
 }
+
+test('W1-BE-38 member discovers and accepts documents before a manager registers them',async t=>{
+ const f=await fixture('pro');
+ t.after(()=>f.db.end());
+ const {db,org,center,api,event,scope,fail}=f;
+ const linkStudent=async label=>{
+  const user=await authUser(label),person=await f.student(),account=await must(user,'account_get_v1');
+  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,person]);
+  return {user,person};
+ };
+ const member=await linkStudent('event-document-member'),other=await linkStudent('event-document-unrelated');
+ const self=(op,body={},who=member)=>must(who.user,op,scope(body),key());
+ const read=async who=>(await self('member_document_contexts_get_v1',{page:{}},who)).items;
+ const product=(await api('product_publish_v1',{terms:{
+  name:'Synthetic event document package',kind:'credits',booking_mode:'flexible',credits:3,price_minor:'0',currency:'TRY',
+  freeze:{enabled:false,extends_validity:false},refund:{method:'none'},
+  scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson','event']}]
+ }})).primary_id;
+ const sale=(await api('sale_apply_v1',{preview:token(await api('sale_preview_v1',{
+  person_id:member.person,product_version_id:product,start_date:date(0),end_date:date(10)
+ }))})).primary_id;
+ const eventId=await event({terms:{...f.terms,package_usage:'eligibility_only',allowed_product_version_ids:[product]}});
+ const freeEvent=await event();
+ const draft=(await api('event_save_v1',f.input())).primary_id;
+ const publish=async(label,requirements)=>(await api('document_version_publish_v1',{
+  digital_content:{name:label,language:'tr',template_id:label,template_version:'1',text:'Synthetic event document acceptance.'},
+  version_label:'v1',scope:{kind:'center',center_id:center},requirements
+ })).primary_id;
+ const scopedRequirement=scope=>({gate:'event_registration',scope:{center_ids:[center],...scope},renewed_acceptance:true});
+ const version=await publish('event-package-doc',[scopedRequirement({event_ids:[eventId],product_version_ids:[product]})]);
+ await publish('event-no-package-doc',[scopedRequirement({event_ids:[freeEvent,draft]})]);
+ const request={event_id:eventId,person_id:member.person,sale_id:sale};
+ assert.deepEqual(await read(member),[]);
+ const preview=await api('event_registration_preview_v1',request);
+ assert.deepEqual(preview.blockers,[]);
+ await fail('event_register_v1',{...request,preview:token(preview)},'DOCUMENT_REQUIRED');
+ const noPackage=await api('event_registration_preview_v1',{event_id:freeEvent,person_id:member.person});
+ const draftAttempt=await call(f.owner,'event_registration_preview_v1',scope({event_id:draft,person_id:member.person}),key());
+ if(draftAttempt.result.ok)assert(draftAttempt.result.data.blockers.length>0);
+ const expired=await api('event_registration_preview_v1',request);
+ await db.query("update private.preview_payloads set expires_at=now()-interval '1 second' where preview_id=$1",[expired.id]);
+ const items=await read(member);
+ const row=items.find(x=>x.context.event_registration_preview_id===preview.id);
+ const context={gate:'event_registration',subject:{type:'events',id:eventId},product_version_id:product,event_registration_preview_id:preview.id};
+ assert.deepEqual(row?.context,context);
+ assert.equal(row.requirements.find(x=>x.version_id===version)?.accepted,false);
+ assert.deepEqual(items.find(x=>x.context.event_registration_preview_id===noPackage.id)?.context,{
+  gate:'event_registration',subject:{type:'events',id:freeEvent},event_registration_preview_id:noPackage.id
+ });
+ assert(!items.some(x=>x.context.subject.id===draft||x.context.event_registration_preview_id===expired.id));
+ assert(!JSON.stringify(items).includes(preview.token));
+ assert.deepEqual(await read(other),[]);
+ const denyRead=async(ctx,who=member)=>{
+  const {result}=await call(who.user,'document_requirements_get_v1',scope({context:ctx}),key());
+  assert.equal(result.error?.code,'NOT_FOUND');
+ };
+ await denyRead(context,other);
+ const bareEvent=id=>({gate:'event_registration',subject:{type:'events',id}});
+ await denyRead(bareEvent(draft));
+ await denyRead({...bareEvent(eventId),product_version_id:product});
+ assert((await self('document_requirements_get_v1',{context:bareEvent(freeEvent)})).length>0);
+ await fail('event_register_v1',{event_id:freeEvent,person_id:member.person,preview:token(noPackage)},'DOCUMENT_REQUIRED');
+ await denyRead({...context,product_version_id:key()});
+ await denyRead({...context,event_registration_preview_id:expired.id});
+ const file=row.requirements.find(x=>x.version_id===version).file.id;
+ const details=await self('document_requirements_get_v1',{context,content_file_id:file});
+ const accept={context,rendered_document_id:details.find(x=>x.version_id===version).rendered_document.id};
+ await fail('document_accept_v1',{...accept,context:{...context,on_behalf_of_person_id:member.person}},'FORBIDDEN');
+ await self('document_accept_v1',accept);
+ assert((await self('document_requirements_get_v1',{context})).find(x=>x.version_id===version).accepted);
+ const registration=await api('event_register_v1',{...request,preview:token(preview)});
+ assert.equal(registration.outcome,'registered');
+ assert(!(await read(member)).some(x=>x.context.event_registration_preview_id===preview.id));
+ await denyRead(context);
+ await denyRead({gate:'event_registration',subject:{type:'event_registrations',id:registration.primary_id},product_version_id:product});
+});

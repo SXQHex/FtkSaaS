@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "89f9f21698b4bb92b42cbfda7a23989fe53b238dfaaf8f979b0ad66b6db14473",
-        "reason": "Reviewed existing operation extension inventory and Ajv required-loop code shape threshold 7; authoritative schemas, validation predicates, diagnostics and upload gate remain unchanged, with independent parity/budget review."
+        "fingerprint": "7fbc7927d4d58bc0a0764b1500a921c38441380578f5d38c62213f91e38f2722",
+        "reason": "Reviewed generated contract and bundle changes for optional event registration preview context, and verified migration inventory remains append-only."
       }
     },
     {
@@ -511,8 +511,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "54bb9a2e0ac8021e37b82f8c0d2ce7f8d4effd723f794297a4f8737876a2c791",
-        "reason": "Reviewed Role/RecordState filters before native limit, unchanged request/actor cursor and org-reader/CM/accessible-center predicates, stored owner semantics, manager command boundaries, append migration and real Auth/API positive/negative tests."
+        "fingerprint": "e66abac488b3102a7e775c198df41a158ac375ed3ccf59d23bbe8eecfd7c0733",
+        "reason": "Reviewed Role/RecordState filters before native limit, unchanged request/actor cursor and org-reader/CM/accessible-center predicates, stored owner semantics, manager command boundaries, append migration and real Auth/API positive/negative tests. Added cross-flow regression coverage for event registration document discovery."
       }
     },
     {
@@ -872,8 +872,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "0a23f359a229c8f08d85a3a10380cdb1598f7a567573095ef925c7214d58c982",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "bdd634818fc114ccd7e0073b14a0097084defa027a7df9b87d411080cac15b2c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery."
       }
     },
     {
@@ -978,8 +978,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "f6a4927a0240ecd0b3f377443634c637e948dcb42ac1ae782df2caf78a9da68d",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "9f6a0dfaf5acd2d2403763ed3d5a71ff022fcc84adaf92292e358ba05144894c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery."
       }
     },
     {
@@ -1047,8 +1047,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "12d9b2c7ecf472ab00a6d04fd7ffb789a9d77253e57383357640eaa6c6843196",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "4d8a5a56a15ac86ee6fe17f85fc63496c27006f6e7c6cca15e4b34ebc115659e",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery."
       }
     },
     {
@@ -1327,7 +1327,8 @@
         "apps/backend/tests/ledger-inbox-automation-unit.mjs",
         "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
         "apps/backend/tests/document-directory-unit.mjs",
-        "apps/backend/tests/document-directory-acceptance.mjs"
+        "apps/backend/tests/document-directory-acceptance.mjs",
+        "apps/backend/tests/event-capacity-package-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1362,7 +1363,9 @@
         "apps/backend/database/document-active-contexts.sql",
         "apps/backend/database/document-management-directory.sql",
         "apps/backend/supabase/migrations/20261117124133_document_active_contexts.sql",
-        "apps/backend/supabase/migrations/20261117124145_document_management_directory.sql"
+        "apps/backend/supabase/migrations/20261117124145_document_management_directory.sql",
+        "apps/backend/database/event-registration-document-discovery.sql",
+        "apps/backend/supabase/migrations/20261117232051_event_registration_document_discovery.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1379,8 +1382,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "a74ff3b0110795e993b6d3312761da5bb99bc7a66421e0a0a91149aa9998ffa1",
-        "reason": "Reviewed shared factual active contexts against original self reader; native configuration/target requirements, current unique-person and historical evidence scope, readonly organization/draft metadata, accepted FD08 decisions and native tests."
+        "fingerprint": "125d512d86fdfefab54f3e09578729c8e2ab489c5f6c11e65169e6cf7a8cdebc",
+        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority."
       }
     },
     {
@@ -1738,8 +1741,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "152dc9fee38360520952789be564fdcf360cbd9619603da65da4646171cb1c8a",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "81031d4c4f3089e762d81a8274db9c916f6cb751f8333c7f8298694865b36d83",
+        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority."
       }
     },
     {
