@@ -706,3 +706,28 @@ export async function openStudio(page: Page) {
   await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Örnek Eğitmen/ })).toBeVisible();
 }
+
+// Warm and revisit the real assignment picker in the same document/query lifetime.
+export async function studioScheduleChoice(page: Page, instructorId: string, eligible: boolean) {
+  const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
+  await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+  await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await expect(
+    panel.locator(`#schedule-create-instructor option[value="${instructorId}"]`),
+  ).toHaveCount(eligible ? 1 : 0);
+  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
+}
+export async function mockStudioCalendar(page: Page) {
+  await page.route("**/functions/v1/backend-v1/calendar_get_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: { items: [], next_cursor: null, as_of: "2026-11-18T08:00:00Z" },
+        trace_id: studioIds.role,
+      },
+    }),
+  );
+}
