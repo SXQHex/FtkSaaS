@@ -238,4 +238,5 @@ export interface Operations {
   instructor_finance_directory_get_v1: {request: T.RequestInstructorFinanceDirectoryGet; response: T.SuccessInstructorFinanceDirectoryGet};
   import_directory_get_v1: {request: T.RequestImportDirectoryGet; response: T.SuccessImportDirectoryGet};
   tracking_directory_get_v1: {request: T.RequestTrackingDirectoryGet; response: T.SuccessTrackingDirectoryGet};
+  document_directory_get_v1: {request: T.RequestDocumentDirectoryGet; response: T.SuccessDocumentDirectoryGet};
 }

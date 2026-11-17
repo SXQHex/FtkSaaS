@@ -1196,6 +1196,8 @@ ST-03 manuel tahsilat adayı cash/bank_transfer/card_pos yöntemini ve banka/kar
 
 Öğrencinin Belgeler kartı yalnız kendi canlı merkez kapsamındaki aktif işlem bağlamlarının gereksinimlerini ve süresi dolmamış satın alma önizlemelerini keşfeder; tamamlanmış/iptal edilmiş geçmiş işlemler bu kartta listelenmez. İşleme özgü gate/subject, satın alma sabitlemesi, native kabul/yenileme ve değişmez gösterim kanıtı korunur; genel kişi belgesi veya toplu bağlam aktarımı kurulmaz. Kesin tüketim [WF11](../workflows.md#wf11) sahibindedir.
 
+Belge yönetimindeki “kabul bekleyen üye / toplam üye” sayacı aktif işlemler ve süresi dolmamış satın alma önizlemelerindeki gerçek gereksinimi olan kişileri tekilleştirir. Bir kişinin birden çok işlem bağlamı paydayı artırmaz; herhangi bir karşılanmamış gereksinim kişiyi bekleyen sayar. Seçili belgenin “Tümü” dizini artık aktif işlemi olmayan kişilerin tarihsel kabullerini de gerçek kayıt olarak içerir; bu kayıtlar güncel hedef kitleye veya bekleyen sayacına eklenmez. Native yenileme ve işlem kapsamı korunur; yönetim okuması başkası adına kabul üretmez. Kesin kapsam/DTO [WF11](../workflows.md#wf11) sahibindedir.
+
 | Alan | Kabul edilen seçenek/default |
 |---|---|
 | İlk belge | Yayımlanmış/zorunlu hazır belge atanmaz; org kendi şablonunu hazırlar/seçer. Başlık/dil/sürüm/içerik-dosya/kapsam/zorunluluk açık. Default taslak, açık yayın olmadan kullanıcıya gösterilmez. |

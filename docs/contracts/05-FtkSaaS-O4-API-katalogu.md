@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-237 sözleşme operasyonu; 237 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+238 sözleşme operasyonu; 238 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -243,6 +243,7 @@
 | `instructor_finance_directory_get_v1` | runtime / ilgili WF’yi oku | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; view: instructors / earnings / payments; person_id?: FtkUuid; interval?: Interval; page: Page | Success_instructor_finance_directory_get |
 | `import_directory_get_v1` | runtime / ilgili WF’yi oku | `import.execute` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; state?: Text | Success_import_directory_get |
 | `tracking_directory_get_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; kind?: all / operation / preview / job; state?: Text; query?: string; interval?: Interval | Success_tracking_directory_get |
+| `document_directory_get_v1` | runtime / ilgili WF’yi oku | `document.manage` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; view: documents / versions / acceptances; scope?: center / organization; document_id?: FtkUuid; version_id?: FtkUuid; acceptance_filter?: all / pending; query?: string; page: Page | Success_document_directory_get |
 
 ## Sürüm ve okuma desteği
 
@@ -487,6 +488,7 @@
 | instructor_finance_directory_get_v1 | read | none | None | operational_development_limited |  |
 | import_directory_get_v1 | read | none | None | not_required |  |
 | tracking_directory_get_v1 | read | none | None | not_required |  |
+| document_directory_get_v1 | read | none | None | operational_development_limited |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

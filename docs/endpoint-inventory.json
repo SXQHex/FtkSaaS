@@ -6455,6 +6455,34 @@
         "Development/test only; final source candidate/main clean required.",
         "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
       ]
+    },
+    {
+      "name": "document_directory_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/document_directory_get_v1",
+      "permission": "document.manage",
+      "features": [
+        "F30"
+      ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [
+        "F30"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_document_directory_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     }
   ]
 }
