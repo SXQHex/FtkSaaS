@@ -395,6 +395,10 @@ function SettingsManagement({
       queryKey: ["settings-disciplines", scope.accountId, scope.orgId],
       refetchType: "none",
     });
+    await queries.invalidateQueries({
+      queryKey: ["schedule-sources", scope.accountId, scope.orgId],
+      refetchType: "none",
+    });
     const result = await query.refetch();
     if (result.error) throw result.error;
     await queries.invalidateQueries({

@@ -156,6 +156,7 @@ function StudioContent({
 }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const queries = useQueryClient();
   const [editor, setEditor] = useState<{
     selection: StudioSheetSelection;
     snapshot: StudioSnapshot;
@@ -289,6 +290,10 @@ function StudioContent({
               classMeta={capturedData.classes.find((item) => item.id === selection.id)}
               onLockChange={publishLock}
               onRefresh={async () => {
+                await queries.invalidateQueries({
+                  queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
+                  refetchType: "none",
+                });
                 const result = await query.refetch({ throwOnError: true });
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
                 return result.data.resources;
