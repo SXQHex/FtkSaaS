@@ -2,6 +2,7 @@ import type { FailureEnvelope } from "../src/lib/api-contracts/generated.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { origin, captureAuth, mockNative } from "./auth-fixture.js";
+import { mockStudio, studioIds } from "./studio-fixture.js";
 
 test("native recovery callback survives URL cleaning, reload and password save", async ({
   page,
@@ -849,7 +850,17 @@ for (const colorScheme of ["light", "dark"] as const) {
 test("signup validates policy, stops existing accounts and requests native confirmation once", async ({
   page,
 }, testInfo) => {
-  await mockNative(page);
+  await mockStudio(page);
+  const scopeReads: { operation: string; request: Record<string, unknown> }[] = [];
+  page.on("request", (request) => {
+    const operation = new URL(request.url()).pathname.split("/").at(-1)!;
+    if (
+      ["account_get_v1", "organizations_list_v1", "centers_list_v1", "roles_list_v1"].includes(
+        operation,
+      )
+    )
+      scopeReads.push({ operation, request: request.postDataJSON() });
+  });
   let status = "account_exists";
   let checks = 0;
   let signups = 0;
@@ -857,7 +868,7 @@ test("signup validates policy, stops existing accounts and requests native confi
     checks++;
     expect(route.request().postDataJSON()).toMatchObject({
       client_api_version: 1,
-      email: "signup@example.invalid",
+      email: "fixture@example.invalid",
     });
     expect(route.request().headers()["authorization"]).toBeUndefined();
     if (status === "temporary")
@@ -877,16 +888,16 @@ test("signup validates policy, stops existing accounts and requests native confi
   await page.route("**/auth/v1/signup*", async (route) => {
     signups++;
     expect(route.request().postDataJSON()).toMatchObject({
-      email: "signup@example.invalid",
+      email: "fixture@example.invalid",
       password: "Fixture123",
       data: { display_name: "Test Student" },
     });
     return route.fulfill({
       json: {
         user: {
-          id: "00000000-0000-4000-8000-000000000001",
+          id: "019a7b00-0000-7000-8000-000000000001",
           aud: "authenticated",
-          email: "signup@example.invalid",
+          email: "fixture@example.invalid",
           identities: [{ provider: "email" }],
           created_at: "2026-11-14T00:00:00Z",
         },
@@ -897,7 +908,7 @@ test("signup validates policy, stops existing accounts and requests native confi
   await page.goto("/signup");
   await captureAuth(page, "e02", testInfo);
   await page.getByLabel("Ad soyad", { exact: true }).fill("Test Student");
-  await page.getByLabel("E-posta", { exact: true }).fill("signup@example.invalid");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   const password = page.getByLabel("Parola", { exact: true });
   const submit = page.getByRole("button", { name: "Hesap oluştur", exact: true });
   await page.getByLabel("Parola tekrar", { exact: true }).fill("Fixture123");
@@ -934,6 +945,44 @@ test("signup validates policy, stops existing accounts and requests native confi
   await expect(page).toHaveURL(`${origin}/verify-email`);
   await expect(page.getByRole("heading", { name: "E-postanı doğrula" })).toBeVisible();
   expect(checks).toBe(3);
+  expect(signups).toBe(1);
+  expect(scopeReads).toHaveLength(0);
+  await page.goto("/auth/callback?code=fixture-signup-confirmed");
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true }).click();
+  const studioLink = page
+    .getByRole("navigation", { name: "Ana menü", exact: true })
+    .getByRole("link", { name: "Stüdyo", exact: true });
+  await expect(studioLink).toHaveAttribute(
+    "href",
+    `/o/${studioIds.org}/c/${studioIds.center}/studio`,
+  );
+  await page.keyboard.press("Escape");
+  expect(scopeReads.some((row) => row.operation === "account_get_v1")).toBe(true);
+  expect(scopeReads.some((row) => row.operation === "organizations_list_v1")).toBe(true);
+  expect(scopeReads.find((row) => row.operation === "centers_list_v1")?.request).toMatchObject({
+    org_id: studioIds.org,
+  });
+  expect(scopeReads.find((row) => row.operation === "roles_list_v1")?.request).toMatchObject({
+    org_id: studioIds.org,
+    person_id: studioIds.self,
+  });
+  await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/login`);
+  const beforeExpired = scopeReads.length;
+  await page.goto("/auth/callback?error=access_denied&error_code=otp_expired");
+  await expect(page).toHaveURL(`${origin}/auth/callback`);
+  await expect(page.getByRole("alert")).toBeVisible();
+  expect(scopeReads).toHaveLength(beforeExpired);
+  await page.getByRole("link", { name: "Girişe dön", exact: true }).click();
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  await page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true }).click();
+  await expect(studioLink).toBeVisible();
+  await page.keyboard.press("Escape");
+  expect(scopeReads.length).toBeGreaterThan(beforeExpired);
   expect(signups).toBe(1);
 });
 
