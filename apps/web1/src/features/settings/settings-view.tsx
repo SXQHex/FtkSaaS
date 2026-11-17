@@ -160,7 +160,9 @@ export type SettingsAction =
         | "cancelSubscription"
         | "copyLink"
         | "preview"
-        | "removeLogo";
+        | "removeLogo"
+        | "renameOrganization"
+        | "renameCenter";
     };
 export interface SettingsViewProps {
   data: SettingsViewData;
@@ -240,6 +242,7 @@ export function SettingsView({
   const { t } = useTranslation(),
     mobile = useIsMobile(),
     prefix = useId();
+  const [teamSection, setTeamSection] = useState("ekip-0");
   const [localSection, setLocalSection] = useState<SettingsSection>("genel");
   const current = section ?? localSection;
   const revealSelectedTab = useCallback(
@@ -471,6 +474,22 @@ export function SettingsView({
                   )}
                   {description && (
                     <FieldDescription id={`${id}-hint`}>{description}</FieldDescription>
+                  )}
+                  {((field.key === "ay-ad" && canAction("renameOrganization")) ||
+                    (field.key === "ay-sube" && canAction("renameCenter"))) && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      aria-label={t(($) => $.settings.identity.editFor, {
+                        name: t(($) => $.settings.fields[field.key]),
+                      })}
+                      onPress={() =>
+                        action(field.key === "ay-ad" ? "renameOrganization" : "renameCenter")
+                      }
+                    >
+                      {t(($) => $.settings.identity.edit)}
+                    </Button>
                   )}
                 </>
               )}
@@ -735,8 +754,8 @@ export function SettingsView({
           })}
         </TabsList>
         <div className="min-w-0 flex-1">
-          {settingsLayout.map((panel) => (
-            <TabsContent key={panel.key} id={panel.key}>
+          {settingsLayout.map((panel) => {
+            const content = (
               <div className="flex min-w-0 flex-col gap-4">
                 {panel.cards.map((card, index) => {
                   const form =
@@ -747,7 +766,7 @@ export function SettingsView({
                     ["politika", "salonlar", "sablon", "ekip", "gecmis"].includes(panel.key) &&
                     !(panel.key === "ekip" && index === 1);
                   const heading = `${prefix}-${card.key}-title`;
-                  return (
+                  const content = (
                     <Card key={card.key} className="min-w-0 gap-4">
                       <CardHeader className="gap-1">
                         <CardTitle>
@@ -937,6 +956,13 @@ export function SettingsView({
                       )}
                     </Card>
                   );
+                  return panel.key === "ekip" ? (
+                    <TabsContent key={card.key} id={card.key}>
+                      {content}
+                    </TabsContent>
+                  ) : (
+                    content
+                  );
                 })}
                 {panel.key === "genel" && (
                   <Card className="min-w-0">
@@ -973,8 +999,32 @@ export function SettingsView({
                   </p>
                 )}
               </div>
-            </TabsContent>
-          ))}
+            );
+            return (
+              <TabsContent key={panel.key} id={panel.key}>
+                {panel.key === "ekip" ? (
+                  <Tabs
+                    selectedKey={teamSection}
+                    onSelectionChange={(key) => {
+                      if (!locked && (key === "ekip-0" || key === "ay-izin")) setTeamSection(key);
+                    }}
+                  >
+                    <TabsList aria-label={t(($) => $.settings.teamSections)}>
+                      <TabsTrigger id="ekip-0" isDisabled={locked}>
+                        {t(($) => $.settings.teamPeople)}
+                      </TabsTrigger>
+                      <TabsTrigger id="ay-izin" isDisabled={locked}>
+                        {t(($) => $.settings.teamPermissions)}
+                      </TabsTrigger>
+                    </TabsList>
+                    {content}
+                  </Tabs>
+                ) : (
+                  content
+                )}
+              </TabsContent>
+            );
+          })}
         </div>
       </Tabs>
     </div>

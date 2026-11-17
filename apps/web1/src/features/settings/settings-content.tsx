@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
+import { SettingsIdentityEditor } from "./settings-identity-editor";
+import { useSettingsDocument } from "./use-settings-document";
 import { readOrganizationSettingsCatalog } from "./settings-reader";
 
 export function SettingsContent({
@@ -75,6 +77,7 @@ export function SettingsContent({
       scope={scope}
       organizationLabel={organization.name}
       centerLabel={center.name}
+      timezone={center.timezone}
       canOrganization={canOrganization}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
@@ -89,6 +92,7 @@ function SettingsManagement({
   scope,
   organizationLabel,
   centerLabel,
+  timezone,
   canOrganization,
   canWriteOrganization,
   readOnly,
@@ -99,6 +103,7 @@ function SettingsManagement({
   scope: ClientScope;
   organizationLabel: string;
   centerLabel: string;
+  timezone: string;
   canOrganization: boolean;
   canWriteOrganization: boolean;
   readOnly: boolean;
@@ -111,7 +116,8 @@ function SettingsManagement({
     queries = useQueryClient();
   const [level, setLevel] = useState<DisciplineLevel>(canCenter ? "center" : "organization");
   const [selection, setSelection] = useState<{ id?: string }>(),
-    [locked, setLocked] = useState(false);
+    [locked, setLocked] = useState(false),
+    [identity, setIdentity] = useState<DisciplineLevel>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -133,9 +139,10 @@ function SettingsManagement({
       )
         return false;
       setSelection(undefined);
-      if (code === "FORBIDDEN")
+      setIdentity(undefined);
+      if (code === "FORBIDDEN") {
         void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
-      else {
+      } else {
         queries.clear();
         void router.invalidate();
       }
@@ -145,6 +152,14 @@ function SettingsManagement({
   );
   const allowed = level === "organization" ? canOrganization : canCenter;
   const writable = !readOnly && (level === "organization" ? canWriteOrganization : canCenter);
+  const document = useSettingsDocument({
+    scope,
+    level,
+    enabled: allowed,
+    readOnly,
+    onLockChange: publishLock,
+    onAccessLost: accessLost,
+  });
   const query = useQuery({
     queryKey: [
       "settings-disciplines",
@@ -180,6 +195,14 @@ function SettingsManagement({
   }, [query.error, router]);
   const source = query.isError || query.isFetching ? undefined : query.data;
   const data: SettingsViewData = {
+    ...document.data,
+    fields: {
+      ...document.data.fields,
+      "ay-ad": { value: organizationLabel, writable: false },
+      "ay-sube": { value: centerLabel, writable: false },
+      "ay-tz": { value: timezone, writable: false },
+    },
+    brand: document.data.brand ? { ...document.data.brand, name: organizationLabel } : undefined,
     tables: source
       ? {
           disciplines: {
@@ -267,7 +290,12 @@ function SettingsManagement({
           </AlertDescription>
         </Alert>
       )}
+      {document.notice}
       <SettingsView
+        onField={document.onField}
+        onColor={document.onColor}
+        onSave={document.onSave}
+        onDiscard={document.onDiscard}
         data={data}
         locked={locked}
         scope={{
@@ -283,11 +311,42 @@ function SettingsManagement({
             setLevel(next);
           }
         }}
-        availableActions={writable && source && level === "organization" ? ["discipline"] : []}
+        availableActions={[
+          ...(writable && source && level === "organization" ? ["discipline" as const] : []),
+          ...(writable
+            ? [
+                level === "organization"
+                  ? ("renameOrganization" as const)
+                  : ("renameCenter" as const),
+              ]
+            : []),
+        ]}
         onAction={(action) => {
-          if (!locked && action.kind === "discipline" && level === "organization") setSelection({});
+          if (locked) return;
+          if (action.kind === "discipline" && level === "organization") setSelection({});
+          if (action.kind === "renameOrganization" && level === "organization")
+            setIdentity("organization");
+          if (action.kind === "renameCenter" && level === "center") setIdentity("center");
         }}
       />
+      {identity && (
+        <SettingsIdentityEditor
+          scope={scope}
+          level={identity}
+          onClose={() => {
+            if (!locked) setIdentity(undefined);
+          }}
+          onSaved={async () => {
+            await queries.invalidateQueries(
+              { queryKey: ["workspace", scope.accountId, scope.orgId] },
+              { throwOnError: true },
+            );
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+        />
+      )}
+      {document.dialog}
       {selection && (
         <DisciplineEditor
           key={`${scope.accountId}:${scope.orgId}:${scope.centerId}:${level}:${selection.id ?? "new"}`}

@@ -1650,6 +1650,20 @@
       "programs": "Programlar",
       "products": "Ürünler",
       "sales": "Satışlar"
+    },
+    "documentReadError": "Ayar belgesi okunamadı. Güncel yetkili kaynağı yeniden oku.",
+    "documentInvalid": "İletişim alanlarını ve #RRGGBB renk biçimini kontrol et.",
+    "documentReviewHint": "Yalnız listelenen alanlar seçili kapsamda değişir. Diğer ayarlar ve geçmiş kayıtlar korunur.",
+    "teamSections": "Ekip bölümleri",
+    "teamPeople": "Kişiler",
+    "teamPermissions": "İzinler",
+    "identity": {
+      "description": "Ad değişikliği ayrı bir işlemdir; iletişim ve marka alanlarını değiştirmez.",
+      "timezonePreserved": "Merkezin mevcut iş saat dilimi korunur.",
+      "invalid": "Geçerli ve değişmiş bir ad gir.",
+      "edit": "Adı düzenle",
+      "editFor": "{{name}}: adı düzenle",
+      "review": "Değişikliği incele"
     }
   },
   "products": {

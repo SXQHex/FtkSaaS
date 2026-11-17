@@ -3709,6 +3709,9 @@ export default interface Resources {
         "writing": "Değişiklik kaydediliyor."
       },
       "disciplines": "Disiplinler",
+      "documentInvalid": "İletişim alanlarını ve #RRGGBB renk biçimini kontrol et.",
+      "documentReadError": "Ayar belgesi okunamadı. Güncel yetkili kaynağı yeniden oku.",
+      "documentReviewHint": "Yalnız listelenen alanlar seçili kapsamda değişir. Diğer ayarlar ve geçmiş kayıtlar korunur.",
       "edit": "Düzenle",
       "empty": "Bu bölümde kayıt yok.",
       "fields": {
@@ -3755,6 +3758,14 @@ export default interface Resources {
         "ay-tz": "Saat dilimi",
         "ay-yoklama": "Yoklamayı kapat",
         "hs-f": "Bölüm"
+      },
+      "identity": {
+        "description": "Ad değişikliği ayrı bir işlemdir; iletişim ve marka alanlarını değiştirmez.",
+        "edit": "Adı düzenle",
+        "editFor": "{{name}}: adı düzenle",
+        "invalid": "Geçerli ve değişmiş bir ad gir.",
+        "review": "Değişikliği incele",
+        "timezonePreserved": "Merkezin mevcut iş saat dilimi korunur."
       },
       "inheritedHint": "Bu değer üst kapsamdan devralındı.",
       "invite": "Kişi davet et",
@@ -3828,6 +3839,9 @@ export default interface Resources {
         "staffType": "Personel türü"
       },
       "teamHint": "Eğitmenler Stüdyo sayfasında yönetilir. Roller ve izinler ayrı işlemlerdir.",
+      "teamPeople": "Kişiler",
+      "teamPermissions": "İzinler",
+      "teamSections": "Ekip bölümleri",
       "templateEditor": {
         "body": "Metin",
         "preview": "Önizleme",
