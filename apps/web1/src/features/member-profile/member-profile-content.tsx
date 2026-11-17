@@ -11,6 +11,7 @@ import { RightAdjustmentEditor } from "./right-adjustment-editor";
 import { FreezeEditor } from "./freeze-editor";
 import { ProfileLedger } from "./profile-ledger";
 import { StudentStateEditor } from "./student-state";
+import { PersonEditor } from "./person-editor";
 import { StudentDisciplineEditor } from "./student-discipline-editor";
 import { SaleLifecycleEditor } from "./sale-lifecycle-editor";
 import type { SaleLifecycleAction } from "./sale-lifecycle";
@@ -55,6 +56,7 @@ export function MemberProfileContent({
     [sale, setSale] = useState(false),
     [studentAction, setStudentAction] = useState<"activate" | "deactivate">(),
     [studentDiscipline, setStudentDiscipline] = useState(false),
+    [editPerson, setEditPerson] = useState(false),
     [lifecycle, setLifecycle] = useState<{ action: SaleLifecycleAction; saleId?: string }>(),
     [collect, setCollect] = useState(false),
     [locked, setLocked] = useState(false),
@@ -447,29 +449,38 @@ export function MemberProfileContent({
     <>
       <MemberProfileView
         studentTools={
-          <Button
-            variant="outline"
-            isDisabled={
-              locked ||
-              !sourceAvailable ||
-              !p ||
-              disciplines.isError ||
-              disciplines.isFetching ||
-              !disciplines.data?.length ||
-              (!p.relationships.some(
-                (row) =>
-                  row.center_id === scope.centerId &&
-                  row.kind === "student" &&
-                  row.state === "active",
-              ) &&
-                !p.discipline_relationships.some(
-                  (row) => row.center_id === scope.centerId && row.kind === "student",
-                ))
-            }
-            onPress={() => setStudentDiscipline(true)}
-          >
-            {t(($) => $.studentDiscipline.title)}
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              isDisabled={locked || !sourceAvailable || !p}
+              onPress={() => setEditPerson(true)}
+            >
+              {t(($) => $.personEdit.title)}
+            </Button>
+            <Button
+              variant="outline"
+              isDisabled={
+                locked ||
+                !sourceAvailable ||
+                !p ||
+                disciplines.isError ||
+                disciplines.isFetching ||
+                !disciplines.data?.length ||
+                (!p.relationships.some(
+                  (row) =>
+                    row.center_id === scope.centerId &&
+                    row.kind === "student" &&
+                    row.state === "active",
+                ) &&
+                  !p.discipline_relationships.some(
+                    (row) => row.center_id === scope.centerId && row.kind === "student",
+                  ))
+              }
+              onPress={() => setStudentDiscipline(true)}
+            >
+              {t(($) => $.studentDiscipline.title)}
+            </Button>
+          </>
         }
         name={p?.display_name ?? t(($) => $.memberProfile.title)}
         initials={
@@ -978,6 +989,22 @@ export function MemberProfileContent({
             setCurrencyDraft(code);
             setSale(false);
             setCollect(true);
+          }}
+        />
+      )}
+      {editPerson && p && (sourceAvailable || preservePending) && (
+        <PersonEditor
+          scope={scope}
+          personId={p.id}
+          sourceAvailable={sourceAvailable}
+          onClose={() => setEditPerson(false)}
+          onLockChange={changeLock}
+          onAccessLost={accessLost}
+          onRefresh={async (current) => {
+            queries.setQueryData(personKey, current);
+            await queries.invalidateQueries({
+              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            });
           }}
         />
       )}

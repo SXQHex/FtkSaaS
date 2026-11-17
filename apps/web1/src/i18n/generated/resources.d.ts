@@ -2918,6 +2918,31 @@ export default interface Resources {
       "visiblePage": "Sonuç sayfası {{number}}",
       "writeUnavailable": "Gerekçeli birleştirme ve onay işlemi şu anda kullanılamıyor."
     },
+    "personEdit": {
+      "addEmail": "E-posta ekle",
+      "addPhone": "Telefon ekle",
+      "after": "Yeni bilgiler",
+      "apply": "Kişi bilgilerini kaydet",
+      "before": "Mevcut bilgiler",
+      "description": "İletişim bilgilerini kaydetmek öğrencilik, hesap daveti veya görev oluşturmaz.",
+      "empty": "İletişim kaydı yok",
+      "invalid": "Adı ve e-posta biçimini kontrol et. Aynı iletişim bilgisini iki kez ekleme.",
+      "phone": "Telefon",
+      "readonly": "Hesaba ait veya yazma izni doğrulanmamış alanlar salt okunurdur. Düzenlenebilir iletişim alanını boş bırakmak o yerel kaydı kaldırır.",
+      "review": "Kişi değişikliklerini incele",
+      "same": "Kaydedilecek değişiklik yok.",
+      "sourceError": "Kişi bilgileri veya alan izinleri değişti ya da okunamadı. Düzenleyiciyi kapatıp güncel kayıtla yeniden aç.",
+      "states": {
+        "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+        "rejected": "Kişi kaydedilemedi. Güncel kaynağı ve yetkiyi kontrol et.",
+        "saved": "Kişi bilgileri kaydedildi ve yeniden okundu. Öğrencilik durumu ayrı bir işlemdir.",
+        "saved-unread": "Kayıt isteği kabul edildi; güncel kişi okunamadı. Yeniden yazmadan sonucu oku.",
+        "stale": "Kişi değişti. Düzenleyiciyi kapatıp güncel kayıtla yeniden incele.",
+        "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem sonucunu oku.",
+        "writing": "Kişi bilgileri kaydediliyor…"
+      },
+      "title": "Kişiyi düzenle"
+    },
     "photo": {
       "fileError": "Fotoğraf okunamadı. Geçerli bir görsel seç.",
       "hint": "PNG, JPEG veya WebP, en fazla 1 MiB.",

@@ -5194,5 +5194,30 @@
     "before": "Önceki çalışma saatleri",
     "after": "Yeni çalışma saatleri",
     "openEnded": "Bitiş yok"
+  },
+  "personEdit": {
+    "title": "Kişiyi düzenle",
+    "description": "İletişim bilgilerini kaydetmek öğrencilik, hesap daveti veya görev oluşturmaz.",
+    "readonly": "Hesaba ait veya yazma izni doğrulanmamış alanlar salt okunurdur. Düzenlenebilir iletişim alanını boş bırakmak o yerel kaydı kaldırır.",
+    "phone": "Telefon",
+    "addEmail": "E-posta ekle",
+    "addPhone": "Telefon ekle",
+    "review": "Kişi değişikliklerini incele",
+    "apply": "Kişi bilgilerini kaydet",
+    "before": "Mevcut bilgiler",
+    "after": "Yeni bilgiler",
+    "empty": "İletişim kaydı yok",
+    "invalid": "Adı ve e-posta biçimini kontrol et. Aynı iletişim bilgisini iki kez ekleme.",
+    "sourceError": "Kişi bilgileri veya alan izinleri değişti ya da okunamadı. Düzenleyiciyi kapatıp güncel kayıtla yeniden aç.",
+    "same": "Kaydedilecek değişiklik yok.",
+    "states": {
+      "writing": "Kişi bilgileri kaydediliyor…",
+      "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem sonucunu oku.",
+      "pending": "İşlem sürüyor; yeni istek göndermeden sonucunu oku.",
+      "saved-unread": "Kayıt isteği kabul edildi; güncel kişi okunamadı. Yeniden yazmadan sonucu oku.",
+      "saved": "Kişi bilgileri kaydedildi ve yeniden okundu. Öğrencilik durumu ayrı bir işlemdir.",
+      "stale": "Kişi değişti. Düzenleyiciyi kapatıp güncel kayıtla yeniden incele.",
+      "rejected": "Kişi kaydedilemedi. Güncel kaynağı ve yetkiyi kontrol et."
+    }
   }
 }
