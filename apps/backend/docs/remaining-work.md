@@ -37,6 +37,9 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] W1-BE-31 kaynak/native: belge yönetimi, sürüm/kabul dizini ve gerçek hedef kişi özeti; [XREQ-068](../../../docs/requests.md#xreq-068), kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management).
 - [x] W1-BE-31 PR324 kaynak/push → aday full clean → merge/main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management); yeni hosted/provider ve frontend kabulü ayrı.
 
+- [x] W1-BE-35 kaynak/native: roles_list_v1 üzerinde mevcut rol/durum filtresi, limit öncesi kapsam ve cursor/yetki korunumu; [XREQ-069](../../../docs/requests.md#xreq-069), kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery).
+- [ ] W1-BE-35 ayrı Draft PR push → aday full clean → ayrıca yetkili merge/main/development teslimi; hosted ve frontend kabulü ayrı.
+
 ## Web1 ek backend talepleri — 15 Kasım
 
 Kullanıcı son `request(1).md` dosyasındaki backend açıklarının kapatılmasını istedi. İş bu görevde [G03 sırasından](production-queue.md) önce yürür; yeni ayrı yol haritası değildir. Kaynak/ortam kanıtının tek sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#web1-talep-ekleri).
