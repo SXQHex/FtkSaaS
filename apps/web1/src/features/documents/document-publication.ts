@@ -308,8 +308,10 @@ export async function readPublication(intent: PublicationIntent, id?: string) {
   if (
     values.file_id !== fileId ||
     values.version_label !== intent.request.version_label ||
-    values.scope?.kind !== "center" ||
-    values.scope.center_id !== intent.scope.centerId ||
+    values.scope?.kind !== intent.request.scope.kind ||
+    (intent.request.scope.kind === "center" &&
+      values.scope.center_id !== intent.request.scope.center_id) ||
+    (intent.request.scope.kind === "organization" && values.scope.center_id != null) ||
     JSON.stringify(normalize(values.requirements)) !==
       JSON.stringify(normalize(intent.request.requirements)) ||
     (intent.request.document_id && values.document_id !== intent.request.document_id)
