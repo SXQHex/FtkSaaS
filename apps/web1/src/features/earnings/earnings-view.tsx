@@ -194,14 +194,16 @@ export function EarningsView({
                 role="region"
                 tabIndex={0}
                 aria-label={t(($) => $.earnings.tabs.instructors)}
-                className="min-w-0 overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-ring [&>[data-slot=table-container]]:overflow-visible"
+                className="min-w-0 scroll-pl-32 overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-ring [&>[data-slot=table-container]]:overflow-visible"
               >
                 <Table aria-label={t(($) => $.earnings.tabs.instructors)} className={tableClass}>
                   <TableHeader>
-                    <TableHead isRowHeader>{t(($) => $.earnings.instructor)}</TableHead>
+                    <TableHead isRowHeader className="w-32">
+                      {t(($) => $.earnings.instructor)}
+                    </TableHead>
                     <TableHead>{t(($) => $.earnings.agreement)}</TableHead>
                     <TableHead>{t(($) => $.earnings.sessions)}</TableHead>
-                    <TableHead>{t(($) => $.earnings.metrics.earned)}</TableHead>
+                    <TableHead>{t(($) => $.earnings.title)}</TableHead>
                     <TableHead>{t(($) => $.earnings.metrics.paid)}</TableHead>
                     <TableHead>{t(($) => $.earnings.metrics.remaining)}</TableHead>
                     <TableHead>{t(($) => $.earnings.actions)}</TableHead>
@@ -209,12 +211,12 @@ export function EarningsView({
                   <TableBody renderEmptyState={() => empty(people)}>
                     {(people ?? []).map((row) => (
                       <TableRow key={row.id} id={row.id} textValue={row.name}>
-                        <TableCell className="sticky left-0 z-10 bg-card">
+                        <TableCell className="sticky left-0 z-10 w-32 min-w-32 max-w-32 bg-card whitespace-normal">
                           <div className="flex items-center gap-2">
                             <Avatar size="sm">
                               <AvatarFallback>{row.initials}</AvatarFallback>
                             </Avatar>
-                            <span>{row.name}</span>
+                            <span className="min-w-0 wrap-anywhere">{row.name}</span>
                           </div>
                         </TableCell>
                         <TableCell>
