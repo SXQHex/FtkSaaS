@@ -5,6 +5,7 @@ import type {
   RequestPublicCalendarGet,
   SuccessPublicCalendarGet,
 } from "../../lib/api-contracts/generated";
+import { publicApplicationDiscovery } from "./public-discovery";
 import { readEnvelope } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import { formatMinorAmount } from "../../lib/money";
@@ -29,10 +30,21 @@ const calendar = z.object({
       currency: z.string().regex(/^[A-Z]{3}$/),
       public_conditions: z.string(),
       discipline_ids: z.array(z.uuid()),
+      kind: z.enum(["lesson", "event"]),
+      timezone: z.string().min(1),
+      occupancy: z
+        .object({
+          registered: z.number().int().nonnegative().safe(),
+          capacity: z.number().int().nonnegative().safe().nullable(),
+        })
+        .nullable(),
+      instructors: z.array(z.string()).nullable(),
     }),
   ),
   next_cursor: z.string().min(1).nullable().optional(),
   as_of: instant,
+  publication_state: z.enum(["available", "unavailable"]),
+  application: publicApplicationDiscovery,
   organization_profile: profile.nullish(),
   center_profile: profile.nullish(),
 });
@@ -45,7 +57,13 @@ export async function publicCalendarInterval(now = Date.now()): Promise<Interval
 }
 
 export async function readPublicCalendar(
-  input: { slug: string; centerId?: string; interval: Interval; cursor?: string | null },
+  input: {
+    slug: string;
+    centerId?: string;
+    disciplineId?: string;
+    interval: Interval;
+    cursor?: string | null;
+  },
   signal?: AbortSignal,
 ) {
   const base = import.meta.env.VITE_PUBLIC_GATEWAY_URL?.trim();
@@ -58,6 +76,8 @@ export async function readPublicCalendar(
     page: { limit: 50, sort: "starts_at_asc", ...(input.cursor ? { cursor: input.cursor } : {}) },
     ...(input.centerId ? { center_id: input.centerId } : {}),
     include_disciplines: true,
+    include_details: true,
+    ...(input.disciplineId ? { discipline_id: z.uuid().parse(input.disciplineId) } : {}),
   };
   const response = await fetch(`${base.replace(/\/$/, "")}/api/public/calendar`, {
     method: "POST",
@@ -74,6 +94,7 @@ export async function readPublicCalendar(
   for (const item of data.items) {
     if (
       ids.has(item.publication_id) ||
+      (input.disciplineId && !item.discipline_ids.includes(input.disciplineId)) ||
       T.Instant.compare(item.interval.starts_at, item.interval.ends_at) >= 0 ||
       T.Instant.compare(item.interval.starts_at, input.interval.starts_at) < 0 ||
       T.Instant.compare(item.interval.starts_at, input.interval.ends_at) >= 0 ||
@@ -85,6 +106,11 @@ export async function readPublicCalendar(
   }
   if (input.cursor && input.cursor === data.next_cursor)
     throw new Error("Geçersiz program cursor yanıtı.");
+  if (
+    data.publication_state === "unavailable" &&
+    (data.items.length || data.next_cursor || data.application.state === "open")
+  )
+    throw new Error("Geçersiz public yayın durumu.");
   return data;
 }
 
@@ -93,21 +119,19 @@ export async function publicProgramRows(
 ): Promise<{ rows: PublicProgramRow[]; timezone?: string }> {
   const T = await getTemporal();
   const first = pages[0];
-  const timezone = first?.center_profile?.timezone ?? first?.organization_profile?.timezone;
-  const zone = timezone ?? "UTC";
-  // A missing public timezone is explicitly labelled UTC; it is never inferred from the visitor's device.
   const ids = new Set<string>();
   const rows = pages
     .flatMap((page) => page.items)
     .map((item) => {
       if (ids.has(item.publication_id)) throw new Error("Yinelenen public program kaydı.");
       ids.add(item.publication_id);
-      const start = T.Instant.from(item.interval.starts_at).toZonedDateTimeISO(zone);
-      const end = T.Instant.from(item.interval.ends_at).toZonedDateTimeISO(zone);
+      const start = T.Instant.from(item.interval.starts_at).toZonedDateTimeISO(item.timezone);
+      const end = T.Instant.from(item.interval.ends_at).toZonedDateTimeISO(item.timezone);
       const time: Intl.DateTimeFormatOptions = {
         hour: "2-digit",
         minute: "2-digit",
         hourCycle: "h23",
+        ...(start.offset !== end.offset ? { timeZoneName: "shortOffset" as const } : {}),
       };
       return {
         id: item.publication_id,
@@ -120,14 +144,34 @@ export async function publicProgramRows(
           year: "numeric",
         }),
         start: start.toLocaleString("tr-TR", time),
-        end: end.toLocaleString("tr-TR", time),
+        end: end.toLocaleString(
+          "tr-TR",
+          start.toPlainDate().equals(end.toPlainDate())
+            ? time
+            : { ...time, day: "numeric", month: "short", year: "numeric" },
+        ),
         startsAt: item.interval.starts_at,
         endsAt: item.interval.ends_at,
         venue: item.venue_public_label,
         conditions: item.public_conditions,
         fee: formatMinorAmount(item.fee_minor, item.currency),
-        // The native public DTO does not classify lesson/event or expose private capacity/instructors.
+        kind: item.kind,
+        timezone: item.timezone,
+        instructor: item.instructors?.join(" · ") || undefined,
+        occupancy: item.occupancy ?? undefined,
       };
     });
-  return { rows, timezone };
+  const zones = new Set(rows.map((row) => row.timezone));
+  const timezone =
+    zones.size === 1
+      ? rows[0]?.timezone
+      : rows.length
+        ? undefined
+        : (first?.center_profile?.timezone ?? first?.organization_profile?.timezone);
+  return {
+    rows: rows.toSorted(
+      (a, b) => a.day.localeCompare(b.day) || T.Instant.compare(a.startsAt, b.startsAt),
+    ),
+    timezone,
+  };
 }

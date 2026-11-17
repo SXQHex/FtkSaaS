@@ -235,4 +235,7 @@ export interface Operations {
   member_document_contexts_get_v1: {request: T.RequestMemberDocumentContextsGet; response: T.SuccessMemberDocumentContextsGet};
   notifications_read_set_v1: {request: T.RequestNotificationsReadSet; response: T.SuccessNotificationsReadSet};
   management_work_list_v1: {request: T.RequestManagementWorkList; response: T.SuccessManagementWorkList};
+  instructor_finance_directory_get_v1: {request: T.RequestInstructorFinanceDirectoryGet; response: T.SuccessInstructorFinanceDirectoryGet};
+  import_directory_get_v1: {request: T.RequestImportDirectoryGet; response: T.SuccessImportDirectoryGet};
+  tracking_directory_get_v1: {request: T.RequestTrackingDirectoryGet; response: T.SuccessTrackingDirectoryGet};
 }

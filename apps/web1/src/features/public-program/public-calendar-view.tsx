@@ -29,7 +29,8 @@ export interface PublicProgramRow {
   conditions: string;
   kind?: "lesson" | "event";
   instructor?: string;
-  availability?: string;
+  occupancy?: { registered: number; capacity: number | null };
+  timezone?: string;
   applyHref?: string;
 }
 
@@ -50,6 +51,7 @@ export function PublicCalendarView({
   nextError,
   refreshError,
   applyHref,
+  applicationUnavailable = false,
 }: {
   rows: PublicProgramRow[];
   address?: string;
@@ -67,6 +69,7 @@ export function PublicCalendarView({
   nextError?: boolean;
   refreshError?: boolean;
   applyHref?: string;
+  applicationUnavailable?: boolean;
 }) {
   const { t } = useTranslation();
   const events = rows.filter((row) => row.kind === "event");
@@ -78,7 +81,7 @@ export function PublicCalendarView({
     return (
       <li
         key={row.id}
-        className="grid min-w-0 grid-cols-[4.5rem_minmax(0,1fr)] items-start gap-3 py-4 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto]"
+        className="grid min-w-0 wrap-anywhere grid-cols-[4.5rem_minmax(0,1fr)] items-start gap-3 py-4 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto]"
       >
         <div className="flex flex-col text-sm tabular-nums">
           <time dateTime={row.startsAt} className="font-semibold">
@@ -92,13 +95,28 @@ export function PublicCalendarView({
           <h3 className="text-sm font-semibold">{row.title}</h3>
           {row.kind === "event" && <p className="text-sm text-muted-foreground">{row.dayLabel}</p>}
           <p className="text-sm text-muted-foreground">
-            {[row.venue, row.instructor].filter(Boolean).join(" · ")}
+            {[row.venue, row.instructor, row.timezone !== timezone ? row.timezone : undefined]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
           {row.conditions && <p className="text-sm text-muted-foreground">{row.conditions}</p>}
         </div>
         <div className="col-start-2 flex flex-wrap items-center gap-2 sm:col-start-3">
-          <Badge variant="secondary">{row.fee}</Badge>
-          {row.availability && <Badge variant="outline">{row.availability}</Badge>}
+          <Badge variant="secondary" className="h-auto min-h-[22px] max-w-full whitespace-normal">
+            {row.fee}
+          </Badge>
+          {row.occupancy && (
+            <Badge variant="outline" className="h-auto min-h-[22px] max-w-full whitespace-normal">
+              {row.occupancy.capacity === null
+                ? t(($) => $.publicProgram.occupancyUnlimited, {
+                    registered: row.occupancy.registered,
+                  })
+                : t(($) => $.publicProgram.occupancy, {
+                    registered: row.occupancy.registered,
+                    capacity: row.occupancy.capacity,
+                  })}
+            </Badge>
+          )}
           {row.applyHref && (
             <LinkButton
               href={row.applyHref}
@@ -119,23 +137,38 @@ export function PublicCalendarView({
         <h1 className="text-3xl font-semibold">{t(($) => $.publicProgram.title)}</h1>
         {address && <p className="mt-1 break-words text-muted-foreground">{address}</p>}
       </div>
-      <Field>
-        <FieldLabel htmlFor="public-discipline">{t(($) => $.publicProgram.discipline)}</FieldLabel>
-        <NativeSelect
-          id="public-discipline"
-          value={selected}
-          onChange={(event) => onSelect(event.target.value)}
-          disabled={!filterAvailable || loading}
-          className="w-full max-w-64"
-        >
-          <NativeSelectOption value="">{t(($) => $.publicProgram.allLessons)}</NativeSelectOption>
-          {disciplines.map((d) => (
-            <NativeSelectOption key={d.id} value={d.id}>
-              {d.name}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
-      </Field>
+      <search aria-label={t(($) => $.publicProgram.filterLabel)}>
+        <Field>
+          <FieldLabel htmlFor="public-discipline">
+            {t(($) => $.publicProgram.discipline)}
+          </FieldLabel>
+          <NativeSelect
+            id="public-discipline"
+            value={selected}
+            onChange={(event) => onSelect(event.target.value)}
+            disabled={!filterAvailable || loading}
+            className="w-full max-w-64"
+          >
+            <NativeSelectOption value="">{t(($) => $.publicProgram.allLessons)}</NativeSelectOption>
+            {disciplines.map((d) => (
+              <NativeSelectOption key={d.id} value={d.id}>
+                {d.name}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </Field>
+      </search>
+      {applicationUnavailable && (
+        <Alert>
+          <AlertTitle>{t(($) => $.publicProgram.applicationUnavailable)}</AlertTitle>
+          <AlertDescription>
+            {t(($) => $.publicProgram.applicationUnavailableHint)}
+          </AlertDescription>
+        </Alert>
+      )}
+      {rows.some((row) => row.occupancy) && (
+        <p className="text-sm text-muted-foreground">{t(($) => $.publicProgram.occupancyHint)}</p>
+      )}
       {!filterAvailable && !loading && (
         <p className="text-sm text-muted-foreground">
           {t(($) => $.publicProgram.filterUnavailable)}
@@ -145,7 +178,9 @@ export function PublicCalendarView({
         <p className="text-sm text-muted-foreground">
           {timezone
             ? t(($) => $.publicProgram.timezone, { timezone })
-            : t(($) => $.publicProgram.utc)}
+            : rows.length > 0 && rows.every((row) => row.timezone)
+              ? t(($) => $.publicProgram.mixedTimezones)
+              : t(($) => $.publicProgram.utc)}
         </p>
       )}
       {loading ? (
