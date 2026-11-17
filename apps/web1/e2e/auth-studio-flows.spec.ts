@@ -220,3 +220,58 @@ test("Studio flow: a verified active assignment cannot submit a duplicate grant"
   await writeFile(".tmp/e12-grant-manual-review.json", JSON.stringify(review, null, 2));
   expect(state.writes).toEqual([]);
 });
+
+test("Studio agreement: explicit new instructor/discipline/format terms create an independent immutable version", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  const original = structuredClone(state.agreements[0]);
+  await openStudio(page);
+  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
+  await page.getByRole("button", { name: "Anlaşma hazırla", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Anlaşma hazırla", exact: true });
+  await expect(panel.locator("#agreement-person")).toBeEnabled();
+  await panel.locator("#agreement-person").selectOption(studioIds.instructor);
+  await panel.locator("#agreement-discipline").selectOption(studioIds.discipline);
+  await panel.locator("#agreement-format").selectOption("private");
+  await panel.getByRole("radio", { name: "Seans başı", exact: true }).press("Space");
+  await panel.locator("#agreement-currency").fill("TRY");
+  await panel
+    .locator('select[id^="agreement-general-"][id$="-kind"]')
+    .selectOption("session_fixed");
+  await panel.getByLabel("Tutar (en küçük para birimi)", { exact: true }).fill("25000");
+  await panel.locator("#agreement-room-kind").selectOption("free");
+  await panel.locator("#agreement-room-order").selectOption("before_instructor_share");
+  await panel.locator("#agreement-from").fill("2030-01-01T09:00");
+  await panel.locator("#agreement-until").fill("2031-01-01T09:00");
+  await panel.locator("#agreement-reason").fill("Kontrollü yeni özel ders anlaşması");
+  expect(state.writes).toHaveLength(0);
+  await panel.getByRole("checkbox").press("Space");
+  await panel.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
+  await expect(panel).toHaveCount(0);
+  expect(state.effects).toEqual(["instructor_agreement_publish_v1"]);
+  expect(state.agreements).toHaveLength(2);
+  expect(state.agreements[0]).toEqual(original);
+  expect(state.agreements[1]).toMatchObject({
+    person_id: studioIds.instructor,
+    discipline_id: studioIds.discipline,
+    center_id: studioIds.center,
+    format: "private",
+    supersedes_id: null,
+    version: 1,
+    valid: { starts_at: "2030-01-01T09:00:00Z", ends_at: "2031-01-01T09:00:00Z" },
+    terms: {
+      model: "session_fixed",
+      currency: "TRY",
+      components: [{ kind: "session_fixed", amount_minor: "25000" }],
+    },
+  });
+  await page
+    .getByRole("button", { name: /Örnek Eğitmen/ })
+    .last()
+    .click();
+  await expect(page.getByRole("dialog").locator("#agreement-format")).toHaveValue("private");
+  await expect(
+    page.getByRole("dialog").getByLabel("Tutar (en küçük para birimi)", { exact: true }),
+  ).toHaveValue("25000");
+});
