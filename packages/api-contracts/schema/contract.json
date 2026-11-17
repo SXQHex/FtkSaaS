@@ -943,7 +943,8 @@
         "management_work_list_v1",
         "instructor_finance_directory_get_v1",
         "import_directory_get_v1",
-        "tracking_directory_get_v1"
+        "tracking_directory_get_v1",
+        "document_directory_get_v1"
       ]
     },
     "EntityType": {
@@ -65197,6 +65198,555 @@
       "minItems": 1,
       "maxItems": 10,
       "uniqueItems": true
+    },
+    "DocumentDirectoryVersion": {
+      "type": "object",
+      "properties": {
+        "version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version_label": {
+          "$ref": "#/$defs/Text"
+        },
+        "published_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "requirements": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/DocumentRequirement"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "version_id",
+        "version",
+        "version_label",
+        "published_at",
+        "effective_at",
+        "requirements"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentDirectoryDocument": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/Text"
+        },
+        "kind": {
+          "enum": [
+            "document",
+            "unpublished_file"
+          ]
+        },
+        "document_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "file_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/Text"
+        },
+        "scope": {
+          "enum": [
+            "center",
+            "organization"
+          ]
+        },
+        "read_only": {
+          "type": "boolean"
+        },
+        "latest_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DocumentDirectoryVersion"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "required_members": {
+          "$ref": "#/$defs/Count"
+        },
+        "pending_members": {
+          "$ref": "#/$defs/Count"
+        },
+        "acceptance_records": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "kind",
+        "document_id",
+        "file_id",
+        "name",
+        "created_at",
+        "expires_at",
+        "state",
+        "scope",
+        "read_only",
+        "latest_version",
+        "version_count",
+        "required_members",
+        "pending_members",
+        "acceptance_records"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentDirectoryRequirement": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/Text"
+        },
+        "kind": {
+          "enum": [
+            "requirement"
+          ]
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "context": {
+          "$ref": "#/$defs/AcceptanceContext"
+        },
+        "document_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "required_version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "valid",
+            "outdated",
+            "missing"
+          ]
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_matches_version": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "kind",
+        "person_id",
+        "display_name",
+        "context",
+        "document_id",
+        "required_version_id",
+        "accepted",
+        "status",
+        "evidence_id",
+        "evidence_version_id",
+        "evidence_at",
+        "evidence_matches_version"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentDirectoryHistory": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/Text"
+        },
+        "kind": {
+          "enum": [
+            "history"
+          ]
+        },
+        "acceptance_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version_label": {
+          "$ref": "#/$defs/Text"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "accepted_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "context": {
+          "$ref": "#/$defs/AcceptanceContext"
+        },
+        "evidence_state": {
+          "enum": [
+            "recorded",
+            "invalidated"
+          ]
+        },
+        "evidence_kind": {
+          "enum": [
+            "server_document",
+            "legacy_client",
+            "file"
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "kind",
+        "acceptance_id",
+        "document_id",
+        "version_id",
+        "version_label",
+        "person_id",
+        "display_name",
+        "accepted_at",
+        "context",
+        "evidence_state",
+        "evidence_kind"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentDirectoryPage": {
+      "type": "object",
+      "properties": {
+        "view": {
+          "enum": [
+            "documents",
+            "versions",
+            "acceptances"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/DocumentDirectoryDocument"
+              },
+              {
+                "$ref": "#/$defs/DocumentDirectoryVersion"
+              },
+              {
+                "$ref": "#/$defs/DocumentDirectoryRequirement"
+              },
+              {
+                "$ref": "#/$defs/DocumentDirectoryHistory"
+              }
+            ]
+          }
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "history_available": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "published_documents": {
+              "$ref": "#/$defs/Count"
+            },
+            "unpublished_files": {
+              "$ref": "#/$defs/Count"
+            },
+            "pending_members": {
+              "$ref": "#/$defs/Count"
+            },
+            "total_members": {
+              "$ref": "#/$defs/Count"
+            },
+            "last_publication": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Instant"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "acceptance_records": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "published_documents",
+            "unpublished_files",
+            "pending_members",
+            "total_members",
+            "last_publication",
+            "acceptance_records"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "view",
+        "items",
+        "as_of",
+        "next_cursor",
+        "history_available",
+        "summary"
+      ],
+      "additionalProperties": false
+    },
+    "Request_document_directory_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "view": {
+          "enum": [
+            "documents",
+            "versions",
+            "acceptances"
+          ]
+        },
+        "scope": {
+          "enum": [
+            "center",
+            "organization"
+          ]
+        },
+        "document_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "acceptance_filter": {
+          "enum": [
+            "all",
+            "pending"
+          ]
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "view",
+        "page"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "enum": [
+                  "versions",
+                  "acceptances"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "document_id"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "const": "documents"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "version_id"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "const": "versions"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "acceptance_filter": {
+                "const": "all"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Success_document_directory_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/DocumentDirectoryPage"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -95251,6 +95801,109 @@
         "runtime_path": "/functions/v1/backend-v1/tracking_directory_get_v1",
         "runtime_external_path": "/functions/v1/backend-v1/tracking_directory_get_v1",
         "runtime_rpc": "api_v1.tracking_directory_get_v1"
+      },
+      {
+        "name": "document_directory_get_v1",
+        "module": "M14",
+        "features": [
+          "F30"
+        ],
+        "permission": "document.manage",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_document_directory_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_document_directory_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read native authorized scope only; no business mutation or capability disclosure.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A39",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F30"
+        ],
+        "runtime_required_features": [
+          "F30"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "documents",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "operational_development_limited",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_document_directory_get"
+          }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/document_directory_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/document_directory_get_v1",
+        "runtime_rpc": "api_v1.document_directory_get_v1"
       }
     ],
     "policy_value_map": {
@@ -112481,6 +113134,114 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryVersion/properties/version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryDocument/properties/document_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryDocument/properties/file_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryRequirement/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryRequirement/properties/document_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryRequirement/properties/required_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryRequirement/properties/evidence_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryRequirement/properties/evidence_version_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryHistory/properties/acceptance_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryHistory/properties/document_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryHistory/properties/version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentDirectoryHistory/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_directory_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_directory_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_directory_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_directory_get/properties/document_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_directory_get/properties/version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_document_directory_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -112971,13 +113732,14 @@
         "management_work_list_v1",
         "instructor_finance_directory_get_v1",
         "import_directory_get_v1",
-        "tracking_directory_get_v1"
+        "tracking_directory_get_v1",
+        "document_directory_get_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 184,
+      "migration_count": 186,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -113692,7 +114454,8 @@
         "management_work_list_v1",
         "instructor_finance_directory_get_v1",
         "import_directory_get_v1",
-        "tracking_directory_get_v1"
+        "tracking_directory_get_v1",
+        "document_directory_get_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -115530,7 +116293,8 @@
           "document_accept_v1",
           "file_upload_complete_v1",
           "document_publication_preview_v1",
-          "member_document_contexts_get_v1"
+          "member_document_contexts_get_v1",
+          "document_directory_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -115543,7 +116307,8 @@
           "document_accept_v1",
           "file_upload_complete_v1",
           "document_publication_preview_v1",
-          "member_document_contexts_get_v1"
+          "member_document_contexts_get_v1",
+          "document_directory_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],

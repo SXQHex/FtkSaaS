@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "1ca2925e551708a5a860650da6465f9b3b1bb409bb03cabcb64d00f4a17906dd",
-        "reason": "Reviewed source-authorized center audit and own native context tracking, approved counters, three append migrations and explicit native support limits."
+        "fingerprint": "4968fc266d6b0f040bfe56d69b58082644b5057cf41bd77fb677f2ecf1d897e0",
+        "reason": "Reviewed one service-only read registration and shared inventory delta; Ajv required/enum loop code generation preserves every predicate, closed schema and diagnostics under unchanged upload budget, independently reviewed with authoritative parity tests."
       }
     },
     {
@@ -392,8 +392,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "b6ea7ba1f6bbba5537e9a9fc9ec455e6c75e4ae46c535fa40f678a172cc23ca0",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "194358eabaaaed340aee123b14ebd8c79980341c7dbfd2ca06b2c30af9b27445",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -507,8 +507,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "b80e49c3db50e2d9a7b5742626e4dd351f9b1f9ce89551ea654e47e0caa10d67",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "a03db0fcf2036b2f23dbe5e7f533b54364a6b0222d211b86633c888d5fb7e966",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -623,8 +623,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "7109d9f48ef28a153e522fdddac1421db0d298cefb69558b2bf3b7fa3c9f34ef",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "ac748b1ec23bfcc14a6ac76fdff73f4ae18498122a24dc6cbfecf0dd36d61bd3",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -740,8 +740,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "24ded27d70098bdc77f8f6d4dfa445760f936c8dcea48ace65daada0f2aefa27",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "69058f60444a4d9e6a96a5b268aebc3dcbceb50c5e3abb939dde2ae5b6ba8441",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -868,8 +868,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "c68b0661fd58e6f5d0066e806075fc1828f7ab590ecce0576b81aa9d1f2c40c5",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "0a23f359a229c8f08d85a3a10380cdb1598f7a567573095ef925c7214d58c982",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -974,8 +974,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "7a2115f30c1217ef6fea1d3bdf5d2b333b9d06fd277b6429f874c66f356c3e66",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "f6a4927a0240ecd0b3f377443634c637e948dcb42ac1ae782df2caf78a9da68d",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1043,8 +1043,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "c192d042dd2a5125b754d11083e75b2226bd04c8c88f31c1674a7fd55fb32a8c",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "12d9b2c7ecf472ab00a6d04fd7ffb789a9d77253e57383357640eaa6c6843196",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1118,8 +1118,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "0576ca6d9c21f92f87165f94bf18e20f1fdc4fca6887c1c5a2e5a93e859154a6",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "a4c713648090135491d9fdccfe7635d461f6b70ea7b725078d6366bb9c33a96c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1227,8 +1227,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "9011e23fdb3eb1540b7145b776b72843c1314440531820e18acfa90783954d47",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "cbdbcb02b05ff14b6478bee580ba6a63d9fa279e49e45f324ee3faab144d2d90",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1296,8 +1296,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "4f55c5cc7bbe597dc3ea24bc9eab849d096e5e60cf57efc3e4a779a88aec9f41",
-        "reason": "Reviewed four actual-fact report kinds, native financial/Starter scope, selected CSV labels, own import config/jobs and complete-file filters; existing CSV worker unchanged."
+        "fingerprint": "fa406fe8e57ef0d45b00f5beb339ef89ba0a0e5334d0854b063b95998a9f7f0d",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1321,7 +1321,9 @@
         "apps/backend/tests/member-self-discovery-unit.mjs",
         "apps/backend/tests/member-self-discovery-acceptance.mjs",
         "apps/backend/tests/ledger-inbox-automation-unit.mjs",
-        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
+        "apps/backend/tests/document-directory-unit.mjs",
+        "apps/backend/tests/document-directory-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1352,7 +1354,11 @@
         "apps/backend/database/notification-inbox-work.sql",
         "apps/backend/supabase/migrations/20261116233015_notification_inbox_work.sql",
         "apps/backend/database/notification-request-source-authority.sql",
-        "apps/backend/supabase/migrations/20261117003000_notification_request_source_authority.sql"
+        "apps/backend/supabase/migrations/20261117003000_notification_request_source_authority.sql",
+        "apps/backend/database/document-active-contexts.sql",
+        "apps/backend/database/document-management-directory.sql",
+        "apps/backend/supabase/migrations/20261117124133_document_active_contexts.sql",
+        "apps/backend/supabase/migrations/20261117124145_document_management_directory.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1365,11 +1371,12 @@
         "content_catalog_get_v1",
         "content_catalog_save_v1",
         "member_document_contexts_get_v1",
-        "notifications_read_set_v1"
+        "notifications_read_set_v1",
+        "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "e24759d32e1b356858a1dbc83864f88c0027d970efcde957726d63ac480a90e5",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "a74ff3b0110795e993b6d3312761da5bb99bc7a66421e0a0a91149aa9998ffa1",
+        "reason": "Reviewed shared factual active contexts against original self reader; native configuration/target requirements, current unique-person and historical evidence scope, readonly organization/draft metadata, accepted FD08 decisions and native tests."
       }
     },
     {
@@ -1506,8 +1513,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "b39e19b63e7ab1be249f47f11f309e1ddeae646c8095d15e2a004bfa7460b097",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "dcb94985fa7e644ed4aa8f0d8e619e4eeb2d834783d575fb2ec0522b2bdf010d",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1582,8 +1589,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "b70ca25b8f39bcd15208b1ca39534cd99025a447450d2858b54ab7707a29cf43",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "550504d5821393c440d3889972085dcdc3ddce53af99cdd2e5339dd32b648bcc",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1648,8 +1655,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "cb4d1ce94f474e072c8330799095175b291add5dee038981405e55a30c99c492",
-        "reason": "Reviewed exact native earning projection factoring and separate managerial history discovery, canonical aliases, real root payment version/corrections and currency/period balances."
+        "fingerprint": "564ba2c347afc2e971df21287f2c909e7c9a96ded98e963900047aec1a7ce01e",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1727,8 +1734,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "236deac362a60c9f392079f12f78a7c1550cdb1888d13b5aabd6eb864e249f5e",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "152dc9fee38360520952789be564fdcf360cbd9619603da65da4646171cb1c8a",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1801,8 +1808,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "52c12fd5871374dfa0138eb4d64a6d1b80c6e1a5fed8a1ec762f3fdf83f26b6a",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "0220749a07a395b3b19d28a15dd485dbdc6e3725b41ac8618e973c955bae559c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1890,8 +1897,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "21b49f917f3ca40327ec4f91f3ba56f8ec4c1d195e9356cb71b8ef44a7795d5b",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "401d201f7ef655e9d87e6d75267983fe54bee5171ce1e8b435bcfafec4fa246c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1923,8 +1930,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "088660304c7eec4f7f8ae540207a577c16ae2d53f6b19c8d8f69e8718a226923",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "ddf1b49f454d40efd32ab2200f0131d91061517fd74e174a642c321214c0f332",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -1964,8 +1971,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "8f78affce4785a9ef90c8f0d533f480c0c49521e05d8a49e654492649c960069",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "582177a641883702389eb79a87f9dacc0fc794f3294f18773d7038e142bc00c2",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     },
     {
@@ -2089,8 +2096,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "63f189189a3d7b81063bb53026eba1eff91149f6a856850d81ffe666a314e7bf",
-        "reason": "Reviewed shared runtime wrapper delta: three service-only read registrations added; original operation wrappers and existing workflow behavior unchanged."
+        "fingerprint": "50ea95968f7a6be7beedefc8cca3b834a33dcfc1798efcb056b931605a493fbf",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
       }
     }
   ]
