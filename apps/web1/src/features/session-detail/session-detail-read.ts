@@ -154,8 +154,12 @@ export async function readSessionAttendance(scope: ClientScope, sessionId: strin
     sessionId,
   );
 }
-export async function readSessionInstructors(scope: ClientScope, sessionId: string) {
-  const session = await readScheduleSession(scope, sessionId),
+export async function readSessionInstructors(
+  scope: ClientScope,
+  sessionId: string,
+  includeRoomLabels = false,
+) {
+  const session = await readScheduleSession(scope, sessionId, includeRoomLabels),
     backend = await scopedBackend(scope);
   const ids = [
     ...new Set(

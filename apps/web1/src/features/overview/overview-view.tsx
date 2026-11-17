@@ -45,6 +45,15 @@ export interface OverviewParticipant {
   initials: string;
   source: string;
 }
+export interface OverviewTask {
+  id: string;
+  title: string;
+  context: string;
+  status: string;
+  due?: string;
+  actionLabel: string;
+  onAction: () => void;
+}
 export function OverviewView({
   date,
   now,
@@ -62,6 +71,9 @@ export function OverviewView({
   canAttend = false,
   notice,
   loading = false,
+  tasks = null,
+  taskNotice,
+  taskPagination,
 }: {
   date: string;
   now: string;
@@ -79,6 +91,9 @@ export function OverviewView({
   canAttend?: boolean;
   notice?: ReactNode;
   loading?: boolean;
+  tasks?: OverviewTask[] | null;
+  taskNotice?: ReactNode;
+  taskPagination?: ReactNode;
 }) {
   const { t } = useTranslation();
   const nowRow = (
@@ -114,7 +129,9 @@ export function OverviewView({
       <div className="grid min-w-0 items-start gap-6 @4xl:grid-cols-[minmax(0,1fr)_22rem]">
         <Card className="min-w-0 gap-0 py-0">
           <CardHeader className="sr-only">
-            <CardTitle>{t(($) => $.overview.timeline)}</CardTitle>
+            <CardTitle>
+              <h2>{t(($) => $.overview.timeline)}</h2>
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
@@ -196,14 +213,16 @@ export function OverviewView({
         >
           <CardHeader>
             <CardTitle>
-              {selected?.title ??
-                t(($) =>
-                  loading
-                    ? $.overview.loading
-                    : lessons === null
-                      ? $.overview.unread
-                      : $.overview.noNextLesson,
-                )}
+              <h2>
+                {selected?.title ??
+                  t(($) =>
+                    loading
+                      ? $.overview.loading
+                      : lessons === null
+                        ? $.overview.unread
+                        : $.overview.noNextLesson,
+                  )}
+              </h2>
             </CardTitle>
             {selected && (
               <CardDescription>
@@ -223,9 +242,9 @@ export function OverviewView({
                   <dd>{t(($) => $.overview.capacityValue, selected.capacity)}</dd>
                 </dl>
                 <div className="flex flex-col gap-3">
-                  <h2 className="text-sm font-medium text-muted-foreground">
+                  <h3 className="text-sm font-medium text-muted-foreground">
                     {t(($) => $.overview.members)}
-                  </h2>
+                  </h3>
                   {participantNotice}
                   {participants === null ? (
                     <p className="text-sm">{t(($) => $.overview.participantsUnread)}</p>
@@ -274,6 +293,49 @@ export function OverviewView({
           )}
         </Card>
       </div>
+      <Card className="min-w-0">
+        <CardHeader>
+          <CardTitle>
+            <h2>{t(($) => $.overview.tasksTitle)}</h2>
+          </CardTitle>
+          <CardDescription>{t(($) => $.overview.tasksDescription)}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {taskNotice}
+          {tasks === null ? (
+            <p className="text-sm text-muted-foreground">{t(($) => $.overview.tasksUnread)}</p>
+          ) : tasks.length === 0 ? (
+            <Empty>
+              <EmptyDescription>{t(($) => $.overview.tasksEmpty)}</EmptyDescription>
+            </Empty>
+          ) : (
+            <ItemGroup className="divide-y gap-0">
+              {tasks.map((task) => (
+                <Item
+                  key={task.id}
+                  role="listitem"
+                  className="flex-wrap rounded-none border-0 px-0"
+                >
+                  <ItemContent>
+                    <ItemTitle>{task.title}</ItemTitle>
+                    <ItemDescription className="line-clamp-none wrap-anywhere">
+                      {task.context}
+                      {task.due && <> · {task.due}</>}
+                    </ItemDescription>
+                  </ItemContent>
+                  <ItemActions className="flex-wrap">
+                    <Badge variant="outline">{task.status}</Badge>
+                    <Button variant="outline" size="sm" onPress={task.onAction}>
+                      {task.actionLabel}
+                    </Button>
+                  </ItemActions>
+                </Item>
+              ))}
+            </ItemGroup>
+          )}
+        </CardContent>
+        {taskPagination && <CardFooter>{taskPagination}</CardFooter>}
+      </Card>
     </div>
   );
 }

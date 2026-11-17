@@ -66,11 +66,13 @@ export function ScheduleContent({
   scope,
   onLockChange,
   initialSession,
+  initialCreate = false,
   initialMode = "view",
 }: {
   scope: ClientScope;
   onLockChange: (value: boolean) => void;
   initialSession?: string;
+  initialCreate?: boolean;
   initialMode?: SchedulePanelMode;
 }) {
   const { t } = useTranslation(),
@@ -168,11 +170,23 @@ export function ScheduleContent({
   const initialOpened = useRef(false);
   useEffect(() => {
     const source = sources.data;
-    if (!initialSession || !source || initialOpened.current) return;
+    if (!source || initialOpened.current || (!initialSession && !initialCreate)) return;
     let active = true;
+    if (initialCreate && !initialSession) {
+      void Promise.resolve().then(() => {
+        if (!active || lost.current) return;
+        initialOpened.current = true;
+        setCreateSource(source);
+        setCreateDraft(emptyCreate(source.initialDate));
+        setCreateOpen(true);
+      });
+      return () => {
+        active = false;
+      };
+    }
     void readScheduleEditor(
       { accountId: scope.accountId, orgId: scope.orgId, centerId: scope.centerId },
-      initialSession,
+      initialSession!,
     )
       .then(async (editor) => {
         const draft = await scheduleSessionDraft(
@@ -210,6 +224,7 @@ export function ScheduleContent({
       active = false;
     };
   }, [
+    initialCreate,
     initialSession,
     initialMode,
     sources.data,

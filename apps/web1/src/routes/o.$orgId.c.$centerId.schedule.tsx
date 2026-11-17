@@ -8,6 +8,7 @@ export const Route = createFileRoute("/o/$orgId/c/$centerId/schedule")({
     z
       .object({
         session: z.uuid().optional(),
+        create: z.boolean().optional(),
         action: z.enum(["edit", "instructor", "cancel"]).optional(),
       })
       .parse(search),

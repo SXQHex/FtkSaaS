@@ -70,6 +70,7 @@ export interface SessionOfferRow {
 }
 export function SessionDetailView({
   title,
+  initialTab = "participants",
   badges,
   facts,
   capacity,
@@ -82,6 +83,7 @@ export function SessionDetailView({
   overlays,
 }: {
   title: string;
+  initialTab?: "participants" | "attendance" | "waitlist";
   badges: string[];
   facts: { label: string; value: string }[];
   capacity: SessionCapacityView;
@@ -154,7 +156,7 @@ export function SessionDetailView({
       </Card>
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
         <Card className="min-w-0">
-          <Tabs defaultSelectedKey="participants" keyboardActivation="manual" className="min-w-0">
+          <Tabs defaultSelectedKey={initialTab} keyboardActivation="manual" className="min-w-0">
             <CardHeader className="min-w-0 border-b">
               <div className="max-w-full overflow-x-auto p-1">
                 <TabsList

@@ -4035,6 +4035,19 @@
     "instructor": "Eğitmen",
     "room": "Salon",
     "loading": "Program okunuyor…",
-    "selectedLesson": "Seçili ders"
+    "selectedLesson": "Seçili ders",
+    "labelsUnread": "Dersin eğitmen veya salon etiketi okunamadı.",
+    "memberNameUnavailable": "Üye adı paylaşılmıyor",
+    "sourceUnavailable": "Paket kaynağı paylaşılmıyor",
+    "remainingRights": "{{amount}} hak kaldı",
+    "states": {
+      "planned": "Planlandı",
+      "occurred": "Tamamlandı",
+      "cancelled": "İptal edildi"
+    },
+    "tasksTitle": "Bekleyen işler",
+    "tasksDescription": "Seçili merkezde yetkin kapsamındaki yönetim işleri. İşlemi kendi ekranında tamamla.",
+    "tasksUnread": "Bekleyen yönetim işleri şu anda okunamıyor.",
+    "tasksEmpty": "Bu kapsamda bekleyen yönetim işi yok."
   }
 }

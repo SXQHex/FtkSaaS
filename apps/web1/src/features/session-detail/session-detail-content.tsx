@@ -28,11 +28,13 @@ import { NativeSelect, NativeSelectOption } from "../../components/ui/native-sel
 export function SessionDetailContent({
   scope,
   sessionId,
+  initialTab,
   onLockChange,
   preservePending = false,
 }: {
   scope: ClientScope;
   sessionId: string;
+  initialTab?: "participants" | "attendance" | "waitlist";
   onLockChange: (value: boolean) => void;
   preservePending?: boolean;
 }) {
@@ -261,6 +263,7 @@ export function SessionDetailContent({
         >
           {(attendanceUi) => (
             <SessionDetailView
+              initialTab={initialTab}
               title={title}
               badges={[
                 t(($) => $.schedule.sessionStates[native.state]),

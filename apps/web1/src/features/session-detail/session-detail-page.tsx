@@ -1,5 +1,11 @@
 import { useCallback, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  useLoaderData,
+  useParams,
+  useSearch,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
@@ -10,17 +16,19 @@ import { SessionDetailContent } from "./session-detail-content";
 import type { AccountView } from "../../lib/api-contracts/generated";
 
 export function SessionDetailRoutePage() {
+  const search = useSearch({ from: "/o/$orgId/c/$centerId/sessions/$sessionId" });
   const account = useLoaderData({ from: "/o/$orgId/c/$centerId/sessions/$sessionId" });
   const { orgId, centerId, sessionId } = useParams({
     from: "/o/$orgId/c/$centerId/sessions/$sessionId",
   });
   return (
     <SessionDetailPage
-      key={`${account.id}:${orgId}:${centerId}:${sessionId}`}
+      key={`${account.id}:${orgId}:${centerId}:${sessionId}:${search.tab ?? "participants"}`}
       account={account}
       orgId={orgId}
       centerId={centerId}
       sessionId={sessionId}
+      initialTab={search.tab}
     />
   );
 }
@@ -29,11 +37,13 @@ function SessionDetailPage({
   orgId,
   centerId,
   sessionId,
+  initialTab,
 }: {
   account: AccountView;
   orgId: string;
   centerId: string;
   sessionId: string;
+  initialTab?: "participants" | "attendance" | "waitlist";
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -110,6 +120,7 @@ function SessionDetailPage({
                   centerId: selection.centerId,
                 }}
                 sessionId={sessionId}
+                initialTab={initialTab}
                 onLockChange={setLocked}
                 preservePending={locked}
               />

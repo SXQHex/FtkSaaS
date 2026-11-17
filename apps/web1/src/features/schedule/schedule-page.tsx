@@ -22,7 +22,8 @@ export function ScheduleRoutePage() {
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/schedule" });
   return (
     <SchedulePage
-      key={`${account.id}:${orgId}:${centerId}:${search.session ?? ""}:${search.action ?? "view"}`}
+      key={`${account.id}:${orgId}:${centerId}:${search.session ?? ""}:${search.action ?? "view"}:${search.create ?? false}`}
+      initialCreate={search.create}
       initialSession={search.session}
       initialMode={search.action ?? "view"}
       account={account}
@@ -37,11 +38,13 @@ function SchedulePage({
   centerId,
   initialSession,
   initialMode,
+  initialCreate,
 }: {
   account: AccountView;
   orgId: string;
   centerId: string;
   initialSession?: string;
+  initialCreate?: boolean;
   initialMode: SchedulePanelMode;
 }) {
   const { t } = useTranslation();
@@ -117,6 +120,7 @@ function SchedulePage({
                 orgId: selection.organizationId,
                 centerId: selection.centerId,
               }}
+              initialCreate={initialCreate}
               initialSession={initialSession}
               initialMode={initialMode}
               onLockChange={setLocked}
