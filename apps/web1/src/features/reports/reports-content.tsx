@@ -56,7 +56,7 @@ export function ReportsContent({
     [locked, setLocked] = useState(false),
     [lost, setLost] = useState(false),
     [fileError, setFileError] = useState(false);
-  const [exporting, setExporting] = useState(false);
+  const [exporting, setExporting] = useState<ReportFilters>();
   const [importing, setImporting] = useState<{ initial?: ImportDirectoryItem }>();
   const [pages, setPages] = useState<
     Record<string, { cursors: (string | undefined)[]; index: number }>
@@ -187,7 +187,7 @@ export function ReportsContent({
         (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
       ) {
         setLost(true);
-        setExporting(false);
+        setExporting(undefined);
         setImporting(undefined);
         setLocked(false);
         onLockChange(false);
@@ -339,7 +339,9 @@ export function ReportsContent({
           setBreakdown(value);
           setPages({});
         }}
-        onExport={() => setExporting(true)}
+        onExport={() => {
+          if (filters) setExporting(structuredClone(filters));
+        }}
         onPeople={() =>
           void router.navigate({
             to: "/o/$orgId/c/$centerId/people",
@@ -507,13 +509,13 @@ export function ReportsContent({
           onSaved={refresh}
         />
       )}
-      {exporting && active && filters && (
+      {exporting && active && (
         <ReportExportEditor
           scope={scope}
-          filters={filters}
-          period={`${filters.interval.starts_at} – ${filters.interval.ends_at} · ${timezone}`}
+          filters={exporting}
+          period={`${exporting.interval.starts_at} – ${exporting.interval.ends_at} · ${timezone}`}
           onClose={() => {
-            if (!locked) setExporting(false);
+            if (!locked) setExporting(undefined);
           }}
           onLockChange={lock}
           onAccessLost={accessLost}

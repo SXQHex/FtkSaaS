@@ -323,7 +323,8 @@ export function ReportImportSheet({
                     const value = [...keys][0];
                     if (
                       !locked &&
-                      ["all", "problem", "invalid", "duplicate"].includes(String(value))
+                      typeof value === "string" &&
+                      availableFilters.includes(value as ImportRowFilter)
                     )
                       onFilter(value as ImportRowFilter);
                   }}

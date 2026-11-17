@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
@@ -82,6 +82,7 @@ export function ReportImportEditor({
   onSaved: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [file, setFile] = useState<File>(),
     [kind, setKind] = useState<"students" | "crm_applications">(initial?.kind ?? "students"),
     [namespace, setNamespace] = useState(""),
@@ -144,6 +145,7 @@ export function ReportImportEditor({
     readResult: readReportJob,
     onAccessLost: lost,
     onRefresh: async (job) => {
+      queries.setQueryData(["report-import-job", scope, job.id], job);
       setJob(job.id);
       setRowsOnly(false);
       setCursors([undefined]);
@@ -249,7 +251,7 @@ export function ReportImportEditor({
     if (executing.current || completion.locked || command.locked || unavailable) return;
     if (
       !file ||
-      !limits ||
+      (!limits && !upload.current) ||
       !namespace.trim() ||
       namespace.trim().length > 100 ||
       !mapping.columns.some((row) => row.target === "source_key") ||
@@ -266,7 +268,7 @@ export function ReportImportEditor({
     try {
       if (!ready.current) {
         if (!upload.current) {
-          upload.current = await importUploadIntent(scope, file, limits.max_bytes);
+          upload.current = await importUploadIntent(scope, file, limits!.max_bytes);
           setUploadStarted(true);
         }
         setUploadUnknown(true);
