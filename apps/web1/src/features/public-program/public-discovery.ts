@@ -40,3 +40,8 @@ export const publicApplicationDiscovery = z.discriminatedUnion("state", [
   z.object({ state: z.literal("open"), form }),
   z.object({ state: z.enum(["closed", "unavailable"]), form: z.null() }),
 ]);
+
+export type DiscoveredPublicForm = Extract<
+  z.infer<typeof publicApplicationDiscovery>,
+  { state: "open" }
+>["form"];

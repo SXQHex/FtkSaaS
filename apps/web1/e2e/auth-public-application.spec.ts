@@ -1,7 +1,9 @@
 import { test, expect } from "./test.js";
+import { prepareApplication } from "./public-application-fixture.js";
 test("public application preserves full form but cannot collect or submit without published target and consent", async ({
   page,
 }) => {
+  await prepareApplication(page, "closed");
   const mutations: string[] = [];
   await page.route("**/api/public/application", async (route) => {
     mutations.push(route.request().url());
