@@ -36,6 +36,7 @@ import { Route as PublicSlugApplyRouteImport } from './routes/public.$slug.apply
 import { Route as PublicSlugCalendarRouteImport } from './routes/public.$slug.calendar'
 import { Route as PublicSlugUnavailableRouteImport } from './routes/public.$slug.unavailable'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
+import { Route as OOrgIdCCenterIdAuditRouteImport } from './routes/o.$orgId.c.$centerId.audit'
 import { Route as OOrgIdCCenterIdAutomationRouteImport } from './routes/o.$orgId.c.$centerId.automation'
 import { Route as OOrgIdCCenterIdDocumentsRouteImport } from './routes/o.$orgId.c.$centerId.documents'
 import { Route as OOrgIdCCenterIdEarningsRouteImport } from './routes/o.$orgId.c.$centerId.earnings'
@@ -45,6 +46,7 @@ import { Route as OOrgIdCCenterIdLeadsRouteImport } from './routes/o.$orgId.c.$c
 import { Route as OOrgIdCCenterIdOverviewRouteImport } from './routes/o.$orgId.c.$centerId.overview'
 import { Route as OOrgIdCCenterIdPeopleRouteImport } from './routes/o.$orgId.c.$centerId.people'
 import { Route as OOrgIdCCenterIdProductsRouteImport } from './routes/o.$orgId.c.$centerId.products'
+import { Route as OOrgIdCCenterIdReportsRouteImport } from './routes/o.$orgId.c.$centerId.reports'
 import { Route as OOrgIdCCenterIdRequestsRouteImport } from './routes/o.$orgId.c.$centerId.requests'
 import { Route as OOrgIdCCenterIdScheduleRouteImport } from './routes/o.$orgId.c.$centerId.schedule'
 import { Route as OOrgIdCCenterIdSettingsRouteImport } from './routes/o.$orgId.c.$centerId.settings'
@@ -190,6 +192,11 @@ const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
   path: '/o/$orgId/c/$centerId/access',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OOrgIdCCenterIdAuditRoute = OOrgIdCCenterIdAuditRouteImport.update({
+  id: '/o/$orgId/c/$centerId/audit',
+  path: '/o/$orgId/c/$centerId/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdAutomationRoute =
   OOrgIdCCenterIdAutomationRouteImport.update({
     id: '/o/$orgId/c/$centerId/automation',
@@ -235,6 +242,11 @@ const OOrgIdCCenterIdPeopleRoute = OOrgIdCCenterIdPeopleRouteImport.update({
 const OOrgIdCCenterIdProductsRoute = OOrgIdCCenterIdProductsRouteImport.update({
   id: '/o/$orgId/c/$centerId/products',
   path: '/o/$orgId/c/$centerId/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OOrgIdCCenterIdReportsRoute = OOrgIdCCenterIdReportsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/reports',
+  path: '/o/$orgId/c/$centerId/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OOrgIdCCenterIdRequestsRoute = OOrgIdCCenterIdRequestsRouteImport.update({
@@ -310,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
   '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
@@ -319,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/o/$orgId/c/$centerId/overview': typeof OOrgIdCCenterIdOverviewRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/reports': typeof OOrgIdCCenterIdReportsRoute
   '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
@@ -356,6 +370,7 @@ export interface FileRoutesByTo {
   '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
   '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
@@ -365,6 +380,7 @@ export interface FileRoutesByTo {
   '/o/$orgId/c/$centerId/overview': typeof OOrgIdCCenterIdOverviewRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/reports': typeof OOrgIdCCenterIdReportsRoute
   '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
@@ -403,6 +419,7 @@ export interface FileRoutesById {
   '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
+  '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
   '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
@@ -412,6 +429,7 @@ export interface FileRoutesById {
   '/o/$orgId/c/$centerId/overview': typeof OOrgIdCCenterIdOverviewRoute
   '/o/$orgId/c/$centerId/people': typeof OOrgIdCCenterIdPeopleRoute
   '/o/$orgId/c/$centerId/products': typeof OOrgIdCCenterIdProductsRoute
+  '/o/$orgId/c/$centerId/reports': typeof OOrgIdCCenterIdReportsRoute
   '/o/$orgId/c/$centerId/requests': typeof OOrgIdCCenterIdRequestsRoute
   '/o/$orgId/c/$centerId/schedule': typeof OOrgIdCCenterIdScheduleRoute
   '/o/$orgId/c/$centerId/settings': typeof OOrgIdCCenterIdSettingsRoute
@@ -451,6 +469,7 @@ export interface FileRouteTypes {
     | '/public/$slug/calendar'
     | '/public/$slug/unavailable'
     | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
     | '/o/$orgId/c/$centerId/documents'
     | '/o/$orgId/c/$centerId/earnings'
@@ -460,6 +479,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/overview'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/reports'
     | '/o/$orgId/c/$centerId/requests'
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
@@ -497,6 +517,7 @@ export interface FileRouteTypes {
     | '/public/$slug/calendar'
     | '/public/$slug/unavailable'
     | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
     | '/o/$orgId/c/$centerId/documents'
     | '/o/$orgId/c/$centerId/earnings'
@@ -506,6 +527,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/overview'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/reports'
     | '/o/$orgId/c/$centerId/requests'
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
@@ -543,6 +565,7 @@ export interface FileRouteTypes {
     | '/public/$slug/calendar'
     | '/public/$slug/unavailable'
     | '/o/$orgId/c/$centerId/access'
+    | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
     | '/o/$orgId/c/$centerId/documents'
     | '/o/$orgId/c/$centerId/earnings'
@@ -552,6 +575,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/overview'
     | '/o/$orgId/c/$centerId/people'
     | '/o/$orgId/c/$centerId/products'
+    | '/o/$orgId/c/$centerId/reports'
     | '/o/$orgId/c/$centerId/requests'
     | '/o/$orgId/c/$centerId/schedule'
     | '/o/$orgId/c/$centerId/settings'
@@ -590,6 +614,7 @@ export interface RootRouteChildren {
   PublicSlugCalendarRoute: typeof PublicSlugCalendarRoute
   PublicSlugUnavailableRoute: typeof PublicSlugUnavailableRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
+  OOrgIdCCenterIdAuditRoute: typeof OOrgIdCCenterIdAuditRoute
   OOrgIdCCenterIdAutomationRoute: typeof OOrgIdCCenterIdAutomationRoute
   OOrgIdCCenterIdDocumentsRoute: typeof OOrgIdCCenterIdDocumentsRoute
   OOrgIdCCenterIdEarningsRoute: typeof OOrgIdCCenterIdEarningsRoute
@@ -599,6 +624,7 @@ export interface RootRouteChildren {
   OOrgIdCCenterIdOverviewRoute: typeof OOrgIdCCenterIdOverviewRoute
   OOrgIdCCenterIdPeopleRoute: typeof OOrgIdCCenterIdPeopleRoute
   OOrgIdCCenterIdProductsRoute: typeof OOrgIdCCenterIdProductsRoute
+  OOrgIdCCenterIdReportsRoute: typeof OOrgIdCCenterIdReportsRoute
   OOrgIdCCenterIdRequestsRoute: typeof OOrgIdCCenterIdRequestsRoute
   OOrgIdCCenterIdScheduleRoute: typeof OOrgIdCCenterIdScheduleRoute
   OOrgIdCCenterIdSettingsRoute: typeof OOrgIdCCenterIdSettingsRoute
@@ -800,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdAccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/audit': {
+      id: '/o/$orgId/c/$centerId/audit'
+      path: '/o/$orgId/c/$centerId/audit'
+      fullPath: '/o/$orgId/c/$centerId/audit'
+      preLoaderRoute: typeof OOrgIdCCenterIdAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/automation': {
       id: '/o/$orgId/c/$centerId/automation'
       path: '/o/$orgId/c/$centerId/automation'
@@ -861,6 +894,13 @@ declare module '@tanstack/react-router' {
       path: '/o/$orgId/c/$centerId/products'
       fullPath: '/o/$orgId/c/$centerId/products'
       preLoaderRoute: typeof OOrgIdCCenterIdProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o/$orgId/c/$centerId/reports': {
+      id: '/o/$orgId/c/$centerId/reports'
+      path: '/o/$orgId/c/$centerId/reports'
+      fullPath: '/o/$orgId/c/$centerId/reports'
+      preLoaderRoute: typeof OOrgIdCCenterIdReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/o/$orgId/c/$centerId/requests': {
@@ -950,6 +990,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicSlugCalendarRoute: PublicSlugCalendarRoute,
   PublicSlugUnavailableRoute: PublicSlugUnavailableRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
+  OOrgIdCCenterIdAuditRoute: OOrgIdCCenterIdAuditRoute,
   OOrgIdCCenterIdAutomationRoute: OOrgIdCCenterIdAutomationRoute,
   OOrgIdCCenterIdDocumentsRoute: OOrgIdCCenterIdDocumentsRoute,
   OOrgIdCCenterIdEarningsRoute: OOrgIdCCenterIdEarningsRoute,
@@ -959,6 +1000,7 @@ const rootRouteChildren: RootRouteChildren = {
   OOrgIdCCenterIdOverviewRoute: OOrgIdCCenterIdOverviewRoute,
   OOrgIdCCenterIdPeopleRoute: OOrgIdCCenterIdPeopleRoute,
   OOrgIdCCenterIdProductsRoute: OOrgIdCCenterIdProductsRoute,
+  OOrgIdCCenterIdReportsRoute: OOrgIdCCenterIdReportsRoute,
   OOrgIdCCenterIdRequestsRoute: OOrgIdCCenterIdRequestsRoute,
   OOrgIdCCenterIdScheduleRoute: OOrgIdCCenterIdScheduleRoute,
   OOrgIdCCenterIdSettingsRoute: OOrgIdCCenterIdSettingsRoute,

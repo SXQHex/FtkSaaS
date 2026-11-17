@@ -241,6 +241,7 @@ export function ReportsView({
   onFile,
   locked = false,
   notice,
+  after,
 }: {
   tab: ReportTab;
   onTab: (tab: ReportTab) => void;
@@ -251,7 +252,10 @@ export function ReportsView({
   onDates: (from: string, to: string) => void;
   breakdown: ReportBreakdown;
   onBreakdown: (by: ReportBreakdown) => void;
-  data?: ReportPresentation;
+  data?: Partial<Omit<ReportPresentation, "breakdowns">> & {
+    breakdowns?: Partial<ReportPresentation["breakdowns"]>;
+  };
+  after?: Partial<Record<ReportTab, ReactNode>>;
   onExport: () => void;
   onPeople: () => void;
   onFile: (kind: "export" | "import", id: string, action: "download" | "retry" | "rows") => void;
@@ -383,6 +387,7 @@ export function ReportsView({
             )}
             rows={data?.lessons}
           />
+          {after?.summary}
         </TabsContent>
         <TabsContent id="collections" className="flex flex-col gap-5">
           <Metrics
@@ -396,7 +401,7 @@ export function ReportsView({
           />
           <ReportTable
             title={t(($) => $.reports.breakdown)}
-            description={data?.breakdowns[breakdown].description}
+            description={data?.breakdowns?.[breakdown]?.description}
             action={
               <ToggleGroup
                 aria-label={t(($) => $.reports.breakdown)}
@@ -421,18 +426,20 @@ export function ReportsView({
             }
             columns={
               breakdown === "member"
-                ? [column("member"), column("rights"), column("lastPayment"), column("debt")]
+                ? [column("member"), column("count"), column("collected")]
                 : breakdown === "instructor"
                   ? [
                       column("instructor"),
-                      column("sessions"),
-                      column("participation"),
-                      column("revenueShare"),
+                      column("closedSessions"),
+                      column("earning"),
+                      column("paid"),
+                      column("remaining"),
                     ]
-                  : [column("package"), column("count"), column("gross")]
+                  : [column("package"), column("count"), column("collected")]
             }
-            rows={data?.breakdowns[breakdown].rows}
+            rows={data?.breakdowns?.[breakdown]?.rows}
           />
+          {after?.collections}
         </TabsContent>
         <TabsContent id="instructors" className="flex flex-col gap-5">
           <Metrics
@@ -470,6 +477,7 @@ export function ReportsView({
               </p>
             </CardContent>
           </Card>
+          {after?.instructors}
         </TabsContent>
         <TabsContent id="files" className="flex flex-col gap-5">
           {(["export", "import"] as const).map((kind) => (
@@ -498,7 +506,7 @@ export function ReportsView({
               <CardContent>
                 {(kind === "export" ? data?.exports : data?.imports)?.length ? (
                   <ul className="flex flex-col gap-4">
-                    {(kind === "export" ? data!.exports : data!.imports).map((row) => (
+                    {((kind === "export" ? data?.exports : data?.imports) ?? []).map((row) => (
                       <li
                         key={row.id}
                         className="flex flex-wrap items-center justify-between gap-3"
@@ -545,11 +553,16 @@ export function ReportsView({
                     ))}
                   </ul>
                 ) : (
-                  <p>{data ? t(($) => $.reports.empty) : t(($) => $.reports.unknown)}</p>
+                  <p>
+                    {(kind === "export" ? data?.exports : data?.imports) !== undefined
+                      ? t(($) => $.reports.empty)
+                      : t(($) => $.reports.unknown)}
+                  </p>
                 )}
               </CardContent>
             </Card>
           ))}
+          {after?.files}
         </TabsContent>
       </Tabs>
     </div>

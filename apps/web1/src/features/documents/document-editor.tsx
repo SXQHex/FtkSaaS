@@ -3,7 +3,12 @@ import { useBlocker } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { UploadRef } from "../../lib/api-contracts/generated";
+import { z } from "zod";
+import type {
+  DocumentDirectoryDocument,
+  DocumentDirectoryVersion,
+  UploadRef,
+} from "../../lib/api-contracts/generated";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { DocumentSheet, type DocumentDraft } from "./document-sheet";
@@ -30,19 +35,31 @@ export function DocumentEditor({
   onLockChange,
   onAccessLost,
   onSaved,
+  target,
+  level = "center",
+  history,
+  timezone = "UTC",
 }: {
   scope: ClientScope;
   onClose: () => void;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
-  onSaved: (version: string) => void;
+  onSaved: (version: string) => void | Promise<void>;
+  target?: DocumentDirectoryDocument;
+  level?: "center" | "organization";
+  history?: DocumentDirectoryVersion[];
+  timezone?: string;
 }) {
   const { t } = useTranslation();
   const [draft, setDraft] = useState<DocumentDraft>({
-    name: "",
+    name: target?.name ?? "",
     versionLabel: "",
-    gates: [],
-    renewedAcceptance: true,
+    gates: [...new Set(target?.latest_version?.requirements?.map((row) => row.gate) ?? [])],
+    renewedAcceptance: target?.latest_version?.requirements?.length
+      ? new Set(target.latest_version.requirements.map((row) => row.renewed_acceptance)).size === 1
+        ? target.latest_version.requirements[0]!.renewed_acceptance
+        : undefined
+      : true,
   });
   const [file, setFile] = useState<File>(),
     [preview, setPreview] = useState<PublicationPreview>(),
@@ -56,7 +73,13 @@ export function DocumentEditor({
   >({});
   const upload = useRef<UploadIntent | undefined>(undefined),
     prepared = useRef<UploadRef | undefined>(undefined),
-    ready = useRef<string | undefined>(undefined),
+    ready = useRef<string | undefined>(
+      target?.kind === "unpublished_file" &&
+        target.state === "ready_unpublished" &&
+        !target.read_only
+        ? target.file_id!
+        : undefined,
+    ),
     executing = useRef(false),
     mounted = useRef(true);
   const completion = useMemberCommand({
@@ -75,12 +98,13 @@ export function DocumentEditor({
     readResult: readPublication,
     onAccessLost,
     onRefresh: async (result) => {
-      onSaved(result.versionLabel!);
+      await onSaved(result.versionLabel!);
     },
   });
   const locked = busy || unknownUpload || completion.locked || publication.locked;
   useEffect(() => {
     onLockChange(locked);
+    return () => onLockChange(false);
   }, [locked, onLockChange]);
   useEffect(() => {
     mounted.current = true;
@@ -123,13 +147,16 @@ export function DocumentEditor({
     if (!draft.versionLabel.trim() || draft.versionLabel.trim().length > 500)
       nextErrors.versionLabel = t(($) => $.documents.requiredVersion);
     if (
-      !file ||
-      !["application/pdf", "text/plain"].includes(file.type) ||
-      file.size < 1 ||
-      file.size > 2 * 1024 * 1024
+      !ready.current &&
+      (!file ||
+        !["application/pdf", "text/plain"].includes(file.type) ||
+        file.size < 1 ||
+        file.size > 2 * 1024 * 1024)
     )
       nextErrors.file = t(($) => $.documents.requiredFile);
     if (!draft.gates.length) nextErrors.gates = t(($) => $.documents.requiredGates);
+    if (typeof draft.renewedAcceptance !== "boolean")
+      nextErrors.gates = t(($) => $.documents.chooseRenewal);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
     executing.current = true;
@@ -138,7 +165,8 @@ export function DocumentEditor({
     let transferStarted = false;
     try {
       if (!ready.current) {
-        if (!upload.current) upload.current = await uploadIntent(scope, draft.name, file!);
+        if (!upload.current)
+          upload.current = await uploadIntent(scope, draft.name, file!, target?.scope ?? level);
         if (!verifyOnly) {
           setUnknownUpload(true);
           prepared.current = await prepareUpload(upload.current);
@@ -156,7 +184,10 @@ export function DocumentEditor({
         fileId: ready.current,
         versionLabel: draft.versionLabel,
         gates: draft.gates,
-        renewedAcceptance: draft.renewedAcceptance,
+        renewedAcceptance: z.boolean().parse(draft.renewedAcceptance),
+        documentId: target?.document_id ?? undefined,
+        level: target?.scope ?? level,
+        baseRequirements: target?.latest_version?.requirements ?? undefined,
       });
       if (mounted.current) {
         setPreview(result);
@@ -218,9 +249,33 @@ export function DocumentEditor({
       draft={draft}
       onDraft={(value) => change(value, file)}
       onFile={(value) => change(draft, value)}
-      fileLabel={file?.name}
-      mode="new"
-      history={null}
+      fileLabel={
+        file?.name ??
+        (target?.kind === "unpublished_file" && target.state === "ready_unpublished"
+          ? target.name
+          : undefined)
+      }
+      mode={target?.kind === "document" ? "version" : target ? "draft" : "new"}
+      history={
+        history?.map((row) => ({
+          id: row.version_id,
+          version: row.version_label,
+          published:
+            new Intl.DateTimeFormat("tr-TR", {
+              timeZone: timezone,
+              dateStyle: "short",
+              timeStyle: "short",
+            }).format(new Date(row.published_at)) + ` ${timezone}`,
+          renewal:
+            row.requirements === null
+              ? t(($) => $.documents.unknown)
+              : row.requirements.every((item) => item.renewed_acceptance)
+                ? t(($) => $.documents.renewAll)
+                : row.requirements.every((item) => !item.renewed_acceptance)
+                  ? t(($) => $.documents.keepAcceptances)
+                  : t(($) => $.documents.mixedRenewal),
+        })) ?? null
+      }
       reviewed={reviewed}
       onReviewed={setReviewed}
       onPreview={() => {
@@ -231,6 +286,7 @@ export function DocumentEditor({
       }}
       onClose={onClose}
       locked={locked}
+      fixedName={!!target}
       readOnly={terminal || publication.state === "saved"}
       errors={errors}
       preview={

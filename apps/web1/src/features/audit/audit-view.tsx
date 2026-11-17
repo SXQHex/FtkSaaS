@@ -227,7 +227,7 @@ export function AuditView({
                           {row.date}
                         </TableCell>
                         <TableCell>{row.actor}</TableCell>
-                        <TableCell>
+                        <TableCell focusMode="child" className="py-6">
                           <Button
                             variant="link"
                             className="h-auto whitespace-normal text-left"

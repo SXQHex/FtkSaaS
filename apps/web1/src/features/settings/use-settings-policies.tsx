@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import type { PolicyValue } from "../../lib/api-contracts/generated";
+import type { PolicyValue, PolicyView } from "../../lib/api-contracts/generated";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -16,12 +16,18 @@ export function useSettingsPolicies({
   enabled,
   timezone,
   onAccessLost,
+  onEdit,
+  writable = false,
+  locked = false,
 }: {
   scope: ClientScope;
   level: SettingsLevel;
   enabled: boolean;
   timezone: string;
   onAccessLost: (cause: unknown) => boolean;
+  onEdit?: (policy: PolicyView) => void;
+  writable?: boolean;
+  locked?: boolean;
 }) {
   const { t } = useTranslation();
   const query = useQuery({
@@ -86,7 +92,7 @@ export function useSettingsPolicies({
     };
   const table: NonNullable<SettingsViewData["tables"]>["politika"] = source
     ? {
-        columns: ["policy", "version", "summary"],
+        columns: ["policy", "version", "summary", "action"],
         rows: source.items.map((row) => ({
           id: row.key,
           cells: [
@@ -107,6 +113,21 @@ export function useSettingsPolicies({
                 : t(($) => $.settings.nativePolicies.advisory),
             }),
             describe(row.value),
+            <Button
+              key="edit"
+              variant="outline"
+              size="sm"
+              isDisabled={
+                locked ||
+                !writable ||
+                !onEdit ||
+                row.value.kind === "documents" ||
+                (level === "center" && row.scope.kind === "organization" && row.mandatory)
+              }
+              onPress={() => onEdit?.(row)}
+            >
+              {t(($) => $.settings.policyNative.edit)}
+            </Button>,
           ],
         })),
       }

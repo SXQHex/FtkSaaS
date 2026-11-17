@@ -28,10 +28,10 @@ import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 export interface DocumentRow {
   id: string;
   name: string;
-  gates: DocumentGate[];
+  gates?: DocumentGate[];
   version?: string;
   publishedAt?: string;
-  state: "published" | "draft";
+  state: "published" | "draft" | "expired" | "uploading" | "inactive" | "unavailable";
   acceptance?: { accepted: number; total: number };
 }
 export interface DocumentAcceptanceRow {
@@ -40,7 +40,9 @@ export interface DocumentAcceptanceRow {
   initials: string;
   document: string;
   requiredVersion: string;
-  state: "accepted" | "old" | "pending";
+  state: "accepted" | "old" | "pending" | "recorded" | "invalidated";
+  context?: string;
+  evidenceMatches?: boolean | null;
   acceptedVersion?: string;
 }
 export function DocumentsView({
@@ -57,6 +59,8 @@ export function DocumentsView({
   notice,
   pagination,
   locked = false,
+  acceptancePrompt,
+  loading = false,
 }: {
   documents: DocumentRow[] | null;
   acceptances: DocumentAcceptanceRow[] | null;
@@ -76,6 +80,8 @@ export function DocumentsView({
   notice?: ReactNode;
   pagination?: ReactNode;
   locked?: boolean;
+  acceptancePrompt?: string;
+  loading?: boolean;
 }) {
   const { t } = useTranslation();
   const unknown = t(($) => $.documents.unknown);
@@ -146,7 +152,9 @@ export function DocumentsView({
           <TabsContent id="documents">
             <CardContent className="min-w-0">
               {documents === null ? (
-                <p role="status">{t(($) => $.documents.documentsUnread)}</p>
+                <p role="status">
+                  {loading ? t(($) => $.documents.loading) : t(($) => $.documents.documentsUnread)}
+                </p>
               ) : (
                 <div
                   role="region"
@@ -191,11 +199,16 @@ export function DocumentsView({
                           </TableCell>
                           <TableCell>
                             <span className="flex flex-wrap gap-1">
-                              {row.gates.map((gate) => (
+                              {row.gates?.map((gate) => (
                                 <Badge variant="secondary" key={gate}>
                                   {t(($) => $.documents.gates[gate])}
                                 </Badge>
                               ))}
+                              {row.gates === undefined && (
+                                <span className="text-xs text-muted-foreground">
+                                  {t(($) => $.documents.metadataOnly)}
+                                </span>
+                              )}
                             </span>
                           </TableCell>
                           <TableCell className="tabular-nums">{row.version ?? unknown}</TableCell>
@@ -244,7 +257,12 @@ export function DocumentsView({
           <TabsContent id="acceptance">
             <CardContent className="min-w-0">
               {acceptances === null ? (
-                <p role="status">{t(($) => $.documents.acceptanceUnread)}</p>
+                <p role="status">
+                  {acceptancePrompt ??
+                    (loading
+                      ? t(($) => $.documents.loading)
+                      : t(($) => $.documents.acceptanceUnread))}
+                </p>
               ) : (
                 <div
                   role="region"
@@ -277,7 +295,14 @@ export function DocumentsView({
                               <Avatar size="sm">
                                 <AvatarFallback>{row.initials}</AvatarFallback>
                               </Avatar>
-                              <span>{row.name}</span>
+                              <span>
+                                {row.name}
+                                {row.context && (
+                                  <span className="mt-1 block text-xs text-muted-foreground">
+                                    {row.context}
+                                  </span>
+                                )}
+                              </span>
                             </span>
                           </TableCell>
                           <TableCell>{row.document}</TableCell>
@@ -290,8 +315,17 @@ export function DocumentsView({
                                   })
                                 : row.state === "accepted"
                                   ? t(($) => $.documents.acceptanceStates.accepted)
-                                  : t(($) => $.documents.acceptanceStates.pending)}
+                                  : row.state === "recorded"
+                                    ? t(($) => $.documents.acceptanceStates.recorded)
+                                    : row.state === "invalidated"
+                                      ? t(($) => $.documents.acceptanceStates.invalidated)
+                                      : t(($) => $.documents.acceptanceStates.pending)}
                             </Badge>
+                            {row.evidenceMatches === false && row.state === "accepted" && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {t(($) => $.documents.previousEvidenceValid)}
+                              </p>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}

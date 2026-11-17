@@ -16,6 +16,7 @@ import {
   FieldSet,
   FieldLegend,
 } from "../../components/ui/field";
+import { Input } from "../../components/ui/input";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Button } from "../../components/ui/button";
 import { ItemGroup, Item, ItemContent, ItemTitle, ItemDescription } from "../../components/ui/item";
@@ -28,6 +29,7 @@ export interface PolicyChoiceField {
   value: string | null;
   options: { value: string; label: string }[];
   writable: boolean;
+  input?: { type: "number" | "text" | "datetime-local"; min?: number; max?: number; step?: number };
 }
 
 /** Choices and effect/history text are supplied by the versioned policy consumer. */
@@ -115,27 +117,41 @@ export function PolicySheet({
             fields.map((field, index) => (
               <Field key={field.key}>
                 <FieldLabel htmlFor={`${id}-${field.key}`}>{field.label}</FieldLabel>
-                <NativeSelect
-                  id={`${id}-${field.key}`}
-                  name={field.key}
-                  autoFocus={index === 0}
-                  value={field.value ?? ""}
-                  required
-                  disabled={locked || !field.writable || !onField}
-                  aria-describedby={field.description ? `${id}-${field.key}-hint` : undefined}
-                  onChange={(event) => onField?.(field.key, event.target.value)}
-                >
-                  {field.value === null && (
-                    <NativeSelectOption value="" disabled>
-                      {t(($) => $.settings.policyEditor.choose)}
-                    </NativeSelectOption>
-                  )}
-                  {field.options.map((option) => (
-                    <NativeSelectOption key={option.value} value={option.value}>
-                      {option.label}
-                    </NativeSelectOption>
-                  ))}
-                </NativeSelect>
+                {field.input ? (
+                  <Input
+                    id={`${id}-${field.key}`}
+                    type={field.input.type}
+                    min={field.input.min}
+                    max={field.input.max}
+                    step={field.input.step}
+                    value={field.value ?? ""}
+                    disabled={locked || !field.writable || !onField}
+                    aria-describedby={field.description ? `${id}-${field.key}-hint` : undefined}
+                    onChange={(event) => onField?.(field.key, event.target.value)}
+                  />
+                ) : (
+                  <NativeSelect
+                    id={`${id}-${field.key}`}
+                    name={field.key}
+                    autoFocus={index === 0}
+                    value={field.value ?? ""}
+                    required
+                    disabled={locked || !field.writable || !onField}
+                    aria-describedby={field.description ? `${id}-${field.key}-hint` : undefined}
+                    onChange={(event) => onField?.(field.key, event.target.value)}
+                  >
+                    {field.value === null && (
+                      <NativeSelectOption value="" disabled>
+                        {t(($) => $.settings.policyEditor.choose)}
+                      </NativeSelectOption>
+                    )}
+                    {field.options.map((option) => (
+                      <NativeSelectOption key={option.value} value={option.value}>
+                        {option.label}
+                      </NativeSelectOption>
+                    ))}
+                  </NativeSelect>
+                )}
                 {field.description && (
                   <FieldDescription id={`${id}-${field.key}-hint`}>
                     {field.description}
