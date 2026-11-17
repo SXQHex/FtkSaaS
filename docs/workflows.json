@@ -392,8 +392,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "47d6ef3515ca4d5e8c1a130f1567aae83fadd32b9d8a86bf95f90a23a3ce2012",
-        "reason": "Reviewed mandatory independent recovery callback pin, strict query/fragment target and expiry checks, existing password/session finally cleanup, sanitized private stdin development CLI and app/loopback/legacy-explicit-pin tests; provider doubles and historical hosted proof remain separate from new app acceptance."
+        "fingerprint": "01db2ab0e8a91e0400177eec2ca448ece3a17277c0b302e8b54aa86c4d7a6990",
+        "reason": "Reviewed native password security notice URL composition, independent Auth config readback and unchanged callback contract."
       }
     },
     {

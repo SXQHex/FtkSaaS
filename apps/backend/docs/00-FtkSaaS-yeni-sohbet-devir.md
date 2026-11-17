@@ -1,5 +1,10 @@
 # Güncel kaynak ve kabul
 
+## W1-BE-37 native parola bildirimi
+
+Başlangıç main `b219f2be822338b40460f1bb981e00d07b6be70e` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı. Development Auth readback’inde SiteURL `https://app.fethiyetango.com/` ve eski şablondaki doğrudan yol eklemesi doğrulandı. [Native parola güvenliği aracı](remote-backend-setup.md#native-parola-güvenliği-xreq-002) şablonu geçerli SiteURL üzerinden hazırlıyor. W1-BE-37 hosted kabulü, aday kaynak kabulünden sonra development şablonunun kurulması ve yeni postadaki tam adresin doğrulanmasıyla tamamlanacak.
+
+
 <a id="web1-recovery-callback-acceptance"></a>
 ## Web1 recovery kabul callback kaynağı — 17 Kasım2026
 
