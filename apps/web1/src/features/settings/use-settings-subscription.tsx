@@ -100,6 +100,14 @@ export function useSettingsSubscription({
   };
   return {
     data,
+    upgradeSource:
+      source?.subscription_version && source.billing?.upgrade_options?.length
+        ? query.data
+        : undefined,
+    cancelSource:
+      source && (source.pending_change || source.billing?.pending_period_change)
+        ? query.data
+        : undefined,
     periodSource:
       source?.subscription_version && source.billing?.period_change_options.length
         ? query.data

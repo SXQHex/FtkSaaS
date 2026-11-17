@@ -166,6 +166,8 @@ export type SettingsAction =
         | "room"
         | "changePlan"
         | "changePeriod"
+        | "cancelChange"
+        | "upgradePlan"
         | "payment"
         | "cancelSubscription"
         | "copyLink"
@@ -1012,8 +1014,7 @@ export function SettingsView({
                       ) : panel.key === "plan" && index === 2 ? (
                         <CardContent>
                           <p className="text-sm text-muted-foreground">
-                            {data.plan?.pendingDescription ??
-                              t(($) => $.settings.subscriptionNoPendingChange)}
+                            {data.plan?.pendingDescription ?? t(($) => $.settings.unknown)}
                           </p>
                         </CardContent>
                       ) : null}
@@ -1026,6 +1027,26 @@ export function SettingsView({
                               ? (data.plan?.nextInvoice ?? t(($) => $.settings.unknown))
                               : (data.plan?.subscriptionState ?? t(($) => $.settings.unknown))}
                           </p>
+                          {index === 2 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              isDisabled={locked || !canAction("cancelChange")}
+                              onPress={() => action("cancelChange")}
+                            >
+                              {t(($) => $.settings.cancelChangeTitle)}
+                            </Button>
+                          )}
+                          {index === 0 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              isDisabled={locked || !canAction("upgradePlan")}
+                              onPress={() => action("upgradePlan")}
+                            >
+                              {t(($) => $.settings.upgradeQuoteTitle)}
+                            </Button>
+                          )}
                           {index === 0 && (
                             <Button
                               type="button"

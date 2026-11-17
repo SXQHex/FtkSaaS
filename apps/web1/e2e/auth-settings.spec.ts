@@ -28,7 +28,7 @@ test("settings creates a master and an explicitly selected center relation with 
     if (operation === "settings_catalog_get_v1" && r.scope === "organization")
       return send({
         scope: "organization",
-        catalog_version: 23,
+        catalog_version: 24,
         fields: [{ key: "address", group: "O01", consumer: "public_profile", writable: true }],
         defaults: { address: "" },
         brand_packages: [],

@@ -8,6 +8,7 @@ import { EventCommandNotice } from "../events/event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { PaymentSheet, type PaymentDraft } from "./payment-sheet";
 import { SettingsReviewDialog } from "./settings-review-dialog";
+import type { SettingsUpgradeQuote } from "./settings-upgrade";
 import type { SettingsSubscriptionSource } from "./settings-subscription";
 import {
   settingsPaymentIntent,
@@ -19,12 +20,14 @@ import {
 
 export function SettingsPaymentEditor({
   before,
+  quote,
   onSaved,
   onClose,
   onLockChange,
   onAccessLost,
 }: {
   before: SettingsSubscriptionSource;
+  quote?: SettingsUpgradeQuote;
   onSaved: (result: SettingsSubscriptionSource) => Promise<void>;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
@@ -64,7 +67,9 @@ export function SettingsPaymentEditor({
   function invalid(field: keyof PaymentDraft) {
     const message =
       field === "amount"
-        ? t(($) => $.settings.paymentAmountError)
+        ? quote?.quote.amount_minor === "0"
+          ? t(($) => $.settings.paymentZeroQuoteError)
+          : t(($) => $.settings.paymentAmountError)
         : field === "reference"
           ? t(($) => $.settings.paymentReferenceError)
           : t(($) => $.settings.paymentTimeError);
@@ -77,7 +82,7 @@ export function SettingsPaymentEditor({
     setPreparing(true);
     setError(undefined);
     try {
-      const intent = await settingsPaymentIntent(before, draft);
+      const intent = await settingsPaymentIntent(before, draft, quote);
       if (active.current) {
         command.reset();
         setAccepted(false);
@@ -150,7 +155,7 @@ export function SettingsPaymentEditor({
     <PaymentSheet
       open
       draft={draft}
-      currency={before.subscription.billing?.current.currency ?? null}
+      currency={quote?.quote.currency ?? before.subscription.billing?.current.currency ?? null}
       writable={!command.unavailable}
       dirty={Object.values(draft).some(Boolean)}
       locked={locked}

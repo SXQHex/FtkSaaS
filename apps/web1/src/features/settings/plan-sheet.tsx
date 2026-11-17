@@ -26,6 +26,9 @@ export function PlanSheet({
   open,
   title,
   selectionLabel,
+  reviewLabel,
+  readOnly = false,
+  primaryAction,
   options,
   selected,
   effects,
@@ -41,6 +44,9 @@ export function PlanSheet({
   open: boolean;
   title?: string;
   selectionLabel?: string;
+  reviewLabel?: string;
+  readOnly?: boolean;
+  primaryAction?: ReactNode;
   options: { key: string; label: string; description: string; disabledReason?: string }[] | null;
   selected: string | null;
   effects: { id: string; title: string; detail: string }[] | null;
@@ -85,40 +91,45 @@ export function PlanSheet({
         }}
       >
         <FieldGroup>
-          <FieldSet>
-            <FieldLegend>{selectionLabel ?? t(($) => $.settings.planEditor.choose)}</FieldLegend>
-            {options === null ? (
-              <p>{t(($) => $.settings.unread)}</p>
-            ) : (
-              <RadioGroup
-                name="plan"
-                aria-label={selectionLabel ?? t(($) => $.settings.planEditor.choose)}
-                value={selected ?? ""}
-                onChange={onSelect}
-                isDisabled={locked || !onSelect}
-              >
-                {options.map((option) => (
-                  <Field key={option.key} orientation="horizontal">
-                    <RadioGroupItem
-                      id={`${id}-${option.key}`}
-                      value={option.key}
-                      isDisabled={Boolean(option.disabledReason)}
-                      aria-labelledby={`${id}-${option.key}-label`}
-                      aria-describedby={`${id}-${option.key}-hint`}
-                    />
-                    <div className="flex min-w-0 flex-col gap-1">
-                      <FieldLabel id={`${id}-${option.key}-label`} htmlFor={`${id}-${option.key}`}>
-                        {option.label}
-                      </FieldLabel>
-                      <FieldDescription id={`${id}-${option.key}-hint`}>
-                        {option.disabledReason ?? option.description}
-                      </FieldDescription>
-                    </div>
-                  </Field>
-                ))}
-              </RadioGroup>
-            )}
-          </FieldSet>
+          {!readOnly && (
+            <FieldSet>
+              <FieldLegend>{selectionLabel ?? t(($) => $.settings.planEditor.choose)}</FieldLegend>
+              {options === null ? (
+                <p>{t(($) => $.settings.unread)}</p>
+              ) : (
+                <RadioGroup
+                  name="plan"
+                  aria-label={selectionLabel ?? t(($) => $.settings.planEditor.choose)}
+                  value={selected ?? ""}
+                  onChange={onSelect}
+                  isDisabled={locked || !onSelect}
+                >
+                  {options.map((option) => (
+                    <Field key={option.key} orientation="horizontal">
+                      <RadioGroupItem
+                        id={`${id}-${option.key}`}
+                        value={option.key}
+                        isDisabled={Boolean(option.disabledReason)}
+                        aria-labelledby={`${id}-${option.key}-label`}
+                        aria-describedby={`${id}-${option.key}-hint`}
+                      />
+                      <div className="flex min-w-0 flex-col gap-1">
+                        <FieldLabel
+                          id={`${id}-${option.key}-label`}
+                          htmlFor={`${id}-${option.key}`}
+                        >
+                          {option.label}
+                        </FieldLabel>
+                        <FieldDescription id={`${id}-${option.key}-hint`}>
+                          {option.disabledReason ?? option.description}
+                        </FieldDescription>
+                      </div>
+                    </Field>
+                  ))}
+                </RadioGroup>
+              )}
+            </FieldSet>
+          )}
           <FieldSet>
             <FieldLegend>{t(($) => $.settings.planEditor.effects)}</FieldLegend>
             {effects === null ? (
@@ -155,13 +166,16 @@ export function PlanSheet({
         <Button type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.settings.discard)}
         </Button>
-        <Button
-          type="submit"
-          form={`${id}-form`}
-          isDisabled={locked || !available || effects === null || !onReview}
-        >
-          {t(($) => $.settings.planEditor.review)}
-        </Button>
+        {primaryAction}
+        {!readOnly && (
+          <Button
+            type="submit"
+            form={`${id}-form`}
+            isDisabled={locked || !available || effects === null || !onReview}
+          >
+            {reviewLabel ?? t(($) => $.settings.planEditor.review)}
+          </Button>
+        )}
       </SheetFooter>
     </Sheet>
   );

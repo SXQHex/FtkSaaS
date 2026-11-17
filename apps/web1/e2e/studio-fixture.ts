@@ -284,7 +284,7 @@ export async function mockStudio(page: Page) {
     if (op === "settings_catalog_get_v1")
       return send(route, {
         scope: "center",
-        catalog_version: 23,
+        catalog_version: 24,
         fields: [{ key: "address", group: "center", consumer: "public_profile", writable: true }],
         defaults: { address: "" },
         brand_packages: [],

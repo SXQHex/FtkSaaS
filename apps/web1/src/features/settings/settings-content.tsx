@@ -12,6 +12,9 @@ import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
+import { SettingsUpgradeEditor } from "./settings-upgrade-editor";
+import type { SettingsUpgradeQuote } from "./settings-upgrade";
+import { SettingsChangeCancelEditor } from "./settings-change-cancel-editor";
 import { SettingsPeriodEditor } from "./settings-period-editor";
 import { SettingsPaymentEditor } from "./settings-payment-editor";
 import { SubscriptionRenewalEditor } from "./subscription-renewal-editor";
@@ -134,8 +137,13 @@ function SettingsManagement({
     [locked, setLocked] = useState(false),
     [identity, setIdentity] = useState<DisciplineLevel>(),
     [renewal, setRenewal] = useState<SettingsSubscriptionSource>(),
-    [payment, setPayment] = useState<SettingsSubscriptionSource>(),
-    [period, setPeriod] = useState<SettingsSubscriptionSource>();
+    [payment, setPayment] = useState<{
+      before: SettingsSubscriptionSource;
+      quote?: SettingsUpgradeQuote;
+    }>(),
+    [period, setPeriod] = useState<SettingsSubscriptionSource>(),
+    [changeCancel, setChangeCancel] = useState<SettingsSubscriptionSource>(),
+    [upgrade, setUpgrade] = useState<SettingsSubscriptionSource>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -161,6 +169,8 @@ function SettingsManagement({
       setRenewal(undefined);
       setPayment(undefined);
       setPeriod(undefined);
+      setChangeCancel(undefined);
+      setUpgrade(undefined);
       if (code === "FORBIDDEN") {
         void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
       } else {
@@ -313,6 +323,13 @@ function SettingsManagement({
         : {}),
     },
   };
+  async function refreshSubscription(result: SettingsSubscriptionSource) {
+    queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
+    await queries.invalidateQueries(
+      { queryKey: ["workspace", scope.accountId, scope.orgId] },
+      { throwOnError: true },
+    );
+  }
   async function refresh() {
     // A master change also invalidates center projections that were read before it.
     // Mark every cached projection stale, then read the active scope only once.
@@ -374,6 +391,8 @@ function SettingsManagement({
           }
         }}
         availableActions={[
+          ...(subscription.upgradeSource && !readOnly ? ["upgradePlan" as const] : []),
+          ...(subscription.cancelSource && !readOnly ? ["cancelChange" as const] : []),
           ...(subscription.periodSource && !readOnly ? ["changePeriod" as const] : []),
           ...(subscription.paymentSource && !readOnly ? ["payment" as const] : []),
           ...(subscription.renewalSource && !readOnly ? ["cancelSubscription" as const] : []),
@@ -391,10 +410,14 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "upgradePlan" && subscription.upgradeSource)
+            setUpgrade(structuredClone(subscription.upgradeSource));
+          if (action.kind === "cancelChange" && subscription.cancelSource)
+            setChangeCancel(structuredClone(subscription.cancelSource));
           if (action.kind === "changePeriod" && subscription.periodSource)
             setPeriod(structuredClone(subscription.periodSource));
           if (action.kind === "payment" && subscription.paymentSource)
-            setPayment(structuredClone(subscription.paymentSource));
+            setPayment({ before: structuredClone(subscription.paymentSource) });
           if (action.kind === "cancelSubscription" && subscription.renewalSource)
             setRenewal(structuredClone(subscription.renewalSource));
           if (action.kind === "reset") document.onReset(action.card);
@@ -423,6 +446,35 @@ function SettingsManagement({
           onAccessLost={accessLost}
         />
       )}
+      {upgrade && (
+        <SettingsUpgradeEditor
+          before={upgrade}
+          timezone={timezone}
+          onClose={() => {
+            if (!locked) setUpgrade(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+          onSaved={refreshSubscription}
+          onPay={(current, quote) => {
+            if (!locked) {
+              setUpgrade(undefined);
+              setPayment({ before: structuredClone(current), quote: structuredClone(quote) });
+            }
+          }}
+        />
+      )}
+      {changeCancel && (
+        <SettingsChangeCancelEditor
+          before={changeCancel}
+          onClose={() => {
+            if (!locked) setChangeCancel(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+          onSaved={refreshSubscription}
+        />
+      )}
       {period && (
         <SettingsPeriodEditor
           before={period}
@@ -432,30 +484,19 @@ function SettingsManagement({
           }}
           onLockChange={publishLock}
           onAccessLost={accessLost}
-          onSaved={async (result) => {
-            queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
-            await queries.invalidateQueries(
-              { queryKey: ["workspace", scope.accountId, scope.orgId] },
-              { throwOnError: true },
-            );
-          }}
+          onSaved={refreshSubscription}
         />
       )}
       {payment && (
         <SettingsPaymentEditor
-          before={payment}
+          before={payment.before}
+          quote={payment.quote}
           onClose={() => {
             if (!locked) setPayment(undefined);
           }}
           onLockChange={publishLock}
           onAccessLost={accessLost}
-          onSaved={async (result) => {
-            queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
-            await queries.invalidateQueries(
-              { queryKey: ["workspace", scope.accountId, scope.orgId] },
-              { throwOnError: true },
-            );
-          }}
+          onSaved={refreshSubscription}
         />
       )}
       {renewal && (
@@ -466,13 +507,7 @@ function SettingsManagement({
           }}
           onLockChange={publishLock}
           onAccessLost={accessLost}
-          onSaved={async (result) => {
-            queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
-            await queries.invalidateQueries(
-              { queryKey: ["workspace", scope.accountId, scope.orgId] },
-              { throwOnError: true },
-            );
-          }}
+          onSaved={refreshSubscription}
         />
       )}
       {subscription.notice}

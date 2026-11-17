@@ -1,11 +1,13 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
+import { BackendError } from "../../lib/backend";
+import type { SettingsUpgradeQuote } from "./settings-upgrade";
 import { scopedBackend } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import { readSettingsSubscription, type SettingsSubscriptionSource } from "./settings-subscription";
 import type { PaymentDraft } from "./payment-sheet";
 
-function amountMinor(value: string, currency: string) {
+function amountMinor(value: string, currency: string, allowZero: boolean) {
   const digits =
     new Intl.NumberFormat("tr-TR", { style: "currency", currency }).resolvedOptions()
       .maximumFractionDigits ?? 0;
@@ -15,16 +17,29 @@ function amountMinor(value: string, currency: string) {
     throw Error("PAYMENT_AMOUNT");
   const minor =
     BigInt(whole) * 10n ** BigInt(digits) + BigInt((match[2] ?? "").padEnd(digits, "0") || "0");
-  if (minor <= 0n || minor > 9223372036854775807n) throw Error("PAYMENT_AMOUNT");
+  if (minor < 0n || (!allowZero && minor === 0n) || minor > 9223372036854775807n)
+    throw Error("PAYMENT_AMOUNT");
   return minor.toString();
 }
 export async function settingsPaymentIntent(
   before: SettingsSubscriptionSource,
   draft: PaymentDraft,
+  quoted?: SettingsUpgradeQuote,
 ) {
-  const currency = before.subscription.billing?.current.currency;
+  if (
+    quoted &&
+    (quoted.scope.accountId !== before.scope.accountId ||
+      quoted.scope.orgId !== before.scope.orgId ||
+      quoted.scope.centerId !== before.scope.centerId)
+  )
+    throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");
+  if (quoted) {
+    z.uuid().parse(quoted.quote.id);
+    z.iso.datetime({ offset: true }).parse(quoted.quote.expires_at);
+  }
+  const currency = quoted?.quote.currency ?? before.subscription.billing?.current.currency;
   if (!currency) throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");
-  const amount_minor = amountMinor(draft.amount, currency);
+  const amount_minor = amountMinor(draft.amount, currency, quoted?.quote.amount_minor === "0");
   const reference = draft.reference.trim();
   if (!reference) throw Error("PAYMENT_REFERENCE");
   let occurred_at: string;
@@ -40,6 +55,12 @@ export async function settingsPaymentIntent(
   const current = await readSettingsSubscription(before.scope);
   if (current.subscription.billing?.current.currency !== currency)
     throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");
+  if (
+    quoted &&
+    (Date.parse(quoted.quote.expires_at) <= Date.now() ||
+      current.subscription.plan !== quoted.quote.from_plan)
+  )
+    throw new BackendError({ code: "PREVIEW_STALE", retryable: false, trace_id: uuidv7() });
   return {
     scope: { ...before.scope },
     key: uuidv7(),
@@ -47,6 +68,7 @@ export async function settingsPaymentIntent(
     currency,
     reference,
     occurred_at,
+    ...(quoted ? { quoteId: quoted.quote.id } : {}),
   };
 }
 export type SettingsPaymentIntent = Awaited<ReturnType<typeof settingsPaymentIntent>>;
@@ -62,6 +84,7 @@ export async function writeSettingsPayment(intent: SettingsPaymentIntent) {
     currency: intent.currency,
     reference: intent.reference,
     occurred_at: intent.occurred_at,
+    ...(intent.quoteId ? { quote_id: intent.quoteId } : {}),
   });
   z.uuid().parse(result.primary_id);
   return result;

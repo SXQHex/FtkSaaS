@@ -3548,6 +3548,9 @@ export default interface Resources {
       "brandExampleAction": "Rezervasyon yap",
       "brandExampleDescription": "Üye sayfası ve e-posta başlığı böyle görünür.",
       "brandPreview": "Marka önizlemesi",
+      "cancelChangeHint": "Yalnız seçilen bekleyen plan veya dönem talebi iptal edilir. Mevcut plan ve ödenmiş dönem korunur.",
+      "cancelChangeTitle": "Bekleyen talebi iptal et",
+      "cancelChangeVersion": "Bekleyen talep · Sürüm {{version}}",
       "cancelSubscription": "Aboneliği iptal et",
       "cards": {
         "ay-genel": {
@@ -3841,6 +3844,7 @@ export default interface Resources {
       "paymentReferenceError": "Ödeme referansını gir.",
       "paymentSubmitted": "Ödeme bildirimi alındı. Platform doğrulaması beklenir; bu sonuç ödemenin doğrulandığını veya planın değiştiğini göstermez.",
       "paymentTimeError": "Geçerli bir UTC tarih ve saat gir.",
+      "paymentZeroQuoteError": "Geçerli bir tutar gir. Sıfır tutar yalnız bakiyesi sıfır olan bu teklif için kullanılabilir; binlik ayırıcı kullanma.",
       "periodEditorChoose": "Yeni dönem",
       "periodEditorEffective": "Yürürlük tarihi",
       "periodEditorHint": "Aynı planın aylık/yıllık dönemini değiştir. Fiyat ve yürürlük tarihi güncel kaynaktan gelir; mevcut ödenmiş dönem korunur.",
@@ -3893,7 +3897,7 @@ export default interface Resources {
       "subscriptionManualPayment": "Manuel ödeme bildirimi",
       "subscriptionNoNumericLimit": "Sayısal sınır tanımlı değil",
       "subscriptionNoPendingChange": "Bekleyen dönem değişikliği yok.",
-      "subscriptionPendingChange": "Bekleyen plan değişikliği var; ayrıntıları işlem kaynağından okunur.",
+      "subscriptionPendingChange": "Bekleyen plan değişikliği var; hedef plan ayrıntısı alınamadı.",
       "subscriptionPendingPeriod": "Bekleyen dönem değişimi: {{period}} · {{amount}} · Yürürlük: {{effective}}",
       "subscriptionPeriod": "Geçerli dönem: {{start}} — {{end}}",
       "subscriptionPeriods": {
@@ -3960,6 +3964,14 @@ export default interface Resources {
       "unlimited": "Sınırsız",
       "unread": "Değer henüz okunmadı.",
       "unsetHint": "Değer tanımlı değil.",
+      "upgradeCatalogHint": "Yürürlükteki üst planı seç. Buradaki fiyat planın dönem ücretidir; ödenecek gerçek bakiye teklif hazırlanırken backend tarafından hesaplanır.",
+      "upgradeQuoteDue": "Teklifte ödenecek bakiye",
+      "upgradeQuoteExpired": "Teklif süresi dolmuş veya abonelik değişmiş. Güncel kaynaktan yeni bir teklif hazırla.",
+      "upgradeQuoteExpiry": "Teklif son kullanım tarihi",
+      "upgradeQuoteHint": "Bu teklif ödeme veya plan değişikliği değildir. Ödeme bildirimi ayrı adımda yapılır; plan değişikliği platform doğrulaması gerektirir.",
+      "upgradeQuoteMissing": "İşlem kaydı alındı ancak teklif ayrıntıları alınamadı. Bu sonuçla ödeme bildirilmez. Güncel kaynaktan yeni bir teklif hazırlayabilirsin.",
+      "upgradeQuotePrepare": "Teklif hazırla",
+      "upgradeQuoteTitle": "Plan yükseltme teklifi",
       "upload": "Logo yükle",
       "usage": "Plan ve kullanım"
     },

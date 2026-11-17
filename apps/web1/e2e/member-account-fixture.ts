@@ -114,7 +114,7 @@ export async function mockMemberAccount(
       if (operation === "settings_catalog_get_v1")
         return send({
           scope: "member",
-          catalog_version: 23,
+          catalog_version: 24,
           defaults: {},
           fields: Object.keys(values).map((key) => ({
             key,

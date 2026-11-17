@@ -368,7 +368,7 @@ export async function mockNative(page: Page, mfa = false) {
           trace_id: id,
           data: {
             scope: "user",
-            catalog_version: 23,
+            catalog_version: 24,
             fields: [
               {
                 key: "theme",
