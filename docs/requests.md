@@ -67,6 +67,8 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-069 | Backend değerlendirmesi; W1-BE-35 Ekip yönetici rolü keşfi | Backend; tüketici frontend | [WF02](workflows.md#wf02) | Mevcut rol/durum enumları, native görünürlük ve cursor kapsamında filtreli keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-069). |
 
+| XREQ-070 | Backend değerlendirmesi; W1-BE-36 recovery kabul callback kaynağı | Backend; tüketici frontend | [WF01](workflows.md#wf01) | Zorunlu bağımsız callback pini ve mevcut development runner CLI girişi; gerçek sağlayıcı kanıtı ayrı. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) | Frontend veya hosted kabulü verilmedi. [Değerlendirme](#xreq-070). |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -948,3 +950,8 @@ Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre
 ## XREQ-069 Web1 Ekip yönetici rolü keşfi
 
 **Backend değerlendirmesi — 17 Kasım2026:** W1-BE-35 için mevcut roles_list_v1 okuyucusunda role/state filtresi eksikliği doğrulandı. Ayrı endpoint veya tüm kişi/öğrenci taraması gerekmez; mevcut Role/RecordState alanları opsiyonel typed filtre olur ve native sorguda limitten önce uygulanır. Mevcut istek/aktör cursor bağı yeni alanları da kapsar. Native org-reader/CM/erişilebilir merkez, plan ve yazar yetkileri korunur; center_id atlanmış OM keşfi CM’ye organizasyon yetkisi vermez. Kesin tüketim ve destek sınırları [WF02](workflows.md#wf02), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery) sahibindedir. Frontend dosyaları/kabulü değiştirilmedi; karşı alan adına kabul verilmedi.
+
+<a id="xreq-070"></a>
+## XREQ-070 Web1 native recovery kabul aracının callback kaynağı
+
+**Backend değerlendirmesi — 17 Kasım2026:** W1-BE-36 bulgusu mevcut recovery helper’ında doğrulandı. Eski hedef varsayımı kaldırılır; native/expired kabulü güvenilir private girdiden zorunlu origin/path/next pini alır, link/provider cevabından hedef türetmez. Mevcut development runner’ına native|expired stdin JSON CLI girişi eklenir; yeni Auth/RPC, proof üretimi, TTL/saat değişikliği veya hosted reset/seed yoktur. Yan callback reddi ve özgün parola/oturum temizliği korunur. Kesin native akış [WF01](workflows.md#wf01), operatör girişleri [backend çalışma rehberi](../apps/backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü), güncel kaynak/run/ortam ve eski kanıt ayrımı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. Unit fixture yeni app/loopback gerçek sağlayıcı kabulü değildir; P01/G-PRO alt kontrolü yeni gerçek kanıt olmadan kapatılmaz. Frontend sayfa kabulü yeniden açılmadı ve karşı alan adına kabul verilmedi.
