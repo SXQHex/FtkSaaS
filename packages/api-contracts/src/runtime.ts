@@ -236,6 +236,7 @@ export const runtimeOperationNames = [
   "management_work_list_v1",
   "instructor_finance_directory_get_v1",
   "import_directory_get_v1",
-  "tracking_directory_get_v1"
+  "tracking_directory_get_v1",
+  "document_directory_get_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

@@ -43,8 +43,9 @@ for(const [key,name] of shared)contract.$defs[name]=children(JSON.parse(key),int
 // Validation rules and standalone (no runtime compiler) execution stay unchanged.
 // Ajv emits a compact required-field loop for larger objects; every required
 // field remains checked. Larger enums use Ajv's equivalent loop as well,
-// avoiding repeated comparisons in the upload.
-const ajv=new Ajv({strict:false,allErrors:false,messages:false,inlineRefs:false,loopRequired:10,loopEnum:10,code:{source:true,esm:true,optimize:2}});addFormats(ajv);ajv.addSchema(contract,'contract');const exports={};
+// avoiding repeated comparisons in the upload. Thresholds 8/4 were measured
+// against the unchanged JSON upload budget; they alter code shape, not checks.
+const ajv=new Ajv({strict:false,allErrors:false,messages:false,inlineRefs:false,loopRequired:8,loopEnum:4,code:{source:true,esm:true,optimize:2}});addFormats(ajv);ajv.addSchema(contract,'contract');const exports={};
 exports.failure_envelope='contract#/$defs/FailureEnvelope';
 for(const op of contract['x-contract'].operations){exports['request_'+op.name]='contract'+op.request.$ref;exports['success_'+op.name]='contract'+op.success.$ref;}
 const modules={'ajv/dist/runtime/ucs2length':['ucs','ajv/dist/runtime/ucs2length.js'],'ajv/dist/runtime/equal':['equal','ajv/dist/runtime/equal.js'],'ajv-formats/dist/formats':['formats','ajv-formats/dist/formats.js']};

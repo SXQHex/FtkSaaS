@@ -63,6 +63,8 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-066 | Backend değerlendirmesi; W1-BE-33 yönetici hakediş/ödeme keşfi | Backend; tüketici frontend | [WF14](workflows.md#wf14) | Mevcut native yetki/plan ve gerçek kaynaklar korunarak typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-066). |
 | XREQ-067 | Backend değerlendirmesi; W1-BE-34 denetim ve kendi işlem keşfi | Backend; tüketici frontend | [WF00](workflows.md#wf00) | Mevcut native yetki/plan ve gerçek kaynaklar korunarak typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-067). |
 
+| XREQ-068 | Backend değerlendirmesi; W1-BE-31 belge yönetimi dizini ve kabul özeti | Backend; tüketici frontend | [WF11](workflows.md#wf11) | Native belge/yetki/yenileme ve gerçek işlem kapsamıyla typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-068). |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -934,3 +936,8 @@ Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre
 ### Backend değerlendirmesi — 17 Kasım 2026
 
 Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre/özet okuyucularla tamamlanır. Kesin tüketim ve açık destek sınırları [WF00](workflows.md#wf00), kaynak/ortam kanıtı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) sahibindedir. Frontend dosyası/kabulü değiştirilmedi; karşı alan adına kabul verilmedi.
+
+<a id="xreq-068"></a>
+## XREQ-068 Web1 belge yönetimi dizini ve kabul özeti
+
+**Backend değerlendirmesi — 17 Kasım 2026:** W1-BE-31 için mevcut native upload/complete/publication preview/publish, context requirements ve kendi açık kabul yolları korunur. Eksik yönetim belge/sürüm/kabul dizini ve sayfadan bağımsız kişi özeti document_directory_get_v1 ile tamamlanır. Kullanıcı aktif işlem/unexpired preview kişilerini sayaç kitlesi, tarihsel kabulleri yalnız “Tümü” gerçek kayıtları olarak seçti; normatif karar FD08 sahibindedir. Kesin native yetki/plan, org salt okunur sınırı, taslak uploader yetkisi, DTO/cursor/yenileme [WF11](workflows.md#wf11), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management) sahibindedir. Frontend kaynak/request/todo değiştirilmedi; karşı alan adına kabul verilmedi.
