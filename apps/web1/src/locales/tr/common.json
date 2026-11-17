@@ -5115,5 +5115,27 @@
     "exampleFeedback": "Yerel örnek eylemi çalıştı; gerçek kayıt değiştirilmedi.",
     "pauseMotion": "Animasyonu durdur",
     "resumeMotion": "Animasyonu sürdür"
+  },
+  "centerSetup": {
+    "title": "İlk merkezini oluştur",
+    "description": "Organizasyon hazır. Ders ve kayıt işlemleri için merkezin adını ve saat dilimini belirle.",
+    "action": "Merkez oluştur",
+    "name": "Merkez adı",
+    "timezone": "Merkez saat dilimi",
+    "chooseTimezone": "Saat dilimi seç",
+    "nameRequired": "Merkez adını gir.",
+    "zoneRequired": "Geçerli bir merkez saat dilimi seç.",
+    "savedHint": "Merkez oluşturuldu. Organizasyon ayarlarının Ekip bölümünden merkez yöneticisini belirleyebilirsin.",
+    "settings": "Merkez ayarlarını aç",
+    "states": {
+      "writing": "Merkez oluşturuluyor…",
+      "unknown": "Yanıt alınamadı. Merkez oluşturulmuş sayılmaz. Aynı isteği yeniden dene veya işlem sonucunu oku.",
+      "pending": "İşlem sürüyor. Yeni merkez isteği göndermeden sonucunu oku.",
+      "saved-unread": "İstek kabul edildi; güncel merkez henüz okunamadı. Yeniden oluşturmadan sonucu oku.",
+      "saved": "Merkez oluşturuldu ve güncel çalışma alanından doğrulandı.",
+      "stale": "Kaynak değişti. Güncel koşulları kontrol edip yeniden dene.",
+      "rejected": "Merkez oluşturulamadı. Organizasyon yetkisini ve plan sınırını kontrol et."
+    },
+    "authorityUnavailable": "Merkez oluşturma yetkisi okunamadı. Yeniden dene."
   }
 }

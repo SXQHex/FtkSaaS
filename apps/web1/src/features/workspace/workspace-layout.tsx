@@ -55,14 +55,20 @@ export function WorkspaceLayout({
   children,
   onThemeChange,
   scopeControl,
+  scopeLocked = false,
   pageTitle,
 }: {
   accountId: string;
   name: string;
   pending: boolean;
   onSignOut: () => void;
-  children: ReactNode | ((selection: WorkspaceSelection) => ReactNode);
+  children:
+    | ReactNode
+    | ((
+        selection: WorkspaceSelection & { workspace?: Awaited<ReturnType<typeof readWorkspace>> },
+      ) => ReactNode);
   scopeControl?: WorkspaceScopeControl;
+  scopeLocked?: boolean;
   pageTitle?: string;
   onThemeChange?: () => void;
 }) {
@@ -88,7 +94,7 @@ export function WorkspaceLayout({
     )
       void router.invalidate();
   }, [scope.error, router]);
-  const view = scope.isError ? undefined : scope.data;
+  const view = scope.isError && !scopeLocked ? undefined : scope.data;
   const centerId =
     (selectedCenterId && view?.centers.some((center) => center.id === selectedCenterId)
       ? selectedCenterId
@@ -128,6 +134,7 @@ export function WorkspaceLayout({
     : t(($) => $.auth.account);
   const caption = t(($) => $.workspace.views[mode]);
   const chooseMode = (value: string) => {
+    if (scopeLocked || scopeControl?.locked) return;
     if (value === "management" || value === "instructor" || value === "account")
       setPreferredView(value);
   };
@@ -137,7 +144,7 @@ export function WorkspaceLayout({
         key={accountId}
         name={name}
         pending={pending}
-        scopeLocked={scopeControl?.locked}
+        scopeLocked={scopeLocked || scopeControl?.locked}
         onSignOut={onSignOut}
         view={view}
         loading={scope.isPending}
@@ -145,7 +152,7 @@ export function WorkspaceLayout({
         onRefresh={() => void scope.refetch()}
         centerId={centerId}
         onOrganization={(id) => {
-          if (scopeControl?.locked) return;
+          if (scopeLocked || scopeControl?.locked) return;
           if (scopeControl) scopeControl.onOrganization(id);
           else {
             setOrganizationId(id);
@@ -154,7 +161,7 @@ export function WorkspaceLayout({
           setPreferredView(undefined);
         }}
         onCenter={(id) => {
-          if (scopeControl?.locked) return;
+          if (scopeLocked || scopeControl?.locked) return;
           if (scopeControl) scopeControl.onCenter(id);
           else setSelectedCenterId(id);
           setPreferredView(undefined);
@@ -194,6 +201,7 @@ export function WorkspaceLayout({
                   size="segmented"
                   selectionMode="single"
                   disallowEmptySelection
+                  isDisabled={scopeLocked || scopeControl?.locked}
                   selectedKeys={new Set([mode])}
                   aria-label={t(($) => $.workspace.viewMode)}
                   onSelectionChange={(keys) => {
@@ -250,7 +258,7 @@ export function WorkspaceLayout({
         </header>
         {view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />}
         {typeof children === "function"
-          ? children({ organizationId: resolvedOrganizationId, centerId })
+          ? children({ organizationId: resolvedOrganizationId, centerId, workspace: view })
           : children}
       </SidebarInset>
     </SidebarProvider>

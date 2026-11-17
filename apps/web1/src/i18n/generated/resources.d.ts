@@ -536,6 +536,28 @@ export default interface Resources {
       "unsupportedDelivery": "Desteklenmiyor",
       "workAlertTiming": "Bu iş uyarısının zamanı merkez ayarlarından belirlenir; buradaki gün alanı kullanılmaz."
     },
+    "centerSetup": {
+      "action": "Merkez oluştur",
+      "authorityUnavailable": "Merkez oluşturma yetkisi okunamadı. Yeniden dene.",
+      "chooseTimezone": "Saat dilimi seç",
+      "description": "Organizasyon hazır. Ders ve kayıt işlemleri için merkezin adını ve saat dilimini belirle.",
+      "name": "Merkez adı",
+      "nameRequired": "Merkez adını gir.",
+      "savedHint": "Merkez oluşturuldu. Organizasyon ayarlarının Ekip bölümünden merkez yöneticisini belirleyebilirsin.",
+      "settings": "Merkez ayarlarını aç",
+      "states": {
+        "pending": "İşlem sürüyor. Yeni merkez isteği göndermeden sonucunu oku.",
+        "rejected": "Merkez oluşturulamadı. Organizasyon yetkisini ve plan sınırını kontrol et.",
+        "saved": "Merkez oluşturuldu ve güncel çalışma alanından doğrulandı.",
+        "saved-unread": "İstek kabul edildi; güncel merkez henüz okunamadı. Yeniden oluşturmadan sonucu oku.",
+        "stale": "Kaynak değişti. Güncel koşulları kontrol edip yeniden dene.",
+        "unknown": "Yanıt alınamadı. Merkez oluşturulmuş sayılmaz. Aynı isteği yeniden dene veya işlem sonucunu oku.",
+        "writing": "Merkez oluşturuluyor…"
+      },
+      "timezone": "Merkez saat dilimi",
+      "title": "İlk merkezini oluştur",
+      "zoneRequired": "Geçerli bir merkez saat dilimi seç."
+    },
     "demo": {
       "action": "Test Et",
       "clickCount": "Tıklama sayısı: {{value}}"

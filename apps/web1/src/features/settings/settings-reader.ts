@@ -2,7 +2,9 @@ import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 
-export async function readOrganizationSettingsCatalog(scope: ClientScope) {
+export async function readOrganizationSettingsCatalog(
+  scope: Pick<ClientScope, "accountId" | "orgId">,
+) {
   const backend = await scopedBackend(scope);
   try {
     const catalog = await backend.call("settings_catalog_get_v1", {
