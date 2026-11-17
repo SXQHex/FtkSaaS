@@ -4049,5 +4049,71 @@
     "tasksDescription": "Seçili merkezde yetkin kapsamındaki yönetim işleri. İşlemi kendi ekranında tamamla.",
     "tasksUnread": "Bekleyen yönetim işleri şu anda okunamıyor.",
     "tasksEmpty": "Bu kapsamda bekleyen yönetim işi yok."
+  },
+  "earnings": {
+    "title": "Hakediş",
+    "description": "Eğitmenlerin kapanan seanslardan doğan alacakları ve yaptığın ödemeler. Üye tahsilatı eğitmen ödemesi değildir.",
+    "pay": "Ödeme kaydet",
+    "correct": "Düzelt",
+    "correctTitle": "Ödemeyi düzelt",
+    "payDescription": "Eğitmene yaptığın ödemeyi kaydet. Üye tahsilatından ayrıdır.",
+    "correctDescription": "Özgün kayıt değişmez, yeni bir düzeltme satırı eklenir.",
+    "metrics": {
+      "earned": "Toplam hakediş",
+      "paid": "Ödenen",
+      "remaining": "Kalan",
+      "overpaid": "Fazla ödeme"
+    },
+    "metricHints": {
+      "earned": "Kapanan seansların hakedişleri",
+      "paid": "Ödemeler ve düzeltmeleri",
+      "remaining": "Güncel hakediş bakiyesi",
+      "overpaid": "Fazla ödenmiş tutar"
+    },
+    "tabsLabel": "Hakediş bölümleri",
+    "tabs": {
+      "instructors": "Eğitmenler",
+      "lines": "Satırlar",
+      "payments": "Ödemeler"
+    },
+    "instructor": "Eğitmen",
+    "allInstructors": "Tüm eğitmenler",
+    "period": "Dönem",
+    "all": "Tümü",
+    "agreement": "Anlaşma",
+    "sessions": "Seans",
+    "actions": "İşlemler",
+    "date": "Tarih",
+    "session": "Seans",
+    "basis": "Hesap",
+    "amount": "Tutar",
+    "state": "Durum",
+    "operation": "İşlem",
+    "note": "Not",
+    "unread": "Bu kapsamın bilgileri henüz okunamadı.",
+    "empty": "Bu kapsamda kayıt yok.",
+    "footer": "Ödeme ve düzeltmeler seçili hakedişlere bağlanır. Sonradan ödeme geçmiş seans için yeni hakediş üretmez.",
+    "selectInstructor": "Eğitmen seç",
+    "selectedEarnings": "Ödenecek hakedişler",
+    "earningSelectionHelp": "Ödemeyi bağlayacağın hakedişleri seç.",
+    "correction": "Düzeltme",
+    "increase": "Artır",
+    "decrease": "Azalt",
+    "difference": "Fark",
+    "method": "Yöntem",
+    "methods": {
+      "bank_transfer": "Havale",
+      "cash": "Nakit",
+      "card_pos": "Kart / POS"
+    },
+    "reference": "İşlem referansı",
+    "referenceHelp": "Havale ve POS için gerçek işlem referansı zorunludur.",
+    "noteUnavailable": "Not kaydı şu anda kullanılamıyor.",
+    "reason": "Gerekçe",
+    "effect": "Etki",
+    "effectUnread": "Etki ve bakiyeler yetkili kaynaktan okununca gösterilir.",
+    "cancel": "Vazgeç",
+    "savePayment": "Ödemeyi kaydet",
+    "saveCorrection": "Düzeltmeyi kaydet"
   }
 }

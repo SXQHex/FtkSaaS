@@ -39,6 +39,8 @@
 | W1-BE-31 | E22 · P15/WF11            | Merkez belge/sürüm dizini, kabul durumu ve özetler                               | Açık: yükleme/yayın/bağlamlı kabul mevcut; merkez geneli yönetim keşfi ve güvenli özet eşlemesi gerekiyor.                                                                                   |
 | W1-BE-32 | E11 · P02                 | Merkez geneli yetkili bekleyen yönetim işleri keşfi                              | Açık: kullanıcı seçili merkezin tüm yetkili işlerini istedi; mevcut dar okuyucular için ortak typed keşif/eşleme gerekiyor.                                                                  |
 
+| W1-BE-33 | E23 · P10/WF14 | Yönetici hakediş/ödeme keşfi, dönemler ve güvenli özetler | Açık: mevcut hakediş okuyucusu kişi+dönem istiyor; merkez geneli üç tablo/özet için typed eşleme gerekiyor. |
+
 ## Bütün talepler için ortak sınır
 
 - Mevcut native Supabase Auth, JWT/AAL, plan/abonelik ve canlı organizasyon/merkez/kişi izinleri korunmalı. Yeni bir okuma mevcut görünürlüğü genişletmemeli.
@@ -307,3 +309,11 @@ Güncel backend kapsamı WF04’te tanımlıdır: aynı normalize iletişimden a
 **İhtiyaç:** Mevcut native kaynakların güvenli typed eşlemesini belirtin; yoksa seçili merkezde aktörün gerçekten görebildiği ve işlem yapabildiği bekleyen kaynak işlerin cursor’lı keşfi gerekir. Hangi iş türlerinin mevcut ürün/WF kapsamında bekleyen yönetim işi olduğu backend sahibi tarafından açıkça eşlenmeli; istemci tarihten veya eksik kayıttan yeni iş kuralı üretmez. Satırın güvenli başlığı/kişi-ders bağlamı, varsa gerçek son tarihi, native durum/sürümü ve izinli kaynak eylemi için gereken domain referansları sağlanmalı. Sıra native olmalı; toplam verilirse sayfa sayımı yerine aynı yetkili kapsamı göstermeli. Yeni endpoint veya kalıcı görev tablosu şart koşulmuyor.
 
 **Sınır:** Bütün kişi/seans/finans/CRM geçmişleri istemcide taranmaz. Borç veya geçen saat kendiliğinden zorunlu görev değildir. Otomatik hatırlatma/görevlendirme, başkası adına belge kabulü, sahte tamamlandı veya ileti gönderimi eklenmez. Merkez/rol/plan ve kişi görünürlüğü korunur; UUID’den ad veya action kind’den yetki tahmin edilmez. Kaynak işte işlem sonrası liste yeniden okunur. E11’in mevcut günlük program/katılımcı/eylem entegrasyonu bağımsız sürer; frontend kapanışı TODO/E11 sahibindedir.
+
+## W1-BE-33 · Yönetici hakediş ve ödeme keşfi
+
+**Mevcut kaynak:** WF14’te `earnings_list_v1` bilinen kişi ve zorunlu interval ister; `instructor_agreements_list_v1` de kişi ister. `instructor_account_get_v1` yalnız gerçek self eğitmene açıktır, yönetici başkası adına kullanamaz. Yönetim ödeme selector’ları bilinen person_id/payment_id içindir. E23 çiziminin merkez genelindeki Eğitmenler/Satırlar/Ödemeler listeleri, tüm dönem seçimi ve dört özeti için güvenli native keşif eşlemesi bulunamadı.
+
+**İhtiyaç:** Mevcut okuyucularla doğru typed API sırasını belirtin; eksikse aktörün seçili merkezde yetkili olduğu hakediş/ödeme kayıtlarını cursor ile keşfeden destek gerekiyor. Eğitmen ve gerçek seansın güvenli adı, geçerli/değişmez anlaşma sürümü ve hesap bağlamı, native satır durumu/ödeme-kalan, kök ödeme ve düzeltme bağı/sürümü korunmalı. Eğitmen ve native dönem filtreleri (interval atlanınca bütün dönemler) cursor kapsamına girmeli. Dört özet ve kapanan seans sayısı aynı filtrede cursor öncesi, para birimi ayrı gelmeli; sayfa satırları toplanarak veya mevcut eğitmen görevleri taranarak merkez toplamı üretilmeyecek. Eski eğitmenlere ait izinli kayıtlar görev diziniyle kaybolmamalı. Yeni endpoint şart değil.
+
+**Ödeme sınırı:** Mevcut yazarın seçili earning_ids dağıtımı, gerçek yöntem/reference ve kök sürümlü düzeltmesi korunur. SQL’de seçili bakiyeyi aşan tutar reddediliyor; çizimdeki avans onayı yeni bir native özellik varsayımı değildir ve istemcide etkinleştirilmeyecek. Çizimdeki isteğe bağlı Not için native kayıt/okuma eşlemesi varsa belirtilmeli; banka/POS reference alanı nota dönüştürülmez. Güvenli not desteği yoksa bu ürün farkı açık tutulur. Ödeme sonrası gerçek kök/düzeltme ve ilgili hakedişler yeniden okunmalı; belirsiz sonuç aynı operation_key ile kurtarılmalı.
