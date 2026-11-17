@@ -1711,7 +1711,55 @@
         "sale_discount_percent_upper": "Satış indirimi yüzde sınırı"
       }
     },
-    "addRoom": "Salon ekle"
+    "addRoom": "Salon ekle",
+    "resetReviewHint": "Bu kartta aşağıda listelenen alanlar backend önizlemesindeki değerlere döner. Kaydedilmemiş alan değişiklikleri yerini bu değerlere bırakır. Logo bu işlemle kaldırılmaz; ayrıca kaldırılabilir.",
+    "historySelf": "Siz",
+    "historyOther": "Diğer yetkili hesap (ad bilgisi sunulmuyor)",
+    "historyFields_one": "{{count}} ayar alanı değişti",
+    "historyFields_other": "{{count}} ayar alanı değişti",
+    "historyMedia": "Logo değişikliği",
+    "historyPage": "Sayfa {{page}} · En fazla 50 kayıt",
+    "historyPrevious": "Önceki sayfa",
+    "historyNext": "Sonraki sayfa",
+    "historyAll": "Tüm bölümler",
+    "historyScopeHint": "Geçmiş seçili organizasyon veya merkez kapsamında okunur. Kaynak bölüm filtresi sunmaz.",
+    "historyReadError": "Ayar geçmişi okunamadı. Yeniden deneyebilirsin.",
+    "subscriptionPlans": {
+      "starter": "Starter",
+      "pro": "Pro",
+      "business": "Business"
+    },
+    "subscriptionPeriods": {
+      "monthly": "Aylık",
+      "yearly": "Yıllık"
+    },
+    "subscriptionStates": {
+      "pending_payment": "Ödeme bekliyor",
+      "active": "Etkin",
+      "grace": "Ek süre",
+      "suspended": "Askıya alındı",
+      "ended": "Sona erdi"
+    },
+    "subscriptionLimits": {
+      "active_students": "Aktif öğrenci",
+      "instructors": "Eğitmen",
+      "centers": "Aktif merkez",
+      "rooms": "Salon",
+      "disciplines": "Disiplin"
+    },
+    "subscriptionNoNumericLimit": "Sayısal sınır tanımlı değil",
+    "subscriptionPeriod": "Geçerli dönem: {{start}} — {{end}}",
+    "subscriptionManualPayment": "Manuel ödeme bildirimi",
+    "subscriptionTerms": "{{period}} · {{amount}}",
+    "subscriptionStatus": "{{state}} · Yenileme: {{renewal}} · Ek süre sonu: {{grace}}",
+    "subscriptionPendingPeriod": "Bekleyen dönem değişimi: {{period}} · {{amount}} · Yürürlük: {{effective}}",
+    "subscriptionPendingChange": "Bekleyen plan değişikliği var; ayrıntıları işlem kaynağından okunur.",
+    "subscriptionNoPendingChange": "Bekleyen dönem değişikliği yok.",
+    "subscriptionReadError": "Abonelik bilgisi okunamadı. Eski plan, fiyat veya limit kullanılmaz.",
+    "subscriptionStopRenewal": "Yenilemeyi durdur",
+    "subscriptionResumeRenewal": "Yenilemeyi aç",
+    "subscriptionRenewalHint": "Güncel abonelik sürümü ve yetki işlemden önce tekrar okunur. Bu işlem anında organizasyon kapatma veya ödeme iadesi değildir.",
+    "subscriptionRenewalEffect": "Mevcut ödenmiş dönem korunur; dönem sonundaki yenileme tercihi değişir."
   },
   "products": {
     "title": "Paketler",

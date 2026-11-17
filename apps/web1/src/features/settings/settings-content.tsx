@@ -12,6 +12,10 @@ import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
+import { SubscriptionRenewalEditor } from "./subscription-renewal-editor";
+import type { SettingsSubscriptionSource } from "./settings-subscription";
+import { useSettingsSubscription } from "./use-settings-subscription";
+import { useSettingsHistory } from "./use-settings-history";
 import { useSettingsRooms } from "./use-settings-rooms";
 import { useSettingsPolicies } from "./use-settings-policies";
 import { useSettingsDocument } from "./use-settings-document";
@@ -80,6 +84,11 @@ export function SettingsContent({
       organizationLabel={organization.name}
       centerLabel={center.name}
       timezone={center.timezone}
+      canSubscription={
+        organizationCatalog?.fields.some(
+          (field) => field.key === "billing_name" && field.writable,
+        ) === true
+      }
       canOrganization={canOrganization}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
@@ -96,6 +105,7 @@ function SettingsManagement({
   centerLabel,
   timezone,
   canOrganization,
+  canSubscription,
   canWriteOrganization,
   readOnly,
   organizationLoading,
@@ -107,6 +117,7 @@ function SettingsManagement({
   centerLabel: string;
   timezone: string;
   canOrganization: boolean;
+  canSubscription: boolean;
   canWriteOrganization: boolean;
   readOnly: boolean;
   organizationLoading: boolean;
@@ -119,7 +130,8 @@ function SettingsManagement({
   const [level, setLevel] = useState<DisciplineLevel>(canCenter ? "center" : "organization");
   const [selection, setSelection] = useState<{ id?: string }>(),
     [locked, setLocked] = useState(false),
-    [identity, setIdentity] = useState<DisciplineLevel>();
+    [identity, setIdentity] = useState<DisciplineLevel>(),
+    [renewal, setRenewal] = useState<SettingsSubscriptionSource>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -142,6 +154,7 @@ function SettingsManagement({
         return false;
       setSelection(undefined);
       setIdentity(undefined);
+      setRenewal(undefined);
       if (code === "FORBIDDEN") {
         void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
       } else {
@@ -168,6 +181,21 @@ function SettingsManagement({
     readOnly,
     locked,
     onLockChange: publishLock,
+    onAccessLost: accessLost,
+  });
+  const subscription = useSettingsSubscription({
+    scope,
+    enabled: allowed && canSubscription && level === "organization",
+    timezone,
+    locked,
+    onAccessLost: accessLost,
+  });
+  const history = useSettingsHistory({
+    scope,
+    level,
+    timezone,
+    enabled: allowed,
+    locked,
     onAccessLost: accessLost,
   });
   const policies = useSettingsPolicies({
@@ -213,9 +241,11 @@ function SettingsManagement({
   const source = query.isError || query.isFetching ? undefined : query.data;
   const data: SettingsViewData = {
     ...document.data,
+    ...subscription.data,
     fields: {
       ...document.data.fields,
       ...policies.fields,
+      "hs-f": history.filter,
       "ay-ad": { value: organizationLabel, writable: false },
       "ay-sube": { value: centerLabel, writable: false },
       "ay-tz": { value: timezone, writable: false },
@@ -224,6 +254,7 @@ function SettingsManagement({
     tables: {
       politika: policies.table,
       salonlar: rooms.table,
+      gecmis: history.table,
       ...(source
         ? {
             disciplines: {
@@ -318,6 +349,7 @@ function SettingsManagement({
         onColor={document.onColor}
         onLogo={document.onLogo}
         logoAccept={document.logoAccept}
+        resetCards={document.resetCards}
         onSave={document.onSave}
         onDiscard={document.onDiscard}
         data={data}
@@ -336,6 +368,8 @@ function SettingsManagement({
           }
         }}
         availableActions={[
+          ...(subscription.renewalSource && !readOnly ? ["cancelSubscription" as const] : []),
+          ...(document.resetCards.length ? ["reset" as const] : []),
           ...(rooms.canCreate ? ["room" as const] : []),
           ...(document.canRemoveLogo ? ["removeLogo" as const] : []),
           ...(writable && source && level === "organization" ? ["discipline" as const] : []),
@@ -349,6 +383,9 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "cancelSubscription" && subscription.renewalSource)
+            setRenewal(structuredClone(subscription.renewalSource));
+          if (action.kind === "reset") document.onReset(action.card);
           if (action.kind === "room") rooms.create();
           if (action.kind === "removeLogo") document.onRemoveLogo();
           if (action.kind === "discipline" && level === "organization") setSelection({});
@@ -374,6 +411,25 @@ function SettingsManagement({
           onAccessLost={accessLost}
         />
       )}
+      {renewal && (
+        <SubscriptionRenewalEditor
+          before={renewal}
+          onClose={() => {
+            if (!locked) setRenewal(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+          onSaved={async (result) => {
+            queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
+            await queries.invalidateQueries(
+              { queryKey: ["workspace", scope.accountId, scope.orgId] },
+              { throwOnError: true },
+            );
+          }}
+        />
+      )}
+      {subscription.notice}
+      {history.notice}
       {rooms.notice}
       {rooms.editor}
       {policies.notice}

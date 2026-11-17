@@ -88,6 +88,7 @@ export interface SettingsDocumentIntent {
   patch: SettingsDocumentPatch;
   key: string;
   logo?: SettingsImageUpload | null;
+  reset?: { id: string; token: string };
 }
 export async function settingsDocumentIntent(
   scope: ClientScope,
@@ -147,6 +148,11 @@ export async function writeSettingsDocument(intent: SettingsDocumentIntent) {
       expected_version: intent.before,
       operation_key: intent.key,
     };
+  if (intent.reset)
+    return backend.call("settings_reset_apply_v1", {
+      ...base,
+      preview: intent.reset,
+    });
   return intent.level === "organization"
     ? backend.call("settings_update_v1", {
         ...base,
@@ -168,11 +174,11 @@ export async function readSettingsDocumentReceipt(intent: SettingsDocumentIntent
     client_api_version: 1,
     org_id: intent.scope.orgId,
     request_id: uuidv7(),
-    operation: "settings_update_v1",
+    operation: intent.reset ? "settings_reset_apply_v1" : "settings_update_v1",
     key: intent.key,
   });
   if (
-    receipt.operation !== "settings_update_v1" ||
+    receipt.operation !== (intent.reset ? "settings_reset_apply_v1" : "settings_update_v1") ||
     receipt.key !== intent.key ||
     (receipt.result_reference &&
       (receipt.result_reference.type !== "accounts" ||
@@ -206,4 +212,76 @@ export async function readSettingsDocumentResult(intent: SettingsDocumentIntent,
       throw Error("SETTINGS_RESULT_UNAVAILABLE");
   }
   return result;
+}
+
+export async function settingsResetIntent(
+  scope: ClientScope,
+  level: SettingsLevel,
+  before: SettingsDocumentSource,
+  fields: (keyof SettingsDocumentPatch)[],
+): Promise<SettingsDocumentIntent> {
+  if (!fields.length || new Set(fields).size !== fields.length)
+    throw Error("SETTINGS_PATCH_UNAVAILABLE");
+  // The same live source/version/field gates apply to update and reset.
+  const original = Object.fromEntries(
+    fields.map((key) => [key, Reflect.get(before.document.values, key)]),
+  );
+  const intent = await settingsDocumentIntent(scope, level, before, patchSchema.parse(original));
+  const backend = await scopedBackend(scope);
+  const [first, ...rest] = fields;
+  if (first === undefined) throw Error("SETTINGS_PATCH_UNAVAILABLE");
+  const centerField = z.enum([
+    "address",
+    "contact_email",
+    "contact_phone",
+    "lesson_reminder_hours",
+    "lesson_reminders_enabled",
+    "package_reminder_days",
+    "package_reminders_enabled",
+    "payment_reminder_days",
+    "payment_reminders_enabled",
+  ]);
+  const preview =
+    level === "organization"
+      ? await backend.call("settings_reset_preview_v1", {
+          client_api_version: 1,
+          request_id: uuidv7(),
+          scope: "organization",
+          org_id: scope.orgId,
+          fields: [first, ...rest],
+        })
+      : await backend.call("settings_reset_preview_v1", {
+          client_api_version: 1,
+          request_id: uuidv7(),
+          scope: "center",
+          org_id: scope.orgId,
+          center_id: scope.centerId,
+          fields: [centerField.parse(first), ...rest.map((key) => centerField.parse(key))],
+        });
+  z.uuid().parse(preview.id);
+  z.string().min(1).max(128).parse(preview.token);
+  if (
+    preview.scope !== level ||
+    preview.version !== intent.before ||
+    preview.fields.length !== fields.length ||
+    fields.some((key) => !preview.fields.some((field) => field === key)) ||
+    fields.some(
+      (key) =>
+        !Object.prototype.hasOwnProperty.call(preview.before, key) ||
+        Reflect.get(preview.before, key) !== Reflect.get(before.document.values, key),
+    )
+  )
+    throw Error("SETTINGS_SOURCE_UNAVAILABLE");
+  z.iso.datetime({ offset: true }).parse(preview.expires_at);
+  if (Date.parse(preview.expires_at) <= Date.now())
+    throw new BackendError({ code: "PREVIEW_STALE", retryable: false, trace_id: uuidv7() });
+  if (fields.some((key) => !Object.prototype.hasOwnProperty.call(preview.after, key)))
+    throw Error("SETTINGS_SOURCE_UNAVAILABLE");
+  return {
+    ...intent,
+    patch: patchSchema.parse(
+      Object.fromEntries(fields.map((key) => [key, Reflect.get(preview.after, key)])),
+    ),
+    reset: { id: preview.id, token: preview.token },
+  };
 }

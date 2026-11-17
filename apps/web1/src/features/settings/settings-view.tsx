@@ -100,6 +100,7 @@ type ColumnKey =
   | "organizationState"
   | "centerState";
 export interface SettingsTableData {
+  after?: ReactNode;
   columns: ColumnKey[];
   rows: { id: string; cells: ReactNode[] }[];
 }
@@ -135,6 +136,7 @@ export interface SettingsViewData {
     value: number;
     maximum: number | null;
     unlimited: boolean;
+    limitDescription?: string;
   }[];
   plan?: {
     name: string;
@@ -142,6 +144,8 @@ export interface SettingsViewData {
     paymentMethod: string | null;
     paymentDescription: string | null;
     subscriptionState: string | null;
+    pendingDescription?: string | null;
+    renewalActionLabel?: string;
   };
   permissions?: {
     people: { id: string; name: string }[];
@@ -190,40 +194,44 @@ export interface SettingsViewProps {
   onColor?: (key: "primaryColor" | "secondaryColor" | "accentColor", value: string) => void;
   onLogo?: (file: File) => void;
   logoAccept?: string;
+  resetCards?: readonly SettingsCardKey[];
   onPermission?: (personId: string, permission: string, value: boolean) => void;
 }
 function SettingsTable({ data, label }: { data?: SettingsTableData; label: string }) {
   const { t } = useTranslation();
   return (
-    <Table aria-label={label} className={data?.rows.length ? "min-w-[30rem]" : undefined}>
-      <TableHeader>
-        {(data?.columns ?? (["name", "state"] as ColumnKey[])).map((key, index) => (
-          <TableHead key={key} id={key} isRowHeader={index === 0}>
-            {t(($) => $.settings.columns[key])}
-          </TableHead>
-        ))}
-      </TableHeader>
-      <TableBody
-        items={data?.rows ?? []}
-        renderEmptyState={() => (
-          <Empty>
-            <EmptyDescription>
-              {data ? t(($) => $.settings.empty) : t(($) => $.settings.unavailable)}
-            </EmptyDescription>
-          </Empty>
-        )}
-      >
-        {(row) => (
-          <TableRow id={row.id}>
-            {row.cells.map((cell, index) => (
-              <TableCell key={index} className="whitespace-normal align-top">
-                {cell ?? t(($) => $.settings.unknown)}
-              </TableCell>
-            ))}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table aria-label={label} className={data?.rows.length ? "min-w-[30rem]" : undefined}>
+        <TableHeader>
+          {(data?.columns ?? (["name", "state"] as ColumnKey[])).map((key, index) => (
+            <TableHead key={key} id={key} isRowHeader={index === 0}>
+              {t(($) => $.settings.columns[key])}
+            </TableHead>
+          ))}
+        </TableHeader>
+        <TableBody
+          items={data?.rows ?? []}
+          renderEmptyState={() => (
+            <Empty>
+              <EmptyDescription>
+                {data ? t(($) => $.settings.empty) : t(($) => $.settings.unavailable)}
+              </EmptyDescription>
+            </Empty>
+          )}
+        >
+          {(row) => (
+            <TableRow id={row.id}>
+              {row.cells.map((cell, index) => (
+                <TableCell key={index} className="whitespace-normal align-top">
+                  {cell ?? t(($) => $.settings.unknown)}
+                </TableCell>
+              ))}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      {data?.after}
+    </>
   );
 }
 
@@ -240,6 +248,7 @@ export function SettingsView({
   onColor,
   onLogo,
   logoAccept,
+  resetCards,
   onPermission,
   scope,
   onScope,
@@ -273,11 +282,11 @@ export function SettingsView({
                 : t(($) => $.settings.unread))}
         </p>
         <div className="flex flex-wrap gap-2">
-          {key === "ay-kural" && (
+          {(key === "ay-kural" || resetCards?.includes(key)) && (
             <Button
               variant="ghost"
               type="button"
-              isDisabled={locked || !canAction("reset")}
+              isDisabled={locked || !canAction("reset") || !resetCards?.includes(key)}
               onPress={() => onAction?.({ kind: "reset", card: key })}
             >
               {t(($) => $.settings.reset)}
@@ -951,7 +960,9 @@ export function SettingsView({
                                   {metric.value} /{" "}
                                   {metric.unlimited
                                     ? t(($) => $.settings.unlimited)
-                                    : (metric.maximum ?? t(($) => $.settings.unknown))}
+                                    : (metric.maximum ??
+                                      metric.limitDescription ??
+                                      t(($) => $.settings.unknown))}
                                 </p>
                               </div>
                               {metric.maximum !== null &&
@@ -997,6 +1008,13 @@ export function SettingsView({
                             data={data.tables?.invoices}
                           />
                         </CardContent>
+                      ) : panel.key === "plan" && index === 2 ? (
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            {data.plan?.pendingDescription ??
+                              t(($) => $.settings.subscriptionNoPendingChange)}
+                          </p>
+                        </CardContent>
                       ) : null}
                       {form && card.key !== "bildirim-0" && footer(card.key)}
                       {panel.key === "ekip" && index === 1 && !form && footer(card.key)}
@@ -1020,7 +1038,8 @@ export function SettingsView({
                           >
                             {index === 0
                               ? t(($) => $.settings.changePlan)
-                              : t(($) => $.settings.cancelSubscription)}
+                              : (data.plan?.renewalActionLabel ??
+                                t(($) => $.settings.cancelSubscription))}
                           </Button>
                         </CardFooter>
                       )}

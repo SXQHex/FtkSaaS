@@ -3761,6 +3761,16 @@ export default interface Resources {
         "ay-yoklama": "Yoklamayı kapat",
         "hs-f": "Bölüm"
       },
+      "historyAll": "Tüm bölümler",
+      "historyFields": "{{count}} ayar alanı değişti" | "{{count}} ayar alanı değişti",
+      "historyMedia": "Logo değişikliği",
+      "historyNext": "Sonraki sayfa",
+      "historyOther": "Diğer yetkili hesap (ad bilgisi sunulmuyor)",
+      "historyPage": "Sayfa {{page}} · En fazla 50 kayıt",
+      "historyPrevious": "Önceki sayfa",
+      "historyReadError": "Ayar geçmişi okunamadı. Yeniden deneyebilirsin.",
+      "historyScopeHint": "Geçmiş seçili organizasyon veya merkez kapsamında okunur. Kaynak bölüm filtresi sunmaz.",
+      "historySelf": "Siz",
       "identity": {
         "description": "Ad değişikliği ayrı bir işlemdir; iletişim ve marka alanlarını değiştirmez.",
         "edit": "Adı düzenle",
@@ -3850,6 +3860,7 @@ export default interface Resources {
       "removeLogo": "Kaldır",
       "reportPayment": "Ödeme bildir",
       "reset": "Varsayılana sıfırla",
+      "resetReviewHint": "Bu kartta aşağıda listelenen alanlar backend önizlemesindeki değerlere döner. Kaydedilmemiş alan değişiklikleri yerini bu değerlere bırakır. Logo bu işlemle kaldırılmaz; ayrıca kaldırılabilir.",
       "review": "İncele",
       "reviewEmpty": "Önizlemede listelenen değişiklik yok.",
       "roomHint": "Oda sınırı, seans kontenjanının aşamayacağı üst değerdir.",
@@ -3860,6 +3871,42 @@ export default interface Resources {
       "secondaryColor": "İkincil renk",
       "sectionsLabel": "Ayar bölümleri",
       "subscriptionActive": "Abonelik etkin.",
+      "subscriptionLimits": {
+        "active_students": "Aktif öğrenci",
+        "centers": "Aktif merkez",
+        "disciplines": "Disiplin",
+        "instructors": "Eğitmen",
+        "rooms": "Salon"
+      },
+      "subscriptionManualPayment": "Manuel ödeme bildirimi",
+      "subscriptionNoNumericLimit": "Sayısal sınır tanımlı değil",
+      "subscriptionNoPendingChange": "Bekleyen dönem değişikliği yok.",
+      "subscriptionPendingChange": "Bekleyen plan değişikliği var; ayrıntıları işlem kaynağından okunur.",
+      "subscriptionPendingPeriod": "Bekleyen dönem değişimi: {{period}} · {{amount}} · Yürürlük: {{effective}}",
+      "subscriptionPeriod": "Geçerli dönem: {{start}} — {{end}}",
+      "subscriptionPeriods": {
+        "monthly": "Aylık",
+        "yearly": "Yıllık"
+      },
+      "subscriptionPlans": {
+        "business": "Business",
+        "pro": "Pro",
+        "starter": "Starter"
+      },
+      "subscriptionReadError": "Abonelik bilgisi okunamadı. Eski plan, fiyat veya limit kullanılmaz.",
+      "subscriptionRenewalEffect": "Mevcut ödenmiş dönem korunur; dönem sonundaki yenileme tercihi değişir.",
+      "subscriptionRenewalHint": "Güncel abonelik sürümü ve yetki işlemden önce tekrar okunur. Bu işlem anında organizasyon kapatma veya ödeme iadesi değildir.",
+      "subscriptionResumeRenewal": "Yenilemeyi aç",
+      "subscriptionStates": {
+        "active": "Etkin",
+        "ended": "Sona erdi",
+        "grace": "Ek süre",
+        "pending_payment": "Ödeme bekliyor",
+        "suspended": "Askıya alındı"
+      },
+      "subscriptionStatus": "{{state}} · Yenileme: {{renewal}} · Ek süre sonu: {{grace}}",
+      "subscriptionStopRenewal": "Yenilemeyi durdur",
+      "subscriptionTerms": "{{period}} · {{amount}}",
       "systemNotifications": "Zorunlu işlem bildirimlerinin teslim kuralları kaynak sözleşmesine bağlıdır.",
       "tabs": {
         "bildirim": "Bildirimler",

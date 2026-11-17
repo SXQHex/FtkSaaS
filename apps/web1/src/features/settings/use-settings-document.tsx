@@ -13,6 +13,8 @@ import {
   readSettingsDocument,
   parseSettingsDocumentPatch,
   settingsDocumentIntent,
+  settingsResetIntent,
+  type SettingsDocumentIntent,
   writeSettingsDocument,
   readSettingsDocumentReceipt,
   readSettingsDocumentResult,
@@ -80,6 +82,7 @@ export function useSettingsDocument({
       patch: SettingsDocumentPatch;
       card: SettingsCardKey;
       logo?: SettingsImageUpload | null;
+      reset?: SettingsDocumentIntent;
     }>(),
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
@@ -140,6 +143,10 @@ export function useSettingsDocument({
         ),
       );
       if (review?.logo !== undefined) setLogoDraft(undefined);
+      await queries.invalidateQueries(
+        { queryKey: ["settings-history", scope.accountId, scope.orgId] },
+        { throwOnError: true },
+      );
       await queries.invalidateQueries(
         { queryKey: ["workspace", scope.accountId, scope.orgId] },
         { throwOnError: true },
@@ -333,18 +340,43 @@ export function useSettingsDocument({
     setError(undefined);
     setReview({ source, patch, card, ...(logo !== undefined ? { logo } : {}) });
   }
+  const resetCards = (Object.keys(groups) as (keyof typeof groups)[]).filter((card) =>
+    groups[card].some(writable),
+  );
+  async function onReset(card: SettingsCardKey) {
+    if (busy.current || locked || review || !source || !(card in groups)) return;
+    const keys = groups[card as keyof typeof groups].filter(writable);
+    if (!keys.length) return;
+    busy.current = true;
+    setPreparing(true);
+    setError(undefined);
+    command.reset();
+    try {
+      const intent = await settingsResetIntent(scope, level, source, keys);
+      if (active.current) {
+        setAccepted(false);
+        setReview({ source, patch: intent.patch, card, reset: intent });
+      }
+    } catch (cause) {
+      if (active.current && !loseAccess(cause))
+        setError(
+          cause instanceof BackendError
+            ? scheduleBackendError(cause.code, t)
+            : t(($) => $.settings.documentInvalid),
+        );
+    } finally {
+      busy.current = false;
+      if (active.current) setPreparing(false);
+    }
+  }
   async function confirm() {
     if (!review || !accepted || busy.current || locked || command.state !== "ready") return;
     busy.current = true;
     setPreparing(true);
     try {
-      const intent = await settingsDocumentIntent(
-        scope,
-        level,
-        review.source,
-        review.patch,
-        review.logo,
-      );
+      const intent =
+        review.reset ??
+        (await settingsDocumentIntent(scope, level, review.source, review.patch, review.logo));
       if (active.current) await command.start(intent);
     } catch (cause) {
       if (active.current && !loseAccess(cause))
@@ -397,7 +429,11 @@ export function useSettingsDocument({
     <SettingsReviewDialog
       open
       title={t(($) => $.settings.cards[review.card].title)}
-      description={t(($) => $.settings.documentReviewHint)}
+      description={
+        review.reset
+          ? t(($) => $.settings.resetReviewHint)
+          : t(($) => $.settings.documentReviewHint)
+      }
       rows={[
         ...Object.entries(review.patch).map(([wire, value]) => {
           const presentation = Object.entries(fields).find(([, key]) => key === wire)?.[0] as
@@ -491,6 +527,10 @@ export function useSettingsDocument({
     onColor,
     onDiscard,
     onSave,
+    resetCards,
+    onReset: (card: SettingsCardKey) => {
+      void onReset(card);
+    },
     notice,
     dialog,
     locked,
