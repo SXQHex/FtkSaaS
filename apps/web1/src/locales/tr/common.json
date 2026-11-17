@@ -5219,5 +5219,18 @@
       "stale": "Kişi değişti. Düzenleyiciyi kapatıp güncel kayıtla yeniden incele.",
       "rejected": "Kişi kaydedilemedi. Güncel kaynağı ve yetkiyi kontrol et."
     }
+  },
+  "agreementDocument": {
+    "title": "Dijital eğitmen anlaşması",
+    "open": "Anlaşma metnini oku",
+    "description": "Onay yalnız burada gösterilen anlaşma belgesine aittir. Ücret şartlarını veya yürürlük tarihlerini değiştirmez.",
+    "noSource": "Onaylı anlaşma metni henüz yayımlanmamış. Finansal şartları inceleyebilirsin; belge kabulü verilemez.",
+    "unavailable": "Anlaşma belgesi okunamadı. Güncel kaynağı yeniden yükle.",
+    "review": "Gösterilen anlaşma metnini okudum ve kabul ediyorum.",
+    "reviewRequired": "Kabul vermeden önce gösterilen metni oku ve onay kutusunu işaretle.",
+    "changed": "Anlaşma belgesi değişti veya güncel kaynak okunamadı. Metni yeniden yükleyip incele.",
+    "accept": "Anlaşma metnini kabul et",
+    "accepted": "Bu anlaşma belgesine verdiğin kabul doğrulandı.",
+    "historical": "Önceki bir kabul kaydı bulunuyor. Bu kayıt, burada yeni bir kabul verdiğin anlamına gelmez."
   }
 }

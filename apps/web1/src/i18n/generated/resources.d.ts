@@ -168,6 +168,19 @@ export default interface Resources {
       "title": "Hesabı sil",
       "uncertain": "Önceki onayın sonucu belirsiz. Güncel girişinle aynı isteği kurtarabilirsin; yeni bir işlem oluşturulmaz."
     },
+    "agreementDocument": {
+      "accept": "Anlaşma metnini kabul et",
+      "accepted": "Bu anlaşma belgesine verdiğin kabul doğrulandı.",
+      "changed": "Anlaşma belgesi değişti veya güncel kaynak okunamadı. Metni yeniden yükleyip incele.",
+      "description": "Onay yalnız burada gösterilen anlaşma belgesine aittir. Ücret şartlarını veya yürürlük tarihlerini değiştirmez.",
+      "historical": "Önceki bir kabul kaydı bulunuyor. Bu kayıt, burada yeni bir kabul verdiğin anlamına gelmez.",
+      "noSource": "Onaylı anlaşma metni henüz yayımlanmamış. Finansal şartları inceleyebilirsin; belge kabulü verilemez.",
+      "open": "Anlaşma metnini oku",
+      "review": "Gösterilen anlaşma metnini okudum ve kabul ediyorum.",
+      "reviewRequired": "Kabul vermeden önce gösterilen metni oku ve onay kutusunu işaretle.",
+      "title": "Dijital eğitmen anlaşması",
+      "unavailable": "Anlaşma belgesi okunamadı. Güncel kaynağı yeniden yükle."
+    },
     "app": {
       "description": "Vite + React + TanStack Router + React Aria",
       "title": "FtkSaaS"
