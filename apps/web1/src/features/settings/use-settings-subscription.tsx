@@ -100,6 +100,11 @@ export function useSettingsSubscription({
   };
   return {
     data,
+    periodSource:
+      source?.subscription_version && source.billing?.period_change_options.length
+        ? query.data
+        : undefined,
+    paymentSource: source?.billing?.current.currency ? query.data : undefined,
     renewalSource:
       query.data &&
       source?.state === "active" &&

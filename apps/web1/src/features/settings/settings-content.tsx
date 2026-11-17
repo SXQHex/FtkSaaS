@@ -12,6 +12,8 @@ import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
+import { SettingsPeriodEditor } from "./settings-period-editor";
+import { SettingsPaymentEditor } from "./settings-payment-editor";
 import { SubscriptionRenewalEditor } from "./subscription-renewal-editor";
 import type { SettingsSubscriptionSource } from "./settings-subscription";
 import { useSettingsSubscription } from "./use-settings-subscription";
@@ -131,7 +133,9 @@ function SettingsManagement({
   const [selection, setSelection] = useState<{ id?: string }>(),
     [locked, setLocked] = useState(false),
     [identity, setIdentity] = useState<DisciplineLevel>(),
-    [renewal, setRenewal] = useState<SettingsSubscriptionSource>();
+    [renewal, setRenewal] = useState<SettingsSubscriptionSource>(),
+    [payment, setPayment] = useState<SettingsSubscriptionSource>(),
+    [period, setPeriod] = useState<SettingsSubscriptionSource>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -155,6 +159,8 @@ function SettingsManagement({
       setSelection(undefined);
       setIdentity(undefined);
       setRenewal(undefined);
+      setPayment(undefined);
+      setPeriod(undefined);
       if (code === "FORBIDDEN") {
         void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
       } else {
@@ -368,6 +374,8 @@ function SettingsManagement({
           }
         }}
         availableActions={[
+          ...(subscription.periodSource && !readOnly ? ["changePeriod" as const] : []),
+          ...(subscription.paymentSource && !readOnly ? ["payment" as const] : []),
           ...(subscription.renewalSource && !readOnly ? ["cancelSubscription" as const] : []),
           ...(document.resetCards.length ? ["reset" as const] : []),
           ...(rooms.canCreate ? ["room" as const] : []),
@@ -383,6 +391,10 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "changePeriod" && subscription.periodSource)
+            setPeriod(structuredClone(subscription.periodSource));
+          if (action.kind === "payment" && subscription.paymentSource)
+            setPayment(structuredClone(subscription.paymentSource));
           if (action.kind === "cancelSubscription" && subscription.renewalSource)
             setRenewal(structuredClone(subscription.renewalSource));
           if (action.kind === "reset") document.onReset(action.card);
@@ -409,6 +421,41 @@ function SettingsManagement({
           }}
           onLockChange={publishLock}
           onAccessLost={accessLost}
+        />
+      )}
+      {period && (
+        <SettingsPeriodEditor
+          before={period}
+          timezone={timezone}
+          onClose={() => {
+            if (!locked) setPeriod(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+          onSaved={async (result) => {
+            queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
+            await queries.invalidateQueries(
+              { queryKey: ["workspace", scope.accountId, scope.orgId] },
+              { throwOnError: true },
+            );
+          }}
+        />
+      )}
+      {payment && (
+        <SettingsPaymentEditor
+          before={payment}
+          onClose={() => {
+            if (!locked) setPayment(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+          onSaved={async (result) => {
+            queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
+            await queries.invalidateQueries(
+              { queryKey: ["workspace", scope.accountId, scope.orgId] },
+              { throwOnError: true },
+            );
+          }}
         />
       )}
       {renewal && (

@@ -24,6 +24,8 @@ import { ItemGroup, Item, ItemContent, ItemTitle, ItemDescription } from "../../
 /** Native catalog/quote supplies prices, limits and effective dates; this sheet calculates none. */
 export function PlanSheet({
   open,
+  title,
+  selectionLabel,
   options,
   selected,
   effects,
@@ -37,6 +39,8 @@ export function PlanSheet({
   recoveryActions,
 }: {
   open: boolean;
+  title?: string;
+  selectionLabel?: string;
   options: { key: string; label: string; description: string; disabledReason?: string }[] | null;
   selected: string | null;
   effects: { id: string; title: string; detail: string }[] | null;
@@ -64,7 +68,7 @@ export function PlanSheet({
       showCloseButton={false}
     >
       <SheetHeader>
-        <SheetTitle id={`${id}-title`}>{t(($) => $.settings.planEditor.title)}</SheetTitle>
+        <SheetTitle id={`${id}-title`}>{title ?? t(($) => $.settings.planEditor.title)}</SheetTitle>
         <Text slot="description" elementType="div">
           <SheetDescription>{description}</SheetDescription>
         </Text>
@@ -82,13 +86,13 @@ export function PlanSheet({
       >
         <FieldGroup>
           <FieldSet>
-            <FieldLegend>{t(($) => $.settings.planEditor.choose)}</FieldLegend>
+            <FieldLegend>{selectionLabel ?? t(($) => $.settings.planEditor.choose)}</FieldLegend>
             {options === null ? (
               <p>{t(($) => $.settings.unread)}</p>
             ) : (
               <RadioGroup
                 name="plan"
-                aria-label={t(($) => $.settings.planEditor.choose)}
+                aria-label={selectionLabel ?? t(($) => $.settings.planEditor.choose)}
                 value={selected ?? ""}
                 onChange={onSelect}
                 isDisabled={locked || !onSelect}

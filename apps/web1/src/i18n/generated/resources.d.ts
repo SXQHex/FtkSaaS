@@ -3824,9 +3824,10 @@ export default interface Resources {
       "nextInvoice": "Sonraki fatura",
       "off": "Kapalı",
       "on": "Açık",
+      "paymentAmountError": "Geçerli, sıfırdan büyük bir tutar gir. Binlik ayırıcı kullanma; para biriminin ondalık basamak sayısını aşma.",
       "paymentEditor": {
         "amount": "Ödenen tutar",
-        "amountHint": "Gönderdiğin gerçek tutarı yaz.",
+        "amountHint": "Gerçek tutarı binlik ayırıcı olmadan yaz. Ondalık ayırıcı olarak virgül veya nokta kullanabilirsin.",
         "currency": "Para birimi",
         "currencyHint": "Güncel abonelik veya seçilen teklifin para birimi.",
         "description": "Yaptığın manuel ödemeyi bildir. Bildirim, ödeme doğrulaması veya plan değişikliği değildir.",
@@ -3836,6 +3837,17 @@ export default interface Resources {
         "timeHint": "Tarih ve saati UTC olarak gir. Yerel saatle karıştırma.",
         "title": "Ödeme bildirimi"
       },
+      "paymentInvalid": "Hatalı alanları düzeltip yeniden incele.",
+      "paymentReferenceError": "Ödeme referansını gir.",
+      "paymentSubmitted": "Ödeme bildirimi alındı. Platform doğrulaması beklenir; bu sonuç ödemenin doğrulandığını veya planın değiştiğini göstermez.",
+      "paymentTimeError": "Geçerli bir UTC tarih ve saat gir.",
+      "periodEditorChoose": "Yeni dönem",
+      "periodEditorEffective": "Yürürlük tarihi",
+      "periodEditorHint": "Aynı planın aylık/yıllık dönemini değiştir. Fiyat ve yürürlük tarihi güncel kaynaktan gelir; mevcut ödenmiş dönem korunur.",
+      "periodEditorPrice": "Yeni dönem ücreti",
+      "periodEditorTitle": "Aylık / yıllık dönem",
+      "periodReplaceHint": "Mevcut bekleyen dönem talebi bu yeni taleple değiştirilir.",
+      "periodSubmitted": "Dönem talebi kaydedildi. Yeni dönem, kayıtlı yürürlük tarihinde gerekli ödeme doğrulamasıyla uygulanır.",
       "permissionUnavailable": "Güncel yetki durumu okunamadı.",
       "permissions": "İzin matrisi",
       "planEditor": {
@@ -3894,6 +3906,7 @@ export default interface Resources {
         "starter": "Starter"
       },
       "subscriptionReadError": "Abonelik bilgisi okunamadı. Eski plan, fiyat veya limit kullanılmaz.",
+      "subscriptionReload": "Güncel aboneliği yeniden oku",
       "subscriptionRenewalEffect": "Mevcut ödenmiş dönem korunur; dönem sonundaki yenileme tercihi değişir.",
       "subscriptionRenewalHint": "Güncel abonelik sürümü ve yetki işlemden önce tekrar okunur. Bu işlem anında organizasyon kapatma veya ödeme iadesi değildir.",
       "subscriptionResumeRenewal": "Yenilemeyi aç",

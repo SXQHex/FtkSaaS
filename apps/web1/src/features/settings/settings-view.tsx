@@ -165,6 +165,7 @@ export type SettingsAction =
         | "discipline"
         | "room"
         | "changePlan"
+        | "changePeriod"
         | "payment"
         | "cancelSubscription"
         | "copyLink"
@@ -1025,6 +1026,16 @@ export function SettingsView({
                               ? (data.plan?.nextInvoice ?? t(($) => $.settings.unknown))
                               : (data.plan?.subscriptionState ?? t(($) => $.settings.unknown))}
                           </p>
+                          {index === 0 && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              isDisabled={locked || !canAction("changePeriod")}
+                              onPress={() => action("changePeriod")}
+                            >
+                              {t(($) => $.settings.periodEditorTitle)}
+                            </Button>
+                          )}
                           <Button
                             type="button"
                             variant="outline"
