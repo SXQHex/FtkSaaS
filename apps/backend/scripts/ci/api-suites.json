@@ -282,7 +282,7 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "b0ba8f578367eb50be278d2b7bc803fbe71406089412c6ca1b517c34f1f6ae19",
+      "sha256": "1f0569efef2913150e0e62ffccbb225f05990acc9f6e1e009266506005b4c875",
       "shared": [
         [
           3,
@@ -386,6 +386,11 @@
           "line": 420,
           "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
           "sha256": "fc766a6002e5ebaf339ecfae436354eec50bc681a1f3b0894e7ae8e00cbded8c"
+        },
+        {
+          "line": 421,
+          "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
+          "sha256": "db5c957c62e89a864534ed3c30660f99bdf9299829791a1155a815b15f417179"
         }
       ],
       "estimated_seconds": 799.78

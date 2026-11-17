@@ -59,6 +59,10 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-063 | Backend değerlendirmesi; W1-BE-25 public program/form keşfi | Backend; tüketici frontend | [WF09](workflows.md#wf09) | Native kaynak/rol/plan sınırında typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-063). |
 | XREQ-064 | Backend değerlendirmesi; W1-BE-32 bekleyen yönetim işleri | Backend; tüketici frontend | [WF16](workflows.md#wf16) | Native kaynak/rol/plan sınırında typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-064). |
 
+| XREQ-065 | Backend değerlendirmesi; W1-BE-30 rapor/import native keşfi | Backend; tüketici frontend | [WF10](workflows.md#wf10) | Mevcut native yetki/plan ve gerçek kaynaklar korunarak typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-065). |
+| XREQ-066 | Backend değerlendirmesi; W1-BE-33 yönetici hakediş/ödeme keşfi | Backend; tüketici frontend | [WF14](workflows.md#wf14) | Mevcut native yetki/plan ve gerçek kaynaklar korunarak typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-066). |
+| XREQ-067 | Backend değerlendirmesi; W1-BE-34 denetim ve kendi işlem keşfi | Backend; tüketici frontend | [WF00](workflows.md#wf00) | Mevcut native yetki/plan ve gerçek kaynaklar korunarak typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-067). |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -909,3 +913,24 @@ Eski anonim Worker/public takvim/başvuru hattı korunur. Gerçek tür/disiplin 
 ### Backend değerlendirmesi — 17 Kasım 2026
 
 Dar native kaynak okuyucuları ayrıntı/işlemi karşılar; seçili merkezin yetkili gerçek pending kaynaklarını tek cursor ve güvenli ayrıntı hedefiyle keşfetmek eksikti. Salt okuyucu gerçek kaynak durumlarından oluşur; bağımsız task/yanıt/tamamlama veya generic yeniden çalıştırma kurulmaz. Kesin çağrı/DTO/yetki/hata ve yeniden okuma [WF16](workflows.md#wf16), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) sahibindedir. Frontend kaynak/todo/kabulüne yazılmadı; karşı alan adına kabul verilmedi.
+
+<a id="xreq-065"></a>
+## XREQ-065 Web1 rapor/import native keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre/özet okuyucularla tamamlanır. Kesin tüketim ve açık destek sınırları [WF10](workflows.md#wf10), kaynak/ortam kanıtı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) sahibindedir. Frontend dosyası/kabulü değiştirilmedi; karşı alan adına kabul verilmedi.
+
+<a id="xreq-066"></a>
+## XREQ-066 Web1 yönetici hakediş/ödeme keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre/özet okuyucularla tamamlanır. Kesin tüketim ve açık destek sınırları [WF14](workflows.md#wf14), kaynak/ortam kanıtı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) sahibindedir. Frontend dosyası/kabulü değiştirilmedi; karşı alan adına kabul verilmedi.
+
+<a id="xreq-067"></a>
+## XREQ-067 Web1 denetim ve kendi işlem keşfi
+
+### Backend değerlendirmesi — 17 Kasım 2026
+
+Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre/özet okuyucularla tamamlanır. Kesin tüketim ve açık destek sınırları [WF00](workflows.md#wf00), kaynak/ortam kanıtı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) sahibindedir. Frontend dosyası/kabulü değiştirilmedi; karşı alan adına kabul verilmedi.

@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**17 Kasım Web1 görevi:** Kullanıcı açıklar arasından en ilgili üç ihtiyacı tamamlayıp push etmeyi istedi; W1-BE-24/25/32 public başvuru → CRM → native yönetim işi keşfi olarak seçildi. PR321 teslimi tamamlandı; yeni üçlü ayrı dal ve tek Draft PR ile yürür. Ürün kararları FD08/FD09, görev durumu [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work) sahibindedir. G03 genişletilmez; her full clean başlangıcında kullanıcıya devir yapılır.
+**17 Kasım Web1 görevi:** Kullanıcının açıklar arasından üç ilgili işi tamamlayıp push etme talebiyle W1-BE-30/33/34 rapor/import → yönetici hakedişi/ödeme → denetim/kendi işlem keşfi olarak seçildi. PR322 teslimi tamamlandı. Yeni üçlü ayrı backend dalı ve tek Draft PR ile yürür; görev [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking) sahibindedir. G03 genişletilmez; her full clean başlangıcında kullanıcıya devir yapılır.
 
 **13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleriyle yürütüldü; ölçütler karşılandığından mevcut G03 sırasına dönülür. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
 
