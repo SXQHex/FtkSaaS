@@ -10282,6 +10282,8 @@ org_id: string
 center_id?: (string | null)
 person_id?: (string | null)
 page: Page
+role?: Role
+state?: RecordState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

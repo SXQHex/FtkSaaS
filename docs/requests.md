@@ -65,6 +65,8 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-068 | Backend değerlendirmesi; W1-BE-31 belge yönetimi dizini ve kabul özeti | Backend; tüketici frontend | [WF11](workflows.md#wf11) | Native belge/yetki/yenileme ve gerçek işlem kapsamıyla typed keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-068). |
 
+| XREQ-069 | Backend değerlendirmesi; W1-BE-35 Ekip yönetici rolü keşfi | Backend; tüketici frontend | [WF02](workflows.md#wf02) | Mevcut rol/durum enumları, native görünürlük ve cursor kapsamında filtreli keşif. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery) | Frontend adına kabul verilmedi. [Değerlendirme](#xreq-069). |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -941,3 +943,8 @@ Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre
 ## XREQ-068 Web1 belge yönetimi dizini ve kabul özeti
 
 **Backend değerlendirmesi — 17 Kasım 2026:** W1-BE-31 için mevcut native upload/complete/publication preview/publish, context requirements ve kendi açık kabul yolları korunur. Eksik yönetim belge/sürüm/kabul dizini ve sayfadan bağımsız kişi özeti document_directory_get_v1 ile tamamlanır. Kullanıcı aktif işlem/unexpired preview kişilerini sayaç kitlesi, tarihsel kabulleri yalnız “Tümü” gerçek kayıtları olarak seçti; normatif karar FD08 sahibindedir. Kesin native yetki/plan, org salt okunur sınırı, taslak uploader yetkisi, DTO/cursor/yenileme [WF11](workflows.md#wf11), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management) sahibindedir. Frontend kaynak/request/todo değiştirilmedi; karşı alan adına kabul verilmedi.
+
+<a id="xreq-069"></a>
+## XREQ-069 Web1 Ekip yönetici rolü keşfi
+
+**Backend değerlendirmesi — 17 Kasım2026:** W1-BE-35 için mevcut roles_list_v1 okuyucusunda role/state filtresi eksikliği doğrulandı. Ayrı endpoint veya tüm kişi/öğrenci taraması gerekmez; mevcut Role/RecordState alanları opsiyonel typed filtre olur ve native sorguda limitten önce uygulanır. Mevcut istek/aktör cursor bağı yeni alanları da kapsar. Native org-reader/CM/erişilebilir merkez, plan ve yazar yetkileri korunur; center_id atlanmış OM keşfi CM’ye organizasyon yetkisi vermez. Kesin tüketim ve destek sınırları [WF02](workflows.md#wf02), kaynak/ortam [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery) sahibindedir. Frontend dosyaları/kabulü değiştirilmedi; karşı alan adına kabul verilmedi.

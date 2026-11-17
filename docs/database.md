@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9f6afe9a7ca5131c528deaec22c2560d5a906c776fa78d9706f39cd121313f57`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `5efd4dd11c84228feda71b167c615b6968e8bb9b35249aa1dd19553519a60360`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 186. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 187. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -194,3 +194,4 @@ Sıralı migration: 186. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261117034926_tracking_discovery.sql](../apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql) | `67beaad362b785720325bafed4656e0cb4d094041c5e89c67ff6359d5ca8a1b2` |
 | [20261117124133_document_active_contexts.sql](../apps/backend/supabase/migrations/20261117124133_document_active_contexts.sql) | `4d50c62fee65f93065816cd888ad8329c294c379e9000456f5ae6b3a44fcd1ce` |
 | [20261117124145_document_management_directory.sql](../apps/backend/supabase/migrations/20261117124145_document_management_directory.sql) | `ec148b66ca7984fd7fa3ae767437e0524b4ddb78cb695a17a0639b4858bd1b3c` |
+| [20261117152419_role_directory_filters.sql](../apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql) | `44152b1ffff6528c23072c025e750c3d4f614acb463418f719bf03e1e627d6d0` |

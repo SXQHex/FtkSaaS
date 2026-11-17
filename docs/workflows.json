@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "4968fc266d6b0f040bfe56d69b58082644b5057cf41bd77fb677f2ecf1d897e0",
-        "reason": "Reviewed one service-only read registration and shared inventory delta; Ajv required/enum loop code generation preserves every predicate, closed schema and diagnostics under unchanged upload budget, independently reviewed with authoritative parity tests."
+        "fingerprint": "89f9f21698b4bb92b42cbfda7a23989fe53b238dfaaf8f979b0ad66b6db14473",
+        "reason": "Reviewed existing operation extension inventory and Ajv required-loop code shape threshold 7; authoritative schemas, validation predicates, diagnostics and upload gate remain unchanged, with independent parity/budget review."
       }
     },
     {
@@ -416,7 +416,9 @@
         "apps/backend/tests/studio-setup-status-acceptance.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/web1-review-acceptance.mjs",
-        "apps/backend/tests/fixtures/web1-review-lifecycle.sql"
+        "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
+        "apps/backend/tests/role-directory-filter-unit.mjs",
+        "apps/backend/tests/role-directory-filter-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -481,7 +483,9 @@
         "apps/backend/database/settings-discipline-effects.sql",
         "apps/backend/database/center-setup-status.sql",
         "apps/backend/supabase/migrations/20261114120000_center_setup_status.sql",
-        "apps/backend/database/availability-lifecycle.sql"
+        "apps/backend/database/availability-lifecycle.sql",
+        "apps/backend/database/role-directory-filters.sql",
+        "apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -507,8 +511,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "a03db0fcf2036b2f23dbe5e7f533b54364a6b0222d211b86633c888d5fb7e966",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "54bb9a2e0ac8021e37b82f8c0d2ce7f8d4effd723f794297a4f8737876a2c791",
+        "reason": "Reviewed Role/RecordState filters before native limit, unchanged request/actor cursor and org-reader/CM/accessible-center predicates, stored owner semantics, manager command boundaries, append migration and real Auth/API positive/negative tests."
       }
     },
     {
