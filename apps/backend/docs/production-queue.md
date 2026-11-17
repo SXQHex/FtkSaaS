@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**17 Kasım Web1 görevi:** W1-BE-30/33/34 PR323 main/development teslimi doğrulandı. Kullanıcının kalan işleri kapatma talebiyle tek açık W1-BE-31 belge yönetimi keşfi ayrı backend dalı ve Draft PR ile yürür; görev [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management) sahibindedir. G03 genişletilmez; full clean başlangıcında kullanıcıya devir yapılır.
+**17 Kasım Web1 görevi:** W1-BE-01–34 için kayıtlı backend ihtiyaçları tamamlandı; görev kapanışları [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), son PR324 kaynak/main/development kanıtları [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management) sahibindedir. Web1 backend talep paketi aktif sıradan çıktı; mevcut aşağıdaki G03 sırası korunur. Yeni hosted/provider ve frontend kabulü ayrı kalır.
 
 **13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleriyle yürütüldü; ölçütler karşılandığından mevcut G03 sırasına dönülür. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
 
