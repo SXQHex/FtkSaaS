@@ -27,7 +27,7 @@ export interface EarningsPaymentDraft {
   personId: string;
   amount: string;
   date: string;
-  method: "bank_transfer" | "cash" | "card_pos";
+  method: "bank_transfer" | "cash" | "card_pos" | "";
   reference: string;
   direction: "increase" | "decrease";
   reason: string;
@@ -48,6 +48,7 @@ export function EarningsPaymentSheet({
   errors,
   locked = false,
   readOnly = false,
+  allowPersonSelection = false,
   onSubmit,
   onClose,
 }: {
@@ -67,6 +68,7 @@ export function EarningsPaymentSheet({
   >;
   locked?: boolean;
   readOnly?: boolean;
+  allowPersonSelection?: boolean;
   onSubmit: () => void;
   onClose: () => void;
 }) {
@@ -120,7 +122,7 @@ export function EarningsPaymentSheet({
                   id={`${id}-person`}
                   value={draft.personId}
                   onChange={(event) => set("personId", event.target.value)}
-                  disabled={disabled}
+                  disabled={locked || (readOnly && !allowPersonSelection)}
                   aria-invalid={!!errors?.personId}
                   aria-describedby={`${id}-person-help`}
                 >
@@ -226,7 +228,7 @@ export function EarningsPaymentSheet({
                 <FieldLabel htmlFor={`${id}-date`}>{t(($) => $.earnings.date)}</FieldLabel>
                 <Input
                   id={`${id}-date`}
-                  type="date"
+                  type="datetime-local"
                   max={maxDate}
                   value={draft.date}
                   onChange={(event) => set("date", event.target.value)}
@@ -250,6 +252,7 @@ export function EarningsPaymentSheet({
                   set("method", method);
               }}
             >
+              <NativeSelectOption value="">{t(($) => $.finance.choose)}</NativeSelectOption>
               <NativeSelectOption value="bank_transfer">
                 {t(($) => $.earnings.methods.bank_transfer)}
               </NativeSelectOption>

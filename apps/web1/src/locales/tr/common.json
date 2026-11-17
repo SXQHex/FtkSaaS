@@ -4415,7 +4415,30 @@
       "event_fee": "Etkinlik ücreti",
       "lesson_agreement": "Ders anlaşması"
     },
-    "overpaidLine": "Fazla ödeme"
+    "overpaidLine": "Fazla ödeme",
+    "invalidPayment": "Tutarı, para birimini, tarih/saatini, hakediş seçimini ve ödeme referansını kontrol et.",
+    "paymentInputHint": "Tutarı para biriminin ana biriminde, binlik ayırıcı olmadan yaz. Tarih/saat merkezin {{timezone}} saat dilimindedir; tekrarlanan veya atlanan saat kabul edilmez.",
+    "moreEarnings": "Daha fazla hakediş göster",
+    "selectionEffect": "Ödeme yalnız açıkça seçtiğin hakedişlere bağlanır; seçili kalan tutardan fazla veya avans ödeme kaydedilmez. Kesin dağılım yazım sırasında doğrulanır.",
+    "correctionEffect": "Özgün ödeme korunur ve sürümlü düzeltme eklenir. Artırma yalnız kökün bağlı hakedişlerinin kalanına, azaltma güncel net ödemeye kadar uygulanabilir. Kesin etki yazım sırasında doğrulanır.",
+    "closedCount": "{{count}} tekil kapalı ders seansı",
+    "closedCount_one": "{{count}} tekil kapalı ders seansı",
+    "closedCount_other": "{{count}} tekil kapalı ders seansı",
+    "sourceTimezone": "Saat dilimi: {{timezone}}",
+    "moreInstructors": "Daha fazla eğitmen seçeneği göster",
+    "pageCount": "Bu sayfada {{count}} kayıt",
+    "pageCount_one": "Bu sayfada {{count}} kayıt",
+    "pageCount_other": "Bu sayfada {{count}} kayıt",
+    "saved": "Ödeme ve güncel hakediş doğrulandı.",
+    "previousPage": "Önceki sayfa",
+    "nextPage": "Sonraki sayfa",
+    "commandStates": {
+      "writing": "Ödeme işlemi kaydediliyor…",
+      "unknown": "Sonuç henüz doğrulanamadı. Aynı işlemle devam et.",
+      "pending": "İşlemin sonucu bekleniyor.",
+      "saved-unread": "Ödeme işlemi kaydedildi; güncel hakediş henüz okunamadı.",
+      "rejected": "Ödeme işlemi kaydedilemedi. Güncel kaydı kontrol et."
+    }
   },
   "audit": {
     "title": "Denetim",

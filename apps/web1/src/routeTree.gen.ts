@@ -38,6 +38,7 @@ import { Route as PublicSlugUnavailableRouteImport } from './routes/public.$slug
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdAutomationRouteImport } from './routes/o.$orgId.c.$centerId.automation'
 import { Route as OOrgIdCCenterIdDocumentsRouteImport } from './routes/o.$orgId.c.$centerId.documents'
+import { Route as OOrgIdCCenterIdEarningsRouteImport } from './routes/o.$orgId.c.$centerId.earnings'
 import { Route as OOrgIdCCenterIdEventsRouteImport } from './routes/o.$orgId.c.$centerId.events'
 import { Route as OOrgIdCCenterIdFinanceRouteImport } from './routes/o.$orgId.c.$centerId.finance'
 import { Route as OOrgIdCCenterIdLeadsRouteImport } from './routes/o.$orgId.c.$centerId.leads'
@@ -201,6 +202,11 @@ const OOrgIdCCenterIdDocumentsRoute =
     path: '/o/$orgId/c/$centerId/documents',
     getParentRoute: () => rootRouteImport,
   } as any)
+const OOrgIdCCenterIdEarningsRoute = OOrgIdCCenterIdEarningsRouteImport.update({
+  id: '/o/$orgId/c/$centerId/earnings',
+  path: '/o/$orgId/c/$centerId/earnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdEventsRoute = OOrgIdCCenterIdEventsRouteImport.update({
   id: '/o/$orgId/c/$centerId/events',
   path: '/o/$orgId/c/$centerId/events',
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
+  '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
   '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
@@ -351,6 +358,7 @@ export interface FileRoutesByTo {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
+  '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
   '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
@@ -397,6 +405,7 @@ export interface FileRoutesById {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
+  '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
   '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
   '/o/$orgId/c/$centerId/finance': typeof OOrgIdCCenterIdFinanceRoute
   '/o/$orgId/c/$centerId/leads': typeof OOrgIdCCenterIdLeadsRoute
@@ -444,6 +453,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/automation'
     | '/o/$orgId/c/$centerId/documents'
+    | '/o/$orgId/c/$centerId/earnings'
     | '/o/$orgId/c/$centerId/events'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/leads'
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/automation'
     | '/o/$orgId/c/$centerId/documents'
+    | '/o/$orgId/c/$centerId/earnings'
     | '/o/$orgId/c/$centerId/events'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/leads'
@@ -534,6 +545,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/automation'
     | '/o/$orgId/c/$centerId/documents'
+    | '/o/$orgId/c/$centerId/earnings'
     | '/o/$orgId/c/$centerId/events'
     | '/o/$orgId/c/$centerId/finance'
     | '/o/$orgId/c/$centerId/leads'
@@ -580,6 +592,7 @@ export interface RootRouteChildren {
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdAutomationRoute: typeof OOrgIdCCenterIdAutomationRoute
   OOrgIdCCenterIdDocumentsRoute: typeof OOrgIdCCenterIdDocumentsRoute
+  OOrgIdCCenterIdEarningsRoute: typeof OOrgIdCCenterIdEarningsRoute
   OOrgIdCCenterIdEventsRoute: typeof OOrgIdCCenterIdEventsRoute
   OOrgIdCCenterIdFinanceRoute: typeof OOrgIdCCenterIdFinanceRoute
   OOrgIdCCenterIdLeadsRoute: typeof OOrgIdCCenterIdLeadsRoute
@@ -801,6 +814,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdDocumentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/earnings': {
+      id: '/o/$orgId/c/$centerId/earnings'
+      path: '/o/$orgId/c/$centerId/earnings'
+      fullPath: '/o/$orgId/c/$centerId/earnings'
+      preLoaderRoute: typeof OOrgIdCCenterIdEarningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/events': {
       id: '/o/$orgId/c/$centerId/events'
       path: '/o/$orgId/c/$centerId/events'
@@ -932,6 +952,7 @@ const rootRouteChildren: RootRouteChildren = {
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdAutomationRoute: OOrgIdCCenterIdAutomationRoute,
   OOrgIdCCenterIdDocumentsRoute: OOrgIdCCenterIdDocumentsRoute,
+  OOrgIdCCenterIdEarningsRoute: OOrgIdCCenterIdEarningsRoute,
   OOrgIdCCenterIdEventsRoute: OOrgIdCCenterIdEventsRoute,
   OOrgIdCCenterIdFinanceRoute: OOrgIdCCenterIdFinanceRoute,
   OOrgIdCCenterIdLeadsRoute: OOrgIdCCenterIdLeadsRoute,

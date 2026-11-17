@@ -5,7 +5,7 @@ import { XIcon } from "lucide-react";
 import { BackendError } from "../../lib/backend";
 import type { AgreementVersionView, ProductView } from "../../lib/api-contracts/generated";
 import type { StudioScope } from "./studio";
-import type { StudioViewData } from "./studio-view";
+import type { StudioViewData, StudioInstructor } from "./studio-view";
 import {
   agreementDraft,
   agreementIntent,
@@ -62,7 +62,9 @@ export function StudioAgreementEditor({
   scope: StudioScope;
   selectedId?: string;
   personId?: string;
-  data: StudioViewData;
+  data: Pick<StudioViewData, "disciplines"> & {
+    instructors: Pick<StudioInstructor, "id" | "name">[];
+  };
   onRefresh: () => Promise<void>;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
@@ -108,7 +110,7 @@ export function StudioAgreementEditor({
         setBase(selected);
         setHistory(versions);
         setHistoryPerson(personId ?? "");
-        setDraft(next);
+        setDraft({ ...next, personId: next.personId || personId || "" });
         setNotice("ready");
       }
     }

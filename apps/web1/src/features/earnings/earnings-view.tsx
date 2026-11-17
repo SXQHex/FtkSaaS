@@ -219,7 +219,7 @@ export function EarningsView({
                             <span className="min-w-0 wrap-anywhere">{row.name}</span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell focusMode="child" className="py-6">
                           <Button
                             variant="link"
                             onPress={() => onAgreement(row.id)}
@@ -233,7 +233,7 @@ export function EarningsView({
                         <TableCell className="tabular-nums">{row.earned}</TableCell>
                         <TableCell className="tabular-nums">{row.paid}</TableCell>
                         <TableCell className="tabular-nums">{row.remaining}</TableCell>
-                        <TableCell>
+                        <TableCell focusMode="child" className="py-6">
                           <Button
                             size="sm"
                             variant="outline"
@@ -317,7 +317,7 @@ export function EarningsView({
                         </TableCell>
                         <TableCell className="tabular-nums">{row.amount}</TableCell>
                         <TableCell>{row.note}</TableCell>
-                        <TableCell>
+                        <TableCell focusMode="child" className="py-6">
                           {row.canCorrect && (
                             <Button
                               size="sm"
