@@ -31,8 +31,10 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] PR321 ilk üçlü kaynak/push ve ilk aday clean; merge öncesi talep ayrıntısı okuma senaryosu native/regresyon kabulü.
 - [x] PR321 son aday full clean → kullanıcı yetkisiyle merge → aynı main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-ledger-inbox-automation); yeni hosted ve frontend kabulü ayrı.
 - [x] W1-BE-24/25/32 kaynak/native test: kullanıcı onaylı CRM, açık public form/program ve kaynak iş kuyruğu. Değerlendirmeler XREQ-062/063/064; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work).
-- [ ] W1-BE-24/25/32 tek Draft PR push → aday full clean → ayrıca yetkili merge/main/development teslimi; hosted ve frontend kabulü ayrı.
-- [ ] W1-BE-30/31/33/34: kaynak/WF/typed değerlendirme; gerçek eksiklerde uygulama/test/push, belirsiz ürün kararında kullanıcı yanıtı.
+- [x] W1-BE-24/25/32 PR322 kaynak/push → aday/main kaynak kabulü → development teslimi; hosted ve frontend kabulü ayrı. Kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-intake-crm-work).
+- [x] W1-BE-30/33/34 kaynak/native: rapor/import, yönetici hakedişi ve native denetim/kendi işlem keşfi; desteklenmeyen native sınırlar açıklandı. Değerlendirmeler XREQ-065/066/067; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-report-finance-tracking).
+- [ ] W1-BE-30/33/34 tek Draft PR push → aday full clean → ayrıca yetkili merge/main/development teslimi; hosted ve frontend kabulü ayrı.
+- [ ] W1-BE-31: belge yönetimi dizini ve kabul özeti; ayrı kaynak/WF/typed değerlendirme.
 
 ## Web1 ek backend talepleri — 15 Kasım
 

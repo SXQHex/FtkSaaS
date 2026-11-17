@@ -6380,6 +6380,81 @@
         "Development/test only; final source candidate/main clean required.",
         "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
       ]
+    },
+    {
+      "name": "instructor_finance_directory_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_finance_directory_get_v1",
+      "permission": "earnings.read",
+      "features": [
+        "F20"
+      ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [
+        "F20"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_finance_directory_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "import_directory_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/import_directory_get_v1",
+      "permission": "import.execute",
+      "features": [
+        "F31"
+      ],
+      "required_features": [
+        "F31"
+      ],
+      "runtime_required_features": [
+        "F31"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_import_directory_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
+    },
+    {
+      "name": "tracking_directory_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/tracking_directory_get_v1",
+      "permission": "report.read",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_tracking_directory_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     }
   ]
 }

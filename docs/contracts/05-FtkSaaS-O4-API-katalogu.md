@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-234 sözleşme operasyonu; 234 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+237 sözleşme operasyonu; 237 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -121,13 +121,13 @@
 | `notifications_list_v1` | runtime / ilgili WF’yi oku | `notification.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; unread_only: Bool; query?: string; work_state?: all / pending / completed / informational / unavailable; include_work?: boolean; include_summary?: boolean | Success_notifications_list |
 | `notification_mark_read_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; notification_id: FtkUuid | Success_notification_mark_read |
 | `notification_preferences_set_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; channel: NotificationChannel; purpose: NotificationPurpose; enabled: Bool | Success_notification_preferences_set |
-| `report_get_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; report: ReportKind; filters: ReportFilters; page: Page; columns?: ReportColumns; report_order?: ReportPreparationOrder; group_by?: ReportPreparationGrouping | Success_report_get |
-| `report_export_start_v1` | runtime / ilgili WF’yi oku | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; report: ReportKind; filters: ReportFilters; format: ExportFormat; columns?: ReportColumns; report_order?: ReportPreparationOrder; group_by?: ReportPreparationGrouping | Success_report_export_start |
+| `report_get_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; report: ReportKind; filters: ReportFilters; page: Page; columns?: ReportDiscoveryColumns; report_order?: ReportPreparationOrder; group_by?: ReportPreparationGrouping | Success_report_get |
+| `report_export_start_v1` | runtime / ilgili WF’yi oku | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; report: ReportKind; filters: ReportFilters; format: ExportFormat; columns?: ReportDiscoveryColumns; report_order?: ReportPreparationOrder; group_by?: ReportPreparationGrouping | Success_report_export_start |
 | `report_file_get_v1` | runtime / ilgili WF’yi oku | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid | Success_report_file_get |
 | `import_upload_prepare_v1` | runtime / ilgili WF’yi oku | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; filename: Text; mime: Text; bytes: Count; checksum: Text | Success_import_upload_prepare |
 | `import_preview_v1` | runtime / ilgili WF’yi oku | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; file_id: FtkUuid; mapping: ImportMapping; source_namespace: Text | Success_import_preview |
 | `import_apply_v1` | runtime / ilgili WF’yi oku | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; selected_row_numbers?: integer[] | Success_import_apply |
-| `import_rows_list_v1` | runtime / ilgili WF’yi oku | `import.execute` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid; page: Page | Success_import_rows_list |
+| `import_rows_list_v1` | runtime / ilgili WF’yi oku | `import.execute` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid; page: Page; state?: ImportRowState; query?: string; include_details?: boolean | Success_import_rows_list |
 | `subscription_get_v1` | runtime / ilgili WF’yi oku | `subscription.owner` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null | Success_subscription_get |
 | `subscription_upgrade_quote_v1` | runtime / ilgili WF’yi oku | `subscription.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; target_plan_id: FtkUuid | Success_subscription_upgrade_quote |
 | `subscription_downgrade_request_v1` | runtime / ilgili WF’yi oku | `subscription.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; target_plan_id: FtkUuid; kept_center_id?: FtkUuid ∣ null; kept_scope?: StarterRetainedScope; expected_version?: PositiveInt | Success_subscription_downgrade_request |
@@ -156,7 +156,7 @@
 | `operation_status_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: OperationName; key: FtkUuid | Success_operation_status_get |
 | `preview_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preview_id: FtkUuid | Success_preview_get |
 | `job_status_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid ∣ null; center_id?: FtkUuid ∣ null; job_id: FtkUuid | Success_job_status_get |
-| `audit_list_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; subject: SubjectRef; interval: Interval; page: Page | Success_audit_list |
+| `audit_list_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; subject?: SubjectRef; interval?: Interval; page: Page; query?: string; module?: M01 / M02 / M03 / M04 / M05 / M06 / M07 / M08 / M09 / M10 / M11 / M12 / M13 / M14 / M17 / X; result?: recorded | Success_audit_list |
 | `seat_offer_issue_v1` | runtime / backend-only | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_issue |
 | `seat_offer_expire_v1` | runtime / backend-only | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_expire |
 | `request_expire_v1` | runtime / backend-only | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_request_expire |
@@ -240,6 +240,9 @@
 | `member_document_contexts_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_member_document_contexts_get |
 | `notifications_read_set_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; read: Bool; notifications: NotificationReadSelection[]; center_id?: FtkUuid ∣ null | Success_notifications_read_set |
 | `management_work_list_v1` | runtime / ilgili WF’yi oku | `management.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind?: all / lesson_request / lesson_attendance / event_attendance / crm_followup / application_review; page: Page | Success_management_work_list |
+| `instructor_finance_directory_get_v1` | runtime / ilgili WF’yi oku | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; view: instructors / earnings / payments; person_id?: FtkUuid; interval?: Interval; page: Page | Success_instructor_finance_directory_get |
+| `import_directory_get_v1` | runtime / ilgili WF’yi oku | `import.execute` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; state?: Text | Success_import_directory_get |
+| `tracking_directory_get_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; kind?: all / operation / preview / job; state?: Text; query?: string; interval?: Interval | Success_tracking_directory_get |
 
 ## Sürüm ve okuma desteği
 
@@ -481,6 +484,9 @@
 | member_document_contexts_get_v1 | read | none | None | operational_development_limited |  |
 | notifications_read_set_v1 | command | append_or_current_scope_lock | notifications_list_v1 | implemented | notifications.versioned_batch_read_state, receipt, audit |
 | management_work_list_v1 | read | none | None | runtime_read |  |
+| instructor_finance_directory_get_v1 | read | none | None | operational_development_limited |  |
+| import_directory_get_v1 | read | none | None | not_required |  |
+| tracking_directory_get_v1 | read | none | None | not_required |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

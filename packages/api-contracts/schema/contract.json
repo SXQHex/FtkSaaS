@@ -586,7 +586,11 @@
         "resource_usage",
         "earnings",
         "crm_conversion",
-        "cross_center_usage"
+        "cross_center_usage",
+        "sales",
+        "session_metrics",
+        "collection_breakdown",
+        "instructor_balances"
       ]
     },
     "DocumentGate": {
@@ -936,7 +940,10 @@
         "member_finance_currencies_get_v1",
         "member_document_contexts_get_v1",
         "notifications_read_set_v1",
-        "management_work_list_v1"
+        "management_work_list_v1",
+        "instructor_finance_directory_get_v1",
+        "import_directory_get_v1",
+        "tracking_directory_get_v1"
       ]
     },
     "EntityType": {
@@ -2621,6 +2628,13 @@
             {
               "type": "null"
             }
+          ]
+        },
+        "breakdown": {
+          "enum": [
+            "week",
+            "product",
+            "person"
           ]
         }
       },
@@ -4906,7 +4920,7 @@
         "amount_minor": {
           "anyOf": [
             {
-              "$ref": "#/$defs/Money"
+              "$ref": "#/$defs/SignedMoney"
             },
             {
               "type": "null"
@@ -4952,6 +4966,66 @@
               "type": "null"
             }
           ]
+        },
+        "period_start": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product_version_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "session_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "session_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -4978,7 +5052,7 @@
         "amount_minor": {
           "anyOf": [
             {
-              "$ref": "#/$defs/Money"
+              "$ref": "#/$defs/SignedMoney"
             },
             {
               "type": "null"
@@ -4987,6 +5061,26 @@
         },
         "group_key": {
           "$ref": "#/$defs/Text"
+        },
+        "basis_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ratio_bps": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReportRatioBps"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -5016,7 +5110,7 @@
           }
         },
         "columns": {
-          "$ref": "#/$defs/ReportColumns"
+          "$ref": "#/$defs/ReportDiscoveryColumns"
         }
       },
       "required": [
@@ -5085,6 +5179,9 @@
         "source_key": {
           "type": "string",
           "maxLength": 500
+        },
+        "student_preview": {
+          "$ref": "#/$defs/ImportStudentPreview"
         }
       },
       "required": [
@@ -5756,6 +5853,42 @@
           "anyOf": [
             {
               "$ref": "#/$defs/AuditDiff"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "module": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result": {
+          "const": "recorded"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject_title": {
+          "$ref": "#/$defs/Text"
+        },
+        "operation_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
             },
             {
               "type": "null"
@@ -15107,7 +15240,7 @@
           "$ref": "#/$defs/Page"
         },
         "columns": {
-          "$ref": "#/$defs/ReportColumns"
+          "$ref": "#/$defs/ReportDiscoveryColumns"
         },
         "report_order": {
           "$ref": "#/$defs/ReportPreparationOrder"
@@ -15146,6 +15279,30 @@
             "properties": {
               "group_by": {
                 "const": "person"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "report"
+            ],
+            "properties": {
+              "report": {
+                "enum": [
+                  "sales",
+                  "session_metrics",
+                  "collection_breakdown",
+                  "instructor_balances"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "columns": {
+                "$ref": "#/$defs/ReportColumns"
               }
             }
           }
@@ -15207,7 +15364,7 @@
           "$ref": "#/$defs/ExportFormat"
         },
         "columns": {
-          "$ref": "#/$defs/ReportColumns"
+          "$ref": "#/$defs/ReportDiscoveryColumns"
         },
         "report_order": {
           "$ref": "#/$defs/ReportPreparationOrder"
@@ -15247,6 +15404,30 @@
             "properties": {
               "group_by": {
                 "const": "person"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "report"
+            ],
+            "properties": {
+              "report": {
+                "enum": [
+                  "sales",
+                  "session_metrics",
+                  "collection_breakdown",
+                  "instructor_balances"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "columns": {
+                "$ref": "#/$defs/ReportColumns"
               }
             }
           }
@@ -15563,6 +15744,17 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "state": {
+          "$ref": "#/$defs/ImportRowState"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "include_details": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -17790,17 +17982,86 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "module": {
+          "enum": [
+            "M01",
+            "M02",
+            "M03",
+            "M04",
+            "M05",
+            "M06",
+            "M07",
+            "M08",
+            "M09",
+            "M10",
+            "M11",
+            "M12",
+            "M13",
+            "M14",
+            "M17",
+            "X"
+          ]
+        },
+        "result": {
+          "const": "recorded"
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "org_id",
-        "subject",
-        "interval",
         "page"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "subject"
+            ]
+          },
+          "then": {
+            "required": [
+              "interval"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "query"
+                  ]
+                },
+                {
+                  "required": [
+                    "module"
+                  ]
+                },
+                {
+                  "required": [
+                    "result"
+                  ]
+                }
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "center_id"
+            ],
+            "properties": {
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_audit_list": {
       "type": "object",
@@ -64139,6 +64400,803 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "InstructorFinanceEarning": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "earning"
+          ]
+        },
+        "earning": {
+          "$ref": "#/$defs/EarningView"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "session_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "agreement_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "agreement_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "earning",
+        "display_name",
+        "session_name",
+        "agreement_id",
+        "agreement_version"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorFinancePayment": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "payment"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "root_payment_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "direction": {
+          "enum": [
+            "increase",
+            "decrease"
+          ]
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "payment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ManualCollectionPayment"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "person_id",
+        "display_name",
+        "root_payment_id",
+        "version",
+        "previous_id",
+        "direction",
+        "amount_minor",
+        "currency",
+        "occurred_at",
+        "payment",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorFinancePerson": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "instructor"
+          ]
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InstructorAccountTotal"
+          }
+        },
+        "agreement_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
+        },
+        "current_agreement_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "person_id",
+        "display_name",
+        "totals",
+        "agreement_ids",
+        "current_agreement_ids"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorFinanceDirectory": {
+      "type": "object",
+      "properties": {
+        "view": {
+          "enum": [
+            "instructors",
+            "earnings",
+            "payments"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/InstructorFinanceEarning"
+              },
+              {
+                "$ref": "#/$defs/InstructorFinancePayment"
+              },
+              {
+                "$ref": "#/$defs/InstructorFinancePerson"
+              }
+            ]
+          }
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InstructorAccountTotal"
+          }
+        },
+        "closed_session_count": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "view",
+        "items",
+        "as_of",
+        "next_cursor",
+        "totals",
+        "closed_session_count"
+      ],
+      "additionalProperties": false
+    },
+    "Request_instructor_finance_directory_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "view": {
+          "enum": [
+            "instructors",
+            "earnings",
+            "payments"
+          ]
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "view",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Success_instructor_finance_directory_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/InstructorFinanceDirectory"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ImportStudentPreview": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "phone",
+                  "email"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "maxLength": 320
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "duplicate_source_key",
+              "source_already_applied"
+            ]
+          }
+        }
+      },
+      "required": [
+        "display_name",
+        "contacts",
+        "warnings"
+      ],
+      "additionalProperties": false
+    },
+    "ImportDirectoryItem": {
+      "type": "object",
+      "properties": {
+        "job_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "state": {
+          "$ref": "#/$defs/Text"
+        },
+        "phase": {
+          "enum": [
+            "preview",
+            "apply"
+          ]
+        },
+        "progress_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "total_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preview_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "safe_error_code": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "enum": [
+            "students",
+            "crm_applications"
+          ]
+        }
+      },
+      "required": [
+        "job_id",
+        "created_at",
+        "state",
+        "phase",
+        "progress_count",
+        "total_count",
+        "preview_id",
+        "safe_error_code",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "ImportDirectory": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ImportDirectoryItem"
+          }
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "limits": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "max_bytes": {
+                  "$ref": "#/$defs/PositiveInt"
+                },
+                "max_rows": {
+                  "$ref": "#/$defs/PositiveInt"
+                }
+              },
+              "required": [
+                "max_bytes",
+                "max_rows"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "as_of",
+        "next_cursor",
+        "limits"
+      ],
+      "additionalProperties": false
+    },
+    "Request_import_directory_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        },
+        "state": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Success_import_directory_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/ImportDirectory"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "TrackingDirectoryItem": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "operation",
+            "preview",
+            "job"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "operation": {
+          "$ref": "#/$defs/OperationName"
+        },
+        "state": {
+          "$ref": "#/$defs/Text"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "progress_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "safe_error_code": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_attempt_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EntityRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "created_at",
+        "operation",
+        "state",
+        "expires_at",
+        "progress_count",
+        "total_count",
+        "safe_error_code",
+        "next_attempt_at",
+        "result_reference"
+      ],
+      "additionalProperties": false
+    },
+    "TrackingDirectory": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TrackingDirectoryItem"
+          }
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "$ref": "#/$defs/Count"
+            },
+            "previews": {
+              "$ref": "#/$defs/Count"
+            },
+            "operations": {
+              "$ref": "#/$defs/Count"
+            },
+            "jobs": {
+              "$ref": "#/$defs/Count"
+            },
+            "attention": {
+              "$ref": "#/$defs/Count"
+            },
+            "running": {
+              "$ref": "#/$defs/Count"
+            },
+            "retry": {
+              "$ref": "#/$defs/Count"
+            },
+            "completed": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "total",
+            "previews",
+            "operations",
+            "jobs",
+            "attention",
+            "running",
+            "retry",
+            "completed"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "items",
+        "as_of",
+        "next_cursor",
+        "summary"
+      ],
+      "additionalProperties": false
+    },
+    "Request_tracking_directory_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        },
+        "kind": {
+          "enum": [
+            "all",
+            "operation",
+            "preview",
+            "job"
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/Text"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Success_tracking_directory_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/TrackingDirectory"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ReportDiscoveryColumns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "group_key",
+          "center_id",
+          "person_id",
+          "currency",
+          "count",
+          "amount_minor",
+          "credits",
+          "ratio_bps",
+          "basis_count",
+          "subscriber_number",
+          "period_start",
+          "product_version_id",
+          "product_name",
+          "display_name",
+          "session_id",
+          "session_name"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 10,
+      "uniqueItems": true
     }
   },
   "x-contract": {
@@ -93901,6 +94959,298 @@
           "Development/test only; final source candidate/main clean required.",
           "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
         ]
+      },
+      {
+        "name": "instructor_finance_directory_get_v1",
+        "module": "M08",
+        "features": [
+          "F20"
+        ],
+        "permission": "earnings.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_instructor_finance_directory_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_instructor_finance_directory_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read native authorized scope only; no business mutation or capability disclosure.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A46",
+          "A47",
+          "A52",
+          "A53",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F20"
+        ],
+        "runtime_required_features": [
+          "F20"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "centers",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "operational_development_limited",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_instructor_finance_directory_get"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/instructor_finance_directory_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/instructor_finance_directory_get_v1",
+        "runtime_rpc": "api_v1.instructor_finance_directory_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
+      },
+      {
+        "name": "import_directory_get_v1",
+        "module": "X",
+        "features": [
+          "F31"
+        ],
+        "permission": "import.execute",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_import_directory_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_import_directory_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read native authorized scope only; no business mutation or capability disclosure.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "same_org_center_discipline",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F31"
+        ],
+        "runtime_required_features": [
+          "F31"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "centers",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_import_directory_get"
+          }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/import_directory_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/import_directory_get_v1",
+        "runtime_rpc": "api_v1.import_directory_get_v1"
+      },
+      {
+        "name": "tracking_directory_get_v1",
+        "module": "M17",
+        "features": [],
+        "permission": "report.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_tracking_directory_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_tracking_directory_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read native authorized scope only; no business mutation or capability disclosure.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "centers",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_tracking_directory_get"
+          }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/tracking_directory_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/tracking_directory_get_v1",
+        "runtime_rpc": "api_v1.tracking_directory_get_v1"
       }
     ],
     "policy_value_map": {
@@ -110963,6 +112313,174 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinanceEarning/properties/agreement_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePayment/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePayment/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePayment/properties/root_payment_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePayment/properties/previous_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePerson/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePerson/properties/agreement_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/InstructorFinancePerson/properties/current_agreement_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_finance_directory_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_finance_directory_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_finance_directory_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_finance_directory_get/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_instructor_finance_directory_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReportRow/properties/product_version_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReportRow/properties/session_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AuditView/properties/operation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_audit_list/allOf/0/else/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ImportDirectoryItem/properties/job_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ImportDirectoryItem/properties/preview_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_import_directory_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_import_directory_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_import_directory_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_import_directory_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/TrackingDirectoryItem/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_tracking_directory_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_tracking_directory_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_tracking_directory_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_tracking_directory_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -111450,13 +112968,16 @@
         "member_finance_currencies_get_v1",
         "member_document_contexts_get_v1",
         "notifications_read_set_v1",
-        "management_work_list_v1"
+        "management_work_list_v1",
+        "instructor_finance_directory_get_v1",
+        "import_directory_get_v1",
+        "tracking_directory_get_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 181,
+      "migration_count": 184,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -112168,7 +113689,10 @@
         "member_finance_currencies_get_v1",
         "member_document_contexts_get_v1",
         "notifications_read_set_v1",
-        "management_work_list_v1"
+        "management_work_list_v1",
+        "instructor_finance_directory_get_v1",
+        "import_directory_get_v1",
+        "tracking_directory_get_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -113546,7 +115070,8 @@
           "attendance_start_v1",
           "settings_preparation_resolve_v1",
           "instructor_agreement_get_v1",
-          "instructor_agreement_accept_v1"
+          "instructor_agreement_accept_v1",
+          "instructor_finance_directory_get_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -113575,7 +115100,8 @@
           "attendance_start_v1",
           "settings_preparation_resolve_v1",
           "instructor_agreement_get_v1",
-          "instructor_agreement_accept_v1"
+          "instructor_agreement_accept_v1",
+          "instructor_finance_directory_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -114046,7 +115572,8 @@
           "job_status_get_v1",
           "import_rows_process_v1",
           "file_upload_complete_v1",
-          "settings_template_resolve_v1"
+          "settings_template_resolve_v1",
+          "import_directory_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -114060,7 +115587,8 @@
           "job_status_get_v1",
           "import_rows_process_v1",
           "file_upload_complete_v1",
-          "settings_template_resolve_v1"
+          "settings_template_resolve_v1",
+          "import_directory_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
