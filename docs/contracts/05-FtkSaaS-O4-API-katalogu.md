@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-232 sözleşme operasyonu; 232 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+233 sözleşme operasyonu; 233 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -118,7 +118,7 @@
 | `crm_followup_list_v1` | runtime / ilgili WF’yi oku | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; kind: FollowupKind; interval?: Interval ∣ null; page: Page | Success_crm_followup_list |
 | `segment_save_v1` | runtime / ilgili WF’yi oku | `crm.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; segment_id?: FtkUuid ∣ null; name: Text; definition: SegmentDefinition; scope: ConfigurationScope | Success_segment_save |
 | `automation_save_v1` | runtime / ilgili WF’yi oku | `crm.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; automation_id?: FtkUuid ∣ null; definition: AutomationDefinition; scope: ConfigurationScope; retry_job?: object | Success_automation_save |
-| `notifications_list_v1` | runtime / ilgili WF’yi oku | `notification.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; unread_only: Bool | Success_notifications_list |
+| `notifications_list_v1` | runtime / ilgili WF’yi oku | `notification.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; unread_only: Bool; query?: string; work_state?: all / pending / completed / informational / unavailable; include_work?: boolean; include_summary?: boolean | Success_notifications_list |
 | `notification_mark_read_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; notification_id: FtkUuid | Success_notification_mark_read |
 | `notification_preferences_set_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; channel: NotificationChannel; purpose: NotificationPurpose; enabled: Bool | Success_notification_preferences_set |
 | `report_get_v1` | runtime / ilgili WF’yi oku | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; report: ReportKind; filters: ReportFilters; page: Page; columns?: ReportColumns; report_order?: ReportPreparationOrder; group_by?: ReportPreparationGrouping | Success_report_get |
@@ -235,9 +235,10 @@
 | `product_state_set_v1` | runtime / ilgili WF’yi oku | `product.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; product_id: FtkUuid; expected_version: PositiveInt; reason: string; action: open / close / archive | Success_product_state_set |
 | `freeze_cancel_preview_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; freeze_id: FtkUuid; reason: ReviewReason | Success_freeze_cancel_preview |
 | `freeze_cancel_apply_v1` | runtime / ilgili WF’yi oku | `entitlement.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_freeze_cancel_apply |
-| `instructor_account_get_v1` | runtime / ilgili WF’yi oku | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; person_id: FtkUuid; interval?: Interval; center_id: FtkUuid; view: agreements / payments; page: InstructorAccountPageRequest | Success_instructor_account_get |
+| `instructor_account_get_v1` | runtime / ilgili WF’yi oku | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; person_id: FtkUuid; interval?: Interval; center_id: FtkUuid; view: agreements / payments / earnings; page: InstructorAccountPageRequest | Success_instructor_account_get |
 | `member_finance_currencies_get_v1` | runtime / ilgili WF’yi oku | `finance.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid | Success_member_finance_currencies_get |
 | `member_document_contexts_get_v1` | runtime / ilgili WF’yi oku | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_member_document_contexts_get |
+| `notifications_read_set_v1` | runtime / ilgili WF’yi oku | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; read: Bool; notifications: NotificationReadSelection[]; center_id?: FtkUuid ∣ null | Success_notifications_read_set |
 
 ## Sürüm ve okuma desteği
 
@@ -477,6 +478,7 @@
 | instructor_account_get_v1 | read | none | None | operational_development_limited |  |
 | member_finance_currencies_get_v1 | read | none | None | operational_development_limited |  |
 | member_document_contexts_get_v1 | read | none | None | operational_development_limited |  |
+| notifications_read_set_v1 | command | append_or_current_scope_lock | notifications_list_v1 | implemented | notifications.versioned_batch_read_state, receipt, audit |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

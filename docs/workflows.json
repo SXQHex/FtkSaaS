@@ -19,7 +19,8 @@
         "apps/backend/tests/deployment-cli-unit.mjs",
         "apps/backend/tests/edge-bundle-unit.mjs",
         "apps/backend/tests/discipline-presentation-unit.mjs",
-        "apps/backend/tests/browser-cors-unit.mjs"
+        "apps/backend/tests/browser-cors-unit.mjs",
+        "apps/backend/tests/ledger-inbox-automation-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -285,7 +286,8 @@
         "apps/backend/scripts/build-spa-assets.mjs",
         "apps/backend/scripts/build-spa-ingress.mjs",
         "apps/backend/transports/spa-validators.mjs",
-        "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql"
+        "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql",
+        "apps/backend/scripts/compact-validator-errors.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -295,8 +297,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e4fa6f0ff8a37661efe12c20f4cd2f74eb31f5894dfb7f0010a157b1677102f4",
-        "reason": "Reviewed final registry/feature summaries for two new self readers; original metadata order retained, existing permissions/features/operations and legacy response assertions unchanged. Final native scope/canonical-evidence tests and generated source bindings reviewed."
+        "fingerprint": "aba39d2a19fb29361d17ff7149c74c0730598931cceca7425977d0fe4808c7e9",
+        "reason": "Reviewed exact native request reader selector, its UUID classification and closed catalog exclusion; no write action selected by inbox, existing common normalization preserved."
       }
     },
     {
@@ -385,8 +387,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "156b71f42aa34a4f71592f8bc7be40332f17c0821e911200da20b162eb4f22f3",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "3b31e2b55b960d0b3363c93c3a65e0f8cca547c19735940ce538ef0fec3d2c9c",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -500,8 +502,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "cedf8231fa6dce71913cdff9e9d63b2f94b79825c1c9accf26ef1d1fa0159cae",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "d090669bf234fa437f62b2bde116a4b2dca2e067e27fdf59a4bcd14653729b79",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -616,8 +618,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "17824e085d0290cd0be52212cff00ec83601cdb6ec730988e14e242792bbc0b4",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "b825d3ed595f88b9e0781580019a2f158df6e42fd7c73deb267ecf77a61427f3",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -733,8 +735,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "874412da3e8adc99366f4bf047074d0864934215c7717c226b4351283a71e4fc",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "f909d0c19a322b5aba850c4c8275d5813bbbae061243c42c782c562fce5857bb",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -861,8 +863,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "0b3676f0981f90771245380540e62d43188b380efbeda03b5cb24e7058493e64",
-        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
+        "fingerprint": "7434dc79aada8b255fedffae4a0fb836c7d5d2421c2282c7e9f7b1343925d257",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -892,7 +894,8 @@
         "apps/backend/tests/lesson-request-status-summary-acceptance.mjs",
         "apps/backend/tests/fixtures/lesson-request-status-summary.sql",
         "apps/backend/tests/member-lesson-discovery-unit.mjs",
-        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -950,7 +953,8 @@
         "apps/backend/database/lesson-request-status-summary.sql",
         "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql",
         "apps/backend/database/member-lesson-discovery.sql",
-        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
+        "apps/backend/database/notification-request-source-authority.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -965,8 +969,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "951136868ec4ad97675621b1a51173523fbc9df6bb7f8dc9000327c121b2f200",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "8079425159f6bc252aaa413af0832801a96a238da35eaf47eb0256aa447896d3",
+        "reason": "Reviewed exact request-detail read selector and inbox source visibility using the same native request page; actions remain separate, catalog mixing rejected; resolve/write/self and live loss tests added."
       }
     },
     {
@@ -1034,8 +1038,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "3f97cd67a8d733ea96d8dcda29d62215daebe51c39315bf5a5a09b88bda6a5d6",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "e47b76c2fb8ea8e4bfc97ee433312852cfe2691794167c7d3c1f3c4fe413bdb2",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1109,8 +1113,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "4318c6c71c9c7a9c692eff1f426bf8693c69bda489c88bbfbbc889b58cccdcf2",
-        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
+        "fingerprint": "e059bb8bbdbeab83d50932135452cdf3b4bd1b03bde4656348896cb9d832eb3d",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1212,8 +1216,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "ad1dad6dd3301a69ee7d1e39720a902c31e4c949cea10b205453fa3e2f2bb3ab",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "f28f68d6099d26cc60433ef2d84a2371774646c228cdc8024f58eff24ff61767",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1272,8 +1276,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "ee83ed56252ecafe1bcaa145c0ef9606a2b0eb91b824644b637601e5424a0fa3",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "0a914f5dd61d70aa8f634bf940aa634641dd9c1fecf5e0c2663740c5e5e93171",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1295,7 +1299,9 @@
         "apps/backend/tests/content-documents-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/member-self-discovery-unit.mjs",
-        "apps/backend/tests/member-self-discovery-acceptance.mjs"
+        "apps/backend/tests/member-self-discovery-acceptance.mjs",
+        "apps/backend/tests/ledger-inbox-automation-unit.mjs",
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1322,7 +1328,11 @@
         "apps/backend/supabase/migrations/20261113090000_content_catalog.sql",
         "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
         "apps/backend/database/member-self-discovery.sql",
-        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql"
+        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql",
+        "apps/backend/database/notification-inbox-work.sql",
+        "apps/backend/supabase/migrations/20261116233015_notification_inbox_work.sql",
+        "apps/backend/database/notification-request-source-authority.sql",
+        "apps/backend/supabase/migrations/20261117003000_notification_request_source_authority.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1334,11 +1344,12 @@
         "document_publication_preview_v1",
         "content_catalog_get_v1",
         "content_catalog_save_v1",
-        "member_document_contexts_get_v1"
+        "member_document_contexts_get_v1",
+        "notifications_read_set_v1"
       ],
       "review": {
-        "fingerprint": "f8ce4015594d37a4b87387a4f6f68d3489b02135b27a9c109256b583fedbe8c6",
-        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
+        "fingerprint": "6096138030145ecc9c07c9954ed9cbb6d8107b0f77a6eb74a332e750144883c4",
+        "reason": "Reviewed exact request-detail read selector and inbox source visibility using the same native request page; actions remain separate, catalog mixing rejected; resolve/write/self and live loss tests added."
       }
     },
     {
@@ -1470,8 +1481,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "cef100f7f7976dcefc9c9e8d602a88c4040b6ea0c7e76c2480b8e84682acba27",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "14b981ce73d53f5af4f510213f7f8840c51814ec1cd73b5617b24de922a55312",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1546,8 +1557,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "dcea8be29bced4e21b91cb1f2825daa2a400581cc012b8a25951eaae9088516b",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "7eaf86006c9dbeb5839efb143c3090e8b9fa9986c9b0898f6971dc086d9a87de",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1564,7 +1575,9 @@
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/agreement-preparation-acceptance.mjs",
         "apps/backend/tests/content-documents-acceptance.mjs",
-        "apps/backend/tests/instructor-account-unit.mjs"
+        "apps/backend/tests/instructor-account-unit.mjs",
+        "apps/backend/tests/ledger-inbox-automation-unit.mjs",
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1589,7 +1602,9 @@
         "apps/backend/database/content-source-guards.sql",
         "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
         "apps/backend/database/instructor-self-account.sql",
-        "apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql"
+        "apps/backend/supabase/migrations/20261116194343_instructor_self_account.sql",
+        "apps/backend/database/instructor-all-period-ledger.sql",
+        "apps/backend/supabase/migrations/20261116233014_instructor_all_period_ledger.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1603,8 +1618,8 @@
         "instructor_account_get_v1"
       ],
       "review": {
-        "fingerprint": "d838231529293c8092fec52ee32a7dc79474011413099c9a27b026034f9595b5",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "e6a6016ddb73047aafc141659894aba18e1497a6b3cef178e71604882f2be924",
+        "reason": "Shared native/unit test module gains exact request-detail navigation regression; existing ledger/automation SQL and behavior unchanged."
       }
     },
     {
@@ -1682,8 +1697,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "3833e2fd1592fb170737e763a1b7cac766dab7ed3c048a14b47c8432518150f0",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "acb46e6fa2d002fea30f65d90de300866b30be84456c01665b35fb7053f1005e",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1704,7 +1719,9 @@
         "apps/backend/tests/person-registry.test.mjs",
         "apps/backend/tests/crm-pipeline-acceptance.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/ledger-inbox-automation-unit.mjs",
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -1729,7 +1746,9 @@
         "apps/backend/database/upper-plan-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
         "apps/backend/database/crm-pipeline-settings.sql",
-        "apps/backend/database/settings-work-alerts.sql"
+        "apps/backend/database/settings-work-alerts.sql",
+        "apps/backend/database/automation-discovery-insights.sql",
+        "apps/backend/supabase/migrations/20261116233016_automation_discovery_insights.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1743,8 +1762,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "90e014d6121cbd76207c42c3147824a0b43d8c2d6b4baf4c986ad39c898c6c58",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "8f4c0e3057f809aa32c0a984691fdc68306763d0975f8ec0687c945bf507455b",
+        "reason": "Shared native/unit test module gains exact request-detail navigation regression; existing ledger/automation SQL and behavior unchanged."
       }
     },
     {
@@ -1832,8 +1851,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "d36767fca8edf18e7a842395cbb49ab29bdcf4c9078c05a86e5a4c496440c6bd",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "8602f39a7dcd4cdd0ec6009170dba1dca91bdacb020ea0d401af10cb3abb2fac",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1865,8 +1884,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "ac347cfcb2a677d92f0ca20c275d45a1ff188bf71de2ab0573a61599dced5495",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "c63b8379adfdb327f30e68871fa8ed1424e694c770efda523e64462ea5f0d331",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -1906,8 +1925,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "272f0e88bbb498493e1faa4d4835e5ef0471a188efa1e8d25a2431da4f1ef9d8",
-        "reason": "Reviewed final self readers, source/native tests and WF guidance; new operation registry/feature links match existing native gates, original FinanceView/document-array schemas preserved, Starter disallowed-context and selected-student negatives explicit."
+        "fingerprint": "52b7c1e9cb9fde33865d806c712d9347527f4a86636e1da984e49f01e4b78e03",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     },
     {
@@ -2031,8 +2050,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "d91c63aef18c08debec3b17cf20e5d1c997c2e8969c956b103b83c26c578b0f9",
-        "reason": "Reviewed final member self readers: legacy finance/document request and response types remain exact; new narrow native finance-currency/document-context endpoints own self checks and original feature gates. Metadata projection reuses native document helper without rendering."
+        "fingerprint": "bb1750768efe04a82f631686befbd478eb0bc7b7073497453c420e9a6abc25ac",
+        "reason": "Reviewed shared wrapper delta: only notifications_read_set_v1 service-only registration/wrapper added; existing operation wrappers and this flow behavior unchanged."
       }
     }
   ]

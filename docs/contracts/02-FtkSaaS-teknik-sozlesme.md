@@ -1125,6 +1125,8 @@ Teknik süre/rate backend işidir. Native Auth SMTP Resend kapsamındadır; uygu
 
 ##### FD04 — bildirim hatırlatma ve pazarlama (kabul edildi)
 
+17 Kasım kullanıcı kararı: inbox kaynak işin gerçek durumunu gösterir; bildirimin okunması kaynak işi tamamlamaz. Bağımsız tamamlandı veya ileti yanıtı eklenmez. Kesin tüketim [WF11](../workflows.md#wf11) sahibindedir.
+
 İlk sürüm ve sonraki aşama kanal/amaç kapsamının tek sahibi [ürün sözleşmesidir](01-FtkSaaS-urun-kapsam-sozlesmesi.md#ilk-tam-sürüm-ve-sonraki-aşama-sınırı). Aşağıdaki davranış kararı gerçek sağlayıcı kurulumu veya çalışan DTO anlamına gelmez; tüketici [destek projeksiyonunu](../settings.md#bildirim-kullanılabilirliği) esas alır.
 
 | Alan | Kabul edilen davranış |
@@ -1220,6 +1222,8 @@ Backend doğrulanmış iş verileriyle tam belgeyi hazırlar, gerçek dilini/kay
 Web/reklam ortak CRM entegrasyonu üretim P08'dir; yukarıdaki kabul mevcut public_application_submit DTO'sunun telefonla çalıştığı anlamına gelmez.
 
 ##### FD10 — iş otomasyonu rapor import (kabul edildi)
+
+17 Kasım kullanıcı kararı: segmentin bağımsız eşleşme hedef kitlesi seçili merkezde aktif kişi durumundaki bütün öğrenci ve aday kayıtlarıdır; aktif/pasif öğrencilik ve açık/kapalı aday geçmişi dahildir. Canonical kişi bir kez değerlendirilir. Worker kendi gerçek tetikleme koşullarını ayrıca korur. Bu teslim mevcut native sınırını açıklar ve segment/iş keşfi ile özetlerini tamamlar; yeni tetikleme/eylem kararı üretmez. Kesin tüketim [WF16](../workflows.md#wf16) sahibindedir.
 
 ST-03 teknik eşleme adayı: `ImportMapping.delimiter` opsiyonel kapalı virgül/noktalı virgül seçimidir; yokluğu eski virgül davranışını korur. Seçim tahmin edilmez, eşlemenin parçası olarak preview/bağımlılık/receipt istek hash'ine girer. Quoted separator, escaped quote, CRLF ve quoted newline aynı parser kurallarını kullanır; hatalı yapı/eşleme reddedilir. Hak/borç veya kişi birleştirme defaultu üretmez. Kaynak/native kabulü [alan devrinden](../settings.md) izlenir.
 
