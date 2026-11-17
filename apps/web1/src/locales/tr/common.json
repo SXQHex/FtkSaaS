@@ -3624,8 +3624,8 @@
     "deliveryJob": "E-posta işlemi",
     "emailDelivery": "E-posta teslim durumu",
     "scopeHint": "Kuruluş kapsamındaki kendi bildirimlerin. Saatler {{timezone}} ile gösterilir.",
-    "limitHint": "Arama, toplu işlem ve yanıt henüz kullanılamıyor. Okundu işareti kaynak işini tamamlamaz.",
-    "sourceUnavailable": "Bu bildirimin güvenli kaynak bağlantısı henüz paylaşılmıyor.",
+    "limitHint": "Okundu işareti kaynak işini tamamlamaz. Toplu işlem yalnız seçtiğin iletilere uygulanır.",
+    "sourceUnavailable": "Kaynak şu anda erişilebilir değil.",
     "jobStates": {
       "pending": "Bekliyor",
       "running": "İşleniyor",
@@ -3641,6 +3641,23 @@
       "bounced": "Geri döndü",
       "complained": "Şikâyet bildirildi",
       "failed": "Teslim başarısız"
+    },
+    "markSelected": "Seçilenleri okundu yap",
+    "searchSubmit": "Ara",
+    "selectMessage": "Seç: {{title}}",
+    "sourceOpen": "Kaynağı aç",
+    "workStates": {
+      "pending": "İşlem bekliyor",
+      "completed": "Tamamlandı",
+      "informational": "Bilgilendirme",
+      "unavailable": "Kaynak erişilemiyor"
+    },
+    "sourceDetail": "Kaynak ayrıntısı",
+    "sourceFlow": "Kaynak işlemine git",
+    "sourceKinds": {
+      "request": "Özel ders talebi",
+      "offer": "Yer teklifi",
+      "activity": "CRM takibi"
     }
   },
   "automation": {

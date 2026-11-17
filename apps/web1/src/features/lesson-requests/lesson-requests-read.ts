@@ -87,13 +87,21 @@ export async function readLessonRequests(
   scope: ClientScope,
   cursor?: string,
   status: RequestFilter = "pending",
+  requestId?: string,
 ) {
   const backend = await scopedBackend(scope);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),
     operation: "lesson_request_create_v1",
-    selector: { operation: "lesson_request_create_v1", key: { status, include_summary: true } },
+    selector: {
+      operation: "lesson_request_create_v1",
+      key: {
+        status,
+        include_summary: true,
+        ...(requestId ? { lesson_request_id: z.uuid().parse(requestId) } : {}),
+      },
+    },
     page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
   if (page.items.length > 20 || (cursor && page.next_cursor === cursor))
@@ -111,6 +119,8 @@ export async function readLessonRequests(
     )
   )
     throw new Error("LESSON_REQUEST_FILTER_UNAVAILABLE");
+  if (requestId && (details.length !== 1 || details[0]!.id !== requestId || page.next_cursor))
+    throw new Error("LESSON_REQUEST_SOURCE_UNAVAILABLE");
   if (new Set(details.map((row) => row.id)).size !== details.length)
     throw new Error("LESSON_REQUEST_PAGE_UNAVAILABLE");
   const ids = [

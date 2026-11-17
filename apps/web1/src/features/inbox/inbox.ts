@@ -12,6 +12,7 @@ export async function readInbox(
   scope: ClientScope,
   unreadOnly: boolean,
   cursor?: string,
+  options?: { query: string; workState: "all" | "pending" },
 ): Promise<Page_NotificationView> {
   const page = await (
     await scopedBackend(scope)
@@ -19,6 +20,14 @@ export async function readInbox(
     ...common(scope),
     request_id: uuidv7(),
     unread_only: unreadOnly,
+    ...(options
+      ? {
+          ...(options.query ? { query: options.query } : {}),
+          work_state: options.workState,
+          include_work: true,
+          include_summary: true,
+        }
+      : {}),
     page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
   z.iso.datetime({ offset: true }).parse(page.as_of);
@@ -34,6 +43,33 @@ export async function readInbox(
     z.uuid().parse(item.payload.subject.id);
     if (item.payload.title !== undefined) z.string().parse(item.payload.title);
     if (item.payload.body !== undefined) z.string().parse(item.payload.body);
+  }
+  if (options) {
+    if (!page.summary) throw new Error("INBOX_SUMMARY_UNAVAILABLE");
+    for (const value of Object.values(page.summary))
+      z.number().int().nonnegative().safe().parse(value);
+    if (
+      page.summary.unread > page.summary.total ||
+      page.summary.pending +
+        page.summary.completed +
+        page.summary.informational +
+        page.summary.unavailable !==
+        page.summary.total
+    )
+      throw new Error("INBOX_SUMMARY_UNAVAILABLE");
+    for (const item of page.items) {
+      z.number().int().positive().safe().parse(item.version);
+      if (!item.work) throw new Error("INBOX_SOURCE_UNAVAILABLE");
+      z.enum(["pending", "completed", "informational", "unavailable"]).parse(item.work.state);
+      if (options.workState === "pending" && item.work.state !== "pending")
+        throw new Error("INBOX_SOURCE_UNAVAILABLE");
+      if (item.work.center_id !== null) z.uuid().parse(item.work.center_id);
+      if (
+        item.work.state === "unavailable" &&
+        (item.work.center_id !== null || item.work.selector !== null)
+      )
+        throw new Error("INBOX_SOURCE_UNAVAILABLE");
+    }
   }
   return page;
 }

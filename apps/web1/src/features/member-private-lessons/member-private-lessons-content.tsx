@@ -42,11 +42,13 @@ export function MemberPrivateLessonsContent({
   personId,
   timezone,
   onLockChange,
+  requestId,
 }: {
   scope: ClientScope;
   personId: string;
   timezone: string;
   onLockChange: (locked: boolean) => void;
+  requestId?: string;
 }) {
   const { t } = useTranslation(),
     router = useRouter();
@@ -64,8 +66,8 @@ export function MemberPrivateLessonsContent({
   const retryButton = useRef<HTMLButtonElement>(null);
   const prefix = ["member-private-lessons", scope.accountId, scope.orgId, scope.centerId, personId];
   const list = useQuery({
-    queryKey: [...prefix, "list", cursors.at(-1)],
-    queryFn: () => readOwnRequests(scope, personId, cursors.at(-1)),
+    queryKey: [...prefix, "list", cursors.at(-1), requestId],
+    queryFn: () => readOwnRequests(scope, personId, cursors.at(-1), requestId),
     retry: false,
   });
   const disciplines = useQuery({

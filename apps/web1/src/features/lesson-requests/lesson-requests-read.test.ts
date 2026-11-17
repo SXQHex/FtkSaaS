@@ -46,3 +46,20 @@ it("rejects cursor repetition before treating the page as an empty success", asy
     "LESSON_REQUEST_PAGE_UNAVAILABLE",
   );
 });
+it("requests only the deep-linked native ID and refuses another or absent target", async () => {
+  const requestId = "019ab7b0-0000-7000-8000-000000000101";
+  call.mockResolvedValue({ items: [], next_cursor: null, lesson_request_summary: summary });
+  await expect(readLessonRequests(scope, undefined, "all", requestId)).rejects.toThrow(
+    "LESSON_REQUEST_SOURCE_UNAVAILABLE",
+  );
+  expect(call).toHaveBeenLastCalledWith(
+    "management_state_get_v1",
+    expect.objectContaining({
+      operation: "lesson_request_create_v1",
+      selector: {
+        operation: "lesson_request_create_v1",
+        key: { status: "all", include_summary: true, lesson_request_id: requestId },
+      },
+    }),
+  );
+});

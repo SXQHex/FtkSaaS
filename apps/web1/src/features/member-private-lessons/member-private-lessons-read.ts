@@ -8,18 +8,30 @@ const common = (scope: ClientScope) => ({
   org_id: scope.orgId,
   center_id: scope.centerId,
 });
-export async function readOwnRequests(scope: ClientScope, personId: string, cursor?: string) {
+export async function readOwnRequests(
+  scope: ClientScope,
+  personId: string,
+  cursor?: string,
+  requestId?: string,
+) {
   z.uuid().parse(personId);
   const backend = await scopedBackend(scope);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     operation: "lesson_request_create_v1",
-    selector: { operation: "lesson_request_create_v1", key: { person_id: personId } },
+    selector: {
+      operation: "lesson_request_create_v1",
+      key: {
+        person_id: personId,
+        ...(requestId ? { lesson_request_id: z.uuid().parse(requestId) } : {}),
+      },
+    },
     page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
   const items = page.items.map((row) => requestDetail(row, scope, "lesson_request_create_v1"));
   if (
     items.length > 20 ||
+    (requestId && (items.length !== 1 || items[0]!.id !== requestId || !!page.next_cursor)) ||
     items.some((row) => row.person_id !== personId || row.format !== "private") ||
     new Set(items.map((row) => row.id)).size !== items.length ||
     (cursor && page.next_cursor === cursor)

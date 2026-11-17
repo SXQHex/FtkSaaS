@@ -153,3 +153,24 @@ it("rejects a cross-person list and mismatched result receipt", async () => {
   });
   await expect(readOwnRequestReceipt(intent)).rejects.toThrow("OWN_REQUEST_RECEIPT_UNAVAILABLE");
 });
+it("deep-linked own request uses exact native read ID and preserves self ownership checks", async () => {
+  mock.call.mockResolvedValue(page(before, "lesson_request_create_v1"));
+  await expect(readOwnRequests(scope, personId, undefined, before.id)).resolves.toMatchObject({
+    items: [before],
+  });
+  expect(mock.call).toHaveBeenLastCalledWith(
+    "management_state_get_v1",
+    expect.objectContaining({
+      selector: {
+        operation: "lesson_request_create_v1",
+        key: { person_id: personId, lesson_request_id: before.id },
+      },
+    }),
+  );
+  await expect(readOwnRequests(scope, personId, undefined, id(99))).rejects.toThrow(
+    "OWN_REQUEST_SOURCE_UNAVAILABLE",
+  );
+  await expect(readOwnRequests(scope, id(99), undefined, before.id)).rejects.toThrow(
+    "OWN_REQUEST_SOURCE_UNAVAILABLE",
+  );
+});

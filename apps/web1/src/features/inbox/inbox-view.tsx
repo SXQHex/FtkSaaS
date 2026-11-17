@@ -20,7 +20,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
-import { Textarea } from "../../components/ui/textarea";
+import { Checkbox } from "../../components/ui/checkbox";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
@@ -55,14 +55,12 @@ export function InboxView({
   detailNotice,
   pagination,
   sourceAction,
-  replyEnabled = false,
-  reply = "",
-  onReply,
-  onSend,
-  onComplete,
-  canComplete = false,
   onUnread,
   canUnread = false,
+  checked = [],
+  onCheck,
+  summary,
+  onSearch,
 }: {
   rows: InboxRow[] | null;
   selected: InboxRow | null;
@@ -82,14 +80,12 @@ export function InboxView({
   detailNotice?: ReactNode;
   pagination?: ReactNode;
   sourceAction?: ReactNode;
-  replyEnabled?: boolean;
-  reply?: string;
-  onReply?: (value: string) => void;
-  onSend?: () => void;
-  onComplete?: () => void;
-  canComplete?: boolean;
   onUnread?: () => void;
   canUnread?: boolean;
+  checked?: string[];
+  onCheck?: (id: string, checked: boolean) => void;
+  summary?: { total: number; unread: number; pending: number };
+  onSearch?: () => void;
 }) {
   const { t } = useTranslation(),
     heading = useRef<HTMLHeadingElement>(null),
@@ -110,7 +106,8 @@ export function InboxView({
           <p className="mt-1 text-sm text-muted-foreground">{t(($) => $.inbox.description)}</p>
         </div>
         <Button variant="outline" isDisabled={locked || !canMarkAll} onPress={onMarkAll}>
-          {t(($) => $.inbox.markAll)}
+          {t(($) => $.inbox.markSelected)}
+          {checked.length > 0 && <Badge variant="secondary">{checked.length}</Badge>}
         </Button>
       </header>
       {notice}
@@ -121,19 +118,30 @@ export function InboxView({
               <h2>{t(($) => $.inbox.messages)}</h2>
             </CardTitle>
             <div className="flex min-w-0 flex-col gap-3">
-              <Field>
-                <FieldLabel htmlFor="inbox-search" className="sr-only">
-                  {t(($) => $.inbox.search)}
-                </FieldLabel>
-                <Input
-                  id="inbox-search"
-                  type="search"
-                  value={query}
-                  placeholder={t(($) => $.inbox.search)}
-                  disabled={locked || !advancedAvailable}
-                  onChange={(event) => onQuery(event.target.value)}
-                />
-              </Field>
+              <form
+                className="flex min-w-0 items-end gap-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  onSearch?.();
+                }}
+              >
+                <Field className="min-w-0 flex-1">
+                  <FieldLabel htmlFor="inbox-search" className="sr-only">
+                    {t(($) => $.inbox.search)}
+                  </FieldLabel>
+                  <Input
+                    id="inbox-search"
+                    type="search"
+                    value={query}
+                    placeholder={t(($) => $.inbox.search)}
+                    disabled={locked || !advancedAvailable}
+                    onChange={(event) => onQuery(event.target.value)}
+                  />
+                </Field>
+                <Button type="submit" variant="outline" isDisabled={locked || !advancedAvailable}>
+                  {t(($) => $.inbox.searchSubmit)}
+                </Button>
+              </form>
               <ToggleGroup
                 aria-label={t(($) => $.inbox.filter)}
                 selectionMode="single"
@@ -148,11 +156,21 @@ export function InboxView({
               >
                 {(["all", "unread", "todo"] as const).map((value) => (
                   <ToggleGroupItem
+                    aria-label={t(($) => $.inbox.filters[value])}
                     id={value}
                     key={value}
                     isDisabled={locked || (value === "todo" && !advancedAvailable)}
                   >
                     {t(($) => $.inbox.filters[value])}
+                    {summary && (
+                      <Badge variant="secondary">
+                        {
+                          summary[
+                            value === "all" ? "total" : value === "unread" ? "unread" : "pending"
+                          ]
+                        }
+                      </Badge>
+                    )}
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
@@ -174,6 +192,14 @@ export function InboxView({
                     variant={selected?.id === row.id ? "muted" : "outline"}
                     size="sm"
                   >
+                    {onCheck && (
+                      <Checkbox
+                        aria-label={t(($) => $.inbox.selectMessage, { title: row.title })}
+                        isSelected={checked.includes(row.id)}
+                        isDisabled={locked}
+                        onChange={(value) => onCheck(row.id, value)}
+                      />
+                    )}
                     <ItemContent className="min-w-0">
                       <ItemTitle className="w-full">
                         <Button
@@ -202,7 +228,7 @@ export function InboxView({
                         {row.actionState && <Badge variant="outline">{row.actionState}</Badge>}
                       </div>
                     </ItemContent>
-                    <ItemActions className="self-start text-xs text-muted-foreground tabular-nums">
+                    <ItemActions className="max-w-full self-start text-xs text-muted-foreground tabular-nums">
                       {row.created}
                     </ItemActions>
                   </Item>
@@ -269,35 +295,9 @@ export function InboxView({
                     ))}
                   </dl>
                   {detailNotice}
-                  <Field>
-                    <FieldLabel htmlFor="inbox-reply">{t(($) => $.inbox.reply)}</FieldLabel>
-                    <Textarea
-                      id="inbox-reply"
-                      value={reply}
-                      disabled={locked || !replyEnabled}
-                      onChange={(event) => onReply?.(event.target.value)}
-                      placeholder={t(($) => $.inbox.replyPlaceholder)}
-                      rows={3}
-                    />
-                  </Field>
                 </CardContent>
                 <CardFooter className="flex flex-wrap items-center gap-2">
                   {sourceAction}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    isDisabled={locked || !canComplete}
-                    onPress={onComplete}
-                  >
-                    {t(($) => $.inbox.complete)}
-                  </Button>
-                  <Button
-                    size="sm"
-                    isDisabled={locked || !replyEnabled || !reply.trim()}
-                    onPress={onSend}
-                  >
-                    {t(($) => $.inbox.send)}
-                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

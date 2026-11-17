@@ -1347,10 +1347,11 @@ export default interface Resources {
         "running": "İşleniyor",
         "succeeded": "Sağlayıcıya kabul edildi"
       },
-      "limitHint": "Arama, toplu işlem ve yanıt henüz kullanılamıyor. Okundu işareti kaynak işini tamamlamaz.",
+      "limitHint": "Okundu işareti kaynak işini tamamlamaz. Toplu işlem yalnız seçtiğin iletilere uygulanır.",
       "loading": "İletiler okunuyor…",
       "markAll": "Tümünü okundu yap",
       "markRead": "Okundu yap",
+      "markSelected": "Seçilenleri okundu yap",
       "markUnread": "Okunmadı yap",
       "messages": "İletiler",
       "notification": "Bildirim",
@@ -1363,12 +1364,28 @@ export default interface Resources {
       "scope": "Kapsam",
       "scopeHint": "Kuruluş kapsamındaki kendi bildirimlerin. Saatler {{timezone}} ile gösterilir.",
       "search": "İletilerde ara",
+      "searchSubmit": "Ara",
+      "selectMessage": "Seç: {{title}}",
       "send": "Yanıtla",
-      "sourceUnavailable": "Bu bildirimin güvenli kaynak bağlantısı henüz paylaşılmıyor.",
+      "sourceDetail": "Kaynak ayrıntısı",
+      "sourceFlow": "Kaynak işlemine git",
+      "sourceKinds": {
+        "activity": "CRM takibi",
+        "offer": "Yer teklifi",
+        "request": "Özel ders talebi"
+      },
+      "sourceOpen": "Kaynağı aç",
+      "sourceUnavailable": "Kaynak şu anda erişilebilir değil.",
       "title": "Gelen kutusu",
       "titleMissing": "Başlık paylaşılmıyor",
       "unknown": "Bilgi paylaşılmıyor",
-      "unread": "Okunmamış"
+      "unread": "Okunmamış",
+      "workStates": {
+        "completed": "Tamamlandı",
+        "informational": "Bilgilendirme",
+        "pending": "İşlem bekliyor",
+        "unavailable": "Kaynak erişilemiyor"
+      }
     },
     "instructorEarnings": {
       "agreement": "Geçerli anlaşman",

@@ -28,6 +28,7 @@ export function MemberPrivateLessonsRoutePage() {
           key={`${scope.orgId}:${scope.centerId}:${personId}`}
           scope={scope}
           personId={personId}
+          requestId={search.request}
           timezone={timezone}
           onLockChange={onLockChange}
         />

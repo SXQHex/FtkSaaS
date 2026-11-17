@@ -2,10 +2,13 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+const secondId = "019ab7b0-0000-7000-8000-000000000202";
+const sourceId = "019ab7b0-0000-7000-8000-000000000203";
+const sourceCenter = "019ab7b0-0000-7000-8000-000000000204";
 const id = "019ab7b0-0000-7000-8000-000000000201";
 async function fixture(
   page: Page,
-  mode: "normal" | "unknown" | "unread" | "denied" | "stale" = "normal",
+  mode: "normal" | "unknown" | "unread" | "denied" | "stale" | "batch" | "source" = "normal",
 ) {
   await mockStudio(page);
   const state = {
@@ -17,10 +20,27 @@ async function fixture(
     failResult: false,
     denied: mode === "denied",
     advanced: false,
+    secondRead: false,
+    secondVersion: 9,
+    keys: new Set<string>(),
+    sourceReads: [] as Record<string, unknown>[],
+    sourceDenied: false,
   };
   const row = () => ({
     id,
     kind: "private_native_kind",
+    version: state.version,
+    work:
+      mode === "source"
+        ? {
+            state: "pending",
+            center_id: sourceCenter,
+            selector: {
+              operation: "crm_activity_save_v1",
+              key: { activity_id: sourceId, person_id: I.self },
+            },
+          }
+        : { state: "informational", center_id: null, selector: null },
     payload: {
       template_key: "private_native_template",
       subject: { type: "notifications", id },
@@ -55,12 +75,75 @@ async function fixture(
       state.lists.push(r);
       if (state.denied) return reject("FORBIDDEN");
       return send({
-        items: r.unread_only && state.read ? [] : [row()],
+        items: (r.work_state === "pending" && mode !== "source"
+          ? []
+          : [
+              row(),
+              ...(mode === "batch"
+                ? [
+                    {
+                      ...row(),
+                      id: secondId,
+                      payload: { ...row().payload, title: "İkinci bildirim" },
+                      version: state.secondVersion,
+                      read_at: state.secondRead ? "2026-11-16T12:05:00Z" : null,
+                    },
+                  ]
+                : []),
+            ]
+        ).filter(
+          (n) =>
+            (!r.unread_only || !n.read_at) &&
+            (!r.query || n.payload.title.toLowerCase().includes(r.query.toLowerCase())),
+        ),
+        summary: {
+          total: 90,
+          unread: 20,
+          pending: 10,
+          completed: 30,
+          informational: 40,
+          unavailable: 10,
+        },
         next_cursor: null,
         as_of: "2026-11-16T12:05:00Z",
       });
     }
-    if (op === "management_state_get_v1" && r.operation === "notification_mark_read_v1") {
+    if (op === "management_state_get_v1" && r.operation === "crm_activity_save_v1") {
+      state.sourceReads.push(r);
+      if (state.sourceDenied) return reject("FORBIDDEN");
+      expect(r.center_id).toBe(sourceCenter);
+      expect(r.selector).toEqual({
+        operation: "crm_activity_save_v1",
+        key: { activity_id: sourceId, person_id: I.self },
+      });
+      return send({
+        items: [
+          {
+            operation: r.operation,
+            exists: true,
+            entity: { type: "crm_activities", id: sourceId },
+            state: "completed",
+            versions: [{ entity: { type: "crm_activities", id: sourceId }, version: 11 }],
+            current: {
+              operation: r.operation,
+              values: {
+                activity_id: sourceId,
+                person_id: I.self,
+                kind: "followup",
+                note: "<img> kaynak metni",
+                due_at: null,
+              },
+            },
+          },
+        ],
+        next_cursor: null,
+        as_of: "2026-11-16T12:05:00Z",
+      });
+    }
+    if (
+      op === "management_state_get_v1" &&
+      ["notification_mark_read_v1", "notifications_read_set_v1"].includes(r.operation)
+    ) {
       if (state.failResult) {
         state.failResult = false;
         return reject("SERVICE_UNAVAILABLE", true);
@@ -69,40 +152,61 @@ async function fixture(
         state.advanced = true;
       } else if (mode === "stale" && state.advanced && !state.writes.length) state.version = 8;
       return send({
-        items: [
-          {
+        items: (r.operation === "notification_mark_read_v1"
+          ? [id]
+          : r.selector.key.notification_ids
+        )
+          .map((notificationId: string) => ({
             operation: r.operation,
             exists: true,
-            entity: { type: "notifications", id },
-            state: state.read ? "read" : "unread",
-            versions: [{ entity: { type: "notifications", id }, version: state.version }],
-            current: { operation: r.operation, values: { notification_id: id } },
-          },
-        ],
+            entity: { type: "notifications", id: notificationId },
+            state: (notificationId === id ? state.read : state.secondRead) ? "read" : "unread",
+            versions: [
+              {
+                entity: { type: "notifications", id: notificationId },
+                version: notificationId === id ? state.version : state.secondVersion,
+              },
+            ],
+            current:
+              r.operation === "notification_mark_read_v1"
+                ? { operation: r.operation, values: { notification_id: notificationId } }
+                : null,
+          }))
+          .reverse(),
         next_cursor: null,
         as_of: "2026-11-16T12:05:00Z",
       });
     }
-    if (op === "notification_mark_read_v1") {
+    if (op === "notifications_read_set_v1") {
       state.writes.push(r);
-      expect(r.notification_id).toBe(id);
-      if (!state.effects) {
-        expect(r.expected_version).toBe(7);
+      if (!state.keys.has(r.operation_key)) {
+        for (const selected of r.notifications)
+          expect(selected.expected_version).toBe(
+            selected.id === id ? state.version : state.secondVersion,
+          );
+        state.keys.add(r.operation_key);
         state.effects++;
-        state.version++;
-        state.read = true;
+        for (const selected of r.notifications) {
+          if (selected.id === id) {
+            state.version++;
+            state.read = r.read;
+          } else {
+            state.secondVersion++;
+            state.secondRead = r.read;
+          }
+        }
         if (mode === "unknown") return route.abort("failed");
         if (mode === "unread") state.failResult = true;
       }
       return send({
         operation_id: I.role,
-        primary_id: id,
+        primary_id: r.notifications[0].id,
         version: state.version,
         replayed: false,
         related: [],
       });
     }
-    if (op === "operation_status_get_v1" && r.operation === "notification_mark_read_v1")
+    if (op === "operation_status_get_v1" && r.operation === "notifications_read_set_v1")
       return send({
         operation: r.operation,
         key: r.key,
@@ -121,20 +225,22 @@ async function fixture(
   await expect(page.getByRole("heading", { name: "Gelen kutusu", exact: true })).toBeVisible();
   return state;
 }
-test("inbox shows native copy safely, keeps unsupported actions disabled, and restores mobile list focus", async ({
+test("inbox shows native copy safely, enables native discovery, and restores mobile list focus", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await fixture(page);
-  await expect(page.getByRole("searchbox", { name: "İletilerde ara", exact: true })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Tümünü okundu yap", exact: true })).toBeDisabled();
+  await expect(page.getByRole("searchbox", { name: "İletilerde ara", exact: true })).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "Seçilenleri okundu yap", exact: true }),
+  ).toBeDisabled();
   await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Örnek bildirim", exact: true })).toBeFocused();
   await expect(page.locator("aside img")).toHaveCount(0);
   await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
     "Gecikti",
   );
-  await expect(page.getByRole("button", { name: "Yanıtla", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Yanıtla", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Gelen kutusu", exact: true }).click();
   await expect(page.getByRole("button", { name: "Örnek bildirim", exact: true })).toBeFocused();
   expect(state.writes).toHaveLength(0);
@@ -149,7 +255,10 @@ test("inbox unread filter stays native and a reviewed click uses actual version 
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
-  expect(state.writes[0]).toMatchObject({ expected_version: 7, notification_id: id });
+  expect(state.writes[0]).toMatchObject({
+    read: true,
+    notifications: [{ expected_version: 7, id }],
+  });
   expect(state.lists.some((r) => r.unread_only === true)).toBe(true);
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeDisabled();
 });
@@ -208,5 +317,95 @@ test("inbox global entry resolves its native workspace before enabling the scope
   await page.goto(`${origin}/inbox`);
   await expect(page).toHaveURL(`${origin}/inbox?org=${I.org}&center=${I.center}`);
   await expect(page.getByRole("button", { name: "Örnek bildirim", exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+});
+
+test("inbox explicit selection uses atomic batch and reverse read remains a separate reviewed command", async ({
+  page,
+}) => {
+  const state = await fixture(page, "batch");
+  await page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }).focus();
+  await page.keyboard.press("Space");
+  await page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }).focus();
+  await page.keyboard.press("Space");
+  await page.getByRole("button", { name: /Seçilenleri okundu yap/ }).click();
+  await expect(
+    page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  expect(state.writes[0]).toMatchObject({
+    read: true,
+    notifications: [
+      { id, expected_version: 7 },
+      { id: secondId, expected_version: 9 },
+    ],
+  });
+  await expect(
+    page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }),
+  ).not.toBeChecked();
+  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
+  await page.getByRole("button", { name: "Okunmadı yap", exact: true }).click();
+  await expect.poll(() => state.writes.length).toBe(2);
+  await expect(
+    page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes[1]).toMatchObject({
+    read: false,
+    notifications: [{ id, expected_version: 8 }],
+  });
+  expect(state.writes[1]!.operation_key).not.toBe(state.writes[0]!.operation_key);
+  expect(state.effects).toBe(2);
+});
+test("inbox native search and pending filter reset explicit selection and preserve authoritative summary", async ({
+  page,
+}) => {
+  const state = await fixture(page, "batch");
+  await page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }).focus();
+  await page.keyboard.press("Space");
+  await page.getByRole("searchbox", { name: "İletilerde ara", exact: true }).fill("İkinci");
+  expect(state.lists.some((r) => r.query === "İkinci")).toBe(false);
+  await page.getByRole("button", { name: "Ara", exact: true }).click();
+  await expect(page.getByRole("button", { name: "İkinci bildirim", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Seçilenleri okundu yap/ })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: "Tümü", exact: true })).toContainText("90");
+  await page.getByRole("radio", { name: "İşlem bekleyen", exact: true }).click();
+  await expect.poll(() => state.lists.at(-1)?.work_state).toBe("pending");
+  expect(state.lists.at(-1)).toMatchObject({
+    query: "İkinci",
+    include_work: true,
+    include_summary: true,
+    page: { limit: 20, sort: "created_at_asc" },
+  });
+  expect(state.writes).toHaveLength(0);
+});
+test("inbox reads exact live source in returned center before offering existing flow without writing", async ({
+  page,
+}) => {
+  const state = await fixture(page, "source");
+  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
+  expect(state.sourceReads).toHaveLength(0);
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  const source = page.getByRole("region", { name: "Kaynak ayrıntısı", exact: true });
+  await expect(source).toContainText("Tamamlandı");
+  await expect(source).toContainText("<img> kaynak metni");
+  await expect(source.locator("img")).toHaveCount(0);
+  await expect(
+    source.getByRole("link", { name: "Kaynak işlemine git", exact: true }),
+  ).toHaveAttribute("href", `/o/${I.org}/c/${sourceCenter}/people/${I.self}`);
+  expect(state.sourceReads).toHaveLength(1);
+  expect(state.writes).toHaveLength(0);
+});
+
+test("inbox hides a previously available source flow when its explicit reread loses permission", async ({
+  page,
+}) => {
+  const state = await fixture(page, "source");
+  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Kaynak işlemine git", exact: true })).toBeVisible();
+  state.sourceDenied = true;
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await expect(page.getByText("Kaynak şu anda erişilebilir değil.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Kaynak işlemine git", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
 });

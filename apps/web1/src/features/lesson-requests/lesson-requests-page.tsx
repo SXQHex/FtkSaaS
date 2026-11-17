@@ -1,5 +1,11 @@
 import { useCallback, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  useLoaderData,
+  useParams,
+  useNavigate,
+  useRouter,
+  useSearch,
+} from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
@@ -11,6 +17,7 @@ import type { AccountView } from "../../lib/api-contracts/generated";
 
 export function LessonRequestsRoutePage() {
   const account = useLoaderData({ from: "/o/$orgId/c/$centerId/requests" });
+  const { request } = useSearch({ from: "/o/$orgId/c/$centerId/requests" });
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/requests" });
   return (
     <LessonRequestsPage
@@ -18,6 +25,7 @@ export function LessonRequestsRoutePage() {
       account={account}
       orgId={orgId}
       centerId={centerId}
+      requestId={request}
     />
   );
 }
@@ -25,10 +33,12 @@ function LessonRequestsPage({
   account,
   orgId,
   centerId,
+  requestId,
 }: {
   account: AccountView;
   orgId: string;
   centerId: string;
+  requestId?: string;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -106,6 +116,7 @@ function LessonRequestsPage({
                 }}
                 onLockChange={setLocked}
                 preservePending={locked}
+                requestId={requestId}
               />
             ) : (
               <div className="p-6">

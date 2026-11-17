@@ -16,17 +16,20 @@ export function LessonRequestsContent({
   scope,
   onLockChange,
   preservePending = false,
+  requestId,
 }: {
   scope: ClientScope;
   onLockChange: (locked: boolean) => void;
   preservePending?: boolean;
+  requestId?: string;
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [pageIndex, setPageIndex] = useState(0);
-  const [filter, setFilter] = useState<RequestFilter>("pending");
+  const [filter, setFilter] = useState<RequestFilter>(requestId ? "all" : "pending");
+  const [focusedRequest, setFocusedRequest] = useState(requestId);
   const [locked, setLocked] = useState(false);
   // The selected snapshot outlives list refreshes, including unknown writer outcomes.
   const [selected, setSelected] = useState<{ detail: LessonRequestView; name: string }>();
@@ -42,9 +45,9 @@ export function LessonRequestsContent({
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
       : undefined;
   const query = useQuery({
-    queryKey: [...prefix, filter, cursors[pageIndex]],
+    queryKey: [...prefix, filter, cursors[pageIndex], focusedRequest],
     queryFn: async () => {
-      const result = await readLessonRequests(scope, cursors[pageIndex], filter);
+      const result = await readLessonRequests(scope, cursors[pageIndex], filter, focusedRequest);
       if (result.next_cursor && cursors.slice(0, pageIndex + 1).includes(result.next_cursor))
         throw new Error("LESSON_REQUEST_PAGE_UNAVAILABLE");
       return result;
@@ -130,7 +133,8 @@ export function LessonRequestsContent({
       <LessonRequestsView
         filter={filter}
         onFilter={(value) => {
-          if (locked || value === filter) return;
+          if (locked || (value === filter && !focusedRequest)) return;
+          setFocusedRequest(undefined);
           setFilter(value);
           setCursors([undefined]);
           setPageIndex(0);
