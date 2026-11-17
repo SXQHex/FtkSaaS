@@ -934,7 +934,8 @@
         "freeze_cancel_preview_v1",
         "freeze_cancel_apply_v1",
         "member_finance_currencies_get_v1",
-        "member_document_contexts_get_v1"
+        "member_document_contexts_get_v1",
+        "notifications_read_set_v1"
       ]
     },
     "EntityType": {
@@ -4822,6 +4823,12 @@
               "type": "null"
             }
           ]
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "work": {
+          "$ref": "#/$defs/NotificationSourceState"
         }
       },
       "required": [
@@ -6362,6 +6369,9 @@
         },
         "reminder_email_preference": {
           "$ref": "#/$defs/NotificationEmailPreferenceView"
+        },
+        "summary": {
+          "$ref": "#/$defs/NotificationInboxSummary"
         }
       },
       "required": [
@@ -14797,6 +14807,29 @@
         },
         "unread_only": {
           "$ref": "#/$defs/Bool"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "work_state": {
+          "enum": [
+            "all",
+            "pending",
+            "completed",
+            "informational",
+            "unavailable"
+          ]
+        },
+        "include_work": {
+          "type": "boolean",
+          "default": false
+        },
+        "include_summary": {
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -27023,6 +27056,15 @@
         },
         "waitlist_session": {
           "$ref": "#/$defs/MemberWaitlistSession"
+        },
+        "segment_match": {
+          "$ref": "#/$defs/SegmentMatchView"
+        },
+        "automation_reference": {
+          "$ref": "#/$defs/AutomationReference"
+        },
+        "automation_job": {
+          "$ref": "#/$defs/AutomationJobView"
         }
       },
       "required": [
@@ -37995,7 +38037,8 @@
         "content_catalog_save_v1",
         "product_state_set_v1",
         "freeze_cancel_preview_v1",
-        "freeze_cancel_apply_v1"
+        "freeze_cancel_apply_v1",
+        "notifications_read_set_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -39304,6 +39347,9 @@
             "include_summary": {
               "type": "boolean",
               "default": false
+            },
+            "lesson_request_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [],
@@ -39328,6 +39374,20 @@
                         "include_summary"
                       ]
                     }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "lesson_request_id"
+                ]
+              },
+              "then": {
+                "not": {
+                  "required": [
+                    "catalog"
                   ]
                 }
               }
@@ -40816,26 +40876,74 @@
           "const": "segment_save_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "segment_id": {
-              "anyOf": [
-                {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "segment_id": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/FtkUuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scope": {
+                  "$ref": "#/$defs/ConfigurationScope"
+                }
+              },
+              "required": [
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "scope": {
+                  "$ref": "#/$defs/ConfigurationScope"
+                },
+                "segment_id": {
                   "$ref": "#/$defs/FtkUuid"
                 },
-                {
-                  "type": "null"
+                "discovery": {
+                  "const": "matches"
+                },
+                "execution_center_id": {
+                  "$ref": "#/$defs/FtkUuid"
                 }
-              ]
+              },
+              "required": [
+                "scope",
+                "segment_id",
+                "discovery",
+                "execution_center_id"
+              ],
+              "additionalProperties": false
             },
-            "scope": {
-              "$ref": "#/$defs/ConfigurationScope"
+            {
+              "type": "object",
+              "properties": {
+                "scope": {
+                  "$ref": "#/$defs/ConfigurationScope"
+                },
+                "segment_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "discovery": {
+                  "const": "automations"
+                }
+              },
+              "required": [
+                "scope",
+                "segment_id",
+                "discovery"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "scope"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -40851,26 +40959,62 @@
           "const": "automation_save_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "automation_id": {
-              "anyOf": [
-                {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "automation_id": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/FtkUuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "scope": {
+                  "$ref": "#/$defs/ConfigurationScope"
+                }
+              },
+              "required": [
+                "scope"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "scope": {
+                  "$ref": "#/$defs/ConfigurationScope"
+                },
+                "automation_id": {
                   "$ref": "#/$defs/FtkUuid"
                 },
-                {
-                  "type": "null"
+                "discovery": {
+                  "const": "jobs"
+                },
+                "state": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/JobState"
+                    },
+                    {
+                      "const": "all"
+                    }
+                  ]
+                },
+                "interval": {
+                  "$ref": "#/$defs/Interval"
                 }
-              ]
-            },
-            "scope": {
-              "$ref": "#/$defs/ConfigurationScope"
+              },
+              "required": [
+                "scope",
+                "discovery"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "scope"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -42798,6 +42942,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_freeze_cancel_apply_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_notifications_read_set_v1"
         }
       ]
     },
@@ -42834,6 +42981,12 @@
         },
         "lesson_request_summary": {
           "$ref": "#/$defs/LessonRequestSummary"
+        },
+        "segment_summary": {
+          "$ref": "#/$defs/SegmentMatchSummary"
+        },
+        "automation_queue_summary": {
+          "$ref": "#/$defs/AutomationQueueSummary"
         }
       },
       "required": [
@@ -56154,6 +56307,24 @@
         },
         "retry_available": {
           "type": "boolean"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "automation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "automation_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "automation_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "configuration_creator_person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "initiator_kind": {
+          "const": "automation"
         }
       },
       "required": [
@@ -61645,7 +61816,8 @@
         "view": {
           "enum": [
             "agreements",
-            "payments"
+            "payments",
+            "earnings"
           ]
         },
         "page": {
@@ -61757,7 +61929,8 @@
         "view": {
           "enum": [
             "agreements",
-            "payments"
+            "payments",
+            "earnings"
           ]
         },
         "items": {
@@ -61769,6 +61942,9 @@
               },
               {
                 "$ref": "#/$defs/InstructorPaymentLedgerItem"
+              },
+              {
+                "$ref": "#/$defs/EarningView"
               }
             ]
           }
@@ -62515,6 +62691,305 @@
         "ok",
         "data",
         "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationSourceState": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "completed",
+            "informational",
+            "unavailable"
+          ]
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selector": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ManagementSelector_seat_offer_accept_v1"
+            },
+            {
+              "$ref": "#/$defs/ManagementSelector_lesson_request_create_v1"
+            },
+            {
+              "$ref": "#/$defs/ManagementSelector_crm_activity_save_v1"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "center_id",
+        "selector"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationInboxSummary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/Count"
+        },
+        "unread": {
+          "$ref": "#/$defs/Count"
+        },
+        "pending": {
+          "$ref": "#/$defs/Count"
+        },
+        "completed": {
+          "$ref": "#/$defs/Count"
+        },
+        "informational": {
+          "$ref": "#/$defs/Count"
+        },
+        "unavailable": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "total",
+        "unread",
+        "pending",
+        "completed",
+        "informational",
+        "unavailable"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationReadSelection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "id",
+        "expected_version"
+      ],
+      "additionalProperties": false
+    },
+    "Request_notifications_read_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "read": {
+          "$ref": "#/$defs/Bool"
+        },
+        "notifications": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/NotificationReadSelection"
+          }
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "read",
+        "notifications"
+      ],
+      "additionalProperties": false
+    },
+    "Success_notifications_read_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "SegmentMatchView": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "person_id",
+        "display_name"
+      ],
+      "additionalProperties": false
+    },
+    "AutomationReference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "enabled": {
+          "$ref": "#/$defs/Bool"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "name",
+        "enabled"
+      ],
+      "additionalProperties": false
+    },
+    "SegmentMatchSummary": {
+      "type": "object",
+      "properties": {
+        "audience_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "matched_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "using_automations": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "audience_count",
+        "matched_count",
+        "using_automations"
+      ],
+      "additionalProperties": false
+    },
+    "AutomationQueueSummary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/Count"
+        },
+        "pending": {
+          "$ref": "#/$defs/Count"
+        },
+        "running": {
+          "$ref": "#/$defs/Count"
+        },
+        "retry_wait": {
+          "$ref": "#/$defs/Count"
+        },
+        "succeeded": {
+          "$ref": "#/$defs/Count"
+        },
+        "failed": {
+          "$ref": "#/$defs/Count"
+        },
+        "cancelled": {
+          "$ref": "#/$defs/Count"
+        },
+        "notifications_created": {
+          "$ref": "#/$defs/Count"
+        },
+        "followups_created": {
+          "$ref": "#/$defs/Count"
+        },
+        "email_delivery": {
+          "const": "not_supported"
+        }
+      },
+      "required": [
+        "total",
+        "pending",
+        "running",
+        "retry_wait",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "notifications_created",
+        "followups_created",
+        "email_delivery"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_notifications_read_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "notifications_read_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "notification_ids": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            }
+          },
+          "required": [
+            "notification_ids"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
       ],
       "additionalProperties": false
     }
@@ -86417,7 +86892,8 @@
           "instructor_agreement_accept_v1",
           "session_change_preview_v1",
           "replacement_session_create_v1",
-          "reservation_cancel_v1"
+          "reservation_cancel_v1",
+          "notifications_read_set_v1"
         ]
       },
       {
@@ -92043,6 +92519,115 @@
         "runtime_rpc": "api_v1.member_document_contexts_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": []
+      },
+      {
+        "name": "notifications_read_set_v1",
+        "module": "M10",
+        "features": [
+          "F26"
+        ],
+        "permission": "notification.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_notifications_read_set"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_notifications_read_set"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "single",
+        "transaction_guarantee": "Atomic notifications.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transition": {
+          "effect": "notification_mark_read_append_or_explicit_update",
+          "from": [],
+          "to": [],
+          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_maintenance",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "required_feature_gates_separate_from_references",
+          "selected_batch_all_or_nothing",
+          "every_selected_row_version",
+          "read_state_is_not_work_completion",
+          "no_notification_or_outbox_from_read_state"
+        ],
+        "audit": true,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "each selected notifications[].expected_version",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F26"
+        ],
+        "runtime_required_features": [
+          "F26"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "notifications",
+          "version_mode": "append_or_current_scope_lock",
+          "version_field": null,
+          "read_operation": "notifications_list_v1",
+          "atomic_effects": [
+            "notifications.versioned_batch_read_state",
+            "receipt",
+            "audit"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_notifications_read_set"
+          }
+        },
+        "runtime_limits": [
+          "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/notifications_read_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/notifications_read_set_v1",
+        "runtime_rpc": "api_v1.notifications_read_set_v1"
       }
     ],
     "policy_value_map": {
@@ -105297,18 +105882,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_segment_save_v1/properties/key/properties/segment_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementSelector_automation_save_v1/properties/key/properties/automation_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/ManagementSelector_notification_mark_read_v1/properties/key/properties/notification_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -108763,6 +109336,120 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_segment_save_v1/properties/key/oneOf/0/properties/segment_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_segment_save_v1/properties/key/oneOf/1/properties/segment_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_segment_save_v1/properties/key/oneOf/1/properties/execution_center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_segment_save_v1/properties/key/oneOf/2/properties/segment_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_automation_save_v1/properties/key/oneOf/0/properties/automation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_automation_save_v1/properties/key/oneOf/1/properties/automation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationJobView/properties/automation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationJobView/properties/configuration_creator_person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/NotificationSourceState/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/NotificationReadSelection/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_notifications_read_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SegmentMatchView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationReference/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_notifications_read_set_v1/properties/key/properties/notification_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_lesson_request_create_v1/properties/key/properties/lesson_request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -109248,13 +109935,14 @@
         "freeze_cancel_preview_v1",
         "freeze_cancel_apply_v1",
         "member_finance_currencies_get_v1",
-        "member_document_contexts_get_v1"
+        "member_document_contexts_get_v1",
+        "notifications_read_set_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 173,
+      "migration_count": 177,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -109964,7 +110652,8 @@
         "freeze_cancel_apply_v1",
         "instructor_account_get_v1",
         "member_finance_currencies_get_v1",
-        "member_document_contexts_get_v1"
+        "member_document_contexts_get_v1",
+        "notifications_read_set_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -111607,7 +112296,8 @@
           "notifications_list_v1",
           "notification_mark_read_v1",
           "notification_preferences_set_v1",
-          "outbox_deliver_v1"
+          "outbox_deliver_v1",
+          "notifications_read_set_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -111617,7 +112307,8 @@
           "notifications_list_v1",
           "notification_mark_read_v1",
           "notification_preferences_set_v1",
-          "outbox_deliver_v1"
+          "outbox_deliver_v1",
+          "notifications_read_set_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],

@@ -1,3 +1,4 @@
+import {compactValidatorErrors} from './compact-validator-errors.mjs';
 import fs from 'node:fs';import assert from 'node:assert/strict';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import standalone from 'ajv/dist/standalone/index.js';
 const contract=JSON.parse(fs.readFileSync('supabase/functions/backend-v1/contract.json'));
 // Ajv retains schema annotations in standalone constants even though they do not
@@ -48,7 +49,7 @@ exports.failure_envelope='contract#/$defs/FailureEnvelope';
 for(const op of contract['x-contract'].operations){exports['request_'+op.name]='contract'+op.request.$ref;exports['success_'+op.name]='contract'+op.success.$ref;}
 const modules={'ajv/dist/runtime/ucs2length':['ucs','ajv/dist/runtime/ucs2length.js'],'ajv/dist/runtime/equal':['equal','ajv/dist/runtime/equal.js'],'ajv-formats/dist/formats':['formats','ajv-formats/dist/formats.js']};
 function writeValidators(selected,path){
- let code=standalone(ajv,selected),imports='// Generated from the authoritative closed JSON contract; no runtime schema compiler.\n';
+ let code=compactValidatorErrors(standalone(ajv,selected)),imports='// Generated from the authoritative closed JSON contract; no runtime schema compiler.\n';
  for(const [name,[binding,url]] of Object.entries(modules)){const ref='require('+JSON.stringify(name)+')';if(code.includes(ref)){imports+='import '+binding+' from '+JSON.stringify(url)+';\n';code=code.replaceAll(ref,binding);}}
  assert(!code.includes('require('));code=imports+code+'\n';
  if(process.argv.includes('--check'))assert.equal(fs.readFileSync(path,'utf8'),code,'Runtime validator drift: '+path);else fs.writeFileSync(path,code);

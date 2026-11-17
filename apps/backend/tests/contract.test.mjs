@@ -786,3 +786,4 @@ import './person-field-policy-unit.mjs';
 import './student-status-filter-unit.mjs';
 
 import './web1-review-unit.mjs';
+import './ledger-inbox-automation-unit.mjs';

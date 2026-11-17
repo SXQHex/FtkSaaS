@@ -233,4 +233,5 @@ export interface Operations {
   instructor_account_get_v1: {request: T.RequestInstructorAccountGet; response: T.SuccessInstructorAccountGet};
   member_finance_currencies_get_v1: {request: T.RequestMemberFinanceCurrenciesGet; response: T.SuccessMemberFinanceCurrenciesGet};
   member_document_contexts_get_v1: {request: T.RequestMemberDocumentContextsGet; response: T.SuccessMemberDocumentContextsGet};
+  notifications_read_set_v1: {request: T.RequestNotificationsReadSet; response: T.SuccessNotificationsReadSet};
 }
