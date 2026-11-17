@@ -5171,5 +5171,28 @@
       "stale": "Disiplin bağı değişti. Yeniden inceleyip onayla.",
       "rejected": "Disiplin bağı kaydedilemedi. Güncel kaynakları ve yetkiyi kontrol et."
     }
+  },
+  "workCalendar": {
+    "title": "Merkez çalışma saatleri",
+    "description": "Çalışma aralıkları merkezin saat dilimindedir. Açık seansları etkileyen değişiklikler kaydedilemez; seanslar kendiliğinden iptal edilmez.",
+    "enabled": "Merkez iş takvimi kullan",
+    "rule": "Çalışma aralığı {{number}}",
+    "start": "Başlangıç saati",
+    "end": "Bitiş saati",
+    "from": "Geçerlilik başlangıcı",
+    "until": "Geçerlilik bitişi (hariç, isteğe bağlı)",
+    "midnight": "Gün sonuna kadar (24:00)",
+    "add": "Çalışma aralığı ekle",
+    "remove": "Çalışma aralığını kaldır",
+    "preservedClosures": "Kayıtlı merkez kapanışları korunur",
+    "review": "Çalışma takvimini incele",
+    "blocked": "Değişiklik açık seansları etkiliyor. Önce ilgili seansları düzenle, sonra güncel bilgileri yükle.",
+    "stale": "Çalışma takvimi değişmiş. Güncel bilgileri yükleyip yeniden incele.",
+    "invalid": "Gün, saat ve tarih aralıklarını kontrol et. Bitiş başlangıçtan sonra olmalı; geceyi aşan saatleri ayrı günlere böl. Değerler değişmediyse yeni işlem gönderilmez.",
+    "summary": "Çalışma aralığı: {{before}} → {{after}}. Merkez kapanışı: {{closuresBefore}} → {{closuresAfter}}.",
+    "noRestriction": "Ek merkez iş takvimi kısıtı yok",
+    "before": "Önceki çalışma saatleri",
+    "after": "Yeni çalışma saatleri",
+    "openEnded": "Bitiş yok"
   }
 }

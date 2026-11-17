@@ -1,3 +1,4 @@
+import { WorkCalendarEditor } from "./work-calendar-editor";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -138,6 +139,7 @@ function SettingsManagement({
   canCenter: boolean;
   onLockChange: (locked: boolean) => void;
 }) {
+  const [workCalendarOpen, setWorkCalendarOpen] = useState(false);
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
@@ -327,7 +329,21 @@ function SettingsManagement({
       politika: policies.table,
       ekip: team.table,
       sablon: notifications.table,
-      salonlar: rooms.table,
+      salonlar: rooms.table && {
+        ...rooms.table,
+        after:
+          level === "center" &&
+          document.source?.catalog.fields.some((field) => field.key === "work_calendar") ? (
+            <Button
+              type="button"
+              variant="outline"
+              isDisabled={locked}
+              onPress={() => setWorkCalendarOpen(true)}
+            >
+              {t(($) => $.workCalendar.title)}
+            </Button>
+          ) : undefined,
+      },
       gecmis: history.table,
       ...(source
         ? {
@@ -407,6 +423,17 @@ function SettingsManagement({
   }
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6">
+      {workCalendarOpen && (
+        <WorkCalendarEditor
+          key={`${scope.accountId}:${scope.orgId}:${scope.centerId}`}
+          scope={scope}
+          onClose={() => {
+            if (!locked) setWorkCalendarOpen(false);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+        />
+      )}
       {((!allowed && !(level === "organization" && organizationLoading)) || query.isError) && (
         <Alert role="alert" variant="destructive">
           <AlertDescription>
