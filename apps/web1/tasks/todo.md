@@ -13,9 +13,9 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım      | Plan | Sayfa/işlev      | Durum                         | Son doğrulama veya engel          | Sonraki eylem                                                                                                                                                                                                                                                                             |
-| --------------- | ---- | ---------------- | ----------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili otomatik paketler başarılı | Başlangıç sırası izleniyor. P01.1 kapalı; P01.4’ün native recovery/ilk parola ve posta hedefi kabulü W1-BE-36 desteğini bekliyor, P01 bütünü kapalı değil. Bağımsız sırada P03.2–P03.4 tamamlandı; sıradaki uygulanabilir iş **P03.5**. Tam Pro aday doğrulaması finalde tek kez yapılır. |
+| Aktif adım      | Plan | Sayfa/işlev      | Durum                         | Son doğrulama veya engel          | Sonraki eylem                                                                                                                                                                                                                                                                     |
+| --------------- | ---- | ---------------- | ----------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili otomatik paketler başarılı | Başlangıç sırası izleniyor. P01.1 kapalı; P01.4’ün native recovery/ilk parola ve posta hedefi kabulü W1-BE-36 desteğini bekliyor, P01 bütünü kapalı değil. Bağımsız sırada **P03 kapalı**; sıradaki uygulanabilir iş **P04.1**. Tam Pro aday doğrulaması finalde tek kez yapılır. |
 
 Git devamı: `feat/web1-pro-completion`, [PR326](https://github.com/SXQHex/FtkSaaS/pull/326). PR327’nin main kaynağı `3b4eaf28f469eef3f66be82aaa3dc65759313ac7` dala birleştirildi ve kanonik typed snapshot üretildi; aynı kaynağın CI/development kanıtı [backend talepleri kaydında](request.md). Kalan kabul, tek toplu paralel paketle yürütülür; yalnız başarısız paket düzeltmeden sonra tekrarlanır. Backend ihtiyacı yalnız request.md’ye yazılır ve uygulanabilir bağımsız işe devam edilir.
 
@@ -957,7 +957,7 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 P02/P01.5 kabulü:141 ilgili birim ve40 farklı tarayıcı senaryosu denetlendi; yeni kapsam dosyasının iki senaryosu sözlükteki gerçek kontrol etiketi düzeltildikten sonra2/2 geçti, geniş koşuda39/40 senaryo başarılıydı. Çok rol → organizasyon değişimi menüyü sıfırlar; önceki merkezin yanıtı gerçekten tamamlandıktan sonra yeni merkez korunur. Hak/kişi okumaları yeni organizasyonun canonical kişisini kullanır; geri dönüş ve erişimi kaldırılmış doğrudan URL eski kaydı açmaz. Auth/AAL2 ve eğitmen doğrudan erişim retleri aynı pakette geçti; önceki gerçek native AAL2 kanıtı E06 kaydındadır. Kaynaklar `auth-scope-transition`, `auth-flow`, `auth-workspace`, `auth-instructor-flows`, `auth-member-account`; son rapor [otomatik rapordadır](../test-reports/local-verification.md).
 
-### P03 · Tek merkez kurulumu, kaynak ve ekip
+### P03 · Tek merkez kurulumu, kaynak ve ekip (kapalı)
 
 | Önkoşul | Sözleşme                                                                                                                                                                                                                                                | Doğrulama                               |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
@@ -975,7 +975,9 @@ P03.1 kabulü: E10’un merkezsiz çalışma alanına kurulu Card/Sheet/Field/In
 - [x] **P03.4** · Eğitmen ilişkisini merkezde oluştur ve kaldır. Güncel görevlendirme seçicisi değişir, başka merkezin ilişkisi etkilenmez.
       P03.4 kabulü: Studio’nun mutation sonrası yenilemesi aynı kapsamın takvim kaynaklarını da geçersiz kılar.38 birim/18 tarayıcı ilk toplu koşuda geçti; sabit saatli aynı SPA oturumunda davet tek başına yetki açmadı, açık rol onayından sonra eğitmen görevlendirmeye geldi, sürümlü rol kaldırma/same-key recovery sonrası listeden çıktı. Başka merkez ilişkisi korundu; native kapsam/bağ/role sınırı `class-duty-management-acceptance` ve [G-PRO-03.1](#pro-kabulu) kaynak/run bağında ayrıdır. Tip/lint ve ortak Axe/reflow temiz; [otomatik rapor](../test-reports/local-verification.md).
 
-- [ ] **P03.5** · Operasyon personeline belirli bir izin ver, sonra kaldır. Personel oturumunda izinli işlem çalışır ve geri alındığında reddedilir.
+- [x] **P03.5** · Operasyon personeline belirli bir izin ver, sonra kaldır. Personel oturumunda izinli işlem çalışır ve geri alındığında reddedilir.
+
+P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sinde `person.manage` ayrı onaylarla verildi/geri alındı; güncel kişi sürümleri4→5 ve farklı işlem anahtarları doğrulandı. Ayrı staff arayüzü senaryosunda izin öncesi ve geri alındıktan sonraki açık taslak reddedildi; yalnız izin açıkken tek kişi oluştu. Sunucu sonucu bu tarayıcı testinde fixture’dır; gerçek native Pro staff aktörüyle grant → person_create → revoke → eski-key replay FORBIDDEN kabulü `class-duty-management-acceptance.mjs:120–131`, `program-session-lifecycle.test.mjs` ve [G-PRO-03.1](#pro-kabulu) kaynak/run bağında karşılanır. Tip/lint ve ortak Axe/reflow temiz; [otomatik rapor](../test-reports/local-verification.md).
 
 ### P04 · Kişi, öğrencilik ve davet
 

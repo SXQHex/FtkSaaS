@@ -204,6 +204,28 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   await expect(
     dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
   ).toBeDisabled();
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const manage = page.getByRole("checkbox", {
+    name: "Sentetik personel: Kişi yönetimi",
+    exact: true,
+  });
+  await manage.press("Space");
+  let manageReview = await confirm(page);
+  await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
+  await manageReview.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(manage).toBeChecked();
+  await manage.press("Space");
+  manageReview = await confirm(page);
+  await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
+  const changes = f.writes.filter(
+    (row) => row.op === "permission_set_v1" && row.r.permission === "person.manage",
+  );
+  expect(changes.map((row) => row.r.enabled)).toEqual([true, false]);
+  expect(changes.map((row) => row.r.expected_version)).toEqual([4, 5]);
+  expect(changes[0]!.r.operation_key).not.toBe(changes[1]!.r.operation_key);
+  expect(f.state.permissions["person.manage"]).toBe(false);
+  await manageReview.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(manage).not.toBeChecked();
 });
 test("operational team role is a separate reviewed command and native channel/template limits stay read-only on mobile", async ({
   page,
