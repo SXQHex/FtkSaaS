@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
+import { OrganizationLifecyclePanel } from "./organization-lifecycle-panel";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
 import { SettingsPublicEditor } from "./settings-public-editor";
 import type { SettingsDocumentSource } from "./settings-document";
@@ -508,6 +509,23 @@ function SettingsManagement({
           if (action.kind === "renameCenter" && level === "center") setIdentity("center");
         }}
       />
+      {section === "plan" && level === "organization" && canOrganization && (
+        <OrganizationLifecyclePanel
+          scope={scope}
+          organizationLabel={organizationLabel}
+          locked={locked}
+          onLockChange={publishLock}
+          onSaved={async () => {
+            await Promise.all([
+              queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] }),
+              queries.invalidateQueries({
+                queryKey: ["settings-subscription", scope.accountId, scope.orgId],
+              }),
+            ]);
+          }}
+          onAccessLost={accessLost}
+        />
+      )}
       {team.dialog}
       {notifications.dialog}
       {publicSettings && (

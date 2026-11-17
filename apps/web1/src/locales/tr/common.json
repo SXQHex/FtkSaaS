@@ -1933,6 +1933,27 @@
       "details": "Yönetim sınırı",
       "boundary": "Buradaki kanal bilgisi gönderim desteğidir; kişi tercihi değildir. Zorunlu işlemsel bildirimler kapatılamaz. Kişisel tercih ve sessiz saatler Hesabım ekranındadır. Merkez hatırlatmaları üç native türle sınırlıdır.",
       "platformContent": "Sistem bildirim metinleri platform içerik kataloğunda yönetilir. Organizasyon/merkez yetkisi bu metinleri okuyup düzenleme yetkisi vermez; bu kapsamda içerik veya gönderim önizlemesi üretilmez."
+    },
+    "organizationLifecycle": {
+      "title": "Organizasyon yaşam döngüsü",
+      "description": "Organizasyonu kapatmadan veya bütün verileri için silme talebi oluşturmadan önce güncel etkileri incele.",
+      "ownerOnly": "Bu işlemler yalnız organizasyon sahibine açıktır. Yetki önizlemede yeniden denetlenir.",
+      "close": "Organizasyonu kapat",
+      "delete": "Organizasyon için silme talebi",
+      "closePreview": "Kapanış önizlemesi",
+      "deletePreview": "Silme önizlemesi",
+      "previewHint": "Güncel etkileri ve engelleri incele. Ayrı onay verilmeden işlem yapılmaz. Kapatma ve silme talebi fiziksel imhanın tamamlandığı anlamına gelmez.",
+      "reason": "İşlem gerekçesi",
+      "review": "Etkileri incele",
+      "closed": "Organizasyon kapatıldı; güncel durum ve kapalı erişim modu doğrulandı.",
+      "pending": "Bu hesaba ait önceki organizasyon silme isteğinin durumu okunmalı.",
+      "resume": "Aynı isteği sürdür",
+      "resumeHint": "Önceden onaylanmış aynı organizasyon silme isteği sürdürülecek. Yeniden doğrulamadan sonra ayrıca onay ver. Yeni silme talebi oluşturulmaz.",
+      "unknown": "Yanıt alınamadı. Silme isteği tamamlanmış sayılmaz. Aynı isteği yeniden deneyerek durumunu geri al.",
+      "failed": "İşlem hazırlanamadı veya kaynak okunamadı. Gerekçeyi, silme onayını ve güncel yetkini kontrol et.",
+      "reading": "Güncel durum okunuyor…",
+      "allData": "Silme kapsamı bütün organizasyon ve merkezleridir. Kişisel kullanıcı hesabın korunur. Fiziksel imhanın tamamlanması ayrıca izlenir.",
+      "allDataTitle": "Silme kapsamı"
     }
   },
   "products": {
