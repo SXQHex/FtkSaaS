@@ -1,10 +1,11 @@
 // Page composition from official @shadcn/sidebar-07.
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
 import { readWorkspace } from "./workspace";
+import { workspaceQuery } from "./workspace-query";
 import { workspaceNavigation, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
 import { BackendError } from "../../lib/backend";
@@ -80,11 +81,8 @@ export function WorkspaceLayout({
   const organizationId = scopeControl ? scopeControl.organizationId : localOrganizationId;
   const selectedCenterId = scopeControl ? scopeControl.centerId : localCenterId;
   const [preferredView, setPreferredView] = useState<NavigationView>();
-  const scope = useQuery({
-    queryKey: ["workspace", accountId, organizationId ?? null],
-    queryFn: () => readWorkspace(accountId, organizationId),
-    retry: false,
-  });
+  const queries = useQueryClient();
+  const scope = useQuery(workspaceQuery(queries, accountId, organizationId));
   useEffect(() => {
     const error = scope.error;
     if (

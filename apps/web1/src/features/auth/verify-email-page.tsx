@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 import { useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
@@ -102,7 +103,7 @@ export function VerifyEmailPage() {
           </Alert>
         )}
         <p>
-          <a href="/login">{t(($) => $.auth.backLogin)}</a>
+          <AriaLink href="/login">{t(($) => $.auth.backLogin)}</AriaLink>
         </p>
       </div>
     </AuthLayout>

@@ -19,7 +19,7 @@ const test = base.extend<
   }
 >({
   artifact: [
-    async ({ browserName }, use) => {
+    async ({ browserName }, provide) => {
       const path = new URL("../dist/index.html", import.meta.url);
       const [html, file] = await Promise.all([readFile(path), stat(path)]);
       const source = execFileSync("git", ["rev-parse", "HEAD"], {
@@ -36,7 +36,7 @@ const test = base.extend<
         });
         const address = server.httpServer.address();
         if (!address || typeof address === "string") throw Error("STATIC_PREVIEW_UNAVAILABLE");
-        await use({
+        await provide({
           origin: `http://127.0.0.1:${address.port}`,
           browser: browserName,
           htmlHash: createHash("sha256").update(html).digest("hex"),

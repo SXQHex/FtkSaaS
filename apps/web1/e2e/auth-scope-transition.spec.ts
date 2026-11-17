@@ -273,7 +273,13 @@ test("a late previous-org calendar cannot replace the selected member, and revok
   const before = f.state.reads.filter(
     (row) => row.op === "calendar_get_v1" && row.r.org_id === I.org,
   ).length;
-  await page.goto(`${origin}/member/classes?org=${I.org}&center=${I.center}`);
+  // A direct reload starts a fresh application; wait for its authority read before inspecting options.
+  await Promise.all([
+    page.waitForResponse(
+      (response) => response.url().endsWith("/organizations_list_v1") && response.ok(),
+    ),
+    page.goto(`${origin}/member/classes?org=${I.org}&center=${I.center}`),
+  ]);
   await expect(
     page
       .getByRole("combobox", { name: common.memberReservations.chooseOrg, exact: true })

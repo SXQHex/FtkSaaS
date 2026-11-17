@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -185,9 +186,9 @@ export function RevokeOthers({ onRefresh }: { onRefresh: () => Promise<void> }) 
               </form.Field>
               <p className="text-muted-foreground">
                 {t(($) => $.sessions.googleFreshHelp)}{" "}
-                <a href="/login" className="underline">
+                <AriaLink href="/login" className="underline">
                   {t(($) => $.auth.backLogin)}
-                </a>
+                </AriaLink>
               </p>
               <Button
                 variant="outline"
