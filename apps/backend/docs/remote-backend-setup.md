@@ -25,7 +25,33 @@ Yanıt kaybında create/cancel aynı operation_key ile uzlaştırılır; başar�
 
 `node scripts/acceptance/s08-native-mfa.mjs` yalnız FTK_ACCEPTANCE_EMAIL/PASSWORD/APIKEY özel ortam girdilerini kullanır. Önceden verified MFA faktörü olan hesapta değişiklik yapmadan durur. Primary+bağımsız backup enroll/verify, weak-session reddi, primary kaldırma ve backup AAL2/backend erişimini gerçek native HTTP ile sınar; oluşturduğu faktörleri finally'de kaldırır. TOTP secret/code/JWT/kişisel payload rapora yazılmaz. Mevcut Google veya recovery/24saat nonce kabulünü ikame etmez.
 
-`scripts/acceptance/s08-hosted-password.mjs` dışa aktarılan `acceptAgedPassword` için yalnız yetkili test hesabı, gerçek24saatten eski native oturum ve gerçekten teslim edilmiş nonce gerekir. Oturum yaşı backend session projeksiyonundan okunur; Auth zamanı/TTL değiştirilmez. Bütün parola PUT denemeleri beklenmedik başarı ve belirsiz HTTP sonucunda da aday parolayı saklar; özgün parola geri yüklenip bağımsız login ile doğrulanır. Kapanmamış temizlik açık hata üretir. `s08-hosted-recovery.mjs` içindeki `acceptNativeRecovery` gerçek native recover isteğinin private PKCE verifier'ı ve aynı isteğin e-postasından alınan verify bağlantısını ister; recovery değişiminde eski parola göndermez. `acceptExpiredRecovery` en az1saat doğal yaş ve gerçek `otp_expired` callback'i ister. Bunlar CLI ortam secret'ı veya proof üretmez; girdiler yalnız ignored `.dev`/özel süreç belleğinde tutulur. Sonuçlar sır/parola/JWT/posta gövdesini içermez; testin açtığı oturumlar kapatılır. Gerçek kaynak/hosted sonuçlarının tek sahibi [güncel kabul](00-FtkSaaS-yeni-sohbet-devir.md#s10-crm-ve-s08-native-kabul-paketi) dosyasıdır.
+`scripts/acceptance/s08-hosted-password.mjs` dışa aktarılan `acceptAgedPassword` için yalnız yetkili test hesabı, gerçek24saatten eski native oturum ve gerçekten teslim edilmiş nonce gerekir. Oturum yaşı backend session projeksiyonundan okunur; Auth zamanı/TTL değiştirilmez. Bütün parola PUT denemeleri beklenmedik başarı ve belirsiz HTTP sonucunda da aday parolayı saklar; özgün parola geri yüklenip bağımsız login ile doğrulanır. Kapanmamış temizlik açık hata üretir. Gerçek kaynak/hosted sonuçlarının tek sahibi [güncel kabul](00-FtkSaaS-yeni-sohbet-devir.md#s10-crm-ve-s08-native-kabul-paketi) dosyasıdır.
+
+
+### Pinlenmiş callback ile native recovery kabulü
+
+`scripts/acceptance/s08-hosted-recovery.mjs` mevcut development Supabase projesindeki native Auth’u kullanır. Yeni Auth/RPC, reset/seed, TTL/saat değişikliği veya proof üretimi yapmaz. İki çalıştırılabilir giriş backend paketinden şöyledir; özel girdiyi terminal argümanına veya rapora yazmayın:
+
+```sh
+node scripts/acceptance/s08-hosted-recovery.mjs native < .dev/recovery-native-input.json
+node scripts/acceptance/s08-hosted-recovery.mjs expired < .dev/recovery-expired-input.json
+```
+
+Ignored `.dev` dosyalarını yalnız yetkili operatörün okuyabildiği özel izinlerle hazırlayın. Native mod JSON girdisi `email`, `password`, projenin public `apikey`, gerçek e-postadaki `link`, o recover isteğinin başlatan istemcideki private `verifier` ve `callback` alanlarını taşır. Expired mod yalnız ayrı `link`, gerçek recover isteğinin UTC `issuedAt` kaydı ve `callback` ister. Bu dosyalar ve proof/verifier/posta gövdesi repoya, argv’ye veya güvenli sonuç raporuna girmez. Import kullanan mevcut araçlar aynı açık callback girdisiyle `acceptNativeRecovery` / `acceptExpiredRecovery` veya `runRecoveryAcceptance(mode,input)` çağırabilir.
+
+Her iki modda zorunlu güvenilir pin, provider cevabından veya verify link’inden türetilmeden operatör tarafından belirlenir:
+
+```json
+{"callback":{"origin":"https://app.fethiyetango.com","path":"/auth/callback","next":"/reset-password"}}
+```
+
+Bu yalnız callback kısmıdır; gerçek private girdi ayrıca yukarıdaki alanları ister. İzinli yerel tüketicide origin açık örneğin `http://localhost:5173` olarak pinlenir; HTTP yalnız literal localhost/127.0.0.1/[::1] loopback origin’inde kabul edilir. Origin tam canonical origin olmalı; userinfo/path/query/hash içeremez. Path ve next normalize aynı uygulama path’idir; protocol-relative/mutlak dış URL veya backslash kabul edilmez. `next:null` açıkça next parametresi bulunmamasını bekleyen ayrı bir hata callback kaydı içindir; hiçbir alanın varsayılanı yoktur. Pin girilmesi native redirect allowlist/SiteURL/mail template konfigürasyonunu kendiliğinden değiştirmez; mevcut [SPA callback hazırlığı](../../../docs/client-integration.md#spa-auth-callback-hazırlığı) ayrıca sağlanmış olmalıdır.
+
+Native moddan önce yetkili sentetik hesabın başlatan istemcisinde normal SDK recovery isteği açık redirectTo ile yapılmış ve gerçek e-postası teslim edilmiş olmalıdır; link ve aynı isteğin private PKCE verifier’ı özel girdi kaynağından alınır. Runner tam origin/path/tek next eşliğini kod değişiminden önce denetler; yanlış verifier reddi, doğru PKCE/kimlik, gerçek parola değişimi, diğer session’ın Edge reddi ve tüketilmiş link/code reddini sınar. Özgün parola geri yüklenip bağımsız login ile doğrulanır; açılan current/other/restoration/verification session’ları finally local logout ile kapatılır. Temizlik başarısızlığı açık inspection hatasıdır.
+
+Expired mod için başka kullanılmamış gerçek proof, gerçek gönderim zamanı kaydıyla doğal olarak3600saniyeden fazla yaşlanmalıdır; bekleme arka planda taklit edilmez, timestamp veya Auth TTL değiştirilmez ve aynı hesabın yeni recovery isteğiyle eski proof iptal edilerek doğal süre kabulü üretilmez. Tam pinli gerçek verify302/303 callback’inde query/fragment birlikte `otp_expired` doğrulanır; yinelenen/çelişen error_code, auth code veya token içeren callback reddedilir. Başarı çıktısı yalnız güvenli durum, callback pini, gerçek yaş ve checks içerir; CLI hataları da credentials/proof/provider yanıtı içermez.
+
+Runner unit fixture’ları ve frontend otomatik callback hata testleri gerçek posta/PKCE/doğal expiry kabulü değildir. Önceki recovery/198962saniye doğal expiry kanıtı [kendi eski kaynak ve ortam kaydında](00-FtkSaaS-yeni-sohbet-devir.md#s10-crm-ve-s08-native-kabul-paketi) korunur; yeni app/loopback callback’inde tekrar edilmiş sayılmaz. Güncel tekrarın kaynak/run/ortam sonucu [W1-BE-36 devrinde](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) tutulur; bu kanıt olmadan P01/G-PRO gerçek sağlayıcı alt kontrolü kapanmaz.
 
 
 Development CD, kaynak kabulünden sonra personal-calendar dedicated Edge gateway'ini kurar. Sadece bu bearer URL transport'unda verify_jwt=false; backend-v1 hosted verify_jwt=true kalır. CI Edge Function Secrets API'sini listelemez veya yazmaz; CI token'ına bu amaçla Read/Read-write verilmez. Ayarlar operatörün Supabase projesi → Edge Functions → Secrets ekranında bir kez kurulur. Mevcut değerler/anahtarlar körlemesine değiştirilmez; imza anahtarı rotasyonu mevcut abonelikler için ayrı planlanır.

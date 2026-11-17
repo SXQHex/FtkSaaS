@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**17 Kasım Web1 görevi:** İlk34 talebin backend teslimi tamamlandı; yeni W1-BE-35 Ekip yönetici rolü keşfi mevcut roles_list_v1 filtre uzantısıyla G03 öncesinde yürür. Görev/kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery) sahibindedir. G03 kapsamı ve sonraki sıra korunur; hosted/provider ve frontend kabulü ayrıdır.
+**17 Kasım Web1 görevi:** İlk35 talebin backend kaynak/main/development teslimi tamamlandı. Yeni W1-BE-36 kabul aracı callback düzeltmesi ve P01/G-PRO gerçek sağlayıcı devamı yürür; frontend sayfa kabulü yeniden açılmaz. Görev/kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/run/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. G03 kapsamı ve sonraki sıra korunur; unit veya eski başka callback kanıtı yeni hosted kabulü değildir.
 
 **13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleriyle yürütüldü; ölçütler karşılandığından mevcut G03 sırasına dönülür. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
 

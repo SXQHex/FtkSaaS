@@ -38,7 +38,11 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] W1-BE-31 PR324 kaynak/push → aday full clean → merge/main kaynak kabulü → development teslimi. Kanıt yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-document-management); yeni hosted/provider ve frontend kabulü ayrı.
 
 - [x] W1-BE-35 kaynak/native: roles_list_v1 üzerinde mevcut rol/durum filtresi, limit öncesi kapsam ve cursor/yetki korunumu; [XREQ-069](../../../docs/requests.md#xreq-069), kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery).
-- [ ] W1-BE-35 ayrı Draft PR push → aday full clean → ayrıca yetkili merge/main/development teslimi; hosted ve frontend kabulü ayrı.
+- [x] W1-BE-35 PR327 aday/main kaynak kabulü ve development teslimi; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery), frontend kabulü ayrı.
+
+- [x] W1-BE-36 kaynak/runner: zorunlu bağımsız callback pini, private stdin native/expired CLI ve yabancı callback/gizlilik/restore unit kabulü; [XREQ-070](../../../docs/requests.md#xreq-070), kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance).
+- [ ] W1-BE-36 Draft PR push → aday CI → ayrıca yetkili merge/main/development teslimi.
+- [ ] W1-BE-36 yeni app/izinli yerel callback’te gerçek teslim/PKCE/tüketilmiş proof ve ayrı doğal expiry kaynak/run/ortam kanıtı; eski S08 kabulü korunur, P01/G-PRO gerçek sağlayıcı alt kontrolü bu yeni kanıtı bekler.
 
 ## Web1 ek backend talepleri — 15 Kasım
 

@@ -392,8 +392,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "194358eabaaaed340aee123b14ebd8c79980341c7dbfd2ca06b2c30af9b27445",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "47d6ef3515ca4d5e8c1a130f1567aae83fadd32b9d8a86bf95f90a23a3ce2012",
+        "reason": "Reviewed mandatory independent recovery callback pin, strict query/fragment target and expiry checks, existing password/session finally cleanup, sanitized private stdin development CLI and app/loopback/legacy-explicit-pin tests; provider doubles and historical hosted proof remain separate from new app acceptance."
       }
     },
     {
