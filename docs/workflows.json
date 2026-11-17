@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "7fbc7927d4d58bc0a0764b1500a921c38441380578f5d38c62213f91e38f2722",
-        "reason": "Reviewed generated contract and bundle changes for optional event registration preview context, and verified migration inventory remains append-only."
+        "fingerprint": "b23e462f4697ebee1fa10c20044432785c5b6c033db9a51db7ca8b181191f808",
+        "reason": "Verified the existing event acceptance import retains complete coverage with the updated test source hash."
       }
     },
     {

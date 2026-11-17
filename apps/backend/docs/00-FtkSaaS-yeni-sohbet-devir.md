@@ -2,7 +2,7 @@
 
 ## W1-BE-38 ilk etkinlik kaydında üyenin belge keşfi
 
-Aynı taslak PR’da [WF11 ilk kayıt akışı](../../../docs/workflows.md#wf11), mevcut native kayıt önizlemesini üyenin kendi belge dizinine bağlıyor. Ürün sürümü gerçek seçilmiş satıştan okunur. Yerel native Auth ve Edge üzerinde üyenin keşif ve kendi onayı sonrası yöneticinin ilk kaydı tamamladığı, taslak/süresi geçmiş/yabancı bağlam ve kaynağa bağlı olmayan ürün okumasının reddedildiği doğrulandı. Mevcut üye belge keşfi regresyonu ve kaynak/kapsam paketindeki 349 test geçti. Aday CI ve development teslimi bekleniyor.
+Aynı taslak PR’da [WF11 ilk kayıt akışı](../../../docs/workflows.md#wf11), mevcut native kayıt önizlemesini üyenin kendi belge dizinine bağlıyor. Ürün sürümü gerçek seçilmiş satıştan okunur. Yerel native Auth ve Edge üzerinde üyenin keşif ve kendi onayı sonrası yöneticinin ilk kaydı tamamladığı, taslak/süresi geçmiş/yabancı bağlam ve kaynağa bağlı olmayan ürün okumasının reddedildiği doğrulandı. Mevcut üye belge keşfi regresyonu ve kaynak/kapsam paketindeki 349 test geçti. [İlk aday koşusu](https://github.com/SXQHex/FtkSaaS/actions/runs/44200387134) API test envanterindeki kaynak hash eşliğinde durdu. Mevcut importun hash’i güncellendi. Yeni aday CI ve development teslimi bekleniyor.
 
 ## W1-BE-37 native parola bildirimi
 
