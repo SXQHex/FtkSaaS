@@ -25,6 +25,7 @@ import {
   BreadcrumbPage,
   BreadcrumbLink,
 } from "../../components/ui/breadcrumb";
+import { StateBanner } from "../states/state-view";
 export interface WorkspaceSelection {
   organizationId?: string;
   centerId?: string;
@@ -247,6 +248,7 @@ export function WorkspaceLayout({
             </LinkButton>
           </div>
         </header>
+        {view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />}
         {typeof children === "function"
           ? children({ organizationId: resolvedOrganizationId, centerId })
           : children}

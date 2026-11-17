@@ -123,22 +123,4 @@ export function AccountPage() {
   );
 }
 
-export function AccountErrorPage() {
-  const { t } = useTranslation();
-  const router = useRouter();
-  return (
-    <main className="mx-auto flex max-w-sm flex-col gap-4 p-6">
-      <h1 className="text-2xl font-semibold">{t(($) => $.auth.account)}</h1>
-      <Alert variant="destructive">
-        <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
-      </Alert>
-      <Button
-        onPress={() => {
-          void router.invalidate();
-        }}
-      >
-        {t(($) => $.auth.retry)}
-      </Button>
-    </main>
-  );
-}
+export { RouteErrorPage as AccountErrorPage } from "../states/route-state-pages";

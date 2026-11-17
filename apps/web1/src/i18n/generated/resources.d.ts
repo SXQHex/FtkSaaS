@@ -3807,6 +3807,134 @@ export default interface Resources {
       "upload": "Logo yükle",
       "usage": "Plan ve kullanım"
     },
+    "states": {
+      "cancel": "Vazgeç",
+      "catalog": {
+        "conflict": {
+          "description": "Güncel kaydı yeniden okuyup açıkça onaylama gerekir.",
+          "title": "Sürüm çakışması (409)"
+        },
+        "empty": {
+          "description": "İlk kullanım; uygun ilk eyleme yönlendirir.",
+          "title": "Boş: henüz kayıt yok"
+        },
+        "error": {
+          "description": "Okuma hatası ve izin verilen yeniden deneme yolu.",
+          "title": "Hata: sunucu"
+        },
+        "expired": {
+          "description": "Önizleme geçerliliği bittiğinde yeniden okuma gerekir.",
+          "title": "Onay süresi doldu"
+        },
+        "forbidden": {
+          "description": "Kaynak kapsam ve yetki kararı korunur.",
+          "title": "Yetkisiz erişim (403)"
+        },
+        "limit": {
+          "description": "Sayı ve fiyat varsaymadan gerçek sınıra yönlendirir.",
+          "title": "Plan limiti"
+        },
+        "loading": {
+          "description": "Liste ya da kart verisi gelirken iskelet görünümü.",
+          "title": "Yükleniyor"
+        },
+        "noResults": {
+          "description": "Sonuçsuz filtre, kayıt yokluğundan ayrıdır.",
+          "title": "Boş: filtre sonucu yok"
+        },
+        "notFound": {
+          "description": "Bilinmeyen adres ya da görünmeyen kayıt.",
+          "title": "Sayfa bulunamadı (404)"
+        },
+        "offline": {
+          "description": "Bağlantı durumu değişir; işlem sonucu kendiliğinden belirlenmez.",
+          "title": "Çevrimdışı"
+        },
+        "readOnly": {
+          "description": "İşlem bazlı kapılar korunur; istemci yetki üretmez.",
+          "title": "Kapalı erişim"
+        },
+        "received": {
+          "description": "Kayıtlar yeniden okunur; yeni işlem anahtarı üretilmez.",
+          "title": "Tekrar gönderim: tek sonuç"
+        }
+      },
+      "checkResult": "Sonucu kontrol et",
+      "clear": "Filtreleri temizle",
+      "closeExample": "Örneklere dön",
+      "conflictHelp": "Bu yerel örnekte iki sürümü karşılaştır. Güncel kaydı yeniden yüklemek önceki kaydı değiştirmez.",
+      "content": {
+        "conflict": {
+          "description": "Güncel kaydı yeniden oku, değişikliklerini kontrol et ve yeniden onayla.",
+          "title": "Kayıt başka biri tarafından değiştirildi"
+        },
+        "empty": {
+          "description": "İlk kaydı oluşturarak başlayabilirsin.",
+          "title": "Henüz kayıt yok"
+        },
+        "error": {
+          "description": "Bilgiler okunamadı. Bağlantını kontrol edip yeniden deneyebilirsin.",
+          "title": "Liste yüklenemedi"
+        },
+        "expired": {
+          "description": "Kayıtlar değişmiş olabilir. Güncel önizlemeyi yeniden alıp etkileri tekrar kontrol et.",
+          "title": "Onay süresi doldu"
+        },
+        "forbidden": {
+          "description": "Seçili kapsam ve yetkilerini kontrol et. Erişim gerekiyorsa stüdyo yöneticisiyle görüş.",
+          "title": "Bu sayfaya erişimin yok"
+        },
+        "limit": {
+          "description": "Bu işlem için gösterilen plan ve kullanım sınırlarını kontrol et.",
+          "title": "Plan sınırına ulaşıldı"
+        },
+        "loading": {
+          "description": "Bilgiler alınıyor.",
+          "title": "Yükleniyor"
+        },
+        "noResults": {
+          "description": "Filtreleri değiştir ya da temizle.",
+          "title": "Bu filtreye uyan kayıt yok"
+        },
+        "notFound": {
+          "description": "Bağlantı eski ya da yanlış olabilir; kayıt kaldırılmış veya görünürlüğü değişmiş olabilir.",
+          "title": "Sayfa bulunamadı"
+        },
+        "offline": {
+          "description": "Sonucu bilinmeyen bir işlemi yeniden başlatmadan önce durumunu kontrol et. Bağlantı geldiğinde okuma işlemini yeniden deneyebilirsin.",
+          "title": "Bağlantı yok"
+        },
+        "readOnly": {
+          "description": "Bu kapsamın erişim durumu değişiklikleri kısıtlıyor. Kullanılabilen işlemler kendi yetki ve plan denetimine tabidir.",
+          "title": "Panel salt okunur"
+        },
+        "received": {
+          "description": "Aynı işlem anahtarı yeni bir etki oluşturmaz. Güncel sonucu kendi işlem ekranından kontrol et.",
+          "title": "Bu işlem zaten alındı"
+        }
+      },
+      "create": "İlk kaydı oluştur",
+      "current": "Güncel değer",
+      "currentExample": "Örnek salon · sürüm 2",
+      "exampleFeedback": "Yerel örnek eylemi çalıştı; gerçek kayıt değiştirilmedi.",
+      "exampleOnly": "Yalnız yerel geliştirme örnekleri. Bu ekran gerçek veri okumaz veya işlem kaydetmez.",
+      "galleryDescription": "Yükleme, boş, hata, çakışma, limit ve erişim durumlarının ortak kalıbı.",
+      "galleryTitle": "Durum ekranları",
+      "help": "Yardım",
+      "home": "Hesabıma dön",
+      "inspectLimit": "Sınırı incele",
+      "openConflict": "Çakışmayı aç",
+      "openExample": "Ortak görünümü aç",
+      "pauseMotion": "Animasyonu durdur",
+      "previous": "Önceki değer",
+      "previousExample": "Örnek salon · sürüm 1",
+      "refreshPreview": "Önizlemeyi yenile",
+      "reload": "Güncel kaydı yükle",
+      "resumeMotion": "Animasyonu sürdür",
+      "retry": "Tekrar dene",
+      "showBanner": "Üst çubuğu göster",
+      "trace": "Destek kimliği:"
+    },
     "studio": {
       "acceptInstructorRole": "Seçili kişiye bu merkezde eğitmen rolü vermeyi onaylıyorum.",
       "accountLinkFound": "Bağ bulundu",

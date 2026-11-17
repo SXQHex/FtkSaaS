@@ -49,6 +49,11 @@ export function HelpContent() {
         void copy();
       }}
       feedback={feedback}
+      onStates={
+        import.meta.env.DEV && import.meta.env.MODE === "development"
+          ? () => window.location.assign("/login?__states_example=1")
+          : undefined
+      }
     />
   );
 }

@@ -25,6 +25,13 @@ assert.deepEqual(
   [],
   "Server, shared workspace, or reference modules entered the independent bundle",
 );
+assert.deepEqual(
+  modules.filter((id) =>
+    /src\/examples\/state-gallery\.tsx|src\/features\/states\/state-gallery-view\.tsx/.test(id),
+  ),
+  [],
+  "Local state examples entered the production bundle",
+);
 const assets = new URL("../dist/assets/", import.meta.url);
 const files = readdirSync(assets).filter((file) => file.endsWith(".js"));
 assert.ok(files.length > 0, "No production JavaScript files");

@@ -4351,5 +4351,133 @@
         }
       }
     }
+  },
+  "states": {
+    "galleryTitle": "Durum ekranları",
+    "galleryDescription": "Yükleme, boş, hata, çakışma, limit ve erişim durumlarının ortak kalıbı.",
+    "exampleOnly": "Yalnız yerel geliştirme örnekleri. Bu ekran gerçek veri okumaz veya işlem kaydetmez.",
+    "content": {
+      "loading": {
+        "title": "Yükleniyor",
+        "description": "Bilgiler alınıyor."
+      },
+      "empty": {
+        "title": "Henüz kayıt yok",
+        "description": "İlk kaydı oluşturarak başlayabilirsin."
+      },
+      "noResults": {
+        "title": "Bu filtreye uyan kayıt yok",
+        "description": "Filtreleri değiştir ya da temizle."
+      },
+      "error": {
+        "title": "Liste yüklenemedi",
+        "description": "Bilgiler okunamadı. Bağlantını kontrol edip yeniden deneyebilirsin."
+      },
+      "offline": {
+        "title": "Bağlantı yok",
+        "description": "Sonucu bilinmeyen bir işlemi yeniden başlatmadan önce durumunu kontrol et. Bağlantı geldiğinde okuma işlemini yeniden deneyebilirsin."
+      },
+      "conflict": {
+        "title": "Kayıt başka biri tarafından değiştirildi",
+        "description": "Güncel kaydı yeniden oku, değişikliklerini kontrol et ve yeniden onayla."
+      },
+      "limit": {
+        "title": "Plan sınırına ulaşıldı",
+        "description": "Bu işlem için gösterilen plan ve kullanım sınırlarını kontrol et."
+      },
+      "forbidden": {
+        "title": "Bu sayfaya erişimin yok",
+        "description": "Seçili kapsam ve yetkilerini kontrol et. Erişim gerekiyorsa stüdyo yöneticisiyle görüş."
+      },
+      "readOnly": {
+        "title": "Panel salt okunur",
+        "description": "Bu kapsamın erişim durumu değişiklikleri kısıtlıyor. Kullanılabilen işlemler kendi yetki ve plan denetimine tabidir."
+      },
+      "notFound": {
+        "title": "Sayfa bulunamadı",
+        "description": "Bağlantı eski ya da yanlış olabilir; kayıt kaldırılmış veya görünürlüğü değişmiş olabilir."
+      },
+      "expired": {
+        "title": "Onay süresi doldu",
+        "description": "Kayıtlar değişmiş olabilir. Güncel önizlemeyi yeniden alıp etkileri tekrar kontrol et."
+      },
+      "received": {
+        "title": "Bu işlem zaten alındı",
+        "description": "Aynı işlem anahtarı yeni bir etki oluşturmaz. Güncel sonucu kendi işlem ekranından kontrol et."
+      }
+    },
+    "catalog": {
+      "loading": {
+        "title": "Yükleniyor",
+        "description": "Liste ya da kart verisi gelirken iskelet görünümü."
+      },
+      "empty": {
+        "title": "Boş: henüz kayıt yok",
+        "description": "İlk kullanım; uygun ilk eyleme yönlendirir."
+      },
+      "noResults": {
+        "title": "Boş: filtre sonucu yok",
+        "description": "Sonuçsuz filtre, kayıt yokluğundan ayrıdır."
+      },
+      "error": {
+        "title": "Hata: sunucu",
+        "description": "Okuma hatası ve izin verilen yeniden deneme yolu."
+      },
+      "offline": {
+        "title": "Çevrimdışı",
+        "description": "Bağlantı durumu değişir; işlem sonucu kendiliğinden belirlenmez."
+      },
+      "conflict": {
+        "title": "Sürüm çakışması (409)",
+        "description": "Güncel kaydı yeniden okuyup açıkça onaylama gerekir."
+      },
+      "limit": {
+        "title": "Plan limiti",
+        "description": "Sayı ve fiyat varsaymadan gerçek sınıra yönlendirir."
+      },
+      "forbidden": {
+        "title": "Yetkisiz erişim (403)",
+        "description": "Kaynak kapsam ve yetki kararı korunur."
+      },
+      "readOnly": {
+        "title": "Kapalı erişim",
+        "description": "İşlem bazlı kapılar korunur; istemci yetki üretmez."
+      },
+      "notFound": {
+        "title": "Sayfa bulunamadı (404)",
+        "description": "Bilinmeyen adres ya da görünmeyen kayıt."
+      },
+      "expired": {
+        "title": "Onay süresi doldu",
+        "description": "Önizleme geçerliliği bittiğinde yeniden okuma gerekir."
+      },
+      "received": {
+        "title": "Tekrar gönderim: tek sonuç",
+        "description": "Kayıtlar yeniden okunur; yeni işlem anahtarı üretilmez."
+      }
+    },
+    "trace": "Destek kimliği:",
+    "conflictHelp": "Bu yerel örnekte iki sürümü karşılaştır. Güncel kaydı yeniden yüklemek önceki kaydı değiştirmez.",
+    "previous": "Önceki değer",
+    "current": "Güncel değer",
+    "previousExample": "Örnek salon · sürüm 1",
+    "currentExample": "Örnek salon · sürüm 2",
+    "cancel": "Vazgeç",
+    "reload": "Güncel kaydı yükle",
+    "retry": "Tekrar dene",
+    "home": "Hesabıma dön",
+    "help": "Yardım",
+    "clear": "Filtreleri temizle",
+    "create": "İlk kaydı oluştur",
+    "openExample": "Ortak görünümü aç",
+    "showBanner": "Üst çubuğu göster",
+    "closeExample": "Örneklere dön",
+    "openConflict": "Çakışmayı aç",
+    "inspectLimit": "Sınırı incele",
+    "refreshPreview": "Önizlemeyi yenile",
+    "checkResult": "Sonucu kontrol et",
+    "exampleFeedback": "Yerel örnek eylemi çalıştı; gerçek kayıt değiştirilmedi.",
+    "pauseMotion": "Animasyonu durdur",
+    "resumeMotion": "Animasyonu sürdür"
   }
 }
