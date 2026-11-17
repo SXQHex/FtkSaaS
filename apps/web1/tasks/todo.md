@@ -13,9 +13,9 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım      | Plan | Sayfa/işlev      | Durum                         | Son doğrulama veya engel        | Sonraki eylem                                                                                                                                                  |
-| --------------- | ---- | ---------------- | ----------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili ekran paketleri başarılı | P16 ve native Pro limit/yarış kapısı tamam. Diğer P/G-PRO zincirlerini denetle; W1-BE-36 kabul aracı düzeltmesini beklemeden bağımsız otomatik kapsamı sürdür. |
+| Aktif adım      | Plan | Sayfa/işlev      | Durum                         | Son doğrulama veya engel        | Sonraki eylem                                                                                                                                                                                       |
+| --------------- | ---- | ---------------- | ----------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili ekran paketleri başarılı | P16 ve native Pro limit/yarış kapısı tamam. Sıradaki iş P17.4 organizasyon kapanış/silme tüketicisi; sonra eksik bütünleşik zincir ve tam Pro aday doğrulaması. W1-BE-36 bağımsız devamı durdurmaz. |
 
 Git devamı: `feat/web1-pro-completion`, [PR326](https://github.com/SXQHex/FtkSaaS/pull/326). PR327’nin main kaynağı `3b4eaf28f469eef3f66be82aaa3dc65759313ac7` dala birleştirildi ve kanonik typed snapshot üretildi; aynı kaynağın CI/development kanıtı [backend talepleri kaydında](request.md). Kalan kabul, tek toplu paralel paketle yürütülür; yalnız başarısız paket düzeltmeden sonra tekrarlanır. Backend ihtiyacı yalnız request.md’ye yazılır ve uygulanabilir bağımsız işe devam edilir.
 
