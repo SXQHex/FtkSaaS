@@ -194,6 +194,79 @@ test('Starter versioned downgrade, preserved history and canonical replacement',
    const sub=(await db.query('select * from core.saas_subscriptions where org_id=$1',[org])).rows[0];
    const selected=(await db.query("select distinct person_id from core.center_relationships where org_id=$1 and kind='student' and state='active' order by person_id limit 99",[org])).rows.map(x=>x.person_id);
    const excluded=(await db.query("select person_id from core.center_relationships where org_id=$1 and kind='student' and state='active' and not (person_id=any($2::uuid[]))",[org,selected])).rows[0].person_id;
+   const personId = selected[0];
+   const publishPolicy = (key, value) => invoke('policy_publish_v1', {
+    center_id: null, key, value, effective_at: new Date(Date.now() - 1000).toISOString(), mandatory: false,
+   });
+   await publishPolicy('reservation_window', {
+    kind: 'window', opens_minutes_before: 10080, closes_minutes_before: 0, manager_exception: false,
+   });
+   await publishPolicy('student_cancel_group', {
+    kind: 'cancellation', terms: {cutoff_minutes: 0, before_cutoff: 'release', after_cutoff: 'release', no_show: 'release'},
+   });
+   // Leave an actual outstanding debt on this fixture without blocking its lesson.
+   await publishPolicy('debt_booking', {kind: 'boolean', value: false});
+   await publishPolicy('debt_participation', {kind: 'boolean', value: false});
+   const productVersion = (await invoke('product_publish_v1', {terms: {
+    name: 'Yoga · downgrade history', kind: 'credits', booking_mode: 'flexible', credits: 4,
+    price_minor: '1000', currency: 'TRY', freeze: {enabled: false, extends_validity: false},
+    refund: {method: 'none'},
+    scopes: [{scope_kind: 'center_discipline', center_id: center, discipline_id: disc, usage_targets: ['lesson']}],
+   }})).primary_id;
+   const salePreview = await invoke('sale_preview_v1', {
+    person_id: personId, product_version_id: productVersion,
+    start_date: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
+    end_date: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+   });
+   assert.deepEqual(salePreview.blockers, []);
+   const saleId = (await invoke('sale_apply_v1', {preview: {id: salePreview.id, token: salePreview.token}})).primary_id;
+   const debtId = (await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,saleId])).rows[0].id;
+   const historySessionId = (await invoke('session_create_v1', {
+    discipline_id: disc, format: 'group',
+    interval: {starts_at: new Date(+legacyStart + 3600000).toISOString(), ends_at: new Date(+legacyStart + 7200000).toISOString()},
+    resources: [], assignments: [], capacity: {total: 10},
+   })).primary_id;
+   const historyReservationId = (await invoke('reservation_create_v1', {
+    session_id: historySessionId, person_id: personId, source_sale_id: saleId, mode: 'flexible',
+   })).primary_id;
+   const attendance = () => invoke('attendance_get_v1', {session_id: historySessionId});
+   await invoke('attendance_start_v1', {
+    session_id: historySessionId, expected_version: (await attendance()).session_version,
+    actual_started_at: new Date().toISOString(), reason: 'Synthetic Pro lesson observed early',
+   });
+   const draft = (await attendance()).entries.find(entry => entry.reservation_id === historyReservationId);
+   assert(draft);
+   await invoke('attendance_mark_v1', {
+    reservation_id: historyReservationId, expected_version: draft.version, result: 'attended',
+   });
+   await invoke('attendance_close_v1', {
+    session_id: historySessionId, expected_version: (await attendance()).session_version,
+    performed: false, performed_instructor_ids: [],
+   });
+   const readHistory = async () => {
+    const reservations = await invoke('reservation_list_v1', {
+     person_id: personId, session_id: historySessionId, page: {limit: 10},
+    });
+    const reservation = reservations.items.find(row => row.id === historyReservationId);
+    const right = (await invoke('entitlements_get_v1', {person_id: personId})).find(row => row.sale_id === saleId);
+    const finance = await invoke('finance_get_v1', {person_id: personId, currency: 'TRY', page: {limit: 10}});
+    const debt = finance.debts.find(row => row.id === debtId);
+    const result = await attendance();
+    const entry = result.entries.find(row => row.reservation_id === historyReservationId);
+    assert(reservation && right && debt && entry);
+    return {
+     reservation: {id: reservation.id, session: reservation.session_id, person: reservation.person_id, state: reservation.state},
+     right: {sale: right.sale_id, product: right.product_version_id, account: right.account_id, available: right.available, reserved: right.reserved, consumed: right.consumed},
+     debt: {id: debt.id, amount: debt.remaining_minor},
+     attendance: {session: result.session_id, closure: result.closure_state, revision: result.revision, reservation: entry.reservation_id, person: entry.person_id, result: entry.result},
+    };
+   };
+   assert.equal((await invoke('subscription_get_v1', {})).plan, 'pro');
+   const proHistory = await readHistory();
+   assert.equal(proHistory.right.product, productVersion);
+   assert.deepEqual([proHistory.right.available, proHistory.right.reserved, proHistory.right.consumed], [3, 0, 1]);
+   assert.equal(proHistory.debt.amount, '1000');
+   assert.deepEqual([proHistory.attendance.closure, proHistory.attendance.result], ['closed', 'attended']);
    const body={target_plan_id:starterPlan,kept_center_id:center,kept_scope:{room_id:room,discipline_id:disc,instructor_id:instructor,student_person_ids:selected}};
    await reject('subscription_downgrade_request_v1',{...body,expected_version:Number(sub.version)+1},'VERSION_CONFLICT');
    const change=(await invoke('subscription_downgrade_request_v1',{...body,expected_version:Number(sub.version)})).primary_id;
@@ -204,6 +277,8 @@ test('Starter versioned downgrade, preserved history and canonical replacement',
    const boundary=key();
    await db.query("insert into core.operation_receipts(id,org_id,actor_account_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,$3::uuid,$3::uuid::text,'subscription_boundary_apply_v1',repeat('a',64),repeat('b',64),'in_progress',now()+interval '1 day')",[boundary,org,account.id]);
    await db.query("select private.p07_boundary($1,$2,$3,$4)",[org,sub.id,boundary,Array.from({length:32},key)]);
+   assert.equal((await invoke('subscription_get_v1', {})).plan, 'starter');
+   assert.deepEqual(await readHistory(), proHistory);
    const discover=(operation,k)=>invoke('management_state_get_v1',{operation,selector:{operation,key:k}});
    assert.equal((await discover('center_discipline_set_v1',{discipline_id:disc})).items[0].exists,true);
    assert.equal((await discover('availability_exception_save_v1',{resource:{kind:'room',id:room}})).items.length,1);
