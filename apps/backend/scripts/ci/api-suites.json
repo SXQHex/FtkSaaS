@@ -385,12 +385,12 @@
         {
           "line": 420,
           "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
-          "sha256": "1bb3421260e27719accf0a06978c9fbd9adf849c56d57c2bbacf8103fa66140c"
+          "sha256": "5be408ac803de78a934c9aee8ab8b588596a553b4ad4eb8ace698e0ed987a106"
         },
         {
           "line": 421,
           "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-          "sha256": "273cf74b7cf76d79fca157d9580c776cf763362b1bb64b63e1ede2e613f5f7ad"
+          "sha256": "8ad4908308bd709ed4b3dd071f7e51da6c52ebd372d26861a3bb51e1dd31de57"
         },
         {
           "line": 422,
@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "4490068bc919fb3f79bfdcc7eb02f736929917b043289667b56bb7717c55373d"
+          "sha256": "c55288b5769ff0432ed975c5d54bc66cefbd088a4cc6b368f0c542aa706678ed"
         },
         {
           "line": 147,

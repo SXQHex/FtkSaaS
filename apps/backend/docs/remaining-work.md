@@ -5,10 +5,11 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="web1-v67-backend"></a>
 ## Web1 v67 backend talepleri
 
-Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/e3fe37d7151dddc2deb4f20eee8bad3622b22ab0/apps/web1/tasks/request.md) W1-BE-43–57 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-inbox) kalır.
+Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/85f83409075180819ff2f91b43b983b1cafe2deb/apps/web1/tasks/request.md) W1-BE-34 ile W1-BE-43–59 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-platform-billing) kalır.
 
 | Talep | Backend kabul ölçütü |
 |---|---|
+| W1-BE-34 | [WF00](../../../docs/workflows.md#wf00) merkez denetim dışa aktarımı ve kesin iş sonucu. Canlı satır/export yetkisi, filtre ve bütçe ile tamamlanmış import ve kaynak rapor tekrarı ayrımı doğrulanmalı. |
 | W1-BE-43 | [WF02](../../../docs/workflows.md#wf02) platform sahibi, doğrulanmış hesap, organizasyon, merkez ve canlı CM sözleşmesine dayanır. Hazır organizasyonda mevcut `manager_self_assign_center_v1` veya yetkili `center_manager_assign_v1` ve ardından self yönetim kapsamı okuması kullanılır. Organizasyonsuz doğrulanmış hesabın talebi ve platform operatörünün mevcut kuruluş komutuyla tamamlaması aynı WF’de doğrulanmalı. |
 | W1-BE-44 | [WF06](../../../docs/workflows.md#wf06) mevcut özel ders talebinde opsiyonel notu kaydetmeli. Eski kayıt, metin sınırı, öz/yetkili okuma, yabancı ret ve aynı-key davranışı doğrulanmalı. |
 | W1-BE-45 | [WF14](../../../docs/workflows.md#wf14) kendi hakedişinde kapanış anındaki seans ve anlaşma bağını projekte etmeli. Düzeltme, önceki kayıt ve atama kaybında tarihsel bağ doğrulanmalı. |
@@ -23,6 +24,8 @@ Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/e3fe
 | W1-BE-55 | [WF09](../../../docs/workflows.md#wf09) anonim ziyaretçi onay bekleyen etkinlik başvurusu bırakır. Geçerli adres ve yayın, bot kontrolü ve aynı niyet sınanmalı. Kontenjan, belge/onay ve ödeme mevcut yetkili kayıt işleminin şartlarıdır. |
 | W1-BE-56 | [WF09](../../../docs/workflows.md#wf09) yönetilebilir yayın adresi ve toplu görünürlük için kanonik adres, önceki adresin kapanması ve toplu kapatmanın bağlı form ve program erişimine etkisi doğrulanmalı. Kaynak kayıtları korunmalı. |
 | W1-BE-57 | [WF11](../../../docs/workflows.md#wf11) alıcı görünürlüğünde arşiv, silme ve geri alma. Canlı alıcı, seçili sürümler, atomik tekrar, mevcut saklama ve kaynak iş durumu doğrulanmalı. |
+| W1-BE-58 | [WF17](../../../docs/workflows.md#wf17) sahip kapsamındaki sürümlü vergi dairesi ve kimliğini doğrulamalı. Yetkisiz erişim, temizleme, eski sürüm, replay ve takip kaydı sınanmalı. Kesilmiş fatura geçmişi ve dosyası gerçek düzenleyici kaynağına bağlıdır. |
+| W1-BE-59 | [WF17](../../../docs/workflows.md#wf17) canlı platform kapsamı, organizasyon/sahip/ödeme dizini ve tam eşleşmeli doğrulanmış hesap keşfi. Gerekçeli askı, eski sürüm, tekrar, anonim yayın, olağan stüdyo erişimi ve yine açılan yollar sınanmalı. Abonelik, ödeme ve gizlilik yetkileri korunmalı. |
 
 <a id="s18"></a>
 ## S18 — Statik SPA backend transportu

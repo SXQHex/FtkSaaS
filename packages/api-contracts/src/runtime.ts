@@ -240,6 +240,11 @@ export const runtimeOperationNames = [
   "document_directory_get_v1",
   "studio_setup_list_v1",
   "studio_setup_open_v1",
-  "attendance_correction_request_v1"
+  "attendance_correction_request_v1",
+  "platform_directory_get_v1",
+  "organization_billing_tax_get_v1",
+  "organization_billing_tax_set_v1",
+  "platform_organization_suspension_set_v1",
+  "audit_center_export_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

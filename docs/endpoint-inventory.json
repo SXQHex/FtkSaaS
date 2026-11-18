@@ -6560,6 +6560,117 @@
       "limits": [
         "Assigned instructor requests review of the live attendance revision. A center manager may decide without applying a correction."
       ]
+    },
+    {
+      "name": "platform_directory_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/platform_directory_get_v1",
+      "permission": "platform.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_directory_get"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Verified account lookup matches a complete email under the live platform gate. Raw Auth profiles are private."
+      ]
+    },
+    {
+      "name": "organization_billing_tax_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/organization_billing_tax_get_v1",
+      "permission": "org.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_billing_tax_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Current tax details are visible only to the organization owner."
+      ]
+    },
+    {
+      "name": "organization_billing_tax_set_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/organization_billing_tax_set_v1",
+      "permission": "org.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_billing_tax_set"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "The Owner writes current tax details under an explicit version. Audits contain no tax values."
+      ]
+    },
+    {
+      "name": "platform_organization_suspension_set_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/platform_organization_suspension_set_v1",
+      "permission": "platform.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_organization_suspension_set"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "The platform operator can place or lift a reasoned, versioned suspension without changing the organization lifecycle."
+      ]
+    },
+    {
+      "name": "audit_center_export_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/audit_center_export_v1",
+      "permission": "report.export",
+      "features": [
+        "F33"
+      ],
+      "required_features": [
+        "F33"
+      ],
+      "runtime_required_features": [
+        "F33"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_audit_center_export"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Only recorded center audit rows visible to the current actor and within the requested filters. Requires existing report export configuration."
+      ]
     }
   ]
 }

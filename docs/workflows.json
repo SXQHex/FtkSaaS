@@ -292,7 +292,11 @@
         "apps/backend/scripts/compact-validator-errors.mjs",
         "apps/backend/database/tracking-discovery.sql",
         "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql",
-        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql"
+        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql",
+        "apps/backend/database/audit-export-tracking-results.sql",
+        "apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql",
+        "apps/backend/database/tracking-media-redaction.sql",
+        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -300,11 +304,12 @@
         "job_status_get_v1",
         "audit_list_v1",
         "management_state_get_v1",
-        "tracking_directory_get_v1"
+        "tracking_directory_get_v1",
+        "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7056423c6a6ad327cc02ceb660c9ba540ddefea755319b35a56b0bc13b5809a0",
-        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
+        "fingerprint": "17314c436f1f12145a6f7b6b8bb3b050dc09255b66d0a26b2a4be00a5e4028a8",
+        "reason": "Reviewed the additive tracking scrub repair retaining both media and billing tax fields in the exclusion list."
       }
     },
     {
@@ -393,8 +398,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "9b815ec9a915e870c87684889af9d473a2155f45a132ef0daa05c202805fd815",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "c234c76274338cc27fab419d2fadc1bfd2129b07fd3c0567eb3d44284021262d",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -519,8 +524,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "c500fc5fe92c7a1784ceb7bf8a045945dbc612321c3eeb03ec644a8d1a605ef6",
-        "reason": "Reviewed first studio request ownership, platform queue visibility, and atomic platform fulfillment."
+        "fingerprint": "ef1e171ab1bd24c13300a5539e8d1e4dfb2ff7a9d008fb5a6d056396d464de1f",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -637,8 +642,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "95c96be540017b2222682a1ae39cdabe502c0f211bfa2a17a3959d217f6e9335",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "8557c30ae3d4e7b4555ebadc1bbbce494d3958dd1bd1a206aa16b6dee7b8b7db",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -754,8 +759,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1fc7df813eaee6723713992e226e0e13612cf1170af8ed485242ba7af9eab48b",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "26202abc90f1e2867b6b3a49b958f8dbcd9257aa251f080814ef40cca3b79f10",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -882,8 +887,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "bddca56a3dcec74a332304298be5ba291597fa7c0dbc3ca7a2449605cb337818",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "340cd1a234ee1a6e1692844a379690a72b55222e60adfb67d9905daba9acb87e",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -992,8 +997,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "862d7f578423aec44f6856d12168620c8a6f85e965bedbd160b3a15d44036fc9",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "571ef1b26b69ab47d79e30ce0893fb5dc8fb802284bc270a98bfd16a5c6dce32",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1064,8 +1069,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "d2d73963b6aa90aa36b9aef2bca7b87ede21b97d856494a1cfa98d3deed2f2eb",
-        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
+        "fingerprint": "bfe5bb3f0c7001f48112534885f17bcf128809657e37e5209be4d57a4cca34b8",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1139,8 +1144,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "0772e5781e78e6cef8d2ad553b2a3c392074b0836f9a018b211c414c1365f9bb",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "a5402e78dda1bb86fedc631fbbef6f0d801f505a50f2745377b9f61805344850",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1256,8 +1261,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "3e1c706482a610ff1b30cd0571ff96a3a6934ee0187153c9a041f7bcf87b8120",
-        "reason": "Reviewed canonical address routing, public form shutdown, and pending event application admission."
+        "fingerprint": "c8c85858c56b84a5eb8033f7c9572032449e3313ca6e2027f8b0ee23d9c5d5f3",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1330,8 +1335,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "618a0141d90f9663e559325754ec5836672886f5a0aa138d7ae0968f95dfe4ba",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "89571a1ca739274a867770b6de4bc20073dbdcabc2c8dd8dccfa736f4f8ad5da",
+        "reason": "Reviewed shared audit export and native terminal import outcome evidence for existing workflow permissions."
       }
     },
     {
@@ -1419,8 +1424,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "3255ced7ab782286cc9af5075a5dffb6d77c98e92f7564fa4107ffe7043abca1",
-        "reason": "Reviewed versioned recipient visibility and the independent native source and read state."
+        "fingerprint": "559c34c148f8662dfbf97fe36a7c6d0ebc5a00bd8c111c2e5df5e571feff69c2",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1557,8 +1562,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "6caeee49284bc0e84c75732a720a344c86daeac1454f430eee5970799abbcf8c",
-        "reason": "Reviewed shared generated runtime inventory and source references after the addition of three scoped Web1 operations."
+        "fingerprint": "dd68c1f8581fc77de40d5bb36f77f660cd5e99917a26e96a3fd45aa8ec44883a",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1633,8 +1638,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "8b4f4e98812e1572c92f81f694cf763380ac81610cbef5ec910df4c57f3e6f4c",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "3d162e420781525ac231097b20f4dc424d5f45912bdb035b49d8865efc382ac2",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1701,8 +1706,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "73a3b553cd42a033efe87f0781ae7c44afece56fc2689fb082042406a8452b69",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "23846c257182d58a166dc41f9465522d53c128c09dcdaa3e329917113336c4a5",
+        "reason": "Reviewed shared audit export and native terminal import outcome evidence for existing workflow permissions."
       }
     },
     {
@@ -1780,8 +1785,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "4ce0bdcc2c69716bbce1af55c4bc27cc179592cd9cf3fdd733fd626e9af06d19",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "5b0fd542482320b8c4b9cda8f5163c13f70a3ba8a8b26243632f378954bcac4a",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1856,8 +1861,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "43c57837e722f629b96ca17e72eea0458ef2a87b1f34a378f69b5437017c1f51",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "c06081b360ac812027de5fb92bf36d813e073eab888e099d814b96b40b4d138d",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1874,7 +1879,9 @@
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/native-account-erasure-unit.mjs",
         "apps/backend/tests/postgres-restore-acceptance.mjs",
-        "apps/backend/tests/export-retention-acceptance.mjs"
+        "apps/backend/tests/export-retention-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/public-program-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1929,7 +1936,15 @@
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
         "apps/backend/scripts/postgres-restore.mjs",
         "apps/backend/database/account-export-erasure.sql",
-        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/database/platform-directory.sql",
+        "apps/backend/supabase/migrations/20261118214500_platform_directory.sql",
+        "apps/backend/database/organization-billing-tax.sql",
+        "apps/backend/database/platform-organization-suspension.sql",
+        "apps/backend/supabase/migrations/20261118214600_organization_billing_tax.sql",
+        "apps/backend/supabase/migrations/20261118214700_platform_organization_suspension.sql",
+        "apps/backend/database/tracking-media-redaction.sql",
+        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1942,11 +1957,15 @@
         "saas_payment_verify_v1",
         "saas_grace_extend_v1",
         "platform_owner_set_v1",
-        "platform_owner_remove_v1"
+        "platform_owner_remove_v1",
+        "platform_directory_get_v1",
+        "organization_billing_tax_get_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1"
       ],
       "review": {
-        "fingerprint": "a262e46fc322cad9e35967393a7ca5d742bb37cc8bf17e9d8f935ef8e8878059",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "b1af30281f0f578f898c64440b965d21110d07ed25dbbc5935b96a07f70ad4c2",
+        "reason": "Reviewed the additive tracking scrub repair retaining both media and billing tax fields in the exclusion list."
       }
     },
     {
@@ -1978,8 +1997,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "dc95b322349aad2843fead0fc8e80a5316631e55d4f6e14054e5d51fe26fb664",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "0ce7526f3d2adfed5e0739c5b170d2bd01f35f54a3580ed70f8c77620b4182e1",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -2019,8 +2038,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "d2db8fac12e4ba556a45c74af8d94c04ec2ae5290fe8b208410bb325f3cd11da",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "c258474aa3d1a8a00da6a1a30505ec46f0bae01332182f52bc8de6b7efa9a90d",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -2144,8 +2163,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "f9db54d813a6a66a85a19e082a93166e3ce03ef2b30fc659d468b232e9e635eb",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "bf698bf8e6b4392b635e429140ac2df41bc1aacc657051158282f587fc93eb1b",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     }
   ]

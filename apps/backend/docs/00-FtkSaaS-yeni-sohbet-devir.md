@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-platform-billing"></a>
+## Web1 v67 denetim, vergi profili ve platform konsolu
+
+Güncel taban `82a5a37deb83d7de1978d82ffba738ecf4ce12b5`. Aynı kaynak için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı. W1-BE-58/59 yeni `codex/web1-audit-platform-billing` dalına taşındı. W1-BE-34’ün açık denetim dışa aktarımı ve kesin kaynak sonucu aynı dalda. Tüketim [WF00](../../../docs/workflows.md#wf00) ve [WF17](../../../docs/workflows.md#wf17), kabul ölçütleri [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir.
+
+İzole loopback Supabase üzerinde 205 migration temiz uygulandı. Tek seri Node runner ile son kaynakta hedefli 9/9 test geçti ve yerel stack kapatıldı. Sözleşme, workflow, backend typecheck, 142 API birimi ve trusted CI politika karşılaştırması doğrulandı. Edge JSON yükü 4.081.566 bayt. Aday CI ve hosted kabulü ayrı izlenir.
+
+[PR #342 API-3](https://github.com/SXQHex/FtkSaaS/actions/runs/44400355798/job/135141531172), vergi filtresi eklenirken medya alanlarının takip kaydından çıkarılmasının kaybolduğunu gösterdi. 206. migration vergi filtrelerini koruyarak `logo_image` ve `photo` filtrelerini geri getirdi. Temiz loopback kurulumunda medya ve vergi senaryoları dahil tek seri runner 9/9 geçti.
+
 <a id="web1-v67-final-five"></a>
 ## Web1 v67 son beş backend talebi
 

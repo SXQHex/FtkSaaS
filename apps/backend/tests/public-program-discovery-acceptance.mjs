@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {preparationFixture} from './starter-preparation-fixture.mjs';import {context} from './api-client.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';import {publicCalendarGateway} from '../transports/public-calendar-gateway.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';import {preparationFixture} from './starter-preparation-fixture.mjs';import {context,must} from './api-client.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';import {publicCalendarGateway} from '../transports/public-calendar-gateway.mjs';
 test('W1-BE-25 anonymous discovery keeps old publications private and uses an explicit active form with real consent source',async t=>{
  const f=await preparationFixture({schedule:true}),{db,org,center,room,discipline,person,api}=f;t.after(()=>db.end());const {env}=context(),at=Date.parse(f.day(3)+'T12:00:00Z'),interval={starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()};
  const session=(await api('session_create_v1',{discipline_id:discipline,format:'group',interval,resources:[{kind:'room',id:room}],assignments:[{person_id:person,duty:'instructor'}],capacity:{total:10}})).primary_id,details={title:'Explicit public lesson',venue_public_label:'Public room',fee_minor:'0',currency:'TRY',public_conditions:'Application only'};
@@ -51,6 +51,14 @@ test('W1-BE-25 anonymous discovery keeps old publications private and uses an ex
   assert.equal((await submitEvent({page_slug:second,client_request_key:key()})).error.code,'SERVICE_UNAVAILABLE');
   await f.change('organization',{public_page:{slug:second,enabled:true}});
   assert.equal((await atAddress(second)).application.state,'open');
+  const {rows:[beforeSuspend]}=await db.query('select version::int from core.organizations where id=$1',[org]);
+  const suspension={org_id:org,expected_version:beforeSuspend.version,suspended:true,reason:'Synthetic public route pause'};
+  const stopped=await must(f.platform,'platform_organization_suspension_set_v1',suspension,key());
+  const pausedPage=await atAddress(second);
+  assert.equal(pausedPage.publication_state,'unavailable');assert.deepEqual(pausedPage.items,[]);assert.equal(pausedPage.application.form,null);
+  assert.equal((await submitEvent({page_slug:second,client_request_key:key()})).error.code,'SERVICE_UNAVAILABLE');
+  await must(f.platform,'platform_organization_suspension_set_v1',{...suspension,expected_version:stopped.version,suspended:false},key());
+  assert.equal((await atAddress(second)).publication_state,'available');
   // Restore the synthetic fixture's legacy address for the older source-retirement assertions.
   await db.query("update private.frontend_settings set values=values-'public_page' where scope_key=$1",['organization:'+org]);
   await db.query("delete from private.public_page_addresses where org_id=$1 and slug in ($2,$3)",[org,first,second]);
