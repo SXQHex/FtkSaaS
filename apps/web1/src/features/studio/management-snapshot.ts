@@ -6,6 +6,7 @@ import {
   readStudioPrograms,
 } from "./studio-reads";
 import { readStudioSetup } from "./setup";
+import { BackendError } from "../../lib/backend";
 import type { ResourceRef } from "../../lib/api-contracts/generated";
 
 export async function readStudioSnapshot(scope: StudioScope, canReadPlan = false) {
@@ -30,7 +31,10 @@ export async function readStudioSnapshot(scope: StudioScope, canReadPlan = false
       .map((id) => ({ kind: "person" as const, id })),
   ];
   const [agreements, programs, closures, setup] = await Promise.all([
-    Promise.all(personIds.map((id) => readStudioAgreements(scope, id))),
+    Promise.all(personIds.map((id) => readStudioAgreements(scope, id))).catch((error: unknown) => {
+      if (error instanceof BackendError && error.code === "PLAN_FEATURE_UNAVAILABLE") return null;
+      throw error;
+    }),
     Promise.all(
       resources.classes.map(async (item) => ({
         classId: item.id,
@@ -40,11 +44,14 @@ export async function readStudioSnapshot(scope: StudioScope, canReadPlan = false
     Promise.all(closureResources.map((resource) => readStudioClosures(scope, resource))),
     readStudioSetup(scope, resources, instructors, canReadPlan),
   ]);
+  const agreementsPlanBlocked =
+    agreements === null || (setup.plan.state === "known" && setup.plan.value?.plan === "starter");
   return {
     resources,
     instructors,
     setup,
-    agreements: agreements.flat(),
+    agreementsPlanBlocked,
+    agreements: agreementsPlanBlocked ? [] : agreements.flat(),
     programs,
     closures: closures.flat(),
   };

@@ -862,6 +862,7 @@
     "agreementInvalid": "Ücret modelini ve ona uygun bileşenleri, para birimini, oda payını ve tarihleri kontrol et. Tutarlar tam sayı; yüzdeler 0–100 olmalıdır. Aynı hak türü için çakışan bileşen veya aynı paket için iki koşul ekleme. Süreli yüzde bileşeni açık sabit birim tutarı ister. Yeni sürüm önceki başlangıçtan sonra başlamalıdır.",
     "agreementApprovalRequired": "Yayımlamadan önce yeni şartların etkisini açıkça onayla.",
     "agreementConflict": "Anlaşma zinciri veya sürümü değişmiş ya da dönem başka bir zincirle çakışıyor. Güncel sürümleri yükle; gerekiyorsa yerine geçilecek son sürümü seçip taslağı yeniden hazırla.",
+    "agreementsPlanBlocked": "Bu planda eğitmen ücret anlaşmaları kullanılamaz.",
     "agreementRejected": "Yayın reddedildi. Güncel kaynak ve yetkiyle tekrar hazırla; seçtiğin para birimi ve ücret koşulları da sunucuda doğrulanır.",
     "agreementSavedUnread": "Yeni anlaşma sürümü kabul edildi; son okuma tamamlanamadı. Yeniden yayımlama; yalnız güncel sürümleri tekrar oku.",
     "agreementSuperseded": "Bu sürümün yerine yeni sürüm yayımlanmış. Şartları geçmiş kaydı olarak görüntülüyorsun; yeni yayın için aşağıdaki listeden son sürümü seç.",

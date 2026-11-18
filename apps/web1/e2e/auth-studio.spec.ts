@@ -138,3 +138,33 @@ test("Studio drawing: complete tabs and live form composition, responsive AA", a
     JSON.stringify({ layout, pageErrors: errors, writes: state.writes.length }, null, 2),
   );
 });
+
+test("an agreement plan denial preserves Starter studio resources and disables agreement preparation", async ({
+  page,
+}) => {
+  await mockStudio(page);
+  await page.route("**/functions/v1/backend-v1/instructor_agreements_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: false,
+        error: {
+          code: "PLAN_FEATURE_UNAVAILABLE",
+          retryable: false,
+          trace_id: "019a7b00-0000-7000-8000-000000000099",
+        },
+      },
+    }),
+  );
+  await openStudio(page);
+  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Salon ekle", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Ana salon", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Bu planda eğitmen ücret anlaşmaları kullanılamaz.",
+  );
+  await expect(page.getByRole("button", { name: "Anlaşma hazırla", exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("tabpanel").getByRole("link", { name: "Hakediş", exact: true }),
+  ).toHaveCount(0);
+});

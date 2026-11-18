@@ -106,6 +106,7 @@ export function studioViewData(
             : t(($) => $.studio.active),
       past: new Date(item.interval.ends_at).getTime() <= Date.now(),
     })),
+    agreementsPlanBlocked: snapshot.agreementsPlanBlocked,
     agreements: snapshot.agreements.map((item) => ({
       id: item.id,
       instructorId: item.person_id,
