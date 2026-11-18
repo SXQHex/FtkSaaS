@@ -92,22 +92,29 @@ async function fixture(
     if (operation === "calendar_get_v1") {
       if (calendarDenied) return denied();
       expect(req.resource).toEqual({ kind: "person", id: I.self });
-      expect(req.interval).toEqual({
-        starts_at: "2026-11-15T21:00:00Z",
-        ends_at: "2026-11-22T21:00:00Z",
-      });
-      const selected = req.page.cursor ? sessions.slice(2) : sessions.slice(0, 2);
+      const starts = Date.parse(req.interval.starts_at);
+      const ends = Date.parse(req.interval.ends_at);
+      const week = starts === Date.parse("2026-11-15T21:00:00Z");
+      if (week) expect(ends).toBe(Date.parse("2026-11-22T21:00:00Z"));
+      const selected = week
+        ? req.page.cursor
+          ? sessions.slice(2)
+          : sessions.slice(0, 2)
+        : sessions.filter(
+            (row) => Date.parse(row.starts_at) === starts && Date.parse(row.ends_at) === ends,
+          );
+      if (!week) expect(selected).toHaveLength(1);
       return send({
-        items: selected.map((row, index) => ({
+        items: selected.map((row) => ({
           id: row.id,
           type: "session",
           center_id: I.center,
-          title: `Sentetik atanmış ${req.page.cursor ? 3 : index + 1}`,
+          title: `Sentetik atanmış ${sessions.indexOf(row) + 1}`,
           starts_at: row.starts_at,
           ends_at: row.ends_at,
           resources: [{ kind: "room", id: I.room }],
         })),
-        next_cursor: req.page.cursor ? null : "second-session-page",
+        next_cursor: week && !req.page.cursor ? "second-session-page" : null,
         as_of: "2026-11-16T12:00:00Z",
       });
     }
@@ -180,11 +187,59 @@ async function fixture(
   await expect(page.getByRole("heading", { name: "Bugün", exact: true })).toBeVisible();
   return {
     reads,
+    sessions,
     permitCalendar: () => {
       calendarDenied = false;
     },
   };
 }
+test("instructor agenda replaces moved session dates and keeps a closed roll call read-only", async ({
+  page,
+}) => {
+  const { reads, sessions } = await fixture(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Haftalık programım", exact: true }).click();
+  const views = page.getByRole("radiogroup", { name: "Takvim görünümü", exact: true });
+  await views.getByRole("radio", { name: /ajanda/i }).click();
+  const agenda = page.getByRole("region", { name: "Atanmış haftalık program", exact: true });
+  const session = (index: number) =>
+    agenda.getByRole("button", { name: new RegExp(`Sentetik atanmış ${index} ·`) });
+  await expect(session(1)).toHaveAccessibleName(/Yoklama kapandı/);
+  await expect(session(2)).toContainText("18:00");
+  await expect(session(3)).toContainText("18:00");
+  const reread = page.getByRole("button", { name: "Yeniden oku", exact: true });
+  sessions[1]!.starts_at = "2026-11-17T16:00:00Z";
+  sessions[1]!.ends_at = "2026-11-17T17:00:00Z";
+  await reread.click();
+  await expect(
+    agenda
+      .getByRole("listitem", { name: "17 Kasım 2026", exact: true })
+      .getByRole("button", { name: /Sentetik atanmış 2/ }),
+  ).toContainText("19:00");
+  await expect(session(3)).toContainText("18:00");
+  for (const [index, day] of [
+    [1, 19],
+    [2, 20],
+  ] as const) {
+    sessions[index]!.starts_at = `2026-11-${day}T17:00:00Z`;
+    sessions[index]!.ends_at = `2026-11-${day}T18:00:00Z`;
+  }
+  await reread.click();
+  for (const index of [2, 3]) {
+    await expect(session(index)).toHaveCount(1);
+    await expect(session(index)).toContainText("20:00");
+  }
+  await session(1).press("Enter");
+  await expect(page).toHaveURL(
+    `${origin}/instructor/sessions/${sessions[0]!.id}?org=${I.org}&center=${I.center}`,
+  );
+  await expect(page.getByText("Yoklama kapalı", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Yoklamayı başlat", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Yoklamayı kapat", exact: true })).toHaveCount(0);
+  expect(
+    reads.filter(({ operation }) => /^attendance_(start|mark|close)_/.test(operation)),
+  ).toEqual([]);
+});
 test("instructor day reads all scoped week pages and exact monthly currencies without private member readers", async ({
   page,
 }) => {

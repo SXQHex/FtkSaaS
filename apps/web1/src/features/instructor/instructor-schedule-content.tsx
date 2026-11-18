@@ -143,6 +143,12 @@ export function InstructorScheduleContent({
             .join(" · "),
           start: session.starts_at,
           end: session.ends_at,
+          status:
+            session.state === "cancelled"
+              ? t(($) => $.instructorToday.states.cancelled)
+              : session.attendance_state === "closed"
+                ? t(($) => $.instructorToday.states.closed)
+                : t(($) => $.schedule.sessionStates[session.state]),
         })) ?? []
       }
       state={query.isError ? "error" : query.isPending ? "pending" : "ready"}

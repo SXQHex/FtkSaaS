@@ -3069,6 +3069,7 @@
   },
   "instructorSchedule": {
     "title": "Programım",
+    "agenda": "Ajanda",
     "description": "Yalnızca sana atanmış seanslar. Program değişikliğini yönetici yapar.",
     "thisWeek": "Bu hafta",
     "previous": "Önceki hafta",

@@ -1638,6 +1638,7 @@ export default interface Resources {
       "unreadPayments": "Güncel ödeme geçmişi okunamadı."
     },
     "instructorSchedule": {
+      "agenda": "Ajanda",
       "description": "Yalnızca sana atanmış seanslar. Program değişikliğini yönetici yapar.",
       "empty": "Bu hafta atanmış seansın yok.",
       "loading": "Atanmış program okunuyor…",
