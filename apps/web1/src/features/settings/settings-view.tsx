@@ -281,6 +281,27 @@ export function SettingsView({
     Boolean(onAction && availableActions.includes(kind));
   const action = (kind: Exclude<SettingsAction["kind"], "reset">) => onAction?.({ kind });
   const footer = (key: SettingsCardKey) => {
+    if (key === "ay-yayin")
+      return (
+        <CardFooter className="flex-wrap gap-2">
+          <Button
+            variant="ghost"
+            type="button"
+            isDisabled={locked || !canAction("copyLink")}
+            onPress={() => action("copyLink")}
+          >
+            {t(($) => $.settings.copyLink)}
+          </Button>
+          <Button
+            variant="outline"
+            type="button"
+            isDisabled={locked || !canAction("preview")}
+            onPress={() => action("preview")}
+          >
+            {t(($) => $.settings.preview)}
+          </Button>
+        </CardFooter>
+      );
     const state = data.forms?.[key];
     return (
       <CardFooter className="flex-wrap justify-between gap-3">
@@ -302,26 +323,6 @@ export function SettingsView({
             >
               {t(($) => $.settings.reset)}
             </Button>
-          )}
-          {key === "ay-yayin" && (
-            <>
-              <Button
-                variant="ghost"
-                type="button"
-                isDisabled={locked || !canAction("copyLink")}
-                onPress={() => action("copyLink")}
-              >
-                {t(($) => $.settings.copyLink)}
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                isDisabled={locked || !canAction("preview")}
-                onPress={() => action("preview")}
-              >
-                {t(($) => $.settings.preview)}
-              </Button>
-            </>
           )}
           <Button
             variant="outline"

@@ -159,7 +159,8 @@ function SettingsManagement({
     [upgrade, setUpgrade] = useState<SettingsSubscriptionSource>(),
     [downgrade, setDowngrade] = useState<SettingsSubscriptionSource>(),
     [policy, setPolicy] = useState<PolicyView>(),
-    [publicSettings, setPublicSettings] = useState<SettingsDocumentSource>();
+    [publicSettings, setPublicSettings] = useState<SettingsDocumentSource>(),
+    [copyFeedback, setCopyFeedback] = useState<{ href: string; success: boolean }>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -294,6 +295,24 @@ function SettingsManagement({
   }, [query.error, router]);
   const source = query.isError || query.isFetching ? undefined : query.data;
   const publicValues = document.source?.document.values;
+  const publicTarget = document.source
+    ? {
+        to: "/public/$slug/calendar" as const,
+        params: { slug: scope.orgId },
+        search: level === "center" ? { center_id: scope.centerId } : {},
+      }
+    : undefined;
+  const publicHref =
+    publicTarget && new URL(router.buildLocation(publicTarget).href, window.location.origin).href;
+  async function copyPublicLink(href: string) {
+    setCopyFeedback(undefined);
+    try {
+      await navigator.clipboard.writeText(href);
+      setCopyFeedback({ href, success: true });
+    } catch {
+      setCopyFeedback({ href, success: false });
+    }
+  }
   const data: SettingsViewData = {
     ...document.data,
     ...subscription.data,
@@ -304,9 +323,9 @@ function SettingsManagement({
       ...(publicValues?.public_profile_enabled !== undefined
         ? {
             "ay-py-on": { value: publicValues.public_profile_enabled, writable: false },
-            "ay-py-slug": { value: scope.orgId, writable: false },
           }
         : {}),
+      ...(publicHref ? { "ay-py-slug": { value: publicHref, writable: false } } : {}),
       ...(publicValues?.public_application_form !== undefined
         ? {
             "ay-py-form": { value: publicValues.public_application_form !== null, writable: false },
@@ -480,6 +499,15 @@ function SettingsManagement({
       {document.notice}
       {team.notice}
       {notifications.notice}
+      {section === "yayin" && (
+        <p role="status" className="text-sm text-muted-foreground">
+          {copyFeedback &&
+            copyFeedback.href === publicHref &&
+            (copyFeedback.success
+              ? t(($) => $.settings.publicLinkCopied)
+              : t(($) => $.settings.publicLinkCopyFailed))}
+        </p>
+      )}
       <SettingsView
         section={section}
         onSection={(next) => {
@@ -515,6 +543,7 @@ function SettingsManagement({
           }
         }}
         availableActions={[
+          ...(publicHref ? ["preview" as const, "copyLink" as const] : []),
           ...(team.canCreate ? ["invite" as const] : []),
           ...(document.source?.catalog.fields.some(
             (row) =>
@@ -544,6 +573,8 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "preview" && publicTarget) void router.navigate(publicTarget);
+          if (action.kind === "copyLink" && publicHref) void copyPublicLink(publicHref);
           if (action.kind === "invite") team.create();
           if (action.kind === "publicSettings" && document.source)
             setPublicSettings(structuredClone(document.source));

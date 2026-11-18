@@ -291,31 +291,7 @@ export const settingsLayout = [
           {
             key: "ay-py-slug",
             kind: "text",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-yer",
-            kind: "select",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-ders",
-            kind: "switch",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-etk",
-            kind: "switch",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-egt",
-            kind: "switch",
-            readonly: false,
+            readonly: true,
             disabled: false,
           },
           {

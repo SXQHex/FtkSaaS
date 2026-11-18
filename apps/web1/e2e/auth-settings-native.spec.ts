@@ -89,7 +89,61 @@ test("public settings explicitly bind the selected form and published consent so
     },
   });
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await expect(page.getByRole("switch", { name: "Sayfayı yayınla", exact: true })).toBeChecked();
+  await expect(
+    page.getByRole("switch", { name: "Ziyaretçi profili görünür", exact: true }),
+  ).toBeChecked();
+});
+test("publication settings share the scoped visitor route and preview live closed and open states", async ({
+  page,
+  context,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin });
+  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
+  const centerUrl = `${origin}/public/${I.org}/calendar?center_id=${I.center}`;
+  const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
+  await expect(address).toHaveValue(centerUrl);
+  await expect(address).toHaveAttribute("readonly", "");
+  await page.getByRole("button", { name: "Bağlantıyı kopyala", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Yayın bağlantısı kopyalandı." }),
+  ).toBeVisible();
+  expect(await page.evaluate("navigator.clipboard.readText()")).toBe(centerUrl);
+
+  let available = false;
+  await page.route("**/api/public/calendar", (route) => {
+    const request = route.request();
+    expect(request.headers()).not.toHaveProperty("authorization");
+    expect(request.headers()).not.toHaveProperty("apikey");
+    expect(request.postDataJSON()).toMatchObject({ slug: I.org, center_id: I.center });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: [],
+          as_of: "2026-11-16T12:00:00Z",
+          next_cursor: null,
+          publication_state: available ? "available" : "unavailable",
+          application: { state: "closed", form: null },
+        },
+      },
+    });
+  });
+  const documentTime = await page.evaluate(() => performance.timeOrigin);
+  await page.getByRole("button", { name: "Sayfayı önizle", exact: true }).click();
+  await expect(page).toHaveURL(centerUrl);
+  await expect(
+    page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);
+  available = true;
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Bu aralıkta yayınlanan bir içerik yok.", { exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(0);
 });
 test("policy editing publishes a native protected change after review and keeps source scope and local instant", async ({
   page,
