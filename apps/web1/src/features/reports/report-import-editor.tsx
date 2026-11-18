@@ -30,6 +30,8 @@ import {
   reportJobReceipt,
   readReportJob,
   readJob,
+  downloadSkippedImportRows,
+  saveCsv,
   type ImportUploadIntent,
   type ReportJobIntent,
 } from "./reports-command";
@@ -90,6 +92,8 @@ export function ReportImportEditor({
   const [jobId, setJob] = useState(initial?.job_id),
     [phase, setPhase] = useState<"preview" | "apply">(initial?.phase ?? "preview"),
     [filter, setFilter] = useState<ImportRowFilter>("all");
+  const [downloadingSkipped, setDownloadingSkipped] = useState(false);
+  const [skippedDownloadFailed, setSkippedDownloadFailed] = useState(false);
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [index, setIndex] = useState(0),
     [selected, setSelected] = useState<Set<number>>(new Set());
@@ -193,9 +197,11 @@ export function ReportImportEditor({
   });
   const currentPreview = !preview.isError && !unavailable ? preview.data : undefined;
   const state = filter === "all" ? undefined : (filter as ImportRowState);
+  const applyFinished =
+    phase === "apply" && (currentJob?.state === "succeeded" || currentJob?.state === "failed");
   const rows = useQuery({
-    queryKey: ["report-import-rows", scope, jobId, state, cursors[index]],
-    queryFn: () => readImportRows(scope, jobId!, state, cursors[index]),
+    queryKey: ["report-import-rows", scope, jobId, state, cursors[index], applyFinished],
+    queryFn: () => readImportRows(scope, jobId!, state, cursors[index], applyFinished),
     enabled: !!jobId && !unavailable,
     retry: false,
     refetchOnWindowFocus: false,
@@ -209,6 +215,7 @@ export function ReportImportEditor({
         else knownValid.current.delete(row.row_number);
   }, [currentRows]);
   const summary = currentPreview?.import_summary;
+  const applySummary = applyFinished ? currentRows?.apply_summary : undefined;
   useEffect(() => {
     if (!currentPreview) return;
     const timer = window.setTimeout(
@@ -359,6 +366,19 @@ export function ReportImportEditor({
     await onSaved();
   }
   const count = (value: number) => value.toLocaleString("tr-TR");
+  async function downloadSkipped() {
+    if (!jobId || !applySummary || downloadingSkipped || locked) return;
+    setSkippedDownloadFailed(false);
+    setDownloadingSkipped(true);
+    try {
+      const blob = await downloadSkippedImportRows(scope, jobId);
+      if (mounted.current) saveCsv(blob, `import-skipped-${jobId}.csv`);
+    } catch (cause) {
+      if (mounted.current && !lost(cause)) setSkippedDownloadFailed(true);
+    } finally {
+      if (mounted.current) setDownloadingSkipped(false);
+    }
+  }
   function template() {
     const blob = new Blob(
       [
@@ -368,12 +388,7 @@ export function ReportImportEditor({
       ],
       { type: "text/csv;charset=utf-8" },
     );
-    const url = URL.createObjectURL(blob),
-      link = document.createElement("a");
-    link.href = url;
-    link.download = `${kind}-template.csv`;
-    link.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    saveCsv(blob, `${kind}-template.csv`);
   }
   return (
     <ReportImportSheet
@@ -562,6 +577,35 @@ export function ReportImportEditor({
               })}
               {currentJob.safe_error_code ? ` · ${currentJob.safe_error_code}` : ""}
             </p>
+          )}
+          {applySummary && (
+            <div className="space-y-2">
+              <p role="status">
+                {t(($) => $.reports.importApplySummary, {
+                  total: count(applySummary.total_rows),
+                  applied: count(applySummary.applied_rows),
+                  skipped: count(applySummary.skipped_rows),
+                  failed: count(applySummary.failed_rows),
+                  replayed: count(applySummary.replayed_rows),
+                })}
+              </p>
+              {applySummary.total_rows > applySummary.applied_rows && (
+                <Button
+                  variant="outline"
+                  isDisabled={locked || downloadingSkipped}
+                  onPress={() => void downloadSkipped()}
+                >
+                  {t(($) => $.reports.importSkippedDownload)}
+                </Button>
+              )}
+              {skippedDownloadFailed && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    {t(($) => $.reports.importSkippedDownloadFailed)}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
           )}
           {summary && (
             <>

@@ -8,6 +8,7 @@ export async function readImportRows(
   jobId: string,
   state?: ImportRowState,
   cursor?: string,
+  includeApplySummary = false,
 ) {
   const data = await (
     await scopedBackend(scope)
@@ -17,6 +18,7 @@ export async function readImportRows(
     job_id: z.uuid().parse(jobId),
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
     include_details: true,
+    ...(includeApplySummary ? { include_apply_summary: true } : {}),
     ...(state ? { state } : {}),
   });
   z.iso.datetime({ offset: true }).parse(data.as_of);
@@ -30,6 +32,14 @@ export async function readImportRows(
     z.number().int().positive().safe().parse(row.row_number);
     z.enum(["pending", "valid", "invalid", "applied", "failed"]).parse(row.state);
     if (state && row.state !== state) throw Error("IMPORT_ROWS_INVALID");
+  }
+  const summary = data.apply_summary;
+  if (summary) {
+    const { total_rows, applied_rows, skipped_rows, failed_rows, replayed_rows } = summary;
+    for (const count of [total_rows, applied_rows, skipped_rows, failed_rows, replayed_rows])
+      z.number().int().nonnegative().safe().parse(count);
+    if (applied_rows + skipped_rows + failed_rows + replayed_rows !== total_rows)
+      throw Error("IMPORT_ROWS_INVALID");
   }
   return data;
 }

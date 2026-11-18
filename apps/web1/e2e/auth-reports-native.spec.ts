@@ -221,9 +221,34 @@ test("CRM import explicitly selects an off-page row and keeps same-job apply pen
   f.releaseApply();
   await dialog.getByRole("button", { name: "İş durumunu oku", exact: true }).click();
   await expect(dialog.getByText(/İş: succeeded/)).toBeVisible();
+  await expect(
+    dialog.getByRole("status").filter({ hasText: "3 satır · 1 aktarıldı · 2 atlandı" }),
+  ).toBeVisible();
   await dialog.getByRole("button", { name: "Satırları gör", exact: true }).click();
   await dialog.getByRole("radio", { name: "Uygulandı", exact: true }).click();
   await expect(dialog.getByText("İkinci sentetik", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByRole("status").filter({ hasText: "3 satır · 1 aktarıldı · 2 atlandı" }),
+  ).toBeVisible();
+  await page.route(
+    "**/functions/v1/backend-v1/import_rows_list_v1?download=skipped_csv",
+    (route) => {
+      expect(route.request().method()).toBe("POST");
+      expect(route.request().postDataJSON()).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        job_id: f.jobId,
+      });
+      expect(route.request().postDataJSON()).not.toHaveProperty("state");
+      return route.fulfill({
+        contentType: "text/csv",
+        body: "row_number,outcome,error_code\r\n1,skipped,\r\n3,skipped,VALIDATION_FAILED\r\n",
+      });
+    },
+  );
+  const download = page.waitForEvent("download");
+  await dialog.getByRole("button", { name: "Aktarılmayan satırları indir (CSV)" }).click();
+  expect((await download).suggestedFilename()).toBe(`import-skipped-${f.jobId}.csv`);
   expect(f.writes.filter((row) => row.op === "import_apply_v1")).toHaveLength(1);
   expect(f.requests.some((row) => row.op === "import_rows_process_v1")).toBe(false);
   expect(

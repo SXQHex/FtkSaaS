@@ -79,8 +79,8 @@ export async function readJob(scope: ClientScope, id: string) {
   if (data.total_count !== null) z.number().int().nonnegative().safe().parse(data.total_count);
   return data;
 }
-export async function downloadReport(scope: ClientScope, jobId: string, key: string) {
-  // Pin the exact verified native session through both metadata and binary POST.
+async function reportFileSession(scope: ClientScope) {
+  // Pin the verified native session through the binary POST.
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error) throw error;
   if (!data.session) throw Error("AUTH_REQUIRED");
@@ -96,6 +96,10 @@ export async function downloadReport(scope: ClientScope, jobId: string, key: str
     request_id: uuidv7(),
   });
   if (account.id !== scope.accountId) throw Error("ACCOUNT_CHANGED");
+  return { backend, base, bearer };
+}
+export async function downloadReport(scope: ClientScope, jobId: string, key: string) {
+  const { backend, base, bearer } = await reportFileSession(scope);
   const request = {
     ...reportsCommon(scope),
     request_id: uuidv7(),
@@ -114,6 +118,22 @@ export async function downloadReport(scope: ClientScope, jobId: string, key: str
     !(Date.parse(file.expires_at) > Date.now())
   )
     throw Error("REPORT_DOWNLOAD_INVALID");
+  return requestCsv(url, bearer, { ...request, request_id: uuidv7() });
+}
+
+export async function downloadSkippedImportRows(scope: ClientScope, jobId: string) {
+  const { base, bearer } = await reportFileSession(scope);
+  const url = new URL(`${base}/functions/v1/backend-v1/import_rows_list_v1?download=skipped_csv`);
+  return requestCsv(url, bearer, {
+    ...reportsCommon(scope),
+    request_id: uuidv7(),
+    job_id: z.uuid().parse(jobId),
+    page: { limit: 1 },
+    include_apply_summary: true,
+  });
+}
+
+async function requestCsv(url: URL, bearer: string, request: object) {
   const response = await fetch(url, {
     method: "POST",
     credentials: "omit",
@@ -124,7 +144,7 @@ export async function downloadReport(scope: ClientScope, jobId: string, key: str
       apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ ...request, request_id: uuidv7() }),
+    body: JSON.stringify(request),
     signal: AbortSignal.timeout(30000),
   });
   if (!response.ok || !response.headers.get("content-type")?.startsWith("text/csv")) {
@@ -132,6 +152,15 @@ export async function downloadReport(scope: ClientScope, jobId: string, key: str
     throw Error("REPORT_DOWNLOAD_INVALID");
   }
   return response.blob();
+}
+
+export function saveCsv(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export interface ImportUploadIntent {
   scope: ClientScope;

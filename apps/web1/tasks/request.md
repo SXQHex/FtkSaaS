@@ -58,7 +58,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
 | W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
-| W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Açık](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
+| W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
 | W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Açık](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
 | W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Açık](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
 | W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Açık](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
@@ -444,9 +444,9 @@ Yoklama için izinli zaman aralığı varsa bu aralığın canlı politika ve ye
 
 ## W1-BE-50 · İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası
 
-**Açık · backend değerlendirmesi.** Güncel çizim, uygulama sonunda aktarılan ve atlanan satırların toplamını ve atlanan satırların dosyasını gösteriyor. `job_status_get_v1` ve `import_directory_get_v1` işin işlem ilerlemesini döndürüyor. `import_rows_list_v1` satır sonucunu yetkili ve sayfalı olarak döndürüyor. Uygulama sonucunun bütün iş için kesin toplamları ve bu işe bağlı atlanan satır dosyası yayımlanmış yanıtlarda bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L4729) · [WF10](../../../docs/workflows.md#wf10).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-İçe aktarma bittiğinde gerçekten uygulanan, atlanan ve başarısız satırların anlamlarını ve toplamlarını değerlendirin. Yetkili iş sahibi için atlanan satırların CSV olarak indirilmesinde mevcut organizasyon, merkez ve canlı dosya yetkisi korunmalı. Geri okuma veya dosya alma ikinci uygulama başlatmamalı. İşlem ilerlemesi ile kişi sayısı ayrı kalmalı.
+`import_rows_list_v1(include_apply_summary:true)` kesin uygulama sonucunu bütün iş için döndürür. Aynı yetkili okuyucunun `download=skipped_csv` biçimi, canlı kaynak dosyası ve iş sahibi denetimiyle aktarılmayan satırları indirir. [Çizim](../read-only/tasarim-v2/app.js#L4730) · [WF10](../../../docs/workflows.md#wf10) · [V04.3 Web1 kabulü](todo.md#v04).
 
 ## W1-BE-51 · Başarısız CSV dışa aktarımını yeniden başlatma
 

@@ -4490,6 +4490,9 @@
     "previewUnavailable": "Önizleme süresi dolmuş veya engel içeriyor. Kaynağı yeniden oku ve yeni önizleme oluştur.",
     "uploadUnknown": "Yükleme sonucu doğrulanamadı. Aynı dosya ve istekle yeniden doğrula.",
     "importFailed": "Aktarım kaynağı okunamadı veya dosya/eşleme geçersiz. Aynı isteğin durumunu kontrol et.",
+    "importApplySummary": "{{total}} satır · {{applied}} aktarıldı · {{skipped}} atlandı · {{failed}} başarısız · {{replayed}} önceki işlemden kullanıldı",
+    "importSkippedDownload": "Aktarılmayan satırları indir (CSV)",
+    "importSkippedDownloadFailed": "Aktarılmayan satırların CSV dosyası indirilemedi.",
     "importFields": {
       "source_key": "Kalıcı kaynak anahtarı",
       "display_name": "Ad soyad",

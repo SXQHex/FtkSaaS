@@ -3370,6 +3370,7 @@ export default interface Resources {
       "funnelHint": "Seçili merkez ve dönemde adayların üyeliğe dönüşümü.",
       "goPeople": "Üyeler'e git",
       "importApply": "Seçilen satırları içe aktar",
+      "importApplySummary": "{{total}} satır · {{applied}} aktarıldı · {{skipped}} atlandı · {{failed}} başarısız · {{replayed}} önceki işlemden kullanıldı",
       "importFailed": "Aktarım kaynağı okunamadı veya dosya/eşleme geçersiz. Aynı isteğin durumunu kontrol et.",
       "importFields": {
         "consents": "Kaynak izin kanıtları (JSON)",
@@ -3399,6 +3400,8 @@ export default interface Resources {
       "importNative": "Geçerli öğrenci satırları native kurala göre aktarılır. CRM başvurularında aktarılacak geçerli satırları açıkça seç. Kaynak dosya silinmez; izin veya gerçek ödeme üretilmez.",
       "importProgress": "İçe aktarma durumu",
       "importReview": "Seçili satırları ve uyarıları inceledim, içe aktarmayı onaylıyorum.",
+      "importSkippedDownload": "Aktarılmayan satırları indir (CSV)",
+      "importSkippedDownloadFailed": "Aktarılmayan satırların CSV dosyası indirilemedi.",
       "importTitle": "Üyeleri içe aktar",
       "importUnconfigured": "Merkez aktarım limitleri yapılandırılmamış; yükleme kapalı.",
       "imports": "İçe aktarmalar",

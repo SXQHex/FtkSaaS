@@ -427,7 +427,20 @@ export async function mockReports(
         : r.page.cursor
           ? actual.slice(1)
           : actual.slice(0, 1);
-      await send(nativePage(selected, r.state || r.page.cursor ? null : "rows-next"));
+      const applySummary =
+        r.include_apply_summary && applied && applyReleased
+          ? {
+              total_rows: rows.length,
+              applied_rows: actual.filter((row) => row.state === "applied").length,
+              skipped_rows: actual.filter((row) => row.state !== "applied").length,
+              failed_rows: 0,
+              replayed_rows: 0,
+            }
+          : undefined;
+      await send({
+        ...nativePage(selected, r.state || r.page.cursor ? null : "rows-next"),
+        ...(applySummary ? { apply_summary: applySummary } : {}),
+      });
     }
     if (op === "import_apply_v1") {
       writes.push({ op, r });
@@ -465,6 +478,7 @@ export async function mockReports(
   return {
     ...f,
     writes,
+    jobId,
     exportId,
     setExportState: (state: JobState) => {
       exportState = state;
