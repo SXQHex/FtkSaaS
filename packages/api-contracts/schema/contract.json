@@ -63460,6 +63460,9 @@
               "type": "null"
             }
           ]
+        },
+        "reservation_target": {
+          "$ref": "#/$defs/NotificationReservationSelector"
         }
       },
       "required": [
@@ -63552,6 +63555,9 @@
               "type": "null"
             }
           ]
+        },
+        "all_unread": {
+          "const": true
         }
       },
       "required": [
@@ -63559,8 +63565,91 @@
         "request_id",
         "org_id",
         "operation_key",
-        "read",
-        "notifications"
+        "read"
+      ],
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "read": {
+              "$ref": "#/$defs/Bool"
+            },
+            "notifications": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/$defs/NotificationReadSelection"
+              }
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "operation_key",
+            "read",
+            "notifications"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "read": {
+              "const": true
+            },
+            "center_id": {
+              "type": "null"
+            },
+            "all_unread": {
+              "const": true
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "operation_key",
+            "read",
+            "all_unread"
+          ],
+          "additionalProperties": false
+        }
       ],
       "additionalProperties": false
     },
@@ -65793,6 +65882,35 @@
         "ok",
         "data",
         "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationReservationSelector": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "reservation_list_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "session_id"
+          ],
+          "additionalProperties": false
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "operation",
+        "key",
+        "center_id"
       ],
       "additionalProperties": false
     }
@@ -95378,7 +95496,8 @@
           "selected_batch_all_or_nothing",
           "every_selected_row_version",
           "read_state_is_not_work_completion",
-          "no_notification_or_outbox_from_read_state"
+          "no_notification_or_outbox_from_read_state",
+          "organization_inbox_mark_all_live_recipient_snapshot"
         ],
         "audit": true,
         "notification": "none",
@@ -95428,7 +95547,8 @@
           }
         },
         "runtime_limits": [
-          "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
+          "An explicit selection contains 1–100 own notification IDs and versions. Duplicates, unavailable rows or any stale version reject the entire selection.",
+          "With all_unread=true and read=true, update the live recipient’s unread organization inbox as of the command snapshot. The mutation primary ID is the recipient person ID. Replay uses the original receipt."
         ],
         "runtime_path": "/functions/v1/backend-v1/notifications_read_set_v1",
         "runtime_external_path": "/functions/v1/backend-v1/notifications_read_set_v1",
@@ -113304,6 +113424,60 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/NotificationReservationSelector/properties/key/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/1/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/NotificationReservationSelector/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -113801,7 +113975,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 190,
+      "migration_count": 191,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

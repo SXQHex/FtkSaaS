@@ -1,5 +1,13 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-inbox"></a>
+## Web1 v67 gelen kutusu
+
+Başlangıç main `6469ac7387da73d974b1e48238daa1243d0bc092`. Aynı SHA’nın [main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/44324726840) ve [merge kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/44324726809) başarılı. W1-BE-47/48 tüketim sözleşmesi [WF11](../../../docs/workflows.md#wf11), açık kabul kapıları ve diğer talepler [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir. 191. append migration ve üretilmiş istemci sözleşmesi hazır. Aday CI, merge ve development doğrulaması açık.
+
+Yerel Auth → Edge → RPC kabulünde dört ilgili senaryo geçti. Sözleşme/governance/restore 458/458, kalite 10/10 ve sıfır bulgu. CI araçlarında doğrudan geçici dizinle 148/149 sonuç alındı. Linux `/proc` bellek örneği macOS’ta üretilemedi. Üretilmiş Edge paketinin JSON boyutu 3.947.801 bayt. Özdeş koleksiyon/birleşim şemaları paylaşılır ve 477 doğrulayıcı için eşdeğerlik testi geçer.
+
+
 ## W1-BE-42 Starter oturumunun kendi yönetim kapsamı
 
 Başlangıç main `40cdd1ff4b06f4af1b3e13ae3527d440ebea5f96` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44290448188) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44290509069) başarılı. Yeni opt-in okumanın tüketim sözleşmesi [WF02](../../../docs/workflows.md#wf02) sahibindedir.

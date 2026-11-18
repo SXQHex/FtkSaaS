@@ -6350,7 +6350,8 @@
       },
       "billing_class": "maintenance",
       "limits": [
-        "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
+        "An explicit selection contains 1–100 own notification IDs and versions. Duplicates, unavailable rows or any stale version reject the entire selection.",
+        "With all_unread=true and read=true, update the live recipient’s unread organization inbox as of the command snapshot. The mutation primary ID is the recipient person ID. Replay uses the original receipt."
       ]
     },
     {

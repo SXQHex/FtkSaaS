@@ -3547,6 +3547,72 @@ freeze_cancellation: FreezeCancellationImpact
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_notifications_read_set".
+ */
+export type RequestNotificationsReadSet = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: Bool
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+notifications?: [NotificationReadSelection, ...(NotificationReadSelection)[]]
+center_id?: (string | null)
+all_unread?: true
+} & RequestNotificationsReadSet1)
+export type RequestNotificationsReadSet1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: Bool
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+notifications: [NotificationReadSelection, ...(NotificationReadSelection)[]]
+center_id?: (string | null)
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: true
+center_id?: null
+all_unread: true
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementWorkKind".
  */
 export type ManagementWorkKind = ("lesson_request" | "lesson_attendance" | "event_attendance" | "crm_followup" | "application_review")
@@ -5110,6 +5176,7 @@ DocumentDirectoryHistory?: DocumentDirectoryHistory
 DocumentDirectoryPage?: DocumentDirectoryPage
 Request_document_directory_get?: RequestDocumentDirectoryGet
 Success_document_directory_get?: SuccessDocumentDirectoryGet
+NotificationReservationSelector?: NotificationReservationSelector
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8523,6 +8590,7 @@ export interface NotificationSourceState {
 state: ("pending" | "completed" | "informational" | "unavailable")
 center_id: (string | null)
 selector: (ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorCrmActivitySaveV1 | null)
+reservation_target?: NotificationReservationSelector
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8612,6 +8680,23 @@ state?: ("all" | "pending" | "completed" | "overdue" | "today")
 assigned_to?: (string | null)
 interval?: Interval
 })
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationReservationSelector".
+ */
+export interface NotificationReservationSelector {
+operation: "reservation_list_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30991,32 +31076,6 @@ export interface NotificationReadSelection {
  */
 id: string
 expected_version: PositiveInt
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_notifications_read_set".
- */
-export interface RequestNotificationsReadSet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-read: Bool
-/**
- * @minItems 1
- * @maxItems 100
- */
-notifications: [NotificationReadSelection, ...(NotificationReadSelection)[]]
-center_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

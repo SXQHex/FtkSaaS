@@ -2,6 +2,24 @@
 
 Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin tek sahibidir**. [Sıra ve kontrol noktaları](production-queue.md), [kaynak/test/hosted kabulü](00-FtkSaaS-yeni-sohbet-devir.md), [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [domain davranışı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [P08](../../../docs/decisions/P08-accepted-scope.md) kendi sahiplerinde tutulur. Buradaki ölçülebilir kabul senaryoları yeni ürün kuralı değildir. F01–F33/14 modül kapsamı korunur; mevcut sağlam kod yeniden yazılmaz.
 
+<a id="web1-v67-backend"></a>
+## Web1 v67 backend talepleri
+
+Kapsam `apps/web1/tasks/request.md` içindeki W1-BE-43–53 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-inbox) kalır.
+
+| Talep | Backend kabul ölçütü |
+|---|---|
+| W1-BE-43 | [WF02](../../../docs/workflows.md#wf02) platform sahibi, doğrulanmış hesap, organizasyon, merkez ve canlı CM sözleşmesine dayanır. Hazır organizasyonda mevcut `manager_self_assign_center_v1` veya yetkili `center_manager_assign_v1` ve ardından self yönetim kapsamı okuması kullanılır. Organizasyonsuz hesabın hazırlama talebini nasıl başlatacağı ve hangi platform operatörü akışının karşılayacağı belirlenmeli. |
+| W1-BE-44 | [WF06](../../../docs/workflows.md#wf06) mevcut özel ders talebinde opsiyonel notu kaydetmeli. Eski kayıt, metin sınırı, öz/yetkili okuma, yabancı ret ve aynı-key davranışı doğrulanmalı. |
+| W1-BE-45 | [WF14](../../../docs/workflows.md#wf14) kendi hakedişinde kapanış anındaki seans ve anlaşma bağını projekte etmeli. Düzeltme, önceki kayıt ve atama kaybında tarihsel bağ doğrulanmalı. |
+| W1-BE-46 | [WF09](../../../docs/workflows.md#wf09) yönetilen program aboneliğinin rolü, planı, kapsamı ve dışarı açılacak alanları belirlenmeli. Oluşturma, yenileme ve yetki kaybı gerçek feed üzerinden sınanmalı. |
+| W1-BE-47/48 | [WF11](../../../docs/workflows.md#wf11) organizasyon gelen kutusunun tamamında aynı-key okuma ve canlı rezervasyon doğrulanınca ders hedefi. Açık seçili komut, yabancı alıcı, sonradan gelen ileti, devredilen hesap bağı ve erişim kaybı regresyonları. |
+| W1-BE-49 | [WF07](../../../docs/workflows.md#wf07) için geçerli zaman politikası ve revizyona bağlı eğitmen düzeltme isteği karara bağlanmalı. İstek yoklamayı veya finansı etkilemeden ayrı izlenmeli. |
+| W1-BE-50 | [WF10](../../../docs/workflows.md#wf10) uygulama sonucu satır sayısı ve atlanan satır CSV'si. Final satır durumları, canlı dosya erişimi ve ikinci apply oluşmaması doğrulanmalı. |
+| W1-BE-51 | [WF10](../../../docs/workflows.md#wf10) kesin başarısız CSV işinin kayıtlı filtreleriyle yeniden başlatılması. İş sahibinin güncel export yetkisi, otomatik retry ayrımı ve aynı-key davranışı doğrulanmalı. |
+| W1-BE-52 | [WF10](../../../docs/workflows.md#wf10) CRM dönem kohortu, ara aşama ölçümü ve kaynak kırılımı. Geçmiş aşama kanıtı ve mevcut rapor/export kapsamı birlikte değerlendirilmeli. |
+| W1-BE-53 | [WF16](../../../docs/workflows.md#wf16) aday görünürlüğü, arama ve sorumlu filtresinde bütün aşamaları toplamalı. Teklif, kayıt ve katılım ayrı sayılmalı. |
+
 <a id="s18"></a>
 ## S18 — Statik SPA backend transportu
 
