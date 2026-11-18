@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "e1a5aa2c145406d89dcc7d67eb627961ebb527d983f74241b68ae344fe1f0746"
+          "sha256": "a2dacfbf173167e7ab7b38fde92bcaafb8354a5fa129a6f4edb159448231680f"
         },
         {
           "line": 147,
@@ -1389,7 +1389,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/settings-domain-closure-acceptance.mjs",
-          "sha256": "946f1beb7150848fe3b9e39f03c01a78efe763c908de7bc2321f2a3704620edd"
+          "sha256": "69f9c78e754177acc47dedf9803de1b3731f61b5c415d4a1ba0461d82875d0e4"
         },
         {
           "line": 2,

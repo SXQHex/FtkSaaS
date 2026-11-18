@@ -98,7 +98,10 @@ test('Starter studio setup: one room, timed sales and immutable published names'
    assert.equal((await rows('select count(*)::int n from core.role_assignments where org_id=$1 and person_id=$2',[org,target]))[0].n,0);
    const v=(await publish('Yoga · public onboarding',{kind:'credits',credits:1})).primary_id;
    const preview=await mut('sale_preview_v1',{person_id:target,product_version_id:v,start_date:day(-1),end_date:day(30)}),sale=(await mut('sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
-   const blocked=await call(newcomer,'reservation_create_v1',scope({session_id:publicSession,person_id:target,mode:'flexible',source_sale_id:sale}),key());assert.equal(blocked.result.ok,false);assert.equal(blocked.result.error.code,'FORBIDDEN');
+   const reservation=scope({session_id:publicSession,person_id:target,mode:'flexible',source_sale_id:sale});
+   const blocked=await call(student,'reservation_create_v1',reservation,key());assert.equal(blocked.result.ok,false);assert.equal(blocked.result.error.code,'FORBIDDEN');
+   const debtBlocked=await call(newcomer,'reservation_create_v1',reservation,key());
+   assert.equal(debtBlocked.result.ok,false);assert.equal(debtBlocked.result.error.code,'DEBT_BOOKING_BLOCKED');
    const debts=await rows('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale]);await mut('collection_record_v1',{person_id:target,debt_ids:debts.map(x=>x.id),amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()});
    const booking=await mut('reservation_create_v1',{session_id:publicSession,person_id:target,mode:'flexible',source_sale_id:sale},key(),newcomer);assert(booking.primary_id);
    const forbidden=await call(newcomer,'policies_get_v1',scope({keys:[]}));assert.equal(forbidden.result.ok,false);assert.equal(forbidden.result.error.code,'FORBIDDEN');

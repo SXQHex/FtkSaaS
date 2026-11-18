@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "a59a1847a5ab9db6742d3d74da5912fe77e95fc898b254da2323aa2415fd6c70",
-        "reason": "Verified that updated source hashes retain the same two imported acceptance modules and API inventory ownership. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "3c58f06fb29c59f6761e2836cff3c59a430ca95a4d4cc32249e1b9356eb2734d",
+        "reason": "Verified the user-approved single debt assertion change, with exact permission denial and unchanged API test ownership."
       }
     },
     {
@@ -629,8 +629,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "29fcb75d7f4a2000c014d5a5cb92ac2dbfacfbfc6fd307e5f4adebb35f8e1c93",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "2dec07318888a12f1db859fc10ed4df4e4fc015c0cafffac61017f3a195d6543",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -746,8 +746,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "4b30b0926b21285e41ab3a3975e42a5aaf8fc954e984a71967b61a4c54729962",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "6df222c2cd3b26db63d4ad2224ac38830e2ef6cf01e136f837f8791ded9d183c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -874,8 +874,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "bdd634818fc114ccd7e0073b14a0097084defa027a7df9b87d411080cac15b2c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery."
+        "fingerprint": "33f68384f6943a77f2b32587d61299c141e4be9d0c64385d7fdaa2e9e47022d7",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -982,8 +982,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "20f9e885d968c6f6a153a35dbd7a21d2f3af91fbb96751fb4595e6f2f9d5866c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "efd0b2cb622a4e679eb86b1569618d3f3a0a6a1528ce6fe50b7bca722be6731a",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1051,8 +1051,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "4d8a5a56a15ac86ee6fe17f85fc63496c27006f6e7c6cca15e4b34ebc115659e",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery."
+        "fingerprint": "56c90b70ba10fa607c4287c13a2238bf04242952c1adb0235daada19d090c082",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1126,8 +1126,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "a4c713648090135491d9fdccfe7635d461f6b70ea7b725078d6366bb9c33a96c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "43172ba5555a681324edcb52eff15f14d760eb5c3dd7aecd4de2c62d0f379421",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1235,8 +1235,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "d85e29590e9c763b9c1e29c76675ea028d23563b19753d98992c0d1d4980fde6",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
+        "fingerprint": "a104020c17cbaf0cf175f7cf7495449729de64ef003408e19d42c77c83cb1bd0",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1304,8 +1304,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "cf97c3b6f4b8d3e50339a24b04279d80c5ac17819f608790b15ffa12a08f1e36",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
+        "fingerprint": "380eb4978b5c58526ca9443b3f8c8b0708d95b3a6c4a0717000fdb51081b5202",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1389,8 +1389,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "38ffd82a7bf8de633e46b0077e9cb6097ca3e48c1914508a7e6aefb5d60fd86e",
-        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "ad29a181d8ec82e810e05309e02c845595269f2b8902edfc54bba109f52704b4",
+        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1527,8 +1527,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "727c3ca0042640bcf78218d2b809ebff13311696f1914d4e886e3e24e52bdae3",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
+        "fingerprint": "1bdd0d03d113ff1bb54efde7ad548243d29a12799e263c6363823f1146848a2f",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
@@ -1822,8 +1822,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "0220749a07a395b3b19d28a15dd485dbdc6e3725b41ac8618e973c955bae559c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "4f0982a5edd900a382a0217eae90f8fdf85178c99d93093fa98945ee639cdd7f",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
       }
     },
     {
