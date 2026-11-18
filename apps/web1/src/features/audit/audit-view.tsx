@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { UploadIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -55,8 +55,7 @@ export interface AuditOperationRow {
   context: string;
   state: string;
   note?: string;
-  progress?: { count: number; total: number | null; label: string };
-  action?: { label: string; onAction: () => void };
+  progress?: { count: number; total: number; label: string };
 }
 export function AuditView({
   tab,
@@ -73,7 +72,6 @@ export function AuditView({
   notice,
   pagination,
   onOpen,
-  onExport,
   locked = false,
   filtersAvailable = false,
 }: {
@@ -91,7 +89,6 @@ export function AuditView({
   notice?: ReactNode;
   pagination?: ReactNode;
   onOpen: (id: string) => void;
-  onExport?: () => void;
   locked?: boolean;
   filtersAvailable?: boolean;
 }) {
@@ -105,12 +102,6 @@ export function AuditView({
             {t(($) => $.audit.description)}
           </p>
         </div>
-        {tab === "records" && (
-          <Button variant="outline" isDisabled={locked || !onExport} onPress={onExport}>
-            <UploadIcon data-icon="inline-start" />
-            {t(($) => $.audit.export)}
-          </Button>
-        )}
       </header>
       {notice}
       <Tabs
@@ -300,30 +291,15 @@ export function AuditView({
                             </ItemDescription>
                             {row.progress && (
                               <Progress
-                                aria-label={row.progress.label}
-                                value={row.progress.total === null ? 0 : row.progress.count}
-                                isIndeterminate={row.progress.total === null}
-                                maxValue={Math.max(row.progress.total ?? 1, 1)}
-                                valueLabel={
-                                  row.progress.total === null
-                                    ? undefined
-                                    : `${row.progress.count} / ${row.progress.total}`
-                                }
+                                aria-label={t(($) => $.audit.progress)}
+                                value={row.progress.count}
+                                maxValue={row.progress.total}
+                                valueLabel={row.progress.label}
                               />
                             )}
                           </ItemContent>
                           <ItemActions className="flex-wrap">
                             <Badge variant="secondary">{row.state}</Badge>
-                            {row.action && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onPress={row.action.onAction}
-                                isDisabled={locked}
-                              >
-                                {row.action.label}
-                              </Button>
-                            )}
                           </ItemActions>
                         </Item>
                       </div>
@@ -331,6 +307,7 @@ export function AuditView({
                   </ItemGroup>
                 )}
               </CardContent>
+              {pagination && <CardFooter className="justify-end border-t">{pagination}</CardFooter>}
             </Card>
           </div>
         </TabsContent>

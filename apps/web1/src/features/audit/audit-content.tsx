@@ -87,6 +87,13 @@ export function AuditContent({
       timeStyle: "short",
     }).format(new Date(value)) + ` ${timezone}`;
   const formatCount = (value: number) => value.toLocaleString("tr-TR");
+  const modules = auditModules.map((id) => ({ id, label: t(($) => $.audit.modules[id]) }));
+  const trackingLabels: Readonly<Partial<Record<string, string>>> = t(
+    ($) => $.audit.trackingStates,
+    {
+      returnObjects: true,
+    },
+  );
   const next = !source.isError && timezone ? source.data?.next_cursor : undefined;
   const refresh = () => {
     reset();
@@ -105,7 +112,7 @@ export function AuditContent({
           setFilter(value);
           reset();
         }}
-        modules={auditModules.map((id) => ({ id, label: id }))}
+        modules={modules}
         results={[{ id: "recorded", label: t(($) => $.audit.recorded) }]}
         filtersAvailable={!!timezone}
         rows={
@@ -119,31 +126,42 @@ export function AuditContent({
           })) ?? null
         }
         operations={
-          operations?.items.map((row) => ({
-            id: `${row.kind}:${row.id}`,
-            title: row.operation,
-            context: `${t(($) => $.audit.kinds[row.kind])} · ${date(row.created_at)}`,
-            state: row.state,
-            note: [
-              row.safe_error_code,
-              row.expires_at ? t(($) => $.audit.expiry, { time: date(row.expires_at) }) : undefined,
-              row.next_attempt_at
-                ? t(($) => $.audit.nextAttempt, { time: date(row.next_attempt_at) })
-                : undefined,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-            ...(row.progress_count !== null
-              ? {
-                  progress: {
-                    count: row.progress_count,
-                    total: row.total_count,
-                    label: t(($) => $.audit.progress),
-                  },
-                }
-              : {}),
-            action: { label: t(($) => $.audit.refresh), onAction: () => void tracking.refetch() },
-          })) ?? null
+          operations?.items.map((row) => {
+            const { progress_count: processed, total_count: total } = row;
+            const progressLabel =
+              processed === null
+                ? undefined
+                : total === null
+                  ? t(($) => $.audit.processed, { processed: formatCount(processed) })
+                  : t(($) => $.audit.processedTotal, {
+                      processed: formatCount(processed),
+                      total: formatCount(total),
+                    });
+            return {
+              id: `${row.kind}:${row.id}`,
+              title: row.operation,
+              context: `${t(($) => $.audit.kinds[row.kind])} · ${date(row.created_at)}`,
+              state: Object.hasOwn(trackingLabels, row.state)
+                ? (trackingLabels[row.state] ?? row.state)
+                : row.state,
+              note: [
+                progressLabel,
+                row.safe_error_code,
+                row.expires_at
+                  ? t(($) => $.audit.expiry, { time: date(row.expires_at) })
+                  : undefined,
+                row.next_attempt_at
+                  ? t(($) => $.audit.nextAttempt, { time: date(row.next_attempt_at) })
+                  : undefined,
+              ]
+                .filter(Boolean)
+                .join(" · "),
+              progress:
+                processed !== null && total !== null && total > 0 && progressLabel
+                  ? { count: processed, total, label: progressLabel }
+                  : undefined,
+            };
+          }) ?? null
         }
         summary={{
           attention: operations ? formatCount(operations.summary.attention) : null,
@@ -265,7 +283,8 @@ export function AuditContent({
             subject: detail.subject_title ?? detail.subject.type,
             date: date(detail.created_at),
             actor: detail.actor_display,
-            module: detail.module ?? undefined,
+            module:
+              modules.find(({ id }) => id === detail.module)?.label ?? detail.module ?? undefined,
             result: t(($) => $.audit.recorded),
             reason: detail.reason ?? undefined,
             changes:

@@ -242,7 +242,6 @@ export default interface Resources {
       "empty": "Bu filtreye uyan kayıt yok.",
       "emptyOperations": "Bu kapsamda işlem yok.",
       "expiry": "Son geçerlilik: {{time}}",
-      "export": "Kaydı dışa aktar",
       "immutable": "Bu kayıt değiştirilemez ve silinemez.",
       "kind": "Kayıt türü",
       "kinds": {
@@ -252,10 +251,10 @@ export default interface Resources {
         "preview": "Önizleme"
       },
       "metricHints": {
-        "attention": "Onay, kısmi ya da yeniden denenebilir",
+        "attention": "Geçerli önizlemeler",
         "completed": "Yetkili liste kapsamı",
         "retry": "Yeniden deneme bekleyen işler",
-        "running": "İşlerin güncel durumu"
+        "running": "Sıradaki ve çalışan işler"
       },
       "metrics": {
         "attention": "Dikkat gerektiren",
@@ -265,22 +264,22 @@ export default interface Resources {
       },
       "module": "Modül",
       "modules": {
-        "M01": "M01",
-        "M02": "M02",
-        "M03": "M03",
-        "M04": "M04",
-        "M05": "M05",
-        "M06": "M06",
-        "M07": "M07",
-        "M08": "M08",
-        "M09": "M09",
-        "M10": "M10",
-        "M11": "M11",
-        "M12": "M12",
-        "M13": "M13",
-        "M14": "M14",
-        "M17": "M17",
-        "X": "X"
+        "M01": "Organizasyon ve merkezler",
+        "M02": "Kimlik ve erişim",
+        "M03": "Kişiler ve üyelik ilişkileri",
+        "M04": "Planlama ve rezervasyon",
+        "M05": "Ders gerçekleşmesi ve katılım",
+        "M06": "Ders paketleri ve kullanım hakları",
+        "M07": "Finans ve tahsilat",
+        "M08": "Eğitmen hakedişleri",
+        "M09": "CRM",
+        "M10": "Bildirimler",
+        "M11": "Raporlama",
+        "M12": "SaaS aboneliği ve ürün erişimi",
+        "M13": "Etkinlik",
+        "M14": "Belge ve onay yönetimi",
+        "M17": "Otomasyon",
+        "X": "Ortak işlemler"
       },
       "nativeRecords": "Bu liste kesinleşmiş merkez kayıtlarını gösterir. Ret kayıtları ve denetim dışa aktarımı sunulmaz.",
       "nativeTracking": "Yalnız kendi hesabının bu merkezde yetkili olduğu işlem, önizleme ve rapor/import işleri gösterilir. Güncelleme yalnız durumu yeniden okur.",
@@ -288,7 +287,7 @@ export default interface Resources {
       "noDetails": "Ek ayrıntı yok.",
       "notProvided": "Bu bilgi sunulmuyor.",
       "operations": "İşlemler",
-      "operationsDescription": "Önizleme, onay ve uzun süren işler. Kısmen tamamlanan ve yeniden denenecek işler tamamlanmış sayılmaz.",
+      "operationsDescription": "Önizlemeler, kaydedilen işlemler ve arka planda yürütülen işler.",
       "pageCount": "Bu sayfada {{count}} kayıt" | "Bu sayfada {{count}} kayıt",
       "period": "Dönem",
       "periods": {
@@ -297,6 +296,8 @@ export default interface Resources {
         "7": "7 gün",
         "all": "Tümü"
       },
+      "processed": "{{processed}} kayıt işlendi",
+      "processedTotal": "{{total}} kaydın {{processed}} tanesi işlendi",
       "progress": "İşlenen kayıtlar",
       "recorded": "Kaydedildi",
       "records": "Denetim kaydı",
@@ -309,6 +310,22 @@ export default interface Resources {
       "tabsLabel": "Denetim bölümleri",
       "time": "Zaman",
       "title": "Denetim",
+      "trackingStates": {
+        "applied": "Uygulandı",
+        "cancelled": "İptal edildi",
+        "current": "Geçerli önizleme",
+        "expired": "Önizleme süresi doldu",
+        "failed": "Başarısız",
+        "failed_final": "Başarısız",
+        "invalidated": "Geçersiz kılındı",
+        "partial": "Kısmen tamamlandı",
+        "pending": "Sırada",
+        "result_expired": "Sonuç saklama süresi doldu",
+        "retry_wait": "Yeniden deneme bekliyor",
+        "running": "Çalışıyor",
+        "succeeded": "Tamamlandı",
+        "superseded": "Yerine yeni önizleme oluşturuldu"
+      },
       "unread": "Bu kapsamın kayıtları henüz okunamadı."
     },
     "auth": {

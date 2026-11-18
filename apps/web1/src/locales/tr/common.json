@@ -4822,7 +4822,6 @@
   "audit": {
     "title": "Denetim",
     "description": "Kim, neyi, ne zaman yaptı ve uzun işlerin durumu. Kayıtlar değiştirilemez ve silinemez.",
-    "export": "Kaydı dışa aktar",
     "tabsLabel": "Denetim bölümleri",
     "records": "Denetim kaydı",
     "operations": "İşlemler",
@@ -4846,7 +4845,7 @@
     "unread": "Bu kapsamın kayıtları henüz okunamadı.",
     "empty": "Bu filtreye uyan kayıt yok.",
     "emptyOperations": "Bu kapsamda işlem yok.",
-    "operationsDescription": "Önizleme, onay ve uzun süren işler. Kısmen tamamlanan ve yeniden denenecek işler tamamlanmış sayılmaz.",
+    "operationsDescription": "Önizlemeler, kaydedilen işlemler ve arka planda yürütülen işler.",
     "metrics": {
       "attention": "Dikkat gerektiren",
       "running": "Çalışıyor",
@@ -4854,8 +4853,8 @@
       "completed": "Tamamlanan"
     },
     "metricHints": {
-      "attention": "Onay, kısmi ya da yeniden denenebilir",
-      "running": "İşlerin güncel durumu",
+      "attention": "Geçerli önizlemeler",
+      "running": "Sıradaki ve çalışan işler",
       "retry": "Yeniden deneme bekleyen işler",
       "completed": "Yetkili liste kapsamı"
     },
@@ -4879,6 +4878,8 @@
     "kind": "Kayıt türü",
     "state": "Durum kodu (isteğe bağlı)",
     "progress": "İşlenen kayıtlar",
+    "processed": "{{processed}} kayıt işlendi",
+    "processedTotal": "{{total}} kaydın {{processed}} tanesi işlendi",
     "expiry": "Son geçerlilik: {{time}}",
     "nextAttempt": "Sonraki deneme: {{time}}",
     "pageCount_one": "Bu sayfada {{count}} kayıt",
@@ -4890,22 +4891,38 @@
       "job": "İş"
     },
     "modules": {
-      "M01": "M01",
-      "M02": "M02",
-      "M03": "M03",
-      "M04": "M04",
-      "M05": "M05",
-      "M06": "M06",
-      "M07": "M07",
-      "M08": "M08",
-      "M09": "M09",
-      "M10": "M10",
-      "M11": "M11",
-      "M12": "M12",
-      "M13": "M13",
-      "M14": "M14",
-      "M17": "M17",
-      "X": "X"
+      "M01": "Organizasyon ve merkezler",
+      "M02": "Kimlik ve erişim",
+      "M03": "Kişiler ve üyelik ilişkileri",
+      "M04": "Planlama ve rezervasyon",
+      "M05": "Ders gerçekleşmesi ve katılım",
+      "M06": "Ders paketleri ve kullanım hakları",
+      "M07": "Finans ve tahsilat",
+      "M08": "Eğitmen hakedişleri",
+      "M09": "CRM",
+      "M10": "Bildirimler",
+      "M11": "Raporlama",
+      "M12": "SaaS aboneliği ve ürün erişimi",
+      "M13": "Etkinlik",
+      "M14": "Belge ve onay yönetimi",
+      "M17": "Otomasyon",
+      "X": "Ortak işlemler"
+    },
+    "trackingStates": {
+      "pending": "Sırada",
+      "running": "Çalışıyor",
+      "partial": "Kısmen tamamlandı",
+      "retry_wait": "Yeniden deneme bekliyor",
+      "succeeded": "Tamamlandı",
+      "failed": "Başarısız",
+      "failed_final": "Başarısız",
+      "cancelled": "İptal edildi",
+      "current": "Geçerli önizleme",
+      "applied": "Uygulandı",
+      "expired": "Önizleme süresi doldu",
+      "invalidated": "Geçersiz kılındı",
+      "superseded": "Yerine yeni önizleme oluşturuldu",
+      "result_expired": "Sonuç saklama süresi doldu"
     }
   },
   "help": {
