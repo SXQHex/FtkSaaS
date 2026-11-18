@@ -32,7 +32,7 @@ test('W1-BE-33 manager directory discovers historical instructor ledgers and pre
 });
 test('W1-BE-30 native reports keep gross sales separate from collections and expose scoped import discovery',async t=>{
  const f=await preparationFixture({schedule:true}),{db,org,center,api}=f;t.after(()=>db.end());
- const start=Date.now()+4*86400000,session=(await api('session_create_v1',{discipline_id:f.discipline,format:'group',interval:{starts_at:new Date(start).toISOString(),ends_at:new Date(start+3600000).toISOString()},resources:[{kind:'room',id:f.room}],assignments:[{person_id:f.person,duty:'instructor'}],capacity:{total:8}})).primary_id;
+ const start=Date.parse(f.day(4)+'T12:00:00Z'),session=(await api('session_create_v1',{discipline_id:f.discipline,format:'group',interval:{starts_at:new Date(start).toISOString(),ends_at:new Date(start+3600000).toISOString()},resources:[{kind:'room',id:f.room}],assignments:[{person_id:f.person,duty:'instructor'}],capacity:{total:8}})).primary_id;
  await db.query("update core.saas_plan_versions set name='business',features=(select array_agg(distinct x) from unnest(features||array['F28','F31','F33','F06','F19']) x) where id=$1",[f.plan]);
  const person=(await api('person_create_v1',{display_name:'Synthetic report buyer',contacts:[]})).primary_id;await api('student_activate_v1',{person_id:person});
  const product=(await api('product_publish_v1',{terms:{name:'Immutable report package',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'100',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:f.discipline,usage_targets:['lesson']}]}})).primary_id;

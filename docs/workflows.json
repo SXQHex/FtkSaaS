@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "b23e462f4697ebee1fa10c20044432785c5b6c033db9a51db7ca8b181191f808",
-        "reason": "Verified the existing event acceptance import retains complete coverage with the updated test source hash."
+        "fingerprint": "ed627e97a0249af9571efdc69c753e59f9ae8182dbbcc90236fb4d8fb98d2e6d",
+        "reason": "Verified that updated source hashes retain the same two imported acceptance modules and API inventory ownership."
       }
     },
     {
@@ -1231,8 +1231,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "cbdbcb02b05ff14b6478bee580ba6a63d9fa279e49e45f324ee3faab144d2d90",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "d85e29590e9c763b9c1e29c76675ea028d23563b19753d98992c0d1d4980fde6",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
       }
     },
     {
@@ -1300,8 +1300,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "fa406fe8e57ef0d45b00f5beb339ef89ba0a0e5334d0854b063b95998a9f7f0d",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "cf97c3b6f4b8d3e50339a24b04279d80c5ac17819f608790b15ffa12a08f1e36",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
       }
     },
     {
@@ -1520,8 +1520,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "dcb94985fa7e644ed4aa8f0d8e619e4eeb2d834783d575fb2ec0522b2bdf010d",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "727c3ca0042640bcf78218d2b809ebff13311696f1914d4e886e3e24e52bdae3",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
       }
     },
     {
@@ -1662,8 +1662,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "564ba2c347afc2e971df21287f2c909e7c9a96ded98e963900047aec1a7ce01e",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "5f2e5433422e6deeabf9d4753cca6fe01e3e01fb54ded4ff6bf8e1a9d9fed7ce",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
       }
     },
     {

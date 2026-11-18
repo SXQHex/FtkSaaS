@@ -2,7 +2,7 @@
 
 ## W1-BE-38 ilk etkinlik kaydında üyenin belge keşfi
 
-Aynı taslak PR’da [WF11 ilk kayıt akışı](../../../docs/workflows.md#wf11), mevcut native kayıt önizlemesini üyenin kendi belge dizinine bağlıyor. Ürün sürümü gerçek seçilmiş satıştan okunur. Yerel native Auth ve Edge üzerinde üyenin keşif ve kendi onayı sonrası yöneticinin ilk kaydı tamamladığı, taslak/süresi geçmiş/yabancı bağlam ve kaynağa bağlı olmayan ürün okumasının reddedildiği doğrulandı. Mevcut üye belge keşfi regresyonu ve kaynak/kapsam paketindeki 349 test geçti. [İlk aday koşusu](https://github.com/SXQHex/FtkSaaS/actions/runs/44200387134) API test envanterindeki kaynak hash eşliğinde durdu. Mevcut importun hash’i güncellendi. Yeni aday CI ve development teslimi bekleniyor.
+Aynı taslak PR’da [WF11 ilk kayıt akışı](../../../docs/workflows.md#wf11), mevcut native kayıt önizlemesini üyenin kendi belge dizinine bağlıyor. Ürün sürümü gerçek seçilmiş satıştan okunur. Yerel native Auth ve Edge üzerinde üyenin keşif ve kendi onayı sonrası yöneticinin ilk kaydı tamamladığı, taslak/süresi geçmiş/yabancı bağlam ve kaynağa bağlı olmayan ürün okumasının reddedildiği doğrulandı. Mevcut üye belge keşfi regresyonu ve kaynak/kapsam paketindeki 349 test geçti. [Aday koşusunda](https://github.com/SXQHex/FtkSaaS/actions/runs/44202210987) core ve W1-BE-38’i içeren API-2 başarılıydı. API-11/12’de W1-BE-30 ve W1-BE-25 seans fixture’ları UTC gece yarısını aştığında RESOURCE_CONFLICT aldı. İki fixture kendi UTC gününde 12.00–13.00 aralığına taşındı ve güncel hash’ler aynı API envanterine işlendi. Yerel native tekrar 3/3 geçti. Yeni aday CI ve development teslimi bekleniyor.
 
 ## W1-BE-37 native parola bildirimi
 

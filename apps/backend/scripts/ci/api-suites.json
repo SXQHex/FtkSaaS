@@ -385,12 +385,12 @@
         {
           "line": 420,
           "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
-          "sha256": "fc766a6002e5ebaf339ecfae436354eec50bc681a1f3b0894e7ae8e00cbded8c"
+          "sha256": "11551bf0545e0a00ce854a1fa6f2bba65a377b1841ea0463af3c5c43894176c5"
         },
         {
           "line": 421,
           "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-          "sha256": "db5c957c62e89a864534ed3c30660f99bdf9299829791a1155a815b15f417179"
+          "sha256": "273cf74b7cf76d79fca157d9580c776cf763362b1bb64b63e1ede2e613f5f7ad"
         },
         {
           "line": 422,
