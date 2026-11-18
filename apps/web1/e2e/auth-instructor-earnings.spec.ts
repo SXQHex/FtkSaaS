@@ -24,6 +24,7 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     const req = route.request().postDataJSON();
     if (req.view !== "earnings") return route.fallback();
     requests.push(req);
+    expect(req.include_session_context).toBe(true);
     expect(req.person_id).toBe(I.instructor);
     expect(req.center_id).toBe(I.center);
     await earningsGate;
@@ -42,6 +43,12 @@ test("own earnings preserves cursor scope and currency alongside native summarie
       closure_id: null,
       created_at: req.interval?.starts_at ?? "2019-01-01T00:00:00Z",
       version: 1,
+      session_context: {
+        title: req.page.cursor ? null : "Kapanıştaki Tango dersi",
+        scheduled_duration_seconds: req.page.cursor ? null : 5400,
+        attended_count: req.page.cursor ? 0 : 7,
+        agreement_version: req.page.cursor ? null : 3,
+      },
       basis: {
         source: "agreement_fixed",
         currency: req.page.cursor ? "USD" : "TRY",
@@ -75,6 +82,10 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     releaseEarnings();
   }
   await expect(page.getByRole("gridcell", { name: /90.071.992.547.409,93/ })).toBeVisible();
+  await expect(lines.getByText("Kapanıştaki Tango dersi", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Planlanan süre 90 dk.", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Katılan kişi sayısı 7", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Anlaşma sürümü 3", { exact: true })).toBeVisible();
   await expect(lines.locator('[data-slot="skeleton"]')).toHaveCount(0);
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
   expect(requests).toHaveLength(1);
@@ -83,6 +94,9 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   await expect(page.getByText(/2019/).first()).toBeVisible();
   await page.getByRole("button", { name: "Sonraki", exact: true }).click();
   await expect(page.getByText("Düzeltme", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Seans hakedişi", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Katılan kişi sayısı 0", { exact: true })).toBeVisible();
+  await expect(lines.getByText(/Planlanan süre|Anlaşma sürümü/)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Sonraki", exact: true })).toBeDisabled();
   expect(requests[1]!.page.cursor).toBe("second");
   await page.getByRole("combobox", { name: "Dönem", exact: true }).selectOption("2026-10");

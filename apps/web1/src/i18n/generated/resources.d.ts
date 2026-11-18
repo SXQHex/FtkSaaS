@@ -1613,6 +1613,8 @@ export default interface Resources {
       "emptyLines": "Bu dönemde hakediş satırı yok.",
       "emptyPayments": "Bu dönemde ödeme yok.",
       "emptyTotals": "Bu dönemde parasal kayıt yok.",
+      "historicalAgreementVersion": "Anlaşma sürümü {{version}}",
+      "historicalAttendance": "Katılan kişi sayısı {{countText}}",
       "loading": "Hakedişler okunuyor…",
       "method": "Yöntem",
       "methods": {
@@ -1646,6 +1648,7 @@ export default interface Resources {
       "previousAgreements": "Önceki anlaşmalar",
       "recordDate": "Hakediş kayıt tarihi",
       "retry": "Yeniden oku",
+      "scheduledDuration": "Planlanan süre {{duration}}",
       "session": "Seans",
       "sessionEarning": "Seans hakedişi",
       "settled": "Kalan yok",
@@ -2086,7 +2089,8 @@ export default interface Resources {
       "calendarEmpty": "Bu stüdyo için takvim bağlantısı yok.",
       "calendarKinds": {
         "duties": "Görevler",
-        "lessons": "Dersler"
+        "lessons": "Dersler",
+        "studio_program": "Stüdyo programı"
       },
       "calendarLabel": "Kişisel takvim bağlantısı",
       "calendarNotices": {

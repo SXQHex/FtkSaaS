@@ -3147,6 +3147,9 @@
     "retry": "Yeniden oku",
     "sourceLimits": "Ödeme ve hakediş dönemleri ayrı izlenir; kalan, hakediş eksi ödeme olarak hesaplanmaz.",
     "sessionEarning": "Seans hakedişi",
+    "scheduledDuration": "Planlanan süre {{duration}}",
+    "historicalAttendance": "Katılan kişi sayısı {{countText}}",
+    "historicalAgreementVersion": "Anlaşma sürümü {{version}}",
     "otherEarning": "Diğer hakediş",
     "recordDate": "Hakediş kayıt tarihi",
     "overpaid": "Fazla ödeme",
@@ -3469,7 +3472,8 @@
     },
     "calendarKinds": {
       "lessons": "Dersler",
-      "duties": "Görevler"
+      "duties": "Görevler",
+      "studio_program": "Stüdyo programı"
     },
     "calendarConfirm": "Yenileme eski bağlantıyı kapatır. İptal edilen bağlantı artık güncelleme sağlamaz. Dış takvimdeki eski kopyalar silinmez.",
     "calendarReview": "Bağlantının gizliliğini ve bu işlemin etkilerini okudum.",

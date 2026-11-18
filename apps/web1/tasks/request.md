@@ -53,7 +53,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Açık. Starter2’de kendi rol okuması plan reddi veriyor, yayımlı Web1 yönetim menüsünü kuramıyor. |
 | W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | Açık. Organizasyonu olmayan hesabın kuruluma nasıl alınacağı ve ilk merkezden sonra yönetim yetkisinin nasıl açılacağı için backend sözleşmesi gerekiyor. |
 | W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Açık](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
-| W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Açık](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
+| W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Açık](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
@@ -414,9 +414,9 @@ Notun yazma ve geri okuma sözleşmesini, metin sınırlarını ve talep sahibi 
 
 ## W1-BE-45 · Eğitmenin hakedişinde tarihsel seans ve anlaşma bağlamı
 
-**Açık · backend değerlendirmesi.** Çizimde eğitmen, kapanmış seansın adı, süresi, katılımcı sayısı ve hakediş hesaplanırken kullanılan anlaşma sürümünü kendi satırında görüyor. `instructor_account_get_v1(view:earnings)` seans ve anlaşma referanslarını, hesaplama türünü ve miktarını döndürüyor. Seans etiketi, süre, katılımcı sayısı ve hesaplamaya bağlı sürüm bu yanıtta yok. Hesaplama miktarının anlamı basis türüne bağlıdır. [v67 çizimi](../design-reference/revisions/2026-11-18/app.js#L3955) · [WF14](../../../docs/workflows.md#wf14).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-Satır bağlamının kendi hakediş okumasında güvenle dönmesini değerlendirin. Düzeltme, anlaşma sürümü değişikliği ve güncel atama kalktıktan sonraki tarihsel kayıtlar için kaynak anlamı korunmalı. Var olan self, merkez, plan ve cursor sınırlarıyla birlikte doğrulanmalı. [W1-BE-19](#w1-be-19--eğitmenin-kendi-hakediş-özeti-ve-ödeme-keşfi) mevcut okumanın sahibidir.
+`instructor_account_get_v1(view:earnings,include_session_context:true)` ders hakedişinde ilk kapanışın ders adını ve planlı süresini, satıra bağlı kapanış revizyonunun katılım sayısını ve kullanılan anlaşma sürümünü döndürüyor. [WF14](../../../docs/workflows.md#wf14) · [V02.1 tüketim ve kabul kaydı](todo.md#v02).
 
 ## W1-BE-46 · Yetkili yönetici için stüdyo programı ICS aboneliği
 

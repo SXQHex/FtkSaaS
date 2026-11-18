@@ -26,7 +26,7 @@ export interface InstructorEarningRow {
   id: string;
   date: string;
   session: string;
-  context: string;
+  context: string[];
   basis: string;
   amount: string;
   state: string;
@@ -178,8 +178,12 @@ export function InstructorEarningsView({
                           {row.date}
                         </TableCell>
                         <TableCell>
-                          <p className="font-medium">{row.session}</p>
-                          <p className="text-xs text-muted-foreground">{row.context}</p>
+                          <p className="font-medium wrap-anywhere">{row.session}</p>
+                          {row.context.map((detail) => (
+                            <p key={detail} className="text-xs text-muted-foreground">
+                              {detail}
+                            </p>
+                          ))}
                         </TableCell>
                         <TableCell className="text-muted-foreground">{row.basis}</TableCell>
                         <TableCell className="text-end tabular-nums">{row.amount}</TableCell>

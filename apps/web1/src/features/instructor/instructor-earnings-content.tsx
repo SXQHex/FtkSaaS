@@ -20,6 +20,13 @@ import { FieldSet } from "../../components/ui/field";
 import { AgreementTermsFields } from "../studio/agreement-terms-fields";
 import { termsDraft } from "../studio/agreement";
 import type { AgreementVersionView } from "../../lib/api-contracts/generated";
+
+const durationFormat = (unit: "minute" | "second") =>
+  new Intl.NumberFormat("tr-TR", { style: "unit", unit, maximumFractionDigits: 6 });
+const minutes = durationFormat("minute");
+const seconds = durationFormat("second");
+const countFormat = new Intl.NumberFormat("tr-TR");
+
 export function InstructorEarningsContent({
   scope,
   onLockChange,
@@ -248,30 +255,57 @@ export function InstructorEarningsContent({
         )
       }
       lines={
-        rows?.map((row) => ({
-          id: row.id,
-          date: date.format(new Date(row.created_at)),
-          session: row.session_id
-            ? t(($) => $.instructorEarnings.sessionEarning)
-            : t(($) => $.instructorEarnings.otherEarning),
-          context: t(($) => $.instructorEarnings.recordDate),
-          basis: t(($) => $.instructorEarnings.sources[row.basis.source]),
-          amount: formatMinorAmount(
-            (BigInt(row.amount_minor) * (row.direction === "subtract" ? -1n : 1n)).toString(),
-            row.currency,
-          ),
-          state: row.previous_id
-            ? t(($) => $.instructorEarnings.correction)
-            : BigInt(row.overpaid_minor ?? "0") > 0n
-              ? t(($) => $.instructorEarnings.overpaid)
-              : BigInt(row.remaining_minor) > 0n
-                ? BigInt(row.paid_minor) > 0n
-                  ? t(($) => $.instructorEarnings.partial)
-                  : t(($) => $.instructorEarnings.pending)
-                : BigInt(row.paid_minor) > 0n
-                  ? t(($) => $.instructorEarnings.paid)
-                  : t(($) => $.instructorEarnings.settled),
-        })) ?? null
+        rows?.map((row) => {
+          const historical = row.session_context;
+          const context: string[] = [t(($) => $.instructorEarnings.recordDate)];
+          const duration = historical?.scheduled_duration_seconds;
+          if (duration != null) {
+            context.push(
+              t(($) => $.instructorEarnings.scheduledDuration, {
+                duration:
+                  duration % 60 === 0 ? minutes.format(duration / 60) : seconds.format(duration),
+              }),
+            );
+          }
+          if (historical?.attended_count != null)
+            context.push(
+              t(($) => $.instructorEarnings.historicalAttendance, {
+                countText: countFormat.format(historical.attended_count),
+              }),
+            );
+          if (historical?.agreement_version != null)
+            context.push(
+              t(($) => $.instructorEarnings.historicalAgreementVersion, {
+                version: countFormat.format(historical.agreement_version),
+              }),
+            );
+          return {
+            id: row.id,
+            date: date.format(new Date(row.created_at)),
+            session:
+              historical?.title?.trim() ||
+              (row.session_id
+                ? t(($) => $.instructorEarnings.sessionEarning)
+                : t(($) => $.instructorEarnings.otherEarning)),
+            context,
+            basis: t(($) => $.instructorEarnings.sources[row.basis.source]),
+            amount: formatMinorAmount(
+              (BigInt(row.amount_minor) * (row.direction === "subtract" ? -1n : 1n)).toString(),
+              row.currency,
+            ),
+            state: row.previous_id
+              ? t(($) => $.instructorEarnings.correction)
+              : BigInt(row.overpaid_minor ?? "0") > 0n
+                ? t(($) => $.instructorEarnings.overpaid)
+                : BigInt(row.remaining_minor) > 0n
+                  ? BigInt(row.paid_minor) > 0n
+                    ? t(($) => $.instructorEarnings.partial)
+                    : t(($) => $.instructorEarnings.pending)
+                  : BigInt(row.paid_minor) > 0n
+                    ? t(($) => $.instructorEarnings.paid)
+                    : t(($) => $.instructorEarnings.settled),
+          };
+        }) ?? null
       }
       payments={
         payments.isError || !payments.data
