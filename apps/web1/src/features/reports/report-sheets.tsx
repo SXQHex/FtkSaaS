@@ -173,13 +173,11 @@ export function ReportImportSheet({
   onFilter,
   onFile,
   onTemplate,
-  onSample,
   onPreview,
   onApply,
   onBack,
   onClose,
   onReadRows,
-  onSkippedDownload,
   onSelectRow,
   reviewed,
   onReviewed,
@@ -189,10 +187,8 @@ export function ReportImportSheet({
   locked = false,
   canPreview = true,
   canApply = true,
-  canSample = false,
   canTemplate = false,
   canReadRows = false,
-  canSkippedDownload = false,
   availableFilters = ["all", "problem", "invalid", "duplicate"],
 }: {
   step: ImportStep;
@@ -204,13 +200,11 @@ export function ReportImportSheet({
   onFilter: (filter: ImportRowFilter) => void;
   onFile: (file: File | undefined) => void;
   onTemplate: () => void;
-  onSample: () => void;
   onPreview: () => void;
   onApply: () => void;
   onBack: () => void;
   onClose: () => void;
   onReadRows: () => void;
-  onSkippedDownload: () => void;
   onSelectRow: (id: string, selected: boolean) => void;
   reviewed: boolean;
   onReviewed: (value: boolean) => void;
@@ -220,10 +214,8 @@ export function ReportImportSheet({
   locked?: boolean;
   canPreview?: boolean;
   canApply?: boolean;
-  canSample?: boolean;
   canTemplate?: boolean;
   canReadRows?: boolean;
-  canSkippedDownload?: boolean;
   availableFilters?: ImportRowFilter[];
 }) {
   const { t } = useTranslation(),
@@ -274,14 +266,6 @@ export function ReportImportSheet({
               />
             </Field>
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                isDisabled={locked || !canSample}
-                onPress={onSample}
-              >
-                {t(($) => $.reports.sample)}
-              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -396,18 +380,7 @@ export function ReportImportSheet({
                 <FieldLabel htmlFor={`${id}-review`}>{t(($) => $.reports.importReview)}</FieldLabel>
               </Field>
             )}
-            {step === "result" && (
-              <>
-                <p>{t(($) => $.reports.importHint)}</p>
-                <Button
-                  variant="outline"
-                  isDisabled={locked || !canSkippedDownload}
-                  onPress={onSkippedDownload}
-                >
-                  {t(($) => $.reports.skippedDownload)}
-                </Button>
-              </>
-            )}
+            {step === "result" && <p>{t(($) => $.reports.importHint)}</p>}
           </>
         )}
         {error && (

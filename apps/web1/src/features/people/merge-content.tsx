@@ -139,6 +139,7 @@ export function MergeContent({
           queryKey[2] === scope.orgId &&
           [
             "people",
+            "merge-directory",
             "profile-person",
             "profile-rights",
             "profile-ledger",

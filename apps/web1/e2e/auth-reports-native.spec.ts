@@ -56,6 +56,23 @@ test("command palette reuses the report and import review forms without starting
     "aria-selected",
     "true",
   );
+  const initialDocument = await page.evaluate(() => performance.timeOrigin);
+  await page
+    .getByRole("navigation", { name: "Ana menü", exact: true })
+    .getByRole("link", { name: "Üyeler", exact: true })
+    .click();
+  const memberImport = page.getByRole("button", { name: "İçe aktar", exact: true });
+  await expect(memberImport).toBeEnabled();
+  await memberImport.press("Enter");
+  await expect(page).toHaveURL(
+    (url) =>
+      url.pathname === `/o/${I.org}/c/${I.center}/reports` &&
+      url.searchParams.get("action") === "import",
+  );
+  await expect(
+    page.getByRole("dialog").getByRole("combobox", { name: "Aktarım türü" }),
+  ).toHaveValue("students");
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialDocument);
   expect(f.writes).toEqual([]);
 });
 

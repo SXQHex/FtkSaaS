@@ -2814,6 +2814,7 @@ export default interface Resources {
       "low": "Az kaldı",
       "member": "Üye",
       "merge": "Kişileri birleştir",
+      "mergePendingCount": "{{total}} birleştirme önerisi",
       "next": "Sonraki",
       "nextSession": "Sıradaki ders",
       "nextShort": "Sıradaki",
@@ -3416,10 +3417,8 @@ export default interface Resources {
       "revenue": "Ciro",
       "rowFilter": "Satır filtresi",
       "rows": "Satırları gör",
-      "sample": "Örnek dosyayı kullan",
       "selectedRows": "{{count}} satır seçildi" | "{{count}} satır seçildi",
       "skipped": "Atlanır",
-      "skippedDownload": "Atlanan satırları indir",
       "sold": "Satılan paket",
       "sourceNames": {
         "balances": "Eğitmen bakiyesi",

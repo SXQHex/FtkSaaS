@@ -44,6 +44,7 @@ export async function readMergeDirectory(
   state: MergeReviewState,
   query = "",
   cursor?: string,
+  limit = 20,
 ) {
   const backend = await scopedBackend(scope);
   const page = await backend.call("management_state_get_v1", {
@@ -56,7 +57,7 @@ export async function readMergeDirectory(
       operation: "person_merge_preview_v1",
       key: { directory: "center", status: state, ...(query.trim() ? { query: query.trim() } : {}) },
     },
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    page: { limit, ...(cursor ? { cursor } : {}) },
   });
   const summary = page.merge_review_summary;
   if (

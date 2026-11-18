@@ -216,9 +216,9 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 ### V04 · Kişi, paket, finans, hakediş ve rapor tutarlılığı
 
-- [ ] **V04.1** · E13–E16/E19'daki davet, birleşim, içe aktarılan kişi, aktif hak sahibi ve satış sayacı görsellerini mevcut typed özet/keşif okumalarıyla eşle. Bütün kişileri veya işlem geçmişini tarayıp sayaç üretme.
+- [x] **V04.1** · E13–E16/E19'daki davet, birleşim, içe aktarılan kişi, aktif hak sahibi ve satış sayacı görsellerini mevcut typed özet/keşif okumalarıyla eşle. Bütün kişileri veya işlem geçmişini tarayıp sayaç üretme. Üyeler rozeti, bir satır istenen `management_state_get_v1` yanıtının filtreli öneri toplamını okuyor ve birleşimden sonra güncelleniyor. Davetler rozeti bekleyen ile süresi dolan davetleri, hesap rozeti bağlantısız üyeleri native durum özetinden alıyor. Paketler aktif hak sahibi ve son 30 gün satış sayılarını merkez özetinden, geliri ayrı para birimleriyle gösteriyor. Üyeler’den açılan içe aktarma mevcut yetkili öğrenci formunu kullanıyor. İçe aktarılan kişiler aynı native iş ve satır sonuçlarında okunuyor. Statik üretim derlemesi, 54 birim testi ve 11 farklı Chromium senaryosu tek işçiyle doğrulandı. [Birleşim](../e2e/auth-merge.spec.ts#L402) · [Davet](../e2e/auth-access.spec.ts#L237) · [Paket](../e2e/auth-products.spec.ts#L233) · [İçe aktarma](../e2e/auth-reports-native.spec.ts#L229).
 - [ ] **V04.2** · E14/E20/E23/E27/E30'da tahsilat iptali, birleşim borcu, etkinlik ödemesi ve hakediş için aynı kaynak kimlikleriyle yeniden okumayı doğrula. Demo tarih/tutar/satır toplamını üretim hesaplaması gibi taşıma.
-- [ ] **V04.3** · E41 rapor, tarih aralığı, CSV iş durumu/yeniden deneme, kaynak hakediş/huni ve içe aktarma özetini yeni çizime uyarla. Gerçek dosya yetkisi korunur. Çizimdeki366gün/180gün timeout senaryosu ürün limiti olarak eklenmez; backend sınırları esas alınır.
+- [ ] **V04.3** · E41 rapor, tarih aralığı, CSV iş durumu/yeniden deneme, kaynak hakediş/huni ve içe aktarma özetini yeni çizime uyarla. Gerçek dosya yetkisi korunur. Çizimdeki366gün/180gün timeout senaryosu ürün limiti olarak eklenmez; backend sınırları esas alınır. Kesin iş sonu sayıları ve atlanan satır dosyası [W1-BE-50](request.md#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası) ile açık.
 
 ### V05 · CRM, public yüzey ve otomasyon
 

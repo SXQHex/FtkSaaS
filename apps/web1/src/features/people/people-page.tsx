@@ -19,6 +19,7 @@ import { readPeoplePage, readPeopleCenter, type PeopleScope } from "./people";
 import type { AccountView, PersonView } from "../../lib/api-contracts/generated";
 
 import { peopleRow } from "./people-summary";
+import { readMergeDirectory } from "./merge-directory";
 
 export function PeopleRoutePage() {
   const account = useLoaderData({ from: "/o/$orgId/c/$centerId/people" });
@@ -179,17 +180,26 @@ function PeopleContent({
     queryFn: () => readPeopleCenter(scope),
     retry: false,
   });
+  const mergeCount = useQuery({
+    queryKey: ["merge-directory", scope.accountId, scope.orgId, scope.centerId, "suggestion-count"],
+    queryFn: async () =>
+      (await readMergeDirectory(scope, "suggested", "", undefined, 1)).summary.filtered,
+    retry: false,
+  });
   useEffect(() => {
-    const error = query.error ?? center.error;
-    const code =
-      error instanceof BackendError
-        ? error.code
-        : error instanceof Error
-          ? error.message
-          : undefined;
-    if (code && ["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED"].includes(code))
-      void router.invalidate();
-  }, [query.error, center.error, router]);
+    for (const error of [query.error, center.error, mergeCount.error]) {
+      const code =
+        error instanceof BackendError
+          ? error.code
+          : error instanceof Error
+            ? error.message
+            : undefined;
+      if (code && ["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED"].includes(code)) {
+        void router.invalidate();
+        return;
+      }
+    }
+  }, [query.error, center.error, mergeCount.error, router]);
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -242,6 +252,7 @@ function PeopleContent({
             });
         }}
         activeSummary=""
+        mergeCount={!mergeCount.isError && !mergeCount.isFetching ? mergeCount.data : undefined}
         hasPrevious={index > 0}
         hasNext={Boolean(query.data?.next_cursor)}
         onPrevious={() => {
@@ -273,6 +284,14 @@ function PeopleContent({
               void navigate({
                 to: "/o/$orgId/c/$centerId/people/merge",
                 params: { orgId: scope.orgId, centerId: scope.centerId },
+              });
+          },
+          import: () => {
+            if (!locked)
+              void navigate({
+                to: "/o/$orgId/c/$centerId/reports",
+                params: { orgId: scope.orgId, centerId: scope.centerId },
+                search: { action: "import" },
               });
           },
         }}

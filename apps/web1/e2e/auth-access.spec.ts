@@ -239,6 +239,8 @@ test("Access directory: server filters/cursors, summary scope, independent permi
 }) => {
   const state = await mockAccess(page);
   await openAccess(page);
+  await expect(page.getByRole("tab", { name: "Davetler 20", exact: true })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Hesap bağlantıları 1", exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "access-invitations-desktop")).violations).toEqual([]);
   await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
   await page.getByRole("button", { name: "Sonraki", exact: true }).click();

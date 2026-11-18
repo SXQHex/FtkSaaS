@@ -484,6 +484,14 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
           ]),
         );
       }
+      if (r.operation === "person_merge_preview_v1" && k.directory === "center") {
+        expect(k.status).toBe("suggested");
+        expect(r.page).toEqual({ limit: 1 });
+        return send(route, {
+          ...list([]),
+          merge_review_summary: { total: 0, filtered: 0, by_state: [] },
+        });
+      }
       throw new Error(`Unexpected Studio selector: ${String(r.operation)}`);
     }
     const key = String(r.operation_key);

@@ -20,6 +20,7 @@ async function mockMerge(page: Page, reuseStudio = false) {
     approved: false,
     receiptAvailable: true,
     directoryDenied: false,
+    summaryReads: 0,
     lostReply: false,
     failResult: 0,
     effects: 0,
@@ -111,6 +112,13 @@ async function mockMerge(page: Page, reuseStudio = false) {
     }
     if (op === "management_state_get_v1" && r.operation === "person_merge_preview_v1") {
       const key = r.selector.key;
+      const summaryOnly = r.page.limit === 1;
+      if (summaryOnly) {
+        state.summaryReads++;
+        expect(r).toMatchObject({ org_id: I.org, center_id: I.center });
+        expect(key).toEqual({ directory: "center", status: "suggested" });
+        expect(r.page).not.toHaveProperty("cursor");
+      }
       state.reads.push({ ...key, cursor: r.page.cursor });
       if (state.directoryDenied)
         return route.fulfill({
@@ -131,12 +139,12 @@ async function mockMerge(page: Page, reuseStudio = false) {
               : [];
       return send({
         items,
-        next_cursor: null,
+        next_cursor: summaryOnly && items.length ? "summary-next" : null,
         as_of: "2026-11-15T00:00:00Z",
         merge_review_summary: {
-          total: 1,
-          filtered: items.length,
-          by_state: [{ state: kind, count: items.length }],
+          total: summaryOnly ? 37 : 1,
+          filtered: summaryOnly && items.length ? 37 : items.length,
+          by_state: [{ state: kind, count: summaryOnly && items.length ? 37 : items.length }],
         },
       });
     }
@@ -417,7 +425,11 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
     .getByRole("navigation", { name: "Ana menü", exact: true })
     .getByRole("link", { name: "Üyeler", exact: true })
     .click();
-  await page.getByRole("button", { name: "Kişileri birleştir", exact: true }).click();
+  const merge = page.getByRole("button", { name: "Kişileri birleştir", exact: true });
+  await expect(merge).toHaveAccessibleDescription("37 birleştirme önerisi");
+  await expect(merge.getByText("37", { exact: true })).toBeVisible();
+  expect(state.summaryReads).toBe(1);
+  await merge.click();
   await selectPair(page);
   await page.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü tarihçe birleştirme");
   await page.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
@@ -443,5 +455,11 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
   await expect.poll(() => reads.finance).toBeGreaterThan(warmFinance);
   await expect(page.getByText("₺1.000,00", { exact: true }).first()).toBeVisible();
   expect(state.effects).toBe(1);
+  await page
+    .getByRole("navigation", { name: "Ana menü", exact: true })
+    .getByRole("link", { name: "Üyeler", exact: true })
+    .click();
+  await expect(merge).toHaveAccessibleDescription("0 birleştirme önerisi");
+  expect(state.summaryReads).toBe(2);
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);
 });

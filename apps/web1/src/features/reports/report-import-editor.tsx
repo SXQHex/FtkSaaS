@@ -429,7 +429,6 @@ export function ReportImportEditor({
       availableFilters={["all", "pending", "valid", "invalid", "applied", "failed"]}
       onFile={changeFile}
       onTemplate={template}
-      onSample={() => {}}
       onPreview={() => void prepare()}
       onApply={() => void apply()}
       onBack={() => {
@@ -440,7 +439,6 @@ export function ReportImportEditor({
       }}
       onClose={onClose}
       onReadRows={() => setRowsOnly(true)}
-      onSkippedDownload={() => {}}
       onSelectRow={(id, value) => {
         const number = Number(id);
         if (!knownValid.current.has(number)) return;
