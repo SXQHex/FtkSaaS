@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8bc2cdd46c3e1cf364ca18ff79d0fafbcc136f947b27b93da5e8f7e552da6713`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9b7e017737e9c66204a20e748eff6cb6357da35315eeae891592b9656de42671`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 
@@ -252,6 +252,10 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 | `organization_billing_tax_set_v1` | runtime (sınırları oku) | command | org.owner | [WF17](workflows.md#wf17) / restricted |
 | `platform_organization_suspension_set_v1` | runtime (sınırları oku) | command | platform.owner | [WF17](workflows.md#wf17) / restricted |
 | `audit_center_export_v1` | runtime (sınırları oku) | read | report.export | [WF00](workflows.md#wf00) / common |
+| `platform_invoice_upload_prepare_v1` | runtime (sınırları oku) | command | platform.owner | [WF17](workflows.md#wf17) / restricted |
+| `platform_invoice_publish_v1` | runtime (sınırları oku) | command | platform.owner | [WF17](workflows.md#wf17) / restricted |
+| `organization_invoices_list_v1` | runtime (sınırları oku) | read | org.owner | [WF17](workflows.md#wf17) / restricted |
+| `organization_invoice_file_get_v1` | runtime (sınırları oku) | read | org.owner | [WF17](workflows.md#wf17) / restricted |
 
 ## Akış kanıt kaynakları
 

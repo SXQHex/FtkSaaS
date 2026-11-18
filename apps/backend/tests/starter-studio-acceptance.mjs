@@ -470,3 +470,63 @@ test('W1-BE-58 owner-only tax profile is versioned and does not create a payment
  await must(owner,'organization_billing_tax_set_v1',{...body,expected_version:1,tax_office:null,tax_identifier:null},key());
  assert.deepEqual(await read(),{org_id:org,version:2,tax_office:null,tax_identifier:null});
 });
+
+test('W1-BE-58 invoices publish verified ZIP and PDF originals to the live organization owner',async t=>{
+ const {platform,owner,db,org}=await preparationFixture();t.after(()=>db.end());
+ const member=await authUser('invoice-other');
+ const otherAccount=await must(member,'account_get_v1');
+ const {rows:[subscription]}=await db.query('select plan_version_id from core.saas_subscriptions where org_id=$1',[org]);
+ const otherOrg=(await must(platform,'organization_create_v1',{verified_account_id:otherAccount.id,name:'Synthetic other invoice org',initial_plan_id:subscription.plan_version_id},key())).primary_id;
+ const list=(extra={})=>must(owner,'organization_invoices_list_v1',{org_id:org,page:{},...extra});
+ const {env}=context();
+ const upload=(d,body,mime)=>fetch(new URL(d.upload_url,env.API_URL),{method:'PUT',headers:{apikey:env.ANON_KEY,'content-type':mime},body});
+ const download=(who,body)=>fetch(env.API_URL+'/functions/v1/backend-v1/organization_invoice_file_get_v1?download=original',{
+  method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+who.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),...body})});
+ const descriptor=(number,mime,bytes)=>({org_id:org,invoice_number:number,issued_on:'2026-10-01',mime,bytes:bytes.length,checksum:createHash('sha256').update(bytes).digest('hex')});
+ const prepare=(body,k=key())=>must(platform,'platform_invoice_upload_prepare_v1',body,k);
+ const zip=Buffer.from('UEsDBBQAAAAAAAAAIQDnnv47JQAAACUAAAAMAAAAaW52b2ljZS5odG1sPGh0bWw+PHA+U3ludGhldGljIGludm9pY2U8L3A+PC9odG1sPlBLAwQUAAAAAAAAACEAI5qzSiIAAAAiAAAACwAAAGludm9pY2UueG1sPEludm9pY2U+PElEPkRFTU8tMTwvSUQ+PC9JbnZvaWNlPlBLAQIUAxQAAAAAAAAAIQDnnv47JQAAACUAAAAMAAAAAAAAAAAAAACAAQAAAABpbnZvaWNlLmh0bWxQSwECFAMUAAAAAAAAACEAI5qzSiIAAAAiAAAACwAAAAAAAAAAAAAAgAFPAAAAaW52b2ljZS54bWxQSwUGAAAAAAIAAgBzAAAAmgAAAAAA','base64');
+ const pdf=Buffer.from('%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n');
+ assert.deepEqual((await list()).items,[]);
+ const zipRequest=descriptor('DEMO-1','application/zip',zip),prepKey=key();
+ assert.equal((await call(owner,'platform_invoice_upload_prepare_v1',zipRequest,key())).result.error.code,'FORBIDDEN');
+ const z=await prepare(zipRequest,prepKey),zipScope={org_id:org,invoice_id:z.invoice_id};
+ assert.equal((await prepare(zipRequest,prepKey)).invoice_id,z.invoice_id);
+ assert.equal((await call(platform,'platform_invoice_publish_v1',{...zipScope,org_id:otherOrg},key())).result.error.code,'NOT_FOUND');
+ assert.equal((await call(platform,'platform_invoice_publish_v1',zipScope,key())).result.error.code,'VALIDATION_FAILED');
+ assert.equal((await download(owner,zipScope)).status,404);
+ assert.equal((await upload(z,zip,'application/zip')).ok,true);
+ assert.deepEqual(await prepare(zipRequest,prepKey),{invoice_id:z.invoice_id,upload_url:null});
+ assert.equal((await upload(z,zip,'application/zip')).ok,false);
+ assert.deepEqual((await list()).items,[]);
+ assert.equal((await call(owner,'platform_invoice_publish_v1',zipScope,key())).result.error.code,'FORBIDDEN');
+ const publishKey=key();
+ assert.equal((await must(platform,'platform_invoice_publish_v1',zipScope,publishKey)).id,z.invoice_id);
+ assert.equal((await must(platform,'platform_invoice_publish_v1',zipScope,publishKey)).id,z.invoice_id);
+ assert.equal((await call(platform,'platform_invoice_upload_prepare_v1',zipRequest,key())).result.error.code,'VERSION_CONFLICT');
+ assert.deepEqual(await prepare(zipRequest,prepKey),{invoice_id:z.invoice_id,upload_url:null});
+ const wrong=await prepare(descriptor('DEMO-invalid','application/pdf',zip));
+ assert.equal((await upload(wrong,zip,'application/pdf')).ok,true);
+ assert.equal((await call(platform,'platform_invoice_publish_v1',{org_id:org,invoice_id:wrong.invoice_id},key())).result.error.code,'VALIDATION_FAILED');
+ const p=await prepare(descriptor('DEMO-2','application/pdf',pdf)),pdfScope={org_id:org,invoice_id:p.invoice_id};
+ assert.equal((await upload(p,pdf,'application/pdf')).ok,true);
+ await must(platform,'platform_invoice_publish_v1',pdfScope,key());
+ const first=await list({page:{limit:1}});
+ assert.equal(first.items.length,1);assert(first.next_cursor);
+ const second=await list({page:{limit:1,cursor:first.next_cursor}});
+ assert.deepEqual([first.items[0].id,second.items[0].id].sort(),[z.invoice_id,p.invoice_id].sort());
+ assert.equal((await download(member,{...zipScope,org_id:otherOrg})).status,404);
+ assert.equal((await download(platform,zipScope)).ok,false);
+ for(const [scope,expected,mime,ext] of [[zipScope,zip,'application/zip','zip'],[pdfScope,pdf,'application/pdf','pdf']]){
+  const response=await download(owner,scope);
+  assert(response.ok);
+  assert.equal(response.headers.get('content-type'),mime);
+  assert.match(response.headers.get('content-disposition'),new RegExp('^attachment;.*[.]'+ext+'"'));
+  assert.equal(response.headers.get('cache-control'),'private, no-store');
+  assert.deepEqual(Buffer.from(await response.arrayBuffer()),expected);
+ }
+ const {rows:[studio]}=await db.query('select version::int from core.organizations where id=$1',[org]);
+ await must(platform,'platform_organization_suspension_set_v1',{org_id:org,expected_version:studio.version,suspended:true,reason:'Synthetic invoice access'},key());
+ await db.query("insert into core.saas_change_requests(id,org_id,target_plan_id,effective_at,state) values($1,$2,$3,now()-interval '1 minute','scheduled')",[key(),org,subscription.plan_version_id]);
+ assert.equal((await list()).items.length,2);
+ assert.equal((await download(owner,zipScope)).ok,true);
+});

@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-246 sözleşme operasyonu; 246 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+250 sözleşme operasyonu; 250 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -252,6 +252,10 @@
 | `organization_billing_tax_set_v1` | runtime / ilgili WF’yi oku | `org.owner` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; expected_version: Count; tax_office: string ∣ null; tax_identifier: string ∣ null | Success_organization_billing_tax_set |
 | `platform_organization_suspension_set_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; suspended: boolean; reason: string | Success_platform_organization_suspension_set |
 | `audit_center_export_v1` | runtime / ilgili WF’yi oku | `report.export` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; interval?: Interval; query?: string; module?: M01 / M02 / M03 / M04 / M05 / M06 / M07 / M08 / M09 / M10 / M11 / M12 / M13 / M14 / M17 / X; result?: recorded | Success_audit_center_export |
+| `platform_invoice_upload_prepare_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; invoice_number: string; issued_on: Date; mime: application/zip / application/pdf; bytes: integer; checksum: string | Success_platform_invoice_upload_prepare |
+| `platform_invoice_publish_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; invoice_id: FtkUuid | Success_platform_invoice_publish |
+| `organization_invoices_list_v1` | runtime / ilgili WF’yi oku | `org.owner` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; page: Page | Success_organization_invoices_list |
+| `organization_invoice_file_get_v1` | runtime / ilgili WF’yi oku | `org.owner` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; invoice_id: FtkUuid | Success_organization_invoice_file_get |
 
 ## Sürüm ve okuma desteği
 
@@ -505,6 +509,10 @@
 | organization_billing_tax_set_v1 | command | row_version | organization_billing_tax_get_v1 | implemented | organization_billing_tax_set, receipt, audit |
 | platform_organization_suspension_set_v1 | command | row_version | platform_directory_get_v1 | implemented | platform_organization_suspension_set, receipt, audit |
 | audit_center_export_v1 | read | none | None | not_required |  |
+| platform_invoice_upload_prepare_v1 | command | append_or_current_scope_lock | platform_directory_get_v1 | implemented | platform_invoice_upload_prepare, receipt, audit |
+| platform_invoice_publish_v1 | command | append_or_current_scope_lock | platform_directory_get_v1 | implemented | platform_invoice_publish, receipt, audit |
+| organization_invoices_list_v1 | read | none | None | not_required |  |
+| organization_invoice_file_get_v1 | read | none | None | not_required |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 
