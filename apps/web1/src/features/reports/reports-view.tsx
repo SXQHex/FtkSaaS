@@ -48,7 +48,8 @@ export interface ReportFileRow {
   detail: string;
   state: string;
   progress?: number;
-  action: "download" | "status" | "rows";
+  action: "download" | "status" | "rows" | "retry";
+  canRetry?: boolean;
 }
 export interface ReportPresentation {
   summary: ReportMetric[];
@@ -57,6 +58,8 @@ export interface ReportPresentation {
   weeks: ReportChartPoint[];
   packages: ReportChartPoint[];
   funnel: { converted: string; candidates: string; rate: string };
+  funnelStages: ReportRow[];
+  funnelSources: ReportRow[];
   packageSummary: string;
   funnelEmpty: string;
   lessons: ReportRow[];
@@ -71,12 +74,14 @@ export function ReportTable({
   columns,
   rows,
   action,
+  compact = false,
 }: {
   title: string;
   description?: string;
   columns: string[];
   rows: ReportRow[] | undefined;
   action?: ReactNode;
+  compact?: boolean;
 }) {
   const { t } = useTranslation(),
     id = useId();
@@ -98,7 +103,7 @@ export function ReportTable({
           tabIndex={0}
           className="overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-ring"
         >
-          <Table aria-labelledby={id} className="min-w-[36rem]">
+          <Table aria-labelledby={id} className={compact ? "min-w-0" : "min-w-[36rem]"}>
             <TableHeader>
               {columns.map((column, index) => (
                 <TableHead key={column} isRowHeader={index === 0}>
@@ -110,7 +115,12 @@ export function ReportTable({
               {(rows ?? []).map((row) => (
                 <TableRow key={row.id} id={row.id}>
                   {row.cells.map((cell, index) => (
-                    <TableCell key={index}>{cell}</TableCell>
+                    <TableCell
+                      key={index}
+                      className={compact ? "wrap-anywhere whitespace-normal" : undefined}
+                    >
+                      {cell}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
@@ -491,6 +501,26 @@ export function ReportsView({
               )}
             </CardContent>
           </Card>
+          {data?.funnelStages && (
+            <ReportTable
+              compact
+              title={t(($) => $.reports.crmFunnelStages)}
+              columns={[t(($) => $.reports.crmStage), t(($) => $.reports.crmCandidates)]}
+              rows={data.funnelStages}
+            />
+          )}
+          {data?.funnelSources && (
+            <ReportTable
+              compact
+              title={t(($) => $.reports.crmFunnelSources)}
+              columns={[
+                t(($) => $.reports.crmSource),
+                t(($) => $.reports.crmCandidates),
+                t(($) => $.reports.crmConverted),
+              ]}
+              rows={data.funnelSources}
+            />
+          )}
           {after?.instructors}
         </TabsContent>
         <TabsContent id="files" className="flex flex-col gap-5">
@@ -550,6 +580,16 @@ export function ReportsView({
                           >
                             {t(($) => $.reports.fileActions[row.action])}
                           </Button>
+                          {row.canRetry && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              isDisabled={locked}
+                              onPress={() => onFile(row.id, "retry")}
+                            >
+                              {t(($) => $.reports.fileActions.retry)}
+                            </Button>
+                          )}
                         </div>
                       </li>
                     ))}

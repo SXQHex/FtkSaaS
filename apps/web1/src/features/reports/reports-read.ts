@@ -60,6 +60,7 @@ export async function readReport(
     org_id: scope.orgId,
     center_id: scope.centerId,
     report,
+    ...(report === "crm_conversion" ? { include_crm_funnel: true } : {}),
     filters: structuredClone(filters),
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
@@ -90,6 +91,23 @@ export async function readReport(
     if (row.count != null) count.parse(row.count);
     if (row.basis_count != null) count.parse(row.basis_count);
     if (row.ratio_bps != null) count.parse(row.ratio_bps);
+  }
+  const funnel = data.crm_funnel;
+  if (funnel) {
+    const { cohort_count, converted_count, stages, sources } = funnel;
+    count.parse(cohort_count);
+    count.parse(converted_count);
+    if (
+      report !== "crm_conversion" ||
+      converted_count > cohort_count ||
+      new Set(stages.map((row) => row.stage_key)).size !== stages.length ||
+      new Set(sources.map((row) => row.source)).size !== sources.length ||
+      stages.some((row) => count.parse(row.count) > cohort_count) ||
+      sources.some((row) => count.parse(row.converted_count) > count.parse(row.count)) ||
+      sources.reduce((sum, row) => sum + row.count, 0) !== cohort_count ||
+      sources.reduce((sum, row) => sum + row.converted_count, 0) !== converted_count
+    )
+      throw Error("REPORT_SOURCE_INVALID");
   }
   return data;
 }

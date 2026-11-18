@@ -64,6 +64,7 @@ export function ReportsContent({
     [fileError, setFileError] = useState(false),
     [checkedExport, setCheckedExport] = useState<JobState>();
   const [exporting, setExporting] = useState<ReportFilters>();
+  const [retryExport, setRetryExport] = useState<{ id: string; date: string }>();
   const [importing, setImporting] = useState<{ initial?: ImportDirectoryItem }>();
   const tab = shortcut === "import" ? "files" : selectedTab;
   const [pages, setPages] = useState<
@@ -222,12 +223,20 @@ export function ReportsContent({
   const conversion = data.crm?.rows.items.find(
     (row) => row.group_key === "crm_conversion" && row.center_id === scope.centerId,
   );
+  const funnel = data.crm?.crm_funnel;
+  const formatCount = (value: number) => value.toLocaleString("tr-TR");
   const currentFinance = active && !finance.isError ? finance.data : undefined;
   const currentImports = active && !imports.isError ? imports.data : undefined,
     currentExports = active && !exports.isError ? exports.data : undefined;
   const importReview =
     importing ?? (shortcut === "import" && currentImports?.limits ? {} : undefined);
-  const exportReview = exporting ?? (shortcut === "export" ? filters : undefined);
+  const exportFilters = exporting ?? (shortcut === "export" ? filters : undefined);
+  const exportReview = retryExport
+    ? { retry: retryExport }
+    : exportFilters && {
+        filters: exportFilters,
+        period: `${exportFilters.interval.starts_at} – ${exportFilters.interval.ends_at} · ${timezone}`,
+      };
   function closeShortcut() {
     if (shortcut) void navigate({ search: {}, replace: true });
   }
@@ -322,8 +331,12 @@ export function ReportsContent({
         setImporting({ initial: row });
       } else {
         const job = await readJob(scope, id);
-        await exports.refetch({ throwOnError: true });
+        const refreshed = await exports.refetch({ throwOnError: true });
         setCheckedExport(job.state);
+        if (action === "retry" && job.state === "failed") {
+          const row = refreshed.data?.items.find((row) => row.id === id && row.state === "failed");
+          if (row) setRetryExport({ id, date: date(row.created_at) });
+        }
       }
     } catch (error) {
       if (!accessLost(error)) setFileError(true);
@@ -426,14 +439,37 @@ export function ReportsContent({
               : undefined,
           },
           earnings: data.balances ? instructorRows(data.balances, t) : undefined,
-          funnel: conversion && {
-            converted: conversion.count?.toLocaleString("tr-TR") ?? unknown,
-            candidates: conversion.basis_count?.toLocaleString("tr-TR") ?? unknown,
-            rate: reportRatio(
-              conversion.ratio_bps,
-              t(($) => $.reports.noDenominator),
-            ),
-          },
+          funnel: funnel
+            ? {
+                converted: formatCount(funnel.converted_count),
+                candidates: formatCount(funnel.cohort_count),
+                rate: reportRatio(
+                  funnel.cohort_count
+                    ? Math.round((funnel.converted_count / funnel.cohort_count) * 10000)
+                    : undefined,
+                  t(($) => $.reports.noDenominator),
+                ),
+              }
+            : conversion && {
+                converted: conversion.count?.toLocaleString("tr-TR") ?? unknown,
+                candidates: conversion.basis_count?.toLocaleString("tr-TR") ?? unknown,
+                rate: reportRatio(
+                  conversion.ratio_bps,
+                  t(($) => $.reports.noDenominator),
+                ),
+              },
+          funnelStages: funnel?.stages.map((row) => ({
+            id: row.stage_key ? `stage:${row.stage_key}` : "no-stage",
+            cells: [row.stage_key ?? t(($) => $.reports.crmNoStage), formatCount(row.count)],
+          })),
+          funnelSources: funnel?.sources.map((row) => ({
+            id: row.source,
+            cells: [
+              t(($) => $.reports.crmFunnelSourceNames[row.source]),
+              formatCount(row.count),
+              formatCount(row.converted_count),
+            ],
+          })),
           funnelEmpty: data.crm ? t(($) => $.reports.empty) : unknown,
           exports: currentExports?.items.map((row) => ({
             id: row.id,
@@ -444,6 +480,7 @@ export function ReportsContent({
                 : date(row.created_at),
             state: jobState(row.state),
             action: row.state === "succeeded" ? "download" : "status",
+            canRetry: row.state === "failed",
             progress:
               row.progress_count !== null && row.total_count
                 ? (row.progress_count / row.total_count) * 100
@@ -539,12 +576,13 @@ export function ReportsContent({
       )}
       {exportReview && active && (
         <ReportExportEditor
+          key={retryExport?.id ?? "export"}
           scope={scope}
-          filters={exportReview}
-          period={`${exportReview.interval.starts_at} – ${exportReview.interval.ends_at} · ${timezone}`}
+          review={exportReview}
           onClose={() => {
             if (locked) return;
             setExporting(undefined);
+            setRetryExport(undefined);
             closeShortcut();
           }}
           onLockChange={lock}

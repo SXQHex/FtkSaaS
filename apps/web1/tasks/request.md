@@ -59,8 +59,8 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
 | W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
 | W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
-| W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Açık](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
-| W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Açık](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
+| W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Karşılandı](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
+| W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Karşılandı](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
 | W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Açık](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
 | W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Açık](#w1-be-54--başvuru-durum-filtresi). |
 | W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Açık](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
@@ -450,15 +450,15 @@ Yoklama için izinli zaman aralığı varsa bu aralığın canlı politika ve ye
 
 ## W1-BE-51 · Başarısız CSV dışa aktarımını yeniden başlatma
 
-**Açık · backend değerlendirmesi.** Çizim, kesin olarak başarısız olan CSV işini aynı rapor kapsamıyla yeniden başlatıyor. `tracking_directory_get_v1` ve `job_status_get_v1` iş durumunu döndürüyor. İşin orijinal rapor seçimi, filtreleri ve CSV sütunları bu yanıtlarda yayımlanmıyor. `report_export_start_v1` yalnız açıkça incelenmiş parametrelerle yeni iş başlatıyor. Web1, sunucunun planladığı denemeyi ve aynı işin güncel durumunu gösteriyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L4645) · [WF10](../../../docs/workflows.md#wf10).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-İş sahibinin yalnız kesin olarak başarısız dışa aktarımı aynı rapor kapsamıyla yeniden başlatabilmesi için yetkili bir işlem veya güvenle tekrar incelenebilen özgün parametreleri değerlendirin. Canlı `report.export`, plan, organizasyon ve merkez yetkisi ile dosya saklama kuralları korunmalı. Durum okuması iş başlatmamalı. Sunucunun zaten yeniden deneyeceği bir iş için ikinci dışa aktarım oluşmamalı.
+`report_export_start_v1(retry_job_id)` yalnız kesin başarısız işi özgün kapsamıyla yeniden başlatır. Yeni iş ayrı kimlikle durum ve dosya kaynaklarından okunur. [WF10](../../../docs/workflows.md#wf10) · [V04.3 Web1 kabulü](todo.md#v04).
 
 ## W1-BE-52 · Aday hunisi aşamaları ve kaynak kırılımı
 
-**Açık · backend değerlendirmesi.** Çizim, seçili dönemde ara huni aşamalarını ve aday kaynaklarına göre sayıları gösteriyor. `report_get_v1(report: "crm_conversion")` yetkili merkez ve dönem için aday sayısını, dönüşen aday sayısını ve dönüşüm oranını döndürüyor. Rapor satırları ara aşama ve aday kaynağı ayrımı taşımıyor. Web1 mevcut üç ölçüyü merkez satırından gösteriyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L4640) · [WF10](../../../docs/workflows.md#wf10) · [WF12](../../../docs/workflows.md#wf12).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-Aşama ve kaynak ölçülerini aynı tarih, merkez, CRM planı ve rapor yetkisi altında değerlendirin. Döneme girme, aşamadan geçme ve dönüşme ölçülerinin anlamı açıklanmalı. Sayılar bütün filtreli sonucu kapsamalı ve kişi ayrıntısı gerektirmemeli.
+`report_get_v1(report:crm_conversion,include_crm_funnel:true)` seçili filtrelerin dönem kohortunu, ulaşılmış aşamaları ve kaynak bazında aday ile dönüşüm sayılarını döndürür. [WF10](../../../docs/workflows.md#wf10) · [V04.3 Web1 kabulü](todo.md#v04).
 
 ## W1-BE-53 · CRM aşama ve deneme sayaçları
 

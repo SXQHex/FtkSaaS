@@ -64,6 +64,8 @@ export async function reportJobReceipt(intent: ReportJobIntent) {
 }
 export async function readReportJob(intent: ReportJobIntent, id?: string) {
   if (!id) throw Error("REPORT_JOB_UNKNOWN");
+  if (intent.operation === "report_export_start_v1" && intent.request.retry_job_id === id)
+    throw Error("REPORT_JOB_INVALID");
   return readJob(intent.scope, id);
 }
 export async function readJob(scope: ClientScope, id: string) {

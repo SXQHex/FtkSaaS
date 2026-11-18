@@ -4364,7 +4364,8 @@
     "fileActions": {
       "download": "İndir",
       "status": "İş durumunu oku",
-      "rows": "Satırları gör"
+      "rows": "Satırları gör",
+      "retry": "Yeniden başlat"
     },
     "jobStates": {
       "pending": "Bekliyor",
@@ -4394,6 +4395,10 @@
     "preparation": "Hazırlık",
     "preparationHint": "İşi Dosyalar sekmesinden izleyebilirsin.",
     "exportReview": "Kapsamı ve dışa aktarılacak bilgileri inceledim.",
+    "exportRetryTitle": "Başarısız dışa aktarımı yeniden başlat",
+    "exportSourceDate": "Önceki işin oluşturulma zamanı",
+    "exportRetryReview": "İşin özgün kapsamıyla yeniden çalışmasını onaylıyorum.",
+    "exportRetryScope": "Yeni iş önceki raporun merkezini, tarih aralığını, filtrelerini ve sütunlarını kullanır.",
     "exportStart": "Dışa aktarmayı başlat",
     "cancel": "Vazgeç",
     "close": "Kapat",
@@ -4469,6 +4474,24 @@
     "crmConverted": "Dönüşen aday",
     "crmCandidates": "Dönemdeki aday",
     "crmConversionRate": "Dönüşüm oranı",
+    "crmFunnelStages": "Ulaşılan aşamalar",
+    "crmFunnelSources": "Aday kaynakları",
+    "crmStage": "Aşama",
+    "crmSource": "Kaynak",
+    "crmNoStage": "Aşama kaydı yok",
+    "crmFunnelSourceNames": {
+      "manual": "Elle eklenen",
+      "phone": "Telefon",
+      "whatsapp": "WhatsApp",
+      "web": "Web",
+      "website": "Web sitesi",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "referral": "Referans",
+      "public_application": "Yayımlı başvuru formu",
+      "legacy_import": "Geçmiş içe aktarma",
+      "other": "Diğer"
+    },
     "studentImport": "Öğrenci aktarımı",
     "crmImport": "Geçmiş CRM başvuruları",
     "existingImport": "Mevcut aktarım işi",
