@@ -104,11 +104,11 @@ Her E*.6 kaydı, geçerli ölçütlerde klavye ve tuzaksız kullanım/odak sıra
 
 ### Güncel görsel kaynak
 
-Yeni çizim paketinin kendi sürümü **v67**. Aktif karşılaştırma kaynağı [18 Kasım HTML](../design-reference/revisions/2026-11-18/index.html), [CSS](../design-reference/revisions/2026-11-18/app.css), [JS](../design-reference/revisions/2026-11-18/app.js) ve [tokenlar](../design-reference/revisions/2026-11-18/tokens.css). [Geçiş notu](../design-reference/revisions/2026-11-18/GECIS.md) ve [çizim günlüğü](../design-reference/revisions/2026-11-18/ILERLEME.md) görsel bağlam verir. Bu dosyalar salt okunur örnektir, uygulama bundle'ına girmez.
+Aktif çizim kaynağı yerelde [`apps/web1/read-only/`](../read-only/) altındadır. Karşılaştırmayı [HTML](../read-only/tasarim-v2/index.html), [CSS](../read-only/tasarim-v2/app.css), [JS](../read-only/tasarim-v2/app.js) ve [tokenlardan](../read-only/tasarim-v2/tokens.css) yap. [Geçiş notu](../read-only/GECIS.md) ve [çizim günlüğü](../read-only/ILERLEME.md) görsel bağlam verir. Güncel yerel paket **v67**. Yerel çizimler uygulama bundle’ına girmez.
 
-13 Kasım'daki dört özgün dosya yerinde kalır; kapanmış E/P kanıtları bu önceki kaynakla değerlendirilmiştir. Yeni karşılaştırmalarda 18 Kasım snapshot'ını kullan. Bu tarihli görsel değişikliklerin tek takip sahibi V01–V08 ve E47–E52'dir. Eski E/P kutularının kapalı olması yeni çizim farklarının teslim edildiği anlamına gelmez.
+13 Kasım’daki özgün çizimlerle alınmış E/P kanıtları o sürüme aittir. Pro/Starter v67 farkları ve ek ekranlar V01–V08 ve E47–E52 altında takip edilir.
 
-Arşivin dört kaynak dosyası ile üç notu byte'ları korunarak `design-reference/revisions/2026-11-18/` altına alındı. Kaynak arşiv kullanıcının bu görevdeki ekidir. Dosyaların SHA-256 kayıtları aşağıdadır. Önizleme uygulama ve test sunucularından ayrı portta açılır: `python3 -m http.server 4184 --bind 127.0.0.1 --directory design-reference/revisions/2026-11-18`.
+Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) karşılaştırma kanıtını yeniden üretmek için saklanır. Aktif yerel paketin dört kaynak dosyası ve üç notu bu arşivle SHA-256 düzeyinde eşleşti. Yerel önizleme için Web1 dizininden `python3 -m http.server 4184 --bind 127.0.0.1 --directory read-only/tasarim-v2` çalıştır.
 
 | Dosya         | SHA-256                                                            |
 | ------------- | ------------------------------------------------------------------ |
@@ -1554,7 +1554,7 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 
 ## Kapsam ve kaynaklar
 
-- Aktif çizim kaynağı `design-reference/revisions/2026-11-18/` snapshot’ıdır; önceki özgün çizimler `design-reference` kökünde salt okunur örnek olarak korunur. Ürün geneli kaynak taraması tamamlandı; E satırları sayfa bazlı uygulama girdisidir. Runtime ve gerçek görsel/işlev kabulü açık kutularda izlenir.
+- Çizim yolu ve arşiv kanıtı [güncel görsel kaynak](#güncel-görsel-kaynak) bölümündedir. Ürün geneli kaynak taraması tamamlandı; E satırları sayfa bazlı uygulama girdisidir. Runtime ve gerçek görsel/işlev kabulü açık kutularda izlenir.
 - Kaynak kodu, testler ve çıktılar `apps/web1` içinde tutulur. Bağımsız uygulama tanımıyla çelişen repo talimatları ve etkin CI/yayın düzeni T02.3 kapsamında kayıt altına alınır. [Uygulama kuralları](https://github.com/SXQHex/FtkSaaS/blob/main/apps/web1/AGENTS.md) · [Kurulum](https://github.com/SXQHex/FtkSaaS/blob/main/apps/web1/README.md)
 - F kimlikleri ürün kapsamını, WF kimlikleri aktör, işlem sırası ve ret/kurtarma davranışını gösterir. Her paketin başlığındaki referanslar geliştirme öncesi kontrol edilir. Ortak davranışta aynı kaynağa ait kanıt tekrar kullanılabilir. [Ürün sözleşmesi](https://github.com/SXQHex/FtkSaaS/blob/main/docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) · [İş akışları](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md)
 - Alan, sürüm ve eylem izinleri için makine sözleşmesi esas alınır. Eksik okuma veya sağlayıcı desteği, ilgili işin engel kaydına yazılır. [İstemci protokolü](https://github.com/SXQHex/FtkSaaS/blob/main/docs/client-integration.md) · [Makine sözleşmesi](https://github.com/SXQHex/FtkSaaS/blob/main/packages/api-contracts/schema/contract.json) · [Ayar davranışları](https://github.com/SXQHex/FtkSaaS/blob/main/docs/settings.md)
