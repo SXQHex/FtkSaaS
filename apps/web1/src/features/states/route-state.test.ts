@@ -8,6 +8,7 @@ it.each([
   ["VERSION_CONFLICT", "conflict"],
   ["PREVIEW_STALE", "expired"],
   ["PLAN_FEATURE_UNAVAILABLE", "limit"],
+  ["PLAN_LIMIT_REACHED", "limit"],
 ] as const)("keeps the native %s outcome distinct from an empty result", (code, kind) => {
   expect(routeErrorState(new BackendError({ code, retryable: false, trace_id: trace }))).toEqual({
     kind,

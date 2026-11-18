@@ -39,6 +39,21 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
   useEffect(() => {
     main.current?.querySelector<HTMLElement>("h1")?.focus();
   }, [error]);
+  async function reload() {
+    const errorPage = main.current;
+    const locationKey = router.state.location.state.__TSR_key;
+    await router.invalidate();
+    if (
+      errorPage?.isConnected ||
+      router.state.location.state.__TSR_key !== locationKey ||
+      document.activeElement !== document.body
+    )
+      return;
+    const heading = document.querySelector<HTMLElement>("main h1");
+    if (!heading) return;
+    heading.tabIndex = -1;
+    heading.focus();
+  }
   return (
     <main
       ref={main}
@@ -54,7 +69,7 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
               <Button
                 isDisabled={loading}
                 onPress={() => {
-                  void router.invalidate();
+                  void reload();
                 }}
               >
                 {state.retryable ? t(($) => $.states.retry) : t(($) => $.states.reload)}
