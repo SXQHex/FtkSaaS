@@ -2156,6 +2156,10 @@
         },
         "purchase_preview_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "event_registration_preview_id": {
+          "$ref": "#/$defs/FtkUuid",
+          "description": "Current event registration preview for the native member; echo the discovered context unchanged for document reads and acceptance."
         }
       },
       "required": [
@@ -96307,6 +96311,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/AcceptanceContext/properties/event_registration_preview_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/AutomationTrigger/properties/recipient_person_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -113746,7 +113756,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 187,
+      "migration_count": 188,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
