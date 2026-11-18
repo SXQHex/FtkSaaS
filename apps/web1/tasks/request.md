@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı.** W1-BE-36’nın kalan sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi de başarılı. Karşılanan kapsam, aşağıdaki native destek sınırlarını da içerir; desteklenmeyen davranışlar frontend’de varmış gibi gösterilmez. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. Starter yönetici gezinmesi için W1-BE-42 açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
 
 İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
 
@@ -50,6 +50,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-39 | P09.2 · WF06 | Borç politikasından kaynaklanan rezervasyon reddinin ayırt edilmesi | Karşılandı (PR330). Yetkili rezervasyonda `DEBT_BOOKING_BLOCKED` ayrımı var. |
 | W1-BE-40 | P14.1 · WF11/WF12 | Ders değişikliğinde etkilenen öğrenciye uygulama içi bildirim | Karşılandı (PR330). Etkilenen aktif rezervasyon sahibine ders değişikliği bildirimi gider. |
 | W1-BE-41 | P01.4 · WF01 | Native ilk parola için izole kabul | Karşılandı (PR330). Native CI parolasız Google kimliğine ilk parolayı doğruladı. |
+| W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Açık. Starter2’de kendi rol okuması plan reddi veriyor, yayımlı Web1 yönetim menüsünü kuramıyor. |
 
 ## Bütün talepler için ortak sınır
 
@@ -371,3 +372,9 @@ Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs
 ## W1-BE-41 · Native ilk parola kabulü
 
 **Karşılandı.** PR330’un native CI senaryosu sentetik Google-only hesabın parolasız durumunu doğruladı, gerçek yerel native oturumdan ilk parolayı yazdı ve parola girişinde aynı Auth ve Edge hesabını okudu. Etkileşimli Google rızası P01.3 kapsamındaki ayrı kontroldür. [Native test](../../backend/tests/account-identity-acceptance.mjs) · [Aday kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44218399421).
+
+## W1-BE-42 · Starter oturumunun kendi yönetim kapsamını keşfetmesi
+
+**Açık.** 18 Kasım’da yayımlı Web1, sentetik Starter2 sahibiyle gerçek development Auth girişini tamamladı. Hesap, organizasyon ve erişilebilir tek merkez HTTP 200 ile okundu. Kendi kanonik `person_id` değeriyle `roles_list_v1` HTTP 200 zarfında `PLAN_FEATURE_UNAVAILABLE` döndürdü. Merkez filtresi olmadan açık `role=owner`, `state=active` isteği de aynı sonucu verdi. Web1 yönetim bağlantılarını kuramadı. Hesap ekranı açıldı ve test oturumu kapatıldı. [Web1 çağrı kaynağı](../src/features/workspace/workspace.ts) · [Güvenli hosted kanıtı](../.tmp/starter-hosted-web1-readback.json).
+
+Web1’in yalnız oturumun kendi etkin yönetim rolünü ve erişilebilir merkez kapsamını yayımlanmış bir okuyucudan edinmesi gerekiyor. İzinli Starter owner ve merkez yöneticisi durumlarını, rol geri alımını ve plan geçişini doğrula. Öğrencide ve kapsam dışı kişide yönetim kapsamı dönmemeli. Başka kişilerin rol dizini ve bağımsız personel yönetimi için F05 kapısı korunmalı. WF02’nin mevcut eğitmen ataması seçicisi kayıtlı eğitmen rolünü doğruluyor. Yönetici gezinmesi için gerekli kendi yönetim rolünü bu seçici sağlamıyor. [WF02](../../../docs/workflows.md#wf02).
