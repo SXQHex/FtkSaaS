@@ -3440,6 +3440,8 @@
     "calendarTitle": "Takvimime ekle",
     "calendarDescription": "Rezervasyonların Google, Apple veya Outlook takviminde görünsün.",
     "instructorCalendarDescription": "Atandığın dersleri Google, Apple veya Outlook takviminde gör.",
+    "studioCalendarTitle": "Stüdyo programı aboneliği",
+    "studioCalendarDescription": "Seçili merkezin yaklaşan programını Google, Apple veya Outlook takviminde gör.",
     "calendarPrivacy": "Bağlantıyı bilen kişiler ders saatlerini görebilir. Bağlantını yalnızca güvendiğin takvim uygulamalarıyla paylaş.",
     "calendarPolling": "Takvim uygulamaları güncellemeleri kendi aralıklarıyla alır. Bağlantıyı iptal etmek daha önce kopyalanmış kayıtları silmez.",
     "calendarCreate": "Takvim bağlantısı oluştur",

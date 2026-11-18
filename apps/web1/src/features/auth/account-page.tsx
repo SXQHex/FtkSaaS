@@ -17,7 +17,11 @@ import { Button } from "../../components/ui/button";
 import { getSupabaseClient } from "../../lib/supabase";
 import { MemberCalendarPanel } from "../member-account/member-calendar-panel";
 import { PersonalCalendarCard } from "../member-account/member-account-view";
-import { workspaceRoles, type readWorkspace } from "../workspace/workspace";
+import {
+  hasWorkspaceManagementScope,
+  workspaceRoles,
+  type readWorkspace,
+} from "../workspace/workspace";
 
 // E10 is implemented in slices; the remaining scope is tracked in tasks/todo.md.
 export function AccountPage() {
@@ -33,7 +37,9 @@ export function AccountPage() {
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
   const [setupLocked, setSetupLocked] = useState(false);
-  const [calendarLocked, setCalendarLocked] = useState(false);
+  const [instructorCalendarLocked, setInstructorCalendarLocked] = useState(false);
+  const [studioCalendarLocked, setStudioCalendarLocked] = useState(false);
+  const calendarLocked = instructorCalendarLocked || studioCalendarLocked;
   const accountLocked = setupLocked || calendarLocked;
   async function signOut() {
     if (accountLocked || pending) return;
@@ -120,14 +126,29 @@ export function AccountPage() {
               className="flex flex-col gap-4 data-inert:hidden"
             >
               <ProfilePanel accountId={account.id} disabled={calendarLocked} />
+              {organizationId && centerId && hasWorkspaceManagementScope(workspace, centerId) && (
+                <PersonalCalendarCard kind="studio_program">
+                  <MemberCalendarPanel
+                    key={`${account.id}:${organizationId}:${centerId}`}
+                    scope={{
+                      accountId: account.id,
+                      orgId: organizationId,
+                      studioCenterId: centerId,
+                    }}
+                    kind="studio_program"
+                    onLockChange={setStudioCalendarLocked}
+                    disabled={setupLocked || pending || instructorCalendarLocked}
+                  />
+                </PersonalCalendarCard>
+              )}
               {organizationId && hasInstructorCalendarScope(workspace) && (
-                <PersonalCalendarCard instructor>
+                <PersonalCalendarCard kind="duties">
                   <MemberCalendarPanel
                     key={`${account.id}:${organizationId}`}
                     scope={{ accountId: account.id, orgId: organizationId }}
                     kind="duties"
-                    onLockChange={setCalendarLocked}
-                    disabled={setupLocked || pending}
+                    onLockChange={setInstructorCalendarLocked}
+                    disabled={setupLocked || pending || studioCalendarLocked}
                   />
                 </PersonalCalendarCard>
               )}

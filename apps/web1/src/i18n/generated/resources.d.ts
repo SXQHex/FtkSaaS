@@ -2147,6 +2147,8 @@ export default interface Resources {
       "profileTitle": "Kişi bilgileri",
       "read": "Oku ve kabul et",
       "security": "Hesap güvenliğini yönet",
+      "studioCalendarDescription": "Seçili merkezin yaklaşan programını Google, Apple veya Outlook takviminde gör.",
+      "studioCalendarTitle": "Stüdyo programı aboneliği",
       "title": "Hesabım",
       "transactionalEmail": "E-posta ile işlem bildirimleri",
       "transactionalEmailHint": "Rezervasyon ve ders değişikliği gibi işlem bildirimlerini e-postayla da al.",

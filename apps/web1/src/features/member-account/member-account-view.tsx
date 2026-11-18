@@ -21,6 +21,7 @@ import { Switch } from "../../components/ui/switch";
 import { Input } from "../../components/ui/input";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+import type { CalendarKind } from "./member-calendar";
 
 export type PreferenceId =
   | "email"
@@ -137,23 +138,30 @@ export function AccountPreferencesView({
 }
 export function PersonalCalendarCard({
   children,
-  instructor = false,
+  kind = "lessons",
 }: {
   children: ReactNode;
-  instructor?: boolean;
+  kind?: CalendarKind;
 }) {
   const { t } = useTranslation();
+  const description = {
+    lessons: t(($) => $.memberAccount.calendarDescription),
+    duties: t(($) => $.memberAccount.instructorCalendarDescription),
+    studio_program: t(($) => $.memberAccount.studioCalendarDescription),
+  };
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          <h2>{t(($) => $.memberAccount.calendarTitle)}</h2>
+          <h2>
+            {t(($) =>
+              kind === "studio_program"
+                ? $.memberAccount.studioCalendarTitle
+                : $.memberAccount.calendarTitle,
+            )}
+          </h2>
         </CardTitle>
-        <CardDescription>
-          {instructor
-            ? t(($) => $.memberAccount.instructorCalendarDescription)
-            : t(($) => $.memberAccount.calendarDescription)}
-        </CardDescription>
+        <CardDescription>{description[kind]}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {children}

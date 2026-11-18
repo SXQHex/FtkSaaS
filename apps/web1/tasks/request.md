@@ -54,7 +54,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | Açık. Organizasyonu olmayan hesabın kuruluma nasıl alınacağı ve ilk merkezden sonra yönetim yetkisinin nasıl açılacağı için backend sözleşmesi gerekiyor. |
 | W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Karşılandı](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
-| W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Açık](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
+| W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Karşılandı](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
 | W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
@@ -420,9 +420,9 @@ Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişi
 
 ## W1-BE-46 · Yetkili yönetici için stüdyo programı ICS aboneliği
 
-**Açık · backend değerlendirmesi.** Çizim, yöneticiye stüdyo programının takvim aboneliğini sunuyor. Yayımlanmış kişisel ICS sözleşmesinde `lessons` yalnız hesabın kendi aktif rezervasyonlarını, `duties` kendi aktif atamalarını içerir. Yönetici rolü program geneli aboneliği açmaz. [v67 çizimi](../design-reference/revisions/2026-11-18/app.js#L7187) · [WF09](../../../docs/workflows.md#wf09).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-Program aboneliğinin yetkili rol ve merkez kapsamını, plan kapısını, çıktıda paylaşılacak asgari alanları ve yetki geri alındığında mevcut bağlantının davranışını belirleyin. Abonelik bağlantısı yalnız yetkili oluşturma ve yenileme cevabında açılmalı. Başkasının bağlantısı ve kişisel bilgileri yöneticiye verilmemeli. Eğitmen ataması olan yönetici kendi atamalarına ait kişisel `duties` bağlantısını kullanabilir.
+`calendar_links_get_v1(studio_program_scope)` yetkili hesabın seçili merkez bağlantılarını listeler. `calendar_link_create_v1` ve `calendar_link_rotate_v1` merkez kapsamını alır ve izinli yanıtta URL açar. Feed yetki ve planı yeniden denetler. [Çizim](../read-only/tasarim-v2/app.js#L7176) · [WF09](../../../docs/workflows.md#wf09) · [V02.2 Web1 kabulü](todo.md#v02).
 
 ## W1-BE-47 · Üye gelen kutusunda tümünü okundu yapma
 

@@ -12,6 +12,7 @@ import {
   readMemberCalendars,
   writeMemberCalendar,
   calendarCredential,
+  calendarLinkMatchesScope,
   type CalendarIntent,
   type CalendarKind,
   type CalendarScope,
@@ -51,7 +52,7 @@ export function MemberCalendarPanel({
   const { t } = useTranslation(),
     router = useRouter();
   const query = useQuery({
-    queryKey: ["member-calendar", scope.accountId, scope.orgId],
+    queryKey: ["member-calendar", scope.accountId, scope.orgId, scope.studioCenterId],
     queryFn: () => readMemberCalendars(scope),
     retry: false,
   });
@@ -92,7 +93,7 @@ export function MemberCalendarPanel({
     const expectedKinds = intent?.action === "create" ? [intent.kind] : intent?.link.kinds;
     if (
       result.primary_id !== scope.accountId ||
-      result.link.org_id !== scope.orgId ||
+      !calendarLinkMatchesScope(scope, result.link) ||
       !intent ||
       !expectedKinds ||
       (intent.action !== "create" && result.link.id !== intent.link.id) ||
