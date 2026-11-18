@@ -56,7 +56,7 @@ export const event: EventView = {
 };
 export async function mockEvents(
   page: Page,
-  mode: "normal" | "unknown" | "result" | "denied" | "empty" | "directory" = "normal",
+  mode: "normal" | "unknown" | "result" | "denied" | "empty" | "directory" | "starter" = "normal",
   options: { limited?: boolean; missingPayments?: boolean } = {},
 ) {
   await mockStudio(page);
@@ -99,10 +99,17 @@ export async function mockEvents(
     }
     if (op === "event_list_v1") {
       state.reads.push(r);
-      if (mode === "denied")
+      if (mode === "denied" || mode === "starter")
         return route.fulfill({
           status: 403,
-          json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+          json: {
+            ok: false,
+            error: {
+              code: mode === "starter" ? "PLAN_FEATURE_UNAVAILABLE" : "FORBIDDEN",
+              retryable: false,
+              trace_id: I.role,
+            },
+          },
         });
       expect(r.page).toMatchObject({ limit: 20, sort: "starts_at_asc" });
       const scoped = state.events.filter(

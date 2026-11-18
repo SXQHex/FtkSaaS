@@ -46,6 +46,7 @@ export function LeadEditor({
   scope,
   target,
   catalog,
+  advanced = true,
   owners = [],
   assignmentWritable = false,
   timezone,
@@ -56,6 +57,7 @@ export function LeadEditor({
   scope: ClientScope;
   target: LeadTarget | null;
   catalog?: CrmPipelineConfiguration;
+  advanced?: boolean;
   owners?: { id: string; name: string }[];
   assignmentWritable?: boolean;
   timezone: string;
@@ -97,6 +99,7 @@ export function LeadEditor({
     return (
       <LeadSheet
         mode={target.mode ?? "edit"}
+        advanced={advanced}
         name={target.name}
         draft={leadDraft()}
         stages={catalog?.stages ?? []}
@@ -141,6 +144,7 @@ export function LeadEditor({
       }
       target={target}
       catalog={catalog}
+      advanced={advanced}
       owners={owners}
       assignmentWritable={assignmentWritable}
       timezone={timezone}
@@ -157,6 +161,7 @@ function LeadEditorForm({
   initialDraft,
   target,
   catalog,
+  advanced,
   owners,
   assignmentWritable,
   timezone,
@@ -174,6 +179,7 @@ function LeadEditorForm({
   initialDraft?: LeadDraft;
   target: LeadTarget | null;
   catalog?: CrmPipelineConfiguration;
+  advanced: boolean;
   owners: { id: string; name: string }[];
   assignmentWritable: boolean;
   timezone: string;
@@ -488,6 +494,7 @@ function LeadEditorForm({
   return (
     <LeadSheet
       mode={mode}
+      advanced={advanced}
       name={before ? (target?.name ?? selected?.display_name) : undefined}
       draft={draft}
       onDraft={(value) => {
@@ -550,7 +557,7 @@ function LeadEditorForm({
         if (!locked) onClose();
       }}
       onMode={(mode) => {
-        if (locked) return;
+        if (locked || (!advanced && mode !== "activity")) return;
         command.reset();
         setActivity(undefined);
         setMode(mode);

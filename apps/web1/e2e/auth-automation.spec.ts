@@ -13,7 +13,7 @@ const autoId = "019ab7b0-0000-7000-8000-000000000201",
   createdId = "019ab7b0-0000-7000-8000-000000000204";
 async function fixture(
   page: Page,
-  mode: "normal" | "unknown" | "stale" | "segment" | "paged" | "older" = "normal",
+  mode: "normal" | "unknown" | "stale" | "segment" | "paged" | "older" | "starter" = "normal",
 ) {
   await mockStudio(page);
   const state = {
@@ -84,6 +84,14 @@ async function fixture(
       ["automation_save_v1", "segment_save_v1"].includes(r.operation)
     ) {
       expect(r.selector.key.scope).toEqual({ kind: "center", center_id: I.center });
+      if (mode === "starter")
+        return route.fulfill({
+          status: 403,
+          json: {
+            ok: false,
+            error: { code: "PLAN_FEATURE_UNAVAILABLE", retryable: false, trace_id: I.role },
+          },
+        });
       if (r.selector.key.discovery) {
         state.discoveries.push(r);
         if (state.denied)
@@ -264,12 +272,22 @@ async function fixture(
   await expect(page).toHaveURL(`${origin}/account`);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/automation`);
   await expect(page.getByRole("heading", { name: "Otomasyon", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Örnek takip", exact: true })).toBeVisible();
+  if (mode !== "starter")
+    await expect(page.getByRole("button", { name: "Örnek takip", exact: true })).toBeVisible();
   return state;
 }
 const saved = (page: Page) =>
   page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true });
 const review = "Tanımı ve etkilerini inceledim, kaydetmeyi onaylıyorum.";
+test("Starter keeps automation and segment creation disabled after native plan denial", async ({
+  page,
+}) => {
+  const state = await fixture(page, "starter");
+  await expect(page.getByRole("button", { name: "Otomasyon ekle", exact: true })).toBeDisabled();
+  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Segment ekle", exact: true })).toBeDisabled();
+  expect(state.writes).toHaveLength(0);
+});
 test("automation native directory keeps unavailable worker actions disabled and reads the scope queue by default", async ({
   page,
 }) => {

@@ -50,6 +50,7 @@ export function LeadsView({
   stageFilter,
   onStageFilter,
   filtersAvailable = false,
+  advanced = true,
   disabled = false,
   notice,
   pagination,
@@ -73,6 +74,7 @@ export function LeadsView({
   stageFilter: string;
   onStageFilter?: (value: string) => void;
   filtersAvailable?: boolean;
+  advanced?: boolean;
   disabled?: boolean;
   notice?: ReactNode;
   pagination?: ReactNode;
@@ -148,7 +150,12 @@ export function LeadsView({
               className="grid w-full grid-cols-2 gap-1 group-data-horizontal/tabs:h-auto sm:flex sm:w-fit"
             >
               {(["board", "tasks", "apps", "list"] as const).map((key) => (
-                <TabsTrigger key={key} id={key} className="h-9 flex-none">
+                <TabsTrigger
+                  key={key}
+                  id={key}
+                  className="h-9 flex-none"
+                  isDisabled={!advanced && key === "board"}
+                >
                   {t(($) => $.leads.tabs[key])}
                 </TabsTrigger>
               ))}

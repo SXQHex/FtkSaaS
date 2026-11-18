@@ -5,6 +5,22 @@ import { studioIds as I } from "./studio-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 const footer = (page: import("@playwright/test").Page) =>
   page.locator('[data-slot="sheet-footer"]');
+test("Starter plan allows the basic candidate list after pipeline denial", async ({ page }) => {
+  const state = await mockLeads(page, { starter: true });
+  await expect(page.getByRole("button", { name: "Aday ekle", exact: true })).toBeEnabled();
+  await expect(page.getByRole("tab", { name: "Pano", exact: true })).toBeDisabled();
+  const dialog = await openLead(page);
+  await expect(
+    dialog.getByRole("button", { name: "Takip veya not ekle", exact: true }),
+  ).toBeEnabled();
+  await expect(dialog.getByRole("button", { name: /deneme|üyeliğe çevir/i })).toHaveCount(0);
+  expect(
+    state.reads
+      .filter((read) => read.operation === "leads_list_v1")
+      .map((read) => read.request.include_pipeline),
+  ).toEqual([true, undefined]);
+  expect(state.writes).toHaveLength(0);
+});
 test("phone lead creation keeps person and candidate writes separate without an invitation", async ({
   page,
 }) => {

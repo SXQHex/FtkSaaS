@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import type { LeadMode, LeadDraft } from "./lead-draft";
 export function LeadSheet({
   mode,
+  advanced = true,
   name,
   draft,
   onDraft,
@@ -50,6 +51,7 @@ export function LeadSheet({
   trialContent,
 }: {
   mode: LeadMode;
+  advanced?: boolean;
   offsets?: { id: string; label: string }[];
   submitLabel?: string;
   assignmentWritable?: boolean;
@@ -411,17 +413,19 @@ export function LeadSheet({
         {mode === "edit" && name && (
           <>
             <div className="flex flex-wrap gap-2">
-              {(["activity", "offer", "confirm", "convert"] as const).map((action) => (
-                <Button
-                  key={action}
-                  variant="outline"
-                  size="sm"
-                  isDisabled={locked || !onMode}
-                  onPress={() => onMode?.(action)}
-                >
-                  {t(($) => $.leads.modes[action])}
-                </Button>
-              ))}
+              {(["activity", "offer", "confirm", "convert"] as const)
+                .filter((action) => advanced || action === "activity")
+                .map((action) => (
+                  <Button
+                    key={action}
+                    variant="outline"
+                    size="sm"
+                    isDisabled={locked || !onMode}
+                    onPress={() => onMode?.(action)}
+                  >
+                    {t(($) => $.leads.modes[action])}
+                  </Button>
+                ))}
             </div>
             {history}
           </>

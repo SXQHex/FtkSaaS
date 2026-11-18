@@ -1325,6 +1325,7 @@ async function freezeSetup(
     unknown?: boolean;
     unread?: boolean;
     stale?: boolean;
+    starter?: boolean;
   } = {},
 ) {
   await page.clock.install({ time: new Date("2026-11-16T08:00:00Z") });
@@ -1365,6 +1366,20 @@ async function freezeSetup(
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (
+      options.starter &&
+      (op === "freeze_preview_v1" ||
+        (op === "management_state_get_v1" && req.operation === "sale_change_preview_v1"))
+    ) {
+      previews.push(req);
+      return route.fulfill({
+        status: 403,
+        json: {
+          ok: false,
+          error: { code: "PLAN_FEATURE_UNAVAILABLE", retryable: false, trace_id: I.role },
+        },
+      });
+    }
     if (op === "entitlements_get_v1") {
       if (options.unread && saved && !unread) {
         unread = true;
@@ -1510,6 +1525,35 @@ async function freezeReview(page: Page, options: Parameters<typeof freezeSetup>[
   await expect(state.panel.getByRole("heading", { name: "Etki", exact: true })).toBeFocused();
   return state;
 }
+test("Starter preview denials preserve existing package rights and prevent freeze or change writes", async ({
+  page,
+}) => {
+  const { panel, previews, writes } = await freezeSetup(page, { starter: true, binding: true });
+  const changeWrites: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith("/sale_change_apply_v1"))
+      changeWrites.push(request.method());
+  });
+  await page.getByRole("button", { name: "Dondur", exact: true }).click();
+  await panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-18");
+  await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-20");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik Starter testi");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByText(/Güncel dondurma kaynağı veya işlem önizlemesi okunamadı/),
+  ).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toHaveCount(0);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.getByRole("button", { name: "Paketi değiştir", exact: true }).click();
+  await panel.locator("#lifecycle-sale").selectOption(saleId);
+  await expect(
+    panel.getByText(/Gelecek rezervasyonlar yüklenmeden paket değişikliği incelenemez/),
+  ).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toHaveCount(0);
+  expect(previews).toHaveLength(2);
+  expect(writes).toHaveLength(0);
+  expect(changeWrites).toHaveLength(0);
+});
 test("freeze review validates dates and preserves native reserved rights and timezone periods", async ({
   page,
 }) => {

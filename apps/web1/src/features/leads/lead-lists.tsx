@@ -190,10 +190,12 @@ export function LeadFollowupPicker({
   value,
   onChange,
   disabled,
+  advanced = true,
 }: {
   value: LeadFollowupKind;
   onChange: (value: LeadFollowupKind) => void;
   disabled: boolean;
+  advanced?: boolean;
 }) {
   const { t } = useTranslation();
   return (
@@ -211,11 +213,13 @@ export function LeadFollowupPicker({
               onChange(next);
           }}
         >
-          {(["manual", "renewal_due", "inactive_student"] as const).map((kind) => (
-            <NativeSelectOption key={kind} value={kind}>
-              {t(($) => $.leads.followupKinds[kind])}
-            </NativeSelectOption>
-          ))}
+          {(["manual", "renewal_due", "inactive_student"] as const)
+            .filter((kind) => advanced || kind === "manual")
+            .map((kind) => (
+              <NativeSelectOption key={kind} value={kind}>
+                {t(($) => $.leads.followupKinds[kind])}
+              </NativeSelectOption>
+            ))}
         </NativeSelect>
       </Field>
     </search>

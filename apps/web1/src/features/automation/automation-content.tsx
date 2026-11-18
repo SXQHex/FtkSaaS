@@ -122,6 +122,9 @@ export function AutomationContent({
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const creationError = tab === "segments" ? segments.error : autos.error;
+  const creationPlanBlocked =
+    creationError instanceof BackendError && creationError.code === "PLAN_FEATURE_UNAVAILABLE";
   const accessLost = useCallback(
     (cause: unknown) => {
       if (
@@ -393,9 +396,13 @@ export function AutomationContent({
         }}
         locked={locked}
         pagination={pagination}
-        onAdd={() => {
-          if (!locked) setSelection({ kind: tab === "segments" ? "segment" : "automation" });
-        }}
+        onAdd={
+          creationPlanBlocked
+            ? undefined
+            : () => {
+                if (!locked) setSelection({ kind: tab === "segments" ? "segment" : "automation" });
+              }
+        }
         onEdit={(id) => {
           if (!locked) {
             const row = autos.data?.items.find((value) => value.id === id);

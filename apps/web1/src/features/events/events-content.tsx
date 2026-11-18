@@ -147,6 +147,8 @@ export function EventsContent({
     [onLockChange],
   );
   const summary = !program.isError ? program.data?.summary : undefined;
+  const creationPlanBlocked =
+    program.error instanceof BackendError && program.error.code === "PLAN_FEATURE_UNAVAILABLE";
   return (
     <>
       <EventsView
@@ -186,9 +188,13 @@ export function EventsContent({
             : null,
         }}
         locked={locked}
-        onAdd={() => {
-          if (center && !locked) setSelected(null);
-        }}
+        onAdd={
+          center && !creationPlanBlocked
+            ? () => {
+                if (!locked) setSelected(null);
+              }
+            : undefined
+        }
         onOpen={(id) => {
           if (!locked)
             void router.navigate({
