@@ -226,6 +226,100 @@ test("event paid registration separates reviewed debt preparation, targeted bank
   page,
 }) => {
   const state = await mockEventDetail(page);
+  await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
+  state.event.interval = { starts_at: "2026-11-18T15:00:00Z", ends_at: "2026-11-18T16:00:00Z" };
+  const financeSnapshots: string[][] = [];
+  await page.route("**/functions/v1/backend-v1/finance_directory_get_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      view: "movements",
+    });
+    const cash = state.cash;
+    const items = cash
+      ? [
+          {
+            id: cash.id,
+            entity: { type: "cash_movements", id: cash.id },
+            person_id: I.instructor,
+            display_name: "Örnek Eğitmen",
+            created_at: cash.occurred_at,
+            occurred_at: cash.occurred_at,
+            version: 1,
+            kind: "collection",
+            amount_minor: cash.amount_minor,
+            currency: cash.currency,
+            method: "bank_transfer",
+            source_sale_id: null,
+            product_name: null,
+            due_at: null,
+          },
+        ]
+      : [];
+    financeSnapshots.push(items.map((item) => String(item.id)));
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          view: "movements",
+          items,
+          next_cursor: null,
+          as_of: "2026-11-16T12:00:00Z",
+          totals: [
+            {
+              currency: "TRY",
+              sales_minor: "0",
+              collections_minor: cash?.amount_minor ?? "0",
+              refunds_minor: "0",
+              debt_minor: "0",
+              credit_minor: "0",
+              debt_people: 0,
+              credit_people: 0,
+            },
+          ],
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/calendar_get_v1", async (route) => {
+    const row = state.event;
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: [
+            {
+              id: row.id,
+              type: "event",
+              center_id: I.center,
+              title: row.name,
+              starts_at: row.interval.starts_at,
+              ends_at: row.interval.ends_at,
+              resources: [{ kind: "room", id: I.room }],
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-16T12:00:00Z",
+        },
+      },
+    });
+  });
+  const finance = page.getByRole("link", { name: "Finans", exact: true });
+  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
+  const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  const ledger = page.getByRole("grid", { name: "Hareketler", exact: true });
+  const firstLedgerRead = page.waitForResponse(
+    "**/functions/v1/backend-v1/finance_directory_get_v1",
+  );
+  await finance.click();
+  await (await firstLedgerRead).finished();
+  await expect(ledger).toBeVisible();
+  expect(financeSnapshots).toEqual([[]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   const sheet = await paidRegistration(page);
   await expect(sheet.getByText(saved, { exact: true }).first()).toBeVisible();
   expect(state.writes.map((row) => row.op)).toEqual([
@@ -249,6 +343,17 @@ test("event paid registration separates reviewed debt preparation, targeted bank
   // The registration is already acknowledged; dismiss through the ready sheet's close control.
   await page.keyboard.press("Escape");
   await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
+  await finance.click();
+  await expect(ledger.getByRole("gridcell", { name: "TRY ₺450,00", exact: true })).toBeVisible();
+  expect(financeSnapshots).toEqual([[], [D.cash]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual([
+    "event_payment_prepare_v1",
+    "collection_record_v1",
+    "event_register_v1",
+  ]);
 });
 test("event capacity race reports settled preparation without a participant or duplicate registration", async ({
   page,
