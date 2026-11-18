@@ -2137,12 +2137,12 @@ export default interface Resources {
         "release": "hak iade edilir"
       },
       "empty": "Bu gün ders yok.",
-      "fixedGroup": "Sabit grup",
       "full": "Dolu",
       "group": "Grup dersi",
       "invalid": "Hak kaynağını, kategoriyi ve açık işlem onayını kontrol et.",
       "join": "Sıraya gir",
       "leave": "Sıradan çık",
+      "loading": "Dersler okunuyor…",
       "modes": {
         "flexible": "Esnek kayıt",
         "priority": "Öncelikli kayıt"

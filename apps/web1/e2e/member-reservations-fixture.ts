@@ -13,9 +13,11 @@ export async function mockOwnReservations(
     ackUnread?: boolean;
     cancelDenied?: boolean;
     staleLesson?: boolean;
+    weekStart?: "monday" | "sunday";
   } = {},
 ) {
-  await mockStudio(page);
+  const { native } = await mockStudio(page);
+  if (options.weekStart) native.weekStart = options.weekStart;
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
   const reads: { operation: string; request: Record<string, unknown> }[] = [],
     writes: Record<string, unknown>[] = [];

@@ -37,6 +37,7 @@ export function MemberLayout({
     scope: ClientScope;
     personId: string;
     timezone: string;
+    weekStart: "monday" | "sunday" | null;
     onLockChange: (locked: boolean) => void;
   }) => ReactNode;
 }) {
@@ -47,7 +48,7 @@ export function MemberLayout({
   const [locked, setLocked] = useState(false),
     [signingOut, setSigningOut] = useState(false),
     [signOutError, setSignOutError] = useState(false);
-  useAccountAppearance(account.id);
+  const appearance = useAccountAppearance(account.id);
   const workspace = useQuery(workspaceQuery(queries, account.id, initial.org));
   const source = !workspace.isError || locked ? workspace.data : undefined;
   const org = source?.selected;
@@ -194,6 +195,9 @@ export function MemberLayout({
           scope: { accountId: account.id, orgId: org.id, centerId: center.id },
           personId: self.person_id,
           timezone: center.timezone,
+          weekStart: appearance.isPending
+            ? null
+            : ((appearance.isError ? undefined : appearance.data?.values.week_start) ?? "monday"),
           onLockChange: setLocked,
         })
       ) : (

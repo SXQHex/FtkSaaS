@@ -80,8 +80,13 @@ export type MemberClass = CalendarItem & {
   member_lesson: MemberLessonDiscovery;
   capacity: SessionCapacityView;
 };
-export async function memberClassWeek(timezone: string, now: string, offset = 0) {
-  const base = await instructorPeriod(timezone, "monday", now, offset),
+export async function memberClassWeek(
+  timezone: string,
+  now: string,
+  offset = 0,
+  weekStart: "monday" | "sunday" = "monday",
+) {
+  const base = await instructorPeriod(timezone, weekStart, now, offset),
     T = await getTemporal();
   const start = T.PlainDate.from(base.start);
   const days = Array.from({ length: 7 }, (_, i) => {

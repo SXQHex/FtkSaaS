@@ -29,6 +29,7 @@ async function fixture(
     stale?: boolean;
     denied?: boolean;
     noStudent?: boolean;
+    weekStart?: "monday" | "sunday";
     ackUnread?: boolean;
     documents?: boolean;
     documentUnknown?: boolean;
@@ -37,7 +38,7 @@ async function fixture(
     bookingRejection?: "ENTITLEMENT_UNAVAILABLE" | "DOCUMENT_REQUIRED" | "DEBT_BOOKING_BLOCKED";
   } = {},
 ) {
-  await mockOwnReservations(page, { noStudent: options.noStudent });
+  await mockOwnReservations(page, { noStudent: options.noStudent, weekStart: options.weekStart });
   await page.goto("about:blank");
   const row: MemberClass = {
     id: id(1),
@@ -263,7 +264,14 @@ async function fixture(
       if (state.denied) return reject();
       if (options.stale && r.interval.starts_at === row.starts_at) row.member_lesson.version = 8;
       sync();
-      return send({ items: [row], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+      const inRange =
+        Date.parse(row.starts_at) < Date.parse(r.interval.ends_at) &&
+        Date.parse(row.ends_at) > Date.parse(r.interval.starts_at);
+      return send({
+        items: inRange ? [row] : [],
+        next_cursor: null,
+        as_of: "2026-11-16T12:00:00Z",
+      });
     }
     if (op === "entitlements_get_v1") {
       expect(r.person_id).toBe(I.self);
@@ -499,6 +507,34 @@ test("member discovery shows safe labels and one semantic menu across a narrow v
   expect(state.reads.filter((row) => row.op === "calendar_get_v1")).toHaveLength(1);
   await page.getByRole("button", { name: "Sonraki hafta", exact: true }).click();
   await expect.poll(() => state.reads.filter((row) => row.op === "calendar_get_v1").length).toBe(2);
+});
+test("member classes use the saved Sunday week and move the same native session after reread", async ({
+  page,
+}) => {
+  const state = await fixture(page, { weekStart: "sunday" });
+  const days = page.getByRole("radiogroup", { name: "Gün seç", exact: true });
+  await expect(days.getByRole("radio").first()).toHaveAccessibleName("15 Kasım 2026 Pazar");
+  await expect(page.getByRole("button", { name: "Kayıt ol", exact: true })).toHaveCount(1);
+  const original = page.locator(`#member-class-${state.row.id}`);
+  await expect(original).toBeVisible();
+  const [first] = state.reads.filter((row) => row.op === "calendar_get_v1");
+  expect(first?.request.interval).toEqual({
+    starts_at: "2026-11-14T21:00:00Z",
+    ends_at: "2026-11-21T21:00:00Z",
+  });
+  state.row.starts_at = "2026-11-17T16:00:00Z";
+  state.row.ends_at = "2026-11-17T17:00:00Z";
+  state.row.member_lesson.version += 1;
+  state.row.member_lesson.room_labels = ["Yeni salon"];
+  await page.getByRole("button", { name: "Listeyi yenile", exact: true }).click();
+  await expect(original).toHaveCount(0);
+  await days.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }).click();
+  await expect(original).toHaveCount(1);
+  const card = page.getByRole("listitem").filter({ hasText: state.row.title });
+  await expect(card.getByText("19:00", { exact: true })).toBeVisible();
+  await expect(card.getByText(/Yeni salon/)).toBeVisible();
+  await expect(card.getByRole("button", { name: "Kayıt ol", exact: true })).toHaveCount(1);
+  expect(state.writes).toHaveLength(0);
 });
 test("member booking requires an explicit right and review, then rereads native reservation and rights", async ({
   page,
