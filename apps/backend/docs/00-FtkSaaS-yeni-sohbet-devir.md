@@ -1,5 +1,16 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-final-five"></a>
+## Web1 v67 son beş backend talebi
+
+[Draft PR #341 core](https://github.com/SXQHex/FtkSaaS/actions/runs/44390514622/job/135106763662), `76f6542d` head’inde yoklama düzeltme talebinin eksik audit modül eşlemesi nedeniyle sözleşme testinde durdu. Yerel düzeltme komutu ve audit eşlemesini mevcut yoklama modülü M05’e bağladı. 201. migration temiz uygulandı. Çalışan SQL’deki 236 audit modül eşlemesi kaynakla aynı ve mevcut assertion dahil ilgili seri paket 509/509 geçti.
+
+W1-BE-43/49/55/56/57, PR #340 merge edildikten sonra aynı kaynak ağacına sahip güncel main `42172f48feb02dc81b86a1723888f80acc3a3bd3` üzerinden `codex/web1-backend-remaining` yerel dalına alındı. [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) bu taban için başarılı. Onaylanmış davranışlar [WF02](../../../docs/workflows.md#wf02), [WF07](../../../docs/workflows.md#wf07), [WF09](../../../docs/workflows.md#wf09) ve [WF11](../../../docs/workflows.md#wf11) sahibindedir.
+
+200 migration izole loopback veritabanında uygulandı. Tek Node runner ve `--test-concurrency=1` ile hedefli backend kabulü 14/14 geçti ve yerel stack kapatıldı. Makine sözleşmesi, kayıtlı 241 runtime yetki kapısı, workflow eşlemesi, test envanteri ve backend typecheck doğrulandı. Kullanıcının güncel Edge JSON yükü sınırı 4.999.999 bayt. Ölçülen yük 4.020.077 bayt. Üretilen Ajv hata biçimi önceki kaynakla aynı kuralı kullanır.
+
+PR #340’ın önceki [Backend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/44379848566) denemesinde `attendance_close_v1` HTTP 503 döndü. Merge edilen tabanın doğrulaması ve Main acceptance başarılı. Güncel boyut eşiği ve katalog sürümüne ait üç test beklentisinin süreli kalite kaydı kullanıcı onayıyla eklendi. Yerel floor guard sıfır bulguyla geçti. Yeni yerel dilim için aday CI ve hosted kabulü bekler.
+
 <a id="web1-v67-studio-import-report"></a>
 ## Web1 v67 stüdyo takvimi ve dosya işleri
 

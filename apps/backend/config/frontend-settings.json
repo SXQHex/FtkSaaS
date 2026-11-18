@@ -1,5 +1,5 @@
 {
-  "version": 24,
+  "version": 25,
   "fields": [
     {
       "scope": "user",
@@ -4143,6 +4143,39 @@
       },
       "default": null,
       "group": "M16",
+      "consumer": "public_program_discovery"
+    },
+    {
+      "scope": "organization",
+      "key": "public_page",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 63,
+                "pattern": "^(?![0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "slug",
+              "enabled"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "O01",
       "consumer": "public_program_discovery"
     }
   ]

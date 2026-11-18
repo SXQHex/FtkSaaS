@@ -291,7 +291,8 @@
         "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql",
         "apps/backend/scripts/compact-validator-errors.mjs",
         "apps/backend/database/tracking-discovery.sql",
-        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql"
+        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql",
+        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -302,8 +303,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "99142bacdd615cfe8163fe8added34dfcbc5a69a4553a938f7fb6d7302df38a4",
-        "reason": "Reviewed shared Edge request and response contract changes, authenticated skip CSV dispatch, and updated acceptance bindings."
+        "fingerprint": "7056423c6a6ad327cc02ceb660c9ba540ddefea755319b35a56b0bc13b5809a0",
+        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
       }
     },
     {
@@ -392,8 +393,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "51e42c8230d5084fdb5c7edfbdfca3e2d84dca2c50e16da051ba1cf4a93dd0e2",
-        "reason": "Reviewed native password security notice URL composition, independent Auth config readback and unchanged callback contract. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "9b815ec9a915e870c87684889af9d473a2155f45a132ef0daa05c202805fd815",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -418,7 +419,8 @@
         "apps/backend/tests/web1-review-acceptance.mjs",
         "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
         "apps/backend/tests/role-directory-filter-unit.mjs",
-        "apps/backend/tests/role-directory-filter-acceptance.mjs"
+        "apps/backend/tests/role-directory-filter-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -487,7 +489,9 @@
         "apps/backend/database/role-directory-filters.sql",
         "apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql",
         "apps/backend/database/account-self-management-scope.sql",
-        "apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql"
+        "apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql",
+        "apps/backend/database/studio-setup-requests.sql",
+        "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -510,11 +514,13 @@
         "disciplines_list_v1",
         "discipline_save_v1",
         "center_discipline_set_v1",
-        "role_revoke_preview_v1"
+        "role_revoke_preview_v1",
+        "studio_setup_list_v1",
+        "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "23ed990f7c5f1a347c8ec51867a9757d2e4c8e8fa5e74f6f87b04abe914f0e7f",
-        "reason": "Reviewed W1-BE-42 opt-in live self scope for owner, org manager and accessible center managers, the native Starter denial and role transition tests, and the unchanged filtered role directory. The new before-and-after reads supplement the existing Starter role and resource write denials."
+        "fingerprint": "c500fc5fe92c7a1784ceb7bf8a045945dbc612321c3eeb03ec644a8d1a605ef6",
+        "reason": "Reviewed first studio request ownership, platform queue visibility, and atomic platform fulfillment."
       }
     },
     {
@@ -631,8 +637,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "467c76c2df0bc6e8a8a73aaafd938f20e6df6c529dcff28a67babcda6971f5bf",
-        "reason": "Reviewed additive inbox acceptance and the source-bound API inventory for the changed native test files."
+        "fingerprint": "95c96be540017b2222682a1ae39cdabe502c0f211bfa2a17a3959d217f6e9335",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -748,8 +754,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "327f539d74ae3dc96c30159e6c865ef816026cfb768c7908ed4aaa4d837921ad",
-        "reason": "Reviewed changed canonical DTO and additive native acceptance without changing existing visibility or lifecycle."
+        "fingerprint": "1fc7df813eaee6723713992e226e0e13612cf1170af8ed485242ba7af9eab48b",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -876,8 +882,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "33f68384f6943a77f2b32587d61299c141e4be9d0c64385d7fdaa2e9e47022d7",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "bddca56a3dcec74a332304298be5ba291597fa7c0dbc3ca7a2449605cb337818",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -986,8 +992,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "b0a59a9dfd2d75ac65083f127ddbcb6032515ede34b35c1cfca5581657f1392f",
-        "reason": "Reviewed optional self-authored note, live reviewer visibility, closed validation, receipt identity and native regression coverage."
+        "fingerprint": "862d7f578423aec44f6856d12168620c8a6f85e965bedbd160b3a15d44036fc9",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1043,7 +1049,9 @@
         "apps/backend/database/event-capacity-practice.sql",
         "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
         "apps/backend/database/assigned-session-room-labels.sql",
-        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql",
+        "apps/backend/database/attendance-window-requests.sql",
+        "apps/backend/supabase/migrations/20261118214300_attendance_window_requests.sql"
       ],
       "operations": [
         "attendance_get_v1",
@@ -1052,11 +1060,12 @@
         "attendance_correct_preview_v1",
         "attendance_correct_apply_v1",
         "attendance_block_v1",
-        "attendance_start_v1"
+        "attendance_start_v1",
+        "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "f13fccf09d382c571385c62e7d35bdff7b7d6a30458a8db3aa601938a74a48e6",
-        "reason": "Reviewed native regression evidence and canonical contract references for optional student notes and own earning history."
+        "fingerprint": "d2d73963b6aa90aa36b9aef2bca7b87ede21b97d856494a1cfa98d3deed2f2eb",
+        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
       }
     },
     {
@@ -1130,8 +1139,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "43172ba5555a681324edcb52eff15f14d760eb5c3dd7aecd4de2c62d0f379421",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "0772e5781e78e6cef8d2ad553b2a3c392074b0836f9a018b211c414c1365f9bb",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1229,7 +1238,11 @@
         "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
         "apps/backend/database/crm-funnel-and-directory.sql",
         "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
-        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql",
+        "apps/backend/database/public-page-event-applications.sql",
+        "apps/backend/database/settings-catalog-v25.sql",
+        "apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql",
+        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1243,8 +1256,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "5d90208f2e9893aca84b4235c19828a8d98fb5cd2b3a8604dc2d2c2b2205902c",
-        "reason": "Reviewed center-manager and F08 gating, credential lifecycle, and personal list compatibility for studio schedule subscriptions."
+        "fingerprint": "3e1c706482a610ff1b30cd0571ff96a3a6934ee0187153c9a041f7bcf87b8120",
+        "reason": "Reviewed canonical address routing, public form shutdown, and pending event application admission."
       }
     },
     {
@@ -1317,8 +1330,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "b05e8506c2d2ef0d746e80f8dfe4f451170a9ad694e24209e2356d9331c8c192",
-        "reason": "Reviewed terminal import outcomes across CRM selection and partial student application, authenticated CSV, and exact report retry parameters."
+        "fingerprint": "618a0141d90f9663e559325754ec5836672886f5a0aa138d7ae0968f95dfe4ba",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1387,7 +1400,9 @@
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
         "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
         "apps/backend/database/member-inbox-actions.sql",
-        "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql"
+        "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql",
+        "apps/backend/database/member-inbox-visibility.sql",
+        "apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1404,8 +1419,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f2b352c76b703ec34b0f1857cee2ef64d2a828bb96b6af97ad052dfced3260eb",
-        "reason": "Reviewed canonical recipient matching and fail-closed missing identities on replay and recovery, and scoped participant navigation."
+        "fingerprint": "3255ced7ab782286cc9af5075a5dffb6d77c98e92f7564fa4107ffe7043abca1",
+        "reason": "Reviewed versioned recipient visibility and the independent native source and read state."
       }
     },
     {
@@ -1542,8 +1557,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "1bdd0d03d113ff1bb54efde7ad548243d29a12799e263c6363823f1146848a2f",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "6caeee49284bc0e84c75732a720a344c86daeac1454f430eee5970799abbcf8c",
+        "reason": "Reviewed shared generated runtime inventory and source references after the addition of three scoped Web1 operations."
       }
     },
     {
@@ -1618,8 +1633,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "7f4adf6afe7c7a68641e7f93013e00cd9a15eb9348338c604acffde273f699a0",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. The native test compares the same reservation, entitlement balance, outstanding debt and closed attendance before and after the Pro to Starter period boundary."
+        "fingerprint": "8b4f4e98812e1572c92f81f694cf763380ac81610cbef5ec910df4c57f3e6f4c",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1686,8 +1701,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "8d02681331cd35805a9626f52f1b5bed2f0dea4679e9e71f88ad18c0573da1d5",
-        "reason": "Reviewed frozen own lesson earning context, exact closure revision, unchanged live authorization and existing cursor semantics."
+        "fingerprint": "73a3b553cd42a033efe87f0781ae7c44afece56fc2689fb082042406a8452b69",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1765,8 +1780,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "81031d4c4f3089e762d81a8274db9c916f6cb751f8333c7f8298694865b36d83",
-        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority."
+        "fingerprint": "4ce0bdcc2c69716bbce1af55c4bc27cc179592cd9cf3fdd733fd626e9af06d19",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1841,8 +1856,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "f2899eb5db1436eff820f387d1f04282120d871f9e15f752f042ce1a4bec14d7",
-        "reason": "Reviewed exact report authorization, native state filtering, visible CRM metrics and a live open-lead requirement for current trial offers."
+        "fingerprint": "43c57837e722f629b96ca17e72eea0458ef2a87b1f34a378f69b5437017c1f51",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1930,8 +1945,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "401d201f7ef655e9d87e6d75267983fe54bee5171ce1e8b435bcfafec4fa246c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "a262e46fc322cad9e35967393a7ca5d742bb37cc8bf17e9d8f935ef8e8878059",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -1963,8 +1978,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "ddf1b49f454d40efd32ab2200f0131d91061517fd74e174a642c321214c0f332",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "dc95b322349aad2843fead0fc8e80a5316631e55d4f6e14054e5d51fe26fb664",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -2004,8 +2019,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "582177a641883702389eb79a87f9dacc0fc794f3294f18773d7038e142bc00c2",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "d2db8fac12e4ba556a45c74af8d94c04ec2ae5290fe8b208410bb325f3cd11da",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     },
     {
@@ -2129,8 +2144,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "44aa84a9d4f3081e9edd809bc61be2bf465aa2ae855a4989e1f3124c04ff093f",
-        "reason": "Reviewed the shared contract and acceptance inventory digest after report scope coverage was updated."
+        "fingerprint": "f9db54d813a6a66a85a19e082a93166e3ce03ef2b30fc659d468b232e9e635eb",
+        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
       }
     }
   ]
