@@ -1550,7 +1550,8 @@ export default interface Resources {
       "sourceKinds": {
         "activity": "CRM takibi",
         "offer": "Yer teklifi",
-        "request": "Özel ders talebi"
+        "request": "Özel ders talebi",
+        "session": "Ders değişikliği"
       },
       "sourceOpen": "Kaynağı aç",
       "sourceUnavailable": "Kaynak şu anda erişilebilir değil.",
@@ -2656,6 +2657,7 @@ export default interface Resources {
     },
     "memberReservations": {
       "activeOffer": "Aktif yer teklifi",
+      "allReservations": "Tüm rezervasyonlarım",
       "cancel": "İptal et",
       "chooseCenter": "Merkez",
       "chooseOrg": "Organizasyon",

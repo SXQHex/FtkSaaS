@@ -3249,6 +3249,7 @@
     "available_other": "{{count}} yer kaldı"
   },
   "memberReservations": {
+    "allReservations": "Tüm rezervasyonlarım",
     "title": "Rezervasyonlarım",
     "description": "Yaklaşan derslerin, bekleme listesi ve geçmişin.",
     "upcoming": "Yaklaşan",
@@ -4092,6 +4093,7 @@
     "sourceDetail": "Kaynak ayrıntısı",
     "sourceFlow": "Kaynak işlemine git",
     "sourceKinds": {
+      "session": "Ders değişikliği",
       "request": "Özel ders talebi",
       "offer": "Yer teklifi",
       "activity": "CRM takibi"

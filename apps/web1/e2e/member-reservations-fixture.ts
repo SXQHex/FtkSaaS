@@ -143,7 +143,13 @@ export async function mockOwnReservations(
       expect(req.center_id).toBe(I.center);
       if (denied) return reject();
       const items = req.session_id
-        ? reservations.filter((row) => row.session_id === req.session_id)
+        ? reservations.filter(
+            (row, index) =>
+              row.session_id === req.session_id &&
+              (req.time_filter === "past"
+                ? index === 2
+                : req.time_filter !== "upcoming" || index !== 2),
+          )
         : req.time_filter === "past"
           ? [reservations[2]!]
           : [reservations[req.page.cursor ? 1 : 0]!];

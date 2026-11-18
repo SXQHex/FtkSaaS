@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43–47 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
+18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43–48 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
 
 İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
 
@@ -56,6 +56,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Açık](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Açık](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
+| W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
 
 ## Bütün talepler için ortak sınır
 
@@ -415,3 +416,9 @@ Program aboneliğinin yetkili rol ve merkez kapsamını, plan kapısını, çık
 **Açık · backend değerlendirmesi.** Üye çizimi, gelen kutusunun tamamını tek eylemle okundu yapıyor. `notifications_read_set_v1` yalnız açıkça seçilen 1–100 kimlik ve sürümü güncelliyor. Web1 üye kabuğunda mevcut seçili iletileri okundu yapma akışı çalışıyor. [v67 çizimi](../design-reference/revisions/2026-11-18/index.html#L1498) · [WF11](../../../docs/workflows.md#wf11).
 
 Gelen kutusu kapsamının tamamını okundu yapacak işlem için canlı alıcı ve organizasyon sınırlarını, aynı anahtarla yeniden denemeyi ve işlem sırasında gelen yeni bildirimlerin davranışını değerlendirin. İlk sayfayı güncellemek bütün kutunun tamamlandığı anlamına gelmemeli. Okundu durumu kaynak işi kapatmamalı. [E48](todo.md#e48--üye-bildirim-merkezi).
+
+## W1-BE-48 · Ders değişikliği bildiriminde yetkili kaynak merkezi
+
+**Açık · backend değerlendirmesi.** Kendi organizasyon gelen kutusundaki `session_changed_for_participant` bildirimi seans kimliğini taşıyor. Bilgilendirme satırında seansın yetkili kaynak merkezi ve seans seçicisi yayımlanmıyor. Web1, seçili merkezdeki kendi rezervasyonunu seans kimliğiyle doğrulayabildiğinde hedef bağlantısını sunuyor. Başka bir merkezdeki seans, kaynak merkezi yayımlanana kadar o merkez seçildiğinde açılabiliyor. [WF11](../../../docs/workflows.md#wf11).
+
+Canlı rezervasyon, öğrenci ve merkez yetkisi geçerliyken bildirimin gerçek kaynak merkezini döndürmeyi değerlendirin. İptal edilmiş, silinmiş ya da erişim dışı kayıtta hedef kapalı kalmalı. Diğer bildirimlerin organizasyon kapsamı ve bilgilendirme durumu korunmalı. [E48](todo.md#e48--üye-bildirim-merkezi).

@@ -25,9 +25,10 @@ export function MemberReservationsRoutePage() {
     >
       {({ scope, personId, timezone, onLockChange }) => (
         <MemberReservationsContent
-          key={`${scope.orgId}:${scope.centerId}:${personId}`}
+          key={`${scope.orgId}:${scope.centerId}:${personId}:${search.session ?? ""}`}
           scope={scope}
           personId={personId}
+          sessionId={search.session}
           timezone={timezone}
           onLockChange={onLockChange}
         />

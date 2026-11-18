@@ -3,6 +3,35 @@ import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { NotificationSourceState } from "../../lib/api-contracts/generated";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
+import { readMemberReservations } from "../member-profile/reservations";
+
+export async function readMemberSessionNotice(
+  scope: ClientScope,
+  personId: string,
+  sessionId: string,
+) {
+  const page = await readMemberReservations(scope, personId, undefined, "all", { sessionId });
+  const own = page.items.find(
+    ({ reservation, session }) =>
+      session?.id === sessionId &&
+      (reservation.state === "active" || reservation.state === "completed"),
+  );
+  if (!own?.session) throw new Error("INBOX_SOURCE_UNAVAILABLE");
+  const search = new URLSearchParams({
+    org: scope.orgId,
+    center: scope.centerId,
+    session: sessionId,
+  });
+  return {
+    kind: "session" as const,
+    workState: "informational" as const,
+    at: own.session.starts_at,
+    note: null,
+    ownHref: null,
+    href: `/member/reservations?${search}`,
+    personId,
+  };
+}
 export async function readInboxSource(
   scope: ClientScope,
   source: NotificationSourceState,

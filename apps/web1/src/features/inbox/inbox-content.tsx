@@ -16,7 +16,7 @@ import {
   readNotificationSetReceipt,
   readNotificationSetResult,
 } from "./inbox-batch";
-import { readInboxSource } from "./inbox-source";
+import { readInboxSource, readMemberSessionNotice } from "./inbox-source";
 import { readWorkspace } from "../workspace/workspace";
 import { LinkButton } from "../../components/ui/button";
 import { Button } from "../../components/ui/button";
@@ -55,16 +55,26 @@ export function InboxContent({
   const prefix = inboxKey(scope);
   const list = useQuery(inboxListQuery(scope, query, filter, cursors[index], cursors));
   const [openedSource, setOpenedSource] = useState<string>();
+  const memberSessionId =
+    memberPersonId &&
+    selected?.kind === "session_changed_for_participant" &&
+    selected.payload.subject.type === "sessions"
+      ? selected.payload.subject.id
+      : undefined;
   const sourceOperation = selected?.work?.selector?.operation;
   const canReadSource = Boolean(
-    sourceOperation &&
-    (!memberPersonId ||
-      sourceOperation === "lesson_request_create_v1" ||
-      sourceOperation === "seat_offer_accept_v1"),
+    memberSessionId ||
+    (sourceOperation &&
+      (!memberPersonId ||
+        sourceOperation === "lesson_request_create_v1" ||
+        sourceOperation === "seat_offer_accept_v1")),
   );
   const nativeSource = useQuery({
-    queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work],
-    queryFn: () => readInboxSource(scope, selected!.work!, memberPersonId),
+    queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work, memberSessionId],
+    queryFn: async () =>
+      memberPersonId && memberSessionId
+        ? readMemberSessionNotice(scope, memberPersonId, memberSessionId)
+        : readInboxSource(scope, selected!.work!, memberPersonId),
     enabled: canReadSource && openedSource === selected?.id,
     retry: false,
     refetchOnWindowFocus: false,

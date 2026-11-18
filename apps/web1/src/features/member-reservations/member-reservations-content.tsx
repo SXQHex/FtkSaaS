@@ -12,15 +12,17 @@ import { readOwnWaitlist, type OwnWaitlistRow } from "./member-waitlist";
 import { MemberWaitlistEditor } from "./member-waitlist-editor";
 import type { WaitlistAction } from "../session-detail/session-waitlist";
 import { MemberReservationsView } from "./member-reservations-view";
-import { Button } from "../../components/ui/button";
+import { Button, LinkButton } from "../../components/ui/button";
 export function MemberReservationsContent({
   scope,
   personId,
+  sessionId,
   timezone,
   onLockChange,
 }: {
   scope: ClientScope;
   personId: string;
+  sessionId?: string;
   timezone: string;
   onLockChange: (locked: boolean) => void;
 }) {
@@ -43,13 +45,15 @@ export function MemberReservationsContent({
   }>();
   const prefix = ["member-reservations", scope.accountId, scope.orgId, scope.centerId, personId];
   const up = useQuery({
-    queryKey: [...prefix, "upcoming", upCursors.at(-1)],
-    queryFn: () => readOwnReservations(scope, personId, "upcoming", upCursors.at(-1)),
+    queryKey: [...prefix, "upcoming", upCursors.at(-1), sessionId],
+    queryFn: () => readOwnReservations(scope, personId, "upcoming", upCursors.at(-1), sessionId),
+    ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const past = useQuery({
-    queryKey: [...prefix, "past", pastCursors.at(-1)],
-    queryFn: () => readOwnReservations(scope, personId, "past", pastCursors.at(-1)),
+    queryKey: [...prefix, "past", pastCursors.at(-1), sessionId],
+    queryFn: () => readOwnReservations(scope, personId, "past", pastCursors.at(-1), sessionId),
+    ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const waiting = useQuery({
@@ -84,8 +88,10 @@ export function MemberReservationsContent({
     for (const error of [up.error, past.error, waiting.error, offers.error])
       if (error) accessLost(error);
   }, [up.error, past.error, waiting.error, offers.error, accessLost]);
-  const upcoming = !up.isError ? up.data : undefined,
-    history = !past.isError ? past.data : undefined;
+  const loadingUpcoming = up.isPending || Boolean(sessionId && up.isFetching);
+  const loadingHistory = past.isPending || Boolean(sessionId && past.isFetching);
+  const upcoming = !up.isError && !loadingUpcoming ? up.data : undefined,
+    history = !past.isError && !loadingHistory ? past.data : undefined;
   const date = new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeZone: timezone });
   const time = new Intl.DateTimeFormat("tr-TR", { timeStyle: "short", timeZone: timezone });
   const historyRows = history ? memberReservationRows(history.items, timezone, [], t) : undefined;
@@ -144,9 +150,9 @@ export function MemberReservationsContent({
     <>
       <MemberReservationsView
         pending={{
-          upcoming: up.isPending,
+          upcoming: loadingUpcoming,
           waiting: !waiting.isError && !offers.isError && (waiting.isPending || offers.isPending),
-          history: past.isPending,
+          history: loadingHistory,
         }}
         upcoming={
           upcoming?.items.map((row) => ({
@@ -319,6 +325,15 @@ export function MemberReservationsContent({
         historyPagination={pagination("past")}
         notice={
           <div className="space-y-3">
+            {sessionId && (
+              <LinkButton
+                variant="outline"
+                href={`/member/reservations?${new URLSearchParams({ org: scope.orgId, center: scope.centerId })}`}
+                isDisabled={locked}
+              >
+                {t(($) => $.memberReservations.allReservations)}
+              </LinkButton>
+            )}
             <p className="text-xs text-muted-foreground">
               {t(($) => $.memberReservations.historyHint)}
             </p>

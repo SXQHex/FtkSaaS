@@ -9,10 +9,12 @@ export async function readOwnReservations(
   personId: string,
   filter: "upcoming" | "past",
   cursor?: string,
+  sessionId?: string,
 ) {
   const page = await readMemberReservations(scope, personId, cursor, filter, {
     sort: filter === "upcoming" ? "starts_at_asc" : "created_at_desc",
     includeSourceSummary: true,
+    sessionId,
   });
   const sessions = [
     ...new Map(

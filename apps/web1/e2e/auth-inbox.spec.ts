@@ -21,8 +21,8 @@ async function fixture(
     | "source"
     | "participant" = "normal",
 ) {
-  if (mode === "participant") await mockOwnReservations(page);
-  else await mockStudio(page);
+  const participant = mode === "participant" ? await mockOwnReservations(page) : undefined;
+  if (!participant) await mockStudio(page);
   const state = {
     read: false,
     version: 7,
@@ -37,6 +37,7 @@ async function fixture(
     keys: new Set<string>(),
     sourceReads: [] as Record<string, unknown>[],
     sourceDenied: false,
+    participant,
   };
   const row = () => ({
     id,
@@ -57,7 +58,7 @@ async function fixture(
       mode === "participant"
         ? {
             template_key: "session_changed_for_participant",
-            subject: { type: "sessions", id: sourceId },
+            subject: { type: "sessions", id: participant!.reservations[1]!.session_id },
             title: changeTitle,
             body: changeBody,
             language: "tr",
@@ -334,6 +335,49 @@ test("participant sees a native session change notice and retains its exact read
   await expect(page.getByText("Organizasyon ve merkez seç.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: changeTitle, exact: true })).toHaveCount(0);
   expect(state.lists).toHaveLength(listsBefore);
+});
+test("member change notice opens the exact reservation and rechecks access on reload", async ({
+  page,
+}) => {
+  const state = await fixture(page, "participant");
+  const participant = state.participant!;
+  const sessionId = participant.reservations[1]!.session_id;
+  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
+  await expect(target).toHaveCount(0);
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  const path = `/member/reservations?org=${I.org}&center=${I.center}&session=${sessionId}`;
+  await expect(target).toHaveAttribute("href", path);
+  expect(participant.reads).toContainEqual(
+    expect.objectContaining({
+      operation: "reservation_list_v1",
+      request: expect.objectContaining({
+        center_id: I.center,
+        person_id: I.self,
+        session_id: sessionId,
+        time_filter: "all",
+      }),
+    }),
+  );
+  await target.press("Enter");
+  await expect(page).toHaveURL(`${origin}${path}`);
+  await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
+  await expect(page.getByText(/18 Kas 2026/).first()).toBeVisible();
+  await expect(page.getByText(/^17 Kas 2026/)).toHaveCount(0);
+  await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "Tüm rezervasyonlarım", exact: true })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByRole("heading", { name: "Bildirimler", exact: true })).toBeVisible();
+  participant.setDenied(true);
+  await page.goForward();
+  await expect(page).toHaveURL(`${origin}${path}`);
+  await expect(page.getByText("Yaklaşan rezervasyonlar okunamadı.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByText("Yaklaşan rezervasyonlar okunamadı.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toHaveCount(0);
+  expect(participant.writes).toHaveLength(0);
+  expect(state.writes).toHaveLength(0);
 });
 test("inbox unknown write recovers its exact receipt and never marks twice", async ({ page }) => {
   const state = await fixture(page, "unknown");
