@@ -51,6 +51,7 @@ async function fixture(
       sale_state: "expired",
       start_date: "2026-10-01",
       end_date: "2026-10-31",
+      purchase_summary: { product_name: "Önceki Tango paketi", initial_credits: 10 },
     });
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!,
@@ -179,7 +180,9 @@ async function fixture(
 test("a reservation cancellation refreshes the warm rights panel on return", async ({ page }) => {
   const state = await fixture(page);
   const available = page.getByText("Kullanılabilir bakiye", { exact: true }).locator("..");
+  const track = page.getByRole("progressbar").locator('[data-slot="progress-track"]');
   await expect(available.getByText("3", { exact: true })).toBeVisible();
+  await expect(track).toHaveCSS("background-image", /37\.5%.*62\.5%/);
   const nav = page.getByRole("navigation");
   await nav.getByRole("link", { name: "Rezervasyonlarım", exact: true }).click();
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
@@ -195,6 +198,7 @@ test("a reservation cancellation refreshes the warm rights panel on return", asy
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
   await nav.getByRole("link", { name: "Haklarım", exact: true }).click();
   await expect(available.getByText("4", { exact: true })).toBeVisible();
+  await expect(track).toHaveCSS("background-image", /37\.5%.*50%/);
   await expect(page.getByText(/1,00.*borç/)).toBeVisible();
   expect(state.reservations.writes).toHaveLength(1);
 });
@@ -316,6 +320,12 @@ test("multiple owned packages require explicit selection and reset the ledger cu
   const latest = state.reads.filter((row) => row.request.ledger_sale_id).at(-1)!.request;
   expect(latest.ledger_sale_id).toBe(id(981));
   expect(latest.ledger_page).not.toHaveProperty("cursor");
+  const progress = page.getByRole("progressbar");
+  await expect(progress).toHaveAttribute("aria-valuemax", "10");
+  await expect(progress.locator('[data-slot="progress-track"]')).toHaveCSS(
+    "background-image",
+    "none",
+  );
   await expect(page.getByText("Önceki paketler", { exact: true })).toBeVisible();
 });
 test("native no outstanding debt never claims there is no credit or no payment history", async ({

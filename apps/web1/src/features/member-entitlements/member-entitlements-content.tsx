@@ -84,8 +84,7 @@ export function MemberEntitlementsContent({
     for (const error of [rights.error, debt.error, ledger.error, currencies.error, payments.error])
       if (error) accessLost(error);
   }, [rights.error, debt.error, ledger.error, currencies.error, payments.error, accessLost]);
-  const numbers = new Intl.NumberFormat("tr-TR"),
-    signed = new Intl.NumberFormat("tr-TR", { signDisplay: "exceptZero" }),
+  const signed = new Intl.NumberFormat("tr-TR", { signDisplay: "exceptZero" }),
     dates = new Intl.DateTimeFormat("tr-TR", {
       dateStyle: "short",
       timeStyle: "short",
@@ -100,15 +99,7 @@ export function MemberEntitlementsContent({
       row.saleState && row.saleState !== "active"
         ? t(($) => $.memberEntitlements.saleStates[row.saleState!])
         : t(($) => $.memberProfile.rightStates[row.state]),
-    ...(row.kind === "credits"
-      ? {
-          counts: {
-            available: numbers.format(row.counts.available),
-            reserved: numbers.format(row.counts.reserved),
-            consumed: numbers.format(row.counts.consumed),
-          },
-        }
-      : {}),
+    counts: row.kind === "credits" ? row.counts : undefined,
     note: [
       row.kind === "timed" ? t(($) => $.memberEntitlements.timed) : undefined,
       row.deficit ? t(($) => $.memberEntitlements.deficit, { count: row.deficit }) : undefined,

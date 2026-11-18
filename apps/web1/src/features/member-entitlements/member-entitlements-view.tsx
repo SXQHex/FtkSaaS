@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -28,7 +28,7 @@ export interface MemberPackageSummary {
   name: string;
   validity: string;
   state: string;
-  counts?: { available: string; reserved: string; consumed: string };
+  counts?: { available: number; reserved: number; consumed: number };
   usage?: { consumed: number; total: number };
   note?: string;
 }
@@ -44,6 +44,20 @@ export interface MemberPaymentMovement {
   title: string;
   amount: string;
 }
+
+const formatCount = new Intl.NumberFormat("tr-TR");
+
+function packageDistribution(counts: MemberPackageSummary["counts"], total: number) {
+  if (!counts || total <= 0) return;
+  const { available, reserved, consumed } = counts;
+  if (Math.min(available, reserved, consumed) < 0 || available + reserved + consumed !== total)
+    return;
+
+  const consumedEnd = `${(consumed / total) * 100}%`;
+  const reservedEnd = `${((consumed + reserved) / total) * 100}%`;
+  return `linear-gradient(to right, var(--border) 0 ${consumedEnd}, color-mix(in oklab, var(--primary) 45%, var(--muted)) ${consumedEnd} ${reservedEnd}, var(--primary) ${reservedEnd} 100%)`;
+}
+
 export function MemberEntitlementsView({
   packages,
   packagesLoading,
@@ -73,6 +87,8 @@ export function MemberEntitlementsView({
 }) {
   const { t } = useTranslation();
   const source = packages?.find((row) => row.id === selected);
+  const counts = source?.counts;
+  const distribution = packageDistribution(counts, source?.usage?.total ?? 0);
   return (
     <div className="@container mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-4 p-4">
       <header>
@@ -127,7 +143,7 @@ export function MemberEntitlementsView({
             )}
           </CardHeader>
           <CardContent>
-            {source?.counts && (
+            {counts && (
               <div className="grid grid-cols-1 gap-3 @lg:grid-cols-3">
                 {(["available", "reserved", "consumed"] as const).map((key) => (
                   <Card key={key} className="gap-0.5 py-3">
@@ -136,7 +152,7 @@ export function MemberEntitlementsView({
                         {t(($) => $.memberEntitlements.metrics[key])}
                       </CardDescription>
                       <CardTitle className="text-[1.375rem] leading-[1.3] tabular-nums">
-                        {source.counts![key]}
+                        {formatCount.format(counts[key])}
                       </CardTitle>
                       <CardDescription>
                         {t(($) => $.memberEntitlements.metricHints[key])}
@@ -148,7 +164,16 @@ export function MemberEntitlementsView({
             )}
             {source?.usage && (
               <Progress
-                className="mt-4"
+                className={
+                  distribution
+                    ? "mt-4 [&_[data-slot=progress-indicator]]:hidden [&_[data-slot=progress-track]]:bg-[image:var(--package-distribution)]"
+                    : "mt-4"
+                }
+                style={
+                  distribution
+                    ? ({ "--package-distribution": distribution } as CSSProperties)
+                    : undefined
+                }
                 value={Math.min(source.usage.consumed, source.usage.total)}
                 maxValue={source.usage.total}
               >
