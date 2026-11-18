@@ -134,14 +134,16 @@ async function main() {
   };
   const env = {
     ...process.env,
-    // Verification can exercise protected static routes in a clean CI checkout.
-    VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || "http://127.0.0.1:4175",
-    VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "public-test-key",
     npm_config_cache: resolve(root, ".npm-cache"),
     TMPDIR: resolve(root, ".tmp"),
     TMP: resolve(root, ".tmp"),
     TEMP: resolve(root, ".tmp"),
     PLAYWRIGHT_BROWSERS_PATH: resolve(root, ".playwright-browsers"),
+  };
+  const staticVerificationEnv = {
+    ...env,
+    VITE_SUPABASE_URL: "http://127.0.0.1:4175",
+    VITE_SUPABASE_PUBLISHABLE_KEY: "public-test-key",
   };
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   const plan = [
@@ -190,7 +192,7 @@ async function main() {
       const code = await new Promise((resolveCode, reject) => {
         const child = spawn(npm, command.args, {
           cwd: root,
-          env,
+          env: ["build", "browser"].includes(command.name) ? staticVerificationEnv : env,
           stdio: ["ignore", log.fd, log.fd],
         });
         child.once("error", reject);

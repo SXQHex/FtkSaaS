@@ -7,7 +7,8 @@ const secondId = "019ab7b0-0000-7000-8000-000000000202";
 const sourceId = "019ab7b0-0000-7000-8000-000000000203";
 const sourceCenter = "019ab7b0-0000-7000-8000-000000000204";
 const id = "019ab7b0-0000-7000-8000-000000000201";
-const changeTitle = "Ders programı değişti";
+const changeTitle = "Ders değişikliği";
+const changeBody = "Yeni işlem bildiriminizi uygulamadan görüntüleyebilirsiniz:";
 async function fixture(
   page: Page,
   mode:
@@ -58,7 +59,7 @@ async function fixture(
             template_key: "session_changed_for_participant",
             subject: { type: "sessions", id: sourceId },
             title: changeTitle,
-            body: "Rezervasyonunun bulunduğu dersin programı değişti.",
+            body: changeBody,
             language: "tr",
           }
         : {
@@ -275,7 +276,7 @@ test("participant sees a native session change notice and retains its exact read
   await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
   await page.getByRole("button", { name: changeTitle, exact: true }).click();
   await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
-    "Rezervasyonunun bulunduğu dersin programı değişti.",
+    changeBody,
   );
   await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
   await expect(

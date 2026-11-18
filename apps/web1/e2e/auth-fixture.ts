@@ -829,6 +829,7 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
         } satisfies SuccessAccountGet,
       });
     }
+    if (url.origin !== origins.app) return route.abort("blockedbyclient");
     await route.continue();
   });
   return calls;
