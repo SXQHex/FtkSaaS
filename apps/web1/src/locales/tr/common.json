@@ -493,6 +493,7 @@
     "searchDescription": "Gitmek istediğin sayfayı seç.",
     "searchPlaceholder": "Sayfa adı ara…",
     "searchResults": "Sayfalar",
+    "searchMembersError": "Üye araması tamamlanamadı.",
     "noResults": "Eşleşen sayfa yok.",
     "searchButtonLabel": "Ara… Ctrl K"
   },

@@ -4,6 +4,62 @@ import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { RequestPeopleList, SuccessPeopleList } from "../src/lib/api-contracts/generated.js";
 
+test("command palette searches active members through the selected center and opens the native result", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  const requests: RequestPeopleList[] = [];
+  await page.route("**/functions/v1/backend-v1/people_list_v1", async (route) => {
+    const request = route.request().postDataJSON() as RequestPeopleList;
+    if (!request.query) return route.fallback();
+    requests.push(request);
+    expect(request).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      student_status: "active",
+    });
+    if (request.query === "1002")
+      return route.fulfill({
+        status: 403,
+        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.org } },
+      });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.org,
+        data: {
+          items: [
+            {
+              id: I.instructor,
+              display_name: "Sentetik Üye",
+              relationships: [{ kind: "student", center_id: I.center, state: "active" }],
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-15T00:00:00Z",
+        },
+      } satisfies SuccessPeopleList,
+    });
+  });
+  await openStudio(page);
+  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
+  const input = palette.getByPlaceholder("Sayfa adı ara…");
+  expect(requests).toHaveLength(0);
+  await input.fill("1001");
+  const member = palette.getByRole("menuitem", { name: "Sentetik Üye", exact: true });
+  await expect(member).toBeVisible();
+  await input.fill("1002");
+  await expect(member).toHaveCount(0);
+  await expect(palette.getByText("Üye araması tamamlanamadı.", { exact: true })).toBeVisible();
+  await input.fill("1001");
+  await expect(member).toBeVisible();
+  await input.press("ArrowDown");
+  await input.press("Enter");
+  await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
+  expect(state.writes).toEqual([]);
+});
+
 test("Members: creation recovers one person, invitation acknowledgement only rereads its job", async ({
   page,
 }) => {

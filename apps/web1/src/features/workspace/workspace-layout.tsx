@@ -122,13 +122,17 @@ export function WorkspaceLayout({
         ? "instructor"
         : (modes[0] ?? "account");
   const groups = workspaceNavigation(mode, view?.selected?.id, centerId);
-  const settingsUrl =
+  const memberSearchScope =
     mode === "management" &&
+    view?.selected?.id &&
     centerId &&
     !scope.isError &&
     !scopeLocked &&
-    !scopeControl?.locked &&
-    hasWorkspaceManagementScope(view, centerId)
+    !scopeControl?.locked
+      ? { accountId, orgId: view.selected.id, centerId }
+      : undefined;
+  const settingsUrl =
+    memberSearchScope && hasWorkspaceManagementScope(view, memberSearchScope.centerId)
       ? groups
           .find((group) => group.key === "studio")
           ?.items.find((item) => item.key === "settings")?.url
@@ -230,6 +234,7 @@ export function WorkspaceLayout({
             <div className="hidden min-[641px]:inline-flex">
               <NavigationSearch
                 settingsUrl={settingsUrl}
+                memberScope={memberSearchScope}
                 groups={[
                   ...groups,
                   {

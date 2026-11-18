@@ -5177,6 +5177,7 @@ export default interface Resources {
       },
       "searchButtonLabel": "Ara… Ctrl K",
       "searchDescription": "Gitmek istediğin sayfayı seç.",
+      "searchMembersError": "Üye araması tamamlanamadı.",
       "searchPlaceholder": "Sayfa adı ara…",
       "searchResults": "Sayfalar",
       "searchShort": "Ara…",
