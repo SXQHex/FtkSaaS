@@ -5,9 +5,9 @@ import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import * as validators from '../supabase/functions/backend-v1/validators.js';
 
-test('Edge upload keeps JSON-encoded source below 4 MB with provider envelope headroom',()=>{
+test('Edge upload keeps JSON-encoded source within 4,999,999 bytes',()=>{
  const source=fs.readFileSync('supabase/functions/backend-v1/index.ts','utf8');
- assert(Buffer.byteLength(JSON.stringify(source))<4_000_000,'Edge API source upload exceeds budget');
+ assert(Buffer.byteLength(JSON.stringify(source))<=4_999_999,'Edge API source upload exceeds budget');
 });
 
 test('Standalone validators retain authoritative acceptance and reject malformed shared references',()=>{

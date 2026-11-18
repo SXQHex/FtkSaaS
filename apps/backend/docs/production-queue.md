@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**18 Kasım Web1 v67:** Gelen kutusu (47/48) ve özel ders/hakediş (44/45) sonrası aynı aday dalında CRM ve başvuru filtresi (52/53/54) yerel kabulden geçti. Aynı dalın sonraki dilimi stüdyo programı aboneliği ve import/export (46/50/51). Ürün kararı bekleyen sırada kurulum, yoklama, ziyaretçi kayıt/yayın ve inbox saklama (43/49/55–57) var. Ölçütler [backend backlog’undadır](remaining-work.md#web1-v67-backend).
+**18 Kasım Web1 v67:** PR #340’ın ilk on maddesi main’de. Onaylanan ilk kurulum, yoklama, etkinlik başvurusu, yayın adresi ve bildirim görünürlüğü (43/49/55–57) güncel main tabanlı takip dalındadır. Ölçütler [backend backlog’undadır](remaining-work.md#web1-v67-backend).
 
 **17 Kasım Web1 görevi:** İlk35 talebin backend kaynak/main/development teslimi tamamlandı. Yeni W1-BE-36 kabul aracı callback düzeltmesi ve P01/G-PRO gerçek sağlayıcı devamı yürür; frontend sayfa kabulü yeniden açılmaz. Görev/kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/run/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. G03 kapsamı ve sonraki sıra korunur; unit veya eski başka callback kanıtı yeni hosted kabulü değildir.
 

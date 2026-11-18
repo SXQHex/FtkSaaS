@@ -944,7 +944,10 @@
         "instructor_finance_directory_get_v1",
         "import_directory_get_v1",
         "tracking_directory_get_v1",
-        "document_directory_get_v1"
+        "document_directory_get_v1",
+        "studio_setup_list_v1",
+        "studio_setup_open_v1",
+        "attendance_correction_request_v1"
       ]
     },
     "EntityType": {
@@ -2703,7 +2706,8 @@
         "mandatory_document",
         "sensitive_money_upper",
         "sensitive_credit_upper",
-        "sale_discount_percent_upper"
+        "sale_discount_percent_upper",
+        "attendance_window"
       ]
     },
     "IntegerPolicy": {
@@ -2866,6 +2870,9 @@
         },
         {
           "$ref": "#/$defs/DocumentPolicy"
+        },
+        {
+          "$ref": "#/$defs/AttendanceWindowPolicy"
         }
       ]
     },
@@ -4253,6 +4260,22 @@
               "type": "null"
             }
           ]
+        },
+        "attendance_window": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttendanceWindow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "correction_requests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AttendanceCorrectionRequest"
+          }
         }
       },
       "required": [
@@ -4903,6 +4926,13 @@
         },
         "work": {
           "$ref": "#/$defs/NotificationSourceState"
+        },
+        "visibility": {
+          "enum": [
+            "inbox",
+            "archived",
+            "deleted"
+          ]
         }
       },
       "required": [
@@ -7291,6 +7321,9 @@
           "$ref": "#/$defs/Text"
         },
         "initial_plan_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "studio_setup_id": {
           "$ref": "#/$defs/FtkUuid"
         }
       },
@@ -11771,6 +11804,9 @@
         },
         "session_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_correction_requests": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -15137,6 +15173,13 @@
         "include_summary": {
           "type": "boolean",
           "default": false
+        },
+        "visibility": {
+          "enum": [
+            "inbox",
+            "archived",
+            "deleted"
+          ]
         }
       },
       "required": [
@@ -17719,6 +17762,14 @@
         },
         "contact_intake": {
           "$ref": "#/$defs/CrmContactIntake"
+        },
+        "event_application": {
+          "const": true
+        },
+        "page_slug": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
         }
       },
       "required": [
@@ -17804,6 +17855,29 @@
             ]
           }
         }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "event_application"
+            ]
+          },
+          "then": {
+            "required": [
+              "publication_id",
+              "contact",
+              "page_slug"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "page_slug"
+              ]
+            }
+          }
+        }
       ]
     },
     "Success_public_application_submit": {
@@ -17813,7 +17887,22 @@
           "const": true
         },
         "data": {
-          "$ref": "#/$defs/GenericAccepted"
+          "type": "object",
+          "properties": {
+            "accepted": {
+              "const": true
+            },
+            "reference": {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            "application_state": {
+              "const": "pending"
+            }
+          },
+          "required": [
+            "accepted"
+          ],
+          "additionalProperties": false
         },
         "trace_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -23467,6 +23556,13 @@
             {
               "type": "null"
             }
+          ]
+        },
+        "inbox_visibility": {
+          "enum": [
+            "inbox",
+            "archived",
+            "deleted"
           ]
         }
       },
@@ -38370,6 +38466,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_freeze_cancel_apply_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_attendance_correction_request_v1"
         }
       ]
     },
@@ -38535,7 +38634,8 @@
         "product_state_set_v1",
         "freeze_cancel_preview_v1",
         "freeze_cancel_apply_v1",
-        "notifications_read_set_v1"
+        "notifications_read_set_v1",
+        "attendance_correction_request_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -43630,6 +43730,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_notifications_read_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_attendance_correction_request_v1"
         }
       ]
     },
@@ -49472,6 +49575,32 @@
               "type": "null"
             }
           ]
+        },
+        "public_page": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 63,
+                  "pattern": "^(?![0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$)[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+                },
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "slug",
+                "enabled"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -49847,7 +49976,8 @@
                   "work_calendar_exceptions_enabled",
                   "sharing_notices",
                   "allow_center_sharing_restrictions",
-                  "public_application_form"
+                  "public_application_form",
+                  "public_page"
                 ]
               },
               "uniqueItems": true,
@@ -50173,7 +50303,7 @@
           ]
         },
         "catalog_version": {
-          "const": 24
+          "const": 25
         },
         "fields": {
           "type": "array",
@@ -50228,7 +50358,7 @@
               "$ref": "#/$defs/UserSettingsValues"
             },
             "catalog_version": {
-              "const": 24
+              "const": 25
             }
           },
           "required": [
@@ -50246,7 +50376,7 @@
               "$ref": "#/$defs/MemberSettingsValues"
             },
             "catalog_version": {
-              "const": 24
+              "const": 25
             }
           },
           "required": [
@@ -50264,7 +50394,7 @@
               "$ref": "#/$defs/CenterSettingsValues"
             },
             "catalog_version": {
-              "const": 24
+              "const": 25
             }
           },
           "required": [
@@ -50282,7 +50412,7 @@
               "$ref": "#/$defs/OrganizationSettingsValues"
             },
             "catalog_version": {
-              "const": 24
+              "const": 25
             }
           },
           "required": [
@@ -50300,7 +50430,7 @@
               "$ref": "#/$defs/PlatformSettingsValues"
             },
             "catalog_version": {
-              "const": 24
+              "const": 25
             }
           },
           "required": [
@@ -57324,7 +57454,8 @@
         "work_calendar_exceptions_enabled",
         "sharing_notices",
         "allow_center_sharing_restrictions",
-        "public_application_form"
+        "public_application_form",
+        "public_page"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -57424,7 +57555,8 @@
         "sharing_notices",
         "allow_center_sharing_restrictions",
         "sharing_restrictions",
-        "public_application_form"
+        "public_application_form",
+        "public_page"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -63684,14 +63816,20 @@
         },
         "all_unread": {
           "const": true
+        },
+        "visibility": {
+          "enum": [
+            "inbox",
+            "archived",
+            "deleted"
+          ]
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "org_id",
-        "operation_key",
-        "read"
+        "operation_key"
       ],
       "oneOf": [
         {
@@ -63773,6 +63911,57 @@
             "operation_key",
             "read",
             "all_unread"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "notifications": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/$defs/NotificationReadSelection"
+              }
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "visibility": {
+              "enum": [
+                "inbox",
+                "archived",
+                "deleted"
+              ]
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "operation_key",
+            "notifications",
+            "visibility"
           ],
           "additionalProperties": false
         }
@@ -66205,6 +66394,499 @@
       "required": [
         "stages",
         "trials"
+      ],
+      "additionalProperties": false
+    },
+    "StudioSetupRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "fulfilled"
+          ]
+        },
+        "organization_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "account_id",
+        "name",
+        "state",
+        "organization_id",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "Page_StudioSetupRequest": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StudioSetupRequest"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "Request_studio_setup_list": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "platform_queue": {
+          "type": "boolean"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Success_studio_setup_list": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Page_StudioSetupRequest"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_studio_setup_open": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "Success_studio_setup_open": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "AttendanceCorrectionRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "instructor_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "closure_revision": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "accepted",
+            "declined"
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "reviewed_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "instructor_id",
+        "closure_revision",
+        "reason",
+        "state",
+        "version",
+        "created_at",
+        "reviewed_at"
+      ],
+      "additionalProperties": false
+    },
+    "AttendanceWindow": {
+      "type": "object",
+      "properties": {
+        "policy_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "opens_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "closes_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "policy_id",
+        "opens_at",
+        "closes_at"
+      ],
+      "additionalProperties": false
+    },
+    "AttendanceWindowPolicy": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "attendance_window"
+        },
+        "opens_minutes_before": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 525600
+        },
+        "closes_minutes_after": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 525600
+        }
+      },
+      "required": [
+        "kind",
+        "opens_minutes_before",
+        "closes_minutes_after"
+      ],
+      "additionalProperties": false
+    },
+    "Request_attendance_correction_request": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "closure_revision": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        },
+        "correction_request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "decision": {
+          "enum": [
+            "accepted",
+            "declined"
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "org_id",
+        "session_id"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "closure_revision": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "operation_key",
+            "org_id",
+            "session_id",
+            "closure_revision",
+            "reason"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "correction_request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "expected_version": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "decision": {
+              "enum": [
+                "accepted",
+                "declined"
+              ]
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "operation_key",
+            "org_id",
+            "session_id",
+            "correction_request_id",
+            "expected_version",
+            "decision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Success_attendance_correction_request": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_attendance_correction_request_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "attendance_correction_request_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "session_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_attendance_correction_request_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "attendance_correction_request_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
       ],
       "additionalProperties": false
     }
@@ -95787,7 +96469,7 @@
           "effect": "notification_mark_read_append_or_explicit_update",
           "from": [],
           "to": [],
-          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
+          "invariant": "Versioned own-recipient inbox selection can change read state or inbox visibility. Source work and retention remain independent."
         },
         "semantic_guards": [
           "live_actor_and_scope",
@@ -96376,6 +97058,322 @@
         "runtime_path": "/functions/v1/backend-v1/document_directory_get_v1",
         "runtime_external_path": "/functions/v1/backend-v1/document_directory_get_v1",
         "runtime_rpc": "api_v1.document_directory_get_v1"
+      },
+      {
+        "name": "studio_setup_list_v1",
+        "module": "M01",
+        "features": [],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_studio_setup_list"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_studio_setup_list"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read active account setup history or the explicitly authorized platform queue.",
+        "transition": {
+          "effect": "studio_setup_list",
+          "from": [],
+          "to": [],
+          "invariant": "Read active account setup history or the explicitly authorized platform queue."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/studio_setup_list_v1",
+        "runtime_rpc": "api_v1.studio_setup_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/studio_setup_list_v1",
+        "runtime_limits": [
+          "Read active account setup history or the explicitly authorized platform queue."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_studio_setup_list"
+          }
+        }
+      },
+      {
+        "name": "studio_setup_open_v1",
+        "module": "M01",
+        "features": [],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_studio_setup_open"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_studio_setup_open"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "OPEN_OPERATIONS_EXIST",
+          "INVALID_STATE_TRANSITION"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "One pending request from a verified account with no active organization link.",
+        "transition": {
+          "effect": "studio_setup_open",
+          "from": [],
+          "to": [],
+          "invariant": "One pending request from a verified account with no active organization link."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "append_or_current_scope_lock",
+          "version_field": null,
+          "read_operation": "studio_setup_list_v1",
+          "atomic_effects": [
+            "studio_setup_open",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_studio_setup_open"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/studio_setup_open_v1",
+        "runtime_rpc": "api_v1.studio_setup_open_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/studio_setup_open_v1",
+        "runtime_limits": [
+          "One pending request from a verified account with no active organization link."
+        ]
+      },
+      {
+        "name": "attendance_correction_request_v1",
+        "module": "M06",
+        "features": [
+          "F14"
+        ],
+        "permission": "attendance.draft",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_attendance_correction_request"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_attendance_correction_request"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "OPEN_OPERATIONS_EXIST",
+          "INVALID_STATE_TRANSITION"
+        ],
+        "transaction_class": "attendance",
+        "transaction_guarantee": "Assigned instructor requests review of the live attendance revision. A center manager may decide without applying a correction.",
+        "transition": {
+          "effect": "attendance_correction_request",
+          "from": [],
+          "to": [],
+          "invariant": "Assigned instructor requests review of the live attendance revision. A center manager may decide without applying a correction."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "correction request review version",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A30",
+          "A31",
+          "A46",
+          "A47",
+          "A51",
+          "A52",
+          "A53",
+          "A54",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F14"
+        ],
+        "runtime_required_features": [
+          "F14"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "sessions",
+          "version_mode": "append_or_current_scope_lock",
+          "version_field": null,
+          "read_operation": "attendance_get_v1",
+          "atomic_effects": [
+            "attendance_correction_request",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_attendance_correction_request"
+          }
+        },
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/attendance_correction_request_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/attendance_correction_request_v1",
+        "runtime_rpc": "api_v1.attendance_correction_request_v1",
+        "runtime_limits": [
+          "Assigned instructor requests review of the live attendance revision. A center manager may decide without applying a correction."
+        ]
       }
     ],
     "policy_value_map": {
@@ -113816,6 +114814,222 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/2/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/2/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/2/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/2/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_organization_create/properties/studio_setup_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StudioSetupRequest/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StudioSetupRequest/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StudioSetupRequest/properties/organization_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_studio_setup_list/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_studio_setup_list/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_studio_setup_open/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_studio_setup_open/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_studio_setup_open/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AttendanceCorrectionRequest/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AttendanceCorrectionRequest/properties/instructor_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AttendanceWindow/properties/policy_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/properties/correction_request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_attendance_correction_request/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/0/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/0/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/1/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/1/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/1/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correction_request/oneOf/1/properties/correction_request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_attendance_correction_request_v1/properties/key/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_attendance_correction_request_v1/properties/values/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -114307,13 +115521,16 @@
         "instructor_finance_directory_get_v1",
         "import_directory_get_v1",
         "tracking_directory_get_v1",
-        "document_directory_get_v1"
+        "document_directory_get_v1",
+        "studio_setup_list_v1",
+        "studio_setup_open_v1",
+        "attendance_correction_request_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 195,
+      "migration_count": 200,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -115029,7 +116246,10 @@
         "instructor_finance_directory_get_v1",
         "import_directory_get_v1",
         "tracking_directory_get_v1",
-        "document_directory_get_v1"
+        "document_directory_get_v1",
+        "studio_setup_list_v1",
+        "studio_setup_open_v1",
+        "attendance_correction_request_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -115873,7 +117093,8 @@
           "class_assignment_set_v1",
           "attendance_block_v1",
           "management_state_get_v1",
-          "attendance_start_v1"
+          "attendance_start_v1",
+          "attendance_correction_request_v1"
         ],
         "dependencies": [
           "confirmed_reservation_protection"
@@ -115896,7 +117117,8 @@
           "class_assignment_set_v1",
           "attendance_block_v1",
           "management_state_get_v1",
-          "attendance_start_v1"
+          "attendance_start_v1",
+          "attendance_correction_request_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

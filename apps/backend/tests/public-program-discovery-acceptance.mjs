@@ -24,6 +24,38 @@ test('W1-BE-25 anonymous discovery keeps old publications private and uses an ex
  const inbox=await api('management_state_get_v1',{operation:'public_application_review_v1',selector:{operation:'public_application_review_v1',key:{application_id:received.id,include_contact_intake:true}},page:{}});assert.equal(Date.parse(inbox.items[0].current.values.received_at),+received.created_at);
  const foreignFixture=await preparationFixture();try{const foreignForm=key();await db.query("insert into private.crm_intake_forms(id,org_id,center_id,channel,form_key,source_url,enabled) values($1,$2,$3,'web_form','foreign-public','https://foreign.invalid/application',true)",[foreignForm,foreignFixture.org,foreignFixture.center]);await assert.rejects(f.change('center',{public_application_form:{...binding,form_id:foreignForm}}),/POLICY_NOT_CONFIGURED/);}finally{await foreignFixture.db.end();}
 
+ await t.test('W1-BE-55/56 event application follows the current address and page visibility',async()=>{
+  const first='studio-'+key().slice(-10),second='studio-'+key().slice(-10);
+  const atAddress=slug=>read({include_details:true,slug});
+  await f.change('organization',{public_page:{slug:first,enabled:true}});
+  assert.equal((await read({include_details:true})).publication_state,'unavailable');
+  assert((await atAddress(first)).items.some(row=>row.publication_id===eventPublication.primary_id));
+  const body={client_api_version:1,request_id:key(),client_request_key:key(),publication_id:eventPublication.primary_id,
+   center_id:center,event_application:true,page_slug:first,contact:'visit@example.invalid',bot_proof:'synthetic'};
+  const submitEvent=async change=>(await db.query("select private.p04_public('public_application_submit_v1',$1,$2,$3) result",
+   [{...body,...change},Array.from({length:60},key),{ip_hash:'a'.repeat(64),target_hash:'d'.repeat(64),phase:'submit',bot_verified:true}])).rows[0].result;
+  assert.equal((await submitEvent({publication_id:publication.primary_id})).error.code,'SERVICE_UNAVAILABLE');
+  assert.equal((await submitEvent({})).data.application_state,'pending');
+  assert.equal((await submitEvent({})).data.application_state,'pending');
+  const {rows:[outcome]}=await db.query("select (select count(*)::int from core.public_applications where publication_id=$1 and state='pending') as pending,(select count(*)::int from core.event_registrations where event_id=$2) as registrations",[eventPublication.primary_id,event]);
+  assert.deepEqual(outcome,{pending:1,registrations:0});
+  await f.change('organization',{public_page:{slug:second,enabled:true}});
+  assert.equal((await atAddress(first)).publication_state,'unavailable');
+  assert.equal((await submitEvent({})).error.code,'SERVICE_UNAVAILABLE');
+  assert.equal((await atAddress(second)).application.state,'open');
+  await f.change('organization',{public_page:{slug:second,enabled:false}});
+  const hidden=await atAddress(second);
+  assert.equal(hidden.publication_state,'unavailable');assert.deepEqual(hidden.items,[]);assert.equal(hidden.application.form,null);
+  assert.equal((await submit({...submission,client_request_key:key()})).error.code,'SERVICE_UNAVAILABLE');
+  assert.equal((await submit(submission)).error.code,'SERVICE_UNAVAILABLE');
+  assert.equal((await submitEvent({page_slug:second,client_request_key:key()})).error.code,'SERVICE_UNAVAILABLE');
+  await f.change('organization',{public_page:{slug:second,enabled:true}});
+  assert.equal((await atAddress(second)).application.state,'open');
+  // Restore the synthetic fixture's legacy address for the older source-retirement assertions.
+  await db.query("update private.frontend_settings set values=values-'public_page' where scope_key=$1",['organization:'+org]);
+  await db.query("delete from private.public_page_addresses where org_id=$1 and slug in ($2,$3)",[org,first,second]);
+ });
+
  await db.query('update private.crm_intake_forms set enabled=false where id=$1',[form]);const disabled=(await read({include_details:true})).application;assert.equal(disabled.state,'unavailable');assert.equal(disabled.form,null);await db.query('update private.crm_intake_forms set enabled=true where id=$1',[form]);
  await api('content_catalog_save_v1',{scope_key:'center:'+org+':'+center,code:'document.'+document,channel:'document',language:'tr',version:source.version,source_version:doc.primary_id,action:'invalidate'});const retired=(await read({include_details:true})).application;assert.equal(retired.state,'unavailable');assert.equal(retired.form,null);const rejected=await submit({...submission,client_request_key:key()});assert.equal(rejected.ok,false);assert.equal(rejected.error.code,'SERVICE_UNAVAILABLE');
 });

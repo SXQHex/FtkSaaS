@@ -357,3 +357,26 @@ test('Starter bookings: quota, immutable names and publication rollback',{timeou
   });
  }finally{await db.end();}
 });
+
+test('W1-BE-43 verified account requests first setup and only the platform fulfills it',async()=>{
+ const {platform,plan}=await fixturePlatform();
+ const applicant=await authUser('setup-applicant'),other=await authUser('setup-unrelated');
+ const account=await must(applicant,'account_get_v1'),open={name:'Requested synthetic studio'},k=key();
+ const requested=await must(applicant,'studio_setup_open_v1',open,k);
+ assert.equal((await must(applicant,'studio_setup_open_v1',open,k)).primary_id,requested.primary_id);
+ assert.equal((await call(applicant,'studio_setup_open_v1',open,key())).result.error.code,'OPEN_OPERATIONS_EXIST');
+ const list=(actor,platform_queue=false)=>must(actor,'studio_setup_list_v1',{platform_queue,page:{limit:200}});
+ assert.deepEqual((await list(other)).items,[]);
+ assert.equal((await call(applicant,'studio_setup_list_v1',{platform_queue:true,page:{}})).result.error.code,'FORBIDDEN');
+ assert.equal((await list(platform,true)).items.find(row=>row.id===requested.primary_id).account_id,account.id);
+ const create={verified_account_id:account.id,name:open.name,initial_plan_id:plan,studio_setup_id:requested.primary_id};
+ assert.equal((await call(applicant,'organization_create_v1',create,key())).result.error.code,'FORBIDDEN');
+ const createKey=key(),organization=await must(platform,'organization_create_v1',create,createKey);
+ assert.equal((await must(platform,'organization_create_v1',create,createKey)).primary_id,organization.primary_id);
+ const [linked]= (await list(applicant)).items;
+ assert.equal(linked.state,'fulfilled');
+ assert.equal(linked.organization_id,organization.primary_id);
+ assert(!(await list(platform,true)).items.some(row=>row.id===requested.primary_id));
+ assert((await must(applicant,'organizations_list_v1',{page:{}})).items.some(row=>row.id===organization.primary_id));
+ assert.equal((await call(applicant,'studio_setup_open_v1',open,key())).result.error.code,'INVALID_STATE_TRANSITION');
+});

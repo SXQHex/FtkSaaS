@@ -42,6 +42,8 @@ Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıl
 
 ## WF02
 
+**İlk stüdyo talebi.** Aktif organizasyon bağı olmayan doğrulanmış hesap `studio_setup_open_v1(name)` çağırır ve `studio_setup_list_v1(page)` ile kendi talebini takip eder. Aynı anahtar aynı talebi döndürür. Platform operatörü `studio_setup_list_v1(platform_queue:true,page)` ile pending talepleri görür ve mevcut `organization_create_v1` komutuna `studio_setup_id`, eşleşen doğrulanmış hesabı, talep adını ve seçtiği geçerli planı verir. Kuruluş ve talebin fulfilled olması atomiktir. Başvuran daha sonra `organizations_list_v1` üzerinden kuruluşu açar ve hazır organizasyondaki mevcut merkez/CM adımlarını izler.
+
 Disiplin kapatmadan önce organizasyon veya merkez kapsamındaki yönetim selector’üyle güncel pasifleştirme etkisi okunur. Açık işler çözülür, kalan referanslar güncel proof ile açıkça kabul edilir; [kesin kapsam](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları) hak/geçmiş silmez.
 
 **Kendi kişi bağını keşfetme (XREQ-032):** Native girişten sonra `organizations_list_v1` içinden açık seçilen org öğesinin `self_context` alanı kullanılır. Doğrulanmış canlı bağ yoksa null; org listede yoksa erişim yoktur. Dönen canonical person_id, nullable Abone No ve canlı centers/student/instructor/assistant kapsamı UUID türetme veya rezervasyon arama ihtiyacını kaldırır. Üyelik/rol kaybında yeniden okunur; bu snapshot sonraki writer'ın canlı yetki kontrolünün yerine geçmez. Hesap kimliği kişi kimliği değildir.
@@ -243,6 +245,8 @@ Cursor aktör/hesap/org/merkez/aralık/keşif modu ve kronolojik sıralamaya ba�
 
 ## WF07
 
+**Yoklama penceresi ve düzeltme talebi.** `policy_publish_v1(key:attendance_window,value:{kind:attendance_window,opens_minutes_before,closes_minutes_after})` başlangıç öncesi ve bitiş sonrası dakika uzaklıklarını yayımlar. Etkin kaynak varsa pencere yoklamanın fiilî başlangıç ve taslak işlemlerini sınırlar. Mevcut yetkili kapanış, geç tamamlanmış derslerin sonlandırılması için kullanılabilir. `attendance_get_v1(include_correction_requests:true)` etkin sınırları ve yetkili düzeltme taleplerini döndürür. Etkin politika yoksa pencere null’dır. Atanmış eğitmen `attendance_correction_request_v1(session_id,closure_revision,reason)` çağırır. Aynı eğitmen ve kapanış revizyonu için tek talep vardır. Canlı CM aynı komutu `correction_request_id,expected_version,decision` ile kullanır. Yeni yoklama revizyonu eski talebin incelenmesini engeller. Kabul, mevcut preview/apply zincirinden ayrı bir karardır ve yoklamayı, hakkı veya hakedişi değiştirmez.
+
 **Amaç/aktör:** Yetkili operatör gerçek katılımı kaydeder ve yoklamayı kapatır.
 
 **Sıra:** `session_get_v1`, `attendance_get_v1`, gerekiyorsa `reservation_list_v1` → fiilî başlangıç için `attendance_start_v1` → taslak `attendance_mark_v1` → kullanıcı kapanışı onaylar → `attendance_close_v1` → seans/yoklama/haklar yeniden okunur. Kapanmış sonuç `attendance_correct_preview_v1` → gerekçeli `attendance_correct_apply_v1` ile düzeltilir; sessizce taslak gibi yazılmaz.
@@ -281,6 +285,8 @@ Yetkili sonuç tek `items` satırında gerçek entity/state/version ve `current:
 Her yanıttaki totals, liste filtrelerinden bağımsız yetkili merkez içindir: dönem net satışları/tahsilat yönlü düzeltmeleri/nakit iadeleri ile güncel borç/alacak ve kişi sayıları para birimine ayrılır. Para birimi dönüşümü veya genel toplam yoktur; toplamlar kesin decimal minor-unit string'dir. Dönem dışında güncel borç/alacak kaybolmaz. created_at_asc cursor/limit≤200; filtre/aktör/kapsam değişiminde VALIDATION_FAILED, içerik değişiminde VERSION_CONFLICT sonrası baştan okunur. Eski `finance_get_v1(person_id,currency,page)` ve tahsilat keşfi/yazısı değişmez; report.read, audit veya Business hesaplaşma listesi bu okuyucunun yerine kullanılmaz.
 
 ## WF09
+
+**Etkinlik başvurusu ve yayın adresi.** Etkinlik kartından `public_application_submit_v1(event_application:true,page_slug,publication_id,contact,bot_proof,client_request_key)` gönderilir. Sunucu güncel adresi ve canlı etkinlik yayını bağını doğrular. `application_state:pending` yetkili incelemeye alınan başvurudur. Kontenjan, ödeme, belge ve üyelik koşulları gerçek etkinlik kaydı sırasında mevcut etkinlik akışında doğrulanır. Organizasyon Owner/OM, F25 açıkken `settings_update_v1(scope:organization,patch:{public_page:{slug,enabled}})` ile bütün ziyaretçi yüzeyinin adresini yönetir. Başarı sonrası `settings_get_v1` ve yeni adres yeniden okunur. Adres değişince önceki adres kapanır. Kapatma ziyaretçi programını, yayın başvurularını ve bağlı web formu alımını kapatır. Kaynak kayıtları ve form ayarları korunur. Herhangi bir adres yapılandırmamış organizasyon mevcut yayın adreslerini kullanır.
 
 **Stüdyo programı ICS.** Canlı merkez yöneticisi, F08 ve mevcut takvim planı açıkken `calendar_link_create_v1(organization_scope:{org_id,center_id},kinds:["studio_program"])` ile kendi hesabına bağlı bir merkez bağlantısı alır. `calendar_links_get_v1(studio_program_scope:{org_id,center_id})` yalnız kendi stüdyo bağlantılarının kimlik, kapsam, durum ve sürümünü döndürür. Seçicisiz liste kişisel bağlantılara aittir. URL yetkili oluşturma ve aynı merkezle yenileme yanıtında verilir. Feed yalnız o merkezin gelecekte başlayacak görünür planlı seanslarının başlık, zaman, konum ve seans referansını taşır. Katılımcı, eğitmen ve iletişim ayrıntısı içermez. Hesap, üyelik, plan veya merkez yöneticiliği artık geçerli değilse feed ve yenileme kapanır. Bağlantı sahibi iptal edebilir. Kişisel ders ve görev abonelikleri kendi biçimini korur.
 
@@ -352,6 +358,8 @@ Mevcut kişi yalnız `person_ref` ile seçilir; e-postadan otomatik merge yoktur
 Kişi referansı olan güncel rapor satırları nullable `subscriber_number` taşır. Merge alias'ına bağlı tarihsel kişi UUID'si korunurken numara canonical kişinin ilk tahsisini gösterir. Varsayılan yeni CSV dosyaları son sütunda `subscriber_number` içerir; açık `columns` seçiminde bu sütun ayrıca seçilebilir. Merkez/toplam gruplaması kişi numarası üretmez; daha önce üretilmiş dosyalar değiştirilmez. Rapor/export yetkisi ve merkez/plan filtreleri genişlemez; numaradan bulunan kişiyle komutlar UUID üzerinden yürür.
 
 ## WF11
+
+**Gelen kutusu görünürlüğü.** `notifications_list_v1(visibility:inbox|archived|deleted,...)` yalnız kendi alıcı kapsamını ve seçilen görünürlüğe ait filtre sayaçlarını getirir. Seçici atlanınca gelen kutusu okunur. `notifications_read_set_v1(visibility,notifications:[{id,expected_version}])` seçili kayıtların görünürlüğünü atomik değiştirir. `inbox` ve `archived` silinen kaydı geri getirebilir. Görünürlük yazımı okundu durumunu ve kaynak işini korur. Tümünü okundu işaretleme gelen kutusuyla sınırlıdır. Saklama ve kalıcı imha mevcut veri yaşam döngüsüne tabidir.
 
 **Amaç/aktör:** Yetkili belge yöneticisi sürüm yayımlar; ilgili kişi gereksinimi görür ve açık kabul verir. Kullanıcı kendi işlemsel inbox'ını okur.
 

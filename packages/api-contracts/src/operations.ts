@@ -239,4 +239,7 @@ export interface Operations {
   import_directory_get_v1: {request: T.RequestImportDirectoryGet; response: T.SuccessImportDirectoryGet};
   tracking_directory_get_v1: {request: T.RequestTrackingDirectoryGet; response: T.SuccessTrackingDirectoryGet};
   document_directory_get_v1: {request: T.RequestDocumentDirectoryGet; response: T.SuccessDocumentDirectoryGet};
+  studio_setup_list_v1: {request: T.RequestStudioSetupList; response: T.SuccessStudioSetupList};
+  studio_setup_open_v1: {request: T.RequestStudioSetupOpen; response: T.SuccessStudioSetupOpen};
+  attendance_correction_request_v1: {request: T.RequestAttendanceCorrectionRequest; response: T.SuccessAttendanceCorrectionRequest};
 }

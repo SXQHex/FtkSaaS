@@ -9,20 +9,20 @@ Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/e3fe
 
 | Talep | Backend kabul ölçütü |
 |---|---|
-| W1-BE-43 | [WF02](../../../docs/workflows.md#wf02) platform sahibi, doğrulanmış hesap, organizasyon, merkez ve canlı CM sözleşmesine dayanır. Hazır organizasyonda mevcut `manager_self_assign_center_v1` veya yetkili `center_manager_assign_v1` ve ardından self yönetim kapsamı okuması kullanılır. Organizasyonsuz hesabın hazırlama talebini nasıl başlatacağı ve hangi platform operatörü akışının karşılayacağı belirlenmeli. |
+| W1-BE-43 | [WF02](../../../docs/workflows.md#wf02) platform sahibi, doğrulanmış hesap, organizasyon, merkez ve canlı CM sözleşmesine dayanır. Hazır organizasyonda mevcut `manager_self_assign_center_v1` veya yetkili `center_manager_assign_v1` ve ardından self yönetim kapsamı okuması kullanılır. Organizasyonsuz doğrulanmış hesabın talebi ve platform operatörünün mevcut kuruluş komutuyla tamamlaması aynı WF’de doğrulanmalı. |
 | W1-BE-44 | [WF06](../../../docs/workflows.md#wf06) mevcut özel ders talebinde opsiyonel notu kaydetmeli. Eski kayıt, metin sınırı, öz/yetkili okuma, yabancı ret ve aynı-key davranışı doğrulanmalı. |
 | W1-BE-45 | [WF14](../../../docs/workflows.md#wf14) kendi hakedişinde kapanış anındaki seans ve anlaşma bağını projekte etmeli. Düzeltme, önceki kayıt ve atama kaybında tarihsel bağ doğrulanmalı. |
 | W1-BE-46 | [WF09](../../../docs/workflows.md#wf09) yönetilen program aboneliğinin rolü, planı, kapsamı ve dışarı açılacak alanları belirlenmeli. Oluşturma, yenileme ve yetki kaybı gerçek feed üzerinden sınanmalı. |
 | W1-BE-47/48 | [WF11](../../../docs/workflows.md#wf11) organizasyon gelen kutusunun tamamında aynı-key okuma ve canlı rezervasyon doğrulanınca ders hedefi. Açık seçili komut, yabancı alıcı, sonradan gelen ileti, devredilen hesap bağı ve erişim kaybı regresyonları. |
-| W1-BE-49 | [WF07](../../../docs/workflows.md#wf07) için geçerli zaman politikası ve revizyona bağlı eğitmen düzeltme isteği karara bağlanmalı. İstek yoklamayı veya finansı etkilemeden ayrı izlenmeli. |
+| W1-BE-49 | [WF07](../../../docs/workflows.md#wf07) yayımlanmış zaman politikasını ve atanmış eğitmenin revizyona bağlı düzeltme isteğini doğrulamalı. Yönetici kararı yoklamadan ve finans etkilerinden ayrı izlenmeli. |
 | W1-BE-50 | [WF10](../../../docs/workflows.md#wf10) uygulama sonucu satır sayısı ve atlanan satır CSV'si. Final satır durumları, canlı dosya erişimi ve ikinci apply oluşmaması doğrulanmalı. |
 | W1-BE-51 | [WF10](../../../docs/workflows.md#wf10) kesin başarısız CSV işinin kayıtlı filtreleriyle yeniden başlatılması. İş sahibinin güncel export yetkisi, otomatik retry ayrımı ve aynı-key davranışı doğrulanmalı. |
 | W1-BE-52 | [WF10](../../../docs/workflows.md#wf10) CRM dönem kohortu, ara aşama ölçümü ve kaynak kırılımı. Geçmiş aşama kanıtı ve mevcut rapor/export kapsamı birlikte değerlendirilmeli. |
 | W1-BE-53 | [WF16](../../../docs/workflows.md#wf16) aday görünürlüğü, arama ve sorumlu filtresinde bütün aşamaları toplamalı. Teklif, kayıt ve katılım ayrı sayılmalı. |
 | W1-BE-54 | [WF09/WF16](../../../docs/workflows.md#wf09) mevcut başvuru incelemesinde sayfalama öncesi durum filtresi. Gerçek durumlar, merkezsiz kapsam, iletişim görünürlüğü ve cursor bağlanması doğrulanmalı. |
-| W1-BE-55 | [WF09](../../../docs/workflows.md#wf09) anonim başvuru veya doğrudan etkinlik kaydı ürün kararı. Yayın, kontenjan, belge/onay, ödeme, bot kontrolü ve aynı niyetin tekrar güvenliği doğrulanmalı. |
-| W1-BE-56 | [WF09](../../../docs/workflows.md#wf09) yönetilebilir yayın adresi ve toplu görünürlük için adres değiştirme, eski bağlantı, bağlı form ve kaynak yayın davranışı belirlenmeli. |
-| W1-BE-57 | [WF11](../../../docs/workflows.md#wf11) bildirim arşivi, silme ve geri alma için saklama ve görünürlük politikası belirlenmeli. Canlı alıcı, seçili sürümler, atomik tekrar ve kaynak iş durumu doğrulanmalı. |
+| W1-BE-55 | [WF09](../../../docs/workflows.md#wf09) anonim ziyaretçi onay bekleyen etkinlik başvurusu bırakır. Geçerli adres ve yayın, bot kontrolü ve aynı niyet sınanmalı. Kontenjan, belge/onay ve ödeme mevcut yetkili kayıt işleminin şartlarıdır. |
+| W1-BE-56 | [WF09](../../../docs/workflows.md#wf09) yönetilebilir yayın adresi ve toplu görünürlük için kanonik adres, önceki adresin kapanması ve toplu kapatmanın bağlı form ve program erişimine etkisi doğrulanmalı. Kaynak kayıtları korunmalı. |
+| W1-BE-57 | [WF11](../../../docs/workflows.md#wf11) alıcı görünürlüğünde arşiv, silme ve geri alma. Canlı alıcı, seçili sürümler, atomik tekrar, mevcut saklama ve kaynak iş durumu doğrulanmalı. |
 
 <a id="s18"></a>
 ## S18 — Statik SPA backend transportu

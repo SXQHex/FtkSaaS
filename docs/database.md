@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `455942e2a984f102d94ba9a1145b05cf973274c822dd68b120166944a9e9e878`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ba63ecc361406405dc036ef750ef023d2135a0cd82d90aaac30e7f98464374ce`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 195. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 200. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -203,3 +203,8 @@ Sıralı migration: 195. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261118211600_instructor_earning_session_context.sql](../apps/backend/supabase/migrations/20261118211600_instructor_earning_session_context.sql) | `fb24c0ae229b80cf30cb16578f32355d8201556762b353eae2eed003f0f71306` |
 | [20261118212300_crm_funnel_and_directory.sql](../apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql) | `a41a757073ef0bc93efbe3fb26c0c85642895983bea3052ec627d5ab05382718` |
 | [20261118213000_studio_calendar_import_results_report_retry.sql](../apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql) | `e10d598d813b6fa7eafa43845f4ceeed9262b6909a41f840f5a9ccb29577126c` |
+| [20261118213900_member_inbox_visibility.sql](../apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql) | `ded491256677fc375d42b855f8ed443ec4a3192d205af53c2548cf6aa6f20e4c` |
+| [20261118214000_settings_catalog_v25.sql](../apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql) | `3fe0f64ca44f29b7d7a1dff8bb03890636ebf0aec68156cb459d1b5f94318252` |
+| [20261118214100_public_page_event_applications.sql](../apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql) | `1f1ca343d8dbaf49683eaa7408d44b042ce5aa9e64bc6d3c8e4da3acb0a5fc31` |
+| [20261118214200_studio_setup_requests.sql](../apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql) | `16739bf94ec2317478e2c1f2f0862e11f8bbad013eb0c2e412016177adffbd66` |
+| [20261118214300_attendance_window_requests.sql](../apps/backend/supabase/migrations/20261118214300_attendance_window_requests.sql) | `3a99567aa0f3f93ae1cf793a0964033ef82eb9e7325b7a738fdb22890a38114e` |

@@ -6491,6 +6491,75 @@
         "Development/test only; final source candidate/main clean required.",
         "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
       ]
+    },
+    {
+      "name": "studio_setup_list_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/studio_setup_list_v1",
+      "permission": "account.self",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_studio_setup_list"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Read active account setup history or the explicitly authorized platform queue."
+      ]
+    },
+    {
+      "name": "studio_setup_open_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/studio_setup_open_v1",
+      "permission": "account.self",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_studio_setup_open"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "One pending request from a verified account with no active organization link."
+      ]
+    },
+    {
+      "name": "attendance_correction_request_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_correction_request_v1",
+      "permission": "attendance.draft",
+      "features": [
+        "F14"
+      ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [
+        "F14"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_correction_request"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "Assigned instructor requests review of the live attendance revision. A center manager may decide without applying a correction."
+      ]
     }
   ]
 }
