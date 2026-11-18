@@ -13,9 +13,9 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım          | Plan | İşlev                              | Durum                               | Sonraki eylem                                                         |
-| ------------------- | ---- | ---------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
-| **G-PRO-04.1–04.2** | Pro  | Son kalite zinciri ve statik çıktı | P01–P17 kapalı · 46/46 ekran kapalı | Teslim adayında kalite zincirini ve statik tarayıcı kabulünü tamamla. |
+| Aktif adım            | Plan | İşlev              | Durum                               | Sonraki eylem                                                                              |
+| --------------------- | ---- | ------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------ |
+| **G-PRO-05 (kapalı)** | Pro  | Çalışan Pro kabulü | P01–P17 kapalı · 46/46 ekran kapalı | 18 Kasım 2026 · [Kabul](#pro-kabulu) ve [otomatik rapor](../test-reports/verification.md). |
 
 Git devamı: PR326 main’de. Yeni kabul dalı `feat/web1-pro-acceptance` güncel main `d48dc4d17abed6f6cc686639a4d763e0979937d2` tabanında. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -1218,9 +1218,12 @@ G-PRO-01 kabulü: `auth-pro-chain.spec.ts` aynı Pro merkezinin kurulum kaynakla
 - [x] **G-PRO-03.1** · Native `commercial-plan-acceptance` Pro örneği249→250, iki eşzamanlı son yer isteğinde tek başarı,251/ikinci merkez reddini doğrular. Kaynak `3b4eaf28f469eef3f66be82aaa3dc65759313ac7`; [aday44115189377/attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/44115189377) core+12 API/full-clean başarılı. [Main binding44119859935](https://github.com/SXQHex/FtkSaaS/actions/runs/44119859935) adayın head/base/merge kaydını main’in aynı `dc8728c6a3996a183a3740c5e19d6477bb862aec` ağacına bağlıyor. Frontend mock’u yarış/DB kanıtı sayılmadı; yeni clean tetiklenmedi.
 - [x] **G-PRO-03.2** · Ağ kesilmesi sonrası aynı işlem anahtarıyla güvenli devamı ve eski sürümle yazma reddini doğrula. Oturum/izin kaybında işlem durmalı, eski organizasyon verisi görünmemeli.
       Aynı tarayıcı paketinde kayıp yanıttan sonra aynı anahtar tek etki üretti, ACK sonrası yalnız okuma yapıldı, eski sürüm yeni inceleme istedi ve açık personel formunun izin kaybındaki yazısı reddedildi. Geciken eski organizasyon yanıtı yeni kişinin verisini değiştirmedi. İptal edilen native oturumun korumalı erişim reddi P01.7’de. [Otomatik rapor](../test-reports/local-verification.md).
-- [ ] **G-PRO-04.1** · Teslim kaynağında uygulamanın kalite zincirini doğrula. Gerçek koşu, test sonuçları ve ilgili kaynak SHA’sını bağla.
-- [ ] **G-PRO-04.2** · Yayına aday statik build’i tarayıcıda aç. Doğrudan URL ve sayfa yenileme çalışmalı. Temel akışları mobil görünümde, klavyeyle ve erişilebilirlik taramasıyla doğrula. Takvimde saat ve tarih seçilen bağlama uymalı.
-- [ ] **G-PRO-05** · P01–P17 ile yukarıdaki Pro senaryolarının açıklarını kontrol et. Yayımlanmış backend sözleşmesinin sürümünü, yerel otomatik raporu, frontend build’ini ve teslim tarihini bu maddeye ekle. Teslim sonrası gerçek kontrol listesinin açıkları görünür kalır ve gerçek kabul kazanılmış sayılmaz. İnsan değerlendirmesi ayrıca varsa kaydedilir; verilmiş sayılmaz.
+- [x] **G-PRO-04.1** · Teslim kaynağında uygulamanın kalite zincirini doğrula. Gerçek koşu, test sonuçları ve ilgili kaynak SHA’sını bağla.
+      Tam `npm run verify:ci` temiz Web1 kaynağı `98284c2d8e0cc289fdc3dde3225f494582a33038` üzerinde geçti. 829 birim ve 532 tarayıcı, 0 atlanan veya flaky sonuç. 821 Axe taramasında ürün durumlarında ihlal yok. Raporun üç ihlali negatif politika örneğine ait. [Otomatik rapor](../test-reports/verification.md).
+- [x] **G-PRO-04.2** · Yayına aday statik build’i tarayıcıda aç. Doğrudan URL ve sayfa yenileme çalışmalı. Temel akışları mobil görünümde, klavyeyle ve erişilebilirlik taramasıyla doğrula. Takvimde saat ve tarih seçilen bağlama uymalı.
+      Aynı `dist/index.html` çıktısı açık/koyu giriş, korumalı adrese doğrudan erişim ve yenileme ile 320 CSS pikselde klavye ve merkez takvimini geçti. İstanbul takviminde 13.00 UTC, yerelde 16.00 ve doğru gün aralığında göründü. Loopback Auth/Edge fixture’lı üretim build’i. HTML SHA-256 `ca2f4b188f4d9348bfe72ce86338e7f54bb79ec1e7e7a3c33f3182927aa4b3f0`. [Playwright kanıtı](../playwright-report/index.html).
+- [x] **G-PRO-05** · P01–P17 ile yukarıdaki Pro senaryolarının açıklarını kontrol et. Yayımlanmış backend sözleşmesinin sürümünü, yerel otomatik raporu, frontend build’ini ve teslim tarihini bu maddeye ekle. Teslim sonrası gerçek kontrol listesinin açıkları görünür kalır ve gerçek kabul kazanılmış sayılmaz. İnsan değerlendirmesi ayrıca varsa kaydedilir; verilmiş sayılmaz.
+      18 Kasım 2026, 06.07 TSİ. P01–P17 ve G-PRO-01–04 kabul edildi. [Yayımlanmış backend sözleşmesi](../src/lib/api-contracts/manifest.json) main `d48dc4d17abed6f6cc686639a4d763e0979937d2` kaynaklı. [Tam yerel rapor](../test-reports/verification.md), statik build kanıtı G-PRO-04.2 ve [aday PR331](https://github.com/SXQHex/FtkSaaS/pull/331). İnsan ve cihaz kontrolleri aşağıdaki Pro sonrası listede açık.
 
 ### Pro teslim sonrası gerçek kontroller
 
