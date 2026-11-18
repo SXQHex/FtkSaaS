@@ -1,6 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
+import type { Page } from "@playwright/test";
+import type { EventView, InstructorFinanceEarning } from "../src/lib/api-contracts/generated.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 test("event registration reads and accepts only the chosen member's own document before renewed review", async ({
   page,
@@ -186,6 +188,12 @@ test("event cancellation exposes server effects before its separately reviewed a
   page,
 }) => {
   const state = await mockEventDetail(page);
+  await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
+  await mockCalendarEvent(page, state.event);
+  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
+  const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  await schedule.click();
+  await calendarEvent.press("Enter");
   await page.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
   const dialog = page.getByRole("alertdialog");
   await dialog
@@ -198,8 +206,54 @@ test("event cancellation exposes server effects before its separately reviewed a
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.event.state).toBe("cancelled");
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const calendarRead = page.waitForResponse((response) =>
+    response.url().endsWith("/calendar_get_v1"),
+  );
+  await schedule.click();
+  const calendar = await (await calendarRead).json();
+  expect(calendar.data.items).toMatchObject([{ id: state.event.id, resources: [] }]);
+  const eventRead = page.waitForResponse((response) => response.url().endsWith("/event_get_v1"));
+  await calendarEvent.press("Enter");
+  const result = await (await eventRead).json();
+  expect(result.data).toMatchObject({ id: state.event.id, state: "cancelled" });
+  await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Etkinliği iptal et", exact: true }),
+  ).toBeDisabled();
+  expect(state.writes.map(({ op }) => op)).toEqual(["event_cancel_apply_v1"]);
 });
-async function paidRegistration(page: import("@playwright/test").Page) {
+async function mockCalendarEvent(page: Page, row: EventView) {
+  await page.route("**/functions/v1/backend-v1/calendar_get_v1", async (route) => {
+    const { interval: range } = route.request().postDataJSON();
+    const included =
+      Date.parse(row.interval.starts_at) < Date.parse(range.ends_at) &&
+      Date.parse(row.interval.ends_at) > Date.parse(range.starts_at);
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: included
+            ? [
+                {
+                  id: row.id,
+                  type: "event",
+                  center_id: I.center,
+                  title: row.name,
+                  starts_at: row.interval.starts_at,
+                  ends_at: row.interval.ends_at,
+                  resources: row.state === "cancelled" ? [] : [{ kind: "room", id: I.room }],
+                },
+              ]
+            : [],
+          next_cursor: null,
+          as_of: "2026-11-16T12:00:00Z",
+        },
+      },
+    });
+  });
+}
+async function paidRegistration(page: Page) {
   await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
@@ -282,30 +336,7 @@ test("event paid registration separates reviewed debt preparation, targeted bank
       },
     });
   });
-  await page.route("**/functions/v1/backend-v1/calendar_get_v1", async (route) => {
-    const row = state.event;
-    await route.fulfill({
-      json: {
-        ok: true,
-        trace_id: I.role,
-        data: {
-          items: [
-            {
-              id: row.id,
-              type: "event",
-              center_id: I.center,
-              title: row.name,
-              starts_at: row.interval.starts_at,
-              ends_at: row.interval.ends_at,
-              resources: [{ kind: "room", id: I.room }],
-            },
-          ],
-          next_cursor: null,
-          as_of: "2026-11-16T12:00:00Z",
-        },
-      },
-    });
-  });
+  await mockCalendarEvent(page, state.event);
   const finance = page.getByRole("link", { name: "Finans", exact: true });
   const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
   const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
@@ -375,6 +406,8 @@ test("event closed attendance correction and performed duty each require a separ
   page,
 }) => {
   const state = await mockEventDetail(page);
+  await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
+  await mockCalendarEvent(page, state.event);
   state.event.attendance_state = "closed";
   state.event.registrations!.push({
     id: D.registration,
@@ -394,7 +427,88 @@ test("event closed attendance correction and performed duty each require a separ
     verified_at: null,
     version: 1,
   });
-  await page.reload();
+  const assignment = state.event.duties![0]!;
+  const earningId = "019ab7b0-0000-7000-8000-000000000105";
+  const earningSnapshots: string[][] = [];
+  await page.route(
+    "**/functions/v1/backend-v1/instructor_finance_directory_get_v1",
+    async (route) => {
+      const request = route.request().postDataJSON();
+      expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+      const items: InstructorFinanceEarning[] =
+        request.view === "earnings" && assignment.performed
+          ? [
+              {
+                kind: "earning",
+                display_name: "Örnek Eğitmen",
+                session_name: state.event.name,
+                agreement_id: null,
+                agreement_version: null,
+                earning: {
+                  id: earningId,
+                  person_id: assignment.person_id,
+                  center_id: I.center,
+                  session_id: null,
+                  event_assignment_id: assignment.id,
+                  amount_minor: "12000",
+                  currency: "TRY",
+                  paid_minor: "0",
+                  remaining_minor: "12000",
+                  previous_id: null,
+                  closure_id: null,
+                  direction: "add",
+                  created_at: assignment.verified_at!,
+                  version: 1,
+                  basis: { source: "event_fee", currency: "TRY", quantity: 1, excluded_blocked: 0 },
+                },
+              },
+            ]
+          : [];
+      if (request.view === "earnings")
+        earningSnapshots.push(
+          items.map(({ earning }) => `${earning.id}:${earning.event_assignment_id}`),
+        );
+      await route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            view: request.view,
+            items,
+            next_cursor: null,
+            as_of: "2026-11-15T19:00:00Z",
+            closed_session_count: 0,
+            totals: assignment.performed
+              ? [
+                  {
+                    currency: "TRY",
+                    earned_minor: "12000",
+                    paid_minor: "0",
+                    remaining_minor: "12000",
+                    overpaid_minor: "0",
+                  },
+                ]
+              : [],
+          },
+        },
+      });
+    },
+  );
+  const earnings = page.getByRole("link", { name: "Hakediş", exact: true });
+  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
+  const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  const lines = page.getByRole("tab", { name: "Satırlar", exact: true });
+  await earnings.click();
+  const initialEarnings = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/instructor_finance_directory_get_v1") &&
+      response.request().postDataJSON().view === "earnings",
+  );
+  await lines.click();
+  await (await initialEarnings).finished();
+  expect(earningSnapshots).toEqual([[]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
   await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
   await page.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
   const dialog = page.getByRole("alertdialog");
@@ -425,6 +539,15 @@ test("event closed attendance correction and performed duty each require a separ
     "event_duty_verify_v1",
   ]);
   await duty.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await earnings.click();
+  await lines.click();
+  const earningRow = page.getByRole("row").filter({ hasText: state.event.name });
+  await expect(earningRow).toContainText("₺120,00");
+  expect(earningSnapshots).toEqual([[], [`${earningId}:${assignment.id}`]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
+  expect(state.writes.filter(({ op }) => op === "event_duty_verify_v1")).toHaveLength(1);
 });
 test("event draft publication and participant cancellation preserve separate reviewed native targets", async ({
   page,
