@@ -1,6 +1,10 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import type { CashSummary, FinanceView } from "../src/lib/api-contracts/generated.js";
+import type {
+  CashSummary,
+  FinanceView,
+  MemberPageSummary,
+} from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -15,6 +19,7 @@ async function setup(
     allowed?: boolean;
     withCollection?: boolean;
     correctionUnknown?: boolean;
+    openProfileFirst?: boolean;
     stale?: boolean;
     blocked?: boolean;
   } = {},
@@ -38,6 +43,8 @@ async function setup(
   let correction: CashSummary | undefined, prepared: Record<string, unknown> | undefined;
   const corrections: Record<string, unknown>[] = [],
     previews: Record<string, unknown>[] = [];
+  const remainingDebt = () =>
+    String(100000n - BigInt(movement?.amount_minor ?? 0) + BigInt(correction?.amount_minor ?? 0));
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON(),
@@ -46,6 +53,21 @@ async function setup(
       return route.fulfill({
         json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
       });
+    if (op === "person_get_v1" && options.openProfileFirst) {
+      expect(req).toMatchObject({ org_id: I.org, center_id: I.center, person_id: I.instructor });
+      return send({
+        ...studio.people.find((person) => person.id === I.instructor),
+        member_summary: {
+          as_of: new Date().toISOString(),
+          rights: { status: "restricted" },
+          next_lesson: { status: "restricted" },
+          debt: {
+            status: "available",
+            by_currency: [{ currency: "TRY", remaining_minor: remainingDebt() }],
+          },
+        } satisfies MemberPageSummary,
+      });
+    }
     if (op === "finance_get_v1") {
       reads.push(req);
       expect(req.person_id).toBe(I.instructor);
@@ -58,7 +80,7 @@ async function setup(
           {
             id: debtId,
             due_at: "2026-11-15T00:00:00Z",
-            remaining_minor: correction ? "70000" : movement ? "60000" : "100000",
+            remaining_minor: remainingDebt(),
             center_id: I.center,
             version: movement ? 2 : 1,
           },
@@ -202,7 +224,14 @@ async function setup(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
+  const centerPath = `${origin}/o/${I.org}/c/${I.center}`;
+  if (options.openProfileFirst) {
+    await page.goto(`${centerPath}/people/${I.instructor}`);
+    await expect(page.getByRole("definition").filter({ hasText: "₺600,00" })).toBeVisible();
+    await page.getByRole("link", { name: "Finans", exact: true }).click();
+  } else {
+    await page.goto(`${centerPath}/finance`);
+  }
   await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
@@ -377,12 +406,12 @@ test("an unknown collection keeps the frozen key after receipt validation failur
   await panel.getByRole("button", { name: "Kapat", exact: true }).click();
 });
 
-async function fillCorrection(page: Page) {
+async function fillCorrection(page: Page, amount = "10000") {
   await page.getByRole("button", { name: "Düzelt", exact: true }).click();
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName("Tahsilatı düzelt");
   await expect(panel.getByLabel("Düzeltme farkı (alt birim)", { exact: true })).toBeEnabled();
-  await panel.getByLabel("Düzeltme farkı (alt birim)", { exact: true }).fill("10000");
+  await panel.getByLabel("Düzeltme farkı (alt birim)", { exact: true }).fill(amount);
   await panel.getByLabel("İşlem tarihi ve saati", { exact: true }).fill("2026-11-15T15:00");
   await panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik tahsilat farkı");
   return panel;
@@ -436,6 +465,32 @@ test("native correction previews a directed difference and rereads the linked ch
       .getByText("₺700,00", { exact: true }),
   ).toBeVisible();
 });
+test("a full collection correction restores the same debt in the cached profile without navigation reload", async ({
+  page,
+}) => {
+  const state = await setup(page, { withCollection: true, openProfileFirst: true });
+  const documentStartedAt = await page.evaluate(() => performance.timeOrigin);
+  const panel = await fillCorrection(page, "40000");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await expect(
+    panel.getByText("Bağlı düzeltme ve güncel finans doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  expect(state.previews).toEqual([
+    expect.objectContaining({
+      cash_movement_id: cashId,
+      correction: expect.objectContaining({ direction: "decrease", amount_minor: "40000" }),
+    }),
+  ]);
+  expect(state.corrections).toHaveLength(1);
+  await page.goBack();
+  await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
+  await expect(page.getByRole("definition").filter({ hasText: "₺1.000,00" })).toBeVisible();
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentStartedAt);
+});
+
 test("blocked correction has no apply action", async ({ page }) => {
   const state = await setup(page, { withCollection: true, blocked: true });
   const panel = await fillCorrection(page);
