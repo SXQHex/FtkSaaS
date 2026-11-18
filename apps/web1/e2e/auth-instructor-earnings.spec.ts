@@ -10,6 +10,10 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
   await mockAccount(page);
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
+  let releaseEarnings!: () => void;
+  const earningsGate = new Promise<void>((resolve) => {
+    releaseEarnings = resolve;
+  });
   const requests: {
     person_id: string;
     center_id: string;
@@ -22,6 +26,7 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     requests.push(req);
     expect(req.person_id).toBe(I.instructor);
     expect(req.center_id).toBe(I.center);
+    await earningsGate;
     const row = {
       id: id(req.page.cursor ? 992 : 991),
       person_id: req.interval ? I.instructor : id(998),
@@ -60,7 +65,17 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   });
   await page.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
   await expect(page).toHaveTitle("Hakedişim · Fethiye Tango");
+  const lines = page.getByRole("tabpanel", { name: "Seans satırları", exact: true });
+  try {
+    await expect(lines.getByRole("status")).toHaveText("Hakedişler okunuyor…");
+    await expect(lines.locator('[data-slot="skeleton"]')).toHaveCount(1);
+    await expect(lines.getByText("Güncel hakediş satırları okunamadı.")).toHaveCount(0);
+    await expect(page.getByText("Bu dönemde parasal kayıt yok.", { exact: true })).toHaveCount(3);
+  } finally {
+    releaseEarnings();
+  }
   await expect(page.getByRole("gridcell", { name: /90.071.992.547.409,93/ })).toBeVisible();
+  await expect(lines.locator('[data-slot="skeleton"]')).toHaveCount(0);
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
   expect(requests).toHaveLength(1);
   expect(requests[0]).not.toHaveProperty("interval");
@@ -88,6 +103,12 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     .toEqual({ starts_at: "2026-10-31T21:00:00Z", ends_at: "2026-11-30T21:00:00Z" });
   await page.setViewportSize({ width: 320, height: 950 });
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
+  const tableRegion = page.getByRole("region", { name: "Seans satırları", exact: true });
+  await expect(tableRegion).toHaveAttribute("tabindex", "0");
+  await tableRegion.focus();
+  await tableRegion.press("ArrowRight");
+  await expect.poll(() => tableRegion.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
 });
 test("own earnings denied read stays unknown until explicit retry", async ({ page }) => {
   await mockSessionDetail(page, { existing: true, instructor: true });

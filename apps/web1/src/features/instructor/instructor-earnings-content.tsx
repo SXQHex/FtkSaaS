@@ -181,6 +181,9 @@ export function InstructorEarningsContent({
         paid: metric("paid_minor"),
         remaining: metric("remaining_minor"),
       }}
+      loadingTotals={payments.isLoading}
+      loadingAgreement={agreements.isLoading}
+      loadingRows={currentQuery.isLoading}
       agreement={
         agreements.isError || !agreements.data ? (
           t(($) => $.instructorEarnings.unknownAgreement)
@@ -311,9 +314,6 @@ export function InstructorEarningsContent({
             <Alert variant="destructive">
               <AlertDescription>{t(($) => $.instructorEarnings.unread)}</AlertDescription>
             </Alert>
-          )}
-          {(months.isPending || currentQuery.isPending) && (
-            <p role="status">{t(($) => $.instructorEarnings.loading)}</p>
           )}
           <Button
             variant="outline"

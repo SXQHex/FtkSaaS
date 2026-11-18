@@ -20,6 +20,8 @@ import {
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Badge } from "../../components/ui/badge";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
+import { Skeleton } from "../../components/ui/skeleton";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
 export interface InstructorEarningRow {
   id: string;
   date: string;
@@ -44,6 +46,9 @@ export function InstructorEarningsView({
   agreement,
   lines,
   payments,
+  loadingTotals,
+  loadingAgreement,
+  loadingRows,
   tab,
   onTab,
   notice,
@@ -56,6 +61,9 @@ export function InstructorEarningsView({
   agreement: ReactNode;
   lines: InstructorEarningRow[] | null;
   payments: InstructorPaymentRow[] | null;
+  loadingTotals: boolean;
+  loadingAgreement: boolean;
+  loadingRows: boolean;
   tab: "lines" | "payments";
   onTab: (value: "lines" | "payments") => void;
   notice?: ReactNode;
@@ -86,13 +94,17 @@ export function InstructorEarningsView({
           ))}
         </NativeSelect>
       </header>
-      <div className="grid min-w-0 grid-cols-1 gap-4 @lg:grid-cols-3">
+      <div aria-busy={loadingTotals} className="grid min-w-0 grid-cols-1 gap-4 @lg:grid-cols-3">
         {(["earned", "paid", "remaining"] as const).map((key) => (
           <Card key={key}>
             <CardHeader>
               <CardDescription>{t(($) => $.instructorEarnings.metrics[key])}</CardDescription>
               <CardTitle className="break-words text-2xl tabular-nums">
-                {totals[key] ?? "—"}
+                {loadingTotals ? (
+                  <Skeleton aria-hidden="true" className="h-8 w-24" />
+                ) : (
+                  (totals[key] ?? "—")
+                )}
               </CardTitle>
               <CardDescription>{t(($) => $.instructorEarnings.metricHints[key])}</CardDescription>
             </CardHeader>
@@ -103,7 +115,9 @@ export function InstructorEarningsView({
       <Card className="min-w-0">
         <CardContent className="pt-5">
           <h2 className="text-sm font-semibold">{t(($) => $.instructorEarnings.agreement)}</h2>
-          <div className="mt-2 text-sm text-muted-foreground">{agreement}</div>
+          <div aria-busy={loadingAgreement} className="mt-2 text-sm text-muted-foreground">
+            {loadingAgreement ? <Skeleton aria-hidden="true" className="h-10 w-full" /> : agreement}
+          </div>
           <p className="mt-2 text-xs text-muted-foreground">
             {t(($) => $.instructorEarnings.agreementHint)}
           </p>
@@ -126,13 +140,16 @@ export function InstructorEarningsView({
           </CardHeader>
           <CardContent className="min-w-0 pt-4 [&_[data-slot=table-container]]:max-h-[min(65dvh,36rem)]">
             <TabsContent id="lines">
-              {lines === null ? (
+              {loadingRows ? (
+                <MemberReadSkeleton label={t(($) => $.instructorEarnings.loading)} />
+              ) : lines === null ? (
                 <p className="py-8 text-sm text-muted-foreground">
                   {t(($) => $.instructorEarnings.unread)}
                 </p>
               ) : (
                 <Table
                   aria-label={t(($) => $.instructorEarnings.tabs.lines)}
+                  scrollRegionLabel={t(($) => $.instructorEarnings.tabs.lines)}
                   className="min-w-[42rem]"
                 >
                   <TableHeader className="sticky top-0 z-20 bg-card">
@@ -176,13 +193,16 @@ export function InstructorEarningsView({
               )}
             </TabsContent>
             <TabsContent id="payments">
-              {payments === null ? (
+              {loadingRows ? (
+                <MemberReadSkeleton label={t(($) => $.instructorEarnings.loading)} />
+              ) : payments === null ? (
                 <p className="py-8 text-sm text-muted-foreground">
                   {t(($) => $.instructorEarnings.unreadPayments)}
                 </p>
               ) : (
                 <Table
                   aria-label={t(($) => $.instructorEarnings.tabs.payments)}
+                  scrollRegionLabel={t(($) => $.instructorEarnings.tabs.payments)}
                   className="min-w-[34rem]"
                 >
                   <TableHeader className="sticky top-0 z-20 bg-card">
