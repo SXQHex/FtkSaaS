@@ -27,7 +27,7 @@ async function setup(page: Page, mode: "normal" | "unknown" | "denied" | "expire
     version: 3,
     state: "active",
     created_at: entry.created_at,
-    expires_at: mode === "expired" ? "2026-11-16T11:59:00Z" : "2026-11-16T13:00:00Z",
+    expires_at: "2026-11-16T13:00:00Z",
   };
   const offered: WaitlistEntryView = {
     ...entry,
@@ -68,7 +68,11 @@ async function setup(page: Page, mode: "normal" | "unknown" | "denied" | "expire
       r = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } }),
       list = (items: unknown[]) =>
-        send({ items, next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+        send({
+          items,
+          next_cursor: null,
+          as_of: mode === "expired" ? offer.expires_at : "2026-11-16T12:00:00Z",
+        });
     if (
       op === "management_state_get_v1" &&
       ["waitlist_join_v1", "waitlist_leave_v1"].includes(r.operation)

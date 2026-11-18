@@ -144,9 +144,10 @@ export function SessionWaitlistController({
       )
         return;
       let entry = target.entry,
-        offer = target.offer;
+        offer = target.offer,
+        asOf: string | undefined;
       if (entry) {
-        entry = await readWaitlistTarget(scope, session.id, personId, target.entry!.id);
+        ({ entry, asOf } = await readWaitlistTarget(scope, session.id, personId, entry.id));
         offer = entry?.offers.find((row) => row.id === target.offer?.id);
         if (
           !entry ||
@@ -169,6 +170,7 @@ export function SessionWaitlistController({
         entry,
         offer,
         ownPersonId,
+        asOf,
       );
       await command.start(intent);
     } catch (failure) {
@@ -311,7 +313,7 @@ export function SessionWaitlistController({
                 action:
                   row.offer!.person_id === ownPersonId &&
                   row.offer!.state === "active" &&
-                  Date.parse(row.offer!.expires_at) > offers.dataUpdatedAt ? (
+                  Date.parse(row.offer!.expires_at) > Date.parse(offers.data!.asOf) ? (
                     <div className="flex flex-wrap gap-2">
                       {(["accept", "reject"] as const).map((action) => (
                         <Button

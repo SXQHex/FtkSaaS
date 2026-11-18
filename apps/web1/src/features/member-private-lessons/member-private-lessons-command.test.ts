@@ -47,6 +47,7 @@ const before: LessonRequestView = {
     },
   ],
 };
+const asOf = "2026-11-16T12:00:00Z";
 function page(row: LessonRequestView, operation = "lesson_request_withdraw_v1") {
   return {
     items: [
@@ -60,12 +61,13 @@ function page(row: LessonRequestView, operation = "lesson_request_withdraw_v1") 
       },
     ],
     next_cursor: null,
+    as_of: asOf,
   };
 }
 beforeEach(() => vi.clearAllMocks());
 it("requires a DST fold choice and preserves the selected occurrence without manager overrides", async () => {
   await expect(
-    createOwnRequestIntent(scope, personId, draft(), "America/New_York", [{ id: id(5) }], []),
+    createOwnRequestIntent(scope, personId, draft(), "America/New_York", [{ id: id(5) }], [], asOf),
   ).rejects.toMatchObject({ message: "SCHEDULE_TIME_AMBIGUOUS" });
   const intent = await createOwnRequestIntent(
     scope,
@@ -74,6 +76,7 @@ it("requires a DST fold choice and preserves the selected occurrence without man
     "America/New_York",
     [{ id: id(5) }],
     [],
+    asOf,
   );
   expect(intent.request).toMatchObject({
     person_id: personId,
@@ -97,6 +100,7 @@ it("rejects a missing local time and instructors outside the native catalog", as
       "America/New_York",
       [{ id: id(5) }],
       [],
+      asOf,
     ),
   ).rejects.toMatchObject({ message: "SCHEDULE_TIME_GAP" });
   await expect(
@@ -107,21 +111,31 @@ it("rejects a missing local time and instructors outside the native catalog", as
       "Europe/Istanbul",
       [{ id: id(5) }],
       [],
+      asOf,
     ),
   ).rejects.toThrow("OWN_REQUEST_CHOICES_UNAVAILABLE");
 });
 it("freezes self request versions and rejects other people or unreviewed actions", () => {
   const source = structuredClone(before),
-    intent = existingOwnRequestIntent(scope, personId, source, "withdraw", draft());
+    intent = existingOwnRequestIntent(scope, personId, source, "withdraw", draft(), asOf);
   source.version = 99;
   expect(intent.request).toMatchObject({ lesson_request_id: before.id, expected_version: 2 });
-  expect(() => existingOwnRequestIntent(scope, id(90), before, "withdraw", draft())).toThrow();
   expect(() =>
-    existingOwnRequestIntent(scope, personId, before, "accept", { ...draft(), reviewed: false }),
+    existingOwnRequestIntent(scope, id(90), before, "withdraw", draft(), asOf),
+  ).toThrow();
+  expect(() =>
+    existingOwnRequestIntent(
+      scope,
+      personId,
+      before,
+      "accept",
+      { ...draft(), reviewed: false },
+      asOf,
+    ),
   ).toThrow();
 });
 it("reads an accepted alternative without treating it as center approval or creating a reservation", async () => {
-  const intent = existingOwnRequestIntent(scope, personId, before, "accept", draft());
+  const intent = existingOwnRequestIntent(scope, personId, before, "accept", draft(), asOf);
   const after = {
     ...before,
     version: 3,
@@ -144,7 +158,7 @@ it("rejects a cross-person list and mismatched result receipt", async () => {
     page({ ...before, person_id: id(99) }, "lesson_request_create_v1"),
   );
   await expect(readOwnRequests(scope, personId)).rejects.toThrow("OWN_REQUEST_SOURCE_UNAVAILABLE");
-  const intent = existingOwnRequestIntent(scope, personId, before, "withdraw", draft());
+  const intent = existingOwnRequestIntent(scope, personId, before, "withdraw", draft(), asOf);
   mock.call.mockResolvedValueOnce({
     operation: intent.operation,
     key: intent.request.operation_key,

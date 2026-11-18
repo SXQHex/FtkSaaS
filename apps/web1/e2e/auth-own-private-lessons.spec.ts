@@ -88,6 +88,23 @@ test("member accepts an alternative but still waits for center approval", async 
     0,
   );
 });
+test("a fresh backend timestamp closes the offer even when the browser clock lags", async ({
+  page,
+}) => {
+  const state = await mockOwnPrivateLessons(page);
+  await page.getByRole("button", { name: "Alternatifi kabul et", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("checkbox").press("Space");
+  state.setAsOf("2026-11-19T14:00:00Z");
+  await dialog.getByRole("button", { name: "Kabul et", exact: true }).click();
+  await expect(dialog.getByText(/Talep değişti veya işlem artık kullanılamıyor/)).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+  await page.reload();
+  await expect(page.getByText("Özel ders · Örnek Eğitmen", { exact: true })).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Alternatifi kabul et", exact: true })).toHaveCount(
+    0,
+  );
+});
 test("member withdraws the entire request with explicit confirmation", async ({ page }) => {
   const state = await mockOwnPrivateLessons(page);
   await page.getByRole("button", { name: "Talebi geri çek", exact: true }).first().click();

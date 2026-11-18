@@ -125,6 +125,9 @@ export function MemberPrivateLessonsContent({
   });
   const time = new Intl.DateTimeFormat("tr-TR", { timeStyle: "short", timeZone: timezone });
   const entries = !list.isError ? list.data?.items : undefined;
+  const asOf = list.data?.asOf;
+  const isOffered = (row: LessonRequestView["alternatives"][number]) =>
+    row.state === "offered" && asOf !== undefined && Date.parse(row.starts_at) > Date.parse(asOf);
   const choicesReady =
     !disciplines.isError &&
     !instructors.isError &&
@@ -138,7 +141,7 @@ export function MemberPrivateLessonsContent({
     setOffsets([]);
     const next = blank();
     if (request) {
-      const offered = request.alternatives.filter((row) => row.state === "offered");
+      const offered = request.alternatives.filter(isOffered);
       if (offered.length === 1) next.alternativeId = offered[0]!.id;
     }
     setDraft(next);
@@ -152,6 +155,8 @@ export function MemberPrivateLessonsContent({
     try {
       if (target.mode === "create") {
         if (!choicesReady || list.isError) throw new Error("OWN_REQUEST_CHOICES_UNAVAILABLE");
+        const { data } = await list.refetch({ throwOnError: true });
+        if (!data) throw new Error("OWN_REQUEST_SOURCE_UNAVAILABLE");
         await command.start(
           await createOwnRequestIntent(
             scope,
@@ -160,17 +165,24 @@ export function MemberPrivateLessonsContent({
             timezone,
             disciplines.data!,
             instructors.data!,
+            data.asOf,
           ),
         );
       } else {
-        const fresh = await readOwnRequest(scope, personId, target.request!.id);
+        const { request: fresh, asOf: freshAsOf } = await readOwnRequest(
+          scope,
+          personId,
+          target.request!.id,
+        );
         if (fresh.version !== target.request!.version) {
           setTarget({ ...target, request: fresh });
           setDraft((value) => ({ ...value, reviewed: false }));
           await list.refetch();
           throw new Error("OWN_REQUEST_SOURCE_CHANGED");
         }
-        await command.start(existingOwnRequestIntent(scope, personId, fresh, target.mode, draft));
+        await command.start(
+          existingOwnRequestIntent(scope, personId, fresh, target.mode, draft, freshAsOf),
+        );
       }
     } catch (failure) {
       if (failure instanceof z.ZodError) {
@@ -241,34 +253,30 @@ export function MemberPrivateLessonsContent({
               .filter(Boolean)
               .join(" · "),
             state: nativeState(row),
-            actions: ["pending", "alternative_offered"].includes(row.state) ? (
-              <div className="flex flex-wrap gap-2">
-                {row.alternatives.some(
-                  (item) =>
-                    item.state === "offered" && Date.parse(item.starts_at) > list.dataUpdatedAt,
-                ) && (
+            actions:
+              asOf &&
+              ["pending", "alternative_offered"].includes(row.state) &&
+              (!row.expires_at || Date.parse(row.expires_at) > Date.parse(asOf)) ? (
+                <div className="flex flex-wrap gap-2">
+                  {row.alternatives.some(isOffered) && (
+                    <Button
+                      size="sm"
+                      isDisabled={locked || Boolean(target)}
+                      onPress={() => open("accept", row)}
+                    >
+                      {t(($) => $.memberPrivateLessons.actions.accept)}
+                    </Button>
+                  )}
                   <Button
+                    variant="outline"
                     size="sm"
                     isDisabled={locked || Boolean(target)}
-                    onPress={() => open("accept", row)}
+                    onPress={() => open("withdraw", row)}
                   >
-                    {t(($) => $.memberPrivateLessons.actions.accept)}
+                    {t(($) => $.memberPrivateLessons.actions.withdraw)}
                   </Button>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  isDisabled={
-                    locked ||
-                    Boolean(target) ||
-                    (Boolean(row.expires_at) && Date.parse(row.expires_at!) <= list.dataUpdatedAt)
-                  }
-                  onPress={() => open("withdraw", row)}
-                >
-                  {t(($) => $.memberPrivateLessons.actions.withdraw)}
-                </Button>
-              </div>
-            ) : undefined,
+                </div>
+              ) : undefined,
           })) ?? null
         }
         onCreate={() => open("create")}
@@ -349,7 +357,7 @@ export function MemberPrivateLessonsContent({
           instructors={instructors.isError ? [] : (instructors.data ?? [])}
           alternatives={
             target.request?.alternatives
-              .filter((row) => row.state === "offered")
+              .filter(isOffered)
               .map((row) => ({ id: row.id, name: alternativeName(row) })) ?? []
           }
           offsets={offsets}

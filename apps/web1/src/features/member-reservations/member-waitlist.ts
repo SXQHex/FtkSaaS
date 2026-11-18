@@ -90,7 +90,11 @@ export async function readOwnWaitlist(
     ids.add(entityId);
     return { id: entityId, session, entry, offer };
   });
-  return { items, nextCursor: page.next_cursor ?? undefined, asOf: page.as_of };
+  return {
+    items,
+    nextCursor: page.next_cursor ?? undefined,
+    asOf: z.iso.datetime({ offset: true }).parse(page.as_of),
+  };
 }
 export async function ownWaitlistIntent(
   scope: ClientScope,
@@ -99,7 +103,7 @@ export async function ownWaitlistIntent(
   reviewed: boolean,
 ) {
   if (!reviewed) throw Error("MEMBER_WAITLIST_REVIEW_REQUIRED");
-  const entry = await readWaitlistTarget(
+  const { entry, asOf } = await readWaitlistTarget(
     scope,
     before.session.id,
     before.entry.person_id,
@@ -120,5 +124,6 @@ export async function ownWaitlistIntent(
     entry,
     offer,
     entry.person_id,
+    asOf,
   );
 }

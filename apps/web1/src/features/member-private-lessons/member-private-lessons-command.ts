@@ -35,6 +35,7 @@ export async function createOwnRequestIntent(
   timezone: string,
   disciplines: { id: string }[],
   instructors: { id: string }[],
+  asOf: string,
 ): Promise<OwnRequestIntent> {
   z.uuid().parse(personId);
   const values = z
@@ -59,7 +60,7 @@ export async function createOwnRequestIntent(
     Number(values.duration),
     values.offset,
   );
-  if (Date.parse(interval.starts_at) <= Date.now()) throw new Error("OWN_REQUEST_PAST");
+  if (Date.parse(interval.starts_at) <= Date.parse(asOf)) throw new Error("OWN_REQUEST_PAST");
   return {
     scope: { ...scope },
     personId,
@@ -83,13 +84,14 @@ export function existingOwnRequestIntent(
   before: LessonRequestView,
   mode: "withdraw" | "accept",
   draft: OwnRequestDraft,
+  asOf: string,
 ): OwnRequestIntent {
   if (
     before.person_id !== personId ||
     before.center_id !== scope.centerId ||
     !["pending", "alternative_offered"].includes(before.state) ||
     !draft.reviewed ||
-    (before.expires_at && Date.parse(before.expires_at) <= Date.now())
+    (before.expires_at && Date.parse(before.expires_at) <= Date.parse(asOf))
   )
     throw new Error("OWN_REQUEST_SOURCE_CHANGED");
   const context = { scope: { ...scope }, personId, before: structuredClone(before) },
@@ -110,7 +112,7 @@ export function existingOwnRequestIntent(
   if (
     before.state !== "alternative_offered" ||
     !alternative ||
-    Date.parse(alternative.starts_at) <= Date.now()
+    Date.parse(alternative.starts_at) <= Date.parse(asOf)
   )
     throw new Error("OWN_REQUEST_SOURCE_CHANGED");
   return {
@@ -154,7 +156,7 @@ export async function readOwnRequestResult(intent: OwnRequestIntent, id?: string
   z.uuid().parse(id);
   if ("before" in intent && id !== intent.before.id)
     throw new Error("OWN_REQUEST_RESULT_UNAVAILABLE");
-  const row = await readOwnRequest(intent.scope, intent.personId, id!);
+  const { request: row } = await readOwnRequest(intent.scope, intent.personId, id!);
   if (intent.operation === "lesson_request_create_v1") {
     const expected = intent.request;
     if (

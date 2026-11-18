@@ -37,7 +37,11 @@ export async function readOwnRequests(
     (cursor && page.next_cursor === cursor)
   )
     throw new Error("OWN_REQUEST_SOURCE_UNAVAILABLE");
-  return { items, nextCursor: page.next_cursor };
+  return {
+    items,
+    nextCursor: page.next_cursor,
+    asOf: z.iso.datetime({ offset: true }).parse(page.as_of),
+  };
 }
 export async function readOwnRequest(scope: ClientScope, personId: string, id: string) {
   z.uuid().parse(id);
@@ -54,7 +58,7 @@ export async function readOwnRequest(scope: ClientScope, personId: string, id: s
   const request = requestDetail(page.items[0]!, scope, "lesson_request_withdraw_v1", id);
   if (request.person_id !== personId || request.format !== "private")
     throw new Error("OWN_REQUEST_SOURCE_UNAVAILABLE");
-  return request;
+  return { request, asOf: z.iso.datetime({ offset: true }).parse(page.as_of) };
 }
 export async function readOwnRequestChoices(
   scope: ClientScope,

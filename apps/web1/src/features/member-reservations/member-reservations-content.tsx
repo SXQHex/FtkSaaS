@@ -139,6 +139,7 @@ export function MemberReservationsContent({
     if (upcomingResult.isError || pastResult.isError || waitlistReadFailed)
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
   }
+  const offerPage = offers.isError ? undefined : offers.data;
   return (
     <>
       <MemberReservationsView
@@ -205,9 +206,9 @@ export function MemberReservationsContent({
           })) ?? null
         }
         waiting={
-          waiting.isError || offers.isError || !waiting.data || !offers.data
+          waiting.isError || !waiting.data || !offerPage
             ? null
-            : [...offers.data.items, ...waiting.data.items].map((row) => {
+            : [...offerPage.items, ...waiting.data.items].map((row) => {
                 const dateTime = new Intl.DateTimeFormat("tr-TR", {
                   dateStyle: "medium",
                   timeStyle: "short",
@@ -252,7 +253,10 @@ export function MemberReservationsContent({
                             variant="outline"
                             isDisabled={
                               !eligible ||
-                              Boolean(row.offer && Date.parse(row.offer.expires_at) <= Date.now())
+                              Boolean(
+                                row.offer &&
+                                Date.parse(row.offer.expires_at) <= Date.parse(offerPage.asOf),
+                              )
                             }
                             onPress={() => setWaitTarget({ row, action })}
                           >

@@ -308,5 +308,5 @@ export async function readSessionWaitlist(
     }
     return { id, name: row.waitlist_display_name, entry, offer };
   });
-  return { items, next_cursor: page.next_cursor };
+  return { items, next_cursor: page.next_cursor, asOf: instant.parse(page.as_of) };
 }
