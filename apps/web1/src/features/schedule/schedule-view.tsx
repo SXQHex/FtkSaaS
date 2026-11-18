@@ -51,6 +51,7 @@ export function ScheduleView({
   events,
   timezone,
   initialDate,
+  firstDay,
   now,
   rooms,
   instructors,
@@ -74,6 +75,7 @@ export function ScheduleView({
   events: ScheduleEvent[];
   timezone: string;
   initialDate: string;
+  firstDay: 0 | 1;
   now?: string;
   rooms: ScheduleChoice[];
   instructors: ScheduleChoice[];
@@ -291,7 +293,7 @@ export function ScheduleView({
                 )
               }
               eventMinHeight={26}
-              firstDay={1}
+              firstDay={firstDay}
               titleFormat={{ year: "numeric", month: "long", day: "numeric" }}
               dayHeaderContent={dayHeader}
               allDaySlot={false}

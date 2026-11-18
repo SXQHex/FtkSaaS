@@ -64,12 +64,14 @@ const emptyCreate = (date: string): ScheduleCreateDraft => ({
 });
 export function ScheduleContent({
   scope,
+  firstDay,
   onLockChange,
   initialSession,
   initialCreate = false,
   initialMode = "view",
 }: {
   scope: ClientScope;
+  firstDay: 0 | 1;
   onLockChange: (value: boolean) => void;
   initialSession?: string;
   initialCreate?: boolean;
@@ -722,6 +724,7 @@ export function ScheduleContent({
         events={events}
         timezone={source.center.timezone}
         initialDate={source.initialDate}
+        firstDay={firstDay}
         rooms={rooms}
         instructors={teachers}
         room={room}

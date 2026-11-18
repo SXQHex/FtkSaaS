@@ -15,8 +15,10 @@ async function scheduleFixture(
   verifiedInstructor = false,
   managed = false,
   series = false,
+  weekStart: "monday" | "sunday" = "monday",
 ) {
   const fixture = await mockStudio(page);
+  fixture.native.weekStart = weekStart;
   if (verifiedInstructor) fixture.roles[0]!.accountAccessGranted = true;
   let session: SessionView | undefined, future: SessionView | undefined;
   if (series) {
@@ -484,6 +486,25 @@ async function scheduleFixture(
     },
   };
 }
+
+test("management calendar reads the Sunday week selected in account settings", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-11-18T12:00:00Z"));
+  const intervals: { starts_at: string; ends_at: string }[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.url().endsWith("/calendar_get_v1"))
+      intervals.push(request.postDataJSON().interval);
+  });
+  const state = await scheduleFixture(page, false, false, false, false, "sunday");
+  const days = page.getByRole("region", { name: "Program günleri", exact: true });
+  await expect(days.getByText("Paz", { exact: true })).toBeVisible();
+  await expect
+    .poll(() => intervals.at(-1))
+    .toEqual({
+      starts_at: "2026-11-14T21:00:00.000Z",
+      ends_at: "2026-11-21T21:00:00.000Z",
+    });
+  expect(state.writes).toEqual([]);
+});
 
 test("empty mobile week keeps all days and hours reachable with the native keyboard scroll", async ({
   page,
