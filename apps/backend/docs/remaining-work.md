@@ -5,10 +5,11 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="web1-v67-backend"></a>
 ## Web1 v67 backend talepleri
 
-Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/7ade9b23896de6a4d694212326e08cb4605e127b/apps/web1/tasks/request.md) W1-BE-43–59 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-platform-billing) kalır.
+Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/85f83409075180819ff2f91b43b983b1cafe2deb/apps/web1/tasks/request.md) W1-BE-34 ile W1-BE-43–59 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-platform-billing) kalır.
 
 | Talep | Backend kabul ölçütü |
 |---|---|
+| W1-BE-34 | [WF00](../../../docs/workflows.md#wf00) merkez denetim dışa aktarımı ve kesin iş sonucu. Canlı satır/export yetkisi, filtre ve bütçe ile tamamlanmış import ve kaynak rapor tekrarı ayrımı doğrulanmalı. |
 | W1-BE-43 | [WF02](../../../docs/workflows.md#wf02) platform sahibi, doğrulanmış hesap, organizasyon, merkez ve canlı CM sözleşmesine dayanır. Hazır organizasyonda mevcut `manager_self_assign_center_v1` veya yetkili `center_manager_assign_v1` ve ardından self yönetim kapsamı okuması kullanılır. Organizasyonsuz doğrulanmış hesabın talebi ve platform operatörünün mevcut kuruluş komutuyla tamamlaması aynı WF’de doğrulanmalı. |
 | W1-BE-44 | [WF06](../../../docs/workflows.md#wf06) mevcut özel ders talebinde opsiyonel notu kaydetmeli. Eski kayıt, metin sınırı, öz/yetkili okuma, yabancı ret ve aynı-key davranışı doğrulanmalı. |
 | W1-BE-45 | [WF14](../../../docs/workflows.md#wf14) kendi hakedişinde kapanış anındaki seans ve anlaşma bağını projekte etmeli. Düzeltme, önceki kayıt ve atama kaybında tarihsel bağ doğrulanmalı. |

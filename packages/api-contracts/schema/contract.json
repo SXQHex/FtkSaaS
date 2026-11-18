@@ -951,7 +951,8 @@
         "platform_directory_get_v1",
         "organization_billing_tax_get_v1",
         "organization_billing_tax_set_v1",
-        "platform_organization_suspension_set_v1"
+        "platform_organization_suspension_set_v1",
+        "audit_center_export_v1"
       ]
     },
     "EntityType": {
@@ -65525,6 +65526,16 @@
               "type": "null"
             }
           ]
+        },
+        "import_result": {
+          "$ref": "#/$defs/TrackingImportResult"
+        },
+        "retry_mode": {
+          "enum": [
+            "none",
+            "automatic",
+            "report_export"
+          ]
         }
       },
       "required": [
@@ -67573,6 +67584,149 @@
       "required": [
         "operation",
         "values"
+      ],
+      "additionalProperties": false
+    },
+    "Request_audit_center_export": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        },
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "module": {
+          "enum": [
+            "M01",
+            "M02",
+            "M03",
+            "M04",
+            "M05",
+            "M06",
+            "M07",
+            "M08",
+            "M09",
+            "M10",
+            "M11",
+            "M12",
+            "M13",
+            "M14",
+            "M17",
+            "X"
+          ]
+        },
+        "result": {
+          "const": "recorded"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "AuditCenterCsv": {
+      "type": "object",
+      "properties": {
+        "filename": {
+          "$ref": "#/$defs/Text"
+        },
+        "mime": {
+          "const": "text/csv"
+        },
+        "csv": {
+          "$ref": "#/$defs/Text"
+        },
+        "row_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "filename",
+        "mime",
+        "csv",
+        "row_count",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "Success_audit_center_export": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/AuditCenterCsv"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "TrackingImportResult": {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "enum": [
+            "complete",
+            "partial",
+            "not_applied"
+          ]
+        },
+        "total_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "applied_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "replayed_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "skipped_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "failed_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "unprocessed_rows": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "outcome",
+        "total_rows",
+        "applied_rows",
+        "replayed_rows",
+        "skipped_rows",
+        "failed_rows",
+        "unprocessed_rows"
       ],
       "additionalProperties": false
     }
@@ -98491,6 +98645,103 @@
         "runtime_limits": [
           "The platform operator can place or lift a reasoned, versioned suspension without changing the organization lifecycle."
         ]
+      },
+      {
+        "name": "audit_center_export_v1",
+        "module": "X",
+        "features": [
+          "F33"
+        ],
+        "permission": "report.export",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_audit_center_export"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_audit_center_export"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Export the complete, authorized center audit projection under the configured export byte budget. No business mutation.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_read",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "scope_filter_before_pagination"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live center, export and original subject authority are evaluated in the same transaction.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F33"
+        ],
+        "runtime_required_features": [
+          "F33"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "centers",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_audit_center_export"
+          }
+        },
+        "runtime_limits": [
+          "Only recorded center audit rows visible to the current actor and within the requested filters. Requires existing report export configuration."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/audit_center_export_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/audit_center_export_v1",
+        "runtime_rpc": "api_v1.audit_center_export_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
       }
     ],
     "policy_value_map": {
@@ -116285,6 +116536,30 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_audit_center_export/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_audit_center_export/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_audit_center_export/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_audit_center_export/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -116783,13 +117058,14 @@
         "platform_directory_get_v1",
         "organization_billing_tax_get_v1",
         "organization_billing_tax_set_v1",
-        "platform_organization_suspension_set_v1"
+        "platform_organization_suspension_set_v1",
+        "audit_center_export_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 204,
+      "migration_count": 205,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -117512,7 +117788,8 @@
         "platform_directory_get_v1",
         "organization_billing_tax_get_v1",
         "organization_billing_tax_set_v1",
-        "platform_organization_suspension_set_v1"
+        "platform_organization_suspension_set_v1",
+        "audit_center_export_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -119502,7 +119779,8 @@
           "operation_status_get_v1",
           "preview_get_v1",
           "audit_list_v1",
-          "privacy_execute_v1"
+          "privacy_execute_v1",
+          "audit_center_export_v1"
         ],
         "dependencies": [
           "confirmed_reservation_protection"
@@ -119520,7 +119798,8 @@
           "operation_status_get_v1",
           "preview_get_v1",
           "audit_list_v1",
-          "privacy_execute_v1"
+          "privacy_execute_v1",
+          "audit_center_export_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -119600,7 +119879,8 @@
         "operation_status_get_v1",
         "preview_get_v1",
         "job_status_get_v1",
-        "audit_list_v1"
+        "audit_list_v1",
+        "audit_center_export_v1"
       ],
       "hosted_workers": "five dedicated Supabase Cron lanes; explicit bindings/config; workload/purge/restore limits owned by current acceptance and backlog",
       "report_files": "private database byte objects, authenticated Edge POST on every download; seven-day expiry, no signed read URL",

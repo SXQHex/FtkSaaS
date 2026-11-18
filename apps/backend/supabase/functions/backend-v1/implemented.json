@@ -244,6 +244,7 @@
     "platform_directory_get_v1",
     "organization_billing_tax_get_v1",
     "organization_billing_tax_set_v1",
-    "platform_organization_suspension_set_v1"
+    "platform_organization_suspension_set_v1",
+    "audit_center_export_v1"
   ]
 }

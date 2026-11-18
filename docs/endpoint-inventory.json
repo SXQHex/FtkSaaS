@@ -6644,6 +6644,33 @@
       "limits": [
         "The platform operator can place or lift a reasoned, versioned suspension without changing the organization lifecycle."
       ]
+    },
+    {
+      "name": "audit_center_export_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/audit_center_export_v1",
+      "permission": "report.export",
+      "features": [
+        "F33"
+      ],
+      "required_features": [
+        "F33"
+      ],
+      "runtime_required_features": [
+        "F33"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_audit_center_export"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Only recorded center audit rows visible to the current actor and within the requested filters. Requires existing report export configuration."
+      ]
     }
   ]
 }

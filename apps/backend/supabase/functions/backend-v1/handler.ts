@@ -184,7 +184,7 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    }
    if(calendarCredential&&calendarPublicOrigin)result.data.subscription_url=calendarSubscriptionUrl(calendarPublicOrigin,calendarCredential.token);
    const success=(validators as any)["success_"+operation];if(!success?.(result))return failure("INTEGRITY_VIOLATION",500);}
-  return json(result,200,operation==='media_get_v1'||operation.startsWith('calendar_'));
+  return json(result,200,operation==='audit_center_export_v1'||operation==='media_get_v1'||operation.startsWith('calendar_'));
   }
   return failure("TEMPORARY_FAILURE",503);
  }catch{return failure("TEMPORARY_FAILURE",503,true);}

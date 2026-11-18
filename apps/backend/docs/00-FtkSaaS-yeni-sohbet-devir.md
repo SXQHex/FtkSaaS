@@ -1,11 +1,11 @@
 # Güncel kaynak ve kabul
 
 <a id="web1-v67-platform-billing"></a>
-## Web1 v67 vergi profili ve platform konsolu
+## Web1 v67 denetim, vergi profili ve platform konsolu
 
-W1-BE-58/59, [Draft PR #341](https://github.com/SXQHex/FtkSaaS/pull/341) için yayımlanan `4b98531b476abd424f963952bbb1524c29891bee` üzerine `codex/web1-backend-remaining` dalında yerel olarak ele alındı. Tüketim [WF17](../../../docs/workflows.md#wf17), kabul ölçütleri [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir. Aday CI ve hosted doğrulama push onayı sonrasında bekler.
+Güncel taban `82a5a37deb83d7de1978d82ffba738ecf4ce12b5`. Aynı kaynak için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı. W1-BE-58/59 yeni `codex/web1-audit-platform-billing` dalına taşındı. W1-BE-34’ün açık denetim dışa aktarımı ve kesin kaynak sonucu aynı dalda. Tüketim [WF00](../../../docs/workflows.md#wf00) ve [WF17](../../../docs/workflows.md#wf17), kabul ölçütleri [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir.
 
-204 migration izole loopback Supabase üzerinde temiz uygulandı. Tek Node runner ve `--test-concurrency=1` ile sözleşme, Starter ve anonim yayın paketleri 349/349 geçti. Workflow kapsamı, 142 API test birimi, sözleşme denetimi, 245 runtime yetki kapısı, backend typecheck ve kalite eşiği doğrulandı. Edge JSON yükü 4.070.277 bayt. Yerel stack kapatıldı.
+İzole loopback Supabase üzerinde 205 migration temiz uygulandı. Tek seri Node runner ile son kaynakta hedefli 9/9 test geçti ve yerel stack kapatıldı. Sözleşme, workflow, backend typecheck, 142 API birimi ve trusted CI politika karşılaştırması doğrulandı. Edge JSON yükü 4.081.566 bayt. Aday CI ve hosted kabulü ayrı izlenir.
 
 <a id="web1-v67-final-five"></a>
 ## Web1 v67 son beş backend talebi

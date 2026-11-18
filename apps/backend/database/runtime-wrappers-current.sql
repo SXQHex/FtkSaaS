@@ -979,6 +979,10 @@ insert into private.runtime_operations(name,permission,billing_class,features) v
 create or replace function api_v1.platform_organization_suspension_set_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('platform_organization_suspension_set_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.platform_organization_suspension_set_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
 grant execute on function api_v1.platform_organization_suspension_set_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('audit_center_export_v1','report.export','read',array['F33']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.audit_center_export_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('audit_center_export_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.audit_center_export_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.audit_center_export_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
 revoke all on all functions in schema private from public,anon,authenticated;
 grant execute on all functions in schema private to service_role;
 notify pgrst,'reload schema';

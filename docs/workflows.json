@@ -292,7 +292,9 @@
         "apps/backend/scripts/compact-validator-errors.mjs",
         "apps/backend/database/tracking-discovery.sql",
         "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql",
-        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql"
+        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql",
+        "apps/backend/database/audit-export-tracking-results.sql",
+        "apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -300,11 +302,12 @@
         "job_status_get_v1",
         "audit_list_v1",
         "management_state_get_v1",
-        "tracking_directory_get_v1"
+        "tracking_directory_get_v1",
+        "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "c448337c0367391e776ca163a58d61d9e7bed19c62b80c7ef00fec94902ecee7",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "e1f0c12d6e89ccd063c21cebf3a268b3f546e682faf0b010eb680a1adb92e610",
+        "reason": "Reviewed the live center CSV boundary, configured byte cap, exact terminal import counts and source-authorized report retry."
       }
     },
     {
@@ -393,8 +396,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "5cdf65cafe64ef4c41ad7d3b0ebf2a2e86254ba8ef3e0d62fbe3e419444487de",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "c234c76274338cc27fab419d2fadc1bfd2129b07fd3c0567eb3d44284021262d",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -519,8 +522,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "2d92f521f04166e7ec6fd31036fc4c394d88625a6063bf9ecf2c9dcff8c9d4c1",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "ef1e171ab1bd24c13300a5539e8d1e4dfb2ff7a9d008fb5a6d056396d464de1f",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -637,8 +640,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "751a7e1ad184f37ebf67636ec78543ae942e6c8afcd39c463baaf8dd0c469dc0",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "8557c30ae3d4e7b4555ebadc1bbbce494d3958dd1bd1a206aa16b6dee7b8b7db",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -754,8 +757,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "296871acbc745ca59e9ea8b029b26d5174f705047569256c0b2baa59c8cfebc5",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "26202abc90f1e2867b6b3a49b958f8dbcd9257aa251f080814ef40cca3b79f10",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -882,8 +885,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "bcee308be39747d56d0f256e0fc9253a885c9253ea5398b4588a060b8d6266dc",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "340cd1a234ee1a6e1692844a379690a72b55222e60adfb67d9905daba9acb87e",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -992,8 +995,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "78dd314dd68f56fdf1becd31c34b67366db86250f3ed2b3cbc609ce0dfe48e8a",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "571ef1b26b69ab47d79e30ce0893fb5dc8fb802284bc270a98bfd16a5c6dce32",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1064,8 +1067,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "d54be1083e4a22fce5bed6b296e2359f0ce7b85f05f074e79e5d72be5c6eaf9d",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "bfe5bb3f0c7001f48112534885f17bcf128809657e37e5209be4d57a4cca34b8",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1139,8 +1142,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "f3de13bd0337b9764caec5c04f3cb8b4b9d84e7b896cece20eb22e1178e344bf",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "a5402e78dda1bb86fedc631fbbef6f0d801f505a50f2745377b9f61805344850",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1256,8 +1259,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "c82ca86dc20f200b385d15e7168cc500f67663348c3f620738ad9cda19b3f46c",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "c8c85858c56b84a5eb8033f7c9572032449e3313ca6e2027f8b0ee23d9c5d5f3",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1330,8 +1333,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f98688d6287b9eba6fff4da8cca2643aaa698274cafd70060dcec733a0bb3a00",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "89571a1ca739274a867770b6de4bc20073dbdcabc2c8dd8dccfa736f4f8ad5da",
+        "reason": "Reviewed shared audit export and native terminal import outcome evidence for existing workflow permissions."
       }
     },
     {
@@ -1419,8 +1422,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "226d844de880d6a92b838a84bf5fe79a2e2dbbfb891fc1a6f127480393911384",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "559c34c148f8662dfbf97fe36a7c6d0ebc5a00bd8c111c2e5df5e571feff69c2",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1557,8 +1560,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "27c0bc3e85cb828656309de7d68fe9b4438c1297fe86123e8d95c98b1542b031",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "dd68c1f8581fc77de40d5bb36f77f660cd5e99917a26e96a3fd45aa8ec44883a",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1633,8 +1636,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "4e62828729ac6f58d8e6065f30624e7c83cbc2467f03c99358af59d19ed80e74",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "3d162e420781525ac231097b20f4dc424d5f45912bdb035b49d8865efc382ac2",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1701,8 +1704,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "077267aa196537b28a9f5bba917001f045711dbd27bfba19befca5b747596397",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "23846c257182d58a166dc41f9465522d53c128c09dcdaa3e329917113336c4a5",
+        "reason": "Reviewed shared audit export and native terminal import outcome evidence for existing workflow permissions."
       }
     },
     {
@@ -1780,8 +1783,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "46d12d181bb1b29b84d41bb16f58da35fb15a88ad18dc0aa34c1d584fc2b6d1c",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "5b0fd542482320b8c4b9cda8f5163c13f70a3ba8a8b26243632f378954bcac4a",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1856,8 +1859,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "29f365a8fdc1aba701f40040a99d6bcb04d9991482bd577b24b05f4ac3fe1f80",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "c06081b360ac812027de5fb92bf36d813e073eab888e099d814b96b40b4d138d",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1957,8 +1960,8 @@
         "platform_organization_suspension_set_v1"
       ],
       "review": {
-        "fingerprint": "395ffc19676114d41acfc166aff8748fe70ead8e99fa912dc9989fb4aaaa0804",
-        "reason": "Reviewed organization-owner tax data, operator directory and suspension including subscription, privacy, and public access boundaries."
+        "fingerprint": "1990fdbd98a8fbcc5b492270747c8e107b418adcb82032860ee825f681ff8e35",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -1990,8 +1993,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "368318b6e38b56dec212790ea08aace3d057898deac4ba1d178176933876ccb3",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "0ce7526f3d2adfed5e0739c5b170d2bd01f35f54a3580ed70f8c77620b4182e1",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -2031,8 +2034,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "9bcc8582c0583faef41764f1bff822ef6e36db92efe09fa5d7e36305e1c879ad",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "c258474aa3d1a8a00da6a1a30505ec46f0bae01332182f52bc8de6b7efa9a90d",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     },
     {
@@ -2156,8 +2159,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "c24f638bc1a48b512b24850eb3910e65c76980b72f62e8bb4432415c8c99ef16",
-        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
+        "fingerprint": "bf698bf8e6b4392b635e429140ac2df41bc1aacc657051158282f587fc93eb1b",
+        "reason": "Reviewed the audit export runtime wrapper and tracking acceptance linkage for existing workflow authority."
       }
     }
   ]

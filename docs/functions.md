@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `91bbfaac17d0e0b1cc8c17be5b0e34e50f9fa7429fff869111b58f22d2dc8231`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `a639e7f85df6bb30350f23006fb3c7552fe676916f9185c60367284d34740669`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 
@@ -251,6 +251,7 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 | `organization_billing_tax_get_v1` | runtime (sınırları oku) | read | org.owner | [WF17](workflows.md#wf17) / restricted |
 | `organization_billing_tax_set_v1` | runtime (sınırları oku) | command | org.owner | [WF17](workflows.md#wf17) / restricted |
 | `platform_organization_suspension_set_v1` | runtime (sınırları oku) | command | platform.owner | [WF17](workflows.md#wf17) / restricted |
+| `audit_center_export_v1` | runtime (sınırları oku) | read | report.export | [WF00](workflows.md#wf00) / common |
 
 ## Akış kanıt kaynakları
 

@@ -246,4 +246,5 @@ export interface Operations {
   organization_billing_tax_get_v1: {request: T.RequestOrganizationBillingTaxGet; response: T.SuccessOrganizationBillingTaxGet};
   organization_billing_tax_set_v1: {request: T.RequestOrganizationBillingTaxSet; response: T.SuccessOrganizationBillingTaxSet};
   platform_organization_suspension_set_v1: {request: T.RequestPlatformOrganizationSuspensionSet; response: T.SuccessPlatformOrganizationSuspensionSet};
+  audit_center_export_v1: {request: T.RequestAuditCenterExport; response: T.SuccessAuditCenterExport};
 }
