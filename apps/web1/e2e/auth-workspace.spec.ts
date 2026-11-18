@@ -182,4 +182,9 @@ test("Starter self management opens the native owner navigation and removes it a
   await page.reload();
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await expect(studio).toHaveCount(0);
+  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
+  await palette.getByPlaceholder("Sayfa adı ara…").fill("Politikalar");
+  await expect(palette.getByText("Eşleşen sayfa yok.", { exact: true })).toBeVisible();
+  await expect(palette.getByRole("menuitem", { name: "Politikalar", exact: true })).toHaveCount(0);
 });

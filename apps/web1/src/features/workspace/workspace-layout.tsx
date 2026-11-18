@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
-import { readWorkspace, workspaceRoles } from "./workspace";
+import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
 import { workspaceQuery } from "./workspace-query";
 import { workspaceNavigation, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
@@ -122,6 +122,17 @@ export function WorkspaceLayout({
         ? "instructor"
         : (modes[0] ?? "account");
   const groups = workspaceNavigation(mode, view?.selected?.id, centerId);
+  const settingsUrl =
+    mode === "management" &&
+    centerId &&
+    !scope.isError &&
+    !scopeLocked &&
+    !scopeControl?.locked &&
+    hasWorkspaceManagementScope(view, centerId)
+      ? groups
+          .find((group) => group.key === "studio")
+          ?.items.find((item) => item.key === "settings")?.url
+      : undefined;
   const roleNames = roles.map((role) => t(($) => $.workspace.roles[role]));
   if (instructor) roleNames.push(t(($) => $.workspace.roles.instructor));
   const roleLabel = roleNames.length
@@ -218,6 +229,7 @@ export function WorkspaceLayout({
             )}
             <div className="hidden min-[641px]:inline-flex">
               <NavigationSearch
+                settingsUrl={settingsUrl}
                 groups={[
                   ...groups,
                   {

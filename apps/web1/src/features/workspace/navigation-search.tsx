@@ -4,6 +4,7 @@ import { SearchIcon } from "lucide-react";
 import type { NavigationGroup } from "./navigation";
 import { Button } from "../../components/ui/button";
 import { DialogFooter } from "../../components/ui/dialog";
+import { settingsLayout } from "../settings/settings-layout";
 import {
   Command,
   CommandDialog,
@@ -13,7 +14,13 @@ import {
   CommandGroup,
   CommandItem,
 } from "../../components/ui/command";
-export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
+export function NavigationSearch({
+  groups,
+  settingsUrl,
+}: {
+  groups: NavigationGroup[];
+  settingsUrl?: string;
+}) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -86,6 +93,24 @@ export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
                   ))}
                 </CommandGroup>
               ))}
+              {settingsUrl && (
+                <CommandGroup heading={t(($) => $.settings.title)}>
+                  {settingsLayout.map(({ key }) => {
+                    const label = t(($) => $.settings.tabs[key]);
+                    return (
+                      <CommandItem
+                        key={key}
+                        id={`settings-${key}`}
+                        href={`${settingsUrl}?${new URLSearchParams({ section: key })}`}
+                        textValue={label}
+                        onAction={() => setOpen(false)}
+                      >
+                        {label}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              )}
             </CommandList>
           </Command>
         </search>

@@ -2,7 +2,7 @@ import { WorkCalendarEditor } from "./work-calendar-editor";
 import { PreparationManagement } from "./preparation-management";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { readWorkspace } from "../workspace/workspace";
 import { BackendError } from "../../lib/backend";
@@ -34,7 +34,6 @@ import { useSettingsPolicies } from "./use-settings-policies";
 import { useSettingsDocument } from "./use-settings-document";
 import { useSettingsTeam } from "./use-settings-team";
 import { useSettingsNotifications } from "./use-settings-notifications";
-import type { SettingsSection } from "./settings-layout";
 import { readOrganizationSettingsCatalog } from "./settings-reader";
 
 export function SettingsContent({
@@ -145,7 +144,8 @@ function SettingsManagement({
     router = useRouter(),
     queries = useQueryClient();
   const [level, setLevel] = useState<DisciplineLevel>(canCenter ? "center" : "organization");
-  const [section, setSection] = useState<SettingsSection>("genel");
+  const navigate = useNavigate({ from: "/o/$orgId/c/$centerId/settings" });
+  const { section = "genel" } = useSearch({ from: "/o/$orgId/c/$centerId/settings" });
   const [selection, setSelection] = useState<{ id?: string }>(),
     [locked, setLocked] = useState(false),
     [identity, setIdentity] = useState<DisciplineLevel>(),
@@ -482,7 +482,13 @@ function SettingsManagement({
       {notifications.notice}
       <SettingsView
         section={section}
-        onSection={setSection}
+        onSection={(next) => {
+          if (!locked)
+            void navigate({
+              search: { section: next === "genel" ? undefined : next },
+              replace: true,
+            });
+        }}
         onPermission={team.onPermission}
         teamActionLabel={t(($) => $.settings.teamNative.addRole)}
         onField={document.onField}

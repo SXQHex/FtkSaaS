@@ -17,6 +17,30 @@ async function confirm(page: import("@playwright/test").Page) {
     .click();
   return dialog;
 }
+test("command palette opens a settings section in the current managed center", async ({ page }) => {
+  const fixture = await mockSettingsCompletion(page);
+  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
+  const search = dialog.getByPlaceholder("Sayfa adı ara…");
+  await expect(search).toBeFocused();
+  await search.fill("Politikalar");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(
+    new RegExp(`/o/${I.org}/c/${I.center}/settings\\?section=politika$`),
+  );
+  await expect(page.getByRole("tab", { name: "Politikalar", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Politikalar", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  expect(fixture.writes).toEqual([]);
+});
+
 test("public settings explicitly bind the selected form and published consent source with native versioned readback", async ({
   page,
 }) => {
