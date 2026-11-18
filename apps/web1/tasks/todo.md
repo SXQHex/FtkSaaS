@@ -13,8 +13,8 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan            | İşlev                           | Durum                                                          | Sonraki eylem                                                                |
-| ---------- | --------------- | ------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Aktif adım | Plan            | İşlev                           | Durum                                                                     | Sonraki eylem                                                                                                           |
+| ---------- | --------------- | ------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | **V08.2**  | Starter + çizim | Tam yerel kabul ve yayımlı aday | V/E kaynak bağımlılıkları kendi maddelerinde. G-STARTER.2 yayın bekliyor. | Tam yerel kabulü tek Chromium işçisiyle çalıştır. Yayımlandığında aynı aday kaynağının rota ve kapsam kabulünü doğrula. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
@@ -158,29 +158,29 @@ Yeni snapshot'taki bilinen açıklar da kabul girdisidir: %125 ölçekte400px ta
 
 Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çıkarıldı. Aktif sayfa açıldığında yalnız ilgili satırın yeni çizimi ve uygulama farkı doğrulanır. Önceki E kutuları kendi sürümünün [ekran kabulüne](#sayfa-kabulu) ve [Pro işlev kayıtlarına](#pro) bağlıdır. [Starter kanıtı](#starter), o plana özgü kaynak sınırlarını izler.
 
-| Ekranlar | Değişen görsel/işlev bağlamı                                         | Güncel iş sahibi                            |
-| -------- | -------------------------------------------------------------------- | ------------------------------------------- |
+| Ekranlar | Değişen görsel/işlev bağlamı                                         | Güncel iş sahibi                                                        |
+| -------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | E01–E09  | Auth kabuğu, tema/ölçek; doğrulama sonrası kurulum girişi            | [V01](#v01), [E47](#e47-ilk-kurulum); mevcut native Auth kabulü korunur |
-| E10      | Rol bilgisi, yönetici/eğitmen ICS ve görünüm tercihleri              | [V01](#v01)/[V02](#v02)/[V07](#v07) |
-| E11      | Etkinlik/finans/CRM kaynaklarıyla özet tutarlılığı ve kabuk          | [V01](#v01)/[V04](#v04)/[V05](#v05) |
-| E12      | Kurulum sonucu, merkez adı, ekip kaynakları                          | [V07](#v07)/[E47](#e47-ilk-kurulum); Business kapsamı E49 |
-| E13–E16  | Birleşim, davet, aktarılan kişi ve bağlı borç/hak görünümleri        | [V04](#v04) |
-| E17/E18  | Hafta başlangıcı, birleşik etkinlik/seans, taşıma ve bekleme bağları | [V03](#v03); self bekleme [V02](#v02) |
-| E19/E20  | Paket istatistikleri, tahsilat/iptal ve etkinlik finansı             | [V04](#v04); etkinlik writer'ı [V03](#v03) |
-| E21      | Öğrenci özel ders talebinin yönetim tarafı                           | [V02](#v02); mevcut WF06/E21 akışı |
-| E22      | Belge sürümü/yeniden kabul ve üye bağlamı                            | [V02](#v02)/[V05](#v05); mevcut P15 |
-| E23      | Etkinlik görevi→hakediş, ödeme ve rapor aynı kaynaktan               | [V03](#v03)/[V04](#v04) |
-| E24–E27  | Eğitmenin kendi seansı, kapanış penceresi, düzeltme isteği ve ICS    | [V02](#v02)/[V03](#v03); E27 hakedişi [V04](#v04) |
-| E28–E32  | Self hak/rezervasyon/özel ders/ödeme, profil ve bildirim girişi      | [V02](#v02)/[E48](#e48-uye-bildirim-merkezi) |
-| E33      | Pano, sorumlu/deneme sayaçları, takip ve ortak başvurular            | [V05](#v05); Business uzantısı B02/E49 |
-| E34–E36  | Slug, yayın durumu, public başvuru ve etkinlik hedefi                | [V05](#v05) |
-| E37/E38  | Etkinlik ödemesi, görev/hakediş ve takvim görünürlüğü                | [V03](#v03)/[V04](#v04) |
-| E39      | Toplu eylemler ve geri al tasarımı, kaynak yetkisi                   | [V06](#v06); üye kabuğu [E48](#e48-uye-bildirim-merkezi) |
-| E40      | Otomasyon→takip ve son işler                                         | [V05](#v05) |
-| E41      | Gerçek rapor/huni/hakediş, CSV ve içe aktarma notları                | [V04](#v04); Business birleşik rapor B05/E49 |
-| E42      | Plan/fatura/havale/organizasyon, kaynak seçimi ve Starter görünümü   | [V07](#v07); Business daralma B06/E49 |
-| E43      | Genişleyen denetim ve işlem durumları                                | [V06](#v06) |
-| E44–E46  | Yardım/durum kataloğu, bağlı hata/plan/salt okunur görselleri        | [V06](#v06); ortak tema/ölçek [V01](#v01) |
+| E10      | Rol bilgisi, yönetici/eğitmen ICS ve görünüm tercihleri              | [V01](#v01)/[V02](#v02)/[V07](#v07)                                     |
+| E11      | Etkinlik/finans/CRM kaynaklarıyla özet tutarlılığı ve kabuk          | [V01](#v01)/[V04](#v04)/[V05](#v05)                                     |
+| E12      | Kurulum sonucu, merkez adı, ekip kaynakları                          | [V07](#v07)/[E47](#e47-ilk-kurulum); Business kapsamı E49               |
+| E13–E16  | Birleşim, davet, aktarılan kişi ve bağlı borç/hak görünümleri        | [V04](#v04)                                                             |
+| E17/E18  | Hafta başlangıcı, birleşik etkinlik/seans, taşıma ve bekleme bağları | [V03](#v03); self bekleme [V02](#v02)                                   |
+| E19/E20  | Paket istatistikleri, tahsilat/iptal ve etkinlik finansı             | [V04](#v04); etkinlik writer'ı [V03](#v03)                              |
+| E21      | Öğrenci özel ders talebinin yönetim tarafı                           | [V02](#v02); mevcut WF06/E21 akışı                                      |
+| E22      | Belge sürümü/yeniden kabul ve üye bağlamı                            | [V02](#v02)/[V05](#v05); mevcut P15                                     |
+| E23      | Etkinlik görevi→hakediş, ödeme ve rapor aynı kaynaktan               | [V03](#v03)/[V04](#v04)                                                 |
+| E24–E27  | Eğitmenin kendi seansı, kapanış penceresi, düzeltme isteği ve ICS    | [V02](#v02)/[V03](#v03); E27 hakedişi [V04](#v04)                       |
+| E28–E32  | Self hak/rezervasyon/özel ders/ödeme, profil ve bildirim girişi      | [V02](#v02)/[E48](#e48-uye-bildirim-merkezi)                            |
+| E33      | Pano, sorumlu/deneme sayaçları, takip ve ortak başvurular            | [V05](#v05); Business uzantısı B02/E49                                  |
+| E34–E36  | Slug, yayın durumu, public başvuru ve etkinlik hedefi                | [V05](#v05)                                                             |
+| E37/E38  | Etkinlik ödemesi, görev/hakediş ve takvim görünürlüğü                | [V03](#v03)/[V04](#v04)                                                 |
+| E39      | Toplu eylemler ve geri al tasarımı, kaynak yetkisi                   | [V06](#v06); üye kabuğu [E48](#e48-uye-bildirim-merkezi)                |
+| E40      | Otomasyon→takip ve son işler                                         | [V05](#v05)                                                             |
+| E41      | Gerçek rapor/huni/hakediş, CSV ve içe aktarma notları                | [V04](#v04); Business birleşik rapor B05/E49                            |
+| E42      | Plan/fatura/havale/organizasyon, kaynak seçimi ve Starter görünümü   | [V07](#v07); Business daralma B06/E49                                   |
+| E43      | Genişleyen denetim ve işlem durumları                                | [V06](#v06)                                                             |
+| E44–E46  | Yardım/durum kataloğu, bağlı hata/plan/salt okunur görselleri        | [V06](#v06); ortak tema/ölçek [V01](#v01)                               |
 
 ### Uygulama sırası
 
