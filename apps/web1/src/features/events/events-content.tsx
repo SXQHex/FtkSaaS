@@ -6,7 +6,7 @@ import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { getTemporal } from "../../lib/temporal";
-import { readWorkspace } from "../workspace/workspace";
+import { hasWorkspaceManagementScope, readWorkspace } from "../workspace/workspace";
 import { EventsView, type EventRow, type EventFilter } from "./events-view";
 import { EventEditor } from "./event-editor";
 import { eventMonth, readEventsPage, readEventRooms } from "./events-read";
@@ -45,17 +45,7 @@ export function EventsContent({
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
       : undefined;
   const canReadSummary =
-    !workspace.isError &&
-    Boolean(
-      workspace.data?.roles.some(
-        (role) =>
-          role.state === "active" &&
-          role.person_id === workspace.data?.selected?.self_context?.person_id &&
-          (role.role === "owner" ||
-            role.role === "org_manager" ||
-            (role.role === "center_manager" && role.scope_center_id === scope.centerId)),
-      ),
-    );
+    !workspace.isError && hasWorkspaceManagementScope(workspace.data, scope.centerId);
   const prefix = ["events", scope.accountId, scope.orgId, scope.centerId];
   const period = useQuery({
     queryKey: ["event-month", center?.timezone, month],

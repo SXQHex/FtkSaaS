@@ -1,6 +1,7 @@
 import { test, expect } from "./test.js";
 import { mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
+import { mockStudio } from "./studio-fixture.js";
 import type {
   SuccessOrganizationsList,
   SuccessCentersList,
@@ -127,3 +128,58 @@ for (const colorScheme of ["light", "dark"] as const)
     expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
     expect((await scanAccessibility(page, "workspace-account-reflow")).violations).toEqual([]);
   });
+
+test("Starter self management opens the native owner navigation and removes it after scope revocation", async ({
+  page,
+}) => {
+  await mockStudio(page);
+  let scope: { owner: boolean; org_manager: boolean; managed_center_ids: string[] } | null = {
+    owner: true,
+    org_manager: false,
+    managed_center_ids: [center],
+  };
+  await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({ include_self_management_scope: true });
+    return route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: org,
+              name: "Fixture Studio",
+              state: "active",
+              access_mode: "normal",
+              version: 1,
+              self_context: { person_id: person, subscriber_number: null, centers: [] },
+              self_management_scope: scope,
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-18T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessOrganizationsList,
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: false,
+        error: { code: "PLAN_FEATURE_UNAVAILABLE", retryable: false, trace_id: org },
+      },
+    }),
+  );
+  await page.goto(`${origin}/login`);
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
+  const studio = page.locator("nav a[href$='/studio']");
+  await expect(studio).toBeVisible();
+  await expect(page.getByRole("button", { name: /Stüdyo sahibi/ })).toBeVisible();
+  scope = null;
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  await expect(studio).toHaveCount(0);
+});

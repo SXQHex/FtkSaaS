@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "../../test/server";
+import type { OrganizationView } from "../../lib/api-contracts/generated";
 const { native } = vi.hoisted(() => ({ native: { getSession: vi.fn() } }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
-import { readWorkspace } from "./workspace";
+import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
 const accountId = "019a7b00-0000-7000-8000-000000000001";
 const orgId = "019a7b00-0000-7000-8000-000000000002";
 const personId = "019a7b00-0000-7000-8000-000000000003";
@@ -11,6 +12,7 @@ const centerId = "019a7b00-0000-7000-8000-000000000004";
 let empty: boolean, multiple: boolean, scopeChanged: boolean;
 let selfRole: "instructor" | "student" | undefined;
 let roleReadError: string | undefined;
+let selfManagement: OrganizationView["self_management_scope"];
 const requests: { operation: string; bearer: string | null; body: Record<string, unknown> }[] = [];
 beforeEach(() => {
   empty = false;
@@ -18,6 +20,7 @@ beforeEach(() => {
   scopeChanged = false;
   selfRole = undefined;
   roleReadError = undefined;
+  selfManagement = undefined;
   requests.length = 0;
   vi.stubEnv("VITE_SUPABASE_URL", "https://backend.invalid");
   vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "public-test-key");
@@ -46,6 +49,9 @@ beforeEach(() => {
                     state: "active",
                     access_mode: "normal",
                     version: 1,
+                    ...(selfManagement !== undefined
+                      ? { self_management_scope: selfManagement }
+                      : {}),
                     self_context: {
                       person_id: personId,
                       subscriber_number: null,
@@ -186,6 +192,31 @@ it.each(["instructor", "student"] as const)(
     expect(result.roles).toEqual([]);
   },
 );
+it("requests native self management and keeps a Starter owner scope when F05 role rows are denied", async () => {
+  roleReadError = "PLAN_FEATURE_UNAVAILABLE";
+  selfManagement = { owner: true, org_manager: false, managed_center_ids: [centerId] };
+  const result = await readWorkspace(accountId, orgId);
+  expect(requests.find((row) => row.operation === "organizations_list_v1")?.body).toMatchObject({
+    include_self_management_scope: true,
+  });
+  expect(result.selected?.self_management_scope).toEqual(selfManagement);
+  expect(workspaceRoles(result, centerId)).toEqual(["owner", "center_manager"]);
+  expect(hasWorkspaceManagementScope(result, centerId)).toBe(true);
+  expect(hasWorkspaceManagementScope(result, personId)).toBe(false);
+  expect(result.roles).toEqual([]);
+});
+
+it("treats explicit null and center-specific scope as authoritative over old role rows", async () => {
+  selfManagement = null;
+  const revoked = await readWorkspace(accountId, orgId);
+  expect(revoked.roles.map((row) => row.role)).toEqual(["owner"]);
+  expect(workspaceRoles(revoked, centerId)).toEqual([]);
+
+  selfManagement = { owner: false, org_manager: false, managed_center_ids: [centerId] };
+  const scoped = await readWorkspace(accountId, orgId);
+  expect(workspaceRoles(scoped, centerId)).toEqual(["center_manager"]);
+  expect(workspaceRoles(scoped)).toEqual([]);
+});
 it("surfaces a management plan denial when there is no verified personal scope", async () => {
   roleReadError = "PLAN_FEATURE_UNAVAILABLE";
   await expect(readWorkspace(accountId, orgId)).rejects.toMatchObject({ code: roleReadError });

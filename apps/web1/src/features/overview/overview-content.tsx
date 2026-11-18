@@ -4,7 +4,7 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
-import { readWorkspace } from "../workspace/workspace";
+import { hasWorkspaceManagementScope, readWorkspace } from "../workspace/workspace";
 import { readOverviewDay, readOverviewLabels, readOverviewParticipants } from "./overview-read";
 import { useOverviewWork } from "./use-overview-work";
 import { OverviewView } from "./overview-view";
@@ -118,17 +118,7 @@ export function OverviewContent({
     };
   });
   const active = rows?.find((row) => row.id === selected?.session.id);
-  const canAdd = Boolean(
-    !workspace.isError &&
-    workspace.data?.roles.some(
-      (role) =>
-        role.state === "active" &&
-        role.person_id === workspace.data?.selected?.self_context?.person_id &&
-        (role.role === "owner" ||
-          role.role === "org_manager" ||
-          (role.role === "center_manager" && role.scope_center_id === scope.centerId)),
-    ),
-  );
+  const canAdd = !workspace.isError && hasWorkspaceManagementScope(workspace.data, scope.centerId);
   function session(tab: "participants" | "attendance" = "participants") {
     if (!active) return;
     void navigate({
