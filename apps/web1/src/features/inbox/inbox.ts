@@ -1,8 +1,36 @@
 import { z } from "zod";
+import { queryOptions } from "@tanstack/react-query";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { Page_NotificationView } from "../../lib/api-contracts/generated";
+export type InboxFilter = "all" | "unread" | "todo";
+export const inboxKey = (scope: ClientScope) =>
+  ["inbox", scope.accountId, scope.orgId, scope.centerId] as const;
+
+export function inboxListQuery(
+  scope: ClientScope,
+  query = "",
+  filter: InboxFilter = "all",
+  cursor?: string,
+  visited: (string | undefined)[] = [],
+) {
+  return queryOptions({
+    queryKey: [...inboxKey(scope), "list", query, filter, cursor],
+    queryFn: async () => {
+      const page = await readInbox(scope, filter === "unread", cursor, {
+        query,
+        workState: filter === "todo" ? "pending" : "all",
+      });
+      if (page.next_cursor && (page.next_cursor === cursor || visited.includes(page.next_cursor)))
+        throw new Error("INBOX_CURSOR_UNAVAILABLE");
+      return page;
+    },
+    retry: false,
+    staleTime: 15_000,
+    refetchOnWindowFocus: false,
+  });
+}
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,

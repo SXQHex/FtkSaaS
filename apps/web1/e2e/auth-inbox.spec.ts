@@ -120,14 +120,24 @@ async function fixture(
             (!r.unread_only || !n.read_at) &&
             (!r.query || n.payload.title.toLowerCase().includes(r.query.toLowerCase())),
         ),
-        summary: {
-          total: 90,
-          unread: 20,
-          pending: 10,
-          completed: 30,
-          informational: 40,
-          unavailable: 10,
-        },
+        summary:
+          mode === "participant"
+            ? {
+                total: 1,
+                unread: state.read ? 0 : 1,
+                pending: 0,
+                completed: 0,
+                informational: 1,
+                unavailable: 0,
+              }
+            : {
+                total: 90,
+                unread: 20,
+                pending: 10,
+                completed: 30,
+                informational: 40,
+                unavailable: 10,
+              },
         next_cursor: null,
         as_of: "2026-11-16T12:05:00Z",
       });
@@ -247,12 +257,24 @@ async function fixture(
   await expect(page).toHaveURL(`${origin}/account`);
   if (mode === "participant") {
     await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
-    await page.getByRole("link", { name: "Bildirimler", exact: true }).press("Enter");
+    const bell = page.getByRole("link", { name: "Bildirimler", exact: true });
+    await expect(bell).toHaveAccessibleDescription("1 okunmamış bildirim");
+    const initialReads = state.lists.length;
+    await page.evaluate("document.documentElement.dataset.inboxNavigationProbe='member'");
+    await bell.press("Enter");
     await expect(page).toHaveURL(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`);
+    await expect(page.getByRole("button", { name: changeTitle, exact: true })).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("data-inbox-navigation-probe", "member");
+    expect(state.lists).toHaveLength(initialReads);
   } else {
     await page.goto(`${origin}/inbox?org=${I.org}&center=${I.center}`);
   }
-  await expect(page.getByRole("heading", { name: "Gelen kutusu", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: mode === "participant" ? "Bildirimler" : "Gelen kutusu",
+      exact: true,
+    }),
+  ).toBeVisible();
   return state;
 }
 test("inbox shows native copy safely, enables native discovery, and restores mobile list focus", async ({
@@ -281,10 +303,9 @@ test("participant sees a native session change notice and retains its exact read
   await page.setViewportSize({ width: 320, height: 840 });
   const state = await fixture(page, "participant");
   await expect(page.getByRole("navigation", { name: "Üye menüsü", exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Bildirimler", exact: true })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+  const bell = page.getByRole("link", { name: "Bildirimler", exact: true });
+  await expect(bell).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("button", { name: changeTitle, exact: true })).toBeVisible();
   await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
   await page.getByRole("button", { name: changeTitle, exact: true }).click();
   await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
@@ -300,6 +321,10 @@ test("participant sees a native session change notice and retains its exact read
   });
   expect(state.lists.some((r) => r.unread_only === true)).toBe(true);
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeDisabled();
+  await expect(bell).toHaveAccessibleDescription("0 okunmamış bildirim");
+  await expect(bell.locator("..").locator('[data-slot="badge"]')).toHaveCount(0);
+  await page.getByRole("button", { name: "Bildirimler", exact: true }).click();
+  await expect(page.getByText("Bu kapsamda görünür ileti yok.", { exact: true })).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: changeTitle, exact: true }).click();
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeEnabled();

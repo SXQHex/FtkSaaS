@@ -8,8 +8,8 @@ import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
-import { InboxView, type InboxRow, type InboxFilter } from "./inbox-view";
-import { readInbox, readNotificationState } from "./inbox";
+import { InboxView, type InboxRow } from "./inbox-view";
+import { inboxKey, inboxListQuery, readNotificationState, type InboxFilter } from "./inbox";
 import {
   notificationSetIntent,
   setNotificationsRead,
@@ -52,21 +52,8 @@ export function InboxContent({
       mounted.current = false;
     };
   }, []);
-  const prefix = ["inbox", scope.accountId, scope.orgId, scope.centerId];
-  const list = useQuery({
-    queryKey: [...prefix, "list", query, filter, cursors[index]],
-    queryFn: async () => {
-      const page = await readInbox(scope, filter === "unread", cursors[index], {
-        query,
-        workState: filter === "todo" ? "pending" : "all",
-      });
-      if (page.next_cursor && cursors.includes(page.next_cursor))
-        throw new Error("INBOX_CURSOR_UNAVAILABLE");
-      return page;
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  const prefix = inboxKey(scope);
+  const list = useQuery(inboxListQuery(scope, query, filter, cursors[index], cursors));
   const [openedSource, setOpenedSource] = useState<string>();
   const sourceOperation = selected?.work?.selector?.operation;
   const canReadSource = Boolean(
@@ -209,6 +196,8 @@ export function InboxContent({
   }
   return (
     <InboxView
+      member={Boolean(memberPersonId)}
+      loading={list.isPending}
       rows={list.isError ? null : (list.data?.items.map(present) ?? null)}
       selected={!list.isError && selected ? present(selected) : null}
       filter={filter}

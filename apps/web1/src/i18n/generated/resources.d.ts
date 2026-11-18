@@ -1530,6 +1530,7 @@ export default interface Resources {
       "markRead": "Okundu yap",
       "markSelected": "Seçilenleri okundu yap",
       "markUnread": "Okunmadı yap",
+      "memberDescription": "Derslerin, rezervasyonların ve taleplerinle ilgili bildirimler.",
       "messages": "İletiler",
       "notification": "Bildirim",
       "ownScope": "Kendi kuruluş bildirimlerin",
@@ -1557,6 +1558,7 @@ export default interface Resources {
       "titleMissing": "Başlık paylaşılmıyor",
       "unknown": "Bilgi paylaşılmıyor",
       "unread": "Okunmamış",
+      "unreadCount": "{{count}} okunmamış bildirim" | "{{count}} okunmamış bildirim",
       "workStates": {
         "completed": "Tamamlandı",
         "informational": "Bilgilendirme",

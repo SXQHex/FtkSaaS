@@ -24,6 +24,8 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
+import type { InboxFilter } from "./inbox";
 export interface InboxRow {
   id: string;
   title: string;
@@ -35,8 +37,9 @@ export interface InboxRow {
   actionState?: string;
   context: { label: string; value: string }[];
 }
-export type InboxFilter = "all" | "unread" | "todo";
 export function InboxView({
+  member = false,
+  loading,
   rows,
   selected,
   filter,
@@ -62,6 +65,8 @@ export function InboxView({
   summary,
   onSearch,
 }: {
+  member?: boolean;
+  loading: boolean;
   rows: InboxRow[] | null;
   selected: InboxRow | null;
   filter: InboxFilter;
@@ -102,8 +107,12 @@ export function InboxView({
     <div className="flex min-w-0 flex-col gap-5">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">{t(($) => $.inbox.title)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t(($) => $.inbox.description)}</p>
+          <h1 className="text-2xl font-semibold">
+            {t(($) => (member ? $.workspace.notifications : $.inbox.title))}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t(($) => (member ? $.inbox.memberDescription : $.inbox.description))}
+          </p>
         </div>
         <Button variant="outline" isDisabled={locked || !canMarkAll} onPress={onMarkAll}>
           {t(($) => $.inbox.markSelected)}
@@ -177,64 +186,64 @@ export function InboxView({
             </div>
           </CardHeader>
           <CardContent>
-            {rows === null ? (
-              <p>{t(($) => $.inbox.loading)}</p>
-            ) : rows.length === 0 ? (
-              <Empty>
-                <EmptyDescription>{t(($) => $.inbox.empty)}</EmptyDescription>
-              </Empty>
-            ) : (
-              <ItemGroup>
-                {rows.map((row) => (
-                  <Item
-                    role="listitem"
-                    key={row.id}
-                    variant={selected?.id === row.id ? "muted" : "outline"}
-                    size="sm"
-                  >
-                    {onCheck && (
-                      <Checkbox
-                        aria-label={t(($) => $.inbox.selectMessage, { title: row.title })}
-                        isSelected={checked.includes(row.id)}
-                        isDisabled={locked}
-                        onChange={(value) => onCheck(row.id, value)}
-                      />
-                    )}
-                    <ItemContent className="min-w-0">
-                      <ItemTitle className="w-full">
-                        <Button
-                          ref={(node) => {
-                            if (node) buttons.current.set(row.id, node);
-                            else buttons.current.delete(row.id);
-                          }}
-                          variant="ghost"
-                          className="h-auto w-full min-w-0 justify-start px-0 text-start whitespace-normal"
+            {loading && <MemberReadSkeleton label={t(($) => $.inbox.loading)} />}
+            {rows &&
+              (rows.length === 0 ? (
+                <Empty>
+                  <EmptyDescription>{t(($) => $.inbox.empty)}</EmptyDescription>
+                </Empty>
+              ) : (
+                <ItemGroup>
+                  {rows.map((row) => (
+                    <Item
+                      role="listitem"
+                      key={row.id}
+                      variant={selected?.id === row.id ? "muted" : "outline"}
+                      size="sm"
+                    >
+                      {onCheck && (
+                        <Checkbox
+                          aria-label={t(($) => $.inbox.selectMessage, { title: row.title })}
+                          isSelected={checked.includes(row.id)}
                           isDisabled={locked}
-                          aria-controls="inbox-detail"
-                          aria-current={selected?.id === row.id ? true : undefined}
-                          onPress={() => onOpen(row.id)}
-                        >
-                          {row.title}
-                        </Button>
-                      </ItemTitle>
-                      <ItemDescription className="line-clamp-2 break-words" lang={row.language}>
-                        {row.body}
-                      </ItemDescription>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge variant="outline">{row.kind}</Badge>
-                        <Badge variant={row.read ? "secondary" : "default"}>
-                          {row.read ? t(($) => $.inbox.read) : t(($) => $.inbox.unread)}
-                        </Badge>
-                        {row.actionState && <Badge variant="outline">{row.actionState}</Badge>}
-                      </div>
-                    </ItemContent>
-                    <ItemActions className="max-w-full self-start text-xs text-muted-foreground tabular-nums">
-                      {row.created}
-                    </ItemActions>
-                  </Item>
-                ))}
-              </ItemGroup>
-            )}
+                          onChange={(value) => onCheck(row.id, value)}
+                        />
+                      )}
+                      <ItemContent className="min-w-0">
+                        <ItemTitle className="w-full">
+                          <Button
+                            ref={(node) => {
+                              if (node) buttons.current.set(row.id, node);
+                              else buttons.current.delete(row.id);
+                            }}
+                            variant="ghost"
+                            className="h-auto w-full min-w-0 justify-start px-0 text-start whitespace-normal"
+                            isDisabled={locked}
+                            aria-controls="inbox-detail"
+                            aria-current={selected?.id === row.id ? true : undefined}
+                            onPress={() => onOpen(row.id)}
+                          >
+                            {row.title}
+                          </Button>
+                        </ItemTitle>
+                        <ItemDescription className="line-clamp-2 break-words" lang={row.language}>
+                          {row.body}
+                        </ItemDescription>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Badge variant="outline">{row.kind}</Badge>
+                          <Badge variant={row.read ? "secondary" : "default"}>
+                            {row.read ? t(($) => $.inbox.read) : t(($) => $.inbox.unread)}
+                          </Badge>
+                          {row.actionState && <Badge variant="outline">{row.actionState}</Badge>}
+                        </div>
+                      </ItemContent>
+                      <ItemActions className="max-w-full self-start text-xs text-muted-foreground tabular-nums">
+                        {row.created}
+                      </ItemActions>
+                    </Item>
+                  ))}
+                </ItemGroup>
+              ))}
           </CardContent>
           <CardFooter className="flex-wrap justify-between gap-3">
             <span className="text-sm text-muted-foreground tabular-nums">
@@ -261,7 +270,7 @@ export function InboxView({
                     isDisabled={locked}
                     onPress={onBack}
                   >
-                    {t(($) => $.inbox.title)}
+                    {t(($) => (member ? $.workspace.notifications : $.inbox.title))}
                   </Button>
                   <CardTitle>
                     <h2

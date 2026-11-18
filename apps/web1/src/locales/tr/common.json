@@ -4025,6 +4025,9 @@
   "inbox": {
     "title": "Gelen kutusu",
     "description": "Üyelerden gelen mesajlar ve işlem gerektiren uyarılar.",
+    "memberDescription": "Derslerin, rezervasyonların ve taleplerinle ilgili bildirimler.",
+    "unreadCount_one": "{{count}} okunmamış bildirim",
+    "unreadCount_other": "{{count}} okunmamış bildirim",
     "markAll": "Tümünü okundu yap",
     "messages": "İletiler",
     "search": "İletilerde ara",

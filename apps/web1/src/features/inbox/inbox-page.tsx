@@ -49,7 +49,7 @@ function MemberInboxPage({
     <MemberLayout
       account={account}
       initial={initial}
-      title={t(($) => $.inbox.title)}
+      title={t(($) => $.workspace.notifications)}
       active="inbox"
       onScope={onScope}
     >
