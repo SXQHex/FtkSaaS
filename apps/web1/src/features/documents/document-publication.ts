@@ -225,9 +225,9 @@ export async function publicationIntent(
   before: PublicationPreview,
   reviewed: boolean,
 ): Promise<PublicationIntent> {
+  const request = publicationRequest(target);
   if (
-    JSON.stringify(publicationRequest(target)) !==
-      JSON.stringify(publicationRequest(before.target)) ||
+    JSON.stringify(request) !== JSON.stringify(publicationRequest(before.target)) ||
     !reviewed ||
     before.preview.blockers.length ||
     Date.parse(before.preview.expires_at) <= Date.now()
@@ -235,7 +235,9 @@ export async function publicationIntent(
     throw Error("DOCUMENT_REVIEW_REQUIRED");
   const backend = await scopedBackend(target.scope);
   const fresh = await backend.call("preview_get_v1", {
-    ...common(target.scope),
+    client_api_version: request.client_api_version,
+    org_id: request.org_id,
+    center_id: request.center_id,
     request_id: uuidv7(),
     preview_id: before.preview.id,
   });
@@ -250,7 +252,7 @@ export async function publicationIntent(
   return {
     scope: structuredClone(target.scope),
     request: {
-      ...publicationRequest(target),
+      ...request,
       operation_key: uuidv7(),
       impact_approval: {
         preview: { id: before.preview.id, token: before.preview.token },
