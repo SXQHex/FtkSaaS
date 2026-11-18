@@ -5,7 +5,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="web1-v67-backend"></a>
 ## Web1 v67 backend talepleri
 
-Kapsam `apps/web1/tasks/request.md` içindeki W1-BE-43–53 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-inbox) kalır.
+Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/e3fe37d7151dddc2deb4f20eee8bad3622b22ab0/apps/web1/tasks/request.md) W1-BE-43–57 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-inbox) kalır.
 
 | Talep | Backend kabul ölçütü |
 |---|---|
@@ -19,6 +19,10 @@ Kapsam `apps/web1/tasks/request.md` içindeki W1-BE-43–53 maddeleridir. Sıra 
 | W1-BE-51 | [WF10](../../../docs/workflows.md#wf10) kesin başarısız CSV işinin kayıtlı filtreleriyle yeniden başlatılması. İş sahibinin güncel export yetkisi, otomatik retry ayrımı ve aynı-key davranışı doğrulanmalı. |
 | W1-BE-52 | [WF10](../../../docs/workflows.md#wf10) CRM dönem kohortu, ara aşama ölçümü ve kaynak kırılımı. Geçmiş aşama kanıtı ve mevcut rapor/export kapsamı birlikte değerlendirilmeli. |
 | W1-BE-53 | [WF16](../../../docs/workflows.md#wf16) aday görünürlüğü, arama ve sorumlu filtresinde bütün aşamaları toplamalı. Teklif, kayıt ve katılım ayrı sayılmalı. |
+| W1-BE-54 | [WF09/WF16](../../../docs/workflows.md#wf09) mevcut başvuru incelemesinde sayfalama öncesi durum filtresi. Gerçek durumlar, merkezsiz kapsam, iletişim görünürlüğü ve cursor bağlanması doğrulanmalı. |
+| W1-BE-55 | [WF09](../../../docs/workflows.md#wf09) anonim başvuru veya doğrudan etkinlik kaydı ürün kararı. Yayın, kontenjan, belge/onay, ödeme, bot kontrolü ve aynı niyetin tekrar güvenliği doğrulanmalı. |
+| W1-BE-56 | [WF09](../../../docs/workflows.md#wf09) yönetilebilir yayın adresi ve toplu görünürlük için adres değiştirme, eski bağlantı, bağlı form ve kaynak yayın davranışı belirlenmeli. |
+| W1-BE-57 | [WF11](../../../docs/workflows.md#wf11) bildirim arşivi, silme ve geri alma için saklama ve görünürlük politikası belirlenmeli. Canlı alıcı, seçili sürümler, atomik tekrar ve kaynak iş durumu doğrulanmalı. |
 
 <a id="s18"></a>
 ## S18 — Statik SPA backend transportu

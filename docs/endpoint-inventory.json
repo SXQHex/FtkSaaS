@@ -1479,7 +1479,8 @@
       },
       "billing_class": "request",
       "limits": [
-        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending.",
+        "Optional student_note is a nonblank string of at most 1000 characters, accepted only on a request created for the live authenticated person."
       ]
     },
     {
@@ -6271,7 +6272,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "For view=earnings, include_session_context=true adds historical lesson closure context to the current self page. Event and unlinked earnings omit the field. Legacy closure label/duration may be null."
+      ]
     },
     {
       "name": "member_finance_currencies_get_v1",

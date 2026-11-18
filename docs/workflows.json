@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "31ca3b5da8bb7cd261da5781c73c7a114672fc13f2cfe767b10affcd7159816c",
-        "reason": "Reviewed one schema traversal, reusable collection and union validators, byte budget and standalone equivalence."
+        "fingerprint": "974e80d063b00ed7e349cc290e7e63c050d84e152c6e392b83f36f23329d1fea",
+        "reason": "Reviewed native regression evidence and canonical contract references for optional student notes and own earning history."
       }
     },
     {
@@ -969,7 +969,9 @@
         "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
         "apps/backend/database/notification-request-source-authority.sql",
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
-        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
+        "apps/backend/database/lesson-request-student-note.sql",
+        "apps/backend/supabase/migrations/20261118211500_lesson_request_student_note.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -984,8 +986,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "fbfe20a90c4eae033387e8e856b8dac43928da79f1f15e9d1f847347cd71c505",
-        "reason": "Reviewed final native inbox test cases and updated source hashes for exact API inventory."
+        "fingerprint": "b0a59a9dfd2d75ac65083f127ddbcb6032515ede34b35c1cfca5581657f1392f",
+        "reason": "Reviewed optional self-authored note, live reviewer visibility, closed validation, receipt identity and native regression coverage."
       }
     },
     {
@@ -1053,8 +1055,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "56c90b70ba10fa607c4287c13a2238bf04242952c1adb0235daada19d090c082",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "f13fccf09d382c571385c62e7d35bdff7b7d6a30458a8db3aa601938a74a48e6",
+        "reason": "Reviewed native regression evidence and canonical contract references for optional student notes and own earning history."
       }
     },
     {
@@ -1658,7 +1660,9 @@
         "apps/backend/database/instructor-all-period-ledger.sql",
         "apps/backend/supabase/migrations/20261116233014_instructor_all_period_ledger.sql",
         "apps/backend/database/instructor-finance-directory.sql",
-        "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql"
+        "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql",
+        "apps/backend/database/instructor-earning-session-context.sql",
+        "apps/backend/supabase/migrations/20261118211600_instructor_earning_session_context.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1673,8 +1677,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "dc26930301506709bab53414d3ea33e4b45aadd628ec642a1728b949ac28ebf9",
-        "reason": "Reviewed additive inbox acceptance and the source-bound API inventory for the changed native test files."
+        "fingerprint": "8d02681331cd35805a9626f52f1b5bed2f0dea4679e9e71f88ad18c0573da1d5",
+        "reason": "Reviewed frozen own lesson earning context, exact closure revision, unchanged live authorization and existing cursor semantics."
       }
     },
     {

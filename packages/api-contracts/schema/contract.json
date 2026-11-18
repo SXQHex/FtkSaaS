@@ -4705,6 +4705,9 @@
               "type": "null"
             }
           ]
+        },
+        "session_context": {
+          "$ref": "#/$defs/EarningSessionContext"
         }
       },
       "required": [
@@ -10815,6 +10818,9 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "student_note": {
+          "$ref": "#/$defs/LessonRequestStudentNote"
         }
       },
       "required": [
@@ -20887,6 +20893,16 @@
         },
         "discipline_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "student_note": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LessonRequestStudentNote"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -45140,6 +45156,9 @@
               "type": "null"
             }
           ]
+        },
+        "student_note": {
+          "$ref": "#/$defs/LessonRequestStudentNote"
         }
       },
       "required": [
@@ -62552,6 +62571,10 @@
         },
         "page": {
           "$ref": "#/$defs/InstructorAccountPageRequest"
+        },
+        "include_session_context": {
+          "type": "boolean",
+          "description": "Opt-in historical closure context for own earnings only."
         }
       },
       "required": [
@@ -65911,6 +65934,57 @@
         "operation",
         "key",
         "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "LessonRequestStudentNote": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "\\S"
+    },
+    "EarningSessionContext": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scheduled_duration_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "agreement_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attended_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "title",
+        "scheduled_duration_seconds",
+        "agreement_version",
+        "attended_count"
       ],
       "additionalProperties": false
     }
@@ -74098,7 +74172,8 @@
           "same_org_center_discipline",
           "required_feature_gates_separate_from_references",
           "effective_request_window",
-          "explicit_cm_policy_exception_with_audit_reason"
+          "explicit_cm_policy_exception_with_audit_reason",
+          "optional_student_note_self_authorship_before_receipt_replay"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -74154,7 +74229,8 @@
         "runtime_rpc": "api_v1.lesson_request_create_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+          "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending.",
+          "Optional student_note is a nonblank string of at most 1000 characters, accepted only on a request created for the live authenticated person."
         ]
       },
       {
@@ -95243,7 +95319,9 @@
         "runtime_external_path": "/functions/v1/backend-v1/instructor_account_get_v1",
         "runtime_rpc": "api_v1.instructor_account_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
-        "runtime_limits": []
+        "runtime_limits": [
+          "For view=earnings, include_session_context=true adds historical lesson closure context to the current self page. Event and unlinked earnings omit the field. Legacy closure label/duration may be null."
+        ]
       },
       {
         "name": "member_finance_currencies_get_v1",
@@ -113975,7 +114053,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 191,
+      "migration_count": 193,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

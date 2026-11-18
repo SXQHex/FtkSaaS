@@ -1053,7 +1053,13 @@ preferred_instructor_id?: (string | null)
 discipline_id: string
 window_exception?: boolean
 reason?: Text
+student_note?: LessonRequestStudentNote
 }
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LessonRequestStudentNote".
+ */
+export type LessonRequestStudentNote = string
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_lesson_request_offer_alternative".
@@ -5177,6 +5183,8 @@ DocumentDirectoryPage?: DocumentDirectoryPage
 Request_document_directory_get?: RequestDocumentDirectoryGet
 Success_document_directory_get?: SuccessDocumentDirectoryGet
 NotificationReservationSelector?: NotificationReservationSelector
+LessonRequestStudentNote?: LessonRequestStudentNote
+EarningSessionContext?: EarningSessionContext
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8407,6 +8415,7 @@ version: PositiveInt
 overpaid_minor?: Money
 payments?: P03PaymentView[]
 subscriber_number?: (SubscriberNumber | null)
+session_context?: EarningSessionContext
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8443,6 +8452,16 @@ amount_minor: Money
 occurred_at: Instant
 reason: Text
 method?: ("cash" | "bank_transfer" | "card_pos" | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EarningSessionContext".
+ */
+export interface EarningSessionContext {
+title: (string | null)
+scheduled_duration_seconds: (number | null)
+agreement_version: (PositiveInt | null)
+attended_count: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16268,6 +16287,7 @@ expires_at?: (Instant | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+student_note?: (LessonRequestStudentNote | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21542,6 +21562,7 @@ expires_at?: (Instant | null)
 discipline_id: string
 alternatives: LessonRequestAlternativeView[]
 subscriber_number?: (SubscriberNumber | null)
+student_note?: LessonRequestStudentNote
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30915,6 +30936,10 @@ interval?: Interval
 center_id: string
 view: ("agreements" | "payments" | "earnings")
 page: InstructorAccountPageRequest
+/**
+ * Opt-in historical closure context for own earnings only.
+ */
+include_session_context?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

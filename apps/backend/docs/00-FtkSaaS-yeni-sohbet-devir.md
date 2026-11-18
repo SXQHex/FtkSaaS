@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-lesson-and-earnings"></a>
+## Web1 v67 özel ders ve hakediş
+
+W1-BE-44/45, PR #340’ın yayımlanan `585a0932202bda10c438dc883d6d208acbbea373` kaynağı üzerine yerelde eklendi. İlk kontrol sırasında [full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/44365849672) yayımlanan head için çalışıyordu. Bu dilimin tüketim sözleşmeleri [WF06](../../../docs/workflows.md#wf06) ve [WF14](../../../docs/workflows.md#wf14) sahibindedir. PR #339’da yeni açılan maddeler [backend backlog’una](remaining-work.md#web1-v67-backend) işlendi.
+
+192–193. append migration’ları loopback native Supabase’te temiz uygulandı. Tek Node runner ve `--test-concurrency=1` ile 20/20 test geçti. Notlu/notsuz talep, canlı yetki, aynı-key uyuşmazlığı, makbuz bağlamında notun ayıklanması, hakediş düzeltmesi, kaynak adı ve atama değişikliği, öz/cursor kapsamı ve 4 MB Edge kabulü doğrulandı. Edge JSON yükü 3.952.357 bayt. Yerel stack kapatıldı. Bu dilimin push’u kullanıcı onayını bekler.
+
 <a id="web1-v67-inbox"></a>
 ## Web1 v67 gelen kutusu
 

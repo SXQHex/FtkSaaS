@@ -189,5 +189,7 @@
   "20261117232051_event_registration_document_discovery.sql": "589d5fe91d122ed50c61b68a791c1baf2cc6a6e593bed4703c76a43c389a5e6f",
   "20261118010101_reservation_debt_and_session_change_notice.sql": "1d4aa501818e2a1d286d4fc3608f4fa5470a92370466741331a1838c13bff5bc",
   "20261118110633_account_self_management_scope.sql": "0534664a75ce982f5779a4f9bd46c218c1d321756c704055b41dc249b9f19448",
-  "20261118205000_member_inbox_actions.sql": "ffcd440c2316e80801cfde2f1e19a44a7432625fc4ceeec0abb71abb13b77e8c"
+  "20261118205000_member_inbox_actions.sql": "ffcd440c2316e80801cfde2f1e19a44a7432625fc4ceeec0abb71abb13b77e8c",
+  "20261118211500_lesson_request_student_note.sql": "b57830725299c9df45b2affec3f90da3b73d4ff9167f1ad7cca3e0e5f3e9a3f0",
+  "20261118211600_instructor_earning_session_context.sql": "fb24c0ae229b80cf30cb16578f32355d8201556762b353eae2eed003f0f71306"
 }
