@@ -1,23 +1,23 @@
 # FtkSaaS · Frontend geliştirme ve kabul listesi
 
 **Sıradaki iş** · Güncel adım ve teslim sayısının sahibi [başlangıç ve devam kaydı](#başlangıç-ve-devam-kaydı); yerel doğrulamanın ayrıntısı [otomatik rapordadır](../test-reports/verification.md).
-**Aktif hedef** · Çalışan Pro kabulü.  
-**Sonraki teslimler** · Starter → Business; bu goal kapsamında başlatılmaz.  
+**Aktif hedef** · Pro sonrası kontroller ve Starter kabulü, başlangıçtaki 1309. satıra kadar.<br>
+**Sonraki teslim** · Business.<br>
 **Çalışma alanı** · `apps/web1`, kendi npm kurulumu, testleri ve yayın süreci olan bağımsız uygulamadır. Üç plan aynı uygulamayı ve ortak backend sözleşmelerini kullanır.
 
 [Ön tarama](#on-tarama) · [Sayfa kabulü](#sayfa-kabulu) · [Başlangıç](#baslangic) · [Pro](#pro) · [Pro kabulü](#pro-kabulu) · [Starter](#starter) · [Business](#business) · [Kaynaklar](#kaynaklar) · [Backend talepleri](request.md)
 
 ## /goal yürütme talimatı
 
-Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantıları ve otomatik kabulüyle teslim etmektir. **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, neden CI ile yapılamadığı belirtilerek [Pro teslim sonrası gerçek kontroller](#pro-teslim-sonrası-gerçek-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Sentetik test gerçek sağlayıcı kabulü diye sunulmaz; gerekiyorsa mevcut native backend CI kanıtı kullanılır. Starter ve Business sonraki teslimlerin takip kayıtlarıdır; aktif goal bunları otomatik başlatmaz. Business ekranları daha sonra eklenecektir; şimdi çizim veya yeni ekran kompozisyonu üretme. Çalışmayı GPT-Sol 6.1 Medium ile, bu dosyadan iş seçerek sürdür. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
+Bu çalışmanın hedefi Pro ekranlarının kalan kabul kontrollerini ve Starter bölümünü yayımlanmış API sözleşmesiyle tamamlamaktır. **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#pro-teslim-sonrası-gerçek-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım            | Plan | İşlev              | Durum                               | Sonraki eylem                                                                              |
-| --------------------- | ---- | ------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------ |
-| **G-PRO-05 (kapalı)** | Pro  | Çalışan Pro kabulü | P01–P17 kapalı · 46/46 ekran kapalı | 18 Kasım 2026 · [Kabul](#pro-kabulu) ve [otomatik rapor](../test-reports/verification.md). |
+| Aktif adım               | Plan          | İşlev                 | Durum                                    | Sonraki eylem                                                                                                    |
+| ------------------------ | ------------- | --------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **G-PRO-04.4 / Starter** | Pro / Starter | Kalan kabul ölçütleri | G-PRO-05 kapalı · Starter kabulü sürüyor | [Pro kontrolü](#pro-kabulu), [Starter](#starter) ve [seçili test raporu](../test-reports/local-verification.md). |
 
-Git devamı: PR326 main’de. Yeni kabul dalı `feat/web1-pro-acceptance` güncel main `d48dc4d17abed6f6cc686639a4d763e0979937d2` tabanında. [Backend desteği ve güncel CI kanıtı](request.md).
+Git devamı: PR331 ve PR332 main’de. Starter kabul dalı `feat/web1-starter-acceptance`, main `05b3951c66063eeb72a7f84e8d580e8d0b4743b2` tabanında. [Backend desteği ve güncel CI kanıtı](request.md).
 
 Kullanıcı gerekli soruların açık WhatsApp uygulamasındaki kendine mesaj sohbetine gönderilmesini ve yanıtların oradan okunmasını istedi; yalnız bu görev soruları/teyitleri o kanaldan gönderilir. Son yeniden denemede WhatsApp `cgWindowNotFound`, başka uygulama penceresi seçimi timeout verdi; pencere yeniden erişilebilir olduğunda yanıt kontrol edilir. E02 erteleme cevabı bu hata öncesinde okundu ve teyit edildi.
 
@@ -84,7 +84,7 @@ Teslim sayısı yerel ekran kabulünü gösterir; Pro teslim sonrası gerçek ko
 
 Her işaretli madde ilgili kaynak/PR veya test koşusuna, ortamına ve gözlenen sonuca bağlanır. Görsel adımın tamamlanması ve gerçek entegrasyon kabulü kendi kutularında kaydedilir. Yerel paralel doğrulama ve tam Pro kabul komutlarının sahibi [başlangıç ve devam kuralıdır](#başlangıç-ve-devam-kaydı). Komutları `apps/web1` içinde çalıştır. Ortak izolasyon kurallarını koru. Yeni gerçek veri yazısı üretmek yerine tekrarlanabilir kabulü yerel zincirde çalıştır; yalnız CI ile yapılamayan kontrolleri yukarıdaki kabul ve erteleme kuralıyla teslim sonrası listesine bağla.
 
-Aktif goal, E01–E46 kapsamındaki Pro ekranlarının uygulanabilir alt işleri, P01–P17 ve G-PRO-01–G-PRO-05 kabul kanıtları tamamlandığında biter. G-PRO-05 sonrasında sonucu kaydet ve teslim et; Starter/Business geliştirmesine kendiliğinden geçme. Dış engel nedeniyle bitmiyorsa açık maddelerin kimliğini, yapılan işi ve devam için eksik girdiyi son kayıtta bırak. Her turun sonunda yeni genel prompt beklemek yerine bu dosyadaki devam kaydını esas al.
+Aktif goal, G-PRO-04.4, Pro sonrası gerçek kontroller ve S01–S05/G-STARTER ölçütleri kanıtıyla kapandığında biter. Dış engel nedeniyle bitmiyorsa açık maddelerin kimliğini, yapılan işi ve devam için eksik girdiyi bu kayıtta bırak. Her turun sonunda bu dosyadaki devam kaydını esas al.
 
 <a id="wcag-22-aa-kabulu"></a>
 
@@ -1226,7 +1226,7 @@ G-PRO-01 kabulü: `auth-pro-chain.spec.ts` aynı Pro merkezinin kurulum kaynakla
 - [x] **G-PRO-04.2** · Yayına aday statik build’i tarayıcıda aç. Doğrudan URL ve sayfa yenileme çalışmalı. Temel akışları mobil görünümde, klavyeyle ve erişilebilirlik taramasıyla doğrula. Takvimde saat ve tarih seçilen bağlama uymalı.
       Aynı `dist/index.html` çıktısı açık/koyu giriş, korumalı adrese doğrudan erişim ve yenileme ile 320 CSS pikselde klavye ve merkez takvimini geçti. İstanbul takviminde 13.00 UTC, yerelde 16.00 ve doğru gün aralığında göründü. Loopback Auth/Edge fixture’lı üretim build’i. HTML SHA-256 `ca2f4b188f4d9348bfe72ce86338e7f54bb79ec1e7e7a3c33f3182927aa4b3f0`. [Playwright kanıtı](../playwright-report/index.html).
 - [x] **G-PRO-04.3** · Yayımlı Web1 giriş/kayıt ve korumalı URL’lerini otomatik tara. SPA geçişi, yenileme, klavye odağı, mobil reflow ve Axe yerel Chromium’da geçti. [Harici test](../e2e-external/hosted.spec.ts) · [Otomatik rapor](../test-reports/external-playwright.json).
-- [ ] **G-PRO-04.4** · Ölçülebilir Axe inceleme adaylarını ilgili ekranın Playwright testinde çöz. CI raporu güncel tarayıcı kontrolü adaylarını otomatik listeler. Tablo başlık/hücre ilişkileri, tıklama hedefi geometrisi ve doğrulanabilir ARIA ilişkileri için ilgili ekranlarda ek assertion gerekebilir. [Axe raporu](../test-reports/verification.md).
+- [ ] **G-PRO-04.4** · Ölçülebilir Axe inceleme adaylarını ilgili ekranın Playwright testinde çöz. Yardım grubu, form hata referansları, masaüstü menü hedefi ve paket tablosunun boş/dolu durumları için tarayıcı assertion’ları eklendi. Kalan adayların güncel koşudaki ekran bazlı incelemesi açık. [Axe raporu](../test-reports/verification.md).
 - [x] **G-PRO-05** · P01–P17 ile yukarıdaki Pro senaryolarının açıklarını kontrol et. Yayımlanmış backend sözleşmesinin sürümünü, yerel otomatik raporu, frontend build’ini ve teslim tarihini bu maddeye ekle. Teslim sonrası gerçek kontrol listesinin açıkları görünür kalır ve gerçek kabul kazanılmış sayılmaz. İnsan değerlendirmesi ayrıca varsa kaydedilir; verilmiş sayılmaz.
       18 Kasım 2026, 06.07 TSİ. P01–P17 ve teslim tarihindeki G-PRO-01–04.2 kabul edildi. [Yayımlanmış backend sözleşmesi](../src/lib/api-contracts/manifest.json) main `d48dc4d17abed6f6cc686639a4d763e0979937d2` kaynaklı. [Tam yerel rapor](../test-reports/verification.md), statik build kanıtı G-PRO-04.2 ve [aday PR331](https://github.com/SXQHex/FtkSaaS/pull/331). İnsan ve cihaz kontrolleri aşağıdaki Pro sonrası listede açık.
 
@@ -1234,7 +1234,7 @@ G-PRO-01 kabulü: `auth-pro-chain.spec.ts` aynı Pro merkezinin kurulum kaynakla
 
 Bu liste yalnız [/goal kabul ve erteleme kuralındaki](#goal-yürütme-talimatı) CI ile yapılamayan kontrolleri taşır. Her kayıtta CI ile yapılamama gerekçesi bulunur. Önceki kanıtlar korunur; ACK almış yazılar tekrar oynatılmaz.
 
-- [ ] **POST-PRO.AUTH** · Gerçek Google hesabında rıza veya ayrı cihaz doğrulaması ve canlı Turnstile challenge ile gerçek sağlayıcı kabulü. Otomasyon, kullanıcı onayı veya canlı challenge için yeterli kanıt üretemez. VoiceOver kullanıcı kararıyla atlanır.
+- [x] **POST-PRO.AUTH** · Gerçek sağlayıcı kabulü. 14 Kasım’da kullanıcı Google giriş/doğrulama/onayını tamamladı ve Web1 development hesabı yenileme sonrası okundu (E01 ve P01.3). 13 Kasım’da kullanıcı onayıyla normal Chrome’da canlı Turnstile `public_application`, gerçek Siteverify ve Starter inbox sonucu doğrulandı. [G01 canlı sağlayıcı kanıtı](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kısıt-kabulü--backend-kabulü-tamamlandı).
 - [ ] **POST-PRO.CHAIN** · Kullanıcının kendi cihazında, kullandığı takvim istemcisinde ICS aboneliğini ekle ve arka plan yenilemesini gözle. Bu kontrol, gerçek istemciye erişim ve kullanıcının abonelik onayını gerektirir.
 - [ ] **POST-PRO.HOSTED** · Yardımcı teknolojiyle gerçek kullanım, erişilebilir adın anlamlılığı ve karmaşık görsel arka planlarda programatik olarak çözülemeyen kontrast gibi somut erişilebilirlik bulgularını insanla değerlendir.
 
@@ -1244,7 +1244,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 
 ## Starter
 
-Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlangıç koşulu **G-PRO-05** ve Starter tesliminin başlatılmasıdır. Aynı uygulamadaki ortak akışları Starter hesabıyla çalıştır, planın getirdiği farkları aşağıdaki senaryolarla doğrula.
+18 Kasım kapsam kararıyla Starter kabulü başladı. G-PRO-05 kapalı. Ortak akışlar ve plan farkları Web1 tarayıcısı, native backend CI ve gerekli gerçek ortam kanıtıyla doğrulanır. [Native Starter kaynak ve koşu kaydı](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kısıt-kabulü--backend-kabulü-tamamlandı).
 
 ### S01 · Starter kaynak ve öğrenci limitleri
 
@@ -1252,9 +1252,9 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | G-PRO-05 | F01, F08, F32 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04) | Starter yetkilisi ve limit sınırındaki test organizasyonu |
 
-- [ ] **S01.1** · Tek aktif merkez, oda, disiplin ve eğitmenle kurulum yap. Her türde ikinci aktif kaynak girişimi reddedilir, ilk kayıt kullanılabilir kalır.
-- [ ] **S01.2** · Aynı mantıksal odada çakışan iki seans dene. İkinci seans reddedilir, oda kapasitesi ve seans kontenjanı ayrı görünür.
-- [ ] **S01.3** · 99 aktif öğrenciden 100’e geçişi dene. Son yer için eşzamanlı etkinleştirmede en fazla 100 aktif öğrenci kalır, sonraki etkinleştirme reddedilir.
+- [x] **S01.1** · Native testlerde tek aktif merkez, oda, disiplin ve eğitmen kuruldu. İkinci aktif kaynak ve yarış retleri G01’de doğrulandı. Web1 Starter tarayıcısı 1/1 salonu gösterdi, ikinci salon reddedilince ilk salonu kullanılabilir tuttu. Development kotası 1/1/1/1 olarak okundu. [G01 kaynak ve koşu kaydı](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kısıt-kabulü--backend-kabulü-tamamlandı) · [Web1 tarayıcı testi](../e2e/auth-pro-chain.spec.ts).
+- [x] **S01.2** · Aynı mantıksal odadaki çakışma `RESOURCE_CONFLICT` ile reddedildi. Native Starter’da oda kapasitesi 50, ayrı seans kontenjanları 40 ve 5 olarak okundu. Web1’in seans kapasite görünümü E18 kabulünde. [Native kaynak](../../backend/tests/starter-studio-acceptance.mjs#L60).
+- [x] **S01.3** · 99 aktif öğrenciden son yer için eşzamanlı iki etkinleştirme tek başarı ve tek `PLAN_LIMIT_REACHED` üretti. Son okuma 100 aktif öğrenci, ayrı geçiş testinde 101. öğrenci reddedildi. [Native kaynak](../../backend/tests/starter-plan-gates-acceptance.mjs#L87) · [G01 CI](https://github.com/SXQHex/FtkSaaS/actions/runs/43428246986).
 
 ### S02 · Starter stüdyoda bir ders günü
 
@@ -1263,8 +1263,8 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 | S01     | F09, F10, F11, F13, F14, F15, F16, F19 · [WF03](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf03), [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF05](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf05), [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06), [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08) | Aynı öğrenci ve seans üzerinden son okumalar |
 
 - [ ] **S02.1** · Tek disiplinli sabit programı ve özel ders talebini tamamla. Programdaki bütün dersler doğru oda, disiplin ve eğitmene bağlıdır.
-- [ ] **S02.2** · Ders sayılı ve süreli/sınırsız paketleri ilgili disiplinle göster. Paket adı disiplinle başlar, satıştan sonra hak ve borç doğru okunur.
-- [ ] **S02.3** · Borçlu öğrencide varsayılan rezervasyon ve katılım engellerini dene. Borç kapandıktan sonra geçerli hakkıyla rezervasyon yapabilir.
+- [x] **S02.2** · Native Starter kataloğu ve satış testinde disiplin ön ekli ders sayılı, süreli kotalı ve süreli sınırsız ürünler doğrulandı. Web1 ürün ekranı süreli ürünün disiplin kapsamını yayımlayıp yeniden okudu. Starter zinciri disiplin ön ekli 8 derslik ürünün satışından sonra hak ve borcu okudu. [Native paket testi](../../backend/tests/starter-studio-acceptance.mjs#L111) · [Web1 paket testi](../e2e/auth-products.spec.ts).
+- [x] **S02.3** · Starter varsayılanlarında borç rezervasyon ve katılım engelleri açık. Native testte borçlu self rezervasyonu `DEBT_BOOKING_BLOCKED` ile reddedildi, tahsilattan sonra aynı satışla kabul edildi. Katılım politikası native yoklamada sınandı. Web1 Starter tarayıcısı ret sonrası 8 hakkı korudu ve tahsilattan sonra aynı satıştan rezervasyon yaptı. [Native rezervasyon](../../backend/tests/starter-studio-acceptance.mjs#L101) · [Native yoklama](../../backend/tests/starter-attendance-protection.test.mjs#L188) · [Web1 tarayıcı testi](../e2e/auth-pro-chain.spec.ts).
 - [ ] **S02.4** · Ücret anlaşması bulunmadan yetkili eğitmen yoklamayı kapatır. Hak sözleşmeye göre tüketilir, hakediş oluşmaz. Tahsilat ve kalan borç temel raporla uyuşur.
 
 ### S03 · Starter öğrenci, aday ve destek akışları
@@ -1274,10 +1274,10 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 | S01 · ders günü verisi için S02 | F06, F21, F25, F26, F28, F30, F31 · [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF10](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf10), [WF11](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf11), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | Starter öğrenci, eğitmen, yönetici ve public ziyaretçi |
 
 - [ ] **S03.1** · Öğrenci kendi rezervasyonunu oluşturur veya iptal eder. Eğitmen günlük panelden aynı seansı açabilir.
-- [ ] **S03.2** · Public ders başvurusunu al ve dar kapsamlı başvuru değerlendirmesini tamamla. Başvuru kendiliğinden hesap, satış, rezervasyon veya pazarlama izni oluşturmaz.
-- [ ] **S03.3** · Elle aday, not ve tekrar arama tarihi gir. Takip tarihini güncelle ve kişinin geçmişinden doğrula.
+- [x] **S03.2** · Web1 ortak formu ve başvuru incelemesi E33/E35’te doğrulandı. Gerçek Starter2 yayınına canlı Turnstile ile başvuru geldi. Replay tek inbox satırını ve `person_id=null` değerini korudu, yetkili değerlendirme kaydı kapattı. Hesap, satış ve rezervasyon yalnız sonraki açık işlemlerle oluşur, pazarlama seçimi bu akışta yok. [G01 canlı kanıtı](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kısıt-kabulü--backend-kabulü-tamamlandı).
+- [x] **S03.3** · Elle aday, not ve takip tarihi P12.1/E33 akışında doğrulandı. Web1 tarih güncellemesinde aynı sürümlü faaliyeti yeniden okudu. Native Starter G01 aynı kişi ve merkezde temel aday/not/takip zincirini doğruladı. [Web1 tarayıcı testi](../e2e/auth-leads.spec.ts) · [G01 kaynak ve koşu kaydı](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kısıt-kabulü--backend-kabulü-tamamlandı).
 - [ ] **S03.4** · İşlemsel bildirimi uygulama içinde oku ve gerekiyorsa sürümlü belgeyi açıkça onayla. Onay yalnız doğru kişinin ilgili işlemine yazılır.
-- [ ] **S03.5** · Temel raporu satış/tahsilatla karşılaştır. İzinli öğrenci/hak/borç dosyasını içe aktar ve sonuçları kaynak kayıtlardan doğrula.
+- [x] **S03.5** · Web1 Starter zincirinde satış ve tahsilat raporu aynı ürün ve kişiyle eşleşti. Öğrenci CSV tarayıcı senaryosu açılış hakkı ve borcu map edip tek işte uyguladı. Native Starter testi aynı içe aktarımı, açılış hakkını, tahsilatı ve kalan borcu kaynak okumalara bağladı. [Web1 rapor ve içe aktarım testi](../e2e/auth-reports-native.spec.ts) · [Native Starter işlemleri](../../backend/tests/starter-operations-acceptance.mjs#L109).
 
 ### S04 · Starter üst plan erişim retleri
 
@@ -1296,12 +1296,12 @@ Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlang
 | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | P17, S01 | F03, F17, F32, F33 · [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13) | Dönem sınırından önce ve sonra aynı kayıtların karşılaştırması |
 
-- [ ] **S05.1** · Çok kaynaklı Pro organizasyonunu Starter’a daraltırken kullanılacak kaynakları seç. Geçişin etkili tarihi ve seçilen kaynaklar güncel okumada görünür.
+- [x] **S05.1** · Web1 plan incelemesi etkili tarihi merkez saat diliminde ve seçili salon/disiplin/eğitmeni gösterdi. Yazıdan sonraki `subscription_get_v1` aynı kapsamı doğrulamadan güncel kayıt bildirimi oluşmadı. Native sınır testi çok kaynaklı organizasyonda aynı seçimi okudu. [Web1 tarayıcı testi](../e2e/auth-settings-native.spec.ts) · [Native kaynak](../../backend/tests/starter-plan-gates-acceptance.mjs#L170).
 - [ ] **S05.2** · Geçiş sonrası kapalı kaynakta yeni işlemi dene. Eski hak, borç, yoklama ve kesin rezervasyonlar sözleşmedeki korumayı sürdürür.
 
 ### Starter kabulü
 
-- [ ] **G-STARTER.1** · Starter hesabıyla kayıtlı bir öğrenciye paket sat, manuel tahsilat al, rezervasyon yap ve yoklamayı kapat. Gerçek ortamda hak tüketilir, doğru bakiye görünür, eğitmen hakedişi üretilmez.
+- [ ] **G-STARTER.1** · Starter hesabıyla kayıtlı bir öğrenciye paket sat, manuel tahsilat al, rezervasyon yap ve yoklamayı kapat. Web1 tarayıcı fixture’ında 8 → 7 hak, borç 0 ve hakediş reddi geçti. Gerçek development okumaları aktif Starter, 1/1 merkez, oda/disiplin/eğitmen kotası 1, öğrenci kotası 100 ve hakediş reddini doğruladı. Gerçek ortamda aynı kayıt zincirinin yazı kabulü açık. [Web1 tarayıcı testi](../e2e/auth-pro-chain.spec.ts) · [Güvenli development özeti](../.tmp/starter-development-readback.json).
 - [ ] **G-STARTER.2** · S01–S05 kanıtlarını Starter kaynağına bağla. Özellikle 100 aktif öğrenci, her kaynak türünden bir tane, kapalı özelliklerin reddi ve plan geçişi ayrı ayrı izlenebilir olmalı.
 - [ ] **G-STARTER** · Ortak Pro akışlarının etkilenen regresyonlarını ve Starter build/ortam kaydını doğrula. Ölçütlerin sağlandığı tarihi kaydet; ayrıca verilmiş insan değerlendirmesi varsa ilişkilendir.
 

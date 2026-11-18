@@ -6,6 +6,7 @@ import type {
   ProductView,
   SalePreview,
   InstructorFinanceEarning,
+  SubscriptionView,
 } from "../src/lib/api-contracts/generated.js";
 import { mockSessionDetail, sessionIds as S } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -24,10 +25,11 @@ export const chainIds = {
 /** One synthetic native boundary, shared by every page; no reset between chain steps.
  * Native ledger/race guarantees are separately bound to the accepted backend CI tree.
  */
-export async function mockProChain(page: Page) {
+export async function mockStudioChain(page: Page, plan: "pro" | "starter") {
   const f = await mockSessionDetail(page);
   const { studio, session, attendance } = f;
   studio.roles[0]!.accountAccessGranted = true;
+  if (plan === "starter") studio.agreements.length = 0;
   const C = chainIds;
   const person: PersonView = {
     id: I.self,
@@ -48,7 +50,7 @@ export async function mockProChain(page: Page) {
     id: C.product,
     version_id: C.version,
     terms: {
-      name: "Zincir 8 ders",
+      name: plan === "starter" ? "Tango · Zincir 8 ders" : "Zincir 8 ders",
       kind: "credits",
       booking_mode: "flexible",
       credits: 8,
@@ -96,46 +98,50 @@ export async function mockProChain(page: Page) {
         ]
       : [];
   const debt = () => (sold && !cash ? "100000" : "0");
-  const agreement = () => studio.agreements.at(-1)!;
-  const earning = (): InstructorFinanceEarning | undefined =>
-    attendance.closure_state === "closed"
-      ? {
-          kind: "earning",
-          display_name: "Örnek Eğitmen",
-          session_name: "Sentetik seans",
-          agreement_id: agreement().id,
-          agreement_version: agreement().version,
-          earning: {
-            id: C.earning,
-            person_id: I.instructor,
-            center_id: I.center,
-            session_id: S.session,
-            event_assignment_id: null,
-            amount_minor: agreement().terms.components[0]!.amount_minor!,
-            currency: "TRY",
-            paid_minor: "0",
-            remaining_minor: agreement().terms.components[0]!.amount_minor!,
-            overpaid_minor: "0",
-            previous_id: null,
-            closure_id: null,
-            direction: "add",
-            created_at: new Date().toISOString(),
-            version: 1,
-            basis: {
-              source: "lesson_agreement",
-              currency: "TRY",
-              quantity: 1,
-              excluded_blocked: 0,
-              agreement_id: agreement().id,
-            },
-          },
-        }
-      : undefined;
+  const earning = (): InstructorFinanceEarning | undefined => {
+    const agreement = studio.agreements.at(-1);
+    if (!agreement || attendance.closure_state !== "closed") return;
+    return {
+      kind: "earning",
+      display_name: "Örnek Eğitmen",
+      session_name: "Sentetik seans",
+      agreement_id: agreement.id,
+      agreement_version: agreement.version,
+      earning: {
+        id: C.earning,
+        person_id: I.instructor,
+        center_id: I.center,
+        session_id: S.session,
+        event_assignment_id: null,
+        amount_minor: agreement.terms.components[0]!.amount_minor!,
+        currency: "TRY",
+        paid_minor: "0",
+        remaining_minor: agreement.terms.components[0]!.amount_minor!,
+        overpaid_minor: "0",
+        previous_id: null,
+        closure_id: null,
+        direction: "add",
+        created_at: new Date().toISOString(),
+        version: 1,
+        basis: {
+          source: "lesson_agreement",
+          currency: "TRY",
+          quantity: 1,
+          excluded_blocked: 0,
+          agreement_id: agreement.id,
+        },
+      },
+    };
+  };
 
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!;
     const r = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    const reject = (
+      code: "PLAN_FEATURE_UNAVAILABLE" | "PLAN_LIMIT_REACHED" | "DEBT_BOOKING_BLOCKED",
+    ) =>
+      route.fulfill({ json: { ok: false, error: { code, retryable: false, trace_id: I.role } } });
     const list = (items: unknown[]) => ({
       items,
       next_cursor: null,
@@ -145,6 +151,28 @@ export async function mockProChain(page: Page) {
     if (r.org_id) expect(r.org_id).toBe(I.org);
     if (r.center_id) expect(r.center_id).toBe(I.center);
     reads.push({ op, request: r });
+    if (plan === "starter" && op === "subscription_get_v1")
+      return send({
+        state: "active",
+        plan,
+        period_start: "2026-11-01T00:00:00Z",
+        period_end: "2026-12-01T00:00:00Z",
+        grace_until: null,
+        cancel_at_period_end: false,
+        pending_change: null,
+        limits: { entries: [{ key: "rooms", value: 1 }] },
+        usage: { entries: [{ key: "rooms", value: studio.rooms.length }] },
+      } satisfies SubscriptionView);
+    if (plan === "starter" && op === "instructor_finance_directory_get_v1")
+      return reject("PLAN_FEATURE_UNAVAILABLE");
+    if (
+      plan === "starter" &&
+      op === "room_save_v1" &&
+      !r.room_id &&
+      r.state === "active" &&
+      studio.rooms.some((room) => room.active)
+    )
+      return reject("PLAN_LIMIT_REACHED");
     if (
       [
         "person_create_v1",
@@ -195,8 +223,12 @@ export async function mockProChain(page: Page) {
           capacity: { total: 12 },
         },
       });
-      expect(agreement().person_id).toBe(I.instructor);
-      expect(agreement().format).toBe(session.format);
+      if (plan === "pro") {
+        expect(studio.agreements.at(-1)).toMatchObject({
+          person_id: I.instructor,
+          format: session.format,
+        });
+      }
       programPreview = r;
       return send({
         id: C.preview,
@@ -371,8 +403,10 @@ export async function mockProChain(page: Page) {
       return ack(C.cash);
     }
     if (op === "reservation_create_v1") {
-      expect(sold && programmed && !!cash).toBe(true);
+      expect(sold && programmed).toBe(true);
       expect(r).toMatchObject({ person_id: I.self, session_id: S.session, source_sale_id: S.sale });
+      if (plan === "starter" && !cash) return reject("DEBT_BOOKING_BLOCKED");
+      expect(cash).toBeDefined();
     }
     if (op === "attendance_close_v1") {
       expect(f.reservation?.person_id).toBe(person.id);
@@ -381,6 +415,7 @@ export async function mockProChain(page: Page) {
     }
     if (op === "instructor_finance_directory_get_v1") {
       const e = earning();
+      const agreement = studio.agreements.at(-1)!;
       const amount = e?.earning.amount_minor ?? "0";
       const totals = [
         {
@@ -401,8 +436,8 @@ export async function mockProChain(page: Page) {
                   person_id: I.instructor,
                   display_name: "Örnek Eğitmen",
                   totals,
-                  agreement_ids: [agreement().id],
-                  current_agreement_ids: [agreement().id],
+                  agreement_ids: [agreement.id],
+                  current_agreement_ids: [agreement.id],
                 },
               ]
             : r.view === "earnings" && e
@@ -462,7 +497,7 @@ export async function mockProChain(page: Page) {
             amount_minor: cash.amount_minor,
           },
         ];
-      if (r.report === "instructor_balances")
+      if (r.report === "instructor_balances" && plan === "pro")
         rows = [
           "earning_accrual",
           "instructor_remaining",

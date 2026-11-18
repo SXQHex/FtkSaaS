@@ -1,36 +1,87 @@
+import type { Page } from "@playwright/test";
 import { test, expect } from "./test.js";
 import { origin } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { sessionIds as S } from "./session-detail-fixture.js";
-import { mockProChain, chainIds as C } from "./pro-chain-fixture.js";
+import { mockStudioChain, chainIds as C } from "./pro-chain-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 test("Pro same-record journey reconciles setup, person, agreement, program, sale, collection, reservation, attendance and earnings reports", async ({
   page,
 }) => {
+  await runStudioChain(page, "pro");
+});
+
+test("Starter same-record journey collects debt and consumes the right without an agreement or earnings", async ({
+  page,
+}) => {
+  await runStudioChain(page, "starter");
+});
+
+async function runStudioChain(page: Page, plan: "pro" | "starter") {
+  const starter = plan === "starter";
   test.setTimeout(120_000);
   await page.clock.setFixedTime(new Date("2026-11-17T08:00:00Z"));
-  const f = await mockProChain(page);
+  const f = await mockStudioChain(page, plan);
   const base = `${origin}/o/${I.org}/c/${I.center}`;
-  await test.step("publish the actual instructor agreement in the same center", async () => {
-    await page.goto(`${base}/studio`);
-    await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
-    await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+  async function bookStudent() {
+    await page.goto(`${base}/sessions/${S.session}`);
+    await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
     const panel = page.getByRole("dialog");
-    await panel.getByLabel("Tutar (en küçük para birimi)", { exact: true }).fill("17500");
-    await panel.locator("#agreement-from").fill("2026-11-17T11:30");
-    await panel.locator("#agreement-until").fill("2027-01-01T09:00");
-    await panel.locator("#agreement-reason").fill("Sentetik Pro zinciri anlaşması");
-    await panel.getByRole("checkbox").press("Space");
-    await panel.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
-    await expect(panel).toHaveCount(0);
-    expect(f.studio.agreements.at(-1)).toMatchObject({
-      person_id: I.instructor,
-      supersedes_id: I.agreement,
-      version: 2,
-      terms: { components: [{ kind: "session_fixed", amount_minor: "17500" }] },
+    await panel.getByRole("button", { name: "Ara", exact: true }).click();
+    await panel.getByLabel("Üye", { exact: true }).selectOption(I.self);
+    await panel.getByLabel("Hak kaynağı", { exact: true }).selectOption(S.sale);
+    await panel
+      .getByRole("checkbox", {
+        name: "Seçili kişi, ders ve hak kaynağını kontrol ettim.",
+        exact: true,
+      })
+      .press("Space");
+    await panel.getByRole("button", { name: "Rezervasyon oluştur", exact: true }).click();
+    return panel;
+  }
+  if (starter)
+    await test.step("Starter slot stays usable when a second room is rejected", async () => {
+      await page.goto(`${base}/studio`);
+      await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
+      await expect(page.getByText("1 / 1 salon kullanılıyor (plan sınırı).")).toBeVisible();
+      await page.getByRole("button", { name: "Salon ekle", exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await dialog.getByRole("textbox", { name: "Salon adı", exact: true }).fill("İkinci salon");
+      await dialog.getByRole("spinbutton", { name: "Kontenjan", exact: true }).fill("12");
+      const denied = page.waitForResponse((response) =>
+        new URL(response.url()).pathname.endsWith("/room_save_v1"),
+      );
+      await dialog.getByRole("button", { name: "Salonu ekle", exact: true }).click();
+      expect(await (await denied).json()).toMatchObject({
+        ok: false,
+        error: { code: "PLAN_LIMIT_REACHED" },
+      });
+      await expect(dialog.getByText(common.studio.resourceRejected)).toBeVisible();
+      await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+      await expect(page.getByRole("button", { name: "Ana salon", exact: true })).toBeEnabled();
+      await expect(page.getByRole("button", { name: "İkinci salon", exact: true })).toHaveCount(0);
     });
-  });
+  if (!starter)
+    await test.step("publish the actual instructor agreement in the same center", async () => {
+      await page.goto(`${base}/studio`);
+      await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
+      await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+      const panel = page.getByRole("dialog");
+      await panel.getByLabel("Tutar (en küçük para birimi)", { exact: true }).fill("17500");
+      await panel.locator("#agreement-from").fill("2026-11-17T11:30");
+      await panel.locator("#agreement-until").fill("2027-01-01T09:00");
+      await panel.locator("#agreement-reason").fill("Sentetik Pro zinciri anlaşması");
+      await panel.getByRole("checkbox").press("Space");
+      await panel.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
+      await expect(panel).toHaveCount(0);
+      expect(f.studio.agreements.at(-1)).toMatchObject({
+        person_id: I.instructor,
+        supersedes_id: I.agreement,
+        version: 2,
+        terms: { components: [{ kind: "session_fixed", amount_minor: "17500" }] },
+      });
+    });
   await test.step("create one person and activate the native student relationship", async () => {
     await page.goto(`${base}/people`);
     await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
@@ -93,6 +144,21 @@ test("Pro same-record journey reconciles setup, person, agreement, program, sale
     expect(f.debt()).toBe("100000");
     await panel.getByRole("button", { name: "Kapat", exact: true }).click();
   });
+  if (starter)
+    await test.step("the same Starter student cannot reserve while the sale debt is unpaid", async () => {
+      const rejection = page.waitForResponse((response) =>
+        new URL(response.url()).pathname.endsWith("/reservation_create_v1"),
+      );
+      const panel = await bookStudent();
+      expect(await (await rejection).json()).toMatchObject({
+        ok: false,
+        error: { code: "DEBT_BOOKING_BLOCKED" },
+      });
+      await expect(panel.getByText(common.sessionDetail.bookingStates.rejected)).toBeVisible();
+      expect(f.reservation).toBeUndefined();
+      expect(f.rights()[0]).toMatchObject({ available: 8, reserved: 0, consumed: 0 });
+      await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    });
   await test.step("collect the exact sale debt and read its cash movement", async () => {
     await page.goto(`${base}/finance`);
     await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
@@ -120,20 +186,8 @@ test("Pro same-record journey reconciles setup, person, agreement, program, sale
     expect(f.debt()).toBe("0");
     await panel.getByRole("button", { name: "Kapat", exact: true }).click();
   });
-  await test.step("reserve the same sale, mark that student and close with the agreed instructor", async () => {
-    await page.goto(`${base}/sessions/${S.session}`);
-    await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
-    let panel = page.getByRole("dialog");
-    await panel.getByRole("button", { name: "Ara", exact: true }).click();
-    await panel.getByLabel("Üye", { exact: true }).selectOption(I.self);
-    await panel.getByLabel("Hak kaynağı", { exact: true }).selectOption(S.sale);
-    await panel
-      .getByRole("checkbox", {
-        name: "Seçili kişi, ders ve hak kaynağını kontrol ettim.",
-        exact: true,
-      })
-      .press("Space");
-    await panel.getByRole("button", { name: "Rezervasyon oluştur", exact: true }).click();
+  await test.step("reserve the same sale, mark the student and close with the assigned instructor", async () => {
+    let panel = await bookStudent();
     await expect(
       panel.getByText("Rezervasyon kaydedildi; güncel rezervasyon, haklar ve seans okundu.", {
         exact: true,
@@ -193,36 +247,57 @@ test("Pro same-record journey reconciles setup, person, agreement, program, sale
       consumed: 1,
     });
   });
-  await test.step("reconcile the actual closed session and immutable agreement in earnings and reports", async () => {
-    await page.goto(`${base}/earnings`);
-    await expect(page.getByText("₺175,00", { exact: true }).first()).toBeVisible();
-    await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
-    await expect(page.getByText("Sentetik seans", { exact: true })).toBeVisible();
-    await expect(page.getByText("Ders anlaşması · Anlaşma v2", { exact: true })).toBeVisible();
-    expect(f.earning()).toMatchObject({
-      agreement_id: f.studio.agreements.at(-1)!.id,
-      agreement_version: 2,
-      earning: {
-        person_id: I.instructor,
-        session_id: S.session,
-        amount_minor: "17500",
-        remaining_minor: "17500",
-      },
+  if (!starter)
+    await test.step("reconcile the closed session and immutable agreement in earnings", async () => {
+      await page.goto(`${base}/earnings`);
+      await expect(page.getByText("₺175,00", { exact: true }).first()).toBeVisible();
+      await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
+      await expect(page.getByText("Sentetik seans", { exact: true })).toBeVisible();
+      await expect(page.getByText("Ders anlaşması · Anlaşma v2", { exact: true })).toBeVisible();
+      expect(f.earning()).toMatchObject({
+        agreement_id: f.studio.agreements.at(-1)!.id,
+        agreement_version: 2,
+        earning: {
+          person_id: I.instructor,
+          session_id: S.session,
+          amount_minor: "17500",
+          remaining_minor: "17500",
+        },
+      });
     });
+  if (starter)
+    await test.step("Starter forbids instructor earnings after a successful closure", async () => {
+      const denied = page.waitForResponse((response) =>
+        new URL(response.url()).pathname.endsWith("/instructor_finance_directory_get_v1"),
+      );
+      await page.goto(`${base}/earnings`);
+      expect(await (await denied).json()).toMatchObject({
+        ok: false,
+        error: { code: "PLAN_FEATURE_UNAVAILABLE" },
+      });
+      expect(f.studio.agreements).toEqual([]);
+      expect(f.earning()).toBeUndefined();
+    });
+  await test.step("reconcile the closed session and sale in reports", async () => {
     await page.goto(`${base}/reports`);
-    await expect(page.getByText("Zincir 8 ders · TRY", { exact: true })).toBeVisible();
+    await expect(page.getByText(`${f.product.terms.name} · TRY`, { exact: true })).toBeVisible();
     await expect(page.getByText(/1\.000,00/).first()).toBeVisible();
     await page.getByRole("tab", { name: "Tahsilat ve borç", exact: true }).click();
     await expect(page.getByText(f.person.display_name, { exact: true })).toBeVisible();
     await expect(page.getByText(/1\.000,00/).first()).toBeVisible();
     await page.getByRole("tab", { name: "Eğitmen ve adaylar", exact: true }).click();
-    await expect(page.getByText("Örnek Eğitmen · Hakediş", { exact: true })).toBeVisible();
-    await expect(page.getByText(/175,00/).first()).toBeVisible();
+    if (starter) {
+      await expect(page.getByText("Örnek Eğitmen · Hakediş", { exact: true })).toHaveCount(0);
+    } else {
+      await expect(page.getByText("Örnek Eğitmen · Hakediş", { exact: true })).toBeVisible();
+      await expect(page.getByText(/175,00/).first()).toBeVisible();
+    }
     expect(f.writes.map((row) => row.op)).toEqual([
       "person_create_v1",
       "student_activate_v1",
       "program_apply_v1",
       "sale_apply_v1",
+      ...(starter ? ["reservation_create_v1"] : []),
       "collection_record_v1",
       "reservation_create_v1",
       "attendance_start_v1",
@@ -237,4 +312,4 @@ test("Pro same-record journey reconciles setup, person, agreement, program, sale
       ),
     ).toBe(true);
   });
-});
+}

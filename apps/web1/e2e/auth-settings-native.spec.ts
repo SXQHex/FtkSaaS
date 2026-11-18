@@ -394,9 +394,20 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
   ).not.toBeChecked();
   await editor.getByRole("button", { name: "Teklifi incele", exact: true }).click();
   const review = await confirm(page);
+  await expect(review.getByText("Geçerlilik tarihi", { exact: true })).toBeVisible();
+  await expect(review.getByText("1.01.2099 03:00", { exact: true })).toBeVisible();
+  await expect(
+    review.getByText(
+      "Salon: Ana salon · Disiplin: Tango · Eğitmen: Sentetik personel · 0 öğrenci",
+      {
+        exact: true,
+      },
+    ),
+  ).toBeVisible();
   await expect
     .poll(() => f.writes.some((row) => row.op === "subscription_downgrade_request_v1"))
     .toBe(true);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
   await expect(
     review.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
   ).toBeDisabled();
