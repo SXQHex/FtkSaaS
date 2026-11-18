@@ -62,7 +62,13 @@ export function LeadActivitiesView({
             </TableHead>
           ))}
         </TableHeader>
-        <TableBody>
+        <TableBody
+          renderEmptyState={() => (
+            <Empty>
+              <EmptyDescription>{t(($) => $.leads.noActivities)}</EmptyDescription>
+            </Empty>
+          )}
+        >
           {rows.map((row) => (
             <TableRow id={row.id} key={row.id} textValue={row.name}>
               <TableCell>
@@ -83,11 +89,6 @@ export function LeadActivitiesView({
           ))}
         </TableBody>
       </Table>
-      {!rows.length && (
-        <Empty>
-          <EmptyDescription>{t(($) => $.leads.noActivities)}</EmptyDescription>
-        </Empty>
-      )}
     </div>
   );
 }
@@ -127,7 +128,13 @@ export function LeadApplicationsView({
             </TableHead>
           ))}
         </TableHeader>
-        <TableBody>
+        <TableBody
+          renderEmptyState={() => (
+            <Empty>
+              <EmptyDescription>{t(($) => $.leads.noApplications)}</EmptyDescription>
+            </Empty>
+          )}
+        >
           {rows.map((row) => (
             <TableRow id={row.id} key={row.id} textValue={row.name}>
               <TableCell>
@@ -151,11 +158,6 @@ export function LeadApplicationsView({
           ))}
         </TableBody>
       </Table>
-      {!rows.length && (
-        <Empty>
-          <EmptyDescription>{t(($) => $.leads.noApplications)}</EmptyDescription>
-        </Empty>
-      )}
     </div>
   );
 }

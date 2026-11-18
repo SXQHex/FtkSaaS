@@ -733,6 +733,8 @@ test("denied attendance stays unknown while authorized reservation and lesson re
       { exact: true },
     ),
   ).toHaveCount(0);
+  const completed = grid.getByRole("row").filter({ hasText: "Tamamlandı" });
+  await expect(completed.getByRole("gridcell").last()).toBeEmpty();
   expect(writes).toHaveLength(0);
 });
 test("reservation page read errors do not relabel stale rows as the next page and can retry", async ({
@@ -747,6 +749,8 @@ test("reservation page read errors do not relabel stale rows as the next page an
   await expect(grid.getByText("Tamamlandı", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }).click();
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
+  const cancelled = grid.getByRole("row").filter({ hasText: "İptal" });
+  await expect(cancelled.getByRole("gridcell").last()).toBeEmpty();
   expect(writes).toHaveLength(0);
 });
 
@@ -785,6 +789,8 @@ test("reservation cancellation validates reason, uses the native version and rer
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
   await expect(grid.getByRole("button", { name: /^İptal et/ })).toHaveCount(0);
+  const cancelled = grid.getByRole("row").filter({ hasText: "İptal" });
+  await expect(cancelled.getByRole("gridcell").last()).toBeEmpty();
   await expect(
     page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }),
   ).toBeFocused();

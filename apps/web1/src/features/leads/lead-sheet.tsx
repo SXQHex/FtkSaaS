@@ -277,10 +277,12 @@ export function LeadSheet({
                     onDraft?.({ ...draft, due: event.target.value, dueOffset: "", reviewed: false })
                   }
                   aria-invalid={Boolean(errors?.due)}
-                  aria-describedby="lead-due-error"
+                  aria-describedby={errors?.due ? "lead-due-hint lead-due-error" : "lead-due-hint"}
                 />
                 <FieldError id="lead-due-error">{errors?.due}</FieldError>
-                <FieldDescription>{t(($) => $.leads.timezoneHint)}</FieldDescription>
+                <FieldDescription id="lead-due-hint">
+                  {t(($) => $.leads.timezoneHint)}
+                </FieldDescription>
               </Field>
               {offsets.length > 0 && (
                 <Field>

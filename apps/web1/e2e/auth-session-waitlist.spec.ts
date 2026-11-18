@@ -245,11 +245,10 @@ test("another person's visible offer does not expose accept or reject controls",
   page,
 }) => {
   const state = await setup(page, { offered: true, otherPerson: true });
-  await expect(
-    page
-      .getByRole("grid", { name: "Sonuçlanan teklifler", exact: true })
-      .getByText("Örnek öğrenci", { exact: true }),
-  ).toBeVisible();
+  const history = page.getByRole("grid", { name: "Sonuçlanan teklifler", exact: true });
+  const offer = history.getByRole("row").filter({ hasText: "Örnek öğrenci" });
+  await expect(offer.getByText("Örnek öğrenci", { exact: true })).toBeVisible();
+  await expect(offer.getByRole("gridcell").last()).toBeEmpty();
   await expect(page.getByRole("button", { name: "Teklifi kabul et", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Teklifi reddet", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);

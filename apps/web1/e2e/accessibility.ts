@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import axe from "axe-core";
+import axe, { type Result } from "axe-core";
 import { expect, test, type Page } from "@playwright/test";
 
 const conformanceTags = [
@@ -12,6 +12,48 @@ const conformanceTags = [
   "best-practice",
 ];
 const conformanceRules = axe.getRules(conformanceTags).map((rule) => rule.ruleId);
+
+async function checkEmptyGrids(page: Page, incomplete: readonly Result[]) {
+  const selectors = incomplete
+    .find((rule) => rule.id === "th-has-data-cells")
+    ?.nodes.flatMap(({ target }) =>
+      target.length === 1 && typeof target[0] === "string" ? [target[0]] : [],
+    );
+  if (!selectors?.length) return [];
+
+  const checks = await page.evaluate<
+    { selector: string; columns: number; columnSpan: number; hasPlaceholder: boolean }[]
+  >(`${JSON.stringify(selectors)}.flatMap((selector) => {
+      const table = document.querySelector(selector);
+      if (!(table instanceof HTMLTableElement) || table.dataset.slot !== "table") return [];
+      const body = table.tBodies[0];
+      if (!body?.hasAttribute("data-empty") || table.getAttribute("aria-busy") === "true")
+        return [];
+      const headers = table.tHead?.rows;
+      const header = headers?.[headers.length - 1];
+      const columns = Array.from(header?.cells ?? []).reduce((sum, cell) => sum + cell.colSpan, 0);
+      const row = body.rows[0];
+      const cell = row?.cells[0];
+      return [
+        {
+          selector,
+          columns,
+          columnSpan: cell?.colSpan ?? 0,
+          hasPlaceholder:
+            body.rows.length === 1 &&
+            row?.cells.length === 1 &&
+            cell?.getAttribute("role") === "rowheader" &&
+            Boolean(cell.textContent?.trim()),
+        },
+      ];
+    })`);
+  for (const check of checks) {
+    expect(check.columns, check.selector).toBeGreaterThan(0);
+    expect(check.columnSpan, check.selector).toBe(check.columns);
+    expect(check.hasPlaceholder, check.selector).toBe(true);
+  }
+  return checks;
+}
 
 export async function scanAccessibility(page: Page, state = "rendered-state") {
   // Scan settled colors and geometry, including newly opened modal transitions.
@@ -37,6 +79,7 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
     conformanceRules.filter((id) => !evaluated.has(id)),
     "Every supported WCAG A/AA rule must run",
   ).toEqual([]);
+  const emptyGridChecks = await checkEmptyGrids(page, results.incomplete);
   await test.info().attach("WCAG-2.2-AA-scan-summary", {
     body: JSON.stringify(
       {
@@ -48,6 +91,7 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
         axeVersion: results.testEngine.version,
         evaluatedConformanceRules: conformanceRules,
         violations: results.violations.map((rule) => rule.id),
+        emptyGridChecks,
         manualReview: results.incomplete.map((rule) => ({
           id: rule.id,
           targets: rule.nodes.map((node) => node.target),

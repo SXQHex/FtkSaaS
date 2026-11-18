@@ -344,7 +344,10 @@ test("a new future followup rereads its native activity and due instant", async 
   const dialog = await openLead(page);
   await dialog.getByRole("button", { name: "Takip veya not ekle", exact: true }).click();
   await dialog.getByLabel("Faaliyet türü", { exact: true }).selectOption("followup");
-  await dialog.getByLabel("Ne zaman", { exact: true }).fill("2026-11-21T16:00");
+  const due = dialog.getByLabel("Ne zaman", { exact: true });
+  await expect(due).toHaveAttribute("aria-describedby", "lead-due-hint");
+  await expect(due).toHaveAccessibleDescription(/saat diliminde/i);
+  await due.fill("2026-11-21T16:00");
   await dialog.getByLabel("Not", { exact: true }).fill("Programı paylaş");
   await dialog
     .getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim.", exact: true })

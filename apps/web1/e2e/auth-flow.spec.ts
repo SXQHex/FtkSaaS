@@ -192,12 +192,18 @@ test("session pages preserve provider IDs, label intent retries and selected rev
   expect(calls.labelKeys).toHaveLength(4);
   expect(calls.labelKeys[3]).not.toBe(calls.labelKeys[2]);
   calls.rejectNextRevoke = true;
-  await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
+  const revokeButton = page.getByRole("button", { name: "Oturumu kapat", exact: true });
+  const target = await revokeButton.boundingBox();
+  expect(target?.width).toBeGreaterThanOrEqual(24);
+  expect(target?.height).toBeGreaterThanOrEqual(24);
+  await revokeButton.click();
   await expect(page.getByText("Oturum kapatma doğrulanamadı.", { exact: false })).toBeVisible();
   await expect(page.getByText("Final fixture phone", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
   await expect(page.getByText("Final fixture phone", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
+  const current = page.getByRole("row").filter({ hasText: "Bu cihaz" });
+  await expect(current.getByRole("gridcell").last()).toBeEmpty();
   expect(calls.revokeKeys).toHaveLength(2);
   expect(calls.revokeKeys[1]).toBe(calls.revokeKeys[0]);
   expect(errors).toEqual([]);
@@ -265,6 +271,8 @@ test("fresh password requiring TOTP uses the canonical MFA route before others c
   await page.getByRole("button", { name: "Yeni giriş yaptım", exact: true }).click();
   await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  const current = page.getByRole("row").filter({ hasText: "Bu cihaz" });
+  await expect(current.getByRole("gridcell").last()).toBeEmpty();
   expect(calls.othersKeys).toHaveLength(1);
   expect(errors).toEqual([]);
 });

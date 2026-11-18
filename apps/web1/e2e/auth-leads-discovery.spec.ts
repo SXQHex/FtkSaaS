@@ -230,6 +230,12 @@ test("native filters and summaries use server scope and explicitly distinguish u
   await page.getByRole("tab", { name: "Liste", exact: true }).click();
   await page.getByRole("combobox", { name: "Sorumlu", exact: true }).selectOption("unassigned");
   await expect(page.getByText("Bu kapsamda aday bulunamadı.", { exact: true })).toBeVisible();
+  const grid = page.getByRole("tabpanel", { name: "Liste", exact: true }).getByRole("grid");
+  await expect(grid.getByRole("columnheader")).toHaveCount(6);
+  await expect(
+    grid.getByRole("rowheader", { name: "Bu kapsamda aday bulunamadı.", exact: true }),
+  ).toHaveAttribute("colspan", "6");
+  await expect(grid.getByRole("gridcell")).toHaveCount(0);
   expect(
     native.reads.filter((row) => row.operation === "leads_list_v1").at(-1)?.request,
   ).toMatchObject({ assigned_to: null, include_details: true, include_summary: true });

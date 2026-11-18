@@ -231,7 +231,13 @@ export function LeadsView({
                   </TableHead>
                 ))}
               </TableHeader>
-              <TableBody>
+              <TableBody
+                renderEmptyState={() => (
+                  <Empty>
+                    <EmptyDescription>{t(($) => $.leads.empty)}</EmptyDescription>
+                  </Empty>
+                )}
+              >
                 {rows.map((row) => (
                   <TableRow id={row.id} key={row.id} textValue={row.name}>
                     <TableCell>
@@ -260,11 +266,6 @@ export function LeadsView({
                 ))}
               </TableBody>
             </Table>
-            {!rows.length && (
-              <Empty>
-                <EmptyDescription>{t(($) => $.leads.empty)}</EmptyDescription>
-              </Empty>
-            )}
           </TabsContent>
         </Tabs>
         <CardFooter className="flex-wrap justify-between gap-3 pt-3">
