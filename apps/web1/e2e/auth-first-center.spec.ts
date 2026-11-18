@@ -1,6 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockNative, origin } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
+import { scanAccessibility } from "./accessibility.js";
+import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import type { CenterView, SuccessSettingsCatalogGet } from "../src/lib/api-contracts/generated.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 const text = common.centerSetup;
@@ -12,6 +14,8 @@ async function setup(
     denied?: boolean;
     existing?: boolean;
     unreadAuthority?: boolean;
+    managesCenter?: boolean;
+    rejectCreate?: "VERSION_CONFLICT" | "PLAN_LIMIT_REACHED";
   } = {},
 ) {
   await mockNative(page);
@@ -45,9 +49,16 @@ async function setup(
             id: I.org,
             name: "Merkezsiz organizasyon",
             state: "active",
-            access_mode: "bootstrap",
+            access_mode: options.managesCenter ? "normal" : "bootstrap",
             version: 1,
             self_context: { person_id: I.self, subscriber_number: null, centers: [] },
+            ...(options.managesCenter && {
+              self_management_scope: {
+                owner: false,
+                org_manager: false,
+                managed_center_ids: [I.center],
+              },
+            }),
           },
         ]),
       );
@@ -61,6 +72,14 @@ async function setup(
     }
     // Owner is held on the organization, not a fabricated role-assignment row.
     if (op === "roles_list_v1") return send(list([]));
+    if (
+      options.managesCenter &&
+      ((op === "management_state_get_v1" && r.operation === "room_save_v1") ||
+        op === "disciplines_list_v1")
+    ) {
+      expect(r).toMatchObject({ org_id: I.org, center_id: I.center });
+      return send(list([]));
+    }
     if (op === "settings_catalog_get_v1" && r.scope === "organization") {
       if (options.unreadAuthority && !readFailed) {
         readFailed = true;
@@ -87,6 +106,14 @@ async function setup(
       writes.push(r);
       expect(r).toMatchObject({ org_id: I.org, name: center.name, timezone: center.timezone });
       expect(r).not.toHaveProperty("center_id");
+      if (options.rejectCreate)
+        return route.fulfill({
+          status: 409,
+          json: {
+            ok: false,
+            error: { code: options.rejectCreate, retryable: false, trace_id: I.role },
+          },
+        });
       if (!created) {
         effects++;
         created = true;
@@ -123,7 +150,17 @@ async function fill(page: import("@playwright/test").Page) {
   const panel = page.getByRole("dialog", { name: text.action, exact: true });
   await panel.getByLabel(text.name, { exact: true }).fill("İlk test merkezi");
   await panel.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
+  await review(panel);
   return panel;
+}
+async function review(panel: import("@playwright/test").Locator) {
+  const next = panel.getByRole("button", { name: text.continue, exact: true });
+  await next.click();
+  await expect(
+    panel.getByRole("heading", { name: text.steps.resources, exact: true }),
+  ).toBeFocused();
+  await next.click();
+  await expect(panel.getByRole("heading", { name: text.steps.review, exact: true })).toBeFocused();
 }
 test("first center validates the ready form, records its explicit zone and restores the actual workspace after reload", async ({
   page,
@@ -136,13 +173,16 @@ test("first center validates the ready form, records its explicit zone and resto
   await expect(name).toBeFocused();
   await expect(name).toHaveAttribute("aria-invalid", "false");
   await expect(zone).toHaveValue("");
-  await panel.getByRole("button", { name: text.action, exact: true }).click();
+  await panel.getByRole("button", { name: text.continue, exact: true }).click();
   await expect(name).toBeFocused();
   await expect(name).toHaveAttribute("aria-invalid", "true");
   expect(f.writes).toHaveLength(0);
   await name.fill(f.center.name);
   await expect(name).toHaveAttribute("aria-invalid", "false");
   await zone.selectOption(f.center.timezone);
+  await review(panel);
+  await expect(panel.getByText(f.center.name, { exact: true })).toBeVisible();
+  expect(f.writes).toHaveLength(0);
   await panel.getByRole("button", { name: text.action, exact: true }).click();
   await expect(panel.getByRole("status")).toContainText(text.states.saved);
   expect(f.effects).toBe(1);
@@ -159,6 +199,51 @@ test("first center validates the ready form, records its explicit zone and resto
     f.reads.filter((op) => ["organization_create_v1", "center_manager_assign_v1"].includes(op)),
   ).toHaveLength(0);
 });
+test("first-center setup can be postponed and starts again from the live account state", async ({
+  page,
+}) => {
+  const f = await setup(page);
+  const trigger = page.getByRole("button", { name: text.action, exact: true });
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const panel = page.getByRole("dialog", { name: text.action, exact: true });
+  await expect(panel.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1");
+  await panel.getByLabel(text.name, { exact: true }).fill(f.center.name);
+  await panel.getByLabel(text.timezone, { exact: true }).selectOption(f.center.timezone);
+  await panel.getByRole("button", { name: text.continue, exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const theme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: theme });
+    expect((await scanAccessibility(page, `first-center-resources-${theme}`)).violations).toEqual(
+      [],
+    );
+    assertLayoutFit(await readLayoutFit(page));
+    await page.screenshot({ path: `.tmp/v67-first-center-resources-${theme}.png` });
+  }
+  await panel.getByRole("button", { name: text.later, exact: true }).click();
+  await expect(panel).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  expect(f.writes).toHaveLength(0);
+  await page.reload();
+  await trigger.click();
+  await expect(panel.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1");
+  await expect(panel.getByLabel(text.name, { exact: true })).toBeEmpty();
+  expect(f.writes).toHaveLength(0);
+  await page.keyboard.press("Escape");
+});
+test("managed center resumes only the live missing room and discipline", async ({ page }) => {
+  const f = await setup(page, { existing: true, managesCenter: true });
+  await expect(page.getByRole("link", { name: text.room, exact: true })).toHaveAttribute(
+    "href",
+    `/o/${I.org}/c/${I.center}/settings?section=salonlar`,
+  );
+  await expect(page.getByRole("link", { name: text.discipline, exact: true })).toHaveAttribute(
+    "href",
+    `/o/${I.org}/c/${I.center}/settings?section=genel`,
+  );
+  await expect(page.getByRole("button", { name: text.action, exact: true })).toHaveCount(0);
+  expect(f.writes).toHaveLength(0);
+});
 test("unknown first-center outcome freezes scope and reuses one immutable command key without duplicate centers", async ({
   page,
 }) => {
@@ -167,7 +252,10 @@ test("unknown first-center outcome freezes scope and reuses one immutable comman
   await panel.getByRole("button", { name: text.action, exact: true }).click();
   await expect(panel.getByRole("status")).toContainText(text.states.unknown);
   await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
-  await expect(panel.getByLabel(text.name, { exact: true })).toBeDisabled();
+  await expect(panel.getByRole("button", { name: text.back, exact: true })).toHaveCount(0);
+  await expect(panel.getByRole("button", { name: text.later, exact: true })).toBeDisabled();
+  await expect(panel.getByRole("textbox", { name: text.name, exact: true })).toHaveCount(0);
+  await expect(panel.getByText(f.center.name, { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(panel).toBeVisible();
   await panel.getByRole("button", { name: common.finance.retrySame, exact: true }).click();
@@ -178,6 +266,22 @@ test("unknown first-center outcome freezes scope and reuses one immutable comman
   expect(f.writes[1]!.request_id).not.toBe(f.writes[0]!.request_id);
   await panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
 });
+for (const rejectCreate of ["VERSION_CONFLICT", "PLAN_LIMIT_REACHED"] as const)
+  test(`first-center review handles ${rejectCreate} without a phantom center`, async ({ page }) => {
+    const f = await setup(page, { rejectCreate });
+    const panel = await fill(page);
+    await panel.getByRole("button", { name: text.action, exact: true }).click();
+    const notice = rejectCreate === "VERSION_CONFLICT" ? text.states.stale : text.states.rejected;
+    await expect(panel.getByRole("status")).toHaveText(notice);
+    await expect(
+      panel.getByRole("button", { name: common.finance.retrySame, exact: true }),
+    ).toHaveCount(0);
+    await panel.getByRole("button", { name: text.later, exact: true }).click();
+    await expect(panel).toHaveCount(0);
+    await expect(page.getByRole("link", { name: text.settings, exact: true })).toHaveCount(0);
+    expect(f.writes).toHaveLength(1);
+    expect(f.effects).toBe(0);
+  });
 test("acknowledged first-center creation permits only workspace rereads after a failed result read", async ({
   page,
 }) => {

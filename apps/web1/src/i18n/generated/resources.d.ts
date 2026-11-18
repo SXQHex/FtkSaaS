@@ -552,10 +552,20 @@ export default interface Resources {
     "centerSetup": {
       "action": "Merkez oluştur",
       "authorityUnavailable": "Merkez oluşturma yetkisi okunamadı. Yeniden dene.",
+      "back": "Geri",
       "chooseTimezone": "Saat dilimi seç",
+      "continue": "Devam",
       "description": "Organizasyon hazır. Ders ve kayıt işlemleri için merkezin adını ve saat dilimini belirle.",
+      "discipline": "İlk ders türü",
+      "disciplineHint": "Merkezin kullanacağı disiplini Stüdyo ayarından seçebilirsin.",
+      "later": "Sonra yaparım",
+      "loading": "İlk kurulum bilgileri okunuyor…",
       "name": "Merkez adı",
       "nameRequired": "Merkez adını gir.",
+      "resourceReadError": "Merkezin salon ve ders türü kayıtları okunamadı.",
+      "resourcesHint": "Salon ve ders türü için önce merkezin oluşturulması ve merkez yetkisinin doğrulanması gerekir.",
+      "room": "İlk salon",
+      "roomHint": "Salonun adını ve kapasitesini merkezin Salonlar ayarından belirleyebilirsin.",
       "savedHint": "Merkez oluşturuldu. Organizasyon ayarlarının Ekip bölümünden merkez yöneticisini belirleyebilirsin.",
       "settings": "Merkez ayarlarını aç",
       "states": {
@@ -566,6 +576,12 @@ export default interface Resources {
         "stale": "Kaynak değişti. Güncel koşulları kontrol edip yeniden dene.",
         "unknown": "Yanıt alınamadı. Merkez oluşturulmuş sayılmaz. Aynı isteği yeniden dene veya işlem sonucunu oku.",
         "writing": "Merkez oluşturuluyor…"
+      },
+      "step": "Adım {{step}} / {{total}}",
+      "steps": {
+        "resources": "Salon ve ders türü",
+        "review": "Kurulum özeti",
+        "studio": "Stüdyonu tanıt"
       },
       "timezone": "Merkez saat dilimi",
       "title": "İlk merkezini oluştur",

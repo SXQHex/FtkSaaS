@@ -59,7 +59,7 @@ export function AccountPage() {
           : () => appearanceActions.current?.toggleTheme()
       }
     >
-      {({ organizationId, workspace }) => (
+      {({ organizationId, centerId, workspace }) => (
         <div className="account-view flex min-w-0 w-full max-w-[76rem] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
           <header className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -85,6 +85,7 @@ export function AccountPage() {
             key={`${account.id}:${organizationId ?? "none"}`}
             accountId={account.id}
             organizationId={organizationId}
+            centerId={centerId}
             workspace={workspace}
             onLockChange={setSetupLocked}
           />

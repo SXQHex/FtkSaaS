@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan            | İşlev                | Durum                                                  | Sonraki eylem                                                                                       |
-| ---------- | --------------- | -------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| **E47.2**  | Starter + çizim | İlk kurulum görünümü | V01 kapalı · E47.1 kapalı · G-STARTER.2 yayın bekliyor | Mevcut ilk merkez akışını kurulum adımlarına yerleştir. Yeni Web1 sürümünde G-STARTER.2’yi doğrula. |
+| Aktif adım | Plan            | İşlev                           | Durum                                                          | Sonraki eylem                                                                |
+| ---------- | --------------- | ------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **V02**    | Starter + çizim | Üye ve eğitmen kişisel akışları | V01 kapalı · E47 dış bağımlılıkta · G-STARTER.2 yayın bekliyor | V02 ve E48’in ilk karşılanmış önkoşulundan ilerle. E47 için W1-BE-43’ü izle. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -138,6 +138,8 @@ Yeni HTML'de **50** `data-view` var. `taslak` çıkarıldığında 49 gerçek b�
 
 ### Mock değerlerin gerçek veriye bağlanması
 
+Üretim Web1’de örnek işlem veya taslak ekran açık kalmaz. Yükleme göstergesi yalnız gerçek okuma beklerken kullanılır; okuma sonucu veri, boş durum veya açık hata olarak gösterilir. Backend desteği olmayan işlem [backend taleplerine](request.md) bağlanır ve ilgili kabul maddesi açık kalır.
+
 Kullanıcının 18 Kasım açıklamasıyla çizimdeki fiyat, limit, tarih, sayaç ve benzeri örnek değerler API bağlantısı bulunmadığı için kullanılan mock yer tutuculardır. Bunlardan ürün kararı veya sözleşme uyuşmazlığı çıkarılmaz. Yerleşim ve sunum çizimden, gerçek değer ve eylem yetkisi yayımlanmış API/ayar kaynağından alınır. Aşağıdaki tablo entegrasyon eşlemesidir.
 
 | Çizimdeki yer tutucu / etkileşim                                                         | Gerçek veri ve işlem kaynağı                                                                                                                                                                             |
@@ -221,6 +223,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 - [ ] **V06.1** · E39'daki toplu seçim, okundu/arşiv/sil/geri al tasarımını desteklenen inbox action'larıyla eşle. Mevcut W1-BE-28 ve okundu/iş tamamlandı ayrımını koru; eksik toplu/geri al desteğini talep olarak kaydet.
 - [ ] **V06.2** · E43'te yeni modül etiketleri, detay ve dışa aktarım ile işlem ilerleme/kısmi/yeniden deneme durumlarını mevcut okuyuculardan göster. Çizim audit çağrısını üretim backend audit'i yerine kullanma.
 - [ ] **V06.3** · E44–E46 durum kataloğu/yardım ve ortak403/404/offline/409/plan/salt okunur durumlarını gerçek route ve kaynak hatalarına bağla. Uygulanabilir hata durumlarında hazır durum bileşeni ve erişilebilir odak geri dönüşü doğrulansın.
+      Üretim kök adresi mevcut hesap/oturum akışına bağlandı. [Statik build kabulü](../e2e/static-build.spec.ts#L60).
 
 ### V07 · Ayarlar, Starter ve yaşam döngüsü
 
@@ -238,11 +241,16 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler aynı hazır bileşen ve sayfa kabul kurallarını izler. İşlev sahipliği P/S/B paketlerinde kalır.
 
+<a id="e47-ilk-kurulum"></a>
+
 - [ ] **E47** · **İlk kurulum** — `data-view="a-kurulum"`, P02/P03/E12. Hesap ve erişilebilir merkez okuması sonrası gerektiğinde açılan kurulum kompozisyonu. Önerilen yol `/setup`, gerçek route kararı mevcut workspace yönlendirmesiyle verilir. Hazır Card, Field, Input, Select, Progress ve Button.
+      Organizasyonu olmayan yeni hesabın kurulum girişi ve ilk merkez yönetim yetkisi [W1-BE-43](request.md#w1-be-43--hesaptan-ilk-stüdyo-kurulumuna-yetkili-geçiş) altında açık. Yerel akış erişilebilir organizasyon ve gerçek yetki ile çalışır.
   - [x] **E47.1** · Mevcut `features/workspace/first-center-setup.tsx` ve native organizasyon/merkez oluşturma yetkisini incele. Stüdyo→oda/disiplin→özet ve Sonra yaparım adımlarını mevcut hesap/merkez akışına eşle.
         `/account` mevcut giriş olarak kalır. Kurulum kartı seçili ve kuruluşa açık organizasyonda merkez bulunmadığında native katalog yetkisini okur. İlk adım stüdyo için merkez adı ve saat dilimini toplar. `organization_create_v1` platform sahibine ayrıdır. Onaylı `center_create_v1` sonrası gerçek merkez yeniden okunur; salon ve merkez disiplini işlemleri etkin merkez kimliği ve canlı yetki varsa mevcut Stüdyo/Ayarlar akışlarına bağlanır. Özet doğrulanmış kaynakları gösterir. Sonra yaparım yazma çağrısı olmadan Hesabım’a döner. Yeniden girişte eksik kurulum native merkez ve kaynak okumalarından belirlenir. [WF02](../../../docs/workflows.md#wf02) · [İlk merkez formu](../src/features/workspace/first-center-setup.tsx) · [Mevcut kabul](../e2e/auth-first-center.spec.ts).
-  - [ ] **E47.2** · Hazır parçalardan görseli kur, mobil/tema/klavye karşılaştırmasını yap. Atlamada erişilebilir hedefe dön; tekrar girişte gerçek eksik kurulum kaydını oku.
-  - [ ] **E47.3** · Yetkili oluşturma→yeniden okuma, eksik/stale/tekrar ve plan retlerini doğrula. İlk merkez adı kabukta kalıcı gerçek okumadan görünsün; ikinci kurulum motoru kurma.
+  - [x] **E47.2** · Hazır parçalardan görseli kur, mobil/tema/klavye karşılaştırmasını yap. Atlamada erişilebilir hedefe dön; tekrar girişte gerçek eksik kurulum kaydını oku.
+        Mevcut Hesabım akışı hazır Sheet, Progress ve Field bileşenleriyle üç adım sunuyor. Bekleyen gerçek okumada Skeleton gösteriliyor. İlk adımda merkez adı ve saat dilimi doğrulanıyor. Sonra yaparım yazma yapmadan tetikleyiciye odak döndürüyor. Yeniden girişte merkez yoksa form, yetkili etkin merkezde salon ya da ders türü eksikse ilgili gerçek Ayarlar bağlantısı açılıyor. 390×844 açık/koyu karşılaştırmada salon ve ders türü formu ayrı yetkili ayar akışına bağlı. [Tarayıcı testi](../e2e/auth-first-center.spec.ts#L202) · [Web1](../.tmp/v67-first-center-resources-light.png) · [Çizim](../.tmp/v67-first-center-reference-light.png).
+  - [x] **E47.3** · Yetkili oluşturma→yeniden okuma, eksik/stale/tekrar ve plan retlerini doğrula. İlk merkez adı kabukta kalıcı gerçek okumadan görünsün; ikinci kurulum motoru kurma.
+        10 seri Chromium senaryosu geçti. Merkez özetteki açık onaydan sonra tek native komutla oluşturuldu. Başarılı sonuç güncel merkez okumadan sonra kabuğa geldi ve yenilemede kaldı. Belirsiz sonuç aynı işlem anahtarıyla toparlandı; kabul edilmiş fakat okunamayan sonuçta yalnız okuma tekrarlandı. Stale ve plan reddinde hayalet merkez oluşmadı. [Kabul senaryoları](../e2e/auth-first-center.spec.ts).
 
 - [ ] **E48** · **Üye bildirim merkezi** — `data-view="m-bildirim"`, P11/P14/E39. Hazır üye kabuğu, Tabs, Card/Item, Badge ve Button.
   - [ ] **E48.1** · Mevcut kendi inbox okuyucu/yazıcılarını üye kabuğunda kullan. Mevcut `/inbox` route'u kapsamı karşılıyorsa aynı feature'ı bu kabukta aç; gereksiz ikinci bildirim kaynağı üretme.
