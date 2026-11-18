@@ -264,7 +264,12 @@ test("mobile product composition reviews explicit terms, publishes, and rereads 
 }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   const state = await productsFixture(page);
-  await expect(page.getByRole("columnheader")).toHaveCount(6);
+  const grid = page.getByRole("grid", { name: "Paketler", exact: true });
+  await expect(grid.getByRole("columnheader")).toHaveCount(6);
+  await expect(
+    grid.getByRole("rowheader", { name: "Henüz paket yok.", exact: true }),
+  ).toHaveAttribute("colspan", "6");
+  await expect(grid.getByRole("gridcell")).toHaveCount(0);
   await expect(page.getByPlaceholder("Paket ara")).toBeEnabled();
   expect((await scanAccessibility(page, "products-list")).violations).toEqual([]);
   const dialog = await fillProduct(page, true);
@@ -300,6 +305,9 @@ test("mobile product composition reviews explicit terms, publishes, and rereads 
   });
   await dialog.getByRole("button", { name: "Kapat", exact: true }).first().click();
   await expect(page.getByText("Sentetik kabul paketi", { exact: true })).toBeVisible();
+  const productRow = grid.getByRole("row").filter({ hasText: "Sentetik kabul paketi" });
+  await expect(productRow.getByRole("rowheader")).toContainText("Sentetik kabul paketi");
+  await expect(productRow.getByRole("gridcell")).toHaveCount(5);
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
 });
 test("unknown publish survives a failed receipt read and retries the same frozen operation", async ({

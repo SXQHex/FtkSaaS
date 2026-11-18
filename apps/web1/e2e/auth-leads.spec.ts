@@ -79,15 +79,15 @@ test("stage selection requires a loss reason and never converts a candidate", as
   const state = await mockLeads(page);
   await page.getByRole("combobox", { name: "Aday A için aşama", exact: true }).selectOption("lost");
   const dialog = page.getByRole("dialog");
+  const lossReason = dialog.getByLabel("Kayıp nedeni", { exact: true });
+  await expect(lossReason).not.toHaveAttribute("aria-describedby", /lead-loss-error/);
   await expect(footer(page).getByRole("button", { name: "Kaydet", exact: true })).toBeDisabled();
   await dialog
     .getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim.", exact: true })
     .press("Space");
   await footer(page).getByRole("button", { name: "Kaydet", exact: true }).click();
-  await expect(dialog.getByLabel("Kayıp nedeni", { exact: true })).toHaveAttribute(
-    "aria-invalid",
-    "true",
-  );
+  await expect(lossReason).toHaveAttribute("aria-invalid", "true");
+  await expect(lossReason).toHaveAccessibleDescription(/.+/);
   expect(state.effects).toHaveLength(0);
   expect((await scanAccessibility(page, "lead-invalid-loss-reason")).violations).toEqual([]);
   await dialog.getByLabel("Kayıp nedeni", { exact: true }).selectOption("price");

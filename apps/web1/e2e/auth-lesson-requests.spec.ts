@@ -305,9 +305,15 @@ test("request rejection requires reason then rereads native state", async ({ pag
   const state = await fixture(page);
   const sheet = await open(page);
   await sheet.getByRole("button", { name: "Reddet", exact: true }).click();
+  const reason = sheet.getByLabel("Ret gerekçesi", { exact: true });
+  await expect(reason).toHaveAttribute("aria-describedby", "request-reason-hint");
   await sheet.getByRole("button", { name: "Reddi gönder", exact: true }).click();
   expect(state.writes).toHaveLength(0);
-  await sheet.getByLabel("Ret gerekçesi", { exact: true }).fill("Saat uygun değil");
+  const error = await sheet.locator("#request-reason-error").innerText();
+  const hint = await sheet.locator("#request-reason-hint").innerText();
+  expect(error).not.toBe("");
+  await expect(reason).toHaveAccessibleDescription(`${hint} ${error}`);
+  await reason.fill("Saat uygun değil");
   await sheet.getByRole("button", { name: "Reddi gönder", exact: true }).click();
   await expect(
     sheet.getByText("İşlem kaydedildi ve güncel talep okundu.", { exact: true }),
@@ -389,9 +395,17 @@ for (const mode of ["existing", "create"] as const) {
     await expect(submit).toBeDisabled();
     expect(state.writes).toHaveLength(0);
     if (mode === "existing") {
-      await sheet.getByLabel("Mevcut özel ders seansı", { exact: true }).selectOption(I.lesson);
+      const session = sheet.getByLabel("Mevcut özel ders seansı", { exact: true });
+      await expect(session).not.toHaveAttribute("aria-describedby", /request-session-error/);
+      await session.selectOption(I.lesson);
     } else {
       await sheet.getByLabel("Onay yolu", { exact: true }).selectOption("create");
+      for (const id of ["room", "create-instructor", "capacity"]) {
+        await expect(sheet.locator(`#request-${id}`)).not.toHaveAttribute(
+          "aria-describedby",
+          `request-${id}-error`,
+        );
+      }
       await sheet.getByLabel("Salon", { exact: true }).selectOption(I.room);
       await sheet.getByLabel("Eğitmen", { exact: true }).selectOption(I.instructor);
       await sheet.getByLabel("Kontenjan", { exact: true }).fill("1");

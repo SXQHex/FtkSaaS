@@ -357,7 +357,11 @@ export function LessonRequestSheet({
                   required
                   disabled={locked}
                   aria-invalid={Boolean(errors.reason)}
-                  aria-describedby="request-reason-hint request-reason-error"
+                  aria-describedby={
+                    errors.reason
+                      ? "request-reason-hint request-reason-error"
+                      : "request-reason-hint"
+                  }
                   onChange={(event) => change("reason", event.target.value)}
                 />
                 <FieldDescription id="request-reason-hint">
@@ -382,7 +386,7 @@ export function LessonRequestSheet({
                         required
                         disabled={locked}
                         aria-invalid={Boolean(errors[key])}
-                        aria-describedby={`request-${key}-error`}
+                        aria-describedby={errors[key] ? `request-${key}-error` : undefined}
                         onChange={(event) => change(key, event.target.value)}
                       />
                       <FieldError id={`request-${key}-error`}>{errors[key]}</FieldError>
@@ -457,7 +461,7 @@ export function LessonRequestSheet({
                       disabled={locked}
                       required
                       aria-invalid={Boolean(errors.reason)}
-                      aria-describedby="request-window-error"
+                      aria-describedby={errors.reason ? "request-window-error" : undefined}
                       onChange={(event) => change("reason", event.target.value)}
                     />
                     <FieldError id="request-window-error">{errors.reason}</FieldError>
@@ -517,7 +521,7 @@ export function LessonRequestSheet({
                       required
                       disabled={locked}
                       aria-invalid={Boolean(errors.sessionId)}
-                      aria-describedby="request-session-error"
+                      aria-describedby={errors.sessionId ? "request-session-error" : undefined}
                       onChange={(event) => change("sessionId", event.target.value)}
                     >
                       <NativeSelectOption value="">
@@ -544,7 +548,7 @@ export function LessonRequestSheet({
                         required
                         disabled={locked}
                         aria-invalid={Boolean(errors.roomId)}
-                        aria-describedby="request-room-error"
+                        aria-describedby={errors.roomId ? "request-room-error" : undefined}
                         onChange={(event) => change("roomId", event.target.value)}
                       >
                         <NativeSelectOption value="">
@@ -569,7 +573,9 @@ export function LessonRequestSheet({
                         disabled={locked || instructorFixed}
                         required
                         aria-invalid={Boolean(errors.instructorId)}
-                        aria-describedby="request-create-instructor-error"
+                        aria-describedby={
+                          errors.instructorId ? "request-create-instructor-error" : undefined
+                        }
                         onChange={(event) => change("instructorId", event.target.value)}
                       >
                         <NativeSelectOption value="">
@@ -597,7 +603,7 @@ export function LessonRequestSheet({
                         required
                         disabled={locked}
                         aria-invalid={Boolean(errors.capacity)}
-                        aria-describedby="request-capacity-error"
+                        aria-describedby={errors.capacity ? "request-capacity-error" : undefined}
                         onChange={(event) => change("capacity", event.target.value)}
                       />
                       <FieldError id="request-capacity-error">{errors.capacity}</FieldError>

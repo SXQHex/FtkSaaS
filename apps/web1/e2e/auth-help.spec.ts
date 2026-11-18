@@ -17,6 +17,7 @@ test("help has all reference groups and questions, supports multiple keyboard di
 }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await setup(page);
+  await expect(page.getByRole("group", { name: "Üyeler ve haklar", exact: true })).toBeVisible();
   await expect(page.locator("main h2")).toHaveText([
     "Üyeler ve haklar",
     "Ders programı",
