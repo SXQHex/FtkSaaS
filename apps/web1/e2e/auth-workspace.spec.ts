@@ -92,6 +92,13 @@ for (const colorScheme of ["light", "dark"] as const)
       "Stüdyo sahibi",
     );
     await expect(page.locator("main")).toHaveCount(1);
+    const rail = page.locator('[data-slot="sidebar-rail"]');
+    await expect(rail).toBeVisible();
+    expect((await rail.boundingBox())?.width).toBeGreaterThanOrEqual(24);
+    await rail.click();
+    await expect(page.locator('[data-slot="sidebar"][data-state="collapsed"]')).toBeVisible();
+    await rail.click();
+    await expect(page.locator('[data-slot="sidebar"][data-state="expanded"]')).toBeVisible();
     expect((await scanAccessibility(page, "workspace-desktop")).violations).toEqual([]);
     await page.setViewportSize({ width: 390, height: 844 });
     const toggle = page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true });

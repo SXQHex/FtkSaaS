@@ -7,17 +7,19 @@ import { Link as LinkPrimitive, type LinkProps } from "react-aria-components";
 
 import { Separator } from "@/components/ui/separator";
 
-function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
+function ItemGroup({ className, children, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      role="list"
+      role={React.Children.toArray(children).length ? "list" : undefined}
       data-slot="item-group"
       className={cn(
         "group/item-group flex w-full flex-col gap-4 has-data-[size=sm]:gap-2.5 has-data-[size=xs]:gap-2",
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </div>
   );
 }
 

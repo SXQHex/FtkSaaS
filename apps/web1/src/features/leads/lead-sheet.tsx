@@ -225,7 +225,7 @@ export function LeadSheet({
                     required
                     disabled={locked}
                     aria-invalid={Boolean(errors?.lossReason)}
-                    aria-describedby="lead-loss-error"
+                    aria-describedby={errors?.lossReason ? "lead-loss-error" : undefined}
                     onChange={(event) => set("lossReason", event.target.value)}
                   >
                     <NativeSelectOption value="">{t(($) => $.leads.choose)}</NativeSelectOption>

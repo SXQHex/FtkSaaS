@@ -83,7 +83,12 @@ export function HelpView({
             </Empty>
           ) : (
             groups.map((group) => (
-              <Card key={group.id} className="min-w-0" aria-labelledby={`${id}-${group.id}`}>
+              <Card
+                key={group.id}
+                className="min-w-0"
+                role="group"
+                aria-labelledby={`${id}-${group.id}`}
+              >
                 <CardHeader>
                   <CardTitle>
                     <h2 id={`${id}-${group.id}`}>{group.title}</h2>
@@ -92,7 +97,6 @@ export function HelpView({
                 <CardContent>
                   <Accordion
                     key={`${group.id}:${query}`}
-                    aria-labelledby={`${id}-${group.id}`}
                     allowsMultipleExpanded
                     defaultExpandedKeys={query.trim() ? group.questions.map((row) => row.id) : []}
                   >
