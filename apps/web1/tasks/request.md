@@ -67,6 +67,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Açık](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
 | W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Açık](#w1-be-57--bildirim-arşivi-ve-silme). |
 | W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Açık](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
+| W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Açık](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
 
 ## Bütün talepler için ortak sınır
 
@@ -494,3 +495,9 @@ Kendi alıcı kapsamındaki seçilmiş bildirimler için arşiv, silme, görün�
 **Açık · backend değerlendirmesi.** Web1 organizasyon ayarlarının `billing_name`, `billing_address` ve `billing_email` alanlarını sürüm denetimli okuyup yazıyor. Çizimde bunlara ek olarak vergi dairesi, vergi kimliği ve kesilmiş fatura geçmişi var. `subscription_get_v1` abonelik ve ödeme koşullarını sağlıyor. Kesilmiş fatura, fatura dosyası ve ilave vergi alanları için yayımlanmış sözleşme bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/index.html#L987) · [WF17](../../../docs/workflows.md#wf17).
 
 Vergi alanlarının ürün kapsamını ve erişim kurallarını, yayımlanmış faturaların değişmez kimliği ve yetkili geçmiş/dosya keşfiyle birlikte değerlendirin. Düzenlenen organizasyon bilgilerinin kesilmiş bir faturaya etkisi ayrı tanımlanmalı. Kart işlemleri mevcut ürün kapsamı dışındadır.
+
+## W1-BE-59 · Platform konsolu kapsamı ve keşif okumaları
+
+**Açık · backend değerlendirmesi.** E50–E52 için hesabın canlı platform yetkisini ve izinli kaynakları açan konsol keşfi gerekli. `organizations_list_v1` hesabın erişilebilir organizasyonlarını, `organization_get_v1` `org.read` kapsamındaki tek hedefi okuyor. `organization_create_v1` platform sahibine ayrılmış. Organizasyon sahibine ait kapatma/yeniden açma işlemlerinden platform askısı çıkarılamaz. Platforma özgü dizin ve askıya alma/kaldırma sözleşmesini değerlendirin.
+
+`saas_payment_verify_v1` bilinen `payment_id` ile `accepted` kararı alıyor. `saas_grace_extend_v1` mevcut operatör yetkisini kullanıyor. Ödeme kuyruğunu, işlem için güncel hedefi ve doğrulanmış sonucu aynı kapsamda okuyabilmek gerekiyor. `platform_owner_set_v1` doğrulanmış hesap kimliği ister. `platform_owner_remove_v1` isteğinde ikame doğrulanmış hesap alanı bulunur. Bu komutlar sahipleri veya atamaya uygun doğrulanmış hesapları keşfetmez. Canlı operatör ve platform sahibi kapsamı, ayrı eylem yetkileri ve sadece gerekli alanları döndüren keşif birlikte tanımlanmalı. [Güncel çizim](../read-only/tasarim-v2/app.js#L3420) · [WF02](../../../docs/workflows.md#wf02) · [WF13](../../../docs/workflows.md#wf13) · [WF17](../../../docs/workflows.md#wf17).

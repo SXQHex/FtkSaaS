@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan            | İşlev                           | Durum                                                                         | Sonraki eylem                                                               |
-| ---------- | --------------- | ------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **V08.2**  | Starter + çizim | Tam yerel kabul ve yayımlı aday | Seri tam koşu ve düzeltme doğrulamaları V08.2’de. G-STARTER.2 yayın bekliyor. | Teslim adayının tam yeşil koşusunu ve yayımlı rota/kapsam kabulünü doğrula. |
+| Aktif adım | Plan            | İşlev               | Durum                                            | Sonraki eylem                                                                |
+| ---------- | --------------- | ------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| **V08.2**  | Starter + çizim | Yayımlı aday kabulü | `5801d879` filtresiz yerel doğrulaması başarılı. | Aynı aday yayımlandığında V08.2 ve G-STARTER.2 rota/kapsam kabulünü doğrula. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -257,7 +257,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 - [x] **V08.1** · [Ekran eşlemesi](#cizim-guncellemesi), ilgili V01–V07/E47/E48 uygulama sonuçlarına, [mevcut ekran kabulüne](#sayfa-kabulu), [Pro işlevlerine](#pro) ve [Starter kanıtına](#starter) bağlı. Karşılanmayan farklar ilgili V/E satırında ve bağlı backend talebinde açık.
 - [ ] **V08.2** · Değişen alanların ilgili birim/tarayıcı paketlerini seri çalıştır. Otomatik ölçümler, yeni WCAG bulguları ve referans/uygulama görselleri raporda yer alsın. Teslim adayında filtresiz `npm run verify` ve yayımlı adayın gerekli route/kapsam kabulü yapılsın.
-      [Filtresiz yerel koşuda](../test-reports/verification.md) 841/841 birim ve tek işçiyle 572/574 Chromium testi geçti. Gece yarısına bağlı test verisi sabitlendi. SPA ölçümü Stüdyo seçicilerini Üyeler’in birleşim okumasından ayırıyor. Sahip gezinmesi, Stüdyo ve Ayarlar aboneliği aynı önbellekten okuyor. Etkilenen [regresyon paketi](../.tmp/v08-2-regressions.log) 34/34, son statik derleme ve [odaklı paket](../.tmp/v08-2-final-browser.log) 7/7 geçti. Axe taramalarındaki gerçek ihlal çıktıları negatif kontrolün beklenen bulgularıydı. Araç tarafından ölçülemeyen kurallar otomatik raporda ayrı kalır. [Görsel rapor](../.tmp/v08-visuals/report/index.html) güncel salt okunur çizim ve uygulamanın 390/1440 pikselde açık/koyu karşılaştırmalarını içerir. Tam yeşil aday koşusu ve yayımlı kabul açık.
+      `5801d8794691ae0db51e5170b71e4d78e4949600` temiz çalışma ağacında [filtresiz yerel doğrulama](../test-reports/verification.md) geçti. 841 birim ve tek Chromium işçisiyle 574 tarayıcı testi başarılı. Önceki takvim ve SPA regresyonları tam pakette geçti. [Görsel rapor](../.tmp/v08-visuals/report/index.html), güncel çizim ve uygulamayı 390/1440 pikselde açık/koyu karşılaştırıyor. Axe’ın otomatik ölçemediği kurallar raporda ayrıca listeleniyor. Yayımlı Web1, 18 Kasım kontrolünde önceki `index-C8ClfQCQ.js` girişini sundu. Aynı adayın yayımlı rota/kapsam kabulü açık. [Yayın kontrolü](../.tmp/v08-before-5801d879/published-check.json)
 - [ ] **G-DESIGN** · V01–V08/E47/E48 ve önceki açık Starter kabulünün sonucunu kaydet. Kalan gerçek sağlayıcı/OS kontrolleri mevcut kullanıcı kabul/erteleme kuralına uysun. Kaynak/görsel/API değişikliği çözülmeden genel tamamlandı sonucu verme.
 
 ### Yeni ekranların envanteri
@@ -291,17 +291,17 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
   - [ ] **E49.3** · Birleşik rapor ve daralma kaynak seçimini E41/E42, B05/B06 ile bağla. Beş merkez ve1250tekil öğrenci sınırı, merkezler arası izolasyon, tekrar güvenliği ve finans yetkisini native/otomatik kabulde doğrula.
 
 - [ ] **E50** · **Platform organizasyonları** — JS `o-organizasyonlar`, `#opshell/#op-root`. WF02/WF17. Hazır Sidebar, Card, Table, Sheet, Dialog ve AlertDialog. Sonraki platform operatörü teslimi.
-  - [ ] **E50.1** · Platform hesabının organizasyon keşfi/detay/oluşturma ve askı/kaldırma DTO/izin desteğini değerlendir. Eksik keşif veya komutu backend talebine bağla.
+  - [x] **E50.1** · `organization_create_v1` platform sahibine, `organization_get_v1` `org.read` yetkisine bağlı. Platform konsolu için erişim keşfi, organizasyon dizini ve askı/kaldırma sözleşmesi [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları) altında açık.
   - [ ] **E50.2** · Gerçek platform kapsamı ile kabuğu ve organizasyon detayını çizime uyarla; müşteri sahibi/personelde doğrudan route/API reddini doğrula.
   - [ ] **E50.3** · Desteklenen askı/kaldırma etkisini kaynak organizasyonda yeniden oku, mevcut verinin ve audit geçmişinin korunduğunu doğrula.
 
 - [ ] **E51** · **Platform ödeme ve ek süre** — JS `o-odemeler`. WF13/WF17. Hazır Tabs, Table, Sheet, Field ve AlertDialog. E50 yetki temeli gerekir.
-  - [ ] **E51.1** · Gerçek ödeme bildirimi keşfi, `saas_payment_verify_v1` ve `saas_grace_extend_v1` ile çizimdeki ret eylemini makine sözleşmesine eşle. Süre/tutar/yetkiyi API'den al.
+  - [ ] **E51.1** · Gerçek ödeme bildirimi keşfi, `saas_payment_verify_v1` ve `saas_grace_extend_v1` ile çizimdeki ret eylemini makine sözleşmesine eşle. Süre/tutar/yetkiyi API'den al. Ödeme keşfi [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları) altında açık.
   - [ ] **E51.2** · Yetkili açık karar→dönem/ödeme yeniden okuması→müşteri plan görünümü zincirini bağla; ikinci onay dönem uzatmasın.
   - [ ] **E51.3** · Yetkisiz karar, stale/tekrar ve ek süre sınırlarını native kaynak/otomatik UI kabulüyle doğrula.
 
 - [ ] **E52** · **Platform sahipleri** — JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
-  - [ ] **E52.1** · `platform_owner_set_v1/remove_v1` ve güvenli sahip keşfiyle taze yetki/gerekçeli onay görselini eşle.
+  - [ ] **E52.1** · `platform_owner_set_v1/remove_v1` ve güvenli sahip keşfiyle taze yetki/gerekçeli onay görselini eşle. Güvenli sahip ve doğrulanmış hesap keşfi [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları) altında açık.
   - [ ] **E52.2** · Son sahip koruması, yetki kaldırma, açık oturumda eski izinle tekrar ve müşteri rolünün reddini doğrula.
   - [ ] **E52.3** · E50–E52'nin görsel/otomatik/gerçek ortam kanıtlarını kendi platform tesliminde bağla. Bu çizimlerin eklenmesi Business veya platform kabulünü kendiliğinden kapatmaz.
 
