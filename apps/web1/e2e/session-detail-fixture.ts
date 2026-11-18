@@ -26,6 +26,7 @@ export async function mockSessionDetail(
     writeDenied?: boolean;
     allowEditor?: boolean;
     instructor?: boolean;
+    starterRoleGate?: boolean;
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
     origins?: Parameters<typeof mockStudio>[1];
@@ -135,7 +136,8 @@ export async function mockSessionDetail(
       expect(req.person_id).toBe(I.instructor);
       return send({ items: [], next_cursor: null, as_of: new Date().toISOString() });
     }
-    if (options.instructor && operation === "roles_list_v1") return reject("FORBIDDEN");
+    if (options.instructor && operation === "roles_list_v1")
+      return reject(options.starterRoleGate ? "PLAN_FEATURE_UNAVAILABLE" : "FORBIDDEN");
     if (operation === "session_get_v1") {
       expect(req.session_id).toBe(S.session);
       if (attendanceUnread) {

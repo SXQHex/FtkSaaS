@@ -1,6 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockMemberAccount, confirmCalendar } from "./member-account-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
+import { studioIds as I } from "./studio-fixture.js";
+import { uid } from "./pro-completion-fixture.js";
 test("member account places five sections and saves native email reminder preference", async ({
   page,
 }) => {
@@ -59,6 +61,36 @@ test("transactional email uses its own native version and never changes the remi
     ["transactional", true, 4],
     ["transactional", false, 5],
   ]);
+});
+test("Starter account shows native delivery limits and rejects another center from a direct URL", async ({
+  page,
+}) => {
+  const state = await mockMemberAccount(page, { starter: true });
+  const transactional = page.getByRole("switch", {
+    name: "E-posta ile işlem bildirimleri",
+    exact: true,
+  });
+  const reminder = page.getByRole("switch", { name: "E-posta ile hatırlatmalar", exact: true });
+  const mandatory = page.getByRole("switch", { name: "Zorunlu bildirimler", exact: true });
+  await expect(mandatory).toBeChecked();
+  await expect(mandatory).toBeDisabled();
+  await expect(transactional).not.toBeChecked();
+  await expect(transactional).toBeDisabled();
+  await expect(reminder).not.toBeChecked();
+  await expect(reminder).toBeDisabled();
+  expect(state.writes).toHaveLength(0);
+
+  const otherCenter = uid(993);
+  const preferencesReads = () =>
+    state.reads.filter(({ operation }) => operation === "notifications_list_v1").length;
+  const before = preferencesReads();
+  await page.goto(`/member/account?org=${I.org}&center=${otherCenter}`);
+  await expect(page.getByText("Organizasyon ve merkez seç.", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("switch", { name: "E-posta ile işlem bildirimleri", exact: true }),
+  ).toHaveCount(0);
+  expect(preferencesReads()).toBe(before);
+  expect(state.writes).toHaveLength(0);
 });
 test("member calendar creates rotates and revokes with explicit review and version rereads", async ({
   page,

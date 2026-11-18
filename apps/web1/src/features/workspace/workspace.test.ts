@@ -8,13 +8,16 @@ const accountId = "019a7b00-0000-7000-8000-000000000001";
 const orgId = "019a7b00-0000-7000-8000-000000000002";
 const personId = "019a7b00-0000-7000-8000-000000000003";
 const centerId = "019a7b00-0000-7000-8000-000000000004";
-let empty: boolean, multiple: boolean, scopeChanged: boolean, instructorOnly: boolean;
+let empty: boolean, multiple: boolean, scopeChanged: boolean;
+let selfRole: "instructor" | "student" | undefined;
+let roleReadError: string | undefined;
 const requests: { operation: string; bearer: string | null; body: Record<string, unknown> }[] = [];
 beforeEach(() => {
   empty = false;
   multiple = false;
   scopeChanged = false;
-  instructorOnly = false;
+  selfRole = undefined;
+  roleReadError = undefined;
   requests.length = 0;
   vi.stubEnv("VITE_SUPABASE_URL", "https://backend.invalid");
   vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "public-test-key");
@@ -46,12 +49,12 @@ beforeEach(() => {
                     self_context: {
                       person_id: personId,
                       subscriber_number: null,
-                      centers: instructorOnly
+                      centers: selfRole
                         ? [
                             {
                               center_id: centerId,
-                              instructor: true,
-                              student: false,
+                              instructor: selfRole === "instructor",
+                              student: selfRole === "student",
                               assistant: false,
                             },
                           ]
@@ -97,10 +100,10 @@ beforeEach(() => {
             next_cursor: null,
             as_of: "2026-11-14T06:00:00Z",
           };
-        else if (instructorOnly)
+        else if (roleReadError)
           return HttpResponse.json(
-            { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: accountId } },
-            { status: 403 },
+            { ok: false, error: { code: roleReadError, retryable: false, trace_id: accountId } },
+            { status: roleReadError === "FORBIDDEN" ? 403 : 200 },
           );
         else
           data = {
@@ -155,7 +158,8 @@ it("returns a real empty account context and clears an unavailable organization 
   expect(result.organizations).toEqual([]);
 });
 it("retains instructor self scope when the management role registry is forbidden", async () => {
-  instructorOnly = true;
+  selfRole = "instructor";
+  roleReadError = "FORBIDDEN";
   const result = await readWorkspace(accountId);
   expect(result.selected?.id).toBe(orgId);
   expect(result.selected?.self_context?.centers).toEqual([
@@ -163,6 +167,33 @@ it("retains instructor self scope when the management role registry is forbidden
   ]);
   expect(result.centers.map((c) => c.id)).toEqual([centerId]);
   expect(result.roles).toEqual([]);
+});
+it.each(["instructor", "student"] as const)(
+  "retains verified %s scope without deriving management access from a Starter plan denial",
+  async (role) => {
+    selfRole = role;
+    roleReadError = "PLAN_FEATURE_UNAVAILABLE";
+    const result = await readWorkspace(accountId, orgId);
+    expect(result.selected?.self_context?.centers).toEqual([
+      {
+        center_id: centerId,
+        instructor: role === "instructor",
+        student: role === "student",
+        assistant: false,
+      },
+    ]);
+    expect(result.centers.map((center) => center.id)).toEqual([centerId]);
+    expect(result.roles).toEqual([]);
+  },
+);
+it("surfaces a management plan denial when there is no verified personal scope", async () => {
+  roleReadError = "PLAN_FEATURE_UNAVAILABLE";
+  await expect(readWorkspace(accountId, orgId)).rejects.toMatchObject({ code: roleReadError });
+});
+it("surfaces a temporary role read failure even when the actor has personal scope", async () => {
+  selfRole = "instructor";
+  roleReadError = "TEMPORARY_FAILURE";
+  await expect(readWorkspace(accountId, orgId)).rejects.toMatchObject({ code: roleReadError });
 });
 it("preserves available organizations when the selected organization loses access", async () => {
   const result = await readWorkspace(accountId, personId);

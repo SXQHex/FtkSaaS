@@ -62,9 +62,16 @@ export async function readWorkspace(accountId: string, organizationId?: string) 
           cursor = page.next_cursor ?? undefined;
         } while (cursor);
       } catch (error) {
-        // The role registry is a management reader, not a self-role endpoint.
-        // Instructor/student scope remains authoritative in self_context.
-        if (!(error instanceof BackendError) || error.code !== "FORBIDDEN") throw error;
+        if (!(error instanceof BackendError)) throw error;
+        const personalScopeRemains =
+          error.code === "PLAN_FEATURE_UNAVAILABLE" &&
+          selected.self_context?.centers.some(
+            (self) =>
+              (self.instructor || self.student) &&
+              centers.some((center) => center.id === self.center_id),
+          );
+        if (!personalScopeRemains && error.code !== "FORBIDDEN") throw error;
+        // Personal scope comes from self_context. A denied registry proves no management grant.
         roles.length = 0;
       }
     }

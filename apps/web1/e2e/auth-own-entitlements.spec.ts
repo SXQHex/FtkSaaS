@@ -15,7 +15,8 @@ async function fixture(
     currencyDenied?: boolean;
   } = {},
 ) {
-  const reservations = await mockOwnReservations(page);
+  const roleGate = { starterRoleGate: false };
+  const reservations = await mockOwnReservations(page, roleGate);
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   let denied = Boolean(options.denied);
   const reads: { operation: string; request: Record<string, unknown> }[] = [];
@@ -165,6 +166,9 @@ async function fixture(
   return {
     reservations,
     reads,
+    enterStarterPeriod: () => {
+      roleGate.starterRoleGate = true;
+    },
     setDenied: (value: boolean) => {
       denied = value;
     },
@@ -192,6 +196,72 @@ test("a reservation cancellation refreshes the warm rights panel on return", asy
   await expect(page.getByText(/1,00.*borç/)).toBeVisible();
   expect(state.reservations.writes).toHaveLength(1);
 });
+test("Starter period keeps the same confirmed reservations, attendance, purchased rights and debt", async ({
+  page,
+}) => {
+  const state = await fixture(page);
+  const navigation = page.getByRole("navigation", { name: "Üye menüsü", exact: true });
+  const reservations = navigation.getByRole("link", { name: "Rezervasyonlarım", exact: true });
+  const rights = navigation.getByRole("link", { name: "Haklarım", exact: true });
+
+  async function expectHistoricalRights() {
+    await expect(page.getByText("Satın alınan sabit Tango paketi", { exact: true })).toBeVisible();
+    await expect(page.getByText("3 / 8 ders kullanıldı", { exact: true })).toBeVisible();
+    await expect(page.getByText(/90.071.992.547.409,93.*borç/)).toBeVisible();
+    await expect(page.getByText(/1,00.*borç/)).toBeVisible();
+  }
+
+  async function expectHistoricalReservations() {
+    await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
+    await expect(page.getByText("Sentetik geçmiş ders", { exact: true })).toBeVisible();
+    await expect(page.getByRole("grid", { name: "Geçmiş", exact: true })).toContainText("Geldi");
+    await expect(page.getByText("Başka üyenin gizli adı", { exact: true })).toHaveCount(0);
+  }
+
+  await expectHistoricalRights();
+  await reservations.click();
+  await expectHistoricalReservations();
+  const records = structuredClone(state.reservations.reservations);
+  const previousReads = state.reads.length;
+
+  state.enterStarterPeriod();
+  const roleRead = page.waitForResponse((response) =>
+    new URL(response.url()).pathname.endsWith("/roles_list_v1"),
+  );
+  await page.reload();
+  expect(await (await roleRead).json()).toMatchObject({
+    ok: false,
+    error: { code: "PLAN_FEATURE_UNAVAILABLE" },
+  });
+  await expectHistoricalReservations();
+  await rights.click();
+  await expectHistoricalRights();
+
+  const after = state.reads.slice(previousReads);
+  expect(after).toContainEqual(
+    expect.objectContaining({
+      operation: "reservation_list_v1",
+      request: expect.objectContaining({
+        person_id: I.self,
+        center_id: I.center,
+        time_filter: "past",
+      }),
+    }),
+  );
+  expect(after).toContainEqual(
+    expect.objectContaining({
+      operation: "entitlements_get_v1",
+      request: expect.objectContaining({
+        person_id: I.self,
+        center_id: I.center,
+        include_purchase_summary: true,
+      }),
+    }),
+  );
+  expect(state.reservations.reservations).toEqual(records);
+  expect(state.reservations.writes).toHaveLength(0);
+});
+
 test("own rights show native counts, exact separate debt currencies and a cursor ledger without a fictional total", async ({
   page,
 }) => {
