@@ -515,10 +515,13 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
       }
       expect(request).not.toHaveProperty("email");
       profile = {
+        ...profile,
         display_name: request.display_name,
-        given_name: request.given_name,
-        family_name: request.family_name,
-        unverified_phone: request.unverified_phone,
+        ...(Object.hasOwn(request, "given_name") && { given_name: request.given_name }),
+        ...(Object.hasOwn(request, "family_name") && { family_name: request.family_name }),
+        ...(Object.hasOwn(request, "unverified_phone") && {
+          unverified_phone: request.unverified_phone,
+        }),
       };
       profileVersion++;
       return route.fulfill({

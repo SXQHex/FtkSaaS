@@ -1,5 +1,5 @@
 import { CheckIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -103,6 +103,7 @@ export function ProfileForm({
   onRefresh: () => Promise<ProfileSnapshot>;
 }) {
   const { t } = useTranslation();
+  const titleId = useId();
   const [base, setBase] = useState(latest);
   const [notice, setNotice] = useState<Notice>("clean");
   const [reading, setReading] = useState(false);
@@ -137,15 +138,15 @@ export function ProfileForm({
     onSubmit: async ({ value }) => {
       if (disabled || writeKnown || preparingPhoto) return;
       const photo = photoDraft === null ? null : photoDraft?.upload;
+      const change = profileChange(value, variant, photo);
       setNotice("clean");
       const signature = JSON.stringify({
         version: base.version,
-        change: profileChange(value),
-        photo,
+        change,
       });
       if (intent.current?.signature !== signature) intent.current = { signature, key: uuidv7() };
       try {
-        await saveProfile(value, base.version, intent.current.key, photo);
+        await saveProfile(base.account.id, change, base.version, intent.current.key);
         setWriteKnown(true);
       } catch (error) {
         setNotice(
@@ -217,6 +218,7 @@ export function ProfileForm({
   const identity = (latest.version >= base.version ? latest : base).account.identity;
   return (
     <form
+      aria-labelledby={titleId}
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
@@ -226,7 +228,7 @@ export function ProfileForm({
       <Card>
         <CardHeader>
           <CardTitle>
-            <h2>
+            <h2 id={titleId}>
               {t(($) => (variant === "member" ? $.memberAccount.profileTitle : $.security.profile))}
             </h2>
           </CardTitle>

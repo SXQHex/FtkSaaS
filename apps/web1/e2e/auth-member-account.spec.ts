@@ -16,6 +16,21 @@ test("member account places five sections and saves native email reminder prefer
     "Takvimime ekle",
     "Bildirim tercihlerim",
   ]);
+  const profile = page.getByRole("form", { name: "Kişi bilgileri", exact: true });
+  await profile.getByLabel("Görünen ad", { exact: true }).fill("Sentetik yeni görünen ad");
+  const profileWrite = page.waitForRequest("**/functions/v1/backend-v1/account_profile_update_v1");
+  await profile.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  const { client_api_version, request_id, operation_key, expected_version, ...changed } = (
+    await profileWrite
+  ).postDataJSON();
+  expect({ client_api_version, request_id, operation_key, expected_version }).toEqual({
+    client_api_version: 1,
+    request_id: expect.any(String),
+    operation_key: expect.any(String),
+    expected_version: expect.any(Number),
+  });
+  expect(changed).toEqual({ display_name: "Sentetik yeni görünen ad", unverified_phone: null });
+  await expect(profile.getByText("Değişiklikler kaydedildi.", { exact: true })).toBeVisible();
   await expect(page.getByRole("switch", { name: "Stüdyo duyuruları", exact: true })).toBeDisabled();
   await expect(
     page.getByRole("switch", { name: "Zorunlu bildirimler", exact: true }),
@@ -37,6 +52,9 @@ test("member account places five sections and saves native email reminder prefer
   expect(state.writes[0]!.operation).toBe("notification_preferences_set_v1");
   await page.reload();
   await expect(email).toBeChecked();
+  await expect(profile.getByLabel("Görünen ad", { exact: true })).toHaveValue(
+    "Sentetik yeni görünen ad",
+  );
 });
 test("transactional email uses its own native version and never changes the reminder preference", async ({
   page,
