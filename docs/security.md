@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8bc2cdd46c3e1cf364ca18ff79d0fafbcc136f947b27b93da5e8f7e552da6713`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9b7e017737e9c66204a20e748eff6cb6357da35315eeae891592b9656de42671`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -181,6 +181,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [planned-start-cancellation.sql](../apps/backend/database/planned-start-cancellation.sql) | `25065e2714247553d72b8396b0ab99bd078c3e15380262e2283d1ea327e86460` |
 | [planned-start-decision-clock.sql](../apps/backend/database/planned-start-decision-clock.sql) | `79a88d9324f14d5ed8949be693d332d33a6add45743f2207221cdb2ec285918c` |
 | [platform-directory.sql](../apps/backend/database/platform-directory.sql) | `202e6e02a6d85e882fc7e6686113abaa6ba15764b9adcd3e14987c84b9ac51a5` |
+| [platform-invoices.sql](../apps/backend/database/platform-invoices.sql) | `943240737ff53d7098fbe65f8f49784671c51f68804a485ffc32e3c260749bb7` |
 | [platform-organization-suspension.sql](../apps/backend/database/platform-organization-suspension.sql) | `7bf26d3755e3667e2275a81660d7f8dadee7c6b6c0373389be51ddf108cda913` |
 | [pro-upgrade-brand-discovery.sql](../apps/backend/database/pro-upgrade-brand-discovery.sql) | `66c777294677bf4d709db2dc10f183f0dd89a7f7183050c1c04621f496e6f470` |
 | [pro-workflow-preparations.sql](../apps/backend/database/pro-workflow-preparations.sql) | `46506ab21f24582a0c8c69cc4af1ebb59916b3546dff156d2149288f5c60cd03` |
@@ -204,7 +205,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `ecac8414eea9ad175fc2f1b985699acbad10e8b8f24124f7bcd6e7fe7419bde3` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `afd09f7f7bdec65c6bbdcaf8eb22eac4b633f89981254d38e3a5c6a273177a08` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [sale-change-inventory.sql](../apps/backend/database/sale-change-inventory.sql) | `0985f3a2ddc067265966ad61dd2144578f5605a50a8f10393e642faf4cf1f8c2` |
@@ -259,7 +260,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [studio-setup-requests.sql](../apps/backend/database/studio-setup-requests.sql) | `16739bf94ec2317478e2c1f2f0862e11f8bbad013eb0c2e412016177adffbd66` |
 | [subscriber-numbers.sql](../apps/backend/database/subscriber-numbers.sql) | `52684678ed0a4dc4356d9b538c6073323e7d700465e342aeb5613830a3976eb6` |
 | [subscription-period-change.sql](../apps/backend/database/subscription-period-change.sql) | `44642e971242c9927b976d55407ffe80d71b852ccfaae7475602d6ddd889461d` |
-| [tracking-discovery.sql](../apps/backend/database/tracking-discovery.sql) | `4e81c098c3249224db924408e14a694cb296eacba56771cc503b7e246a55f2ae` |
+| [tracking-discovery.sql](../apps/backend/database/tracking-discovery.sql) | `0e030220f562060329371a24f786ee4abee7eb0a3956cbc1a39d202ebce7dbdd` |
 | [transactional-email.sql](../apps/backend/database/transactional-email.sql) | `a4a044188761eeb96ea0231399ea27a31bde0b5dc2be91b24363f24ec7ac2257` |
 | [user-settings-context.sql](../apps/backend/database/user-settings-context.sql) | `5e8db303c5e326ca40e18a7dd232b4c27cbbf4007eef0dcbbf987ac95784f183` |
 | [wrappers.sql](../apps/backend/database/wrappers.sql) | `ff1b4e487ff5aba58483f7f1e2c8c6a3412ab4fd6d3916e51caa5fd6c766b592` |
@@ -435,6 +436,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261118214600_organization_billing_tax.sql](../apps/backend/supabase/migrations/20261118214600_organization_billing_tax.sql) | `777089f0f8925e56ee7c88983cec1399c2f5ea2871eda4da97f92cf6d0cca75e` |
 | [20261118214700_platform_organization_suspension.sql](../apps/backend/supabase/migrations/20261118214700_platform_organization_suspension.sql) | `7bf26d3755e3667e2275a81660d7f8dadee7c6b6c0373389be51ddf108cda913` |
 | [20261118214800_audit_export_tracking_results.sql](../apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql) | `22a7dc583102741342c06530b78a21c9a113ea5bc31bb1c09c69eba869824a84` |
+| [20261118215000_platform_invoices.sql](../apps/backend/supabase/migrations/20261118215000_platform_invoices.sql) | `943240737ff53d7098fbe65f8f49784671c51f68804a485ffc32e3c260749bb7` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

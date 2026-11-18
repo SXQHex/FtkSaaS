@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="platform-invoice-files"></a>
+## W1-BE-58 · Manuel platform faturaları
+
+Kaynak tabanı `4d1e45ab590737afaeafdfd5b21aac94e5657d4a`. Aynı SHA’nın [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) sonuçları başarılı. Dışarıda düzenlenen faturanın manuel ZIP/PDF yüklemesi ve organizasyon sahibinin orijinal eki indirmesi `codex/platform-invoice-files` dalında yerel. Tüketim [WF17](../../../docs/workflows.md#wf17) sahibindedir.
+
+207 migration izole loopback Supabase üzerinde temiz uygulandı. Tek seri Node runner’da 6/6 test geçti. Orijinal baytlar, yükleme ve yayın tekrarları, organizasyon izolasyonu, askı ile vadesi gelmiş plan geçişi sırasında sahip erişimi ve mevcut belge akışı doğrulandı. Sözleşme, workflow kapsamı, 142 API test birimi, typecheck ve floor guard geçti. Edge JSON yükü 4.113.269 bayt. Yerel stack kapatıldı.
+
 <a id="web1-v67-platform-billing"></a>
 ## Web1 v67 denetim, vergi profili ve platform konsolu
 

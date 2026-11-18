@@ -6671,6 +6671,90 @@
       "limits": [
         "Only recorded center audit rows visible to the current actor and within the requested filters. Requires existing report export configuration."
       ]
+    },
+    {
+      "name": "platform_invoice_upload_prepare_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/platform_invoice_upload_prepare_v1",
+      "permission": "platform.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_invoice_upload_prepare"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Reserve a private immutable upload target for the selected organization."
+      ]
+    },
+    {
+      "name": "platform_invoice_publish_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/platform_invoice_publish_v1",
+      "permission": "platform.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_invoice_publish"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Publish verified bytes and bind the immutable issued invoice to the target organization."
+      ]
+    },
+    {
+      "name": "organization_invoices_list_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/organization_invoices_list_v1",
+      "permission": "org.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_invoices_list"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "List published invoices for the live organization owner only."
+      ]
+    },
+    {
+      "name": "organization_invoice_file_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/organization_invoice_file_get_v1",
+      "permission": "org.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_invoice_file_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Read invoice metadata and authorize an original attachment download for the live owner."
+      ]
     }
   ]
 }

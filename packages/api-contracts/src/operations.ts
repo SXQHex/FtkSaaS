@@ -247,4 +247,8 @@ export interface Operations {
   organization_billing_tax_set_v1: {request: T.RequestOrganizationBillingTaxSet; response: T.SuccessOrganizationBillingTaxSet};
   platform_organization_suspension_set_v1: {request: T.RequestPlatformOrganizationSuspensionSet; response: T.SuccessPlatformOrganizationSuspensionSet};
   audit_center_export_v1: {request: T.RequestAuditCenterExport; response: T.SuccessAuditCenterExport};
+  platform_invoice_upload_prepare_v1: {request: T.RequestPlatformInvoiceUploadPrepare; response: T.SuccessPlatformInvoiceUploadPrepare};
+  platform_invoice_publish_v1: {request: T.RequestPlatformInvoicePublish; response: T.SuccessPlatformInvoicePublish};
+  organization_invoices_list_v1: {request: T.RequestOrganizationInvoicesList; response: T.SuccessOrganizationInvoicesList};
+  organization_invoice_file_get_v1: {request: T.RequestOrganizationInvoiceFileGet; response: T.SuccessOrganizationInvoiceFileGet};
 }
