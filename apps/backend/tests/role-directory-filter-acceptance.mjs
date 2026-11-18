@@ -22,6 +22,9 @@ test('W1-BE-35 role and state filters precede paging and preserve native manager
  const cm=await linked('Synthetic team CM','center_manager');
  const remote=await linked('Synthetic remote CM','center_manager',other);
  const om=await linked('Synthetic team OM','org_manager');
+ const omOrganizations=await must(om.user,'organizations_list_v1',{page:{},include_self_management_scope:true});
+ assert.deepEqual(omOrganizations.items.find(item=>item.id===org)?.self_management_scope,
+  {owner:false,org_manager:true,managed_center_ids:[]});
  const retired=await linked('Synthetic former OM','org_manager');
  const read=(body={},user=owner)=>must(user,'roles_list_v1',{org_id:org,page:{},...body});
  const reject=async(body,code,user=owner)=>{
@@ -72,4 +75,61 @@ test('W1-BE-35 role and state filters precede paging and preserve native manager
  await reject({role:'center_manager',state:'active',page:{cursor:cmFirst.next_cursor}},'FORBIDDEN',cm.user);
  await db.query("update core.saas_plan_versions set features=array_remove(features,'F05') where id=$1",[f.plan]);
  try{await reject({role:'org_manager'},'PLAN_FEATURE_UNAVAILABLE');}finally{await db.query("update core.saas_plan_versions set features=features||array['F05'] where id=$1",[f.plan]);}
+});
+
+test('W1-BE-42 native Starter self scope preserves live management authority and F05',async t=>{
+ const f=await preparationFixture({studentUser:true,studentMembership:true});
+ const {db,org,center,api,owner,student,studentPerson}=f;
+ t.after(()=>db.end());
+ const manager=await authUser('starter-self-manager'),account=await must(manager,'account_get_v1');
+ const person=(await api('person_create_v1',{display_name:'Synthetic Starter center manager',contacts:[]})).primary_id;
+ await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",
+  [key(),org,account.id,person]);
+ const grant=await api('center_manager_assign_v1',{person_id:person});
+ const listing=async(user,option={include_self_management_scope:true})=>(await must(user,'organizations_list_v1',{page:{},...option})).items;
+ const own=async(user,option)=>(await listing(user,option)).find(item=>item.id===org);
+ const read=async user=>(await own(user))?.self_management_scope;
+ const ownerScope={owner:true,org_manager:false,managed_center_ids:[center]};
+ const managerScope={owner:false,org_manager:false,managed_center_ids:[center]};
+ assert.deepEqual(await read(owner),ownerScope);
+ assert.deepEqual(await read(manager),managerScope);
+ assert.equal(await read(student),null);
+ assert.deepEqual((await own(student)).self_context.centers.map(item=>item.center_id),[center]);
+ const outsider=await authUser('starter-self-outsider');
+ assert.equal(await own(outsider),undefined);
+ const legacy=await own(owner,{});
+ assert(!Object.hasOwn(legacy,'self_management_scope'));
+ assert.deepEqual(await own(owner,{include_self_management_scope:false}),legacy);
+ const suppliedPerson=await call(manager,'organizations_list_v1',{page:{},include_self_management_scope:true,person_id:studentPerson});
+ assert.equal(suppliedPerson.result.error?.code,'VALIDATION_FAILED');
+
+ const directory=(user,target)=>call(user,'roles_list_v1',{org_id:org,page:{},person_id:target});
+ const assertStarterGate=async()=>{
+  for(const [user,target] of [[owner,person],[manager,person],[manager,studentPerson]]){
+   assert.equal((await directory(user,target)).result.error?.code,'PLAN_FEATURE_UNAVAILABLE');
+  }
+ };
+ await assertStarterGate();
+ const staff=await call(owner,'role_assign_v1',{org_id:org,center_id:center,person_id:studentPerson,role:'staff',scope:{center_id:center}},key());
+ assert.equal(staff.result.error?.code,'PLAN_FEATURE_UNAVAILABLE');
+
+ await api('center_manager_revoke_v1',{person_id:person,expected_version:grant.version,reason:'Synthetic live scope revocation'});
+ assert.equal(await read(manager),null);
+ assert.deepEqual(await read(owner),ownerScope);
+ await api('center_manager_assign_v1',{person_id:person});
+ assert.deepEqual(await read(manager),managerScope);
+
+ // Reuse the same authenticated sessions before and after the effective plan
+ // changes. The older first center is the kept center for this fixture.
+ await db.query("update core.saas_plan_versions set name='business' where id=$1",[f.plan]);
+ const remote=(await must(owner,'center_create_v1',{org_id:org,name:'Synthetic second managed center',timezone:'UTC'},key())).primary_id;
+ assert.deepEqual(await read(owner),ownerScope);
+ assert.deepEqual((await own(owner)).self_context.centers.map(x=>x.center_id),[center,remote].sort());
+ await api('center_manager_assign_v1',{center_id:remote,person_id:person});
+ assert.deepEqual(await read(manager),{...managerScope,managed_center_ids:[center,remote].sort()});
+ assert((await directory(owner,person)).result.ok);
+ await db.query("update core.saas_plan_versions set name='starter' where id=$1",[f.plan]);
+ assert.deepEqual(await read(manager),managerScope);
+ assert.deepEqual((await own(owner)).self_context.centers.map(x=>x.center_id),[center]);
+ await assertStarterGate();
 });

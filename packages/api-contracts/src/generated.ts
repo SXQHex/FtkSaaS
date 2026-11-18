@@ -3777,6 +3777,7 @@ GenericAccepted?: GenericAccepted
 WorkerResult?: WorkerResult
 ContactView?: ContactView
 AccountView?: AccountView
+OrganizationSelfManagementScope?: OrganizationSelfManagementScope
 OrganizationView?: OrganizationView
 CenterView?: CenterView
 RoleView?: RoleView
@@ -7568,6 +7569,18 @@ checksum: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "OrganizationSelfManagementScope".
+ */
+export interface OrganizationSelfManagementScope {
+owner: Bool
+org_manager: Bool
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+managed_center_ids: string[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationView".
  */
 export interface OrganizationView {
@@ -7581,6 +7594,7 @@ access_mode: ("bootstrap" | "normal" | "grace" | "closed")
 version: PositiveInt
 logo?: (SettingsMediaAsset | null)
 self_context?: (AccountSelfContext | null)
+self_management_scope?: (OrganizationSelfManagementScope | null)
 regional_defaults?: OrganizationRegionalDefaults
 brand_colors?: OrganizationBrandColors
 }
@@ -9791,6 +9805,7 @@ client_api_version: 1
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 request_id: string
+include_self_management_scope?: Bool
 page: Page
 }
 /**
