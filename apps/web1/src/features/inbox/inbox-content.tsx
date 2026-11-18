@@ -76,6 +76,7 @@ export function InboxContent({
         ? readMemberSessionNotice(scope, memberPersonId, memberSessionId)
         : readInboxSource(scope, selected!.work!, memberPersonId),
     enabled: canReadSource && openedSource === selected?.id,
+    staleTime: 0,
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

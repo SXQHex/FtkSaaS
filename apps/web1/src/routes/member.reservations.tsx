@@ -7,6 +7,7 @@ const search = z.object({
   org: z.uuid().optional(),
   center: z.uuid().optional(),
   session: z.uuid().optional(),
+  offer: z.uuid().optional(),
 });
 export const Route = createFileRoute("/member/reservations")({
   beforeLoad: requireAccountSession,

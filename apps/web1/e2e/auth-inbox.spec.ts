@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
+import { mockOwnPrivateLessons } from "./member-private-lessons-fixture.js";
 const secondId = "019ab7b0-0000-7000-8000-000000000202";
 const sourceId = "019ab7b0-0000-7000-8000-000000000203";
 const sourceCenter = "019ab7b0-0000-7000-8000-000000000204";
@@ -19,10 +20,19 @@ async function fixture(
     | "stale"
     | "batch"
     | "source"
+    | "member-offer"
+    | "member-request"
     | "participant" = "normal",
 ) {
-  const participant = mode === "participant" ? await mockOwnReservations(page) : undefined;
-  if (!participant) await mockStudio(page);
+  const privateLessons = mode === "member-request" ? await mockOwnPrivateLessons(page) : undefined;
+  const participant =
+    mode === "participant" || mode === "member-offer" ? await mockOwnReservations(page) : undefined;
+  const member = Boolean(participant || privateLessons);
+  if (!member) await mockStudio(page);
+  const offerId = sourceId;
+  const requestId = privateLessons?.requests[1]?.id;
+  const memberTitle =
+    mode === "participant" ? changeTitle : requestId ? "Özel ders yanıtı" : "Yeni yer teklifi";
   const state = {
     read: false,
     version: 7,
@@ -37,7 +47,9 @@ async function fixture(
     keys: new Set<string>(),
     sourceReads: [] as Record<string, unknown>[],
     sourceDenied: false,
+    foreignOffer: false,
     participant,
+    privateLessons,
   };
   const row = () => ({
     id,
@@ -53,7 +65,22 @@ async function fixture(
               key: { activity_id: sourceId, person_id: I.self },
             },
           }
-        : { state: "informational", center_id: null, selector: null },
+        : mode === "member-offer"
+          ? {
+              state: "pending",
+              center_id: I.center,
+              selector: { operation: "seat_offer_accept_v1", key: { offer_id: offerId } },
+            }
+          : requestId
+            ? {
+                state: "pending",
+                center_id: I.center,
+                selector: {
+                  operation: "lesson_request_create_v1",
+                  key: { lesson_request_id: requestId },
+                },
+              }
+            : { state: "informational", center_id: null, selector: null },
     payload:
       mode === "participant"
         ? {
@@ -65,8 +92,13 @@ async function fixture(
           }
         : {
             template_key: "private_native_template",
-            subject: { type: "notifications", id },
-            title: "Örnek bildirim",
+            subject:
+              mode === "member-offer"
+                ? { type: "seat_offers", id: offerId }
+                : requestId
+                  ? { type: "lesson_requests", id: requestId }
+                  : { type: "notifications", id },
+            title: member ? memberTitle : "Örnek bildirim",
             body: '<img src=x onerror="alert(1)"> Gönderim durumu güncellendi.',
             language: "tr",
           },
@@ -121,26 +153,85 @@ async function fixture(
             (!r.unread_only || !n.read_at) &&
             (!r.query || n.payload.title.toLowerCase().includes(r.query.toLowerCase())),
         ),
-        summary:
-          mode === "participant"
-            ? {
-                total: 1,
-                unread: state.read ? 0 : 1,
-                pending: 0,
-                completed: 0,
-                informational: 1,
-                unavailable: 0,
-              }
-            : {
-                total: 90,
-                unread: 20,
-                pending: 10,
-                completed: 30,
-                informational: 40,
-                unavailable: 10,
-              },
+        summary: member
+          ? {
+              total: 1,
+              unread: state.read ? 0 : 1,
+              pending: 0,
+              completed: 0,
+              informational: 1,
+              unavailable: 0,
+            }
+          : {
+              total: 90,
+              unread: 20,
+              pending: 10,
+              completed: 30,
+              informational: 40,
+              unavailable: 10,
+            },
         next_cursor: null,
         as_of: "2026-11-16T12:05:00Z",
+      });
+    }
+    if (
+      op === "management_state_get_v1" &&
+      (r.operation === "seat_offer_accept_v1" ||
+        (r.operation === "waitlist_join_v1" && r.entity?.type === "seat_offers")) &&
+      mode === "member-offer"
+    ) {
+      state.sourceReads.push(r);
+      if (state.sourceDenied) return reject("FORBIDDEN");
+      if (r.operation === "seat_offer_accept_v1")
+        expect(r.selector.key).toEqual({ offer_id: offerId });
+      else {
+        expect(r.entity).toEqual({ type: "seat_offers", id: offerId });
+        expect(r.selector.key).toEqual({ directory: "self", view: "offers", status: "all" });
+      }
+      expect(r.center_id).toBe(I.center);
+      const person = state.foreignOffer ? I.role : I.self;
+      const sessionId = participant!.reservations[1]!.session_id;
+      return send({
+        next_cursor: null,
+        as_of: "2026-11-16T12:05:00Z",
+        items: [
+          {
+            operation: r.operation,
+            exists: true,
+            entity: { type: "seat_offers", id: offerId },
+            versions: [
+              { entity: { type: "seat_offers", id: offerId }, version: 2 },
+              { entity: { type: "waitlist_entries", id: secondId }, version: 2 },
+            ],
+            waitlist_session: {
+              id: sessionId,
+              title: "Teklifin gerçek seansı",
+              state: "planned",
+              version: 3,
+              timezone: "Europe/Istanbul",
+              interval: { starts_at: "2026-11-18T15:00:00Z", ends_at: "2026-11-18T16:00:00Z" },
+            },
+            waitlist_detail: {
+              id: secondId,
+              center_id: I.center,
+              session_id: sessionId,
+              person_id: person,
+              state: "offered",
+              version: 2,
+              offers: [
+                {
+                  id: offerId,
+                  state: "active",
+                  version: 2,
+                  entry_id: secondId,
+                  person_id: person,
+                  session_id: sessionId,
+                  expires_at: "2026-11-17T12:00:00Z",
+                },
+              ],
+            },
+          },
+        ],
       });
     }
     if (op === "management_state_get_v1" && r.operation === "crm_activity_save_v1") {
@@ -256,7 +347,7 @@ async function fixture(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  if (mode === "participant") {
+  if (member) {
     await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
     const bell = page.getByRole("link", { name: "Bildirimler", exact: true });
     await expect(bell).toHaveAccessibleDescription("1 okunmamış bildirim");
@@ -264,7 +355,7 @@ async function fixture(
     await page.evaluate("document.documentElement.dataset.inboxNavigationProbe='member'");
     await bell.press("Enter");
     await expect(page).toHaveURL(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`);
-    await expect(page.getByRole("button", { name: changeTitle, exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: memberTitle, exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-inbox-navigation-probe", "member");
     expect(state.lists).toHaveLength(initialReads);
   } else {
@@ -272,7 +363,7 @@ async function fixture(
   }
   await expect(
     page.getByRole("heading", {
-      name: mode === "participant" ? "Bildirimler" : "Gelen kutusu",
+      name: member ? "Bildirimler" : "Gelen kutusu",
       exact: true,
     }),
   ).toBeVisible();
@@ -379,6 +470,65 @@ test("member change notice opens the exact reservation and rechecks access on re
   expect(participant.writes).toHaveLength(0);
   expect(state.writes).toHaveLength(0);
 });
+test("member offer notice opens only the exact offer and rejects a foreign owner on return", async ({
+  page,
+}) => {
+  const state = await fixture(page, "member-offer");
+  await page.getByRole("button", { name: "Yeni yer teklifi", exact: true }).click();
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
+  const path = `/member/reservations?org=${I.org}&center=${I.center}&offer=${sourceId}`;
+  await expect(target).toHaveAttribute("href", path);
+  await target.press("Enter");
+  await expect(page).toHaveURL(`${origin}${path}`);
+  await expect(page.getByRole("button", { name: "Teklifi kabul et", exact: true })).toBeEnabled();
+  await expect(page.getByText("Teklifin gerçek seansı", { exact: true })).toBeVisible();
+  expect(state.sourceReads).toHaveLength(2);
+  await page.goBack();
+  await expect(page.getByRole("heading", { name: "Bildirimler", exact: true })).toBeVisible();
+  state.foreignOffer = true;
+  await page.getByRole("button", { name: "Yeni yer teklifi", exact: true }).click();
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await expect(page.getByText("Kaynak şu anda erişilebilir değil.", { exact: true })).toBeVisible();
+  await expect(target).toHaveCount(0);
+  await page.goForward();
+  await expect(
+    page.getByText("Güncel bekleme listesi ve teklifler okunamadı.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Teklifi kabul et", exact: true })).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+  expect(state.participant!.writes).toHaveLength(0);
+});
+
+test("member private lesson response opens only its request and rereads after reload", async ({
+  page,
+}) => {
+  const state = await fixture(page, "member-request");
+  const lessons = state.privateLessons!;
+  const requestId = lessons.requests[1]!.id;
+  await page.getByRole("button", { name: "Özel ders yanıtı", exact: true }).click();
+  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
+  const path = `/member/private-lessons?org=${I.org}&center=${I.center}&request=${requestId}`;
+  await expect(target).toHaveAttribute("href", path);
+  await target.press("Enter");
+  await expect(page).toHaveURL(`${origin}${path}`);
+  await expect(page.getByText("Özel ders · Örnek Eğitmen", { exact: true })).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Alternatifi kabul et", exact: true }),
+  ).toBeEnabled();
+  lessons.requests[1]!.person_id = I.role;
+  await page.reload();
+  await expect(
+    page.getByText("Güncel özel ders talepleri okunamadı.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Alternatifi kabul et", exact: true })).toHaveCount(
+    0,
+  );
+  expect(state.writes).toHaveLength(0);
+  expect(lessons.writes).toHaveLength(0);
+});
+
 test("inbox unknown write recovers its exact receipt and never marks twice", async ({ page }) => {
   const state = await fixture(page, "unknown");
   await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();

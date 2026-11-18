@@ -17,12 +17,14 @@ export function MemberReservationsContent({
   scope,
   personId,
   sessionId,
+  offerId,
   timezone,
   onLockChange,
 }: {
   scope: ClientScope;
   personId: string;
   sessionId?: string;
+  offerId?: string;
   timezone: string;
   onLockChange: (locked: boolean) => void;
 }) {
@@ -62,8 +64,12 @@ export function MemberReservationsContent({
     retry: false,
   });
   const offers = useQuery({
-    queryKey: [...prefix, "offers", offerCursors.at(-1)],
-    queryFn: () => readOwnWaitlist(scope, "offers", offerCursors.at(-1)),
+    queryKey: [...prefix, "offers", offerCursors.at(-1), offerId],
+    queryFn: () =>
+      offerId
+        ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId })
+        : readOwnWaitlist(scope, "offers", offerCursors.at(-1)),
+    ...(offerId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const accessLost = useCallback(
@@ -145,13 +151,16 @@ export function MemberReservationsContent({
     if (upcomingResult.isError || pastResult.isError || waitlistReadFailed)
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
   }
-  const offerPage = offers.isError ? undefined : offers.data;
+  const loadingOffers = offers.isPending || Boolean(offerId && offers.isFetching);
+  const offerPage = offers.isError || loadingOffers ? undefined : offers.data;
   return (
     <>
       <MemberReservationsView
         pending={{
           upcoming: loadingUpcoming,
-          waiting: !waiting.isError && !offers.isError && (waiting.isPending || offers.isPending),
+          waiting:
+            !offers.isError &&
+            (loadingOffers || (!offerId && !waiting.isError && waiting.isPending)),
           history: loadingHistory,
         }}
         upcoming={
@@ -212,9 +221,9 @@ export function MemberReservationsContent({
           })) ?? null
         }
         waiting={
-          waiting.isError || !waiting.data || !offerPage
+          !offerPage || (!offerId && (waiting.isError || !waiting.data))
             ? null
-            : [...offerPage.items, ...waiting.data.items].map((row) => {
+            : [...offerPage.items, ...(offerId ? [] : (waiting.data?.items ?? []))].map((row) => {
                 const dateTime = new Intl.DateTimeFormat("tr-TR", {
                   dateStyle: "medium",
                   timeStyle: "short",
@@ -247,71 +256,84 @@ export function MemberReservationsContent({
                       })
                     : t(($) => $.memberReservations.queuePositionUnknown),
                   state: row.offer
-                    ? t(($) => $.memberReservations.activeOffer)
+                    ? t(($) =>
+                        row.offer?.state === "active"
+                          ? $.memberReservations.activeOffer
+                          : $.sessionDetail[row.offer!.state],
+                      )
                     : t(($) => $.memberClasses.waiting),
-                  action: (
-                    <div className="flex flex-wrap gap-2">
-                      {(row.offer ? (["accept", "reject"] as const) : (["leave"] as const)).map(
-                        (action) => (
-                          <Button
-                            key={action}
-                            size="sm"
-                            variant="outline"
-                            isDisabled={
-                              !eligible ||
-                              Boolean(
-                                row.offer &&
-                                Date.parse(row.offer.expires_at) <= Date.parse(offerPage.asOf),
-                              )
-                            }
-                            onPress={() => setWaitTarget({ row, action })}
-                          >
-                            {t(($) => $.memberClasses[action])}
-                          </Button>
-                        ),
-                      )}
-                    </div>
-                  ),
+                  action:
+                    row.offer && row.offer.state !== "active" ? undefined : (
+                      <div className="flex flex-wrap gap-2">
+                        {(row.offer ? (["accept", "reject"] as const) : (["leave"] as const)).map(
+                          (action) => (
+                            <Button
+                              key={action}
+                              size="sm"
+                              variant="outline"
+                              isDisabled={
+                                !eligible ||
+                                Boolean(
+                                  row.offer &&
+                                  Date.parse(row.offer.expires_at) <= Date.parse(offerPage.asOf),
+                                )
+                              }
+                              onPress={() => setWaitTarget({ row, action })}
+                            >
+                              {t(($) => $.memberClasses[action])}
+                            </Button>
+                          ),
+                        )}
+                      </div>
+                    ),
                 };
               })
         }
         waitingPagination={
-          <div className="flex flex-wrap gap-4">
-            {(["entries", "offers"] as const).map((view) => {
-              const query = view === "entries" ? waiting : offers,
-                cursors = view === "entries" ? entryCursors : offerCursors,
-                setCursors = view === "entries" ? setEntryCursors : setOfferCursors,
-                next = query.data?.nextCursor;
-              return (
-                <div
-                  key={view}
-                  role="group"
-                  aria-label={t(($) => $.memberReservations.queuePages[view])}
-                  className="flex flex-wrap items-center gap-2"
-                >
-                  <span className="text-xs">{t(($) => $.memberReservations.queuePages[view])}</span>
-                  <Button
-                    variant="outline"
-                    isDisabled={locked || query.isFetching || cursors.length === 1}
-                    onPress={() => setCursors((old) => old.slice(0, -1))}
+          offerId ? undefined : (
+            <div className="flex flex-wrap gap-4">
+              {(["entries", "offers"] as const).map((view) => {
+                const query = view === "entries" ? waiting : offers,
+                  cursors = view === "entries" ? entryCursors : offerCursors,
+                  setCursors = view === "entries" ? setEntryCursors : setOfferCursors,
+                  next = query.data?.nextCursor;
+                return (
+                  <div
+                    key={view}
+                    role="group"
+                    aria-label={t(($) => $.memberReservations.queuePages[view])}
+                    className="flex flex-wrap items-center gap-2"
                   >
-                    {t(($) => $.memberReservations.previous)}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    isDisabled={
-                      locked || query.isFetching || query.isError || !next || cursors.includes(next)
-                    }
-                    onPress={() => {
-                      if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
-                    }}
-                  >
-                    {t(($) => $.memberReservations.next)}
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+                    <span className="text-xs">
+                      {t(($) => $.memberReservations.queuePages[view])}
+                    </span>
+                    <Button
+                      variant="outline"
+                      isDisabled={locked || query.isFetching || cursors.length === 1}
+                      onPress={() => setCursors((old) => old.slice(0, -1))}
+                    >
+                      {t(($) => $.memberReservations.previous)}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      isDisabled={
+                        locked ||
+                        query.isFetching ||
+                        query.isError ||
+                        !next ||
+                        cursors.includes(next)
+                      }
+                      onPress={() => {
+                        if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
+                      }}
+                    >
+                      {t(($) => $.memberReservations.next)}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )
         }
         history={
           historyRows?.map((row, index) => ({
@@ -325,7 +347,7 @@ export function MemberReservationsContent({
         historyPagination={pagination("past")}
         notice={
           <div className="space-y-3">
-            {sessionId && (
+            {(sessionId || offerId) && (
               <LinkButton
                 variant="outline"
                 href={`/member/reservations?${new URLSearchParams({ org: scope.orgId, center: scope.centerId })}`}

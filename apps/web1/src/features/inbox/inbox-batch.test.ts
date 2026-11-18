@@ -276,15 +276,17 @@ it("validates the exact native seat offer without treating its read selector as 
     selector: { operation, key: { offer_id: offer.id } },
   };
   call.mockResolvedValue({ items: [row], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
-  await expect(readInboxSource(scope, source, id(7))).rejects.toThrow("INBOX_SOURCE_UNAVAILABLE");
+  await expect(readInboxSource(scope, source, id(7))).rejects.toThrow(
+    "MEMBER_WAITLIST_UNAVAILABLE",
+  );
   expect(await readInboxSource(scope, source)).toMatchObject({
     kind: "offer",
     workState: "pending",
-    href: `/member/reservations?org=${scope.orgId}&center=${id(9)}`,
+    href: `/member/reservations?org=${scope.orgId}&center=${id(9)}&offer=${offer.id}`,
   });
   call.mockResolvedValue({
     items: [{ ...row, waitlist_detail: { ...row.waitlist_detail, center_id: id(99) } }],
   });
-  await expect(readInboxSource(scope, source)).rejects.toThrow("INBOX_SOURCE_UNAVAILABLE");
+  await expect(readInboxSource(scope, source)).rejects.toThrow("MEMBER_WAITLIST_UNAVAILABLE");
   expect(call.mock.calls.every(([op]) => op === "management_state_get_v1")).toBe(true);
 });

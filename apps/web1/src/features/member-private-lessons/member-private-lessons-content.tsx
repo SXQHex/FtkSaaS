@@ -68,6 +68,7 @@ export function MemberPrivateLessonsContent({
   const list = useQuery({
     queryKey: [...prefix, "list", cursors.at(-1), requestId],
     queryFn: () => readOwnRequests(scope, personId, cursors.at(-1), requestId),
+    ...(requestId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const disciplines = useQuery({
@@ -124,7 +125,8 @@ export function MemberPrivateLessonsContent({
     timeZoneName: "shortOffset",
   });
   const time = new Intl.DateTimeFormat("tr-TR", { timeStyle: "short", timeZone: timezone });
-  const entries = !list.isError ? list.data?.items : undefined;
+  const loading = list.isPending || Boolean(requestId && list.isFetching);
+  const entries = !list.isError && !loading ? list.data?.items : undefined;
   const asOf = list.data?.asOf;
   const isOffered = (row: LessonRequestView["alternatives"][number]) =>
     row.state === "offered" && asOf !== undefined && Date.parse(row.starts_at) > Date.parse(asOf);
@@ -223,7 +225,7 @@ export function MemberPrivateLessonsContent({
   return (
     <>
       <MemberPrivateLessonsView
-        pending={list.isPending}
+        pending={loading}
         rows={
           entries?.map((row) => ({
             id: row.id,

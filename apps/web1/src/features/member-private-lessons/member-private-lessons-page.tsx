@@ -25,7 +25,7 @@ export function MemberPrivateLessonsRoutePage() {
     >
       {({ scope, personId, timezone, onLockChange }) => (
         <MemberPrivateLessonsContent
-          key={`${scope.orgId}:${scope.centerId}:${personId}`}
+          key={`${scope.orgId}:${scope.centerId}:${personId}:${search.request ?? ""}`}
           scope={scope}
           personId={personId}
           requestId={search.request}
