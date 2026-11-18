@@ -1,5 +1,11 @@
 # Güncel kaynak ve kabul
 
+## W1-BE-42 Starter oturumunun kendi yönetim kapsamı
+
+Başlangıç main `40cdd1ff4b06f4af1b3e13ae3527d440ebea5f96` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44290448188) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44290509069) başarılı. Yeni opt-in okumanın tüketim sözleşmesi [WF02](../../../docs/workflows.md#wf02) sahibindedir.
+
+190. append migration ile yerel sözleşme ve governance testleri 417/417, API envanteri 14/14 ve native Auth → Edge → RPC kabulü 2/2 geçti. Starter sahipliği, merkez yöneticiliği, başka kişi ve personel F05 reddi, öğrencinin ve yabancı hesabın kapsam dışı kalması, canlı rol geri alımı ve plan değişiminde merkez filtresi doğrulandı. Tekrarlanan özdeş alt şemaların ortak doğrulayıcıya alınmasıyla JSON Edge yükü 3.998.555 bayta indi ve mevcut 4.000.000 bayt sınırı ile doğrulayıcı eşdeğerliği testleri geçti. Aday full clean, main ve development teslimi bekleniyor.
+
 ## W1-BE-39–41 rezervasyon, bildirim ve ilk parola
 
 Başlangıç main `82e0648b455a5074816dd0df5d0feee796b15713` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44211621384) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44211688721) başarılı. [WF06](../../../docs/workflows.md#wf06) yetkili yeni rezervasyonda güvenli borç engelini tanımlar. [WF11](../../../docs/workflows.md#wf11) yalnız değişen seansların aktif rezervasyon sahiplerine uygulama içi bildirim üretir. [Native Auth sözleşmesi](../../../docs/settings.md#parola-değişimi-ve-güvenlik-bildirimi) ilk parolayı mevcut parolasız oturumdan kabul eder.

@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e9fde2d6c75fee970753e6297342f524848ad320b7f58cb749f44d09e407fe7a`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `f9e0932e9eaad022b2b00ac8b7a1c941367e9dfa24e72104f35bb547db299255`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 189. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 190. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -197,3 +197,4 @@ Sıralı migration: 189. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261117152419_role_directory_filters.sql](../apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql) | `44152b1ffff6528c23072c025e750c3d4f614acb463418f719bf03e1e627d6d0` |
 | [20261117232051_event_registration_document_discovery.sql](../apps/backend/supabase/migrations/20261117232051_event_registration_document_discovery.sql) | `589d5fe91d122ed50c61b68a791c1baf2cc6a6e593bed4703c76a43c389a5e6f` |
 | [20261118010101_reservation_debt_and_session_change_notice.sql](../apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql) | `1d4aa501818e2a1d286d4fc3608f4fa5470a92370466741331a1838c13bff5bc` |
+| [20261118110633_account_self_management_scope.sql](../apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql) | `0534664a75ce982f5779a4f9bd46c218c1d321756c704055b41dc249b9f19448` |
