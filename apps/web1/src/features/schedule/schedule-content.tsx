@@ -398,7 +398,14 @@ export function ScheduleContent({
     const entry = calendar.data?.entries.find((x) => `${x.type}:${x.item.id}` === id);
     if (!entry) return;
     if (entry.type === "event") {
-      setNotice(t(($) => $.schedule.eventLabel));
+      const eventId = entry.item.id;
+      queries.removeQueries({
+        queryKey: ["event-detail", scope.accountId, scope.orgId, scope.centerId, eventId],
+      });
+      void navigate({
+        to: "/o/$orgId/c/$centerId/events/$eventId",
+        params: { orgId: scope.orgId, centerId: scope.centerId, eventId },
+      });
       return;
     }
     await perform(async () => {

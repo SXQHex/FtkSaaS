@@ -13,6 +13,7 @@ export function scheduleEvents(entries: ScheduleReadItem[], sources: Sources): S
   );
   return entries.map((entry) => ({
     id: `${entry.type}:${entry.item.id}`,
+    kind: entry.type,
     title: entry.item.title,
     start: entry.item.starts_at,
     end: entry.item.ends_at,

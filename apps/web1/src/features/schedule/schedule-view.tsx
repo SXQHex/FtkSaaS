@@ -31,6 +31,7 @@ export interface ScheduleChoice {
 }
 export interface ScheduleEvent {
   id: string;
+  kind: "session" | "event";
   title: string;
   start: string;
   end: string;
@@ -113,6 +114,7 @@ export function ScheduleView({
               end: event.end,
               editable: event.state === "planned" && event.canChange,
               className: cn(
+                event.kind === "event" ? "border-l-chart-2" : "border-l-primary",
                 event.draft && "border-dashed",
                 event.state === "cancelled" && "line-through",
               ),
@@ -203,6 +205,7 @@ export function ScheduleView({
         <span className="relative flex min-w-0 flex-col overflow-hidden px-1.5 py-0.5 text-left">
           <span className="shrink-0 text-[0.625rem]/2.5 tabular-nums text-muted-foreground">
             {info.timeText}
+            {event?.kind === "event" && ` · ${t(($) => $.schedule.eventLabel)}`}
           </span>
           <span className="shrink-0 truncate text-[0.75rem]/3.5 font-medium">
             {info.event.title}
@@ -233,9 +236,7 @@ export function ScheduleView({
               </span>
               <span className="sr-only">
                 {event.instructor}{" "}
-                {eventState
-                  ? t(($) => $.schedule.sessionStates[eventState])
-                  : t(($) => $.schedule.eventLabel)}
+                {eventState ? t(($) => $.schedule.sessionStates[eventState]) : null}
                 {event.draft ? `, ${t(($) => $.schedule.draft)}` : ""}
               </span>
             </>
@@ -311,7 +312,7 @@ export function ScheduleView({
               eventDurationEditable={Boolean(onDraftChange) && !locked && state === "ready"}
               events={calendarEvents}
               eventContent={content}
-              eventClass="rounded-md border border-border border-l-[3px] border-l-primary focus-visible:outline-2 focus-visible:outline-foreground"
+              eventClass="rounded-md border border-border border-l-[3px] focus-visible:outline-2 focus-visible:outline-foreground"
               dayLaneClass={(info) => cn("border-l", info.isDisabled && "bg-muted/50")}
               eventClick={select}
               eventDrop={change}

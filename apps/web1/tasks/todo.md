@@ -208,7 +208,8 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 ### V03 · Takvim, seans ve etkinlik bağları
 
-- [ ] **V03.1** · E17/E18 ve E24–E26'da hafta başlangıcı, gün/hafta, taşıma/seri etki önizlemesi ve etkinlik görünümünü mevcut FullCalendar Standard üzerinden uyarla. Etkinlik/seans tür ayrımını yayımlanmış okumayla bağla; oda çakışmasını tarayıcıda karar motoruna dönüştürme.
+- [x] **V03.1** · E17/E18 ve E24–E26'da hafta başlangıcı, gün/hafta, taşıma/seri etki önizlemesi ve etkinlik görünümünü mevcut FullCalendar Standard üzerinden uyarla. Etkinlik/seans tür ayrımını yayımlanmış okumayla bağla; oda çakışmasını tarayıcıda karar motoruna dönüştürme.
+      Yönetim takvimi kayıtlı hafta başlangıcını kullanıyor. FullCalendar gün ve hafta görünümleri merkezin aralığını okuyor. `calendar_get_v1` etkinliği metinle ayırıyor ve klavyeyle mevcut etkinlik detayını açıyor. Yeniden girişte API reddi eski detayın gösterilmesini engelledi. Seans taşımada tek seans ve seri için native önizleme, uygulama ve üye/eğitmen yeniden okuması geçti. Oda etki kurallarını aynı native önizleme değerlendiriyor. [Hafta başlangıcı](../e2e/auth-schedule.spec.ts#L528) · [Etkinlik ve gün görünümü](../e2e/auth-schedule.spec.ts#L578) · [Seri önizleme](../e2e/auth-schedule.spec.ts#L939) · [Üye ve eğitmen](../e2e/auth-schedule.spec.ts#L1002).
 - [ ] **V03.2** · E37/E38 etkinlik tahsilatı, iptal/iade ve görev doğrulamasını E20/E23/E30 ile aynı kaynak hareketlerine bağla. İlgili sorgu anahtarlarını yenile; takvimden tekrar giriş ikinci finans veya hakediş işlemi üretmesin.
 - [ ] **V03.3** · Eğitmen kapanış penceresi/fiilî başlangıç/eksik yoklama/düzeltme isteği görsellerini native yetkilerle eşle. Aynı seansı öğrenci/eğitmen/yönetici oturumlarında seri otomatik senaryoyla karşılaştır; destek boşluğu varsa writer uydurmadan kaydet.
 

@@ -10,6 +10,7 @@ import type {
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
+import { event } from "./events-fixture.js";
 
 async function scheduleFixture(
   page: Page,
@@ -18,6 +19,7 @@ async function scheduleFixture(
   managed = false,
   series = false,
   weekStart: "monday" | "sunday" = "monday",
+  withEvent = false,
 ) {
   const fixture = await mockStudio(page);
   fixture.native.weekStart = weekStart;
@@ -40,6 +42,8 @@ async function scheduleFixture(
   }
   const writes: string[] = [];
   const reads: string[] = [];
+  const eventReads: Record<string, unknown>[] = [];
+  let eventDenied = false;
   const group = {
     active: false,
     version: 1,
@@ -58,6 +62,15 @@ async function scheduleFixture(
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!;
     const request = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (withEvent && operation === "event_get_v1") {
+      eventReads.push(request);
+      if (eventDenied)
+        return route.fulfill({
+          status: 403,
+          json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+        });
+      return send({ ...event, state: "published" });
+    }
     if (managed && operation === "session_change_preview_v1") {
       previews.push(request);
       const affected = [
@@ -185,32 +198,51 @@ async function scheduleFixture(
           ends_at: new Date(Date.parse(session.ends_at) + 86400000).toISOString(),
         };
       return send({
-        items: session
-          ? [
-              {
-                id: session.id,
-                type: "session",
-                center_id: I.center,
-                starts_at: session.starts_at,
-                ends_at: session.ends_at,
-                title: "Sentetik program seansı",
-                resources: [{ kind: "room", id: I.room }],
-              },
-              ...(future
-                ? [
-                    {
-                      id: future.id,
-                      type: "session",
-                      center_id: I.center,
-                      starts_at: future.starts_at,
-                      ends_at: future.ends_at,
-                      title: "İleri program seansı",
-                      resources: [{ kind: "room", id: I.room }],
-                    },
-                  ]
-                : []),
-            ]
-          : [],
+        items: [
+          ...(session
+            ? [
+                {
+                  id: session.id,
+                  type: "session",
+                  center_id: I.center,
+                  starts_at: session.starts_at,
+                  ends_at: session.ends_at,
+                  title: "Sentetik program seansı",
+                  resources: [{ kind: "room", id: I.room }],
+                },
+                ...(future
+                  ? [
+                      {
+                        id: future.id,
+                        type: "session",
+                        center_id: I.center,
+                        starts_at: future.starts_at,
+                        ends_at: future.ends_at,
+                        title: "İleri program seansı",
+                        resources: [{ kind: "room", id: I.room }],
+                      },
+                    ]
+                  : []),
+              ]
+            : []),
+          ...(withEvent
+            ? [
+                {
+                  id: event.id,
+                  type: "event",
+                  center_id: I.center,
+                  title: event.name,
+                  starts_at: event.interval.starts_at,
+                  ends_at: event.interval.ends_at,
+                  resources: [{ kind: "room", id: I.room }],
+                },
+              ]
+            : []),
+        ].filter(
+          (item) =>
+            Date.parse(item.starts_at) < Date.parse(request.interval.ends_at) &&
+            Date.parse(item.ends_at) > Date.parse(request.interval.starts_at),
+        ),
         next_cursor: null,
         as_of: new Date().toISOString(),
       });
@@ -479,6 +511,10 @@ async function scheduleFixture(
     group,
     changes,
     previews,
+    eventReads,
+    denyEvent() {
+      eventDenied = true;
+    },
     get future() {
       return future;
     },
@@ -537,6 +573,46 @@ test("empty mobile week keeps all days and hours reachable with the native keybo
     .toBeLessThanOrEqual(1);
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
   expect(state.writes).toEqual([]);
+});
+
+test("calendar distinguishes an event from a session and opens its live detail by keyboard", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-11-18T12:00:00Z"));
+  const state = await scheduleFixture(page, true, false, false, false, "monday", true);
+  const eventCard = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  await expect(eventCard).toContainText("Etkinlik");
+  await expect(page.getByText("Sentetik program seansı", { exact: true })).toBeVisible();
+  await page.getByRole("radio", { name: "Gün", exact: true }).click();
+  await expect(eventCard).toHaveCount(0);
+  await page.getByRole("button", { name: "Sonraki dönem", exact: true }).click();
+  await page.getByRole("button", { name: "Sonraki dönem", exact: true }).click();
+  await expect(eventCard).toBeVisible();
+  await expect(page.getByText("Sentetik program seansı", { exact: true })).toHaveCount(0);
+  await eventCard.press("Enter");
+  const url = `${origin}/o/${I.org}/c/${I.center}/events/${event.id}`;
+  await expect(page).toHaveURL(url);
+  await expect(page.getByRole("heading", { name: event.name, exact: true })).toBeVisible();
+  expect(state.eventReads).toHaveLength(1);
+  expect(state.eventReads[0]).toMatchObject({
+    event_id: event.id,
+    center_id: I.center,
+    org_id: I.org,
+  });
+  await page.goBack();
+  await expect(eventCard).toBeVisible();
+  state.denyEvent();
+  await eventCard.press("Enter");
+  await expect(page).toHaveURL(url);
+  await expect(page.getByRole("heading", { name: "Etkinlik detayı", exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Etkinlik kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: event.name, exact: true })).toHaveCount(0);
+  await expect.poll(() => state.eventReads.length).toBe(2);
+  expect(state.writes).toHaveLength(0);
 });
 
 test("missing editor policy keeps session details and independent cancellation accessible", async ({
