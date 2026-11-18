@@ -5,6 +5,7 @@ import type {
   Preview,
   ReservationView,
   EventView,
+  FinanceView,
 } from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
@@ -115,6 +116,15 @@ export async function mockMemberLifecycle(
     freezes: [],
   };
   const rights = [old];
+  const debts: FinanceView["debts"] = [
+    {
+      id: R.debt,
+      remaining_minor: "100000",
+      due_at: "2027-01-15T00:00:00Z",
+      center_id: I.center,
+      version: 1,
+    },
+  ];
   const event: EventView = {
     id: R.event,
     name: "Sentetik etkinlik",
@@ -186,15 +196,7 @@ export async function mockMemberLifecycle(
         person_id: I.instructor,
         currency: "TRY",
         credit_available_minor: "0",
-        debts: [
-          {
-            id: R.debt,
-            remaining_minor: "100000",
-            due_at: "2027-01-15T00:00:00Z",
-            center_id: I.center,
-            version: saved ? 2 : 1,
-          },
-        ],
+        debts: debts.map((debt) => (debt.id === R.debt && saved ? { ...debt, version: 2 } : debt)),
         movements: { items: [], next_cursor: null, as_of: stamp() },
       });
     if (operation === "reservation_list_v1")
@@ -498,5 +500,5 @@ export async function mockMemberLifecycle(
   await expect(page).toHaveURL(origin + "/account");
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
   await expect(page.getByRole("heading", { name: person.display_name, exact: true })).toBeVisible();
-  return { writes, previews, inventoryReads, rights, reservations, person, event };
+  return { writes, previews, inventoryReads, rights, debts, reservations, person, event };
 }

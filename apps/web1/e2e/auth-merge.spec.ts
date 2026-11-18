@@ -1,11 +1,12 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
-import { mockMemberLifecycle } from "./member-lifecycle-fixture.js";
+import { lifecycleIds, mockMemberLifecycle } from "./member-lifecycle-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type {
   PersonView,
+  FinanceView,
   Preview,
   ManagementStateView,
 } from "../src/lib/api-contracts/generated.js";
@@ -405,10 +406,25 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
   await page.clock.setFixedTime(new Date("2026-11-18T08:00:00Z"));
   const f = await mockMemberLifecycle(page);
   const reads = { rights: 0, finance: 0 };
+  const linkedDebt: FinanceView["debts"][number] = {
+    id: "019a7b00-0000-7000-8000-000000000098",
+    remaining_minor: "1700",
+    due_at: "2027-02-15T00:00:00Z",
+    center_id: I.center,
+    version: 1,
+  };
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!;
     if (op === "entitlements_get_v1") reads.rights++;
-    if (op === "finance_get_v1") reads.finance++;
+    if (op === "finance_get_v1") {
+      expect(route.request().postDataJSON()).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        person_id: I.instructor,
+        currency: "TRY",
+      });
+      reads.finance++;
+    }
     return route.fallback();
   });
   // Load finance into the existing profile as well as its initial rights snapshot.
@@ -441,8 +457,10 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
   await expect(
     page.getByText("İşlem kaydedildi ve güncel sonuç okundu.", { exact: true }).first(),
   ).toBeVisible();
+  expect(state.merged).toBe(true);
   // The backend owns aggregation/history; this fixture models its newer canonical view.
   f.rights[0]!.available = 15;
+  f.debts.push(linkedDebt);
   f.person.display_name = "Birleşmiş sentetik kişi";
   await page.getByRole("link", { name: "Profili aç", exact: true }).click();
   await expect(
@@ -451,9 +469,17 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
   await expect.poll(() => reads.rights).toBeGreaterThan(warmRights);
   await expect(page.getByText("15", { exact: true }).first()).toBeVisible();
   await page.locator("#member-finance-currency").fill("TRY");
+  const financeResponse = page.waitForResponse((response) =>
+    response.url().endsWith("/finance_get_v1"),
+  );
   await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
-  await expect.poll(() => reads.finance).toBeGreaterThan(warmFinance);
-  await expect(page.getByText("₺1.000,00", { exact: true }).first()).toBeVisible();
+  const { data } = await (await financeResponse).json();
+  expect(data.debts).toEqual([
+    expect.objectContaining({ id: lifecycleIds.debt, remaining_minor: "100000" }),
+    linkedDebt,
+  ]);
+  expect(reads.finance).toBeGreaterThan(warmFinance);
+  await expect(page.getByText("₺1.017,00", { exact: true }).first()).toBeVisible();
   expect(state.effects).toBe(1);
   await page
     .getByRole("navigation", { name: "Ana menü", exact: true })

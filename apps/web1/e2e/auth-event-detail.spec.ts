@@ -1,6 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
+import { mockSessionDetail } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
+import { origin } from "./auth-fixture.js";
 import type { Page } from "@playwright/test";
 import type {
   EventView,
@@ -550,6 +552,7 @@ test("event capacity race reports settled preparation without a participant or d
 });
 test("event closed attendance correction and performed duty each require a separate reviewed native command", async ({
   page,
+  browser,
 }) => {
   const state = await mockEventDetail(page);
   await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
@@ -575,6 +578,23 @@ test("event closed attendance correction and performed duty each require a separ
   });
   const assignment = state.event.duties![0]!;
   const earningId = "019ab7b0-0000-7000-8000-000000000105";
+  const eventEarning = (): InstructorFinanceEarning["earning"] => ({
+    id: earningId,
+    person_id: assignment.person_id,
+    center_id: I.center,
+    session_id: null,
+    event_assignment_id: assignment.id,
+    amount_minor: "12000",
+    currency: "TRY",
+    paid_minor: "0",
+    remaining_minor: "12000",
+    previous_id: null,
+    closure_id: null,
+    direction: "add",
+    created_at: assignment.verified_at!,
+    version: 1,
+    basis: { source: "event_fee", currency: "TRY", quantity: 1, excluded_blocked: 0 },
+  });
   const earningSnapshots: string[][] = [];
   await page.route(
     "**/functions/v1/backend-v1/instructor_finance_directory_get_v1",
@@ -590,23 +610,7 @@ test("event closed attendance correction and performed duty each require a separ
                 session_name: state.event.name,
                 agreement_id: null,
                 agreement_version: null,
-                earning: {
-                  id: earningId,
-                  person_id: assignment.person_id,
-                  center_id: I.center,
-                  session_id: null,
-                  event_assignment_id: assignment.id,
-                  amount_minor: "12000",
-                  currency: "TRY",
-                  paid_minor: "0",
-                  remaining_minor: "12000",
-                  previous_id: null,
-                  closure_id: null,
-                  direction: "add",
-                  created_at: assignment.verified_at!,
-                  version: 1,
-                  basis: { source: "event_fee", currency: "TRY", quantity: 1, excluded_blocked: 0 },
-                },
+                earning: eventEarning(),
               },
             ]
           : [];
@@ -694,6 +698,43 @@ test("event closed attendance correction and performed duty each require a separ
   await calendarEvent.press("Enter");
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   expect(state.writes.filter(({ op }) => op === "event_duty_verify_v1")).toHaveLength(1);
+
+  const instructor = await browser.newPage({ locale: "tr-TR", serviceWorkers: "block" });
+  try {
+    const self = await mockSessionDetail(instructor, { existing: true, instructor: true });
+    await instructor.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
+    const selfSnapshots: string[] = [];
+    await instructor.route("**/functions/v1/backend-v1/instructor_account_get_v1", (route) => {
+      const request = route.request().postDataJSON();
+      expect(request).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        person_id: I.instructor,
+      });
+      const row = request.view === "earnings" ? eventEarning() : undefined;
+      if (row) selfSnapshots.push(`${row.id}:${row.event_assignment_id}`);
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            view: request.view,
+            items: row ? [row] : [],
+            totals: [],
+            next_cursor: null,
+            as_of: "2026-11-15T19:00:00Z",
+          },
+        },
+      });
+    });
+    await instructor.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
+    const selfRow = instructor.getByRole("row").filter({ hasText: "Etkinlik ücreti" });
+    await expect(selfRow).toContainText("₺120,00");
+    expect(selfSnapshots).toEqual(earningSnapshots.at(-1));
+    expect(self.writes).toHaveLength(0);
+  } finally {
+    await instructor.close();
+  }
 });
 test("event draft publication and participant cancellation preserve separate reviewed native targets", async ({
   page,
