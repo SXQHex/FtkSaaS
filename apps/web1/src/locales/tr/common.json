@@ -3385,6 +3385,9 @@
       "accept": "Kabul et"
     },
     "formHint": "Saatler merkezin {{timezone}} saat dilimindedir.",
+    "noteOptional": "Not (isteğe bağlı)",
+    "noteHint": "Talebini inceleyen yetkililer notunu görebilir. En fazla 1.000 karakter.",
+    "noteInvalid": "Not, boşluk dışında en az bir karakter içermeli ve 1.000 karakteri aşmamalı.",
     "discipline": "Disiplin",
     "chooseDiscipline": "Disiplin seç",
     "instructor": "Eğitmen",

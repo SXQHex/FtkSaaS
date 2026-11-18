@@ -34,6 +34,7 @@ const blank = (): OwnRequestDraft => ({
   time: "",
   duration: "45",
   offset: "",
+  studentNote: "",
   alternativeId: "",
   reviewed: false,
 });
@@ -192,7 +193,11 @@ export function MemberPrivateLessonsContent({
         for (const issue of failure.issues) {
           const field = issue.path[0];
           if (typeof field === "string" && field in draft)
-            invalid[field as keyof OwnRequestDraft] = t(($) => $.memberPrivateLessons.invalid);
+            invalid[field as keyof OwnRequestDraft] = t(($) =>
+              field === "studentNote"
+                ? $.memberPrivateLessons.noteInvalid
+                : $.memberPrivateLessons.invalid,
+            );
         }
         setErrors(invalid);
         setError(t(($) => $.memberPrivateLessons.invalid));
@@ -239,6 +244,7 @@ export function MemberPrivateLessonsContent({
                 : t(($) => $.memberPrivateLessons.noInstructor),
             ].join(" · "),
             metadata: date.format(new Date(row.requested_start)),
+            studentNote: row.student_note,
             hint: [
               t(($) => $.memberPrivateLessons.sent, {
                 date: date.format(new Date(row.created_at)),

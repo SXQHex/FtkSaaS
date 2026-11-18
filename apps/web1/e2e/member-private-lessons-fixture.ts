@@ -154,6 +154,7 @@ export async function mockOwnPrivateLessons(
             requested_start: req.requested_start,
             duration_minutes: req.duration_minutes,
             preferred_instructor_id: req.preferred_instructor_id ?? null,
+            ...(req.student_note !== undefined ? { student_note: req.student_note } : {}),
             state: "pending",
             version: 1,
             alternatives: [],

@@ -10,6 +10,7 @@ import type {
 import type { OwnRequestDraft } from "./member-private-lessons-view";
 import { scheduleInterval } from "../schedule/schedule-time";
 import { readOwnRequest } from "./member-private-lessons-read";
+import { studentNote } from "../lesson-requests/lesson-requests-read";
 type Context = { scope: ClientScope; personId: string };
 export type OwnRequestIntent = Context &
   (
@@ -46,6 +47,7 @@ export async function createOwnRequestIntent(
       time: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/),
       duration: z.enum(["45", "60"]),
       offset: z.string(),
+      studentNote: z.union([z.literal(""), studentNote]),
     })
     .parse(draft);
   if (
@@ -75,6 +77,7 @@ export async function createOwnRequestIntent(
       requested_start: interval.starts_at,
       duration_minutes: Number(values.duration),
       ...(values.instructorId ? { preferred_instructor_id: values.instructorId } : {}),
+      ...(values.studentNote ? { student_note: values.studentNote } : {}),
     },
   };
 }
@@ -163,6 +166,7 @@ export async function readOwnRequestResult(intent: OwnRequestIntent, id?: string
       row.discipline_id !== expected.discipline_id ||
       Date.parse(row.requested_start) !== Date.parse(expected.requested_start) ||
       row.duration_minutes !== expected.duration_minutes ||
+      row.student_note !== expected.student_note ||
       (row.preferred_instructor_id ?? undefined) !== (expected.preferred_instructor_id ?? undefined)
     )
       throw new Error("OWN_REQUEST_RESULT_UNAVAILABLE");

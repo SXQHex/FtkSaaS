@@ -284,6 +284,7 @@ export function LessonRequestEditor({
           : unknown
       }
       state={current?.state}
+      note={current?.student_note}
       stage={stage}
       onStage={(next) => {
         void changeStage(next);

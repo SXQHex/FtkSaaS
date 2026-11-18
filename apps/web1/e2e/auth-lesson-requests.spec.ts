@@ -304,6 +304,11 @@ test("native request list preserves exact credits and uses scoped status and sum
 test("request rejection requires reason then rereads native state", async ({ page }) => {
   const state = await fixture(page);
   const sheet = await open(page);
+  const note = "Temel adımları çalışmak isterim.";
+  await sheet.getByRole("button", { name: "Kapat", exact: true }).click();
+  Object.assign(state.detail, { student_note: note });
+  await page.reload();
+  await expect((await open(page)).getByText(note, { exact: true })).toBeVisible();
   await sheet.getByRole("button", { name: "Reddet", exact: true }).click();
   const reason = sheet.getByLabel("Ret gerekçesi", { exact: true });
   await expect(reason).toHaveAttribute("aria-describedby", "request-reason-hint");

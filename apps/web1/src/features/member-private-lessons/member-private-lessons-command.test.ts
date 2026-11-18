@@ -21,6 +21,7 @@ const draft = (): OwnRequestDraft => ({
   disciplineId: id(5),
   instructorId: "",
   offset: "",
+  studentNote: "",
   alternativeId: id(9),
   reviewed: true,
 });
@@ -114,6 +115,43 @@ it("rejects a missing local time and instructors outside the native catalog", as
       asOf,
     ),
   ).rejects.toThrow("OWN_REQUEST_CHOICES_UNAVAILABLE");
+});
+it("preserves a Unicode student note for same-key retry and verifies it on reread", async () => {
+  const note = "💃".repeat(1000);
+  const create = (studentNote: string) =>
+    createOwnRequestIntent(
+      scope,
+      personId,
+      { ...draft(), studentNote },
+      "Europe/Istanbul",
+      [{ id: id(5) }],
+      [],
+      asOf,
+    );
+  await expect(create(" \t ")).rejects.toMatchObject({ issues: [{ path: ["studentNote"] }] });
+  await expect(create(note + "a")).rejects.toMatchObject({ issues: [{ path: ["studentNote"] }] });
+  const intent = await create(note);
+  if (intent.operation !== "lesson_request_create_v1") throw new Error("Expected create intent");
+  const result = { ...before, requested_start: intent.request.requested_start };
+  mock.call
+    .mockResolvedValueOnce({ primary_id: result.id })
+    .mockResolvedValueOnce({ primary_id: result.id })
+    .mockResolvedValueOnce(page(result))
+    .mockResolvedValueOnce(page({ ...result, student_note: note }));
+  await writeOwnRequest(intent);
+  await writeOwnRequest(intent);
+  for (const [, request] of mock.call.mock.calls) {
+    expect(request).toMatchObject({
+      student_note: note,
+      operation_key: intent.request.operation_key,
+    });
+  }
+  await expect(readOwnRequestResult(intent, result.id)).rejects.toThrow(
+    "OWN_REQUEST_RESULT_UNAVAILABLE",
+  );
+  await expect(readOwnRequestResult(intent, result.id)).resolves.toMatchObject({
+    student_note: note,
+  });
 });
 it("freezes self request versions and rejects other people or unreviewed actions", () => {
   const source = structuredClone(before),

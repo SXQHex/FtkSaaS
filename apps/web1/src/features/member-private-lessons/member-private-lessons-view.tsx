@@ -16,8 +16,9 @@ import {
   SheetDescription,
   SheetFooter,
 } from "../../components/ui/sheet";
-import { Field, FieldLabel, FieldError } from "../../components/ui/field";
+import { Field, FieldLabel, FieldDescription, FieldError } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Button } from "../../components/ui/button";
@@ -32,6 +33,7 @@ export interface PrivateLessonRow {
   duration: string;
   title: string;
   metadata: string;
+  studentNote?: string;
   hint: string;
   state: string;
   actions?: ReactNode;
@@ -99,6 +101,9 @@ export function MemberPrivateLessonsView({
                       {row.metadata}
                     </ItemDescription>
                     <p className="text-xs text-muted-foreground">{row.hint}</p>
+                    {row.studentNote && (
+                      <p className="text-sm wrap-anywhere whitespace-pre-wrap">{row.studentNote}</p>
+                    )}
                   </ItemContent>
                   <ItemActions className="col-start-2 min-w-0 flex-wrap gap-2 @lg:col-start-3 @lg:flex-col @lg:items-end">
                     <Badge variant="outline" className="h-auto max-w-full whitespace-normal">
@@ -123,6 +128,7 @@ export interface OwnRequestDraft {
   time: string;
   duration: string;
   offset: string;
+  studentNote: string;
   alternativeId: string;
   reviewed: boolean;
 }
@@ -319,6 +325,26 @@ export function OwnRequestSheet({
                     </ToggleGroupItem>
                   ))}
                 </ToggleGroup>
+              </Field>
+              <Field data-invalid={Boolean(errors?.studentNote)}>
+                <FieldLabel htmlFor="own-request-note">
+                  {t(($) => $.memberPrivateLessons.noteOptional)}
+                </FieldLabel>
+                <Textarea
+                  id="own-request-note"
+                  name="student_note"
+                  value={draft.studentNote}
+                  disabled={locked || readOnly}
+                  aria-invalid={Boolean(errors?.studentNote)}
+                  aria-describedby={
+                    errors?.studentNote ? "own-note-hint own-note-error" : "own-note-hint"
+                  }
+                  onChange={(event) => set("studentNote", event.target.value)}
+                />
+                <FieldDescription id="own-note-hint">
+                  {t(($) => $.memberPrivateLessons.noteHint)}
+                </FieldDescription>
+                <FieldError id="own-note-error">{errors?.studentNote}</FieldError>
               </Field>
             </>
           ) : (

@@ -52,7 +52,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-41 | P01.4 · WF01 | Native ilk parola için izole kabul | Karşılandı (PR330). Native CI parolasız Google kimliğine ilk parolayı doğruladı. |
 | W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Açık. Starter2’de kendi rol okuması plan reddi veriyor, yayımlı Web1 yönetim menüsünü kuramıyor. |
 | W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | Açık. Organizasyonu olmayan hesabın kuruluma nasıl alınacağı ve ilk merkezden sonra yönetim yetkisinin nasıl açılacağı için backend sözleşmesi gerekiyor. |
-| W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Açık](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
+| W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Karşılandı](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Açık](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
@@ -408,9 +408,9 @@ Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişi
 
 ## W1-BE-44 · Özel ders talebinde öğrencinin notu
 
-**Açık · backend değerlendirmesi.** Güncel çizimde öğrenci yeni özel ders talebine isteğe bağlı not ekleyebiliyor. `lesson_request_create_v1` öğrenci notu almıyor ve `LessonRequestView` öğrenci notu döndürmüyor. Bu nedenle Web1 talep formunda not alanını göstermiyor. [v67 arşivinde çizim](../design-reference/revisions/2026-11-18/app.js#L4336) · [WF06](../../../docs/workflows.md#wf06).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-Notun yazma ve geri okuma sözleşmesini, metin sınırlarını ve talep sahibi ile inceleyen yetkililerin okuma kapsamını değerlendirin. Notlu ve notsuz talep, yetki reddi ve aynı-key yeniden deneme mevcut talep davranışıyla birlikte doğrulanmalı. [E31](todo.md#sayfa-kabulu).
+`lesson_request_create_v1` öğrencinin kendi talebinde isteğe bağlı `student_note` alır. Yetkili liste ve ayrıntı aynı alanı `request_detail` içinde döndürür. [Çizim](../read-only/tasarim-v2/app.js#L4332) · [WF06](../../../docs/workflows.md#wf06) · [V02.1 Web1 kabul kaydı](todo.md#v02).
 
 ## W1-BE-45 · Eğitmenin hakedişinde tarihsel seans ve anlaşma bağlamı
 
