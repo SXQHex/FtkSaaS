@@ -9,6 +9,29 @@ test('W1-BE-24 native CRM filters and whole-scope summary count real conversion 
  const q={page:{limit:1},include_summary:true,include_details:true},first=await api('leads_list_v1',q);assert.equal(first.summary.total,2);assert.equal(first.summary.converted_last_30_days,0);assert.equal(first.summary.overdue_followups,1);assert.equal(first.items[0].display_name,'Synthetic discovery A');assert(first.items[0].created_at);assert(first.next_cursor);
  const second=await api('leads_list_v1',{...q,page:{limit:1,cursor:first.next_cursor}});assert.deepEqual(second.summary,first.summary);assert.equal(second.items[0].id,leadB);
  assert.deepEqual((await api('leads_list_v1',{...q,stage_key:stage})).items.map(x=>x.id),[leadA]);assert.deepEqual((await api('leads_list_v1',{...q,assigned_to:null})).items.map(x=>x.id),[leadB]);await api('lead_convert_v1',{lead_id:leadB});assert.equal((await api('leads_list_v1',q)).summary.converted_last_30_days,1);
+
+ const scoped={page:{limit:1},include_pipeline_summary:true,query:'Discovery'};
+ const stagePage=await api('leads_list_v1',{...scoped,stage_key:stage});
+ assert.deepEqual(stagePage.items.map(x=>x.id),[leadA]);
+ const stageCounts=Object.fromEntries(stagePage.pipeline_summary.stages.map(x=>[x.stage_key,x.count]));
+ assert.equal(stageCounts[stage],1);assert.equal(stageCounts[won],1);
+ assert.equal(stageCounts[catalog.stages.find(x=>x.kind==='lost').key],0);
+ const unassigned=await api('leads_list_v1',{...scoped,assigned_to:null});
+ assert.equal(unassigned.pipeline_summary.stages.find(x=>x.stage_key===stage).count,0);
+ assert.equal(unassigned.pipeline_summary.stages.find(x=>x.stage_key===won).count,1);
+ assert.deepEqual((await api('leads_list_v1',{...scoped,query:'Absent needle'})).pipeline_summary.trials,{offered:0,registered:0,attended:0});
+
+ const privateLabel=await person('Synthetic other channel');
+ await api('lead_save_v1',{person_id:privateLabel,source:'Synthetic arbitrary source text',interest:'Discovery'});
+ const start=new Date(Date.now()-3600000).toISOString(),end=new Date(Date.now()+3600000).toISOString();
+ const report={report:'crm_conversion',filters:{center_ids:[center],interval:{starts_at:start,ends_at:end}},page:{limit:1},include_crm_funnel:true};
+ const result=await api('report_get_v1',report);
+ assert.deepEqual(result.crm_funnel,{cohort_count:3,converted_count:1,
+  stages:[{stage_key:stage,count:1},{stage_key:won,count:1}].sort((a,b)=>a.stage_key.localeCompare(b.stage_key)),
+  sources:[{source:'other',count:1,converted_count:0},{source:'phone',count:2,converted_count:1}]});
+ assert.equal((await api('report_get_v1',{...report,include_crm_funnel:false})).crm_funnel,undefined);
+ const empty=await api('report_get_v1',{...report,filters:{center_ids:[center],interval:{starts_at:new Date(Date.now()-7200000).toISOString(),ends_at:start}}});
+ assert.deepEqual(empty.crm_funnel,{cohort_count:0,converted_count:0,stages:[],sources:[]});
 });
 test('W1-BE-24 native followup and assignee discovery preserves actual completion and scoped trial configuration',async t=>{
  const {db,org,center,api,person,ownerPerson,managed,owner}=await lifecycleFixture(t),p=await person('Synthetic followed candidate');const lead=(await api('lead_save_v1',{person_id:p,source:'phone',interest:'Discovery',assigned_to:ownerPerson})).primary_id;

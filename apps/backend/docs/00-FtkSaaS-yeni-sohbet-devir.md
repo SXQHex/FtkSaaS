@@ -1,5 +1,34 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-studio-import-report"></a>
+## Web1 v67 stüdyo takvimi ve dosya işleri
+
+W1-BE-46/50/51, [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) için `261dd5f8` üzerine yerelde eklendi. Tüketim [WF09](../../../docs/workflows.md#wf09) ve [WF10](../../../docs/workflows.md#wf10) sahibindedir.
+
+195. append migration izole loopback Supabase'e uygulandı. Tek Node runner ve `--test-concurrency=1` ile native takvim ve P06 kabulü 22/22 geçti. Aynı runtime kaynağında CRM import, takvim kodlayıcı ve Edge paket kontrolleri 13/13 geçti. Sözleşme denetimi, migration manifesti, workflow kaynak bağları, 142 API test biriminin kapsamı ve backend typecheck geçti. Edge API yükü 3.970.922 bayt. Yerel stack kapatıldı. Bu dilim yerel dalda bekler.
+
+<a id="web1-v67-crm-directory"></a>
+## Web1 v67 CRM raporu ve dizinleri
+
+W1-BE-52/53/54, PR #340’a push edilen `8405fa8b` üzerine yerelde eklendi. Tüketim [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16) ve [WF09](../../../docs/workflows.md#wf09) sahibindedir.
+
+194. append migration loopback native Supabase’e uygulandı. Tek Node runner ve `--test-concurrency=1` ile 12/12 geçti. Dönem dışı kohort, audit kaynaklı dönüşüm, güvenli kaynak grubu, bütün aşamaları kapsayan ve sorumlu filtresini koruyan sayaçlar, teklif/kayıt/yoklama geçişi, başvuru cursor’ı, merkezsiz kapsam ve iletişim verisi kuralı sınandı. Edge JSON yükü 3.963.795 bayt. Yerel stack kapatıldı. Bu dilim yerel dalda bekler.
+
+<a id="web1-v67-lesson-and-earnings"></a>
+## Web1 v67 özel ders ve hakediş
+
+W1-BE-44/45, PR #340’ın yayımlanan `585a0932202bda10c438dc883d6d208acbbea373` kaynağı üzerine yerelde eklendi. İlk kontrol sırasında [full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/44365849672) yayımlanan head için çalışıyordu. Bu dilimin tüketim sözleşmeleri [WF06](../../../docs/workflows.md#wf06) ve [WF14](../../../docs/workflows.md#wf14) sahibindedir. PR #339’da yeni açılan maddeler [backend backlog’una](remaining-work.md#web1-v67-backend) işlendi.
+
+192–193. append migration’ları loopback native Supabase’te temiz uygulandı. Tek Node runner ve `--test-concurrency=1` ile 20/20 test geçti. Notlu/notsuz talep, canlı yetki, aynı-key uyuşmazlığı, makbuz bağlamında notun ayıklanması, hakediş düzeltmesi, kaynak adı ve atama değişikliği, öz/cursor kapsamı ve 4 MB Edge kabulü doğrulandı. Edge JSON yükü 3.952.357 bayt. Yerel stack kapatıldı. Kullanıcı onayıyla `8405fa8b`, [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) dalına push edildi. Bu kaynağın aday kabulü ayrı izlenir.
+
+<a id="web1-v67-inbox"></a>
+## Web1 v67 gelen kutusu
+
+Başlangıç main `6469ac7387da73d974b1e48238daa1243d0bc092`. Aynı SHA’nın [main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/44324726840) ve [merge kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/44324726809) başarılı. W1-BE-47/48 tüketim sözleşmesi [WF11](../../../docs/workflows.md#wf11), açık kabul kapıları ve diğer talepler [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir. 191. append migration ve üretilmiş istemci sözleşmesi hazır. Aday CI, merge ve development doğrulaması açık.
+
+Yerel Auth → Edge → RPC kabulünde dört ilgili senaryo geçti. Sözleşme/governance/restore 458/458, kalite 10/10 ve sıfır bulgu. CI araçlarında doğrudan geçici dizinle 148/149 sonuç alındı. Linux `/proc` bellek örneği macOS’ta üretilemedi. Üretilmiş Edge paketinin JSON boyutu 3.947.801 bayt. Özdeş koleksiyon/birleşim şemaları paylaşılır ve 477 doğrulayıcı için eşdeğerlik testi geçer.
+
+
 ## W1-BE-42 Starter oturumunun kendi yönetim kapsamı
 
 Başlangıç main `40cdd1ff4b06f4af1b3e13ae3527d440ebea5f96` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44290448188) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44290509069) başarılı. Yeni opt-in okumanın tüketim sözleşmesi [WF02](../../../docs/workflows.md#wf02) sahibindedir.

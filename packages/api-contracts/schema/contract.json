@@ -4705,6 +4705,9 @@
               "type": "null"
             }
           ]
+        },
+        "session_context": {
+          "$ref": "#/$defs/EarningSessionContext"
         }
       },
       "required": [
@@ -5151,6 +5154,9 @@
         },
         "columns": {
           "$ref": "#/$defs/ReportDiscoveryColumns"
+        },
+        "crm_funnel": {
+          "$ref": "#/$defs/CrmFunnelSummary"
         }
       },
       "required": [
@@ -6559,6 +6565,9 @@
         },
         "summary": {
           "$ref": "#/$defs/CrmLeadSummary"
+        },
+        "pipeline_summary": {
+          "$ref": "#/$defs/CrmPipelineSummary"
         }
       },
       "required": [
@@ -6655,6 +6664,34 @@
         },
         "as_of": {
           "$ref": "#/$defs/Instant"
+        },
+        "apply_summary": {
+          "type": "object",
+          "properties": {
+            "total_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "applied_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "skipped_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "failed_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "replayed_rows": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "total_rows",
+            "applied_rows",
+            "skipped_rows",
+            "failed_rows",
+            "replayed_rows"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -10815,6 +10852,9 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "student_note": {
+          "$ref": "#/$defs/LessonRequestStudentNote"
         }
       },
       "required": [
@@ -14308,6 +14348,9 @@
         },
         "include_summary": {
           "type": "boolean"
+        },
+        "include_pipeline_summary": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -15296,6 +15339,9 @@
         },
         "group_by": {
           "$ref": "#/$defs/ReportPreparationGrouping"
+        },
+        "include_crm_funnel": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -15420,16 +15466,16 @@
         },
         "group_by": {
           "$ref": "#/$defs/ReportPreparationGrouping"
+        },
+        "retry_job_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "org_id",
-        "operation_key",
-        "report",
-        "filters",
-        "format"
+        "operation_key"
       ],
       "additionalProperties": false,
       "allOf": [
@@ -15479,6 +15525,30 @@
                 "$ref": "#/$defs/ReportColumns"
               }
             }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "retry_job_id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "report": false,
+              "filters": false,
+              "format": false,
+              "columns": false,
+              "report_order": false,
+              "group_by": false
+            }
+          },
+          "else": {
+            "required": [
+              "report",
+              "filters",
+              "format"
+            ]
           }
         }
       ]
@@ -15803,6 +15873,9 @@
           "maxLength": 200
         },
         "include_details": {
+          "type": "boolean"
+        },
+        "include_apply_summary": {
           "type": "boolean"
         }
       },
@@ -20887,6 +20960,16 @@
         },
         "discipline_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "student_note": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LessonRequestStudentNote"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -42396,6 +42479,15 @@
             },
             "include_contact_intake": {
               "type": "boolean"
+            },
+            "states": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ApplicationState"
+              },
+              "minItems": 1,
+              "maxItems": 3,
+              "uniqueItems": true
             }
           },
           "required": [],
@@ -45140,6 +45232,9 @@
               "type": "null"
             }
           ]
+        },
+        "student_note": {
+          "$ref": "#/$defs/LessonRequestStudentNote"
         }
       },
       "required": [
@@ -53700,7 +53795,8 @@
             "type": "string",
             "enum": [
               "lessons",
-              "duties"
+              "duties",
+              "studio_program"
             ]
           },
           "minItems": 1,
@@ -53719,6 +53815,9 @@
         },
         "created_at": {
           "$ref": "#/$defs/Instant"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -53862,6 +53961,22 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "studio_program_scope": {
+          "type": "object",
+          "properties": {
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "org_id",
+            "center_id"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -53888,6 +54003,9 @@
           "properties": {
             "org_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [
@@ -53901,7 +54019,8 @@
             "type": "string",
             "enum": [
               "lessons",
-              "duties"
+              "duties",
+              "studio_program"
             ]
           },
           "minItems": 1,
@@ -53934,6 +54053,9 @@
           "type": "object",
           "properties": {
             "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
               "$ref": "#/$defs/FtkUuid"
             }
           },
@@ -62552,6 +62674,10 @@
         },
         "page": {
           "$ref": "#/$defs/InstructorAccountPageRequest"
+        },
+        "include_session_context": {
+          "type": "boolean",
+          "description": "Opt-in historical closure context for own earnings only."
         }
       },
       "required": [
@@ -63460,6 +63586,9 @@
               "type": "null"
             }
           ]
+        },
+        "reservation_target": {
+          "$ref": "#/$defs/NotificationReservationSelector"
         }
       },
       "required": [
@@ -63552,6 +63681,9 @@
               "type": "null"
             }
           ]
+        },
+        "all_unread": {
+          "const": true
         }
       },
       "required": [
@@ -63559,8 +63691,91 @@
         "request_id",
         "org_id",
         "operation_key",
-        "read",
-        "notifications"
+        "read"
+      ],
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "read": {
+              "$ref": "#/$defs/Bool"
+            },
+            "notifications": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/$defs/NotificationReadSelection"
+              }
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "operation_key",
+            "read",
+            "notifications"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "read": {
+              "const": true
+            },
+            "center_id": {
+              "type": "null"
+            },
+            "all_unread": {
+              "const": true
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "operation_key",
+            "read",
+            "all_unread"
+          ],
+          "additionalProperties": false
+        }
       ],
       "additionalProperties": false
     },
@@ -65793,6 +66008,203 @@
         "ok",
         "data",
         "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationReservationSelector": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "reservation_list_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "session_id"
+          ],
+          "additionalProperties": false
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "operation",
+        "key",
+        "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "LessonRequestStudentNote": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "\\S"
+    },
+    "EarningSessionContext": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scheduled_duration_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "agreement_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attended_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "title",
+        "scheduled_duration_seconds",
+        "agreement_version",
+        "attended_count"
+      ],
+      "additionalProperties": false
+    },
+    "CrmStageCount": {
+      "type": "object",
+      "properties": {
+        "stage_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "stage_key",
+        "count"
+      ],
+      "additionalProperties": false
+    },
+    "CrmFunnelSource": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "manual",
+            "phone",
+            "whatsapp",
+            "web",
+            "website",
+            "instagram",
+            "facebook",
+            "referral",
+            "public_application",
+            "legacy_import",
+            "other"
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/Count"
+        },
+        "converted_count": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "source",
+        "count",
+        "converted_count"
+      ],
+      "additionalProperties": false
+    },
+    "CrmFunnelSummary": {
+      "type": "object",
+      "properties": {
+        "cohort_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "converted_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmStageCount"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmFunnelSource"
+          }
+        }
+      },
+      "required": [
+        "cohort_count",
+        "converted_count",
+        "stages",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "CrmPipelineSummary": {
+      "type": "object",
+      "properties": {
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmStageCount"
+          }
+        },
+        "trials": {
+          "type": "object",
+          "properties": {
+            "offered": {
+              "$ref": "#/$defs/Count"
+            },
+            "registered": {
+              "$ref": "#/$defs/Count"
+            },
+            "attended": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "offered",
+            "registered",
+            "attended"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "stages",
+        "trials"
       ],
       "additionalProperties": false
     }
@@ -73980,7 +74392,8 @@
           "same_org_center_discipline",
           "required_feature_gates_separate_from_references",
           "effective_request_window",
-          "explicit_cm_policy_exception_with_audit_reason"
+          "explicit_cm_policy_exception_with_audit_reason",
+          "optional_student_note_self_authorship_before_receipt_replay"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -74036,7 +74449,8 @@
         "runtime_rpc": "api_v1.lesson_request_create_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+          "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending.",
+          "Optional student_note is a nonblank string of at most 1000 characters, accepted only on a request created for the live authenticated person."
         ]
       },
       {
@@ -80287,7 +80701,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_leads_list"
           }
-        }
+        },
+        "runtime_limits": [
+          "include_pipeline_summary=true returns whole-center visible stage and trial counts before the selected stage and page limit, with the current search and assignee filters."
+        ]
       },
       {
         "name": "lead_save_v1",
@@ -81591,7 +82008,8 @@
         "runtime_limits": [
           "Development/test only; final source candidate/main clean required.",
           "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
-          "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
+          "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted.",
+          "include_crm_funnel=true enriches crm_conversion with authorized whole-period cohort, audited stage transitions and safe source counts."
         ]
       },
       {
@@ -81641,7 +82059,7 @@
           "effect": "report_export_start_append_or_explicit_update",
           "from": [],
           "to": [],
-          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
+          "invariant": "A retry of a terminal failed export creates one new job from its original server-side parameters and current authority."
         },
         "semantic_guards": [
           "live_actor_and_scope",
@@ -82278,7 +82696,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "read",
-        "transaction_guarantee": "Read authorized import_rows_list projection only; no domain/rights/earning/settlement/receipt mutation.",
+        "transaction_guarantee": "Read authorized import rows and final apply totals. Skipped CSV additionally checks the live input file. No writes.",
         "transition": {
           "effect": "read_only_business",
           "from": [],
@@ -93200,7 +93618,7 @@
           "effect": "own_calendar_calendar_link_create",
           "from": [],
           "to": [],
-          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+          "invariant": "Own active account, explicit organization and kinds. Studio program binds one live managed center. Current credential and live business authority."
         },
         "semantic_guards": [
           "live_account_and_org_link",
@@ -95125,7 +95543,9 @@
         "runtime_external_path": "/functions/v1/backend-v1/instructor_account_get_v1",
         "runtime_rpc": "api_v1.instructor_account_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
-        "runtime_limits": []
+        "runtime_limits": [
+          "For view=earnings, include_session_context=true adds historical lesson closure context to the current self page. Event and unlinked earnings omit the field. Legacy closure label/duration may be null."
+        ]
       },
       {
         "name": "member_finance_currencies_get_v1",
@@ -95378,7 +95798,8 @@
           "selected_batch_all_or_nothing",
           "every_selected_row_version",
           "read_state_is_not_work_completion",
-          "no_notification_or_outbox_from_read_state"
+          "no_notification_or_outbox_from_read_state",
+          "organization_inbox_mark_all_live_recipient_snapshot"
         ],
         "audit": true,
         "notification": "none",
@@ -95428,7 +95849,8 @@
           }
         },
         "runtime_limits": [
-          "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
+          "An explicit selection contains 1–100 own notification IDs and versions. Duplicates, unavailable rows or any stale version reject the entire selection.",
+          "With all_unread=true and read=true, update the live recipient’s unread organization inbox as of the command snapshot. The mutation primary ID is the recipient person ID. Replay uses the original receipt."
         ],
         "runtime_path": "/functions/v1/backend-v1/notifications_read_set_v1",
         "runtime_external_path": "/functions/v1/backend-v1/notifications_read_set_v1",
@@ -113304,6 +113726,96 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/NotificationReservationSelector/properties/key/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_notifications_read_set/oneOf/1/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/NotificationReservationSelector/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarLink/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_create/properties/organization_scope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_rotate/properties/organization_scope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_report_export_start/properties/retry_job_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_links_get/properties/studio_program_scope/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_links_get/properties/studio_program_scope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -113801,7 +114313,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 190,
+      "migration_count": 195,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

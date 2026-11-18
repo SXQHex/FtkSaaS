@@ -1479,7 +1479,8 @@
       },
       "billing_class": "request",
       "limits": [
-        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending.",
+        "Optional student_note is a nonblank string of at most 1000 characters, accepted only on a request created for the live authenticated person."
       ]
     },
     {
@@ -2827,7 +2828,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "include_pipeline_summary=true returns whole-center visible stage and trial counts before the selected stage and page limit, with the current search and assignee filters."
+      ]
     },
     {
       "name": "lead_save_v1",
@@ -3163,7 +3166,8 @@
       "limits": [
         "Development/test only; final source candidate/main clean required.",
         "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
-        "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
+        "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted.",
+        "include_crm_funnel=true enriches crm_conversion with authorized whole-period cohort, audited stage transitions and safe source counts."
       ]
     },
     {
@@ -6271,7 +6275,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "For view=earnings, include_session_context=true adds historical lesson closure context to the current self page. Event and unlinked earnings omit the field. Legacy closure label/duration may be null."
+      ]
     },
     {
       "name": "member_finance_currencies_get_v1",
@@ -6350,7 +6356,8 @@
       },
       "billing_class": "maintenance",
       "limits": [
-        "One explicit batch contains 1–100 own notification IDs and versions; duplicates, unavailable rows or any stale version reject the entire batch. No query-based mark-all or partial success."
+        "An explicit selection contains 1–100 own notification IDs and versions. Duplicates, unavailable rows or any stale version reject the entire selection.",
+        "With all_unread=true and read=true, update the live recipient’s unread organization inbox as of the command snapshot. The mutation primary ID is the recipient person ID. Replay uses the original receipt."
       ]
     },
     {

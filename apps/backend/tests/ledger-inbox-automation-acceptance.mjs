@@ -87,3 +87,57 @@ test('W1-BE-28 resolve-only staff alerts retain native request navigation and li
  await api('lesson_request_reject_v1',{lesson_request_id:request,expected_version:1,reason:'Synthetic authorized resolution'},key(),staff);const completed=(await read()).items.find(x=>x.id===notice.id);assert.equal(completed.work.state,'completed');assert.equal(completed.read_at,null);
  await api('student_activate_v1',{person_id:staffPerson});const own=key(),ownNotice=key();await db.query("insert into core.lesson_requests(id,org_id,center_id,person_id,discipline_id,format,requested_start,duration_minutes,state) values($1,$2,$3,$4,$5,'private',now()+interval '2 days',60,'pending')",[own,org,center,staffPerson,discipline]);await db.query("insert into core.notifications(id,org_id,recipient_person_id,kind,subject_id,payload) values($1,$2,$3,'reminder',$4,$5)",[ownNotice,org,staffPerson,own,{template_key:'work.pending_request',subject:{type:'lesson_requests',id:own}}]);const self=(await read()).items.find(x=>x.id===ownNotice);assert.equal(self.work.state,'pending');assert.equal(self.work.selector.operation,'lesson_request_create_v1');await api('lesson_request_withdraw_v1',{lesson_request_id:own,expected_version:1},key(),staff);assert.equal((await read()).items.find(x=>x.id===ownNotice).work.state,'completed');await grant(false);const hidden=(await read()).items.find(x=>x.id===notice.id);assert.equal(hidden.work.state,'unavailable');const outsideOwn=await api('management_state_get_v1',{operation:notice.work.selector.operation,selector:notice.work.selector,page:{}},key(),staff);assert.equal(outsideOwn.items.length,0);
 });
+
+test('W1-BE-47 mark-all uses the whole live organization inbox and replays the original snapshot',async t=>{
+ const f=await preparationFixture({schedule:true,studentUser:true,studentMembership:true});
+ const {db,api,org,student,studentPerson}=f;
+ t.after(()=>db.end());
+
+ const own=Array.from({length:105},key),alreadyRead=key(),foreign=key();
+ const insert=(ids,recipient,read=false)=>db.query(
+  "insert into core.notifications(id,org_id,recipient_person_id,kind,subject_id,payload,read_at) select i,$2,$3,'reminder',i,'{}',case when $4 then now() end from unnest($1::uuid[]) i",
+  [ids,org,recipient,read]
+ );
+ await insert(own,studentPerson);
+ await insert([alreadyRead],studentPerson,true);
+ await insert([foreign],f.person);
+ const state=async ids=>(await db.query(
+  'select id,read_at,version::int from core.notifications where org_id=$1 and id=any($2::uuid[])',[org,ids]
+ )).rows;
+ const body={center_id:null,read:true,all_unread:true},operationKey=key();
+ const ack=await api('notifications_read_set_v1',body,student,operationKey);
+ assert.equal(ack.primary_id,studentPerson);
+ assert.equal(ack.replayed,false);
+ assert.deepEqual(ack.related,[]);
+ const touched=await state(own);
+ assert.equal(touched.length,105);
+ assert(touched.every(row=>row.read_at&&row.version===2));
+ assert.deepEqual((await state([alreadyRead,foreign])).map(row=>[row.id,row.read_at!==null,row.version]).sort(),
+  [[alreadyRead,true,1],[foreign,false,1]].sort());
+
+ const later=key();
+ await insert([later],studentPerson);
+ const replay=await api('notifications_read_set_v1',body,student,operationKey);
+ assert.deepEqual(replay,{...ack,replayed:true});
+ assert.deepEqual(await state([later]),[{id:later,read_at:null,version:1}]);
+ assert.equal((await db.query('select count(*)::int as count from core.audit_events where org_id=$1 and operation_id=$2',[org,ack.operation_id])).rows[0].count,1);
+ const outsider=await authUser('mark-all-outsider');
+ assert.equal((await call(outsider,'notifications_read_set_v1',{org_id:org,...body},key())).result.ok,false);
+
+ await api('notifications_read_set_v1',body,student);
+ assert.equal((await state([later]))[0].version,2);
+ const empty=await api('notifications_read_set_v1',body,student);
+ assert.equal(empty.replayed,false);
+ assert.equal((await state([later]))[0].version,2);
+
+ const recovery={operation:'notifications_read_set_v1',key:operationKey};
+ const saved=await must(student,'operation_status_get_v1',{org_id:org,...recovery});
+ assert.deepEqual(saved.result_reference,{type:'people',id:studentPerson});
+ const account=(await must(student,'account_get_v1')).id;
+ const replacement=(await api('person_create_v1',{display_name:'Synthetic changed inbox recipient',contacts:[]})).primary_id;
+ await db.query('update core.account_links set person_id=$1 where org_id=$2 and account_id=$3',[replacement,org,account]);
+ for(const [operation,request,k] of [['notifications_read_set_v1',body,operationKey],['operation_status_get_v1',recovery,undefined]]){
+  const denied=await call(student,operation,{org_id:org,...request},k);
+  assert.equal(denied.result.error?.code,'NOT_FOUND');
+ }
+});

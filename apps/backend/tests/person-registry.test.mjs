@@ -227,6 +227,8 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   offer=(await mut('trial_offer_create_v1',{lead_id:lead,product_version_id:product,session_id:ses},staff)).primary_id;
   await fail('trial_offer_create_v1',{lead_id:lead,product_version_id:product,session_id:ses},'QUOTA_EXCEEDED');
   const offers=await managed('trial_offer_create_v1',{lead_id:lead,product_version_id:product},staff);assert.equal(offers.items[0].entity.id,offer);
+  const pipeline=()=>must(owner,'leads_list_v1',scope({page:{limit:1},include_pipeline_summary:true}));
+  assert.deepEqual((await pipeline()).pipeline_summary.trials,{offered:1,registered:0,attended:0});
   await db.query('update core.sessions set nominal=1,maximum=1 where id=$1',[ses]);
   const nonTrial=(await mut('person_create_v1',{display_name:'No overbook',contacts:[]})).primary_id;await mut('student_activate_v1',{person_id:nonTrial});
   await fail('reservation_create_v1',{session_id:ses,person_id:nonTrial,mode:'flexible'},'CAPACITY_FULL');
@@ -234,6 +236,7 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   await fail('trial_registration_confirm_v1',{offer_id:offer},'OFFER_UNAVAILABLE');
   const reservations=await rows('select * from core.reservations where org_id=$1 and person_id=$2',[org,person]);assert.equal(reservations.length,1);assert.equal(reservations[0].trial_offer_id,offer);assert.equal(reservations[0].source_sale_id,null);
   assert.equal((await rows('select count(*)::int n from core.trial_usages where org_id=$1 and person_id=$2',[org,person]))[0].n,1);
+  assert.deepEqual((await pipeline()).pipeline_summary.trials,{offered:0,registered:1,attended:0});
   assert.equal((await rows('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,person]))[0].n,0);
   // The authenticated instructor needs an active center relationship as well as a role.
   await mut('student_activate_v1',{person_id:ownerPerson});
@@ -255,6 +258,7 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   finally{await db.query('insert into core.trial_usages select * from jsonb_populate_record(null::core.trial_usages,$1::jsonb)',[usage]);}
   await mut('attendance_close_v1',closeBody);
   assert((await rows('select used_at from core.trial_usages where id=$1',[usage.id]))[0].used_at);
+  assert.deepEqual((await pipeline()).pipeline_summary.trials,{offered:0,registered:1,attended:1});
 
   const frozen=(await rows('select earnings_snapshot from core.attendance_closures where org_id=$1 and session_id=$2',[org,ses]))[0].earnings_snapshot;
   assert.equal(frozen[0].participants[0].trial,true);assert.equal((await rows('select count(*)::int n from core.earnings where org_id=$1 and session_id=$2',[org,ses]))[0].n,0);

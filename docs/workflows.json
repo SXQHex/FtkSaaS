@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "ca9fa359ddd52e06f25bfaebc9b2b03f6de864cdec2beffe79d3fbed157b1521",
-        "reason": "Reviewed W1-BE-42 optional authenticated self management scope, unchanged F05 directory and staff authority, and identical schema interning under the existing Edge upload budget. The updated Starter downgrade slice binds the new test bytes and keeps the existing API unit ownership and checks."
+        "fingerprint": "99142bacdd615cfe8163fe8added34dfcbc5a69a4553a938f7fb6d7302df38a4",
+        "reason": "Reviewed shared Edge request and response contract changes, authenticated skip CSV dispatch, and updated acceptance bindings."
       }
     },
     {
@@ -631,8 +631,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "84aa8fc2e065944ddda915987e6c77c6a38dd18b8a5f621249f93a715a37b22d",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths. The new test reads the same Pro reservation and closed attendance after the Starter boundary. Scheduling and authorization rules remain unchanged."
+        "fingerprint": "467c76c2df0bc6e8a8a73aaafd938f20e6df6c529dcff28a67babcda6971f5bf",
+        "reason": "Reviewed additive inbox acceptance and the source-bound API inventory for the changed native test files."
       }
     },
     {
@@ -748,8 +748,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "6df222c2cd3b26db63d4ad2224ac38830e2ef6cf01e136f837f8791ded9d183c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "327f539d74ae3dc96c30159e6c865ef816026cfb768c7908ed4aaa4d837921ad",
+        "reason": "Reviewed changed canonical DTO and additive native acceptance without changing existing visibility or lifecycle."
       }
     },
     {
@@ -969,7 +969,9 @@
         "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
         "apps/backend/database/notification-request-source-authority.sql",
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
-        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
+        "apps/backend/database/lesson-request-student-note.sql",
+        "apps/backend/supabase/migrations/20261118211500_lesson_request_student_note.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -984,8 +986,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "efd0b2cb622a4e679eb86b1569618d3f3a0a6a1528ce6fe50b7bca722be6731a",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "b0a59a9dfd2d75ac65083f127ddbcb6032515ede34b35c1cfca5581657f1392f",
+        "reason": "Reviewed optional self-authored note, live reviewer visibility, closed validation, receipt identity and native regression coverage."
       }
     },
     {
@@ -1053,8 +1055,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "56c90b70ba10fa607c4287c13a2238bf04242952c1adb0235daada19d090c082",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "f13fccf09d382c571385c62e7d35bdff7b7d6a30458a8db3aa601938a74a48e6",
+        "reason": "Reviewed native regression evidence and canonical contract references for optional student notes and own earning history."
       }
     },
     {
@@ -1172,6 +1174,7 @@
         "apps/backend/tests/public-program-discovery-acceptance.mjs"
       ],
       "sources": [
+        "apps/backend/database/studio-calendar-import-results-report-retry.sql",
         "apps/backend/api/public-application.js",
         "apps/backend/database/p04-crm-public-wrappers.sql",
         "apps/backend/database/p04-crm-public.sql",
@@ -1223,7 +1226,10 @@
         "apps/backend/database/public-form-discovery.sql",
         "apps/backend/database/public-program-discovery.sql",
         "apps/backend/database/settings-catalog-v24.sql",
-        "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql"
+        "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
+        "apps/backend/database/crm-funnel-and-directory.sql",
+        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1237,8 +1243,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "a104020c17cbaf0cf175f7cf7495449729de64ef003408e19d42c77c83cb1bd0",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "5d90208f2e9893aca84b4235c19828a8d98fb5cd2b3a8604dc2d2c2b2205902c",
+        "reason": "Reviewed center-manager and F08 gating, credential lifecycle, and personal list compatibility for studio schedule subscriptions."
       }
     },
     {
@@ -1260,9 +1266,11 @@
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/report-finance-tracking-unit.mjs",
-        "apps/backend/tests/report-finance-tracking-acceptance.mjs"
+        "apps/backend/tests/report-finance-tracking-acceptance.mjs",
+        "apps/backend/tests/intake-crm-work-acceptance.mjs"
       ],
       "sources": [
+        "apps/backend/database/studio-calendar-import-results-report-retry.sql",
         "apps/backend/database/p05-bind.sql",
         "apps/backend/database/p05-documents.sql",
         "apps/backend/database/p05-wrappers.sql",
@@ -1292,7 +1300,10 @@
         "apps/backend/database/instructor-finance-directory.sql",
         "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql",
         "apps/backend/supabase/migrations/20261117034912_report_import_discovery.sql",
-        "apps/backend/tests/report-worker-fixture.mjs"
+        "apps/backend/tests/report-worker-fixture.mjs",
+        "apps/backend/database/crm-funnel-and-directory.sql",
+        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1306,8 +1317,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "380eb4978b5c58526ca9443b3f8c8b0708d95b3a6c4a0717000fdb51081b5202",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "b05e8506c2d2ef0d746e80f8dfe4f451170a9ad694e24209e2356d9331c8c192",
+        "reason": "Reviewed terminal import outcomes across CRM selection and partial student application, authenticated CSV, and exact report retry parameters."
       }
     },
     {
@@ -1374,7 +1385,9 @@
         "apps/backend/database/event-registration-document-discovery.sql",
         "apps/backend/supabase/migrations/20261117232051_event_registration_document_discovery.sql",
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
-        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
+        "apps/backend/database/member-inbox-actions.sql",
+        "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1391,8 +1404,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "ad29a181d8ec82e810e05309e02c845595269f2b8902edfc54bba109f52704b4",
-        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "f2b352c76b703ec34b0f1857cee2ef64d2a828bb96b6af97ad052dfced3260eb",
+        "reason": "Reviewed canonical recipient matching and fail-closed missing identities on replay and recovery, and scoped participant navigation."
       }
     },
     {
@@ -1656,7 +1669,9 @@
         "apps/backend/database/instructor-all-period-ledger.sql",
         "apps/backend/supabase/migrations/20261116233014_instructor_all_period_ledger.sql",
         "apps/backend/database/instructor-finance-directory.sql",
-        "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql"
+        "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql",
+        "apps/backend/database/instructor-earning-session-context.sql",
+        "apps/backend/supabase/migrations/20261118211600_instructor_earning_session_context.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1671,8 +1686,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "0c2abb943d53896647f57e4c3a3b5da168cd9e40a304bc326beba8d1cfe428e7",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "8d02681331cd35805a9626f52f1b5bed2f0dea4679e9e71f88ad18c0573da1d5",
+        "reason": "Reviewed frozen own lesson earning context, exact closure revision, unchanged live authorization and existing cursor semantics."
       }
     },
     {
@@ -1809,7 +1824,9 @@
         "apps/backend/database/management-work-discovery.sql",
         "apps/backend/supabase/migrations/20261117014802_crm_discovery.sql",
         "apps/backend/supabase/migrations/20261117014803_crm_activity_discovery.sql",
-        "apps/backend/supabase/migrations/20261117014805_management_work_discovery.sql"
+        "apps/backend/supabase/migrations/20261117014805_management_work_discovery.sql",
+        "apps/backend/database/crm-funnel-and-directory.sql",
+        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1824,8 +1841,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "4f0982a5edd900a382a0217eae90f8fdf85178c99d93093fa98945ee639cdd7f",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "f2899eb5db1436eff820f387d1f04282120d871f9e15f752f042ce1a4bec14d7",
+        "reason": "Reviewed exact report authorization, native state filtering, visible CRM metrics and a live open-lead requirement for current trial offers."
       }
     },
     {
@@ -2112,8 +2129,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "703d484ac0a35c10681721d230985728b772616561b27758770b36d4bfa58c6f",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. The additional history assertions use the existing isolated subscription boundary path. Worker behavior and authority remain unchanged."
+        "fingerprint": "44aa84a9d4f3081e9edd809bc61be2bf465aa2ae855a4989e1f3124c04ff093f",
+        "reason": "Reviewed the shared contract and acceptance inventory digest after report scope coverage was updated."
       }
     }
   ]

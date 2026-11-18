@@ -33,3 +33,18 @@ test('notification request navigation is an exact native read, independent of a 
  assert(valid('NotificationSourceState',{state:'pending',center_id:id,selector}));
  assert(!valid('Request_management_state_get',{...base,operation:selector.operation,selector:{...selector,key:{...selector.key,catalog:'disciplines'}},page:{}}));
 });
+test('mark-all accepts only an unfiltered organization inbox and read=true',()=>{
+ const body={...base,center_id:null,operation_key:id,read:true,all_unread:true};
+ assert(valid('Request_notifications_read_set',body));
+ for(const patch of [{read:false},{center_id:id},{all_unread:false},{all_unread:undefined},{query:'filtered'},{notifications:[{id,expected_version:1}]}]){
+  assert(!valid('Request_notifications_read_set',{...body,...patch}));
+ }
+});
+
+test('a participant notice carries a closed native reservation selector',()=>{
+ const reservation_target={operation:'reservation_list_v1',center_id:id,key:{session_id:id}};
+ const work={state:'informational',center_id:null,selector:null};
+ assert(valid('NotificationSourceState',{...work,reservation_target}));
+ assert(!valid('NotificationSourceState',{...work,selector:reservation_target}));
+ assert(!valid('NotificationSourceState',{...work,reservation_target:{...reservation_target,key:{...reservation_target.key,person_id:id}}}));
+});

@@ -140,6 +140,7 @@ async function earningsFixture(t){
   await mark(ses);await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'200');
  });
  await t.test('reasoned correction previews and appends a linked difference from the frozen original agreement',async()=>{
+  const frozenVersion=agreement.version;
   const replacement={supersedes_id:agreement.primary_id,expected_version:agreement.version,valid:{starts_at:new Date(Date.now()-30000).toISOString(),ends_at:'2030-01-01T00:00:00Z'}};
   agreement=await agree(terms([fixed(9999)]),replacement);
   const originalEarning=(await earningRows(sid))[0],payment=key();
@@ -154,6 +155,27 @@ async function earningsFixture(t){
   assert.equal((await rows('select amount_minor from core.instructor_payments where id=$1',[payment]))[0].amount_minor,'500');
   assert.equal((await rows('select amount_minor from core.earning_allocations where payment_id=$1',[payment]))[0].amount_minor,'500');
   const view=await earningRead();assert.equal(view.items.filter(x=>x.session_id===sid).length,2);
+  const contextBody={person_id:instructor.p,view:'earnings',include_session_context:true,page:{}};
+  const own=()=>must(instructor.u,'instructor_account_get_v1',scope(contextBody));
+  const earlier={title:'Starter lesson',scheduled_duration_seconds:3600,agreement_version:frozenVersion,attended_count:2};
+  const later={...earlier,attended_count:1};
+  const facts=page=>page.items.filter(x=>x.session_id===sid).map(x=>x.session_context);
+  assert.deepEqual(facts(await own()),[earlier,later]);
+  assert(view.items.filter(x=>x.session_id===sid).every(x=>x.session_context===undefined));
+  await fail('instructor_account_get_v1',contextBody,'FORBIDDEN',student.u);
+  const initial=await must(instructor.u,'instructor_account_get_v1',scope({...contextBody,page:{limit:1}}));
+  assert(initial.next_cursor);
+  await fail('instructor_account_get_v1',{...contextBody,include_session_context:false,page:{limit:1,cursor:initial.next_cursor}},'VALIDATION_FAILED',instructor.u);
+
+  const assignment=(await rows("select id from core.session_assignments where org_id=$1 and session_id=$2 and person_id=$3 and state='active'",[org,sid,instructor.p]))[0].id;
+  await db.query("update core.session_assignments set state='inactive' where id=$1",[assignment]);
+  await db.query("update core.disciplines set name='Renamed synthetic lesson' where org_id=$1 and id=$2",[org,discipline]);
+  try{
+   assert.deepEqual(facts(await own()),[earlier,later]);
+  }finally{
+   await db.query("update core.disciplines set name='Starter lesson' where org_id=$1 and id=$2",[org,discipline]);
+   await db.query("update core.session_assignments set state='active' where id=$1",[assignment]);
+  }
  });
  await t.test('late outbox failure rolls back linked correction, earning, rights, audit and receipt',async()=>{
   const preview=await must(owner,'attendance_correct_preview_v1',scope({session_id:sid,corrections:[{reservation_id:rv2,result:'no_show'}],reason:'Correct second attendance'}));

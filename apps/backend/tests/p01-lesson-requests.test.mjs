@@ -65,6 +65,33 @@ test('P01-B request intent, alternatives and atomic guarded approval through Aut
   await fail('policy_publish_v1',{key:'request_window',value:window(20000),effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false},'FORBIDDEN');
   await pub('request_window',window(10080));
  });
+ await t.test('W1-BE-44 optional note is self-authored, scoped to live reviewers, and part of replay identity',async()=>{
+  const body={person_id:student.p,discipline_id:discipline,requested_start:next(),duration_minutes:60};
+  const student_note='Sentetik öğrenci notu\nİkinci satır';
+  const k=key();
+  for(const invalid of ['', ' \t\n', 'x'.repeat(1001), null]){
+   await fail('lesson_request_create_v1',{...body,student_note:invalid},'VALIDATION_FAILED',student.u);
+  }
+  await fail('lesson_request_create_v1',{...body,student_note},'FORBIDDEN',owner);
+  await fail('lesson_request_create_v1',{...body,student_note},'FORBIDDEN',other.u);
+  const created=await mut('lesson_request_create_v1',{...body,student_note},student.u,k);
+  const operation='lesson_request_create_v1';
+  assert.equal((await view(created.primary_id,student.u,operation)).student_note,student_note);
+  assert.equal((await view(created.primary_id,owner,operation)).student_note,student_note);
+  assert.equal(await view(created.primary_id,other.u,operation),undefined);
+  const receipt=(await mut(operation,{...body,student_note},student.u,k));
+  assert.equal(receipt.primary_id,created.primary_id);
+  assert.equal(receipt.replayed,true);
+  await fail(operation,{...body,student_note:'Farklı sentetik not'},'IDEMPOTENCY_PAYLOAD_MISMATCH',student.u,k);
+  const context=(await rows('select request from private.p06_contexts where receipt_id=$1',[created.operation_id]))[0];
+  assert(context);
+  assert.equal(Object.hasOwn(context.request,'student_note'),false);
+  const without=await request();
+  assert.equal(Object.hasOwn(await view(without.primary_id,student.u,operation),'student_note'),false);
+  for(const id of [created.primary_id,without.primary_id]){
+   await mut('lesson_request_withdraw_v1',{lesson_request_id:id,expected_version:1},student.u);
+  }
+ });
  await t.test('different keys cannot duplicate an open intent; no seat, resource or right is held',async()=>{
   const start=next(),r=await request(start),after=await domainCounts();
   await fail('lesson_request_create_v1',{person_id:student.p,discipline_id:discipline,requested_start:start,duration_minutes:60},'OPEN_OPERATIONS_EXIST',student.u);

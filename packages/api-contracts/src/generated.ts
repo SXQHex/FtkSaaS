@@ -1053,7 +1053,13 @@ preferred_instructor_id?: (string | null)
 discipline_id: string
 window_exception?: boolean
 reason?: Text
+student_note?: LessonRequestStudentNote
 }
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LessonRequestStudentNote".
+ */
+export type LessonRequestStudentNote = string
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_lesson_request_offer_alternative".
@@ -1323,6 +1329,7 @@ page: Page
 columns?: ReportDiscoveryColumns
 report_order?: ReportPreparationOrder
 group_by?: ReportPreparationGrouping
+include_crm_funnel?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1353,12 +1360,16 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 operation_key: string
-report: ReportKind
-filters: ReportFilters
-format: ExportFormat
+report?: ReportKind
+filters?: ReportFilters
+format?: ExportFormat
 columns?: ReportDiscoveryColumns
 report_order?: ReportPreparationOrder
 group_by?: ReportPreparationGrouping
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+retry_job_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3547,6 +3558,72 @@ freeze_cancellation: FreezeCancellationImpact
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_notifications_read_set".
+ */
+export type RequestNotificationsReadSet = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: Bool
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+notifications?: [NotificationReadSelection, ...(NotificationReadSelection)[]]
+center_id?: (string | null)
+all_unread?: true
+} & RequestNotificationsReadSet1)
+export type RequestNotificationsReadSet1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: Bool
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+notifications: [NotificationReadSelection, ...(NotificationReadSelection)[]]
+center_id?: (string | null)
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+read: true
+center_id?: null
+all_unread: true
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementWorkKind".
  */
 export type ManagementWorkKind = ("lesson_request" | "lesson_attendance" | "event_attendance" | "crm_followup" | "application_review")
@@ -5110,6 +5187,13 @@ DocumentDirectoryHistory?: DocumentDirectoryHistory
 DocumentDirectoryPage?: DocumentDirectoryPage
 Request_document_directory_get?: RequestDocumentDirectoryGet
 Success_document_directory_get?: SuccessDocumentDirectoryGet
+NotificationReservationSelector?: NotificationReservationSelector
+LessonRequestStudentNote?: LessonRequestStudentNote
+EarningSessionContext?: EarningSessionContext
+CrmStageCount?: CrmStageCount
+CrmFunnelSource?: CrmFunnelSource
+CrmFunnelSummary?: CrmFunnelSummary
+CrmPipelineSummary?: CrmPipelineSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8340,6 +8424,7 @@ version: PositiveInt
 overpaid_minor?: Money
 payments?: P03PaymentView[]
 subscriber_number?: (SubscriberNumber | null)
+session_context?: EarningSessionContext
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8376,6 +8461,16 @@ amount_minor: Money
 occurred_at: Instant
 reason: Text
 method?: ("cash" | "bank_transfer" | "card_pos" | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EarningSessionContext".
+ */
+export interface EarningSessionContext {
+title: (string | null)
+scheduled_duration_seconds: (number | null)
+agreement_version: (PositiveInt | null)
+attended_count: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8523,6 +8618,7 @@ export interface NotificationSourceState {
 state: ("pending" | "completed" | "informational" | "unavailable")
 center_id: (string | null)
 selector: (ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorCrmActivitySaveV1 | null)
+reservation_target?: NotificationReservationSelector
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8615,6 +8711,23 @@ interval?: Interval
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationReservationSelector".
+ */
+export interface NotificationReservationSelector {
+operation: "reservation_list_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReportRow".
  */
 export interface ReportRow {
@@ -8658,6 +8771,7 @@ filters: ReportFilters
 rows: Page_ReportRow
 totals: ReportTotal[]
 columns?: ReportDiscoveryColumns
+crm_funnel?: CrmFunnelSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8667,6 +8781,33 @@ export interface Page_ReportRow {
 items: ReportRow[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFunnelSummary".
+ */
+export interface CrmFunnelSummary {
+cohort_count: Count
+converted_count: Count
+stages: CrmStageCount[]
+sources: CrmFunnelSource[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmStageCount".
+ */
+export interface CrmStageCount {
+stage_key: (string | null)
+count: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFunnelSource".
+ */
+export interface CrmFunnelSource {
+source: ("manual" | "phone" | "whatsapp" | "web" | "website" | "instagram" | "facebook" | "referral" | "public_application" | "legacy_import" | "other")
+count: Count
+converted_count: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9384,6 +9525,7 @@ next_cursor?: (OpaqueToken | null)
 as_of: Instant
 pipeline_catalog?: CrmPipelineConfiguration
 summary?: CrmLeadSummary
+pipeline_summary?: CrmPipelineSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9412,6 +9554,18 @@ open_leads: Count
 followups_today: Count
 overdue_followups: Count
 converted_last_30_days: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmPipelineSummary".
+ */
+export interface CrmPipelineSummary {
+stages: CrmStageCount[]
+trials: {
+offered: Count
+registered: Count
+attended: Count
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9463,6 +9617,13 @@ export interface Page_ImportRowView {
 items: ImportRowView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+apply_summary?: {
+total_rows: Count
+applied_rows: Count
+skipped_rows: Count
+failed_rows: Count
+replayed_rows: Count
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13203,6 +13364,7 @@ stage_key?: string
 assigned_to?: (string | null)
 include_details?: boolean
 include_summary?: boolean
+include_pipeline_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13810,6 +13972,7 @@ page: Page
 state?: ImportRowState
 query?: string
 include_details?: boolean
+include_apply_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16183,6 +16346,7 @@ expires_at?: (Instant | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+student_note?: (LessonRequestStudentNote | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21457,6 +21621,7 @@ expires_at?: (Instant | null)
 discipline_id: string
 alternatives: LessonRequestAlternativeView[]
 subscriber_number?: (SubscriberNumber | null)
+student_note?: LessonRequestStudentNote
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23635,6 +23800,11 @@ key: {
 application_id?: string
 person_id?: (string | null)
 include_contact_intake?: boolean
+/**
+ * @minItems 1
+ * @maxItems 3
+ */
+states?: [ApplicationState]|[ApplicationState, ApplicationState]|[ApplicationState, ApplicationState, ApplicationState]
 }
 }
 /**
@@ -29906,10 +30076,14 @@ org_id: string
  * @minItems 1
  * @maxItems 2
  */
-kinds: [("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+kinds: [("lessons" | "duties" | "studio_program")]|[("lessons" | "duties" | "studio_program"), ("lessons" | "duties" | "studio_program")]
 state: ("active" | "revoked")
 version: PositiveInt
 created_at: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -29973,6 +30147,16 @@ client_api_version: 1
  */
 request_id: string
 page: Page
+studio_program_scope?: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -29993,12 +30177,16 @@ organization_scope: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 }
 /**
  * @minItems 1
  * @maxItems 2
  */
-kinds: [("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+kinds: [("lessons" | "duties" | "studio_program")]|[("lessons" | "duties" | "studio_program"), ("lessons" | "duties" | "studio_program")]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30019,6 +30207,10 @@ organization_scope: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 }
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -30830,6 +31022,10 @@ interval?: Interval
 center_id: string
 view: ("agreements" | "payments" | "earnings")
 page: InstructorAccountPageRequest
+/**
+ * Opt-in historical closure context for own earnings only.
+ */
+include_session_context?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30991,32 +31187,6 @@ export interface NotificationReadSelection {
  */
 id: string
 expected_version: PositiveInt
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_notifications_read_set".
- */
-export interface RequestNotificationsReadSet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-read: Bool
-/**
- * @minItems 1
- * @maxItems 100
- */
-notifications: [NotificationReadSelection, ...(NotificationReadSelection)[]]
-center_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
