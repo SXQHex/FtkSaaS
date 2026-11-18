@@ -8,6 +8,7 @@ import { readWorkspace } from "../workspace/workspace";
 import { LeadsView, type LeadTab } from "./leads-view";
 import { LeadEditor, type LeadTarget } from "./lead-editor";
 import { ApplicationEditor } from "./application-editor";
+import { PersonFollowupDialog } from "./person-followup-dialog";
 import {
   LeadFollowupPicker,
   type LeadFollowupKind,
@@ -19,7 +20,7 @@ import {
   readApplicationsPage,
   readLeadAssignees,
   readLeadFollowups,
-  readStudentFollowups,
+  readSourceFollowups,
 } from "./leads-read";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
@@ -49,6 +50,11 @@ export function LeadsContent({
     [followupKind, setFollowupKind] = useState<LeadFollowupKind>("manual"),
     [target, setTarget] = useState<LeadTarget | null | undefined>(),
     [application, setApplication] = useState<string>(),
+    [personFollowup, setPersonFollowup] = useState<{
+      id: string;
+      personId: string;
+      name: string;
+    }>(),
     [locked, setLocked] = useState(false),
     [owner, setOwner] = useState(""),
     [stageFilter, setStageFilter] = useState("all");
@@ -136,9 +142,9 @@ export function LeadsContent({
     enabled: Boolean(current) && tab === "tasks" && followupKind === "manual",
     retry: false,
   });
-  const studentFollowups = useQuery({
+  const sourceFollowups = useQuery({
     queryKey: [
-      "student-followups",
+      "lead-source-followups",
       scope.accountId,
       scope.orgId,
       scope.centerId,
@@ -147,12 +153,12 @@ export function LeadsContent({
     ],
     queryFn: () => {
       if (followupKind === "manual") throw Error("FOLLOWUP_KIND_UNAVAILABLE");
-      return readStudentFollowups(scope, followupKind, followupCursors[followupIndex]);
+      return readSourceFollowups(scope, followupKind, followupCursors[followupIndex]);
     },
     enabled: Boolean(current) && tab === "tasks" && followupKind !== "manual",
     retry: false,
   });
-  const tasks = followupKind === "manual" ? followups : studentFollowups;
+  const tasks = followupKind === "manual" ? followups : sourceFollowups;
   const applications = useQuery({
     queryKey: [
       "lead-applications",
@@ -360,7 +366,7 @@ export function LeadsContent({
                 }
               }}
             />
-            {followupKind !== "manual" && (
+            {(followupKind === "renewal_due" || followupKind === "inactive_student") && (
               <p className="text-sm text-muted-foreground">
                 {t(($) => $.leads.followupSourceHint)}
               </p>
@@ -389,7 +395,7 @@ export function LeadsContent({
                         outcome: row.completed_at ? date(row.completed_at) : null,
                         owner: row.assigned_name,
                       }))
-                    : (studentFollowups.data?.items ?? []).map((row) => ({
+                    : (sourceFollowups.data?.items ?? []).map((row) => ({
                         id: row.id,
                         name: row.name ?? t(($) => $.leads.unknownPerson),
                         kind: t(($) => $.leads.followupKinds[followupKind]),
@@ -414,8 +420,20 @@ export function LeadsContent({
                         mode: "activity",
                       });
                   } else {
-                    const row = studentFollowups.data?.items.find((row) => row.id === id);
-                    if (row)
+                    const row = sourceFollowups.data?.items.find((row) => row.id === id);
+                    if (!row) return;
+                    if (followupKind === "automation_followup") {
+                      const name = row.name ?? t(($) => $.leads.unknownPerson);
+                      if (row.lead_id)
+                        setTarget({
+                          id: row.lead_id,
+                          personId: row.person_id,
+                          name,
+                          activityId: row.id,
+                          mode: "activity",
+                        });
+                      else setPersonFollowup({ id: row.id, personId: row.person_id, name });
+                    } else
                       void navigate({
                         to: "/o/$orgId/c/$centerId/people/$personId",
                         params: {
@@ -540,6 +558,15 @@ export function LeadsContent({
           </div>
         }
       />
+      {personFollowup && current && timezone && (
+        <PersonFollowupDialog
+          key={personFollowup.id}
+          scope={scope}
+          followup={personFollowup}
+          formatDate={date}
+          onClose={() => setPersonFollowup(undefined)}
+        />
+      )}
       {target !== undefined && timezone && (
         <LeadEditor
           key={target?.id ?? "new"}

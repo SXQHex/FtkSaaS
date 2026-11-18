@@ -2,6 +2,7 @@ import { BackendError } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import type { FollowupKind } from "../../lib/api-contracts/generated";
 const base = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -172,9 +173,24 @@ export async function readLeadDetail(scope: ClientScope, personId: string, leadI
   };
 }
 export type LeadDetail = Awaited<ReturnType<typeof readLeadDetail>>;
-export async function readLeadActivities(
+export function readLeadActivities(
   scope: ClientScope,
   leadId: string,
+  cursor?: string,
+  activityId?: string,
+) {
+  return readActivities(scope, { lead_id: leadId }, cursor, activityId);
+}
+export async function readPersonFollowup(scope: ClientScope, personId: string, activityId: string) {
+  const page = await readActivities(scope, { person_id: personId }, undefined, activityId);
+  const activity = page.items[0];
+  if (page.items.length !== 1 || activity?.id !== activityId || activity.values.kind !== "followup")
+    throw Error("LEAD_ACTIVITY_UNAVAILABLE");
+  return activity;
+}
+async function readActivities(
+  scope: ClientScope,
+  key: { lead_id: string } | { person_id: string },
   cursor?: string,
   activityId?: string,
 ) {
@@ -185,7 +201,7 @@ export async function readLeadActivities(
       operation: "crm_activity_save_v1",
       selector: {
         operation: "crm_activity_save_v1",
-        key: { lead_id: leadId, ...(activityId ? { activity_id: activityId } : {}) },
+        key: { ...key, ...(activityId ? { activity_id: activityId } : {}) },
       },
       page: { limit: 20, ...(cursor ? { cursor } : {}) },
     });
@@ -194,7 +210,9 @@ export async function readLeadActivities(
       !item.entity ||
       item.entity.type !== "crm_activities" ||
       item.current?.operation !== "crm_activity_save_v1" ||
-      item.current.values.lead_id !== leadId ||
+      ("lead_id" in key
+        ? item.current.values.lead_id !== key.lead_id
+        : item.current.values.person_id !== key.person_id || item.current.values.lead_id != null) ||
       item.current.values.kind === undefined ||
       item.current.values.note === undefined ||
       item.current.values.outcome === undefined ||
@@ -258,11 +276,7 @@ export async function readApplicationsPage(
   return { ...page, items };
 }
 
-export async function readStudentFollowups(
-  scope: ClientScope,
-  kind: "renewal_due" | "inactive_student",
-  cursor?: string,
-) {
+export async function readSourceFollowups(scope: ClientScope, kind: FollowupKind, cursor?: string) {
   const backend = await scopedBackend(scope),
     page = await backend.call("crm_followup_list_v1", {
       ...base(scope),
@@ -275,7 +289,9 @@ export async function readStudentFollowups(
     if (row.kind !== kind || row.center_id !== scope.centerId || ids.has(row.id))
       throw Error("STUDENT_FOLLOWUP_UNAVAILABLE");
     ids.add(row.id);
+    z.uuid().parse(row.id);
     z.uuid().parse(row.person_id);
+    if (row.lead_id !== null) z.uuid().parse(row.lead_id);
     z.iso.datetime({ offset: true }).parse(row.due_at);
   }
   if (cursor && cursor === page.next_cursor) throw Error("LEAD_CURSOR_REPEATED");

@@ -3654,10 +3654,12 @@
     "filtersMissing": "Merkez toplamları ve aşama/sorumlu filtreleri şu anda kullanılamıyor. Pano sayıları yalnız bu sayfadaki adayları gösterir.",
     "followupKind": "Takip kaynağı",
     "followupKinds": {
-      "manual": "Elle oluşturulan takipler",
+      "manual": "Aday takipleri",
       "renewal_due": "Yenileme zamanı gelenler",
-      "inactive_student": "Hareketsiz öğrenciler"
+      "inactive_student": "Hareketsiz öğrenciler",
+      "automation_followup": "Otomasyon takipleri"
     },
+    "followupReadFailed": "Otomasyon takibinin güncel kaydı okunamadı.",
     "followupSourceHint": "Tarih ve liste üyeliği güncel merkez politikalarına göre gelir; kişi kartında işlem seçebilirsin.",
     "completedAt": "Tamamlanma tarihi",
     "followupsMissing": "Tüm takiplerin listesi şu anda kullanılamıyor. Seçili adayın panelinden takip ve notlarını yönetebilirsin.",

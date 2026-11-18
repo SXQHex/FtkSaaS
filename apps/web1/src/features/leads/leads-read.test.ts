@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from "vitest";
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call }) }));
-import { readApplicationsPage, readLeadsPage, readStudentFollowups } from "./leads-read";
+import { readApplicationsPage, readLeadsPage, readSourceFollowups } from "./leads-read";
 import { BackendError } from "../../lib/backend";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`,
   scope = { accountId: id(1), orgId: id(2), centerId: id(3) };
@@ -121,7 +121,7 @@ it.each(["renewal_due", "inactive_student"] as const)(
           }
         : { id: request.person_id, display_name: "Görünür öğrenci" },
     );
-    const page = await readStudentFollowups(scope, kind, "native-cursor");
+    const page = await readSourceFollowups(scope, kind, "native-cursor");
     expect(page.items[0]).toMatchObject({
       name: "Görünür öğrenci",
       due_at: "2026-11-17T12:00:00Z",
@@ -152,7 +152,7 @@ it("rejects a foreign-center student followup before reading any person", async 
       },
     ],
   });
-  await expect(readStudentFollowups(scope, "renewal_due")).rejects.toThrow(
+  await expect(readSourceFollowups(scope, "renewal_due")).rejects.toThrow(
     "STUDENT_FOLLOWUP_UNAVAILABLE",
   );
   expect(call).toHaveBeenCalledTimes(1);
@@ -176,7 +176,7 @@ it("does not replace a forbidden student name with a private or invented identit
       };
     throw new BackendError({ code: "FORBIDDEN", retryable: false, trace_id: id(9) });
   });
-  const page = await readStudentFollowups(scope, "renewal_due");
+  const page = await readSourceFollowups(scope, "renewal_due");
   expect(page.items).toHaveLength(1);
   expect(page.items[0].name).toBeUndefined();
   expect(call).toHaveBeenCalledTimes(2);

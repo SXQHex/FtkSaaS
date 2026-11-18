@@ -61,6 +61,8 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Açık](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
 | W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Açık](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
 | W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Açık](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
+| W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Açık](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
+| W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Açık](#w1-be-54--başvuru-durum-filtresi). |
 
 ## Bütün talepler için ortak sınır
 
@@ -450,3 +452,15 @@ Yoklama için izinli zaman aralığı varsa bu aralığın canlı politika ve ye
 **Açık · backend değerlendirmesi.** Çizim, seçili dönemde ara huni aşamalarını ve aday kaynaklarına göre sayıları gösteriyor. `report_get_v1(report: "crm_conversion")` yetkili merkez ve dönem için aday sayısını, dönüşen aday sayısını ve dönüşüm oranını döndürüyor. Rapor satırları ara aşama ve aday kaynağı ayrımı taşımıyor. Web1 mevcut üç ölçüyü merkez satırından gösteriyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L4640) · [WF10](../../../docs/workflows.md#wf10) · [WF12](../../../docs/workflows.md#wf12).
 
 Aşama ve kaynak ölçülerini aynı tarih, merkez, CRM planı ve rapor yetkisi altında değerlendirin. Döneme girme, aşamadan geçme ve dönüşme ölçülerinin anlamı açıklanmalı. Sayılar bütün filtreli sonucu kapsamalı ve kişi ayrıntısı gerektirmemeli.
+
+## W1-BE-53 · CRM aşama ve deneme sayaçları
+
+**Açık · backend değerlendirmesi.** Çizim aynı görünümde bütün satış aşamalarının sayılarını ve deneme planlanan veya gerçekleşen adayları gösteriyor. `leads_list_v1` seçilen tek aşamayı filtreleyebiliyor ve filtreli toplam sağlıyor. Aşama kataloğu iş anlamı olarak `open`, `won` ve `lost` ayrımını taşıyor. `trial_offer_create_v1` geçmiş seçicisi tek adayın gerçek teklif ve ders kaydı bağını döndürüyor. Tüm görünür aşamaların ve deneme sonuçlarının birlikte sayıldığı bir yanıt bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L6725) · [WF12](../../../docs/workflows.md#wf12).
+
+Merkez ve canlı aday görünürlüğü altında, arama ve sorumlu filtresiyle uyumlu aşama sayaçlarını ve gerçek deneme durumlarının güvenli özetini değerlendirin. Teklif, ders kaydı ve fiilî katılım ayrı ölçüler olmalı. Aday veya teklif geçmişi sayaç üretmek için sayfa sayfa taranmamalı.
+
+## W1-BE-54 · Başvuru durum filtresi
+
+**Açık · backend değerlendirmesi.** Çizim, Başvurular sekmesinde açık ve tamamlanan kayıtları ayrı gösteriyor. `management_state_get_v1(operation: "public_application_review_v1")` satırın gerçek durumunu veriyor. Seçici, durumu sayfalama öncesinde filtrelemiyor. `management_work_list_v1` yalnız bekleyen, işlem yapılabilir yönetim işlerini döndürüyor. [Güncel çizim](../read-only/tasarim-v2/index.html#L1335) · [WF12](../../../docs/workflows.md#wf12).
+
+Mevcut başvuru görünürlüğü ve inceleme yetkisiyle, cursor kapsamına bağlı bir durum filtresini değerlendirin. Açık, incelenmiş ve kapatılmış kayıtların eşlemesi, merkezsiz başvurular ve istemciye gösterilen iletişim verisinin sınırı korunmalı.

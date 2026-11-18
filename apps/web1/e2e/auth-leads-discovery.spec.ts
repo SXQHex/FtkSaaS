@@ -410,6 +410,106 @@ for (const kind of ["renewal_due", "inactive_student"] as const)
     expect(native.writes).toHaveLength(0);
   });
 
+test("automation followups open the exact generated activities for members and candidates", async ({
+  page,
+}) => {
+  const native = await mockLeads(page);
+  const memberActivity = id(981);
+  const kinds: string[] = [];
+  const selectors: Record<string, unknown>[] = [];
+  const due = "2026-11-18T10:00:00Z";
+  let permitted = false;
+  await page.route("**/functions/v1/backend-v1/*", (route) => {
+    const op = new URL(route.request().url()).pathname.split("/").at(-1);
+    const request = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (op === "crm_followup_list_v1") {
+      kinds.push(request.kind);
+      expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+      const source = {
+        kind: "automation_followup",
+        center_id: I.center,
+        assigned_to: null,
+        due_at: due,
+      };
+      return send({
+        items: [
+          { ...source, id: memberActivity, lead_id: null, person_id: I.self },
+          { ...source, id: leadIds.activity, lead_id: leadIds.first, person_id: leadIds.person },
+        ],
+        as_of: due,
+        next_cursor: null,
+      });
+    }
+    if (op === "management_state_get_v1" && request.operation === "crm_activity_save_v1") {
+      const key = request.selector.key;
+      if (key.activity_id) selectors.push(key);
+      if (key.person_id === I.self) {
+        expect(key).toEqual({ person_id: I.self, activity_id: memberActivity });
+        if (!permitted)
+          return route.fulfill({
+            status: 403,
+            json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+          });
+        const entity = { type: "crm_activities", id: memberActivity };
+        return send({
+          items: [
+            {
+              operation: "crm_activity_save_v1",
+              entity,
+              exists: true,
+              state: "open",
+              versions: [{ entity, version: 1 }],
+              current: {
+                operation: "crm_activity_save_v1",
+                values: {
+                  person_id: I.self,
+                  lead_id: null,
+                  activity_id: memberActivity,
+                  kind: "followup",
+                  due_at: due,
+                  note: "Sunucunun oluşturduğu takip notu",
+                  outcome: null,
+                },
+              },
+            },
+          ],
+          as_of: due,
+          next_cursor: null,
+        });
+      }
+    }
+    return route.fallback();
+  });
+  await page.getByRole("tab", { name: "Takipler", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Takip kaynağı", exact: true })
+    .selectOption("automation_followup");
+  const member = page.getByRole("row").filter({ hasText: "Örnek sorumlu" }).getByRole("button");
+  await member.click();
+  const dialog = page.getByRole("dialog", { name: "Otomasyon takipleri", exact: true });
+  await expect(dialog.getByText("Otomasyon takibinin güncel kaydı okunamadı.")).toBeVisible();
+  permitted = true;
+  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(dialog.getByText("Sunucunun oluşturduğu takip notu", { exact: true })).toBeVisible();
+  expect((await scanAccessibility(page, "automation-followup-source")).violations).toEqual([]);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(member).toBeFocused();
+  await page.getByRole("row").filter({ hasText: "Aday A" }).getByRole("button").click();
+  await expect(page.getByRole("dialog").getByLabel("Not", { exact: true })).toHaveValue(
+    "İlk görüşmeyi yap",
+  );
+  await closeLead(page);
+  expect(kinds).toEqual(["automation_followup"]);
+  expect(selectors).toEqual([
+    { person_id: I.self, activity_id: memberActivity },
+    { person_id: I.self, activity_id: memberActivity },
+    { lead_id: leadIds.first, activity_id: leadIds.activity },
+  ]);
+  expect(native.writes).toHaveLength(0);
+});
+
 test("student followup policy failure remains unread and recovers through an explicit source read", async ({
   page,
 }) => {

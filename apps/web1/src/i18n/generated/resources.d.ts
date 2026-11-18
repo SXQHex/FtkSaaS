@@ -1817,10 +1817,12 @@ export default interface Resources {
       "filtersMissing": "Merkez toplamları ve aşama/sorumlu filtreleri şu anda kullanılamıyor. Pano sayıları yalnız bu sayfadaki adayları gösterir.",
       "followupKind": "Takip kaynağı",
       "followupKinds": {
+        "automation_followup": "Otomasyon takipleri",
         "inactive_student": "Hareketsiz öğrenciler",
-        "manual": "Elle oluşturulan takipler",
+        "manual": "Aday takipleri",
         "renewal_due": "Yenileme zamanı gelenler"
       },
+      "followupReadFailed": "Otomasyon takibinin güncel kaydı okunamadı.",
       "followupSourceHint": "Tarih ve liste üyeliği güncel merkez politikalarına göre gelir; kişi kartında işlem seçebilirsin.",
       "followupsMissing": "Tüm takiplerin listesi şu anda kullanılamıyor. Seçili adayın panelinden takip ve notlarını yönetebilirsin.",
       "history": "Geçmiş",

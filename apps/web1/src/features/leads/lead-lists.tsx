@@ -185,7 +185,8 @@ export function LeadHistoryView({ rows }: { rows: LeadActivityRow[] }) {
   );
 }
 
-export type LeadFollowupKind = "manual" | "renewal_due" | "inactive_student";
+const followupKinds = ["manual", "renewal_due", "inactive_student", "automation_followup"] as const;
+export type LeadFollowupKind = (typeof followupKinds)[number];
 export function LeadFollowupPicker({
   value,
   onChange,
@@ -208,12 +209,11 @@ export function LeadFollowupPicker({
           value={value}
           disabled={disabled}
           onChange={(event) => {
-            const next = event.target.value;
-            if (next === "manual" || next === "renewal_due" || next === "inactive_student")
-              onChange(next);
+            const next = followupKinds.find((kind) => kind === event.target.value);
+            if (next) onChange(next);
           }}
         >
-          {(["manual", "renewal_due", "inactive_student"] as const)
+          {followupKinds
             .filter((kind) => advanced || kind === "manual")
             .map((kind) => (
               <NativeSelectOption key={kind} value={kind}>

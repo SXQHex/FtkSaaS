@@ -222,7 +222,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 ### V05 · CRM, public yüzey ve otomasyon
 
-- [ ] **V05.1** · E33'ün pano/takip/başvuru/liste görünümleri, sorumlu seçimi ve deneme sayaçlarını mevcut native keşif ve hazır Dice UI bileşenleriyle eşle. Otomasyonun oluşturduğu takip aynı kaynak işleminden görülsün.
+- [ ] **V05.1** · E33'ün pano/takip/başvuru/liste görünümleri, sorumlu seçimi ve deneme sayaçlarını mevcut native keşif ve hazır Dice UI bileşenleriyle eşle. Takipler’de otomasyon kaynağı, `crm_followup_list_v1` ile yetkili faaliyet kimliklerini alıyor. Adayla bağlı ve adaysız kayıtlar aynı faaliyet kimliğiyle kendi yetkili ayrıntısını açıyor. Yetki reddi içeriği gizli tutuyor ve yeniden deneme yalnız kaynak okuması yapıyor. Pano, sorumlu seçimi, başvuru ve deneme akışlarıyla birlikte 29 birim testi ve tek işçiyle 33 Chromium senaryosu geçti. Merkez aşama ve deneme sayaçları [W1-BE-53](request.md#w1-be-53--crm-aşama-ve-deneme-sayaçları), başvuru durum filtresi [W1-BE-54](request.md#w1-be-54--başvuru-durum-filtresi) kapsamında açık. [Otomasyon takibi](../e2e/auth-leads-discovery.spec.ts#L413).
 - [ ] **V05.2** · E34–E36 ve E42 Yayın bölümünde slug değişimi/açık-kapalı durum, başvuru sürümü/onay, ziyaretçi etkinlik kayıt tasarımını gerçek yayın hedefiyle karşılaştır. Public etkinlik desteği belirsizse ayrı talep yaz; mevcut ders başvurusunu koru.
 - [ ] **V05.3** · E40 segment/otomasyon/son iş görünümü ve rapor bağlantısını yayımlı dar WF16 kapsamıyla uyarla. Başarı, kaynak job ve tekrar sonrası tek sonuç üzerinden okunur; yeni e-posta/reklam sağlayıcı entegrasyonu bu çizimden türetilmez.
 
