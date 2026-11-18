@@ -1,0 +1,58 @@
+# FtkSaaS tasarım v2: geçiş belgesi (v67, güncel)
+
+Bu belge eski `GECIS-vNN-*.md` notlarının tek, alan alan birleşimidir. Sürüm sürüm geçmiş için `ILERLEME.md`.
+Tüm ekranlar kurgusal veriyle bellekte çalışır. "Backend karşılığı" satırları frontend'in sonra backend'den çağıracağı işlem adlarıdır.
+
+## 1. Genel mimari ve kurallar
+- Shadcn adlı OKLCH tokenlar, Geist, açık/koyu/sistem tema, masaüstü öncelikli kompakt 36 px kontroller, tek vurgu `--now`. Terim "Üye". Ölçek: kök `font-size` (%100/110/125), px değerleri rem.
+- Görünümler `section.view[data-view]`, hash yönlendirme. Kabuklar: yönetim (`.app`), eğitmen (yönetim kabuğunda sadeleştirilmiş, `ALLOWED` dışı 403), üye (`#mshell`, `m-`), herkese açık (`#pubshell`, `p-`), giriş (`#authshell`, `a-`), platform operatörü (`#opshell`, `o-`). `SHARED.roleTo(r)`.
+- Kalıplar: önizleme → etki listesi → onay; gerekçeli onay; sürümlü yayın; tek sonuç (tekrar gönderim); her yazma işlemi `SHARED.audit(modül, işlem, nesne, sonuç, ayrıntı, op, by)` ile Denetim'e.
+- Ortak bileşenler: `.btn .card .badge .seg .tabs table.list .sheet .dialog.card .aff .kpis .note .state(+emptyRow, [data-clr]) .sk .pvbar`; `toast() swap() bind() emptyRow()`; genel onay penceresi `SHARED.dlg({t,b,ok,fn,danger,dis})`.
+- Yerel ortak veri köprüsü `SHARED`: `stu() cal coachOf ev(E,open,unpay) finEvent finPay finEvRows finTotals finSold pkgAct audit taskAdd memberAdd accSet actAs hist ibAdd ibDone roleTo refreshMembers planHas orgActive orgExtra settleOpen centersPlan pplShared saasState saasSubmit ownerSet renamers calEff lrFromMember lrMemberAct lrFromAdmin hkSync hkReport crmStats icsOf appAdd docsOf docAccept attApi pubCfg pubRender`.
+
+## 2. Roller ve kabuklar
+- **Eğitmen (`egt-bugun, egt-program, egt-seans, egt-hakedis`, Hesabım, Yardım):** eğitmen yalnız kendi seansını ve katılımcı adını görür; üye iletişim/ödeme/paket görünmez (API alan düzeyinde kısıtlı olmalı). Yoklama pencere kuralları: başlangıçtan 15 dk önce açılır, fiilî başlangıç 5 dk+ farklıysa gerekçe, bitişten sonrası ve seans günü dışı engelli, tüm üyeler işaretlenmeden kapanmaz, taslak saklanır. Kapatma etki önizlemesi (yoklama, hak tüketimi, hakediş). Kapalı yoklamayı yalnız yönetici düzeltir; eğitmen gerekçeli "Düzeltme iste" (Gelen kutusuna + Denetim). Saat dilimi: Hesabım > "Cihaz saati" ise gösterim çevrilir, DST uyarısı.
+- **Üye kabuğu (`m-dersler, m-rez, m-haklarim, m-ozel, m-hesap, m-bildirim`):** ders kaydı/iptal (hak seçimi, etki, ücretsiz iptal süresi, geç iptalde hak düşer), dolu derste bekleme listesi ve süreli yer teklifi (**süre = min(ayar, seans başlangıcına kalan dk)**, onaylı), kapalı kayıt nedenleri (belge, hak, borç, dondurma, pasif, açılış penceresi), haklar/bakiye/ödemeler, özel ders talebi (iki yönlü Talepler bağı), bildirim merkezi, ICS, hesap silme. Ad soyad üye tarafından düzenlenir (karar 1): `SHARED.renamers` tüm ad-anahtarlı kaynakları günceller; backend'de bağ üye numarasıdır. Veri `SHARED.stu()` ile aynı kayıt; politikalar Ayarlar > Rezervasyon alanlarından; yönetici programındaki tek seans taşıması `SHARED.calEff` ile yansır.
+- **Herkese açık sayfa (`p-takvim, p-basvuru, p-kapali`):** Ayarlar > Yayın (yayın anahtarı, slug doğrulaması, doluluk, bölüm anahtarları, onay cümlesi + form sürümü, önizleme). Başvuru formu (tekrar başvuruda tek sonuç, honeypot, onay kanıtı) ve ziyaretçi etkinlik kaydı `SHARED.appAdd` ile Adaylar > Başvurular'a düşer. Slug değişince uyarı: açıkken eski bağlantı çalışmaz, kapalıyken yayına alınınca geçerli; Denetim'e yazılır.
+- **Giriş ve hesap (`a-giris, a-kayit, a-dogrula, a-parola, a-yeni-parola, a-mfa, a-davet, a-davet-bitti, a-silindi, a-kurulum`):** kurgusal hesaplar (parola `Parola123!`; ayse@ yönetici, elif.kara@ eğitmen, selin.aksoy@ üye, yeni@ doğrulanmamış; iki adım kodu 123456). Hesap sayımını sızdırmayan metinler, 5 hatalı denemede kilit, parola kuralı (10+, harf+rakam). Hesabım > Güvenlik: parola, iki adım, geçmiş, oturumlar, hesabı sil (yönetici sahiplik engeli). **Kurulum sihirbazı:** yeni kayıt → doğrulama → ilk giriş → 3 adım (stüdyo, salon + ders türü, özet), "Sonra yaparım" ile atlanır, Ayarlar'a işlenir, Denetim'e yazılır.
+- **Platform operatörü (`o-organizasyonlar, o-odemeler, o-sahipler`):** `organization_create`, `saas_payment_verify` (dönemi uzatır, ikinci doğrulama tekrar uzatmaz) / gerekçeli red, `saas_grace_extend` (3/7/14 gün, toplam ≤30), `platform_owner_set/remove` (taze yetki, son sahip korunur), organizasyon detayı + askıya al/kaldır (yalnız Platform sahibi; müşteride şerit + pasif eylemler, veri silinmez). Kimlikler: Platform sahibi, Destek (ödeme/ek süre), Müşteri Sahibi (403).
+
+## 3. Yönetim sayfaları
+- **Program:** hafta/gün, sürükle-bırak taşıma (kaydet çubuğu, bildirim), Pazar-ilk modda önceki haftanın Pazar'ı düzenlenebilir, etkinlikler takvimde (kesik kenarlık, salon çakışma işareti, `kind: session|event` birleşik sorgu), ders/eğitmen değişikliği, sabit grup, bu ve sonraki haftalar.
+- **Üyeler:** liste, profil, hak düzeltme, dondurma, sonlandırma, paket değişimi, negatif limit, tahsilat; içe aktarma (3 adım, CSV, tekrar tek sonuç, aktarılan üyede paket ve rezervasyon yok); davet; birleşim kopyaları; Yan panelde takvim bağlantısı durumu.
+- **Paketler:** sürümlü yayın, arşiv, satışa aç/kapa. "Aktif hak sahibi" üye listesinden (`pkgAct`), "son 30 gün satış" Finans satışlarından (`finSold`) türetilir.
+- **Finans:** satış/tahsilat/iade, iptal, borç/alacak; etkinlik ödemesi (`finEvent`: ödendi/bekliyor/iptal/iade, "Ödemeyi al" `POST /event-registrations/{id}/collect`); Finans ↔ Üyeler tahsilat senkronu; Raporlar aynı veriyi okur (`revenue_by_period` tek sorgu).
+- **Etkinlikler:** liste/detay, ekle-düzenle, 3 adımlı kayıt, iptal etki önizlemesi, görev doğrulama; doğrulanan görev `Hakediş` satırı üretir (`syncEv`).
+- **Hakediş:** sürümlü anlaşmalar, seans/etkinlik satırları, ödeme, düzeltme. Raporlar eğitmen hakedişini buradan okur (`hkReport`).
+- **Adaylar:** Pano (Kanban + klavye), Takipler, Başvurular, Liste; deneme teklifi → kabul → yönetici kayıt onayı; ortak başvuru kutusu; hunisi Raporlar'a `crmStats` ile gider.
+- **Otomasyon:** Segmentler, Otomasyonlar, Son işler; "Takip görevi" eylemi Adaylar > Takipler'e yazar (`taskAdd`).
+- **Raporlar:** özel aralık (bitiş ≥ başlangıç, ≤366 gün), 4 sekme, CSV dışa aktarma işleri (hazırlanıyor/hazır/başarısız + yeniden dene; 180 gün+ ilk denemede zaman aşımı), dışa aktarma Denetim'e yazılır.
+- **Denetim:** denetim kaydı (filtre, ayrıntı çekmecesi, dışa aktarma), İşlemler (önizleme+süre, canlı ilerleme, kısmi, yeniden denenecek, başarısız, tamamlandı). Backend: her yazma uç noktası aynı transaction'da `audit_log` yazar. Kapsam: Üyeler, Yoklama, Finans, Hakediş, Paketler, Etkinlikler, Program, Belgeler, Ekip, Ayarlar, Takvim, Platform, Organizasyon, Merkezler, Kişiler, Hesaplaşma.
+- **Gelen kutusu:** toplu seç/okundu/arşiv/sil, 7 sn geri al (backend: `PATCH /inbox/messages`, 30 gün yumuşak silme). **Talepler, Belgeler** (sürümlü, yeniden kabul), **Yardım** (kısayollar, Durum ekranları kataloğu), **Ctrl K** komut paleti (sayfa, ayar, üye, eylem).
+- **Ortak durumlar:** `.state`, iskelet, 404/403/çevrimdışı gerçek; boş/hata/409/salt okunur/plan limiti Durum kataloğunda ve ilgili sayfalara bağlı.
+
+## 4. Ayarlar
+Genel, Rezervasyon (varsayılana sıfırla), Politikalar, Salonlar (oda sınırı), Bildirimler, Şablonlar, Yayın, **Ekip** (Kişiler, İzinler matrisi → sayfa görünürlüğü ve "Bu kişi olarak görüntüle" 403, rol kaldırma önizlemesi, son Merkez yöneticisi koruması, yönetici sınırı), **Plan**, **Organizasyon**, Geçmiş. Hesabım > Görünüm (tema, saat dilimi, hafta başı, ölçek, karşıtlık), Takvim bağlantısı.
+- **Takvim bağlantısı (ICS):** üye kendi rezervasyonları; eğitmen kendi seansları; yönetici tüm program. Oluştur/yenile/iptal (`calendar_link_create/rotate/revoke`), bağlantı yalnız oluşturma anında tam görünür, rol başına ayrı bağlantı, Denetim'e yazılır.
+- **Plan:** Başlangıç 490 (100 üye/1 salon/1 yönetici), Stüdyo 990 (250/5/3), İşletme 1990 (1250/15/10). Yükseltme hemen (orantılı fark), düşürme dönem sonu; limit aşan plan devre dışı; planlanan geçişi geri alma; kart güncelle; fatura listesi + **Fatura bilgileri** (unvan, vergi dairesi, 10/11 hane no); aboneliği iptal et → "Dönem sonuna git (demo)" → salt okunur mod + "Aboneliği yeniden başlat"; **Havale bildir** (`saas_payment_submit`, tek bekleyen) → operatör doğrular/reddeder → Plan kartına yansır. Gerçek ödeme/3D Secure yok.
+- **Starter (Faz B):** kapalı özellikler (etkinlik, hakediş, otomasyon, Merkezler…) kenar çubuğunda gizli, bağlamda kilit rozeti + "Planı yükselt", doğrudan adres "plan" durumu. Başlangıç'a düşürmede salon/eğitmen/disiplin ve (>100 üye) üye seçimi zorunlu, geçmiş/hak/borç korunur; tek salon/eğitmen; temel CRM (deneme teklifi, Başvurular, segment kapalı); public yüzey yalnız program + form; yoklama→hakediş yok, temel raporlar; yalnız işlem bildirimi; 100/100 limit durumu.
+- **Organizasyon (C5):** sahiplik devri (taze yetki, alıcı kabulü, 7 gün), kapat/yeniden aç (`organization_close_preview/apply`, `organization_reopen`), sil (`organization_delete_preview/apply`; dışa aktarma şart; 5 adım; kısmi/yeniden deneme tamamlandı sayılmaz). Yalnız Sahip.
+
+## 5. Business (çok merkez, yalnız İşletme)
+- **Merkezler (C1):** liste, ekle/düzenle, 5 merkez sınırı, Yöneticiler (Sahip/OM/MM, son yönetici koruması), Politikalar (Zorunlu/Tavsiye, miras/ezme), Disiplinler; merkez seçici. Mock veri yalnız Moda Merkez.
+- **Kişiler ve Başvurular (C2):** tek kişi kaydı + değişmeyen Abone No (`person_*`), merkez kapsamlı okuma, merkez onaylı birleşim; organizasyon başvuru kutusu (`assign_center`, aktar/kapat).
+- **Hesaplaşma (C3):** Hareketler, Talepler, Kullanım kapsamı, Yetki (`settlement_*`). Aynı kullanım ikinci hareket üretmez; talepteki hareket seçilemez; Sahip/OM kimliği tek başına finans yetkisi vermez.
+- **Birleşik rapor (C4):** OM tüm organizasyon, MM yalnız kendi satırı; mutabakat; tekil aktif kişi kotası (1.250); Moda Merkez rakamları Finans'tan, diğerleri örnek. Business'tan düşerken merkez seçimi (`#pl-kcn`), açık hesaplaşma engeli, diğer merkezler arşive (veri silinmez).
+
+## 6. Kararlar
+Starter kapalıları gizlenir; platform operatörü kapsamda; Hakediş Satış grubunda; yalnız üye paneli ayrı kabuk; yer teklifi süresi = min(ayar, kalan dk); üye adını üye düzenler; backend'e bağlı konular (gerçek oturum/yetki, Google girişi, gerçek ödeme/3DS, çöp kutusu, 90 gün veri ölçekleme) çizimden çıkarıldı.
+
+## 7. Bilinen eksikler
+- Üye bekleme listesi/teklifi ile yönetici Seans detayı Bekleme listesi ortak değil (ortak occurrence modeli gerekir).
+- "Bu ve sonrakiler" / seri taşıma üye görünümüne yansımaz.
+- Eğitmen görünümünde tarih/saat sabit (Çar 4 Kas 14:20), geçmiş yoklamalar örnek veri; yalnız Çar 14:30 tango yoklaması denenebilir.
+- Moda dışı merkezler ve rapor doluluğu örnek veri; kapalı organizasyonda pasiflik yalnız görsel (yetki backend'de).
+- %125 ölçekte 400 px genişlikte yatay taşma olabilir (%100'de yok). Kurulum sihirbazından girilen şube adı kenar çubuğunda ilk yüklemede varsayılana dönebilir.
+
+## 8. Doğrulama düzeni (her turda)
+Playwright: masaüstü açık/koyu, 400 px yatay taşma yok, konsol hatasız, yinelenen `id` yok; tam regresyon (`t*.js`). Yama yöntemi: `python3 -I` ile `rep(a,b)` (`assert s.count(a)==1`), söz dizimi `node --check`. Eski testler: t (eğitmen), t2 (rol), t4 (üye), t5 (hakediş), t6 (public), t8 (plan), t11 (rapor/içe aktar), t12 (giriş), t13 (denetim), t15 (durumlar), t16 (Ctrl K), t17–t31 (A9), t32–t41 (Faz B/C1), t44–t62 (C2–üye bağları), t63 (denetim/ölçek/paket), t64 (ICS), t65 (public), t66 (kurulum).
