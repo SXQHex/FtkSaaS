@@ -198,5 +198,6 @@
   "20261118214000_settings_catalog_v25.sql": "3fe0f64ca44f29b7d7a1dff8bb03890636ebf0aec68156cb459d1b5f94318252",
   "20261118214100_public_page_event_applications.sql": "1f1ca343d8dbaf49683eaa7408d44b042ce5aa9e64bc6d3c8e4da3acb0a5fc31",
   "20261118214200_studio_setup_requests.sql": "16739bf94ec2317478e2c1f2f0862e11f8bbad013eb0c2e412016177adffbd66",
-  "20261118214300_attendance_window_requests.sql": "3a99567aa0f3f93ae1cf793a0964033ef82eb9e7325b7a738fdb22890a38114e"
+  "20261118214300_attendance_window_requests.sql": "3a99567aa0f3f93ae1cf793a0964033ef82eb9e7325b7a738fdb22890a38114e",
+  "20261118214400_attendance_correction_audit_module.sql": "5f3a1802df9a6f721e3d52530a62c50366302266d01594ddee51ac6478d963db"
 }

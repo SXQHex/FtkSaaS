@@ -291,7 +291,8 @@
         "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql",
         "apps/backend/scripts/compact-validator-errors.mjs",
         "apps/backend/database/tracking-discovery.sql",
-        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql"
+        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql",
+        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -302,8 +303,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "a1118bc3e91a3156ffed146f2a82b08e249efda346fff6dcb6750818174a3ee4",
-        "reason": "Reviewed three user-approved exact assertion fingerprints for the new Edge byte budget and the published settings catalog revision."
+        "fingerprint": "7056423c6a6ad327cc02ceb660c9ba540ddefea755319b35a56b0bc13b5809a0",
+        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
       }
     },
     {
@@ -1063,8 +1064,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "6cbc5126713a239abe54e09412ad046cdfc46962e99bcce74458dcdc85e02f78",
-        "reason": "Reviewed the effective attendance window and the separate instructor-to-manager correction request lifecycle."
+        "fingerprint": "d2d73963b6aa90aa36b9aef2bca7b87ede21b97d856494a1cfa98d3deed2f2eb",
+        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
       }
     },
     {

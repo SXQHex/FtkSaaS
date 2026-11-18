@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ba63ecc361406405dc036ef750ef023d2135a0cd82d90aaac30e7f98464374ce`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `abcafc68ac4390da20a47347c3251c866dea49f9d1bd197cc368159362065d13`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 200. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 201. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -208,3 +208,4 @@ Sıralı migration: 200. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261118214100_public_page_event_applications.sql](../apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql) | `1f1ca343d8dbaf49683eaa7408d44b042ce5aa9e64bc6d3c8e4da3acb0a5fc31` |
 | [20261118214200_studio_setup_requests.sql](../apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql) | `16739bf94ec2317478e2c1f2f0862e11f8bbad013eb0c2e412016177adffbd66` |
 | [20261118214300_attendance_window_requests.sql](../apps/backend/supabase/migrations/20261118214300_attendance_window_requests.sql) | `3a99567aa0f3f93ae1cf793a0964033ef82eb9e7325b7a738fdb22890a38114e` |
+| [20261118214400_attendance_correction_audit_module.sql](../apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql) | `5f3a1802df9a6f721e3d52530a62c50366302266d01594ddee51ac6478d963db` |
