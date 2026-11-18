@@ -1,38 +1,43 @@
 import {compactValidatorErrors} from './compact-validator-errors.mjs';
 import fs from 'node:fs';import assert from 'node:assert/strict';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import standalone from 'ajv/dist/standalone/index.js';
 const contract=JSON.parse(fs.readFileSync('supabase/functions/backend-v1/contract.json'));
-// Ajv retains schema annotations in standalone constants even though they do not
-// validate data. Keep those in the published contract, outside the Edge upload.
-function validationSchema(schema){
- if(!schema||typeof schema!=='object'||Array.isArray(schema))return schema;
- const result={};
- for(const [key,value] of Object.entries(schema)){
-  if(key.startsWith('x-')||['title','description','$comment','default','examples'].includes(key))continue;
-  if(['properties','patternProperties','$defs','definitions','dependentSchemas'].includes(key))result[key]=Object.fromEntries(Object.entries(value).map(([name,item])=>[name,validationSchema(item)]));
-  else if(['allOf','anyOf','oneOf','prefixItems'].includes(key))result[key]=value.map(validationSchema);
-  else if(['items','contains','not','if','then','else','additionalProperties','unevaluatedProperties','propertyNames'].includes(key))result[key]=validationSchema(value);
-  else result[key]=value;
- }
- return result;
-}
-for(const [name,schema] of Object.entries(contract.$defs))contract.$defs[name]=validationSchema(schema);
-// Intern identical nested object/array/compound schemas before compilation. Ajv shares
-// named refs; inline copies otherwise generate one validator per scope. Repeated
-// compound/nullable unions are shared too, preserving every branch. Only
-// schema positions are visited, so user property names and enum data stay data.
 const nestedMaps=['properties','patternProperties','$defs','definitions','dependentSchemas'];
 const nestedLists=['allOf','anyOf','oneOf','prefixItems'];
 const nestedSingles=['items','contains','not','if','then','else','additionalProperties','unevaluatedProperties','propertyNames'];
+const annotations=['title','description','$comment','default','examples'];
+const isSchemaObject=value=>value&&typeof value==='object'&&!Array.isArray(value);
+
+// Visit schema positions only. Property names and literal data are untouched.
 function children(schema,visit){
- if(!schema||typeof schema!=='object'||Array.isArray(schema))return schema;
+ if(!isSchemaObject(schema))return schema;
  const out={...schema};
  for(const key of nestedMaps)if(out[key])out[key]=Object.fromEntries(Object.entries(out[key]).map(([name,value])=>[name,visit(value)]));
  for(const key of nestedLists)if(out[key])out[key]=out[key].map(visit);
- for(const key of nestedSingles)if(out[key]&&typeof out[key]==='object')out[key]=visit(out[key]);
+ for(const key of nestedSingles)if(isSchemaObject(out[key]))out[key]=visit(out[key]);
  return out;
 }
+
+// Ajv retains annotations in standalone constants. Keep them in the published contract.
+function validationSchema(schema){
+ if(!isSchemaObject(schema))return schema;
+ const constraints=Object.fromEntries(Object.entries(schema).filter(([key])=>!key.startsWith('x-')&&!annotations.includes(key)));
+ return children(constraints,validationSchema);
+}
+for(const [name,schema] of Object.entries(contract.$defs))contract.$defs[name]=validationSchema(schema);
+
+// Identical collection and union schemas can share one compiled validator.
+const shareable=schema=>isSchemaObject(schema)&&(
+ schema.type==='object'||schema.type==='array'||Array.isArray(schema.anyOf)||Array.isArray(schema.oneOf)
+);
 const occurrences=new Map();
-const count=schema=>{children(schema,count);if(schema&&typeof schema==='object'&&!Array.isArray(schema)){const key=JSON.stringify(schema),compound=Array.isArray(schema.anyOf)||Array.isArray(schema.oneOf);if(((schema.type==='object'||schema.type==='array')&&key.length>150)||(compound&&key.length>40))occurrences.set(key,(occurrences.get(key)??0)+1);}return schema;};
+function count(schema){
+ children(schema,count);
+ if(shareable(schema)){
+  const key=JSON.stringify(schema);
+  occurrences.set(key,(occurrences.get(key)??0)+1);
+ }
+ return schema;
+}
 for(const schema of Object.values(contract.$defs))count(schema);
 const shared=new Map([...occurrences].filter(([,count])=>count>1).map(([key],i)=>[key,'__shared_validation_'+i]));
 for(const name of shared.values())assert(!Object.hasOwn(contract.$defs,name),'Internal validation name collision');

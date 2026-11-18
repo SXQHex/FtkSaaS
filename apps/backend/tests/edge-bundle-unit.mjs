@@ -17,7 +17,9 @@ test('Standalone validators retain authoritative acceptance and reject malformed
  const samples=[null,{},[],{ok:true,data:{},trace_id:id},{client_api_version:1,request_id:id},
   {client_api_version:1,request_id:id,org_id:id},
   {client_api_version:1,request_id:id,org_id:id,operation_key:id,lead_id:id,kind:'contact'},
-  {ok:true,data:{operation_id:id,primary_id:id,replayed:false,related:[]},trace_id:id}];
+  {ok:true,data:{operation_id:id,primary_id:id,replayed:false,related:[]},trace_id:id},
+  {client_api_version:1,request_id:id,org_id:id,operation_key:id,read:true,all_unread:true},
+  {client_api_version:1,request_id:id,org_id:id,operation_key:id,read:false,notifications:[{id,expected_version:1}]}];
  for(const operation of contract['x-contract'].operations)for(const kind of ['request','success']){
   const reference=ajv.getSchema('contract'+operation[kind].$ref),standalone=validators[kind+'_'+operation.name];
   for(const sample of samples){
@@ -37,4 +39,7 @@ test('Standalone validators retain authoritative acceptance and reject malformed
  assert(validators.success_crm_activity_save_v1(samples[7]));
  assert(!validators.success_crm_activity_save_v1({...samples[7],data:{...samples[7].data,primary_id:'not-a-uuid'}}));
  assert(!validators.request_account_get_v1({...samples[4],request_id:'not-a-uuid'}));
+ assert(validators.request_notifications_read_set_v1(samples[8]));
+ assert(validators.request_notifications_read_set_v1(samples[9]));
+ assert(!validators.request_notifications_read_set_v1({...samples[8],notifications:samples[9].notifications}));
 });

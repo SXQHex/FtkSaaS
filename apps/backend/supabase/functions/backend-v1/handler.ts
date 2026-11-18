@@ -136,9 +136,17 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    try{const text=await imports.read(meta);const rows=parseImportCsv(text,request.mapping,meta.max_rows);invite={import_verified:true,checksum:meta.checksum,rows};}
    catch{return failure('VALIDATION_FAILED');}
   }
-  if(operation==='report_file_get_v1'&&new URL(req.url).searchParams.get('download')==='csv'){
-   const context=await rpcContext({phase:'p06_download'});if(!context._internal_download)return json(context);
-   const file=context._internal_download;if(typeof file.body!=='string'||file.body.length>24*1024*1024||!/^report-[a-f0-9-]{36}\.csv$/.test(file.filename))return failure('INTEGRITY_VIOLATION',500);
+  const download=new URL(req.url).searchParams.get('download');
+  const importDownload=operation==='import_rows_list_v1'&&download==='skipped_csv';
+  if(importDownload||(operation==='report_file_get_v1'&&download==='csv')){
+   const context=await rpcContext({phase:importDownload?'p06_import_skipped_download':'p06_download'});
+   if(!context._internal_download){
+    if(!importDownload)return json(context);
+    const code=context.error?.code;
+    return json(context,code==='NOT_FOUND'?404:code==='AUTH_REQUIRED'||code==='SESSION_REVOKED'?401:403,true);
+   }
+   const file=context._internal_download,filename=importDownload?/^import-skipped-[a-f0-9-]{36}\.csv$/:/^report-[a-f0-9-]{36}\.csv$/;
+   if(typeof file.body!=='string'||file.body.length>24*1024*1024||!filename.test(file.filename))return failure('INTEGRITY_VIOLATION',500);
    const bytes=Uint8Array.from(atob(file.body),x=>x.charCodeAt(0));
    return new Response(bytes,{headers:{'content-type':'text/csv; charset=utf-8','content-disposition':'attachment; filename="'+file.filename+'"','cache-control':'no-store','x-content-type-options':'nosniff','access-control-allow-origin':'*'}});
   }

@@ -59,6 +59,35 @@ test('ST-03 personal calendar real HTTP GET, native Auth, live SQL scope and cre
    const token=new URL(ownerLink.subscription_url).pathname.split('/').at(-1).slice(0,-4),stored=await rows("select result from core.operation_receipts where actor_account_id=$1 and operation like 'calendar_link_%'",[account.id]);assert(!JSON.stringify(stored).includes(token));assert(!JSON.stringify(stored).includes('subscription_url'));assert(!JSON.stringify(await rows('select * from private.personal_calendar_history where account_id=$1',[account.id])).includes(token));
    await denied(student,'calendar_link_revoke_v1',{link_id:ownerLink.link.id,expected_version:ownerLink.link.version},'NOT_FOUND');await denied(owner,'calendar_link_create_v1',{organization_scope:{org_id:org},kinds:['events']},'VALIDATION_FAILED');
   });
+  await t.test('studio program is independent of own participation and closes on manager role loss',async()=>{
+   const scope={org_id:org,center_id:center},body={organization_scope:scope,kinds:['studio_program']},k=key();
+   await denied(student,'calendar_link_create_v1',body,'NOT_FOUND');
+   await denied(owner,'calendar_link_create_v1',{...body,kinds:['studio_program','duties']},'VALIDATION_FAILED');
+   const credential=await must(owner,'calendar_link_create_v1',body,k);
+   assert.equal(credential.link.center_id,center);
+   const studioList=u=>must(u,'calendar_links_get_v1',{studio_program_scope:scope,page:{limit:10}});
+   assert.equal((await list(owner)).items.some(x=>x.id===credential.link.id),false);
+   assert.deepEqual((await studioList(owner)).items,[credential.link]);
+   assert.deepEqual((await studioList(student)).items,[]);
+   const rotate={organization_scope:scope,link_id:credential.link.id,expected_version:credential.link.version};
+   await denied(owner,'calendar_link_rotate_v1',{...rotate,organization_scope:{org_id:org}},'NOT_FOUND');
+   try{
+    await db.query("update core.session_assignments set state='inactive' where session_id=$1",[session]);
+    await db.query("update core.reservations set state='cancelled' where org_id=$1 and person_id=$2",[org,person]);
+    const result=await calendar(credential);assert(result.text.includes('BEGIN:VEVENT'));assert(!result.text.includes('Private calendar student'));
+    assert(!(await calendar(ownerLink)).text.includes('BEGIN:VEVENT'));
+   }finally{
+    await db.query("update core.session_assignments set state='active' where session_id=$1",[session]);
+    await db.query("update core.reservations set state='active' where org_id=$1 and person_id=$2",[org,person]);
+   }
+   const renewed=await must(owner,'calendar_link_rotate_v1',rotate,key());assert.equal((await feed(credential)).status,404);
+   await db.query("update core.role_assignments set state='inactive' where org_id=$1 and person_id=$2 and scope_center_id=$3 and role='center_manager'",[org,person,center]);
+   try{
+    assert.equal((await feed(renewed)).status,404);
+    await denied(owner,'calendar_link_rotate_v1',{...rotate,expected_version:renewed.link.version},'NOT_FOUND');
+    await must(owner,'calendar_link_revoke_v1',{link_id:renewed.link.id,expected_version:renewed.link.version},key());
+   }finally{await db.query("update core.role_assignments set state='active' where org_id=$1 and person_id=$2 and scope_center_id=$3 and role='center_manager'",[org,person,center]);}
+  });
   await t.test('current times, cancellations, duties and Starter selected session bounds are read afresh',async()=>{
    await db.query("update core.reservations set state='cancelled' where org_id=$1 and person_id=$2",[org,studentPerson]);assert(!(await calendar(studentLink)).text.includes('BEGIN:VEVENT'));await db.query("update core.reservations set state='active' where org_id=$1 and person_id=$2",[org,studentPerson]);
    await db.query("update core.rooms set name='Updated calendar room',version=version+1 where id=$1",[room]);const next=new Date(+start+7200000);await db.query('update core.sessions set starts_at=$1,ends_at=$2,version=version+1 where id=$3',[next,new Date(+next+3600000),session]);let current=await calendar(studentLink);assert(current.text.includes('Updated calendar room'));assert(current.text.includes('DTSTART:'+next.toISOString().slice(0,19).replaceAll('-','').replaceAll(':','')+'Z'));

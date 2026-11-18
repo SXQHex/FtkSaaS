@@ -128,4 +128,25 @@ test('W1-BE-40 applied lesson change notifies only affected students once',async
  assert.deepEqual(await notices(),[{recipient_person_id:studentPerson,subject_id:session,subject:{type:'sessions',id:session},kind:'in_app'}]);
  const inbox=await api('notifications_list_v1',{page:{},unread_only:false},student);
  assert.equal(inbox.items.filter(item=>item.kind==='session_changed_for_participant'&&item.payload?.subject?.id===session).length,1);
+ const participantWork=async (selectedCenter=null)=>{
+  const page=await api('notifications_list_v1',{center_id:selectedCenter,page:{},unread_only:false,include_work:true},student);
+  return page.items.find(item=>item.kind==='session_changed_for_participant'&&item.payload.subject.id===session).work;
+ };
+ const hidden={state:'informational',center_id:null,selector:null};
+ const work=await participantWork();
+ const target={operation:'reservation_list_v1',center_id:center,key:{session_id:session}};
+ assert.deepEqual(work,{...hidden,reservation_target:target});
+ const reservations=await api(target.operation,{center_id:target.center_id,person_id:studentPerson,...target.key,page:{}},student);
+ assert.equal(reservations.items.length,1);
+ assert.equal(reservations.items[0].session_id,session);
+
+ await db.query("update core.saas_plan_versions set name='business' where id=$1",[f.plan]);
+ const alternateCenter=(await api('center_create_v1',{center_id:null,name:'Another inbox center',timezone:'UTC'})).primary_id;
+ assert.deepEqual(await participantWork(alternateCenter),work);
+ await db.query("update core.center_relationships set state='inactive' where org_id=$1 and center_id=$2 and person_id=$3 and kind='student'",[org,center,studentPerson]);
+ assert.deepEqual(await participantWork(),hidden);
+ await db.query("update core.center_relationships set state='active' where org_id=$1 and center_id=$2 and person_id=$3 and kind='student'",[org,center,studentPerson]);
+ assert.deepEqual(await participantWork(),work);
+ await db.query("update core.reservations set state='cancelled' where org_id=$1 and id=$2",[org,reservations.items[0].id]);
+ assert.deepEqual(await participantWork(),hidden);
 });
