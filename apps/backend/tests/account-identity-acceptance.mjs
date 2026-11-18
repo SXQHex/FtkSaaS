@@ -221,3 +221,57 @@ test('Global identity current projections, safe links, immutable scope and trans
   });
  }finally{if(trigger){await db.query(`drop trigger if exists ${trigger} on core.people`);await db.query(`drop function if exists private.${trigger}()`);}await db.end();}
 });
+
+test('W1-BE-41 native first password for a synthetic Google-only account',async t=>{
+ const guard=resources(t),{env}=context();
+ assert.equal(new URL(env.API_URL).hostname,'127.0.0.1');
+ const db=await guard.connect(env.DB_URL),email='google-only-'+key()+'@ftksaas.invalid',password='Local!9'+key(),subject=key();
+ const native=async(path,method,body,token,apikey=env.ANON_KEY)=>{
+  const res=await fetch(env.API_URL+'/auth/v1'+path,{
+   method,headers:{apikey,'content-type':'application/json',...(token?{authorization:'Bearer '+token}:{})},
+   body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)
+  });
+  return {status:res.status,data:res.status===204?null:await res.json()};
+ };
+ const admin=(path,body)=>native(path,'POST',body,env.SERVICE_ROLE_KEY,env.SERVICE_ROLE_KEY);
+ const created=await admin('/admin/users',{email,email_confirm:true});
+ assert.equal(created.status,200);
+ const userId=created.data.id;
+ await db.query('delete from auth.identities where user_id=$1',[userId]);
+ await db.query("insert into auth.identities(id,user_id,provider,provider_id,identity_data,created_at,updated_at) values($1,$2,'google',$3,$4,now(),now())",
+  [key(),userId,subject,{sub:subject,email,email_verified:true}]);
+ await db.query("update auth.users set encrypted_password='',raw_app_meta_data=raw_app_meta_data||'{\"provider\":\"google\",\"providers\":[\"google\"]}'::jsonb where id=$1",[userId]);
+ const check=async()=>(await db.query(
+  "select coalesce(u.encrypted_password,'')<>'' has_password,array(select provider from auth.identities where user_id=u.id order by provider) providers from auth.users u where u.id=$1",
+  [userId])).rows[0];
+ assert.deepEqual(await check(),{has_password:false,providers:['google']});
+
+ const passwordLogin=()=>native('/token?grant_type=password','POST',{email,password});
+ assert.equal((await passwordLogin()).status,400);
+ // Generate a real local native session for the synthetic identity; the
+ // Google provider consent screen is a separate interactive acceptance.
+ const link=await admin('/admin/generate_link',{type:'magiclink',email});
+ assert.equal(link.status,200);
+ const signedIn=await native('/verify','POST',{type:'magiclink',token_hash:link.data.hashed_token});
+ assert.equal(signedIn.status,200);
+ assert.equal(signedIn.data.user.id,userId);
+ assert.deepEqual(await check(),{has_password:false,providers:['google']});
+ const sessions=[signedIn.data.access_token];
+ try{
+  const account=await must({jwt:sessions[0]},'account_get_v1');
+  const firstPassword=await native('/user','PUT',{password},sessions[0]);
+  assert.equal(firstPassword.status,200);
+  assert.equal(firstPassword.data.id,userId);
+  assert.equal((await check()).has_password,true);
+  const loggedIn=await passwordLogin();
+  assert.equal(loggedIn.status,200);
+  sessions.push(loggedIn.data.access_token);
+  assert.equal(loggedIn.data.user.id,userId);
+  assert.equal((await must({jwt:sessions.at(-1)},'account_get_v1')).id,account.id);
+ }finally{
+  for(const token of sessions){
+   const loggedOut=await native('/logout?scope=local','POST',undefined,token);
+   assert([204,401,403].includes(loggedOut.status));
+  }
+ }
+});

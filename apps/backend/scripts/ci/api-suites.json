@@ -631,7 +631,7 @@
         {
           "line": 4,
           "path": "apps/backend/tests/account-identity-acceptance.mjs",
-          "sha256": "df5551c42269a124360a2897faa7a75be70f20ec1bfe547ada564480a8771ff6"
+          "sha256": "de953113347a10f9a93afcd611680f07df623644e6794ebca2099aef842ca765"
         },
         {
           "line": 5,
@@ -743,7 +743,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/program-configuration-acceptance.mjs",
-          "sha256": "ab2011311522525807f956d30a66b5981e687efe91c4d7c69fb8558521bf776e"
+          "sha256": "e712ed0b551c426a37ce8d76ebaa7bdbd4de76849835c37b6482ba82cae24868"
         }
       ],
       "estimated_seconds": 813.86
@@ -1007,7 +1007,7 @@
         {
           "line": 139,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
-          "sha256": "c55f9ea4811efeb1a59e1440a95e1ba9c762c608eff09aed67afcd49e7fa62f6"
+          "sha256": "76b404fc949d20b0aae090f3df43fc27d20ff765d47a1840e07b89ce21d1817d"
         },
         {
           "line": 140,

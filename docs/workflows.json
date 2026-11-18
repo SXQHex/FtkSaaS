@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "ed627e97a0249af9571efdc69c753e59f9ae8182dbbcc90236fb4d8fb98d2e6d",
-        "reason": "Verified that updated source hashes retain the same two imported acceptance modules and API inventory ownership."
+        "fingerprint": "a59a1847a5ab9db6742d3d74da5912fe77e95fc898b254da2323aa2415fd6c70",
+        "reason": "Verified that updated source hashes retain the same two imported acceptance modules and API inventory ownership. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {
@@ -392,8 +392,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "01db2ab0e8a91e0400177eec2ca448ece3a17277c0b302e8b54aa86c4d7a6990",
-        "reason": "Reviewed native password security notice URL composition, independent Auth config readback and unchanged callback contract."
+        "fingerprint": "51e42c8230d5084fdb5c7edfbdfca3e2d84dca2c50e16da051ba1cf4a93dd0e2",
+        "reason": "Reviewed native password security notice URL composition, independent Auth config readback and unchanged callback contract. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {
@@ -604,7 +604,9 @@
         "apps/backend/database/assigned-session-room-labels.sql",
         "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql",
         "apps/backend/database/member-lesson-discovery.sql",
-        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql"
+        "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
+        "apps/backend/database/reservation-debt-and-session-change-notice.sql",
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -627,8 +629,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "ac748b1ec23bfcc14a6ac76fdff73f4ae18498122a24dc6cbfecf0dd36d61bd3",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "29fcb75d7f4a2000c014d5a5cb92ac2dbfacfbfc6fd307e5f4adebb35f8e1c93",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {
@@ -744,8 +746,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "69058f60444a4d9e6a96a5b268aebc3dcbceb50c5e3abb939dde2ae5b6ba8441",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "4b30b0926b21285e41ab3a3975e42a5aaf8fc954e984a71967b61a4c54729962",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {
@@ -963,7 +965,9 @@
         "apps/backend/supabase/migrations/20261116135202_lesson_request_status_summary.sql",
         "apps/backend/database/member-lesson-discovery.sql",
         "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
-        "apps/backend/database/notification-request-source-authority.sql"
+        "apps/backend/database/notification-request-source-authority.sql",
+        "apps/backend/database/reservation-debt-and-session-change-notice.sql",
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -978,8 +982,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "9f6a0dfaf5acd2d2403763ed3d5a71ff022fcc84adaf92292e358ba05144894c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery."
+        "fingerprint": "20f9e885d968c6f6a153a35dbd7a21d2f3af91fbb96751fb4595e6f2f9d5866c",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {
@@ -1328,7 +1332,8 @@
         "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
         "apps/backend/tests/document-directory-unit.mjs",
         "apps/backend/tests/document-directory-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/program-configuration-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/document-self-requirements.sql",
@@ -1365,7 +1370,9 @@
         "apps/backend/supabase/migrations/20261117124133_document_active_contexts.sql",
         "apps/backend/supabase/migrations/20261117124145_document_management_directory.sql",
         "apps/backend/database/event-registration-document-discovery.sql",
-        "apps/backend/supabase/migrations/20261117232051_event_registration_document_discovery.sql"
+        "apps/backend/supabase/migrations/20261117232051_event_registration_document_discovery.sql",
+        "apps/backend/database/reservation-debt-and-session-change-notice.sql",
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1382,8 +1389,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "125d512d86fdfefab54f3e09578729c8e2ab489c5f6c11e65169e6cf7a8cdebc",
-        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority."
+        "fingerprint": "38ffd82a7bf8de633e46b0077e9cb6097ca3e48c1914508a7e6aefb5d60fd86e",
+        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {
@@ -1662,8 +1669,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "5f2e5433422e6deeabf9d4753cca6fe01e3e01fb54ded4ff6bf8e1a9d9fed7ce",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions."
+        "fingerprint": "0c2abb943d53896647f57e4c3a3b5da168cd9e40a304bc326beba8d1cfe428e7",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
       }
     },
     {

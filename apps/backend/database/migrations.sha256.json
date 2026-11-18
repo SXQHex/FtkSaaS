@@ -186,5 +186,6 @@
   "20261117124133_document_active_contexts.sql": "4d50c62fee65f93065816cd888ad8329c294c379e9000456f5ae6b3a44fcd1ce",
   "20261117124145_document_management_directory.sql": "ec148b66ca7984fd7fa3ae767437e0524b4ddb78cb695a17a0639b4858bd1b3c",
   "20261117152419_role_directory_filters.sql": "44152b1ffff6528c23072c025e750c3d4f614acb463418f719bf03e1e627d6d0",
-  "20261117232051_event_registration_document_discovery.sql": "589d5fe91d122ed50c61b68a791c1baf2cc6a6e593bed4703c76a43c389a5e6f"
+  "20261117232051_event_registration_document_discovery.sql": "589d5fe91d122ed50c61b68a791c1baf2cc6a6e593bed4703c76a43c389a5e6f",
+  "20261118010101_reservation_debt_and_session_change_notice.sql": "1d4aa501818e2a1d286d4fc3608f4fa5470a92370466741331a1838c13bff5bc"
 }
