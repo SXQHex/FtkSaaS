@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import type { JobState } from "../src/lib/api-contracts/generated.js";
 import {
   mockCompletion,
   nativePage,
@@ -28,10 +29,19 @@ export async function mockReports(
     applied = false,
     applyReleased = false,
     exportStarted = false;
+  let exportState: JobState = "succeeded";
   const fileId = uid(51),
     jobId = uid(52),
     previewId = uid(53),
     exportId = uid(54);
+  const exportJob = () => ({
+    id: exportId,
+    state: exportState,
+    progress_count: exportState === "succeeded" ? 3 : 1,
+    total_count: 3,
+    safe_error_code: exportState === "failed" ? "TEMPORARY_FAILURE" : null,
+    result_reference: exportState === "succeeded" ? { type: "files", id: uid(55) } : null,
+  });
   const rows = [
     {
       row_number: 1,
@@ -271,16 +281,11 @@ export async function mockReports(
           ? [
               {
                 kind: "job",
-                id: exportId,
+                ...exportJob(),
                 created_at: at,
                 operation: "report_build_v1",
-                state: "succeeded",
                 expires_at: null,
-                progress_count: 3,
-                total_count: 3,
-                safe_error_code: null,
-                next_attempt_at: null,
-                result_reference: { type: "files", id: uid(55) },
+                next_attempt_at: exportState === "retry_wait" ? "2026-11-16T13:00:00Z" : null,
               },
             ]
           : [],
@@ -339,15 +344,7 @@ export async function mockReports(
         if (options.ackUnread && !jobReadFailed) {
           jobReadFailed = true;
           await abort();
-        } else
-          await send({
-            id: exportId,
-            state: "succeeded",
-            progress_count: 3,
-            total_count: 3,
-            result_reference: { type: "files", id: uid(55) },
-            safe_error_code: null,
-          });
+        } else await send(exportJob());
       } else
         await send({
           id: jobId,
@@ -468,6 +465,10 @@ export async function mockReports(
   return {
     ...f,
     writes,
+    exportId,
+    setExportState: (state: JobState) => {
+      exportState = state;
+    },
     releaseApply: () => {
       applyReleased = true;
     },

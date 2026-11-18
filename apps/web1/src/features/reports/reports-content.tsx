@@ -10,6 +10,7 @@ import type {
   ReportKind,
   ReportView,
   ImportDirectoryItem,
+  JobState,
 } from "../../lib/api-contracts/generated";
 import { readWorkspace } from "../workspace/workspace";
 import { readTracking } from "../audit/audit-read";
@@ -19,6 +20,7 @@ import {
   type ReportTab,
   type ReportRange,
   type ReportBreakdown,
+  type ReportFileRow,
 } from "./reports-view";
 import { reportInterval, readReport, readImportDirectory } from "./reports-read";
 import {
@@ -59,7 +61,8 @@ export function ReportsContent({
   const [anchor, setAnchor] = useState(() => new Date().toISOString()),
     [locked, setLocked] = useState(false),
     [lost, setLost] = useState(false),
-    [fileError, setFileError] = useState(false);
+    [fileError, setFileError] = useState(false),
+    [checkedExport, setCheckedExport] = useState<JobState>();
   const [exporting, setExporting] = useState<ReportFilters>();
   const [importing, setImporting] = useState<{ initial?: ImportDirectoryItem }>();
   const tab = shortcut === "import" ? "files" : selectedTab;
@@ -204,6 +207,9 @@ export function ReportsContent({
     [router, onLockChange],
   );
   const unknown = t(($) => $.reports.unknown);
+  const jobStates = t(($) => $.reports.jobStates, { returnObjects: true });
+  const jobState = (state: string) =>
+    Object.hasOwn(jobStates, state) ? jobStates[state as JobState] : unknown;
   const amount = (view: ReportView | undefined, metric: string) =>
     view ? reportMoney(view.totals, metric) || t(($) => $.reports.empty) : unknown;
   const proportion = (view: ReportView | undefined, metric: string) =>
@@ -213,6 +219,9 @@ export function ReportsContent({
           t(($) => $.reports.noDenominator),
         )
       : unknown;
+  const conversion = data.crm?.rows.items.find(
+    (row) => row.group_key === "crm_conversion" && row.center_id === scope.centerId,
+  );
   const currentFinance = active && !finance.isError ? finance.data : undefined;
   const currentImports = active && !imports.isError ? imports.data : undefined,
     currentExports = active && !exports.isError ? exports.data : undefined;
@@ -298,15 +307,12 @@ export function ReportsContent({
       queries.invalidateQueries({ queryKey: ["report-import-directory", scope] }),
     ]);
   }
-  async function file(
-    kind: "export" | "import",
-    id: string,
-    action: "download" | "retry" | "rows",
-  ) {
+  async function file(id: string, action: ReportFileRow["action"]) {
     if (locked) return;
     setFileError(false);
+    setCheckedExport(undefined);
     try {
-      if (kind === "export" && action === "download") {
+      if (action === "download") {
         const row = currentExports?.items.find((row) => row.id === id);
         if (!row || row.state !== "succeeded") throw Error("REPORT_FILE_UNAVAILABLE");
         const blob = await downloadReport(scope, id, uuidv7());
@@ -316,13 +322,14 @@ export function ReportsContent({
         link.download = `report-${id}.csv`;
         link.click();
         window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      } else if (kind === "import" && action === "rows") {
+      } else if (action === "rows") {
         const row = currentImports?.items.find((row) => row.job_id === id);
         if (!row) throw Error("IMPORT_JOB_UNKNOWN");
         setImporting({ initial: row });
       } else {
-        await readJob(scope, id);
-        await refresh();
+        const job = await readJob(scope, id);
+        await exports.refetch({ throwOnError: true });
+        setCheckedExport(job.state);
       }
     } catch (error) {
       if (!accessLost(error)) setFileError(true);
@@ -425,22 +432,24 @@ export function ReportsContent({
               : undefined,
           },
           earnings: data.balances ? instructorRows(data.balances, t) : undefined,
-          funnel: data.crm
-            ? data.crm.totals.map((row, index) => ({
-                id: String(index),
-                label: t(($) => $.reports.crmConverted),
-                value: row.count,
-                display: `${row.count.toLocaleString("tr-TR")} / ${row.basis_count?.toLocaleString("tr-TR") ?? unknown}`,
-              }))
-            : undefined,
-          funnelSummary: t(($) => $.reports.crmNative),
+          funnel: conversion && {
+            converted: conversion.count?.toLocaleString("tr-TR") ?? unknown,
+            candidates: conversion.basis_count?.toLocaleString("tr-TR") ?? unknown,
+            rate: reportRatio(
+              conversion.ratio_bps,
+              t(($) => $.reports.noDenominator),
+            ),
+          },
+          funnelEmpty: data.crm ? t(($) => $.reports.empty) : unknown,
           exports: currentExports?.items.map((row) => ({
             id: row.id,
             name: t(($) => $.reports.exportTitle),
-            detail: date(row.created_at),
-            state: row.state,
-            canDownload: row.state === "succeeded",
-            canRetry: row.state !== "succeeded",
+            detail:
+              row.state === "retry_wait" && row.next_attempt_at
+                ? `${date(row.created_at)} · ${t(($) => $.reports.exportNextAttempt, { date: date(row.next_attempt_at) })}`
+                : date(row.created_at),
+            state: jobState(row.state),
+            action: row.state === "succeeded" ? "download" : "status",
             progress:
               row.progress_count !== null && row.total_count
                 ? (row.progress_count / row.total_count) * 100
@@ -453,8 +462,8 @@ export function ReportsContent({
                 ? t(($) => $.reports.studentImport)
                 : t(($) => $.reports.crmImport),
             detail: `${date(row.created_at)} · ${row.phase}`,
-            state: row.state,
-            canReadRows: true,
+            state: jobState(row.state),
+            action: "rows",
             progress: row.total_count ? (row.progress_count / row.total_count) * 100 : undefined,
           })),
         }}
@@ -495,13 +504,21 @@ export function ReportsContent({
               </Alert>
             )}
             {tab === "files" && (
-              <Button
-                variant="outline"
-                isDisabled={locked || !active || !currentImports?.limits}
-                onPress={() => setImporting({})}
-              >
-                {t(($) => $.reports.startImport)}
-              </Button>
+              <>
+                <p role="status" className="text-sm text-muted-foreground">
+                  {checkedExport &&
+                    t(($) => $.reports.exportChecked, {
+                      state: t(($) => $.reports.jobStates[checkedExport]),
+                    })}
+                </p>
+                <Button
+                  variant="outline"
+                  isDisabled={locked || !active || !currentImports?.limits}
+                  onPress={() => setImporting({})}
+                >
+                  {t(($) => $.reports.startImport)}
+                </Button>
+              </>
             )}
             <Button variant="outline" isDisabled={locked} onPress={() => void refresh()}>
               {t(($) => $.reports.readAgain)}

@@ -95,7 +95,10 @@ test("reports bind all real sections, immutable product names, exact currencies 
   await expect(page.getByText("TRY ₺20,00", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "Eğitmen ve adaylar", exact: true }).click();
   await expect(page.getByText("Native eğitmen · Hakediş", { exact: true })).toBeVisible();
-  await expect(page.getByText("Dönüşen aday", { exact: true })).toBeVisible();
+  const funnel = page.locator("dl").filter({ hasText: "Dönüşen aday" });
+  await expect(funnel.getByText("2", { exact: true })).toBeVisible();
+  await expect(funnel.getByText("5", { exact: true })).toBeVisible();
+  await expect(funnel.getByText("%40", { exact: true })).toBeVisible();
   expect(
     f.requests
       .filter((row) => row.op === "report_get_v1")
@@ -161,6 +164,34 @@ test("export ACK with failed readback never redispatches the accepted writer", a
   await expect(
     dialog.getByRole("button", { name: "Dışa aktarmayı başlat", exact: true }),
   ).toBeDisabled();
+  expect(f.writes.filter((row) => row.op === "report_export_start_v1")).toHaveLength(1);
+});
+test("file list rereads the same CSV job while its server retry is pending", async ({ page }) => {
+  const f = await mockReports(page);
+  f.setExportState("retry_wait");
+  const dialog = await exportForm(page);
+  await dialog.getByRole("button", { name: "Dışa aktarmayı başlat", exact: true }).click();
+  await expect(dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.")).toBeVisible();
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("tab", { name: "Dosyalar", exact: true }).click();
+  const files = page.getByRole("tabpanel", { name: "Dosyalar", exact: true });
+  await expect(files.getByText("Yeniden denemeyi bekliyor", { exact: true })).toBeVisible();
+  await expect(files.getByText(/Sonraki sunucu denemesi/)).toBeVisible();
+  await expect(files.getByRole("button", { name: "İndir", exact: true })).toHaveCount(0);
+  const readCount = f.requests.filter((row) => row.op === "job_status_get_v1").length;
+  f.setExportState("succeeded");
+  await files.getByRole("button", { name: "İş durumunu oku", exact: true }).click();
+  await expect(files.getByRole("button", { name: "İndir", exact: true })).toBeEnabled();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Dışa aktarma durumu: Tamamlandı" }),
+  ).toBeVisible();
+  const jobReads = f.requests.filter((row) => row.op === "job_status_get_v1");
+  expect(jobReads).toHaveLength(readCount + 1);
+  expect(jobReads.at(-1)!.r).toMatchObject({
+    job_id: f.exportId,
+    org_id: I.org,
+    center_id: I.center,
+  });
   expect(f.writes.filter((row) => row.op === "report_export_start_v1")).toHaveLength(1);
 });
 test("CRM import explicitly selects an off-page row and keeps same-job apply pending until native worker completion on mobile", async ({

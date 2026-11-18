@@ -48,9 +48,7 @@ export interface ReportFileRow {
   detail: string;
   state: string;
   progress?: number;
-  canDownload?: boolean;
-  canRetry?: boolean;
-  canReadRows?: boolean;
+  action: "download" | "status" | "rows";
 }
 export interface ReportPresentation {
   summary: ReportMetric[];
@@ -58,9 +56,9 @@ export interface ReportPresentation {
   instructors: ReportMetric[];
   weeks: ReportChartPoint[];
   packages: ReportChartPoint[];
-  funnel: ReportChartPoint[];
+  funnel: { converted: string; candidates: string; rate: string };
   packageSummary: string;
-  funnelSummary: string;
+  funnelEmpty: string;
   lessons: ReportRow[];
   breakdowns: Record<ReportBreakdown, { description: string; rows: ReportRow[] }>;
   earnings: ReportRow[];
@@ -258,7 +256,7 @@ export function ReportsView({
   after?: Partial<Record<ReportTab, ReactNode>>;
   onExport: () => void;
   onPeople: () => void;
-  onFile: (kind: "export" | "import", id: string, action: "download" | "retry" | "rows") => void;
+  onFile: (id: string, action: ReportFileRow["action"]) => void;
   locked?: boolean;
   notice?: ReactNode;
 }) {
@@ -471,10 +469,26 @@ export function ReportsView({
               <CardDescription>{t(($) => $.reports.funnelHint)}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Bars points={data?.funnel} />
-              <p className="mt-3 text-sm text-muted-foreground">
-                {data?.funnelSummary ?? t(($) => $.reports.unknown)}
-              </p>
+              {data?.funnel ? (
+                <dl className="grid gap-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt>{t(($) => $.reports.crmCandidates)}</dt>
+                    <dd className="font-medium tabular-nums">{data.funnel.candidates}</dd>
+                  </div>
+                  <div>
+                    <dt>{t(($) => $.reports.crmConverted)}</dt>
+                    <dd className="font-medium tabular-nums">{data.funnel.converted}</dd>
+                  </div>
+                  <div>
+                    <dt>{t(($) => $.reports.crmConversionRate)}</dt>
+                    <dd className="font-medium tabular-nums">{data.funnel.rate}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {data?.funnelEmpty ?? t(($) => $.reports.unknown)}
+                </p>
+              )}
             </CardContent>
           </Card>
           {after?.instructors}
@@ -531,22 +545,10 @@ export function ReportsView({
                           <Button
                             variant="ghost"
                             size="sm"
-                            isDisabled={
-                              locked || !(row.canDownload || row.canReadRows || row.canRetry)
-                            }
-                            onPress={() =>
-                              onFile(
-                                kind,
-                                row.id,
-                                row.canDownload ? "download" : row.canReadRows ? "rows" : "retry",
-                              )
-                            }
+                            isDisabled={locked}
+                            onPress={() => onFile(row.id, row.action)}
                           >
-                            {row.canReadRows
-                              ? t(($) => $.reports.rows)
-                              : row.canRetry
-                                ? t(($) => $.reports.retry)
-                                : t(($) => $.reports.download)}
+                            {t(($) => $.reports.fileActions[row.action])}
                           </Button>
                         </div>
                       </li>
