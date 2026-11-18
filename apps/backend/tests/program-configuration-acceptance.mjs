@@ -80,3 +80,52 @@ test('Program agreement requirements and native recovery preserve plan and scope
   });
  }finally{await db.end();}
 });
+
+test('W1-BE-40 applied lesson change notifies only affected students once',async t=>{
+ const {preparationFixture}=await import('./starter-preparation-fixture.mjs');
+ const f=await preparationFixture({schedule:true,studentUser:true,studentMembership:true});
+ const {api,db,org,center,room,discipline,student,studentPerson}=f;
+ t.after(()=>db.end());
+ await api('policy_publish_v1',{
+  center_id:null,key:'student_cancel_group',effective_at:new Date().toISOString(),mandatory:false,
+  value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}}
+ });
+ const slot=hour=>({starts_at:f.day(3)+'T'+hour+':00:00Z',ends_at:f.day(3)+'T'+String(Number(hour)+1)+':00:00Z'});
+ const createSession=async hour=>(await api('session_create_v1',{
+  discipline_id:discipline,format:'group',interval:slot(hour),resources:[{kind:'room',id:room}],
+  assignments:[{person_id:f.person,duty:'instructor'}],capacity:{total:8}
+ })).primary_id;
+ const session=await createSession('10'),otherSession=await createSession('14');
+ const name=(await db.query('select name from core.disciplines where org_id=$1 and id=$2',[org,discipline])).rows[0].name;
+ const {primary_id:product}=await api('product_publish_v1',{terms:{
+  name:name+' notification package',kind:'credits',booking_mode:'flexible',credits:3,price_minor:'0',currency:'TRY',
+  freeze:{enabled:false,extends_validity:false},refund:{method:'none'},
+  scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]
+ }});
+ const book=async(person_id,session_id)=>{
+  const sale=await api('sale_preview_v1',{person_id,product_version_id:product,start_date:f.day(0),end_date:f.day(10)});
+  const {primary_id:saleId}=await api('sale_apply_v1',{preview:{id:sale.id,token:sale.token}});
+  await api('reservation_create_v1',{person_id,session_id,source_sale_id:saleId,mode:'flexible'});
+ };
+ const {primary_id:otherPerson}=await api('person_create_v1',{display_name:'Synthetic unrelated student',contacts:[]});
+ await api('student_activate_v1',{person_id:otherPerson});
+ await book(studentPerson,session);
+ await book(otherPerson,otherSession);
+ const notices=async()=>(await db.query(
+  "select n.recipient_person_id,n.subject_id,n.payload->'subject' as subject,j.kind from core.notifications n join core.outbox_jobs j on j.org_id=n.org_id and j.notification_id=n.id where n.org_id=$1 and n.kind='session_changed_for_participant'",
+  [org])).rows;
+ const change=(hour='12')=>api('session_change_preview_v1',{session_id:session,scope:'single',reason:'Synthetic reschedule',patch:{interval:slot(hour)}});
+ const conflict=await change('14');
+ assert(conflict.blockers.some(blocker=>blocker.code==='RESOURCE_CONFLICT'));
+ await assert.rejects(api('session_change_apply_v1',{preview:{id:conflict.id,token:conflict.token}}),/RESOURCE_CONFLICT/);
+ const preview=await change(),stale=await change();
+ assert.deepEqual(preview.blockers,[]);
+ assert.deepEqual(await notices(),[]);
+ const body={preview:{id:preview.id,token:preview.token}},operationKey=key();
+ await api('session_change_apply_v1',body,f.owner,operationKey);
+ assert((await api('session_change_apply_v1',body,f.owner,operationKey)).replayed);
+ await assert.rejects(api('session_change_apply_v1',{preview:{id:stale.id,token:stale.token}}),/PREVIEW_STALE/);
+ assert.deepEqual(await notices(),[{recipient_person_id:studentPerson,subject_id:session,subject:{type:'sessions',id:session},kind:'in_app'}]);
+ const inbox=await api('notifications_list_v1',{page:{},unread_only:false},student);
+ assert.equal(inbox.items.filter(item=>item.kind==='session_changed_for_participant'&&item.payload?.subject?.id===session).length,1);
+});

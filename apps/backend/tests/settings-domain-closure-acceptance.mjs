@@ -122,7 +122,7 @@ test('initial zero credit needs no invented upper and default debt guards remain
  const product=(await api('product_publish_v1',{terms})).primary_id;
  const preview=await api('sale_preview_v1',{person_id:studentPerson,product_version_id:product,start_date:f.day(0),end_date:f.day(30)});
  const sale=(await api('sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
- await reject('FORBIDDEN');
+ await reject('DEBT_BOOKING_BLOCKED');
  await publish('debt_booking',{kind:'boolean',value:false});
  const booked=await must(owner,'reservation_create_v1',{...body,source_sale_id:sale},key());
  assert.equal((await f.rows('select private.debt_remaining($1,id)::text n from core.debts where org_id=$1 and sale_id=$2',[org,sale]))[0].n,'100');

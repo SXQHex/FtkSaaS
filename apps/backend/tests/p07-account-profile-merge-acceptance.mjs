@@ -138,7 +138,14 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    const booked=await mut('reservation_create_v1',{person_id:target,session_id:futureSession,source_sale_id:sold,mode:'flexible'});assert.equal((await rows('select sale_id from core.entitlement_allocations where org_id=$1 and reservation_id=$2',[org,booked.primary_id]))[0].sale_id,sold);
    const offset=await mut('student_credit_offset_v1',{person_id:target,debt_id:debt,expected_version:1,amount_minor:'500',currency:'TRY'});assert(offset.primary_id);
    const finance=await must(member,'finance_get_v1',scope({person_id:target,currency:'TRY',page:{}}));assert.equal(finance.debts.find(x=>x.id===debt).remaining_minor,'1200');assert.equal(finance.credit_available_minor,'0');
-   await publish('debt_booking',{kind:'boolean',value:true});await fail('reservation_create_v1',{person_id:target,session_id:blockedSession,source_sale_id:sold,mode:'flexible'},'FORBIDDEN');
+   await publish('debt_booking',{kind:'boolean',value:true});
+   const blocked={person_id:target,session_id:blockedSession,source_sale_id:sold,mode:'flexible'};
+   const failedKey=key();
+   await fail('reservation_create_v1',blocked,'DEBT_BOOKING_BLOCKED',failedKey,member);
+   await fail('reservation_create_v1',blocked,'DEBT_BOOKING_BLOCKED');
+   await fail('reservation_create_v1',blocked,'FORBIDDEN',key(),second);
+   assert.equal((await rows('select count(*)::int n from core.reservations where org_id=$1 and session_id=$2',[org,blockedSession]))[0].n,0);
+   assert.equal((await rows('select count(*)::int n from core.operation_receipts where actor_account_id=$1 and operation=$2 and key_hash=$3',[memberAccount.id,'reservation_create_v1',createHash('sha256').update(failedKey).digest('hex')]))[0].n,0);
   });
   await t.test('retired account contact stays historical after merge; explicit re-add is unverified',async()=>{
    const oldEmail=member.email,newEmail='merged-current-'+key()+'@ftksaas.invalid';
