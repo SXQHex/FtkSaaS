@@ -17,6 +17,17 @@ test("event registration reads and accepts only the chosen member's own document
   await expect(back).toBeVisible();
   await expect(read).toHaveCount(0);
   expect(state.reads.some(({ op }) => op === "document_requirements_get_v1")).toBe(false);
+  await next.click();
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await expect(
+    sheet.getByText(
+      "Üye, kaydı tamamlamadan önce kendi hesabından etkinlik belgesini kabul etmeli.",
+    ),
+  ).toBeVisible();
+  expect(state.event.registrations).toEqual([]);
+  expect(state.writes).toEqual([]);
+  await back.click();
   await back.click();
   await person.selectOption(I.self);
   await next.click();

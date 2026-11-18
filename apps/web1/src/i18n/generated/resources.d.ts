@@ -872,6 +872,7 @@ export default interface Resources {
       "ineligibleAcknowledgement": "Paket uygun olmasa da gerçekleşen katılımı gerekçeyle kaydediyorum; hak uygunluğu verilmez.",
       "markFor": "{{name}} için yoklama",
       "member": "Üye",
+      "memberDocumentRequired": "Üye, kaydı tamamlamadan önce kendi hesabından etkinlik belgesini kabul etmeli.",
       "netAmount": "Güncel net borç",
       "noActual": "Fiilî başlangıç kaydı yok",
       "noDuties": "Görevli bulunmuyor.",

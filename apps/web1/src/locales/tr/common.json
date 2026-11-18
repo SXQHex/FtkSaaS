@@ -3885,6 +3885,7 @@
     "unresolvedPayments_other": "{{count}} kaydın ödeme kaynağı eksik; bakiyesi sıfır sayılmadı."
   },
   "eventDetail": {
+    "memberDocumentRequired": "Üye, kaydı tamamlamadan önce kendi hesabından etkinlik belgesini kabul etmeli.",
     "sections": "Etkinlik bölümleri",
     "participants": "Katılımcılar",
     "attendance": "Yoklama",

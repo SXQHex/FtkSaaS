@@ -350,7 +350,7 @@ OM için organizasyon okuyucusu `center_id` atlar ve `role=org_manager` kullanı
 
 **Karşılandı:** [PR328](https://github.com/SXQHex/FtkSaaS/pull/328) main `b219f2be822338b40460f1bb981e00d07b6be70e` üzerinde native ve expired modlarına zorunlu origin/path/next pini ile stdin girdisi ekledi. Native Auth sözleşmesi korunuyor. Aynı SHA’da [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177737) ve [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı.
 
-Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü). Google-only ilk parola, doğal süre dolumu ve güvenlik postasının eylem hedefi dahil frontend kabulünün sahibi [P01.4](todo.md#p01--kimlik-hesap-ve-güvenlik).
+Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü). Google-only ilk parola, doğal süre dolumu ve güvenlik postasının eylem hedefi dahil frontend kabulünün sahibi [P01.4](todo.md#p01--kimlik-hesap-ve-güvenlik-kapalı).
 
 ## W1-BE-37 · Native güvenlik postasının kurtarma yolu
 

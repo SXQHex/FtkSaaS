@@ -1145,7 +1145,7 @@ P12.2–P12.5 kabulü: E33/E34/E35 tarayıcı raporları aşama, takip, deneme o
 - [x] **P13.2** · Katılımı işle ve ayrı örnekte etkinliği iptal et. Durum, belge ve varsa finans etkisi kaynak işlemlerden doğrulanır.
 - [x] **P13.3** · Pakete bağlı Pratik katılımını kapat. Uygun paketle katılım kaydedilir, ders kredisi bakiyesi aynı kalır.
 
-P13 kabulü: 11 etkinlik detay senaryosu yayımlama, kayıt, belge, kapasite, açık yoklama ve iptali doğruladı. Pratik seçili paketle kaydedilip ödeme komutu olmadan kapandı; seçili tekrar gerçek panel düğmesiyle geçti (`.tmp/p13-events-first-playwright.json`, `.tmp/p13-practice-retry.log`). Native `event-capacity-package-acceptance.mjs` Pro son yer yarışı, canlı uygunluk, yoklama sonrası değişmeyen kredi ve sıfır hak hareketini; `event-cancellation.test.mjs` ayrı iptal, finans/iade ve atomikliği doğruladı. Başkası için ilk kayıt öncesi belge keşfi P15.4/W1-BE-38’de açık. [Native kaynak kabulü](#pro-kabulu).
+P13 kabulü: 11 etkinlik detay senaryosu yayımlama, kayıt, belge, kapasite, açık yoklama ve iptali doğruladı. Pratik seçili paketle kaydedilip ödeme komutu olmadan kapandı; seçili tekrar gerçek panel düğmesiyle geçti (`.tmp/p13-events-first-playwright.json`, `.tmp/p13-practice-retry.log`). Native `event-capacity-package-acceptance.mjs` Pro son yer yarışı, canlı uygunluk, yoklama sonrası değişmeyen kredi ve sıfır hak hareketini; `event-cancellation.test.mjs` ayrı iptal, finans/iade ve atomikliği doğruladı. Başkası için ilk kayıt öncesi belge keşfi P15.4’te doğrulandı. [Native kaynak kabulü](#pro-kabulu).
 
 ### P14 · Bildirimler, hatırlatmalar ve CRM otomasyonu (kapalı)
 

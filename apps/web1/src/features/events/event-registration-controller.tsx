@@ -126,7 +126,19 @@ function NewEventRegistrationController({
   const payment =
     preparation ?? (existing.data?.kind === "available" ? existing.data.value : undefined);
   const registerCommand = useMemberCommand({
-    write: writeEventRegistration,
+    write: async (intent: Parameters<typeof writeEventRegistration>[0]) => {
+      try {
+        return await writeEventRegistration(intent);
+      } catch (cause) {
+        if (active.current && cause instanceof BackendError && cause.code === "DOCUMENT_REQUIRED")
+          setError(
+            personId === selfPersonId
+              ? t(($) => $.schedule.errors.document)
+              : t(($) => $.eventDetail.memberDocumentRequired),
+          );
+        throw cause;
+      }
+    },
     readReceipt: readRegistrationReceipt,
     readResult: readRegistrationResult,
     onAccessLost,
@@ -370,9 +382,11 @@ function NewEventRegistrationController({
         }}
         onBack={() => {
           if (!locked) {
+            if (step === 3 && registerCommand.state === "rejected") registerCommand.reset();
             setStep(step === 3 ? 2 : 1);
             setReviewed(false);
-            setPreview(undefined);
+            setError(undefined);
+            if (step === 2) setPreview(undefined);
           }
         }}
         onClose={onClose}
