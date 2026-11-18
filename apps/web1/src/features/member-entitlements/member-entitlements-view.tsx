@@ -21,6 +21,8 @@ import { NativeSelect, NativeSelectOption } from "../../components/ui/native-sel
 import { Progress, ProgressLabel } from "../../components/ui/progress";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 import { Badge } from "../../components/ui/badge";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
+export type MemberLedgerRead<Row> = Row[] | "loading" | "choose" | "unread";
 export interface MemberPackageSummary {
   id: string;
   name: string;
@@ -44,6 +46,7 @@ export interface MemberPaymentMovement {
 }
 export function MemberEntitlementsView({
   packages,
+  packagesLoading,
   selected,
   onSelect,
   movements,
@@ -56,11 +59,12 @@ export function MemberEntitlementsView({
   notice,
 }: {
   packages: MemberPackageSummary[] | null;
+  packagesLoading: boolean;
   selected: string;
   onSelect: (id: string) => void;
-  movements: MemberRightMovement[] | null;
+  movements: MemberLedgerRead<MemberRightMovement>;
   movementPagination?: ReactNode;
-  payments: MemberPaymentMovement[] | null;
+  payments: MemberLedgerRead<MemberPaymentMovement>;
   paymentPagination?: ReactNode;
   paymentControl?: ReactNode;
   balance: ReactNode;
@@ -97,65 +101,79 @@ export function MemberEntitlementsView({
           ))}
         </NativeSelect>
       )}
-      <Card className="min-w-0">
-        <CardHeader>
-          <CardTitle>
-            {source?.name ??
-              t(($) =>
-                packages?.length === 0
-                  ? $.memberEntitlements.emptyPackages
-                  : packages && packages.length > 1
-                    ? $.memberEntitlements.choosePackage
-                    : $.memberEntitlements.packageUnread,
-              )}
-          </CardTitle>
-          {source && (
-            <CardDescription>
-              {source.validity} · <Badge variant="outline">{source.state}</Badge>
-            </CardDescription>
-          )}
-        </CardHeader>
-        <CardContent>
-          {source?.counts && (
-            <div className="grid grid-cols-1 gap-3 @lg:grid-cols-3">
-              {(["available", "reserved", "consumed"] as const).map((key) => (
-                <Card key={key} className="gap-0.5 py-3">
-                  <CardHeader className="px-4 [&_[data-slot=card-description]]:text-xs">
-                    <CardDescription>{t(($) => $.memberEntitlements.metrics[key])}</CardDescription>
-                    <CardTitle className="text-[1.375rem] leading-[1.3] tabular-nums">
-                      {source.counts![key]}
-                    </CardTitle>
-                    <CardDescription>
-                      {t(($) => $.memberEntitlements.metricHints[key])}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          )}
-          {source?.usage && (
-            <Progress
-              className="mt-4"
-              value={Math.min(source.usage.consumed, source.usage.total)}
-              maxValue={source.usage.total}
-            >
-              <ProgressLabel>
-                {t(($) => $.memberEntitlements.usageValue, source.usage)}
-              </ProgressLabel>
-            </Progress>
-          )}
-          {source?.note && <p className="mt-3 text-sm text-muted-foreground">{source.note}</p>}
-        </CardContent>
-      </Card>
+      {packagesLoading ? (
+        <Card className="min-w-0">
+          <CardContent>
+            <MemberReadSkeleton label={t(($) => $.memberEntitlements.loading)} />
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>
+              {source?.name ??
+                t(($) =>
+                  packages?.length === 0
+                    ? $.memberEntitlements.emptyPackages
+                    : packages && packages.length > 1
+                      ? $.memberEntitlements.choosePackage
+                      : $.memberEntitlements.packageUnread,
+                )}
+            </CardTitle>
+            {source && (
+              <CardDescription>
+                {source.validity} · <Badge variant="outline">{source.state}</Badge>
+              </CardDescription>
+            )}
+          </CardHeader>
+          <CardContent>
+            {source?.counts && (
+              <div className="grid grid-cols-1 gap-3 @lg:grid-cols-3">
+                {(["available", "reserved", "consumed"] as const).map((key) => (
+                  <Card key={key} className="gap-0.5 py-3">
+                    <CardHeader className="px-4 [&_[data-slot=card-description]]:text-xs">
+                      <CardDescription>
+                        {t(($) => $.memberEntitlements.metrics[key])}
+                      </CardDescription>
+                      <CardTitle className="text-[1.375rem] leading-[1.3] tabular-nums">
+                        {source.counts![key]}
+                      </CardTitle>
+                      <CardDescription>
+                        {t(($) => $.memberEntitlements.metricHints[key])}
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                ))}
+              </div>
+            )}
+            {source?.usage && (
+              <Progress
+                className="mt-4"
+                value={Math.min(source.usage.consumed, source.usage.total)}
+                maxValue={source.usage.total}
+              >
+                <ProgressLabel>
+                  {t(($) => $.memberEntitlements.usageValue, source.usage)}
+                </ProgressLabel>
+              </Progress>
+            )}
+            {source?.note && <p className="mt-3 text-sm text-muted-foreground">{source.note}</p>}
+          </CardContent>
+        </Card>
+      )}
       <Card className="min-w-0">
         <CardHeader>
           <CardTitle>{t(($) => $.memberEntitlements.movements)}</CardTitle>
           <CardDescription>{t(($) => $.memberEntitlements.balanceChange)}</CardDescription>
         </CardHeader>
         <CardContent>
-          {movements === null ? (
+          {movements === "loading" ? (
+            <MemberReadSkeleton label={t(($) => $.memberEntitlements.loading)} />
+          ) : typeof movements === "string" ? (
             <p className="text-sm text-muted-foreground">
-              {t(($) => $.memberEntitlements.movementsUnread)}
+              {movements === "choose"
+                ? t(($) => $.memberEntitlements.movementsChoose)
+                : t(($) => $.memberEntitlements.movementsUnread)}
             </p>
           ) : movements.length === 0 ? (
             <Empty>
@@ -190,11 +208,15 @@ export function MemberEntitlementsView({
           {paymentControl}
           <div className="mb-4 flex flex-wrap justify-between gap-2 text-sm">
             <span>{t(($) => $.memberEntitlements.balance)}</span>
-            <div className="font-medium tabular-nums">{balance}</div>
+            <div className="min-w-24 font-medium tabular-nums">{balance}</div>
           </div>
-          {payments === null ? (
+          {payments === "loading" ? (
+            <MemberReadSkeleton label={t(($) => $.memberEntitlements.paymentsLoading)} />
+          ) : typeof payments === "string" ? (
             <p className="text-sm text-muted-foreground">
-              {t(($) => $.memberEntitlements.paymentsUnread)}
+              {payments === "choose"
+                ? t(($) => $.memberEntitlements.paymentsChoose)
+                : t(($) => $.memberEntitlements.paymentsUnread)}
             </p>
           ) : (
             <Table aria-label={t(($) => $.memberEntitlements.payments)} className="min-w-[28rem]">

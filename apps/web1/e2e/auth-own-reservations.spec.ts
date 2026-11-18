@@ -7,6 +7,9 @@ test("student own reservations keep separate native cursors, source package and 
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await mockOwnReservations(page);
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
+  await expect(page.getByText(/^İptal et — Sentetik gelecek ders$/, { exact: true })).toHaveCount(
+    1,
+  );
   await expect(page.getByText("Sentetik geçmiş ders", { exact: true })).toBeVisible();
   await expect(page.getByText(/Sentetik satın alınmış paket/)).toBeVisible();
   await expect(page.getByText(/Öğrenciye görünür eğitmen · Öğrenciye görünür salon/)).toBeVisible();

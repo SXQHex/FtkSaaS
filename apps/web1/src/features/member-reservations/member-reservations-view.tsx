@@ -26,6 +26,7 @@ import {
 } from "../../components/ui/table";
 import { Badge } from "../../components/ui/badge";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
 export interface MemberUpcomingRow {
   id: string;
   time: string;
@@ -50,6 +51,7 @@ export function MemberReservationsView({
   upcomingPagination,
   waitingPagination,
   historyPagination,
+  pending,
   notice,
 }: {
   upcoming: MemberUpcomingRow[] | null;
@@ -58,10 +60,12 @@ export function MemberReservationsView({
   upcomingPagination?: ReactNode;
   waitingPagination?: ReactNode;
   historyPagination?: ReactNode;
+  pending: { upcoming: boolean; waiting: boolean; history: boolean };
   notice?: ReactNode;
 }) {
   const { t } = useTranslation();
   function list(rows: MemberUpcomingRow[] | null, kind: "upcoming" | "waiting") {
+    if (pending[kind]) return <MemberReadSkeleton label={t(($) => $.memberReservations.loading)} />;
     if (rows === null)
       return (
         <p className="py-6 text-sm text-muted-foreground">
@@ -80,7 +84,7 @@ export function MemberReservationsView({
           <Item
             role="listitem"
             key={row.id}
-            className="flex-nowrap items-start gap-3 rounded-none border-0 px-0 py-4"
+            className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-none border-0 px-0 py-4 @lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,14rem)]"
           >
             <div className="w-14 shrink-0 text-sm tabular-nums">
               <p className="font-semibold">{row.time}</p>
@@ -91,15 +95,13 @@ export function MemberReservationsView({
               <ItemDescription className="line-clamp-none break-words">
                 {row.metadata}
               </ItemDescription>
-              <p className="text-xs text-muted-foreground">{row.hint}</p>
+              {row.hint && <p className="text-xs text-muted-foreground">{row.hint}</p>}
               {row.policy}
-              <ItemActions className="mt-2 flex-wrap @lg:hidden">
-                <Badge variant="outline">{row.state}</Badge>
-                {row.action}
-              </ItemActions>
             </ItemContent>
-            <ItemActions className="hidden shrink-0 flex-col items-end gap-2 @lg:flex">
-              <Badge variant="outline">{row.state}</Badge>
+            <ItemActions className="col-start-2 min-w-0 flex-wrap gap-2 @lg:col-start-3 @lg:flex-col @lg:items-end">
+              <Badge variant="outline" className="max-w-full whitespace-normal">
+                {row.state}
+              </Badge>
               {row.action}
             </ItemActions>
           </Item>
@@ -138,7 +140,9 @@ export function MemberReservationsView({
           <CardTitle>{t(($) => $.memberReservations.history)}</CardTitle>
         </CardHeader>
         <CardContent className="min-w-0 [&_[data-slot=table-container]]:max-h-[min(65dvh,36rem)]">
-          {history === null ? (
+          {pending.history ? (
+            <MemberReadSkeleton label={t(($) => $.memberReservations.loading)} />
+          ) : history === null ? (
             <p className="py-6 text-sm text-muted-foreground">
               {t(($) => $.memberReservations.unread.history)}
             </p>

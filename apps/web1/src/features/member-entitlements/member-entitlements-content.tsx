@@ -7,7 +7,13 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { readEntitlementLedger } from "../member-profile/entitlement-ledger";
 import { readOwnPackages, readOwnDebt, readOwnFinanceCurrencies } from "./member-entitlements-read";
-import { MemberEntitlementsView } from "./member-entitlements-view";
+import {
+  MemberEntitlementsView,
+  type MemberLedgerRead,
+  type MemberPaymentMovement,
+  type MemberRightMovement,
+} from "./member-entitlements-view";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
 import { readFinancePage } from "../finance/finance";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Button } from "../../components/ui/button";
@@ -118,41 +124,60 @@ export function MemberEntitlementsContent({
       .filter(Boolean)
       .join(" · "),
   }));
-  const balance =
-    !debt.isError && debt.data?.status === "available" ? (
-      debt.data.by_currency.length === 0 ? (
-        <p>{t(($) => $.memberEntitlements.noDebt)}</p>
-      ) : (
-        debt.data.by_currency.map((row) => (
-          <p key={row.currency}>
-            {t(($) => $.memberEntitlements.debt, {
-              amount: formatMinorAmount(row.remaining_minor, row.currency),
-            })}
-          </p>
-        ))
-      )
+  const balance = debt.isPending ? (
+    <MemberReadSkeleton label={t(($) => $.memberEntitlements.balanceLoading)} />
+  ) : !debt.isError && debt.data?.status === "available" ? (
+    debt.data.by_currency.length === 0 ? (
+      <p>{t(($) => $.memberEntitlements.noDebt)}</p>
     ) : (
-      <p>{t(($) => $.memberEntitlements.unread)}</p>
-    );
+      debt.data.by_currency.map((row) => (
+        <p key={row.currency}>
+          {t(($) => $.memberEntitlements.debt, {
+            amount: formatMinorAmount(row.remaining_minor, row.currency),
+          })}
+        </p>
+      ))
+    )
+  ) : (
+    <p>{t(($) => $.memberEntitlements.unread)}</p>
+  );
   const next = ledger.data?.next_cursor;
+  let movements: MemberLedgerRead<MemberRightMovement> = "unread";
+  if (rights.isPending || (selected && ledger.isPending)) movements = "loading";
+  else if (!rights.isError && !ledger.isError) {
+    if (selected && ledger.data) {
+      movements = ledger.data.items.map((row) => ({
+        id: row.id,
+        date: dates.format(new Date(row.created_at)),
+        title: `${t(($) => $.memberProfile.ledgerKinds[row.kind])} · ${t(($) => $.memberEntitlements.quantity, { count: row.quantity })}`,
+        quantity: signed.format(row.balance_delta),
+      }));
+    } else if (!selected) movements = sources?.length ? "choose" : [];
+  }
+  let paymentHistory: MemberLedgerRead<MemberPaymentMovement> = "unread";
+  if (currencies.isPending || (currency && payments.isPending)) paymentHistory = "loading";
+  else if (!currencies.isError && !payments.isError && currencies.data) {
+    if (currencies.data.length === 0) paymentHistory = [];
+    else if (!currency) paymentHistory = "choose";
+    else if (payments.data) {
+      paymentHistory = payments.data.movements.items.map((row) => ({
+        id: row.id,
+        date: dates.format(new Date(row.occurred_at)),
+        title: t(($) => $.finance.movementKinds[row.kind]),
+        amount: formatMinorAmount(row.amount_minor, row.currency),
+      }));
+    }
+  }
   return (
     <MemberEntitlementsView
       packages={packageRows ?? null}
+      packagesLoading={rights.isPending}
       selected={selected?.id ?? ""}
       onSelect={(id) => {
         setSelection(id);
         setCursors([undefined]);
       }}
-      movements={
-        selected && !ledger.isError && ledger.data
-          ? ledger.data.items.map((row) => ({
-              id: row.id,
-              date: dates.format(new Date(row.created_at)),
-              title: `${t(($) => $.memberProfile.ledgerKinds[row.kind])} · ${t(($) => $.memberEntitlements.quantity, { count: row.quantity })}`,
-              quantity: signed.format(row.balance_delta),
-            }))
-          : null
-      }
+      movements={movements}
       movementPagination={
         <div className="flex flex-wrap gap-2">
           <Button
@@ -175,20 +200,7 @@ export function MemberEntitlementsContent({
           </Button>
         </div>
       }
-      payments={
-        currencies.isError || !currencies.data
-          ? null
-          : currencies.data.length === 0
-            ? []
-            : currency && !payments.isError && payments.data
-              ? payments.data.movements.items.map((row) => ({
-                  id: row.id,
-                  date: dates.format(new Date(row.occurred_at)),
-                  title: t(($) => $.finance.movementKinds[row.kind]),
-                  amount: formatMinorAmount(row.amount_minor, row.currency),
-                }))
-              : null
-      }
+      payments={paymentHistory}
       paymentControl={
         currencies.data && currencies.data.length > 1 && !currencies.isError ? (
           <NativeSelect
@@ -252,13 +264,13 @@ export function MemberEntitlementsContent({
                 amount: formatMinorAmount(payments.data.credit_available_minor, currency),
               })}
             </p>
-          ) : (
+          ) : currencies.isError || payments.isError || currencies.data?.length === 0 ? (
             <p className="text-xs font-normal text-muted-foreground">
               {currencies.data?.length === 0 && !currencies.isError
                 ? t(($) => $.memberEntitlements.noFinanceHistory)
                 : t(($) => $.memberEntitlements.creditUnknown)}
             </p>
-          )}
+          ) : null}
         </>
       }
       previous={
@@ -281,13 +293,6 @@ export function MemberEntitlementsContent({
             <Alert variant="destructive">
               <AlertDescription>{t(($) => $.memberEntitlements.unread)}</AlertDescription>
             </Alert>
-          )}
-          {(rights.isPending ||
-            debt.isPending ||
-            currencies.isPending ||
-            (currency && payments.isPending) ||
-            (selected && ledger.isPending)) && (
-            <p role="status">{t(($) => $.memberEntitlements.loading)}</p>
           )}
           <Button
             variant="outline"

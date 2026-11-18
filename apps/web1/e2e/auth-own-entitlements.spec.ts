@@ -13,6 +13,7 @@ async function fixture(
     emptyDebt?: boolean;
     noCurrencies?: boolean;
     currencyDenied?: boolean;
+    paymentGate?: Promise<void>;
   } = {},
 ) {
   const plan = { starter: false };
@@ -73,6 +74,7 @@ async function fixture(
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);
       if (denied) return reject();
+      await options.paymentGate;
       return send({
         person_id: I.self,
         currency: req.currency,
@@ -300,6 +302,10 @@ test("multiple owned packages require explicit selection and reset the ledger cu
 }) => {
   const state = await fixture(page, { two: true });
   await expect(page.getByRole("combobox", { name: "Paket seç", exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Hak hareketlerini görmek için bir paket seç.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Hak hareketleri okunamadı.", { exact: true })).toHaveCount(0);
   expect(state.reads.filter((row) => row.request.ledger_sale_id)).toHaveLength(0);
   await page.getByRole("combobox", { name: "Paket seç", exact: true }).selectOption(id(980));
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(1);
@@ -318,9 +324,42 @@ test("native no outstanding debt never claims there is no credit or no payment h
   await fixture(page, { emptyDebt: true });
   await expect(page.getByText("Bu merkezde açık borcun yok.", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("Alacak ve ödeme geçmişi kaynağı okunamadı.", { exact: true }),
+    page.getByText("Ödeme geçmişini görmek için bir para birimi seç.", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("Ödeme geçmişi okunamadı.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Ödeme geçmişi okunamadı.", { exact: true })).toHaveCount(0);
+  await expect(
+    page.getByText("Alacak ve ödeme geçmişi kaynağı okunamadı.", { exact: true }),
+  ).toHaveCount(0);
+});
+test("payment Skeleton is limited to the pending native read and keeps the confirmed balance", async ({
+  page,
+}) => {
+  let releasePayment!: () => void;
+  const paymentGate = new Promise<void>((resolve) => {
+    releasePayment = resolve;
+  });
+  try {
+    const state = await fixture(page, { emptyDebt: true, paymentGate });
+    await expect(
+      page.getByText("Ödeme geçmişini görmek için bir para birimi seç.", { exact: true }),
+    ).toBeVisible();
+    expect(state.reads.filter(({ operation }) => operation === "finance_get_v1")).toHaveLength(0);
+    await page
+      .getByRole("combobox", { name: "Ödeme para birimi seç", exact: true })
+      .selectOption("USD");
+    const loading = page.getByRole("status").filter({ hasText: "Ödeme geçmişi okunuyor…" });
+    await expect(loading).toBeAttached();
+    await expect(page.getByText("Bu merkezde açık borcun yok.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Ödeme geçmişi okunamadı.", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("grid", { name: "Ödemelerim", exact: true })).toHaveCount(0);
+    releasePayment();
+    await expect(page.getByRole("grid", { name: "Ödemelerim", exact: true })).toContainText(
+      "50,00",
+    );
+    await expect(loading).toHaveCount(0);
+  } finally {
+    releasePayment();
+  }
 });
 test("unread rights and balance remain unknown until an explicit retry", async ({ page }) => {
   const state = await fixture(page, { denied: true });

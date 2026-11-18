@@ -142,6 +142,11 @@ export function MemberReservationsContent({
   return (
     <>
       <MemberReservationsView
+        pending={{
+          upcoming: up.isPending,
+          waiting: !waiting.isError && !offers.isError && (waiting.isPending || offers.isPending),
+          history: past.isPending,
+        }}
         upcoming={
           upcoming?.items.map((row) => ({
             id: row.reservation.id,
@@ -313,9 +318,6 @@ export function MemberReservationsContent({
             <p className="text-xs text-muted-foreground">
               {t(($) => $.memberReservations.historyHint)}
             </p>
-            {(up.isPending || past.isPending || waiting.isPending || offers.isPending) && (
-              <p role="status">{t(($) => $.memberReservations.loading)}</p>
-            )}
             <Button
               ref={retryButton}
               variant="outline"
@@ -329,12 +331,8 @@ export function MemberReservationsContent({
               onPress={() => {
                 void waiting.refetch();
                 void offers.refetch();
-                if (up.isError) void up.refetch();
-                if (past.isError) void past.refetch();
-                if (!up.isError && !past.isError) {
-                  void up.refetch();
-                  void past.refetch();
-                }
+                void up.refetch();
+                void past.refetch();
               }}
             >
               {t(($) => $.memberReservations.retry)}
