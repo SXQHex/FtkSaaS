@@ -2,11 +2,11 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-241 sözleşme operasyonu; 241 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+245 sözleşme operasyonu; 245 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
-| `account_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_get |
+| `account_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; include_platform_scope?: boolean | Success_account_get |
 | `account_profile_update_v1` | runtime / ilgili WF’yi oku | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; display_name: Text; given_name?: string ∣ null; family_name?: string ∣ null; unverified_phone?: string ∣ null; photo?: SettingsImageUpload ∣ null | Success_account_profile_update |
 | `account_delete_preview_v1` | runtime / ilgili WF’yi oku | `account.self` | P / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_delete_preview |
 | `account_delete_apply_v1` | runtime / ilgili WF’yi oku | `account.self` | E / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; preview: PreviewToken; reauth: ReauthProof | Success_account_delete_apply |
@@ -247,6 +247,10 @@
 | `studio_setup_list_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; platform_queue?: boolean; page: Page | Success_studio_setup_list |
 | `studio_setup_open_v1` | runtime / ilgili WF’yi oku | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; name: string | Success_studio_setup_open |
 | `attendance_correction_request_v1` | runtime / ilgili WF’yi oku | `attendance.draft` | W / maintenance | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid; closure_revision?: PositiveInt; reason?: string; correction_request_id?: FtkUuid; expected_version?: PositiveInt; decision?: accepted / declined | Success_attendance_correction_request |
+| `platform_directory_get_v1` | runtime / ilgili WF’yi oku | `platform.owner` | R / exempt | client_api_version: 1; request_id: FtkUuid; view: organizations / owners / payments / verified_accounts; page: Page; scope?: object; account_email?: string; payment_state?: ApprovalState; payment_id?: FtkUuid | Success_platform_directory_get |
+| `organization_billing_tax_get_v1` | runtime / ilgili WF’yi oku | `org.owner` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid | Success_organization_billing_tax_get |
+| `organization_billing_tax_set_v1` | runtime / ilgili WF’yi oku | `org.owner` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; expected_version: Count; tax_office: string ∣ null; tax_identifier: string ∣ null | Success_organization_billing_tax_set |
+| `platform_organization_suspension_set_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; suspended: boolean; reason: string | Success_platform_organization_suspension_set |
 
 ## Sürüm ve okuma desteği
 
@@ -495,6 +499,10 @@
 | studio_setup_list_v1 | read | none | None | not_required |  |
 | studio_setup_open_v1 | auth | append_or_current_scope_lock | studio_setup_list_v1 | implemented | studio_setup_open, receipt |
 | attendance_correction_request_v1 | command | append_or_current_scope_lock | attendance_get_v1 | implemented | attendance_correction_request, receipt |
+| platform_directory_get_v1 | read | none | None | not_required |  |
+| organization_billing_tax_get_v1 | read | none | None | not_required |  |
+| organization_billing_tax_set_v1 | command | row_version | organization_billing_tax_get_v1 | implemented | organization_billing_tax_set, receipt, audit |
+| platform_organization_suspension_set_v1 | command | row_version | platform_directory_get_v1 | implemented | platform_organization_suspension_set, receipt, audit |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

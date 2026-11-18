@@ -242,4 +242,8 @@ export interface Operations {
   studio_setup_list_v1: {request: T.RequestStudioSetupList; response: T.SuccessStudioSetupList};
   studio_setup_open_v1: {request: T.RequestStudioSetupOpen; response: T.SuccessStudioSetupOpen};
   attendance_correction_request_v1: {request: T.RequestAttendanceCorrectionRequest; response: T.SuccessAttendanceCorrectionRequest};
+  platform_directory_get_v1: {request: T.RequestPlatformDirectoryGet; response: T.SuccessPlatformDirectoryGet};
+  organization_billing_tax_get_v1: {request: T.RequestOrganizationBillingTaxGet; response: T.SuccessOrganizationBillingTaxGet};
+  organization_billing_tax_set_v1: {request: T.RequestOrganizationBillingTaxSet; response: T.SuccessOrganizationBillingTaxSet};
+  platform_organization_suspension_set_v1: {request: T.RequestPlatformOrganizationSuspensionSet; response: T.SuccessPlatformOrganizationSuspensionSet};
 }

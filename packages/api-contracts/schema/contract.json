@@ -947,7 +947,11 @@
         "document_directory_get_v1",
         "studio_setup_list_v1",
         "studio_setup_open_v1",
-        "attendance_correction_request_v1"
+        "attendance_correction_request_v1",
+        "platform_directory_get_v1",
+        "organization_billing_tax_get_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1"
       ]
     },
     "EntityType": {
@@ -3486,6 +3490,38 @@
               "type": "null"
             }
           ]
+        },
+        "platform_scope": {
+          "type": "object",
+          "properties": {
+            "organizations": {
+              "type": "boolean"
+            },
+            "organization_create": {
+              "type": "boolean"
+            },
+            "owner_manage": {
+              "type": "boolean"
+            },
+            "payment_verify": {
+              "type": "boolean"
+            },
+            "grace_extend": {
+              "type": "boolean"
+            },
+            "organization_suspend": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "organizations",
+            "organization_create",
+            "owner_manage",
+            "payment_verify",
+            "grace_extend",
+            "organization_suspend"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -7063,6 +7099,9 @@
         },
         "request_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_platform_scope": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -19749,6 +19788,9 @@
               "type": "null"
             }
           ]
+        },
+        "platform_suspended": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -38469,6 +38511,12 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_attendance_correction_request_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_organization_billing_tax_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_platform_organization_suspension_set_v1"
         }
       ]
     },
@@ -38635,7 +38683,9 @@
         "freeze_cancel_preview_v1",
         "freeze_cancel_apply_v1",
         "notifications_read_set_v1",
-        "attendance_correction_request_v1"
+        "attendance_correction_request_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -43733,6 +43783,12 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_attendance_correction_request_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_organization_billing_tax_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_platform_organization_suspension_set_v1"
         }
       ]
     },
@@ -66878,6 +66934,636 @@
           "properties": {
             "session_id": {
               "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryOrganization": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "organization"
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "$ref": "#/$defs/OrganizationState"
+        },
+        "access_mode": {
+          "enum": [
+            "normal",
+            "grace",
+            "bootstrap",
+            "closed"
+          ]
+        },
+        "subscription_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriptionState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "grace_until": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "platform_suspended": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "name",
+        "version",
+        "state",
+        "access_mode",
+        "subscription_state",
+        "grace_until",
+        "platform_suspended"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryOwner": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "owner"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "account_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "org_id",
+        "person_id",
+        "display_name",
+        "account_id"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryPayment": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "payment"
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "state": {
+          "$ref": "#/$defs/ApprovalState"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "reference": {
+          "$ref": "#/$defs/Text"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "org_id",
+        "amount_minor",
+        "currency",
+        "state",
+        "version",
+        "reference",
+        "occurred_at",
+        "verified_at"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryAccount": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "verified_account"
+        },
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "kind",
+        "account_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_platform_directory_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "view": {
+          "enum": [
+            "organizations",
+            "owners",
+            "payments",
+            "verified_accounts"
+          ]
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "org_id"
+          ],
+          "additionalProperties": false
+        },
+        "account_email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        },
+        "payment_state": {
+          "$ref": "#/$defs/ApprovalState"
+        },
+        "payment_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "view",
+        "page"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "const": "verified_accounts"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "account_email"
+            ],
+            "properties": {
+              "scope": false,
+              "account_email": {
+                "type": "string",
+                "format": "email",
+                "maxLength": 320
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "account_email": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "const": "payments"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "payment_id": false,
+              "payment_state": false
+            }
+          }
+        }
+      ]
+    },
+    "Page_PlatformDirectory": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/PlatformDirectoryOrganization"
+              },
+              {
+                "$ref": "#/$defs/PlatformDirectoryOwner"
+              },
+              {
+                "$ref": "#/$defs/PlatformDirectoryPayment"
+              },
+              {
+                "$ref": "#/$defs/PlatformDirectoryAccount"
+              }
+            ]
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "Success_platform_directory_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Page_PlatformDirectory"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "OrganizationBillingTaxProfile": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/Count"
+        },
+        "tax_office": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tax_identifier": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "org_id",
+        "version",
+        "tax_office",
+        "tax_identifier"
+      ],
+      "additionalProperties": false
+    },
+    "Request_organization_billing_tax_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_organization_billing_tax_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/OrganizationBillingTaxProfile"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_organization_billing_tax_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/Count"
+        },
+        "tax_office": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tax_identifier": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "expected_version",
+        "tax_office",
+        "tax_identifier"
+      ],
+      "additionalProperties": false
+    },
+    "Request_platform_organization_suspension_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "suspended": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "expected_version",
+        "suspended",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "Success_organization_billing_tax_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_platform_organization_suspension_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_organization_billing_tax_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "organization_billing_tax_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_organization_billing_tax_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "organization_billing_tax_set_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/Text"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_platform_organization_suspension_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "platform_organization_suspension_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_platform_organization_suspension_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "platform_organization_suspension_set_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/Text"
             }
           },
           "required": [],
@@ -97374,6 +98060,437 @@
         "runtime_limits": [
           "Assigned instructor requests review of the live attendance revision. A center manager may decide without applying a correction."
         ]
+      },
+      {
+        "name": "platform_directory_get_v1",
+        "module": "M01",
+        "features": [],
+        "permission": "platform.owner",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_platform_directory_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_platform_directory_get"
+        },
+        "errors": [
+          "ACCOUNT_ALREADY_LINKED",
+          "ACCOUNT_LINK_CONFLICT",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "ENTITLEMENT_UNAVAILABLE",
+          "FORBIDDEN",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "RESERVATION_EXISTS",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Live platform authorization on every read. Organization, owner, payment or exact verified account projection.",
+        "transition": {
+          "effect": "platform_console_read",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/platform_directory_get_v1",
+        "runtime_rpc": "api_v1.platform_directory_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/platform_directory_get_v1",
+        "runtime_limits": [
+          "Verified account lookup matches a complete email under the live platform gate. Raw Auth profiles are private."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "organizations",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_platform_directory_get"
+          }
+        }
+      },
+      {
+        "name": "organization_billing_tax_get_v1",
+        "module": "M12",
+        "features": [],
+        "permission": "org.owner",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_organization_billing_tax_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_organization_billing_tax_get"
+        },
+        "errors": [
+          "ACCOUNT_ALREADY_LINKED",
+          "ACCOUNT_LINK_CONFLICT",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "ENTITLEMENT_UNAVAILABLE",
+          "FORBIDDEN",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "RESERVATION_EXISTS",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Current tax details are visible only to the organization owner.",
+        "transition": {
+          "effect": "organization_billing_tax_get",
+          "from": [],
+          "to": [],
+          "invariant": "Current tax details are visible only to the organization owner."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/organization_billing_tax_get_v1",
+        "runtime_rpc": "api_v1.organization_billing_tax_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/organization_billing_tax_get_v1",
+        "runtime_limits": [
+          "Current tax details are visible only to the organization owner."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "organizations",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_organization_billing_tax_get"
+          }
+        }
+      },
+      {
+        "name": "organization_billing_tax_set_v1",
+        "module": "M12",
+        "features": [],
+        "permission": "org.owner",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_organization_billing_tax_set"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_organization_billing_tax_set"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "OPEN_OPERATIONS_EXIST",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "attendance",
+        "transaction_guarantee": "The Owner writes current tax details under an explicit version. Audits contain no tax values.",
+        "transition": {
+          "effect": "organization_billing_tax_set",
+          "from": [],
+          "to": [],
+          "invariant": "The Owner writes current tax details under an explicit version. Audits contain no tax values."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "organization or billing tax profile",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A30",
+          "A31",
+          "A46",
+          "A47",
+          "A51",
+          "A52",
+          "A53",
+          "A54",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "organizations",
+          "version_mode": "row_version",
+          "version_field": null,
+          "read_operation": "organization_billing_tax_get_v1",
+          "atomic_effects": [
+            "organization_billing_tax_set",
+            "receipt",
+            "audit"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_organization_billing_tax_set"
+          }
+        },
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/organization_billing_tax_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/organization_billing_tax_set_v1",
+        "runtime_rpc": "api_v1.organization_billing_tax_set_v1",
+        "runtime_limits": [
+          "The Owner writes current tax details under an explicit version. Audits contain no tax values."
+        ]
+      },
+      {
+        "name": "platform_organization_suspension_set_v1",
+        "module": "M01",
+        "features": [],
+        "permission": "platform.owner",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_platform_organization_suspension_set"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_platform_organization_suspension_set"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "OPEN_OPERATIONS_EXIST",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "attendance",
+        "transaction_guarantee": "The platform operator can place or lift a reasoned, versioned suspension without changing the organization lifecycle.",
+        "transition": {
+          "effect": "platform_organization_suspension_set",
+          "from": [],
+          "to": [],
+          "invariant": "The platform operator can place or lift a reasoned, versioned suspension without changing the organization lifecycle."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Scope lock and canonical receipt replay.",
+        "expected_version_subject": "organization or billing tax profile",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A30",
+          "A31",
+          "A46",
+          "A47",
+          "A51",
+          "A52",
+          "A53",
+          "A54",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "organizations",
+          "version_mode": "row_version",
+          "version_field": null,
+          "read_operation": "platform_directory_get_v1",
+          "atomic_effects": [
+            "platform_organization_suspension_set",
+            "receipt",
+            "audit"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_platform_organization_suspension_set"
+          }
+        },
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/platform_organization_suspension_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/platform_organization_suspension_set_v1",
+        "runtime_rpc": "api_v1.platform_organization_suspension_set_v1",
+        "runtime_limits": [
+          "The platform operator can place or lift a reasoned, versioned suspension without changing the organization lifecycle."
+        ]
       }
     ],
     "policy_value_map": {
@@ -115030,6 +116147,144 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryOrganization/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryOwner/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryOwner/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryOwner/properties/account_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryPayment/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryPayment/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryAccount/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_directory_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_directory_get/properties/scope/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_directory_get/properties/payment_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_platform_directory_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationBillingTaxProfile/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_organization_billing_tax_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_organization_billing_tax_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_organization_billing_tax_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_organization_billing_tax_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_organization_billing_tax_set/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_organization_billing_tax_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_organization_suspension_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_organization_suspension_set/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_organization_suspension_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_organization_billing_tax_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_platform_organization_suspension_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -115524,13 +116779,17 @@
         "document_directory_get_v1",
         "studio_setup_list_v1",
         "studio_setup_open_v1",
-        "attendance_correction_request_v1"
+        "attendance_correction_request_v1",
+        "platform_directory_get_v1",
+        "organization_billing_tax_get_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 201,
+      "migration_count": 204,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -116249,7 +117508,11 @@
         "document_directory_get_v1",
         "studio_setup_list_v1",
         "studio_setup_open_v1",
-        "attendance_correction_request_v1"
+        "attendance_correction_request_v1",
+        "platform_directory_get_v1",
+        "organization_billing_tax_get_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {

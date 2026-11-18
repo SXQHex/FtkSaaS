@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-platform-billing"></a>
+## Web1 v67 vergi profili ve platform konsolu
+
+W1-BE-58/59, [Draft PR #341](https://github.com/SXQHex/FtkSaaS/pull/341) için yayımlanan `4b98531b476abd424f963952bbb1524c29891bee` üzerine `codex/web1-backend-remaining` dalında yerel olarak ele alındı. Tüketim [WF17](../../../docs/workflows.md#wf17), kabul ölçütleri [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir. Aday CI ve hosted doğrulama push onayı sonrasında bekler.
+
+204 migration izole loopback Supabase üzerinde temiz uygulandı. Tek Node runner ve `--test-concurrency=1` ile sözleşme, Starter ve anonim yayın paketleri 349/349 geçti. Workflow kapsamı, 142 API test birimi, sözleşme denetimi, 245 runtime yetki kapısı, backend typecheck ve kalite eşiği doğrulandı. Edge JSON yükü 4.070.277 bayt. Yerel stack kapatıldı.
+
 <a id="web1-v67-final-five"></a>
 ## Web1 v67 son beş backend talebi
 

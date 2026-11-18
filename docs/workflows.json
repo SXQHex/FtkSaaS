@@ -303,8 +303,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "7056423c6a6ad327cc02ceb660c9ba540ddefea755319b35a56b0bc13b5809a0",
-        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
+        "fingerprint": "c448337c0367391e776ca163a58d61d9e7bed19c62b80c7ef00fec94902ecee7",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -393,8 +393,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "9b815ec9a915e870c87684889af9d473a2155f45a132ef0daa05c202805fd815",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "5cdf65cafe64ef4c41ad7d3b0ebf2a2e86254ba8ef3e0d62fbe3e419444487de",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -519,8 +519,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "c500fc5fe92c7a1784ceb7bf8a045945dbc612321c3eeb03ec644a8d1a605ef6",
-        "reason": "Reviewed first studio request ownership, platform queue visibility, and atomic platform fulfillment."
+        "fingerprint": "2d92f521f04166e7ec6fd31036fc4c394d88625a6063bf9ecf2c9dcff8c9d4c1",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -637,8 +637,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "95c96be540017b2222682a1ae39cdabe502c0f211bfa2a17a3959d217f6e9335",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "751a7e1ad184f37ebf67636ec78543ae942e6c8afcd39c463baaf8dd0c469dc0",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -754,8 +754,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1fc7df813eaee6723713992e226e0e13612cf1170af8ed485242ba7af9eab48b",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "296871acbc745ca59e9ea8b029b26d5174f705047569256c0b2baa59c8cfebc5",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -882,8 +882,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "bddca56a3dcec74a332304298be5ba291597fa7c0dbc3ca7a2449605cb337818",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "bcee308be39747d56d0f256e0fc9253a885c9253ea5398b4588a060b8d6266dc",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -992,8 +992,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "862d7f578423aec44f6856d12168620c8a6f85e965bedbd160b3a15d44036fc9",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "78dd314dd68f56fdf1becd31c34b67366db86250f3ed2b3cbc609ce0dfe48e8a",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1064,8 +1064,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "d2d73963b6aa90aa36b9aef2bca7b87ede21b97d856494a1cfa98d3deed2f2eb",
-        "reason": "Reviewed the canonical and applied M05 audit module mapping for attendance correction request records."
+        "fingerprint": "d54be1083e4a22fce5bed6b296e2359f0ce7b85f05f074e79e5d72be5c6eaf9d",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1139,8 +1139,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "0772e5781e78e6cef8d2ad553b2a3c392074b0836f9a018b211c414c1365f9bb",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "f3de13bd0337b9764caec5c04f3cb8b4b9d84e7b896cece20eb22e1178e344bf",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1256,8 +1256,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "3e1c706482a610ff1b30cd0571ff96a3a6934ee0187153c9a041f7bcf87b8120",
-        "reason": "Reviewed canonical address routing, public form shutdown, and pending event application admission."
+        "fingerprint": "c82ca86dc20f200b385d15e7168cc500f67663348c3f620738ad9cda19b3f46c",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1330,8 +1330,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "618a0141d90f9663e559325754ec5836672886f5a0aa138d7ae0968f95dfe4ba",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "f98688d6287b9eba6fff4da8cca2643aaa698274cafd70060dcec733a0bb3a00",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1419,8 +1419,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "3255ced7ab782286cc9af5075a5dffb6d77c98e92f7564fa4107ffe7043abca1",
-        "reason": "Reviewed versioned recipient visibility and the independent native source and read state."
+        "fingerprint": "226d844de880d6a92b838a84bf5fe79a2e2dbbfb891fc1a6f127480393911384",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1557,8 +1557,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "6caeee49284bc0e84c75732a720a344c86daeac1454f430eee5970799abbcf8c",
-        "reason": "Reviewed shared generated runtime inventory and source references after the addition of three scoped Web1 operations."
+        "fingerprint": "27c0bc3e85cb828656309de7d68fe9b4438c1297fe86123e8d95c98b1542b031",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1633,8 +1633,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "8b4f4e98812e1572c92f81f694cf763380ac81610cbef5ec910df4c57f3e6f4c",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "4e62828729ac6f58d8e6065f30624e7c83cbc2467f03c99358af59d19ed80e74",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1701,8 +1701,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "73a3b553cd42a033efe87f0781ae7c44afece56fc2689fb082042406a8452b69",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "077267aa196537b28a9f5bba917001f045711dbd27bfba19befca5b747596397",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1780,8 +1780,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "4ce0bdcc2c69716bbce1af55c4bc27cc179592cd9cf3fdd733fd626e9af06d19",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "46d12d181bb1b29b84d41bb16f58da35fb15a88ad18dc0aa34c1d584fc2b6d1c",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1856,8 +1856,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "43c57837e722f629b96ca17e72eea0458ef2a87b1f34a378f69b5437017c1f51",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "29f365a8fdc1aba701f40040a99d6bcb04d9991482bd577b24b05f4ac3fe1f80",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -1874,7 +1874,9 @@
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/native-account-erasure-unit.mjs",
         "apps/backend/tests/postgres-restore-acceptance.mjs",
-        "apps/backend/tests/export-retention-acceptance.mjs"
+        "apps/backend/tests/export-retention-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/public-program-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1929,7 +1931,13 @@
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
         "apps/backend/scripts/postgres-restore.mjs",
         "apps/backend/database/account-export-erasure.sql",
-        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/database/platform-directory.sql",
+        "apps/backend/supabase/migrations/20261118214500_platform_directory.sql",
+        "apps/backend/database/organization-billing-tax.sql",
+        "apps/backend/database/platform-organization-suspension.sql",
+        "apps/backend/supabase/migrations/20261118214600_organization_billing_tax.sql",
+        "apps/backend/supabase/migrations/20261118214700_platform_organization_suspension.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1942,11 +1950,15 @@
         "saas_payment_verify_v1",
         "saas_grace_extend_v1",
         "platform_owner_set_v1",
-        "platform_owner_remove_v1"
+        "platform_owner_remove_v1",
+        "platform_directory_get_v1",
+        "organization_billing_tax_get_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1"
       ],
       "review": {
-        "fingerprint": "a262e46fc322cad9e35967393a7ca5d742bb37cc8bf17e9d8f935ef8e8878059",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "395ffc19676114d41acfc166aff8748fe70ead8e99fa912dc9989fb4aaaa0804",
+        "reason": "Reviewed organization-owner tax data, operator directory and suspension including subscription, privacy, and public access boundaries."
       }
     },
     {
@@ -1978,8 +1990,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "dc95b322349aad2843fead0fc8e80a5316631e55d4f6e14054e5d51fe26fb664",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "368318b6e38b56dec212790ea08aace3d057898deac4ba1d178176933876ccb3",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -2019,8 +2031,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "d2db8fac12e4ba556a45c74af8d94c04ec2ae5290fe8b208410bb325f3cd11da",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "9bcc8582c0583faef41764f1bff822ef6e36db92efe09fa5d7e36305e1c879ad",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     },
     {
@@ -2144,8 +2156,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "f9db54d813a6a66a85a19e082a93166e3ce03ef2b30fc659d468b232e9e635eb",
-        "reason": "Reviewed the affected authenticated or public runtime scope, source bindings and scenario coverage for the final Web1 backend requests."
+        "fingerprint": "c24f638bc1a48b512b24850eb3910e65c76980b72f62e8bb4432415c8c99ef16",
+        "reason": "Reviewed shared runtime and acceptance sources for organization tax data and platform suspension while preserving existing workflow authority."
       }
     }
   ]
