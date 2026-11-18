@@ -120,14 +120,23 @@ export function MemberReservationsContent({
   function label(row: OwnReservations["items"][number]) {
     return row.title ?? t(($) => $.memberReservations.unknown);
   }
-  async function refresh() {
-    const results = await Promise.all([
+  async function refresh(purpose: "reservation" | "waitlist") {
+    const [upcomingResult, pastResult, waitingResult, offersResult] = await Promise.all([
       up.refetch(),
       past.refetch(),
       waiting.refetch(),
       offers.refetch(),
     ]);
-    if (results.some((result) => result.isError))
+    const waitlistReadFailed = [waitingResult, offersResult].some(
+      ({ isError, error }) =>
+        isError &&
+        !(
+          purpose === "reservation" &&
+          error instanceof BackendError &&
+          error.code === "PLAN_FEATURE_UNAVAILABLE"
+        ),
+    );
+    if (upcomingResult.isError || pastResult.isError || waitlistReadFailed)
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
   }
   return (
@@ -344,7 +353,7 @@ export function MemberReservationsContent({
             setWaitTarget(undefined);
             requestAnimationFrame(() => retryButton.current?.focus());
           }}
-          onSaved={refresh}
+          onSaved={() => refresh("waitlist")}
           onLockChange={lock}
           onAccessLost={accessLost}
         />
@@ -367,7 +376,7 @@ export function MemberReservationsContent({
             setTarget(undefined);
             if (saved) requestAnimationFrame(() => retryButton.current?.focus());
           }}
-          onRefresh={refresh}
+          onRefresh={() => refresh("reservation")}
           onLockChange={lock}
           onAccessLost={accessLost}
         />

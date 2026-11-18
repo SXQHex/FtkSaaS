@@ -10,7 +10,7 @@ import type {
 } from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-import { scanAccessibility } from "./accessibility.js";
+import { expectEmptyActionCell, scanAccessibility } from "./accessibility.js";
 const versionId = "019a7b00-0000-7000-8000-000000000022",
   productId = "019a7b00-0000-7000-8000-000000000021",
   saleId = "019a7b00-0000-7000-8000-000000000070",
@@ -733,6 +733,8 @@ test("denied attendance stays unknown while authorized reservation and lesson re
       { exact: true },
     ),
   ).toHaveCount(0);
+  const completed = grid.getByRole("row").filter({ hasText: "Tamamlandı" });
+  await expectEmptyActionCell(completed.getByRole("gridcell").last());
   expect(writes).toHaveLength(0);
 });
 test("reservation page read errors do not relabel stale rows as the next page and can retry", async ({
@@ -747,6 +749,8 @@ test("reservation page read errors do not relabel stale rows as the next page an
   await expect(grid.getByText("Tamamlandı", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }).click();
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
+  const cancelled = grid.getByRole("row").filter({ hasText: "İptal" });
+  await expectEmptyActionCell(cancelled.getByRole("gridcell").last());
   expect(writes).toHaveLength(0);
 });
 
@@ -785,6 +789,8 @@ test("reservation cancellation validates reason, uses the native version and rer
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
   await expect(grid.getByRole("button", { name: /^İptal et/ })).toHaveCount(0);
+  const cancelled = grid.getByRole("row").filter({ hasText: "İptal" });
+  await expectEmptyActionCell(cancelled.getByRole("gridcell").last());
   await expect(
     page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }),
   ).toBeFocused();
@@ -1319,6 +1325,7 @@ async function freezeSetup(
     unknown?: boolean;
     unread?: boolean;
     stale?: boolean;
+    starter?: boolean;
   } = {},
 ) {
   await page.clock.install({ time: new Date("2026-11-16T08:00:00Z") });
@@ -1359,6 +1366,20 @@ async function freezeSetup(
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    if (
+      options.starter &&
+      (op === "freeze_preview_v1" ||
+        (op === "management_state_get_v1" && req.operation === "sale_change_preview_v1"))
+    ) {
+      previews.push(req);
+      return route.fulfill({
+        status: 403,
+        json: {
+          ok: false,
+          error: { code: "PLAN_FEATURE_UNAVAILABLE", retryable: false, trace_id: I.role },
+        },
+      });
+    }
     if (op === "entitlements_get_v1") {
       if (options.unread && saved && !unread) {
         unread = true;
@@ -1504,6 +1525,35 @@ async function freezeReview(page: Page, options: Parameters<typeof freezeSetup>[
   await expect(state.panel.getByRole("heading", { name: "Etki", exact: true })).toBeFocused();
   return state;
 }
+test("Starter preview denials preserve existing package rights and prevent freeze or change writes", async ({
+  page,
+}) => {
+  const { panel, previews, writes } = await freezeSetup(page, { starter: true, binding: true });
+  const changeWrites: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith("/sale_change_apply_v1"))
+      changeWrites.push(request.method());
+  });
+  await page.getByRole("button", { name: "Dondur", exact: true }).click();
+  await panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-18");
+  await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-20");
+  await panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik Starter testi");
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(
+    panel.getByText(/Güncel dondurma kaynağı veya işlem önizlemesi okunamadı/),
+  ).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toHaveCount(0);
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.getByRole("button", { name: "Paketi değiştir", exact: true }).click();
+  await panel.locator("#lifecycle-sale").selectOption(saleId);
+  await expect(
+    panel.getByText(/Gelecek rezervasyonlar yüklenmeden paket değişikliği incelenemez/),
+  ).toBeVisible();
+  await expect(panel.getByRole("button", { name: "Uygula", exact: true })).toHaveCount(0);
+  expect(previews).toHaveLength(2);
+  expect(writes).toHaveLength(0);
+  expect(changeWrites).toHaveLength(0);
+});
 test("freeze review validates dates and preserves native reserved rights and timezone periods", async ({
   page,
 }) => {

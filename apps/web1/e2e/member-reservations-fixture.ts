@@ -7,6 +7,7 @@ export async function mockOwnReservations(
   page: Page,
   options: {
     noStudent?: boolean;
+    starter?: boolean;
     denied?: boolean;
     unknown?: boolean;
     ackUnread?: boolean;
@@ -81,7 +82,7 @@ export async function mockOwnReservations(
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
     const reject = (code = "FORBIDDEN") =>
       route.fulfill({
-        status: 403,
+        status: code === "PLAN_FEATURE_UNAVAILABLE" ? 200 : 403,
         json: { ok: false, error: { code, retryable: false, trace_id: I.role } },
       });
     if (operation === "organizations_list_v1")
@@ -126,13 +127,15 @@ export async function mockOwnReservations(
             next_cursor: null,
             as_of: "2026-11-16T12:00:00Z",
           })
-        : reject();
+        : reject(options.starter ? "PLAN_FEATURE_UNAVAILABLE" : "FORBIDDEN");
     if (
       operation === "management_state_get_v1" &&
       req.operation === "waitlist_join_v1" &&
       req.selector?.key?.directory === "self"
-    )
+    ) {
+      if (options.starter) return reject("PLAN_FEATURE_UNAVAILABLE");
       return send({ items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+    }
     if (operation === "reservation_list_v1") {
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);

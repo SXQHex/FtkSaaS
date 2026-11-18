@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
-import axe from "axe-core";
-import { expect, test, type Page } from "@playwright/test";
+import axe, { type Result } from "axe-core";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const conformanceTags = [
   "wcag2a",
@@ -12,6 +12,96 @@ const conformanceTags = [
   "best-practice",
 ];
 const conformanceRules = axe.getRules(conformanceTags).map((rule) => rule.ruleId);
+type GridTargetCheck = "empty-action" | "button-size";
+const measuredGridCells = new WeakMap<Page, Map<string, GridTargetCheck>>();
+
+async function gridCellSelector(cell: Locator) {
+  await expect(cell).toHaveAttribute("data-slot", "table-cell");
+  const id = await cell.getAttribute("id");
+  if (!id || !/^[A-Za-z][\w-]*$/.test(id)) throw new Error("Grid cell has no CSS-safe identifier");
+  return `#${id}`;
+}
+
+function recordGridTarget(page: Page, selector: string, check: GridTargetCheck) {
+  const checked = measuredGridCells.get(page) ?? new Map<string, GridTargetCheck>();
+  checked.set(selector, check);
+  measuredGridCells.set(page, checked);
+}
+
+export async function expectEmptyActionCell(cell: Locator) {
+  await expect(cell).toBeEmpty();
+  // React Aria can move the grid's roving tab stop to a cell that has no action.
+  await expect(cell).toHaveAttribute("tabindex", /^(0|-1)$/);
+  const selector = await gridCellSelector(cell);
+  const page = cell.page();
+  const isActionlessCell = await page.evaluate<boolean>(`(() => {
+    const element = document.querySelector(${JSON.stringify(selector)});
+    return Boolean(element?.matches('td[role="gridcell"]') &&
+      element.cellIndex === element.parentElement.cells.length - 1 &&
+      !element.closest('[role="link"], [role="button"]') &&
+      getComputedStyle(element).cursor !== 'pointer');
+  })()`);
+  expect(isActionlessCell).toBe(true);
+  recordGridTarget(page, selector, "empty-action");
+}
+
+async function expectMinimumButtonSize(button: Locator) {
+  const target = await button.boundingBox();
+  expect(target?.width).toBeGreaterThanOrEqual(24);
+  expect(target?.height).toBeGreaterThanOrEqual(24);
+}
+
+export async function expectGridButtonTarget(button: Locator) {
+  const cell = button.locator('xpath=ancestor::td[@role="gridcell"][1]');
+  const selector = await gridCellSelector(cell);
+  await expect(cell.getByRole("button")).toHaveCount(1);
+  await expect(cell.getByRole("link")).toHaveCount(0);
+  await button.click({ trial: true });
+  await expectMinimumButtonSize(button);
+  recordGridTarget(button.page(), selector, "button-size");
+}
+
+async function checkEmptyGrids(page: Page, incomplete: readonly Result[]) {
+  const selectors = incomplete
+    .find((rule) => rule.id === "th-has-data-cells")
+    ?.nodes.flatMap(({ target }) =>
+      target.length === 1 && typeof target[0] === "string" ? [target[0]] : [],
+    );
+  if (!selectors?.length) return [];
+
+  const checks = await page.evaluate<
+    { selector: string; columns: number; columnSpan: number; hasPlaceholder: boolean }[]
+  >(`${JSON.stringify(selectors)}.flatMap((selector) => {
+      const table = document.querySelector(selector);
+      if (!(table instanceof HTMLTableElement) || table.dataset.slot !== "table") return [];
+      const body = table.tBodies[0];
+      if (!body?.hasAttribute("data-empty") || table.getAttribute("aria-busy") === "true")
+        return [];
+      const headers = table.tHead?.rows;
+      const header = headers?.[headers.length - 1];
+      const columns = Array.from(header?.cells ?? []).reduce((sum, cell) => sum + cell.colSpan, 0);
+      const row = body.rows[0];
+      const cell = row?.cells[0];
+      return [
+        {
+          selector,
+          columns,
+          columnSpan: cell?.colSpan ?? 0,
+          hasPlaceholder:
+            body.rows.length === 1 &&
+            row?.cells.length === 1 &&
+            cell?.getAttribute("role") === "rowheader" &&
+            Boolean(cell.textContent?.trim()),
+        },
+      ];
+    })`);
+  for (const check of checks) {
+    expect(check.columns, check.selector).toBeGreaterThan(0);
+    expect(check.columnSpan, check.selector).toBe(check.columns);
+    expect(check.hasPlaceholder, check.selector).toBe(true);
+  }
+  return checks;
+}
 
 export async function scanAccessibility(page: Page, state = "rendered-state") {
   // Scan settled colors and geometry, including newly opened modal transitions.
@@ -37,6 +127,23 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
     conformanceRules.filter((id) => !evaluated.has(id)),
     "Every supported WCAG A/AA rule must run",
   ).toEqual([]);
+  const emptyGridChecks = await checkEmptyGrids(page, results.incomplete);
+  const measuredCells = measuredGridCells.get(page);
+  const gridTargetChecks =
+    results.incomplete
+      .find((rule) => rule.id === "target-size")
+      ?.nodes.flatMap(({ target }) => {
+        const selector = target[0];
+        const check = typeof selector === "string" ? measuredCells?.get(selector) : undefined;
+        return target.length === 1 && typeof selector === "string" && check
+          ? [{ selector, check }]
+          : [];
+      }) ?? [];
+  for (const { selector, check } of gridTargetChecks) {
+    const cell = page.locator(selector);
+    if (check === "empty-action") await expect(cell).toBeEmpty();
+    else await expectMinimumButtonSize(cell.getByRole("button"));
+  }
   await test.info().attach("WCAG-2.2-AA-scan-summary", {
     body: JSON.stringify(
       {
@@ -48,6 +155,8 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
         axeVersion: results.testEngine.version,
         evaluatedConformanceRules: conformanceRules,
         violations: results.violations.map((rule) => rule.id),
+        emptyGridChecks,
+        gridTargetChecks,
         manualReview: results.incomplete.map((rule) => ({
           id: rule.id,
           targets: rule.nodes.map((node) => node.target),

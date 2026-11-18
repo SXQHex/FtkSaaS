@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 import type { WaitlistEntryView, SeatOfferView } from "../src/lib/api-contracts/generated.js";
 import { mockSessionDetail, sessionIds as S } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
-import { scanAccessibility } from "./accessibility.js";
+import { expectGridButtonTarget, scanAccessibility } from "./accessibility.js";
 const entryId = "019a7b00-0000-7000-8000-000000000091",
   offerId = "019a7b00-0000-7000-8000-000000000092";
 async function setup(
@@ -245,11 +245,16 @@ test("another person's visible offer does not expose accept or reject controls",
   page,
 }) => {
   const state = await setup(page, { offered: true, otherPerson: true });
-  await expect(
-    page
-      .getByRole("grid", { name: "Sonuçlanan teklifler", exact: true })
-      .getByText("Örnek öğrenci", { exact: true }),
-  ).toBeVisible();
+  const history = page.getByRole("grid", { name: "Sonuçlanan teklifler", exact: true });
+  const offer = history.getByRole("row").filter({ hasText: "Örnek öğrenci" });
+  await expect(offer.getByText("Örnek öğrenci", { exact: true })).toBeVisible();
+  await expect(offer.getByRole("gridcell").last()).toBeEmpty();
+  const waiting = page.getByRole("grid", { name: "Bekleme listesi", exact: true });
+  const remove = waiting.getByRole("button", {
+    name: "Listeden çıkar — Örnek öğrenci",
+    exact: true,
+  });
+  await expectGridButtonTarget(remove);
   await expect(page.getByRole("button", { name: "Teklifi kabul et", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Teklifi reddet", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);

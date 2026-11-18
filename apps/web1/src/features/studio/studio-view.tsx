@@ -80,6 +80,7 @@ export interface StudioViewData {
   classes: StudioClass[];
   closures: StudioClosure[];
   agreements: StudioAgreement[];
+  agreementsPlanBlocked?: boolean;
   disciplines: { id: string; name: string }[];
   compatibility: { classId: string; roomId: string; allowed: boolean; writable: boolean }[];
   availability: Record<string, AvailabilityDraft>;
@@ -711,62 +712,72 @@ export function StudioView({
           <Card>
             <CardHeader>
               <h2 className="text-base font-semibold">{t(($) => $.studio.agreementsTitle)}</h2>
-              <p className="text-[13px] text-muted-foreground">
-                {t(($) => $.studio.agreementsDescription)}{" "}
-                <AriaLink href={earningsHref} className="underline underline-offset-2">
-                  {t(($) => $.studio.earnings)}
-                </AriaLink>
-                {t(($) => $.studio.settingsSuffix)}
-              </p>
+              {!data.agreementsPlanBlocked && (
+                <p className="text-[13px] text-muted-foreground">
+                  {t(($) => $.studio.agreementsDescription)}{" "}
+                  <AriaLink href={earningsHref} className="underline underline-offset-2">
+                    {t(($) => $.studio.earnings)}
+                  </AriaLink>
+                  {t(($) => $.studio.settingsSuffix)}
+                </p>
+              )}
             </CardHeader>
             <CardContent>
-              <Table aria-label={t(($) => $.studio.agreementsTitle)}>
-                <TableHeader>
-                  <TableHead isRowHeader>{t(($) => $.studio.instructor)}</TableHead>
-                  <TableHead>{t(($) => $.studio.model)}</TableHead>
-                  <TableHead>{t(($) => $.studio.fee)}</TableHead>
-                  <TableHead>{t(($) => $.studio.effective)}</TableHead>
-                  <TableHead>{t(($) => $.studio.version)}</TableHead>
-                  <TableHead>{t(($) => $.studio.weeklyEstimate)}</TableHead>
-                </TableHeader>
-                <TableBody items={data.agreements} renderEmptyState={() => empty}>
-                  {(item) => (
-                    <TableRow id={item.id}>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          className="h-auto px-0 py-0 text-sm font-normal"
-                          onPress={() => setSelection({ kind: "agreement", id: item.id })}
-                        >
-                          <span className="grid gap-0.5 text-left">
-                            <span>{item.instructor}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {item.instructor.trim().split(/\s+/).length > 1
-                                ? `${item.instructor.trim().split(/\s+/)[0]} ${item.instructor.trim().split(/\s+/).at(-1)?.[0] ?? ""}.`
-                                : item.instructor}
+              {data.agreementsPlanBlocked ? (
+                <Alert>
+                  <AlertDescription>{t(($) => $.studio.agreementsPlanBlocked)}</AlertDescription>
+                </Alert>
+              ) : (
+                <Table aria-label={t(($) => $.studio.agreementsTitle)}>
+                  <TableHeader>
+                    <TableHead isRowHeader>{t(($) => $.studio.instructor)}</TableHead>
+                    <TableHead>{t(($) => $.studio.model)}</TableHead>
+                    <TableHead>{t(($) => $.studio.fee)}</TableHead>
+                    <TableHead>{t(($) => $.studio.effective)}</TableHead>
+                    <TableHead>{t(($) => $.studio.version)}</TableHead>
+                    <TableHead>{t(($) => $.studio.weeklyEstimate)}</TableHead>
+                  </TableHeader>
+                  <TableBody items={data.agreements} renderEmptyState={() => empty}>
+                    {(item) => (
+                      <TableRow id={item.id}>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            className="h-auto px-0 py-0 text-sm font-normal"
+                            onPress={() => setSelection({ kind: "agreement", id: item.id })}
+                          >
+                            <span className="grid gap-0.5 text-left">
+                              <span>{item.instructor}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {item.instructor.trim().split(/\s+/).length > 1
+                                  ? `${item.instructor.trim().split(/\s+/)[0]} ${item.instructor.trim().split(/\s+/).at(-1)?.[0] ?? ""}.`
+                                  : item.instructor}
+                              </span>
                             </span>
-                          </span>
-                        </Button>
-                      </TableCell>
-                      <TableCell>{item.model}</TableCell>
-                      <TableCell>{item.fee}</TableCell>
-                      <TableCell>{item.effective}</TableCell>
-                      <TableCell>{item.version}</TableCell>
-                      <TableCell>{item.weeklyEstimate ?? "—"}</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                          </Button>
+                        </TableCell>
+                        <TableCell>{item.model}</TableCell>
+                        <TableCell>{item.fee}</TableCell>
+                        <TableCell>{item.effective}</TableCell>
+                        <TableCell>{item.version}</TableCell>
+                        <TableCell>{item.weeklyEstimate ?? "—"}</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
             <CardFooter className="flex-wrap justify-between gap-3">
-              <span className="text-xs text-muted-foreground">
-                {t(($) => $.studio.newVersionHint)}
-              </span>
+              {!data.agreementsPlanBlocked && (
+                <span className="text-xs text-muted-foreground">
+                  {t(($) => $.studio.newVersionHint)}
+                </span>
+              )}
               <Button
                 variant="outline"
                 size="sm"
-                isDisabled={state !== "ready"}
+                isDisabled={state !== "ready" || data.agreementsPlanBlocked}
                 onPress={() => setSelection({ kind: "agreement" })}
               >
                 {t(($) => $.studio.prepareAgreement)}

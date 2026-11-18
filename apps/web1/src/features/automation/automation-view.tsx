@@ -67,7 +67,7 @@ export function AutomationView({
   automations: AutomationRow[] | null;
   segments: SegmentRow[] | null;
   jobs: AutomationJobRow[] | null;
-  onAdd: () => void;
+  onAdd?: () => void;
   onEdit: (id: string) => void;
   onSegment: (id: string) => void;
   onToggle: (id: string, enabled: boolean) => void;
@@ -97,7 +97,7 @@ export function AutomationView({
           </p>
         </div>
         {tab !== "jobs" && (
-          <Button isDisabled={locked} onPress={onAdd}>
+          <Button isDisabled={locked || !onAdd} onPress={onAdd}>
             {tab === "segments" ? t(($) => $.automation.addSegment) : t(($) => $.automation.add)}
           </Button>
         )}

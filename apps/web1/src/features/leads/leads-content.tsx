@@ -38,7 +38,9 @@ export function LeadsContent({
   const [tab, setTab] = useState<LeadTab>("board"),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState(""),
-    [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
+    [cursors, setCursors] = useState<({ token: string; pipeline: boolean } | undefined)[]>([
+      undefined,
+    ]),
     [index, setIndex] = useState(0),
     [appCursors, setAppCursors] = useState<(string | undefined)[]>([undefined]),
     [appIndex, setAppIndex] = useState(0),
@@ -116,7 +118,8 @@ export function LeadsContent({
       filters,
       cursors[index],
     ],
-    queryFn: () => readLeadsPage(scope, query, cursors[index], filters),
+    queryFn: () =>
+      readLeadsPage(scope, query, cursors[index]?.token, filters, cursors[index]?.pipeline),
     enabled: Boolean(current),
     retry: false,
   });
@@ -172,6 +175,9 @@ export function LeadsContent({
       void router.invalidate();
   }, [leads.error, assignees.error, tasks.error, applications.error, router]);
   const data = leads.isError && !preservePending ? undefined : leads.data;
+  const advanced = (data?.pipelineAvailable ?? cursors[index]?.pipeline) !== false;
+  const activeTab = !advanced && tab === "board" ? "list" : tab;
+
   const date = (instant: string) =>
     new Intl.DateTimeFormat("tr-TR", {
       dateStyle: "medium",
@@ -226,12 +232,13 @@ export function LeadsContent({
           late: data?.summary ? String(data.summary.overdue_followups) : null,
           converted: data?.summary ? String(data.summary.converted_last_30_days) : null,
         }}
-        tab={tab}
+        tab={activeTab}
+        advanced={advanced}
         onTab={(value) => {
           if (!locked) setTab(value);
         }}
         search={search}
-        onSearch={tab === "board" || tab === "list" ? setSearch : undefined}
+        onSearch={activeTab === "board" || activeTab === "list" ? setSearch : undefined}
         owner={tab === "tasks" && followupKind !== "manual" ? "" : owner}
         owners={owners}
         onOwner={
@@ -281,7 +288,7 @@ export function LeadsContent({
         }
         disabled={locked || !current}
         onSelect={(id) => select(id)}
-        onStage={(id, stage) => select(id, "stage", stage)}
+        onStage={advanced ? (id, stage) => select(id, "stage", stage) : undefined}
         onAdd={!leads.isError && current ? () => setTarget(null) : undefined}
         notice={
           <>
@@ -318,8 +325,11 @@ export function LeadsContent({
               isDisabled={locked || leads.isFetching || leads.isError || !data?.next_cursor}
               onPress={() => {
                 const next = data?.next_cursor;
-                if (next) {
-                  setCursors([...cursors.slice(0, index + 1), next]);
+                if (next && data) {
+                  setCursors([
+                    ...cursors.slice(0, index + 1),
+                    { token: next, pipeline: data.pipelineAvailable },
+                  ]);
                   setIndex(index + 1);
                 }
               }}
@@ -339,6 +349,7 @@ export function LeadsContent({
         tasks={
           <div className="flex flex-col gap-3">
             <LeadFollowupPicker
+              advanced={advanced}
               value={followupKind}
               disabled={locked}
               onChange={(value) => {
@@ -535,6 +546,7 @@ export function LeadsContent({
           scope={scope}
           target={target}
           catalog={data?.pipeline_catalog}
+          advanced={advanced}
           owners={owners}
           assignmentWritable={
             canReview && assignees.isSuccess && !assignees.isFetching && !assignees.isError

@@ -1,6 +1,6 @@
 import type { FailureEnvelope } from "../src/lib/api-contracts/generated.js";
 import { test, expect } from "./test.js";
-import { scanAccessibility } from "./accessibility.js";
+import { expectEmptyActionCell, scanAccessibility } from "./accessibility.js";
 import { origin, captureAuth, mockNative } from "./auth-fixture.js";
 import { mockStudio, studioIds } from "./studio-fixture.js";
 
@@ -192,12 +192,18 @@ test("session pages preserve provider IDs, label intent retries and selected rev
   expect(calls.labelKeys).toHaveLength(4);
   expect(calls.labelKeys[3]).not.toBe(calls.labelKeys[2]);
   calls.rejectNextRevoke = true;
-  await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
+  const revokeButton = page.getByRole("button", { name: "Oturumu kapat", exact: true });
+  const target = await revokeButton.boundingBox();
+  expect(target?.width).toBeGreaterThanOrEqual(24);
+  expect(target?.height).toBeGreaterThanOrEqual(24);
+  await revokeButton.click();
   await expect(page.getByText("Oturum kapatma doğrulanamadı.", { exact: false })).toBeVisible();
   await expect(page.getByText("Final fixture phone", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
   await expect(page.getByText("Final fixture phone", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
+  const current = page.getByRole("row").filter({ hasText: "Bu cihaz" });
+  await expectEmptyActionCell(current.getByRole("gridcell").last());
   expect(calls.revokeKeys).toHaveLength(2);
   expect(calls.revokeKeys[1]).toBe(calls.revokeKeys[0]);
   expect(errors).toEqual([]);
@@ -265,6 +271,8 @@ test("fresh password requiring TOTP uses the canonical MFA route before others c
   await page.getByRole("button", { name: "Yeni giriş yaptım", exact: true }).click();
   await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  const current = page.getByRole("row").filter({ hasText: "Bu cihaz" });
+  await expectEmptyActionCell(current.getByRole("gridcell").last());
   expect(calls.othersKeys).toHaveLength(1);
   expect(errors).toEqual([]);
 });
@@ -489,11 +497,26 @@ test("native Google linking returns through the existing callback and selected u
     .click();
   await expect(page.getByRole("button", { name: "Google ile bağla", exact: true })).toBeEnabled();
   expect(calls.identityUnlink).toBe(removals);
+  expect(errors).toEqual([]);
+});
+
+test("the last Google login method stays protected with a long provider email", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
   calls.identityEmail = `${"a".repeat(63)}@${"b".repeat(50)}.example.invalid`;
   calls.onlyGoogleIdentity = true;
   await page.reload();
   await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
   await expect(page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true })).toBeDisabled();
+  expect(calls.identityUnlink).toBe(0);
   await captureAuth(page, "e10-google-last-long-email", testInfo);
   expect(errors).toEqual([]);
 });

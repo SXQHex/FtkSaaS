@@ -54,7 +54,67 @@ test("reports fresh checked results and Axe facts without claiming manual accept
     violations: [],
     incomplete: ["color-contrast", "aria-valid-attr-value"],
     browserFollowUp: ["aria-valid-attr-value"],
+    emptyGridChecks: 0,
+    emptyActionCellChecks: 0,
+    gridButtonChecks: 0,
   });
+});
+
+test("an empty-grid check resolves only its measured Axe targets for browser follow-up", () => {
+  const checked = structuredClone(browser);
+  const scan = {
+    evaluatedConformanceRules: ["th-has-data-cells"],
+    violations: [],
+    manualReview: [{ id: "th-has-data-cells", targets: [["#empty"]] }],
+    emptyGridChecks: [{ selector: "#empty", columns: 4, columnSpan: 4, hasPlaceholder: true }],
+  };
+  const summarize = () => {
+    checked.suites[0].specs[0].tests[0].results[0].attachments = [
+      {
+        name: "WCAG-2.2-AA-scan-summary",
+        body: Buffer.from(JSON.stringify(scan)).toString("base64"),
+      },
+    ];
+    return summarizeVerification(steps, unit, checked).axe;
+  };
+  const proof = summarize();
+  assert.deepEqual(proof.incomplete, ["th-has-data-cells"]);
+  assert.deepEqual(proof.browserFollowUp, []);
+  assert.equal(proof.emptyGridChecks, 1);
+
+  scan.manualReview[0].targets.push(["#unmeasured"]);
+  assert.deepEqual(summarize().browserFollowUp, ["th-has-data-cells"]);
+  scan.emptyGridChecks[0].columnSpan = 3;
+  assert.equal(summarize().emptyGridChecks, 0);
+});
+
+test("an empty action cell measurement applies only to its exact target without removing Axe results", () => {
+  const checked = structuredClone(browser);
+  const scan = {
+    evaluatedConformanceRules: ["target-size"],
+    violations: ["target-size"],
+    manualReview: [{ id: "target-size", targets: [["#empty"]] }],
+    gridTargetChecks: [{ selector: "#empty", check: "empty-action" }],
+  };
+  const summarize = () => {
+    checked.suites[0].specs[0].tests[0].results[0].attachments = [
+      {
+        name: "WCAG-2.2-AA-scan-summary",
+        body: Buffer.from(JSON.stringify(scan)).toString("base64"),
+      },
+    ];
+    return summarizeVerification(steps, unit, checked).axe;
+  };
+  assert.deepEqual(summarize().browserFollowUp, []);
+  assert.deepEqual(summarize().incomplete, ["target-size"]);
+  assert.deepEqual(summarize().violations, ["target-size"]);
+  assert.equal(summarize().emptyActionCellChecks, 1);
+
+  scan.manualReview[0].targets.push(["#live-control"]);
+  assert.deepEqual(summarize().browserFollowUp, ["target-size"]);
+  scan.gridTargetChecks.push({ selector: "#live-control", check: "button-size" });
+  assert.deepEqual(summarize().browserFollowUp, []);
+  assert.equal(summarize().gridButtonChecks, 1);
 });
 
 test("a failed or unexecuted gate cannot be hidden by old successful test reports", () => {

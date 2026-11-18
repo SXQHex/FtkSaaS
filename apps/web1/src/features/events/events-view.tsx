@@ -61,7 +61,7 @@ export function EventsView({
     registrations: string | null;
     unpaid: string | null;
   };
-  onAdd: () => void;
+  onAdd?: () => void;
   onOpen: (id: string) => void;
   notice?: ReactNode;
   pagination?: ReactNode;
@@ -75,7 +75,7 @@ export function EventsView({
           <h1 className="text-2xl font-semibold">{t(($) => $.events.title)}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t(($) => $.events.description)}</p>
         </div>
-        <Button onPress={onAdd} isDisabled={locked}>
+        <Button onPress={onAdd} isDisabled={locked || !onAdd}>
           {t(($) => $.events.add)}
         </Button>
       </header>

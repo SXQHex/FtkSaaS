@@ -4707,6 +4707,7 @@ export default interface Resources {
       "agreementVersionChoice": "Sürüm {{version}} · {{discipline}} · {{format}}",
       "agreements": "Anlaşmalar",
       "agreementsDescription": "Ücret modeli sürümlüdür. Yeni sürüm yalnızca yürürlük tarihinden sonra kapanan seansları etkiler. Ödemeler",
+      "agreementsPlanBlocked": "Bu planda eğitmen ücret anlaşmaları kullanılamaz.",
       "agreementsTitle": "Eğitmen anlaşmaları",
       "all": "Tümü",
       "allEntitlements": "Bütün hak türleri",

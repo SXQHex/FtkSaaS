@@ -16,19 +16,35 @@ export async function readLeadsPage(
   query: string,
   cursor?: string,
   filters: LeadFilters = {},
+  includePipeline = true,
 ) {
-  const page = await (
-    await scopedBackend(scope)
-  ).call("leads_list_v1", {
-    ...base(scope),
-    request_id: uuidv7(),
-    include_pipeline: true,
-    include_details: true,
-    include_summary: true,
-    ...(query.trim() ? { query: query.trim() } : {}),
-    ...(filters.stage ? { stage_key: filters.stage } : {}),
-    ...(filters.assignedTo !== undefined ? { assigned_to: filters.assignedTo } : {}),
-    page: { limit: 20, sort: "created_at_desc", ...(cursor ? { cursor } : {}) },
+  const backend = await scopedBackend(scope);
+  const read = (pipeline: boolean) =>
+    backend.call("leads_list_v1", {
+      ...base(scope),
+      request_id: uuidv7(),
+      ...(pipeline ? { include_pipeline: true } : {}),
+      include_details: true,
+      include_summary: true,
+      ...(query.trim() ? { query: query.trim() } : {}),
+      ...(filters.stage ? { stage_key: filters.stage } : {}),
+      ...(filters.assignedTo !== undefined ? { assigned_to: filters.assignedTo } : {}),
+      page: { limit: 20, sort: "created_at_desc", ...(cursor ? { cursor } : {}) },
+    });
+  let pipelineAvailable = includePipeline;
+  const page = await read(pipelineAvailable).catch((error: unknown) => {
+    if (
+      !pipelineAvailable ||
+      cursor ||
+      filters.stage ||
+      filters.assignedTo !== undefined ||
+      !(error instanceof BackendError) ||
+      error.code !== "PLAN_FEATURE_UNAVAILABLE"
+    )
+      throw error;
+    // A basic cursor belongs to the basic projection. Never replay an advanced cursor here.
+    pipelineAvailable = false;
+    return read(false);
   });
   const ids = new Set<string>();
   for (const row of page.items) {
@@ -45,7 +61,7 @@ export async function readLeadsPage(
     z.number().int().nonnegative().safe().parse(value);
   if (page.summary.total < page.items.length || (cursor && cursor === page.next_cursor))
     throw new Error("LEAD_PAGE_UNAVAILABLE");
-  return page;
+  return { ...page, pipelineAvailable };
 }
 export async function readLeadAssignees(scope: ClientScope, cursor?: string) {
   const page = await (

@@ -109,6 +109,14 @@ test("forbidden event directory stays unread and does not claim an empty program
   ).toBeVisible();
   await expect(page.getByText("Bu kapsamda görünür etkinlik yok.", { exact: true })).toHaveCount(0);
 });
+test("Starter event plan denial disables creation on the direct directory route", async ({
+  page,
+}) => {
+  const state = await mockEvents(page, "starter");
+  await expect(page.getByRole("button", { name: "Etkinlik ekle", exact: true })).toBeDisabled();
+  await expect(page.getByText(/Etkinlik kaynağı okunamadı/)).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+});
 test("new package practice draft uses an external unlimited venue and never consumes a lesson right", async ({
   page,
 }) => {

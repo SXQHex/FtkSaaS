@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import type { LeadMode, LeadDraft } from "./lead-draft";
 export function LeadSheet({
   mode,
+  advanced = true,
   name,
   draft,
   onDraft,
@@ -50,6 +51,7 @@ export function LeadSheet({
   trialContent,
 }: {
   mode: LeadMode;
+  advanced?: boolean;
   offsets?: { id: string; label: string }[];
   submitLabel?: string;
   assignmentWritable?: boolean;
@@ -277,10 +279,12 @@ export function LeadSheet({
                     onDraft?.({ ...draft, due: event.target.value, dueOffset: "", reviewed: false })
                   }
                   aria-invalid={Boolean(errors?.due)}
-                  aria-describedby="lead-due-error"
+                  aria-describedby={errors?.due ? "lead-due-hint lead-due-error" : "lead-due-hint"}
                 />
                 <FieldError id="lead-due-error">{errors?.due}</FieldError>
-                <FieldDescription>{t(($) => $.leads.timezoneHint)}</FieldDescription>
+                <FieldDescription id="lead-due-hint">
+                  {t(($) => $.leads.timezoneHint)}
+                </FieldDescription>
               </Field>
               {offsets.length > 0 && (
                 <Field>
@@ -409,17 +413,19 @@ export function LeadSheet({
         {mode === "edit" && name && (
           <>
             <div className="flex flex-wrap gap-2">
-              {(["activity", "offer", "confirm", "convert"] as const).map((action) => (
-                <Button
-                  key={action}
-                  variant="outline"
-                  size="sm"
-                  isDisabled={locked || !onMode}
-                  onPress={() => onMode?.(action)}
-                >
-                  {t(($) => $.leads.modes[action])}
-                </Button>
-              ))}
+              {(["activity", "offer", "confirm", "convert"] as const)
+                .filter((action) => advanced || action === "activity")
+                .map((action) => (
+                  <Button
+                    key={action}
+                    variant="outline"
+                    size="sm"
+                    isDisabled={locked || !onMode}
+                    onPress={() => onMode?.(action)}
+                  >
+                    {t(($) => $.leads.modes[action])}
+                  </Button>
+                ))}
             </div>
             {history}
           </>

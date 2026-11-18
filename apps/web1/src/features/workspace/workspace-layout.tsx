@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
-import { readWorkspace } from "./workspace";
+import { readWorkspace, workspaceRoles } from "./workspace";
 import { workspaceQuery } from "./workspace-query";
 import { workspaceNavigation, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
@@ -102,15 +102,12 @@ export function WorkspaceLayout({
   useEffect(() => {
     onResolved?.({ organizationId: resolvedOrganizationId, centerId });
   }, [onResolved, resolvedOrganizationId, centerId]);
-  const roles =
-    view?.roles.filter(
-      (role) => role.scope_center_id === null || role.scope_center_id === centerId,
-    ) ?? [];
+  const roles = workspaceRoles(view, centerId);
   const modes: NavigationView[] = [];
-  if (roles.some((role) => ["owner", "org_manager", "center_manager", "staff"].includes(role.role)))
+  if (roles.some((role) => ["owner", "org_manager", "center_manager", "staff"].includes(role)))
     modes.push("management");
   const instructor =
-    roles.some((role) => role.role === "instructor") ||
+    roles.includes("instructor") ||
     Boolean(
       view?.selected?.self_context?.centers.some(
         (center) => center.center_id === centerId && center.instructor,
@@ -125,7 +122,7 @@ export function WorkspaceLayout({
         ? "instructor"
         : (modes[0] ?? "account");
   const groups = workspaceNavigation(mode, view?.selected?.id, centerId);
-  const roleNames = roles.map((role) => t(($) => $.workspace.roles[role.role]));
+  const roleNames = roles.map((role) => t(($) => $.workspace.roles[role]));
   if (instructor) roleNames.push(t(($) => $.workspace.roles.instructor));
   const roleLabel = roleNames.length
     ? [...new Set(roleNames)].join(", ")

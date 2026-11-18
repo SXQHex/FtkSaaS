@@ -17,6 +17,7 @@ export async function mockLeads(
     staff?: boolean;
     personDenied?: boolean;
     unboundManager?: boolean;
+    starter?: boolean;
   } = {},
 ) {
   const studio = await mockStudio(page);
@@ -136,7 +137,8 @@ export async function mockLeads(
     if (operation === "leads_list_v1") {
       expect(req.org_id).toBe(I.org);
       expect(req.center_id).toBe(I.center);
-      expect(req.include_pipeline).toBe(true);
+      if (options.starter && req.include_pipeline) return reject("PLAN_FEATURE_UNAVAILABLE");
+      if (!options.starter) expect(req.include_pipeline).toBe(true);
       if (denied) return reject();
       expect(req.include_details).toBe(true);
       expect(req.include_summary).toBe(true);
@@ -152,6 +154,7 @@ export async function mockLeads(
         ...list(
           visible.map((lead) => ({
             ...lead,
+            ...(options.starter ? { pipeline: undefined } : {}),
             created_at: "2026-11-16T10:00:00Z",
             display_name: people.get(lead.person_id)!.display_name,
             assigned_name: lead.assigned_to
@@ -159,7 +162,7 @@ export async function mockLeads(
               : null,
           })),
         ),
-        pipeline_catalog: catalog,
+        ...(options.starter ? {} : { pipeline_catalog: catalog }),
         summary: {
           total: visible.length,
           open_leads: visible.filter((row) => row.state === "open").length,

@@ -11,9 +11,10 @@ export async function mockMemberAccount(
     denied?: boolean;
     stale?: boolean;
     serviceReady?: boolean;
+    starter?: boolean;
   } = {},
 ) {
-  await mockOwnReservations(page);
+  await mockOwnReservations(page, { starter: options.starter });
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   const links: PersonalCalendarLink[] = [],
     writes: { operation: string; request: Record<string, unknown> }[] = [],
@@ -148,11 +149,15 @@ export async function mockMemberAccount(
         items: [],
         next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",
-        reminder_email_preference: { enabled: email, version: emailVersion, available: true },
+        reminder_email_preference: {
+          enabled: email,
+          version: emailVersion,
+          available: !options.starter,
+        },
         email_preference: {
           enabled: transactionalEmail,
           version: transactionalVersion,
-          available: true,
+          available: !options.starter,
         },
       });
     if (operation === "notification_preferences_set_v1") {

@@ -56,6 +56,24 @@ test("instructor today and weekly navigation retain center scope and open only t
   expect(state.reads).not.toContain("entitlements_get_v1");
   await expect(page.getByRole("button", { name: "Üye ekle", exact: true })).toHaveCount(0);
 });
+test("Starter instructor opens an assigned lesson from the daily panel after role plan denial", async ({
+  page,
+}) => {
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    instructor: true,
+    starterRoleGate: true,
+  });
+  await page.getByRole("button", { name: "Bugünkü derslerime dön", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
+  await page.getByRole("button", { name: /Sentetik seans/ }).click();
+  await expect(page).toHaveURL(
+    `${origin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`,
+  );
+  await expect(page.getByText("Atanmış salon", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Stüdyo", exact: true })).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+});
 test("instructor selects actual start, explicitly marks, closes and corrects without member finance reads", async ({
   page,
 }) => {

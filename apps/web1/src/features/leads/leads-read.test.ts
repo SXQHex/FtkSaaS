@@ -181,3 +181,50 @@ it("does not replace a forbidden student name with a private or invented identit
   expect(page.items[0].name).toBeUndefined();
   expect(call).toHaveBeenCalledTimes(2);
 });
+
+it("opens the basic Starter directory after explicit pipeline denial and keeps its cursor on basic reads", async () => {
+  const denied = new BackendError({
+    code: "PLAN_FEATURE_UNAVAILABLE",
+    retryable: false,
+    trace_id: id(9),
+  });
+  const basicPage = {
+    items: [],
+    next_cursor: "basic-next",
+    summary: {
+      total: 0,
+      open_leads: 0,
+      followups_today: 0,
+      overdue_followups: 0,
+      converted_last_30_days: 0,
+    },
+  };
+  call
+    .mockRejectedValueOnce(denied)
+    .mockResolvedValueOnce(basicPage)
+    .mockResolvedValueOnce({ ...basicPage, next_cursor: null });
+  const first = await readLeadsPage(scope, " Tango ");
+  expect(first.pipelineAvailable).toBe(false);
+  expect(call.mock.calls[0]![1].include_pipeline).toBe(true);
+  expect(call.mock.calls[1]![1]).not.toHaveProperty("include_pipeline");
+  expect(call.mock.calls[1]![1]).toMatchObject({
+    query: "Tango",
+    include_details: true,
+    include_summary: true,
+  });
+  await readLeadsPage(scope, "Tango", first.next_cursor!, {}, first.pipelineAvailable);
+  expect(call.mock.calls[2]![1]).not.toHaveProperty("include_pipeline");
+  expect(call.mock.calls[2]![1]).toMatchObject({ page: { cursor: "basic-next" } });
+});
+
+it("keeps stage filters and pipeline-bound cursors on their original projection", async () => {
+  const denied = new BackendError({
+    code: "PLAN_FEATURE_UNAVAILABLE",
+    retryable: false,
+    trace_id: id(9),
+  });
+  call.mockRejectedValue(denied);
+  await expect(readLeadsPage(scope, "", undefined, { stage: "talk" })).rejects.toBe(denied);
+  await expect(readLeadsPage(scope, "", "pipeline-cursor")).rejects.toBe(denied);
+  expect(call).toHaveBeenCalledTimes(2);
+});

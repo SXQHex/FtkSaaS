@@ -32,7 +32,12 @@ export function summarizeVerification(steps, unit, browser) {
     if (value.name === "WCAG-2.2-AA-scan-summary" && value.body) {
       const scan = JSON.parse(Buffer.from(value.body, "base64").toString("utf8"));
       if (
-        ![scan.evaluatedConformanceRules, scan.violations, scan.manualReview].every(Array.isArray)
+        ![scan.evaluatedConformanceRules, scan.violations, scan.manualReview].every(
+          Array.isArray,
+        ) ||
+        [scan.emptyGridChecks, scan.gridTargetChecks].some(
+          (checks) => checks !== undefined && !Array.isArray(checks),
+        )
       )
         throw new Error("Invalid Axe attachment");
       scans.push(scan);
@@ -50,6 +55,55 @@ export function summarizeVerification(steps, unit, browser) {
   const incomplete = [
     ...new Set(scans.flatMap((scan) => scan.manualReview.map((rule) => rule.id))),
   ];
+  const browserFollowUp = new Set();
+  let emptyGridChecks = 0;
+  let emptyActionCellChecks = 0;
+  let gridButtonChecks = 0;
+  for (const scan of scans) {
+    const checkedTables = new Set(
+      (scan.emptyGridChecks ?? [])
+        .filter(
+          (check) =>
+            typeof check?.selector === "string" &&
+            check.hasPlaceholder === true &&
+            Number.isInteger(check.columns) &&
+            check.columns > 0 &&
+            check.columnSpan === check.columns,
+        )
+        .map((check) => check.selector),
+    );
+    const checkedActions = new Map(
+      (scan.gridTargetChecks ?? [])
+        .filter(
+          (row) =>
+            typeof row?.selector === "string" &&
+            row.selector.startsWith("#") &&
+            row.selector.length > 1 &&
+            ["empty-action", "button-size"].includes(row.check),
+        )
+        .map(({ selector, check }) => [selector, check]),
+    );
+    emptyGridChecks += checkedTables.size;
+    for (const check of checkedActions.values()) {
+      if (check === "empty-action") emptyActionCellChecks++;
+      else gridButtonChecks++;
+    }
+    const checkedTargets = new Map([
+      ["th-has-data-cells", checkedTables],
+      ["target-size", checkedActions],
+    ]);
+    for (const rule of scan.manualReview) {
+      const measured = checkedTargets.get(rule.id);
+      const checked =
+        measured &&
+        Array.isArray(rule.targets) &&
+        rule.targets.length > 0 &&
+        rule.targets.every(
+          (target) => Array.isArray(target) && target.length === 1 && measured.has(target[0]),
+        );
+      if (measurableAxeRules.has(rule.id) && !checked) browserFollowUp.add(rule.id);
+    }
+  }
   return {
     status,
     ...(reportError ? { reportError } : {}),
@@ -61,7 +115,10 @@ export function summarizeVerification(steps, unit, browser) {
         : 0,
       violations: [...new Set(scans.flatMap((scan) => scan.violations))],
       incomplete,
-      browserFollowUp: incomplete.filter((rule) => measurableAxeRules.has(rule)),
+      browserFollowUp: [...browserFollowUp],
+      emptyGridChecks,
+      emptyActionCellChecks,
+      gridButtonChecks,
     },
   };
 }
@@ -95,6 +152,9 @@ async function save(report) {
     `Axe: ${report.axe?.scans ?? 0} scans; minimum ${report.axe?.minimumRules ?? 0} rules; violations: ${report.axe?.violations.join(", ") || "none reported"}.`,
     `Incomplete Axe findings: ${report.axe?.incomplete.join(", ") || "see individual reports"}.`,
     `Candidates for explicit browser checks: ${report.axe?.browserFollowUp.join(", ") || "none in this run"}.`,
+    `Empty grid placeholders verified in the browser: ${report.axe?.emptyGridChecks ?? 0}.`,
+    `Empty action grid cells verified in the browser: ${report.axe?.emptyActionCellChecks ?? 0}.`,
+    `Grid buttons verified in the browser: ${report.axe?.gridButtonChecks ?? 0}.`,
     "",
     "Selected tests do not prove full-suite acceptance. Native/hosted acceptance and full WCAG compliance are not granted by this report.",
     "Axe attachments may include expected negative policy checks; test assertions remain authoritative.",

@@ -74,6 +74,20 @@ test("student cancellation validates reason and rereads the actual cancelled res
   await expect(page.getByRole("button", { name: /^İptal et —/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Yeniden oku", exact: true })).toBeFocused();
 });
+test("Starter student keeps their own cancellable reservation after role plan denial", async ({
+  page,
+}) => {
+  const state = await mockOwnReservations(page, { starter: true });
+  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");
+  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^İptal et —/ })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Stüdyo", exact: true })).toHaveCount(0);
+});
 test("student cancellation unknown outcome reads receipt without a second writer", async ({
   page,
 }) => {

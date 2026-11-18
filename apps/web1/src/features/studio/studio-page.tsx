@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { readWorkspace } from "../workspace/workspace";
+import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { StudioView, type StudioViewData } from "./studio-view";
@@ -194,7 +194,7 @@ function StudioContent({
   const canReadPlan =
     !workspace.isError &&
     workspace.data?.selected?.id === scope.orgId &&
-    Boolean(workspace.data.roles.some((role) => role.role === "owner" && role.state === "active"));
+    workspaceRoles(workspace.data, scope.centerId).includes("owner");
   const query = useQuery({
     queryKey: ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan],
     queryFn: () => readStudioSnapshot(scope, canReadPlan),

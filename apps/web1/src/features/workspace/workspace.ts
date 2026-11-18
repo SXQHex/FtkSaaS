@@ -24,6 +24,7 @@ export async function readWorkspace(accountId: string, organizationId?: string) 
     const page = await backend.call("organizations_list_v1", {
       client_api_version: 1,
       request_id: uuidv7(),
+      include_self_management_scope: true,
       page: { limit: 50, ...(cursor ? { cursor } : {}) },
     });
     organizations.push(...page.items);
@@ -62,12 +63,61 @@ export async function readWorkspace(accountId: string, organizationId?: string) 
           cursor = page.next_cursor ?? undefined;
         } while (cursor);
       } catch (error) {
-        // The role registry is a management reader, not a self-role endpoint.
-        // Instructor/student scope remains authoritative in self_context.
-        if (!(error instanceof BackendError) || error.code !== "FORBIDDEN") throw error;
+        if (!(error instanceof BackendError)) throw error;
+        const ownScopeAvailable =
+          selected.self_management_scope !== undefined ||
+          selected.self_context?.centers.some(
+            (self) =>
+              (self.instructor || self.student) &&
+              centers.some((center) => center.id === self.center_id),
+          );
+        if (
+          error.code !== "FORBIDDEN" &&
+          !(error.code === "PLAN_FEATURE_UNAVAILABLE" && ownScopeAvailable)
+        )
+          throw error;
+        // The denied directory contributes no roles. Native own scope remains authoritative.
         roles.length = 0;
       }
     }
   }
   return { organizations, selected, centers, roles };
+}
+
+type Workspace = Awaited<ReturnType<typeof readWorkspace>>;
+
+function isManagementRole(role: RoleView["role"]) {
+  return role === "owner" || role === "org_manager" || role === "center_manager";
+}
+
+export function workspaceRoles(view: Workspace | undefined, centerId?: string) {
+  if (
+    !view?.selected ||
+    (centerId && !view.centers.some((center) => center.id === centerId && center.accessible))
+  )
+    return [];
+  const roles = view.roles.flatMap((role) =>
+    role.state === "active" &&
+    role.person_id === view.selected?.self_context?.person_id &&
+    (role.scope_center_id === null || role.scope_center_id === centerId)
+      ? [role.role]
+      : [],
+  );
+  const scope = view.selected.self_management_scope;
+  if (scope === undefined) return roles;
+  // Null is the server's explicit absence of own management scope.
+  const result: RoleView["role"][] = roles.filter((role) => !isManagementRole(role));
+  if (scope?.owner === true) result.push("owner");
+  if (scope?.org_manager === true) result.push("org_manager");
+  if (
+    centerId &&
+    Array.isArray(scope?.managed_center_ids) &&
+    scope.managed_center_ids.includes(centerId)
+  )
+    result.push("center_manager");
+  return result;
+}
+
+export function hasWorkspaceManagementScope(view: Workspace | undefined, centerId: string) {
+  return workspaceRoles(view, centerId).some(isManagementRole);
 }
