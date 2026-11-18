@@ -66,6 +66,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Açık](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
 | W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Açık](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
 | W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Açık](#w1-be-57--bildirim-arşivi-ve-silme). |
+| W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Açık](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
 
 ## Bütün talepler için ortak sınır
 
@@ -487,3 +488,9 @@ Yönetilebilir kanonik adresi, adres değişimi sonrası eski bağlantının dur
 **Açık · backend değerlendirmesi.** Gelen kutusu çiziminde arşivleme, silme, toplu seçim ve bunları geri alma bulunuyor. `notifications_read_set_v1` yalnız seçilen bildirimlerin okundu/okunmadı durumunu değiştiriyor. Web1 okuma değişikliğini doğrulanan sürümlerle geri alabiliyor. Arşiv ve silme için yayımlanmış liste durumu veya yazma işlemi yok. [Güncel çizim](../read-only/tasarim-v2/index.html#L682) · [WF11](../../../docs/workflows.md#wf11).
 
 Kendi alıcı kapsamındaki seçilmiş bildirimler için arşiv, silme, görünürlük ve geri alma kurallarını değerlendirin. Saklama politikası, sürüm çakışması, atomik toplu seçim, aynı işlem niyetinin tekrar güvenliği ve filtre sayaçları açıklanmalı. Bildirim görünürlüğü değiştiğinde kaynak işin durumu korunmalı.
+
+## W1-BE-58 · Fatura vergi bilgileri ve geçmişi
+
+**Açık · backend değerlendirmesi.** Web1 organizasyon ayarlarının `billing_name`, `billing_address` ve `billing_email` alanlarını sürüm denetimli okuyup yazıyor. Çizimde bunlara ek olarak vergi dairesi, vergi kimliği ve kesilmiş fatura geçmişi var. `subscription_get_v1` abonelik ve ödeme koşullarını sağlıyor. Kesilmiş fatura, fatura dosyası ve ilave vergi alanları için yayımlanmış sözleşme bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/index.html#L987) · [WF17](../../../docs/workflows.md#wf17).
+
+Vergi alanlarının ürün kapsamını ve erişim kurallarını, yayımlanmış faturaların değişmez kimliği ve yetkili geçmiş/dosya keşfiyle birlikte değerlendirin. Düzenlenen organizasyon bilgilerinin kesilmiş bir faturaya etkisi ayrı tanımlanmalı. Kart işlemleri mevcut ürün kapsamı dışındadır.

@@ -1423,8 +1423,12 @@
         "description": "Güncel plan, dönem ve kullanım limitleri."
       },
       "plan-1": {
-        "title": "Fatura ve ödeme",
-        "description": "Ödeme yöntemi ve geçmiş faturalar."
+        "title": "Abonelik ödemesi",
+        "description": "Geçerli abonelik koşulları ve havale bildirimi."
+      },
+      "plan-billing": {
+        "title": "Fatura bilgileri",
+        "description": "Organizasyonun fatura için kayıtlı unvanı, adresi ve e-postası."
       },
       "plan-2": {
         "title": "Aboneliği iptal et",
@@ -1436,6 +1440,9 @@
       }
     },
     "fields": {
+      "billing-name": "Fatura unvanı",
+      "billing-address": "Fatura adresi",
+      "billing-email": "Fatura e-postası",
       "ay-ad": "Stüdyo adı",
       "ay-sube": "Şube",
       "ay-tel": "Telefon",

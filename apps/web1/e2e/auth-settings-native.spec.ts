@@ -201,6 +201,46 @@ test("program duration changes only the reviewed center setting and survives a f
     .selectOption("organization");
   await expect(duration).toHaveValue("45");
 });
+test("V07.1 reviews organization billing fields and reloads the saved values without a center write", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
+  await scope.selectOption("organization");
+  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  const form = page.getByRole("form", { name: "Fatura bilgileri", exact: true });
+  const name = form.getByRole("textbox", { name: "Fatura unvanı" });
+  const address = form.getByRole("textbox", { name: "Fatura adresi" });
+  const email = form.getByRole("textbox", { name: "Fatura e-postası" });
+  await expect(name).toHaveValue("Sentetik kuruluş");
+  await name.fill("Örnek Atölye");
+  await address.fill("Örnek Sokak\nAnkara");
+  await email.clear();
+  await name.press("Enter");
+  await expect(page.getByRole("dialog")).toContainText("Örnek Atölye");
+  expect(f.writes).toHaveLength(0);
+  const review = await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes).toHaveLength(1);
+  expect(f.writes[0]).toMatchObject({
+    op: "settings_update_v1",
+    r: { scope: "organization", org_id: I.org, expected_version: 1 },
+  });
+  expect(f.writes[0]?.r).not.toHaveProperty("center_id");
+  expect(f.writes[0]?.r.patch).toEqual({
+    billing_name: "Örnek Atölye",
+    billing_address: "Örnek Sokak\nAnkara",
+    billing_email: null,
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.reload();
+  await scope.selectOption("organization");
+  await expect(name).toHaveValue("Örnek Atölye");
+  await expect(address).toHaveValue("Örnek Sokak\nAnkara");
+  await expect(email).toHaveValue("");
+  await scope.selectOption("center");
+  await expect(form).toHaveCount(0);
+});
 test("E42 saves an automation preparation and restores the organization source with live scope", async ({
   page,
 }) => {

@@ -335,6 +335,29 @@ export const settingsLayout = [
         fields: [],
       },
       {
+        key: "plan-billing",
+        fields: [
+          {
+            key: "billing-name",
+            kind: "text",
+            readonly: false,
+            disabled: false,
+          },
+          {
+            key: "billing-address",
+            kind: "text",
+            readonly: false,
+            disabled: false,
+          },
+          {
+            key: "billing-email",
+            kind: "email",
+            readonly: false,
+            disabled: false,
+          },
+        ],
+      },
+      {
         key: "plan-2",
         fields: [],
       },

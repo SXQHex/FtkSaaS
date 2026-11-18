@@ -174,6 +174,9 @@ const patchSchema = z
     program_duration_minutes: z.number().int().min(1).max(2147483647).optional(),
     contact_phone: z.string().max(100).optional(),
     contact_email: z.union([z.email().max(320), z.null()]).optional(),
+    billing_name: z.string().max(1000).optional(),
+    billing_address: z.string().max(1000).optional(),
+    billing_email: z.email().max(320).nullable().optional(),
     primary_color: z
       .string()
       .regex(/^#[0-9a-fA-F]{6}$/)
@@ -297,7 +300,10 @@ export async function settingsDocumentIntent(
         .strict()
         .parse(logo);
   }
-  if (level === "center" && keys.some((key) => key.endsWith("_color")))
+  if (
+    level === "center" &&
+    keys.some((key) => key.endsWith("_color") || key.startsWith("billing_"))
+  )
     throw Error("SETTINGS_PATCH_UNAVAILABLE");
   return {
     scope: { ...scope },

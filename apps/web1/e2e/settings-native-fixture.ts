@@ -21,6 +21,9 @@ export async function mockSettingsCompletion(
     values: {
       organization: {
         address: "Sentetik adres",
+        billing_name: "Sentetik kuruluş",
+        billing_address: "Sentetik fatura adresi",
+        billing_email: "billing@example.invalid",
         program_duration_minutes: 45,
         program_templates: [],
         event_templates: [],
@@ -184,7 +187,9 @@ export async function mockSettingsCompletion(
           "event_templates",
           "automation_templates",
           "crm_templates",
-          ...(r.scope === "organization" ? ["billing_name"] : []),
+          ...(r.scope === "organization"
+            ? ["billing_name", "billing_address", "billing_email"]
+            : []),
           "public_profile_enabled",
           "public_fields",
           "public_application_form",

@@ -235,7 +235,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 ### V07 · Ayarlar, Starter ve yaşam döngüsü
 
-- [ ] **V07.1** · E12/E42'nin ekip/izinler, plan, havale, fatura alanı, organizasyon yaşam döngüsü ve merkez adı görsellerini mevcut ayar/action desteğiyle eşle. Hesap sahibi/platform sahibi ayrımını ve silme/kapama önizlemelerini koru. Eksik yeni alanın backend sözleşmesini kaydet.
+- [ ] **V07.1** · E12/E42 ekip, plan, havale, merkez adı ve organizasyon yaşam döngüsü mevcut yetki ve kaynak komutlarına bağlı. Fatura unvanı, adresi ve e-postası organizasyon ayarından okunur, sürümlü değişiklik onaylandıktan sonra yeniden doğrulanır. Statik derleme, 52 ayar birim testi ve tek Chromium işçisiyle seri ayar/yaşam döngüsü paketi 22/22 geçti. Vergi alanları ve kesilmiş fatura geçmişi [W1-BE-58](request.md#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi) kapsamında açık.
 - [ ] **V07.2** · Yeni çizim üzerindeki Starter gizli menü/kilitli eylem/doğrudan URL reddi, tek kaynak/100üye sınırı ve dar public/CRM yüzeyini S01–S05 ile doğrula. Plan reddinde veri korunur; temel başvuru, tahsilat ve rapor gereksiz kapanmaz.
 - [ ] **V07.3** · Yeni Pro→Starter seçim görselini gerçek kept_scope ve yürürlükle bağla. S05.2’deki geçmiş koruma kanıtını kullan. Yeni arayüzün seçim, yürürlük ve ret durumlarını V08 otomatik kabulünde doğrula.
 

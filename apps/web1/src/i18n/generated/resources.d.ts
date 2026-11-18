@@ -4016,12 +4016,16 @@ export default interface Resources {
           "title": "Plan ve kullanım"
         },
         "plan-1": {
-          "description": "Ödeme yöntemi ve geçmiş faturalar.",
-          "title": "Fatura ve ödeme"
+          "description": "Geçerli abonelik koşulları ve havale bildirimi.",
+          "title": "Abonelik ödemesi"
         },
         "plan-2": {
           "description": "Dönem sonuna kadar kullanmaya devam edersin, verilerin silinmez.",
           "title": "Aboneliği iptal et"
+        },
+        "plan-billing": {
+          "description": "Organizasyonun fatura için kayıtlı unvanı, adresi ve e-postası.",
+          "title": "Fatura bilgileri"
         },
         "politika-0": {
           "description": "Üyelerin tabi olduğu kurallar. Her değişiklik yeni sürüm olarak yayımlanır ve yalnız sonraki rezervasyon ve satışlara uygulanır.",
@@ -4195,6 +4199,9 @@ export default interface Resources {
         "ay-tel": "Telefon",
         "ay-tz": "Saat dilimi",
         "ay-yoklama": "Yoklamayı kapat",
+        "billing-address": "Fatura adresi",
+        "billing-email": "Fatura e-postası",
+        "billing-name": "Fatura unvanı",
         "hs-f": "Bölüm"
       },
       "historyAll": "Tüm bölümler",
