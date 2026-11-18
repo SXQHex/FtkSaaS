@@ -14,7 +14,7 @@ import type { AccountView } from "../../lib/api-contracts/generated";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
-import { readWorkspace } from "../workspace/workspace";
+import { workspaceQuery } from "../workspace/workspace-query";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { MemberShellView } from "./member-shell-view";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
@@ -48,11 +48,7 @@ export function MemberLayout({
     [signingOut, setSigningOut] = useState(false),
     [signOutError, setSignOutError] = useState(false);
   useAccountAppearance(account.id);
-  const workspace = useQuery({
-    queryKey: ["workspace", account.id, initial.org ?? null],
-    queryFn: () => readWorkspace(account.id, initial.org),
-    retry: false,
-  });
+  const workspace = useQuery(workspaceQuery(queries, account.id, initial.org));
   const source = !workspace.isError || locked ? workspace.data : undefined;
   const org = source?.selected;
   const center = initial.center

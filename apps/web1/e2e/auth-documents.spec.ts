@@ -38,6 +38,56 @@ async function setup(
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!,
       r = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: fileId } });
+    if (op === "document_directory_get_v1") {
+      const latest = {
+        version_id: fileId,
+        version: 1,
+        version_label: "v1",
+        published_at: "2026-11-17T00:00:00Z",
+        effective_at: "2026-11-17T00:00:00Z",
+        requirements: [
+          { gate: "sale", scope: { center_ids: [I.center] }, renewed_acceptance: true },
+        ],
+      };
+      return send({
+        view: r.view,
+        items:
+          r.view === "documents" && state.published
+            ? [
+                {
+                  key: documentId,
+                  kind: "document",
+                  document_id: documentId,
+                  file_id: fileId,
+                  name: "Sentetik belge",
+                  created_at: "2026-11-17T00:00:00Z",
+                  expires_at: null,
+                  state: "published",
+                  scope: "center",
+                  read_only: false,
+                  latest_version: latest,
+                  version_count: 1,
+                  required_members: 1,
+                  pending_members: 1,
+                  acceptance_records: 0,
+                },
+              ]
+            : r.view === "versions" && state.published
+              ? [latest]
+              : [],
+        as_of: "2026-11-17T00:00:00Z",
+        next_cursor: null,
+        history_available: true,
+        summary: {
+          published_documents: state.published ? 1 : 0,
+          unpublished_files: 0,
+          pending_members: state.published ? 1 : 0,
+          total_members: state.published ? 1 : 0,
+          last_publication: state.published ? "2026-11-17T00:00:00Z" : null,
+          acceptance_records: 0,
+        },
+      });
+    }
     if (op === "document_upload_prepare_v1") {
       state.writes.push({ op, r });
       if (mode === "prepare-unknown" && !state.failed) {

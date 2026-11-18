@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ import {
   readInstructorEarningPage,
   readInstructorAccount,
 } from "./instructor-earnings-read";
+import { AgreementDocumentSheet } from "./agreement-document-sheet";
 import { InstructorEarningsView } from "./instructor-earnings-view";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
@@ -19,10 +20,42 @@ import { FieldSet } from "../../components/ui/field";
 import { AgreementTermsFields } from "../studio/agreement-terms-fields";
 import { termsDraft } from "../studio/agreement";
 import type { AgreementVersionView } from "../../lib/api-contracts/generated";
-export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
+export function InstructorEarningsContent({
+  scope,
+  onLockChange,
+  preservePending = false,
+}: {
+  scope: ClientScope;
+  onLockChange: (value: boolean) => void;
+  preservePending?: boolean;
+}) {
   const { t } = useTranslation(),
     router = useRouter();
-  const { center, identity, self } = useInstructorScope(scope);
+  const { center, identity, self } = useInstructorScope(scope, preservePending);
+  const [locked, setLocked] = useState(false);
+  const [documentAccessLost, setDocumentAccessLost] = useState(false);
+  const loseDocumentAccess = useCallback(
+    (cause: unknown) => {
+      if (
+        (cause instanceof BackendError &&
+          ["AUTH_REQUIRED", "SESSION_REVOKED", "FORBIDDEN"].includes(cause.code)) ||
+        (cause instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(cause.message))
+      ) {
+        setDocumentAccessLost(true);
+        void router.invalidate();
+        return true;
+      }
+      return false;
+    },
+    [router],
+  );
+  const changeLock = useCallback(
+    (value: boolean) => {
+      setLocked(value);
+      onLockChange(value);
+    },
+    [onLockChange],
+  );
   const personId = self?.instructor ? identity?.person_id : undefined;
   const [now] = useState(() => new Date().toISOString());
   const [selected, setSelected] = useState("all");
@@ -106,7 +139,7 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
         void router.invalidate();
     }
   }, [months.error, query.error, payments.error, agreements.error, router]);
-  if (!center || !personId)
+  if (!center || !personId || documentAccessLost)
     return (
       <div className="space-y-4 p-6">
         <h1 className="text-2xl font-semibold">{t(($) => $.instructorEarnings.title)}</h1>
@@ -156,6 +189,7 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
             {agreementRows && agreementRows.length > 1 && (
               <NativeSelect
                 aria-label={t(($) => $.instructorEarnings.agreement)}
+                disabled={locked}
                 value={agreement?.id ?? ""}
                 onChange={(event) => setAgreementId(event.target.value)}
               >
@@ -174,6 +208,9 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
                 key={agreement.id}
                 row={agreement}
                 timezone={center.timezone}
+                scope={scope}
+                onLockChange={changeLock}
+                onAccessLost={loseDocumentAccess}
               />
             ) : (
               <p>{t(($) => $.instructorEarnings.noAgreement)}</p>
@@ -328,12 +365,19 @@ export function InstructorEarningsContent({ scope }: { scope: ClientScope }) {
 function InstructorAgreementSummary({
   row,
   timezone,
+  scope,
+  onLockChange,
+  onAccessLost,
 }: {
   row: AgreementVersionView;
   timezone: string;
+  scope: ClientScope;
+  onLockChange: (value: boolean) => void;
+  onAccessLost: (cause: unknown) => boolean;
 }) {
   const { t } = useTranslation();
   const terms = useMemo(() => termsDraft(row.terms), [row.terms]);
+  const [documentOpen, setDocumentOpen] = useState(false);
   return (
     <div>
       <p>
@@ -348,6 +392,17 @@ function InstructorAgreementSummary({
           }).format(new Date(row.valid.starts_at)),
         })}
       </p>
+      <Button variant="outline" onPress={() => setDocumentOpen(true)}>
+        {t(($) => $.agreementDocument.open)}
+      </Button>
+      {documentOpen && (
+        <AgreementDocumentSheet
+          binding={{ scope, agreement: row }}
+          onLockChange={onLockChange}
+          onAccessLost={onAccessLost}
+          onClose={() => setDocumentOpen(false)}
+        />
+      )}
       <details>
         <summary className="cursor-pointer rounded-sm py-2 focus-visible:outline-2 focus-visible:outline-ring">
           {t(($) => $.instructorEarnings.agreementTerms)}

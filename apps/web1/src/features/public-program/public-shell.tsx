@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { LinkButton } from "../../components/ui/button";
@@ -36,7 +37,7 @@ export function PublicShell({
               </AvatarFallback>
             </Avatar>
           )}
-          <a
+          <AriaLink
             href={calendarHref}
             className="min-w-0 flex-1 rounded-sm focus-visible:outline-2 focus-visible:outline-ring"
           >
@@ -46,7 +47,7 @@ export function PublicShell({
             {description && (
               <span className="block break-words text-sm text-muted-foreground">{description}</span>
             )}
-          </a>
+          </AriaLink>
           <nav aria-label={t(($) => $.publicProgram.menu)} className="flex flex-wrap gap-1">
             <LinkButton href={calendarHref} variant="ghost" size="sm">
               {t(($) => $.publicProgram.program)}

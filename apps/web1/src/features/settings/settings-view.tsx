@@ -161,6 +161,7 @@ export type SettingsAction =
   | { kind: "reset"; card: SettingsCardKey }
   | {
       kind:
+        | "publicSettings"
         | "invite"
         | "discipline"
         | "room"
@@ -199,6 +200,7 @@ export interface SettingsViewProps {
   logoAccept?: string;
   resetCards?: readonly SettingsCardKey[];
   onPermission?: (personId: string, permission: string, value: boolean) => void;
+  teamActionLabel?: string;
 }
 function SettingsTable({ data, label }: { data?: SettingsTableData; label: string }) {
   const { t } = useTranslation();
@@ -225,7 +227,11 @@ function SettingsTable({ data, label }: { data?: SettingsTableData; label: strin
           {(row) => (
             <TableRow id={row.id}>
               {row.cells.map((cell, index) => (
-                <TableCell key={index} className="whitespace-normal align-top">
+                <TableCell
+                  key={index}
+                  focusMode={data?.columns[index] === "action" ? "child" : "cell"}
+                  className="py-6 whitespace-normal align-top"
+                >
                   {cell ?? t(($) => $.settings.unknown)}
                 </TableCell>
               ))}
@@ -253,6 +259,7 @@ export function SettingsView({
   logoAccept,
   resetCards,
   onPermission,
+  teamActionLabel,
   scope,
   onScope,
 }: SettingsViewProps) {
@@ -734,7 +741,7 @@ export function SettingsView({
           <TableRow id={row.id}>
             <TableCell>{row.label}</TableCell>
             {data.permissions?.people.map((person) => (
-              <TableCell key={person.id}>
+              <TableCell key={person.id} focusMode="child" className="py-6">
                 <Checkbox
                   aria-label={`${person.name}: ${row.label}`}
                   isSelected={row.values[person.id]?.value === true}
@@ -853,7 +860,18 @@ export function SettingsView({
                               onPress={() => action("invite")}
                             >
                               <PlusIcon data-icon="inline-start" />
-                              {t(($) => $.settings.invite)}
+                              {teamActionLabel ?? t(($) => $.settings.invite)}
+                            </Button>
+                          </CardAction>
+                        )}
+                        {panel.key === "yayin" && (
+                          <CardAction>
+                            <Button
+                              variant="outline"
+                              isDisabled={locked || !canAction("publicSettings")}
+                              onPress={() => action("publicSettings")}
+                            >
+                              {t(($) => $.settings.publicEditor.title)}
                             </Button>
                           </CardAction>
                         )}

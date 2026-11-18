@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 // Shared composition from the official @shadcn/login-02 page layout.
 import type { ReactNode } from "react";
 import { CalendarIcon, WalletIcon, UsersIcon } from "lucide-react";
@@ -7,10 +8,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <main className="auth-layout">
       <div className="auth-left">
-        <a href="/login" className="auth-brand">
+        <AriaLink href="/login" className="auth-brand">
           <span className="auth-logo">{t(($) => $.auth.brandInitials)}</span>
           {t(($) => $.auth.brand)}
-        </a>
+        </AriaLink>
         <div className="auth-form-position">
           <div className="auth-form-width">{children}</div>
         </div>

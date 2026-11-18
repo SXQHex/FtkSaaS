@@ -1,3 +1,4 @@
+import { WorkCalendarEditor } from "./work-calendar-editor";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -11,7 +12,13 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { SettingsView, type SettingsViewData } from "./settings-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
+import { OrganizationLifecyclePanel } from "./organization-lifecycle-panel";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
+import { SettingsPublicEditor } from "./settings-public-editor";
+import type { SettingsDocumentSource } from "./settings-document";
+import { SettingsPolicyEditor } from "./settings-policy-editor";
+import type { PolicyView } from "../../lib/api-contracts/generated";
+import { SettingsDowngradeEditor } from "./settings-downgrade-editor";
 import { SettingsUpgradeEditor } from "./settings-upgrade-editor";
 import type { SettingsUpgradeQuote } from "./settings-upgrade";
 import { SettingsChangeCancelEditor } from "./settings-change-cancel-editor";
@@ -24,6 +31,9 @@ import { useSettingsHistory } from "./use-settings-history";
 import { useSettingsRooms } from "./use-settings-rooms";
 import { useSettingsPolicies } from "./use-settings-policies";
 import { useSettingsDocument } from "./use-settings-document";
+import { useSettingsTeam } from "./use-settings-team";
+import { useSettingsNotifications } from "./use-settings-notifications";
+import type { SettingsSection } from "./settings-layout";
 import { readOrganizationSettingsCatalog } from "./settings-reader";
 
 export function SettingsContent({
@@ -129,10 +139,12 @@ function SettingsManagement({
   canCenter: boolean;
   onLockChange: (locked: boolean) => void;
 }) {
+  const [workCalendarOpen, setWorkCalendarOpen] = useState(false);
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
   const [level, setLevel] = useState<DisciplineLevel>(canCenter ? "center" : "organization");
+  const [section, setSection] = useState<SettingsSection>("genel");
   const [selection, setSelection] = useState<{ id?: string }>(),
     [locked, setLocked] = useState(false),
     [identity, setIdentity] = useState<DisciplineLevel>(),
@@ -143,7 +155,10 @@ function SettingsManagement({
     }>(),
     [period, setPeriod] = useState<SettingsSubscriptionSource>(),
     [changeCancel, setChangeCancel] = useState<SettingsSubscriptionSource>(),
-    [upgrade, setUpgrade] = useState<SettingsSubscriptionSource>();
+    [upgrade, setUpgrade] = useState<SettingsSubscriptionSource>(),
+    [downgrade, setDowngrade] = useState<SettingsSubscriptionSource>(),
+    [policy, setPolicy] = useState<PolicyView>(),
+    [publicSettings, setPublicSettings] = useState<SettingsDocumentSource>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -171,6 +186,9 @@ function SettingsManagement({
       setPeriod(undefined);
       setChangeCancel(undefined);
       setUpgrade(undefined);
+      setDowngrade(undefined);
+      setPolicy(undefined);
+      setPublicSettings(undefined);
       if (code === "FORBIDDEN") {
         void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
       } else {
@@ -220,7 +238,26 @@ function SettingsManagement({
     timezone,
     enabled: allowed,
     onAccessLost: accessLost,
+    writable,
+    locked,
+    onEdit: (value) => setPolicy(structuredClone(value)),
   });
+  const team = useSettingsTeam({
+    scope,
+    enabled: allowed && !readOnly,
+    level,
+    writable,
+    canManageManagers: canWriteOrganization,
+    visible: section === "ekip",
+    locked,
+    onLockChange: publishLock,
+    onAccessLost: accessLost,
+  });
+  const notifications = useSettingsNotifications(
+    document.source,
+    section === "bildirim" || section === "sablon",
+    locked,
+  );
   const query = useQuery({
     queryKey: [
       "settings-disciplines",
@@ -255,11 +292,32 @@ function SettingsManagement({
       void router.invalidate();
   }, [query.error, router]);
   const source = query.isError || query.isFetching ? undefined : query.data;
+  const publicValues = document.source?.document.values;
   const data: SettingsViewData = {
     ...document.data,
     ...subscription.data,
+    permissions: team.matrix,
     fields: {
       ...document.data.fields,
+      ...notifications.fields,
+      ...(publicValues?.public_profile_enabled !== undefined
+        ? {
+            "ay-py-on": { value: publicValues.public_profile_enabled, writable: false },
+            "ay-py-slug": { value: scope.orgId, writable: false },
+          }
+        : {}),
+      ...(publicValues?.public_application_form !== undefined
+        ? {
+            "ay-py-form": { value: publicValues.public_application_form !== null, writable: false },
+            "ay-py-cons": {
+              value:
+                publicValues.public_application_form?.consents
+                  .map((row) => `${row.purpose} · ${row.version}`)
+                  .join("; ") ?? "",
+              writable: false,
+            },
+          }
+        : {}),
       ...policies.fields,
       "hs-f": history.filter,
       "ay-ad": { value: organizationLabel, writable: false },
@@ -269,7 +327,23 @@ function SettingsManagement({
     brand: document.data.brand ? { ...document.data.brand, name: organizationLabel } : undefined,
     tables: {
       politika: policies.table,
-      salonlar: rooms.table,
+      ekip: team.table,
+      sablon: notifications.table,
+      salonlar: rooms.table && {
+        ...rooms.table,
+        after:
+          level === "center" &&
+          document.source?.catalog.fields.some((field) => field.key === "work_calendar") ? (
+            <Button
+              type="button"
+              variant="outline"
+              isDisabled={locked}
+              onPress={() => setWorkCalendarOpen(true)}
+            >
+              {t(($) => $.workCalendar.title)}
+            </Button>
+          ) : undefined,
+      },
       gecmis: history.table,
       ...(source
         ? {
@@ -337,6 +411,10 @@ function SettingsManagement({
       queryKey: ["settings-disciplines", scope.accountId, scope.orgId],
       refetchType: "none",
     });
+    await queries.invalidateQueries({
+      queryKey: ["schedule-sources", scope.accountId, scope.orgId],
+      refetchType: "none",
+    });
     const result = await query.refetch();
     if (result.error) throw result.error;
     await queries.invalidateQueries({
@@ -345,6 +423,17 @@ function SettingsManagement({
   }
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6">
+      {workCalendarOpen && (
+        <WorkCalendarEditor
+          key={`${scope.accountId}:${scope.orgId}:${scope.centerId}`}
+          scope={scope}
+          onClose={() => {
+            if (!locked) setWorkCalendarOpen(false);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+        />
+      )}
       {((!allowed && !(level === "organization" && organizationLoading)) || query.isError) && (
         <Alert role="alert" variant="destructive">
           <AlertDescription>
@@ -367,7 +456,13 @@ function SettingsManagement({
         </Alert>
       )}
       {document.notice}
+      {team.notice}
+      {notifications.notice}
       <SettingsView
+        section={section}
+        onSection={setSection}
+        onPermission={team.onPermission}
+        teamActionLabel={t(($) => $.settings.teamNative.addRole)}
         onField={document.onField}
         onColor={document.onColor}
         onLogo={document.onLogo}
@@ -387,10 +482,21 @@ function SettingsManagement({
         onScope={(next) => {
           if (!locked) {
             setSelection(undefined);
+            team.reset();
             setLevel(next);
           }
         }}
         availableActions={[
+          ...(team.canCreate ? ["invite" as const] : []),
+          ...(document.source?.catalog.fields.some(
+            (row) =>
+              ["public_profile_enabled", "public_fields", "public_application_form"].includes(
+                row.key,
+              ) && row.writable,
+          ) && !readOnly
+            ? ["publicSettings" as const]
+            : []),
+          ...(subscription.downgradeSource && !readOnly ? ["changePlan" as const] : []),
           ...(subscription.upgradeSource && !readOnly ? ["upgradePlan" as const] : []),
           ...(subscription.cancelSource && !readOnly ? ["cancelChange" as const] : []),
           ...(subscription.periodSource && !readOnly ? ["changePeriod" as const] : []),
@@ -410,6 +516,11 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "invite") team.create();
+          if (action.kind === "publicSettings" && document.source)
+            setPublicSettings(structuredClone(document.source));
+          if (action.kind === "changePlan" && subscription.downgradeSource)
+            setDowngrade(structuredClone(subscription.downgradeSource));
           if (action.kind === "upgradePlan" && subscription.upgradeSource)
             setUpgrade(structuredClone(subscription.upgradeSource));
           if (action.kind === "cancelChange" && subscription.cancelSource)
@@ -429,6 +540,87 @@ function SettingsManagement({
           if (action.kind === "renameCenter" && level === "center") setIdentity("center");
         }}
       />
+      {section === "plan" && level === "organization" && canOrganization && (
+        <OrganizationLifecyclePanel
+          scope={scope}
+          organizationLabel={organizationLabel}
+          locked={locked}
+          onLockChange={publishLock}
+          onSaved={async () => {
+            await Promise.all([
+              queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] }),
+              queries.invalidateQueries({
+                queryKey: ["settings-subscription", scope.accountId, scope.orgId],
+              }),
+            ]);
+          }}
+          onAccessLost={accessLost}
+        />
+      )}
+      {team.dialog}
+      {notifications.dialog}
+      {publicSettings && (
+        <SettingsPublicEditor
+          before={publicSettings}
+          onSaved={async () => {
+            await queries.invalidateQueries(
+              {
+                queryKey: [
+                  "settings-document",
+                  scope.accountId,
+                  scope.orgId,
+                  scope.centerId,
+                  level,
+                ],
+              },
+              { throwOnError: true },
+            );
+            await queries.invalidateQueries({
+              queryKey: ["settings-history", scope.accountId, scope.orgId],
+            });
+          }}
+          onClose={() => {
+            if (!locked) setPublicSettings(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+        />
+      )}
+      {policy && (
+        <SettingsPolicyEditor
+          scope={scope}
+          level={level}
+          before={policy}
+          timezone={timezone}
+          disciplines={
+            source?.items
+              .filter((row) => row.state === "active")
+              .map((row) => ({ id: row.id, name: row.name })) ?? []
+          }
+          onSaved={async () => {
+            await queries.invalidateQueries(
+              {
+                queryKey: [
+                  "settings-policies",
+                  scope.accountId,
+                  scope.orgId,
+                  scope.centerId,
+                  level,
+                ],
+              },
+              { throwOnError: true },
+            );
+            await queries.invalidateQueries({
+              queryKey: ["settings-history", scope.accountId, scope.orgId],
+            });
+          }}
+          onClose={() => {
+            if (!locked) setPolicy(undefined);
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+        />
+      )}
       {identity && (
         <SettingsIdentityEditor
           scope={scope}
@@ -441,6 +633,18 @@ function SettingsManagement({
               { queryKey: ["workspace", scope.accountId, scope.orgId] },
               { throwOnError: true },
             );
+          }}
+          onLockChange={publishLock}
+          onAccessLost={accessLost}
+        />
+      )}
+      {downgrade && (
+        <SettingsDowngradeEditor
+          before={downgrade}
+          timezone={timezone}
+          onSaved={refreshSubscription}
+          onClose={() => {
+            if (!locked) setDowngrade(undefined);
           }}
           onLockChange={publishLock}
           onAccessLost={accessLost}

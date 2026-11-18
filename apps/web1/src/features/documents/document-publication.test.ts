@@ -8,6 +8,7 @@ import {
   readComplete,
   previewPublication,
   publicationIntent,
+  writePublication,
   readPublication,
   documentReceipt,
   type PublicationIntent,
@@ -145,6 +146,49 @@ it("binds review to the exact publication target and all native protected subjec
   ]);
   call.mockResolvedValue({ ...p, scope_hash: "changed" });
   await expect(publicationIntent(target, before, true)).rejects.toThrow("DOCUMENT_PREVIEW_STALE");
+});
+it("keeps organization scope through preview, review, publish and readback", async () => {
+  const p = preview();
+  const orgTarget = { ...target, level: "organization" as const };
+  call.mockResolvedValueOnce({ preview: p, affected: [], preserves_reservations: true });
+  const before = await previewPublication(orgTarget);
+  call.mockResolvedValueOnce(p);
+  const intent = await publicationIntent(orgTarget, before, true);
+  call.mockResolvedValueOnce({ status: "succeeded" });
+  await writePublication(intent);
+  call.mockResolvedValueOnce({
+    items: [
+      {
+        exists: true,
+        state: "published",
+        entity: { type: "document_versions", id: target.fileId },
+        current: {
+          operation: "document_version_publish_v1",
+          values: {
+            document_id: id(9),
+            file_id: target.fileId,
+            version_label: target.versionLabel,
+            scope: { kind: "organization" },
+            requirements: intent.request.requirements,
+          },
+        },
+      },
+    ],
+  });
+  await expect(readPublication(intent, target.fileId)).resolves.toMatchObject({
+    documentId: id(9),
+  });
+  expect(call.mock.calls.map(([operation]) => operation)).toEqual([
+    "document_publication_preview_v1",
+    "preview_get_v1",
+    "document_version_publish_v1",
+    "management_state_get_v1",
+  ]);
+  for (const [, request] of call.mock.calls)
+    expect(request).toMatchObject({ org_id: scope.orgId, center_id: null });
+  expect(call.mock.calls[3]![1]).toMatchObject({
+    selector: { key: { file_id: target.fileId, scope: { kind: "organization" } } },
+  });
 });
 it("requires exact published native values and validates receipt operation/ref type", async () => {
   const intent: PublicationIntent = {

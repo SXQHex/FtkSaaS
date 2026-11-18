@@ -83,6 +83,7 @@ export function MemberProfileView({
   stateLabel,
   joined,
   actions,
+  studentTools,
   metrics,
   tab,
   onTab,
@@ -109,6 +110,7 @@ export function MemberProfileView({
   stateLabel: string;
   joined: string | null;
   actions: ProfileAction[];
+  studentTools?: ReactNode;
   metrics: {
     available: ProfileMetric;
     upcoming: ProfileMetric;
@@ -200,7 +202,10 @@ export function MemberProfileView({
             )}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">{buttons(headerActions)}</div>
+        <div className="flex flex-wrap gap-2">
+          {studentTools}
+          {buttons(headerActions)}
+        </div>
       </div>
       {notice}
       <div

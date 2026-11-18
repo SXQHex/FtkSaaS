@@ -1,9 +1,9 @@
 {
   "source": "packages/api-contracts/src",
-  "source_sha": "df82165d0145f8ec1a6d4c42e77249dc89c1bd82",
-  "schema_sha256": "f28bb6b90084d7260dbf02bc5884a5c3a60f400c79c1ead929c757b066e5655f",
+  "source_sha": "f31c4406c9c6b581ac501b5ded7429be8c51cf64",
+  "schema_sha256": "c286ff78dc676df17347afa5323c50a439d5320cf25f237727544d3faa5968f3",
   "files": {
-    "generated.ts": "a90bfa748ed07d824bf5071b77222fe0d20ab5298ced6503dc7288849f15c2f9",
+    "generated.ts": "cb2197a3195db42d38eccff5687b637c30b89d7e8fe9b15295211dddf58d9408",
     "operations.ts": "30b248f8fd30285ccc0d305867071da8eb5d34cba27cf7a1ceeda65661aaab25",
     "runtime.ts": "9a77edadfaa740792cd022da8426e14789fde7e0acee60855c5a06e588174abf",
     "index.ts": "690c45b2a80dfceb0bcdfec050931cc9959d69d4488dc05da40985fc5ad71bfd"

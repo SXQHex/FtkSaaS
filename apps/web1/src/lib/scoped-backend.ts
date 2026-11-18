@@ -10,7 +10,7 @@ export interface ClientScope {
 
 // Pin one native bearer across an operation and validate the domain account.
 // A stale editor must never submit its draft as a newly selected native account.
-export async function scopedBackend(scope: ClientScope) {
+export async function scopedBackend(scope: Pick<ClientScope, "accountId">) {
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error) throw error;
   if (!data.session) throw new Error("AUTH_REQUIRED");

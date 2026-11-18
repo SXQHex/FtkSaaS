@@ -1,10 +1,11 @@
 // Page composition from official @shadcn/sidebar-07.
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
 import { readWorkspace } from "./workspace";
+import { workspaceQuery } from "./workspace-query";
 import { workspaceNavigation, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
 import { BackendError } from "../../lib/backend";
@@ -55,14 +56,20 @@ export function WorkspaceLayout({
   children,
   onThemeChange,
   scopeControl,
+  scopeLocked = false,
   pageTitle,
 }: {
   accountId: string;
   name: string;
   pending: boolean;
   onSignOut: () => void;
-  children: ReactNode | ((selection: WorkspaceSelection) => ReactNode);
+  children:
+    | ReactNode
+    | ((
+        selection: WorkspaceSelection & { workspace?: Awaited<ReturnType<typeof readWorkspace>> },
+      ) => ReactNode);
   scopeControl?: WorkspaceScopeControl;
+  scopeLocked?: boolean;
   pageTitle?: string;
   onThemeChange?: () => void;
 }) {
@@ -74,11 +81,8 @@ export function WorkspaceLayout({
   const organizationId = scopeControl ? scopeControl.organizationId : localOrganizationId;
   const selectedCenterId = scopeControl ? scopeControl.centerId : localCenterId;
   const [preferredView, setPreferredView] = useState<NavigationView>();
-  const scope = useQuery({
-    queryKey: ["workspace", accountId, organizationId ?? null],
-    queryFn: () => readWorkspace(accountId, organizationId),
-    retry: false,
-  });
+  const queries = useQueryClient();
+  const scope = useQuery(workspaceQuery(queries, accountId, organizationId));
   useEffect(() => {
     const error = scope.error;
     if (
@@ -88,7 +92,7 @@ export function WorkspaceLayout({
     )
       void router.invalidate();
   }, [scope.error, router]);
-  const view = scope.isError ? undefined : scope.data;
+  const view = scope.isError && !scopeLocked ? undefined : scope.data;
   const centerId =
     (selectedCenterId && view?.centers.some((center) => center.id === selectedCenterId)
       ? selectedCenterId
@@ -128,6 +132,7 @@ export function WorkspaceLayout({
     : t(($) => $.auth.account);
   const caption = t(($) => $.workspace.views[mode]);
   const chooseMode = (value: string) => {
+    if (scopeLocked || scopeControl?.locked) return;
     if (value === "management" || value === "instructor" || value === "account")
       setPreferredView(value);
   };
@@ -137,7 +142,7 @@ export function WorkspaceLayout({
         key={accountId}
         name={name}
         pending={pending}
-        scopeLocked={scopeControl?.locked}
+        scopeLocked={scopeLocked || scopeControl?.locked}
         onSignOut={onSignOut}
         view={view}
         loading={scope.isPending}
@@ -145,7 +150,7 @@ export function WorkspaceLayout({
         onRefresh={() => void scope.refetch()}
         centerId={centerId}
         onOrganization={(id) => {
-          if (scopeControl?.locked) return;
+          if (scopeLocked || scopeControl?.locked) return;
           if (scopeControl) scopeControl.onOrganization(id);
           else {
             setOrganizationId(id);
@@ -154,7 +159,7 @@ export function WorkspaceLayout({
           setPreferredView(undefined);
         }}
         onCenter={(id) => {
-          if (scopeControl?.locked) return;
+          if (scopeLocked || scopeControl?.locked) return;
           if (scopeControl) scopeControl.onCenter(id);
           else setSelectedCenterId(id);
           setPreferredView(undefined);
@@ -194,6 +199,7 @@ export function WorkspaceLayout({
                   size="segmented"
                   selectionMode="single"
                   disallowEmptySelection
+                  isDisabled={scopeLocked || scopeControl?.locked}
                   selectedKeys={new Set([mode])}
                   aria-label={t(($) => $.workspace.viewMode)}
                   onSelectionChange={(keys) => {
@@ -250,7 +256,7 @@ export function WorkspaceLayout({
         </header>
         {view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />}
         {typeof children === "function"
-          ? children({ organizationId: resolvedOrganizationId, centerId })
+          ? children({ organizationId: resolvedOrganizationId, centerId, workspace: view })
           : children}
       </SidebarInset>
     </SidebarProvider>

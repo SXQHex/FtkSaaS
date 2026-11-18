@@ -139,7 +139,15 @@ export function ReportExportSheet({
   );
 }
 export type ImportStep = "file" | "preview" | "result" | "rows";
-export type ImportRowFilter = "all" | "problem" | "invalid" | "duplicate";
+export type ImportRowFilter =
+  | "all"
+  | "problem"
+  | "invalid"
+  | "duplicate"
+  | "pending"
+  | "valid"
+  | "applied"
+  | "failed";
 export interface ImportDisplayRow {
   id: string;
   number: string;
@@ -185,6 +193,7 @@ export function ReportImportSheet({
   canTemplate = false,
   canReadRows = false,
   canSkippedDownload = false,
+  availableFilters = ["all", "problem", "invalid", "duplicate"],
 }: {
   step: ImportStep;
   fileName: string;
@@ -215,6 +224,7 @@ export function ReportImportSheet({
   canTemplate?: boolean;
   canReadRows?: boolean;
   canSkippedDownload?: boolean;
+  availableFilters?: ImportRowFilter[];
 }) {
   const { t } = useTranslation(),
     id = useId();
@@ -313,7 +323,8 @@ export function ReportImportSheet({
                     const value = [...keys][0];
                     if (
                       !locked &&
-                      ["all", "problem", "invalid", "duplicate"].includes(String(value))
+                      typeof value === "string" &&
+                      availableFilters.includes(value as ImportRowFilter)
                     )
                       onFilter(value as ImportRowFilter);
                   }}
@@ -322,7 +333,7 @@ export function ReportImportSheet({
                   size="sm"
                   className="max-w-full flex-wrap"
                 >
-                  {(["all", "problem", "invalid", "duplicate"] as const).map((key) => (
+                  {availableFilters.map((key) => (
                     <ToggleGroupItem key={key} id={key}>
                       {t(($) => $.reports.filters[key])}
                     </ToggleGroupItem>
@@ -343,7 +354,7 @@ export function ReportImportSheet({
                     <TableBody renderEmptyState={() => <p>{t(($) => $.reports.empty)}</p>}>
                       {rows.map((row) => (
                         <TableRow key={row.id} id={row.id}>
-                          <TableCell>
+                          <TableCell focusMode={row.selectable ? "child" : "cell"} className="py-6">
                             {row.selectable ? (
                               <Checkbox
                                 aria-label={`${t(($) => $.reports.columns.row)} ${row.number}`}

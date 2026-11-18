@@ -3,6 +3,7 @@ import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   DocumentGate,
+  DocumentRequirement,
   RequestDocumentUploadPrepare,
   RequestFileUploadComplete,
   RequestDocumentVersionPublish,
@@ -25,6 +26,7 @@ export async function uploadIntent(
   scope: ClientScope,
   name: string,
   file: File,
+  level: "center" | "organization" = "center",
 ): Promise<UploadIntent> {
   const mime = z.enum(["application/pdf", "text/plain"]).parse(file.type);
   z.number().int().min(1).max(maxBytes).parse(file.size);
@@ -37,6 +39,7 @@ export async function uploadIntent(
     scope: structuredClone(scope),
     request: {
       ...common(scope),
+      ...(level === "organization" ? { center_id: null } : {}),
       operation_key: uuidv7(),
       name: z.string().trim().min(1).max(500).parse(name),
       mime,
@@ -109,6 +112,7 @@ export function completeIntent(intent: UploadIntent, upload: UploadRef): Complet
     scope: structuredClone(intent.scope),
     request: {
       ...common(intent.scope),
+      center_id: intent.request.center_id,
       operation_key: uuidv7(),
       file_id: upload.file_id,
       checksum: intent.checksum,
@@ -124,6 +128,7 @@ export async function readComplete(intent: CompleteIntent, id?: string) {
   const backend = await scopedBackend(intent.scope);
   const result = await backend.call("management_state_get_v1", {
     ...common(intent.scope),
+    center_id: intent.request.center_id,
     request_id: uuidv7(),
     operation: "file_upload_complete_v1",
     selector: { operation: "file_upload_complete_v1", key: { file_id: intent.request.file_id } },
@@ -149,6 +154,8 @@ export interface PublicationTarget {
   versionLabel: string;
   gates: DocumentGate[];
   renewedAcceptance: boolean;
+  level?: "center" | "organization";
+  baseRequirements?: DocumentRequirement[];
 }
 function publicationRequest(target: PublicationTarget) {
   if (!target.gates.length || new Set(target.gates).size !== target.gates.length)
@@ -158,15 +165,29 @@ function publicationRequest(target: PublicationTarget) {
     .parse(target.gates);
   return {
     ...common(target.scope),
+    ...(target.level === "organization" ? { center_id: null } : {}),
     file_id: z.uuid().parse(target.fileId),
     ...(target.documentId ? { document_id: z.uuid().parse(target.documentId) } : {}),
     version_label: z.string().trim().min(1).max(500).parse(target.versionLabel),
-    scope: { kind: "center" as const, center_id: target.scope.centerId },
-    requirements: gates.map((gate) => ({
-      gate,
-      scope: { center_ids: [target.scope.centerId] },
-      renewed_acceptance: target.renewedAcceptance,
-    })),
+    scope:
+      target.level === "organization"
+        ? { kind: "organization" as const }
+        : { kind: "center" as const, center_id: target.scope.centerId },
+    requirements: gates.flatMap((gate) => {
+      const existing = target.baseRequirements?.filter((row) => row.gate === gate);
+      return existing?.length
+        ? existing.map((row) => ({
+            ...structuredClone(row),
+            renewed_acceptance: target.renewedAcceptance,
+          }))
+        : [
+            {
+              gate,
+              scope: { center_ids: [target.scope.centerId] },
+              renewed_acceptance: target.renewedAcceptance,
+            },
+          ];
+    }),
   };
 }
 export type PublicationPreview = SuccessDocumentPublicationPreview["data"] & {
@@ -204,9 +225,9 @@ export async function publicationIntent(
   before: PublicationPreview,
   reviewed: boolean,
 ): Promise<PublicationIntent> {
+  const request = publicationRequest(target);
   if (
-    JSON.stringify(publicationRequest(target)) !==
-      JSON.stringify(publicationRequest(before.target)) ||
+    JSON.stringify(request) !== JSON.stringify(publicationRequest(before.target)) ||
     !reviewed ||
     before.preview.blockers.length ||
     Date.parse(before.preview.expires_at) <= Date.now()
@@ -214,7 +235,9 @@ export async function publicationIntent(
     throw Error("DOCUMENT_REVIEW_REQUIRED");
   const backend = await scopedBackend(target.scope);
   const fresh = await backend.call("preview_get_v1", {
-    ...common(target.scope),
+    client_api_version: request.client_api_version,
+    org_id: request.org_id,
+    center_id: request.center_id,
     request_id: uuidv7(),
     preview_id: before.preview.id,
   });
@@ -229,7 +252,7 @@ export async function publicationIntent(
   return {
     scope: structuredClone(target.scope),
     request: {
-      ...publicationRequest(target),
+      ...request,
       operation_key: uuidv7(),
       impact_approval: {
         preview: { id: before.preview.id, token: before.preview.token },
@@ -248,6 +271,7 @@ export async function readPublication(intent: PublicationIntent, id?: string) {
   if (id && id !== fileId) throw Error("DOCUMENT_RESULT_UNAVAILABLE");
   const result = await backend.call("management_state_get_v1", {
     ...common(intent.scope),
+    center_id: intent.request.center_id,
     request_id: uuidv7(),
     operation: "document_version_publish_v1",
     selector: {
@@ -286,8 +310,10 @@ export async function readPublication(intent: PublicationIntent, id?: string) {
   if (
     values.file_id !== fileId ||
     values.version_label !== intent.request.version_label ||
-    values.scope?.kind !== "center" ||
-    values.scope.center_id !== intent.scope.centerId ||
+    values.scope?.kind !== intent.request.scope.kind ||
+    (intent.request.scope.kind === "center" &&
+      values.scope.center_id !== intent.request.scope.center_id) ||
+    (intent.request.scope.kind === "organization" && values.scope.center_id != null) ||
     JSON.stringify(normalize(values.requirements)) !==
       JSON.stringify(normalize(intent.request.requirements)) ||
     (intent.request.document_id && values.document_id !== intent.request.document_id)

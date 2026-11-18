@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckIcon, PlusIcon, UserPlusIcon } from "lucide-react";
@@ -162,9 +163,9 @@ export function StudioView({
           <h1 className="text-2xl font-semibold">{t(($) => $.studio.title)}</h1>
           <p className="text-muted-foreground">
             {t(($) => $.studio.description)}{" "}
-            <a className="underline underline-offset-2" href={settingsHref}>
+            <AriaLink className="underline underline-offset-2" href={settingsHref}>
               {t(($) => $.studio.settings)}
-            </a>
+            </AriaLink>
             {t(($) => $.studio.settingsSuffix)}
           </p>
         </div>
@@ -712,9 +713,9 @@ export function StudioView({
               <h2 className="text-base font-semibold">{t(($) => $.studio.agreementsTitle)}</h2>
               <p className="text-[13px] text-muted-foreground">
                 {t(($) => $.studio.agreementsDescription)}{" "}
-                <a href={earningsHref} className="underline underline-offset-2">
+                <AriaLink href={earningsHref} className="underline underline-offset-2">
                   {t(($) => $.studio.earnings)}
-                </a>
+                </AriaLink>
                 {t(($) => $.studio.settingsSuffix)}
               </p>
             </CardHeader>

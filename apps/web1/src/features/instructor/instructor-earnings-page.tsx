@@ -32,8 +32,13 @@ export function InstructorEarningsRoutePage() {
       title={t(($) => $.instructorEarnings.title)}
       onScope={resolve}
     >
-      {({ scope }) => (
-        <InstructorEarningsContent key={`${scope.orgId}:${scope.centerId}`} scope={scope} />
+      {({ scope, onLockChange, preservePending }) => (
+        <InstructorEarningsContent
+          key={`${scope.orgId}:${scope.centerId}`}
+          scope={scope}
+          onLockChange={onLockChange}
+          preservePending={preservePending}
+        />
       )}
     </InstructorLayout>
   );

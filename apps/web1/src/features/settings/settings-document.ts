@@ -1,11 +1,48 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import type { SettingsImageUpload } from "../../lib/api-contracts/generated";
+import type {
+  SettingsImageUpload,
+  OrganizationSettingsValues,
+} from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 export type SettingsLevel = "organization" | "center";
 const patchSchema = z
   .object({
+    public_profile_enabled: z.boolean().optional(),
+    public_fields: z
+      .array(
+        z.enum([
+          "name",
+          "description",
+          "logo",
+          "address",
+          "contact",
+          "hours",
+          "location",
+          "website",
+        ]),
+      )
+      .max(8)
+      .refine((values) => new Set(values).size === values.length)
+      .optional(),
+    public_application_form: z
+      .object({
+        form_id: z.uuid(),
+        consents: z
+          .array(
+            z.object({
+              purpose: z.string().min(1).max(100),
+              version: z.string().min(1).max(200),
+              required: z.boolean(),
+              content_template_id: z.uuid(),
+            }),
+          )
+          .min(1)
+          .max(20),
+      })
+      .nullable()
+      .optional(),
     lesson_reminders_enabled: z.boolean().optional(),
     lesson_reminder_hours: z.union([z.literal(1), z.literal(3), z.literal(24)]).optional(),
     package_reminders_enabled: z.boolean().optional(),
@@ -32,8 +69,14 @@ const patchSchema = z
       .optional(),
   })
   .strict();
-export const parseSettingsDocumentPatch = (value: unknown) => patchSchema.parse(value);
-export type SettingsDocumentPatch = z.infer<typeof patchSchema>;
+export type SettingsDocumentPatch = Omit<
+  z.infer<typeof patchSchema>,
+  "public_fields" | "public_application_form"
+> &
+  Pick<OrganizationSettingsValues, "public_fields" | "public_application_form">;
+// The closed runtime schema checks the generated DTO's finite array bounds.
+export const parseSettingsDocumentPatch = (value: unknown): SettingsDocumentPatch =>
+  patchSchema.parse(value) as SettingsDocumentPatch;
 const common = (scope: ClientScope, level: SettingsLevel) =>
   level === "center"
     ? {
@@ -97,7 +140,7 @@ export async function settingsDocumentIntent(
   patch: SettingsDocumentPatch,
   logo?: SettingsImageUpload | null,
 ): Promise<SettingsDocumentIntent> {
-  const parsed = patchSchema.parse(patch),
+  const parsed = parseSettingsDocumentPatch(patch),
     keys = Object.keys(parsed);
   if (
     (!keys.length && logo === undefined) ||
@@ -187,6 +230,29 @@ export async function readSettingsDocumentReceipt(intent: SettingsDocumentIntent
     throw Error("SETTINGS_RECEIPT_UNAVAILABLE");
   return receipt;
 }
+function settingsFieldMatches(key: string, expected: unknown, actual: unknown) {
+  if (key === "public_fields" && Array.isArray(expected) && Array.isArray(actual))
+    return (
+      z
+        .array(z.string())
+        .parse(expected)
+        .sort((a, b) => a.localeCompare(b))
+        .join() ===
+      z
+        .array(z.string())
+        .parse(actual)
+        .sort((a, b) => a.localeCompare(b))
+        .join()
+    );
+  if (key === "public_application_form")
+    return (
+      JSON.stringify(
+        patchSchema.parse({ public_application_form: expected }).public_application_form,
+      ) ===
+      JSON.stringify(patchSchema.parse({ public_application_form: actual }).public_application_form)
+    );
+  return expected === actual;
+}
 export async function readSettingsDocumentResult(intent: SettingsDocumentIntent, id?: string) {
   if (id !== intent.scope.accountId) throw Error("SETTINGS_RESULT_UNAVAILABLE");
   const result = await readSettingsDocument(intent.scope, intent.level);
@@ -195,7 +261,7 @@ export async function readSettingsDocumentResult(intent: SettingsDocumentIntent,
     Object.entries(intent.patch).some(
       ([key, value]) =>
         !Object.prototype.hasOwnProperty.call(result.document.values, key) ||
-        Reflect.get(result.document.values, key) !== value,
+        !settingsFieldMatches(key, value, Reflect.get(result.document.values, key)),
     )
   )
     throw Error("SETTINGS_RESULT_UNAVAILABLE");
@@ -226,7 +292,12 @@ export async function settingsResetIntent(
   const original = Object.fromEntries(
     fields.map((key) => [key, Reflect.get(before.document.values, key)]),
   );
-  const intent = await settingsDocumentIntent(scope, level, before, patchSchema.parse(original));
+  const intent = await settingsDocumentIntent(
+    scope,
+    level,
+    before,
+    parseSettingsDocumentPatch(original),
+  );
   const backend = await scopedBackend(scope);
   const [first, ...rest] = fields;
   if (first === undefined) throw Error("SETTINGS_PATCH_UNAVAILABLE");
@@ -268,7 +339,11 @@ export async function settingsResetIntent(
     fields.some(
       (key) =>
         !Object.prototype.hasOwnProperty.call(preview.before, key) ||
-        Reflect.get(preview.before, key) !== Reflect.get(before.document.values, key),
+        !settingsFieldMatches(
+          key,
+          Reflect.get(before.document.values, key),
+          Reflect.get(preview.before, key),
+        ),
     )
   )
     throw Error("SETTINGS_SOURCE_UNAVAILABLE");
@@ -279,7 +354,7 @@ export async function settingsResetIntent(
     throw Error("SETTINGS_SOURCE_UNAVAILABLE");
   return {
     ...intent,
-    patch: patchSchema.parse(
+    patch: parseSettingsDocumentPatch(
       Object.fromEntries(fields.map((key) => [key, Reflect.get(preview.after, key)])),
     ),
     reset: { id: preview.id, token: preview.token },

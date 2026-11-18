@@ -1,6 +1,12 @@
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
-import { mockStudio, openStudio, studioIds } from "./studio-fixture.js";
+import {
+  mockStudio,
+  openStudio,
+  studioIds,
+  studioScheduleChoice,
+  mockStudioCalendar,
+} from "./studio-fixture.js";
 
 async function openInstructor(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
@@ -87,8 +93,20 @@ test("Studio instructor: acknowledged contact edit is not replayed when class gr
 test("Studio instructor: revocation keeps its preview and key through an unknown result", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(new Date("2026-11-18T08:00:00Z"));
   const state = await mockStudio(page);
+  state.accountLinked = true;
+  state.roles[0]!.accountAccessGranted = true;
+  await mockStudioCalendar(page);
+  const foreign = {
+    center_id: "019a7b00-0000-7000-8000-000000000901",
+    kind: "instructor" as const,
+    state: "active" as const,
+  };
+  state.people[0]!.relationships!.push(foreign);
   await openStudio(page);
+  const lifetime = await page.evaluate("performance.timeOrigin");
+  await studioScheduleChoice(page, studioIds.instructor, true);
   const sheet = await openInstructor(page);
   await sheet.getByRole("button", { name: "Eğitmen rolünü kaldır", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Eğitmen rolünü kaldır", exact: true });
@@ -115,6 +133,9 @@ test("Studio instructor: revocation keeps its preview and key through an unknown
   expect(state.writes[0]!.key).toBe(state.writes[1]!.key);
   expect(state.effects).toEqual(["role_revoke_v1"]);
   expect(state.roles[0]).toMatchObject({ active: false, version: 3 });
+  await studioScheduleChoice(page, studioIds.instructor, false);
+  expect(state.people[0]!.relationships).toContainEqual(foreign);
+  expect(await page.evaluate("performance.timeOrigin")).toBe(lifetime);
 });
 
 for (const width of [1440, 320]) {

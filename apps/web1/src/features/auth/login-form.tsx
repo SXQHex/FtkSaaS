@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 // Adapted from @shadcn/login-02 (aria-rhea), installed with shadcn 4.23.0.
 import { useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
@@ -104,7 +105,7 @@ export function LoginForm({
             >
               <div className="flex items-center justify-between gap-2">
                 <FieldLabel htmlFor="password">{t(($) => $.auth.password)}</FieldLabel>
-                <a href="/forgot-password">{t(($) => $.auth.forgot)}</a>
+                <AriaLink href="/forgot-password">{t(($) => $.auth.forgot)}</AriaLink>
               </div>
               <Input
                 id="password"
@@ -148,7 +149,7 @@ export function LoginForm({
           {t(($) => $.auth.google)}
         </Button>
         <FieldDescription className="text-center">
-          {t(($) => $.auth.noAccount)} <a href="/signup">{t(($) => $.auth.signup)}</a>
+          {t(($) => $.auth.noAccount)} <AriaLink href="/signup">{t(($) => $.auth.signup)}</AriaLink>
         </FieldDescription>
       </FieldGroup>
     </form>

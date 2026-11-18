@@ -27,7 +27,7 @@ export interface DocumentDraft {
   name: string;
   versionLabel: string;
   gates: DocumentGate[];
-  renewedAcceptance: boolean;
+  renewedAcceptance: boolean | undefined;
 }
 export interface DocumentHistoryRow {
   id: string;
@@ -50,6 +50,7 @@ export function DocumentSheet({
   onClose,
   locked = false,
   readOnly = false,
+  fixedName = false,
   errors,
   notice,
 }: {
@@ -67,6 +68,7 @@ export function DocumentSheet({
   onClose: () => void;
   locked?: boolean;
   readOnly?: boolean;
+  fixedName?: boolean;
   errors?: Partial<Record<"name" | "versionLabel" | "file" | "gates", string>>;
   notice?: ReactNode;
 }) {
@@ -140,13 +142,13 @@ export function DocumentSheet({
               id={`${id}-name`}
               name="name"
               value={draft.name}
-              readOnly={mode === "version"}
+              readOnly={mode === "version" || fixedName}
               disabled={disabled}
               aria-invalid={Boolean(errors?.name)}
               aria-describedby={errors?.name ? `${id}-name-error` : undefined}
               onChange={(e) => set("name", e.target.value)}
             />
-            {mode === "version" && (
+            {(mode === "version" || fixedName) && (
               <FieldDescription>{t(($) => $.documents.fixedName)}</FieldDescription>
             )}
             {errors?.name && <FieldError id={`${id}-name-error`}>{errors.name}</FieldError>}
@@ -218,7 +220,13 @@ export function DocumentSheet({
               <FieldLegend>{t(($) => $.documents.renewal)}</FieldLegend>
               <RadioGroup
                 aria-label={t(($) => $.documents.renewal)}
-                value={draft.renewedAcceptance ? "yes" : "no"}
+                value={
+                  draft.renewedAcceptance === undefined
+                    ? ""
+                    : draft.renewedAcceptance
+                      ? "yes"
+                      : "no"
+                }
                 isDisabled={disabled}
                 onChange={(value) => set("renewedAcceptance", value === "yes")}
               >

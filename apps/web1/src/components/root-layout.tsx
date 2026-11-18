@@ -1,7 +1,7 @@
-import { I18nProvider } from "react-aria-components";
+import { I18nProvider, RouterProvider as AriaRouterProvider } from "react-aria-components";
 import { useTranslation } from "react-i18next";
 import { lazy, Suspense } from "react";
-import { Outlet, useRouterState } from "@tanstack/react-router";
+import { Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { useAuthSession } from "../features/auth/use-auth-session";
 import { RoutePendingPage } from "../features/states/route-state-pages";
 import { NetworkNotice } from "../features/states/network-notice";
@@ -14,6 +14,7 @@ const StateGallery = isDevelopment ? lazy(() => import("../examples/state-galler
 
 export function RootLayout() {
   const { i18n } = useTranslation();
+  const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const anonymousProgram = pathname.startsWith("/public/");
   const authReady = useAuthSession(!anonymousProgram);
@@ -28,21 +29,28 @@ export function RootLayout() {
     isDevelopment && new URLSearchParams(window.location.search).has("__states_example");
   return (
     <I18nProvider locale={i18n.resolvedLanguage ?? i18n.language}>
-      <NetworkNotice />
-      <Suspense fallback={<RoutePendingPage />}>
-        {!authReady && !publicRoute ? (
-          <RoutePendingPage />
-        ) : showStates ? (
-          <StateGallery />
-        ) : showExample ? (
-          <FormPreview />
-        ) : (
-          <Outlet />
-        )}
-      </Suspense>
-      <Suspense fallback={null}>
-        <Devtools />
-      </Suspense>
+      <AriaRouterProvider
+        navigate={(href) => {
+          const url = new URL(href, window.location.href);
+          void router.navigate({ href: `${url.pathname}${url.search}${url.hash}` });
+        }}
+      >
+        <NetworkNotice />
+        <Suspense fallback={<RoutePendingPage />}>
+          {!authReady && !publicRoute ? (
+            <RoutePendingPage />
+          ) : showStates ? (
+            <StateGallery />
+          ) : showExample ? (
+            <FormPreview />
+          ) : (
+            <Outlet />
+          )}
+        </Suspense>
+        <Suspense fallback={null}>
+          <Devtools />
+        </Suspense>
+      </AriaRouterProvider>
     </I18nProvider>
   );
 }

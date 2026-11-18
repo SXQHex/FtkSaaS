@@ -522,6 +522,7 @@ export function useSettingsDocument({
     }
   }
   return {
+    source,
     data,
     onField,
     onColor,

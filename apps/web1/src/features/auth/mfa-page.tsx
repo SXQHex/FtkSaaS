@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 import { useState } from "react";
 import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
@@ -176,7 +177,7 @@ export function MfaPage() {
           </form>
         )}
         <p>
-          <a href="/login">{t(($) => $.auth.backLogin)}</a>
+          <AriaLink href="/login">{t(($) => $.auth.backLogin)}</AriaLink>
         </p>
       </div>
     </AuthLayout>
@@ -200,7 +201,7 @@ export function MfaErrorPage() {
         >
           {t(($) => $.auth.retry)}
         </Button>
-        <a href="/login">{t(($) => $.auth.backLogin)}</a>
+        <AriaLink href="/login">{t(($) => $.auth.backLogin)}</AriaLink>
       </div>
     </AuthLayout>
   );

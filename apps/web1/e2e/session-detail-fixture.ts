@@ -448,6 +448,7 @@ export async function mockSessionDetail(
   );
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   return {
+    studio,
     session,
     attendance,
     writes,

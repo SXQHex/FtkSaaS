@@ -1,5 +1,11 @@
 import { test, expect } from "./test.js";
-import { mockStudio, openStudio, studioIds } from "./studio-fixture.js";
+import {
+  mockStudio,
+  openStudio,
+  studioIds,
+  studioScheduleChoice,
+  mockStudioCalendar,
+} from "./studio-fixture.js";
 
 test("Studio enrollment: unknown person creation resumes without duplicating the person", async ({
   page,
@@ -34,9 +40,19 @@ test("Studio enrollment: unknown person creation resumes without duplicating the
 test("Studio enrollment: queued invitation grants no access until link and explicit role approval", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(new Date("2026-11-18T08:00:00Z"));
   const state = await mockStudio(page);
+  await mockStudioCalendar(page);
+  const foreign = {
+    center_id: "019a7b00-0000-7000-8000-000000000901",
+    kind: "instructor" as const,
+    state: "active" as const,
+  };
+  state.people[0]!.relationships!.push(foreign);
   state.roles[0]!.accountAccessGranted = false;
   await openStudio(page);
+  const lifetime = await page.evaluate("performance.timeOrigin");
+  await studioScheduleChoice(page, studioIds.instructor, false);
   await page.getByRole("button", { name: "Eğitmen ekle", exact: true }).click();
   let dialog = page.getByRole("dialog");
   await dialog.getByRole("radio", { name: "Mevcut kişi", exact: true }).click();
@@ -60,4 +76,8 @@ test("Studio enrollment: queued invitation grants no access until link and expli
   expect(state.effects).toEqual(["account_access_send_v1", "role_assign_v1"]);
   expect(state.roles).toHaveLength(1);
   expect(state.roles[0]).toMatchObject({ accountAccessGranted: true, version: 3 });
+  await page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await studioScheduleChoice(page, studioIds.instructor, true);
+  expect(state.people[0]!.relationships).toContainEqual(foreign);
+  expect(await page.evaluate("performance.timeOrigin")).toBe(lifetime);
 });

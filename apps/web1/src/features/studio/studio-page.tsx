@@ -156,6 +156,7 @@ function StudioContent({
 }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const queries = useQueryClient();
   const [editor, setEditor] = useState<{
     selection: StudioSheetSelection;
     snapshot: StudioSnapshot;
@@ -199,6 +200,13 @@ function StudioContent({
     queryFn: () => readStudioSnapshot(scope, canReadPlan),
     retry: false,
   });
+  async function refreshStudio() {
+    await queries.invalidateQueries({
+      queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
+      refetchType: "none",
+    });
+    return query.refetch({ throwOnError: true });
+  }
   useEffect(() => {
     const error = query.error;
     if (
@@ -272,7 +280,7 @@ function StudioContent({
           }
           onLockChange={publishLock}
           onRefresh={async () => {
-            await query.refetch({ throwOnError: true });
+            await refreshStudio();
           }}
         />
       }
@@ -289,7 +297,7 @@ function StudioContent({
               classMeta={capturedData.classes.find((item) => item.id === selection.id)}
               onLockChange={publishLock}
               onRefresh={async () => {
-                const result = await query.refetch({ throwOnError: true });
+                const result = await refreshStudio();
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
                 return result.data.resources;
               }}
@@ -318,7 +326,7 @@ function StudioContent({
               onClose={onClose}
               onLockChange={publishLock}
               onReady={async (personId, isCurrent) => {
-                const result = await query.refetch({ throwOnError: true });
+                const result = await refreshStudio();
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
                 if (!isCurrent()) return;
                 setPendingInstructor(undefined);
@@ -341,7 +349,7 @@ function StudioContent({
               onLockChange={publishLock}
               onClose={onClose}
               onRefresh={async () => {
-                const result = await query.refetch({ throwOnError: true });
+                const result = await refreshStudio();
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
                 return result.data;
               }}
@@ -368,7 +376,7 @@ function StudioContent({
               onClose={onClose}
               onLockChange={publishLock}
               onRefresh={async () => {
-                await query.refetch({ throwOnError: true });
+                await refreshStudio();
               }}
             />
           );
@@ -389,7 +397,7 @@ function StudioContent({
                 onClose={onClose}
                 onLockChange={publishLock}
                 onRefresh={async () => {
-                  await query.refetch({ throwOnError: true });
+                  await refreshStudio();
                 }}
               />
             );
@@ -407,7 +415,7 @@ function StudioContent({
               onClose={onClose}
               onLockChange={publishLock}
               onRefresh={async () => {
-                await query.refetch({ throwOnError: true });
+                await refreshStudio();
               }}
             />
           );

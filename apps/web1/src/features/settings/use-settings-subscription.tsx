@@ -100,6 +100,10 @@ export function useSettingsSubscription({
   };
   return {
     data,
+    downgradeSource:
+      source?.subscription_version && source.billing?.downgrade_options?.length
+        ? query.data
+        : undefined,
     upgradeSource:
       source?.subscription_version && source.billing?.upgrade_options?.length
         ? query.data

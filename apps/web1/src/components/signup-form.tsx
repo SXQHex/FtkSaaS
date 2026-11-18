@@ -1,3 +1,4 @@
+import { Link as AriaLink } from "react-aria-components";
 import { useTranslation } from "react-i18next";
 import { cn } from "cn";
 
@@ -65,7 +66,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             {t(($) => $.auth.signupGoogle)}
           </Button>
           <FieldDescription className="px-6 text-center">
-            {t(($) => $.auth.signupHaveAccount)} <a href="/login">{t(($) => $.auth.login)}</a>
+            {t(($) => $.auth.signupHaveAccount)}{" "}
+            <AriaLink href="/login">{t(($) => $.auth.login)}</AriaLink>
           </FieldDescription>
         </Field>
       </FieldGroup>
