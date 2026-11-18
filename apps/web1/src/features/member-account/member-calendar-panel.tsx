@@ -3,16 +3,21 @@ import { useQuery } from "@tanstack/react-query";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
-import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
-import type { PersonalCalendarMutation } from "../../lib/api-contracts/generated";
+import type {
+  PersonalCalendarCredentialMutation,
+  PersonalCalendarMutation,
+} from "../../lib/api-contracts/generated";
 import {
   readMemberCalendars,
   writeMemberCalendar,
   calendarCredential,
   type CalendarIntent,
+  type CalendarKind,
+  type CalendarScope,
 } from "./member-calendar";
 import { AccountCalendarView } from "./member-account-view";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Badge } from "../../components/ui/badge";
@@ -34,10 +39,12 @@ import {
 } from "../../components/ui/sheet";
 export function MemberCalendarPanel({
   scope,
+  kind = "lessons",
   onLockChange,
   disabled = false,
 }: {
-  scope: ClientScope;
+  scope: CalendarScope;
+  kind?: CalendarKind;
   onLockChange: (locked: boolean) => void;
   disabled?: boolean;
 }) {
@@ -58,7 +65,7 @@ export function MemberCalendarPanel({
     [copied, setCopied] = useState(false),
     [copyFailed, setCopyFailed] = useState(false);
   const executing = useRef(false),
-    ack = useRef<PersonalCalendarMutation>(undefined);
+    ack = useRef<PersonalCalendarMutation | PersonalCalendarCredentialMutation>(undefined);
   const locked = busy || notice === "unknown" || notice === "saved-unread";
   useEffect(() => {
     onLockChange(locked);
@@ -82,13 +89,15 @@ export function MemberCalendarPanel({
   async function reread() {
     const result = ack.current;
     if (!result) throw new Error("CALENDAR_ACK_REQUIRED");
+    const expectedKinds = intent?.action === "create" ? [intent.kind] : intent?.link.kinds;
     if (
       result.primary_id !== scope.accountId ||
       result.link.org_id !== scope.orgId ||
       !intent ||
+      !expectedKinds ||
       (intent.action !== "create" && result.link.id !== intent.link.id) ||
-      (intent.action === "create" &&
-        (result.link.kinds.length !== 1 || result.link.kinds[0] !== "lessons"))
+      result.link.kinds.length !== expectedKinds.length ||
+      !expectedKinds.every((item) => result.link.kinds.includes(item))
     )
       throw new Error("CALENDAR_RESULT_MISMATCH");
     const next = await query.refetch({ throwOnError: true });
@@ -96,10 +105,18 @@ export function MemberCalendarPanel({
     if (
       !current ||
       current.version < result.link.version ||
+      current.kinds.length !== expectedKinds.length ||
+      !expectedKinds.every((item) => current.kinds.includes(item)) ||
       current.state !== (intent.action === "revoke" ? "revoked" : "active")
     )
       throw new Error("CALENDAR_RESULT_UNREAD");
-    if (current.version !== result.link.version) setCredential(undefined);
+    if (
+      current.version === result.link.version &&
+      intent.action !== "revoke" &&
+      "subscription_url" in result
+    ) {
+      setCredential(calendarCredential(result.subscription_url));
+    }
     setNotice("saved");
   }
   async function execute() {
@@ -117,17 +134,8 @@ export function MemberCalendarPanel({
             return;
           }
         }
-        const result = await writeMemberCalendar(scope, intent);
-        ack.current = result;
+        ack.current = await writeMemberCalendar(scope, intent);
         setNotice("saved-unread");
-        if (
-          result.primary_id !== scope.accountId ||
-          result.link.org_id !== scope.orgId ||
-          (intent.action !== "create" && result.link.id !== intent.link.id)
-        )
-          throw new Error("CALENDAR_RESULT_MISMATCH");
-        if ("subscription_url" in result && typeof result.subscription_url === "string")
-          setCredential(calendarCredential(result.subscription_url));
       }
       await reread();
     } catch (error) {
@@ -138,6 +146,9 @@ export function MemberCalendarPanel({
         setCredential(undefined);
         setNotice("rejected");
         void router.invalidate();
+      } else if (error instanceof Error && error.message === "CALENDAR_RESULT_MISMATCH") {
+        ack.current = undefined;
+        setNotice("rejected");
       } else if (ack.current) setNotice("saved-unread");
       else if (error instanceof BackendError && error.code === "VERSION_CONFLICT")
         setNotice("stale");
@@ -176,11 +187,12 @@ export function MemberCalendarPanel({
     rotate: t(($) => $.memberAccount.calendarRotate),
     revoke: t(($) => $.memberAccount.calendarRevoke),
   };
+  const links = query.data?.links.filter((link) => link.kinds.includes(kind));
   return (
     <>
       {query.data && (
         <ItemGroup>
-          {query.data.links.map((link) => (
+          {links?.map((link) => (
             <Item role="listitem" key={link.id} size="xs">
               <ItemContent>
                 <ItemTitle>
@@ -226,7 +238,7 @@ export function MemberCalendarPanel({
       <AccountCalendarView
         notice={
           <>
-            {query.isPending && <p role="status">{t(($) => $.memberAccount.loading)}</p>}
+            {query.isPending && <MemberReadSkeleton label={t(($) => $.memberAccount.loading)} />}
             {query.isError && (
               <Alert variant="destructive">
                 <AlertDescription>
@@ -242,9 +254,7 @@ export function MemberCalendarPanel({
                 </AlertDescription>
               </Alert>
             )}
-            {query.data && !query.data.links.length && (
-              <p>{t(($) => $.memberAccount.calendarEmpty)}</p>
-            )}
+            {links?.length === 0 && <p>{t(($) => $.memberAccount.calendarEmpty)}</p>}
             {query.data && !query.data.ready && (
               <p>{t(($) => $.memberAccount.calendarUnavailable)}</p>
             )}
@@ -253,9 +263,13 @@ export function MemberCalendarPanel({
         actions={
           <Button
             isDisabled={
-              disabled || locked || query.isError || !query.data?.ready || !query.data.lessons
+              disabled ||
+              locked ||
+              query.isError ||
+              !query.data?.ready ||
+              !query.data.supportedKinds.includes(kind)
             }
-            onPress={() => select({ action: "create", key: uuidv7() })}
+            onPress={() => select({ action: "create", kind, key: uuidv7() })}
           >
             {names.create}
           </Button>
@@ -265,6 +279,7 @@ export function MemberCalendarPanel({
         isOpen={Boolean(intent)}
         onOpenChange={(open) => {
           if (!open && !locked) {
+            ack.current = undefined;
             setIntent(undefined);
             setCredential(undefined);
           }
@@ -315,9 +330,11 @@ export function MemberCalendarPanel({
         </div>
         <SheetFooter className="flex-wrap">
           <Button
+            autoFocus={intent?.action === "revoke"}
             variant="outline"
             isDisabled={locked}
             onPress={() => {
+              ack.current = undefined;
               setIntent(undefined);
               setCredential(undefined);
             }}

@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43, W1-BE-44 ve W1-BE-45 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
+18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43–46 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
 
 İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
 
@@ -54,6 +54,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | Açık. Organizasyonu olmayan hesabın kuruluma nasıl alınacağı ve ilk merkezden sonra yönetim yetkisinin nasıl açılacağı için backend sözleşmesi gerekiyor. |
 | W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Açık](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Açık](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
+| W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Açık](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 
 ## Bütün talepler için ortak sınır
 
@@ -401,3 +402,9 @@ Notun yazma ve geri okuma sözleşmesini, metin sınırlarını ve talep sahibi 
 **Açık · backend değerlendirmesi.** Çizimde eğitmen, kapanmış seansın adı, süresi, katılımcı sayısı ve hakediş hesaplanırken kullanılan anlaşma sürümünü kendi satırında görüyor. `instructor_account_get_v1(view:earnings)` seans ve anlaşma referanslarını, hesaplama türünü ve miktarını döndürüyor. Seans etiketi, süre, katılımcı sayısı ve hesaplamaya bağlı sürüm bu yanıtta yok. Hesaplama miktarının anlamı basis türüne bağlıdır. [v67 çizimi](../design-reference/revisions/2026-11-18/app.js#L3955) · [WF14](../../../docs/workflows.md#wf14).
 
 Satır bağlamının kendi hakediş okumasında güvenle dönmesini değerlendirin. Düzeltme, anlaşma sürümü değişikliği ve güncel atama kalktıktan sonraki tarihsel kayıtlar için kaynak anlamı korunmalı. Var olan self, merkez, plan ve cursor sınırlarıyla birlikte doğrulanmalı. [W1-BE-19](#w1-be-19--eğitmenin-kendi-hakediş-özeti-ve-ödeme-keşfi) mevcut okumanın sahibidir.
+
+## W1-BE-46 · Yetkili yönetici için stüdyo programı ICS aboneliği
+
+**Açık · backend değerlendirmesi.** Çizim, yöneticiye stüdyo programının takvim aboneliğini sunuyor. Yayımlanmış kişisel ICS sözleşmesinde `lessons` yalnız hesabın kendi aktif rezervasyonlarını, `duties` kendi aktif atamalarını içerir. Yönetici rolü program geneli aboneliği açmaz. [v67 çizimi](../design-reference/revisions/2026-11-18/app.js#L7187) · [WF09](../../../docs/workflows.md#wf09).
+
+Program aboneliğinin yetkili rol ve merkez kapsamını, plan kapısını, çıktıda paylaşılacak asgari alanları ve yetki geri alındığında mevcut bağlantının davranışını belirleyin. Abonelik bağlantısı yalnız yetkili oluşturma ve yenileme cevabında açılmalı. Başkasının bağlantısı ve kişisel bilgileri yöneticiye verilmemeli. Eğitmen ataması olan yönetici kendi atamalarına ait kişisel `duties` bağlantısını kullanabilir.

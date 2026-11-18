@@ -15,6 +15,9 @@ import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { getSupabaseClient } from "../../lib/supabase";
+import { MemberCalendarPanel } from "../member-account/member-calendar-panel";
+import { PersonalCalendarCard } from "../member-account/member-account-view";
+import { workspaceRoles, type readWorkspace } from "../workspace/workspace";
 
 // E10 is implemented in slices; the remaining scope is tracked in tasks/todo.md.
 export function AccountPage() {
@@ -30,8 +33,10 @@ export function AccountPage() {
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
   const [setupLocked, setSetupLocked] = useState(false);
+  const [calendarLocked, setCalendarLocked] = useState(false);
+  const accountLocked = setupLocked || calendarLocked;
   async function signOut() {
-    if (setupLocked || pending) return;
+    if (accountLocked || pending) return;
     setPending(true);
     setFailed(false);
     const { error } = await getSupabaseClient().auth.signOut({ scope: "local" });
@@ -48,13 +53,13 @@ export function AccountPage() {
     <WorkspaceLayout
       accountId={account.id}
       name={account.display_name}
-      pending={pending || setupLocked}
-      scopeLocked={setupLocked}
+      pending={pending || accountLocked}
+      scopeLocked={accountLocked}
       onSignOut={() => {
         void signOut();
       }}
       onThemeChange={
-        appearanceDisabled || setupLocked
+        appearanceDisabled || accountLocked
           ? undefined
           : () => appearanceActions.current?.toggleTheme()
       }
@@ -68,7 +73,7 @@ export function AccountPage() {
             </div>
             <Button
               variant="outline"
-              isDisabled={pending || setupLocked}
+              isDisabled={pending || accountLocked}
               onPress={() => {
                 void signOut();
               }}
@@ -93,6 +98,7 @@ export function AccountPage() {
             orientation={mobile ? "horizontal" : "vertical"}
             className="account-tabs"
             defaultSelectedKey="profile"
+            disabledKeys={calendarLocked ? ["security", "sessions"] : undefined}
           >
             <TabsList variant="sidebar" aria-label={t(($) => $.security.sections)}>
               <TabsTrigger id="profile">
@@ -113,7 +119,18 @@ export function AccountPage() {
               shouldForceMount
               className="flex flex-col gap-4 data-inert:hidden"
             >
-              <ProfilePanel accountId={account.id} />
+              <ProfilePanel accountId={account.id} disabled={calendarLocked} />
+              {organizationId && hasInstructorCalendarScope(workspace) && (
+                <PersonalCalendarCard instructor>
+                  <MemberCalendarPanel
+                    key={`${account.id}:${organizationId}`}
+                    scope={{ accountId: account.id, orgId: organizationId }}
+                    kind="duties"
+                    onLockChange={setCalendarLocked}
+                    disabled={setupLocked || pending}
+                  />
+                </PersonalCalendarCard>
+              )}
               <AppearancePanel
                 ref={appearanceActions}
                 onDisabledChange={setAppearanceDisabled}
@@ -136,6 +153,19 @@ export function AccountPage() {
         </div>
       )}
     </WorkspaceLayout>
+  );
+}
+
+function hasInstructorCalendarScope(
+  workspace: Awaited<ReturnType<typeof readWorkspace>> | undefined,
+) {
+  return workspace?.centers.some(
+    (center) =>
+      center.accessible &&
+      (workspaceRoles(workspace, center.id).includes("instructor") ||
+        workspace.selected?.self_context?.centers.some(
+          (context) => context.center_id === center.id && context.instructor,
+        )),
   );
 }
 

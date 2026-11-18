@@ -56,7 +56,7 @@ it("rejects repeated cursor metadata instead of looping or silently truncating",
 });
 it("creates only explicit own lesson links with the frozen operation key", async () => {
   call.mockResolvedValue({});
-  await writeMemberCalendar(scope, { action: "create", key: "frozen" });
+  await writeMemberCalendar(scope, { action: "create", key: "frozen", kind: "lessons" });
   expect(call).toHaveBeenCalledWith(
     "calendar_link_create_v1",
     expect.objectContaining({

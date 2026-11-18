@@ -81,23 +81,7 @@ export function MemberAccountView({
         </CardContent>
       </Card>
       {deletion}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <h2>{t(($) => $.memberAccount.calendarTitle)}</h2>
-          </CardTitle>
-          <CardDescription>{t(($) => $.memberAccount.calendarDescription)}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          {calendar}
-          <p className="text-sm text-muted-foreground">
-            {t(($) => $.memberAccount.calendarPrivacy)}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {t(($) => $.memberAccount.calendarPolling)}
-          </p>
-        </CardContent>
-      </Card>
+      <PersonalCalendarCard>{calendar}</PersonalCalendarCard>
       <Card>
         <CardHeader>
           <CardTitle>
@@ -151,6 +135,35 @@ export function AccountPreferencesView({
     </div>
   );
 }
+export function PersonalCalendarCard({
+  children,
+  instructor = false,
+}: {
+  children: ReactNode;
+  instructor?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <h2>{t(($) => $.memberAccount.calendarTitle)}</h2>
+        </CardTitle>
+        <CardDescription>
+          {instructor
+            ? t(($) => $.memberAccount.instructorCalendarDescription)
+            : t(($) => $.memberAccount.calendarDescription)}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        {children}
+        <p className="text-sm text-muted-foreground">{t(($) => $.memberAccount.calendarPrivacy)}</p>
+        <p className="text-sm text-muted-foreground">{t(($) => $.memberAccount.calendarPolling)}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function AccountCalendarView({
   credential,
   actions,

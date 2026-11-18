@@ -2085,6 +2085,7 @@ export default interface Resources {
       "emailHint": "Etkin hatırlatma türlerin için e-posta gönderimine izin ver.",
       "inApp": "Uygulama içi hatırlatmalar",
       "inAppHint": "Etkin hatırlatma türlerin için uygulama içi bildirim al.",
+      "instructorCalendarDescription": "Atandığın dersleri Google, Apple veya Outlook takviminde gör.",
       "loading": "Hesap ayarları yükleniyor…",
       "mandatory": "Zorunlu bildirimler",
       "mandatoryHint": "Rezervasyon ve iptal gibi işlem bildirimleri kapatılamaz.",

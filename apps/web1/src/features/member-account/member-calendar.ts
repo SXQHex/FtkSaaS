@@ -1,13 +1,15 @@
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { PersonalCalendarLink } from "../../lib/api-contracts/generated";
-export async function readMemberCalendars(scope: ClientScope) {
+export type CalendarScope = Pick<ClientScope, "accountId" | "orgId">;
+export type CalendarKind = PersonalCalendarLink["kinds"][number];
+export async function readMemberCalendars(scope: CalendarScope) {
   const backend = await scopedBackend(scope);
   const links: PersonalCalendarLink[] = [];
   const seen = new Set<string>();
   let cursor: string | undefined;
   let ready = false;
-  let lessons = false;
+  let supportedKinds: CalendarKind[] = [];
   do {
     const page = await backend.call("calendar_links_get_v1", {
       client_api_version: 1,
@@ -15,7 +17,7 @@ export async function readMemberCalendars(scope: ClientScope) {
       page: { limit: 50, cursor },
     });
     ready = page.service_ready;
-    lessons = page.supported_kinds.some((kind) => kind === "lessons");
+    supportedKinds = page.supported_kinds;
     for (const link of page.items) {
       if (seen.has(link.id) || !Number.isSafeInteger(link.version) || link.version < 1)
         throw new Error("CALENDAR_METADATA_UNAVAILABLE");
@@ -27,21 +29,21 @@ export async function readMemberCalendars(scope: ClientScope) {
     if (next) seen.add(`cursor:${next}`);
     cursor = next;
   } while (cursor);
-  return { links, ready, lessons };
+  return { links, ready, supportedKinds };
 }
 export type CalendarSnapshot = Awaited<ReturnType<typeof readMemberCalendars>>;
 export type CalendarIntent = { key: string } & (
-  | { action: "create" }
+  | { action: "create"; kind: CalendarKind }
   | { action: "rotate" | "revoke"; link: PersonalCalendarLink }
 );
-export async function writeMemberCalendar(scope: ClientScope, intent: CalendarIntent) {
+export async function writeMemberCalendar(scope: CalendarScope, intent: CalendarIntent) {
   const backend = await scopedBackend(scope);
   const base = { client_api_version: 1 as const, request_id: uuidv7(), operation_key: intent.key };
   if (intent.action === "create")
     return backend.call("calendar_link_create_v1", {
       ...base,
       organization_scope: { org_id: scope.orgId },
-      kinds: ["lessons"],
+      kinds: [intent.kind],
     });
   if (intent.link.org_id !== scope.orgId) throw new Error("CALENDAR_SCOPE_CHANGED");
   const selected = { ...base, link_id: intent.link.id, expected_version: intent.link.version };
