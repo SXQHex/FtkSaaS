@@ -7,6 +7,7 @@ const uid = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0"
 async function fixture(
   page: Page,
   mode: "normal" | "earnings-denied" | "no-instructor" | "list-denied" = "normal",
+  calendarReady?: Promise<void>,
 ) {
   await mockStudio(page);
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
@@ -91,6 +92,7 @@ async function fixture(
         : denied();
     if (operation === "calendar_get_v1") {
       if (calendarDenied) return denied();
+      await calendarReady;
       expect(req.resource).toEqual({ kind: "person", id: I.self });
       const starts = Date.parse(req.interval.starts_at);
       const ends = Date.parse(req.interval.ends_at);
@@ -243,12 +245,30 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
 test("instructor day reads all scoped week pages and exact monthly currencies without private member readers", async ({
   page,
 }) => {
-  const { reads } = await fixture(page);
+  const viewport = page.viewportSize()!;
+  await page.setViewportSize({ width: 320, height: 844 });
+  let releaseCalendar!: () => void;
+  const calendarReady = new Promise<void>((resolve) => {
+    releaseCalendar = resolve;
+  });
+  const { reads } = await fixture(page, "normal", calendarReady);
+  const loading = page.getByRole("progressbar", { name: "Atanmış program okunuyor…" });
+  try {
+    await expect(loading).toBeVisible();
+    await expect(page.getByText("Güncel atanmış seanslar okunamadı.", { exact: true })).toHaveCount(
+      0,
+    );
+    await expect(page.getByText("Bugün seansın yok.", { exact: true })).toHaveCount(0);
+  } finally {
+    releaseCalendar();
+  }
   await expect(page.getByText(/Atanmış salon/).first()).toBeVisible();
+  await expect(loading).toHaveCount(0);
   await expect(page.getByText("3 seans", { exact: true })).toBeVisible();
   await expect(page.getByText("2 seans", { exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik atanmış 3", { exact: true })).toBeVisible();
   await expect(page.getByText(/90\.071\.992\.547\.409,90.*1,00/)).toBeVisible();
+  await page.setViewportSize(viewport);
   await expect(
     page
       .getByRole("navigation", { name: "Ana menü", exact: true })
@@ -292,6 +312,7 @@ test("denied assigned calendar does not become an empty day", async ({ page }) =
   await expect(
     page.getByText("Güncel atanmış seanslar okunamadı.", { exact: true }).first(),
   ).toBeVisible();
+  await expect(page.getByRole("progressbar", { name: "Atanmış program okunuyor…" })).toHaveCount(0);
   await expect(page.getByText("Bugün seansın yok.", { exact: true })).toHaveCount(0);
   permitCalendar();
   await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
