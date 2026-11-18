@@ -6,7 +6,7 @@ import { formatMinorAmount } from "../../lib/money";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import type { SettingsViewData } from "./settings-view";
-import { readSettingsSubscription } from "./settings-subscription";
+import { settingsSubscriptionQuery } from "./settings-subscription";
 
 export function useSettingsSubscription({
   scope,
@@ -22,14 +22,7 @@ export function useSettingsSubscription({
   onAccessLost: (cause: unknown) => boolean;
 }) {
   const { t } = useTranslation();
-  const query = useQuery({
-    queryKey: ["settings-subscription", scope.accountId, scope.orgId],
-    queryFn: () => readSettingsSubscription(scope),
-    enabled,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  const query = useQuery({ ...settingsSubscriptionQuery(scope), enabled });
   useEffect(() => {
     if (query.error) onAccessLost(query.error);
   }, [query.error, onAccessLost]);

@@ -204,10 +204,14 @@ test("program duration changes only the reviewed center setting and survives a f
 test("V07.1 reviews organization billing fields and reloads the saved values without a center write", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   const f = await mockSettingsCompletion(page);
   const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
   await scope.selectOption("organization");
-  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  const plan = page.getByRole("tab", { name: "Plan", exact: true });
+  await plan.click();
+  await expect(plan).toHaveAttribute("aria-selected", "true");
+  await expect(plan).toBeInViewport();
   const form = page.getByRole("form", { name: "Fatura bilgileri", exact: true });
   const name = form.getByRole("textbox", { name: "Fatura unvanı" });
   const address = form.getByRole("textbox", { name: "Fatura adresi" });

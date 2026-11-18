@@ -27,7 +27,7 @@ import {
   BreadcrumbLink,
 } from "../../components/ui/breadcrumb";
 import { StateBanner } from "../states/state-view";
-import { readSettingsSubscription } from "../settings/settings-subscription";
+import { settingsSubscriptionQuery } from "../settings/settings-subscription";
 export interface WorkspaceSelection {
   organizationId?: string;
   centerId?: string;
@@ -126,13 +126,11 @@ export function WorkspaceLayout({
     !scope.isError && resolvedOrganizationId && centerId && roles.includes("owner")
       ? { accountId, orgId: resolvedOrganizationId, centerId }
       : undefined;
-  const subscription = useQuery({
-    queryKey: ["settings-subscription", accountId, ownerScope?.orgId],
-    queryFn: ownerScope ? () => readSettingsSubscription(ownerScope) : skipToken,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  const subscription = useQuery(
+    ownerScope
+      ? settingsSubscriptionQuery(ownerScope)
+      : { queryKey: ["settings-subscription-inactive", accountId], queryFn: skipToken },
+  );
   const starter =
     !!ownerScope && !subscription.isError && subscription.data?.subscription.plan === "starter";
   const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter);

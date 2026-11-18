@@ -59,7 +59,7 @@ Geliştirmede yalnız değişen dilimi aynı kontrollerle doğrulayın; kod veya
 npm run test:local -- --unit src/features/member-profile --e2e e2e/auth-member-profile.spec.ts --grep "freeze "
 ```
 
-Seçili dilim tam paket kabulü değildir. CI’da filtreler reddedilir ve bütün paket çalışır. Hızlı yerel döngü Playwright’ı iki headless worker ile çalıştırır; tam kabul zinciri kendi kontrollü worker ayarını korur. Gerçek sağlayıcı/hosted kabulü bu mock test zincirinden ayrı kalır; native ACK’li writer’lar otomatik yeniden çalıştırılmaz. TODO yalnız sonuç/engel ve rapor bağlantısını taşır; komut çıktısı dökümü tutmaz.
+Seçili dilim tam paket kabulü değildir. CI’da filtreler reddedilir ve bütün paket çalışır. Yerel Playwright koşuları tek headless Chromium işçisi kullanır. Gerçek sağlayıcı/hosted kabulü bu mock test zincirinden ayrı kalır; native ACK’li writer’lar otomatik yeniden çalıştırılmaz. TODO yalnız sonuç/engel ve rapor bağlantısını taşır; komut çıktısı dökümü tutmaz.
 
 ## Erişilebilirlik, analiz, Devtools ve form örneği
 

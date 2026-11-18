@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan            | İşlev                           | Durum                                                                     | Sonraki eylem                                                                                                           |
-| ---------- | --------------- | ------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **V08.2**  | Starter + çizim | Tam yerel kabul ve yayımlı aday | V/E kaynak bağımlılıkları kendi maddelerinde. G-STARTER.2 yayın bekliyor. | Tam yerel kabulü tek Chromium işçisiyle çalıştır. Yayımlandığında aynı aday kaynağının rota ve kapsam kabulünü doğrula. |
+| Aktif adım | Plan            | İşlev                           | Durum                                                                         | Sonraki eylem                                                               |
+| ---------- | --------------- | ------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **V08.2**  | Starter + çizim | Tam yerel kabul ve yayımlı aday | Seri tam koşu ve düzeltme doğrulamaları V08.2’de. G-STARTER.2 yayın bekliyor. | Teslim adayının tam yeşil koşusunu ve yayımlı rota/kapsam kabulünü doğrula. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -257,6 +257,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 - [x] **V08.1** · [Ekran eşlemesi](#cizim-guncellemesi), ilgili V01–V07/E47/E48 uygulama sonuçlarına, [mevcut ekran kabulüne](#sayfa-kabulu), [Pro işlevlerine](#pro) ve [Starter kanıtına](#starter) bağlı. Karşılanmayan farklar ilgili V/E satırında ve bağlı backend talebinde açık.
 - [ ] **V08.2** · Değişen alanların ilgili birim/tarayıcı paketlerini seri çalıştır. Otomatik ölçümler, yeni WCAG bulguları ve referans/uygulama görselleri raporda yer alsın. Teslim adayında filtresiz `npm run verify` ve yayımlı adayın gerekli route/kapsam kabulü yapılsın.
+      [Filtresiz yerel koşuda](../test-reports/verification.md) 841/841 birim ve tek işçiyle 572/574 Chromium testi geçti. Gece yarısına bağlı test verisi sabitlendi. SPA ölçümü Stüdyo seçicilerini Üyeler’in birleşim okumasından ayırıyor. Sahip gezinmesi, Stüdyo ve Ayarlar aboneliği aynı önbellekten okuyor. Etkilenen [regresyon paketi](../.tmp/v08-2-regressions.log) 34/34, son statik derleme ve [odaklı paket](../.tmp/v08-2-final-browser.log) 7/7 geçti. Axe taramalarındaki gerçek ihlal çıktıları negatif kontrolün beklenen bulgularıydı. Araç tarafından ölçülemeyen kurallar otomatik raporda ayrı kalır. [Görsel rapor](../.tmp/v08-visuals/report/index.html) güncel salt okunur çizim ve uygulamanın 390/1440 pikselde açık/koyu karşılaştırmalarını içerir. Tam yeşil aday koşusu ve yayımlı kabul açık.
 - [ ] **G-DESIGN** · V01–V08/E47/E48 ve önceki açık Starter kabulünün sonucunu kaydet. Kalan gerçek sağlayıcı/OS kontrolleri mevcut kullanıcı kabul/erteleme kuralına uysun. Kaynak/görsel/API değişikliği çözülmeden genel tamamlandı sonucu verme.
 
 ### Yeni ekranların envanteri

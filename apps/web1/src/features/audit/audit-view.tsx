@@ -282,8 +282,11 @@ export function AuditView({
                     {operations.map((row, index) => (
                       <div key={row.id}>
                         {index > 0 && <ItemSeparator />}
-                        <Item role="listitem" className="flex-wrap px-0">
-                          <ItemContent className="min-w-0">
+                        <Item
+                          role="listitem"
+                          className="flex-col items-start px-0 @sm:flex-row @sm:items-center"
+                        >
+                          <ItemContent className="w-full min-w-0">
                             <ItemTitle className="wrap-anywhere">{row.title}</ItemTitle>
                             <ItemDescription className="wrap-anywhere">
                               {row.context}

@@ -29,6 +29,7 @@ export async function mockSessionDetail(
     starterRoleGate?: boolean;
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
+    now?: Date;
     origins?: Parameters<typeof mockStudio>[1];
     source?: { session: SessionView; attendance: AttendanceView; reservation: ReservationView };
   } = {},
@@ -44,7 +45,7 @@ export async function mockSessionDetail(
       { operation: string; type: "sessions" | "reservations"; id: string }
     >();
   const calendarReads: Record<string, unknown>[] = [];
-  const start = Date.now() + (options.existing ? -20 : 60) * 60000;
+  const start = (options.now?.getTime() ?? Date.now()) + (options.existing ? -20 : 60) * 60000;
   const session: SessionView = options.source?.session ?? {
     id: S.session,
     class_id: I.lesson,

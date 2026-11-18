@@ -256,7 +256,9 @@ test("a denied native attendance command leaves the readable session intact", as
 test("schedule detail opens the protected session route without requiring editing policy", async ({
   page,
 }) => {
-  const state = await mockSessionDetail(page);
+  const now = new Date("2026-11-18T09:00:00Z");
+  await page.clock.setFixedTime(now);
+  const state = await mockSessionDetail(page, { now });
   await page.getByRole("link", { name: "Ders programı", exact: true }).last().click();
   await page
     .getByRole("button", { name: /Sentetik seans/ })

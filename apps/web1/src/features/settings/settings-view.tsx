@@ -1,4 +1,4 @@
-import { useCallback, useId, useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Building2Icon,
@@ -270,13 +270,6 @@ export function SettingsView({
   const [teamSection, setTeamSection] = useState("ekip-0");
   const [localSection, setLocalSection] = useState<SettingsSection>("genel");
   const current = section ?? localSection;
-  const revealSelectedTab = useCallback(
-    (element: HTMLDivElement | null) => {
-      const options = { block: "nearest", inline: "nearest", container: "nearest" } as const;
-      if (mobile) element?.scrollIntoView(options);
-    },
-    [mobile],
-  );
   const canAction = (kind: SettingsAction["kind"]) =>
     Boolean(onAction && availableActions.includes(kind));
   const action = (kind: Exclude<SettingsAction["kind"], "reset">) => onAction?.({ kind });
@@ -833,7 +826,7 @@ export function SettingsView({
           className={cn(
             "shrink-0 p-0!",
             mobile
-              ? "h-auto! min-h-14 w-full max-w-full flex-row! justify-start overflow-x-auto"
+              ? "h-auto! min-h-14 w-full max-w-full flex-row! flex-wrap justify-start"
               : "sticky top-4 w-44 self-start",
           )}
         >
@@ -843,7 +836,6 @@ export function SettingsView({
               <TabsTrigger
                 key={panel.key}
                 id={panel.key}
-                ref={panel.key === current ? revealSelectedTab : undefined}
                 isDisabled={locked}
                 className="relative min-h-9 shrink-0 data-selected:before:absolute data-selected:before:inset-y-1 data-selected:before:start-0 data-selected:before:border-s-2 data-selected:before:border-current"
               >
