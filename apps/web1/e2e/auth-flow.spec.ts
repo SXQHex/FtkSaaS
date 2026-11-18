@@ -497,11 +497,26 @@ test("native Google linking returns through the existing callback and selected u
     .click();
   await expect(page.getByRole("button", { name: "Google ile bağla", exact: true })).toBeEnabled();
   expect(calls.identityUnlink).toBe(removals);
+  expect(errors).toEqual([]);
+});
+
+test("the last Google login method stays protected with a long provider email", async ({
+  page,
+}, testInfo) => {
+  const calls = await mockNative(page);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account`);
   calls.identityEmail = `${"a".repeat(63)}@${"b".repeat(50)}.example.invalid`;
   calls.onlyGoogleIdentity = true;
   await page.reload();
   await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
   await expect(page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true })).toBeDisabled();
+  expect(calls.identityUnlink).toBe(0);
   await captureAuth(page, "e10-google-last-long-email", testInfo);
   expect(errors).toEqual([]);
 });
