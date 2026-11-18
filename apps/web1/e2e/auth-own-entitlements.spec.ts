@@ -1,7 +1,13 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import type { EntitlementView, PersonView } from "../src/lib/api-contracts/generated.js";
+import type {
+  EntitlementLedgerItem,
+  EntitlementView,
+  EventRegistrationView,
+  PersonView,
+} from "../src/lib/api-contracts/generated.js";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
+import { mockEventDetail, detailIds } from "./event-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
@@ -14,6 +20,7 @@ async function fixture(
     noCurrencies?: boolean;
     currencyDenied?: boolean;
     paymentGate?: Promise<void>;
+    eventRegistration?: EventRegistrationView;
   } = {},
 ) {
   const plan = { starter: false };
@@ -53,6 +60,16 @@ async function fixture(
       end_date: "2026-10-31",
       purchase_summary: { product_name: "Önceki Tango paketi", initial_credits: 10 },
     });
+  const assignedEvent = options.eventRegistration;
+  const eventReserve: EntitlementLedgerItem | undefined = assignedEvent && {
+    id: id(992),
+    created_at: "2026-11-14T12:00:00Z",
+    kind: "reserve",
+    quantity: 1,
+    balance_delta: 0,
+    previous_id: null,
+    source: { type: "event_registrations", id: assignedEvent.id },
+  };
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!,
       req = route.request().postDataJSON();
@@ -101,8 +118,9 @@ async function fixture(
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);
       if (denied) return reject();
+      const eventCancelled = assignedEvent?.state === "cancelled";
       const current =
-        reservations.reservations[0]?.state === "cancelled"
+        eventCancelled || reservations.reservations[0]?.state === "cancelled"
           ? rights.map((row, index) =>
               index === 0 ? { ...row, available: 4, reserved: 1, version: 2 } : row,
             )
@@ -116,6 +134,21 @@ async function fixture(
                 ...row,
                 movements: {
                   items: [
+                    ...(eventReserve
+                      ? [
+                          eventReserve,
+                          ...(eventCancelled
+                            ? [
+                                {
+                                  ...eventReserve,
+                                  id: id(993),
+                                  kind: "release",
+                                  created_at: "2026-11-15T19:00:00Z",
+                                } satisfies EntitlementLedgerItem,
+                              ]
+                            : []),
+                        ]
+                      : []),
                     {
                       id: id(req.ledger_page.cursor ? 991 : 990),
                       created_at: "2026-11-16T12:00:00Z",
@@ -201,6 +234,94 @@ test("a reservation cancellation refreshes the warm rights panel on return", asy
   await expect(track).toHaveCSS("background-image", /37\.5%.*50%/);
   await expect(page.getByText(/1,00.*borç/)).toBeVisible();
   expect(state.reservations.writes).toHaveLength(1);
+});
+
+test("event cancellation restores the same purchased right and shows one release on member reload", async ({
+  page,
+}) => {
+  const operator = await page.context().browser()!.newPage();
+  try {
+    const registration: EventRegistrationView = {
+      id: detailIds.registration,
+      person_id: I.self,
+      display_name: "Sentetik üye",
+      state: "active",
+      attendance_result: "unmarked",
+      version: 1,
+    };
+    const state = await mockEventDetail(operator);
+    state.event.registrations!.push(registration);
+    state.cancellationEffects.push({
+      entity: { type: "entitlement_allocations", id: id(994) },
+      action: "release",
+      quantity: 1,
+    });
+    const member = await fixture(page, { eventRegistration: registration });
+    const available = page.getByText("Kullanılabilir bakiye", { exact: true }).locator("..");
+    const released = page.getByRole("listitem").filter({ hasText: "Ayrılan hakkı bırakma" });
+    await expect(available.getByText("3", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Hak ayırma/).first()).toBeVisible();
+    await expect(released).toHaveCount(0);
+
+    await operator.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
+    const confirmation = operator.getByRole("alertdialog");
+    await confirmation
+      .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
+      .fill("Sentetik paketli etkinlik iptali");
+    const checked = confirmation.getByRole("checkbox", {
+      name: "İşlemi ve etkilerini inceledim, onaylıyorum.",
+      exact: true,
+    });
+    await checked.press("Space");
+    await confirmation.getByRole("button", { name: "İptal etkilerini oku", exact: true }).click();
+    await expect(confirmation.getByText("Serbest bırakma · 1", { exact: true })).toBeVisible();
+    expect(state.writes).toHaveLength(0);
+    expect(registration.state).toBe("active");
+    await checked.press("Space");
+    await confirmation.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
+    await expect(
+      confirmation.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+    ).toBeVisible();
+    expect(registration.state).toBe("cancelled");
+
+    const ledgerRead = page.waitForResponse(
+      (response) =>
+        response.url().endsWith("/entitlements_get_v1") &&
+        response.request().postDataJSON().ledger_sale_id === id(980),
+    );
+    await page.reload();
+    const result = await (await ledgerRead).json();
+    expect(result.data).toMatchObject([
+      {
+        sale_id: id(980),
+        available: 4,
+        reserved: 1,
+        movements: {
+          items: expect.arrayContaining([
+            {
+              id: id(993),
+              kind: "release",
+              source: { type: "event_registrations", id: registration.id },
+              quantity: 1,
+              balance_delta: 0,
+              created_at: "2026-11-15T19:00:00Z",
+              previous_id: null,
+            },
+          ]),
+        },
+      },
+    ]);
+    await expect(available.getByText("4", { exact: true })).toBeVisible();
+    await expect(released).toHaveCount(1);
+    await expect(released).toContainText("Ayrılan hakkı bırakma");
+    await page.reload();
+    await expect(available.getByText("4", { exact: true })).toBeVisible();
+    await expect(released).toHaveCount(1);
+    expect(state.writes.map(({ op }) => op)).toEqual(["event_cancel_apply_v1"]);
+    expect(member.reservations.writes).toHaveLength(0);
+  } finally {
+    await operator.close();
+  }
 });
 test("Starter period keeps the same confirmed reservations, attendance, purchased rights and debt", async ({
   page,

@@ -3,6 +3,7 @@ import { expect } from "@playwright/test";
 import type {
   EventPaymentPreparationView,
   EventRegistrationPaymentSummary,
+  Preview,
 } from "../src/lib/api-contracts/generated.js";
 import { mockEvents, eventId, product } from "./events-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -78,6 +79,7 @@ export async function mockEventDetail(
     unknownSent: false,
     receipts: new Map<string, { type: string; id: string }>(),
     cash: undefined as Record<string, unknown> | undefined,
+    cancellationEffects: [] as Preview["effects"],
   };
   if (options.existing) {
     const empty = {
@@ -316,24 +318,27 @@ export async function mockEventDetail(
         },
         effects:
           op === "event_cancel_preview_v1"
-            ? event.registrations!.flatMap((row) =>
-                (row.payment_summary?.debts ?? []).flatMap((debt) => [
-                  {
-                    entity: { type: "debts", id: debt.id },
-                    action: "adjust",
-                    amount_minor: debt.remaining_minor,
-                    currency: debt.currency,
-                    reason: "remaining_debt_removed",
-                  },
-                  {
-                    entity: { type: "debts", id: debt.id },
-                    action: "create",
-                    amount_minor: debt.paid_minor,
-                    currency: debt.currency,
-                    reason: "student_credit_added",
-                  },
-                ]),
-              )
+            ? [
+                ...state.cancellationEffects,
+                ...event.registrations!.flatMap((row) =>
+                  (row.payment_summary?.debts ?? []).flatMap((debt) => [
+                    {
+                      entity: { type: "debts", id: debt.id },
+                      action: "adjust",
+                      amount_minor: debt.remaining_minor,
+                      currency: debt.currency,
+                      reason: "remaining_debt_removed",
+                    },
+                    {
+                      entity: { type: "debts", id: debt.id },
+                      action: "create",
+                      amount_minor: debt.paid_minor,
+                      currency: debt.currency,
+                      reason: "student_credit_added",
+                    },
+                  ]),
+                ),
+              ]
             : [],
         blockers: [],
         expires_at: "2099-11-16T12:00:00Z",

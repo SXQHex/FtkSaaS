@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43–48 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
+18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43–49 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
 
 İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
 
@@ -57,6 +57,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Açık](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
+| W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
 
 ## Bütün talepler için ortak sınır
 
@@ -422,3 +423,9 @@ Gelen kutusu kapsamının tamamını okundu yapacak işlem için canlı alıcı 
 **Açık · backend değerlendirmesi.** Kendi organizasyon gelen kutusundaki `session_changed_for_participant` bildirimi seans kimliğini taşıyor. Bilgilendirme satırında seansın yetkili kaynak merkezi ve seans seçicisi yayımlanmıyor. Web1, seçili merkezdeki kendi rezervasyonunu seans kimliğiyle doğrulayabildiğinde hedef bağlantısını sunuyor. Başka bir merkezdeki seans, kaynak merkezi yayımlanana kadar o merkez seçildiğinde açılabiliyor. [WF11](../../../docs/workflows.md#wf11).
 
 Canlı rezervasyon, öğrenci ve merkez yetkisi geçerliyken bildirimin gerçek kaynak merkezini döndürmeyi değerlendirin. İptal edilmiş, silinmiş ya da erişim dışı kayıtta hedef kapalı kalmalı. Diğer bildirimlerin organizasyon kapsamı ve bilgilendirme durumu korunmalı. [E48](todo.md#e48--üye-bildirim-merkezi).
+
+## W1-BE-49 · Eğitmen yoklama zaman sınırı ve düzeltme isteği
+
+**Açık · backend değerlendirmesi.** Eğitmen çizimi, seans için yoklamanın ne zaman açılacağını ve kapanmış yoklamaya gerekçeli düzeltme isteği vermeyi gösteriyor. `attendance_get_v1` fiilî başlangıç, kapanış durumu, revizyon ve kayıtları sağlıyor. Yayımlanmış okuma sözleşmesinde seansa özel açma veya kapatma zaman sınırı bulunmuyor. `attendance_correct_preview_v1` ve `attendance_correct_apply_v1` düzeltme yetkisi olan operatörün işlemleri. Eğitmenin yöneticiye ilettiği ayrı isteği oluşturma ve durumunu okuma desteği bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L3885) · [WF07](../../../docs/workflows.md#wf07).
+
+Yoklama için izinli zaman aralığı varsa bu aralığın canlı politika ve yetkiyle nasıl okunacağını değerlendirin. Kapanmış yoklamada yalnız atanmış eğitmenin, seans ve kapanış revizyonuna bağlı gerekçeli isteği gönderebilmesi ve durumunu okuyabilmesi ayrı değerlendirme gerektiriyor. İsteğin kendisi yoklamayı, hakkı veya hakedişi değiştirmemeli. Yetki kaybı, değişen kapanış sürümü ve aynı anahtarla tekrar deneme doğrulanmalı.
