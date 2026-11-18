@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `a639e7f85df6bb30350f23006fb3c7552fe676916f9185c60367284d34740669`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8bc2cdd46c3e1cf364ca18ff79d0fafbcc136f947b27b93da5e8f7e552da6713`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 205. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 206. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -213,3 +213,4 @@ Sıralı migration: 205. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261118214600_organization_billing_tax.sql](../apps/backend/supabase/migrations/20261118214600_organization_billing_tax.sql) | `777089f0f8925e56ee7c88983cec1399c2f5ea2871eda4da97f92cf6d0cca75e` |
 | [20261118214700_platform_organization_suspension.sql](../apps/backend/supabase/migrations/20261118214700_platform_organization_suspension.sql) | `7bf26d3755e3667e2275a81660d7f8dadee7c6b6c0373389be51ddf108cda913` |
 | [20261118214800_audit_export_tracking_results.sql](../apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql) | `22a7dc583102741342c06530b78a21c9a113ea5bc31bb1c09c69eba869824a84` |
+| [20261118214900_tracking_media_redaction.sql](../apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql) | `4d4ec589be8b16e726254a96c207888d2f027e9059f9270e611454eb2966b2d5` |

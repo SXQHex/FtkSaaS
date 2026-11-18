@@ -7,6 +7,8 @@ Güncel taban `82a5a37deb83d7de1978d82ffba738ecf4ce12b5`. Aynı kaynak için [ma
 
 İzole loopback Supabase üzerinde 205 migration temiz uygulandı. Tek seri Node runner ile son kaynakta hedefli 9/9 test geçti ve yerel stack kapatıldı. Sözleşme, workflow, backend typecheck, 142 API birimi ve trusted CI politika karşılaştırması doğrulandı. Edge JSON yükü 4.081.566 bayt. Aday CI ve hosted kabulü ayrı izlenir.
 
+[PR #342 API-3](https://github.com/SXQHex/FtkSaaS/actions/runs/44400355798/job/135141531172), vergi filtresi eklenirken medya alanlarının takip kaydından çıkarılmasının kaybolduğunu gösterdi. 206. migration vergi filtrelerini koruyarak `logo_image` ve `photo` filtrelerini geri getirdi. Temiz loopback kurulumunda medya ve vergi senaryoları dahil tek seri runner 9/9 geçti.
+
 <a id="web1-v67-final-five"></a>
 ## Web1 v67 son beş backend talebi
 
