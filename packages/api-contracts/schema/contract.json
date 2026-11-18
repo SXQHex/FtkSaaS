@@ -5154,6 +5154,9 @@
         },
         "columns": {
           "$ref": "#/$defs/ReportDiscoveryColumns"
+        },
+        "crm_funnel": {
+          "$ref": "#/$defs/CrmFunnelSummary"
         }
       },
       "required": [
@@ -6562,6 +6565,9 @@
         },
         "summary": {
           "$ref": "#/$defs/CrmLeadSummary"
+        },
+        "pipeline_summary": {
+          "$ref": "#/$defs/CrmPipelineSummary"
         }
       },
       "required": [
@@ -14314,6 +14320,9 @@
         },
         "include_summary": {
           "type": "boolean"
+        },
+        "include_pipeline_summary": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -15302,6 +15311,9 @@
         },
         "group_by": {
           "$ref": "#/$defs/ReportPreparationGrouping"
+        },
+        "include_crm_funnel": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -42412,6 +42424,15 @@
             },
             "include_contact_intake": {
               "type": "boolean"
+            },
+            "states": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ApplicationState"
+              },
+              "minItems": 1,
+              "maxItems": 3,
+              "uniqueItems": true
             }
           },
           "required": [],
@@ -65987,6 +66008,123 @@
         "attended_count"
       ],
       "additionalProperties": false
+    },
+    "CrmStageCount": {
+      "type": "object",
+      "properties": {
+        "stage_key": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "stage_key",
+        "count"
+      ],
+      "additionalProperties": false
+    },
+    "CrmFunnelSource": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "enum": [
+            "manual",
+            "phone",
+            "whatsapp",
+            "web",
+            "website",
+            "instagram",
+            "facebook",
+            "referral",
+            "public_application",
+            "legacy_import",
+            "other"
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/Count"
+        },
+        "converted_count": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "source",
+        "count",
+        "converted_count"
+      ],
+      "additionalProperties": false
+    },
+    "CrmFunnelSummary": {
+      "type": "object",
+      "properties": {
+        "cohort_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "converted_count": {
+          "$ref": "#/$defs/Count"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmStageCount"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmFunnelSource"
+          }
+        }
+      },
+      "required": [
+        "cohort_count",
+        "converted_count",
+        "stages",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "CrmPipelineSummary": {
+      "type": "object",
+      "properties": {
+        "stages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmStageCount"
+          }
+        },
+        "trials": {
+          "type": "object",
+          "properties": {
+            "offered": {
+              "$ref": "#/$defs/Count"
+            },
+            "registered": {
+              "$ref": "#/$defs/Count"
+            },
+            "attended": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "offered",
+            "registered",
+            "attended"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "stages",
+        "trials"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -80481,7 +80619,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_leads_list"
           }
-        }
+        },
+        "runtime_limits": [
+          "include_pipeline_summary=true returns whole-center visible stage and trial counts before the selected stage and page limit, with the current search and assignee filters."
+        ]
       },
       {
         "name": "lead_save_v1",
@@ -81785,7 +81926,8 @@
         "runtime_limits": [
           "Development/test only; final source candidate/main clean required.",
           "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
-          "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
+          "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted.",
+          "include_crm_funnel=true enriches crm_conversion with authorized whole-period cohort, audited stage transitions and safe source counts."
         ]
       },
       {
@@ -114053,7 +114195,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 193,
+      "migration_count": 194,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

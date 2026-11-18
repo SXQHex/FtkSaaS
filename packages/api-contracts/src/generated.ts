@@ -1329,6 +1329,7 @@ page: Page
 columns?: ReportDiscoveryColumns
 report_order?: ReportPreparationOrder
 group_by?: ReportPreparationGrouping
+include_crm_funnel?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5185,6 +5186,10 @@ Success_document_directory_get?: SuccessDocumentDirectoryGet
 NotificationReservationSelector?: NotificationReservationSelector
 LessonRequestStudentNote?: LessonRequestStudentNote
 EarningSessionContext?: EarningSessionContext
+CrmStageCount?: CrmStageCount
+CrmFunnelSource?: CrmFunnelSource
+CrmFunnelSummary?: CrmFunnelSummary
+CrmPipelineSummary?: CrmPipelineSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8762,6 +8767,7 @@ filters: ReportFilters
 rows: Page_ReportRow
 totals: ReportTotal[]
 columns?: ReportDiscoveryColumns
+crm_funnel?: CrmFunnelSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8771,6 +8777,33 @@ export interface Page_ReportRow {
 items: ReportRow[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFunnelSummary".
+ */
+export interface CrmFunnelSummary {
+cohort_count: Count
+converted_count: Count
+stages: CrmStageCount[]
+sources: CrmFunnelSource[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmStageCount".
+ */
+export interface CrmStageCount {
+stage_key: (string | null)
+count: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFunnelSource".
+ */
+export interface CrmFunnelSource {
+source: ("manual" | "phone" | "whatsapp" | "web" | "website" | "instagram" | "facebook" | "referral" | "public_application" | "legacy_import" | "other")
+count: Count
+converted_count: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9488,6 +9521,7 @@ next_cursor?: (OpaqueToken | null)
 as_of: Instant
 pipeline_catalog?: CrmPipelineConfiguration
 summary?: CrmLeadSummary
+pipeline_summary?: CrmPipelineSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9516,6 +9550,18 @@ open_leads: Count
 followups_today: Count
 overdue_followups: Count
 converted_last_30_days: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmPipelineSummary".
+ */
+export interface CrmPipelineSummary {
+stages: CrmStageCount[]
+trials: {
+offered: Count
+registered: Count
+attended: Count
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13307,6 +13353,7 @@ stage_key?: string
 assigned_to?: (string | null)
 include_details?: boolean
 include_summary?: boolean
+include_pipeline_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23741,6 +23788,11 @@ key: {
 application_id?: string
 person_id?: (string | null)
 include_contact_intake?: boolean
+/**
+ * @minItems 1
+ * @maxItems 3
+ */
+states?: [ApplicationState]|[ApplicationState, ApplicationState]|[ApplicationState, ApplicationState, ApplicationState]
 }
 }
 /**

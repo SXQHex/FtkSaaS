@@ -1,11 +1,18 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-crm-directory"></a>
+## Web1 v67 CRM raporu ve dizinleri
+
+W1-BE-52/53/54, PR #340’a push edilen `8405fa8b` üzerine yerelde eklendi. Tüketim [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16) ve [WF09](../../../docs/workflows.md#wf09) sahibindedir.
+
+194. append migration loopback native Supabase’e uygulandı. Tek Node runner ve `--test-concurrency=1` ile 12/12 geçti. Dönem dışı kohort, audit kaynaklı dönüşüm, güvenli kaynak grubu, bütün aşamaları kapsayan ve sorumlu filtresini koruyan sayaçlar, teklif/kayıt/yoklama geçişi, başvuru cursor’ı, merkezsiz kapsam ve iletişim verisi kuralı sınandı. Edge JSON yükü 3.963.795 bayt. Yerel stack kapatıldı. Bu dilim yerel dalda bekler.
+
 <a id="web1-v67-lesson-and-earnings"></a>
 ## Web1 v67 özel ders ve hakediş
 
 W1-BE-44/45, PR #340’ın yayımlanan `585a0932202bda10c438dc883d6d208acbbea373` kaynağı üzerine yerelde eklendi. İlk kontrol sırasında [full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/44365849672) yayımlanan head için çalışıyordu. Bu dilimin tüketim sözleşmeleri [WF06](../../../docs/workflows.md#wf06) ve [WF14](../../../docs/workflows.md#wf14) sahibindedir. PR #339’da yeni açılan maddeler [backend backlog’una](remaining-work.md#web1-v67-backend) işlendi.
 
-192–193. append migration’ları loopback native Supabase’te temiz uygulandı. Tek Node runner ve `--test-concurrency=1` ile 20/20 test geçti. Notlu/notsuz talep, canlı yetki, aynı-key uyuşmazlığı, makbuz bağlamında notun ayıklanması, hakediş düzeltmesi, kaynak adı ve atama değişikliği, öz/cursor kapsamı ve 4 MB Edge kabulü doğrulandı. Edge JSON yükü 3.952.357 bayt. Yerel stack kapatıldı. Bu dilimin push’u kullanıcı onayını bekler.
+192–193. append migration’ları loopback native Supabase’te temiz uygulandı. Tek Node runner ve `--test-concurrency=1` ile 20/20 test geçti. Notlu/notsuz talep, canlı yetki, aynı-key uyuşmazlığı, makbuz bağlamında notun ayıklanması, hakediş düzeltmesi, kaynak adı ve atama değişikliği, öz/cursor kapsamı ve 4 MB Edge kabulü doğrulandı. Edge JSON yükü 3.952.357 bayt. Yerel stack kapatıldı. Kullanıcı onayıyla `8405fa8b`, [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) dalına push edildi. Bu kaynağın aday kabulü ayrı izlenir.
 
 <a id="web1-v67-inbox"></a>
 ## Web1 v67 gelen kutusu

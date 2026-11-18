@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {authUser,fixturePlatform,must} from './api-client.mjs';
+import {authUser,fixturePlatform,must,call} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
@@ -63,6 +63,34 @@ test('P05 common intake normalizes phone and preserves distinct form delivery an
   const candidate=(await db.query('select person_id from core.public_applications where id=$1',[first.id])).rows[0].person_id;
   const contacts=(await db.query('select kind,value from core.person_contacts where org_id=$1 and person_id=$2',[org,candidate])).rows;
   assert.deepEqual(contacts,[{kind:'email',value:'applicant@example.invalid'}]);
+
+  const second=rows[1];
+  const operation='public_application_review_v1';
+  await must(owner,operation,{org_id:org,center_id:center,application_id:second.id,expected_version:Number(second.version),action:'close'},key());
+  const query=(states,page={limit:1},scope=center,extra={})=>({
+   org_id:org,center_id:scope,operation,selector:{operation,key:{states,...extra}},page
+  });
+  const finished=await must(owner,'management_state_get_v1',query(['reviewed','closed']));
+  assert(finished.next_cursor);
+  const last=await must(owner,'management_state_get_v1',query(['reviewed','closed'],{limit:1,cursor:finished.next_cursor}));
+  assert.deepEqual([finished.items[0].state,last.items[0].state].sort(),['closed','reviewed']);
+  for(const row of [finished.items[0],last.items[0]])assert.equal(row.current.values.contact_intake,undefined);
+  const wrong=await call(owner,'management_state_get_v1',query(['pending'],{limit:1,cursor:finished.next_cursor}));
+  assert.equal(wrong.result.error?.code,'VALIDATION_FAILED');
+  for(const states of [[],['pending','pending'],['unknown']]){
+   const denied=await call(owner,'management_state_get_v1',query(states));
+   assert.equal(denied.result.error?.code,'VALIDATION_FAILED');
+  }
+  const centerlessForm=key();
+  await db.query("insert into private.crm_intake_forms(id,org_id,channel,form_key,source_url,enabled) values($1,$2,'web_form','synthetic-org-form','https://example.invalid/org',true)",[centerlessForm,org]);
+  const centerlessRequest={...request,form_id:centerlessForm,client_request_key:key()};
+  assert.equal((await rpc(centerlessRequest)).ok,true);
+  const centerless=(await db.query('select id,center_id from core.public_applications where request_reference=$1',[centerlessRequest.client_request_key])).rows[0];
+  assert.equal(centerless.center_id,null);
+  const organizationPending=await must(owner,'management_state_get_v1',query(['pending'],{limit:20},null));
+  assert(organizationPending.items.some(x=>x.entity.id===centerless.id));
+  const centerPending=await must(owner,'management_state_get_v1',query(['pending'],{limit:20}));
+  assert(centerPending.items.every(x=>x.entity.id!==centerless.id&&x.state==='pending'));
   assert.equal((await db.query('select count(*)::int n from core.sales where org_id=$1 and person_id=$2',[org,candidate])).rows[0].n,0);
   // A changed form rule cannot turn a successful request into an unknown retry.
   await setRules([]);assert.equal((await rpc(emailRequest,emailAux)).ok,true);
