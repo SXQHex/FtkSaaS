@@ -35,7 +35,9 @@ export function summarizeVerification(steps, unit, browser) {
         ![scan.evaluatedConformanceRules, scan.violations, scan.manualReview].every(
           Array.isArray,
         ) ||
-        (scan.emptyGridChecks !== undefined && !Array.isArray(scan.emptyGridChecks))
+        [scan.emptyGridChecks, scan.gridTargetChecks].some(
+          (checks) => checks !== undefined && !Array.isArray(checks),
+        )
       )
         throw new Error("Invalid Axe attachment");
       scans.push(scan);
@@ -55,6 +57,8 @@ export function summarizeVerification(steps, unit, browser) {
   ];
   const browserFollowUp = new Set();
   let emptyGridChecks = 0;
+  let emptyActionCellChecks = 0;
+  let gridButtonChecks = 0;
   for (const scan of scans) {
     const checkedTables = new Set(
       (scan.emptyGridChecks ?? [])
@@ -68,14 +72,34 @@ export function summarizeVerification(steps, unit, browser) {
         )
         .map((check) => check.selector),
     );
+    const checkedActions = new Map(
+      (scan.gridTargetChecks ?? [])
+        .filter(
+          (row) =>
+            typeof row?.selector === "string" &&
+            row.selector.startsWith("#") &&
+            row.selector.length > 1 &&
+            ["empty-action", "button-size"].includes(row.check),
+        )
+        .map(({ selector, check }) => [selector, check]),
+    );
     emptyGridChecks += checkedTables.size;
+    for (const check of checkedActions.values()) {
+      if (check === "empty-action") emptyActionCellChecks++;
+      else gridButtonChecks++;
+    }
+    const checkedTargets = new Map([
+      ["th-has-data-cells", checkedTables],
+      ["target-size", checkedActions],
+    ]);
     for (const rule of scan.manualReview) {
+      const measured = checkedTargets.get(rule.id);
       const checked =
-        rule.id === "th-has-data-cells" &&
+        measured &&
         Array.isArray(rule.targets) &&
         rule.targets.length > 0 &&
         rule.targets.every(
-          (target) => Array.isArray(target) && target.length === 1 && checkedTables.has(target[0]),
+          (target) => Array.isArray(target) && target.length === 1 && measured.has(target[0]),
         );
       if (measurableAxeRules.has(rule.id) && !checked) browserFollowUp.add(rule.id);
     }
@@ -93,6 +117,8 @@ export function summarizeVerification(steps, unit, browser) {
       incomplete,
       browserFollowUp: [...browserFollowUp],
       emptyGridChecks,
+      emptyActionCellChecks,
+      gridButtonChecks,
     },
   };
 }
@@ -127,6 +153,8 @@ async function save(report) {
     `Incomplete Axe findings: ${report.axe?.incomplete.join(", ") || "see individual reports"}.`,
     `Candidates for explicit browser checks: ${report.axe?.browserFollowUp.join(", ") || "none in this run"}.`,
     `Empty grid placeholders verified in the browser: ${report.axe?.emptyGridChecks ?? 0}.`,
+    `Empty action grid cells verified in the browser: ${report.axe?.emptyActionCellChecks ?? 0}.`,
+    `Grid buttons verified in the browser: ${report.axe?.gridButtonChecks ?? 0}.`,
     "",
     "Selected tests do not prove full-suite acceptance. Native/hosted acceptance and full WCAG compliance are not granted by this report.",
     "Axe attachments may include expected negative policy checks; test assertions remain authoritative.",

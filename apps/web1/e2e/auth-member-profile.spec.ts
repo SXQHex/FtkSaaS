@@ -10,7 +10,7 @@ import type {
 } from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-import { scanAccessibility } from "./accessibility.js";
+import { expectEmptyActionCell, scanAccessibility } from "./accessibility.js";
 const versionId = "019a7b00-0000-7000-8000-000000000022",
   productId = "019a7b00-0000-7000-8000-000000000021",
   saleId = "019a7b00-0000-7000-8000-000000000070",
@@ -734,7 +734,7 @@ test("denied attendance stays unknown while authorized reservation and lesson re
     ),
   ).toHaveCount(0);
   const completed = grid.getByRole("row").filter({ hasText: "Tamamlandı" });
-  await expect(completed.getByRole("gridcell").last()).toBeEmpty();
+  await expectEmptyActionCell(completed.getByRole("gridcell").last());
   expect(writes).toHaveLength(0);
 });
 test("reservation page read errors do not relabel stale rows as the next page and can retry", async ({
@@ -750,7 +750,7 @@ test("reservation page read errors do not relabel stale rows as the next page an
   await page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }).click();
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
   const cancelled = grid.getByRole("row").filter({ hasText: "İptal" });
-  await expect(cancelled.getByRole("gridcell").last()).toBeEmpty();
+  await expectEmptyActionCell(cancelled.getByRole("gridcell").last());
   expect(writes).toHaveLength(0);
 });
 
@@ -790,7 +790,7 @@ test("reservation cancellation validates reason, uses the native version and rer
   await expect(grid.getByText("İptal", { exact: true })).toBeVisible();
   await expect(grid.getByRole("button", { name: /^İptal et/ })).toHaveCount(0);
   const cancelled = grid.getByRole("row").filter({ hasText: "İptal" });
-  await expect(cancelled.getByRole("gridcell").last()).toBeEmpty();
+  await expectEmptyActionCell(cancelled.getByRole("gridcell").last());
   await expect(
     page.getByRole("button", { name: "Rezervasyonları yeniden oku", exact: true }),
   ).toBeFocused();
