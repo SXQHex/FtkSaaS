@@ -1238,6 +1238,11 @@
     "start": "Başlangıç",
     "duration": "Süre",
     "minutes": "Dakika",
+    "seriesDurationHint": "Dakika. Boş bırakırsanız merkezin program süresi kullanılır.",
+    "capacityCategories": {
+      "male": "Erkek kontenjanı",
+      "female": "Kadın kontenjanı"
+    },
     "seriesLength": "Seri uzunluğu",
     "weeks": "Hafta",
     "whichDays": "Hangi günler",
@@ -1337,6 +1342,7 @@
       "conflict": "Seçilen saat, salon veya eğitmen uygunluk kurallarını karşılamıyor ya da başka bir kayıtla çakışıyor.",
       "reservation": "Mevcut rezervasyonlar bu değişikliği engelliyor. Güncel etkiyi incele.",
       "plan": "Plan veya abonelik bu işleme izin vermiyor.",
+      "debtBooking": "Ödenmemiş borç nedeniyle rezervasyon yapılamıyor.",
       "document": "Gerekli belge koşulu karşılanmıyor.",
       "entitlement": "Hak veya kredi koşulu bu işleme izin vermiyor."
     },
@@ -1430,6 +1436,7 @@
       "ay-posta": "İletişim e-postası",
       "ay-adres": "Adres",
       "ay-tz": "Saat dilimi",
+      "ay-program-sure": "Varsayılan program süresi (dakika)",
       "ay-acilis": "Rezervasyon açılışı",
       "ay-iptal": "Ücretsiz iptal süresi",
       "ay-yoklama": "Yoklamayı kapat",
@@ -1535,6 +1542,7 @@
       "futureOperations": "Gelecek/devam eden ders ve etkinlikler"
     },
     "timezoneHint": "Ders saatleri bu saat diliminde gösterilir ve hesaplanır.",
+    "programDurationHint": "Süre belirtilmeyen yeni haftalık program önizlemelerinde kullanılır.",
     "brandExampleDescription": "Üye sayfası ve e-posta başlığı böyle görünür.",
     "brandExampleAction": "Rezervasyon yap",
     "reviewEmpty": "Önizlemede listelenen değişiklik yok.",
@@ -1673,6 +1681,31 @@
     "reminderHours_other": "{{count}} saat önce",
     "reminderDays_one": "{{count}} gün önce",
     "reminderDays_other": "{{count}} gün önce",
+    "preparation": {
+      "title": "Hazırlık şablonu",
+      "apply": "Taslağa uygula",
+      "hint": "Seçilen değerleri taslağa aktarır. Önizleme ve onay ayrı adımlardır.",
+      "unavailable": "Şablonun güncel sürümü okunamadı.",
+      "applied": "Şablon taslağa uygulandı.",
+      "program_templates": "Program hazırlık şablonları",
+      "event_templates": "Etkinlik hazırlık şablonları",
+      "automation_templates": "Otomasyon hazırlık şablonları",
+      "reminderAction": "Uygulama içi hatırlatma gönder",
+      "followupText": "Takip görevi metni",
+      "reminderKey": "Bildirim şablonu anahtarı",
+      "inherit": "Organizasyon kaynağını kullan",
+      "inheritReview": "Merkezdeki yerel şablon listesi kaldırılır ve organizasyonun güncel listesi kullanılır.",
+      "eventKind": "Şablon etkinlik türü",
+      "collection_templates": "Tahsilat hazırlık şablonları",
+      "crm_templates": "Aday hazırlık şablonları",
+      "inheritanceHint": "Kaydedildiğinde bu şablon listesi merkeze özel olur.",
+      "new": "Yeni şablon",
+      "name": "Şablon adı",
+      "paymentMethod": "Ödeme yöntemi",
+      "duration": "Süre (dakika)",
+      "review": "Şablonu incele",
+      "remove": "Kaldırmayı incele"
+    },
     "nativePolicies": {
       "organization": "Organizasyon",
       "center": "Merkez",
@@ -2627,7 +2660,8 @@
       "saved": "Öğrencilik durumu kaydedildi ve merkez ilişkisi yeniden okundu.",
       "stale": "Önizleme eskidi. Yeniden incele ve onayla.",
       "rejected": "İşlem reddedildi. Güncel koşulları kontrol edip yeniden incele."
-    }
+    },
+    "saleRecheckDocuments": "Belge onayını kontrol et"
   },
   "scheduleRoster": {
     "scope": "{{interval}} · {{timezone}}. Bu aralıkta oluşmuş derslerin öncelikli rezervasyonları gösterilir. Gelecek programlara otomatik kayıt yapılmaz.",
@@ -3395,6 +3429,8 @@
     "preferencesDescription": "Değişiklikler anında kaydedilir.",
     "email": "E-posta ile hatırlatmalar",
     "emailHint": "Etkin hatırlatma türlerin için e-posta gönderimine izin ver.",
+    "transactionalEmail": "E-posta ile işlem bildirimleri",
+    "transactionalEmailHint": "Rezervasyon ve ders değişikliği gibi işlem bildirimlerini e-postayla da al.",
     "inApp": "Uygulama içi hatırlatmalar",
     "inAppHint": "Etkin hatırlatma türlerin için uygulama içi bildirim al.",
     "package": "Paket bitiş hatırlatmaları",

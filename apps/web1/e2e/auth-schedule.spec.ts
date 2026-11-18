@@ -298,6 +298,28 @@ async function scheduleFixture(
                 version: group.version,
                 state: group.active ? "active" : "cancelled",
                 mode: "priority",
+                ...(request.include_source_summary
+                  ? {
+                      source_summary: {
+                        status: "available",
+                        as_of: new Date().toISOString(),
+                        source_sale_id: saleId,
+                        product_version_id: "019ab7b0-0000-7000-8000-000000000156",
+                        product_name: "Sentetik sabit grup paketi",
+                        kind: "credits",
+                        booking_mode: "priority",
+                        sale_state: "active",
+                        state: "active",
+                        start_date: "2026-01-01",
+                        end_date: "2027-12-31",
+                        timezone: "Europe/Istanbul",
+                        available_credits: group.active ? "7" : "8",
+                        reserved: group.active ? "1" : "0",
+                        consumed: "0",
+                        sale_version: 1,
+                      },
+                    }
+                  : {}),
               },
             ]
           : [],
@@ -534,6 +556,7 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
   await panel.locator("#group-person").selectOption(I.self);
   await panel.locator("#group-sale").selectOption(state.saleId);
   await panel.locator("#group-session").selectOption(state.session!.id);
+  const beforeCapacity = { ...state.session!.capacity };
   await panel.getByRole("button", { name: "Seçilen dersi ve kaynağı incele", exact: true }).click();
   await expect(panel.getByRole("button", { name: "Üye ekle", exact: true })).toBeDisabled();
   expect(state.group.creates).toHaveLength(0);
@@ -553,6 +576,10 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
   ).toBeVisible();
   expect(state.group.creates).toHaveLength(1);
   expect(state.group.effects).toBe(1);
+  expect(state.session?.capacity).toMatchObject({
+    held: beforeCapacity.held + 1,
+    remaining: beforeCapacity.remaining - 1,
+  });
   await page.setViewportSize({ width: 320, height: 900 });
   await page.emulateMedia({ colorScheme: "dark" });
   expect(await page.evaluate<boolean>("document.documentElement.scrollWidth > innerWidth")).toBe(
@@ -622,15 +649,77 @@ test("cancelled session shows its native durable replacement relation", async ({
   await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
 });
 
-test("blocked program preview explains the native reason and clears it when the draft changes", async ({
+test("weekly preparation resolves the current scoped template without writing and preserves program preview guards", async ({
   page,
 }) => {
   const state = await scheduleFixture(page, false, true);
   let previews = 0;
+  let version = 1;
+  const defaults = {
+    weekdays: [2],
+    local_start: "11:17:30",
+    duration_minutes: 30,
+    capacity: { total: 2, categories: { male: 1, female: 1 } },
+  };
+  const source = () => ({ scope: "center", center_id: I.center, key: "weekly", version });
+  await page.route("**/functions/v1/backend-v1/settings_catalog_get_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      scope: "center",
+    });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          scope: "center",
+          catalog_version: 24,
+          fields: [],
+          defaults: {},
+          brand_packages: [],
+          limitations: [],
+          preparation_templates: {
+            availability: [],
+            packages: [],
+            package_currency_suggestion: "TRY",
+            programs: [
+              {
+                source: source(),
+                template: { key: "weekly", name: `Haftalık örnek v${version}`, defaults },
+              },
+            ],
+          },
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/settings_preparation_resolve_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      kind: "program",
+      source: source(),
+    });
+    if (version === 1) {
+      version++;
+      return route.fulfill({
+        status: 409,
+        json: {
+          ok: false,
+          error: { code: "VERSION_CONFLICT", trace_id: I.role, retryable: false },
+        },
+      });
+    }
+    return route.fulfill({
+      json: { ok: true, trace_id: I.role, data: { kind: "program", source: source(), defaults } },
+    });
+  });
   await page.route("**/functions/v1/backend-v1/program_preview_v1", async (route) => {
     const request = route.request().postDataJSON();
     expect(request.class_id).toBe(I.lesson);
     expect(request.schedule.room_id).toBe(I.room);
+    expect(request.schedule).toMatchObject(defaults);
     previews++;
     return route.fulfill({
       json: {
@@ -660,15 +749,22 @@ test("blocked program preview explains the native reason and clears it when the 
   await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
   const panel = page.getByRole("dialog");
   await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
+  const template = panel.getByRole("combobox", { name: "Hazırlık şablonu" });
+  await template.selectOption({ label: "Haftalık örnek v1 · Merkez" });
+  await expect(panel.getByText("Şablonun güncel sürümü okunamadı.", { exact: true })).toBeVisible();
+  await expect(panel.locator("#schedule-create-duration")).toHaveValue("");
+  await panel.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await template.selectOption({ label: "Haftalık örnek v2 · Merkez" });
+  await panel.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  await expect(panel.getByText("Şablon taslağa uygulandı.", { exact: true })).toBeVisible();
+  expect(previews).toBe(0);
+  expect(state.writes).toEqual([]);
+  await expect(panel.locator("#schedule-create-class")).toHaveValue("");
   await panel.locator("#schedule-create-class").selectOption(I.lesson);
   await panel.locator("#schedule-create-instructor").selectOption(I.instructor);
   await panel.locator("#schedule-create-room").selectOption(I.room);
-  await panel.locator("#schedule-create-capacity").fill("2");
   await panel.locator("#schedule-create-date").fill("2026-11-17");
-  await panel.locator("#schedule-create-time").fill("11:17");
-  await panel.locator("#schedule-create-duration").fill("30");
   await panel.locator("#schedule-create-weeks").fill("1");
-  await panel.getByRole("button", { name: "Sal", exact: true }).click();
   await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
   await expect(panel.getByRole("alert")).toHaveText(
     "Seçilen saat, salon veya eğitmen uygunluk kurallarını karşılamıyor ya da başka bir kayıtla çakışıyor.",

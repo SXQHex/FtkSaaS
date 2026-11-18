@@ -17,15 +17,47 @@ export async function mockSettingsCompletion(
   const writes: { op: string; r: NativeRequest }[] = [];
   const state = {
     version: { organization: 1, center: 1 },
+    inherited: {} as Record<string, { kind: string; organization_version: number }>,
     values: {
       organization: {
         address: "Sentetik adres",
+        program_duration_minutes: 45,
+        program_templates: [],
+        event_templates: [],
+        automation_templates: [
+          {
+            key: "org-followup",
+            name: "Organizasyon takibi",
+            defaults: {
+              trigger: { kind: "student_inactive", offset_days: 2 },
+              action: {
+                kind: "create_followup",
+                channel: "in_app",
+                template_key: "Organizasyon takip notu",
+              },
+            },
+          },
+        ],
+        collection_templates: [],
+        crm_templates: [],
         public_profile_enabled: false,
         public_fields: ["name"],
         public_application_form: null,
       },
       center: {
         address: "Sentetik adres",
+        program_duration_minutes: 60,
+        program_templates: [],
+        event_templates: [],
+        automation_templates: [],
+        collection_templates: [
+          {
+            key: "cash",
+            name: "Yerel nakit",
+            defaults: { currency: "TRY", payment_method: "cash" },
+          },
+        ],
+        crm_templates: [],
         public_profile_enabled: false,
         public_fields: ["name"],
         public_application_form: null,
@@ -147,16 +179,28 @@ export async function mockSettingsCompletion(
         catalog_version: 24,
         fields: [
           "address",
+          "collection_templates",
+          "program_templates",
+          "event_templates",
+          "automation_templates",
+          "crm_templates",
           ...(r.scope === "organization" ? ["billing_name"] : []),
           "public_profile_enabled",
           "public_fields",
           "public_application_form",
-        ].map((key) => ({
-          key,
-          group: r.scope === "organization" ? "O01" : "M01",
-          consumer: "public_profile",
-          writable: true,
-        })),
+        ]
+          .map((key) => ({
+            key,
+            group: r.scope === "organization" ? "O01" : "M01",
+            consumer: "public_profile",
+            writable: true,
+          }))
+          .concat({
+            key: "program_duration_minutes",
+            group: r.scope === "organization" ? "O18" : "M06",
+            consumer: "schedule_build_program",
+            writable: true,
+          }),
         defaults: {},
         brand_packages: [],
         limitations: [],
@@ -186,11 +230,22 @@ export async function mockSettingsCompletion(
         overridden_fields: [],
         as_of: at,
         ...(r.scope === "organization" ? { logo: null } : {}),
+        ...(r.scope === "center" ? { inherited_fields: state.inherited } : {}),
       });
     if (op === "settings_update_v1") {
       writes.push({ op, r });
       state.version[r.scope as "organization" | "center"]++;
       Object.assign(state.values[r.scope]!, structuredClone(r.patch));
+      if (r.scope === "center") {
+        for (const key of Object.keys(r.patch)) delete state.inherited[key];
+        for (const key of r.inherit_fields ?? []) {
+          state.inherited[key] = {
+            kind: "organization_inherited",
+            organization_version: state.version.organization,
+          };
+          state.values.center![key] = structuredClone(state.values.organization![key]);
+        }
+      }
       await send(nativeMutation(I.account));
     }
     if (op === "settings_history_get_v1") await send(nativePage([]));

@@ -134,6 +134,9 @@ async function main() {
   };
   const env = {
     ...process.env,
+    // Verification can exercise protected static routes in a clean CI checkout.
+    VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || "http://127.0.0.1:4175",
+    VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "public-test-key",
     npm_config_cache: resolve(root, ".npm-cache"),
     TMPDIR: resolve(root, ".tmp"),
     TMP: resolve(root, ".tmp"),

@@ -3,7 +3,12 @@ import type { Page } from "@playwright/test";
 import { mockSessionDetail, sessionIds as S } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-async function setup(page: Page, mode: "normal" | "denied" | "empty" | "past-planned" = "normal") {
+import common from "../src/locales/tr/common.json" with { type: "json" };
+async function setup(
+  page: Page,
+  mode: "normal" | "denied" | "empty" | "past-planned" = "normal",
+  staff = false,
+) {
   const state = await mockSessionDetail(page, { existing: true, allowEditor: true });
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
   state.session.starts_at =
@@ -13,6 +18,30 @@ async function setup(page: Page, mode: "normal" | "denied" | "empty" | "past-pla
   state.reads.length = 0;
   let denied = mode === "denied";
   const requests: Record<string, unknown>[] = [];
+  if (staff)
+    await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) => {
+      expect(route.request().postDataJSON()).toMatchObject({ org_id: I.org, person_id: I.self });
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            items: [
+              {
+                id: I.role,
+                person_id: I.self,
+                role: "staff",
+                scope_center_id: I.center,
+                state: "active",
+                version: 1,
+                account_access_granted: true,
+              },
+            ],
+            next_cursor: null,
+          },
+        },
+      });
+    });
   await page.route("**/functions/v1/backend-v1/calendar_get_v1", async (route) => {
     const r = route.request().postDataJSON();
     requests.push(r);
@@ -47,6 +76,23 @@ async function setup(page: Page, mode: "normal" | "denied" | "empty" | "past-pla
     },
   };
 }
+test("authorized staff reads the scoped center day and loses it when native read permission is revoked", async ({
+  page,
+}) => {
+  const state = await setup(page, "normal", true);
+  const next = page.getByRole("region", { name: "Sıradaki ders", exact: true });
+  await expect(next).toContainText("Sentetik seans");
+  expect(state.requests[0]).toMatchObject({ org_id: I.org, center_id: I.center });
+  expect(state.requests[0]).not.toHaveProperty("person_id");
+  await expect(
+    page.getByRole("radio", { name: common.workspace.viewLabels.instructor, exact: true }),
+  ).toHaveCount(0);
+  state.setDenied(true);
+  await page.reload();
+  await expect(page.getByText(common.overview.unread, { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Sentetik seans", { exact: true })).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+});
 test("daily overview reads the center day and safe native member/package preview without finance scans", async ({
   page,
 }) => {

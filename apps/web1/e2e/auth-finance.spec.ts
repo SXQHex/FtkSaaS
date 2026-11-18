@@ -227,9 +227,71 @@ test("mobile collection uses explicit authority, reference and timezone then rer
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await setup(page);
+  const source = { scope: "center", center_id: I.center, key: "bank-try", version: 2 };
+  const defaults = { currency: "TRY", payment_method: "bank_transfer" };
+  await page.route("**/functions/v1/backend-v1/settings_catalog_get_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      scope: "center",
+      org_id: I.org,
+      center_id: I.center,
+    });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          scope: "center",
+          catalog_version: 24,
+          fields: [],
+          defaults: {},
+          brand_packages: [],
+          limitations: [],
+          preparation_templates: {
+            availability: [],
+            packages: [],
+            package_currency_suggestion: "TRY",
+            collections: [
+              { source, template: { key: source.key, name: "TRY havale", defaults } },
+              {
+                source: { ...source, key: "bank-usd" },
+                template: {
+                  key: "bank-usd",
+                  name: "USD havale",
+                  defaults: { ...defaults, currency: "USD" },
+                },
+              },
+            ],
+          },
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/settings_preparation_resolve_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      kind: "collection",
+      source,
+    });
+    return route.fulfill({
+      json: { ok: true, trace_id: I.role, data: { kind: "collection", source, defaults } },
+    });
+  });
   await expect(page.getByRole("button", { name: "Tahsilat al", exact: true })).toBeEnabled();
   expect((await scanAccessibility(page, "finance-person-scope")).violations).toEqual([]);
-  const panel = await fillCollection(page);
+  await page.getByRole("button", { name: "Tahsilat al", exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await expect(panel).toHaveAccessibleName("Tahsilat al");
+  const template = panel.getByRole("combobox", { name: "Hazırlık şablonu" });
+  await template.selectOption({ label: "TRY havale · Merkez" });
+  await expect(template.locator("option").filter({ hasText: "USD havale" })).toHaveCount(0);
+  await panel.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  await expect(panel.getByRole("radio", { name: "Havale", exact: true })).toBeChecked();
+  const reference = panel.getByLabel("İşlem referansı", { exact: true });
+  await expect(reference).toHaveValue("");
+  await expect(reference).toHaveJSProperty("required", true);
+  await reference.fill("SYNTHETIC-REF");
+  await panel.getByLabel("İşlem tarihi ve saati", { exact: true }).fill("2026-11-15T14:30");
   const amount = panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true });
   await amount.fill("0");
   await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
@@ -241,6 +303,12 @@ test("mobile collection uses explicit authority, reference and timezone then rer
   expect(state.writes).toHaveLength(0);
   await amount.fill("40000");
   await expect(amount).toHaveAttribute("aria-invalid", "false");
+  await reference.clear();
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await expect(reference).toBeFocused();
+  await expect(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true })).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+  await reference.fill("SYNTHETIC-REF");
   expect((await scanAccessibility(page, "collection-editor")).violations).toEqual([]);
   await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
   await expect(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true })).toBeDisabled();

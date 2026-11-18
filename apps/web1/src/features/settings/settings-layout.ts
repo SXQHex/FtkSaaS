@@ -42,6 +42,12 @@ export const settingsLayout = [
             readonly: true,
             disabled: false,
           },
+          {
+            key: "ay-program-sure",
+            kind: "number",
+            readonly: false,
+            disabled: false,
+          },
         ],
       },
       {

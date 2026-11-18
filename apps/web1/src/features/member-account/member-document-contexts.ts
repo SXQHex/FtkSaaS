@@ -9,6 +9,7 @@ export function documentContextKey(context: AcceptanceContext) {
     context.subject.id,
     context.product_version_id ?? null,
     context.purchase_preview_id ?? null,
+    context.event_registration_preview_id ?? null,
   ]);
 }
 export async function readMemberDocumentContexts(scope: ClientScope, cursor?: string) {
@@ -39,6 +40,15 @@ export async function readMemberDocumentContexts(scope: ClientScope, cursor?: st
     z.uuid().parse(context.subject.id);
     if (context.product_version_id) z.uuid().parse(context.product_version_id);
     if (context.purchase_preview_id) z.uuid().parse(context.purchase_preview_id);
+    if (context.event_registration_preview_id) {
+      z.uuid().parse(context.event_registration_preview_id);
+      if (
+        context.gate !== "event_registration" ||
+        context.subject.type !== "events" ||
+        context.purchase_preview_id
+      )
+        throw Error("MEMBER_DOCUMENT_CONTEXTS_UNAVAILABLE");
+    }
     const key = documentContextKey(context);
     if (context.on_behalf_of_person_id || contexts.has(key) || !row.requirements.length)
       throw Error("MEMBER_DOCUMENT_CONTEXTS_UNAVAILABLE");

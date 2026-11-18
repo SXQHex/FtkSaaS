@@ -125,6 +125,7 @@ export function scheduleSessionPanel(
 
 /** Safe native blocker codes reuse the same translated errors as rejected commands. */
 export function scheduleBackendError(code: string, t: TFunction) {
+  if (code === "DEBT_BOOKING_BLOCKED") return t(($) => $.schedule.errors.debtBooking);
   return code === "POLICY_NOT_CONFIGURED"
     ? t(($) => $.schedule.errors.configuration)
     : code === "CAPACITY_FULL"

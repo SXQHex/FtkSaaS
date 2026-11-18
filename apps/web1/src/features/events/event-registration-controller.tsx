@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type {
@@ -12,6 +12,7 @@ import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { readProfileRights } from "../member-profile/profile-read";
+import { MemberDocumentsPanel } from "../member-documents/member-documents-panel";
 import { LeadPersonPicker } from "../leads/lead-person-picker";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { EventRegistrationSheet } from "./event-registration-sheet";
@@ -46,22 +47,24 @@ type RegistrationControllerProps = {
   scope: ClientScope;
   before: EventView;
   registrationId?: string;
+  selfPersonId?: string;
   onClose: () => void;
   onSaved: () => Promise<void>;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
 };
 export function EventRegistrationController(props: RegistrationControllerProps) {
-  const { registrationId, ...rest } = props;
+  const { registrationId, selfPersonId, ...rest } = props;
   return registrationId ? (
     <RegisteredEventPayment {...rest} registrationId={registrationId} />
   ) : (
-    <NewEventRegistrationController {...rest} />
+    <NewEventRegistrationController {...rest} selfPersonId={selfPersonId} />
   );
 }
 function NewEventRegistrationController({
   scope,
   before,
+  selfPersonId,
   onClose,
   onSaved,
   onLockChange,
@@ -69,6 +72,7 @@ function NewEventRegistrationController({
 }: {
   scope: ClientScope;
   before: EventView;
+  selfPersonId?: string;
   onClose: () => void;
   onSaved: () => Promise<void>;
   onLockChange: (value: boolean) => void;
@@ -86,7 +90,9 @@ function NewEventRegistrationController({
     [confirmed, setConfirmed] = useState(false),
     [capacityClosed, setCapacityClosed] = useState(false),
     [working, setWorking] = useState(false),
+    [documentsLocked, setDocumentsLocked] = useState(false),
     [error, setError] = useState<string>();
+  const documentLock = useCallback((value: boolean) => setDocumentsLocked(value), []);
   const active = useRef(true),
     running = useRef(false);
   useEffect(() => {
@@ -154,8 +160,14 @@ function NewEventRegistrationController({
       await onSaved();
     },
   });
-  const locked =
+  const actionLocked =
     working || registerCommand.locked || prepareCommand.locked || collectionCommand.locked;
+  const locked = actionLocked || documentsLocked;
+  const productVersionId = sale
+    ? rights.data?.find((right) => right.sale_id === sale)?.product_version_id
+    : undefined;
+  const documentPreviewId =
+    preview && !preview.value.blockers.length ? preview.value.id : undefined;
   useEffect(() => {
     onLockChange(locked);
     return () => onLockChange(false);
@@ -430,13 +442,38 @@ function NewEventRegistrationController({
           </Field>
         }
         preview={
-          preview ? (
-            <EventPreviewEffects preview={preview.value} />
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              {t(($) => $.eventDetail.previewRegistrationHint)}
-            </p>
-          )
+          <>
+            {preview ? (
+              <EventPreviewEffects preview={preview.value} />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {t(($) => $.eventDetail.previewRegistrationHint)}
+              </p>
+            )}
+            {step === 2 &&
+              personId &&
+              personId === selfPersonId &&
+              (!sale || (productVersionId && documentPreviewId)) && (
+                <MemberDocumentsPanel
+                  binding={{
+                    scope,
+                    personId,
+                    context: {
+                      gate: "event_registration",
+                      subject: { type: "events", id: before.id },
+                      ...(productVersionId ? { product_version_id: productVersionId } : {}),
+                      ...(documentPreviewId
+                        ? { event_registration_preview_id: documentPreviewId }
+                        : {}),
+                    },
+                  }}
+                  disabled={actionLocked}
+                  onLockChange={documentLock}
+                  onAccessLost={onAccessLost}
+                  onAccepted={() => setReviewed(false)}
+                />
+              )}
+          </>
         }
         payment={paymentPanel}
         summary={

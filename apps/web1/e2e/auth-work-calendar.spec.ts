@@ -141,6 +141,8 @@ async function fixture(page: import("@playwright/test").Page) {
       state.previews++;
       expect(state.calendar?.rules[0]?.local_end).toBe("12:00:00");
       expect(r.schedule.local_start).toBe(state.previews === 1 ? "12:30:00" : "11:30:00");
+      if (state.previews === 1) expect(r.schedule).not.toHaveProperty("duration_minutes");
+      else expect(r.schedule.duration_minutes).toBe(30);
       return send({
         id: I.role,
         token: "synthetic-program-preview",
@@ -252,13 +254,17 @@ test("work calendar saves only after native impact and explicit review; local da
   await panel.locator("#schedule-create-capacity").fill("2");
   await panel.locator("#schedule-create-date").fill("2026-11-23");
   await panel.locator("#schedule-create-time").fill("12:30");
-  await panel.locator("#schedule-create-duration").fill("30");
+  await expect(panel.locator("#schedule-create-duration")).toHaveValue("");
+  await expect(panel.locator("#schedule-create-duration")).toHaveAccessibleDescription(
+    "Dakika. Boş bırakırsanız merkezin program süresi kullanılır.",
+  );
   await panel.locator("#schedule-create-weeks").fill("1");
   await panel.getByRole("button", { name: "Pzt", exact: true }).click();
   await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
   await expect(panel.getByRole("alert")).toContainText("uygunluk kurallarını");
   await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toHaveCount(0);
   await panel.locator("#schedule-create-time").fill("11:30");
+  await panel.locator("#schedule-create-duration").fill("30");
   await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
   await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toBeEnabled();
   expect(f.state.previews).toBe(2);

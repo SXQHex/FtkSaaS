@@ -4,7 +4,7 @@ import type {
   EventPaymentPreparationView,
   EventRegistrationPaymentSummary,
 } from "../src/lib/api-contracts/generated.js";
-import { mockEvents, eventId } from "./events-fixture.js";
+import { mockEvents, eventId, product } from "./events-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 export const detailIds = {
@@ -21,6 +21,8 @@ export async function mockEventDetail(
     existing?: EventRegistrationPaymentSummary["status"];
     deniedCollection?: boolean;
     refreshFailure?: boolean;
+    documents?: boolean;
+    practice?: boolean;
   } = {},
 ) {
   const base = await mockEvents(page),
@@ -31,8 +33,42 @@ export async function mockEventDetail(
   event.actual_start_history = [];
   event.interval = { starts_at: "2026-11-15T15:00:00Z", ends_at: "2026-11-15T16:00:00Z" };
   event.terms.full_payment_required = true;
+  if (options.documents || options.practice) {
+    event.terms.full_payment_required = false;
+    event.terms.fee_minor = "0";
+  }
+  if (options.practice) {
+    event.name = "Sentetik paketli Pratik";
+    event.terms.package_usage = "eligibility_only";
+    event.terms.allowed_product_version_ids = [product.version_id];
+  }
+  const practiceRight = {
+    sale_id: "019ab7b0-0000-7000-8000-000000000093",
+    person_id: I.instructor,
+    product_version_id: product.version_id,
+    booking_mode: "flexible",
+    kind: "credits",
+    start_date: "2026-11-01",
+    end_date: "2026-12-01",
+    timezone: "Europe/Istanbul",
+    state: "active",
+    available: 8,
+    reserved: 0,
+    consumed: 0,
+    deficit: 0,
+    quotas: [],
+    deficit_scopes: [],
+  };
+  const documentId = "019ab7b0-0000-7000-8000-000000000099";
+  const documentContext = {
+    gate: "event_registration",
+    subject: { type: "events", id: event.id },
+    event_registration_preview_id: detailIds.preview,
+  };
+  let documentAccepted = false;
   const state = {
     event,
+    practiceRight,
     reads: [] as { op: string; request: Record<string, unknown> }[],
     payment: undefined as EventPaymentPreparationView | undefined,
     writes: [] as { op: string; request: Record<string, unknown> }[],
@@ -120,6 +156,52 @@ export async function mockEventDetail(
         status: retryable ? 503 : 403,
         json: { ok: false, error: { code, retryable, trace_id: I.role } },
       });
+    if (options.documents && op === "people_list_v1")
+      return send({
+        items: [
+          { id: I.self, display_name: "Örnek yönetici" },
+          { id: I.instructor, display_name: "Örnek Eğitmen" },
+        ],
+        next_cursor: null,
+      });
+    if (options.documents && op === "document_requirements_get_v1") {
+      expect(r.person_id).toBe(I.self);
+      expect(r.context).toEqual(documentContext);
+      if (r.content_file_id) expect(r.content_file_id).toBe(documentId);
+      return send([
+        {
+          id: documentId,
+          version_id: documentId,
+          file: { type: "files", id: documentId },
+          name: "Etkinlik koşulları",
+          required_at: "event_registration",
+          accepted: documentAccepted,
+          ...(r.content_file_id
+            ? {
+                content: {
+                  encoding: "base64",
+                  mime: "text/plain",
+                  data: Buffer.from("Sentetik etkinlik koşulları").toString("base64"),
+                },
+              }
+            : {}),
+        },
+      ]);
+    }
+    if (options.documents && op === "document_accept_v1") {
+      expect(r.context).toEqual(documentContext);
+      expect(r.document_version_id).toBe(documentId);
+      expect(r).not.toHaveProperty("person_id");
+      documentAccepted = true;
+      state.writes.push({ op, request: r });
+      return send({ primary_id: documentId, operation_id: I.role, version: 1, related: [] });
+    }
+    if (
+      options.documents &&
+      op === "event_register_v1" &&
+      (!documentAccepted || r.person_id !== I.self)
+    )
+      return reject("DOCUMENT_REQUIRED");
     if (
       op.startsWith("event_") ||
       (op === "management_state_get_v1" && String(r.operation).startsWith("event_"))
@@ -167,7 +249,7 @@ export async function mockEventDetail(
       }
       return send(event);
     }
-    if (op === "entitlements_get_v1") return send([]);
+    if (op === "entitlements_get_v1") return send(options.practice ? [practiceRight] : []);
     if (op === "management_state_get_v1" && r.operation === "collection_record_v1")
       return send({
         items: [
@@ -362,6 +444,7 @@ export async function mockEventDetail(
           primary = { type: "cash_movements", id: detailIds.cash };
         }
         if (op === "event_register_v1") {
+          if (options.practice) expect(r.sale_id).toBe(practiceRight.sale_id);
           if (mode === "capacity") {
             state.payment!.state = "capacity_closed";
             state.payment!.remaining_minor = "0";
@@ -375,6 +458,7 @@ export async function mockEventDetail(
               state: "active",
               attendance_result: "unmarked",
               version: 1,
+              ...(options.practice ? { package_eligible: true } : {}),
             });
             if (state.payment) {
               state.payment.state = "registered";

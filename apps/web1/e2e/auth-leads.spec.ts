@@ -1,6 +1,7 @@
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockLeads, openLead, closeLead, leadIds } from "./leads-fixture.js";
+import { studioIds as I } from "./studio-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 const footer = (page: import("@playwright/test").Page) =>
   page.locator('[data-slot="sheet-footer"]');
@@ -9,8 +10,51 @@ test("phone lead creation keeps person and candidate writes separate without an 
 }) => {
   await page.setViewportSize({ width: 320, height: 750 });
   const state = await mockLeads(page);
+  const source = { scope: "organization", key: "phone", version: 2 };
+  const defaults = { source: "phone", interest: "Akşam Tango" };
+  await page.route("**/functions/v1/backend-v1/settings_catalog_get_v1", (route) => {
+    const request = route.request().postDataJSON();
+    if (request.scope !== "center") return route.fallback();
+    expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          scope: "center",
+          catalog_version: 24,
+          fields: [],
+          defaults: {},
+          brand_packages: [],
+          limitations: [],
+          preparation_templates: {
+            availability: [],
+            packages: [],
+            package_currency_suggestion: "TRY",
+            crm: [{ source, template: { key: "phone", name: "Telefon başvurusu", defaults } }],
+          },
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/settings_preparation_resolve_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      source,
+      kind: "crm",
+    });
+    return route.fulfill({
+      json: { ok: true, trace_id: I.role, data: { source, kind: "crm", defaults } },
+    });
+  });
   await page.getByRole("button", { name: "Aday ekle", exact: true }).click();
   let dialog = page.getByRole("dialog");
+  await dialog
+    .getByRole("combobox", { name: "Hazırlık şablonu" })
+    .selectOption({ label: "Telefon başvurusu · Organizasyon" });
+  await dialog.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  expect(state.writes).toHaveLength(0);
   await dialog.getByLabel("Ad soyad", { exact: false }).fill("Telefon adayı");
   await dialog.getByLabel("Telefon", { exact: false }).fill("+905550000001");
   await footer(page)
@@ -20,11 +64,14 @@ test("phone lead creation keeps person and candidate writes separate without an 
   expect(state.effects).toEqual(["person_create_v1"]);
   expect(state.leads).toHaveLength(1);
   await dialog.getByRole("button", { name: "Aday kaydına devam et", exact: true }).click();
-  await dialog.getByLabel("İlgilendiği ders", { exact: true }).fill("Akşam Tango");
+  await expect(dialog.getByLabel("İlgilendiği ders", { exact: true })).toHaveValue(
+    defaults.interest,
+  );
   await footer(page).getByRole("button", { name: "Kaydet", exact: true }).click();
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.effects).toEqual(["person_create_v1", "lead_save_v1"]);
   expect(state.writes[0]!.request.contacts).toEqual([{ kind: "phone", value: "+905550000001" }]);
+  expect(state.writes[1]!.request).toMatchObject(defaults);
   await closeLead(page);
   await expect(page.getByRole("button", { name: "Telefon adayı", exact: true })).toBeVisible();
 });

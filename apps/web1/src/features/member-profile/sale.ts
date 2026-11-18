@@ -19,6 +19,7 @@ export interface SaleReview {
   product: ProductView;
   request: Omit<RequestSalePreview, "request_id">;
   preview: SalePreview;
+  purchase: { id: string; expiresAt: string };
   collectAfterSale: boolean;
 }
 export interface SaleIntent {
@@ -37,6 +38,7 @@ export async function previewSale(
   timezone: string,
   product: ProductView,
   draft: MemberDraft,
+  previous?: SaleReview,
 ): Promise<SaleReview> {
   z.uuid().parse(personId);
   const value = z
@@ -63,6 +65,15 @@ export async function previewSale(
     end_date: value.endDate,
     ...(value.netMinor === "" ? {} : { net_minor: value.netMinor }),
   };
+  const samePurchase =
+    previous &&
+    previous.scope.accountId === scope.accountId &&
+    previous.scope.orgId === scope.orgId &&
+    previous.scope.centerId === scope.centerId &&
+    Date.parse(previous.purchase.expiresAt) > Date.now() &&
+    JSON.stringify({ ...previous.request, document_purchase_id: undefined }) ===
+      JSON.stringify(request);
+  if (samePurchase) request.document_purchase_id = previous.purchase.id;
   const backend = await scopedBackend(scope),
     preview = await backend.call("sale_preview_v1", { ...request, request_id: uuidv7() });
   z.uuid().parse(preview.id);
@@ -101,11 +112,18 @@ export async function previewSale(
     product: structuredClone(product),
     request,
     preview,
+    purchase: samePurchase
+      ? structuredClone(previous.purchase)
+      : { id: preview.id, expiresAt: preview.expires_at },
     collectAfterSale: value.collectAfterSale,
   };
 }
 export function saleIntent(review: SaleReview): SaleIntent {
-  if (review.preview.blockers.length || Date.parse(review.preview.expires_at) <= Date.now())
+  if (
+    review.preview.blockers.length ||
+    Date.parse(review.preview.expires_at) <= Date.now() ||
+    Date.parse(review.purchase.expiresAt) <= Date.now()
+  )
     throw new Error("PROFILE_SALE_PREVIEW_STALE");
   return {
     scope: { ...review.scope },

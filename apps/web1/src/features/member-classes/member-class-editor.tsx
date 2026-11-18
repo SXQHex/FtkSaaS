@@ -70,7 +70,27 @@ export function MemberClassEditor({
     };
   }, []);
   const command = useMemberCommand({
-    write: writeMemberClass,
+    write: async (intent: Parameters<typeof writeMemberClass>[0]) => {
+      try {
+        return await writeMemberClass(intent);
+      } catch (cause) {
+        if (
+          mounted.current &&
+          cause instanceof BackendError &&
+          !cause.retryable &&
+          [
+            "DOCUMENT_REQUIRED",
+            "DEBT_BOOKING_BLOCKED",
+            "ENTITLEMENT_UNAVAILABLE",
+            "INSUFFICIENT_STUDENT_CREDIT",
+            "CREDIT_LIMIT_EXCEEDED",
+            "QUOTA_EXCEEDED",
+          ].includes(cause.code)
+        )
+          setError(scheduleBackendError(cause.code, t));
+        throw cause;
+      }
+    },
     readReceipt: readMemberClassReceipt,
     readResult: readMemberClassResult,
     onRefresh: onSaved,

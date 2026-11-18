@@ -13,11 +13,11 @@ Bu çalışmanın hedefi Pro ekranlarını yayımlanmış gerçek API bağlantı
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım      | Plan | Sayfa/işlev      | Durum                         | Son doğrulama veya engel          | Sonraki eylem                                                                                                                                                                                                                                                                     |
-| --------------- | ---- | ---------------- | ----------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| G-PRO / P01–P17 | Pro  | Bütünleşik kabul | Toplam46/46; ekranlar kapandı | Seçili otomatik paketler başarılı | Başlangıç sırası izleniyor. P01.1 kapalı; P01.4’ün native recovery/ilk parola ve posta hedefi kabulü W1-BE-36 desteğini bekliyor, P01 bütünü kapalı değil. Bağımsız sırada **P02–P06 kapalı**; dosya sırasındaki sonraki uygulanabilir iş **P15.1**. Tam Pro aday doğrulaması finalde tek kez yapılır. |
+| Aktif adım          | Plan | İşlev                              | Durum                               | Sonraki eylem                                                         |
+| ------------------- | ---- | ---------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
+| **G-PRO-04.1–04.2** | Pro  | Son kalite zinciri ve statik çıktı | P01–P17 kapalı · 46/46 ekran kapalı | Teslim adayında kalite zincirini ve statik tarayıcı kabulünü tamamla. |
 
-Git devamı: `feat/web1-pro-completion`, [PR326](https://github.com/SXQHex/FtkSaaS/pull/326). PR327’nin main kaynağı `3b4eaf28f469eef3f66be82aaa3dc65759313ac7` dala birleştirildi ve kanonik typed snapshot üretildi; aynı kaynağın CI/development kanıtı [backend talepleri kaydında](request.md). Kalan kabul, tek toplu paralel paketle yürütülür; yalnız başarısız paket düzeltmeden sonra tekrarlanır. Backend ihtiyacı yalnız request.md’ye yazılır ve uygulanabilir bağımsız işe devam edilir.
+Git devamı: PR326 main’de. Yeni kabul dalı `feat/web1-pro-acceptance` güncel main `d48dc4d17abed6f6cc686639a4d763e0979937d2` tabanında. [Backend desteği ve güncel CI kanıtı](request.md).
 
 Kullanıcı gerekli soruların açık WhatsApp uygulamasındaki kendine mesaj sohbetine gönderilmesini ve yanıtların oradan okunmasını istedi; yalnız bu görev soruları/teyitleri o kanaldan gönderilir. Son yeniden denemede WhatsApp `cgWindowNotFound`, başka uygulama penceresi seçimi timeout verdi; pencere yeniden erişilebilir olduğunda yanıt kontrol edilir. E02 erteleme cevabı bu hata öncesinde okundu ve teyit edildi.
 
@@ -914,7 +914,7 @@ T04 kabulü: React Aria RouterProvider → TanStack navigate; mevcut menüler ve
 
 Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun sayfayı izler. İlk Auth sayfası P01.2/P01.3 kapsamındaki giriştir, ardından P01.1 kayıt akışına geçilir. P15.1’i ilk belge gerektiren işlemden önce ele al. P15.2–P15.4’ü ilgili tüketiciyle birlikte doğrula. P17.1’deki ayarları da ilk kullanıldıkları pakette bağla.
 
-### P01 · Kimlik, hesap ve güvenlik
+### P01 · Kimlik, hesap ve güvenlik (kapalı)
 
 | Önkoşul                                | Sözleşme                                                                              | Doğrulama                     |
 | -------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------- |
@@ -925,12 +925,13 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 - [x] **P01.2** · Parolalı giriş, çıkış ve korumalı sayfayı yenileme akışını tamamla. Çıkıştan sonra aynı adresi açan kullanıcı giriş ekranına ulaşır.
 - [x] **P01.3** · Google giriş/dönüşünü ve mevcut hesapta kimlik bağlama/kaldırmayı tamamla. Kullanıcı kendi hesabına döner ve kalan giriş yöntemleri güncel okunur. Gerçek giriş/dönüş E01, normal Chrome bağlama/yenileme/kaldırma ve güncel native kimlik/güvenlik geçmişi kabulü E10 kaydındadır.
-- [ ] **P01.4** · Parola kurtarma ve hesap içi parola değişikliğini tamamla. Geçerli bağlantıyla yeni parola kullanılabilir, tüketilmiş bağlantı anlaşılır hata verir.
+- [x] **P01.4** · Parola kurtarma ve hesap içi parola değişikliğini tamamla. Geçerli bağlantıyla yeni parola kullanılabilir, tüketilmiş bağlantı anlaşılır hata verir.
   - [x] Hesap içi native parola: aktif Pro öğrenci synthetic fixture, local5173/headless Chromium, gerçek development Auth/Edge. Önce yalnız yeni A oturumu, sonra yalnız bu çalışmanın yeni A/B native session ID’leri bulunduğu ve cursor devamı olmadığı exact preflight ile doğrulandı. Yanlış mevcut parola native400 reddi → doğru mevcut/yeni parola native200 → A korunarak account/session/security_history200 → B reload account_get401/login → yeni parolayla giriş geçti. Başlangıç parolası aynı UI üzerinden geri yüklendi ve native girişle doğrulandı; son UI local çıkış yapıldı. Test hazırlığında A’nın30sn cache’i yerine gerçek reload ile yeni liste okundu; uygulama cache politikası gevşetilmedi. Dört kontrol edilen synthetic fixture’da yalnız bu scriptin iki exact özel User-Agent etiketini taşıyan eski test oturumları seçili UI revoke ile temizlendi; toplam6 kapatma, başka UA veya current satırı hedeflenmedi. Credential/session ID/nonce/kişisel değer/gerçek screenshot kaydı yok; yalnız rol/adım/HTTP status ve passed:true/restored:true kanıtı `.tmp/e10-password-hosted-result.json`, temizleme sonucu `.tmp/e10-password-session-cleanup.json`. Hosted reset/seed/SQL yok.
   - [x] Eski oturum nonce sağlayıcı kabulü backend’in [S08 kaydında](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-backend-kapanisi): gerçek24saat üzeri oturum, doğal expired/yanlış/geçerli/tüketilmiş nonce, diğer oturum reddi ve özgün parola restore kanıtları ayrıdır. Mevcut frontend açık reauthenticate/nonce gönderme ve hata-kurtarma bağlantısı `auth-flow.spec.ts` paketinde geçti; bu frontend fixture’ı gerçek posta kanıtı diye sunulmadı.
-  - [ ] Gerçek e-posta recovery/callback ve doğal3600sn/tüketilmiş proof kabulü [W1-BE-36](request.md#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) mevcut backend kabul aracının doğru callback desteğine bağlı; native password_changed güvenlik bildiriminin doğru frontend bağlantısı kabulü. Yerel fixture bu kontrolleri kapatmaz. Google-only ilk parola yolu provider’da ayrıca doğrulanır.
-
-  - [x] Native password_changed posta teslimi: Gmail salt okunur incelemesinde önceki parola kabulündeki iki sahip olunan fixture’a ait dört “Parolanız değiştirildi” bildirimi eşleşti; plain/HTML içerik, güvenlik eylemi etiketi ve DKIM/SPF geçişi doğrulandı. Kurtarma bağlantısının origin’i frontend ile uyuşmadığından bağlantı kabulü açık kalır; hedefe gidilmedi. Kanıt yalnız fixture sırası/tarih/boolean taşır: `.tmp/e10-password-notification-mail-result.json`. Frontend adresi `https://app.fethiyetango.com`; ilgisiz hedef uygulama veya kanıtlara taşınmaz.
+  - [x] Gerçek development recovery: PR328 kaynaklı runner, kontrollü Pro öğrenci hesabı ve gerçek posta ile pinli `127.0.0.1:5173/auth/callback?next=/reset-password`, yanlış/doğru PKCE, parola değişimi, önceki oturumun Edge reddi ve tüketilmiş link/code reddi geçti. Özgün parola bağımsız girişle doğrulandı ve test oturumları kapandı. Güvenli sonuç `.tmp/p01-recovery-native-result.json`.
+  - [x] Kullanılmamış gerçek kurtarma bağlantısının doğal süre dolumu: 18 Kasım 03.01 TSİ’de ilk isteğin Auth logu `expired` ve HTTP 303 gösterdi. İlk otomatik runner kabul vermedi. Sonraki yönlendirme tanısı doğru callback/next, `otp_expired` ve oturum kodu ya da token dönmediğini doğruladı. Hedefe yönlendirme takip edilmedi. Güvenli özet `.tmp/p01-recovery-expiry-diagnostic.json`.
+  - [x] Native ilk parola: sentetik Google-only hesap gerçek yerel Auth oturumunda ilk parolayı ekledi. Parola girişi aynı Auth ve Edge hesabına döndü. [W1-BE-41](request.md#w1-be-41--native-ilk-parola-kabulü).
+  - [x] Gerçek development güvenlik postası: yeni parola ve geri yükleme postalarında eylem hedefi tam `https://app.fethiyetango.com/forgot-password`. [W1-BE-37](request.md#w1-be-37--native-güvenlik-postasının-kurtarma-yolu).
 
 - [x] **P01.5** · TOTP kurulumunu, native doğrulamayı ve korumalı hedefe dönüşü tamamla. Yanlış kodda hedef kapalı kalır, doğru koddan sonra erişim yeniden okunur.
 - [x] **P01.6** · Profil, iletişim bilgisi ve fotoğrafı güncelle. Yenileme sonrasında kayıtlı değer ve sağlayıcının bekleyen/doğrulanmış iletişim durumu doğru görünür.
@@ -1026,18 +1027,22 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 - [x] **P06.5** · Öğrenciden özel ders talebi gönder. Yetkili kullanıcı onay, ret veya alternatif saat verdiğinde öğrenci güncel sonucu görür.
       P06.5 kabulü:18 birim/16 tarayıcı geçti. Öğrenci create/withdraw/alternatif kabulü; merkez gerekçeli ret, alternatif ve mevcut/yeni seansla ayrı onay; öğrencide güncel onay/ret ve reload doğrulandı. Teklif veya öğrenci kabulü rezervasyon/hak tutmaz; native rezervasyon bağı yalnız merkez onayından sonra okunur. Belirsiz sonuç, ACK read-only kurtarma, stale kaynak ve yetki sınırları dahil. Gerçek aktör/atomik sınır `p01-lesson-requests.test.mjs:68–114`, [G-PRO-03.1](#pro-kabulu) kaynak/run bağı; UI fixture gerçek provider kabulü sayılmadı. [Otomatik rapor](../test-reports/local-verification.md).
 
-### P15 · Sürümlü belge ve açık onay
+### P15 · Sürümlü belge ve açık onay (kapalı)
 
 | Önkoşul                                           | Sözleşme                                                                              | Doğrulama                                 |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------- |
 | P02 · ilk satış, rezervasyon veya katılım bağlamı | F30, F33 · [WF11](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf11) | Gerçek sürüm, kişi, işlem ve geçmiş kaydı |
 
-- [ ] **P15.1** · Yetkili kullanıcı belge kaynağını hazırlar, etkiyi önizler ve sürümü yayımlar. Yeni sürüm yetkili listeden geri okunur.
-- [ ] **P15.2** · İlk tüketici akışında gerekli metin veya özel dosyayı güncel işlem bağlamında aç. İlgili kişi açıkça kabul edince aynı bağlamda kişi ve sürümle eşleşen onay görünür.
-- [ ] **P15.3** · Eski sürüm, yabancı kişi ve eksik onayı dene. Yetkisiz dosya okunamaz, zorunlu onay eksikken ilgili yeni işlem ilerlemez. Mevcut rezervasyon sözleşmedeki korumayı sürdürür.
-- [ ] **P15.4** · Sonraki satış, rezervasyon ve katılım tüketicilerinde ilgili gereksinim okumasını bağla. Kayıt geçmişi yetkili kullanıcıya gösterilir.
+- [x] **P15.1** · Yetkili kullanıcı belge kaynağını hazırlar, etkiyi önizler ve sürümü yayımlar. Yeni sürüm yetkili listeden geri okunur.
+      P15.1 kabulü:27 birim/14 tarayıcı içeren yayın/bağlam paketi geçti. Gerçek dosya byte/checksum niyeti, scoped signed upload, native complete/etki/yayın zinciri ve yetkili katalogdan yeni sürümü okuma; kayıp yanıt, ACK sonrası yalnız okuma ve mevcut işlemlerin korunması doğrulandı. Fixture sağlayıcı/hosted kanıtı sayılmadı; native kaynak/run bağı [G-PRO-03.1](#pro-kabulu), ayrıntı [otomatik raporda](../test-reports/local-verification.md).
+- [x] **P15.2** · İlk tüketici akışında gerekli metin veya özel dosyayı güncel işlem bağlamında aç. İlgili kişi açıkça kabul edince aynı bağlamda kişi ve sürümle eşleşen onay görünür.
+- [x] **P15.3** · Eski sürüm, yabancı kişi ve eksik onayı dene. Yetkisiz dosya okunamaz, zorunlu onay eksikken ilgili yeni işlem ilerlemez. Mevcut rezervasyon sözleşmedeki korumayı sürdürür.
+      P15.2–P15.3 kabulü: belge ve rezervasyon paketleri güncel metin/özel dosya, açık kişi onayı, aynı bağlam ve sürümden yeniden okuma, değişmiş sürümde yazma reddi ve onay sonrası yeni rezervasyon önizlemesini doğruladı. Yabancı kişi, geçersiz eski sürüm ve eksik onayın native reddi `content-documents-acceptance.mjs` ile [G-PRO-03.1](#pro-kabulu) kaynak kabulünde.
+- [x] **P15.4** · Sonraki satış, rezervasyon ve katılım tüketicilerinde ilgili gereksinim okumasını bağla. Kayıt geçmişi yetkili kullanıcıya gösterilir.
+  - [x] Satış aynı açık satın alma bağlamını korur, belge onayından sonra yeni önizleme ve ayrı satış onayı ister. Etkinlikte kendi kayıt belgesi ve hesapta mevcut rezervasyon/yoklama ile etkinlik belgeleri gerçek native bağlamları kullanır. 10 birim/19 tarayıcı, ortak Axe/reflow ve tip/lint geçti. [Otomatik rapor](../test-reports/local-verification.md).
+  - [x] İlk kayıt önizleme kimliği ve gerçek ürün sürümü üyenin belge okuma/onayında korundu. Yönetici başka kişi adına onay veremiyor. Playwright etkinlik ve üye belge paketleri geçti. Üye onayı sonrası yöneticinin ilk kaydı tamamlaması [W1-BE-38](request.md#w1-be-38--etkinlik-kaydı-öncesi-üyenin-kendi-belge-bağlamını-keşfi) native kabulünde doğrulandı.
 
-### P07 · Ürün, satış ve paket hakları
+### P07 · Ürün, satış ve paket hakları (kapalı)
 
 | Önkoşul                                                | Sözleşme                                                                                        | Doğrulama                      |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------ |
@@ -1048,10 +1053,14 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
   - [x] Kredili owned ürünün doğru sürümüyle gerçek normal satış preview/onay/apply ve geçerlilik/hak/finans okuması E14 native satış kaydında geçti.
   - [x] Aynı owned kotalı süreli ürünün gerçek normal satış/tarih/kota ve ayrı1200 TL borç kabulü E14 süreli satış kaydında geçti; ürün-genel gün varsayımı yoktur.
   - [x] Seçicide native merkez/disiplin adları, kullanım hedefleri, rezervasyon biçimi ve kota; açık tarih alanları ve aynı immutable koşullarla inceleme görünür. İki owned ürünün gerçek scope etiketi/mobil salt-okuma kabulü E14 kapsam kaydında geçti.
-- [ ] **P07.2** · Yetkili kullanıcı indirimli satışın bedel, hak ve borç etkisini önizleyip uygular. Öğrencinin satış, hak ve finans kayıtları önizlemeyle eşleşir. W1-BE-12 kaynak desteği karşılandı; indirim için açık sale.discount yetkisi ve sale_discount_percent_upper politikası gerekir. Normal satış veya sonradan borç düzeltme bu kabul değildir.
-- [ ] **P07.3** · Sabit grup kaydını uygun ürün ve programla tamamla. Hak ve kesin rezervasyonlar güncel okumalarda sözleşmedeki etkiyi gösterir.
-- [ ] **P07.4** · Uygun paketi dondur ve dondurmayı bitir. Geçerlilik ve etkilenen rezervasyonlar yeni okumada önizlemeyle uyuşur.
-- [ ] **P07.5** · Değişim, yenileme ve sonlandırma işlemlerini uygun satışlarda ayrı ayrı uygula. Her sonucun hak hareketleri ve eski satış geçmişi izlenebilir.
+- [x] **P07.2** · Yetkili kullanıcı indirimli satışın bedel, hak ve borç etkisini önizleyip uygular. Öğrencinin satış, hak ve finans kayıtları önizlemeyle eşleşir. W1-BE-12 kaynak desteği karşılandı; indirim için açık sale.discount yetkisi ve sale_discount_percent_upper politikası gerekir. Normal satış veya sonradan borç düzeltme bu kabul değildir.
+      P07.2 kabulü: `auth-member-profile.spec.ts` paketinde 750 TL indirimli bedel, kota, ayrı onay, tek apply ve hak/finans yeniden okuması geçti. Native [G-PRO-03.1](#pro-kabulu) kapsamındaki `sale-discount-acceptance.mjs` açık yetki, politika, sınır reddi, eski önizleme ve satış/hak/borç eşliğini doğruladı.
+- [x] **P07.3** · Sabit grup kaydını uygun ürün ve programla tamamla. Hak ve kesin rezervasyonlar güncel okumalarda sözleşmedeki etkiyi gösterir.
+      P07.3 kabulü: ACK sonrası rezervasyonun native `source_summary` bağı seçilen satışla doğrulanır. Eksik, kısıtlı ya da başka kaynakta başarı gösterilmez. 8 birim ve 9 tarayıcı senaryosu geçti. İlk koşuda zaman aşımına uğrayan iki senaryo aynı sınırla seçili tekrarda geçti. Kanıt `.tmp/p07-group-first-playwright.json`, `.tmp/p07-group-retry.log`.
+- [x] **P07.4** · Uygun paketi dondur ve dondurmayı bitir. Geçerlilik ve etkilenen rezervasyonlar yeni okumada önizlemeyle uyuşur.
+      P07.4 kabulü: E14 otomatik paketi dondurma ve erken bitişi, güncel dönem ile korunan rezervasyon ve hakları doğruladı. Native `program-session-lifecycle.test.mjs` aynı satışta geçerlilik uzaması/kısalması, mevcut rezervasyonun aktif kalması, dondurma sırasında yeni rezervasyon reddi ve erken bitiş sonrası yeniden rezervasyonu doğruladı. [Native kaynak kabulü](#pro-kabulu).
+- [x] **P07.5** · Değişim, yenileme ve sonlandırma işlemlerini uygun satışlarda ayrı ayrı uygula. Her sonucun hak hareketleri ve eski satış geçmişi izlenebilir.
+      P07.5 kabulü: değişimde korunan rezervasyonun yeni satışa bağlı olduğu yetkili envanterden doğrulanır. Bağ okunmadan ACK sonucu tekrar yazılmaz. Yenileme, sonlandırma ve ayrı değişim için 7 birim/10 tarayıcı, Axe/reflow ve tip/lint geçti. Native `pro-lifecycle-earnings-acceptance.mjs` eski satış, korunan rezervasyon ve yeni hak bakiyesini doğruladı. [Otomatik rapor](../test-reports/local-verification.md).
 
 ### P08 · Manuel tahsilat ve öğrenci alacağı (kapalı)
 
@@ -1068,73 +1077,89 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
   - [x] Yetkili native nakit alacak iadesi ve gerçek bakiye okuması E20 native nakit alacak iadesi kaydında doğrulandı.
   - [x] Native self bağından ve yetkili merkez görünümünden aynı sentetik kişinin borç/alacağı yerel CI’da karşılaştırıldı. Gerçek oturum mutabakatının sahibi POST-PRO.CHAIN; yerel sonuç gerçek sağlayıcı kanıtı sayılmaz.
 
-### P09 · Rezervasyon, bekleme ve teklif
+### P09 · Rezervasyon, bekleme ve teklif (kapalı)
 
 | Önkoşul                                              | Sözleşme                                                                                                                                                                    | Doğrulama                                    |
 | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | P06, P07 · borçlu senaryoda P08 · gereken onayda P15 | F09, F11, F12, F15 · [WF06](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf06), [WF19](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf19) | İki öğrenci oturumu ve yetkili liste okuması |
 
-- [ ] **P09.1** · Yönetici ve öğrenci kendi izinli yollarından rezervasyon oluşturup iptal eder. Kontenjan ile ayrılmış/kullanılabilir hak yeniden okumada tutarlıdır.
-- [ ] **P09.2** · Hak, borç ve belge koşullarını ayrı test verileriyle dene. Uygulama reddin nedenini gösterir, başarısız istekte hak veya yer ayrılmaz.
-- [ ] **P09.3** · Son yer için iki uygun oturumdan istek gönder. Kesin rezervasyon sayısı izinli kapasiteyle sınırlı kalır.
-- [ ] **P09.4** · Dolu seansta beklemeye katıl ve ayrıl. Sıraya girişte kesin rezervasyon oluşmaz. Yer açılınca uygun kişiye süreli teklif görünür.
-- [ ] **P09.5** · Teklif kabulünü, reddini ve süre dolmasını ayrı örneklerde çalıştır. Kabulde güncel uygunluk denetlenir ve liste, hak ve rezervasyon sonuçları uyuşur.
+- [x] **P09.1** · Yönetici ve öğrenci kendi izinli yollarından rezervasyon oluşturup iptal eder. Kontenjan ile ayrılmış/kullanılabilir hak yeniden okumada tutarlıdır.
+      Yönetici/öğrenci ACK okuması artık rezervasyonun native paket bağını doğruluyor. Yanlış bağda yalnız okuma tekrarı açılır. Yönetici ve öğrenci oluşturma/iptal, kapasite ve haklar doğrulandı. 9 birim ve 27 tarayıcı senaryosu geçti. Program geçişinde bir tıklama gerçek düğmeye bağlandı ve yalnız bu senaryo yeniden geçti. Kanıt `.tmp/p09-booking-first-playwright.json`, `.tmp/p09-booking-retry.log` ve E14 iptal kabulü.
+- [x] **P09.2** · Hak, borç ve belge koşullarını ayrı test verileriyle dene. Uygulama reddin nedenini gösterir, başarısız istekte hak veya yer ayrılmaz.
+      Hak ve belge retleri, ayrı mesaj/odak ve sıfır tahsis/kontenjan değişikliğiyle doğrulandı. 9 birim/17 tarayıcı geçti (`.tmp/p09-rejections-playwright.json`). Güncel tarayıcı paketi hak, belge ve borç nedenlerini ayrı doğruladı. Borç reddi ayrı odaklanabilir mesaj gösterdi ve rezervasyon, hak veya kontenjan değişmedi. [Native yetki ve atomiklik kanıtı](request.md#w1-be-39--borç-nedeniyle-rezervasyon-reddinin-güvenli-nedeni).
+- [x] **P09.3** · Son yer için iki uygun oturumdan istek gönder. Kesin rezervasyon sayısı izinli kapasiteyle sınırlı kalır.
+      Native `starter-attendance-protection.test.mjs` paylaşılan WF06 işlemini iki ayrı öğrenci oturumuyla son tek yer için eşzamanlı çağırdı. Bir rezervasyon kabul edildi, diğeri CAPACITY_FULL ile döndü. [Native kaynak kabulü](#pro-kabulu).
+- [x] **P09.4** · Dolu seansta beklemeye katıl ve ayrıl. Sıraya girişte kesin rezervasyon oluşmaz. Yer açılınca uygun kişiye süreli teklif görünür.
+      Öğrenci tarayıcı senaryosunda dolu kategoriye katılma/ayrılma geçti. Native `p01-waitlist-workers.test.mjs` beklemenin rezervasyon oluşturmadığını, yer ve FIFO uygunluğunda süreli teklif çıktığını doğruladı.
+- [x] **P09.5** · Teklif kabulünü, reddini ve süre dolmasını ayrı örneklerde çalıştır. Kabulde güncel uygunluk denetlenir ve liste, hak ve rezervasyon sonuçları uyuşur.
+      Tarayıcıda ayrı kabul ve ret geçti. Native `p01-waitlist-workers.test.mjs` hak yetersizken aktif teklifin korunduğunu, uygun hakla tek rezervasyon oluştuğunu, reddin ve süre dolumunun sırayı ilerlettiğini ve tekrarın ek kayıt üretmediğini doğruladı.
 
-### P10 · Yoklama, hakediş ve eğitmen ödemesi
+### P10 · Yoklama, hakediş ve eğitmen ödemesi (kapalı)
 
 | Önkoşul  | Sözleşme                                                                                                                                                               | Doğrulama                                               |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | P05, P09 | F14, F15, F20 · [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF14](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf14) | Aynı seans için yoklama, hak ve hakediş karşılaştırması |
 
-- [ ] **P10.1** · Eğitmen kendi seansında hazır/gelmedi durumlarını taslak kaydeder. Taslakta kapanışa ait tüketim oluşmaz.
-- [ ] **P10.2** · Seansı fiilen görev alan eğitmenle kapat. Hak hareketi ve hakediş, katılım politikasına ve geçerli anlaşmaya uyar.
-- [ ] **P10.3** · Gerekçeli yoklama düzeltmesini uygula. Değişen hak ve hakediş etkileri kaynak kapanışla ilişkilidir.
-- [ ] **P10.4** · Seçili hakedişe ödeme gir ve izinli düzeltmeyi yap. Bekleyen ve ödenen tutarlar hareketlerle mutabıktır, fazla ödeme reddedilir.
+- [x] **P10.1** · Eğitmen kendi seansında hazır/gelmedi durumlarını taslak kaydeder. Taslakta kapanışa ait tüketim oluşmaz.
+- [x] **P10.2** · Seansı fiilen görev alan eğitmenle kapat. Hak hareketi ve hakediş, katılım politikasına ve geçerli anlaşmaya uyar.
+- [x] **P10.3** · Gerekçeli yoklama düzeltmesini uygula. Değişen hak ve hakediş etkileri kaynak kapanışla ilişkilidir.
+- [x] **P10.4** · Seçili hakedişe ödeme gir ve izinli düzeltmeyi yap. Bekleyen ve ödenen tutarlar hareketlerle mutabıktır, fazla ödeme reddedilir.
 
-### P11 · Günlük paneller ve kişisel takvim
+P10 kabulü: eğitmen yolunda gelmedi ve katıldı taslakları kapanış revizyonunu değiştirmedi; ayrı gerçekleşen eğitmen onayı, kapanış ve gerekçeli düzeltme ile 8 tarayıcı senaryosu ve ortak Axe/reflow geçti. Native `starter-attendance-protection.test.mjs` taslakta tahsisin korunmasını ve kapanış/düzeltmede tüketim/iade bağını, `pro-lifecycle-earnings-acceptance.mjs` geçerli anlaşma ve kaynak hakediş farkı, gerçek ödeme/düzeltme, eşzamanlı fazla ödeme reddi ve bakiye mutabakatını doğruladı. Yönetici ödeme, düzeltme ve erişilebilir fazla ödeme reddi E23 kayıtlarında. [Native kaynak kabulü](#pro-kabulu).
+
+### P11 · Günlük paneller ve kişisel takvim (kapalı)
 
 | Önkoşul            | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                   |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | P06, P08, P09, P10 | F06, F08, F11 · [WF07](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf07), [WF08](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf08), [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09) | Öğrenci, eğitmen ve gerçek takvim istemcisi |
 
-- [ ] **P11.1** · Öğrenci kendi yaklaşan dersini, haklarını ve borcunu görür. Rezervasyon iptali paneli yeniler.
+- [x] **P11.1** · Öğrenci kendi yaklaşan dersini, haklarını ve borcunu görür. Rezervasyon iptali paneli yeniler.
+      P11.1 kabulü: iptal doğrulandıktan sonra aynı hesap/merkez/kişi kapsamındaki ders, rezervasyon ve hak önbellekleri geçersiz kılınır. Aynı SPA oturumunda önceden açılmış Haklarım paneli 3 → 4 kullanılabilir hak ve doğru borç durumunu yeniden okudu. 11 birim/16 tarayıcı, ortak Axe/reflow, tip ve lint geçti. [Otomatik rapor](../test-reports/local-verification.md).
 - [x] **P11.2** · Eğitmen kendi programından seansı açar ve yetkili yoklamaya ulaşır. Başka eğitmenin kapalı görevine doğrudan erişim reddedilir.
 - [x] **P11.3** · Kişisel takvimin native HTTP/ICS, yetkili ders/saat ve eski bağlantının iptalini otomatik doğrula. Kullanıcının harici takvim istemcisindeki insan onayı [POST-PRO.CHAIN](#pro-kabulu) kapsamındadır; bu otomatik kabulü engellemez.
 
 P11.2/.3 kabulü: `auth-instructor-flows`8/8 ve `auth-member-account`8/8, eğitmen gün/hafta/atanmış seans ve kişisel takvim oluşturma/döndürme/geri alma yollarını doğruladı. Aynı kabul ağacındaki `personal-calendar-acceptance` (`schedule-reads.test.mjs`, API shard manifesti) gerçek native Auth + HTTP GET/HEAD, ICS ders/saat, canlı üyelik/rol sınırı ve eski URL retlerini doğrular; [G-PRO-03.1](#pro-kabulu) kaynak/run bağı kullanılır. Harici OS/takvim istemcisinde insan etkileşimi POST-PRO.CHAIN’de kalır.
 
-### P12 · Manuel CRM, deneme ve public başvuru
+### P12 · Manuel CRM, deneme ve public başvuru (kapalı)
 
 | Önkoşul                         | Sözleşme                                                                                                                                                                         | Doğrulama                                  |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | P04 · deneme için P06, P07, P09 | F07, F21, F22, F23, F25 · [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | Aday, öğrenci ve public ziyaretçi akışları |
 
-- [ ] **P12.1** · Telefon veya WhatsApp’tan gelen adayı elle kaydet, not ve takip tarihi ekle. Tarihli takip işi aynı kişi ve merkezle yeniden açılır.
-- [ ] **P12.2** · Adayı yetkili aşamaya taşı ve personel erişimini dene. Atanmış kullanıcı kendi adayının faaliyetini görebilir, kapsam dışı kayda erişemez.
-- [ ] **P12.3** · Uygun adaya deneme teklif et ve sonucunu işle. Kontrollü indirim yetkisi satışta denetlenir, ücretsiz denemede borç oluşmaz.
-- [ ] **P12.4** · Adayı açık işlemle öğrenciliğe dönüştür. Aynı kişi korunur, ikinci kişi veya otomatik satış oluşmaz. Yenileme ve hareketsiz öğrenci listeleri kaynak duruma uyar.
-- [ ] **P12.5** · Paylaşılan ders takviminden test başvurusu gönder ve merkez gelen kutusunda değerlendir. Hesapsız başvuru kesin rezervasyon yaratmaz. Geçerli sağlayıcı doğrulaması ve ret durumu yetkili ortamda denenir.
+- [x] **P12.1** · Telefon veya WhatsApp’tan gelen adayı elle kaydet, not ve takip tarihi ekle. Tarihli takip işi aynı kişi ve merkezle yeniden açılır.
+      P12.1 kabulü: E33 otomasyonunda telefon adayı, ayrı tarihli not ve exact faaliyet açılışı geçti. Native `crm-lifecycle-authority-acceptance.mjs` aynı aday ve merkezde takip oluşturma, tek kayıt ve kimlik/sürümle yeniden okumayı doğruladı. [Native kaynak kabulü](#pro-kabulu).
+- [x] **P12.2** · Adayı yetkili aşamaya taşı ve personel erişimini dene. Atanmış kullanıcı kendi adayının faaliyetini görebilir, kapsam dışı kayda erişemez.
+- [x] **P12.3** · Uygun adaya deneme teklif et ve sonucunu işle. Kontrollü indirim yetkisi satışta denetlenir, ücretsiz denemede borç oluşmaz.
+- [x] **P12.4** · Adayı açık işlemle öğrenciliğe dönüştür. Aynı kişi korunur, ikinci kişi veya otomatik satış oluşmaz. Yenileme ve hareketsiz öğrenci listeleri kaynak duruma uyar.
+- [x] **P12.5** · Paylaşılan ders takviminden test başvurusu gönder ve merkez gelen kutusunda değerlendir. Hesapsız başvuru kesin rezervasyon yaratmaz. Geçerli sağlayıcı doğrulaması ve ret durumu yetkili ortamda denenir.
 
-### P13 · Etkinlik, atölye ve Pratik
+P12.2–P12.5 kabulü: E33/E34/E35 tarayıcı raporları aşama, takip, deneme onayı, aynı kişi dönüşümü, native öğrenci listeleri ve anonim form/ret akışlarını doğruladı. CI’da `person-registry.test.mjs` atanmış personelin faaliyet okuması, kapsam dışı ret, ücretsiz denemede sıfır borç ve ayrı ücretli hak, `crm-followup-projections-acceptance.mjs` gerçek yenileme/hareketsizlik kapsamını doğruladı. İndirim yetkisi P07.2’de. `public-program-discovery-acceptance.mjs` aynı yayımlı form/consent → tek inbox kaydı, `crm-application-intake-acceptance.mjs` bot reddi ve sıfır rezervasyon, `crm-application-review-acceptance.mjs` yetkili incelemeyi doğruladı. Gerçek etkileşimli widget tekrarı POST-PRO.AUTH altında. [Native kaynak kabulü](#pro-kabulu).
+
+### P13 · Etkinlik, atölye ve Pratik (kapalı)
 
 | Önkoşul                                 | Sözleşme                                                                              | Doğrulama                                     |
 | --------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------- |
 | P06, P07, P08, P10 · gereken onayda P15 | F29, F30 · [WF15](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf15) | Etkinlik kaydı, katılım ve finans hareketleri |
 
-- [ ] **P13.1** · Kontenjanlı atölye yayımla, uygun katılımcıyı kaydet. Liste ve boş yer sayısı güncellenir, dolu etkinlikte izin dışı kayıt reddedilir.
-- [ ] **P13.2** · Katılımı işle ve ayrı örnekte etkinliği iptal et. Durum, belge ve varsa finans etkisi kaynak işlemlerden doğrulanır.
-- [ ] **P13.3** · Pakete bağlı Pratik katılımını kapat. Uygun paketle katılım kaydedilir, ders kredisi bakiyesi aynı kalır.
+- [x] **P13.1** · Kontenjanlı atölye yayımla, uygun katılımcıyı kaydet. Liste ve boş yer sayısı güncellenir, dolu etkinlikte izin dışı kayıt reddedilir.
+- [x] **P13.2** · Katılımı işle ve ayrı örnekte etkinliği iptal et. Durum, belge ve varsa finans etkisi kaynak işlemlerden doğrulanır.
+- [x] **P13.3** · Pakete bağlı Pratik katılımını kapat. Uygun paketle katılım kaydedilir, ders kredisi bakiyesi aynı kalır.
 
-### P14 · Bildirimler, hatırlatmalar ve CRM otomasyonu
+P13 kabulü: 11 etkinlik detay senaryosu yayımlama, kayıt, belge, kapasite, açık yoklama ve iptali doğruladı. Pratik seçili paketle kaydedilip ödeme komutu olmadan kapandı; seçili tekrar gerçek panel düğmesiyle geçti (`.tmp/p13-events-first-playwright.json`, `.tmp/p13-practice-retry.log`). Native `event-capacity-package-acceptance.mjs` Pro son yer yarışı, canlı uygunluk, yoklama sonrası değişmeyen kredi ve sıfır hak hareketini; `event-cancellation.test.mjs` ayrı iptal, finans/iade ve atomikliği doğruladı. Başkası için ilk kayıt öncesi belge keşfi P15.4/W1-BE-38’de açık. [Native kaynak kabulü](#pro-kabulu).
+
+### P14 · Bildirimler, hatırlatmalar ve CRM otomasyonu (kapalı)
 
 | Önkoşul                           | Sözleşme                                                                                                                                                                                                                                                                                                                       | Doğrulama                                          |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
 | P09 veya P13 olayı · CRM için P12 | F24, F26, F27 · [WF11](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf11), [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16), [WF20](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf20) | Inbox, iş sonucu ve yetkili test alıcısında teslim |
 
-- [ ] **P14.1** · Ders değişikliğiyle uygulama içi bildirim üret. Doğru kişinin gelen kutusunda okunmuş işareti yenilemede korunur.
-- [ ] **P14.2** · Pro kullanıcının işlemsel e-posta tercihini değiştir. Açık tercihte yetkili test alıcısına gerçekleşen teslimi, kapalı tercihte uygulanan kanal davranışını doğrula.
-- [ ] **P14.3** · Yaklaşan ders veya paket bitişi hatırlatmasını test verisiyle izle. Etkili tercih, dil ve sessiz saat politikasıyla gönderim zamanı ve içerik eşleşir. Teslim hatasında yalnız izinli yeniden deneme seçeneği görünür.
-- [ ] **P14.4** · Güncel segmentten takip otomasyonu oluştur. Aynı kaynak olayı yeniden işlendiğinde yetkili merkezde tek takip görevi okunur.
+- [x] **P14.1** · Ders değişikliğiyle uygulama içi bildirim üret. Doğru kişinin gelen kutusunda okunmuş işareti yenilemede korunur.
+      Native kabul doğru öğrenci, seans, tek bildirim ve diğer seansın dışlanmasını doğruladı. Öğrenci tarayıcı senaryosunda ders değişikliği bildirimi okundu ve yenilemede korundu. [Native kanıt](request.md#w1-be-40--ders-değişikliğinde-etkilenen-öğrenci-bildirimi).
+- [x] **P14.2** · Pro kullanıcının işlemsel e-posta tercihini değiştir. Açık tercihte yetkili test alıcısına gerçekleşen teslimi, kapalı tercihte uygulanan kanal davranışını doğrula.
+- [x] **P14.3** · Yaklaşan ders veya paket bitişi hatırlatmasını test verisiyle izle. Etkili tercih, dil ve sessiz saat politikasıyla gönderim zamanı ve içerik eşleşir. Teslim hatasında yalnız izinli yeniden deneme seçeneği görünür.
+- [x] **P14.4** · Güncel segmentten takip otomasyonu oluştur. Aynı kaynak olayı yeniden işlendiğinde yetkili merkezde tek takip görevi okunur.
+
+P14.2–P14.4 kanıtı: İşlemsel e-posta anahtarı hatırlatmadan bağımsız çalıştı ve seçim yenilemede korundu. Gelen kutusu ve hesap paketinde 20 tarayıcı senaryosu geçti. Ders/paket zamanlaması ve dil native `reminder-scheduling-acceptance.mjs` ile `transactional-email-acceptance.mjs` kapsamındadır. Yetkili yeniden deneme ve segment kaydı E40 otomasyonunda doğrulandı. Gerçek Pro [işlemsel e-posta](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı), [etkinlik hatırlatması ve CRM takibi](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p15p16-kaynak-kabulü-ve-xreq-021-canlı-doğrulaması) kendi backend kabullerindedir. [Otomatik rapor](../test-reports/local-verification.md).
 
 ### P16 · Rapor, CSV ve kontrollü içe aktarma (kapalı)
 
@@ -1149,13 +1174,23 @@ P11.2/.3 kabulü: `auth-instructor-flows`8/8 ve `auth-member-account`8/8, eğitm
 
 P16 kabulü: `auth-reports-native.spec.ts`7/7 ve rapor birim paketi8/8 geçti; para birimine ayrılmış kesin tutarlar, CSV baytları/aynı filtre, öğrenci açılış hakkı/borç eşlemesi, hatalı satır ve aynı native işin tamamlanması doğrulandı. Sunucu mutabakatı/tekrarsızlık kanıtı aynı main ağacındaki `p06-acceptance` ve `report-finance-tracking-acceptance` native paketleridir; kaynak/run bağı [G-PRO-03.1](#pro-kabulu) altında. Mock DB/worker kanıtı sayılmadı. Ayrıntı [otomatik yerel raporda](../test-reports/local-verification.md).
 
-### P17 · İşletme ayarları, abonelik ve yaşam döngüsü
+### P17 · İşletme ayarları, abonelik ve yaşam döngüsü (kapalı)
 
 | Önkoşul                                                 | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                       |
 | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | P02 · ayarın ilk tüketicisi · kapanışta ilgili kayıtlar | F03, F32, F33 · [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13), [WF17](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf17) | Güncel ayar, abonelik ve etkilenen gerçek işlem |
 
-- [ ] **P17.1** · İlgili akış geliştirilirken program, rezervasyon, etkinlik, finans ve CRM/otomasyon ayarlarını yetkili ekrana bağla. Seçilen değerin etkisini ilgili kullanıcı işlemiyle doğrula, kanıtı ayar grubuyla ilişkilendir.
+- [x] **P17.1** · İlgili akış geliştirilirken program, rezervasyon, etkinlik, finans ve CRM/otomasyon ayarlarını yetkili ekrana bağla. Seçilen değerin etkisini ilgili kullanıcı işlemiyle doğrula, kanıtı ayar grubuyla ilişkilendir.
+  - [x] Program süresi: E42 mevcut Stüdyo bilgileri formu seçili kapsamın değerini okur ve inceleme sonrası sürümlü değişikliği kaydeder. Haftalık programda boş süre native merkez ayarını, açık süre girilen değeri kullanır. 42 takvim ve 52 ayar birim testi ile ilgili Chromium senaryoları geçti. Yeni ayar senaryosu formun klavye gönderimiyle seçili tekrarda geçti. Native `starter-preparation-acceptance.mjs` merkez kopyasını, yerel değişikliğin yeni önizlemeye etkisini ve onay bekleyen eski sürenin korunmasını doğrular. [Son otomatik rapor](../test-reports/local-verification.md).
+  - [x] Çalışma takvimi: E42’de kaydedilen saatler yeni program önizlemesinde kullanıldı. Kapalı saat reddi, kayıttan sonra yeniden okuma ve aynı işlem anahtarıyla kurtarma otomatik testte, kapalı saatte seans reddi [gerçek Pro backend kabulünde](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-iş-takvimi-hosted-kabulü--12-kasım-2026) doğrulandı.
+  - [x] Program ve CRM hazırlığı: yetkili merkez kataloğu ve sürümlü çözümle seçilen taslak değerleri, ayrı kullanıcı onayından önce hiçbir kayıt yazmadan aktarılır. Eski program şablonu reddi, kontenjan alt dağılımı, program önizleme koruması ve CRM kaynak/ilgi alanının ayrı kişi yazımı sonrası korunması doğrulandı. 27 CRM birim ve 28 Chromium senaryosu geçti. [Native şablon kabulü](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#s10-gerçek-pro-hazırlık-kabulü--8-kasım-2026).
+  - [x] Etkinlik hazırlığı: sürümlü Paketli Pratik şablonundan kontenjan, paket ve katılım/ödeme koşulları taslağa aktarıldı. Tarih ve mekân açıkça girildi. Yalnız ayrı onaydan sonra etkinlik taslağı yazıldı. [Otomatik rapor](../test-reports/local-verification.md).
+  - [x] Tahsilat hazırlığı: seçili üye ve para birimine uygun güncel şablon ödeme yöntemini doldurur. Havale referansı, tutar, tarih ve ayrı onay formdan gelir. 41 birim ile 17 farklı Chromium senaryosu geçti. Yeni senaryo, boş referansı tarayıcının zorunlu alan kontrolüyle doğrulayan test düzeltmesinden sonra geçti. [Son otomatik rapor](../test-reports/local-verification.md).
+  - [x] E42 tahsilat ve aday şablon yönetimi: seçili kapsamın listesi tek sürümlü ayar yazımı ve açık onayla değişir. Merkez tahsilat şablonu düzenleme, organizasyon aday şablonu ekleme/kaldırma ve sonuçları yeniden okuma geçti. 52 birim ve 12 farklı Chromium senaryosu başarılı, kaldırma onayı eklenen seçili tekrar da geçti. [Son otomatik rapor](../test-reports/local-verification.md).
+  - [x] E42 program şablon yönetimi: haftanın günleri, saniyeli yerel saat, süre ve kategori kontenjanı kapsamlı ayar onayında kaydedildi ve yeniden okundu. 52 birim ve 13 farklı Chromium senaryosu geçti. Program senaryosu, alanın gerçek etiketine bağlanan seçili tekrarda geçti. [Son otomatik rapor](../test-reports/local-verification.md).
+  - [x] E42 etkinlik şablon yönetimi: kontenjan, ödeme, paket, iptal ve iade koşulları mevcut etkinlik alanlarıyla düzenlenir. Şablon yazısı ayrı onayla yalnız seçili kapsamı değiştirir. E42 kaydetme/yeniden okuma ve E37 mevcut etkinlik işlemleri için 94 birim, 21 Chromium geçti. [Otomatik rapor](../test-reports/local-verification.md).
+  - [x] E42 otomasyon şablonu ve organizasyon kaynağına dönüş: sıfır gün eşiği ve uygulama içi takip şablonu kaydedildi. Sonraki ayrı onay boş `patch` ve açık `inherit_fields` ile yerel listeyi kaldırdı. Yeniden okunan listede organizasyon şablonu ve miras kaynağı doğrulandı. Programın tek seferlik başlangıç kopyası dışında dört hazırlık ailesi aynı sürümlü dönüşü kullanır. Ayarlar ve otomasyon paketi 75 birim, 23 Chromium geçti. [Otomatik rapor](../test-reports/local-verification.md).
+  - [x] Ayarın işlem etkisi: rezervasyon penceresi ve borç kuralı `settings-domain-closure-acceptance`, `program-session-lifecycle` ve E42 ayar akışında; etkinlik ödeme/katılım koşulları `event-capacity-package-acceptance` ile P13’te; CRM deneme sınırı `intake-crm-work-acceptance` ve P12.3’te; otomasyonun çalışma etkisi P14.4’te doğrulandı. Tahsilat hazırlığının uygulaması yukarıdaki P17.1 kaydında. [Native kaynak kabulü](#pro-kabulu) · [Hazırlık şablonları sözleşmesi](../../../docs/settings.md#pro-iş-akışı-hazırlıkları).
   - [x] E10 kişisel tema: 14 Kasım2026, mevcut aktif Pro öğrenci synthetic fixture/local5173/headless Chromium, gerçek development Auth/Edge. user katalog/ayar okuma200 → yalnız theme sürümlü settings_update200 → son okuma200 → reload ve Güvenlik/Profil dönüşünde kayıtlı temanın korunması geçti. Başlangıç teması aynı UI’dan geri yazıldı200; bütün diğer user values alanlarının eşit kaldığı bellekte doğrulandı, native local çıkışta HTML tema override’ı temizlendi. Native credential/SMS çağrısı0, pageerror0, passed:true/restored:true/otherSettingsPreserved:true. Tercih değerleri/credential/kimlik/canlı screenshot kaydı yok; yalnız rol/adım/status/boolean kanıtı `.tmp/e10-theme-hosted-result.json`. Ayar sürümü ve immutable audit geri sarılmadı; reset/seed/SQL yok.
   - [x] E10 kişisel ölçek: aktif Pro öğrenci synthetic fixture/local5173, gerçek development Auth/Edge. user katalog/ayar200 → yalnız font_scale sürümlü update200 → son okuma200 → reload/sekme dönüşünde zoom/değer eşitliği → başlangıç değerine UI’dan dönüş200 geçti. Bütün diğer user values korundu; native local çıkışta zoom/tema temizlendi. Credential/SMS çağrısı0, pageerror0; yalnız rol/adım/status/boolean kanıtı `.tmp/e10-scale-hosted-result.json` (passed:true, restored:true, otherSettingsPreserved:true). Sürüm/audit geri sarılmadı; reset/seed/SQL yok.
 - [x] **P17.2** · Yetkili kullanıcı planı, aylık/yıllık dönemi, yenileme tercihini ve kullanım limitini okur. İzinli değişiklikten sonra geçerli ve bekleyen durumlar sözleşmedeki tarihlerle görünür.
@@ -1176,10 +1211,13 @@ Aşağıdaki frontend senaryolarını yerel otomatik kabulde doğrula. Test fixt
 
 G-PRO-01 kabulü: `auth-pro-chain.spec.ts` aynı Pro merkezinin kurulum kaynaklarıyla yeni kişi/öğrencilik, yayımlanan anlaşma v2, program, satış, tahsilat, rezervasyon ve yoklamayı tek tarayıcı oturumunda tamamladı. Değişmez ürün/satış/seans/rezervasyon/anlaşma kimlikleri korundu;8 hak →7 kullanılabilir/0 ayrılmış/1 tüketilmiş,100000 TRY alt birim borç →0, tahsilat100000 ve hakediş17500 alt birim kaynaklarıyla raporda eşleşti. Paralel paket151 birim/20 tarayıcı geçti; ortak Axe/reflow dahil. Native sınır mock’tur; sunucu ledger/yarış kabulü [G-PRO-03.1](#pro-kabulu) kaynak/run bağıyla ayrıdır. Ayrıntı [otomatik raporda](../test-reports/local-verification.md).
 
-- [ ] **G-PRO-02.1** · Günlük panel ve kişisel takvim için öğrenci, eğitmen ve izinli personel senaryolarının yerel otomatik sonuçlarını bağla. Rol değişiminde görüntülenen veri doğru kişiye ait olmalı.
-- [ ] **G-PRO-02.2** · CRM dönüşümü, public başvuru, etkinlik/Pratik, sürümlü belge, gerçek bildirim ve import için P11–P16 ile kayıtlı kabul sonuçlarını bağla. Her akışın gözlenen sonucu ilgili işlemle eşleşmeli.
+- [x] **G-PRO-02.1** · Günlük panel ve kişisel takvim için öğrenci, eğitmen ve izinli personel senaryolarının yerel otomatik sonuçlarını bağla. Rol değişiminde görüntülenen veri doğru kişiye ait olmalı.
+      36 senaryolu pakette izinli personel merkez gününü okudu ve izin kaybından sonra eski ders görünmedi. Eğitmen atanmış gün/hafta ve yoklamayı açtı. Öğrenci kendi takvim bağlantısını oluşturdu, değiştirdi ve kaldırdı. Rol/organizasyon geçişi kanonik kişi kapsamını yeniden okudu. P11’deki native ICS/üyelik ve görev kaybı kanıtı geçerlidir. [Otomatik rapor](../test-reports/local-verification.md).
+- [x] **G-PRO-02.2** · CRM dönüşümü, public başvuru, etkinlik/Pratik, sürümlü belge, gerçek bildirim ve import için P11–P16 ile kayıtlı kabul sonuçlarını bağla. Her akışın gözlenen sonucu ilgili işlemle eşleşmeli.
+      Kanıt eşlemesi: CRM dönüşümü ve public başvuru → P12.4–P12.5. Etkinlik ve Pratik → P13. Sürümlü belge ve ilk kayıt keşfi → P15. Ders bildirimi, işlemsel posta, hatırlatma ve otomasyon → P14. Kontrollü import → P16.
 - [x] **G-PRO-03.1** · Native `commercial-plan-acceptance` Pro örneği249→250, iki eşzamanlı son yer isteğinde tek başarı,251/ikinci merkez reddini doğrular. Kaynak `3b4eaf28f469eef3f66be82aaa3dc65759313ac7`; [aday44115189377/attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/44115189377) core+12 API/full-clean başarılı. [Main binding44119859935](https://github.com/SXQHex/FtkSaaS/actions/runs/44119859935) adayın head/base/merge kaydını main’in aynı `dc8728c6a3996a183a3740c5e19d6477bb862aec` ağacına bağlıyor. Frontend mock’u yarış/DB kanıtı sayılmadı; yeni clean tetiklenmedi.
-- [ ] **G-PRO-03.2** · Ağ kesilmesi sonrası aynı işlem anahtarıyla güvenli devamı ve eski sürümle yazma reddini doğrula. Oturum/izin kaybında işlem durmalı, eski organizasyon verisi görünmemeli.
+- [x] **G-PRO-03.2** · Ağ kesilmesi sonrası aynı işlem anahtarıyla güvenli devamı ve eski sürümle yazma reddini doğrula. Oturum/izin kaybında işlem durmalı, eski organizasyon verisi görünmemeli.
+      Aynı tarayıcı paketinde kayıp yanıttan sonra aynı anahtar tek etki üretti, ACK sonrası yalnız okuma yapıldı, eski sürüm yeni inceleme istedi ve açık personel formunun izin kaybındaki yazısı reddedildi. Geciken eski organizasyon yanıtı yeni kişinin verisini değiştirmedi. İptal edilen native oturumun korumalı erişim reddi P01.7’de. [Otomatik rapor](../test-reports/local-verification.md).
 - [ ] **G-PRO-04.1** · Teslim kaynağında uygulamanın kalite zincirini doğrula. Gerçek koşu, test sonuçları ve ilgili kaynak SHA’sını bağla.
 - [ ] **G-PRO-04.2** · Yayına aday statik build’i tarayıcıda aç. Doğrudan URL ve sayfa yenileme çalışmalı. Temel akışları mobil görünümde, klavyeyle ve erişilebilirlik taramasıyla doğrula. Takvimde saat ve tarih seçilen bağlama uymalı.
 - [ ] **G-PRO-05** · P01–P17 ile yukarıdaki Pro senaryolarının açıklarını kontrol et. Yayımlanmış backend sözleşmesinin sürümünü, yerel otomatik raporu, frontend build’ini ve teslim tarihini bu maddeye ekle. Teslim sonrası gerçek kontrol listesinin açıkları görünür kalır ve gerçek kabul kazanılmış sayılmaz. İnsan değerlendirmesi ayrıca varsa kaydedilir; verilmiş sayılmaz.

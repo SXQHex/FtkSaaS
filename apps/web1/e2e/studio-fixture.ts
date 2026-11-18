@@ -89,8 +89,8 @@ export const initialAgreement: AgreementVersionView = {
   },
 };
 type Write = { operation: string; key: string; payload: Record<string, unknown> };
-export async function mockStudio(page: Page) {
-  const native = await mockNative(page);
+export async function mockStudio(page: Page, origins?: Parameters<typeof mockNative>[2]) {
+  const native = await mockNative(page, false, origins);
   const state = {
     native,
     setupStatus: undefined as CenterSetupStatus | undefined,

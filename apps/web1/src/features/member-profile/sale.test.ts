@@ -249,3 +249,91 @@ it("reads native discipline name cursor pages and rejects a repeated cursor rath
     "PROFILE_DISCIPLINE_SOURCE_UNAVAILABLE",
   );
 });
+
+it("continues only the original document purchase and applies its final preview after a fresh confirmation", async () => {
+  const first = preview();
+  first.blockers = [{ code: "DOCUMENT_REQUIRED", retryable: false, trace_id: personId }];
+  call.mockResolvedValue(first);
+  const a = await previewSale(scope, personId, "Europe/Istanbul", product, draft());
+  const second = {
+    ...preview(),
+    id: "019a7b00-0000-7000-8000-000000000072",
+    token: "synthetic-final",
+  };
+  call.mockResolvedValue(second);
+  const b = await previewSale(scope, personId, "Europe/Istanbul", product, draft(), a);
+  expect(call.mock.calls.at(-1)![1].document_purchase_id).toBe(first.id);
+  expect(b.purchase).toEqual(a.purchase);
+  expect(saleIntent(b).request.preview).toEqual({ id: second.id, token: second.token });
+  call.mockResolvedValue({ ...second, id: "019a7b00-0000-7000-8000-000000000073" });
+  const c = await previewSale(
+    scope,
+    personId,
+    "Europe/Istanbul",
+    product,
+    { ...draft(), collectAfterSale: true },
+    b,
+  );
+  expect(call.mock.calls.at(-1)![1].document_purchase_id).toBe(first.id);
+  expect(c.purchase.id).toBe(first.id);
+  expect(c.collectAfterSale).toBe(true);
+});
+it("does not reuse document consent for a different actor, organization, center, person or purchase parameter", async () => {
+  call.mockResolvedValue(preview());
+  const original = await previewSale(scope, personId, "Europe/Istanbul", product, draft());
+  const changedScopes = [
+    { ...scope, accountId: "019a7b00-0000-7000-8000-000000000091" },
+    { ...scope, orgId: "019a7b00-0000-7000-8000-000000000092" },
+    { ...scope, centerId: "019a7b00-0000-7000-8000-000000000093" },
+  ];
+  for (const target of changedScopes) {
+    await previewSale(target, personId, "Europe/Istanbul", product, draft(), original);
+    expect(call.mock.calls.at(-1)![1]).not.toHaveProperty("document_purchase_id");
+  }
+  const changes: {
+    personId?: string;
+    endDate?: string;
+    netMinor?: string;
+    productVersionId?: string;
+  }[] = [
+    { personId: "019a7b00-0000-7000-8000-000000000094" },
+    { endDate: "2026-11-23" },
+    { netMinor: "12345" },
+    { productVersionId: "019a7b00-0000-7000-8000-000000000095" },
+  ];
+  for (const change of changes) {
+    const next = preview();
+    if (change.personId) next.sale.person_id = change.personId;
+    if (change.endDate) {
+      next.sale.end_date = change.endDate;
+      next.sale.valid_until = change.endDate + "T21:00:00Z";
+    }
+    if (change.netMinor) next.sale.debt_minor = change.netMinor;
+    if (change.productVersionId) next.sale.product_version_id = change.productVersionId;
+    call.mockResolvedValue(next);
+    const nextDraft = {
+      ...draft(),
+      ...(change.endDate ? { endDate: change.endDate } : {}),
+      ...(change.netMinor ? { netMinor: change.netMinor } : {}),
+      ...(change.productVersionId ? { productVersionId: change.productVersionId } : {}),
+    };
+    await previewSale(
+      scope,
+      change.personId ?? personId,
+      "Europe/Istanbul",
+      { ...product, version_id: change.productVersionId ?? product.version_id },
+      nextDraft,
+      original,
+    );
+    expect(call.mock.calls.at(-1)![1]).not.toHaveProperty("document_purchase_id");
+  }
+});
+it("preserves the original purchase deadline rather than extending it with later preview responses", async () => {
+  call.mockResolvedValue(preview());
+  const a = await previewSale(scope, personId, "Europe/Istanbul", product, draft());
+  a.purchase.expiresAt = "2000-01-01T00:00:00Z";
+  expect(() => saleIntent(a)).toThrow("PROFILE_SALE_PREVIEW_STALE");
+  const b = await previewSale(scope, personId, "Europe/Istanbul", product, draft(), a);
+  expect(call.mock.calls.at(-1)![1]).not.toHaveProperty("document_purchase_id");
+  expect(b.purchase.expiresAt).toBe(b.preview.expires_at);
+});

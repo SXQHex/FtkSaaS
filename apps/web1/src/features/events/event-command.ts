@@ -1,6 +1,11 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import type { EventView, RequestEventSave } from "../../lib/api-contracts/generated";
+import type {
+  EventCapacity,
+  EventTerms,
+  EventView,
+  RequestEventSave,
+} from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
@@ -32,6 +37,29 @@ function unique(values: string[]) {
   if (new Set(result).size !== result.length) throw new Error("EVENT_INVALID");
   return result;
 }
+export function eventTermsDraft(capacity: EventCapacity, terms: EventTerms) {
+  const unlimited = "kind" in capacity;
+  const kind: EventDraft["kind"] =
+    terms.package_usage === "eligibility_only" ? "practice" : "workshop";
+  return {
+    kind,
+    nominal: unlimited ? "" : String(capacity.nominal),
+    maximum: unlimited ? "" : String(capacity.maximum),
+    unlimited,
+    fee: terms.fee_minor,
+    currency: terms.currency,
+    fullPayment: terms.full_payment_required,
+    productIds: [...terms.allowed_product_version_ids],
+    cutoff:
+      terms.cancellation.cutoff_minutes == null ? "" : String(terms.cancellation.cutoff_minutes),
+    before: terms.cancellation.before_cutoff,
+    after: terms.cancellation.after_cutoff,
+    noShow: terms.cancellation.no_show,
+    refund: terms.refund.method,
+    usedUnit: terms.refund.used_unit_minor ?? "",
+  };
+}
+
 export async function eventDraft(before?: EventView, timezone = ""): Promise<EventDraft> {
   if (!before) return { ...emptyEventDraft, timezone };
   if (before.assignments.length && !before.assignment_terms)
@@ -39,7 +67,6 @@ export async function eventDraft(before?: EventView, timezone = ""): Promise<Eve
   const T = await getTemporal(),
     start = T.Instant.from(before.interval.starts_at).toZonedDateTimeISO(before.timezone),
     end = T.Instant.from(before.interval.ends_at).toZonedDateTimeISO(before.timezone);
-  const unlimited = "kind" in before.capacity;
   const duties = before.assignment_terms ?? [];
   if (
     duties.length !== before.assignments.length ||
@@ -54,7 +81,7 @@ export async function eventDraft(before?: EventView, timezone = ""): Promise<Eve
   return {
     ...emptyEventDraft,
     name: before.name,
-    kind: before.terms.package_usage === "eligibility_only" ? "practice" : "workshop",
+    ...eventTermsDraft(before.capacity, before.terms),
     disciplineIds: [...before.discipline_ids],
     timezone: before.timezone,
     starts: start.toPlainDateTime().toString({ smallestUnit: "minute" }),
@@ -65,23 +92,6 @@ export async function eventDraft(before?: EventView, timezone = ""): Promise<Eve
     roomId: before.venue.room_id ?? "",
     venueName: before.venue.name ?? "",
     address: before.venue.address ?? "",
-    nominal: "kind" in before.capacity ? "" : String(before.capacity.nominal),
-    maximum: "kind" in before.capacity ? "" : String(before.capacity.maximum),
-    unlimited,
-    fee: before.terms.fee_minor,
-    currency: before.terms.currency,
-    fullPayment: before.terms.full_payment_required,
-    productIds: [...before.terms.allowed_product_version_ids],
-    cutoff:
-      before.terms.cancellation.cutoff_minutes === null ||
-      before.terms.cancellation.cutoff_minutes === undefined
-        ? ""
-        : String(before.terms.cancellation.cutoff_minutes),
-    before: before.terms.cancellation.before_cutoff,
-    after: before.terms.cancellation.after_cutoff,
-    noShow: before.terms.cancellation.no_show,
-    refund: before.terms.refund.method,
-    usedUnit: before.terms.refund.used_unit_minor ?? "",
     duties: duties.map((row) => ({
       personId: row.person_id,
       duty: row.duty,
@@ -137,6 +147,40 @@ export async function eventWallInstant(
     .toInstant()
     .toString();
 }
+export function eventTermsInput(
+  draft: EventDraft,
+  existingUsage?: EventTerms["package_usage"],
+): EventTerms {
+  return {
+    fee_minor: money(draft.fee),
+    currency: currency(draft.currency),
+    full_payment_required: draft.fullPayment,
+    allowed_product_version_ids: unique(draft.productIds),
+    ...(draft.kind === "practice"
+      ? { package_usage: "eligibility_only" as const }
+      : existingUsage === "consume"
+        ? { package_usage: "consume" as const }
+        : {}),
+    cancellation: {
+      ...(draft.cutoff ? { cutoff_minutes: integer(draft.cutoff) } : {}),
+      before_cutoff: z.enum(["release", "consume"]).parse(draft.before),
+      after_cutoff: z.enum(["release", "consume"]).parse(draft.after),
+      no_show: z.enum(["release", "consume"]).parse(draft.noShow),
+    },
+    refund: {
+      method: z
+        .enum(["none", "credit_ratio", "used_at_unit_price", "time_ratio"])
+        .parse(draft.refund),
+      ...(draft.refund === "used_at_unit_price" ? { used_unit_minor: money(draft.usedUnit) } : {}),
+    },
+  };
+}
+export function eventCapacityInput(draft: EventDraft): EventCapacity {
+  if (draft.unlimited) return { kind: "unlimited" };
+  const capacity = { nominal: integer(draft.nominal), maximum: integer(draft.maximum) };
+  if (capacity.maximum < capacity.nominal) throw Error("EVENT_INVALID");
+  return capacity;
+}
 export async function eventSaveIntent(
   scope: ClientScope,
   draft: EventDraft,
@@ -154,14 +198,8 @@ export async function eventSaveIntent(
     disciplines = unique(draft.disciplineIds);
   if (draft.kind === "practice" && (!products.length || BigInt(money(draft.fee)) !== 0n))
     throw new Error("EVENT_INVALID");
-  const capacity = draft.unlimited
-    ? { kind: "unlimited" as const }
-    : { nominal: integer(draft.nominal), maximum: integer(draft.maximum) };
-  if (
-    (draft.unlimited && draft.venueKind !== "external") ||
-    (!("kind" in capacity) && capacity.maximum < capacity.nominal)
-  )
-    throw new Error("EVENT_INVALID");
+  const capacity = eventCapacityInput(draft);
+  if (draft.unlimited && draft.venueKind !== "external") throw new Error("EVENT_INVALID");
   const preserved =
     before?.venue.kind === "external" &&
     draft.venueKind === "external" &&
@@ -199,31 +237,7 @@ export async function eventSaveIntent(
           },
     capacity,
     discipline_ids: disciplines,
-    terms: {
-      fee_minor: money(draft.fee),
-      currency: currency(draft.currency),
-      full_payment_required: draft.fullPayment,
-      allowed_product_version_ids: products,
-      ...(draft.kind === "practice"
-        ? { package_usage: "eligibility_only" as const }
-        : before?.terms.package_usage === "consume"
-          ? { package_usage: "consume" as const }
-          : {}),
-      cancellation: {
-        ...(draft.cutoff ? { cutoff_minutes: integer(draft.cutoff) } : {}),
-        before_cutoff: z.enum(["release", "consume"]).parse(draft.before),
-        after_cutoff: z.enum(["release", "consume"]).parse(draft.after),
-        no_show: z.enum(["release", "consume"]).parse(draft.noShow),
-      },
-      refund: {
-        method: z
-          .enum(["none", "credit_ratio", "used_at_unit_price", "time_ratio"])
-          .parse(draft.refund),
-        ...(draft.refund === "used_at_unit_price"
-          ? { used_unit_minor: money(draft.usedUnit) }
-          : {}),
-      },
-    },
+    terms: eventTermsInput(draft, before?.terms.package_usage),
     assignments: draft.duties.map((row) => ({
       person_id: z.uuid().parse(row.personId),
       duty: row.duty,

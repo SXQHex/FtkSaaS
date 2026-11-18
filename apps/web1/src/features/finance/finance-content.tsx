@@ -9,6 +9,7 @@ import type { DebtAction } from "./debt-command";
 import { CreditRefundEditor } from "./credit-refund-editor";
 import { CorrectionEditor } from "./correction-editor";
 import { FinanceActionSheet } from "./finance-action-sheet";
+import { PreparationPicker } from "../settings/preparation-picker";
 import {
   readFinancePage,
   readCollectionAuthority,
@@ -678,6 +679,25 @@ export function CollectionEditor({
           <p className="text-sm text-muted-foreground">
             {t(($) => $.finance.timezone, { timezone })}
           </p>
+          {!review && canWrite && status === "ready" && (
+            <PreparationPicker
+              scope={scope}
+              kind="collection"
+              collectionCurrency={selection.currency}
+              disabled={locked}
+              onApply={(preparation) => {
+                if (preparation.kind !== "collection") return;
+                const method = preparation.defaults.payment_method;
+                setDraft((current) => ({
+                  ...current,
+                  method,
+                  reference: current.method === method ? current.reference : "",
+                }));
+                setPrepareError(undefined);
+                setErrors({});
+              }}
+            />
+          )}
           {prepareError && (
             <Alert variant="destructive">
               <AlertDescription>{prepareError}</AlertDescription>

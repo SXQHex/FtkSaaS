@@ -11,6 +11,7 @@ import { Button } from "../../components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
 import { EventSheet } from "./event-sheet";
 import { EventCommandNotice } from "./event-command-notice";
+import { PreparationPicker } from "../settings/preparation-picker";
 import {
   readEvent,
   readEventRooms,
@@ -20,6 +21,7 @@ import {
 } from "./events-read";
 import {
   eventDraft,
+  eventTermsDraft,
   eventSaveIntent,
   writeEventIntent,
   readEventReceipt,
@@ -257,6 +259,25 @@ function EventEditorForm({
       disciplines={disciplineChoices}
       editing={!!before}
       locked={locked}
+      preparationPicker={
+        !before && (
+          <PreparationPicker
+            scope={scope}
+            kind="event"
+            disabled={locked || command.state !== "ready" || command.unavailable}
+            onApply={(preparation) => {
+              if (preparation.kind !== "event") return;
+              const { capacity, terms } = preparation.defaults;
+              setDraft((current) => ({
+                ...current,
+                ...eventTermsDraft(capacity, terms),
+                reviewed: false,
+              }));
+              setError(undefined);
+            }}
+          />
+        )
+      }
       readOnly={
         command.state !== "ready" ||
         (!!before &&

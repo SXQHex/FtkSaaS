@@ -68,11 +68,22 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
       .toString({ smallestUnit: "minute" }),
   ).toBe(time);
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const draft = page.getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true });
+  const closeRevision = state.attendance.revision;
+  await draft.selectOption("no_show");
+  await page.getByRole("button", { name: "Kaydet — Örnek öğrenci", exact: true }).click();
+  await expect(page.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.attendance.entries[0]!.result).toBe("no_show");
+  expect(state.attendance.closure_state).toBe("open");
+  expect(state.attendance.revision).toBe(closeRevision);
   await page
     .getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true })
     .selectOption("attended");
   await page.getByRole("button", { name: "Kaydet — Örnek öğrenci", exact: true }).click();
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.attendance.entries[0]!.result).toBe("attended");
+  expect(state.attendance.closure_state).toBe("open");
+  expect(state.attendance.revision).toBe(closeRevision);
   await page.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
   const close = page.getByRole("alertdialog");
   await close.getByRole("checkbox", { name: "Seans gerçekleşti", exact: true }).press("Space");
@@ -107,6 +118,7 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
   ).toEqual([]);
   expect(state.writes.map((row) => row.operation)).toEqual([
     "attendance_start_v1",
+    "attendance_mark_v1",
     "attendance_mark_v1",
     "attendance_close_v1",
     "attendance_correct_apply_v1",

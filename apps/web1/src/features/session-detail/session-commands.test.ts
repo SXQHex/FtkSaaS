@@ -148,6 +148,7 @@ it("recovers the exact acknowledged reservation, accepts a native category, and 
         mode: "flexible",
         booking_category: "female",
         version: 2,
+        source_summary: { status: "available", source_sale_id: sale.sale_id },
       },
     ],
     next_cursor: null,

@@ -52,6 +52,7 @@ export function SaleEditor({
     [accepted, setAccepted] = useState(false),
     [error, setError] = useState<string>(),
     [errors, setErrors] = useState<Partial<Record<keyof MemberDraft, string>>>({});
+  const purchase = useRef<SaleReview | undefined>(undefined);
   const mounted = useRef(true),
     executing = useRef(false);
   useEffect(() => {
@@ -76,6 +77,8 @@ export function SaleEditor({
     if (executing.current || command.locked || !sourceAvailable) return;
     executing.current = true;
     setPreparing(true);
+    setReview(undefined);
+    setAccepted(false);
     setErrors({});
     setError(undefined);
     try {
@@ -86,8 +89,13 @@ export function SaleEditor({
         setErrors({ productVersionId: t(($) => $.memberProfile.saleErrors.productVersionId) });
         return;
       }
-      const next = await previewSale(scope, personId, timezone, product, draft);
+      const next = await previewSale(scope, personId, timezone, product, draft, purchase.current);
       if (mounted.current) {
+        purchase.current =
+          next.request.document_purchase_id ||
+          next.preview.blockers.some((blocker) => blocker.code === "DOCUMENT_REQUIRED")
+            ? next
+            : undefined;
         setReview(next);
         setAccepted(false);
       }
@@ -260,6 +268,20 @@ export function SaleEditor({
                     )}
                   </p>
                 ))}
+                {review.preview.blockers.some(
+                  (blocker) => blocker.code === "DOCUMENT_REQUIRED",
+                ) && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    isDisabled={locked || !sourceAvailable || state !== "ready"}
+                    onPress={() => {
+                      void prepare();
+                    }}
+                  >
+                    {t(($) => $.memberProfile.saleRecheckDocuments)}
+                  </Button>
+                )}
               </AlertDescription>
             </Alert>
           )}

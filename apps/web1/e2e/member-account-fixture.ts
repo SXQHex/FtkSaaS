@@ -24,7 +24,9 @@ export async function mockMemberAccount(
     bump = false,
     version = 3,
     emailVersion = 2,
-    email = false;
+    email = false,
+    transactionalVersion = 4,
+    transactionalEmail = false;
   const values = {
     in_app_reminders: true,
     package_reminders_enabled: true,
@@ -147,14 +149,25 @@ export async function mockMemberAccount(
         next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",
         reminder_email_preference: { enabled: email, version: emailVersion, available: true },
+        email_preference: {
+          enabled: transactionalEmail,
+          version: transactionalVersion,
+          available: true,
+        },
       });
     if (operation === "notification_preferences_set_v1") {
       writes.push({ operation, request });
       expect(request.channel).toBe("email");
-      expect(request.purpose).toBe("reminder");
-      expect(request.expected_version).toBe(emailVersion);
-      email = request.enabled;
-      emailVersion++;
+      if (request.purpose === "transactional") {
+        expect(request.expected_version).toBe(transactionalVersion);
+        transactionalEmail = request.enabled;
+        transactionalVersion++;
+      } else {
+        expect(request.purpose).toBe("reminder");
+        expect(request.expected_version).toBe(emailVersion);
+        email = request.enabled;
+        emailVersion++;
+      }
       return send({ primary_id: I.self, versions: [], job_ids: [] });
     }
     if (operation === "operation_status_get_v1")

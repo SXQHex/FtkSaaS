@@ -2,15 +2,26 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import { mockOwnReservations } from "./member-reservations-fixture.js";
 const secondId = "019ab7b0-0000-7000-8000-000000000202";
 const sourceId = "019ab7b0-0000-7000-8000-000000000203";
 const sourceCenter = "019ab7b0-0000-7000-8000-000000000204";
 const id = "019ab7b0-0000-7000-8000-000000000201";
+const changeTitle = "Ders programı değişti";
 async function fixture(
   page: Page,
-  mode: "normal" | "unknown" | "unread" | "denied" | "stale" | "batch" | "source" = "normal",
+  mode:
+    | "normal"
+    | "unknown"
+    | "unread"
+    | "denied"
+    | "stale"
+    | "batch"
+    | "source"
+    | "participant" = "normal",
 ) {
-  await mockStudio(page);
+  if (mode === "participant") await mockOwnReservations(page);
+  else await mockStudio(page);
   const state = {
     read: false,
     version: 7,
@@ -28,7 +39,7 @@ async function fixture(
   };
   const row = () => ({
     id,
-    kind: "private_native_kind",
+    kind: mode === "participant" ? "session_changed_for_participant" : "private_native_kind",
     version: state.version,
     work:
       mode === "source"
@@ -41,24 +52,36 @@ async function fixture(
             },
           }
         : { state: "informational", center_id: null, selector: null },
-    payload: {
-      template_key: "private_native_template",
-      subject: { type: "notifications", id },
-      title: "Örnek bildirim",
-      body: '<img src=x onerror="alert(1)"> Gönderim durumu güncellendi.',
-      language: "tr",
-    },
+    payload:
+      mode === "participant"
+        ? {
+            template_key: "session_changed_for_participant",
+            subject: { type: "sessions", id: sourceId },
+            title: changeTitle,
+            body: "Rezervasyonunun bulunduğu dersin programı değişti.",
+            language: "tr",
+          }
+        : {
+            template_key: "private_native_template",
+            subject: { type: "notifications", id },
+            title: "Örnek bildirim",
+            body: '<img src=x onerror="alert(1)"> Gönderim durumu güncellendi.',
+            language: "tr",
+          },
     created_at: "2026-11-16T12:00:00Z",
     read_at: state.read ? "2026-11-16T12:05:00Z" : null,
-    email_job: {
-      id: I.role,
-      state: "succeeded",
-      progress_count: 1,
-      total_count: 1,
-      result_reference: null,
-      safe_error_code: null,
-      email_delivery: { state: "delayed", occurred_at: "2026-11-16T12:02:00Z" },
-    },
+    email_job:
+      mode === "participant"
+        ? null
+        : {
+            id: I.role,
+            state: "succeeded",
+            progress_count: 1,
+            total_count: 1,
+            result_reference: null,
+            safe_error_code: null,
+            email_delivery: { state: "delayed", occurred_at: "2026-11-16T12:02:00Z" },
+          },
   });
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
@@ -245,12 +268,15 @@ test("inbox shows native copy safely, enables native discovery, and restores mob
   await expect(page.getByRole("button", { name: "Örnek bildirim", exact: true })).toBeFocused();
   expect(state.writes).toHaveLength(0);
 });
-test("inbox unread filter stays native and a reviewed click uses actual version before read-state confirmation", async ({
+test("participant sees a native session change notice and retains its exact read state after reload", async ({
   page,
 }) => {
-  const state = await fixture(page);
+  const state = await fixture(page, "participant");
   await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
+  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
+    "Rezervasyonunun bulunduğu dersin programı değişti.",
+  );
   await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
@@ -261,6 +287,10 @@ test("inbox unread filter stays native and a reviewed click uses actual version 
   });
   expect(state.lists.some((r) => r.unread_only === true)).toBe(true);
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeDisabled();
+  await page.reload();
+  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeEnabled();
+  expect(state.writes).toHaveLength(1);
 });
 test("inbox unknown write recovers its exact receipt and never marks twice", async ({ page }) => {
   const state = await fixture(page, "unknown");

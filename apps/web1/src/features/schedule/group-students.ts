@@ -131,6 +131,7 @@ export async function readPriorityResult(intent: PriorityIntent, id?: string) {
       ...request(intent.scope),
       person_id: intent.request.person_id,
       session_id: intent.request.session_id,
+      include_source_summary: true,
       page: { limit: 20, ...(cursor ? { cursor } : {}) },
     });
     if (
@@ -145,14 +146,18 @@ export async function readPriorityResult(intent: PriorityIntent, id?: string) {
       (row) => (!id || row.id === id) && row.state === "active" && row.mode === "priority",
     );
     if (matches.length > 1) throw new Error("SCHEDULE_GROUP_RESULT_UNAVAILABLE");
-    if (matches[0]) {
+    const reservation = matches[0];
+    if (reservation) {
+      const source = reservation.source_summary;
+      if (source?.status !== "available" || source.source_sale_id !== intent.request.source_sale_id)
+        throw new Error("SCHEDULE_GROUP_RESULT_UNAVAILABLE");
       const [rights, session] = await Promise.all([
         readProfileRights(intent.scope, intent.request.person_id),
         readScheduleSession(intent.scope, intent.request.session_id),
       ]);
       if (!rights.some((row) => row.sale_id === intent.request.source_sale_id))
         throw new Error("SCHEDULE_GROUP_RESULT_UNAVAILABLE");
-      return { reservation: matches[0], rights, session };
+      return { reservation, rights, session };
     }
     cursor = page.next_cursor ?? undefined;
     if (cursor && seen.has(cursor)) throw new Error("SCHEDULE_GROUP_RESULT_UNAVAILABLE");

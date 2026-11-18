@@ -70,7 +70,6 @@ function createValues(sources: Sources, draft: ScheduleCreateDraft) {
     room,
     assignments: [{ person_id: instructor.person.id, duty: "instructor" as const }],
     capacity: { total: integer(draft.capacity) },
-    duration: integer(draft.duration, true),
   };
 }
 export async function singleSessionIntent(
@@ -83,7 +82,7 @@ export async function singleSessionIntent(
     sources.center.timezone,
     draft.date,
     draft.time,
-    value.duration,
+    integer(draft.duration, true),
     draft.offset,
   );
   return {
@@ -132,11 +131,21 @@ export async function previewScheduleProgram(
       local_start: temporal.PlainTime.from(draft.time).toString({ smallestUnit: "second" }),
       starts_on: from.toString(),
       ends_on: until.toString(),
-      duration_minutes: value.duration,
+      ...(draft.duration !== "" ? { duration_minutes: integer(draft.duration, true) } : {}),
       room_id: value.room.id,
       assignments: value.assignments,
       inherit_class_assignments: false,
-      capacity: value.capacity,
+      capacity: {
+        ...value.capacity,
+        ...(draft.capacityCategories
+          ? {
+              categories: {
+                male: integer(draft.capacityCategories.male),
+                female: integer(draft.capacityCategories.female),
+              },
+            }
+          : {}),
+      },
       ...(offsets.length ? { offset_choices: offsets } : {}),
     },
   });

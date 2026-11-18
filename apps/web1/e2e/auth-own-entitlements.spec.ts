@@ -15,7 +15,7 @@ async function fixture(
     currencyDenied?: boolean;
   } = {},
 ) {
-  await mockOwnReservations(page);
+  const reservations = await mockOwnReservations(page);
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   let denied = Boolean(options.denied);
   const reads: { operation: string; request: Record<string, unknown> }[] = [];
@@ -97,10 +97,16 @@ async function fixture(
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);
       if (denied) return reject();
-      if (!req.ledger_sale_id) return send(rights);
+      const current =
+        reservations.reservations[0]?.state === "cancelled"
+          ? rights.map((row, index) =>
+              index === 0 ? { ...row, available: 4, reserved: 1, version: 2 } : row,
+            )
+          : rights;
+      if (!req.ledger_sale_id) return send(current);
       expect(rights.some((row) => row.sale_id === req.ledger_sale_id)).toBe(true);
       return send(
-        rights.map((row) =>
+        current.map((row) =>
           row.sale_id === req.ledger_sale_id
             ? {
                 ...row,
@@ -157,12 +163,35 @@ async function fixture(
   await page.goto(`${origin}/member/entitlements?org=${I.org}&center=${I.center}`);
   await expect(page.getByRole("heading", { name: "Haklarım", exact: true })).toBeVisible();
   return {
+    reservations,
     reads,
     setDenied: (value: boolean) => {
       denied = value;
     },
   };
 }
+test("a reservation cancellation refreshes the warm rights panel on return", async ({ page }) => {
+  const state = await fixture(page);
+  const available = page.getByText("Kullanılabilir bakiye", { exact: true }).locator("..");
+  await expect(available.getByText("3", { exact: true })).toBeVisible();
+  const nav = page.getByRole("navigation");
+  await nav.getByRole("link", { name: "Rezervasyonlarım", exact: true }).click();
+  await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Sentetik iptal");
+  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await expect(
+    dialog.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await nav.getByRole("link", { name: "Haklarım", exact: true }).click();
+  await expect(available.getByText("4", { exact: true })).toBeVisible();
+  await expect(page.getByText(/1,00.*borç/)).toBeVisible();
+  expect(state.reservations.writes).toHaveLength(1);
+});
 test("own rights show native counts, exact separate debt currencies and a cursor ledger without a fictional total", async ({
   page,
 }) => {

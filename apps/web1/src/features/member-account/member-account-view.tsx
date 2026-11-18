@@ -22,7 +22,13 @@ import { Input } from "../../components/ui/input";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 
-export type PreferenceId = "email" | "inApp" | "package" | "marketing" | "mandatory";
+export type PreferenceId =
+  | "email"
+  | "transactionalEmail"
+  | "inApp"
+  | "package"
+  | "marketing"
+  | "mandatory";
 export interface AccountPreference {
   id: PreferenceId;
   selected?: boolean;

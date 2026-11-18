@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { MemberStateDialog } from "./member-action-sheet";
@@ -52,6 +53,7 @@ export function CancelReservation({
   onAccessLost: (error: unknown) => boolean;
 }) {
   const { t } = useTranslation(),
+    queries = useQueryClient(),
     [state, setState] = useState<State>("reading"),
     [base, setBase] = useState<CancellationBase>(),
     [reason, setReason] = useState(""),
@@ -132,6 +134,14 @@ export function CancelReservation({
     if (!intent.current || !ack.current) return;
     const result = await readCancellationResult(intent.current, primary.current);
     if (!mounted.current || terminal.current) return;
+    await Promise.all(
+      ["member-classes", "member-reservations", "member-entitlements"].map((view) =>
+        queries.invalidateQueries({
+          queryKey: [view, accountId, orgId, centerId, personId],
+          refetchType: "none",
+        }),
+      ),
+    );
     await onRefresh(result);
     if (mounted.current && !terminal.current) setState("saved");
   }

@@ -1,8 +1,8 @@
 # Web1 · Backend talepleri
 
-17 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **35 talebin kaynak desteği karşılandı; açık ürün/API sözleşme talebi yok. Pro son kabulünde bulunan1 backend kabul aracı düzeltmesi W1-BE-36’da açık.** W1-BE-35’in aynı kaynaklı development teslimi de başarılı. Karşılanan kapsam, aşağıdaki native destek sınırlarını da içerir; desteklenmeyen davranışlar frontend’de varmış gibi gösterilmez. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
+18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir; ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı.** W1-BE-36’nın kalan sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi de başarılı. Karşılanan kapsam, aşağıdaki native destek sınırlarını da içerir; desteklenmeyen davranışlar frontend’de varmış gibi gösterilmez. Talep açılması tek başına backend onayı veya uygulama kanıtı değildir. Backend kodu, ortak sözleşmeler ve backend kabul kayıtları bu frontend çalışmasında değiştirilmez.
 
-İncelenen main: `3b4eaf28f469eef3f66be82aaa3dc65759313ac7` ([PR327](https://github.com/SXQHex/FtkSaaS/pull/327), 17 Kasım2026). `roles_list_v1` rol/durum filtreleri kaynakta mevcut. Aynı SHA’nın [Main acceptance44119859935](https://github.com/SXQHex/FtkSaaS/actions/runs/44119859935) ve [Backend merge verification44119859432](https://github.com/SXQHex/FtkSaaS/actions/runs/44119859432) sonuçları success; [development44119981434](https://github.com/SXQHex/FtkSaaS/actions/runs/44119981434) success, [Vercel44119981411](https://github.com/SXQHex/FtkSaaS/actions/runs/44119981411) success. Native teslim ayrıntısı [backend devrinin](https://github.com/SXQHex/FtkSaaS/blob/3b4eaf28f469eef3f66be82aaa3dc65759313ac7/apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-ekip-yönetici-rolü-keşfi--17-kasım2026) sahibindedir.
+İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
 
 PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel typed snapshot güncellendi. Frontend tüketimi ve ekran kabulü TODO sahibindedir. Backend kaynak desteği; development dağıtımı, frontend tüketimi, ekran kabulü veya gerçek hosted/provider kabulü değildir. Ekran durumu yalnız [TODO](todo.md) sahibindedir.
 
@@ -44,7 +44,12 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-34 | E43 · WF00/P02/P14/P16    | Merkez denetim/işlem keşfi, filtreler ve dışa aktarma eşlemesi                   | Backend karşılandı (PR323): merkez audit keşfi ve kendi tracking_directory_get_v1 dizini mevcut. Ret logu/audit export/genel tekrar çalıştırma yok; E43 tüketimi/kabulü açık.                                                             |
 
 | W1-BE-35 | E42 · WF02/P17 | Yönetici rollerini filtreli ve cursor kapsamlı keşif | Kaynak/main/development karşılandı (PR327): native role/state filtreleri var; frontend kabulü TODO/E42 sahibinde. |
-| W1-BE-36 | P01 / G-PRO · WF01 | Native recovery kabul aracının doğru frontend callback kaynağı | Açık: mevcut backend runner ilgisiz eski origin’e sabit; beklenen callback açıkça pinlenmeli. Yeni Auth/RPC istenmiyor. |
+| W1-BE-36 | P01 / G-PRO · WF01 | Native recovery kabul aracının doğru frontend callback kaynağı | Kaynak desteği karşılandı: PR328, zorunlu callback pini ve iki CLI modu. Sağlayıcı kontrolü P01.4’te. |
+| W1-BE-37 | P01.4 · WF01 | Native parola değişikliği postasının kurtarma yolu | Karşılandı (PR329). Development postasında tam kurtarma adresi doğrulandı. |
+| W1-BE-38 | P15.4 · WF11/WF15 | Yönetici kayıt işlemi öncesi üyenin kendi etkinlik belgesini keşfi | Karşılandı (PR329). Üye kendi ilk kayıt önizlemesi üzerinden belgeyi keşfedebilir. |
+| W1-BE-39 | P09.2 · WF06 | Borç politikasından kaynaklanan rezervasyon reddinin ayırt edilmesi | Karşılandı (PR330). Yetkili rezervasyonda `DEBT_BOOKING_BLOCKED` ayrımı var. |
+| W1-BE-40 | P14.1 · WF11/WF12 | Ders değişikliğinde etkilenen öğrenciye uygulama içi bildirim | Karşılandı (PR330). Etkilenen aktif rezervasyon sahibine ders değişikliği bildirimi gider. |
+| W1-BE-41 | P01.4 · WF01 | Native ilk parola için izole kabul | Karşılandı (PR330). Native CI parolasız Google kimliğine ilk parolayı doğruladı. |
 
 ## Bütün talepler için ortak sınır
 
@@ -343,10 +348,26 @@ OM için organizasyon okuyucusu `center_id` atlar ve `role=org_manager` kullanı
 
 ## W1-BE-36 · Native Auth recovery kabul aracının callback kaynağı
 
-**Durum:** Frontend talebi açık; backend onayı veya teslimi verilmiş sayılmaz. Ekranlar kapalıdır; bu ihtiyaç P01/G-PRO bütünleşik kabulündedir.
+**Karşılandı:** [PR328](https://github.com/SXQHex/FtkSaaS/pull/328) main `b219f2be822338b40460f1bb981e00d07b6be70e` üzerinde native ve expired modlarına zorunlu origin/path/next pini ile stdin girdisi ekledi. Native Auth sözleşmesi korunuyor. Aynı SHA’da [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177737) ve [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı.
 
-**Kaynak bulgusu:** İncelenen main’de `apps/backend/scripts/acceptance/s08-hosted-recovery.mjs` içindeki `acceptExpiredRecovery` ve `acceptNativeRecovery`, callback origin’ini uygulamayla ilgisi olmayan eski bir adrese sabitliyor; birim fixture’ı da bunu tekrar ediyor. Native Auth sözleşmesi değiştirilmeden mevcut kabul aracı `https://app.fethiyetango.com` ve izinli yerel callback için kullanılamıyor. Frontend’in otomatik callback hata testleri gerçek sağlayıcının süre dolumu/PKCE kabulü olarak sunulmaz.
+Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü). Google-only ilk parola, doğal süre dolumu ve güvenlik postasının eylem hedefi dahil frontend kabulünün sahibi [P01.4](todo.md#p01--kimlik-hesap-ve-güvenlik).
 
-**İstenen destek:** Backend sahibi mevcut runner’da beklenen callback origin/path/next bilgisini güvenilir, açıkça pinlenen kabul girdisinden alsın; yabancı callback reddi, token/verifier gizliliği ve mevcut parola/oturum temizliği korunsun. Native recovery için mevcut gerçek teslim/PKCE/tüketilmiş proof ve doğal süre dolumu kabulünün çalıştırılabilir otomasyon girişini belirtin; varsa mevcut kanıta bağlayın. Yoksa izole CI-native sağlayıcı fixture desteği veya mevcut development runner desteği backend kabulünün kendi sahibinde tamamlansın. P01.4’te parolasız native hesaba ilk parola ekleme için mevcut gerçek fixture/run varsa belirtin; native password_changed postasının kurtarma eylemi de doğru frontend callback’ine gitmeli. Eski oturum nonce garantisi mevcut S08 kabulünden yeniden türetilmiyor; kendi kanıtı korunuyor. Hosted reset/seed, Auth TTL zayıflatma, elle üretilmiş provider proof veya yeni Auth/RPC talep edilmiyor.
+## W1-BE-37 · Native güvenlik postasının kurtarma yolu
 
-**Frontend devamı:** Signup/doğrulamanın doğal süre dolumu P01.1’de gerçek provider ile doğrulandı; bu talep recovery kapsamındadır. Bağımsız P/G-PRO işleri sürer. Kesin kaynak/run/ortam kanıtı gelene kadar P01’in gerçek sağlayıcı alt kontrolü kapanmaz; sayfa kabulü tekrar açılmaz.
+**Karşılandı.** [PR329](https://github.com/SXQHex/FtkSaaS/pull/329) development Auth şablonunda kurtarma hedefini tam `https://app.fethiyetango.com/forgot-password` olarak üretti. Özgün parola korunarak alınan iki gerçek postanın HTML eylemi ve diğer Auth ayarlarının korunduğu backend kabulünde doğrulandı. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44210183795) · [Development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44210267029).
+
+## W1-BE-38 · Etkinlik kaydı öncesi üyenin kendi belge bağlamını keşfi
+
+**Karşılandı.** PR329 mevcut `event_registration_preview_v1` önizlemesine bağlı keşfi `member_document_contexts_get_v1` içinde yayımladı. Üyenin kendi bağlamında `event_registration_preview_id` ve varsa gerçek ürün sürümü bulunur. Native kabul üyenin onayı sonrası yöneticinin ilk kaydı tamamladığını doğruladı. [WF11](../../../docs/workflows.md#wf11) · [Native kabul](https://github.com/SXQHex/FtkSaaS/actions/runs/44206547572).
+
+## W1-BE-39 · Borç nedeniyle rezervasyon reddinin güvenli nedeni
+
+**Karşılandı.** [PR330](https://github.com/SXQHex/FtkSaaS/pull/330) yetkili rezervasyonda `DEBT_BOOKING_BLOCKED` döndürüyor. Yetkisiz aktörün genel reddi ve yazısız sonuç native testte doğrulandı. [WF06](../../../docs/workflows.md#wf06) · [Aday kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44218399421) · [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44221816510) · [Development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44221924497).
+
+## W1-BE-40 · Ders değişikliğinde etkilenen öğrenci bildirimi
+
+**Karşılandı.** PR330 başarılı ders değişikliğinde aynı seansın aktif rezervasyon sahiplerine uygulama içi bildirim gönderiyor. Stale/başarısız yazıda veya aynı anahtarın tekrarında ek bildirim oluşmadığı native testte doğrulandı. [WF11](../../../docs/workflows.md#wf11).
+
+## W1-BE-41 · Native ilk parola kabulü
+
+**Karşılandı.** PR330’un native CI senaryosu sentetik Google-only hesabın parolasız durumunu doğruladı, gerçek yerel native oturumdan ilk parolayı yazdı ve parola girişinde aynı Auth ve Edge hesabını okudu. Etkileşimli Google rızası P01.3 kapsamındaki ayrı kontroldür. [Native test](../../backend/tests/account-identity-acceptance.mjs) · [Aday kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44218399421).

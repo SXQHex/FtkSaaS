@@ -35,6 +35,31 @@ test("member account places five sections and saves native email reminder prefer
   await page.reload();
   await expect(email).toBeChecked();
 });
+test("transactional email uses its own native version and never changes the reminder preference", async ({
+  page,
+}) => {
+  const state = await mockMemberAccount(page);
+  const email = page.getByRole("switch", { name: "E-posta ile işlem bildirimleri", exact: true });
+  const reminder = page.getByRole("switch", { name: "E-posta ile hatırlatmalar", exact: true });
+  await expect(email).not.toBeChecked();
+  await email.press("Space");
+  await expect(email).toBeChecked();
+  await page.reload();
+  await expect(email).toBeChecked();
+  await expect(reminder).not.toBeChecked();
+  await email.press("Space");
+  await expect(email).not.toBeChecked();
+  await page.reload();
+  await expect(email).toBeEnabled();
+  await expect(email).not.toBeChecked();
+  await expect(reminder).not.toBeChecked();
+  expect(
+    state.writes.map(({ request }) => [request.purpose, request.enabled, request.expected_version]),
+  ).toEqual([
+    ["transactional", true, 4],
+    ["transactional", false, 5],
+  ]);
+});
 test("member calendar creates rotates and revokes with explicit review and version rereads", async ({
   page,
 }) => {

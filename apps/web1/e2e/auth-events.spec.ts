@@ -1,5 +1,6 @@
 import { test, expect } from "./test.js";
-import { mockEvents, openEvent, reviewEvent } from "./events-fixture.js";
+import { mockEvents, openEvent, product, reviewEvent } from "./events-fixture.js";
+import { studioIds as I } from "./studio-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 test("event list uses native period, enabled filters and real directory summaries", async ({
   page,
@@ -112,29 +113,75 @@ test("new package practice draft uses an external unlimited venue and never cons
   page,
 }) => {
   const state = await mockEvents(page, "empty");
+  const source = { scope: "center", center_id: I.center, key: "practice", version: 2 };
+  const defaults = {
+    capacity: { kind: "unlimited" },
+    terms: {
+      fee_minor: "0",
+      currency: "TRY",
+      full_payment_required: false,
+      package_usage: "eligibility_only",
+      allowed_product_version_ids: [product.version_id],
+      cancellation: { before_cutoff: "release", after_cutoff: "consume", no_show: "consume" },
+      refund: { method: "none" },
+    },
+  };
+  await page.route("**/functions/v1/backend-v1/settings_catalog_get_v1", (route) => {
+    const request = route.request().postDataJSON();
+    if (request.scope !== "center") return route.fallback();
+    expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          scope: "center",
+          catalog_version: 24,
+          fields: [],
+          defaults: {},
+          brand_packages: [],
+          limitations: [],
+          preparation_templates: {
+            availability: [],
+            packages: [],
+            package_currency_suggestion: "TRY",
+            events: [{ source, template: { key: "practice", name: "Paketli Pratik", defaults } }],
+          },
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/settings_preparation_resolve_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      source,
+      kind: "event",
+    });
+    return route.fulfill({
+      json: { ok: true, trace_id: I.role, data: { source, kind: "event", defaults } },
+    });
+  });
   await page.setViewportSize({ width: 320, height: 750 });
   await page.getByRole("button", { name: "Etkinlik ekle", exact: true }).click();
   const dialog = page.getByRole("dialog");
+  await dialog
+    .getByRole("combobox", { name: "Hazırlık şablonu" })
+    .selectOption({ label: "Paketli Pratik · Merkez" });
+  await dialog.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  expect(state.writes).toHaveLength(0);
   await dialog.getByLabel("Başlık", { exact: true }).fill("Pratik gecesi");
-  await dialog.getByRole("radio", { name: "Paketli Pratik", exact: true }).click();
+  await expect(dialog.getByRole("radio", { name: "Paketli Pratik", exact: true })).toBeChecked();
   await dialog.getByLabel("Başlangıç tarihi ve saati", { exact: true }).fill("2026-11-20T20:00");
   await dialog.getByLabel("Bitiş tarihi ve saati", { exact: true }).fill("2026-11-20T23:00");
   await dialog.getByRole("radio", { name: "Dış mekân", exact: true }).click();
   await dialog.getByLabel("Mekân adı", { exact: true }).fill("Açık alan");
   await dialog.getByLabel("Adres", { exact: true }).fill("Açık adres");
-  await dialog.getByRole("switch", { name: "Kontenjan sınırsız", exact: true }).press("Space");
-  await dialog.getByLabel("Para birimi", { exact: true }).fill("TRY");
-  await dialog.getByRole("checkbox", { name: "Pratik paketi", exact: true }).press("Space");
-  await dialog.getByLabel("Sınırdan önce", { exact: true }).selectOption("release");
-  await dialog.getByLabel("Sınırdan sonra", { exact: true }).selectOption("consume");
-  await dialog.getByLabel("Gelmediğinde", { exact: true }).selectOption("consume");
-  await dialog.getByLabel("İade yöntemi", { exact: true }).selectOption("none");
   await reviewEvent(page);
   await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes[0]).toMatchObject({
-    capacity: { kind: "unlimited" },
-    terms: { fee_minor: "0", package_usage: "eligibility_only" },
+    ...defaults,
     discipline_ids: [],
   });
   expect(state.effects).toBe(1);

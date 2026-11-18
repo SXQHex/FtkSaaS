@@ -16,6 +16,8 @@ import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { ItemGroup, Item, ItemContent, ItemTitle, ItemDescription } from "../../components/ui/item";
 import type { ScheduleChoice } from "./schedule-view";
+import type { ClientScope } from "../../lib/scoped-backend";
+import { PreparationPicker } from "../settings/preparation-picker";
 
 export interface ScheduleCreateDraft {
   mode: "single" | "weekly";
@@ -23,6 +25,7 @@ export interface ScheduleCreateDraft {
   instructorId: string;
   roomId: string;
   capacity: string;
+  capacityCategories?: { male: string; female: string };
   date: string;
   time: string;
   duration: string;
@@ -49,6 +52,7 @@ const weekdays = [
 ] as const;
 export function ScheduleCreateSheet({
   open,
+  scope,
   timezone,
   draft,
   classes,
@@ -67,6 +71,7 @@ export function ScheduleCreateSheet({
   recoveryActions,
 }: {
   open: boolean;
+  scope: ClientScope;
   timezone: string;
   draft: ScheduleCreateDraft;
   classes: ScheduleChoice[];
@@ -142,6 +147,28 @@ export function ScheduleCreateSheet({
                   : t(($) => $.schedule.singleHint)}
               </FieldDescription>
             </Field>
+            {open && draft.mode === "weekly" && (
+              <PreparationPicker
+                scope={scope}
+                kind="program"
+                disabled={locked || !onDraft}
+                onApply={(preparation) => {
+                  if (preparation.kind !== "program") return;
+                  const defaults = preparation.defaults;
+                  const categories = defaults.capacity.categories;
+                  onDraft?.({
+                    ...draft,
+                    time: defaults.local_start,
+                    duration: String(defaults.duration_minutes),
+                    weekdays: defaults.weekdays.map(String),
+                    capacity: String(defaults.capacity.total),
+                    capacityCategories: categories
+                      ? { male: String(categories.male), female: String(categories.female) }
+                      : undefined,
+                  });
+                }}
+              />
+            )}
             <FieldGroup className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
               <Field>
                 <FieldLabel htmlFor="schedule-create-class">
@@ -242,6 +269,32 @@ export function ScheduleCreateSheet({
                   onChange={(event) => set("capacity", event.target.value)}
                 />
               </Field>
+              {draft.mode === "weekly" && draft.capacityCategories && (
+                <>
+                  {(["male", "female"] as const).map((category) => (
+                    <Field key={category}>
+                      <FieldLabel htmlFor={`schedule-create-capacity-${category}`}>
+                        {t(($) => $.schedule.capacityCategories[category])}
+                      </FieldLabel>
+                      <Input
+                        id={`schedule-create-capacity-${category}`}
+                        type="number"
+                        min={0}
+                        required
+                        value={draft.capacityCategories?.[category]}
+                        disabled={locked || !onDraft}
+                        onChange={(event) => {
+                          if (draft.capacityCategories)
+                            set("capacityCategories", {
+                              ...draft.capacityCategories,
+                              [category]: event.target.value,
+                            });
+                        }}
+                      />
+                    </Field>
+                  ))}
+                </>
+              )}
               <Field>
                 <FieldLabel htmlFor="schedule-create-date">
                   {draft.mode === "weekly"
@@ -264,7 +317,7 @@ export function ScheduleCreateSheet({
                   id="schedule-create-time"
                   name="time"
                   type="time"
-                  step={60}
+                  step={draft.mode === "weekly" ? 1 : 60}
                   required
                   value={draft.time}
                   disabled={locked || !onDraft}
@@ -280,12 +333,17 @@ export function ScheduleCreateSheet({
                   name="duration"
                   type="number"
                   min={1}
-                  required
+                  required={draft.mode === "single"}
+                  aria-describedby="schedule-create-duration-hint"
                   value={draft.duration}
                   disabled={locked || !onDraft}
                   onChange={(event) => set("duration", event.target.value)}
                 />
-                <FieldDescription>{t(($) => $.schedule.minutes)}</FieldDescription>
+                <FieldDescription id="schedule-create-duration-hint">
+                  {draft.mode === "weekly"
+                    ? t(($) => $.schedule.seriesDurationHint)
+                    : t(($) => $.schedule.minutes)}
+                </FieldDescription>
               </Field>
               {draft.mode === "weekly" && (
                 <Field>

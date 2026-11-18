@@ -770,6 +770,7 @@ export function ScheduleContent({
       <ScheduleCreateSheet
         recoveryActions={recovery}
         open={createOpen}
+        scope={scope}
         timezone={createSource?.center.timezone ?? source.center.timezone}
         draft={createDraft}
         classes={source.resources.classes

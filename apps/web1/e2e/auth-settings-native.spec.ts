@@ -97,6 +97,280 @@ test("policy editing publishes a native protected change after review and keeps 
   });
   expect(write).not.toHaveProperty("center_id");
 });
+test("program duration changes only the reviewed center setting and survives a fresh read", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  const form = page.getByRole("form", { name: "Stüdyo bilgileri", exact: true });
+  const duration = form.getByRole("spinbutton", { name: "Varsayılan program süresi (dakika)" });
+  await expect(duration).toHaveValue("60");
+  await duration.fill("75");
+  await duration.press("Enter");
+  expect(f.writes).toHaveLength(0);
+  const review = await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes).toHaveLength(1);
+  expect(f.writes[0]).toMatchObject({
+    op: "settings_update_v1",
+    r: { scope: "center", org_id: I.org, center_id: I.center, expected_version: 1 },
+  });
+  expect(f.writes[0]?.r.patch).toEqual({ program_duration_minutes: 75 });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.reload();
+  await expect(duration).toHaveValue("75");
+  await page
+    .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
+    .selectOption("organization");
+  await expect(duration).toHaveValue("45");
+});
+test("E42 saves an automation preparation and restores the organization source with live scope", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  const form = page.getByRole("form", { name: "Otomasyon hazırlık şablonları", exact: true });
+  await form.getByLabel("Şablon adı", { exact: true }).fill("Paket takibi");
+  await form
+    .getByLabel(common.automation.columns.when, { exact: true })
+    .selectOption("entitlement_expiring");
+  await expect(
+    form.getByRole("option", { name: common.automation.triggers.pending_request, exact: true }),
+  ).toHaveCount(0);
+  await form.getByLabel(common.automation.offsetDays, { exact: true }).fill("0");
+  await form
+    .getByLabel(common.automation.columns.action, { exact: true })
+    .selectOption("create_followup");
+  await form.getByLabel("Takip görevi metni", { exact: true }).fill("Paket yenilemesini görüş");
+  await form.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  const review = page.getByRole("dialog");
+  expect(f.writes).toHaveLength(0);
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes[0]?.r.patch).toEqual({
+    automation_templates: [
+      {
+        key: expect.stringMatching(/^template-/),
+        name: "Paket takibi",
+        defaults: {
+          trigger: { kind: "entitlement_expiring", offset_days: 0 },
+          action: {
+            kind: "create_followup",
+            channel: "in_app",
+            template_key: "Paket yenilemesini görüş",
+          },
+        },
+      },
+    ],
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(form.getByRole("option", { name: "Paket takibi", exact: true })).toHaveCount(1);
+  await form.getByRole("button", { name: "Organizasyon kaynağını kullan", exact: true }).click();
+  await expect(
+    review.getByText(common.settings.preparation.inheritReview, { exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(1);
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes[1]).toMatchObject({
+    op: "settings_update_v1",
+    r: {
+      scope: "center",
+      center_id: I.center,
+      expected_version: 2,
+      patch: {},
+      inherit_fields: ["automation_templates"],
+    },
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(form.getByRole("option", { name: "Organizasyon takibi", exact: true })).toHaveCount(
+    1,
+  );
+  await expect(form.getByRole("option", { name: "Paket takibi", exact: true })).toHaveCount(0);
+  expect(f.writes.map(({ op }) => op)).toEqual(["settings_update_v1", "settings_update_v1"]);
+});
+
+test("E42 edits event capacity, payment and cancellation defaults without creating an event", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  const form = page.getByRole("form", { name: "Etkinlik hazırlık şablonları", exact: true });
+  await form.getByLabel("Şablon adı", { exact: true }).fill("Atölye koşulları");
+  await form.getByLabel(common.events.editor.nominal, { exact: true }).fill("8");
+  await form.getByLabel(common.events.editor.maximum, { exact: true }).fill("12");
+  await form.getByLabel(common.events.editor.fee, { exact: true }).fill("15000");
+  await form.getByLabel(common.events.editor.currency, { exact: true }).fill("TRY");
+  await form.getByLabel(common.events.editor.fullPayment, { exact: true }).press("Space");
+  await form.getByLabel(common.events.editor.cutoff, { exact: true }).fill("120");
+  await form.getByLabel("Sınırdan önce", { exact: true }).selectOption("release");
+  await form.getByLabel("Sınırdan sonra", { exact: true }).selectOption("consume");
+  await form.getByLabel("Gelmediğinde", { exact: true }).selectOption("consume");
+  await form.getByLabel("İade yöntemi", { exact: true }).selectOption("none");
+  await form.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  expect(f.writes).toHaveLength(0);
+  const review = page.getByRole("dialog");
+  await expect(review.getByText(/Atölye koşulları.*15000 TRY/)).toBeVisible();
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes).toHaveLength(1);
+  expect(f.writes[0]).toMatchObject({
+    op: "settings_update_v1",
+    r: { scope: "center", center_id: I.center, expected_version: 1 },
+  });
+  expect(f.writes[0]?.r.patch).toEqual({
+    event_templates: [
+      {
+        key: expect.stringMatching(/^template-/),
+        name: "Atölye koşulları",
+        defaults: {
+          capacity: { nominal: 8, maximum: 12 },
+          terms: {
+            fee_minor: "15000",
+            currency: "TRY",
+            full_payment_required: true,
+            allowed_product_version_ids: [],
+            cancellation: {
+              cutoff_minutes: 120,
+              before_cutoff: "release",
+              after_cutoff: "consume",
+              no_show: "consume",
+            },
+            refund: { method: "none" },
+          },
+        },
+      },
+    ],
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await form
+    .getByLabel("Hazırlık şablonu", { exact: true })
+    .selectOption({ label: "Atölye koşulları" });
+  await expect(form.getByLabel(common.events.editor.maximum, { exact: true })).toHaveValue("12");
+});
+
+test("E42 saves a weekly program template with exact clock and category capacity", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  const form = page.getByRole("form", { name: "Program hazırlık şablonları", exact: true });
+  await form.getByLabel("Şablon adı", { exact: true }).fill("Hafta sonu");
+  await form.getByRole("button", { name: "Cmt", exact: true }).press("Space");
+  await form.getByRole("button", { name: "Paz", exact: true }).press("Space");
+  await form.getByLabel("Başlangıç", { exact: true }).fill("10:20:30");
+  await form.getByLabel("Süre (dakika)", { exact: true }).fill("75");
+  await form.getByLabel(common.schedule.capacity, { exact: true }).fill("10");
+  await form.getByLabel("Erkek kontenjanı", { exact: true }).fill("4");
+  await form.getByLabel("Kadın kontenjanı", { exact: true }).fill("6");
+  await form.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  expect(f.writes).toHaveLength(0);
+  const review = page.getByRole("dialog");
+  await expect(review.getByText(/Cmt, Paz · 10:20:30 · 75 dk/)).toBeVisible();
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes[0]?.r).toMatchObject({
+    scope: "center",
+    center_id: I.center,
+    expected_version: 1,
+  });
+  expect(f.writes[0]?.r.patch).toEqual({
+    program_templates: [
+      {
+        key: expect.stringMatching(/^template-/),
+        name: "Hafta sonu",
+        defaults: {
+          weekdays: [6, 7],
+          local_start: "10:20:30",
+          duration_minutes: 75,
+          capacity: { total: 10, categories: { male: 4, female: 6 } },
+        },
+      },
+    ],
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await form.getByLabel("Hazırlık şablonu", { exact: true }).selectOption({ label: "Hafta sonu" });
+  await expect(form.getByLabel("Kadın kontenjanı", { exact: true })).toHaveValue("6");
+});
+
+test("E42 manages a center payment template and an organization CRM template with separate review", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  const collection = page.getByRole("form", { name: "Tahsilat hazırlık şablonları", exact: true });
+  await collection.getByLabel("Hazırlık şablonu", { exact: true }).selectOption("cash");
+  await collection.getByLabel("Ödeme yöntemi", { exact: true }).selectOption("bank_transfer");
+  await collection.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  const review = page.getByRole("dialog");
+  await expect(
+    review.getByText("Yerel nakit · TRY · Nakit → Yerel nakit · TRY · Havale", { exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(0);
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes[0]?.r).toMatchObject({
+    scope: "center",
+    center_id: I.center,
+    expected_version: 1,
+  });
+  expect(f.writes[0]?.r.patch).toEqual({
+    collection_templates: [
+      {
+        key: "cash",
+        name: "Yerel nakit",
+        defaults: { currency: "TRY", payment_method: "bank_transfer" },
+      },
+    ],
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await collection.getByLabel("Hazırlık şablonu").selectOption("cash");
+  await expect(collection.getByLabel("Ödeme yöntemi")).toHaveValue("bank_transfer");
+  await collection.getByRole("button", { name: "Kaldırmayı incele", exact: true }).click();
+  expect(f.writes).toHaveLength(1);
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
+    .selectOption("organization");
+  const crm = page.getByRole("form", { name: "Aday hazırlık şablonları", exact: true });
+  await crm.getByLabel("Şablon adı", { exact: true }).fill("Telefon başvurusu");
+  await crm.getByLabel(common.leads.source, { exact: true }).fill("phone");
+  await crm.getByLabel(common.leads.interest, { exact: true }).fill("Tango");
+  await crm.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  expect(f.writes).toHaveLength(1);
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes[1]?.r).toMatchObject({
+    scope: "organization",
+    expected_version: 1,
+    patch: {
+      crm_templates: [
+        {
+          key: expect.stringMatching(/^template-/),
+          name: "Telefon başvurusu",
+          defaults: { source: "phone", interest: "Tango" },
+        },
+      ],
+    },
+  });
+  expect(f.writes[1]?.r).not.toHaveProperty("center_id");
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(crm.getByRole("option", { name: "Telefon başvurusu", exact: true })).toHaveCount(1);
+  await crm
+    .getByLabel("Hazırlık şablonu", { exact: true })
+    .selectOption({ label: "Telefon başvurusu" });
+  await crm.getByRole("button", { name: "Kaldırmayı incele", exact: true }).click();
+  expect(f.writes).toHaveLength(2);
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes[2]?.r).toMatchObject({
+    scope: "organization",
+    expected_version: 2,
+    patch: { crm_templates: [] },
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(crm.getByRole("option", { name: "Telefon başvurusu", exact: true })).toHaveCount(0);
+});
+
 test("downgrade preserves the selected scope and period, then a stale Pro editor cannot publish after the native transition", async ({
   page,
 }) => {

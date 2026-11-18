@@ -21,15 +21,18 @@ import {
   type SettingsDocumentPatch,
   type SettingsLevel,
   type SettingsDocumentSource,
+  type PreparationFamily,
+  type InheritedPreparationFamily,
 } from "./settings-document";
 import type { SettingsViewData } from "./settings-view";
 import type { SettingsFieldKey, SettingsCardKey } from "./settings-layout";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
-const contactFields = {
+const generalFields = {
   "ay-tel": "contact_phone",
   "ay-posta": "contact_email",
   "ay-adres": "address",
+  "ay-program-sure": "program_duration_minutes",
 } as const;
 const reminderFields = {
   "ay-h-ders": "lesson_reminders_enabled",
@@ -44,14 +47,14 @@ const reminderChoices = {
   package_reminder_days: [3, 7, 14],
   payment_reminder_days: [1, 3, 7],
 } as const;
-const fields = { ...contactFields, ...reminderFields };
+const fields = { ...generalFields, ...reminderFields };
 const colors = {
   primaryColor: "primary_color",
   secondaryColor: "secondary_color",
   accentColor: "accent_color",
 } as const;
 const groups = {
-  "ay-genel": Object.values(contactFields),
+  "ay-genel": Object.values(generalFields),
   "ay-marka": Object.values(colors),
   "ay-hat": Object.values(reminderFields),
 } as const;
@@ -83,6 +86,8 @@ export function useSettingsDocument({
       card: SettingsCardKey;
       logo?: SettingsImageUpload | null;
       reset?: SettingsDocumentIntent;
+      rows?: { id: string; title: string; detail: string }[];
+      inherit?: InheritedPreparationFamily;
     }>(),
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
@@ -143,6 +148,11 @@ export function useSettingsDocument({
         ),
       );
       if (review?.logo !== undefined) setLogoDraft(undefined);
+      if (review?.rows)
+        await queries.invalidateQueries({
+          queryKey: ["preparation-catalog", scope.accountId, scope.orgId],
+          refetchType: "none",
+        });
       await queries.invalidateQueries(
         { queryKey: ["settings-history", scope.accountId, scope.orgId] },
         { throwOnError: true },
@@ -217,6 +227,9 @@ export function useSettingsDocument({
       fieldData[presentation] = {
         value,
         writable: writable(wire),
+        ...(wire === "program_duration_minutes"
+          ? { description: t(($) => $.settings.programDurationHint) }
+          : {}),
         ...(choices
           ? {
               options: choices.map((count) => ({
@@ -236,11 +249,11 @@ export function useSettingsDocument({
     forms: {
       "ay-genel": {
         dirty: Object.keys(draft).some((key) =>
-          Object.values(contactFields).some((field) => field === key),
+          Object.values(generalFields).some((field) => field === key),
         ),
         pending: locked,
         read: !!source,
-        writable: Object.values(contactFields).some(writable),
+        writable: Object.values(generalFields).some(writable),
       },
       "ay-hat": {
         dirty: Object.keys(draft).some((key) =>
@@ -320,7 +333,12 @@ export function useSettingsDocument({
         Object.fromEntries(
           Object.entries(draft)
             .filter(([field]) => keys.some((key) => key === field))
-            .map(([field, value]) => [field, field in reminderChoices ? Number(value) : value])
+            .map(([field, value]) => [
+              field,
+              field in reminderChoices || field === "program_duration_minutes"
+                ? Number(value)
+                : value,
+            ])
             .filter(
               ([field, value]) => value !== Reflect.get(source.document.values, field as string),
             ),
@@ -376,7 +394,14 @@ export function useSettingsDocument({
     try {
       const intent =
         review.reset ??
-        (await settingsDocumentIntent(scope, level, review.source, review.patch, review.logo));
+        (await settingsDocumentIntent(
+          scope,
+          level,
+          review.source,
+          review.patch,
+          review.logo,
+          review.inherit,
+        ));
       if (active.current) await command.start(intent);
     } catch (cause) {
       if (active.current && !loseAccess(cause))
@@ -428,44 +453,50 @@ export function useSettingsDocument({
   const dialog = review && !accessDenied && !command.unavailable && (
     <SettingsReviewDialog
       open
-      title={t(($) => $.settings.cards[review.card].title)}
+      title={
+        review.rows
+          ? t(($) => $.settings.preparation.title)
+          : t(($) => $.settings.cards[review.card].title)
+      }
       description={
         review.reset
           ? t(($) => $.settings.resetReviewHint)
           : t(($) => $.settings.documentReviewHint)
       }
-      rows={[
-        ...Object.entries(review.patch).map(([wire, value]) => {
-          const presentation = Object.entries(fields).find(([, key]) => key === wire)?.[0] as
-            | keyof typeof fields
-            | undefined;
-          const color = Object.entries(colors).find(([, key]) => key === wire)?.[0] as
-            | keyof typeof colors
-            | undefined;
-          const label = presentation
-            ? t(($) => $.settings.fields[presentation])
-            : color
-              ? t(($) => $.settings[color])
-              : t(($) => $.settings.unknown);
-          return {
-            id: wire,
-            title: label,
-            detail: `${reviewValue(wire, Reflect.get(review.source.document.values, wire))} → ${reviewValue(wire, value)}`,
-          };
-        }),
-        ...(review.logo !== undefined
-          ? [
-              {
-                id: "logo",
-                title: t(($) => $.settings.logoLabel),
-                detail:
-                  review.logo === null
-                    ? t(($) => $.settings.logoRemoveReview)
-                    : t(($) => $.settings.logoUploadReview),
-              },
-            ]
-          : []),
-      ]}
+      rows={
+        review.rows ?? [
+          ...Object.entries(review.patch).map(([wire, value]) => {
+            const presentation = Object.entries(fields).find(([, key]) => key === wire)?.[0] as
+              | keyof typeof fields
+              | undefined;
+            const color = Object.entries(colors).find(([, key]) => key === wire)?.[0] as
+              | keyof typeof colors
+              | undefined;
+            const label = presentation
+              ? t(($) => $.settings.fields[presentation])
+              : color
+                ? t(($) => $.settings[color])
+                : t(($) => $.settings.unknown);
+            return {
+              id: wire,
+              title: label,
+              detail: `${reviewValue(wire, Reflect.get(review.source.document.values, wire))} → ${reviewValue(wire, value)}`,
+            };
+          }),
+          ...(review.logo !== undefined
+            ? [
+                {
+                  id: "logo",
+                  title: t(($) => $.settings.logoLabel),
+                  detail:
+                    review.logo === null
+                      ? t(($) => $.settings.logoRemoveReview)
+                      : t(($) => $.settings.logoUploadReview),
+                },
+              ]
+            : []),
+        ]
+      }
       accepted={accepted}
       onAccepted={setAccepted}
       locked={locked}
@@ -523,6 +554,17 @@ export function useSettingsDocument({
   }
   return {
     source,
+    reviewPreparation: (
+      patch: Pick<SettingsDocumentPatch, PreparationFamily>,
+      rows: NonNullable<NonNullable<typeof review>["rows"]>,
+      inherit?: InheritedPreparationFamily,
+    ) => {
+      if (locked || review || !source || readOnly) return;
+      setAccepted(false);
+      setError(undefined);
+      command.reset();
+      setReview({ source, patch, card: "sablon-0", rows, inherit });
+    },
     data,
     onField,
     onColor,
