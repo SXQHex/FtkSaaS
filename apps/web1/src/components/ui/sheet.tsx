@@ -62,6 +62,7 @@ function SheetOverlay({
 }
 
 function Sheet({
+  "aria-labelledby": labelledBy,
   className,
   children,
   side = "right",
@@ -69,6 +70,7 @@ function Sheet({
   ...props
 }: Omit<ModalOverlayPrimitiveProps, "className" | "children"> &
   Pick<React.ComponentProps<typeof ModalPrimitive>, "isDismissable"> & {
+    "aria-labelledby"?: string;
     className?: string;
     children: React.ReactNode;
     side?: "top" | "right" | "bottom" | "left";
@@ -86,6 +88,7 @@ function Sheet({
       >
         <SheetPrimitive
           data-slot="sheet"
+          aria-labelledby={labelledBy}
           className="[display:inherit] h-full max-h-[inherit] [flex-direction:inherit] [gap:inherit] outline-none"
         >
           {children}

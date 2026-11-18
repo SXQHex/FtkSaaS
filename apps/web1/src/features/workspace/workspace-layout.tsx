@@ -1,6 +1,6 @@
 // Page composition from official @shadcn/sidebar-07.
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
@@ -27,6 +27,7 @@ import {
   BreadcrumbLink,
 } from "../../components/ui/breadcrumb";
 import { StateBanner } from "../states/state-view";
+import { readSettingsSubscription } from "../settings/settings-subscription";
 export interface WorkspaceSelection {
   organizationId?: string;
   centerId?: string;
@@ -121,7 +122,20 @@ export function WorkspaceLayout({
       : pathname.startsWith("/instructor/") && modes.includes("instructor")
         ? "instructor"
         : (modes[0] ?? "account");
-  const groups = workspaceNavigation(mode, view?.selected?.id, centerId);
+  const ownerScope =
+    !scope.isError && resolvedOrganizationId && centerId && roles.includes("owner")
+      ? { accountId, orgId: resolvedOrganizationId, centerId }
+      : undefined;
+  const subscription = useQuery({
+    queryKey: ["settings-subscription", accountId, ownerScope?.orgId],
+    queryFn: ownerScope ? () => readSettingsSubscription(ownerScope) : skipToken,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const starter =
+    !!ownerScope && !subscription.isError && subscription.data?.subscription.plan === "starter";
+  const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter);
   const memberSearchScope =
     mode === "management" &&
     view?.selected?.id &&

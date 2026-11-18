@@ -214,6 +214,25 @@ test("Starter self management opens the native owner navigation and removes it a
       },
     }),
   );
+  await page.route("**/functions/v1/backend-v1/subscription_get_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          state: "active",
+          plan: "starter",
+          period_start: null,
+          period_end: null,
+          grace_until: null,
+          cancel_at_period_end: false,
+          pending_change: null,
+          limits: { entries: [] },
+          usage: { entries: [] },
+        },
+        trace_id: org,
+      },
+    }),
+  );
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
@@ -222,12 +241,22 @@ test("Starter self management opens the native owner navigation and removes it a
   const studio = page.locator("nav a[href$='/studio']");
   await expect(studio).toBeVisible();
   await expect(page.getByRole("button", { name: /Stüdyo sahibi/ })).toBeVisible();
+  await expect(
+    page.locator("nav a[href$='/events'], nav a[href$='/earnings'], nav a[href$='/automation']"),
+  ).toHaveCount(0);
+  for (const path of ["leads", "finance", "reports"]) {
+    await expect(page.locator(`nav a[href$='/${path}']`)).toBeVisible();
+  }
+  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
+  await palette.getByPlaceholder("Sayfa adı ara…").fill("Otomasyon");
+  await expect(palette.getByRole("menuitem", { name: "Otomasyon", exact: true })).toHaveCount(0);
+  await page.keyboard.press("Escape");
   scope = null;
   await page.reload();
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await expect(studio).toHaveCount(0);
   await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
-  const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
   await palette.getByPlaceholder("Sayfa adı ara…").fill("Politikalar");
   await expect(palette.getByText("Eşleşen sayfa yok.", { exact: true })).toBeVisible();
   await expect(palette.getByRole("menuitem", { name: "Politikalar", exact: true })).toHaveCount(0);

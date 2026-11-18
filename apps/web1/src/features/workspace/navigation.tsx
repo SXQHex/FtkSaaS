@@ -34,6 +34,7 @@ export function workspaceNavigation(
   view: NavigationView,
   orgId?: string,
   centerId?: string,
+  starter = false,
 ): NavigationGroup[] {
   const base =
     orgId && centerId
@@ -55,7 +56,7 @@ export function workspaceNavigation(
     ];
   if (view === "account")
     return [{ key: "general", items: [{ key: "account", url: "/account", icon: <UserIcon /> }] }];
-  return [
+  const groups: NavigationGroup[] = [
     {
       key: "general",
       items: [
@@ -88,4 +89,9 @@ export function workspaceNavigation(
       ],
     },
   ];
+  if (!starter) return groups;
+  return groups.map((group) => ({
+    ...group,
+    items: group.items.filter(({ key }) => !["events", "earnings", "automation"].includes(key)),
+  }));
 }

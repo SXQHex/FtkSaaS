@@ -499,8 +499,8 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
     .selectOption("organization");
   await page.getByRole("tab", { name: "Plan", exact: true }).click();
   await page.getByRole("button", { name: "Planı değiştir", exact: true }).click();
-  const editor = page.getByRole("dialog");
-  await editor.getByRole("radio", { name: /starter/ }).press("Space");
+  const editor = page.getByRole("dialog", { name: "Planı daralt", exact: true });
+  await editor.getByRole("radio", { name: /^Starter/ }).press("Space");
   await editor
     .getByRole("combobox", { name: "Korunacak merkez", exact: true })
     .selectOption(I.center);

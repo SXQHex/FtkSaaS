@@ -15,7 +15,7 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 | Aktif adım | Plan            | İşlev                           | Durum                                                          | Sonraki eylem                                                                |
 | ---------- | --------------- | ------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **V02**    | Starter + çizim | Üye ve eğitmen kişisel akışları | V01 kapalı · E47 dış bağımlılıkta · G-STARTER.2 yayın bekliyor | V02 ve E48’in ilk karşılanmış önkoşulundan ilerle. E47 için W1-BE-43’ü izle. |
+| **V08.2**  | Starter + çizim | Tam yerel kabul ve yayımlı aday | V/E kaynak bağımlılıkları kendi maddelerinde. G-STARTER.2 yayın bekliyor. | Tam yerel kabulü tek Chromium işçisiyle çalıştır. Yayımlandığında aynı aday kaynağının rota ve kapsam kabulünü doğrula. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -156,35 +156,37 @@ Yeni snapshot'taki bilinen açıklar da kabul girdisidir: %125 ölçekte400px ta
 
 ### Mevcut ekranların yeni kaynak eşlemesi
 
-Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çıkarıldı. Aktif sayfa açıldığında yalnız ilgili satırın yeni çizimi ve uygulama farkı doğrulanır. Önceki E kutuları kendi sürümünün kabul kaydıdır.
+Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çıkarıldı. Aktif sayfa açıldığında yalnız ilgili satırın yeni çizimi ve uygulama farkı doğrulanır. Önceki E kutuları kendi sürümünün [ekran kabulüne](#sayfa-kabulu) ve [Pro işlev kayıtlarına](#pro) bağlıdır. [Starter kanıtı](#starter), o plana özgü kaynak sınırlarını izler.
 
 | Ekranlar | Değişen görsel/işlev bağlamı                                         | Güncel iş sahibi                            |
 | -------- | -------------------------------------------------------------------- | ------------------------------------------- |
-| E01–E09  | Auth kabuğu, tema/ölçek; doğrulama sonrası kurulum girişi            | V01, E47; mevcut native Auth kabulü korunur |
-| E10      | Rol bilgisi, yönetici/eğitmen ICS ve görünüm tercihleri              | V01/V02/V07                                 |
-| E11      | Etkinlik/finans/CRM kaynaklarıyla özet tutarlılığı ve kabuk          | V01/V04/V05                                 |
-| E12      | Kurulum sonucu, merkez adı, ekip kaynakları                          | V07/E47; Business kapsamı E49               |
-| E13–E16  | Birleşim, davet, aktarılan kişi ve bağlı borç/hak görünümleri        | V04                                         |
-| E17/E18  | Hafta başlangıcı, birleşik etkinlik/seans, taşıma ve bekleme bağları | V03; self bekleme V02                       |
-| E19/E20  | Paket istatistikleri, tahsilat/iptal ve etkinlik finansı             | V04; etkinlik writer'ı V03                  |
-| E21      | Öğrenci özel ders talebinin yönetim tarafı                           | V02; mevcut WF06/E21 akışı                  |
-| E22      | Belge sürümü/yeniden kabul ve üye bağlamı                            | V02/V05; mevcut P15                         |
-| E23      | Etkinlik görevi→hakediş, ödeme ve rapor aynı kaynaktan               | V03/V04                                     |
-| E24–E27  | Eğitmenin kendi seansı, kapanış penceresi, düzeltme isteği ve ICS    | V02/V03; E27 hakedişi V04                   |
-| E28–E32  | Self hak/rezervasyon/özel ders/ödeme, profil ve bildirim girişi      | V02/E48                                     |
-| E33      | Pano, sorumlu/deneme sayaçları, takip ve ortak başvurular            | V05; Business uzantısı B02/E49              |
-| E34–E36  | Slug, yayın durumu, public başvuru ve etkinlik hedefi                | V05                                         |
-| E37/E38  | Etkinlik ödemesi, görev/hakediş ve takvim görünürlüğü                | V03/V04                                     |
-| E39      | Toplu eylemler ve geri al tasarımı, kaynak yetkisi                   | V06; üye kabuğu E48                         |
-| E40      | Otomasyon→takip ve son işler                                         | V05                                         |
-| E41      | Gerçek rapor/huni/hakediş, CSV ve içe aktarma notları                | V04; Business birleşik rapor B05/E49        |
-| E42      | Plan/fatura/havale/organizasyon, kaynak seçimi ve Starter görünümü   | V07; Business daralma B06/E49               |
-| E43      | Genişleyen denetim ve işlem durumları                                | V06                                         |
-| E44–E46  | Yardım/durum kataloğu, bağlı hata/plan/salt okunur görselleri        | V06; ortak tema/ölçek V01                   |
+| E01–E09  | Auth kabuğu, tema/ölçek; doğrulama sonrası kurulum girişi            | [V01](#v01), [E47](#e47-ilk-kurulum); mevcut native Auth kabulü korunur |
+| E10      | Rol bilgisi, yönetici/eğitmen ICS ve görünüm tercihleri              | [V01](#v01)/[V02](#v02)/[V07](#v07) |
+| E11      | Etkinlik/finans/CRM kaynaklarıyla özet tutarlılığı ve kabuk          | [V01](#v01)/[V04](#v04)/[V05](#v05) |
+| E12      | Kurulum sonucu, merkez adı, ekip kaynakları                          | [V07](#v07)/[E47](#e47-ilk-kurulum); Business kapsamı E49 |
+| E13–E16  | Birleşim, davet, aktarılan kişi ve bağlı borç/hak görünümleri        | [V04](#v04) |
+| E17/E18  | Hafta başlangıcı, birleşik etkinlik/seans, taşıma ve bekleme bağları | [V03](#v03); self bekleme [V02](#v02) |
+| E19/E20  | Paket istatistikleri, tahsilat/iptal ve etkinlik finansı             | [V04](#v04); etkinlik writer'ı [V03](#v03) |
+| E21      | Öğrenci özel ders talebinin yönetim tarafı                           | [V02](#v02); mevcut WF06/E21 akışı |
+| E22      | Belge sürümü/yeniden kabul ve üye bağlamı                            | [V02](#v02)/[V05](#v05); mevcut P15 |
+| E23      | Etkinlik görevi→hakediş, ödeme ve rapor aynı kaynaktan               | [V03](#v03)/[V04](#v04) |
+| E24–E27  | Eğitmenin kendi seansı, kapanış penceresi, düzeltme isteği ve ICS    | [V02](#v02)/[V03](#v03); E27 hakedişi [V04](#v04) |
+| E28–E32  | Self hak/rezervasyon/özel ders/ödeme, profil ve bildirim girişi      | [V02](#v02)/[E48](#e48-uye-bildirim-merkezi) |
+| E33      | Pano, sorumlu/deneme sayaçları, takip ve ortak başvurular            | [V05](#v05); Business uzantısı B02/E49 |
+| E34–E36  | Slug, yayın durumu, public başvuru ve etkinlik hedefi                | [V05](#v05) |
+| E37/E38  | Etkinlik ödemesi, görev/hakediş ve takvim görünürlüğü                | [V03](#v03)/[V04](#v04) |
+| E39      | Toplu eylemler ve geri al tasarımı, kaynak yetkisi                   | [V06](#v06); üye kabuğu [E48](#e48-uye-bildirim-merkezi) |
+| E40      | Otomasyon→takip ve son işler                                         | [V05](#v05) |
+| E41      | Gerçek rapor/huni/hakediş, CSV ve içe aktarma notları                | [V04](#v04); Business birleşik rapor B05/E49 |
+| E42      | Plan/fatura/havale/organizasyon, kaynak seçimi ve Starter görünümü   | [V07](#v07); Business daralma B06/E49 |
+| E43      | Genişleyen denetim ve işlem durumları                                | [V06](#v06) |
+| E44–E46  | Yardım/durum kataloğu, bağlı hata/plan/salt okunur görselleri        | [V06](#v06); ortak tema/ölçek [V01](#v01) |
 
 ### Uygulama sırası
 
 Önce mevcut açık Starter maddelerinin uygulanabilir devamını tamamla. Dış onay/dağıtım/kanıt engeli varsa aynı maddede bırakıp V01 → E47 → V02/E48 → V03 → V04 → V05 → V06 → V07 → V08 sırasındaki bağımsız işe geç. Her grupta önce görsel kompozisyon ve karşılaştırma, ardından gerçek entegrasyon ve ilgili seri otomatik kabul gelir. Değişiklik yapılmamış mevcut işlevlerin testlerini gereksiz tekrar etme.
+
+<a id="v01"></a>
 
 ### V01 · Ortak kabuk, tema ve bütün ekranların fark envanteri (kapalı)
 
@@ -193,6 +195,8 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
       Yönetim takvimi Hesabım’daki native hafta başlangıcını kullanıyor. Tercih okunamazsa Pazartesi varsayılanı uygulanıyor. Seri Chromium’da Pazar seçimi, İstanbul saat dilimindeki Pazar–Pazar okuma aralığına bağlandı ve takvim paketinin 10 senaryosu geçti. Komut paleti, erişilebilir merkezdeki yönetim kapsamında Ayarlar bölümlerini sunuyor. Klavyeyle seçilen sekme yenilemede korundu ve yönetim kapsamı kalkınca sonuçlar gizlendi. Ayarlar ve ortak kabuk paketi seri 15/15 geçti. Komut paleti seçili merkezin aktif üyelerini native okuyucudan arıyor. Seri Chromium’da üye numarasıyla bulunan profile klavyeyle geçiş ve izin reddinde eski sonucun kaldırılması doğrulandı. Eylemler grubu mevcut davet, üye içe aktarma ve rapor dışa aktarma formlarını açıyor. Tema eylemi mevcut görünüm kontrolünü kullanıyor, kontrol bu sayfada yoksa Hesabım’daki Görünüm bölümüne gidiyor. Çıkış eylemi mevcut oturum kapatma akışını kullanıyor. Seri Chromium’da davet formunun klavye ve odağı ile dosya formlarının yazma başlatmadan açılması doğrulandı. Hesap ölçeği çizimdeki gibi kök yazı boyutuna yüzde olarak uygulanıyor. Gövde ve sabit yazı boyutları rem’e bağlandı. Sistem ve %100 tarayıcı varsayılanını izliyor. Tema kısayolu, hesap tercihi ve çıkış tarayıcıda doğrulandı. Seri görünüm testlerinde %110/%125/%200, %200’de büyüyen gerçek başlık, panelin kapanması, izinli ayarın yeniden okunması ve 320 CSS px reflow doğrulandı. [Görünüm](../e2e/auth-flow.spec.ts#L692) · [Tema ve çıkış](../e2e/auth-workspace.spec.ts#L14). [Davet](../e2e/auth-people-summary.spec.ts#L7) · [Dosya eylemleri](../e2e/auth-reports-native.spec.ts#L36). [Üye araması](../e2e/auth-people-summary.spec.ts#L26). [Takvim](../e2e/auth-schedule.spec.ts#L490) · [Komut paleti](../e2e/auth-settings-native.spec.ts#L20) · [Kapsam kaybı](../e2e/auth-workspace.spec.ts#L132).
 - [x] **V01.3** · Aynı veri/durumda açık/koyu masaüstü1440×900, mobil390×844, kaynak400px ve mevcut WCAG320px/reflow kapsamını doğrula. %100/110/125 tercihleri, %200 metin büyütme, görünür odak ve taşma mevcut kalite ölçütlerini karşılasın. Farklı test amaçlarını tek zoom yüzdesi sayma.
       Aynı sentetik hesap değerleriyle v67 ve Web1 Hesabım/Profil görünümü 1440×900, 390×844 ve 400×844 açık/koyu karşılaştırıldı. Web1 ayrıca 320 CSS px’de ve ayrı metin aralığı/yeniden akış senaryosunda sınandı. Seri kabuk paketinde dört senaryo, Axe ve taşma kontrolleri geçti. Mobil çekmecenin odak halkası ve Escape sonrası tetikleyiciye dönüşü görüldü. %100/%110/%125 ve %200 hesap ölçeği [görünüm akışında](../e2e/auth-flow.spec.ts#L692) ayrı doğrulandı. Web1 WCAG için daha belirgin kontrol kenarlıklarını ve yetkiye bağlı rol seçiciyi koruyor. Hesap takvim kartı V02.2 kapsamındadır. [Kabuk testi](../e2e/auth-workspace.spec.ts#L49) · [Uygulama örneği](../.tmp/v67-shell-app-390-light.png) · [v67 örneği](../.tmp/v67-shell-reference-390-light.png).
+
+<a id="v02"></a>
 
 ### V02 · Üye ve eğitmen kişisel akışları
 
@@ -206,6 +210,8 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 - [x] **V02.3** · Rezervasyon/iptal etki, bekleme/teklif ve belge engeli aynı self kaynaklardan güncellensin. Sabit tarih veya demo kalan süre yerine API zamanı/politikasını kullan. E48 bildiriminden açılan hedefte canlı yetkiyi yeniden kontrol et.
       Kendi rezervasyonu oluşturulduğunda veya iptal edildiğinde kesin rezervasyon, seans, kapasite ve bağlı hak yeniden okunuyor. Belge kabulü güncel native gereksinimi ve gerçek metni kullanıyor. Kabulden sonra rezervasyon için yeni inceleme ve ayrı onay gerekiyor. Yer teklifi kabulü/reddi tam native teklif kaydını kullanıyor. Bekleme ve özel ders tekliflerinin uygunluğu API `as_of` zamanıyla değerlendiriliyor. Üye bildirimi tam seans, teklif veya talep kimliğine gidiyor. Geri/ileri ve yenileme sonrası izin kaybı ile yabancı kayıt doğrulandı. Tek işçili Chromium kabulü 16/16 geçti. E48’in merkezler arası kaynak keşfi [W1-BE-48](request.md#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi) altında açık. [Rezervasyon ve iptal](../e2e/auth-member-classes.spec.ts#L539) · [Belge](../e2e/auth-member-classes.spec.ts#L692) · [Teklif](../e2e/auth-own-waitlist.spec.ts#L197) · [Özel ders süresi](../e2e/auth-own-private-lessons.spec.ts#L91) · [Bildirim hedefi](../e2e/auth-inbox.spec.ts#L430).
 
+<a id="v03"></a>
+
 ### V03 · Takvim, seans ve etkinlik bağları
 
 - [x] **V03.1** · E17/E18 ve E24–E26'da hafta başlangıcı, gün/hafta, taşıma/seri etki önizlemesi ve etkinlik görünümünü mevcut FullCalendar Standard üzerinden uyarla. Etkinlik/seans tür ayrımını yayımlanmış okumayla bağla; oda çakışmasını tarayıcıda karar motoruna dönüştürme.
@@ -214,17 +220,23 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
       Etkinlik onayı sonrası takvim aralığı ve ilgili merkez finansı, üye hakkı ya da hakediş sorguları geçersiz kılınıyor. Sözleşmeye uygun sentetik API yanıtlarıyla, önceden okunmuş Finans ekranı aynı havale hareketi kimliğini ve Hakediş ekranı doğrulanan görev kimliğine bağlı satırı yeniden okudu. İptal onayından sonra takvim aynı etkinliği salon rezervasyonu olmadan okudu ve tekrar açılan detayda iptal eylemi devre dışıydı. Takvimden tekrar giriş ikinci tahsilat, kayıt, görev doğrulaması veya iptal oluşturmadı. Merkez iptali önizlemesi kapanacak borcu ve oluşacak üye alacağını ayrı tutarlarla gösterdi. Onaydan sonra E20 aynı açık borcun kapandığını ve aynı kişinin alacağını yeniden okudu. İlk havale hareketi kimliği korundu, ikinci nakit hareketi oluşmadı. Paketli etkinlik ayrı senaryoda iptal edildi. E30 aynı satış için kullanılabilir hakkı 3’ten 4’e, ayrılmış hakkı 2’den 1’e güncelledi. Hareket defteri aynı etkinlik kayıt kimliğine bağlı tek bırakma hareketini iki yenilemede de gösterdi. Statik derleme ve tek işçili Chromium kabulü 25/25 geçti. [Paket hakkı iadesi](../e2e/auth-own-entitlements.spec.ts#L239). [İptal, finans ve takvim](../e2e/auth-event-detail.spec.ts#L191) · [Tahsilat](../e2e/auth-event-detail.spec.ts#L425) · [Görev ve hakediş](../e2e/auth-event-detail.spec.ts#L551).
 - [ ] **V03.3** · Eğitmen kapanış penceresi/fiilî başlangıç/eksik yoklama/düzeltme isteği görsellerini native yetkilerle eşle. Aynı seansı öğrenci/eğitmen/yönetici oturumlarında seri otomatik senaryoyla karşılaştır; destek boşluğu varsa writer uydurmadan kaydet. Yoklama zaman aralığı ve eğitmenin ayrı düzeltme isteği [W1-BE-49](request.md#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği) ile açık. Fiilî başlangıç ve kapanış mevcut işlemlerle doğrulandı. Açık yoklamada kaydedilmemiş katılımcı sonucu varsa kapanış devre dışı ve gerekçe görünür. Native yeniden okuma sonucu kaydın tamamlandığını doğrulayınca kapanış açılıyor. Seri senaryoda yönetici aynı fiilî başlangıç ve düzeltilmiş yoklamayı gördü, üye aynı seansın kendi geçmiş sonucunu gördü. Statik SPA derlemesi, 15 birim testi ve iki seri Chromium koşusunda 35 farklı senaryo geçti. [Üç rol kabulü](../e2e/auth-instructor-flows.spec.ts#L78).
 
+<a id="v04"></a>
+
 ### V04 · Kişi, paket, finans, hakediş ve rapor tutarlılığı
 
 - [x] **V04.1** · E13–E16/E19'daki davet, birleşim, içe aktarılan kişi, aktif hak sahibi ve satış sayacı görsellerini mevcut typed özet/keşif okumalarıyla eşle. Bütün kişileri veya işlem geçmişini tarayıp sayaç üretme. Üyeler rozeti, bir satır istenen `management_state_get_v1` yanıtının filtreli öneri toplamını okuyor ve birleşimden sonra güncelleniyor. Davetler rozeti bekleyen ile süresi dolan davetleri, hesap rozeti bağlantısız üyeleri native durum özetinden alıyor. Paketler aktif hak sahibi ve son 30 gün satış sayılarını merkez özetinden, geliri ayrı para birimleriyle gösteriyor. Üyeler’den açılan içe aktarma mevcut yetkili öğrenci formunu kullanıyor. İçe aktarılan kişiler aynı native iş ve satır sonuçlarında okunuyor. Statik üretim derlemesi, 54 birim testi ve 11 farklı Chromium senaryosu tek işçiyle doğrulandı. [Birleşim](../e2e/auth-merge.spec.ts#L402) · [Davet](../e2e/auth-access.spec.ts#L237) · [Paket](../e2e/auth-products.spec.ts#L233) · [İçe aktarma](../e2e/auth-reports-native.spec.ts#L229).
 - [x] **V04.2** · E14/E20/E23/E27/E30'da tahsilat iptali, birleşim borcu, etkinlik ödemesi ve hakediş için aynı kaynak kimlikleriyle yeniden okumayı doğrula. Demo tarih/tutar/satır toplamını üretim hesaplaması gibi taşıma. Sözleşmeye uygun sentetik yanıtlarla E20 tam tahsilat düzeltmesi kaynak harekete bağlı tek kayıt oluşturdu. E14 aynı SPA belgesinde güncel borç özetini, birleşimden sonra da aynı merkez/kişi/para biriminde hem önceki borcu hem taşınan borcu okudu. E23 ve E27 aynı etkinlik görevi ve hakediş kimliğini okudu. E20 etkinlik ödemesi ve E30 hak iadesi V03.2’deki kaynak hareketleriyle yeniden doğrulandı. E27 tarihsel seans ve anlaşma ayrıntısı [W1-BE-45](request.md#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı) kapsamında açık. 41 finans birim testi, statik derlemeden 3 doğrudan URL/yenileme senaryosu ve son kapsamda 13 seri Chromium senaryosu geçti. [Tahsilat düzeltmesi](../e2e/auth-finance.spec.ts#L468) · [Birleşim](../e2e/auth-merge.spec.ts#L403) · [Etkinlik hakedişi](../e2e/auth-event-detail.spec.ts#L553).
 - [ ] **V04.3** · E41 rapor, tarih aralığı, CSV iş durumu/yeniden deneme, kaynak hakediş/huni ve içe aktarma özetini yeni çizime uyarla. Gerçek dosya yetkisi korunur. Tarih sınırı yayımlanmış rapor sözleşmesinden gelir. Çizimdeki 180 günlük deneme zaman aşımı kullanılmaz. Dosyalar sekmesi sunucunun planladığı deneme zamanını gösterir ve aynı iş kimliğini yeniden okur. Aday hunisi seçili merkezin yetkili rapor satırındaki aday, dönüşen ve oran alanlarını gösterir. 8 rapor birim testi ve 3 statik rota dahil 12 seri Chromium senaryosu geçti. Kesin içe aktarım sonucu ve atlanan satır dosyası [W1-BE-50](request.md#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası), başarısız CSV işini özgün kapsamla yeniden başlatma [W1-BE-51](request.md#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma), huni aşamaları ve kaynak kırılımı [W1-BE-52](request.md#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı) ile açık. [Rapor ve dosya kabulü](../e2e/auth-reports-native.spec.ts#L79).
 
+<a id="v05"></a>
+
 ### V05 · CRM, public yüzey ve otomasyon
 
 - [ ] **V05.1** · E33'ün pano/takip/başvuru/liste görünümleri, sorumlu seçimi ve deneme sayaçlarını mevcut native keşif ve hazır Dice UI bileşenleriyle eşle. Takipler’de otomasyon kaynağı, `crm_followup_list_v1` ile yetkili faaliyet kimliklerini alıyor. Adayla bağlı ve adaysız kayıtlar aynı faaliyet kimliğiyle kendi yetkili ayrıntısını açıyor. Yetki reddi içeriği gizli tutuyor ve yeniden deneme yalnız kaynak okuması yapıyor. Sekme sayaçları `management_work_list_v1` merkez özetinden geliyor. Takip tamamlanınca ve başvuru kapatılınca ilgili sayaç yeniden okunuyor. Son kapsamda 48 birim testi ve 7 Chromium senaryosu tek işçiyle geçti. Merkez aşama ve deneme sayaçları [W1-BE-53](request.md#w1-be-53--crm-aşama-ve-deneme-sayaçları), başvuru durum filtresi [W1-BE-54](request.md#w1-be-54--başvuru-durum-filtresi) kapsamında açık. [Otomasyon takibi](../e2e/auth-leads-discovery.spec.ts#L413) · [Bekleyen iş sayaçları](../e2e/auth-leads.spec.ts#L160).
 - [ ] **V05.2** · E34–E36 ve E42 Yayın bölümünde slug değişimi/açık-kapalı durum, başvuru sürümü/onay, ziyaretçi etkinlik kayıt tasarımını gerçek yayın hedefiyle karşılaştır. Yayın ayarları seçili kapsamın ziyaretçi bağlantısını kopyalıyor ve anonim önizlemeyi açıyor. Profil görünürlüğü ile sayfanın gerçek yayın durumu ayrı. Mevcut ders başvurusu ve sürümlü onay kaynağı korunuyor. Statik derleme, 72 birim testi ve 8 farklı Chromium senaryosu seri geçti. Ziyaretçinin doğrudan etkinlik kaydı [W1-BE-55](request.md#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı), adres düzenleme ve tüm sayfanın yayın durumu [W1-BE-56](request.md#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması) kapsamında açık. [Yayın ayarları ve ziyaretçi rotası](../e2e/auth-settings-native.spec.ts#L44).
 - [x] **V05.3** · E40 segment/otomasyon/son iş görünümü ve rapor bağlantısı dar WF16 kapsamına bağlı. Segment eşleşmeleri ve kullanan otomasyonlar, yetkili iş kuyruğu ve filtrelenmiş sayfalar native okuyuculardan geliyor. Son işler, sonuç türünü ve teslim kanıtından ayrı kaynak kimliğini gösteriyor. Sentetik sözleşme senaryosunda onaylı yeniden deneme aynı işi beklemeye aldı. İki durum okuması aynı takip kimliğini bir kez gösterdi ve ikinci yazma yapmadı. Merkez raporları aynı merkez rotasını açıyor. Elle çalıştırma kontrolü kaldırıldı. Statik derleme, 25 birim ve tek işçiyle 16 Chromium senaryosu geçti. [Otomasyon kabulü](../e2e/auth-automation.spec.ts#L411) · [Native yeniden deneme kanıtının kaynağı](../../backend/tests/automation-results-acceptance.mjs#L28).
+
+<a id="v06"></a>
 
 ### V06 · Gelen kutusu, denetim ve ortak durumlar
 
@@ -233,15 +245,17 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 - [x] **V06.3** · E44–E46 yardım ve ortak durumları gerçek rota, kaynak hatası, tarayıcı bağlantısı ve organizasyon erişim moduna bağlı. 403/404, 409, plan özelliği ve plan limiti, bağlantı kesintisi, salt okunur erişim ve klavye odağı doğrulandı. Kaynak yeniden okununca odak açılan sayfanın başlığına gider. Geliştirme kataloğu kendi modunda çalışır. Statik derleme, 14 birim testi ve tek Chromium işçisiyle seri yardım/durum paketi 17/17 geçti.
       Üretim kök adresi mevcut hesap/oturum akışına bağlandı. [Statik build kabulü](../e2e/static-build.spec.ts#L60).
 
+<a id="v07"></a>
+
 ### V07 · Ayarlar, Starter ve yaşam döngüsü
 
 - [ ] **V07.1** · E12/E42 ekip, plan, havale, merkez adı ve organizasyon yaşam döngüsü mevcut yetki ve kaynak komutlarına bağlı. Fatura unvanı, adresi ve e-postası organizasyon ayarından okunur, sürümlü değişiklik onaylandıktan sonra yeniden doğrulanır. Statik derleme, 52 ayar birim testi ve tek Chromium işçisiyle seri ayar/yaşam döngüsü paketi 22/22 geçti. Vergi alanları ve kesilmiş fatura geçmişi [W1-BE-58](request.md#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi) kapsamında açık.
-- [ ] **V07.2** · Yeni çizim üzerindeki Starter gizli menü/kilitli eylem/doğrudan URL reddi, tek kaynak/100üye sınırı ve dar public/CRM yüzeyini S01–S05 ile doğrula. Plan reddinde veri korunur; temel başvuru, tahsilat ve rapor gereksiz kapanmaz.
-- [ ] **V07.3** · Yeni Pro→Starter seçim görselini gerçek kept_scope ve yürürlükle bağla. S05.2’deki geçmiş koruma kanıtını kullan. Yeni arayüzün seçim, yürürlük ve ret durumlarını V08 otomatik kabulünde doğrula.
+- [x] **V07.2** · Sahip gezinmesi ve sayfa araması, doğrulanmış `subscription_get_v1` Starter sonucuyla Etkinlikler, Hakediş ve Otomasyon bağlantılarını gizler. Doğrudan URL ve işlem izinleri native denetimde kalır. Tek Chromium işçisiyle Starter paketi 11/11 geçti. Temel CRM, açık başvuru, satış, tahsilat, kesin rezervasyon, yoklama ve rapor korunuyor. Tek salon reddinde mevcut salon kaldı. 100 aktif üye ve diğer kaynak sınırlarının native kanıtı [S01’de](#starter), yayımlı aday kabulü G-STARTER.2’de.
+- [x] **V07.3** · Planı daralt çekmecesi erişilebilir başlığı, kaynak Starter seçeneğini ve merkez saat dilimindeki yürürlük tarihini gösterir. `kept_scope` açık seçilir, onaylanır ve `subscription_get_v1` ile doğrulanır. Bekleyen Pro dönemi, dönem sınırından sonra eski Pro yazısının reddi ve aynı rezervasyon/hak/borç/yoklama geçmişi tek Chromium işçisiyle 2/2 geçti. Native dönem geçişi kanıtı [S05.2’de](#starter).
 
 ### V08 · Yeni çizim kabulünün kapanışı
 
-- [ ] **V08.1** · V01 envanterindeki bütün Pro/Starter farklarının V01–V07/E47/E48 sonucunu bağla. Mevcut E/P işlev kabulleriyle yeni görsel kabul birbirine izlenebilir olsun.
+- [x] **V08.1** · [Ekran eşlemesi](#cizim-guncellemesi), ilgili V01–V07/E47/E48 uygulama sonuçlarına, [mevcut ekran kabulüne](#sayfa-kabulu), [Pro işlevlerine](#pro) ve [Starter kanıtına](#starter) bağlı. Karşılanmayan farklar ilgili V/E satırında ve bağlı backend talebinde açık.
 - [ ] **V08.2** · Değişen alanların ilgili birim/tarayıcı paketlerini seri çalıştır. Otomatik ölçümler, yeni WCAG bulguları ve referans/uygulama görselleri raporda yer alsın. Teslim adayında filtresiz `npm run verify` ve yayımlı adayın gerekli route/kapsam kabulü yapılsın.
 - [ ] **G-DESIGN** · V01–V08/E47/E48 ve önceki açık Starter kabulünün sonucunu kaydet. Kalan gerçek sağlayıcı/OS kontrolleri mevcut kullanıcı kabul/erteleme kuralına uysun. Kaynak/görsel/API değişikliği çözülmeden genel tamamlandı sonucu verme.
 
@@ -259,6 +273,8 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
         Mevcut Hesabım akışı hazır Sheet, Progress ve Field bileşenleriyle üç adım sunuyor. Bekleyen gerçek okumada Skeleton gösteriliyor. İlk adımda merkez adı ve saat dilimi doğrulanıyor. Sonra yaparım yazma yapmadan tetikleyiciye odak döndürüyor. Yeniden girişte merkez yoksa form, yetkili etkin merkezde salon ya da ders türü eksikse ilgili gerçek Ayarlar bağlantısı açılıyor. 390×844 açık/koyu karşılaştırmada salon ve ders türü formu ayrı yetkili ayar akışına bağlı. [Tarayıcı testi](../e2e/auth-first-center.spec.ts#L202) · [Web1](../.tmp/v67-first-center-resources-light.png) · [Çizim](../.tmp/v67-first-center-reference-light.png).
   - [x] **E47.3** · Yetkili oluşturma→yeniden okuma, eksik/stale/tekrar ve plan retlerini doğrula. İlk merkez adı kabukta kalıcı gerçek okumadan görünsün; ikinci kurulum motoru kurma.
         10 seri Chromium senaryosu geçti. Merkez özetteki açık onaydan sonra tek native komutla oluşturuldu. Başarılı sonuç güncel merkez okumadan sonra kabuğa geldi ve yenilemede kaldı. Belirsiz sonuç aynı işlem anahtarıyla toparlandı; kabul edilmiş fakat okunamayan sonuçta yalnız okuma tekrarlandı. Stale ve plan reddinde hayalet merkez oluşmadı. [Kabul senaryoları](../e2e/auth-first-center.spec.ts).
+
+<a id="e48-uye-bildirim-merkezi"></a>
 
 - [ ] **E48** · **Üye bildirim merkezi** — `data-view="m-bildirim"`, P11/P14/E39. Hazır üye kabuğu, Tabs, Card/Item, Badge ve Button.
   - [x] **E48.1** · Üye kabuğunun zili `/inbox?view=member` görünümünü aynı organizasyon/merkez kapsamında açıyor. Gelen kutusu mevcut okuyucu/yazıcıları ve mobil ayrıntı düzenini paylaşıyor. Üye kapsamı doğrulanmadan gelen kutusu isteği yapılmıyor. Seri tarayıcıda 320 CSS px’de klavyeyle giriş, mevcut sayfa işareti, okundu durumunun yenilemede korunması ve erişilemeyen merkezde isteğin engellenmesi doğrulandı. [Üye gelen kutusu](../e2e/auth-inbox.spec.ts#L278).
