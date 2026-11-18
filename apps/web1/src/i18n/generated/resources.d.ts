@@ -1865,6 +1865,7 @@ export default interface Resources {
       "outcome": "Sonuç",
       "owner": "Sorumlu",
       "pageHint": "Bu sayfada {{loaded}} aday. Pano sayıları yalnız yüklenen sayfaya aittir.",
+      "pendingTabCount": "Bekleyen iş sayısı {{value}}",
       "peopleReadFailed": "Kişiler okunamadı.",
       "person": "Kişi",
       "personCreated": "Kişi oluşturuldu. Aday kaydını ayrı kaydetme adımıyla tamamla.",

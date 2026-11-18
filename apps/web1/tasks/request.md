@@ -63,6 +63,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Açık](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
 | W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Açık](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
 | W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Açık](#w1-be-54--başvuru-durum-filtresi). |
+| W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Açık](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
 
 ## Bütün talepler için ortak sınır
 
@@ -464,3 +465,9 @@ Merkez ve canlı aday görünürlüğü altında, arama ve sorumlu filtresiyle u
 **Açık · backend değerlendirmesi.** Çizim, Başvurular sekmesinde açık ve tamamlanan kayıtları ayrı gösteriyor. `management_state_get_v1(operation: "public_application_review_v1")` satırın gerçek durumunu veriyor. Seçici, durumu sayfalama öncesinde filtrelemiyor. `management_work_list_v1` yalnız bekleyen, işlem yapılabilir yönetim işlerini döndürüyor. [Güncel çizim](../read-only/tasarim-v2/index.html#L1335) · [WF12](../../../docs/workflows.md#wf12).
 
 Mevcut başvuru görünürlüğü ve inceleme yetkisiyle, cursor kapsamına bağlı bir durum filtresini değerlendirin. Açık, incelenmiş ve kapatılmış kayıtların eşlemesi, merkezsiz başvurular ve istemciye gösterilen iletişim verisinin sınırı korunmalı.
+
+## W1-BE-55 · Ziyaretçinin etkinlik kayıt akışı
+
+**Açık · backend değerlendirmesi.** Çizim, anonim ziyaretçinin etkinlik kartındaki formdan doğrudan kayıt olmasını gösteriyor. `public_calendar_get_v1` yayımlanan etkinliği ve izinli kapasite bilgisini okuyabilir. `public_application_submit_v1` eski yayın başvurusunda etkinlik yayınına bağlı **bekleyen başvuru**, bağlı form üzerinden ise CRM başvurusu oluşturur. Başvurunun kabulü etkinlik kaydı veya kontenjan garantisi vermiyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L4469) · [WF09](../../../docs/workflows.md#wf09).
+
+Ürün kararıyla anonim başvurunun mu yoksa doğrudan etkinlik kaydının mı sunulacağını ve sonucunun nasıl okunacağını değerlendirin. Canlı yayın, kontenjan, belge sürümü/onay, ödeme gerekiyorsa ödeme koşulu, bot doğrulaması ve aynı iş niyetinin tekrar güvenliği korunmalı. Genel ders başvurusu mevcut bağ ve onay kaynağıyla çalışmaya devam etmeli.

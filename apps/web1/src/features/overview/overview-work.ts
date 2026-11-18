@@ -58,7 +58,7 @@ function checkTask(task: ManagementWorkView) {
   }
   throw Error("WORK_SOURCE_UNAVAILABLE");
 }
-export async function readOverviewWork(scope: ClientScope, cursor?: string) {
+export async function readOverviewWork(scope: ClientScope, cursor?: string, limit = 20) {
   const page = await (
     await scopedBackend(scope)
   ).call("management_work_list_v1", {
@@ -67,7 +67,7 @@ export async function readOverviewWork(scope: ClientScope, cursor?: string) {
     org_id: scope.orgId,
     center_id: scope.centerId,
     kind: "all",
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    page: { limit, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
   instant.parse(page.as_of);
   const seen = new Set<string>();
@@ -77,7 +77,7 @@ export async function readOverviewWork(scope: ClientScope, cursor?: string) {
     if (seen.has(key)) throw Error("WORK_SOURCE_UNAVAILABLE");
     seen.add(key);
   }
-  if (page.items.length > 20 || (cursor && page.next_cursor === cursor))
+  if (page.items.length > limit || (cursor && page.next_cursor === cursor))
     throw Error("WORK_CURSOR_UNAVAILABLE");
   for (const value of Object.values(page.summary)) count.parse(value);
   if (

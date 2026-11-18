@@ -159,6 +159,10 @@ test("stale lead review reloads the actual version before saving", async ({ page
 });
 test("a known followup is completed with its exact activity version", async ({ page }) => {
   const state = await mockLeads(page);
+  const tasks = page.getByRole("tab", { name: "Takipler", exact: true });
+  const applications = page.getByRole("tab", { name: "Başvurular", exact: true });
+  await expect(tasks).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
   const dialog = await openLead(page);
   await dialog.getByRole("button", { name: "İlk görüşmeyi yap", exact: true }).click();
   await dialog.getByLabel("Faaliyet türü", { exact: true }).selectOption("outcome");
@@ -175,6 +179,8 @@ test("a known followup is completed with its exact activity version", async ({ p
   });
   expect(state.activities[0]!.state).toBe("completed");
   await closeLead(page);
+  await expect(tasks).toHaveAccessibleDescription("Bekleyen iş sayısı 0");
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
 });
 test("conversion keeps the same person and creates no sale or invitation", async ({ page }) => {
   const state = await mockLeads(page);
@@ -235,7 +241,9 @@ test("application phone suggestion stays a proposal until explicit person match 
 });
 test("application close preserves its intake without creating a lead", async ({ page }) => {
   const state = await mockLeads(page);
-  await page.getByRole("tab", { name: "Başvurular", exact: true }).click();
+  const applications = page.getByRole("tab", { name: "Başvurular", exact: true });
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
+  await applications.click();
   await page.getByRole("button", { name: "Başvuran Örnek", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Başvuru işlemi", { exact: true }).selectOption("close");
@@ -248,6 +256,7 @@ test("application close preserves its intake without creating a lead", async ({ 
   expect(state.app.intake.phone).toBe("+905550000000");
   expect(state.leads).toHaveLength(1);
   await closeLead(page);
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 0");
 });
 test("denied lead listing has read recovery and no invented totals", async ({ page }) => {
   const state = await mockLeads(page, { denied: true });

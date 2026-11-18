@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import type { CrmPipelineStage } from "../../lib/api-contracts/generated";
@@ -36,6 +36,7 @@ export function LeadsView({
   rows,
   stages,
   summary,
+  pendingCounts,
   tab,
   onTab,
   onSelect,
@@ -60,6 +61,7 @@ export function LeadsView({
   rows: LeadRow[];
   stages: CrmPipelineStage[];
   summary: LeadsSummary;
+  pendingCounts: Partial<Record<LeadTab, number>>;
   tab: LeadTab;
   onTab: (tab: LeadTab) => void;
   onSelect: (id: string) => void;
@@ -82,6 +84,7 @@ export function LeadsView({
   applications: ReactNode;
 }) {
   const { t } = useTranslation();
+  const countId = useId();
   const stats = [
     { label: t(($) => $.leads.stats.open), value: summary.open },
     { label: t(($) => $.leads.stats.today), value: summary.today },
@@ -149,16 +152,33 @@ export function LeadsView({
               variant="line"
               className="grid w-full grid-cols-2 gap-1 group-data-horizontal/tabs:h-auto sm:flex sm:w-fit"
             >
-              {(["board", "tasks", "apps", "list"] as const).map((key) => (
-                <TabsTrigger
-                  key={key}
-                  id={key}
-                  className="h-9 flex-none"
-                  isDisabled={!advanced && key === "board"}
-                >
-                  {t(($) => $.leads.tabs[key])}
-                </TabsTrigger>
-              ))}
+              {(["board", "tasks", "apps", "list"] as const).map((key) => {
+                const count = pendingCounts[key];
+                const descriptionId = `${countId}-${key}`;
+                return (
+                  <TabsTrigger
+                    key={key}
+                    id={key}
+                    className="h-9 flex-none gap-1.5"
+                    aria-describedby={count == null ? undefined : descriptionId}
+                    isDisabled={!advanced && key === "board"}
+                  >
+                    {t(($) => $.leads.tabs[key])}
+                    {count != null && (
+                      <>
+                        <Badge variant="secondary" className="tabular-nums" aria-hidden="true">
+                          {count.toLocaleString("tr-TR")}
+                        </Badge>
+                        <span id={descriptionId} hidden>
+                          {t(($) => $.leads.pendingTabCount, {
+                            value: count.toLocaleString("tr-TR"),
+                          })}
+                        </span>
+                      </>
+                    )}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
             <search
               className="flex flex-wrap items-center gap-3"

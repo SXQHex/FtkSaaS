@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { readWorkspace } from "../workspace/workspace";
+import { readOverviewWork } from "../overview/overview-work";
 import { LeadsView, type LeadTab } from "./leads-view";
 import { LeadEditor, type LeadTarget } from "./lead-editor";
 import { ApplicationEditor } from "./application-editor";
@@ -171,15 +172,25 @@ export function LeadsContent({
     enabled: Boolean(current) && tab === "apps",
     retry: false,
   });
+  const workSummary = useQuery({
+    queryKey: ["lead-work-summary", scope.accountId, scope.orgId, scope.centerId],
+    queryFn: async () => (await readOverviewWork(scope, undefined, 1)).summary,
+    enabled: Boolean(current),
+    refetchOnMount: "always",
+    retry: false,
+  });
   useEffect(() => {
-    const error = leads.error ?? assignees.error ?? tasks.error ?? applications.error;
+    const error =
+      leads.error ?? assignees.error ?? tasks.error ?? applications.error ?? workSummary.error;
     if (
       (error instanceof BackendError &&
         ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
       (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
     )
       void router.invalidate();
-  }, [leads.error, assignees.error, tasks.error, applications.error, router]);
+  }, [leads.error, assignees.error, tasks.error, applications.error, workSummary.error, router]);
+  const work =
+    current && !workSummary.isError && !workSummary.isFetching ? workSummary.data : undefined;
   const data = leads.isError && !preservePending ? undefined : leads.data;
   const advanced = (data?.pipelineAvailable ?? cursors[index]?.pipeline) !== false;
   const activeTab = !advanced && tab === "board" ? "list" : tab;
@@ -199,7 +210,7 @@ export function LeadsContent({
           ? t(($) => $.leads.sources.whatsapp)
           : source;
   async function refresh() {
-    await leads.refetch({ throwOnError: true });
+    await Promise.all([leads.refetch({ throwOnError: true }), workSummary.refetch()]);
     if (tab === "tasks") await tasks.refetch({ throwOnError: true });
   }
   const rows = (data?.items ?? []).map((row) => ({
@@ -239,6 +250,10 @@ export function LeadsContent({
           converted: data?.summary ? String(data.summary.converted_last_30_days) : null,
         }}
         tab={activeTab}
+        pendingCounts={{
+          tasks: work?.crm_followup,
+          apps: canReview ? work?.application_review : undefined,
+        }}
         advanced={advanced}
         onTab={(value) => {
           if (!locked) setTab(value);

@@ -3604,6 +3604,7 @@
     "close": "Kapat",
     "save": "Kaydet",
     "activitiesHint": "Takip işleri kaynak kişi ve merkez kapsamıyla açılır.",
+    "pendingTabCount": "Bekleyen iş sayısı {{value}}",
     "noActivities": "Gösterilecek takip veya faaliyet yok.",
     "applicationsHint": "Telefon eşleşmesi yalnızca öneridir. Hesap bağı, öğrencilik ve rezervasyon otomatik oluşmaz.",
     "applicant": "Başvuran",

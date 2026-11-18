@@ -172,6 +172,62 @@ export async function mockLeads(
         },
       });
     }
+    if (operation === "management_work_list_v1") {
+      expect(req).toMatchObject({ org_id: I.org, center_id: I.center, page: { limit: 1 } });
+      const open = activities.filter((row) => row.kind === "followup" && row.state === "open");
+      const pending =
+        app.state === "pending" && !options.staff && !options.unboundManager && !options.starter;
+      const items = [
+        ...open.map((row) => ({
+          id: row.id,
+          version: row.version,
+          kind: "crm_followup",
+          created_at: "2026-11-16T12:00:00Z",
+          title: row.note ?? "Takip",
+          person_id: leadIds.person,
+          due_at: row.due_at,
+          target: {
+            operation: "management_state_get_v1",
+            selector: {
+              operation: "crm_activity_save_v1",
+              key: { lead_id: row.lead_id, activity_id: row.id },
+            },
+          },
+        })),
+        ...(pending
+          ? [
+              {
+                id: app.id,
+                version: app.version,
+                kind: "application_review",
+                created_at: "2026-11-16T12:00:00Z",
+                title: "Başvuru",
+                person_id: app.person_id,
+                due_at: null,
+                target: {
+                  operation: "management_state_get_v1",
+                  selector: {
+                    operation: "public_application_review_v1",
+                    key: { application_id: app.id },
+                  },
+                },
+              },
+            ]
+          : []),
+      ];
+      return send({
+        ...list(items.slice(0, 1)),
+        next_cursor: items.length > 1 ? "work-next" : null,
+        summary: {
+          total: items.length,
+          crm_followup: open.length,
+          application_review: Number(pending),
+          lesson_request: 0,
+          lesson_attendance: 0,
+          event_attendance: 0,
+        },
+      });
+    }
 
     const entity = (
       type: string,
