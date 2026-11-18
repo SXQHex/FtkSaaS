@@ -34,6 +34,7 @@ export async function mockMemberLifecycle(
     blocked?: boolean;
     studentActive?: boolean;
     studentBlocked?: boolean;
+    bindingUnread?: boolean;
   } = {},
 ) {
   const studio = await mockStudio(page),
@@ -157,6 +158,8 @@ export async function mockMemberLifecycle(
     previews: { operation: string; request: Record<string, unknown> }[] = [],
     inventoryReads: Record<string, unknown>[] = [];
   const receipt = new Map<string, { operation: string; id: string; type: string }>();
+  const reservationSources = new Map(reservations.map((row) => [row.id, R.sale as string]));
+  let bindingUnread = options.bindingUnread;
   let unread = false,
     saved = false;
   const stamp = () => new Date().toISOString();
@@ -224,10 +227,17 @@ export async function mockMemberLifecycle(
     }
     if (operation === "management_state_get_v1" && req.operation === "sale_change_preview_v1") {
       inventoryReads.push(req);
-      expect(req.selector.key).toEqual({ sale_id: R.sale });
+      const target = rights.find((row) => row.sale_id === req.selector.key.sale_id);
+      if (!target || target.sale_state !== "active") return reject("NOT_FOUND");
+      const saleId = target.sale_id;
+      const hideBindings = saleId === R.nextSale && bindingUnread;
+      if (hideBindings) bindingUnread = false;
       const records = [
         ...reservations
-          .filter((row) => row.state === "active")
+          .filter(
+            (row) =>
+              !hideBindings && row.state === "active" && reservationSources.get(row.id) === saleId,
+          )
           .map((row) => ({
             entity: { type: "reservations" as const, id: row.id },
             state: row.state,
@@ -235,15 +245,17 @@ export async function mockMemberLifecycle(
             parent: { type: "sessions", id: R.session },
             person_id: row.person_id,
           })),
-        ...(event.registrations
-          ?.filter((row) => row.state === "active")
-          .map((row) => ({
-            entity: { type: "event_registrations", id: row.id },
-            state: row.state,
-            version: row.version,
-            parent: { type: "events", id: R.event },
-            person_id: row.person_id,
-          })) ?? []),
+        ...(saleId === R.sale
+          ? (event.registrations
+              ?.filter((row) => row.state === "active")
+              .map((row) => ({
+                entity: { type: "event_registrations", id: row.id },
+                state: row.state,
+                version: row.version,
+                parent: { type: "events", id: R.event },
+                person_id: row.person_id,
+              })) ?? [])
+          : []),
       ];
       const visible = options.paged
         ? records.slice(req.page?.cursor ? 1 : 0, req.page?.cursor ? records.length : 1)
@@ -254,9 +266,9 @@ export async function mockMemberLifecycle(
           entity: row.entity,
           exists: true,
           state: row.state,
-          current: { operation: req.operation, values: { sale_id: R.sale } },
+          current: { operation: req.operation, values: { sale_id: saleId } },
           versions: [
-            { entity: { type: "sales", id: R.sale }, version: old.sale_version },
+            { entity: { type: "sales", id: saleId }, version: target.sale_version },
             { entity: row.entity, version: row.version },
             { entity: row.parent, version: 3 },
           ],
@@ -271,7 +283,10 @@ export async function mockMemberLifecycle(
         next_cursor:
           options.paged && records.length > 1 && !req.page?.cursor ? "native-next" : null,
         as_of: stamp(),
-        sale_change_context: { entity: { type: "sales", id: R.sale }, version: old.sale_version },
+        sale_change_context: {
+          entity: { type: "sales", id: saleId },
+          version: target.sale_version,
+        },
       });
     }
     if (operation === "management_state_get_v1" && req.operation === "reservation_cancel_v1") {
@@ -396,6 +411,7 @@ export async function mockMemberLifecycle(
               ? "cancelled"
               : "active";
             row.version++;
+            if (row.state === "active") reservationSources.set(row.id, R.nextSale);
           }
         rights.push({
           ...old,

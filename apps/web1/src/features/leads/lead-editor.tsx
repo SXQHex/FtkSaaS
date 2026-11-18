@@ -10,6 +10,7 @@ import { useMemberCommand } from "../member-profile/use-member-command";
 import { readPerson } from "../people/people";
 import { getTemporal } from "../../lib/temporal";
 import { ScheduleTimeError } from "../schedule/schedule-time";
+import { PreparationPicker } from "../settings/preparation-picker";
 import { LeadTrialEditor } from "./lead-trial-editor";
 import { LeadSheet } from "./lead-sheet";
 import { LeadPersonPicker } from "./lead-person-picker";
@@ -512,7 +513,25 @@ function LeadEditorForm({
       sessions={[]}
       offers={[]}
       offsets={offsets}
-      personPicker={!before ? personFields : undefined}
+      personPicker={
+        !before ? (
+          <>
+            {personFields}
+            <PreparationPicker
+              scope={scope}
+              kind="crm"
+              disabled={locked || readError || command.state !== "ready"}
+              onApply={(preparation) => {
+                if (preparation.kind !== "crm") return;
+                const { source, interest } = preparation.defaults;
+                setDraft((current) => ({ ...current, source, interest, reviewed: false }));
+                setErrors({});
+                setError("");
+              }}
+            />
+          </>
+        ) : undefined
+      }
       details={before ? <p>{target?.name}</p> : undefined}
       disabled={locked}
       readOnly={

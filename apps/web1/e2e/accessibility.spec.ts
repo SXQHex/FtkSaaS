@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { scanAccessibility } from "./accessibility.js";
+import { verifyResponsiveLayout } from "./layout.js";
 
 test("WCAG 2.2 AA catches adjacent undersized targets while keeping default landmark checks", async ({
   page,
@@ -28,4 +29,15 @@ test("the reflow measurement detects genuine horizontal overflow under CSS zoom"
     '<html lang="tr" style="zoom:2"><head><title>Negative reflow specimen</title></head><body><main style="width:500px">Oversized content</main></body></html>',
   );
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(true);
+});
+
+test("shared reflow keeps a 320 CSS pixel minimum under scenario zoom", async ({ page }) => {
+  const viewport = { width: 640, height: 900 };
+  await page.setViewportSize(viewport);
+  await page.goto("/");
+  await page.setContent(
+    '<html lang="tr" style="zoom:2"><head><title>Reflow specimen</title></head><body><main style="width:300px">Content fits</main></body></html>',
+  );
+  await verifyResponsiveLayout(page);
+  expect(page.viewportSize()).toEqual(viewport);
 });

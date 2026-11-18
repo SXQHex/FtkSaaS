@@ -88,7 +88,7 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo, 
   }
 }
 
-export async function mockNative(page: Page, mfa = false) {
+export async function mockNative(page: Page, mfa = false, origins = { app: origin, auth: origin }) {
   const calls = {
     theme: "system" as "system" | "light" | "dark",
     themeWritable: true,
@@ -183,7 +183,7 @@ export async function mockNative(page: Page, mfa = false) {
   });
   await page.context().route("**/*", async (route) => {
     const url = new URL(route.request().url());
-    expect(url.origin).toBe(origin);
+    expect([origins.app, origins.auth]).toContain(url.origin);
     const googleIdentity: UserIdentity = {
       identity_id: "019a7b00-0000-7000-8000-000000000903",
       id: "fixture-google-provider-id",
@@ -829,6 +829,7 @@ export async function mockNative(page: Page, mfa = false) {
         } satisfies SuccessAccountGet,
       });
     }
+    if (url.origin !== origins.app) return route.abort("blockedbyclient");
     await route.continue();
   });
   return calls;

@@ -128,7 +128,15 @@ export function ScheduleRoster({
     retry: false,
   });
   const command = useMemberCommand({
-    write: writePriority,
+    write: async (intent: Parameters<typeof writePriority>[0]) => {
+      try {
+        return await writePriority(intent);
+      } catch (failure) {
+        if (failure instanceof BackendError && failure.code === "DEBT_BOOKING_BLOCKED")
+          setError(scheduleBackendError(failure.code, t));
+        throw failure;
+      }
+    },
     readReceipt: readPriorityReceipt,
     readResult: readPriorityResult,
     onAccessLost,

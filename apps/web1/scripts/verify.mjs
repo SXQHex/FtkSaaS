@@ -140,6 +140,11 @@ async function main() {
     TEMP: resolve(root, ".tmp"),
     PLAYWRIGHT_BROWSERS_PATH: resolve(root, ".playwright-browsers"),
   };
+  const staticVerificationEnv = {
+    ...env,
+    VITE_SUPABASE_URL: "http://127.0.0.1:4175",
+    VITE_SUPABASE_PUBLISHABLE_KEY: "public-test-key",
+  };
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
   const plan = [
     ...["lint", "format:check", "i18n:check", "build", "test:ci:guards"].map((command) => ({
@@ -187,7 +192,7 @@ async function main() {
       const code = await new Promise((resolveCode, reject) => {
         const child = spawn(npm, command.args, {
           cwd: root,
-          env,
+          env: ["build", "browser"].includes(command.name) ? staticVerificationEnv : env,
           stdio: ["ignore", log.fd, log.fd],
         });
         child.once("error", reject);

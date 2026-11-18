@@ -420,6 +420,7 @@ export function EventDetailContent({
           scope={scope}
           before={registration.event}
           registrationId={registration.id}
+          selfPersonId={center ? workspace.data?.selected?.self_context?.person_id : undefined}
           onClose={() => {
             if (!locked) {
               setRegistration(undefined);

@@ -7,19 +7,29 @@ const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")
 async function setup(
   page: Page,
   mode: "normal" | "unknown" | "context-unread" | "denied" | "empty" = "normal",
+  operational = false,
 ) {
   await mockMemberAccount(page);
   const accepted = new Set<string>(),
     writes: Record<string, unknown>[] = [],
     reads: Record<string, unknown>[] = [];
   let failed = false;
-  const first: AcceptanceContext = { gate: "sale", subject: { type: "sales", id: id(30) } },
-    second: AcceptanceContext = {
-      gate: "sale",
-      subject: { type: "product_versions", id: id(31) },
-      product_version_id: id(31),
-      purchase_preview_id: id(32),
-    };
+  const first: AcceptanceContext = operational
+      ? { gate: "attendance", subject: { type: "reservations", id: id(30) } }
+      : { gate: "sale", subject: { type: "sales", id: id(30) } },
+    second: AcceptanceContext = operational
+      ? {
+          gate: "event_registration",
+          subject: { type: "events", id: id(31) },
+          product_version_id: id(33),
+          event_registration_preview_id: id(34),
+        }
+      : {
+          gate: "sale",
+          subject: { type: "product_versions", id: id(31) },
+          product_version_id: id(31),
+          purchase_preview_id: id(32),
+        };
   const document = (context: AcceptanceContext, content = false): DocumentView => {
     const key = context.subject.id,
       renderId = context.purchase_preview_id ? id(24) : id(23),
@@ -30,7 +40,7 @@ async function setup(
       version_id: id(21),
       file: { type: "files", id: id(22) },
       name,
-      required_at: "sale",
+      required_at: context.gate,
       accepted: accepted.has(key),
       content_kind: "digital",
       content_hash: hash,
@@ -93,6 +103,7 @@ async function setup(
     if (op === "document_requirements_get_v1") {
       expect(r.person_id).toBe(I.self);
       expect(r.center_id).toBe(I.center);
+      if (operational && r.context.gate === "event_registration") expect(r.context).toEqual(second);
       return send([document(r.context, !!r.content_file_id)]);
     }
     if (op === "document_accept_v1") {
@@ -140,31 +151,32 @@ async function accept(page: Page) {
     .press("Space");
   await page.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
 }
-test("account document discovery preserves purchase contexts and never copies another transaction acceptance", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 320, height: 950 });
-  const state = await setup(page);
-  await accept(page);
-  await expect(
-    page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
-  ).toBeVisible();
-  expect(state.writes[0]!.context).toEqual(state.first);
-  expect(await page.evaluate(() => Object.hasOwn(globalThis, "contextScript"))).toBe(false);
-  await page.getByRole("button", { name: "Belgeyi kapat", exact: true }).click();
-  await expect(state.card.getByText("Kabul edildi", { exact: true })).toBeVisible();
-  await state.card.getByRole("button", { name: "Sonraki", exact: true }).click();
-  await expect(
-    state.card.getByRole("button", { name: "İşleme özel koşullar belgesini oku", exact: true }),
-  ).toBeVisible();
-  await accept(page);
-  await expect(
-    page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
-  ).toBeVisible();
-  expect(state.writes).toHaveLength(2);
-  expect(state.writes[1]!.context).toEqual(state.second);
-  expect(state.reads.at(-1)).toMatchObject({ page: { cursor: "second-context" } });
-});
+for (const operational of [false, true])
+  test(`account document discovery preserves ${operational ? "attendance and event" : "purchase"} contexts and never copies another transaction acceptance`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 950 });
+    const state = await setup(page, "normal", operational);
+    await accept(page);
+    await expect(
+      page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+    ).toBeVisible();
+    expect(state.writes[0]!.context).toEqual(state.first);
+    expect(await page.evaluate(() => Object.hasOwn(globalThis, "contextScript"))).toBe(false);
+    await page.getByRole("button", { name: "Belgeyi kapat", exact: true }).click();
+    await expect(state.card.getByText("Kabul edildi", { exact: true })).toBeVisible();
+    await state.card.getByRole("button", { name: "Sonraki", exact: true }).click();
+    await expect(
+      state.card.getByRole("button", { name: "İşleme özel koşullar belgesini oku", exact: true }),
+    ).toBeVisible();
+    await accept(page);
+    await expect(
+      page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+    ).toBeVisible();
+    expect(state.writes).toHaveLength(2);
+    expect(state.writes[1]!.context).toEqual(state.second);
+    expect(state.reads.at(-1)).toMatchObject({ page: { cursor: "second-context" } });
+  });
 for (const mode of ["unknown", "context-unread"] as const)
   test(`account document ${mode} keeps the editor and shared fields locked until exact result reread`, async ({
     page,

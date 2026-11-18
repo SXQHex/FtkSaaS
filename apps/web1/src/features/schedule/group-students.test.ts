@@ -35,6 +35,7 @@ const reservation = {
   mode: "priority",
   state: "active",
   version: 2,
+  source_summary: { status: "available", source_sale_id: sale.sale_id },
 };
 const groupItem = () => ({
   entity: { type: "people", id: id(5) },
@@ -136,9 +137,29 @@ it("rereads the acknowledged reservation, rights and lesson without another writ
   rights.mockResolvedValueOnce([{ ...sale, available: 7, reserved: 1 }]);
   const result = await readPriorityResult(intent, id(7));
   expect(result.reservation).toEqual(reservation);
+  expect(result.rights[0]).toMatchObject({ sale_id: sale.sale_id, available: 7, reserved: 1 });
+  expect(result.session.capacity).toEqual({ total: 12, held: 1, remaining: 11 });
+  expect(call).toHaveBeenCalledWith(
+    "reservation_list_v1",
+    expect.objectContaining({ include_source_summary: true }),
+  );
   expect(rights).toHaveBeenCalledWith(scope, id(5));
   expect(call.mock.calls.map(([operation]) => operation)).toEqual([
     "reservation_list_v1",
     "session_get_v1",
   ]);
 });
+it.each([undefined, { status: "restricted" }, { status: "available", source_sale_id: id(10) }])(
+  "keeps the result unverified without the exact reservation source (%j)",
+  async (source_summary) => {
+    const intent = priorityIntent(scope, id(5), id(8), sale);
+    call.mockResolvedValueOnce({
+      items: [{ ...reservation, source_summary }],
+      next_cursor: null,
+    });
+    await expect(readPriorityResult(intent, id(7))).rejects.toThrow(
+      "SCHEDULE_GROUP_RESULT_UNAVAILABLE",
+    );
+    expect(rights).not.toHaveBeenCalled();
+  },
+);

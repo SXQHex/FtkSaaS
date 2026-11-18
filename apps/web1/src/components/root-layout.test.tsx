@@ -6,6 +6,7 @@ import { LoginForm } from "../features/auth/login-form";
 const state = vi.hoisted(() => ({ ready: true, pathname: "/login", password: vi.fn() }));
 vi.mock("../features/auth/use-auth-session", () => ({ useAuthSession: () => state.ready }));
 vi.mock("@tanstack/react-router", () => ({
+  useRouter: () => ({ navigate: vi.fn() }),
   useRouterState: () => state.pathname,
   Outlet: () =>
     state.pathname === "/login" ? (

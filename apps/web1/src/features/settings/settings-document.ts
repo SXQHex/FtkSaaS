@@ -7,8 +7,129 @@ import type {
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 export type SettingsLevel = "organization" | "center";
+export type InheritedPreparationFamily =
+  | "event_templates"
+  | "collection_templates"
+  | "crm_templates"
+  | "automation_templates";
+export type PreparationFamily = InheritedPreparationFamily | "program_templates";
+const preparationIdentity = {
+  key: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
+  name: z
+    .string()
+    .min(1)
+    .max(100)
+    .refine((value) => !!value.trim()),
+};
+const collectionTemplate = z.strictObject({
+  ...preparationIdentity,
+  defaults: z.strictObject({
+    currency: z.string().regex(/^[A-Z]{3}$/),
+    payment_method: z.enum(["cash", "bank_transfer", "card_pos"]),
+  }),
+});
+const crmTemplate = z.strictObject({
+  ...preparationIdentity,
+  defaults: z.strictObject({
+    source: z
+      .string()
+      .min(1)
+      .max(100)
+      .refine((value) => !!value.trim()),
+    interest: z
+      .string()
+      .min(1)
+      .max(1000)
+      .refine((value) => !!value.trim()),
+  }),
+});
+const weekday = z.number().int().min(1).max(7);
+const capacityCount = z.number().int().nonnegative().safe();
+const programTemplate = z.strictObject({
+  ...preparationIdentity,
+  defaults: z.strictObject({
+    weekdays: z
+      .tuple([weekday])
+      .rest(weekday)
+      .refine((days) => new Set(days).size === days.length),
+    local_start: z.string().regex(/^(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/),
+    duration_minutes: z.number().int().positive().safe(),
+    capacity: z.strictObject({
+      total: capacityCount,
+      categories: z.strictObject({ male: capacityCount, female: capacityCount }).nullish(),
+    }),
+  }),
+});
+const uniquePreparationKeys = (rows: { key: string }[]) =>
+  new Set(rows.map(({ key }) => key)).size === rows.length;
+const eventMoney = z
+  .string()
+  .regex(/^(0|[1-9][0-9]{0,18})$/)
+  .refine((value) => /^\d+$/.test(value) && BigInt(value) <= 9223372036854775807n);
+const eventEffect = z.enum(["release", "consume"]);
+const eventTemplate = z.strictObject({
+  ...preparationIdentity,
+  defaults: z.strictObject({
+    capacity: z.union([
+      z.strictObject({ kind: z.literal("unlimited") }),
+      z
+        .strictObject({ nominal: capacityCount, maximum: capacityCount })
+        .refine(({ nominal, maximum }) => nominal <= maximum),
+    ]),
+    terms: z
+      .strictObject({
+        fee_minor: eventMoney,
+        currency: z.string().regex(/^[A-Z]{3}$/),
+        full_payment_required: z.boolean(),
+        allowed_product_version_ids: z.array(z.uuid()),
+        cancellation: z.strictObject({
+          cutoff_minutes: capacityCount.nullish(),
+          before_cutoff: eventEffect,
+          after_cutoff: eventEffect,
+          no_show: eventEffect,
+        }),
+        refund: z.strictObject({
+          method: z.enum(["none", "credit_ratio", "used_at_unit_price", "time_ratio"]),
+          used_unit_minor: eventMoney.nullish(),
+        }),
+        package_usage: z.enum(["consume", "eligibility_only"]).optional(),
+      })
+      .refine(
+        (value) =>
+          value.package_usage !== "eligibility_only" ||
+          (value.fee_minor === "0" && value.allowed_product_version_ids.length > 0),
+      ),
+  }),
+});
+const automationTemplate = z.strictObject({
+  ...preparationIdentity,
+  defaults: z.strictObject({
+    trigger: z.strictObject({
+      kind: z.enum(["entitlement_expiring", "student_inactive", "lead_followup_due"]),
+      offset_days: capacityCount,
+    }),
+    action: z.strictObject({
+      kind: z.enum(["create_followup", "send_reminder"]),
+      channel: z.literal("in_app"),
+      template_key: z.string().refine((value) => !!value.trim()),
+    }),
+  }),
+});
 const patchSchema = z
   .object({
+    automation_templates: z
+      .array(automationTemplate)
+      .max(100)
+      .refine(uniquePreparationKeys)
+      .optional(),
+    event_templates: z.array(eventTemplate).max(100).refine(uniquePreparationKeys).optional(),
+    program_templates: z.array(programTemplate).max(100).refine(uniquePreparationKeys).optional(),
+    collection_templates: z
+      .array(collectionTemplate)
+      .max(100)
+      .refine(uniquePreparationKeys)
+      .optional(),
+    crm_templates: z.array(crmTemplate).max(100).refine(uniquePreparationKeys).optional(),
     public_profile_enabled: z.boolean().optional(),
     public_fields: z
       .array(
@@ -50,6 +171,7 @@ const patchSchema = z
     payment_reminders_enabled: z.boolean().optional(),
     payment_reminder_days: z.union([z.literal(1), z.literal(3), z.literal(7)]).optional(),
     address: z.string().max(1000).optional(),
+    program_duration_minutes: z.number().int().min(1).max(2147483647).optional(),
     contact_phone: z.string().max(100).optional(),
     contact_email: z.union([z.email().max(320), z.null()]).optional(),
     primary_color: z
@@ -132,6 +254,7 @@ export interface SettingsDocumentIntent {
   key: string;
   logo?: SettingsImageUpload | null;
   reset?: { id: string; token: string };
+  inherit?: InheritedPreparationFamily;
 }
 export async function settingsDocumentIntent(
   scope: ClientScope,
@@ -139,11 +262,13 @@ export async function settingsDocumentIntent(
   before: SettingsDocumentSource,
   patch: SettingsDocumentPatch,
   logo?: SettingsImageUpload | null,
+  inherit?: InheritedPreparationFamily,
 ): Promise<SettingsDocumentIntent> {
   const parsed = parseSettingsDocumentPatch(patch),
     keys = Object.keys(parsed);
   if (
-    (!keys.length && logo === undefined) ||
+    (!keys.length && logo === undefined && !inherit) ||
+    (inherit && (level !== "center" || keys.length > 0 || logo !== undefined)) ||
     before.document.scope !== level ||
     before.scope.accountId !== scope.accountId ||
     before.scope.orgId !== scope.orgId ||
@@ -153,7 +278,7 @@ export async function settingsDocumentIntent(
   const current = await readSettingsDocument(scope, level);
   if (current.document.version !== before.document.version)
     throw new BackendError({ code: "VERSION_CONFLICT", retryable: false, trace_id: uuidv7() });
-  for (const key of keys) {
+  for (const key of inherit ? [inherit] : keys) {
     if (!current.catalog.fields.some((field) => field.key === key && field.writable))
       throw new BackendError({ code: "FORBIDDEN", retryable: false, trace_id: uuidv7() });
   }
@@ -179,6 +304,7 @@ export async function settingsDocumentIntent(
     level,
     before: current.document.version,
     patch: parsed,
+    ...(inherit ? { inherit } : {}),
     key: uuidv7(),
     ...(logo !== undefined ? { logo } : {}),
   };
@@ -208,6 +334,7 @@ export async function writeSettingsDocument(intent: SettingsDocumentIntent) {
         scope: "center",
         center_id: intent.scope.centerId,
         patch: intent.patch,
+        ...(intent.inherit ? { inherit_fields: [intent.inherit] } : {}),
       });
 }
 export async function readSettingsDocumentReceipt(intent: SettingsDocumentIntent) {
@@ -231,6 +358,17 @@ export async function readSettingsDocumentReceipt(intent: SettingsDocumentIntent
   return receipt;
 }
 function settingsFieldMatches(key: string, expected: unknown, actual: unknown) {
+  if (
+    key === "collection_templates" ||
+    key === "crm_templates" ||
+    key === "program_templates" ||
+    key === "event_templates" ||
+    key === "automation_templates"
+  )
+    return (
+      JSON.stringify(patchSchema.shape[key].parse(expected)) ===
+      JSON.stringify(patchSchema.shape[key].parse(actual))
+    );
   if (key === "public_fields" && Array.isArray(expected) && Array.isArray(actual))
     return (
       z
@@ -277,6 +415,17 @@ export async function readSettingsDocumentResult(intent: SettingsDocumentIntent,
     )
       throw Error("SETTINGS_RESULT_UNAVAILABLE");
   }
+  if (intent.inherit) {
+    const inherited =
+      result.document.scope === "center" && result.document.inherited_fields?.[intent.inherit];
+    if (
+      !inherited ||
+      inherited.kind !== "organization_inherited" ||
+      !Number.isSafeInteger(inherited.organization_version) ||
+      inherited.organization_version < 0
+    )
+      throw Error("SETTINGS_RESULT_UNAVAILABLE");
+  }
   return result;
 }
 
@@ -311,6 +460,7 @@ export async function settingsResetIntent(
     "package_reminders_enabled",
     "payment_reminder_days",
     "payment_reminders_enabled",
+    "program_duration_minutes",
   ]);
   const preview =
     level === "organization"

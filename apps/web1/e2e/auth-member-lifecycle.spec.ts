@@ -58,10 +58,14 @@ test("mobile renewal explicitly selects its source and dates, creates a linked s
     available: 8,
   });
 });
-test("change reads every native cursor page, requires each keep/cancel choice and rereads terminal reservation states", async ({
+test("change confirms the transfer to the new sale after separately reviewed keep/cancel choices", async ({
   page,
 }) => {
-  const state = await mockMemberLifecycle(page, { reservations: true, paged: true });
+  const state = await mockMemberLifecycle(page, {
+    reservations: true,
+    paged: true,
+    bindingUnread: true,
+  });
   const dialog = await open(page, "change");
   await chooseProduct(page);
   await dialog.getByLabel(text.reason, { exact: true }).fill("Sentetik paket değişimi");
@@ -71,7 +75,13 @@ test("change reads every native cursor page, requires each keep/cancel choice an
   await choices.nth(1).selectOption("cancel");
   await review(page);
   await apply(page);
+  await expect(
+    dialog.getByText(text.lifecycle.states["saved-unread"], { exact: true }),
+  ).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
   await expect(dialog.getByText(text.lifecycle.states.saved, { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
   expect(
     state.inventoryReads.some((req) => (req.page as { cursor?: string }).cursor === "native-next"),
   ).toBe(true);

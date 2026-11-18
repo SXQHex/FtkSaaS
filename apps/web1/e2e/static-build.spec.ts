@@ -1,5 +1,7 @@
 import { test as base, expect } from "./test.js";
-import { preview, type PreviewServer } from "vite";
+import { loadEnv, preview, type PreviewServer } from "vite";
+import { mockSessionDetail } from "./session-detail-fixture.js";
+import { studioIds as I } from "./studio-fixture.js";
 import { fileURLToPath } from "node:url";
 import { readFile, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -100,3 +102,59 @@ for (const colorScheme of ["light", "dark"] as const)
       contentType: "application/json",
     });
   });
+
+test("production artifact reads the center calendar in its own timezone after a direct URL and reload", async ({
+  page,
+  artifact,
+}, testInfo) => {
+  const configuration = loadEnv("production", root, "VITE_");
+  const authOrigin = new URL(configuration.VITE_SUPABASE_URL!).origin;
+  await page.setViewportSize({ width: 320, height: 950 });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.name));
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    allowEditor: true,
+    origins: { app: artifact.origin, auth: authOrigin },
+  });
+  await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
+  state.session.starts_at = "2026-11-16T13:00:00Z";
+  state.session.ends_at = "2026-11-16T14:00:00Z";
+  await page.route("**/functions/v1/backend-v1/management_work_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: { items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" },
+        trace_id: I.role,
+      },
+    }),
+  );
+  const path = `${artifact.origin}/o/${I.org}/c/${I.center}/overview`;
+  const result = await page.goto(path);
+  expect(result?.status()).toBe(200);
+  const next = page.getByRole("region", { name: "Sıradaki ders", exact: true });
+  await expect(next).toContainText("Sentetik seans");
+  await expect(next).toContainText("16:00");
+  expect(state.calendarReads).toContainEqual(
+    expect.objectContaining({
+      org_id: I.org,
+      center_id: I.center,
+      interval: { starts_at: "2026-11-15T21:00:00Z", ends_at: "2026-11-16T21:00:00Z" },
+    }),
+  );
+  await page.reload();
+  await expect(page).toHaveURL(path);
+  await expect(next).toContainText("16:00");
+  await page.keyboard.press("Tab");
+  await expect(page.locator(":focus-visible")).toBeVisible();
+  expect(errors).toEqual([]);
+  await testInfo.attach("production-calendar", {
+    body: JSON.stringify({
+      ...artifact,
+      timezone: "Europe/Istanbul",
+      start: "16:00",
+      reload: true,
+    }),
+    contentType: "application/json",
+  });
+});

@@ -2,6 +2,60 @@ import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
+test("event registration reads and accepts only the chosen member's own document before renewed review", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "normal", { documents: true });
+  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  const next = sheet.getByRole("button", { name: "Devam", exact: true });
+  const person = sheet.getByLabel("Kişi", { exact: true });
+  const read = sheet.getByRole("button", { name: "Etkinlik koşulları belgesini oku", exact: true });
+  await person.selectOption(I.instructor);
+  await next.click();
+  const back = sheet.getByRole("button", { name: "Geri", exact: true });
+  await expect(back).toBeVisible();
+  await expect(read).toHaveCount(0);
+  expect(state.reads.some(({ op }) => op === "document_requirements_get_v1")).toBe(false);
+  await next.click();
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await expect(
+    sheet.getByText(
+      "Üye, kaydı tamamlamadan önce kendi hesabından etkinlik belgesini kabul etmeli.",
+    ),
+  ).toBeVisible();
+  expect(state.event.registrations).toEqual([]);
+  expect(state.writes).toEqual([]);
+  await back.click();
+  await back.click();
+  await person.selectOption(I.self);
+  await next.click();
+  await read.click();
+  await expect(sheet.getByText("Sentetik etkinlik koşulları", { exact: true })).toBeVisible();
+  await sheet
+    .getByRole("checkbox", { name: "Belgeyi okudum, bu işlem için kabul ediyorum.", exact: true })
+    .press("Space");
+  await sheet.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(sheet.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1"]);
+  expect(state.writes[0]?.request.context).toMatchObject({
+    gate: "event_registration",
+    event_registration_preview_id: D.preview,
+  });
+  const previews = () =>
+    state.reads.filter(({ op }) => op === "event_registration_preview_v1").length;
+  const before = previews();
+  await next.click();
+  const save = sheet.getByRole("button", { name: "Kaydı onayla", exact: true });
+  await expect(save).toBeDisabled();
+  expect(previews()).toBe(before + 1);
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await save.click();
+  await expect(sheet.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1", "event_register_v1"]);
+  expect(state.event.registrations?.[0]?.person_id).toBe(I.self);
+});
 async function accept(page: import("@playwright/test").Page, button: string) {
   const dialog = page.getByRole("alertdialog");
   await dialog
@@ -44,6 +98,52 @@ test("event detail shows native unknown payment and requires reviewed actual sta
   await expect(close.getByText(saved, { exact: true })).toBeVisible();
   await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
   expect(state.event.attendance_state).toBe("closed");
+});
+test("package practice uses the selected right for eligibility and closes without a payment command", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "normal", { practice: true });
+  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
+  await sheet
+    .getByLabel("Kayıt için paket", { exact: true })
+    .selectOption(state.practiceRight.sale_id);
+  const next = sheet.getByRole("button", { name: "Devam", exact: true });
+  await next.click();
+  await next.click();
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await expect(sheet.getByText(saved, { exact: true })).toBeVisible();
+  await sheet.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toContainText("Paket uygun");
+  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await page.getByLabel("Fiilî başlangıç", { exact: true }).fill("2026-11-15T18:05");
+  await page.getByLabel("Gerekçe", { exact: true }).fill("Sentetik Pratik başladı");
+  await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+  const start = await accept(page, "Fiilî başlangıcı kaydet");
+  await expect(start.getByText(saved, { exact: true })).toBeVisible();
+  await start.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("radio", { name: "Geldi", exact: true }).click();
+  const mark = await accept(page, "Örnek Eğitmen için yoklama");
+  await expect(mark.getByText(saved, { exact: true })).toBeVisible();
+  await mark.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  const close = await accept(page, "Yoklamayı kapat");
+  await expect(close.getByText(saved, { exact: true })).toBeVisible();
+  await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.event.attendance_state).toBe("closed");
+  expect(state.event.registrations?.[0]).toMatchObject({
+    person_id: I.instructor,
+    attendance_result: "attended",
+    state: "completed",
+  });
+  expect(state.writes.map(({ op }) => op)).toEqual([
+    "event_register_v1",
+    "event_actual_start_record_v1",
+    "event_attendance_mark_v1",
+    "event_attendance_close_v1",
+  ]);
 });
 test("event unknown result keeps the frozen action and recovers its exact receipt without another write", async ({
   page,

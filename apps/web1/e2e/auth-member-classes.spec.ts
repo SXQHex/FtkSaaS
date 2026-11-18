@@ -34,6 +34,7 @@ async function fixture(
     documentUnknown?: boolean;
     documentAckUnread?: boolean;
     documentContentFailure?: boolean;
+    bookingRejection?: "ENTITLEMENT_UNAVAILABLE" | "DOCUMENT_REQUIRED" | "DEBT_BOOKING_BLOCKED";
   } = {},
 ) {
   await mockOwnReservations(page, { noStudent: options.noStudent });
@@ -104,6 +105,7 @@ async function fixture(
   };
   const state = {
     row,
+    right,
     entry: undefined as WaitlistEntryView | undefined,
     reservation: undefined as ReservationView | undefined,
     writes: [] as { op: string; request: Record<string, unknown> }[],
@@ -286,12 +288,38 @@ async function fixture(
     if (op === "reservation_list_v1") {
       expect(r.person_id).toBe(I.self);
       expect(r.session_id).toBe(row.id);
-      if (state.unread) {
-        state.unread = false;
-        return reject("SERVICE_UNAVAILABLE", true);
-      }
+      const sourceSale = state.unread ? id(99) : right.sale_id;
+      state.unread = false;
       return send({
-        items: state.reservation ? [state.reservation] : [],
+        items: state.reservation
+          ? [
+              {
+                ...state.reservation,
+                ...(r.include_source_summary
+                  ? {
+                      source_summary: {
+                        status: "available",
+                        as_of: "2026-11-16T12:00:00Z",
+                        source_sale_id: sourceSale,
+                        product_version_id: right.product_version_id,
+                        product_name: "Sentetik ders paketi",
+                        kind: "credits",
+                        booking_mode: right.booking_mode,
+                        sale_state: "active",
+                        state: "active",
+                        start_date: right.start_date,
+                        end_date: right.end_date,
+                        timezone: right.timezone,
+                        available_credits: String(right.available),
+                        reserved: String(right.reserved),
+                        consumed: "0",
+                        sale_version: 2,
+                      },
+                    }
+                  : {}),
+              },
+            ]
+          : [],
         next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",
       });
@@ -360,6 +388,7 @@ async function fixture(
         if (options.documents) expect(state.documentAccepted).toBe(true);
         expect(r.person_id).toBe(I.self);
         expect(r.source_sale_id).toBe(right.sale_id);
+        if (options.bookingRejection) return reject(options.bookingRejection);
         state.reservation = {
           id: primary,
           session_id: row.id,
@@ -368,11 +397,19 @@ async function fixture(
           mode: r.mode,
           version: 2,
         };
+        right.available--;
+        right.reserved++;
+        row.capacity.held++;
+        row.capacity.remaining--;
         state.unread = !!options.ackUnread;
       }
       if (op === "reservation_cancel_v1") {
         expect(r.expected_version).toBe(2);
         state.reservation = { ...state.reservation!, state: "cancelled", version: 3 };
+        right.available++;
+        right.reserved--;
+        row.capacity.held--;
+        row.capacity.remaining++;
       }
       if (op === "waitlist_join_v1") {
         type = "waitlist_entries";
@@ -492,7 +529,9 @@ test("member unknown booking recovers from the same receipt and never repeats th
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
-test("member acknowledged booking retries only the unread result", async ({ page }) => {
+test("member acknowledged booking with a different package link retries only the result read", async ({
+  page,
+}) => {
   const state = await fixture(page, { ackUnread: true });
   await book(page);
   await expect(
@@ -512,6 +551,26 @@ test("member stale lesson preflight prevents booking without inventing capacity 
   await expect(page.getByRole("dialog").getByRole("alert")).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
+for (const [bookingRejection, message] of [
+  ["ENTITLEMENT_UNAVAILABLE", "Hak veya kredi koşulu bu işleme izin vermiyor."],
+  ["DOCUMENT_REQUIRED", "Gerekli belge koşulu karşılanmıyor."],
+  ["DEBT_BOOKING_BLOCKED", "Ödenmemiş borç nedeniyle rezervasyon yapılamıyor."],
+] as const)
+  test(`member booking shows ${bookingRejection} without allocating a right or seat`, async ({
+    page,
+  }) => {
+    const state = await fixture(page, { bookingRejection });
+    const right = { ...state.right };
+    const capacity = { ...state.row.capacity };
+    const panel = await book(page);
+    const error = panel.getByRole("alert").filter({ hasText: message });
+    await expect(error).toBeFocused();
+    await expect(panel.getByText(saved, { exact: true })).toHaveCount(0);
+    expect(state.writes).toHaveLength(1);
+    expect(state.reservation).toBeUndefined();
+    expect(state.right).toEqual(right);
+    expect(state.row.capacity).toEqual(capacity);
+  });
 test("member category-full waitlist uses its native category, then supports explicit leave", async ({
   page,
 }) => {
@@ -557,8 +616,10 @@ test("member reservation cancellation keeps its native reason/version and refres
   page,
 }) => {
   const state = await fixture(page);
+  const remaining = state.row.capacity.remaining;
   let d = await book(page);
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.row.capacity.remaining).toBe(remaining - 1);
   await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await page.getByRole("button", { name: "İptal et", exact: true }).click();
   const a = page.getByRole("alertdialog");
@@ -570,6 +631,7 @@ test("member reservation cancellation keeps its native reason/version and refres
     }),
   ).toBeVisible();
   expect(state.reservation!.state).toBe("cancelled");
+  expect(state.row.capacity.remaining).toBe(remaining);
 });
 test("member discovery denial stays unknown until explicit retry", async ({ page }) => {
   const state = await fixture(page, { denied: true });

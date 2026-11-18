@@ -156,6 +156,7 @@ export interface SettingsViewData {
     }[];
   };
   reminderPreview?: { id: string; lesson: string; delivery: string | null }[];
+  preparationManagement?: ReactNode;
 }
 export type SettingsAction =
   | { kind: "reset"; card: SettingsCardKey }
@@ -390,7 +391,9 @@ export function SettingsView({
       )}
     >
       {card.fields
-        .filter((field) => filter(field.key))
+        .filter(
+          (field) => filter(field.key) && (field.kind !== "number" || data.fields?.[field.key]),
+        )
         .map((field) => {
           const value = data.fields?.[field.key],
             id = `${prefix}-${field.key}`;
@@ -475,6 +478,9 @@ export function SettingsView({
                       id={id}
                       name={field.key}
                       type={field.key === "ay-tel" ? "tel" : field.kind}
+                      {...(field.kind === "number"
+                        ? { min: 1, max: 2147483647, required: true }
+                        : {})}
                       className={field.readonly ? "bg-muted" : undefined}
                       value={typeof value?.value === "string" ? value.value : ""}
                       readOnly={field.readonly}
@@ -1103,6 +1109,7 @@ export function SettingsView({
                     content
                   );
                 })}
+                {panel.key === "sablon" && data.preparationManagement}
                 {panel.key === "genel" && (
                   <Card className="min-w-0">
                     <CardHeader>

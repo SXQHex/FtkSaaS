@@ -28,9 +28,11 @@ export async function mockSessionDetail(
     instructor?: boolean;
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
+    origins?: Parameters<typeof mockStudio>[1];
   } = {},
 ) {
-  const studio = await mockStudio(page);
+  const studio = await mockStudio(page, options.origins);
+  const appOrigin = options.origins?.app ?? origin;
   if (options.allowEditor) studio.roles[0]!.accountAccessGranted = true;
   const S = sessionIds,
     writes: { operation: string; request: Record<string, unknown> }[] = [],
@@ -436,15 +438,15 @@ export async function mockSessionDetail(
     }
     return route.fallback();
   });
-  await page.goto(`${origin}/login`);
+  await page.goto(`${appOrigin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
-  await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page).toHaveURL(`${appOrigin}/account`);
   await page.goto(
     options.instructor
-      ? `${origin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`
-      : `${origin}/o/${I.org}/c/${I.center}/sessions/${S.session}`,
+      ? `${appOrigin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`
+      : `${appOrigin}/o/${I.org}/c/${I.center}/sessions/${S.session}`,
   );
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   return {

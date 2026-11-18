@@ -158,6 +158,7 @@ export async function readSessionBookingResult(intent: SessionBookingIntent, id?
       center_id: intent.scope.centerId,
       person_id: intent.request.person_id,
       session_id: intent.request.session_id,
+      include_source_summary: true,
       page: { limit: 20, ...(cursor ? { cursor } : {}) },
     });
     if (
@@ -176,14 +177,18 @@ export async function readSessionBookingResult(intent: SessionBookingIntent, id?
           row.booking_category === intent.request.booking_category),
     );
     if (matches.length > 1) throw new Error("SESSION_BOOKING_RESULT_UNAVAILABLE");
-    if (matches[0]) {
+    const reservation = matches[0];
+    if (reservation) {
+      const source = reservation.source_summary;
+      if (source?.status !== "available" || source.source_sale_id !== intent.request.source_sale_id)
+        throw new Error("SESSION_BOOKING_RESULT_UNAVAILABLE");
       const [session, rights] = await Promise.all([
         readScheduleSession(intent.scope, intent.request.session_id),
         readProfileRights(intent.scope, intent.request.person_id),
       ]);
       if (!rights.some((row) => row.sale_id === intent.request.source_sale_id))
         throw new Error("SESSION_BOOKING_RESULT_UNAVAILABLE");
-      return { session, rights, reservation: matches[0] };
+      return { session, rights, reservation };
     }
     cursor = page.next_cursor ?? undefined;
     if (cursor && seen.has(cursor)) throw new Error("SESSION_BOOKING_RESULT_UNAVAILABLE");

@@ -258,7 +258,10 @@ test("schedule detail opens the protected session route without requiring editin
 }) => {
   const state = await mockSessionDetail(page);
   await page.getByRole("link", { name: "Ders programı", exact: true }).last().click();
-  await page.getByText("Sentetik seans", { exact: true }).click();
+  await page
+    .getByRole("button", { name: /Sentetik seans/ })
+    .filter({ visible: true })
+    .click();
   const panel = page.getByRole("dialog");
   await expect(panel.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   await panel.getByRole("button", { name: "Seans sayfasını aç", exact: true }).click();

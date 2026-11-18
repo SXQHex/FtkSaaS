@@ -38,6 +38,7 @@ export async function readMemberPreferences(scope: ClientScope) {
     };
   });
   const email = notifications.reminder_email_preference;
+  const transactional = notifications.email_preference;
   return {
     rows: [
       ...rows,
@@ -46,6 +47,12 @@ export async function readMemberPreferences(scope: ClientScope) {
         selected: email?.enabled,
         version: email?.version,
         writable: email?.available === true,
+      },
+      {
+        id: "transactionalEmail" as const,
+        selected: transactional?.enabled,
+        version: transactional?.version,
+        writable: transactional?.available === true,
       },
       {
         id: "mandatory" as const,
@@ -73,12 +80,12 @@ export async function writeMemberPreference(intent: PreferenceIntent) {
       operation_key: intent.key,
       expected_version: intent.version,
     };
-  if (intent.id === "email")
+  if (intent.id === "email" || intent.id === "transactionalEmail")
     return backend.call("notification_preferences_set_v1", {
       ...base,
       center_id: intent.scope.centerId,
       channel: "email",
-      purpose: "reminder",
+      purpose: intent.id === "email" ? "reminder" : "transactional",
       enabled: intent.enabled,
     });
   return backend.call("settings_update_v1", {
@@ -90,7 +97,9 @@ export async function writeMemberPreference(intent: PreferenceIntent) {
 export async function readMemberPreferenceReceipt(intent: PreferenceIntent) {
   const backend = await scopedBackend(intent.scope);
   const operation =
-    intent.id === "email" ? "notification_preferences_set_v1" : "settings_update_v1";
+    intent.id === "email" || intent.id === "transactionalEmail"
+      ? "notification_preferences_set_v1"
+      : "settings_update_v1";
   const receipt = await backend.call("operation_status_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

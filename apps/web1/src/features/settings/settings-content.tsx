@@ -1,4 +1,5 @@
 import { WorkCalendarEditor } from "./work-calendar-editor";
+import { PreparationManagement } from "./preparation-management";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -325,6 +326,27 @@ function SettingsManagement({
       "ay-tz": { value: timezone, writable: false },
     },
     brand: document.data.brand ? { ...document.data.brand, name: organizationLabel } : undefined,
+    preparationManagement:
+      document.source && section === "sablon"
+        ? (
+            [
+              "program_templates",
+              "event_templates",
+              "collection_templates",
+              "crm_templates",
+              "automation_templates",
+            ] as const
+          ).map((family) => (
+            <PreparationManagement
+              key={`${scope.orgId}:${scope.centerId}:${level}:${document.source!.document.version}:${family}`}
+              source={document.source!}
+              family={family}
+              locked={locked}
+              readOnly={readOnly}
+              onReview={document.reviewPreparation}
+            />
+          ))
+        : undefined,
     tables: {
       politika: policies.table,
       ekip: team.table,

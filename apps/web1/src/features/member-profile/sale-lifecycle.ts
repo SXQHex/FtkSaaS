@@ -285,6 +285,19 @@ export async function readSaleLifecycleResult(intent: LifecycleIntent, id?: stri
     )
       throw new Error("SALE_LIFECYCLE_RESULT_UNAVAILABLE");
   }
+  const keptReservations = Object.entries(review.decisions)
+    .filter(([, decision]) => decision === "keep")
+    .map(([reservationId]) => reservationId);
+  if (review.action === "change" && keptReservations.length) {
+    const inventory = await readSaleInventory(review.scope, z.uuid().parse(id));
+    const transferred = new Set(
+      inventory.items
+        .filter((row) => row.entity?.type === "reservations")
+        .map((row) => row.entity!.id),
+    );
+    if (keptReservations.some((reservationId) => !transferred.has(reservationId)))
+      throw new Error("SALE_LIFECYCLE_RESULT_UNAVAILABLE");
+  }
   const backend = await scopedBackend(review.scope);
   for (const effect of review.preview.effects.filter((row) => row.entity.type === "reservations")) {
     const page = await backend.call("management_state_get_v1", {

@@ -49,6 +49,33 @@ it("keeps the same document in separate purchases and preserves original preview
   expect((await readMemberDocumentContexts(scope)).items).toHaveLength(2);
   expect(documentContextKey(context)).not.toBe(documentContextKey(other));
 });
+it("keeps first-registration previews for the same event and product distinct", async () => {
+  const first = {
+    gate: "event_registration" as const,
+    subject: { type: "events" as const, id: id(11) },
+    product_version_id: id(12),
+    event_registration_preview_id: id(13),
+  };
+  const second = { ...first, event_registration_preview_id: id(14) };
+  const requirements = [{ ...doc, required_at: "event_registration" }];
+  call.mockResolvedValue({
+    ...page(),
+    items: [
+      { context: first, requirements },
+      { context: second, requirements },
+    ],
+  });
+  expect((await readMemberDocumentContexts(scope)).items.map((row) => row.context)).toEqual([
+    first,
+    second,
+  ]);
+  expect(documentContextKey(first)).not.toBe(documentContextKey(second));
+  call.mockResolvedValue({
+    ...page(),
+    items: [{ context: { ...first, event_registration_preview_id: "invalid" }, requirements }],
+  });
+  await expect(readMemberDocumentContexts(scope)).rejects.toThrow();
+});
 it("rejects generic people, on-behalf acceptance, mismatched gates and duplicate contexts", async () => {
   for (const item of [
     { context: { ...context, subject: { type: "people", id: id(4) } }, requirements: [doc] },

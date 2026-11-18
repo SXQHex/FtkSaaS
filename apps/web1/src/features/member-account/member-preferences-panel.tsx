@@ -81,7 +81,9 @@ export function MemberPreferencesPanel({
   }
   return (
     <AccountPreferencesView
-      rows={(["email", "inApp", "package", "marketing", "mandatory"] as const).map((id) => {
+      rows={(
+        ["email", "transactionalEmail", "inApp", "package", "marketing", "mandatory"] as const
+      ).map((id) => {
         const row = query.data?.rows.find((row) => row.id === id);
         return {
           id,

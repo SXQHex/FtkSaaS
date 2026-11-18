@@ -24,6 +24,7 @@ export function EventTermsFields({
   people,
   disabled,
   productsFooter,
+  preparation = false,
 }: {
   draft: EventDraft;
   onDraft: (value: EventDraft) => void;
@@ -31,6 +32,7 @@ export function EventTermsFields({
   people: EventChoice[];
   disabled: boolean;
   productsFooter?: ReactNode;
+  preparation?: boolean;
 }) {
   const { t } = useTranslation();
   function set<K extends keyof EventDraft>(key: K, value: EventDraft[K]) {
@@ -176,110 +178,117 @@ export function EventTermsFields({
           </Field>
         )}
       </FieldSet>
-      <Field>
-        <FieldLabel htmlFor="event-document">{t(($) => $.events.editor.document)}</FieldLabel>
-        <NativeSelect id="event-document" disabled className="w-full">
-          <NativeSelectOption value="">
-            {t(($) => $.events.editor.documentSource)}
-          </NativeSelectOption>
-        </NativeSelect>
-        <FieldDescription>{t(($) => $.events.editor.documentHint)}</FieldDescription>
-      </Field>
-      <FieldSet>
-        <FieldLegend variant="label">{t(($) => $.events.editor.duties)}</FieldLegend>
-        {people.length === 0 && (
-          <FieldDescription>{t(($) => $.events.editor.noPeople)}</FieldDescription>
-        )}
-        {people.map((person) => {
-          const duty = draft.duties.find((row) => row.personId === person.id);
-          return (
-            <div key={person.id} className="flex flex-col gap-3">
-              <Field orientation="horizontal">
-                <Checkbox
-                  id={`event-duty-${person.id}`}
-                  name="duties"
-                  value={person.id}
-                  isSelected={!!duty}
-                  isDisabled={disabled}
-                  onChange={(value) =>
-                    set(
-                      "duties",
-                      value
-                        ? [
-                            ...draft.duties,
-                            {
-                              personId: person.id,
-                              duty: "instructor",
-                              fee: "",
-                              currency: draft.currency,
-                            },
-                          ]
-                        : draft.duties.filter((row) => row.personId !== person.id),
-                    )
-                  }
-                />
-                <FieldLabel htmlFor={`event-duty-${person.id}`}>{person.name}</FieldLabel>
-              </Field>
-              {duty && (
-                <FieldGroup className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <Field>
-                    <FieldLabel htmlFor={`event-duty-role-${person.id}`}>
-                      {t(($) => $.events.editor.duty)}
-                    </FieldLabel>
-                    <NativeSelect
-                      id={`event-duty-role-${person.id}`}
-                      name="duty_role"
-                      value={duty.duty}
-                      disabled={disabled}
-                      onChange={(event) =>
+      {!preparation && (
+        <>
+          <Field>
+            <FieldLabel htmlFor="event-document">{t(($) => $.events.editor.document)}</FieldLabel>
+            <NativeSelect id="event-document" disabled className="w-full">
+              <NativeSelectOption value="">
+                {t(($) => $.events.editor.documentSource)}
+              </NativeSelectOption>
+            </NativeSelect>
+            <FieldDescription>{t(($) => $.events.editor.documentHint)}</FieldDescription>
+          </Field>
+          <FieldSet>
+            <FieldLegend variant="label">{t(($) => $.events.editor.duties)}</FieldLegend>
+            {people.length === 0 && (
+              <FieldDescription>{t(($) => $.events.editor.noPeople)}</FieldDescription>
+            )}
+            {people.map((person) => {
+              const duty = draft.duties.find((row) => row.personId === person.id);
+              return (
+                <div key={person.id} className="flex flex-col gap-3">
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id={`event-duty-${person.id}`}
+                      name="duties"
+                      value={person.id}
+                      isSelected={!!duty}
+                      isDisabled={disabled}
+                      onChange={(value) =>
                         set(
                           "duties",
-                          draft.duties.map((row) =>
-                            row.personId === person.id
-                              ? { ...row, duty: event.target.value as "instructor" | "assistant" }
-                              : row,
-                          ),
+                          value
+                            ? [
+                                ...draft.duties,
+                                {
+                                  personId: person.id,
+                                  duty: "instructor",
+                                  fee: "",
+                                  currency: draft.currency,
+                                },
+                              ]
+                            : draft.duties.filter((row) => row.personId !== person.id),
                         )
                       }
-                      className="w-full"
-                    >
-                      <NativeSelectOption value="instructor">
-                        {t(($) => $.events.editor.instructor)}
-                      </NativeSelectOption>
-                      <NativeSelectOption value="assistant">
-                        {t(($) => $.events.editor.assistant)}
-                      </NativeSelectOption>
-                    </NativeSelect>
+                    />
+                    <FieldLabel htmlFor={`event-duty-${person.id}`}>{person.name}</FieldLabel>
                   </Field>
-                  {(["fee", "currency"] as const).map((key) => (
-                    <Field key={key}>
-                      <FieldLabel htmlFor={`event-duty-${key}-${person.id}`}>
-                        {t(($) => $.events.editor[key])}
-                      </FieldLabel>
-                      <Input
-                        id={`event-duty-${key}-${person.id}`}
-                        name={`duty_${key}`}
-                        value={duty[key]}
-                        disabled={disabled}
-                        onChange={(event) =>
-                          set(
-                            "duties",
-                            draft.duties.map((row) =>
-                              row.personId === person.id
-                                ? { ...row, [key]: event.target.value }
-                                : row,
-                            ),
-                          )
-                        }
-                      />
-                    </Field>
-                  ))}
-                </FieldGroup>
-              )}
-            </div>
-          );
-        })}
-      </FieldSet>
+                  {duty && (
+                    <FieldGroup className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <Field>
+                        <FieldLabel htmlFor={`event-duty-role-${person.id}`}>
+                          {t(($) => $.events.editor.duty)}
+                        </FieldLabel>
+                        <NativeSelect
+                          id={`event-duty-role-${person.id}`}
+                          name="duty_role"
+                          value={duty.duty}
+                          disabled={disabled}
+                          onChange={(event) =>
+                            set(
+                              "duties",
+                              draft.duties.map((row) =>
+                                row.personId === person.id
+                                  ? {
+                                      ...row,
+                                      duty: event.target.value as "instructor" | "assistant",
+                                    }
+                                  : row,
+                              ),
+                            )
+                          }
+                          className="w-full"
+                        >
+                          <NativeSelectOption value="instructor">
+                            {t(($) => $.events.editor.instructor)}
+                          </NativeSelectOption>
+                          <NativeSelectOption value="assistant">
+                            {t(($) => $.events.editor.assistant)}
+                          </NativeSelectOption>
+                        </NativeSelect>
+                      </Field>
+                      {(["fee", "currency"] as const).map((key) => (
+                        <Field key={key}>
+                          <FieldLabel htmlFor={`event-duty-${key}-${person.id}`}>
+                            {t(($) => $.events.editor[key])}
+                          </FieldLabel>
+                          <Input
+                            id={`event-duty-${key}-${person.id}`}
+                            name={`duty_${key}`}
+                            value={duty[key]}
+                            disabled={disabled}
+                            onChange={(event) =>
+                              set(
+                                "duties",
+                                draft.duties.map((row) =>
+                                  row.personId === person.id
+                                    ? { ...row, [key]: event.target.value }
+                                    : row,
+                                ),
+                              )
+                            }
+                          />
+                        </Field>
+                      ))}
+                    </FieldGroup>
+                  )}
+                </div>
+              );
+            })}
+          </FieldSet>
+        </>
+      )}
     </>
   );
 }

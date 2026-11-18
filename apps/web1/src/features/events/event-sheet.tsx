@@ -43,6 +43,7 @@ export function EventSheet({
   errors,
   readOnly = false,
   productsFooter,
+  preparationPicker,
 }: {
   draft: EventDraft;
   onDraft: (value: EventDraft) => void;
@@ -60,6 +61,7 @@ export function EventSheet({
   errors?: string;
   readOnly?: boolean;
   productsFooter?: ReactNode;
+  preparationPicker?: ReactNode;
 }) {
   const { t } = useTranslation();
   const formId = useId();
@@ -86,6 +88,7 @@ export function EventSheet({
       </SheetHeader>
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
         {notice}
+        {preparationPicker}
         <form
           id={formId}
           method="post"

@@ -29,10 +29,15 @@ export function assertLayoutFit(layout: Awaited<ReturnType<typeof readLayoutFit>
   }
 }
 export async function verifyResponsiveLayout(page: Page) {
-  const original = page.viewportSize(),
-    observations: Awaited<ReturnType<typeof readLayoutFit>>[] = [];
+  const original = page.viewportSize();
+  const rootZoom = await page.evaluate<number>(
+    "parseFloat(getComputedStyle(document.documentElement).zoom) || 1",
+  );
+  const observations: (LayoutFit & { cssWidth: number })[] = [];
   try {
-    for (const width of [1440, 320]) {
+    for (const cssWidth of [1440, 320]) {
+      // CSS zoom in a scenario scales the layout without resizing the Playwright viewport.
+      const width = Math.ceil(cssWidth * rootZoom);
       await page.setViewportSize({ width, height: original?.height ?? 900 });
       await expect
         .poll(
@@ -49,11 +54,11 @@ export async function verifyResponsiveLayout(page: Page) {
               )
             );
           },
-          { message: `Page and dialogs must fit ${width}px` },
+          { message: `Page and dialogs must fit ${cssWidth} CSS px` },
         )
         .toBe(true);
       const layout = await readLayoutFit(page);
-      observations.push(layout);
+      observations.push({ ...layout, cssWidth });
       assertLayoutFit(layout);
     }
   } finally {
