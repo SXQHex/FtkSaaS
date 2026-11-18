@@ -2,7 +2,11 @@ import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import type { Page } from "@playwright/test";
-import type { EventView, InstructorFinanceEarning } from "../src/lib/api-contracts/generated.js";
+import type {
+  EventView,
+  FinanceDirectoryEntry,
+  InstructorFinanceEarning,
+} from "../src/lib/api-contracts/generated.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 test("event registration reads and accepts only the chosen member's own document before renewed review", async ({
   page,
@@ -187,9 +191,117 @@ test("event native authority denial does not manufacture a successful mutation",
 test("event cancellation exposes server effects before its separately reviewed apply", async ({
   page,
 }) => {
-  const state = await mockEventDetail(page);
+  const state = await mockEventDetail(page, "normal", { existing: "available" });
   await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
   await mockCalendarEvent(page, state.event);
+  const participant = state.event.registrations![0]!;
+  const debt = participant.payment_summary!.debts[0]!;
+  const timestamp = "2026-11-15T18:00:00Z";
+  const financeReads: string[] = [];
+  await page.route("**/functions/v1/backend-v1/finance_directory_get_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+    const { view } = request;
+    const remaining = debt.remaining_minor;
+    const credit = debt.credited_minor;
+    const items: FinanceDirectoryEntry[] = [];
+    const row = {
+      person_id: participant.person_id,
+      display_name: participant.display_name,
+      version: debt.version,
+      created_at: timestamp,
+      occurred_at: timestamp,
+      currency: debt.currency,
+      source_sale_id: null,
+      product_name: null,
+      due_at: null,
+      method: null,
+    };
+    if (view === "debts" && remaining !== "0")
+      items.push({
+        ...row,
+        id: debt.id,
+        entity: { type: "debts", id: debt.id },
+        kind: "debt",
+        amount_minor: remaining,
+      });
+    if (view === "credits" && credit !== "0")
+      items.push({
+        ...row,
+        id: row.person_id,
+        entity: { type: "people", id: row.person_id },
+        kind: "credit",
+        amount_minor: credit,
+      });
+    if (view === "movements")
+      items.push({
+        ...row,
+        id: D.cash,
+        entity: { type: "cash_movements", id: D.cash },
+        version: 1,
+        kind: "collection",
+        amount_minor: debt.paid_minor,
+        method: "bank_transfer",
+      });
+    financeReads.push(
+      `${view}:${items.map(({ id, amount_minor }) => `${id}:${amount_minor}`).join(",")}`,
+    );
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          view,
+          items,
+          next_cursor: null,
+          as_of: timestamp,
+          totals: [
+            {
+              currency: debt.currency,
+              sales_minor: "0",
+              collections_minor: debt.paid_minor,
+              refunds_minor: "0",
+              debt_minor: remaining,
+              credit_minor: credit,
+              debt_people: Number(remaining !== "0"),
+              credit_people: Number(credit !== "0"),
+            },
+          ],
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/finance_get_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      center_id: I.center,
+      person_id: participant.person_id,
+      currency: debt.currency,
+    });
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          person_id: participant.person_id,
+          currency: debt.currency,
+          credit_available_minor: debt.credited_minor,
+          debts: [],
+          movements: { items: [], next_cursor: null, as_of: timestamp },
+        },
+      },
+    });
+  });
+  const finance = page.getByRole("link", { name: "Finans", exact: true });
+  const credits = page.getByRole("grid", { name: "Alacaklar", exact: true });
+  const debts = page.getByRole("grid", { name: "Açık borçlar", exact: true });
+  const debtTab = page.getByRole("tab", { name: /Açık borçlar/ });
+  const movements = page.getByRole("grid", { name: "Hareketler", exact: true });
+  await finance.click();
+  await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
+  await debtTab.click();
+  await expect(debts.getByRole("gridcell", { name: "TRY ₺400,00", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await expect.poll(() => financeReads.at(-1)).toBe("credits:");
   const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
   const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
   await schedule.click();
@@ -202,20 +314,54 @@ test("event cancellation exposes server effects before its separately reviewed a
   await accept(page, "İptal etkilerini oku");
   expect(state.writes).toHaveLength(0);
   await expect(dialog.getByText(/sunucunun güncel önizlemesidir/)).toBeVisible();
+  await expect(dialog.getByText(/₺400,00/)).toBeVisible();
+  await expect(dialog.getByText(/₺100,00/)).toBeVisible();
   await accept(page, "Etkinliği iptal et");
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.event.state).toBe("cancelled");
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await finance.click();
+  await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
+  await expect
+    .poll(() => financeReads.filter((read) => read.startsWith("movements:")).length)
+    .toBe(2);
+  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  const creditRow = credits.getByRole("row").filter({ hasText: participant.display_name! });
+  await expect(creditRow).toContainText("₺100,00");
+  await debtTab.click();
+  await expect
+    .poll(() => financeReads.filter((read) => read.startsWith("debts:")).at(-1))
+    .toBe("debts:");
+  await expect(debts.getByText(participant.display_name!, { exact: true })).toHaveCount(0);
+  expect(financeReads).toContain(`debts:${debt.id}:40000`);
+  expect(financeReads).toContain(`credits:${participant.person_id}:10000`);
+  expect(financeReads.filter((read) => read.startsWith("movements:"))).toEqual([
+    `movements:${D.cash}:10000`,
+    `movements:${D.cash}:10000`,
+  ]);
   const calendarRead = page.waitForResponse((response) =>
     response.url().endsWith("/calendar_get_v1"),
   );
   await schedule.click();
   const calendar = await (await calendarRead).json();
   expect(calendar.data.items).toMatchObject([{ id: state.event.id, resources: [] }]);
-  const eventRead = page.waitForResponse((response) => response.url().endsWith("/event_get_v1"));
+  const eventRead = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/event_get_v1") &&
+      response.request().postDataJSON().include_payment_summary === true,
+  );
   await calendarEvent.press("Enter");
   const result = await (await eventRead).json();
-  expect(result.data).toMatchObject({ id: state.event.id, state: "cancelled" });
+  expect(result.data).toMatchObject({
+    id: state.event.id,
+    state: "cancelled",
+    registrations: [
+      {
+        id: participant.id,
+        payment_summary: { net_minor: "0", credited_minor: "10000", debts: [{ id: debt.id }] },
+      },
+    ],
+  });
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Etkinliği iptal et", exact: true }),
