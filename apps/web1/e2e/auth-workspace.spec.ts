@@ -1,6 +1,7 @@
 import { test, expect } from "./test.js";
 import { mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
+import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
 import type {
   SuccessOrganizationsList,
@@ -10,6 +11,13 @@ import type {
 const org = "019a7b00-0000-7000-8000-000000000003",
   center = "019a7b00-0000-7000-8000-000000000004",
   person = "019a7b00-0000-7000-8000-000000000005";
+
+const shellViewports = [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+  { width: 400, height: 844 },
+  { width: 320, height: 844 },
+];
 
 test("command palette reaches appearance, switches the saved theme and signs out", async ({
   page,
@@ -40,6 +48,7 @@ test("command palette reaches appearance, switches the saved theme and signs out
 for (const colorScheme of ["light", "dark"] as const)
   test(`ready workspace sidebar and mobile navigation ${colorScheme}`, async ({ page }) => {
     await mockNative(page);
+    await page.setViewportSize(shellViewports[0]!);
     await page.emulateMedia({ colorScheme });
     await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
       route.fulfill({
@@ -127,7 +136,14 @@ for (const colorScheme of ["light", "dark"] as const)
     await expect(page.locator('[data-slot="sidebar"][data-state="collapsed"]')).toBeVisible();
     await rail.click();
     await expect(page.locator('[data-slot="sidebar"][data-state="expanded"]')).toBeVisible();
-    expect((await scanAccessibility(page, "workspace-desktop")).violations).toEqual([]);
+    for (const viewport of shellViewports) {
+      await page.setViewportSize(viewport);
+      expect(
+        (await scanAccessibility(page, `workspace-${viewport.width}-${colorScheme}`)).violations,
+      ).toEqual([]);
+      assertLayoutFit(await readLayoutFit(page));
+      await page.screenshot({ path: `.tmp/v67-shell-app-${viewport.width}-${colorScheme}.png` });
+    }
     await page.setViewportSize({ width: 390, height: 844 });
     const toggle = page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true });
     await toggle.focus();
@@ -136,6 +152,7 @@ for (const colorScheme of ["light", "dark"] as const)
     await expect(dialog).toBeVisible();
     const close = dialog.getByRole("button", { name: "Menüyü kapat", exact: true });
     await expect(close).toBeFocused();
+    await expect(close).toHaveCSS("box-shadow", /^(?!none$).+/);
     expect((await scanAccessibility(page, "workspace-mobile-drawer")).violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
