@@ -77,7 +77,7 @@ test("student cancellation validates reason and rereads the actual cancelled res
 test("Starter student keeps their own cancellable reservation after role plan denial", async ({
   page,
 }) => {
-  const state = await mockOwnReservations(page, { starterRoleGate: true });
+  const state = await mockOwnReservations(page, { starter: true });
   await page.getByRole("button", { name: /^İptal et —/ }).click();
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");

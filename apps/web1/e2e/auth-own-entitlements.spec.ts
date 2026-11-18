@@ -15,8 +15,8 @@ async function fixture(
     currencyDenied?: boolean;
   } = {},
 ) {
-  const roleGate = { starterRoleGate: false };
-  const reservations = await mockOwnReservations(page, roleGate);
+  const plan = { starter: false };
+  const reservations = await mockOwnReservations(page, plan);
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   let denied = Boolean(options.denied);
   const reads: { operation: string; request: Record<string, unknown> }[] = [];
@@ -167,7 +167,7 @@ async function fixture(
     reservations,
     reads,
     enterStarterPeriod: () => {
-      roleGate.starterRoleGate = true;
+      plan.starter = true;
     },
     setDenied: (value: boolean) => {
       denied = value;
@@ -234,6 +234,10 @@ test("Starter period keeps the same confirmed reservations, attendance, purchase
     error: { code: "PLAN_FEATURE_UNAVAILABLE" },
   });
   await expectHistoricalReservations();
+  await expect(
+    page.getByText("Güncel bekleme listesi ve teklifler okunamadı.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Bekleme listesinde değilsin.", { exact: true })).toHaveCount(0);
   await rights.click();
   await expectHistoricalRights();
 

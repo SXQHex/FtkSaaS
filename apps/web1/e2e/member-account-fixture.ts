@@ -14,7 +14,7 @@ export async function mockMemberAccount(
     starter?: boolean;
   } = {},
 ) {
-  await mockOwnReservations(page, { starterRoleGate: options.starter });
+  await mockOwnReservations(page, { starter: options.starter });
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   const links: PersonalCalendarLink[] = [],
     writes: { operation: string; request: Record<string, unknown> }[] = [],

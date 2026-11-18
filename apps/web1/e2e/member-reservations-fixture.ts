@@ -7,7 +7,7 @@ export async function mockOwnReservations(
   page: Page,
   options: {
     noStudent?: boolean;
-    starterRoleGate?: boolean;
+    starter?: boolean;
     denied?: boolean;
     unknown?: boolean;
     ackUnread?: boolean;
@@ -127,13 +127,15 @@ export async function mockOwnReservations(
             next_cursor: null,
             as_of: "2026-11-16T12:00:00Z",
           })
-        : reject(options.starterRoleGate ? "PLAN_FEATURE_UNAVAILABLE" : "FORBIDDEN");
+        : reject(options.starter ? "PLAN_FEATURE_UNAVAILABLE" : "FORBIDDEN");
     if (
       operation === "management_state_get_v1" &&
       req.operation === "waitlist_join_v1" &&
       req.selector?.key?.directory === "self"
-    )
+    ) {
+      if (options.starter) return reject("PLAN_FEATURE_UNAVAILABLE");
       return send({ items: [], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+    }
     if (operation === "reservation_list_v1") {
       expect(req.person_id).toBe(I.self);
       expect(req.center_id).toBe(I.center);
