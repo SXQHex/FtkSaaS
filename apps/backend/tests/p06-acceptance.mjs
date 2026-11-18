@@ -16,8 +16,12 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
  const claim=async(limit=1)=>(await worker.query('select private.p06_jobs_claim($1,$2,$3) jobs',[org,bank(),limit])).rows[0].jobs;
  const invoke=async j=>{assert(validators['request_'+j.operation](j.request));const r=(await worker.query('select private.p06_worker_execute($1,$2,$3) result',[j.operation,j.request,bank()])).rows[0].result;if(r.ok)assert(validators['success_'+j.operation](r),JSON.stringify(r));return r;};
  const drain=async()=>{for(let n=0;n<10;n++){const jobs=await claim();if(!jobs.length)return;for(const j of jobs){const r=await invoke(j);assert(r.ok,JSON.stringify(r));}}throw Error('P06 worker did not drain within bounded fixture');};
+ const skippedCsv=(u,job_id)=>fetch(context().env.API_URL+'/functions/v1/backend-v1/import_rows_list_v1?download=skipped_csv',{
+  method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+u.jwt,'content-type':'application/json'},
+  body:JSON.stringify(scope({client_api_version:1,request_id:key(),job_id,page:{}}))
+ });
  const mapping={columns:['source_key','display_name','opening_debt_minor','currency'].map(target=>({source_column:target,target}))};
- let uploaded,job,preview,exportJob,creditProduct,staffPerson;
+ let uploaded,job,preview,exportJob,creditProduct,staffPerson,counterpartCenter;
  const interval={starts_at:new Date(Date.now()-86400000).toISOString(),ends_at:new Date(Date.now()+86400000).toISOString()},filters={interval,center_ids:[center]};
  async function upload(text,checksum=createHash('sha256').update(text).digest('hex')){
   const file=await mut('import_upload_prepare_v1',{filename:'synthetic.csv',mime:'text/csv',bytes:Buffer.byteLength(text),checksum});files.push(file.file_id);
@@ -54,6 +58,10 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   await drain();assert.equal((await rows('select count(*)::int n from core.people where org_id=$1',[org]))[0].n,1);assert.equal((await rows('select count(*)::int n from core.debts where org_id=$1',[org]))[0].n,0);preview=await getPreview(job);assert.equal(preview.import_summary.new_people,27);assert.equal(preview.import_summary.invalid_rows,1);assert.equal(preview.import_summary.opening_debt_totals[0].amount_minor,'2700');
   const list=await must(owner,'import_rows_list_v1',scope({job_id:job,page:{limit:50}}));assert.equal(list.items.length,28);assert.equal(list.items.filter(x=>x.state==='invalid').length,1);assert.equal('payload' in list.items[0],false);
  });
+ await t.test('completed preview offers neither an apply summary nor a skipped row download',async()=>{
+  const page=await mut('import_rows_list_v1',{job_id:job,page:{limit:1},include_apply_summary:true});
+  assert.equal(page.apply_summary,undefined);assert.equal((await skippedCsv(owner,job)).status,404);
+ });
  await t.test('preview dependency changes reject apply; late audit failure rolls back the whole batch',async()=>{
   await db.query('update private.p06_configuration set max_import_rows=4999 where org_id=$1',[org]);await fail('import_apply_v1',{preview:{id:preview.id,token:preview.token}},'PREVIEW_STALE');await db.query('update private.p06_configuration set max_import_rows=5000 where org_id=$1',[org]);
   await mut('import_apply_v1',{preview:{id:preview.id,token:preview.token}});
@@ -65,8 +73,28 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   await db.query('update core.outbox_jobs set next_attempt_at=clock_timestamp() where id=$1',[job]);const fresh=(await claim())[0];await assert.rejects(invoke(j),/FORBIDDEN/);assert((await invoke(fresh)).ok);assert.deepEqual(await invoke(fresh),await invoke(fresh));await drain();
   assert.equal((await rows('select count(*)::int n from core.people where org_id=$1',[org]))[0].n,28);assert.equal((await rows('select count(*)::int n from core.debts where org_id=$1',[org]))[0].n,27);
  });
+ await t.test('final apply summary spans pages and skipped CSV uses live file and owner authority',async()=>{
+  const page=await mut('import_rows_list_v1',{job_id:job,page:{limit:1},state:'invalid',include_apply_summary:true});
+  assert.equal(page.items.length,1);
+  assert.deepEqual(page.apply_summary,{total_rows:28,applied_rows:27,skipped_rows:1,failed_rows:0,replayed_rows:0});
+  const csv=await skippedCsv(owner,job);assert.equal(csv.status,200);assert.match(csv.headers.get('cache-control'),/no-store/);
+  assert.equal((await csv.text()).split('\r\n').filter(Boolean).length,2);
+  assert(!(await skippedCsv(stranger,job)).ok);
+  await db.query("update core.import_jobs set state='failed' where id=$1",[job]);
+  await db.query("update core.outbox_jobs set state='failed' where id=$1",[job]);
+  try{assert.deepEqual((await mut('import_rows_list_v1',{job_id:job,page:{},include_apply_summary:true})).apply_summary,page.apply_summary);}
+  finally{
+   await db.query("update core.import_jobs set state='succeeded' where id=$1",[job]);
+   await db.query("update core.outbox_jobs set state='succeeded' where id=$1",[job]);
+  }
+  await db.query("update core.files set expires_at=clock_timestamp()-interval '1 second' where id=$1",[uploaded.file_id]);
+  try{assert.equal((await skippedCsv(owner,job)).status,404);}
+  finally{await db.query('update core.files set expires_at=null where id=$1',[uploaded.file_id]);}
+ });
  await t.test('re-upload dedupe preserves successful rows and rejects changed source payloads',async()=>{
   const repeat=await beginPreview(uploaded);await drain();const p=await getPreview(repeat.job_id);assert.equal(p.import_summary.replayed_rows,27);assert.equal(p.import_summary.new_people,0);await mut('import_apply_v1',{preview:{id:p.id,token:p.token}});await drain();
+  const result=await mut('import_rows_list_v1',{job_id:repeat.job_id,page:{limit:1},include_apply_summary:true});
+  assert.deepEqual(result.apply_summary,{total_rows:28,applied_rows:0,skipped_rows:1,failed_rows:0,replayed_rows:27});
   assert.equal((await rows('select count(*)::int n from core.people where org_id=$1',[org]))[0].n,28);assert.equal((await rows('select count(*)::int n from core.debts where org_id=$1',[org]))[0].n,27);
   const changed=await upload('source_key,display_name,opening_debt_minor,currency\nr0,Changed,100,TRY\n');const next=await beginPreview(changed);await drain();const rs=await must(owner,'import_rows_list_v1',scope({job_id:next.job_id,page:{}}));assert.equal(rs.items[0].error_code,'IDEMPOTENCY_PAYLOAD_MISMATCH');
  });
@@ -90,7 +118,7 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   const f={interval:{starts_at:day+'T00:00:00Z',ends_at:next+'T00:00:00Z'},center_ids:[center]};
   const occupancy=await must(owner,'report_get_v1',scope({report:'occupancy',filters:f,page:{}}));assert.equal(occupancy.rows.items.length,1);assert.equal(occupancy.rows.items[0].basis_count,4);
   const usage=await must(owner,'report_get_v1',scope({report:'resource_usage',filters:f,page:{}}));const used=usage.rows.items.find(x=>x.group_key==='resource:room:'+room);assert.equal(used.count,3600);assert.equal(used.basis_count,25200);assert.equal(used.ratio_bps,1428);
-  const other=(await must(owner,'center_create_v1',{org_id:org,name:'P06 counterpart',timezone:'UTC'},key())).primary_id;
+  const other=(await must(owner,'center_create_v1',{org_id:org,name:'P06 counterpart',timezone:'UTC'},key())).primary_id;counterpartCenter=other;
   await db.query("insert into private.settlement_movements(id,org_id,debtor_center_id,creditor_center_id,currency,amount_minor,open_minor,kind,operation_id) values($1,$2,$3,$4,'TRY',100,100,'accrual',$5)",[key(),org,center,other,key()]);
   const cross=await must(owner,'report_get_v1',scope({report:'cross_center_usage',filters,page:{}}));assert(cross.rows.items.some(x=>x.group_key==='outgoing_to:'+other&&x.center_id===center&&x.amount_minor==='100'));
  });
@@ -106,6 +134,25 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   assert(csv.split('\r\n').slice(1).some(row=>row.endsWith(',\"1001\"')));
   assert.equal((await rows("select private.p06_csv_cell('=1+1') cell"))[0].cell,"\"'=1+1\"");
   const audit=await must(owner,'audit_list_v1',scope({subject:{type:'import_jobs',id:job},interval,page:{}}));assert(audit.items.length);assert(audit.items.every(x=>!JSON.stringify(x).includes('worker_role')));
+ });
+ await t.test('terminal report retry reuses original scope and creates one fresh job',async()=>{
+  const original={center_id:null,report:'collections_debts',filters:{...filters,center_ids:[]},format:'csv',columns:['group_key','amount_minor']};
+  const old=(await mut('report_export_start_v1',original)).job_id,retry={center_id:null,retry_job_id:old};
+  await fail('report_export_start_v1',retry,'OPERATION_IN_PROGRESS');
+  await db.query("update core.outbox_jobs set state='retry_wait',attempts=1 where id=$1",[old]);
+  await db.query("update core.report_jobs set state='retry_wait' where id=$1",[old]);
+  await fail('report_export_start_v1',retry,'OPERATION_IN_PROGRESS');
+  await db.query("update core.outbox_jobs set state='failed',attempts=3 where id=$1",[old]);
+  await db.query("update core.report_jobs set state='failed' where id=$1",[old]);
+  await fail('report_export_start_v1',{...retry,filters},'VALIDATION_FAILED');
+  const k=key(),fresh=(await mut('report_export_start_v1',retry,k)).job_id;
+  assert.notEqual(fresh,old);assert.equal((await mut('report_export_start_v1',retry,k)).job_id,fresh);
+  await fail('report_export_start_v1',retry,'VERSION_CONFLICT');
+  const [saved]=await rows("select request - 'request_id' - 'operation_key' as request from private.p06_jobs where job_id=$1",[fresh]);
+  const [prior]=await rows("select request - 'request_id' - 'operation_key' as request from private.p06_jobs where job_id=$1",[old]);
+  assert.deepEqual(saved,prior);assert.deepEqual(saved.request.filters.center_ids,[center,counterpartCenter].sort());await drain();
+  assert.equal((await mut('job_status_get_v1',{center_id:null,job_id:old})).state,'failed');
+  assert.equal((await mut('job_status_get_v1',{center_id:null,job_id:fresh})).state,'succeeded');
  });
  await t.test('opening credits settle consumed negative balances first without recreating attendance, earning or cash',async()=>{
   const target=(await rows("select person_id from private.p06_sources where org_id=$1 and source_namespace='p06-fixture' and source_key='r0'",[org]))[0].person_id,discipline=key();

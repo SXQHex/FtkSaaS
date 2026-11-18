@@ -1360,12 +1360,16 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 operation_key: string
-report: ReportKind
-filters: ReportFilters
-format: ExportFormat
+report?: ReportKind
+filters?: ReportFilters
+format?: ExportFormat
 columns?: ReportDiscoveryColumns
 report_order?: ReportPreparationOrder
 group_by?: ReportPreparationGrouping
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+retry_job_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9613,6 +9617,13 @@ export interface Page_ImportRowView {
 items: ImportRowView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+apply_summary?: {
+total_rows: Count
+applied_rows: Count
+skipped_rows: Count
+failed_rows: Count
+replayed_rows: Count
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13961,6 +13972,7 @@ page: Page
 state?: ImportRowState
 query?: string
 include_details?: boolean
+include_apply_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30064,10 +30076,14 @@ org_id: string
  * @minItems 1
  * @maxItems 2
  */
-kinds: [("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+kinds: [("lessons" | "duties" | "studio_program")]|[("lessons" | "duties" | "studio_program"), ("lessons" | "duties" | "studio_program")]
 state: ("active" | "revoked")
 version: PositiveInt
 created_at: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30131,6 +30147,16 @@ client_api_version: 1
  */
 request_id: string
 page: Page
+studio_program_scope?: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30151,12 +30177,16 @@ organization_scope: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 }
 /**
  * @minItems 1
  * @maxItems 2
  */
-kinds: [("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+kinds: [("lessons" | "duties" | "studio_program")]|[("lessons" | "duties" | "studio_program"), ("lessons" | "duties" | "studio_program")]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -30177,6 +30207,10 @@ organization_scope: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 }
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.

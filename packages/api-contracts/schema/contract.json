@@ -6664,6 +6664,34 @@
         },
         "as_of": {
           "$ref": "#/$defs/Instant"
+        },
+        "apply_summary": {
+          "type": "object",
+          "properties": {
+            "total_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "applied_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "skipped_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "failed_rows": {
+              "$ref": "#/$defs/Count"
+            },
+            "replayed_rows": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "total_rows",
+            "applied_rows",
+            "skipped_rows",
+            "failed_rows",
+            "replayed_rows"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -15438,16 +15466,16 @@
         },
         "group_by": {
           "$ref": "#/$defs/ReportPreparationGrouping"
+        },
+        "retry_job_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "org_id",
-        "operation_key",
-        "report",
-        "filters",
-        "format"
+        "operation_key"
       ],
       "additionalProperties": false,
       "allOf": [
@@ -15497,6 +15525,30 @@
                 "$ref": "#/$defs/ReportColumns"
               }
             }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "retry_job_id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "report": false,
+              "filters": false,
+              "format": false,
+              "columns": false,
+              "report_order": false,
+              "group_by": false
+            }
+          },
+          "else": {
+            "required": [
+              "report",
+              "filters",
+              "format"
+            ]
           }
         }
       ]
@@ -15821,6 +15873,9 @@
           "maxLength": 200
         },
         "include_details": {
+          "type": "boolean"
+        },
+        "include_apply_summary": {
           "type": "boolean"
         }
       },
@@ -53740,7 +53795,8 @@
             "type": "string",
             "enum": [
               "lessons",
-              "duties"
+              "duties",
+              "studio_program"
             ]
           },
           "minItems": 1,
@@ -53759,6 +53815,9 @@
         },
         "created_at": {
           "$ref": "#/$defs/Instant"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -53902,6 +53961,22 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "studio_program_scope": {
+          "type": "object",
+          "properties": {
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "org_id",
+            "center_id"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -53928,6 +54003,9 @@
           "properties": {
             "org_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [
@@ -53941,7 +54019,8 @@
             "type": "string",
             "enum": [
               "lessons",
-              "duties"
+              "duties",
+              "studio_program"
             ]
           },
           "minItems": 1,
@@ -53974,6 +54053,9 @@
           "type": "object",
           "properties": {
             "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
               "$ref": "#/$defs/FtkUuid"
             }
           },
@@ -81977,7 +82059,7 @@
           "effect": "report_export_start_append_or_explicit_update",
           "from": [],
           "to": [],
-          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
+          "invariant": "A retry of a terminal failed export creates one new job from its original server-side parameters and current authority."
         },
         "semantic_guards": [
           "live_actor_and_scope",
@@ -82614,7 +82696,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "read",
-        "transaction_guarantee": "Read authorized import_rows_list projection only; no domain/rights/earning/settlement/receipt mutation.",
+        "transaction_guarantee": "Read authorized import rows and final apply totals. Skipped CSV additionally checks the live input file. No writes.",
         "transition": {
           "effect": "read_only_business",
           "from": [],
@@ -93536,7 +93618,7 @@
           "effect": "own_calendar_calendar_link_create",
           "from": [],
           "to": [],
-          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+          "invariant": "Own active account, explicit organization and kinds. Studio program binds one live managed center. Current credential and live business authority."
         },
         "semantic_guards": [
           "live_account_and_org_link",
@@ -113698,6 +113780,42 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarLink/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_create/properties/organization_scope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_rotate/properties/organization_scope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_report_export_start/properties/retry_job_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_links_get/properties/studio_program_scope/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_links_get/properties/studio_program_scope/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -114195,7 +114313,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 194,
+      "migration_count": 195,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

@@ -920,7 +920,7 @@
         {
           "line": 14,
           "path": "apps/backend/tests/p06-acceptance.mjs",
-          "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242"
+          "sha256": "e38d701c5913d93a632c7947de8e9496ba3397c25f0b381c4724b0476705c218"
         },
         {
           "line": 15,
@@ -1133,7 +1133,7 @@
         {
           "line": 155,
           "path": "apps/backend/tests/crm-import-acceptance.mjs",
-          "sha256": "3447c6d22dd8eeaaca5a65f6f0e5d13dc3bfc9b71b54ece3ba8e313c905da010"
+          "sha256": "c7963575bb6bd75fe0ac9c8075f7eaeb3c2ae084663a62d48859b5ddcf60aa4f"
         },
         {
           "line": 156,
@@ -1306,7 +1306,7 @@
         {
           "line": 3,
           "path": "apps/backend/tests/personal-calendar-acceptance.mjs",
-          "sha256": "77acabdd6f9dcb832e779104c4d2f71a5ff24e744474132f5be2f712d66cc800"
+          "sha256": "a292b77b9265a39a6dab14f93def4f9020bb7ff5f282c16f9b1cc123eaab16e2"
         },
         {
           "line": 4,

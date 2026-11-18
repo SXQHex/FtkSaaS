@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="web1-v67-studio-import-report"></a>
+## Web1 v67 stüdyo takvimi ve dosya işleri
+
+W1-BE-46/50/51, [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) için `261dd5f8` üzerine yerelde eklendi. Tüketim [WF09](../../../docs/workflows.md#wf09) ve [WF10](../../../docs/workflows.md#wf10) sahibindedir.
+
+195. append migration izole loopback Supabase'e uygulandı. Tek Node runner ve `--test-concurrency=1` ile native takvim ve P06 kabulü 22/22 geçti. Aynı runtime kaynağında CRM import, takvim kodlayıcı ve Edge paket kontrolleri 13/13 geçti. Sözleşme denetimi, migration manifesti, workflow kaynak bağları, 142 API test biriminin kapsamı ve backend typecheck geçti. Edge API yükü 3.970.922 bayt. Yerel stack kapatıldı. Bu dilim yerel dalda bekler.
+
 <a id="web1-v67-crm-directory"></a>
 ## Web1 v67 CRM raporu ve dizinleri
 

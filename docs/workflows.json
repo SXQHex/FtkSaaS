@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "ebedf8a4749a0c1c416549b86633817f86930dc9e3c5ce9c76772f9ccc70445e",
-        "reason": "Reviewed exact report authorization, native state filtering, visible CRM metrics and a live open-lead requirement for current trial offers."
+        "fingerprint": "99142bacdd615cfe8163fe8added34dfcbc5a69a4553a938f7fb6d7302df38a4",
+        "reason": "Reviewed shared Edge request and response contract changes, authenticated skip CSV dispatch, and updated acceptance bindings."
       }
     },
     {
@@ -1174,6 +1174,7 @@
         "apps/backend/tests/public-program-discovery-acceptance.mjs"
       ],
       "sources": [
+        "apps/backend/database/studio-calendar-import-results-report-retry.sql",
         "apps/backend/api/public-application.js",
         "apps/backend/database/p04-crm-public-wrappers.sql",
         "apps/backend/database/p04-crm-public.sql",
@@ -1227,7 +1228,8 @@
         "apps/backend/database/settings-catalog-v24.sql",
         "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
         "apps/backend/database/crm-funnel-and-directory.sql",
-        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql"
+        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1241,8 +1243,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "be6c5ab73f5309eb8ed41eacac91e095fed6352c56a2917047c23813597fba8a",
-        "reason": "Reviewed exact report authorization, native state filtering, visible CRM metrics and a live open-lead requirement for current trial offers."
+        "fingerprint": "5d90208f2e9893aca84b4235c19828a8d98fb5cd2b3a8604dc2d2c2b2205902c",
+        "reason": "Reviewed center-manager and F08 gating, credential lifecycle, and personal list compatibility for studio schedule subscriptions."
       }
     },
     {
@@ -1268,6 +1270,7 @@
         "apps/backend/tests/intake-crm-work-acceptance.mjs"
       ],
       "sources": [
+        "apps/backend/database/studio-calendar-import-results-report-retry.sql",
         "apps/backend/database/p05-bind.sql",
         "apps/backend/database/p05-documents.sql",
         "apps/backend/database/p05-wrappers.sql",
@@ -1299,7 +1302,8 @@
         "apps/backend/supabase/migrations/20261117034912_report_import_discovery.sql",
         "apps/backend/tests/report-worker-fixture.mjs",
         "apps/backend/database/crm-funnel-and-directory.sql",
-        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql"
+        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1313,8 +1317,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "07d11241b9fe27916d5125603e8af42c53400fe8c17d7c0279b0470824274b8c",
-        "reason": "Reviewed exact report authorization, native state filtering, visible CRM metrics and a live open-lead requirement for current trial offers."
+        "fingerprint": "b05e8506c2d2ef0d746e80f8dfe4f451170a9ad694e24209e2356d9331c8c192",
+        "reason": "Reviewed terminal import outcomes across CRM selection and partial student application, authenticated CSV, and exact report retry parameters."
       }
     },
     {
@@ -2125,8 +2129,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "703d484ac0a35c10681721d230985728b772616561b27758770b36d4bfa58c6f",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. The additional history assertions use the existing isolated subscription boundary path. Worker behavior and authority remain unchanged."
+        "fingerprint": "44aa84a9d4f3081e9edd809bc61be2bf465aa2ae855a4989e1f3124c04ff093f",
+        "reason": "Reviewed the shared contract and acceptance inventory digest after report scope coverage was updated."
       }
     }
   ]
