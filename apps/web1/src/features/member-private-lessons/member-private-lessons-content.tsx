@@ -211,6 +211,7 @@ export function MemberPrivateLessonsContent({
   return (
     <>
       <MemberPrivateLessonsView
+        pending={list.isPending}
         rows={
           entries?.map((row) => ({
             id: row.id,
@@ -271,7 +272,7 @@ export function MemberPrivateLessonsContent({
           })) ?? null
         }
         onCreate={() => open("create")}
-        disabled={locked || Boolean(target) || !choicesReady || list.isError}
+        disabled={locked || Boolean(target) || !choicesReady || list.isPending || list.isError}
         pagination={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -303,7 +304,6 @@ export function MemberPrivateLessonsContent({
                 </AlertDescription>
               </Alert>
             )}
-            {list.isPending && <p role="status">{t(($) => $.memberPrivateLessons.loading)}</p>}
             {saved && !target && (
               <Alert>
                 <AlertDescription>

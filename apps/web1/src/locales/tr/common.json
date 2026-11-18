@@ -3383,8 +3383,6 @@
     "duration": "Süre",
     "offset": "Saat dilimi farkı",
     "chooseOffset": "Tekrarlanan saati seç",
-    "note": "Not (isteğe bağlı)",
-    "noteUnavailable": "Bu işlemde not ekleme kullanılamıyor.",
     "alternative": "Önerilen saat",
     "chooseAlternative": "Alternatif seç",
     "acceptHint": "Kabulün merkez onayını bekler; ders henüz kesinleşmez.",

@@ -12,6 +12,7 @@ export async function mockOwnPrivateLessons(
     stale?: boolean;
     denied?: boolean;
     catalogDenied?: boolean;
+    listGate?: Promise<void>;
   } = {},
 ) {
   await mockOwnReservations(page);
@@ -125,6 +126,7 @@ export async function mockOwnPrivateLessons(
         return send({ items: row ? [item(row)] : [], next_cursor: null });
       }
       expect(key.person_id).toBe(I.self);
+      await options.listGate;
       if (denied) return reject();
       return send({ items: requests.map(item), next_cursor: null });
     }

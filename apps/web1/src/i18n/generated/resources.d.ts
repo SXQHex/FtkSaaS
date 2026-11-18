@@ -2290,8 +2290,6 @@ export default interface Resources {
       "noInstructor": "Eğitmen tercihi yok",
       "noPreference": "Tercihim yok",
       "noReservation": "Talep göndermek veya alternatif kabul etmek yer/hak ayırmaz. Rezervasyon merkez onayıyla oluşur.",
-      "note": "Not (isteğe bağlı)",
-      "noteUnavailable": "Bu işlemde not ekleme kullanılamıyor.",
       "offset": "Saat dilimi farkı",
       "pastTime": "Geçmiş bir saat seçtin.",
       "previous": "Önceki",

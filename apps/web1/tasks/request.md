@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
+18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43 ve W1-BE-44 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
 
 İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
 
@@ -52,6 +52,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-41 | P01.4 · WF01 | Native ilk parola için izole kabul | Karşılandı (PR330). Native CI parolasız Google kimliğine ilk parolayı doğruladı. |
 | W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Açık. Starter2’de kendi rol okuması plan reddi veriyor, yayımlı Web1 yönetim menüsünü kuramıyor. |
 | W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | Açık. Organizasyonu olmayan hesabın kuruluma nasıl alınacağı ve ilk merkezden sonra yönetim yetkisinin nasıl açılacağı için backend sözleşmesi gerekiyor. |
+| W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Açık](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
 
 ## Bütün talepler için ortak sınır
 
@@ -387,3 +388,9 @@ Web1’in yalnız oturumun kendi etkin yönetim rolünü ve erişilebilir merkez
 **Açık · backend değerlendirmesi.** v67 ilk kurulum ekranı yeni hesabın stüdyo, ilk salon ve ders türü adımlarını sunuyor. Web1’in native kayıt akışı hesap oluşturuyor. WF02’de `organization_create_v1` platform sahibine ayrılmış. `center_create_v1` var olan organizasyonda `org.manage` istiyor. Salon ve merkez disiplini yazıları etkin merkez ve ayrı canlı `center.manage` yetkisi gerektiriyor. Sahiplik kendiliğinden bu merkez yetkisini vermiyor. [API kataloğu](../../../docs/functions.md) · [WF02](../../../docs/workflows.md#wf02).
 
 Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişini, organizasyonu hazırlayan aktörü ve ilk merkez oluşturulduktan sonra merkez yönetim kapsamının hangi doğrulanmış kaynaktan açılacağını belirleyin. Mevcut platform sınırı, Starter limitleri ve yeniden denemede tek sonuç korunmalı. Sahipliği veya merkez yönetimini dolaylı varsaydıran bir istemci kuralı eklenmemeli. Mevcut destekle Web1, yetkili hazır organizasyonda gerçek ilk merkezi oluşturuyor; canlı merkez yöneticisine eksik salon/disiplin için mevcut ayar akışlarını sunuyor. [E47](todo.md#e47-ilk-kurulum).
+
+## W1-BE-44 · Özel ders talebinde öğrencinin notu
+
+**Açık · backend değerlendirmesi.** Güncel çizimde öğrenci yeni özel ders talebine isteğe bağlı not ekleyebiliyor. `lesson_request_create_v1` öğrenci notu almıyor ve `LessonRequestView` öğrenci notu döndürmüyor. Bu nedenle Web1 talep formunda not alanını göstermiyor. [v67 arşivinde çizim](../design-reference/revisions/2026-11-18/app.js#L4336) · [WF06](../../../docs/workflows.md#wf06).
+
+Notun yazma ve geri okuma sözleşmesini, metin sınırlarını ve talep sahibi ile inceleyen yetkililerin okuma kapsamını değerlendirin. Notlu ve notsuz talep, yetki reddi ve aynı-key yeniden deneme mevcut talep davranışıyla birlikte doğrulanmalı. [E31](todo.md#sayfa-kabulu).

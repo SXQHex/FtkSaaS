@@ -16,9 +16,8 @@ import {
   SheetDescription,
   SheetFooter,
 } from "../../components/ui/sheet";
-import { Field, FieldLabel, FieldError, FieldDescription } from "../../components/ui/field";
+import { Field, FieldLabel, FieldError } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
-import { Textarea } from "../../components/ui/textarea";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Button } from "../../components/ui/button";
@@ -26,6 +25,7 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Badge } from "../../components/ui/badge";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 import { PlusIcon } from "lucide-react";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
 export interface PrivateLessonRow {
   id: string;
   time: string;
@@ -38,12 +38,14 @@ export interface PrivateLessonRow {
 }
 export function MemberPrivateLessonsView({
   rows,
+  pending,
   onCreate,
   disabled,
   notice,
   pagination,
 }: {
   rows: PrivateLessonRow[] | null;
+  pending: boolean;
   onCreate: () => void;
   disabled: boolean;
   notice?: ReactNode;
@@ -69,7 +71,9 @@ export function MemberPrivateLessonsView({
       {notice}
       <Card className="min-w-0">
         <CardContent>
-          {rows === null ? (
+          {pending ? (
+            <MemberReadSkeleton label={t(($) => $.memberPrivateLessons.loading)} />
+          ) : rows === null ? (
             <p className="py-5 text-sm text-muted-foreground">
               {t(($) => $.memberPrivateLessons.unread)}
             </p>
@@ -83,25 +87,23 @@ export function MemberPrivateLessonsView({
                 <Item
                   role="listitem"
                   key={row.id}
-                  className="flex-nowrap items-start gap-3 rounded-none border-0 px-0 py-4"
+                  className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-none border-0 px-0 py-4 @lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,14rem)]"
                 >
                   <div className="w-14 shrink-0 text-sm tabular-nums">
                     <p className="font-semibold">{row.time}</p>
                     <p className="mt-1 text-xs text-muted-foreground">{row.duration}</p>
                   </div>
                   <ItemContent className="min-w-0">
-                    <ItemTitle>{row.title}</ItemTitle>
+                    <ItemTitle className="wrap-anywhere">{row.title}</ItemTitle>
                     <ItemDescription className="line-clamp-none break-words">
                       {row.metadata}
                     </ItemDescription>
                     <p className="text-xs text-muted-foreground">{row.hint}</p>
-                    <ItemActions className="mt-2 flex-wrap @lg:hidden">
-                      <Badge variant="outline">{row.state}</Badge>
-                      {row.actions}
-                    </ItemActions>
                   </ItemContent>
-                  <ItemActions className="hidden shrink-0 flex-col items-end gap-2 @lg:flex">
-                    <Badge variant="outline">{row.state}</Badge>
+                  <ItemActions className="col-start-2 min-w-0 flex-wrap gap-2 @lg:col-start-3 @lg:flex-col @lg:items-end">
+                    <Badge variant="outline" className="h-auto max-w-full whitespace-normal">
+                      {row.state}
+                    </Badge>
                     {row.actions}
                   </ItemActions>
                 </Item>
@@ -317,15 +319,6 @@ export function OwnRequestSheet({
                     </ToggleGroupItem>
                   ))}
                 </ToggleGroup>
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="own-request-note">
-                  {t(($) => $.memberPrivateLessons.note)}
-                </FieldLabel>
-                <Textarea id="own-request-note" disabled rows={2} />
-                <FieldDescription>
-                  {t(($) => $.memberPrivateLessons.noteUnavailable)}
-                </FieldDescription>
               </Field>
             </>
           ) : (
