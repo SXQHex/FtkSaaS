@@ -1022,7 +1022,7 @@
         {
           "line": 143,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
-          "sha256": "b6936c8d4087db840e84bd821e64d6d558c070fcac0999dbcab07116ccd654de",
+          "sha256": "64d4794d8314936334cd1e727fe1dccb7baeaf96ebc91bc91e5db4eeea839e35",
           "shared": [
             [
               1,
@@ -1053,7 +1053,7 @@
               "ranges": [
                 [
                   157,
-                  310
+                  385
                 ]
               ]
             }
