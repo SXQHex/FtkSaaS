@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+## W1-BE-38 ilk etkinlik kaydında üyenin belge keşfi
+
+Aynı taslak PR’da [WF11 ilk kayıt akışı](../../../docs/workflows.md#wf11), mevcut native kayıt önizlemesini üyenin kendi belge dizinine bağlıyor. Ürün sürümü gerçek seçilmiş satıştan okunur. Yerel native Auth ve Edge üzerinde üyenin keşif ve kendi onayı sonrası yöneticinin ilk kaydı tamamladığı, taslak/süresi geçmiş/yabancı bağlam ve kaynağa bağlı olmayan ürün okumasının reddedildiği doğrulandı. Mevcut üye belge keşfi regresyonu ve kaynak/kapsam paketindeki 349 test geçti. [Aday koşusunda](https://github.com/SXQHex/FtkSaaS/actions/runs/44202210987) core ve W1-BE-38’i içeren API-2 başarılıydı. API-11/12’de W1-BE-30 ve W1-BE-25 seans fixture’ları UTC gece yarısını aştığında RESOURCE_CONFLICT aldı. İki fixture kendi UTC gününde 12.00–13.00 aralığına taşındı ve güncel hash’ler aynı API envanterine işlendi. Yerel native tekrar 3/3 geçti. Yeni aday CI ve development teslimi bekleniyor.
+
+## W1-BE-37 native parola bildirimi
+
+Başlangıç main `b219f2be822338b40460f1bb981e00d07b6be70e` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı. Development Auth readback’inde SiteURL `https://app.fethiyetango.com/` ve eski şablondaki doğrudan yol eklemesi doğrulandı. [Native parola güvenliği aracı](remote-backend-setup.md#native-parola-güvenliği-xreq-002) şablonu geçerli SiteURL üzerinden hazırlıyor. W1-BE-37 hosted kabulü, aday kaynak kabulünden sonra development şablonunun kurulması ve yeni postadaki tam adresin doğrulanmasıyla tamamlanacak.
+
+
 <a id="web1-recovery-callback-acceptance"></a>
 ## Web1 recovery kabul callback kaynağı — 17 Kasım2026
 
