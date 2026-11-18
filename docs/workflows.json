@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "a7432ec2801e8187391180dc427cf1b404f2e469daef467234687a18ed422917",
-        "reason": "Reviewed W1-BE-42 optional authenticated self management scope, unchanged F05 directory and staff authority, and identical schema interning under the existing Edge upload budget."
+        "fingerprint": "ca9fa359ddd52e06f25bfaebc9b2b03f6de864cdec2beffe79d3fbed157b1521",
+        "reason": "Reviewed W1-BE-42 optional authenticated self management scope, unchanged F05 directory and staff authority, and identical schema interning under the existing Edge upload budget. The updated Starter downgrade slice binds the new test bytes and keeps the existing API unit ownership and checks."
       }
     },
     {
@@ -513,8 +513,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "3e9ba097f51efc73d5735553ed4699b7e650cc3351c790be13cbe7f78f7ebe30",
-        "reason": "Reviewed W1-BE-42 opt-in live self scope for owner, org manager and accessible center managers, the native Starter denial and role transition tests, and the unchanged filtered role directory."
+        "fingerprint": "23ed990f7c5f1a347c8ec51867a9757d2e4c8e8fa5e74f6f87b04abe914f0e7f",
+        "reason": "Reviewed W1-BE-42 opt-in live self scope for owner, org manager and accessible center managers, the native Starter denial and role transition tests, and the unchanged filtered role directory. The new before-and-after reads supplement the existing Starter role and resource write denials."
       }
     },
     {
@@ -631,8 +631,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "2dec07318888a12f1db859fc10ed4df4e4fc015c0cafffac61017f3a195d6543",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "84aa8fc2e065944ddda915987e6c77c6a38dd18b8a5f621249f93a715a37b22d",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow. Verified the specific debt denial and preserved permission denial in the affected acceptance paths. The new test reads the same Pro reservation and closed attendance after the Starter boundary. Scheduling and authorization rules remain unchanged."
       }
     },
     {
@@ -1605,8 +1605,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "550504d5821393c440d3889972085dcdc3ddce53af99cdd2e5339dd32b648bcc",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "7f4adf6afe7c7a68641e7f93013e00cd9a15eb9348338c604acffde273f699a0",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. The native test compares the same reservation, entitlement balance, outstanding debt and closed attendance before and after the Pro to Starter period boundary."
       }
     },
     {
@@ -2112,8 +2112,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "50ea95968f7a6be7beedefc8cca3b834a33dcfc1798efcb056b931605a493fbf",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "703d484ac0a35c10681721d230985728b772616561b27758770b36d4bfa58c6f",
+        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. The additional history assertions use the existing isolated subscription boundary path. Worker behavior and authority remain unchanged."
       }
     }
   ]
