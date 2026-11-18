@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  useLoaderData,
+  useParams,
+  useNavigate,
+  useRouter,
+  useSearch,
+} from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
@@ -129,6 +135,10 @@ function PeopleContent({
 }) {
   const router = useRouter();
   const navigate = useNavigate();
+  const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/people" });
+  const { action } = useSearch({ from: "/o/$orgId/c/$centerId/people" });
+  const inviteRequested =
+    action === "invite" && scope.orgId === orgId && scope.centerId === centerId;
   const { t } = useTranslation();
   const [filter, setFilter] = useState<PeopleFilter>("all");
   const [search, setSearch] = useState("");
@@ -273,12 +283,16 @@ function PeopleContent({
         }}
         interactionLocked={locked}
       />
-      {entryStarted && (
+      {(entryStarted || inviteRequested) && (
         <PersonEntry
-          key={entryGeneration}
+          key={inviteRequested ? "shortcut" : entryGeneration}
           scope={scope}
-          open={entryOpen}
-          onClose={() => setEntryOpen(false)}
+          open={entryOpen || inviteRequested}
+          onClose={() => {
+            setEntryOpen(false);
+            if (inviteRequested)
+              void navigate({ from: "/o/$orgId/c/$centerId/people", search: {}, replace: true });
+          }}
           onLockChange={publishLock}
           onCreated={created}
         />

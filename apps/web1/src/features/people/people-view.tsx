@@ -491,6 +491,7 @@ export function PeopleEntrySheet({
             </FieldLabel>
             <Input
               id="people-name"
+              autoFocus
               onBlur={onNameBlur}
               aria-invalid={Boolean(nameError)}
               aria-describedby={nameError ? "people-name-error" : undefined}

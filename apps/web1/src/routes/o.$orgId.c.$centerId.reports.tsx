@@ -3,6 +3,9 @@ import { requireAccountSession, loadAccount } from "../features/auth/account-gua
 import { AccountErrorPage } from "../features/auth/account-page";
 import { ReportsRoutePage } from "../features/reports/reports-page";
 export const Route = createFileRoute("/o/$orgId/c/$centerId/reports")({
+  validateSearch: (search): { action?: "import" | "export" } => ({
+    action: search.action === "import" || search.action === "export" ? search.action : undefined,
+  }),
   beforeLoad: requireAccountSession,
   loader: loadAccount,
   component: ReportsRoutePage,

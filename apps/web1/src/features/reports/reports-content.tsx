@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate, useParams, useRouter, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
@@ -47,7 +47,11 @@ export function ReportsContent({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const [tab, setTab] = useState<ReportTab>("summary"),
+  const navigate = useNavigate({ from: "/o/$orgId/c/$centerId/reports" });
+  const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/reports" });
+  const { action } = useSearch({ from: "/o/$orgId/c/$centerId/reports" });
+  const shortcut = scope.orgId === orgId && scope.centerId === centerId ? action : undefined;
+  const [selectedTab, setTab] = useState<ReportTab>("summary"),
     [range, setRange] = useState<ReportRange>("30"),
     [from, setFrom] = useState(""),
     [to, setTo] = useState(""),
@@ -58,6 +62,7 @@ export function ReportsContent({
     [fileError, setFileError] = useState(false);
   const [exporting, setExporting] = useState<ReportFilters>();
   const [importing, setImporting] = useState<{ initial?: ImportDirectoryItem }>();
+  const tab = shortcut === "import" ? "files" : selectedTab;
   const [pages, setPages] = useState<
     Record<string, { cursors: (string | undefined)[]; index: number }>
   >({});
@@ -211,6 +216,12 @@ export function ReportsContent({
   const currentFinance = active && !finance.isError ? finance.data : undefined;
   const currentImports = active && !imports.isError ? imports.data : undefined,
     currentExports = active && !exports.isError ? exports.data : undefined;
+  const importReview =
+    importing ?? (shortcut === "import" && currentImports?.limits ? {} : undefined);
+  const exportReview = exporting ?? (shortcut === "export" ? filters : undefined);
+  function closeShortcut() {
+    if (shortcut) void navigate({ search: {}, replace: true });
+  }
   const date = (value: string) =>
     new Intl.DateTimeFormat("tr-TR", {
       timeZone: timezone!,
@@ -321,7 +332,10 @@ export function ReportsContent({
     <>
       <ReportsView
         tab={tab}
-        onTab={setTab}
+        onTab={(value) => {
+          setTab(value);
+          closeShortcut();
+        }}
         range={range}
         onRange={(value) => {
           setRange(value);
@@ -340,7 +354,7 @@ export function ReportsContent({
           setPages({});
         }}
         onExport={() => {
-          if (filters) setExporting(structuredClone(filters));
+          if (filters) setExporting(filters);
         }}
         onPeople={() =>
           void router.navigate({
@@ -495,27 +509,32 @@ export function ReportsContent({
           </div>
         }
       />
-      {importing && active && (
+      {importReview && active && (
         <ReportImportEditor
-          key={importing.initial?.job_id ?? "new"}
+          key={importReview.initial?.job_id ?? "new"}
           scope={scope}
           limits={currentImports?.limits ?? null}
-          initial={importing.initial}
+          initial={importReview.initial}
           onClose={() => {
-            if (!locked) setImporting(undefined);
+            if (locked) return;
+            if (shortcut === "import") setTab("files");
+            setImporting(undefined);
+            closeShortcut();
           }}
           onLockChange={lock}
           onAccessLost={accessLost}
           onSaved={refresh}
         />
       )}
-      {exporting && active && (
+      {exportReview && active && (
         <ReportExportEditor
           scope={scope}
-          filters={exporting}
-          period={`${exporting.interval.starts_at} – ${exporting.interval.ends_at} · ${timezone}`}
+          filters={exportReview}
+          period={`${exportReview.interval.starts_at} – ${exportReview.interval.ends_at} · ${timezone}`}
           onClose={() => {
-            if (!locked) setExporting(undefined);
+            if (locked) return;
+            setExporting(undefined);
+            closeShortcut();
           }}
           onLockChange={lock}
           onAccessLost={accessLost}

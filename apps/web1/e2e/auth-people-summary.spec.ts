@@ -4,6 +4,25 @@ import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { RequestPeopleList, SuccessPeopleList } from "../src/lib/api-contracts/generated.js";
 
+test("command palette opens the existing invitation form without creating a person", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  await openStudio(page);
+  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  const input = page.getByPlaceholder("Sayfa adı ara…");
+  await input.fill("Üye davet et");
+  await expect(page.getByRole("menuitem", { name: "Üye davet et", exact: true })).toBeVisible();
+  await input.press("ArrowDown");
+  await input.press("Enter");
+  const invite = page.getByRole("dialog", { name: "Üye davet et", exact: true });
+  await expect(invite.getByRole("textbox", { name: /Ad soyad/ })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(invite).toHaveCount(0);
+  await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/people`);
+  expect(state.writes).toEqual([]);
+});
+
 test("command palette searches active members through the selected center and opens the native result", async ({
   page,
 }) => {

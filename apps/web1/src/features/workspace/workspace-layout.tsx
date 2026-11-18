@@ -131,12 +131,12 @@ export function WorkspaceLayout({
     !scopeControl?.locked
       ? { accountId, orgId: view.selected.id, centerId }
       : undefined;
-  const settingsUrl =
-    memberSearchScope && hasWorkspaceManagementScope(view, memberSearchScope.centerId)
-      ? groups
-          .find((group) => group.key === "studio")
-          ?.items.find((item) => item.key === "settings")?.url
-      : undefined;
+  const manager =
+    memberSearchScope && hasWorkspaceManagementScope(view, memberSearchScope.centerId);
+  const settingsUrl = manager
+    ? groups.find((group) => group.key === "studio")?.items.find((item) => item.key === "settings")
+        ?.url
+    : undefined;
   const roleNames = roles.map((role) => t(($) => $.workspace.roles[role]));
   if (instructor) roleNames.push(t(($) => $.workspace.roles.instructor));
   const roleLabel = roleNames.length
@@ -235,6 +235,12 @@ export function WorkspaceLayout({
               <NavigationSearch
                 settingsUrl={settingsUrl}
                 memberScope={memberSearchScope}
+                showActions={
+                  !pending && !scopeLocked && !scopeControl?.locked && mode === "management"
+                }
+                managementActions={Boolean(manager)}
+                onThemeChange={onThemeChange}
+                onSignOut={onSignOut}
                 groups={[
                   ...groups,
                   {

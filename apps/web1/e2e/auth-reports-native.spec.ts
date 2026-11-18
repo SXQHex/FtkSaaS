@@ -33,6 +33,32 @@ async function importForm(page: import("@playwright/test").Page) {
   await dialog.getByRole("button", { name: "Önizle", exact: true }).click();
   return dialog;
 }
+test("command palette reuses the report and import review forms without starting jobs", async ({
+  page,
+}) => {
+  const f = await mockReports(page);
+  const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
+  const input = page.getByPlaceholder("Sayfa adı ara…");
+  await search.click();
+  await input.fill("Raporu dışa aktar");
+  await page.getByRole("menuitem", { name: "Raporu dışa aktar", exact: true }).click();
+  const report = page.getByRole("dialog");
+  await expect(report.getByRole("combobox", { name: "Rapor", exact: true })).toBeVisible();
+  await report.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await search.click();
+  await input.fill("Üyeleri içe aktar");
+  await page.getByRole("menuitem", { name: "Üyeleri içe aktar", exact: true }).click();
+  await expect(
+    page.getByRole("dialog").getByRole("combobox", { name: "Aktarım türü" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("tab", { name: "Dosyalar", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  expect(f.writes).toEqual([]);
+});
+
 test("reports bind all real sections, immutable product names, exact currencies and explicit custom dates", async ({
   page,
 }) => {

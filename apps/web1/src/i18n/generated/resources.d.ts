@@ -5128,6 +5128,7 @@ export default interface Resources {
       "chooseCenter": "Merkez seç",
       "chooseOrganization": "Stüdyo seç",
       "closeNavigation": "Menüyü kapat",
+      "exportReport": "Raporu dışa aktar",
       "general": "Genel",
       "groups": {
         "general": "Genel",
@@ -5136,6 +5137,7 @@ export default interface Resources {
         "studio": "Stüdyo",
         "work": "Çalışma"
       },
+      "importMembers": "Üyeleri içe aktar",
       "links": {
         "account": "Hesabım",
         "audit": "Denetim",
@@ -5165,6 +5167,7 @@ export default interface Resources {
       "noResults": "Eşleşen sayfa yok.",
       "notifications": "Bildirimler",
       "organizations": "Stüdyolar",
+      "quickActions": "Eylemler",
       "readFailed": "Stüdyo kapsamı okunamadı.",
       "roles": {
         "assistant": "Asistan",

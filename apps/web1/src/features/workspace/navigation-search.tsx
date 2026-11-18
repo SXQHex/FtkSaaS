@@ -22,10 +22,18 @@ export function NavigationSearch({
   groups,
   settingsUrl,
   memberScope,
+  showActions,
+  managementActions,
+  onThemeChange,
+  onSignOut,
 }: {
   groups: NavigationGroup[];
   settingsUrl?: string;
   memberScope?: ClientScope;
+  showActions: boolean;
+  managementActions: boolean;
+  onThemeChange?: () => void;
+  onSignOut: () => void;
 }) {
   const { t } = useTranslation();
   const { contains } = useFilter({ sensitivity: "base" });
@@ -33,6 +41,11 @@ export function NavigationSearch({
   const [input, setInput] = useState("");
   const [settled, setSettled] = useState("");
   const query = input.trim();
+  const links = groups.flatMap(({ items }) => items);
+  const peopleUrl = managementActions ? links.find(({ key }) => key === "people")?.url : undefined;
+  const reportsUrl = managementActions
+    ? links.find(({ key }) => key === "reports")?.url
+    : undefined;
   const canSearchMembers = open && !!memberScope && query.length >= 2;
   useEffect(() => {
     if (!canSearchMembers) return;
@@ -59,6 +72,32 @@ export function NavigationSearch({
       setSettled("");
     }
   }
+  const actions = [
+    ...(peopleUrl
+      ? [{ key: "invite", label: t(($) => $.people.invite), href: `${peopleUrl}?action=invite` }]
+      : []),
+    ...(reportsUrl
+      ? [
+          {
+            key: "import",
+            label: t(($) => $.workspace.importMembers),
+            href: `${reportsUrl}?action=import`,
+          },
+          {
+            key: "export",
+            label: t(($) => $.workspace.exportReport),
+            href: `${reportsUrl}?action=export`,
+          },
+        ]
+      : []),
+    {
+      key: "theme",
+      label: t(($) => $.workspace.changeTheme),
+      href: onThemeChange ? undefined : "/account#account-appearance",
+      run: onThemeChange,
+    },
+    { key: "sign-out", label: t(($) => $.auth.signout), run: onSignOut },
+  ];
   useEffect(() => {
     function shortcut(event: KeyboardEvent) {
       if (
@@ -167,6 +206,24 @@ export function NavigationSearch({
                       onAction={() => changeOpen(false)}
                     >
                       {member.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+              {showActions && query && (
+                <CommandGroup heading={t(($) => $.workspace.quickActions)}>
+                  {actions.map(({ key, label, href, run }) => (
+                    <CommandItem
+                      key={key}
+                      id={`action-${key}`}
+                      href={href}
+                      textValue={label}
+                      onAction={() => {
+                        changeOpen(false);
+                        run?.();
+                      }}
+                    >
+                      {label}
                     </CommandItem>
                   ))}
                 </CommandGroup>

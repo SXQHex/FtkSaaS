@@ -31,6 +31,7 @@ export function ReportExportEditor({
   onSaved: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const [review] = useState(() => ({ filters, period }));
   const [kind, setKind] = useState<ExportReportKind | "">("");
   const [reviewed, setReviewed] = useState(false);
   const [error, setError] = useState(false);
@@ -64,7 +65,7 @@ export function ReportExportEditor({
         ...reportsCommon(scope),
         operation_key: uuidv7(),
         report,
-        filters: structuredClone(filters),
+        filters: structuredClone(review.filters),
         format: "csv",
         ...(["sales", "instructor_balances"].includes(report)
           ? {
@@ -94,7 +95,7 @@ export function ReportExportEditor({
           setError(false);
         }
       }}
-      period={period}
+      period={review.period}
       fileDescription={t(($) => $.reports.nativeFiles)}
       preparation={t(($) => $.reports.exportAsync)}
       reviewed={reviewed}

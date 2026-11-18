@@ -154,7 +154,7 @@ export function AppearancePanel({
     ...new Set([0.75, 1, 1.1, 1.25, 1.5, 2, ...(typeof scale === "number" ? [scale] : [])]),
   ].sort((a, b) => a - b);
   return (
-    <Card ref={card}>
+    <Card ref={card} id="account-appearance">
       <CardHeader>
         <CardTitle>
           <h2>{t(($) => $.appearance.title)}</h2>
