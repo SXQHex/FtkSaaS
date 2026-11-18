@@ -16,5 +16,12 @@
     "noFallthroughCasesInSwitch": true,
     "strict": true
   },
-  "include": ["vite.config.ts", "i18next.config.ts", "playwright.config.ts", "e2e"]
+  "include": [
+    "vite.config.ts",
+    "i18next.config.ts",
+    "playwright.config.ts",
+    "playwright.external.config.ts",
+    "e2e",
+    "e2e-external"
+  ]
 }

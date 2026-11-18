@@ -3,20 +3,22 @@ import { preparePublicCalendar, publicForm } from "./public-calendar-fixture.js"
 export async function prepareApplication(
   page: Page,
   state: "open" | "closed" | "unavailable" = "open",
+  verifyProof?: (proof: string) => Promise<boolean>,
 ) {
-  const fixture = await preparePublicCalendar(page);
+  const fixture = await preparePublicCalendar(page, "normal", Boolean(verifyProof));
   fixture.packet.next_cursor = null;
   fixture.packet.application =
     state === "open" ? { state, form: structuredClone(publicForm) } : { state, form: null };
-  await page.route(
-    "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit",
-    async (route) => {
-      await route.fulfill({
-        contentType: "application/javascript",
-        body: `window.turnstile={render(element,options){window.__widget=options;const button=document.createElement('button');button.type='button';button.textContent='Test doğrulamasını tamamla';window.__proofCount=(window.__proofCount||0)+1;const proof='test-provider-proof-'+window.__proofCount;button.onclick=()=>options.callback(proof);element.append(button);return 'test-widget';},remove(){document.querySelectorAll('button').forEach(b=>{if(b.textContent==='Test doğrulamasını tamamla')b.remove()})}};`,
-      });
-    },
-  );
+  if (!verifyProof)
+    await page.route(
+      "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit",
+      async (route) => {
+        await route.fulfill({
+          contentType: "application/javascript",
+          body: `window.turnstile={render(element,options){window.__widget=options;const button=document.createElement('button');button.type='button';button.textContent='Test doğrulamasını tamamla';window.__proofCount=(window.__proofCount||0)+1;const proof='test-provider-proof-'+window.__proofCount;button.onclick=()=>options.callback(proof);element.append(button);return 'test-widget';},remove(){document.querySelectorAll('button').forEach(b=>{if(b.textContent==='Test doğrulamasını tamamla')b.remove()})}};`,
+        });
+      },
+    );
   const mutations: Record<string, unknown>[] = [];
   let response: "success" | "abort" | "bot" | "expired" = "success";
   await page.route("**/api/public/application", async (route) => {
@@ -24,7 +26,12 @@ export async function prepareApplication(
     expect(request.headers()["authorization"]).toBeUndefined();
     expect(request.headers()["apikey"]).toBeUndefined();
     expect(request.headers()["cookie"]).toBeUndefined();
-    mutations.push(request.postDataJSON() as Record<string, unknown>);
+    const payload = request.postDataJSON() as Record<string, unknown>;
+    mutations.push(payload);
+    if (verifyProof) {
+      expect(typeof payload.bot_proof).toBe("string");
+      if (!(await verifyProof(String(payload.bot_proof)))) response = "bot";
+    }
     if (response === "abort") {
       response = "success";
       await route.abort();
@@ -51,7 +58,7 @@ export async function prepareApplication(
     },
   };
 }
-export async function fillApplication(page: Page) {
+export async function fillApplication(page: Page, completeFixtureProof = true) {
   await page.getByLabel("Ad soyad (zorunlu)", { exact: true }).fill("Örnek Aday");
   await page.getByLabel("E-posta", { exact: true }).fill("candidate@example.test");
   await page.getByLabel("Ne ilgini çekiyor?", { exact: true }).selectOption({ label: "Tango" });
@@ -59,5 +66,6 @@ export async function fillApplication(page: Page) {
   await consent.focus();
   await consent.press("Space");
   await expect(consent).toBeChecked();
-  await page.getByRole("button", { name: "Test doğrulamasını tamamla", exact: true }).click();
+  if (completeFixtureProof)
+    await page.getByRole("button", { name: "Test doğrulamasını tamamla", exact: true }).click();
 }

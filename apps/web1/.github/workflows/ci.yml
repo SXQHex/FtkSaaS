@@ -55,6 +55,8 @@ jobs:
         run: npm run test:e2e:deps
       - name: Install pinned Chromium browser
         run: npm run test:e2e:install
+      - name: Check hosted entry points and Turnstile test keys
+        run: npm run test:external
       - name: Run all quality and test gates
         id: verify
         run: npm run verify:ci

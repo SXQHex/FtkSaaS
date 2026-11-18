@@ -29,6 +29,9 @@ test("instructor today and weekly navigation retain center scope and open only t
 }) => {
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
   await expect(page.getByText("Atanmış salon", { exact: true })).toBeVisible();
+  const actualTime = page.getByLabel("Fiilî başlangıç saati", { exact: true });
+  await expect(actualTime).toHaveAttribute("aria-invalid", "false");
+  await expect(actualTime).not.toHaveAttribute("aria-describedby", "actual-time-error");
   await page.getByRole("button", { name: "Bugünkü derslerime dön", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
   await expect(page.getByText(/Atanmış salon/).first()).toBeVisible();

@@ -7,6 +7,13 @@ import { checkTestResults } from "./check-test-results.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const reports = resolve(root, "test-reports");
+const measurableAxeRules = new Set([
+  "aria-prohibited-attr",
+  "aria-required-children",
+  "aria-valid-attr-value",
+  "target-size",
+  "th-has-data-cells",
+]);
 
 export function summarizeVerification(steps, unit, browser) {
   let status =
@@ -40,6 +47,9 @@ export function summarizeVerification(steps, unit, browser) {
     status = "failed";
     reportError = "Invalid Axe attachment";
   }
+  const incomplete = [
+    ...new Set(scans.flatMap((scan) => scan.manualReview.map((rule) => rule.id))),
+  ];
   return {
     status,
     ...(reportError ? { reportError } : {}),
@@ -50,7 +60,8 @@ export function summarizeVerification(steps, unit, browser) {
         ? Math.min(...scans.map((scan) => scan.evaluatedConformanceRules.length))
         : 0,
       violations: [...new Set(scans.flatMap((scan) => scan.violations))],
-      incomplete: [...new Set(scans.flatMap((scan) => scan.manualReview.map((rule) => rule.id)))],
+      incomplete,
+      browserFollowUp: incomplete.filter((rule) => measurableAxeRules.has(rule)),
     },
   };
 }
@@ -82,7 +93,8 @@ async function save(report) {
     "",
     `Unit tests: ${report.tests?.unit ?? "not run"}; browser tests: ${report.tests?.browser ?? "not run"}.`,
     `Axe: ${report.axe?.scans ?? 0} scans; minimum ${report.axe?.minimumRules ?? 0} rules; violations: ${report.axe?.violations.join(", ") || "none reported"}.`,
-    `Incomplete/manual review: ${report.axe?.incomplete.join(", ") || "see individual reports"}.`,
+    `Incomplete Axe findings: ${report.axe?.incomplete.join(", ") || "see individual reports"}.`,
+    `Candidates for explicit browser checks: ${report.axe?.browserFollowUp.join(", ") || "none in this run"}.`,
     "",
     "Selected tests do not prove full-suite acceptance. Native/hosted acceptance and full WCAG compliance are not granted by this report.",
     "Axe attachments may include expected negative policy checks; test assertions remain authoritative.",
