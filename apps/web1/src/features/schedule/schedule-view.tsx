@@ -201,13 +201,15 @@ export function ScheduleView({
       const eventState = event?.state;
       return (
         <span className="relative flex min-w-0 flex-col overflow-hidden px-1.5 py-0.5 text-left">
-          <span className="shrink-0 text-[10px]/2.5 tabular-nums text-muted-foreground">
+          <span className="shrink-0 text-[0.625rem]/2.5 tabular-nums text-muted-foreground">
             {info.timeText}
           </span>
-          <span className="shrink-0 truncate text-[12px]/3.5 font-medium">{info.event.title}</span>
+          <span className="shrink-0 truncate text-[0.75rem]/3.5 font-medium">
+            {info.event.title}
+          </span>
           {event && (
             <>
-              <span className="flex min-w-0 shrink-0 items-center gap-1 text-[10px]/2.5 tabular-nums text-muted-foreground">
+              <span className="flex min-w-0 shrink-0 items-center gap-1 text-[0.625rem]/2.5 tabular-nums text-muted-foreground">
                 <span className="min-w-0 truncate">{event.room}</span>
                 {event.reserved !== null && event.capacity !== null && (
                   <>

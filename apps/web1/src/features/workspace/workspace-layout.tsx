@@ -221,7 +221,7 @@ export function WorkspaceLayout({
                 >
                   {modes.map((value) => (
                     <ToggleGroupItem
-                      className="h-[26px] px-2 text-[13px] min-[641px]:px-2.5"
+                      className="h-[26px] px-2 text-[0.8125rem] min-[641px]:px-2.5"
                       key={value}
                       id={value}
                     >

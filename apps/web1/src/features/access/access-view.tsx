@@ -171,7 +171,7 @@ export function AccessView({
             <CardContent>
               <data
                 value={summary[item.key] ?? ""}
-                className="block text-[22px] leading-[1.3] font-semibold tabular-nums"
+                className="block text-[1.375rem] leading-[1.3] font-semibold tabular-nums"
               >
                 {summary[item.key] ?? unknown}
                 {item.key === "linked" && summary.totalMembers && (

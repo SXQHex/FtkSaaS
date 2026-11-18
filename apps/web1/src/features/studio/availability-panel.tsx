@@ -102,7 +102,7 @@ export function AvailabilityPanel({
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold">{t(($) => $.studio.weeklyAvailability)}</h2>
-            <p className="text-[13px] text-muted-foreground">
+            <p className="text-[0.8125rem] text-muted-foreground">
               {t(($) => $.studio.availabilityDescription)}
             </p>
           </div>
@@ -347,7 +347,9 @@ export function AvailabilityPanel({
             <h3 className="mb-2 text-xs font-semibold text-muted-foreground">
               {t(($) => $.studio.programImpact)}
             </h3>
-            <p className="text-[13px] text-muted-foreground">{t(($) => $.studio.impactPending)}</p>
+            <p className="text-[0.8125rem] text-muted-foreground">
+              {t(($) => $.studio.impactPending)}
+            </p>
           </div>
         </CardContent>
         <CardFooter className="flex-wrap justify-between gap-3">

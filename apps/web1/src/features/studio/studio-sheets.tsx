@@ -248,7 +248,7 @@ function StudioSheetForm({
                     ))}
                   </ItemGroup>
                 ) : (
-                  <p className="text-[13px] text-muted-foreground">
+                  <p className="text-[0.8125rem] text-muted-foreground">
                     {t(($) => $.studio.noClasses)}
                   </p>
                 )}
@@ -272,7 +272,7 @@ function StudioSheetForm({
           {selection.kind === "closure" &&
             (closure ? (
               <>
-                <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 text-[13px]">
+                <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 text-[0.8125rem]">
                   <dt className="text-muted-foreground">{t(($) => $.studio.period)}</dt>
                   <dd>{closure.period}</dd>
                   <dt className="text-muted-foreground">{t(($) => $.studio.scope)}</dt>
@@ -286,7 +286,7 @@ function StudioSheetForm({
                   <h3 className="mb-2 text-xs font-semibold text-muted-foreground">
                     {t(($) => $.studio.affectedSessions)}
                   </h3>
-                  <p className="text-[13px] text-muted-foreground">
+                  <p className="text-[0.8125rem] text-muted-foreground">
                     {closure.affectedSessions ?? "—"}
                   </p>
                 </div>
@@ -680,7 +680,7 @@ function StudioSheetForm({
                 <h3 className="mb-2 text-xs font-semibold text-muted-foreground">
                   {t(($) => $.studio.versions)}
                 </h3>
-                <ul className="flex flex-col gap-2 text-[13px]">
+                <ul className="flex flex-col gap-2 text-[0.8125rem]">
                   {data.agreements
                     .filter((item) => item.instructorId === agreement?.instructorId)
                     .map((item) => (

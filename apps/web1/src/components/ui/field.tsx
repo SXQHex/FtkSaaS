@@ -149,7 +149,7 @@ function FieldSeparator({
       data-slot="field-separator"
       data-content={!!children}
       className={cn(
-        "relative h-5 text-[13px] group-data-[variant=outline]/field-group:-mb-2",
+        "relative h-5 text-[0.8125rem] group-data-[variant=outline]/field-group:-mb-2",
         className,
       )}
       {...props}

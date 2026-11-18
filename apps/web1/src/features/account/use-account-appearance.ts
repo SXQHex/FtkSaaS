@@ -9,14 +9,14 @@ export function useAccountAppearance(accountId: string) {
   const contrast = query.data?.values.contrast;
   useEffect(() => {
     if (!theme) return;
-    document.documentElement.dataset.theme = theme;
-    if (contrast) document.documentElement.dataset.contrast = contrast;
-    if (typeof scale === "number") document.documentElement.style.zoom = String(scale);
-    else document.documentElement.style.removeProperty("zoom");
+    const root = document.documentElement;
+    root.dataset.theme = theme;
+    if (contrast) root.dataset.contrast = contrast;
+    if (typeof scale === "number" && scale !== 1) root.style.fontSize = `${scale * 100}%`;
     return () => {
-      delete document.documentElement.dataset.theme;
-      delete document.documentElement.dataset.contrast;
-      document.documentElement.style.removeProperty("zoom");
+      delete root.dataset.theme;
+      delete root.dataset.contrast;
+      root.style.removeProperty("font-size");
     };
   }, [accountId, theme, scale, contrast]);
   return query;

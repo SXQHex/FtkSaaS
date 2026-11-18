@@ -1,7 +1,7 @@
 import { test, expect } from "./test.js";
 import { mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
-import { mockStudio } from "./studio-fixture.js";
+import { mockStudio, openStudio } from "./studio-fixture.js";
 import type {
   SuccessOrganizationsList,
   SuccessCentersList,
@@ -10,6 +10,33 @@ import type {
 const org = "019a7b00-0000-7000-8000-000000000003",
   center = "019a7b00-0000-7000-8000-000000000004",
   person = "019a7b00-0000-7000-8000-000000000005";
+
+test("command palette reaches appearance, switches the saved theme and signs out", async ({
+  page,
+}) => {
+  const { native } = await mockStudio(page);
+  await page.emulateMedia({ colorScheme: "light" });
+  await openStudio(page);
+  const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
+  const input = page.getByPlaceholder("Sayfa adı ara…");
+  await search.click();
+  await input.fill("Temayı değiştir");
+  await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/account#account-appearance`);
+  const appearance = page.locator("#account-appearance");
+  await expect(appearance.getByRole("radiogroup", { name: "Tema", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Temayı değiştir", exact: true })).toBeEnabled();
+  await search.click();
+  await input.fill("Temayı değiştir");
+  await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect(native.settingsPatches).toEqual([{ theme: "dark" }]);
+  await search.click();
+  await input.fill("Çıkış yap");
+  await page.getByRole("menuitem", { name: "Çıkış yap", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/login`);
+  await expect(page.locator("html")).not.toHaveAttribute("data-theme");
+});
 for (const colorScheme of ["light", "dark"] as const)
   test(`ready workspace sidebar and mobile navigation ${colorScheme}`, async ({ page }) => {
     await mockNative(page);

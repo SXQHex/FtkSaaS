@@ -122,7 +122,7 @@ export function MemberEntitlementsView({
                 <Card key={key} className="gap-0.5 py-3">
                   <CardHeader className="px-4 [&_[data-slot=card-description]]:text-xs">
                     <CardDescription>{t(($) => $.memberEntitlements.metrics[key])}</CardDescription>
-                    <CardTitle className="text-[22px] leading-[1.3] tabular-nums">
+                    <CardTitle className="text-[1.375rem] leading-[1.3] tabular-nums">
                       {source.counts![key]}
                     </CardTitle>
                     <CardDescription>

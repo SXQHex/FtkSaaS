@@ -441,7 +441,7 @@ export function ProfileForm({
               const dirty = textDirty || photoDraft !== undefined;
               return (
                 <>
-                  <span role="status" className="text-[13px] text-muted-foreground">
+                  <span role="status" className="text-[0.8125rem] text-muted-foreground">
                     {notice === "saved"
                       ? t(($) => $.profile.saved)
                       : notice === "clean"
