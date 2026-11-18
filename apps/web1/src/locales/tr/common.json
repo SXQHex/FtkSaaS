@@ -4084,6 +4084,10 @@
       "failed": "Teslim başarısız"
     },
     "markSelected": "Seçilenleri okundu yap",
+    "markSelectedUnread": "Seçilenleri okunmadı yap",
+    "selectVisible": "Görünen iletilerin tümünü seç",
+    "selectionActions": "İleti seçimi ve toplu işlemler",
+    "undoReadChange": "Okuma değişikliğini geri al",
     "searchSubmit": "Ara",
     "selectMessage": "Seç: {{title}}",
     "sourceOpen": "Kaynağı aç",

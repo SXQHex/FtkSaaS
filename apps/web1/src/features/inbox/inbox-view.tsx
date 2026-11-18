@@ -52,7 +52,9 @@ export function InboxView({
   canMarkRead,
   advancedAvailable = false,
   canMarkAll = false,
-  onMarkAll,
+  onMarkSelected,
+  onSelectVisible,
+  onUndo,
   locked = false,
   notice,
   detailNotice,
@@ -79,7 +81,9 @@ export function InboxView({
   canMarkRead: boolean;
   advancedAvailable?: boolean;
   canMarkAll?: boolean;
-  onMarkAll: () => void;
+  onMarkSelected: (read: boolean) => void;
+  onSelectVisible: (value: boolean) => void;
+  onUndo?: () => void;
   locked?: boolean;
   notice?: ReactNode;
   detailNotice?: ReactNode;
@@ -97,6 +101,7 @@ export function InboxView({
     buttons = useRef(new Map<string, HTMLButtonElement>()),
     previous = useRef<string | null>(null);
   const selectedId = selected?.id;
+  const visibleChecked = rows?.filter((row) => checked.includes(row.id)).length ?? 0;
   useEffect(() => {
     if (selectedId) {
       previous.current = selectedId;
@@ -114,12 +119,42 @@ export function InboxView({
             {t(($) => (member ? $.inbox.memberDescription : $.inbox.description))}
           </p>
         </div>
-        <Button variant="outline" isDisabled={locked || !canMarkAll} onPress={onMarkAll}>
-          {t(($) => $.inbox.markSelected)}
-          {checked.length > 0 && <Badge variant="secondary">{checked.length}</Badge>}
-        </Button>
+        <div
+          role="group"
+          aria-label={t(($) => $.inbox.selectionActions)}
+          className="flex flex-wrap items-center gap-2"
+        >
+          <Checkbox
+            isSelected={visibleChecked > 0 && visibleChecked === rows?.length}
+            isIndeterminate={visibleChecked > 0 && visibleChecked < (rows?.length ?? 0)}
+            isDisabled={locked || !rows?.length}
+            onChange={onSelectVisible}
+          >
+            {t(($) => $.inbox.selectVisible)}
+          </Checkbox>
+          <Button
+            variant="outline"
+            isDisabled={locked || !canMarkAll}
+            onPress={() => onMarkSelected(true)}
+          >
+            {t(($) => $.inbox.markSelected)}
+            {checked.length > 0 && <Badge variant="secondary">{checked.length}</Badge>}
+          </Button>
+          <Button
+            variant="outline"
+            isDisabled={locked || !canMarkAll}
+            onPress={() => onMarkSelected(false)}
+          >
+            {t(($) => $.inbox.markSelectedUnread)}
+          </Button>
+        </div>
       </header>
       {notice}
+      {onUndo && (
+        <Button variant="outline" className="self-start" isDisabled={locked} onPress={onUndo}>
+          {t(($) => $.inbox.undoReadChange)}
+        </Button>
+      )}
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_26rem]">
         <Card className={cn("min-w-0", selected && "hidden xl:flex")}>
           <CardHeader>

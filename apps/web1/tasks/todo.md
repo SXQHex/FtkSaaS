@@ -228,7 +228,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 ### V06 · Gelen kutusu, denetim ve ortak durumlar
 
-- [ ] **V06.1** · E39'daki toplu seçim, okundu/arşiv/sil/geri al tasarımını desteklenen inbox action'larıyla eşle. Mevcut W1-BE-28 ve okundu/iş tamamlandı ayrımını koru; eksik toplu/geri al desteğini talep olarak kaydet.
+- [ ] **V06.1** · E39 gelen kutusu görünür sayfayı seçebiliyor ve seçilenleri `notifications_read_set_v1` ile topluca okundu ya da okunmadı yapıyor. Okuma değişikliğini geri alma yalnız gerçekten değişen iletilere doğrulanmış sürümleriyle uygulanıyor. Araya giren sürüm değişikliğinde geri alma yeni yazma yapmıyor. Statik derleme, 17 birim testi ve tek Chromium işçisiyle seri gelen kutusu paketi 15/15 geçti. Okundu ve kaynak işin durumu [W1-BE-28](request.md#w1-be-28--kendi-gelen-kutusunun-kalan-çizim-eşlemesi) sınırında ayrı. Arşiv, silme ve bunları geri alma [W1-BE-57](request.md#w1-be-57--bildirim-arşivi-ve-silme) kapsamında açık. [Geri alma kabulü](../e2e/auth-inbox.spec.ts#L626).
 - [ ] **V06.2** · E43'te yeni modül etiketleri, detay ve dışa aktarım ile işlem ilerleme/kısmi/yeniden deneme durumlarını mevcut okuyuculardan göster. Çizim audit çağrısını üretim backend audit'i yerine kullanma.
 - [ ] **V06.3** · E44–E46 durum kataloğu/yardım ve ortak403/404/offline/409/plan/salt okunur durumlarını gerçek route ve kaynak hatalarına bağla. Uygulanabilir hata durumlarında hazır durum bileşeni ve erişilebilir odak geri dönüşü doğrulansın.
       Üretim kök adresi mevcut hesap/oturum akışına bağlandı. [Statik build kabulü](../e2e/static-build.spec.ts#L60).

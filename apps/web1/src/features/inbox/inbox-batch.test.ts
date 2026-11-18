@@ -40,6 +40,7 @@ const intent = {
   ],
   read: true,
   key: id(6),
+  changedIds: [id(4), id(5)],
 };
 beforeEach(() => call.mockReset());
 it("uses native search/work/options and accepts authoritative counts beyond the page, omitting empty query", async () => {

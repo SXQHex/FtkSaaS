@@ -623,6 +623,53 @@ test("inbox explicit selection uses atomic batch and reverse read remains a sepa
   expect(state.writes[1]!.operation_key).not.toBe(state.writes[0]!.operation_key);
   expect(state.effects).toBe(2);
 });
+test("inbox bulk selection undoes only changed read states using confirmed versions", async ({
+  page,
+}) => {
+  const state = await fixture(page, "batch");
+  state.secondRead = true;
+  await page.reload();
+  const selectPage = page.getByRole("checkbox", {
+    name: "Görünen iletilerin tümünü seç",
+    exact: true,
+  });
+  await selectPage.press("Space");
+  await expect(
+    page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }),
+  ).toBeChecked();
+  await page.getByRole("button", { name: /Seçilenleri okundu yap/ }).click();
+  const undo = page.getByRole("button", { name: "Okuma değişikliğini geri al", exact: true });
+  await expect(undo).toBeEnabled();
+  await undo.click();
+  await expect.poll(() => state.writes.length).toBe(2);
+  await expect(
+    page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes[1]).toMatchObject({
+    read: false,
+    notifications: [{ id, expected_version: 8 }],
+  });
+  expect(state.writes[1]!.operation_key).not.toBe(state.writes[0]!.operation_key);
+  expect(state.secondRead).toBe(true);
+  await expect(undo).toHaveCount(0);
+
+  await selectPage.press("Space");
+  await page.getByRole("button", { name: "Seçilenleri okunmadı yap", exact: true }).click();
+  await expect(undo).toBeEnabled();
+  expect(state.writes[2]).toMatchObject({
+    read: false,
+    notifications: [
+      { id, expected_version: 9 },
+      { id: secondId, expected_version: 10 },
+    ],
+  });
+  state.secondVersion++;
+  await undo.click();
+  await expect(undo).toHaveCount(0);
+  await expect(page.getByRole("alert").filter({ hasText: /değişti/i })).toBeVisible();
+  expect(state.writes).toHaveLength(3);
+  expect(state.secondRead).toBe(false);
+});
 test("inbox native search and pending filter reset explicit selection and preserve authoritative summary", async ({
   page,
 }) => {

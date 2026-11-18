@@ -55,6 +55,7 @@ export interface NotificationSetIntent {
   notifications: [NotificationReadSelection, ...NotificationReadSelection[]];
   read: boolean;
   key: string;
+  changedIds: string[];
 }
 export async function notificationSetIntent(
   scope: ClientScope,
@@ -73,6 +74,9 @@ export async function notificationSetIntent(
     notifications: [notifications[0]!, ...notifications.slice(1)],
     read,
     key: uuidv7(),
+    changedIds: current
+      .filter((row) => row.state !== (read ? "read" : "unread"))
+      .map((row) => row.id),
   };
 }
 export async function setNotificationsRead(intent: NotificationSetIntent) {

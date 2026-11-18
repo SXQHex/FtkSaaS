@@ -3,7 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { NotificationView } from "../../lib/api-contracts/generated";
+import type {
+  NotificationReadSelection,
+  NotificationView,
+} from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
@@ -15,6 +18,7 @@ import {
   setNotificationsRead,
   readNotificationSetReceipt,
   readNotificationSetResult,
+  type NotificationSetIntent,
 } from "./inbox-batch";
 import { readInboxSource, readMemberSessionNotice } from "./inbox-source";
 import { readWorkspace } from "../workspace/workspace";
@@ -41,6 +45,7 @@ export function InboxContent({
     [query, setQuery] = useState(""),
     [draftQuery, setDraftQuery] = useState(""),
     [checked, setChecked] = useState<string[]>([]),
+    [undo, setUndo] = useState<{ read: boolean; notifications: NotificationReadSelection[] }>(),
     [selected, setSelected] = useState<NotificationView>(),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState<string>();
@@ -118,12 +123,30 @@ export function InboxContent({
   const command = useMemberCommand({
     write: setNotificationsRead,
     readReceipt: readNotificationSetReceipt,
-    readResult: readNotificationSetResult,
+    readResult: async (intent: NotificationSetIntent & { undoing: boolean }, id) => ({
+      intent,
+      rows: await readNotificationSetResult(intent, id),
+    }),
     onAccessLost: accessLost,
-    onRefresh: async (value) => {
-      for (const row of value) queries.setQueryData([...prefix, "state", row.id], row);
+    onRefresh: async ({ intent, rows }) => {
+      for (const row of rows) queries.setQueryData([...prefix, "state", row.id], row);
       await queries.invalidateQueries({ queryKey: [...prefix, "list"] }, { throwOnError: true });
       setChecked([]);
+      const changed = new Set(intent.changedIds);
+      const exact = rows.every(
+        (row, index) =>
+          !changed.has(row.id) || row.version === intent.notifications[index]!.expected_version + 1,
+      );
+      setUndo(
+        !intent.undoing && exact && changed.size
+          ? {
+              read: !intent.read,
+              notifications: rows
+                .filter((row) => changed.has(row.id))
+                .map((row) => ({ id: row.id, expected_version: row.version })),
+            }
+          : undefined,
+      );
     },
   });
   const locked = preparing || command.locked;
@@ -139,23 +162,33 @@ export function InboxContent({
       void list.refetch();
     }
   }
-  async function markRead(read = true, batch = false) {
-    if (pending.current || locked || command.state !== "ready") return;
+  async function markRead(read = true, target: "detail" | "selection" | "undo" = "detail") {
+    if (pending.current || locked || command.unavailable) return;
+    if (target === "undo") {
+      if (!undo || !["ready", "saved"].includes(command.state)) return;
+      command.reset();
+    } else if (command.state !== "ready") return;
     pending.current = true;
     setPreparing(true);
     setError(undefined);
     try {
-      const notifications = batch
-        ? checked.map((id) => {
-            const row = list.isError ? undefined : list.data?.items.find((item) => item.id === id);
-            if (!row?.version) throw new Error("INBOX_SELECTION_UNAVAILABLE");
-            return { id, expected_version: row.version };
-          })
-        : !source.isError && source.data
-          ? [{ id: source.data.id, expected_version: source.data.version }]
-          : [];
+      const notifications =
+        target === "undo"
+          ? undo!.notifications
+          : target === "selection"
+            ? checked.map((id) => {
+                const row = list.isError
+                  ? undefined
+                  : list.data?.items.find((item) => item.id === id);
+                if (!row?.version) throw new Error("INBOX_SELECTION_UNAVAILABLE");
+                return { id, expected_version: row.version };
+              })
+            : !source.isError && source.data
+              ? [{ id: source.data.id, expected_version: source.data.version }]
+              : [];
+      setUndo(undefined);
       const intent = await notificationSetIntent(scope, notifications, read);
-      if (mounted.current) await command.start(intent);
+      if (mounted.current) await command.start({ ...intent, undoing: target === "undo" });
     } catch (cause) {
       if (mounted.current && !accessLost(cause))
         setError(
@@ -275,9 +308,19 @@ export function InboxContent({
       canMarkAll={
         !list.isFetching && !list.isError && checked.length > 0 && command.state === "ready"
       }
-      onMarkAll={() => {
-        void markRead(true, true);
+      onMarkSelected={(read) => {
+        void markRead(read, "selection");
       }}
+      onSelectVisible={(value) => {
+        if (locked || list.isError || list.isFetching) return;
+        command.reset();
+        setChecked(value ? (list.data?.items.map((row) => row.id) ?? []) : []);
+      }}
+      onUndo={
+        undo && ["ready", "saved"].includes(command.state)
+          ? () => void markRead(undo.read, "undo")
+          : undefined
+      }
       locked={locked}
       sourceAction={
         canReadSource &&
