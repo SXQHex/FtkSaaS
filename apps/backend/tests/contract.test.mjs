@@ -795,3 +795,14 @@ import './report-finance-tracking-unit.mjs';
 import './document-directory-unit.mjs';
 
 import './role-directory-filter-unit.mjs';
+
+test('W1-BE-42 organization management scope is an opt-in closed self projection',()=>{
+ const request={request_id:id,client_api_version:1,page:{},include_self_management_scope:true};
+ assert(valid('Request_organizations_list',request));
+ assert(!valid('Request_organizations_list',{...request,person_id:id}));
+ const org={id,name:'Synthetic own organization',state:'active',access_mode:'normal',version:1};
+ const scope={owner:false,org_manager:false,managed_center_ids:[id]};
+ assert(valid('OrganizationView',{...org,self_management_scope:scope}));
+ assert(valid('OrganizationView',{...org,self_management_scope:null}));
+ assert(!valid('OrganizationView',{...org,self_management_scope:{...scope,account_id:id}}));
+});

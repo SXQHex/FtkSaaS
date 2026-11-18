@@ -32,7 +32,7 @@ function children(schema,visit){
  return out;
 }
 const occurrences=new Map();
-const count=schema=>{children(schema,count);if(schema&&typeof schema==='object'&&!Array.isArray(schema)){const key=JSON.stringify(schema),compound=Array.isArray(schema.anyOf)||Array.isArray(schema.oneOf);if(((schema.type==='object'||schema.type==='array')&&key.length>200)||(compound&&key.length>40))occurrences.set(key,(occurrences.get(key)??0)+1);}return schema;};
+const count=schema=>{children(schema,count);if(schema&&typeof schema==='object'&&!Array.isArray(schema)){const key=JSON.stringify(schema),compound=Array.isArray(schema.anyOf)||Array.isArray(schema.oneOf);if(((schema.type==='object'||schema.type==='array')&&key.length>150)||(compound&&key.length>40))occurrences.set(key,(occurrences.get(key)??0)+1);}return schema;};
 for(const schema of Object.values(contract.$defs))count(schema);
 const shared=new Map([...occurrences].filter(([,count])=>count>1).map(([key],i)=>[key,'__shared_validation_'+i]));
 for(const name of shared.values())assert(!Object.hasOwn(contract.$defs,name),'Internal validation name collision');

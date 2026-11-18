@@ -302,8 +302,8 @@
         "tracking_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "3c58f06fb29c59f6761e2836cff3c59a430ca95a4d4cc32249e1b9356eb2734d",
-        "reason": "Verified the user-approved single debt assertion change, with exact permission denial and unchanged API test ownership."
+        "fingerprint": "a7432ec2801e8187391180dc427cf1b404f2e469daef467234687a18ed422917",
+        "reason": "Reviewed W1-BE-42 optional authenticated self management scope, unchanged F05 directory and staff authority, and identical schema interning under the existing Edge upload budget."
       }
     },
     {
@@ -485,7 +485,9 @@
         "apps/backend/supabase/migrations/20261114120000_center_setup_status.sql",
         "apps/backend/database/availability-lifecycle.sql",
         "apps/backend/database/role-directory-filters.sql",
-        "apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql"
+        "apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql",
+        "apps/backend/database/account-self-management-scope.sql",
+        "apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -511,8 +513,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "e66abac488b3102a7e775c198df41a158ac375ed3ccf59d23bbe8eecfd7c0733",
-        "reason": "Reviewed Role/RecordState filters before native limit, unchanged request/actor cursor and org-reader/CM/accessible-center predicates, stored owner semantics, manager command boundaries, append migration and real Auth/API positive/negative tests. Added cross-flow regression coverage for event registration document discovery."
+        "fingerprint": "3e9ba097f51efc73d5735553ed4699b7e650cc3351c790be13cbe7f78f7ebe30",
+        "reason": "Reviewed W1-BE-42 opt-in live self scope for owner, org manager and accessible center managers, the native Starter denial and role transition tests, and the unchanged filtered role directory."
       }
     },
     {
