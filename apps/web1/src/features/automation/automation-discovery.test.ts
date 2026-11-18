@@ -163,6 +163,25 @@ it("rejects wrong native job versions, filter mismatches and missing summary", a
   call.mockResolvedValue({ ...queue(), automation_queue_summary: undefined });
   await expect(readAutomationQueue(scope, { state: "all" })).rejects.toThrow();
 });
+it.each(["automation_runs", "outbox_jobs"] as const)(
+  "keeps a native %s result reference",
+  async (type) => {
+    const page = queue();
+    const result_reference = { type, id: id(8) };
+    call.mockResolvedValue({
+      ...page,
+      items: [
+        {
+          ...page.items[0],
+          state: "succeeded",
+          automation_job: { ...job, state: "succeeded", retry_available: false, result_reference },
+        },
+      ],
+    });
+    const result = await readAutomationQueue(scope, { state: "all" });
+    expect(result.items[0]?.result_reference).toEqual(result_reference);
+  },
+);
 it("does not reinterpret native job success or notification counts as email delivery", async () => {
   call.mockResolvedValue({
     ...queue(),

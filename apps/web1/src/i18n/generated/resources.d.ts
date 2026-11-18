@@ -413,6 +413,7 @@ export default interface Resources {
       "allJobStates": "Tüm durumlar",
       "assignee": "Görev sorumlusu",
       "cancel": "Vazgeç",
+      "centerReports": "Merkez raporları",
       "choose": "Seç",
       "chooseJobs": "Son işleri görmek için bir otomasyon seç.",
       "columns": {
@@ -427,6 +428,7 @@ export default interface Resources {
         "lastJob": "Son iş",
         "members": "Üye",
         "operation": "Eylem",
+        "result": "Kaynak sonuç",
         "segment": "Segment",
         "targets": "Hedef",
         "time": "Zaman",
@@ -474,6 +476,12 @@ export default interface Resources {
       "invalidName": "Ad gerekli.",
       "jobFilter": "İş durumu",
       "jobHint": "İş durumu, e-posta kabulü ve teslim ayrı izlenir. Yeniden deneme yalnız denenebilir olarak işaretli işler için vardır.",
+      "jobResults": {
+        "automation_runs": "Otomasyon çalışma kaydı",
+        "crm_activities": "Takip oluşturuldu",
+        "notifications": "Bildirim oluşturuldu",
+        "outbox_jobs": "Kaynak artık uygun değil"
+      },
       "jobStates": {
         "cancelled": "İptal",
         "failed": "Başarısız",
@@ -509,13 +517,13 @@ export default interface Resources {
       "queueTitle": "İş özeti",
       "readError": "Otomasyon kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
       "recipients": "Uyarı alıcıları",
+      "reloadJobs": "Güncel işleri oku",
       "remove": "Kaldır",
       "removeCondition": "{{name}} koşulunu kaldır",
       "retry": "Yeniden dene",
       "retryHint": "Yalnız bu işin halen denenebilir sürümü yeniden kuyruğa alınır. Tanım değiştirilmez; worker ve teslim sonucu ayrıca izlenir.",
       "review": "Tanımı ve etkilerini inceledim, kaydetmeyi onaylıyorum.",
       "reviewRequired": "Kaydetmeden önce tanımı ve etkilerini inceleyip onayla.",
-      "run": "Elle çalıştır",
       "save": "Kaydet",
       "savedDefinition": "Kaydedilmiş tanım; eşleşme çalıştırma garantisi değildir.",
       "segmentCounts": {

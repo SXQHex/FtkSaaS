@@ -288,12 +288,12 @@ test("Starter keeps automation and segment creation disabled after native plan d
   await expect(page.getByRole("button", { name: "Segment ekle", exact: true })).toBeDisabled();
   expect(state.writes).toHaveLength(0);
 });
-test("automation native directory keeps unavailable worker actions disabled and reads the scope queue by default", async ({
+test("automation native directory omits unsupported worker actions and reads the scope queue by default", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await fixture(page);
-  await expect(page.getByRole("button", { name: "Elle çalıştır", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Elle çalıştır", exact: true })).toHaveCount(0);
   await page.getByRole("tab", { name: "Son işler", exact: true }).click();
   await expect(page.getByRole("grid", { name: "Son işler", exact: true })).toContainText(
     "Başarısız",
@@ -425,6 +425,32 @@ test("automation retry advances only the failed job and keeps the automation ver
     expected_version: 7,
     retry_job: { id: jobId, version: 12 },
   });
+  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const grid = page.getByRole("grid", { name: "Son işler", exact: true });
+  await expect(grid).toContainText("Bekliyor");
+  await expect(grid.getByText("Takip oluşturuldu", { exact: true })).toHaveCount(0);
+  const resultId = "019ab7b0-0000-7000-8000-000000000205";
+  state.jobs[0] = {
+    ...state.jobs[0]!,
+    version: 14,
+    state: "succeeded",
+    attempts: 1,
+    safe_error_code: null,
+    result_reference: { type: "crm_activities", id: resultId },
+  };
+  for (let read = 0; read < 2; read++) {
+    await page.getByRole("button", { name: "Güncel işleri oku", exact: true }).click();
+    await expect(grid.getByText(resultId, { exact: true })).toHaveCount(1);
+  }
+  await expect(grid.getByRole("row").filter({ hasText: resultId })).toContainText(
+    "Takip oluşturuldu",
+  );
+  await expect(page.getByRole("link", { name: "Merkez raporları", exact: true })).toHaveAttribute(
+    "href",
+    `/o/${I.org}/c/${I.center}/reports`,
+  );
+  expect(state.jobs[0]!.id).toBe(jobId);
+  expect(state.writes).toHaveLength(1);
 });
 test("automation notification preparation uses the actual template and explicit self recipient", async ({
   page,

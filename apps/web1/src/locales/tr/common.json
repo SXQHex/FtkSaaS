@@ -4127,11 +4127,11 @@
       "time": "Zaman",
       "initiator": "Başlatan",
       "jobState": "İş durumu",
+      "result": "Kaynak sonuç",
       "targets": "Hedef",
       "emailAccepted": "E-posta kabulü",
       "delivery": "Teslim"
     },
-    "run": "Elle çalıştır",
     "toggleFor": "{{name}} otomasyonunu aç veya kapat",
     "edit": "Düzenle",
     "retry": "Yeniden dene",
@@ -4142,6 +4142,14 @@
     "pageCount_other": "Bu sayfada {{count}} otomasyon",
     "segmentHint": "Koşulların hepsi birlikte sağlanır. Eşleşme kaynaktan okunmadan üye sayısı gösterilmez.",
     "jobHint": "İş durumu, e-posta kabulü ve teslim ayrı izlenir. Yeniden deneme yalnız denenebilir olarak işaretli işler için vardır.",
+    "reloadJobs": "Güncel işleri oku",
+    "centerReports": "Merkez raporları",
+    "jobResults": {
+      "crm_activities": "Takip oluşturuldu",
+      "notifications": "Bildirim oluşturuldu",
+      "automation_runs": "Otomasyon çalışma kaydı",
+      "outbox_jobs": "Kaynak artık uygun değil"
+    },
     "editAutomation": "Otomasyonu düzenle",
     "newHint": "Yeni otomasyon kapalı başlar, istersen açarsın.",
     "name": "Otomasyon adı",
