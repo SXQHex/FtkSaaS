@@ -3777,6 +3777,7 @@ export default interface Resources {
       "filteredPerson": "Seçilen kişi: {{name}}",
       "flexible": "Esnek",
       "group": "Grup dersi",
+      "incompleteAttendance": "Kapatmadan önce tüm yoklama sonuçlarını kaydet.",
       "joinWaitlist": "Bekleme listesine ekle",
       "joined": "Sıraya girdi",
       "leave": "Listeden çıkar",

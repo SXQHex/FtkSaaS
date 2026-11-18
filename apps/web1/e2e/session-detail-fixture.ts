@@ -30,6 +30,7 @@ export async function mockSessionDetail(
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
     origins?: Parameters<typeof mockStudio>[1];
+    source?: { session: SessionView; attendance: AttendanceView; reservation: ReservationView };
   } = {},
 ) {
   const studio = await mockStudio(page, options.origins);
@@ -44,7 +45,7 @@ export async function mockSessionDetail(
     >();
   const calendarReads: Record<string, unknown>[] = [];
   const start = Date.now() + (options.existing ? -20 : 60) * 60000;
-  const session: SessionView = {
+  const session: SessionView = options.source?.session ?? {
     id: S.session,
     class_id: I.lesson,
     discipline_id: I.discipline,
@@ -64,17 +65,19 @@ export async function mockSessionDetail(
       room_capacity: 20,
     },
   };
-  let reservation: ReservationView | undefined = options.existing
-    ? {
-        id: S.reservation,
-        session_id: S.session,
-        person_id: I.self,
-        state: "active",
-        mode: "flexible",
-        version: 2,
-      }
-    : undefined;
-  const attendance: AttendanceView = {
+  let reservation: ReservationView | undefined =
+    options.source?.reservation ??
+    (options.existing
+      ? {
+          id: S.reservation,
+          session_id: S.session,
+          person_id: I.self,
+          state: "active",
+          mode: "flexible",
+          version: 2,
+        }
+      : undefined);
+  const attendance: AttendanceView = options.source?.attendance ?? {
     session_id: S.session,
     session_version: 3,
     closure_state: "open",

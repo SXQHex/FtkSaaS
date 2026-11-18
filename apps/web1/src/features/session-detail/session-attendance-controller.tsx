@@ -18,6 +18,7 @@ import {
   attendanceStartIntent,
   attendanceMarkIntent,
   attendanceCloseIntent,
+  hasUnmarkedAttendance,
   previewAttendanceCorrection,
   attendanceCorrectionIntent,
   writeSessionAttendance,
@@ -220,6 +221,10 @@ export function SessionAttendanceController({
       setBusy(false);
     }
   }
+  const incomplete = Boolean(
+    attendance && attendance.closure_state === "open" && hasUnmarkedAttendance(attendance),
+  );
+  const canClose = Boolean(attendance?.actual_started_at && !incomplete);
   const panel = (
     <SessionAttendance
       rows={
@@ -251,6 +256,7 @@ export function SessionAttendanceController({
       }
       unavailable={!attendance}
       closed={session.attendance_state === "closed"}
+      incomplete={incomplete}
       editing={editing}
       reason={reason}
       locked={locked || disabled}
@@ -321,7 +327,7 @@ export function SessionAttendanceController({
           : undefined
       }
       onClose={
-        attendance?.actual_started_at
+        canClose
           ? () => {
               reset();
               setCloseOpen(true);
@@ -445,7 +451,7 @@ export function SessionAttendanceController({
             if (!locked) setCloseOpen(false);
           }}
           onSubmit={
-            attendance && command.state !== "saved"
+            attendance && canClose && command.state !== "saved"
               ? () => {
                   if (liveAccepted)
                     void run(() =>

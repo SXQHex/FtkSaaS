@@ -105,6 +105,10 @@ export async function attendanceMarkIntent(
     ? { ...base, operation: "attendance_mark_v1", request: { ...request, result } }
     : { ...base, operation: "attendance_block_v1", request: { ...request, reason: result } };
 }
+export function hasUnmarkedAttendance(attendance: AttendanceView) {
+  return attendance.entries.some((row) => row.result === "unmarked");
+}
+
 export function attendanceCloseIntent(
   scope: ClientScope,
   session: SessionView,
@@ -116,6 +120,7 @@ export function attendanceCloseIntent(
   if (
     !attendance.actual_started_at ||
     attendance.closure_state !== "open" ||
+    hasUnmarkedAttendance(attendance) ||
     new Set(instructorIds).size !== instructorIds.length ||
     instructorIds.some(
       (id) => !session.assignments.some((row) => row.person_id === id && row.duty === "instructor"),

@@ -185,15 +185,20 @@ it("marks using the reservation version rather than the independent entry versio
   expect(intent.request.expected_version).not.toBe(attendance.entries[0]!.version);
 });
 it("requires a real start and an explicit valid performance roster for closure", () => {
+  const marked: AttendanceView = {
+    ...attendance,
+    entries: attendance.entries.map((row) => ({ ...row, result: "attended" })),
+  };
   expect(() =>
-    attendanceCloseIntent(scope, session, { ...attendance, actual_started_at: null }, true, [
-      id(10),
-    ]),
+    attendanceCloseIntent(scope, session, { ...marked, actual_started_at: null }, true, [id(10)]),
   ).toThrow("SESSION_ATTENDANCE_SOURCE_CHANGED");
-  expect(() => attendanceCloseIntent(scope, session, attendance, true, [id(99)])).toThrow(
+  expect(() => attendanceCloseIntent(scope, session, marked, true, [id(99)])).toThrow(
     "SESSION_ATTENDANCE_SOURCE_CHANGED",
   );
-  expect(attendanceCloseIntent(scope, session, attendance, true, [id(10)])).toMatchObject({
+  expect(() => attendanceCloseIntent(scope, session, attendance, true, [id(10)])).toThrow(
+    "SESSION_ATTENDANCE_SOURCE_CHANGED",
+  );
+  expect(attendanceCloseIntent(scope, session, marked, true, [id(10)])).toMatchObject({
     request: { expected_version: 3, performed: true, performed_instructor_ids: [id(10)] },
   });
   expect(() => attendanceStartIntent(scope, session, attendance, "reason")).toThrow(

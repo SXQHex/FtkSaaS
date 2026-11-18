@@ -1,7 +1,11 @@
 import { expect, type Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-import type { ReservationView, SessionView } from "../src/lib/api-contracts/generated.js";
+import type {
+  AttendanceView,
+  ReservationView,
+  SessionView,
+} from "../src/lib/api-contracts/generated.js";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 export async function mockOwnReservations(
   page: Page,
@@ -14,6 +18,11 @@ export async function mockOwnReservations(
     cancelDenied?: boolean;
     staleLesson?: boolean;
     weekStart?: "monday" | "sunday";
+    closedLesson?: {
+      session: SessionView;
+      attendance: AttendanceView;
+      reservation: ReservationView;
+    };
   } = {},
 ) {
   const { native } = await mockStudio(page);
@@ -74,6 +83,12 @@ export async function mockOwnReservations(
       sale_version: 1,
     },
   }));
+  const closedLesson = options.closedLesson;
+  const pastTitle = closedLesson ? "Sentetik seans" : "Sentetik geçmiş ders";
+  if (closedLesson) {
+    sessions[2] = closedLesson.session;
+    reservations[2] = closedLesson.reservation;
+  }
   let denied = Boolean(options.denied),
     unread = Boolean(options.ackUnread),
     saved = false;
@@ -157,12 +172,20 @@ export async function mockOwnReservations(
         items,
         next_cursor:
           !req.session_id && req.time_filter === "upcoming" && !req.page.cursor ? "own-next" : null,
-        as_of: "2026-11-16T12:00:00Z",
+        as_of:
+          closedLesson && req.time_filter === "past"
+            ? new Date().toISOString()
+            : "2026-11-16T12:00:00Z",
       });
     }
     if (operation === "session_get_v1")
       return send(sessions.find((row) => row.id === req.session_id));
     if (operation === "attendance_get_v1") {
+      if (closedLesson && closedLesson.session.id === req.session_id)
+        return send({
+          ...closedLesson.attendance,
+          entries: closedLesson.attendance.entries.filter((row) => row.person_id === I.self),
+        });
       const session = sessions.find((row) => row.id === req.session_id)!;
       return send({
         session_id: session.id,
@@ -200,7 +223,7 @@ export async function mockOwnReservations(
             id: row.id,
             type: "session",
             center_id: I.center,
-            title: row.id === sessions[2]!.id ? "Sentetik geçmiş ders" : "Sentetik gelecek ders",
+            title: row.id === sessions[2]!.id ? pastTitle : "Sentetik gelecek ders",
             starts_at: row.starts_at,
             ends_at: row.ends_at,
             ...(req.member_discovery

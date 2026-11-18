@@ -2797,6 +2797,7 @@
     "waitlistDisabledHint": "Bekleyen kayıtların durumu korunur. Yeni kayıt için güncel native politika uygulanır.",
     "confirm": "Onayla",
     "attendanceStarted": "Başlangıç: {{date}}",
+    "incompleteAttendance": "Kapatmadan önce tüm yoklama sonuçlarını kaydet.",
     "filteredPerson": "Seçilen kişi: {{name}}",
     "clearPerson": "Tüm katılımcılar",
     "notAvailable": "Bu işlem için güncel yetkili kaynak gerekli.",
