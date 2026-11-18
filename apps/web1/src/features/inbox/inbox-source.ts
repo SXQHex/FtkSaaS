@@ -3,13 +3,18 @@ import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { NotificationSourceState } from "../../lib/api-contracts/generated";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
-export async function readInboxSource(scope: ClientScope, source: NotificationSourceState) {
+export async function readInboxSource(
+  scope: ClientScope,
+  source: NotificationSourceState,
+  memberPersonId?: string,
+) {
   const selector = source.selector;
   if (selector?.operation === "seat_offer_accept_v1") z.uuid().parse(selector.key.offer_id);
   else if (selector?.operation === "lesson_request_create_v1") {
     z.uuid().parse(selector.key.lesson_request_id);
     if (selector.key.catalog) throw new Error("INBOX_SOURCE_UNAVAILABLE");
   } else if (selector?.operation === "crm_activity_save_v1") {
+    if (memberPersonId) throw new Error("INBOX_SOURCE_UNAVAILABLE");
     z.uuid().parse(selector.key.activity_id);
     z.uuid().parse(selector.key.lead_id || selector.key.person_id);
   } else throw new Error("INBOX_SOURCE_UNAVAILABLE");
@@ -54,6 +59,8 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
   const base = `/o/${scope.orgId}/c/${centerId}`;
   if (selector.operation === "lesson_request_create_v1") {
     const detail = requestDetail(row, targetScope, selector.operation, expected.id);
+    if (memberPersonId && (detail.person_id !== memberPersonId || detail.format !== "private"))
+      throw new Error("INBOX_SOURCE_UNAVAILABLE");
     return {
       kind: "request" as const,
       state: detail.state,
@@ -74,6 +81,7 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
     if (
       !entry ||
       !offer ||
+      (memberPersonId && offer.person_id !== memberPersonId) ||
       entry.center_id !== centerId ||
       offer.entry_id !== entry.id ||
       offer.person_id !== entry.person_id ||
@@ -90,7 +98,8 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
       state: offer.state,
       workState:
         offer.state === "active"
-          ? Date.parse(offer.expires_at) > Date.now()
+          ? Date.parse(offer.expires_at) >
+            Date.parse(z.iso.datetime({ offset: true }).parse(page.as_of))
             ? ("pending" as const)
             : ("unavailable" as const)
           : ("completed" as const),

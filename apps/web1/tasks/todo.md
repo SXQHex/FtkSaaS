@@ -259,7 +259,7 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
         10 seri Chromium senaryosu geçti. Merkez özetteki açık onaydan sonra tek native komutla oluşturuldu. Başarılı sonuç güncel merkez okumadan sonra kabuğa geldi ve yenilemede kaldı. Belirsiz sonuç aynı işlem anahtarıyla toparlandı; kabul edilmiş fakat okunamayan sonuçta yalnız okuma tekrarlandı. Stale ve plan reddinde hayalet merkez oluşmadı. [Kabul senaryoları](../e2e/auth-first-center.spec.ts).
 
 - [ ] **E48** · **Üye bildirim merkezi** — `data-view="m-bildirim"`, P11/P14/E39. Hazır üye kabuğu, Tabs, Card/Item, Badge ve Button.
-  - [ ] **E48.1** · Mevcut kendi inbox okuyucu/yazıcılarını üye kabuğunda kullan. Mevcut `/inbox` route'u kapsamı karşılıyorsa aynı feature'ı bu kabukta aç; gereksiz ikinci bildirim kaynağı üretme.
+  - [x] **E48.1** · Üye kabuğunun zili `/inbox?view=member` görünümünü aynı organizasyon/merkez kapsamında açıyor. Gelen kutusu mevcut okuyucu/yazıcıları ve mobil ayrıntı düzenini paylaşıyor. Üye kapsamı doğrulanmadan gelen kutusu isteği yapılmıyor. Seri tarayıcıda 320 CSS px’de klavyeyle giriş, mevcut sayfa işareti, okundu durumunun yenilemede korunması ve erişilemeyen merkezde isteğin engellenmesi doğrulandı. [Üye gelen kutusu](../e2e/auth-inbox.spec.ts#L278).
   - [ ] **E48.2** · Okundu/filtre/boş durum ve üye gezinmesini snapshot ile eşle; yalnız kendi bildirimleri ve erişilebilir hedefler görünsün.
   - [ ] **E48.3** · Yeni talep yanıtı, ders değişimi ve tekliften doğru seans/talebe geçişi, yabancı kişi reddini, klavye/mobil ve tekrar okumasını seri otomatik kapsamda doğrula.
 

@@ -275,7 +275,8 @@ it("validates the exact native seat offer without treating its read selector as 
     center_id: id(9),
     selector: { operation, key: { offer_id: offer.id } },
   };
-  call.mockResolvedValue({ items: [row], next_cursor: null });
+  call.mockResolvedValue({ items: [row], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+  await expect(readInboxSource(scope, source, id(7))).rejects.toThrow("INBOX_SOURCE_UNAVAILABLE");
   expect(await readInboxSource(scope, source)).toMatchObject({
     kind: "offer",
     workState: "pending",

@@ -245,7 +245,13 @@ async function fixture(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.goto(`${origin}/inbox?org=${I.org}&center=${I.center}`);
+  if (mode === "participant") {
+    await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
+    await page.getByRole("link", { name: "Bildirimler", exact: true }).press("Enter");
+    await expect(page).toHaveURL(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`);
+  } else {
+    await page.goto(`${origin}/inbox?org=${I.org}&center=${I.center}`);
+  }
   await expect(page.getByRole("heading", { name: "Gelen kutusu", exact: true })).toBeVisible();
   return state;
 }
@@ -272,7 +278,13 @@ test("inbox shows native copy safely, enables native discovery, and restores mob
 test("participant sees a native session change notice and retains its exact read state after reload", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 320, height: 840 });
   const state = await fixture(page, "participant");
+  await expect(page.getByRole("navigation", { name: "Üye menüsü", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Bildirimler", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
   await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
   await page.getByRole("button", { name: changeTitle, exact: true }).click();
   await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
@@ -292,6 +304,11 @@ test("participant sees a native session change notice and retains its exact read
   await page.getByRole("button", { name: changeTitle, exact: true }).click();
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeEnabled();
   expect(state.writes).toHaveLength(1);
+  const listsBefore = state.lists.length;
+  await page.goto(`${origin}/inbox?org=${I.org}&center=${sourceCenter}&view=member`);
+  await expect(page.getByText("Organizasyon ve merkez seç.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: changeTitle, exact: true })).toHaveCount(0);
+  expect(state.lists).toHaveLength(listsBefore);
 });
 test("inbox unknown write recovers its exact receipt and never marks twice", async ({ page }) => {
   const state = await fixture(page, "unknown");

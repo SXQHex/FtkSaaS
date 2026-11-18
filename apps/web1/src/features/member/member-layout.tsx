@@ -9,6 +9,7 @@ import {
   SparklesIcon,
   UserIcon,
   MoonIcon,
+  BellIcon,
 } from "lucide-react";
 import type { AccountView } from "../../lib/api-contracts/generated";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -19,7 +20,7 @@ import { useAccountAppearance } from "../account/use-account-appearance";
 import { MemberShellView } from "./member-shell-view";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Button, LinkButton } from "../../components/ui/button";
 export function MemberLayout({
   account,
   initial,
@@ -31,7 +32,7 @@ export function MemberLayout({
   account: AccountView;
   initial: { org?: string; center?: string };
   title: string;
-  active: "classes" | "reservations" | "entitlements" | "requests" | "account";
+  active: "classes" | "reservations" | "entitlements" | "requests" | "account" | "inbox";
   onScope: (selection: { org?: string; center?: string }) => void;
   children: (context: {
     scope: ClientScope;
@@ -125,6 +126,19 @@ export function MemberLayout({
       linksDisabled={locked || signingOut}
       actions={
         <div className="flex flex-wrap gap-2">
+          {org && center && student && (
+            <LinkButton
+              href={`/inbox?${new URLSearchParams({ org: org.id, center: center.id, view: "member" })}`}
+              aria-label={t(($) => $.workspace.notifications)}
+              aria-current={active === "inbox" ? "page" : undefined}
+              isDisabled={locked || signingOut}
+              size="icon"
+              variant={active === "inbox" ? "secondary" : "ghost"}
+              className={active === "inbox" ? "border border-current" : undefined}
+            >
+              <BellIcon aria-hidden="true" />
+            </LinkButton>
+          )}
           <Button
             variant="ghost"
             size="icon"

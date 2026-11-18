@@ -24,10 +24,12 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 export function InboxContent({
   scope,
   timezone,
+  memberPersonId,
   onLockChange,
 }: {
   scope: ClientScope;
   timezone: string;
+  memberPersonId?: string;
   onLockChange: (value: boolean) => void;
 }) {
   const { t } = useTranslation(),
@@ -66,10 +68,17 @@ export function InboxContent({
     refetchOnWindowFocus: false,
   });
   const [openedSource, setOpenedSource] = useState<string>();
+  const sourceOperation = selected?.work?.selector?.operation;
+  const canReadSource = Boolean(
+    sourceOperation &&
+    (!memberPersonId ||
+      sourceOperation === "lesson_request_create_v1" ||
+      sourceOperation === "seat_offer_accept_v1"),
+  );
   const nativeSource = useQuery({
-    queryKey: [...prefix, "work", selected?.id, selected?.work],
-    queryFn: () => readInboxSource(scope, selected!.work!),
-    enabled: !!selected?.work?.selector && openedSource === selected.id,
+    queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work],
+    queryFn: () => readInboxSource(scope, selected!.work!, memberPersonId),
+    enabled: canReadSource && openedSource === selected?.id,
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -271,7 +280,8 @@ export function InboxContent({
       }}
       locked={locked}
       sourceAction={
-        selected?.work?.selector && (
+        canReadSource &&
+        selected && (
           <Button
             variant="outline"
             size="sm"
@@ -334,7 +344,7 @@ export function InboxContent({
               </AlertDescription>
             </Alert>
           )}
-          {(!selected?.work?.selector || nativeSource.isError) && (
+          {(!canReadSource || nativeSource.isError) && (
             <p className="text-sm text-muted-foreground">{t(($) => $.inbox.sourceUnavailable)}</p>
           )}
           {nativeSource.isFetching && <p role="status">{t(($) => $.inbox.loading)}</p>}
@@ -360,7 +370,8 @@ export function InboxContent({
                   variant="outline"
                   href={
                     nativeSource.data.ownHref &&
-                    workspace.data?.selected?.self_context?.person_id === nativeSource.data.personId
+                    (memberPersonId ?? workspace.data?.selected?.self_context?.person_id) ===
+                      nativeSource.data.personId
                       ? nativeSource.data.ownHref
                       : nativeSource.data.href
                   }
