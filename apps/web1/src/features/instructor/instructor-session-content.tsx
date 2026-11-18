@@ -285,7 +285,7 @@ export function InstructorSessionContent({
                     value={time}
                     disabled={locked}
                     aria-invalid={Boolean(timeError)}
-                    aria-describedby="actual-time-error"
+                    aria-describedby={timeError ? "actual-time-error" : undefined}
                     onChange={(event) => {
                       setOffset("");
                       setTime(event.target.value);

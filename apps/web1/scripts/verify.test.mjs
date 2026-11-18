@@ -40,7 +40,7 @@ test("reports fresh checked results and Axe facts without claiming manual accept
         JSON.stringify({
           evaluatedConformanceRules: ["one", "two"],
           violations: [],
-          manualReview: [{ id: "color-contrast" }],
+          manualReview: [{ id: "color-contrast" }, { id: "aria-valid-attr-value" }],
         }),
       ).toString("base64"),
     },
@@ -52,7 +52,8 @@ test("reports fresh checked results and Axe facts without claiming manual accept
     scans: 1,
     minimumRules: 2,
     violations: [],
-    incomplete: ["color-contrast"],
+    incomplete: ["color-contrast", "aria-valid-attr-value"],
+    browserFollowUp: ["aria-valid-attr-value"],
   });
 });
 

@@ -46,8 +46,9 @@ const item: PublicCalendarItem = {
 export async function preparePublicCalendar(
   page: Page,
   mode: "normal" | "error" | "empty" | "malformed" | "timezone" = "normal",
+  useProviderClock = false,
 ) {
-  await page.clock.install({ time: new Date("2026-11-16T12:00:00Z") });
+  if (!useProviderClock) await page.clock.install({ time: new Date("2026-11-16T12:00:00Z") });
   const calls: Record<string, unknown>[] = [];
   const packet: SuccessPublicCalendarGet["data"] = {
     items: [structuredClone(item)],

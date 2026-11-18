@@ -18,6 +18,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -b",
     "test:e2e": "node scripts/playwright.mjs test",
+    "test:external": "node scripts/playwright.mjs test --config playwright.external.config.ts && node scripts/check-test-results.mjs playwright test-reports/external-playwright.json",
     "test:e2e:install": "node scripts/playwright.mjs install chromium",
     "verify": "node scripts/verify.mjs",
     "test:ci": "vitest run --coverage --allowOnly=false --reporter=default --reporter=json --reporter=junit --outputFile.json=test-reports/vitest.json --outputFile.junit=test-reports/vitest.xml && node scripts/check-test-results.mjs vitest test-reports/vitest.json",
