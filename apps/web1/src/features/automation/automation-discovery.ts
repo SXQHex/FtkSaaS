@@ -99,7 +99,10 @@ const jobSchema = z.object({
   next_attempt_at: instant.nullable(),
   safe_error_code: z.string().nullable(),
   result_reference: z
-    .object({ type: z.enum(["notifications", "crm_activities"]), id: z.uuid() })
+    .object({
+      type: z.enum(["notifications", "crm_activities", "automation_runs", "outbox_jobs"]),
+      id: z.uuid(),
+    })
     .nullable(),
   retry_available: z.boolean(),
   created_at: instant,

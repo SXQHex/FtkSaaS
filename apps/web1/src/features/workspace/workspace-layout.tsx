@@ -1,10 +1,10 @@
 // Page composition from official @shadcn/sidebar-07.
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
-import { readWorkspace, workspaceRoles } from "./workspace";
+import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
 import { workspaceQuery } from "./workspace-query";
 import { workspaceNavigation, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
@@ -27,6 +27,8 @@ import {
   BreadcrumbLink,
 } from "../../components/ui/breadcrumb";
 import { StateBanner } from "../states/state-view";
+import { settingsSubscriptionQuery } from "../settings/settings-subscription";
+import { businessWorkspaceQuery } from "../business/business-workspace";
 export interface WorkspaceSelection {
   organizationId?: string;
   centerId?: string;
@@ -66,7 +68,10 @@ export function WorkspaceLayout({
   children:
     | ReactNode
     | ((
-        selection: WorkspaceSelection & { workspace?: Awaited<ReturnType<typeof readWorkspace>> },
+        selection: WorkspaceSelection & {
+          workspace?: Awaited<ReturnType<typeof readWorkspace>>;
+          loading: boolean;
+        },
       ) => ReactNode);
   scopeControl?: WorkspaceScopeControl;
   scopeLocked?: boolean;
@@ -121,7 +126,60 @@ export function WorkspaceLayout({
       : pathname.startsWith("/instructor/") && modes.includes("instructor")
         ? "instructor"
         : (modes[0] ?? "account");
-  const groups = workspaceNavigation(mode, view?.selected?.id, centerId);
+  const ownerScope =
+    !scope.isError && resolvedOrganizationId && centerId && roles.includes("owner")
+      ? { accountId, orgId: resolvedOrganizationId, centerId }
+      : undefined;
+  const subscription = useQuery(
+    ownerScope
+      ? settingsSubscriptionQuery(ownerScope)
+      : { queryKey: ["settings-subscription-inactive", accountId], queryFn: skipToken },
+  );
+  const starter =
+    !!ownerScope && !subscription.isError && subscription.data?.subscription.plan === "starter";
+  const subscriptionPlan = subscription.isError ? undefined : subscription.data?.subscription.plan;
+  const manyCenters = (view?.centers.filter((center) => center.state === "active").length ?? 0) > 1;
+  const canManageCenters = roles.some(
+    (role) => role === "org_manager" || role === "center_manager",
+  );
+  const businessScope =
+    !ownerScope &&
+    !scope.isError &&
+    resolvedOrganizationId &&
+    centerId &&
+    canManageCenters &&
+    (pathname.endsWith("/studio") || pathname.endsWith("/centers"))
+      ? { accountId, orgId: resolvedOrganizationId, centerId }
+      : undefined;
+  const businessAccess = useQuery(
+    businessScope
+      ? businessWorkspaceQuery(businessScope)
+      : {
+          queryKey: ["business-workspace-inactive", accountId],
+          queryFn: skipToken,
+        },
+  );
+  const business = ownerScope
+    ? subscriptionPlan === "business"
+    : businessScope
+      ? !businessAccess.isError && businessAccess.data === true
+      : canManageCenters && manyCenters;
+  const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter, business);
+  const memberSearchScope =
+    mode === "management" &&
+    view?.selected?.id &&
+    centerId &&
+    !scope.isError &&
+    !scopeLocked &&
+    !scopeControl?.locked
+      ? { accountId, orgId: view.selected.id, centerId }
+      : undefined;
+  const manager =
+    memberSearchScope && hasWorkspaceManagementScope(view, memberSearchScope.centerId);
+  const settingsUrl = manager
+    ? groups.find((group) => group.key === "studio")?.items.find((item) => item.key === "settings")
+        ?.url
+    : undefined;
   const roleNames = roles.map((role) => t(($) => $.workspace.roles[role]));
   if (instructor) roleNames.push(t(($) => $.workspace.roles.instructor));
   const roleLabel = roleNames.length
@@ -206,7 +264,7 @@ export function WorkspaceLayout({
                 >
                   {modes.map((value) => (
                     <ToggleGroupItem
-                      className="h-[26px] px-2 text-[13px] min-[641px]:px-2.5"
+                      className="h-[26px] px-2 text-[0.8125rem] min-[641px]:px-2.5"
                       key={value}
                       id={value}
                     >
@@ -218,6 +276,14 @@ export function WorkspaceLayout({
             )}
             <div className="hidden min-[641px]:inline-flex">
               <NavigationSearch
+                settingsUrl={settingsUrl}
+                memberScope={memberSearchScope}
+                showActions={
+                  !pending && !scopeLocked && !scopeControl?.locked && mode === "management"
+                }
+                managementActions={Boolean(manager)}
+                onThemeChange={onThemeChange}
+                onSignOut={onSignOut}
                 groups={[
                   ...groups,
                   {
@@ -253,7 +319,12 @@ export function WorkspaceLayout({
         </header>
         {view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />}
         {typeof children === "function"
-          ? children({ organizationId: resolvedOrganizationId, centerId, workspace: view })
+          ? children({
+              organizationId: resolvedOrganizationId,
+              centerId,
+              workspace: view,
+              loading: scope.isPending,
+            })
           : children}
       </SidebarInset>
     </SidebarProvider>

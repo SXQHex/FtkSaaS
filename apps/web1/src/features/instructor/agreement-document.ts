@@ -8,26 +8,30 @@ export interface AgreementDocumentBinding {
   scope: ClientScope;
   agreement: AgreementVersionView;
 }
-export async function readAgreementDocument(binding: AgreementDocumentBinding) {
+async function readBoundAgreement(
+  scope: ClientScope,
+  agreementId: string,
+  personId: string,
+  expected?: AgreementVersionView,
+) {
   const view = await (
-    await scopedBackend(binding.scope)
+    await scopedBackend(scope)
   ).call("instructor_agreement_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
-    org_id: binding.scope.orgId,
-    center_id: binding.scope.centerId,
-    agreement_id: binding.agreement.id,
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    agreement_id: agreementId,
   });
-  const expected = binding.agreement,
-    actual = view.agreement;
-  // Self discovery authorizes historical aliases. Do not rewrite their immutable person IDs.
+  const actual = view.agreement;
   if (
-    actual.id !== expected.id ||
-    actual.center_id !== binding.scope.centerId ||
-    actual.person_id !== expected.person_id ||
-    actual.discipline_id !== expected.discipline_id ||
-    actual.version !== expected.version ||
-    actual.format !== expected.format
+    actual.id !== agreementId ||
+    actual.center_id !== scope.centerId ||
+    actual.person_id !== personId ||
+    (expected &&
+      (actual.discipline_id !== expected.discipline_id ||
+        actual.version !== expected.version ||
+        actual.format !== expected.format))
   )
     throw Error("AGREEMENT_DOCUMENT_UNAVAILABLE");
   z.string().min(1).parse(view.source_content_hash);
@@ -62,20 +66,42 @@ export async function readAgreementDocument(binding: AgreementDocumentBinding) {
   }
   return view;
 }
-export function ownServerAcceptance(view: DigitalAgreementView, accountId: string) {
+export function readAgreementDocument({ scope, agreement }: AgreementDocumentBinding) {
+  // Self discovery authorizes historical aliases. Do not rewrite their immutable person IDs.
+  return readBoundAgreement(scope, agreement.id, agreement.person_id, agreement);
+}
+
+function hasCurrentAgreementEvidence(view: DigitalAgreementView) {
   const a = view.acceptance,
     d = view.rendered_document;
   return !!(
     a &&
     d &&
     a.evidence_kind === "server_document" &&
-    a.account_id === accountId &&
     a.agreement_id === view.agreement.id &&
     a.rendered_document_id === d.id &&
     a.content_hash === d.content_hash &&
     a.source_content_hash === view.source_content_hash
   );
 }
+export function ownServerAcceptance(view: DigitalAgreementView, accountId: string) {
+  return view.acceptance?.account_id === accountId && hasCurrentAgreementEvidence(view);
+}
+
+export async function readManagedAgreementStatus(scope: ClientScope, personId: string, id: string) {
+  const view = await readBoundAgreement(scope, id, personId);
+  if (view.acceptance && view.acceptance.person_id !== personId)
+    throw Error("AGREEMENT_DOCUMENT_UNAVAILABLE");
+  const status = !view.rendered_document
+    ? "unpublished"
+    : hasCurrentAgreementEvidence(view)
+      ? "accepted"
+      : view.acceptance
+        ? "renewal"
+        : "pending";
+  return { id, version: view.agreement.version, status } as const;
+}
+
 export async function prepareAgreementAcceptance(
   binding: AgreementDocumentBinding,
   before: DigitalAgreementView,

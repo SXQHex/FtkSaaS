@@ -17,9 +17,23 @@ import {
   type TableProps,
 } from "react-aria-components";
 
-function Table({ className, ...props }: TableProps) {
+function Table({
+  className,
+  scrollRegionLabel,
+  ...props
+}: TableProps & { scrollRegionLabel?: string }) {
   return (
-    <div data-slot="table-container" className="relative w-full overflow-x-auto">
+    <div
+      data-slot="table-container"
+      role={scrollRegionLabel ? "region" : undefined}
+      aria-label={scrollRegionLabel}
+      tabIndex={scrollRegionLabel ? 0 : undefined}
+      className={cn(
+        "relative w-full overflow-x-auto",
+        scrollRegionLabel &&
+          "rounded-md focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+      )}
+    >
       <TablePrimitive
         data-slot="table"
         className={cn("w-full border-collapse caption-bottom text-sm", className)}

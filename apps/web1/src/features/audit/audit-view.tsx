@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { UploadIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -31,7 +31,6 @@ import {
   ItemTitle,
   ItemDescription,
   ItemActions,
-  ItemSeparator,
 } from "../../components/ui/item";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 export interface AuditFilter {
@@ -55,11 +54,12 @@ export interface AuditOperationRow {
   context: string;
   state: string;
   note?: string;
-  progress?: { count: number; total: number | null; label: string };
-  action?: { label: string; onAction: () => void };
+  definitiveResult?: string;
+  progress?: { count: number; total: number; label: string };
 }
 export function AuditView({
   tab,
+  headerAction,
   onTab,
   filter,
   onFilter,
@@ -73,11 +73,11 @@ export function AuditView({
   notice,
   pagination,
   onOpen,
-  onExport,
   locked = false,
   filtersAvailable = false,
 }: {
   tab: "records" | "operations";
+  headerAction?: ReactNode;
   onTab: (value: "records" | "operations") => void;
   filter: AuditFilter;
   onFilter: (value: AuditFilter) => void;
@@ -91,7 +91,6 @@ export function AuditView({
   notice?: ReactNode;
   pagination?: ReactNode;
   onOpen: (id: string) => void;
-  onExport?: () => void;
   locked?: boolean;
   filtersAvailable?: boolean;
 }) {
@@ -105,12 +104,7 @@ export function AuditView({
             {t(($) => $.audit.description)}
           </p>
         </div>
-        {tab === "records" && (
-          <Button variant="outline" isDisabled={locked || !onExport} onPress={onExport}>
-            <UploadIcon data-icon="inline-start" />
-            {t(($) => $.audit.export)}
-          </Button>
-        )}
+        {headerAction}
       </header>
       {notice}
       <Tabs
@@ -287,50 +281,40 @@ export function AuditView({
                     </EmptyDescription>
                   </Empty>
                 ) : (
-                  <ItemGroup>
-                    {operations.map((row, index) => (
-                      <div key={row.id}>
-                        {index > 0 && <ItemSeparator />}
-                        <Item role="listitem" className="flex-wrap px-0">
-                          <ItemContent className="min-w-0">
-                            <ItemTitle className="wrap-anywhere">{row.title}</ItemTitle>
-                            <ItemDescription className="wrap-anywhere">
-                              {row.context}
-                              {row.note ? ` · ${row.note}` : ""}
-                            </ItemDescription>
-                            {row.progress && (
-                              <Progress
-                                aria-label={row.progress.label}
-                                value={row.progress.total === null ? 0 : row.progress.count}
-                                isIndeterminate={row.progress.total === null}
-                                maxValue={Math.max(row.progress.total ?? 1, 1)}
-                                valueLabel={
-                                  row.progress.total === null
-                                    ? undefined
-                                    : `${row.progress.count} / ${row.progress.total}`
-                                }
-                              />
-                            )}
-                          </ItemContent>
-                          <ItemActions className="flex-wrap">
-                            <Badge variant="secondary">{row.state}</Badge>
-                            {row.action && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onPress={row.action.onAction}
-                                isDisabled={locked}
-                              >
-                                {row.action.label}
-                              </Button>
-                            )}
-                          </ItemActions>
-                        </Item>
-                      </div>
+                  <ItemGroup className="divide-y">
+                    {operations.map((row) => (
+                      <Item
+                        key={row.id}
+                        role="listitem"
+                        className="flex-col items-start px-0 @sm:flex-row @sm:items-center"
+                      >
+                        <ItemContent className="w-full min-w-0">
+                          <ItemTitle className="wrap-anywhere">{row.title}</ItemTitle>
+                          <ItemDescription className="wrap-anywhere">
+                            {row.context}
+                            {row.note ? ` · ${row.note}` : ""}
+                          </ItemDescription>
+                          {row.definitiveResult && (
+                            <p className="text-sm wrap-anywhere">{row.definitiveResult}</p>
+                          )}
+                          {row.progress && (
+                            <Progress
+                              aria-label={t(($) => $.audit.progress)}
+                              value={row.progress.count}
+                              maxValue={row.progress.total}
+                              valueLabel={row.progress.label}
+                            />
+                          )}
+                        </ItemContent>
+                        <ItemActions className="flex-wrap">
+                          <Badge variant="secondary">{row.state}</Badge>
+                        </ItemActions>
+                      </Item>
                     ))}
                   </ItemGroup>
                 )}
               </CardContent>
+              {pagination && <CardFooter className="justify-end border-t">{pagination}</CardFooter>}
             </Card>
           </div>
         </TabsContent>

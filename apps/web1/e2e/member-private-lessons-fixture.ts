@@ -12,6 +12,7 @@ export async function mockOwnPrivateLessons(
     stale?: boolean;
     denied?: boolean;
     catalogDenied?: boolean;
+    listGate?: Promise<void>;
   } = {},
 ) {
   await mockOwnReservations(page);
@@ -50,7 +51,8 @@ export async function mockOwnPrivateLessons(
     catalogDenied = Boolean(options.catalogDenied),
     bumped = false,
     unread = Boolean(options.ackUnread),
-    lastId: string | undefined;
+    lastId: string | undefined,
+    asOf = "2026-11-16T12:00:00Z";
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!,
       req = route.request().postDataJSON();
@@ -122,11 +124,12 @@ export async function mockOwnPrivateLessons(
           row.version++;
           bumped = true;
         }
-        return send({ items: row ? [item(row)] : [], next_cursor: null });
+        return send({ items: row ? [item(row)] : [], next_cursor: null, as_of: asOf });
       }
       expect(key.person_id).toBe(I.self);
+      await options.listGate;
       if (denied) return reject();
-      return send({ items: requests.map(item), next_cursor: null });
+      return send({ items: requests.map(item), next_cursor: null, as_of: asOf });
     }
     if (
       [
@@ -151,6 +154,7 @@ export async function mockOwnPrivateLessons(
             requested_start: req.requested_start,
             duration_minutes: req.duration_minutes,
             preferred_instructor_id: req.preferred_instructor_id ?? null,
+            ...(req.student_note !== undefined ? { student_note: req.student_note } : {}),
             state: "pending",
             version: 1,
             alternatives: [],
@@ -191,6 +195,9 @@ export async function mockOwnPrivateLessons(
     requests,
     writes,
     reads,
+    setAsOf: (value: string) => {
+      asOf = value;
+    },
     setDenied: (value: boolean) => {
       denied = value;
     },

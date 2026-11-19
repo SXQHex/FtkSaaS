@@ -33,6 +33,7 @@ export function waitlistIntent(
   entry?: WaitlistEntryView,
   offer?: SeatOfferView,
   ownPersonId?: string,
+  asOf?: string,
 ): WaitlistIntent {
   z.uuid().parse(sessionId);
   z.uuid().parse(personId);
@@ -55,7 +56,8 @@ export function waitlistIntent(
       offer.person_id !== personId ||
       personId !== ownPersonId ||
       offer.state !== "active" ||
-      Date.parse(offer.expires_at) <= Date.now())
+      !asOf ||
+      Date.parse(offer.expires_at) <= Date.parse(asOf))
   )
     throw new Error("SESSION_WAITLIST_SOURCE_UNAVAILABLE");
   return {
@@ -114,7 +116,7 @@ export async function readWaitlistTarget(
     ).length !== 1
   )
     throw new Error("SESSION_WAITLIST_SOURCE_UNAVAILABLE");
-  return entry;
+  return { entry, asOf: z.iso.datetime({ offset: true }).parse(page.as_of) };
 }
 export async function writeWaitlist(intent: WaitlistIntent) {
   const backend = await scopedBackend(intent.scope);

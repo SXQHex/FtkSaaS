@@ -49,7 +49,8 @@ const summary = {
 test("audit uses native module/search/cursor and escaped source detail, with keyboard access", async ({
   page,
 }) => {
-  const f = await mockCompletion(page, async ({ op, r, send }) => {
+  let exportDenied = true;
+  const f = await mockCompletion(page, async ({ op, r, send, fail }) => {
     if (op === "audit_list_v1")
       await send(
         nativePage(
@@ -63,6 +64,16 @@ test("audit uses native module/search/cursor and escaped source detail, with key
           r.page.cursor ? null : "audit-next",
         ),
       );
+    if (op === "audit_center_export_v1") {
+      if (exportDenied) return fail("FORBIDDEN");
+      await send({
+        filename: `audit-${I.center}.csv`,
+        mime: "text/csv",
+        csv: "id,action\r\nsynthetic,person_update_v1\r\n",
+        row_count: 1,
+        as_of: at,
+      });
+    }
   });
   await page.goto(completionUrl("audit"));
   const row = page.getByRole("row").filter({ hasText: "Sentetik kişi" });
@@ -71,9 +82,12 @@ test("audit uses native module/search/cursor and escaped source detail, with key
   await page.keyboard.press("Enter");
   const detail = page.getByRole("dialog");
   await expect(detail).toContainText("<script>sentetik</script>");
+  await expect(detail).toContainText("Kişiler ve üyelik ilişkileri");
   await expect(detail.locator("script")).toHaveCount(0);
   await page.keyboard.press("Escape");
-  await page.getByRole("combobox", { name: "Modül", exact: true }).selectOption("M03");
+  await page.getByRole("combobox", { name: "Modül", exact: true }).selectOption({
+    label: "Kişiler ve üyelik ilişkileri",
+  });
   await page.getByRole("textbox", { name: "Denetim kaydında ara", exact: true }).fill("Sentetik");
   await expect
     .poll(() => f.requests.filter((row) => row.op === "audit_list_v1").at(-1)?.r.query)
@@ -83,7 +97,27 @@ test("audit uses native module/search/cursor and escaped source detail, with key
   const last = f.requests.filter((row) => row.op === "audit_list_v1").at(-1)!.r;
   expect(last).toMatchObject({ module: "M03", query: "Sentetik", page: { cursor: "audit-next" } });
   expect(last).not.toHaveProperty("subject");
-  await expect(page.getByRole("button", { name: "Kaydı dışa aktar", exact: true })).toBeDisabled();
+  const exportButton = page.getByRole("button", {
+    name: "Denetim kayıtlarını indir (CSV)",
+    exact: true,
+  });
+  await exportButton.click();
+  await expect(
+    page.getByText("Bu kapsamdaki denetim kayıtları indirilemedi.", { exact: true }),
+  ).toBeVisible();
+  exportDenied = false;
+  const download = page.waitForEvent("download");
+  await exportButton.click();
+  expect((await download).suggestedFilename()).toBe(`audit-${I.center}.csv`);
+  const exported = f.requests.filter((row) => row.op === "audit_center_export_v1").at(-1)!.r;
+  expect(exported).toMatchObject({
+    center_id: I.center,
+    org_id: I.org,
+    module: "M03",
+    query: "Sentetik",
+    interval: last.interval,
+  });
+  expect(exported).not.toHaveProperty("page");
 });
 test("tracking preserves native global counters, nullable denominator, filters and read-only refresh on mobile", async ({
   page,
@@ -94,7 +128,19 @@ test("tracking preserves native global counters, nullable denominator, filters a
     if (op === "audit_list_v1") await send(nativePage([]));
     if (op === "tracking_directory_get_v1")
       await send({
-        items: [tracking],
+        items: r.page.cursor
+          ? [
+              {
+                ...tracking,
+                id: uid(4),
+                state: "running",
+                progress_count: 3,
+                total_count: 9,
+                safe_error_code: null,
+                next_attempt_at: null,
+              },
+            ]
+          : [tracking],
         summary,
         as_of: at,
         next_cursor: r.page.cursor ? null : "tracking-next",
@@ -105,6 +151,16 @@ test("tracking preserves native global counters, nullable denominator, filters a
   await page.getByRole("tab", { name: /^İşlemler/ }).click();
   await expect(page.getByText("report_build_v1", { exact: true })).toBeVisible();
   await expect(page.getByText("3", { exact: true })).toBeVisible();
+  await expect(page.getByRole("listitem")).toContainText("Yeniden deneme bekliyor");
+  await expect(page.getByRole("listitem")).toContainText("3 kayıt işlendi");
+  await expect(page.getByRole("listitem")).toContainText("Sonraki deneme");
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
+  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await expect(page.getByRole("listitem")).toContainText("Çalışıyor");
+  await expect(page.getByRole("listitem")).toContainText("9 kaydın 3 tanesi işlendi");
+  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "3");
+  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuemax", "9");
+  await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
   await page.getByRole("combobox", { name: "Kayıt türü", exact: true }).selectOption("job");
   await page
     .getByRole("textbox", { name: "Durum kodu (isteğe bağlı)", exact: true })
@@ -112,11 +168,60 @@ test("tracking preserves native global counters, nullable denominator, filters a
   await expect
     .poll(() => f.requests.filter((row) => row.op === "tracking_directory_get_v1").at(-1)?.r.state)
     .toBe("retry_wait");
-  await page.getByRole("button", { name: "Durumu güncelle", exact: true }).last().click();
+  await page.getByRole("button", { name: "Durumu güncelle", exact: true }).click();
+  await expect(page.getByRole("listitem")).toContainText("Yeniden deneme bekliyor");
   expect(f.requests.filter((row) => !/(_get_v1|_list_v1)$/.test(row.op))).toEqual([]);
   const native = f.requests.filter((row) => row.op === "tracking_directory_get_v1").at(-1)!.r;
   expect(native).toMatchObject({ kind: "job", state: "retry_wait" });
   expect(native).not.toHaveProperty("interval");
+});
+test("tracking distinguishes definitive partial import counts from worker progress", async ({
+  page,
+}) => {
+  await mockCompletion(page, async ({ op, send }) => {
+    if (op === "audit_list_v1") await send(nativePage([]));
+    if (op === "tracking_directory_get_v1") {
+      await send({
+        items: [
+          {
+            ...tracking,
+            operation: "import_rows_process_v1",
+            state: "failed",
+            total_count: 9,
+            next_attempt_at: null,
+            import_result: {
+              outcome: "partial",
+              total_rows: 9,
+              applied_rows: 2,
+              replayed_rows: 1,
+              skipped_rows: 1,
+              failed_rows: 1,
+              unprocessed_rows: 4,
+            },
+          },
+          {
+            ...tracking,
+            id: uid(8),
+            state: "failed",
+            next_attempt_at: null,
+            retry_mode: "report_export",
+          },
+        ],
+        summary,
+        as_of: at,
+        next_cursor: null,
+      });
+    }
+  });
+  await page.goto(completionUrl("audit"));
+  await page.getByRole("tab", { name: /^İşlemler/ }).click();
+  const job = page.getByRole("listitem").filter({ hasText: "import_rows_process_v1" });
+  await expect(job).toContainText("Kısmen uygulandı · 9 satır · 2 uygulandı");
+  await expect(job).toContainText("4 işlenmedi");
+  await expect(job).toContainText("9 kaydın 3 tanesi işlendi");
+  await expect(page.getByRole("listitem").filter({ hasText: "report_build_v1" })).toContainText(
+    "Dışa aktarma Raporlar ekranından yeniden başlatılabilir.",
+  );
 });
 test("denied audit source does not become an empty successful table or reveal cached detail", async ({
   page,

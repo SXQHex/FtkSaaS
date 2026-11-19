@@ -5,6 +5,20 @@ import { studioIds as I } from "./studio-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 const footer = (page: import("@playwright/test").Page) =>
   page.locator('[data-slot="sheet-footer"]');
+test("CRM stage and trial totals use the native summary instead of the visible cards", async ({
+  page,
+}) => {
+  const state = await mockLeads(page);
+  await expect(page.getByText("24", { exact: true })).toBeVisible();
+  const totals = page.getByLabel("Deneme dersi sayaçları", { exact: true });
+  await expect(totals.locator("dd")).toHaveText(["8", "5", "3"]);
+  await page.getByRole("radio", { name: "Görüşülüyor", exact: true }).click();
+  await expect
+    .poll(() => state.reads.filter((read) => read.operation === "leads_list_v1").at(-1)?.request)
+    .toMatchObject({ stage_key: "talk", include_pipeline_summary: true });
+  await expect(page.getByText("24", { exact: true })).toBeVisible();
+  await expect(totals.locator("dd")).toHaveText(["8", "5", "3"]);
+});
 test("Starter plan allows the basic candidate list after pipeline denial", async ({ page }) => {
   const state = await mockLeads(page, { starter: true });
   await expect(page.getByRole("button", { name: "Aday ekle", exact: true })).toBeEnabled();
@@ -159,6 +173,10 @@ test("stale lead review reloads the actual version before saving", async ({ page
 });
 test("a known followup is completed with its exact activity version", async ({ page }) => {
   const state = await mockLeads(page);
+  const tasks = page.getByRole("tab", { name: "Takipler", exact: true });
+  const applications = page.getByRole("tab", { name: "Başvurular", exact: true });
+  await expect(tasks).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
   const dialog = await openLead(page);
   await dialog.getByRole("button", { name: "İlk görüşmeyi yap", exact: true }).click();
   await dialog.getByLabel("Faaliyet türü", { exact: true }).selectOption("outcome");
@@ -175,6 +193,8 @@ test("a known followup is completed with its exact activity version", async ({ p
   });
   expect(state.activities[0]!.state).toBe("completed");
   await closeLead(page);
+  await expect(tasks).toHaveAccessibleDescription("Bekleyen iş sayısı 0");
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
 });
 test("conversion keeps the same person and creates no sale or invitation", async ({ page }) => {
   const state = await mockLeads(page);
@@ -235,7 +255,9 @@ test("application phone suggestion stays a proposal until explicit person match 
 });
 test("application close preserves its intake without creating a lead", async ({ page }) => {
   const state = await mockLeads(page);
-  await page.getByRole("tab", { name: "Başvurular", exact: true }).click();
+  const applications = page.getByRole("tab", { name: "Başvurular", exact: true });
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
+  await applications.click();
   await page.getByRole("button", { name: "Başvuran Örnek", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Başvuru işlemi", { exact: true }).selectOption("close");
@@ -248,6 +270,18 @@ test("application close preserves its intake without creating a lead", async ({ 
   expect(state.app.intake.phone).toBe("+905550000000");
   expect(state.leads).toHaveLength(1);
   await closeLead(page);
+  await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 0");
+  const tab = page.getByRole("tabpanel", { name: "Başvurular", exact: true });
+  await expect(tab.getByRole("button", { name: "Başvuran Örnek", exact: true })).toHaveCount(0);
+  await tab.getByRole("radio", { name: "Tamamlanan", exact: true }).click();
+  await expect(tab.getByRole("button", { name: "Başvuran Örnek", exact: true })).toBeVisible();
+  expect(
+    state.reads.filter((read) => read.request.operation === "public_application_review_v1").at(-1)
+      ?.request,
+  ).toMatchObject({
+    selector: { key: { states: ["reviewed", "closed"] } },
+    page: { limit: 20 },
+  });
 });
 test("denied lead listing has read recovery and no invented totals", async ({ page }) => {
   const state = await mockLeads(page, { denied: true });

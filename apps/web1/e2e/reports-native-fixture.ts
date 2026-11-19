@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import type { JobState } from "../src/lib/api-contracts/generated.js";
 import {
   mockCompletion,
   nativePage,
@@ -27,11 +28,30 @@ export async function mockReports(
     imported = false,
     applied = false,
     applyReleased = false,
-    exportStarted = false;
+    exportStarted = false,
+    retryStarted = false;
+  let exportState: JobState = "succeeded";
   const fileId = uid(51),
     jobId = uid(52),
     previewId = uid(53),
-    exportId = uid(54);
+    exportId = uid(54),
+    retryId = uid(56);
+  const retryJob = {
+    id: retryId,
+    state: "pending",
+    progress_count: 0,
+    total_count: 3,
+    safe_error_code: null,
+    result_reference: null,
+  };
+  const exportJob = () => ({
+    id: exportId,
+    state: exportState,
+    progress_count: exportState === "succeeded" ? 3 : 1,
+    total_count: 3,
+    safe_error_code: exportState === "failed" ? "TEMPORARY_FAILURE" : null,
+    result_reference: exportState === "succeeded" ? { type: "files", id: uid(55) } : null,
+  });
   const rows = [
     {
       row_number: 1,
@@ -244,6 +264,19 @@ export async function mockReports(
         filters: r.filters,
         rows: nativePage(entries),
         totals,
+        ...(key === "crm_conversion" && r.include_crm_funnel
+          ? {
+              crm_funnel: {
+                cohort_count: 5,
+                converted_count: 2,
+                stages: [{ stage_key: "review", count: 3 }],
+                sources: [
+                  { source: "referral", count: 3, converted_count: 2 },
+                  { source: "web", count: 2, converted_count: 0 },
+                ],
+              },
+            }
+          : {}),
       });
     }
     if (op === "finance_directory_get_v1")
@@ -271,26 +304,33 @@ export async function mockReports(
           ? [
               {
                 kind: "job",
-                id: exportId,
+                ...exportJob(),
                 created_at: at,
                 operation: "report_build_v1",
-                state: "succeeded",
                 expires_at: null,
-                progress_count: 3,
-                total_count: 3,
-                safe_error_code: null,
-                next_attempt_at: null,
-                result_reference: { type: "files", id: uid(55) },
+                next_attempt_at: exportState === "retry_wait" ? "2026-11-16T13:00:00Z" : null,
               },
+              ...(retryStarted
+                ? [
+                    {
+                      ...retryJob,
+                      kind: "job",
+                      created_at: at,
+                      operation: "report_build_v1",
+                      expires_at: null,
+                      next_attempt_at: null,
+                    },
+                  ]
+                : []),
             ]
           : [],
         as_of: at,
         next_cursor: null,
         summary: {
-          total: exportStarted ? 1 : 0,
+          total: Number(exportStarted) + Number(retryStarted),
           previews: 0,
           operations: 0,
-          jobs: exportStarted ? 1 : 0,
+          jobs: Number(exportStarted) + Number(retryStarted),
           attention: 0,
           running: 0,
           retry: 0,
@@ -326,7 +366,10 @@ export async function mockReports(
       });
     if (op === "report_export_start_v1") {
       writes.push({ op, r });
-      if (options.unknownExport && !failed) {
+      if (r.retry_job_id) {
+        retryStarted = true;
+        await send({ job_id: retryId, state: "pending" });
+      } else if (options.unknownExport && !failed) {
         failed = true;
         await abort();
       } else {
@@ -339,16 +382,9 @@ export async function mockReports(
         if (options.ackUnread && !jobReadFailed) {
           jobReadFailed = true;
           await abort();
-        } else
-          await send({
-            id: exportId,
-            state: "succeeded",
-            progress_count: 3,
-            total_count: 3,
-            result_reference: { type: "files", id: uid(55) },
-            safe_error_code: null,
-          });
-      } else
+        } else await send(exportJob());
+      } else if (r.job_id === retryId) await send(retryJob);
+      else
         await send({
           id: jobId,
           state: applied && !applyReleased ? "pending" : "succeeded",
@@ -430,7 +466,20 @@ export async function mockReports(
         : r.page.cursor
           ? actual.slice(1)
           : actual.slice(0, 1);
-      await send(nativePage(selected, r.state || r.page.cursor ? null : "rows-next"));
+      const applySummary =
+        r.include_apply_summary && applied && applyReleased
+          ? {
+              total_rows: rows.length,
+              applied_rows: actual.filter((row) => row.state === "applied").length,
+              skipped_rows: actual.filter((row) => row.state !== "applied").length,
+              failed_rows: 0,
+              replayed_rows: 0,
+            }
+          : undefined;
+      await send({
+        ...nativePage(selected, r.state || r.page.cursor ? null : "rows-next"),
+        ...(applySummary ? { apply_summary: applySummary } : {}),
+      });
     }
     if (op === "import_apply_v1") {
       writes.push({ op, r });
@@ -468,6 +517,12 @@ export async function mockReports(
   return {
     ...f,
     writes,
+    jobId,
+    exportId,
+    retryId,
+    setExportState: (state: JobState) => {
+      exportState = state;
+    },
     releaseApply: () => {
       applyReleased = true;
     },

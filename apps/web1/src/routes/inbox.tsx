@@ -3,7 +3,11 @@ import { z } from "zod";
 import { requireAccountSession, loadAccount } from "../features/auth/account-guard";
 import { AccountErrorPage } from "../features/auth/account-page";
 import { InboxRoutePage } from "../features/inbox/inbox-page";
-const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
+const search = z.object({
+  org: z.uuid().optional(),
+  center: z.uuid().optional(),
+  view: z.literal("member").optional(),
+});
 export const Route = createFileRoute("/inbox")({
   beforeLoad: requireAccountSession,
   loader: loadAccount,

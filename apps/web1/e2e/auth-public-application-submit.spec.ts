@@ -1,7 +1,66 @@
 import { test, expect } from "./test.js";
 import { prepareApplication, fillApplication } from "./public-application-fixture.js";
-import { publicForm } from "./public-calendar-fixture.js";
+import { publicCalendarId, publicForm } from "./public-calendar-fixture.js";
 const submit = "Başvuruyu gönder";
+test("public event application keeps the exact publication address and recovers a pending application", async ({
+  page,
+}) => {
+  const f = await prepareApplication(page, "closed");
+  await page.setViewportSize({ width: 320, height: 900 });
+  const event = "019ab7b0-0000-7000-8000-000000000030";
+  f.packet.items = [
+    ...f.packet.items,
+    { ...f.packet.items[0]!, publication_id: event, kind: "event", title: "Örnek atölye" },
+  ];
+  await page.reload();
+  await page.getByRole("link", { name: "Örnek atölye için başvur", exact: true }).click();
+  const application = page.getByRole("form", { name: "Örnek atölye" });
+  const email = application.getByLabel("E-posta (zorunlu)");
+  await expect(application).toBeVisible();
+  await expect(page).toHaveURL(
+    new RegExp(`/apply\\?center_id=${publicCalendarId}&event=${event}$`),
+  );
+  await application.getByRole("button", { name: submit, exact: true }).click();
+  await expect(email).toBeFocused();
+  expect(f.mutations).toHaveLength(0);
+  f.setResponse("abort");
+  await email.fill("visitor@example.test");
+  await application.getByRole("button", { name: "Test doğrulamasını tamamla" }).click();
+  await application.getByRole("button", { name: submit, exact: true }).click();
+  await expect(email).toBeDisabled();
+  f.setResponse("unavailable");
+  await application.getByRole("button", { name: "Test doğrulamasını tamamla" }).click();
+  await page.getByRole("button", { name: "Aynı başvuruyu yeniden dene" }).click();
+  await expect(email).toBeDisabled();
+  await expect.poll(() => f.mutations.length).toBe(2);
+  f.setResponse("success");
+  await application.getByRole("button", { name: "Test doğrulamasını tamamla" }).click();
+  await page.getByRole("button", { name: "Aynı başvuruyu yeniden dene" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Etkinlik başvurun inceleme bekliyor." }),
+  ).toBeVisible();
+  expect(f.mutations).toHaveLength(3);
+  expect(f.mutations[0]).toMatchObject({
+    publication_id: event,
+    center_id: publicCalendarId,
+    page_slug: "test-studio",
+    event_application: true,
+    contact: "visitor@example.test",
+  });
+  expect(f.mutations[0]).not.toHaveProperty("contact_intake");
+  expect(f.mutations[1]!.client_request_key).toBe(f.mutations[0]!.client_request_key);
+  expect(f.mutations[2]!.client_request_key).toBe(f.mutations[0]!.client_request_key);
+  expect(f.mutations[1]!.bot_proof).not.toBe(f.mutations[0]!.bot_proof);
+});
+test("a lesson publication cannot open an event application form", async ({ page }) => {
+  const f = await prepareApplication(page);
+  await page.goto(`/public/test-studio/apply?event=${publicCalendarId}`);
+  await expect(
+    page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: submit, exact: true })).toHaveCount(0);
+  expect(f.mutations).toHaveLength(0);
+});
 test("open bound form displays actual source, follows native contact rules, sends anonymous form branch and offers a real new application", async ({
   page,
 }) => {

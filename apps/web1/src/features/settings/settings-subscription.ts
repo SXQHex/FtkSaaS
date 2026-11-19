@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
+import { queryOptions } from "@tanstack/react-query";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 
@@ -53,6 +54,15 @@ export async function readSettingsSubscription(scope: ClientScope) {
   return { scope: { ...scope }, subscription, readAt: Date.now() };
 }
 export type SettingsSubscriptionSource = Awaited<ReturnType<typeof readSettingsSubscription>>;
+export function settingsSubscriptionQuery(scope: ClientScope) {
+  return queryOptions({
+    queryKey: ["settings-subscription", scope.accountId, scope.orgId],
+    queryFn: () => readSettingsSubscription(scope),
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+}
 export async function subscriptionRenewalIntent(before: SettingsSubscriptionSource) {
   const scope = before.scope,
     operation = "subscription_renewal_set_v1" as const;

@@ -12,7 +12,7 @@ import type {
 import type { ReportRange } from "./reports-view";
 export async function reportInterval(
   timezone: string,
-  range: ReportRange,
+  range: ReportRange | "7",
   from: string,
   to: string,
   anchor: string,
@@ -50,7 +50,25 @@ export async function readReport(
   filters: ReportFilters,
   cursor?: string,
 ): Promise<ReportView> {
-  if (filters.center_ids.length !== 1 || filters.center_ids[0] !== scope.centerId)
+  return readScopedReport(scope, report, filters, { cursor });
+}
+
+export async function readScopedReport(
+  scope: ClientScope,
+  report: ReportKind,
+  filters: ReportFilters,
+  {
+    cursor,
+    aggregate = false,
+    limit = 20,
+  }: { cursor?: string; aggregate?: boolean; limit?: number },
+): Promise<ReportView> {
+  const ids = new Set(filters.center_ids);
+  if (
+    !ids.size ||
+    ids.size !== filters.center_ids.length ||
+    (!aggregate && (ids.size !== 1 || !ids.has(scope.centerId)))
+  )
     throw Error("REPORT_SCOPE_INVALID");
   const data = await (
     await scopedBackend(scope)
@@ -58,19 +76,22 @@ export async function readReport(
     client_api_version: 1,
     request_id: uuidv7(),
     org_id: scope.orgId,
-    center_id: scope.centerId,
+    ...(aggregate ? {} : { center_id: scope.centerId }),
     report,
+    ...(report === "crm_conversion" ? { include_crm_funnel: true } : {}),
     filters: structuredClone(filters),
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    page: { limit, ...(cursor ? { cursor } : {}) },
   });
   instant.parse(data.as_of);
   instant.parse(data.rows.as_of);
   if (
     data.report_kind !== report ||
-    data.rows.items.length > 20 ||
+    data.rows.items.length > limit ||
     (cursor && data.rows.next_cursor === cursor) ||
-    data.filters.center_ids.length !== 1 ||
-    data.filters.center_ids[0] !== scope.centerId ||
+    data.filters.center_ids.length !== ids.size ||
+    new Set(data.filters.center_ids).size !== ids.size ||
+    !data.filters.center_ids.every((id) => ids.has(id)) ||
+    data.rows.items.some((row) => row.center_id && !ids.has(row.center_id)) ||
     data.filters.interval.starts_at !== filters.interval.starts_at ||
     data.filters.interval.ends_at !== filters.interval.ends_at
   )
@@ -90,6 +111,23 @@ export async function readReport(
     if (row.count != null) count.parse(row.count);
     if (row.basis_count != null) count.parse(row.basis_count);
     if (row.ratio_bps != null) count.parse(row.ratio_bps);
+  }
+  const funnel = data.crm_funnel;
+  if (funnel) {
+    const { cohort_count, converted_count, stages, sources } = funnel;
+    count.parse(cohort_count);
+    count.parse(converted_count);
+    if (
+      report !== "crm_conversion" ||
+      converted_count > cohort_count ||
+      new Set(stages.map((row) => row.stage_key)).size !== stages.length ||
+      new Set(sources.map((row) => row.source)).size !== sources.length ||
+      stages.some((row) => count.parse(row.count) > cohort_count) ||
+      sources.some((row) => count.parse(row.converted_count) > count.parse(row.count)) ||
+      sources.reduce((sum, row) => sum + row.count, 0) !== cohort_count ||
+      sources.reduce((sum, row) => sum + row.converted_count, 0) !== converted_count
+    )
+      throw Error("REPORT_SOURCE_INVALID");
   }
   return data;
 }

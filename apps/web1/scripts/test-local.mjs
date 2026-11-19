@@ -43,7 +43,8 @@ export function localTestPlan(argv) {
               "test",
               "--",
               ...values.unit,
-              "--maxWorkers=2",
+              "--maxWorkers=1",
+              "--no-file-parallelism",
               "--allowOnly=false",
               "--reporter=default",
               "--reporter=json",
@@ -63,7 +64,7 @@ export function localTestPlan(argv) {
               "test:e2e",
               "--",
               ...values.e2e,
-              "--workers=2",
+              "--workers=1",
               ...(values.grep ? ["--grep", values.grep] : []),
             ],
           },
@@ -98,46 +99,45 @@ export async function runLocalTests(argv) {
     TEMP: resolve(root, ".tmp"),
     PLAYWRIGHT_BROWSERS_PATH: resolve(root, ".playwright-browsers"),
   };
-  const results = await Promise.all(
-    plan.map(async (job) => {
-      await rm(resolve(reports, job.report), { force: true });
-      const log = await open(resolve(logs, `${job.name}.log`), "w"),
-        began = Date.now();
-      let error, count;
-      console.log(`Starting ${job.name}…`);
-      try {
-        const code = await new Promise((done, reject) => {
-          const child = spawn(process.platform === "win32" ? "npm.cmd" : "npm", job.args, {
-            cwd: root,
-            env,
-            stdio: ["ignore", log.fd, log.fd],
-          });
-          child.once("error", reject);
-          child.once("exit", (code, signal) => done(signal ? 1 : (code ?? 1)));
+  const results = [];
+  for (const job of plan) {
+    await rm(resolve(reports, job.report), { force: true });
+    const log = await open(resolve(logs, `${job.name}.log`), "w"),
+      began = Date.now();
+    let error, count;
+    console.log(`Starting ${job.name}…`);
+    try {
+      const code = await new Promise((done, reject) => {
+        const child = spawn(process.platform === "win32" ? "npm.cmd" : "npm", job.args, {
+          cwd: root,
+          env,
+          stdio: ["ignore", log.fd, log.fd],
         });
-        if (code !== 0) throw new Error(`Command exited ${code}`);
-        const report = JSON.parse(await readFile(resolve(reports, job.report), "utf8"));
-        checkTestResults(job.kind, report);
-        count = job.kind === "vitest" ? report.numPassedTests : report.stats.expected;
-      } catch (failure) {
-        error = failure.message;
-      } finally {
-        await log.close();
-      }
-      const result = {
-        name: job.name,
-        status: error ? "failed" : "passed",
-        ...(error ? { error } : {}),
-        tests: count,
-        startedAt: new Date(began).toISOString(),
-        durationMs: Date.now() - began,
-        report: job.report,
-        log: `local-logs/${job.name}.log`,
-      };
-      console.log(`${job.name}: ${result.status}`);
-      return result;
-    }),
-  );
+        child.once("error", reject);
+        child.once("exit", (code, signal) => done(signal ? 1 : (code ?? 1)));
+      });
+      if (code !== 0) throw new Error(`Command exited ${code}`);
+      const report = JSON.parse(await readFile(resolve(reports, job.report), "utf8"));
+      checkTestResults(job.kind, report);
+      count = job.kind === "vitest" ? report.numPassedTests : report.stats.expected;
+    } catch (failure) {
+      error = failure.message;
+    } finally {
+      await log.close();
+    }
+    const result = {
+      name: job.name,
+      status: error ? "failed" : "passed",
+      ...(error ? { error } : {}),
+      tests: count,
+      startedAt: new Date(began).toISOString(),
+      durationMs: Date.now() - began,
+      report: job.report,
+      log: `local-logs/${job.name}.log`,
+    };
+    console.log(`${job.name}: ${result.status}`);
+    results.push(result);
+  }
   const report = {
     status: results.every((row) => row.status === "passed") ? "passed" : "failed",
     mode: "local-selected-tests",
@@ -166,7 +166,7 @@ export async function runLocalTests(argv) {
           `| ${row.name} | ${row.status} | ${row.tests ?? "unknown"} | [log](${row.log}) · [raw report](${row.report}) |`,
       ),
       "",
-      "Selected local tests run concurrently, without build, coverage or the full verify chain. Full acceptance gates remain in npm run verify / verify:ci. Axe findings and layout evidence are attached to the browser report.",
+      "Selected local tests run in order with one worker. Full build, coverage and acceptance are available in npm run verify / verify:ci. Axe findings and layout evidence are attached to the browser report.",
       "",
     ].join("\n"),
   );

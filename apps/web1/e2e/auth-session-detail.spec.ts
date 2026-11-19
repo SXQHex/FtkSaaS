@@ -119,7 +119,7 @@ test("native attendance uses reservation versions then closes and corrects throu
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
-  const state = await mockSessionDetail(page, { existing: true });
+  const state = await mockSessionDetail(page, { existing: true, centerManager: true });
   await page.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
   let dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Seans şimdi başladı");
@@ -256,7 +256,9 @@ test("a denied native attendance command leaves the readable session intact", as
 test("schedule detail opens the protected session route without requiring editing policy", async ({
   page,
 }) => {
-  const state = await mockSessionDetail(page);
+  const now = new Date("2026-11-18T09:00:00Z");
+  await page.clock.setFixedTime(now);
+  const state = await mockSessionDetail(page, { now });
   await page.getByRole("link", { name: "Ders programı", exact: true }).last().click();
   await page
     .getByRole("button", { name: /Sentetik seans/ })

@@ -29,6 +29,7 @@ export function ReportExportSheet({
   kind,
   onKind,
   period,
+  retry = false,
   fileDescription,
   preparation,
   notice,
@@ -44,6 +45,7 @@ export function ReportExportSheet({
   kind: ExportReportKind | "";
   onKind: (kind: ExportReportKind | "") => void;
   period: string;
+  retry?: boolean;
   fileDescription: string;
   preparation: string;
   notice?: ReactNode;
@@ -70,7 +72,9 @@ export function ReportExportSheet({
       className="flex w-full min-w-0 flex-col sm:max-w-lg"
     >
       <SheetHeader>
-        <SheetTitle>{t(($) => $.reports.exportTitle)}</SheetTitle>
+        <SheetTitle>
+          {t(($) => (retry ? $.reports.exportRetryTitle : $.reports.exportTitle))}
+        </SheetTitle>
         <SheetDescription>
           {period} · {t(($) => $.reports.csv)}
         </SheetDescription>
@@ -86,31 +90,33 @@ export function ReportExportSheet({
       >
         {notice}
         <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor={`${form}-kind`}>{t(($) => $.reports.report)}</FieldLabel>
-            <NativeSelect
-              id={`${form}-kind`}
-              value={kind}
-              disabled={locked}
-              onChange={(e) => onKind(e.target.value as ExportReportKind | "")}
-            >
-              <NativeSelectOption value="">{t(($) => $.reports.choose)}</NativeSelectOption>
-              {(["summary", "collections", "debtors", "earnings", "crm"] as const).map((key) => (
-                <NativeSelectOption key={key} value={key} disabled={unsupported.includes(key)}>
-                  {t(($) => $.reports.reportKinds[key])}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </Field>
+          {!retry && (
+            <Field>
+              <FieldLabel htmlFor={`${form}-kind`}>{t(($) => $.reports.report)}</FieldLabel>
+              <NativeSelect
+                id={`${form}-kind`}
+                value={kind}
+                disabled={locked}
+                onChange={(e) => onKind(e.target.value as ExportReportKind | "")}
+              >
+                <NativeSelectOption value="">{t(($) => $.reports.choose)}</NativeSelectOption>
+                {(["summary", "collections", "debtors", "earnings", "crm"] as const).map((key) => (
+                  <NativeSelectOption key={key} value={key} disabled={unsupported.includes(key)}>
+                    {t(($) => $.reports.reportKinds[key])}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </Field>
+          )}
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
-            <dt>{t(($) => $.reports.period)}</dt>
+            <dt>{t(($) => (retry ? $.reports.exportSourceDate : $.reports.period))}</dt>
             <dd>{period}</dd>
             <dt>{t(($) => $.reports.file)}</dt>
             <dd>{fileDescription}</dd>
             <dt>{t(($) => $.reports.preparation)}</dt>
             <dd>{preparation}</dd>
           </dl>
-          <FieldDescription>{t(($) => $.reports.preparationHint)}</FieldDescription>
+          {!retry && <FieldDescription>{t(($) => $.reports.preparationHint)}</FieldDescription>}
           <Field orientation="horizontal">
             <Checkbox
               id={`${form}-review`}
@@ -118,7 +124,9 @@ export function ReportExportSheet({
               isDisabled={locked}
               onChange={onReviewed}
             />
-            <FieldLabel htmlFor={`${form}-review`}>{t(($) => $.reports.exportReview)}</FieldLabel>
+            <FieldLabel htmlFor={`${form}-review`}>
+              {t(($) => (retry ? $.reports.exportRetryReview : $.reports.exportReview))}
+            </FieldLabel>
           </Field>
         </FieldGroup>
         {error && (
@@ -132,7 +140,7 @@ export function ReportExportSheet({
           {t(($) => $.reports.cancel)}
         </Button>
         <Button type="submit" form={form} isDisabled={locked || !canStart}>
-          {t(($) => $.reports.exportStart)}
+          {t(($) => (retry ? $.reports.fileActions.retry : $.reports.exportStart))}
         </Button>
       </SheetFooter>
     </Sheet>
@@ -173,13 +181,11 @@ export function ReportImportSheet({
   onFilter,
   onFile,
   onTemplate,
-  onSample,
   onPreview,
   onApply,
   onBack,
   onClose,
   onReadRows,
-  onSkippedDownload,
   onSelectRow,
   reviewed,
   onReviewed,
@@ -189,10 +195,8 @@ export function ReportImportSheet({
   locked = false,
   canPreview = true,
   canApply = true,
-  canSample = false,
   canTemplate = false,
   canReadRows = false,
-  canSkippedDownload = false,
   availableFilters = ["all", "problem", "invalid", "duplicate"],
 }: {
   step: ImportStep;
@@ -204,13 +208,11 @@ export function ReportImportSheet({
   onFilter: (filter: ImportRowFilter) => void;
   onFile: (file: File | undefined) => void;
   onTemplate: () => void;
-  onSample: () => void;
   onPreview: () => void;
   onApply: () => void;
   onBack: () => void;
   onClose: () => void;
   onReadRows: () => void;
-  onSkippedDownload: () => void;
   onSelectRow: (id: string, selected: boolean) => void;
   reviewed: boolean;
   onReviewed: (value: boolean) => void;
@@ -220,10 +222,8 @@ export function ReportImportSheet({
   locked?: boolean;
   canPreview?: boolean;
   canApply?: boolean;
-  canSample?: boolean;
   canTemplate?: boolean;
   canReadRows?: boolean;
-  canSkippedDownload?: boolean;
   availableFilters?: ImportRowFilter[];
 }) {
   const { t } = useTranslation(),
@@ -274,14 +274,6 @@ export function ReportImportSheet({
               />
             </Field>
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                isDisabled={locked || !canSample}
-                onPress={onSample}
-              >
-                {t(($) => $.reports.sample)}
-              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -396,18 +388,7 @@ export function ReportImportSheet({
                 <FieldLabel htmlFor={`${id}-review`}>{t(($) => $.reports.importReview)}</FieldLabel>
               </Field>
             )}
-            {step === "result" && (
-              <>
-                <p>{t(($) => $.reports.importHint)}</p>
-                <Button
-                  variant="outline"
-                  isDisabled={locked || !canSkippedDownload}
-                  onPress={onSkippedDownload}
-                >
-                  {t(($) => $.reports.skippedDownload)}
-                </Button>
-              </>
-            )}
+            {step === "result" && <p>{t(($) => $.reports.importHint)}</p>}
           </>
         )}
         {error && (

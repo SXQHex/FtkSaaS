@@ -201,7 +201,7 @@ it("configured forms are explicitly discovered by scope with native cursor and n
     configured_forms_page: { limit: 50, cursor: "before" },
   });
 });
-it("consent selection uses only the actual published non-retired catalog source", async () => {
+it("consent selection uses only published catalog sources with neither retirement nor invalidation", async () => {
   const row = {
     org_id: scope.orgId,
     center_id: null,
@@ -218,9 +218,15 @@ it("consent selection uses only the actual published non-retired catalog source"
     created_at: at,
     published_at: at,
     retired: false,
+    invalidated: false,
   };
   call.mockResolvedValue({
-    items: [row, { ...row, id: id(6), state: "draft" }, { ...row, id: id(7), retired: true }],
+    items: [
+      row,
+      { ...row, id: id(6), state: "draft" },
+      { ...row, id: id(7), retired: true },
+      { ...row, id: id(8), invalidated: true },
+    ],
     as_of: at,
   });
   expect(

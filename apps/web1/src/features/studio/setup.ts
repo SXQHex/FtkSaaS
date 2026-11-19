@@ -1,6 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
+import type { SubscriptionView } from "../../lib/api-contracts/generated";
 import { studioBackend, studioPages, type StudioResources, type StudioScope } from "./studio";
 import { readStudioAvailability, type InstructorRecord } from "./studio-reads";
 
@@ -22,7 +23,7 @@ export async function readStudioSetup(
   scope: StudioScope,
   resources: StudioResources,
   instructors: InstructorRecord[],
-  canReadPlan = false,
+  readPlan?: () => Promise<SubscriptionView>,
 ) {
   const backend = await studioBackend(scope);
   const common = {
@@ -101,14 +102,10 @@ export async function readStudioSetup(
       ).size;
     }),
     readable(async () => {
-      if (!canReadPlan) return null;
+      if (!readPlan) return null;
       // This reader is owner-scoped. A CM-only actor may get FORBIDDEN; that
       // becomes unknown metadata, never an invented quota or a relaxed gate.
-      const value = await backend.call("subscription_get_v1", {
-        client_api_version: 1,
-        request_id: uuidv7(),
-        org_id: scope.orgId,
-      });
+      const value = await readPlan();
       const limits = value.limits.entries.filter((item) => item.key === "rooms");
       const limit = limits[0];
       if (limits.length !== 1 || !limit) throw new Error("STUDIO_UNAVAILABLE");

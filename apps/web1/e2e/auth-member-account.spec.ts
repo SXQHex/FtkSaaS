@@ -1,7 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockMemberAccount, confirmCalendar } from "./member-account-fixture.js";
+import { mockSessionDetail } from "./session-detail-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
-import { studioIds as I } from "./studio-fixture.js";
+import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { uid } from "./pro-completion-fixture.js";
 test("member account places five sections and saves native email reminder preference", async ({
   page,
@@ -15,6 +16,21 @@ test("member account places five sections and saves native email reminder prefer
     "Takvimime ekle",
     "Bildirim tercihlerim",
   ]);
+  const profile = page.getByRole("form", { name: "Kişi bilgileri", exact: true });
+  await profile.getByLabel("Görünen ad", { exact: true }).fill("Sentetik yeni görünen ad");
+  const profileWrite = page.waitForRequest("**/functions/v1/backend-v1/account_profile_update_v1");
+  await profile.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  const { client_api_version, request_id, operation_key, expected_version, ...changed } = (
+    await profileWrite
+  ).postDataJSON();
+  expect({ client_api_version, request_id, operation_key, expected_version }).toEqual({
+    client_api_version: 1,
+    request_id: expect.any(String),
+    operation_key: expect.any(String),
+    expected_version: expect.any(Number),
+  });
+  expect(changed).toEqual({ display_name: "Sentetik yeni görünen ad", unverified_phone: null });
+  await expect(profile.getByText("Değişiklikler kaydedildi.", { exact: true })).toBeVisible();
   await expect(page.getByRole("switch", { name: "Stüdyo duyuruları", exact: true })).toBeDisabled();
   await expect(
     page.getByRole("switch", { name: "Zorunlu bildirimler", exact: true }),
@@ -36,6 +52,9 @@ test("member account places five sections and saves native email reminder prefer
   expect(state.writes[0]!.operation).toBe("notification_preferences_set_v1");
   await page.reload();
   await expect(email).toBeChecked();
+  await expect(profile.getByLabel("Görünen ad", { exact: true })).toHaveValue(
+    "Sentetik yeni görünen ad",
+  );
 });
 test("transactional email uses its own native version and never changes the reminder preference", async ({
   page,
@@ -116,6 +135,148 @@ test("member calendar creates rotates and revokes with explicit review and versi
   expect(state.writes).toHaveLength(3);
   expect(state.writes[2]!.request.expected_version).toBe(2);
 });
+test("instructor account creates its own assigned-lesson calendar and hides the secret on reload", async ({
+  page,
+}) => {
+  await mockSessionDetail(page, { existing: true, instructor: true });
+  const links = [
+    {
+      id: uid(981),
+      org_id: I.org,
+      kinds: ["lessons"],
+      state: "active",
+      version: 1,
+      created_at: "2026-11-16T12:00:00Z",
+    },
+  ];
+  await page.route("**/functions/v1/backend-v1/calendar_links_get_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: links,
+          next_cursor: null,
+          as_of: "2026-11-16T12:00:00Z",
+          service_ready: true,
+          supported_kinds: ["lessons", "duties"],
+        },
+      },
+    }),
+  );
+  await page.route("**/functions/v1/backend-v1/calendar_link_create_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      organization_scope: { org_id: I.org },
+      kinds: ["duties"],
+    });
+    const link = { ...links[0]!, id: uid(982), kinds: ["duties"] };
+    links.push(link);
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          operation_id: I.role,
+          primary_id: I.account,
+          replayed: false,
+          related: [],
+          link,
+          subscription_url: "https://calendar.example.invalid/calendar/synthetic-duties.ics",
+        },
+      },
+    });
+  });
+  await page.goto("/account");
+  await expect(
+    page.getByText("Atandığın dersleri Google, Apple veya Outlook takviminde gör."),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Stüdyo programı aboneliği" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Bağlantıyı yenile", exact: true })).toHaveCount(0);
+  const dialog = await confirmCalendar(page, "Takvim bağlantısı oluştur");
+  await expect(dialog.getByLabel("Kişisel takvim bağlantısı", { exact: true })).toHaveValue(
+    /synthetic-duties/,
+  );
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Bağlantıyı yenile", exact: true })).toHaveCount(1);
+  await expect(page.getByLabel("Kişisel takvim bağlantısı", { exact: true })).toHaveCount(0);
+});
+test("manager creates, rotates and revokes the studio calendar in the selected center", async ({
+  page,
+}) => {
+  await mockStudio(page);
+  const center = { org_id: I.org, center_id: I.center };
+  const link = {
+    ...center,
+    id: uid(983),
+    kinds: ["studio_program"],
+    state: "active",
+    version: 0,
+    created_at: "2026-11-18T08:00:00Z",
+  };
+  await page.route("**/functions/v1/backend-v1/calendar_links_get_v1", (route) => {
+    expect(route.request().postDataJSON().studio_program_scope).toEqual(center);
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: link.version ? [link] : [],
+          next_cursor: null,
+          as_of: link.created_at,
+          service_ready: true,
+          supported_kinds: ["lessons", "duties"],
+        },
+      },
+    });
+  });
+  for (const action of ["create", "rotate", "revoke"]) {
+    await page.route(`**/functions/v1/backend-v1/calendar_link_${action}_v1`, (route) => {
+      const request = route.request().postDataJSON();
+      if (action !== "revoke") expect(request.organization_scope).toEqual(center);
+      if (action === "create") expect(request.kinds).toEqual(["studio_program"]);
+      else expect(request).toMatchObject({ link_id: link.id, expected_version: link.version });
+      link.version++;
+      if (action === "revoke") link.state = "revoked";
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            operation_id: I.role,
+            primary_id: I.account,
+            replayed: false,
+            related: [],
+            link,
+            ...(action === "revoke"
+              ? {}
+              : {
+                  subscription_url: `https://calendar.example.invalid/calendar/studio-v${link.version}.ics`,
+                }),
+          },
+        },
+      });
+    });
+  }
+  await page.goto("/login");
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Stüdyo programı aboneliği" })).toBeVisible();
+  const create = await confirmCalendar(page, "Takvim bağlantısı oluştur");
+  await expect(create.getByLabel("Kişisel takvim bağlantısı")).toHaveValue(/studio-v1/);
+  await create.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.reload();
+  await expect(page.getByLabel("Kişisel takvim bağlantısı")).toHaveCount(0);
+  const rotate = await confirmCalendar(page, "Bağlantıyı yenile");
+  await expect(rotate.getByLabel("Kişisel takvim bağlantısı")).toHaveValue(/studio-v2/);
+  await rotate.getByRole("button", { name: "Kapat", exact: true }).click();
+  const revoke = await confirmCalendar(page, "Bağlantıyı iptal et");
+  await expect(revoke.getByRole("button", { name: "Kapat", exact: true })).toBeVisible();
+  await expect(revoke.getByLabel("Kişisel takvim bağlantısı")).toHaveCount(0);
+  await revoke.getByRole("button", { name: "Kapat", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Bağlantıyı yenile", exact: true })).toHaveCount(0);
+});
 test("unknown calendar uses the same key and freezes navigation without exposing credential in URL or storage", async ({
   page,
 }) => {
@@ -146,8 +307,12 @@ test("acknowledged calendar retries only metadata reads", async ({ page }) => {
   const state = await mockMemberAccount(page, { ackUnread: true });
   const dialog = await confirmCalendar(page, "Takvim bağlantısı oluştur");
   await expect(dialog.getByText(/İşlem kaydedildi. Güncel durumu yeniden oku/)).toBeVisible();
+  await expect(dialog.getByLabel("Kişisel takvim bağlantısı", { exact: true })).toHaveCount(0);
   await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
   await expect(dialog.getByText(/İşlem tamamlandı ve güncel durum okundu/)).toBeVisible();
+  await expect(dialog.getByLabel("Kişisel takvim bağlantısı", { exact: true })).toHaveValue(
+    /synthetic-1/,
+  );
   expect(state.writes).toHaveLength(1);
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
 });

@@ -692,6 +692,8 @@ test("account theme uses versioned user settings, exact retry and read-only reco
 test("font scale preserves exact pending intents, system choice, keyboard access and reflow at 200 percent", async ({
   page,
 }, testInfo) => {
+  // This scenario scans both saved scales at four viewport and theme combinations each.
+  test.setTimeout(60_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -713,15 +715,19 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
+  await expect(page.locator("html")).toHaveCSS("font-size", "20px");
   expect(calls.settingsKeys[1]).toBe(calls.settingsKeys[0]);
   expect(calls.settingsPatches[1]).toEqual({ font_scale: 1.25 });
   expect(calls.settingsPatches[0]).toEqual(calls.settingsPatches[1]);
   await page.reload();
   await expect(scale).toHaveValue("1.25");
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
+  await expect(page.locator("html")).toHaveCSS("font-size", "20px");
   await scale.selectOption("2");
-  await expect(page.locator("html")).toHaveCSS("zoom", "2");
+  await expect(page.locator("html")).toHaveCSS("font-size", "32px");
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toHaveCSS(
+    "font-size",
+    "48px",
+  );
   await expect(scale).toBeEnabled();
   await captureAuth(
     page,
@@ -731,7 +737,8 @@ test("font scale preserves exact pending intents, system choice, keyboard access
       .locator('[data-slot="card"]')
       .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
   );
-  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  const emailTrigger = page.getByRole("button", { name: "E-postayı değiştir", exact: true });
+  await emailTrigger.click();
   const emailDialog = page.getByRole("dialog");
   await expect(emailDialog.getByLabel("Yeni e-posta", { exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "email-sheet-200-percent")).violations).toEqual([]);
@@ -741,6 +748,8 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   expect(dialogBounds!.x + dialogBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
   await page.screenshot({ path: ".tmp/e10-appearance-scale-sheet-200-390-dark.png" });
   await emailDialog.getByLabel("Kapat", { exact: true }).click();
+  await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
+  await expect(emailTrigger).toBeFocused();
   await scale.focus();
   await expect(scale).toBeFocused();
   await page.keyboard.press("Shift+Tab");
@@ -757,9 +766,15 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   // The SDK-recommended selection API tests the write; native menu keyboard acceptance stays separate.
   await scale.selectOption("1.5");
   await expect(scale).toHaveValue("1.5");
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
+  await expect(page.locator("html")).toHaveCSS("font-size", "24px");
   await expect(scale).toBeEnabled();
   await expect(scale).toBeFocused();
+  await scale.selectOption("1.1");
+  await expect(page.locator("html")).toHaveCSS("font-size", "17.6px");
+  await expect(scale).toBeEnabled();
+  await scale.selectOption("1");
+  await expect(page.locator("html")).toHaveCSS("font-size", "16px");
+  await expect(scale).toBeEnabled();
   calls.blockSettingsReads = true;
   await scale.selectOption("system");
   await expect(page.getByText("Tercih kaydedildi. Güncel görünüm okunamadı.")).toBeVisible();
@@ -768,7 +783,7 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   calls.blockSettingsReads = false;
   await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
   await expect(scale).toHaveValue("system");
-  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  await expect(page.locator("html")).toHaveCSS("font-size", "16px");
   expect(calls.settingsKeys).toHaveLength(writes);
   expect(calls.settingsPatches.at(-1)).toEqual({ font_scale: null });
   await captureAuth(
@@ -782,7 +797,7 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
-  expect(await page.locator("html").evaluate((element) => element.style.zoom)).toBe("");
+  expect(await page.locator("html").evaluate((element) => element.style.fontSize)).toBe("");
   expect(errors).toEqual([]);
 });
 
@@ -797,7 +812,7 @@ test("minimum saved font scale and 320 CSS pixel reflow keep the same WCAG 2.2 A
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   const scale = page.getByRole("combobox", { name: "Ölçek", exact: true });
   await expect(scale).toHaveValue("0.75");
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.75");
+  await expect(page.locator("html")).toHaveCSS("font-size", "12px");
   await captureAuth(
     page,
     "e10-appearance-scale-75",
@@ -807,7 +822,7 @@ test("minimum saved font scale and 320 CSS pixel reflow keep the same WCAG 2.2 A
       .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
   );
   await scale.selectOption("system");
-  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  await expect(page.locator("html")).toHaveCSS("font-size", "16px");
   await expect(scale).toBeEnabled();
   await page.setViewportSize({ width: 320, height: 844 });
   for (const colorScheme of ["light", "dark"] as const) {

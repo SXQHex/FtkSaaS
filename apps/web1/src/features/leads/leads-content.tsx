@@ -3,11 +3,14 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
+import type { ManagementSelectorPublicApplicationReviewV1 } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { readWorkspace } from "../workspace/workspace";
+import { readOverviewWork } from "../overview/overview-work";
 import { LeadsView, type LeadTab } from "./leads-view";
 import { LeadEditor, type LeadTarget } from "./lead-editor";
 import { ApplicationEditor } from "./application-editor";
+import { PersonFollowupDialog } from "./person-followup-dialog";
 import {
   LeadFollowupPicker,
   type LeadFollowupKind,
@@ -19,10 +22,18 @@ import {
   readApplicationsPage,
   readLeadAssignees,
   readLeadFollowups,
-  readStudentFollowups,
+  readSourceFollowups,
 } from "./leads-read";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
+const applicationStates = {
+  open: ["pending"],
+  completed: ["reviewed", "closed"],
+} satisfies Record<
+  string,
+  NonNullable<ManagementSelectorPublicApplicationReviewV1["key"]["states"]>
+>;
 export function LeadsContent({
   scope,
   onLockChange,
@@ -44,11 +55,17 @@ export function LeadsContent({
     [index, setIndex] = useState(0),
     [appCursors, setAppCursors] = useState<(string | undefined)[]>([undefined]),
     [appIndex, setAppIndex] = useState(0),
+    [appFilter, setAppFilter] = useState<keyof typeof applicationStates>("open"),
     [followupCursors, setFollowupCursors] = useState<(string | undefined)[]>([undefined]),
     [followupIndex, setFollowupIndex] = useState(0),
     [followupKind, setFollowupKind] = useState<LeadFollowupKind>("manual"),
     [target, setTarget] = useState<LeadTarget | null | undefined>(),
     [application, setApplication] = useState<string>(),
+    [personFollowup, setPersonFollowup] = useState<{
+      id: string;
+      personId: string;
+      name: string;
+    }>(),
     [locked, setLocked] = useState(false),
     [owner, setOwner] = useState(""),
     [stageFilter, setStageFilter] = useState("all");
@@ -136,9 +153,9 @@ export function LeadsContent({
     enabled: Boolean(current) && tab === "tasks" && followupKind === "manual",
     retry: false,
   });
-  const studentFollowups = useQuery({
+  const sourceFollowups = useQuery({
     queryKey: [
-      "student-followups",
+      "lead-source-followups",
       scope.accountId,
       scope.orgId,
       scope.centerId,
@@ -147,33 +164,45 @@ export function LeadsContent({
     ],
     queryFn: () => {
       if (followupKind === "manual") throw Error("FOLLOWUP_KIND_UNAVAILABLE");
-      return readStudentFollowups(scope, followupKind, followupCursors[followupIndex]);
+      return readSourceFollowups(scope, followupKind, followupCursors[followupIndex]);
     },
     enabled: Boolean(current) && tab === "tasks" && followupKind !== "manual",
     retry: false,
   });
-  const tasks = followupKind === "manual" ? followups : studentFollowups;
+  const tasks = followupKind === "manual" ? followups : sourceFollowups;
   const applications = useQuery({
     queryKey: [
       "lead-applications",
       scope.accountId,
       scope.orgId,
       scope.centerId,
+      appFilter,
       appCursors[appIndex],
     ],
-    queryFn: () => readApplicationsPage(scope, appCursors[appIndex]),
+    queryFn: () =>
+      readApplicationsPage(scope, appCursors[appIndex], undefined, applicationStates[appFilter]),
     enabled: Boolean(current) && tab === "apps",
     retry: false,
   });
+  const workSummary = useQuery({
+    queryKey: ["lead-work-summary", scope.accountId, scope.orgId, scope.centerId],
+    queryFn: async () => (await readOverviewWork(scope, undefined, 1)).summary,
+    enabled: Boolean(current),
+    refetchOnMount: "always",
+    retry: false,
+  });
   useEffect(() => {
-    const error = leads.error ?? assignees.error ?? tasks.error ?? applications.error;
+    const error =
+      leads.error ?? assignees.error ?? tasks.error ?? applications.error ?? workSummary.error;
     if (
       (error instanceof BackendError &&
         ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
       (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
     )
       void router.invalidate();
-  }, [leads.error, assignees.error, tasks.error, applications.error, router]);
+  }, [leads.error, assignees.error, tasks.error, applications.error, workSummary.error, router]);
+  const work =
+    current && !workSummary.isError && !workSummary.isFetching ? workSummary.data : undefined;
   const data = leads.isError && !preservePending ? undefined : leads.data;
   const advanced = (data?.pipelineAvailable ?? cursors[index]?.pipeline) !== false;
   const activeTab = !advanced && tab === "board" ? "list" : tab;
@@ -193,7 +222,7 @@ export function LeadsContent({
           ? t(($) => $.leads.sources.whatsapp)
           : source;
   async function refresh() {
-    await leads.refetch({ throwOnError: true });
+    await Promise.all([leads.refetch({ throwOnError: true }), workSummary.refetch()]);
     if (tab === "tasks") await tasks.refetch({ throwOnError: true });
   }
   const rows = (data?.items ?? []).map((row) => ({
@@ -226,6 +255,7 @@ export function LeadsContent({
       <LeadsView
         rows={rows}
         stages={data?.pipeline_catalog?.stages ?? []}
+        pipelineSummary={data?.pipeline_summary}
         summary={{
           open: data?.summary ? String(data.summary.open_leads) : null,
           today: data?.summary ? String(data.summary.followups_today) : null,
@@ -233,6 +263,10 @@ export function LeadsContent({
           converted: data?.summary ? String(data.summary.converted_last_30_days) : null,
         }}
         tab={activeTab}
+        pendingCounts={{
+          tasks: work?.crm_followup,
+          apps: canReview ? work?.application_review : undefined,
+        }}
         advanced={advanced}
         onTab={(value) => {
           if (!locked) setTab(value);
@@ -360,7 +394,7 @@ export function LeadsContent({
                 }
               }}
             />
-            {followupKind !== "manual" && (
+            {(followupKind === "renewal_due" || followupKind === "inactive_student") && (
               <p className="text-sm text-muted-foreground">
                 {t(($) => $.leads.followupSourceHint)}
               </p>
@@ -389,7 +423,7 @@ export function LeadsContent({
                         outcome: row.completed_at ? date(row.completed_at) : null,
                         owner: row.assigned_name,
                       }))
-                    : (studentFollowups.data?.items ?? []).map((row) => ({
+                    : (sourceFollowups.data?.items ?? []).map((row) => ({
                         id: row.id,
                         name: row.name ?? t(($) => $.leads.unknownPerson),
                         kind: t(($) => $.leads.followupKinds[followupKind]),
@@ -414,8 +448,20 @@ export function LeadsContent({
                         mode: "activity",
                       });
                   } else {
-                    const row = studentFollowups.data?.items.find((row) => row.id === id);
-                    if (row)
+                    const row = sourceFollowups.data?.items.find((row) => row.id === id);
+                    if (!row) return;
+                    if (followupKind === "automation_followup") {
+                      const name = row.name ?? t(($) => $.leads.unknownPerson);
+                      if (row.lead_id)
+                        setTarget({
+                          id: row.lead_id,
+                          personId: row.person_id,
+                          name,
+                          activityId: row.id,
+                          mode: "activity",
+                        });
+                      else setPersonFollowup({ id: row.id, personId: row.person_id, name });
+                    } else
                       void navigate({
                         to: "/o/$orgId/c/$centerId/people/$personId",
                         params: {
@@ -463,8 +509,33 @@ export function LeadsContent({
         }
         applications={
           <div className="flex flex-col gap-3">
-            {applications.isPending && <p role="status">{t(($) => $.leads.loading)}</p>}
-            {applications.isError ? (
+            <ToggleGroup
+              aria-label={t(($) => $.leads.applicationFilterLabel)}
+              selectionMode="single"
+              disallowEmptySelection
+              selectedKeys={new Set([appFilter])}
+              isDisabled={locked}
+              onSelectionChange={(keys) => {
+                const filter = [...keys][0];
+                if (filter === "open" || filter === "completed") {
+                  setAppFilter(filter);
+                  setAppCursors([undefined]);
+                  setAppIndex(0);
+                }
+              }}
+              variant="outline"
+              className="flex-wrap"
+            >
+              <ToggleGroupItem id="open">
+                {t(($) => $.leads.applicationFilters.open)}
+              </ToggleGroupItem>
+              <ToggleGroupItem id="completed">
+                {t(($) => $.leads.applicationFilters.completed)}
+              </ToggleGroupItem>
+            </ToggleGroup>
+            {applications.isPending ? (
+              <p role="status">{t(($) => $.leads.loading)}</p>
+            ) : applications.isError ? (
               <Alert variant="destructive">
                 <AlertDescription>
                   {t(($) => $.leads.applicationReadFailed)}{" "}
@@ -540,6 +611,15 @@ export function LeadsContent({
           </div>
         }
       />
+      {personFollowup && current && timezone && (
+        <PersonFollowupDialog
+          key={personFollowup.id}
+          scope={scope}
+          followup={personFollowup}
+          formatDate={date}
+          onClose={() => setPersonFollowup(undefined)}
+        />
+      )}
       {target !== undefined && timezone && (
         <LeadEditor
           key={target?.id ?? "new"}

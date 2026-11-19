@@ -397,6 +397,7 @@ export function SessionAttendance({
   rows,
   startedAt,
   closed,
+  incomplete,
   editing,
   reason,
   onReason,
@@ -415,6 +416,7 @@ export function SessionAttendance({
   rows: SessionAttendanceRow[];
   startedAt?: string;
   closed: boolean;
+  incomplete: boolean;
   editing: boolean;
   reason: string;
   onReason: (reason: string) => void;
@@ -431,7 +433,8 @@ export function SessionAttendance({
   unavailable?: boolean;
 }) {
   const { t } = useTranslation(),
-    reasonId = useId();
+    reasonId = useId(),
+    incompleteId = useId();
   return (
     <div className="flex flex-col gap-4">
       <CardContent className="flex flex-col gap-4">
@@ -532,8 +535,10 @@ export function SessionAttendance({
         {correction}
       </CardContent>
       <CardFooter className="flex-wrap justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          {t(($) => $.sessionDetail.attendanceEffect)}
+        <p id={incomplete ? incompleteId : undefined} className="text-xs text-muted-foreground">
+          {incomplete
+            ? t(($) => $.sessionDetail.incompleteAttendance)
+            : t(($) => $.sessionDetail.attendanceEffect)}
         </p>
         <div className="flex flex-wrap gap-2">
           {closed ? (
@@ -546,13 +551,17 @@ export function SessionAttendance({
                   {t(($) => $.sessionDetail.previewCorrection)}
                 </Button>
               </>
-            ) : (
-              <Button variant="outline" isDisabled={locked || !onEdit} onPress={onEdit}>
+            ) : onEdit ? (
+              <Button variant="outline" isDisabled={locked} onPress={onEdit}>
                 {t(($) => $.sessionDetail.editAttendance)}
               </Button>
-            )
+            ) : null
           ) : (
-            <Button isDisabled={locked || !onClose} onPress={onClose}>
+            <Button
+              aria-describedby={incomplete ? incompleteId : undefined}
+              isDisabled={locked || !onClose}
+              onPress={onClose}
+            >
               {t(($) => $.sessionDetail.closeAttendance)}
             </Button>
           )}

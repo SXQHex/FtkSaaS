@@ -2,6 +2,31 @@ import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockOwnPrivateLessons, openOwnRequestForm } from "./member-private-lessons-fixture.js";
 const saved = "İşlem kaydedildi; güncel talep yeniden okundu.";
+test("member request list shows a skeleton until the private lesson rows arrive", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  let release!: () => void;
+  const listGate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const state = await mockOwnPrivateLessons(page, { listGate });
+  try {
+    await expect(page.getByRole("status")).toContainText("Özel ders talepleri okunuyor…");
+    await expect(page.locator('[data-slot="skeleton"]')).toHaveCount(1);
+    await expect(page.getByText("Güncel özel ders talepleri okunamadı.")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Yeni talep", exact: true })).toBeDisabled();
+  } finally {
+    release();
+  }
+  const rows = page.getByRole("listitem").filter({ hasText: "Özel ders · Örnek Eğitmen" });
+  await expect(rows).toHaveCount(2);
+  await expect(rows.getByText("Alternatifi kabul et", { exact: true })).toHaveCount(1);
+  await expect(rows.getByText("Talebi geri çek", { exact: true })).toHaveCount(2);
+  await expect(page.locator('[data-slot="skeleton"]')).toHaveCount(0);
+  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
+  expect(state.writes).toHaveLength(0);
+});
 test("member sends a native private lesson request after validation without reserving rights", async ({
   page,
 }) => {
@@ -24,7 +49,13 @@ test("member sends a native private lesson request after validation without rese
   expect(state.writes).toHaveLength(0);
   await dialog.getByLabel("Tarih", { exact: true }).fill("2026-11-20");
   await dialog.getByRole("radio", { name: "60 dk", exact: true }).click();
-  await expect(dialog.getByLabel("Not (isteğe bağlı)", { exact: true })).toBeDisabled();
+  const note = dialog.getByLabel("Not (isteğe bağlı)", { exact: true });
+  await note.fill(" ".repeat(3));
+  await dialog.getByRole("button", { name: "Talebi gönder", exact: true }).click();
+  await expect(note).toBeFocused();
+  await expect(note).toHaveAttribute("aria-invalid", "true");
+  expect(state.writes).toHaveLength(0);
+  await note.fill("");
   await dialog.getByRole("button", { name: "Talebi gönder", exact: true }).click();
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
@@ -34,6 +65,7 @@ test("member sends a native private lesson request after validation without rese
   });
   expect(state.writes[0]!.request).not.toHaveProperty("reason");
   expect(state.writes[0]!.request).not.toHaveProperty("window_exception");
+  expect(state.writes[0]!.request).not.toHaveProperty("student_note");
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
   expect(
     state.reads.filter((row) =>
@@ -63,6 +95,23 @@ test("member accepts an alternative but still waits for center approval", async 
     0,
   );
 });
+test("a fresh backend timestamp closes the offer even when the browser clock lags", async ({
+  page,
+}) => {
+  const state = await mockOwnPrivateLessons(page);
+  await page.getByRole("button", { name: "Alternatifi kabul et", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("checkbox").press("Space");
+  state.setAsOf("2026-11-19T14:00:00Z");
+  await dialog.getByRole("button", { name: "Kabul et", exact: true }).click();
+  await expect(dialog.getByText(/Talep değişti veya işlem artık kullanılamıyor/)).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+  await page.reload();
+  await expect(page.getByText("Özel ders · Örnek Eğitmen", { exact: true })).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Alternatifi kabul et", exact: true })).toHaveCount(
+    0,
+  );
+});
 test("member withdraws the entire request with explicit confirmation", async ({ page }) => {
   const state = await mockOwnPrivateLessons(page);
   await page.getByRole("button", { name: "Talebi geri çek", exact: true }).first().click();
@@ -79,6 +128,8 @@ test("member withdraws the entire request with explicit confirmation", async ({ 
 test("unknown request creation recovers the receipt with no second writer", async ({ page }) => {
   const state = await mockOwnPrivateLessons(page, { unknown: true });
   const dialog = await openOwnRequestForm(page);
+  const note = "İlk özel dersim.\nTemel adımları çalışmak isterim.";
+  await dialog.getByLabel("Not (isteğe bağlı)", { exact: true }).fill(note);
   await dialog.getByRole("button", { name: "Talebi gönder", exact: true }).click();
   await expect(
     dialog.getByText("Sonuç bilinmiyor; aynı isteği yeniden dene veya işlem durumunu oku.", {
@@ -90,7 +141,10 @@ test("unknown request creation recovers the receipt with no second writer", asyn
   await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
+  expect(state.writes[0]!.request.student_note).toBe(note);
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.reload();
+  await expect(page.getByText(note, { exact: true })).toBeVisible();
 });
 test("acknowledged request creation repeats only result reads", async ({ page }) => {
   const state = await mockOwnPrivateLessons(page, { ackUnread: true });

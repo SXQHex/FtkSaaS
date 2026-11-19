@@ -21,6 +21,7 @@ const draft = (): OwnRequestDraft => ({
   disciplineId: id(5),
   instructorId: "",
   offset: "",
+  studentNote: "",
   alternativeId: id(9),
   reviewed: true,
 });
@@ -47,6 +48,7 @@ const before: LessonRequestView = {
     },
   ],
 };
+const asOf = "2026-11-16T12:00:00Z";
 function page(row: LessonRequestView, operation = "lesson_request_withdraw_v1") {
   return {
     items: [
@@ -60,12 +62,13 @@ function page(row: LessonRequestView, operation = "lesson_request_withdraw_v1") 
       },
     ],
     next_cursor: null,
+    as_of: asOf,
   };
 }
 beforeEach(() => vi.clearAllMocks());
 it("requires a DST fold choice and preserves the selected occurrence without manager overrides", async () => {
   await expect(
-    createOwnRequestIntent(scope, personId, draft(), "America/New_York", [{ id: id(5) }], []),
+    createOwnRequestIntent(scope, personId, draft(), "America/New_York", [{ id: id(5) }], [], asOf),
   ).rejects.toMatchObject({ message: "SCHEDULE_TIME_AMBIGUOUS" });
   const intent = await createOwnRequestIntent(
     scope,
@@ -74,6 +77,7 @@ it("requires a DST fold choice and preserves the selected occurrence without man
     "America/New_York",
     [{ id: id(5) }],
     [],
+    asOf,
   );
   expect(intent.request).toMatchObject({
     person_id: personId,
@@ -97,6 +101,7 @@ it("rejects a missing local time and instructors outside the native catalog", as
       "America/New_York",
       [{ id: id(5) }],
       [],
+      asOf,
     ),
   ).rejects.toMatchObject({ message: "SCHEDULE_TIME_GAP" });
   await expect(
@@ -107,21 +112,68 @@ it("rejects a missing local time and instructors outside the native catalog", as
       "Europe/Istanbul",
       [{ id: id(5) }],
       [],
+      asOf,
     ),
   ).rejects.toThrow("OWN_REQUEST_CHOICES_UNAVAILABLE");
 });
+it("preserves a Unicode student note for same-key retry and verifies it on reread", async () => {
+  const note = "💃".repeat(1000);
+  const create = (studentNote: string) =>
+    createOwnRequestIntent(
+      scope,
+      personId,
+      { ...draft(), studentNote },
+      "Europe/Istanbul",
+      [{ id: id(5) }],
+      [],
+      asOf,
+    );
+  await expect(create(" \t ")).rejects.toMatchObject({ issues: [{ path: ["studentNote"] }] });
+  await expect(create(note + "a")).rejects.toMatchObject({ issues: [{ path: ["studentNote"] }] });
+  const intent = await create(note);
+  if (intent.operation !== "lesson_request_create_v1") throw new Error("Expected create intent");
+  const result = { ...before, requested_start: intent.request.requested_start };
+  mock.call
+    .mockResolvedValueOnce({ primary_id: result.id })
+    .mockResolvedValueOnce({ primary_id: result.id })
+    .mockResolvedValueOnce(page(result))
+    .mockResolvedValueOnce(page({ ...result, student_note: note }));
+  await writeOwnRequest(intent);
+  await writeOwnRequest(intent);
+  for (const [, request] of mock.call.mock.calls) {
+    expect(request).toMatchObject({
+      student_note: note,
+      operation_key: intent.request.operation_key,
+    });
+  }
+  await expect(readOwnRequestResult(intent, result.id)).rejects.toThrow(
+    "OWN_REQUEST_RESULT_UNAVAILABLE",
+  );
+  await expect(readOwnRequestResult(intent, result.id)).resolves.toMatchObject({
+    student_note: note,
+  });
+});
 it("freezes self request versions and rejects other people or unreviewed actions", () => {
   const source = structuredClone(before),
-    intent = existingOwnRequestIntent(scope, personId, source, "withdraw", draft());
+    intent = existingOwnRequestIntent(scope, personId, source, "withdraw", draft(), asOf);
   source.version = 99;
   expect(intent.request).toMatchObject({ lesson_request_id: before.id, expected_version: 2 });
-  expect(() => existingOwnRequestIntent(scope, id(90), before, "withdraw", draft())).toThrow();
   expect(() =>
-    existingOwnRequestIntent(scope, personId, before, "accept", { ...draft(), reviewed: false }),
+    existingOwnRequestIntent(scope, id(90), before, "withdraw", draft(), asOf),
+  ).toThrow();
+  expect(() =>
+    existingOwnRequestIntent(
+      scope,
+      personId,
+      before,
+      "accept",
+      { ...draft(), reviewed: false },
+      asOf,
+    ),
   ).toThrow();
 });
 it("reads an accepted alternative without treating it as center approval or creating a reservation", async () => {
-  const intent = existingOwnRequestIntent(scope, personId, before, "accept", draft());
+  const intent = existingOwnRequestIntent(scope, personId, before, "accept", draft(), asOf);
   const after = {
     ...before,
     version: 3,
@@ -144,7 +196,7 @@ it("rejects a cross-person list and mismatched result receipt", async () => {
     page({ ...before, person_id: id(99) }, "lesson_request_create_v1"),
   );
   await expect(readOwnRequests(scope, personId)).rejects.toThrow("OWN_REQUEST_SOURCE_UNAVAILABLE");
-  const intent = existingOwnRequestIntent(scope, personId, before, "withdraw", draft());
+  const intent = existingOwnRequestIntent(scope, personId, before, "withdraw", draft(), asOf);
   mock.call.mockResolvedValueOnce({
     operation: intent.operation,
     key: intent.request.operation_key,

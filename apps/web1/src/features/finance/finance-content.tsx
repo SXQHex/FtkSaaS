@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
@@ -55,7 +55,8 @@ export function FinanceContent({
   initialContext?: FinanceInitialContext;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
   const [tab, setTab] = useState<FinanceTab>("movements"),
     [selection, setSelection] = useState<FinanceSelection | undefined>(initialContext?.selection),
     [draftSelection, setDraftSelection] = useState<FinanceSelection>(
@@ -521,7 +522,20 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setCorrectionId(undefined)}
           onRefresh={async () => {
-            await finance.refetch({ throwOnError: true });
+            const scopeIds = [scope.accountId, scope.orgId, scope.centerId];
+            await queries.invalidateQueries({
+              queryKey: ["finance", ...scopeIds, selection.personId, selection.currency],
+              refetchType: "none",
+            });
+            await Promise.all([
+              finance.refetch({ throwOnError: true }),
+              queries.invalidateQueries({
+                queryKey: ["profile-person", ...scopeIds, selection.personId],
+              }),
+              ...["people", "finance-directory", "finance-directory-credit-debts"].map((name) =>
+                queries.invalidateQueries({ queryKey: [name, ...scopeIds] }),
+              ),
+            ]);
           }}
           onLockChange={changeLock}
           onAccessLost={accessLost}

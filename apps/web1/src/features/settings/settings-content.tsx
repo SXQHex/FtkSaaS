@@ -2,9 +2,9 @@ import { WorkCalendarEditor } from "./work-calendar-editor";
 import { PreparationManagement } from "./preparation-management";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { readWorkspace } from "../workspace/workspace";
+import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { Button } from "../../components/ui/button";
@@ -16,7 +16,12 @@ import { DisciplineEditor } from "./discipline-editor";
 import { OrganizationLifecyclePanel } from "./organization-lifecycle-panel";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
 import { SettingsPublicEditor } from "./settings-public-editor";
-import type { SettingsDocumentSource } from "./settings-document";
+import {
+  publicSettingsKeys,
+  readSettingsDocument,
+  type SettingsDocumentSource,
+} from "./settings-document";
+import { publicCalendarInterval, readPublicCalendar } from "../public-program/public-calendar-read";
 import { SettingsPolicyEditor } from "./settings-policy-editor";
 import type { PolicyView } from "../../lib/api-contracts/generated";
 import { SettingsDowngradeEditor } from "./settings-downgrade-editor";
@@ -34,8 +39,9 @@ import { useSettingsPolicies } from "./use-settings-policies";
 import { useSettingsDocument } from "./use-settings-document";
 import { useSettingsTeam } from "./use-settings-team";
 import { useSettingsNotifications } from "./use-settings-notifications";
-import type { SettingsSection } from "./settings-layout";
 import { readOrganizationSettingsCatalog } from "./settings-reader";
+import { SettingsTaxProfile } from "./settings-tax-profile";
+import { SettingsInvoiceHistory } from "./settings-invoice-history";
 
 export function SettingsContent({
   scope,
@@ -106,6 +112,7 @@ export function SettingsContent({
         ) === true
       }
       canOrganization={canOrganization}
+      owner={workspaceRoles(current, scope.centerId).includes("owner")}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
       organizationLoading={catalog.isPending || catalog.isFetching}
@@ -121,6 +128,7 @@ function SettingsManagement({
   centerLabel,
   timezone,
   canOrganization,
+  owner,
   canSubscription,
   canWriteOrganization,
   readOnly,
@@ -133,6 +141,7 @@ function SettingsManagement({
   centerLabel: string;
   timezone: string;
   canOrganization: boolean;
+  owner: boolean;
   canSubscription: boolean;
   canWriteOrganization: boolean;
   readOnly: boolean;
@@ -145,7 +154,8 @@ function SettingsManagement({
     router = useRouter(),
     queries = useQueryClient();
   const [level, setLevel] = useState<DisciplineLevel>(canCenter ? "center" : "organization");
-  const [section, setSection] = useState<SettingsSection>("genel");
+  const navigate = useNavigate({ from: "/o/$orgId/c/$centerId/settings" });
+  const { section = "genel" } = useSearch({ from: "/o/$orgId/c/$centerId/settings" });
   const [selection, setSelection] = useState<{ id?: string }>(),
     [locked, setLocked] = useState(false),
     [identity, setIdentity] = useState<DisciplineLevel>(),
@@ -159,7 +169,8 @@ function SettingsManagement({
     [upgrade, setUpgrade] = useState<SettingsSubscriptionSource>(),
     [downgrade, setDowngrade] = useState<SettingsSubscriptionSource>(),
     [policy, setPolicy] = useState<PolicyView>(),
-    [publicSettings, setPublicSettings] = useState<SettingsDocumentSource>();
+    [publicSettings, setPublicSettings] = useState<SettingsDocumentSource>(),
+    [copyFeedback, setCopyFeedback] = useState<{ href: string; success: boolean }>();
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -294,19 +305,99 @@ function SettingsManagement({
   }, [query.error, router]);
   const source = query.isError || query.isFetching ? undefined : query.data;
   const publicValues = document.source?.document.values;
+  const organizationSource = useQuery({
+    queryKey: ["settings-document", scope.accountId, scope.orgId, scope.centerId, "organization"],
+    queryFn: () => readSettingsDocument(scope, "organization"),
+    enabled: section === "yayin" && level === "center" && canOrganization && !readOnly,
+    retry: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+  const legacyCenter = useQuery({
+    queryKey: ["settings-public-legacy-center", scope.orgId, scope.centerId],
+    queryFn: async ({ signal }) =>
+      readPublicCalendar(
+        {
+          slug: scope.orgId,
+          centerId: scope.centerId,
+          interval: await publicCalendarInterval(),
+        },
+        signal,
+      ),
+    enabled:
+      section === "yayin" &&
+      level === "center" &&
+      !canOrganization &&
+      !organizationLoading &&
+      !readOnly,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const organizationDocument =
+    level === "organization"
+      ? document.source?.document
+      : canOrganization && !organizationSource.isError && !organizationSource.isFetching
+        ? organizationSource.data?.document
+        : undefined;
+  const managedPage =
+    organizationDocument?.scope === "organization"
+      ? organizationDocument.values.public_page
+      : undefined;
+  const publicTarget =
+    document.source &&
+    !readOnly &&
+    (organizationDocument ||
+      (!canOrganization &&
+        !legacyCenter.isError &&
+        !legacyCenter.isFetching &&
+        legacyCenter.data?.publication_state === "available"))
+      ? {
+          to: "/public/$slug/calendar" as const,
+          params: { slug: managedPage?.slug ?? scope.orgId },
+          search: level === "center" ? { center_id: scope.centerId } : {},
+        }
+      : undefined;
+  const publicHref =
+    publicTarget && new URL(router.buildLocation(publicTarget).href, window.location.origin).href;
+  const copyable = !!publicHref && managedPage?.enabled !== false;
+  async function copyPublicLink(href: string) {
+    setCopyFeedback(undefined);
+    try {
+      await navigator.clipboard.writeText(href);
+      setCopyFeedback({ href, success: true });
+    } catch {
+      setCopyFeedback({ href, success: false });
+    }
+  }
   const data: SettingsViewData = {
     ...document.data,
     ...subscription.data,
+    ...(section === "plan" && level === "organization" && owner && !readOnly && canOrganization
+      ? {
+          billingTax: (
+            <SettingsTaxProfile
+              scope={scope}
+              locked={locked}
+              onLockChange={publishLock}
+              onAccessLost={accessLost}
+            />
+          ),
+          invoiceHistory: (
+            <SettingsInvoiceHistory scope={scope} locked={locked} onAccessLost={accessLost} />
+          ),
+        }
+      : {}),
     permissions: team.matrix,
     fields: {
       ...document.data.fields,
       ...notifications.fields,
+      ...(managedPage ? { "ay-py-page": { value: managedPage.enabled, writable: false } } : {}),
       ...(publicValues?.public_profile_enabled !== undefined
         ? {
             "ay-py-on": { value: publicValues.public_profile_enabled, writable: false },
-            "ay-py-slug": { value: scope.orgId, writable: false },
           }
         : {}),
+      ...(publicHref ? { "ay-py-slug": { value: publicHref, writable: false } } : {}),
       ...(publicValues?.public_application_form !== undefined
         ? {
             "ay-py-form": { value: publicValues.public_application_form !== null, writable: false },
@@ -480,9 +571,24 @@ function SettingsManagement({
       {document.notice}
       {team.notice}
       {notifications.notice}
+      {section === "yayin" && (
+        <p role="status" className="text-sm text-muted-foreground">
+          {copyFeedback &&
+            copyFeedback.href === publicHref &&
+            (copyFeedback.success
+              ? t(($) => $.settings.publicLinkCopied)
+              : t(($) => $.settings.publicLinkCopyFailed))}
+        </p>
+      )}
       <SettingsView
         section={section}
-        onSection={setSection}
+        onSection={(next) => {
+          if (!locked)
+            void navigate({
+              search: { section: next === "genel" ? undefined : next },
+              replace: true,
+            });
+        }}
         onPermission={team.onPermission}
         teamActionLabel={t(($) => $.settings.teamNative.addRole)}
         onField={document.onField}
@@ -509,11 +615,13 @@ function SettingsManagement({
           }
         }}
         availableActions={[
+          ...(publicHref ? ["preview" as const] : []),
+          ...(copyable ? ["copyLink" as const] : []),
           ...(team.canCreate ? ["invite" as const] : []),
           ...(document.source?.catalog.fields.some(
             (row) =>
-              ["public_profile_enabled", "public_fields", "public_application_form"].includes(
-                row.key,
+              publicSettingsKeys.some(
+                (key) => key === row.key && (key !== "public_page" || level === "organization"),
               ) && row.writable,
           ) && !readOnly
             ? ["publicSettings" as const]
@@ -538,6 +646,8 @@ function SettingsManagement({
         ]}
         onAction={(action) => {
           if (locked) return;
+          if (action.kind === "preview" && publicTarget) void router.navigate(publicTarget);
+          if (action.kind === "copyLink" && publicHref && copyable) void copyPublicLink(publicHref);
           if (action.kind === "invite") team.create();
           if (action.kind === "publicSettings" && document.source)
             setPublicSettings(structuredClone(document.source));
@@ -599,6 +709,14 @@ function SettingsManagement({
             );
             await queries.invalidateQueries({
               queryKey: ["settings-history", scope.accountId, scope.orgId],
+            });
+            await queries.invalidateQueries({ queryKey: ["public-calendar"], refetchType: "none" });
+            await queries.invalidateQueries({
+              queryKey: ["public-application-discovery"],
+              refetchType: "none",
+            });
+            await queries.invalidateQueries({
+              queryKey: ["settings-public-legacy-center", scope.orgId],
             });
           }}
           onClose={() => {

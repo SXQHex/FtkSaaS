@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { readAudit, readTracking } from "./audit-read";
+import { readAudit, readAuditCsv, readTracking } from "./audit-read";
 const call = vi.hoisted(() => vi.fn());
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call }) }));
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`;
@@ -73,6 +73,28 @@ it("uses center-local midnight for today and binds a stable end instant across c
     ends_at: input.anchor,
   });
   expect(call.mock.calls[1]![1].interval).toEqual(call.mock.calls[0]![1].interval);
+});
+it("exports the filtered center without a cursor and rejects a foreign filename", async () => {
+  const csv = {
+    filename: `audit-${scope.centerId}.csv`,
+    mime: "text/csv",
+    csv: "id\r\n",
+    row_count: 0,
+    as_of: input.anchor,
+  };
+  call.mockResolvedValueOnce(csv).mockResolvedValueOnce({ ...csv, filename: `audit-${id(9)}.csv` });
+  await expect(
+    readAuditCsv(scope, { ...input, module: "M03", query: " kişi ", cursor: "old" }),
+  ).resolves.toEqual(csv);
+  expect(call.mock.calls[0]![0]).toBe("audit_center_export_v1");
+  expect(call.mock.calls[0]![1]).toMatchObject({
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    module: "M03",
+    query: "kişi",
+  });
+  expect(call.mock.calls[0]![1]).not.toHaveProperty("page");
+  await expect(readAuditCsv(scope, input)).rejects.toThrow("AUDIT_SOURCE_INVALID");
 });
 it("rejects invented result filters, cross-module rows and non-recorded events", async () => {
   await expect(readAudit(scope, { ...input, result: "failed" })).rejects.toThrow();

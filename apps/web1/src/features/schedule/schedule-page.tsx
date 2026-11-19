@@ -51,7 +51,8 @@ function SchedulePage({
   const navigate = useNavigate();
   const router = useRouter();
   const queries = useQueryClient();
-  useAccountAppearance(account.id);
+  const appearance = useAccountAppearance(account.id);
+  const firstDay = !appearance.isError && appearance.data?.values.week_start === "sunday" ? 0 : 1;
   const [organizationId, setOrganizationId] = useState(orgId);
   const [selectedCenterId, setCenterId] = useState<string | undefined>(centerId);
   const [locked, setLocked] = useState(false);
@@ -123,6 +124,7 @@ function SchedulePage({
               initialCreate={initialCreate}
               initialSession={initialSession}
               initialMode={initialMode}
+              firstDay={firstDay}
               onLockChange={setLocked}
             />
           ) : (

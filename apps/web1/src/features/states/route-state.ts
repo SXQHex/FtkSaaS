@@ -15,7 +15,7 @@ export function routeErrorState(error: unknown): {
           ? "conflict"
           : error.code === "PREVIEW_STALE"
             ? "expired"
-            : error.code === "PLAN_FEATURE_UNAVAILABLE"
+            : error.code === "PLAN_FEATURE_UNAVAILABLE" || error.code === "PLAN_LIMIT_REACHED"
               ? "limit"
               : "error";
   const traceId =

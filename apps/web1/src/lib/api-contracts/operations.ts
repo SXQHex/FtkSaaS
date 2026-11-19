@@ -239,4 +239,17 @@ export interface Operations {
   import_directory_get_v1: {request: T.RequestImportDirectoryGet; response: T.SuccessImportDirectoryGet};
   tracking_directory_get_v1: {request: T.RequestTrackingDirectoryGet; response: T.SuccessTrackingDirectoryGet};
   document_directory_get_v1: {request: T.RequestDocumentDirectoryGet; response: T.SuccessDocumentDirectoryGet};
+  studio_setup_list_v1: {request: T.RequestStudioSetupList; response: T.SuccessStudioSetupList};
+  studio_setup_open_v1: {request: T.RequestStudioSetupOpen; response: T.SuccessStudioSetupOpen};
+  attendance_correction_request_v1: {request: T.RequestAttendanceCorrectionRequest; response: T.SuccessAttendanceCorrectionRequest};
+  platform_directory_get_v1: {request: T.RequestPlatformDirectoryGet; response: T.SuccessPlatformDirectoryGet};
+  organization_billing_tax_get_v1: {request: T.RequestOrganizationBillingTaxGet; response: T.SuccessOrganizationBillingTaxGet};
+  organization_billing_tax_set_v1: {request: T.RequestOrganizationBillingTaxSet; response: T.SuccessOrganizationBillingTaxSet};
+  platform_organization_suspension_set_v1: {request: T.RequestPlatformOrganizationSuspensionSet; response: T.SuccessPlatformOrganizationSuspensionSet};
+  audit_center_export_v1: {request: T.RequestAuditCenterExport; response: T.SuccessAuditCenterExport};
+  platform_invoice_upload_prepare_v1: {request: T.RequestPlatformInvoiceUploadPrepare; response: T.SuccessPlatformInvoiceUploadPrepare};
+  platform_invoice_publish_v1: {request: T.RequestPlatformInvoicePublish; response: T.SuccessPlatformInvoicePublish};
+  organization_invoices_list_v1: {request: T.RequestOrganizationInvoicesList; response: T.SuccessOrganizationInvoicesList};
+  organization_invoice_file_get_v1: {request: T.RequestOrganizationInvoiceFileGet; response: T.SuccessOrganizationInvoiceFileGet};
+  platform_operator_access_set_v1: {request: T.RequestPlatformOperatorAccessSet; response: T.SuccessPlatformOperatorAccessSet};
 }

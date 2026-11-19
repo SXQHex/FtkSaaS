@@ -274,6 +274,7 @@ export function InstructorTodayContent({
   return (
     <InstructorTodayView
       data={data}
+      calendarLoading={enabled && query.isLoading}
       onSchedule={source ? onSchedule : undefined}
       onOpen={source ? onOpen : undefined}
       notice={

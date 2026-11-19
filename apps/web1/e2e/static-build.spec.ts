@@ -83,6 +83,12 @@ for (const colorScheme of ["light", "dark"] as const)
     await expect(
       page.getByRole("heading", { name: "Hesabına giriş yap", exact: true }),
     ).toBeVisible();
+    const entryResponse = await page.goto(`${artifact.origin}/`);
+    expect(entryResponse?.status()).toBe(200);
+    await expect(page).toHaveURL(`${artifact.origin}/login`);
+    await expect(
+      page.getByRole("heading", { name: "Hesabına giriş yap", exact: true }),
+    ).toBeVisible();
     await expect(page.getByText(/TanStack Devtools/i)).toHaveCount(0);
     expect(pageErrors).toEqual([]);
     const scripts = await page
@@ -96,6 +102,7 @@ for (const colorScheme of ["light", "dark"] as const)
         colorScheme,
         directUrl: true,
         reload: true,
+        entryRedirect: true,
         protectedRedirect: true,
         pageErrors: pageErrors.length,
       }),

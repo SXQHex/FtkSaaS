@@ -3,20 +3,26 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { NotificationView } from "../../lib/api-contracts/generated";
+import type {
+  NotificationReadSelection,
+  NotificationView,
+} from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
-import { InboxView, type InboxRow, type InboxFilter } from "./inbox-view";
-import { readInbox, readNotificationState } from "./inbox";
+import { InboxView, type InboxRow } from "./inbox-view";
+import { inboxKey, inboxListQuery, readNotificationState, type InboxFilter } from "./inbox";
 import {
   notificationSetIntent,
+  markAllNotificationsIntent,
   setNotificationsRead,
   readNotificationSetReceipt,
   readNotificationSetResult,
+  type NotificationSetIntent,
+  type NotificationChange,
 } from "./inbox-batch";
-import { readInboxSource } from "./inbox-source";
+import { readInboxSource, readMemberSessionNotice } from "./inbox-source";
 import { readWorkspace } from "../workspace/workspace";
 import { LinkButton } from "../../components/ui/button";
 import { Button } from "../../components/ui/button";
@@ -24,10 +30,12 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 export function InboxContent({
   scope,
   timezone,
+  memberPersonId,
   onLockChange,
 }: {
   scope: ClientScope;
   timezone: string;
+  memberPersonId?: string;
   onLockChange: (value: boolean) => void;
 }) {
   const { t } = useTranslation(),
@@ -39,6 +47,10 @@ export function InboxContent({
     [query, setQuery] = useState(""),
     [draftQuery, setDraftQuery] = useState(""),
     [checked, setChecked] = useState<string[]>([]),
+    [undo, setUndo] = useState<{
+      change: NotificationChange;
+      notifications: NotificationReadSelection[];
+    }>(),
     [selected, setSelected] = useState<NotificationView>(),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState<string>();
@@ -50,26 +62,33 @@ export function InboxContent({
       mounted.current = false;
     };
   }, []);
-  const prefix = ["inbox", scope.accountId, scope.orgId, scope.centerId];
-  const list = useQuery({
-    queryKey: [...prefix, "list", query, filter, cursors[index]],
-    queryFn: async () => {
-      const page = await readInbox(scope, filter === "unread", cursors[index], {
-        query,
-        workState: filter === "todo" ? "pending" : "all",
-      });
-      if (page.next_cursor && cursors.includes(page.next_cursor))
-        throw new Error("INBOX_CURSOR_UNAVAILABLE");
-      return page;
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  const prefix = inboxKey(scope);
+  const list = useQuery(inboxListQuery(scope, query, filter, cursors[index], cursors));
   const [openedSource, setOpenedSource] = useState<string>();
+  const memberSessionTarget =
+    memberPersonId && selected?.kind === "session_changed_for_participant"
+      ? selected.work?.reservation_target
+      : undefined;
+  const sourceOperation = selected?.work?.selector?.operation;
+  const canReadSource = Boolean(
+    memberSessionTarget ||
+    (sourceOperation &&
+      (!memberPersonId ||
+        sourceOperation === "lesson_request_create_v1" ||
+        sourceOperation === "seat_offer_accept_v1")),
+  );
   const nativeSource = useQuery({
-    queryKey: [...prefix, "work", selected?.id, selected?.work],
-    queryFn: () => readInboxSource(scope, selected!.work!),
-    enabled: !!selected?.work?.selector && openedSource === selected.id,
+    queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work],
+    queryFn: async () =>
+      memberPersonId && memberSessionTarget
+        ? readMemberSessionNotice(
+            { ...scope, centerId: memberSessionTarget.center_id },
+            memberPersonId,
+            memberSessionTarget.key.session_id,
+          )
+        : readInboxSource(scope, selected!.work!, memberPersonId),
+    enabled: canReadSource && openedSource === selected?.id,
+    staleTime: 0,
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -111,12 +130,43 @@ export function InboxContent({
   const command = useMemberCommand({
     write: setNotificationsRead,
     readReceipt: readNotificationSetReceipt,
-    readResult: readNotificationSetResult,
+    readResult: async (intent: NotificationSetIntent & { undoing: boolean }, id) => ({
+      intent,
+      rows: await readNotificationSetResult(intent, id),
+    }),
     onAccessLost: accessLost,
-    onRefresh: async (value) => {
-      for (const row of value) queries.setQueryData([...prefix, "state", row.id], row);
+    onRefresh: async ({ intent, rows }) => {
+      if ("personId" in intent) {
+        await queries.invalidateQueries({ queryKey: prefix.slice(0, 3) }, { throwOnError: true });
+        setChecked([]);
+        setSelected(undefined);
+        setUndo(undefined);
+        setCursors([undefined]);
+        setIndex(0);
+        return;
+      }
+      for (const row of rows) queries.setQueryData([...prefix, "state", row.id], row);
       await queries.invalidateQueries({ queryKey: [...prefix, "list"] }, { throwOnError: true });
       setChecked([]);
+      if (typeof intent.change !== "boolean") setSelected(undefined);
+      const changed = new Set(intent.changedIds);
+      const exact = rows.every(
+        (row, index) =>
+          !changed.has(row.id) || row.version === intent.notifications[index]!.expected_version + 1,
+      );
+      setUndo(
+        !intent.undoing && exact && changed.size
+          ? {
+              change:
+                typeof intent.change === "boolean"
+                  ? !intent.change
+                  : { visibility: intent.change.from, from: intent.change.visibility },
+              notifications: rows
+                .filter((row) => changed.has(row.id))
+                .map((row) => ({ id: row.id, expected_version: row.version })),
+            }
+          : undefined,
+      );
     },
   });
   const locked = preparing || command.locked;
@@ -132,23 +182,52 @@ export function InboxContent({
       void list.refetch();
     }
   }
-  async function markRead(read = true, batch = false) {
-    if (pending.current || locked || command.state !== "ready") return;
+  function markInboxRead() {
+    if (
+      !memberPersonId ||
+      pending.current ||
+      locked ||
+      command.unavailable ||
+      !["ready", "saved"].includes(command.state) ||
+      list.isError ||
+      !list.data
+    )
+      return;
+    command.reset();
+    setError(undefined);
+    setUndo(undefined);
+    void command.start({ ...markAllNotificationsIntent(scope, memberPersonId), undoing: false });
+  }
+  async function changeSelected(
+    change: NotificationChange = true,
+    target: "detail" | "selection" | "undo" = "detail",
+  ) {
+    if (pending.current || locked || command.unavailable) return;
+    if (target === "undo") {
+      if (!undo || !["ready", "saved"].includes(command.state)) return;
+      command.reset();
+    } else if (command.state !== "ready") return;
     pending.current = true;
     setPreparing(true);
     setError(undefined);
     try {
-      const notifications = batch
-        ? checked.map((id) => {
-            const row = list.isError ? undefined : list.data?.items.find((item) => item.id === id);
-            if (!row?.version) throw new Error("INBOX_SELECTION_UNAVAILABLE");
-            return { id, expected_version: row.version };
-          })
-        : !source.isError && source.data
-          ? [{ id: source.data.id, expected_version: source.data.version }]
-          : [];
-      const intent = await notificationSetIntent(scope, notifications, read);
-      if (mounted.current) await command.start(intent);
+      const notifications =
+        target === "undo"
+          ? undo!.notifications
+          : target === "selection"
+            ? checked.map((id) => {
+                const row = list.isError
+                  ? undefined
+                  : list.data?.items.find((item) => item.id === id);
+                if (!row?.version) throw new Error("INBOX_SELECTION_UNAVAILABLE");
+                return { id, expected_version: row.version };
+              })
+            : !source.isError && source.data
+              ? [{ id: source.data.id, expected_version: source.data.version }]
+              : [];
+      setUndo(undefined);
+      const intent = await notificationSetIntent(scope, notifications, change);
+      if (mounted.current) await command.start({ ...intent, undoing: target === "undo" });
     } catch (cause) {
       if (mounted.current && !accessLost(cause))
         setError(
@@ -200,6 +279,8 @@ export function InboxContent({
   }
   return (
     <InboxView
+      member={Boolean(memberPersonId)}
+      loading={list.isPending}
       rows={list.isError ? null : (list.data?.items.map(present) ?? null)}
       selected={!list.isError && selected ? present(selected) : null}
       filter={filter}
@@ -256,22 +337,50 @@ export function InboxContent({
         }
       }}
       onMarkRead={() => {
-        void markRead();
+        void changeSelected();
       }}
       canMarkRead={!source.isError && source.data?.state === "unread" && command.state === "ready"}
       onUnread={() => {
-        void markRead(false);
+        void changeSelected(false);
       }}
       canUnread={!source.isError && source.data?.state === "read" && command.state === "ready"}
-      canMarkAll={
+      canMarkSelection={
         !list.isFetching && !list.isError && checked.length > 0 && command.state === "ready"
       }
-      onMarkAll={() => {
-        void markRead(true, true);
+      onMarkInboxRead={
+        memberPersonId &&
+        !list.isError &&
+        list.data &&
+        !list.isFetching &&
+        ["ready", "saved"].includes(command.state) &&
+        !command.unavailable
+          ? markInboxRead
+          : undefined
+      }
+      onMarkSelected={(read) => {
+        void changeSelected(read, "selection");
       }}
+      onMoveSelected={(visibility) =>
+        void changeSelected(
+          { visibility, from: filter === "archived" || filter === "deleted" ? filter : "inbox" },
+          "selection",
+        )
+      }
+      onSelectVisible={(value) => {
+        if (locked || list.isError || list.isFetching) return;
+        command.reset();
+        setChecked(value ? (list.data?.items.map((row) => row.id) ?? []) : []);
+      }}
+      onUndo={
+        undo && ["ready", "saved"].includes(command.state)
+          ? () => void changeSelected(undo.change, "undo")
+          : undefined
+      }
+      undoVisibility={undo !== undefined && typeof undo.change !== "boolean"}
       locked={locked}
       sourceAction={
-        selected?.work?.selector && (
+        canReadSource &&
+        selected && (
           <Button
             variant="outline"
             size="sm"
@@ -334,7 +443,7 @@ export function InboxContent({
               </AlertDescription>
             </Alert>
           )}
-          {(!selected?.work?.selector || nativeSource.isError) && (
+          {(!canReadSource || nativeSource.isError) && (
             <p className="text-sm text-muted-foreground">{t(($) => $.inbox.sourceUnavailable)}</p>
           )}
           {nativeSource.isFetching && <p role="status">{t(($) => $.inbox.loading)}</p>}
@@ -360,7 +469,8 @@ export function InboxContent({
                   variant="outline"
                   href={
                     nativeSource.data.ownHref &&
-                    workspace.data?.selected?.self_context?.person_id === nativeSource.data.personId
+                    (memberPersonId ?? workspace.data?.selected?.self_context?.person_id) ===
+                      nativeSource.data.personId
                       ? nativeSource.data.ownHref
                       : nativeSource.data.href
                   }

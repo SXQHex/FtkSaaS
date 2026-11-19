@@ -21,6 +21,7 @@ import { Switch } from "../../components/ui/switch";
 import { Input } from "../../components/ui/input";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+import type { CalendarKind } from "./member-calendar";
 
 export type PreferenceId =
   | "email"
@@ -81,23 +82,7 @@ export function MemberAccountView({
         </CardContent>
       </Card>
       {deletion}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <h2>{t(($) => $.memberAccount.calendarTitle)}</h2>
-          </CardTitle>
-          <CardDescription>{t(($) => $.memberAccount.calendarDescription)}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          {calendar}
-          <p className="text-sm text-muted-foreground">
-            {t(($) => $.memberAccount.calendarPrivacy)}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {t(($) => $.memberAccount.calendarPolling)}
-          </p>
-        </CardContent>
-      </Card>
+      <PersonalCalendarCard>{calendar}</PersonalCalendarCard>
       <Card>
         <CardHeader>
           <CardTitle>
@@ -151,6 +136,42 @@ export function AccountPreferencesView({
     </div>
   );
 }
+export function PersonalCalendarCard({
+  children,
+  kind = "lessons",
+}: {
+  children: ReactNode;
+  kind?: CalendarKind;
+}) {
+  const { t } = useTranslation();
+  const description = {
+    lessons: t(($) => $.memberAccount.calendarDescription),
+    duties: t(($) => $.memberAccount.instructorCalendarDescription),
+    studio_program: t(($) => $.memberAccount.studioCalendarDescription),
+  };
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <h2>
+            {t(($) =>
+              kind === "studio_program"
+                ? $.memberAccount.studioCalendarTitle
+                : $.memberAccount.calendarTitle,
+            )}
+          </h2>
+        </CardTitle>
+        <CardDescription>{description[kind]}</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        {children}
+        <p className="text-sm text-muted-foreground">{t(($) => $.memberAccount.calendarPrivacy)}</p>
+        <p className="text-sm text-muted-foreground">{t(($) => $.memberAccount.calendarPolling)}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function AccountCalendarView({
   credential,
   actions,

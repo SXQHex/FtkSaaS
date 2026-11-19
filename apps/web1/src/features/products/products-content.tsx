@@ -14,7 +14,7 @@ import {
 } from "./products";
 import { useProductCommand } from "./use-product-command";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
-import { readWorkspace } from "../workspace/workspace";
+import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { ProductManagementEntry } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
@@ -220,6 +220,13 @@ export function ProductsContent({
           scope={scope}
           base={editor.base}
           canWrite={canWrite && !workspace.isError}
+          usageCenters={
+            workspaceRoles(current, scope.centerId).some(
+              (role) => role === "owner" || role === "org_manager",
+            )
+              ? (current?.centers.filter((row) => row.state === "active") ?? [])
+              : []
+          }
           onClose={() => setEditor(null)}
           onLockChange={onLockChange}
           onAccessLost={accessLost}
@@ -235,6 +242,7 @@ function ProductEditorController({
   scope,
   base,
   canWrite,
+  usageCenters,
   onClose,
   onRefresh,
   onAccessLost,
@@ -243,6 +251,7 @@ function ProductEditorController({
   scope: ClientScope;
   base?: ProductManagementEntry;
   canWrite: boolean;
+  usageCenters: { id: string; name: string }[];
   onClose: () => void;
   onRefresh: () => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
@@ -291,6 +300,7 @@ function ProductEditorController({
             draft,
             base,
             activeDisciplines.map((row) => row.id),
+            usageCenters.map((row) => row.id),
           ),
         );
         setStage(next);
@@ -346,6 +356,7 @@ function ProductEditorController({
           versionNote: false,
         }}
         scopesEditable={!base && canWrite}
+        usageCenters={base ? [] : usageCenters}
         unitPrice={null}
         versions={
           base
@@ -377,6 +388,22 @@ function ProductEditorController({
                   title: t(($) => $.products.reviewChanges),
                   detail: `${review.request.terms.name} · ${formatMinorAmount(review.request.terms.price_minor, review.request.terms.currency)}`,
                 },
+                ...(draft.scopeKind === "selected_centers"
+                  ? [
+                      {
+                        id: "usage-centers",
+                        title: t(($) => $.businessCenters.usageCenters),
+                        detail: usageCenters
+                          .filter((center) =>
+                            review.request.terms.scopes.some(
+                              (item) => item.center_id === center.id,
+                            ),
+                          )
+                          .map((center) => center.name)
+                          .join(", "),
+                      },
+                    ]
+                  : []),
               ]
             : []
         }

@@ -12,6 +12,10 @@ import { readScheduleSession } from "../schedule/schedule-read";
 import type { RequestFilter } from "./lesson-requests-view";
 const positive = z.number().int().positive().safe(),
   instant = z.iso.datetime({ offset: true });
+export const studentNote = z
+  .string()
+  .regex(/\S/)
+  .refine((note) => Array.from(note).length <= 1000);
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -44,6 +48,7 @@ export function requestDetail(
   for (const value of [detail.id, detail.person_id, detail.discipline_id]) z.uuid().parse(value);
   if (detail.preferred_instructor_id) z.uuid().parse(detail.preferred_instructor_id);
   if (detail.reservation_id) z.uuid().parse(detail.reservation_id);
+  if (detail.student_note !== undefined) studentNote.parse(detail.student_note);
   positive.parse(detail.version);
   positive.parse(detail.duration_minutes);
   instant.parse(detail.requested_start);

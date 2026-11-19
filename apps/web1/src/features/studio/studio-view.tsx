@@ -194,7 +194,7 @@ export function StudioView({
           <CardHeader className="flex flex-row flex-wrap items-center gap-3">
             <div className="mr-auto">
               <h2 className="text-base font-semibold">{t(($) => $.studio.setup)}</h2>
-              <p className="text-[13px] text-muted-foreground">
+              <p className="text-[0.8125rem] text-muted-foreground">
                 {t(($) => $.studio.setupDescription)}
               </p>
             </div>
@@ -223,7 +223,7 @@ export function StudioView({
               {data.setup.map((item) => (
                 <li
                   key={item.key}
-                  className="flex min-h-14 items-center gap-2.5 border-t border-border py-2 text-[13px]"
+                  className="flex min-h-14 items-center gap-2.5 border-t border-border py-2 text-[0.8125rem]"
                 >
                   <Badge
                     aria-hidden="true"
@@ -349,7 +349,7 @@ export function StudioView({
                           onPress={() => setSelection({ kind: "instructor", id: item.id })}
                         >
                           <Avatar className="size-6">
-                            <AvatarFallback className="text-[10px]">
+                            <AvatarFallback className="text-[0.625rem]">
                               {item.name
                                 .trim()
                                 .split(/\s+/)
@@ -359,7 +359,7 @@ export function StudioView({
                                 .toLocaleUpperCase("tr")}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="grid gap-0.5 text-[13px] font-normal">
+                          <span className="grid gap-0.5 text-[0.8125rem] font-normal">
                             <span>{item.name}</span>
                             <span className="text-xs font-normal text-muted-foreground">
                               {item.email ?? "—"}
@@ -406,7 +406,7 @@ export function StudioView({
               <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold">{t(($) => $.studio.classTypes)}</h2>
-                  <p className="text-[13px] text-muted-foreground">
+                  <p className="text-[0.8125rem] text-muted-foreground">
                     {t(($) => $.studio.classDescription)}
                   </p>
                 </div>
@@ -475,7 +475,7 @@ export function StudioView({
               <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold">{t(($) => $.studio.rooms)}</h2>
-                  <p className="text-[13px] text-muted-foreground">
+                  <p className="text-[0.8125rem] text-muted-foreground">
                     {data.roomLimit === null
                       ? t(($) => $.studio.roomCount, {
                           count: data.rooms.filter((item) => item.active).length,
@@ -540,7 +540,7 @@ export function StudioView({
             <Card>
               <CardHeader>
                 <h2 className="text-base font-semibold">{t(($) => $.studio.compatibility)}</h2>
-                <p className="text-[13px] text-muted-foreground">
+                <p className="text-[0.8125rem] text-muted-foreground">
                   {t(($) => $.studio.compatibilityDescription)}
                 </p>
               </CardHeader>
@@ -552,7 +552,7 @@ export function StudioView({
                       <TableHead key={room.id} className="w-[17%] text-center last:text-center">
                         <span className="grid gap-1">
                           <span>{room.name}</span>
-                          <span className="text-[10px] font-normal">
+                          <span className="text-[0.625rem] font-normal">
                             {room.capacity === null
                               ? "—"
                               : t(($) => $.studio.peopleCount, { count: room.capacity })}
@@ -644,7 +644,7 @@ export function StudioView({
             <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold">{t(($) => $.studio.closuresTitle)}</h2>
-                <p className="text-[13px] text-muted-foreground">
+                <p className="text-[0.8125rem] text-muted-foreground">
                   {t(($) => $.studio.closuresDescription)}
                 </p>
               </div>
@@ -713,7 +713,7 @@ export function StudioView({
             <CardHeader>
               <h2 className="text-base font-semibold">{t(($) => $.studio.agreementsTitle)}</h2>
               {!data.agreementsPlanBlocked && (
-                <p className="text-[13px] text-muted-foreground">
+                <p className="text-[0.8125rem] text-muted-foreground">
                   {t(($) => $.studio.agreementsDescription)}{" "}
                   <AriaLink href={earningsHref} className="underline underline-offset-2">
                     {t(($) => $.studio.earnings)}

@@ -3,13 +3,46 @@ import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { NotificationSourceState } from "../../lib/api-contracts/generated";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
-export async function readInboxSource(scope: ClientScope, source: NotificationSourceState) {
+import { readSeatOffer } from "../member-reservations/member-waitlist";
+import { readMemberReservations } from "../member-profile/reservations";
+
+export async function readMemberSessionNotice(
+  scope: ClientScope,
+  personId: string,
+  sessionId: string,
+) {
+  const page = await readMemberReservations(scope, personId, undefined, "all", { sessionId });
+  const own = page.items.find(
+    ({ reservation, session }) => session?.id === sessionId && reservation.state === "active",
+  );
+  if (!own?.session) throw new Error("INBOX_SOURCE_UNAVAILABLE");
+  const search = new URLSearchParams({
+    org: scope.orgId,
+    center: scope.centerId,
+    session: sessionId,
+  });
+  return {
+    kind: "session" as const,
+    workState: "informational" as const,
+    at: own.session.starts_at,
+    note: null,
+    ownHref: null,
+    href: `/member/reservations?${search}`,
+    personId,
+  };
+}
+export async function readInboxSource(
+  scope: ClientScope,
+  source: NotificationSourceState,
+  memberPersonId?: string,
+) {
   const selector = source.selector;
   if (selector?.operation === "seat_offer_accept_v1") z.uuid().parse(selector.key.offer_id);
   else if (selector?.operation === "lesson_request_create_v1") {
     z.uuid().parse(selector.key.lesson_request_id);
     if (selector.key.catalog) throw new Error("INBOX_SOURCE_UNAVAILABLE");
   } else if (selector?.operation === "crm_activity_save_v1") {
+    if (memberPersonId) throw new Error("INBOX_SOURCE_UNAVAILABLE");
     z.uuid().parse(selector.key.activity_id);
     z.uuid().parse(selector.key.lead_id || selector.key.person_id);
   } else throw new Error("INBOX_SOURCE_UNAVAILABLE");
@@ -17,6 +50,25 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
     throw new Error("INBOX_SOURCE_UNAVAILABLE");
   const centerId = z.uuid().parse(source.center_id);
   const targetScope = { ...scope, centerId };
+  if (selector.operation === "seat_offer_accept_v1") {
+    const { offer, asOf } = await readSeatOffer(targetScope, selector.key.offer_id, memberPersonId);
+    const search = new URLSearchParams({ org: scope.orgId, center: centerId, offer: offer.id });
+    return {
+      kind: "offer" as const,
+      state: offer.state,
+      workState:
+        offer.state !== "active"
+          ? ("completed" as const)
+          : Date.parse(offer.expires_at) > Date.parse(asOf)
+            ? ("pending" as const)
+            : ("unavailable" as const),
+      at: offer.expires_at,
+      note: null,
+      href: `/member/reservations?${search}`,
+      ownHref: null,
+      personId: offer.person_id,
+    };
+  }
   const page = await (
     await scopedBackend(targetScope)
   ).call("management_state_get_v1", {
@@ -30,11 +82,9 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
   });
   const row = page.items[0];
   const expected =
-    selector.operation === "seat_offer_accept_v1"
-      ? { type: "seat_offers", id: selector.key.offer_id }
-      : selector.operation === "lesson_request_create_v1"
-        ? { type: "lesson_requests", id: selector.key.lesson_request_id }
-        : { type: "crm_activities", id: selector.key.activity_id };
+    selector.operation === "lesson_request_create_v1"
+      ? { type: "lesson_requests", id: selector.key.lesson_request_id }
+      : { type: "crm_activities", id: selector.key.activity_id };
   z.uuid().parse(expected.id);
   if (
     page.items.length !== 1 ||
@@ -54,6 +104,8 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
   const base = `/o/${scope.orgId}/c/${centerId}`;
   if (selector.operation === "lesson_request_create_v1") {
     const detail = requestDetail(row, targetScope, selector.operation, expected.id);
+    if (memberPersonId && (detail.person_id !== memberPersonId || detail.format !== "private"))
+      throw new Error("INBOX_SOURCE_UNAVAILABLE");
     return {
       kind: "request" as const,
       state: detail.state,
@@ -66,39 +118,6 @@ export async function readInboxSource(scope: ClientScope, source: NotificationSo
       href: `${base}/requests?request=${detail.id}`,
       ownHref: `/member/private-lessons?org=${scope.orgId}&center=${centerId}&request=${detail.id}`,
       personId: detail.person_id,
-    };
-  }
-  if (selector.operation === "seat_offer_accept_v1") {
-    const entry = row.waitlist_detail;
-    const offer = entry?.offers.find((o) => o.id === expected.id);
-    if (
-      !entry ||
-      !offer ||
-      entry.center_id !== centerId ||
-      offer.entry_id !== entry.id ||
-      offer.person_id !== entry.person_id ||
-      offer.session_id !== entry.session_id ||
-      offer.version !==
-        row.versions.find((v) => v.entity.type === "seat_offers" && v.entity.id === expected.id)
-          ?.version
-    )
-      throw new Error("INBOX_SOURCE_UNAVAILABLE");
-    z.uuid().parse(entry.session_id);
-    z.iso.datetime({ offset: true }).parse(offer.expires_at);
-    return {
-      kind: "offer" as const,
-      state: offer.state,
-      workState:
-        offer.state === "active"
-          ? Date.parse(offer.expires_at) > Date.now()
-            ? ("pending" as const)
-            : ("unavailable" as const)
-          : ("completed" as const),
-      at: offer.expires_at,
-      note: null,
-      href: `/member/reservations?org=${scope.orgId}&center=${centerId}`,
-      ownHref: null,
-      personId: offer.person_id,
     };
   }
   if (

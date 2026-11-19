@@ -50,9 +50,37 @@ it("keeps one cursor page, exact money strings and native self scope", async () 
       person_id: id(4),
       center_id: scope.centerId,
       view: "earnings",
+      include_session_context: true,
       interval,
       page: { limit: 20, cursor: "current" },
     }),
+  );
+});
+it("rejects malformed historical closure context and context attached to an event", async () => {
+  const session_context = {
+    title: null,
+    scheduled_duration_seconds: null,
+    attended_count: 0,
+    agreement_version: 2,
+  };
+  mock.call
+    .mockResolvedValueOnce({ ...earningPage, items: [{ ...row, session_context }] })
+    .mockResolvedValueOnce({
+      ...earningPage,
+      items: [{ ...row, session_context: { ...session_context, attended_count: -1 } }],
+    })
+    .mockResolvedValueOnce({
+      ...earningPage,
+      items: [{ ...row, session_id: null, event_assignment_id: id(8), session_context }],
+    });
+  expect((await readInstructorEarningPage(scope, id(4))).items[0]?.session_context).toEqual(
+    session_context,
+  );
+  await expect(readInstructorEarningPage(scope, id(4))).rejects.toThrow(
+    "INSTRUCTOR_EARNINGS_UNAVAILABLE",
+  );
+  await expect(readInstructorEarningPage(scope, id(4))).rejects.toThrow(
+    "INSTRUCTOR_EARNINGS_UNAVAILABLE",
   );
 });
 it("rejects wrong centers, malformed identities, currency mismatches and invalid money", async () => {

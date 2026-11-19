@@ -46,6 +46,7 @@ export async function readInstructorEarningPage(
     center_id: scope.centerId,
     person_id: personId,
     view: "earnings",
+    include_session_context: true,
     ...(interval ? { interval: { ...interval } } : {}),
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
@@ -84,6 +85,13 @@ export async function readInstructorEarningPage(
       if (!money.safeParse(value).success) throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
     for (const value of [row.session_id, row.event_assignment_id, row.previous_id, row.closure_id])
       if (value !== null) z.uuid().parse(value);
+    if (
+      row.session_context !== undefined &&
+      (!row.session_id ||
+        row.event_assignment_id ||
+        !sessionContext.safeParse(row.session_context).success)
+    )
+      throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
     z.enum([
       "sale_unit",
       "negative_snapshot",
@@ -103,6 +111,12 @@ const money = z.string().regex(/^(0|[1-9]\d*)$/);
 const signedMoney = z.string().regex(/^-?(0|[1-9]\d*)$/);
 const instant = z.iso.datetime({ offset: true });
 const positive = z.number().int().positive().safe();
+const sessionContext = z.object({
+  title: z.string().nullable(),
+  scheduled_duration_seconds: z.number().positive().nullable(),
+  agreement_version: positive.nullable(),
+  attended_count: z.number().int().nonnegative().safe().nullable(),
+});
 const payment = z.object({
   id: z.uuid(),
   root_payment_id: z.uuid(),

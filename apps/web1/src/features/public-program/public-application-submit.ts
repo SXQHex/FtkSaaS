@@ -34,6 +34,28 @@ export type PublicApplicationAttempt = {
   key: string;
   intake: CrmContactIntake;
 };
+export type PublicEventApplicationAttempt = {
+  publicationId: string;
+  slug: string;
+  centerId?: string;
+  key: string;
+  contact: string;
+};
+
+export function preparePublicEventApplication(
+  publicationId: string,
+  slug: string,
+  values: FormData,
+  centerId?: string,
+): PublicEventApplicationAttempt {
+  return {
+    publicationId: z.uuid().parse(publicationId),
+    slug: z.string().min(1).parse(slug),
+    ...(centerId ? { centerId: z.uuid().parse(centerId) } : {}),
+    key: uuidv7(),
+    contact: z.string().trim().pipe(z.email().max(320)).parse(values.get("email")),
+  };
+}
 
 export function preparePublicApplication(
   form: DiscoveredPublicForm,
@@ -77,15 +99,24 @@ export function preparePublicApplication(
   };
 }
 
-export async function submitPublicApplication(attempt: PublicApplicationAttempt, proof: string) {
+export async function submitPublicApplication(
+  attempt: PublicApplicationAttempt | PublicEventApplicationAttempt,
+  proof: string,
+) {
   const base = import.meta.env.VITE_PUBLIC_GATEWAY_URL?.trim();
   if (!base || !proof.trim()) throw new Error("PUBLIC_SUBMIT_UNAVAILABLE");
   const request: RequestPublicApplicationSubmit = {
     client_api_version: 1,
     request_id: uuidv7(),
-    form_id: attempt.formId,
+    ...("publicationId" in attempt
+      ? {
+          publication_id: attempt.publicationId,
+          event_application: true,
+          page_slug: attempt.slug,
+          contact: attempt.contact,
+        }
+      : { form_id: attempt.formId, contact_intake: attempt.intake }),
     ...(attempt.centerId ? { center_id: attempt.centerId } : {}),
-    contact_intake: attempt.intake,
     client_request_key: attempt.key,
     bot_proof: proof,
   };
@@ -97,7 +128,8 @@ export async function submitPublicApplication(attempt: PublicApplicationAttempt,
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
   });
-  return z
-    .object({ accepted: z.literal(true) })
-    .parse(await readEnvelope<SuccessPublicApplicationSubmit>(response));
+  const result = await readEnvelope<SuccessPublicApplicationSubmit>(response);
+  return "publicationId" in attempt
+    ? z.object({ accepted: z.literal(true), application_state: z.literal("pending") }).parse(result)
+    : z.object({ accepted: z.literal(true) }).parse(result);
 }

@@ -1,4 +1,4 @@
-import { useCallback, useId, useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Building2Icon,
@@ -119,7 +119,7 @@ export interface SettingsViewData {
       { dirty: boolean; pending: boolean; read: boolean; writable: boolean; notice?: string }
     >
   >;
-  tables?: Partial<Record<SettingsSection | "disciplines" | "invoices", SettingsTableData>>;
+  tables?: Partial<Record<SettingsSection | "disciplines", SettingsTableData>>;
   brand?: {
     name: string;
     logo?: { src?: string; blob?: Blob; alt: string } | null;
@@ -157,6 +157,8 @@ export interface SettingsViewData {
   };
   reminderPreview?: { id: string; lesson: string; delivery: string | null }[];
   preparationManagement?: ReactNode;
+  billingTax?: ReactNode;
+  invoiceHistory?: ReactNode;
 }
 export type SettingsAction =
   | { kind: "reset"; card: SettingsCardKey }
@@ -270,17 +272,31 @@ export function SettingsView({
   const [teamSection, setTeamSection] = useState("ekip-0");
   const [localSection, setLocalSection] = useState<SettingsSection>("genel");
   const current = section ?? localSection;
-  const revealSelectedTab = useCallback(
-    (element: HTMLDivElement | null) => {
-      const options = { block: "nearest", inline: "nearest", container: "nearest" } as const;
-      if (mobile) element?.scrollIntoView(options);
-    },
-    [mobile],
-  );
   const canAction = (kind: SettingsAction["kind"]) =>
     Boolean(onAction && availableActions.includes(kind));
   const action = (kind: Exclude<SettingsAction["kind"], "reset">) => onAction?.({ kind });
   const footer = (key: SettingsCardKey) => {
+    if (key === "ay-yayin")
+      return (
+        <CardFooter className="flex-wrap gap-2">
+          <Button
+            variant="ghost"
+            type="button"
+            isDisabled={locked || !canAction("copyLink")}
+            onPress={() => action("copyLink")}
+          >
+            {t(($) => $.settings.copyLink)}
+          </Button>
+          <Button
+            variant="outline"
+            type="button"
+            isDisabled={locked || !canAction("preview")}
+            onPress={() => action("preview")}
+          >
+            {t(($) => $.settings.preview)}
+          </Button>
+        </CardFooter>
+      );
     const state = data.forms?.[key];
     return (
       <CardFooter className="flex-wrap justify-between gap-3">
@@ -302,26 +318,6 @@ export function SettingsView({
             >
               {t(($) => $.settings.reset)}
             </Button>
-          )}
-          {key === "ay-yayin" && (
-            <>
-              <Button
-                variant="ghost"
-                type="button"
-                isDisabled={locked || !canAction("copyLink")}
-                onPress={() => action("copyLink")}
-              >
-                {t(($) => $.settings.copyLink)}
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                isDisabled={locked || !canAction("preview")}
-                onPress={() => action("preview")}
-              >
-                {t(($) => $.settings.preview)}
-              </Button>
-            </>
           )}
           <Button
             variant="outline"
@@ -461,13 +457,18 @@ export function SettingsView({
                         </NativeSelectOption>
                       ))}
                     </NativeSelect>
-                  ) : field.key === "ay-adres" ? (
+                  ) : field.key === "ay-adres" || field.key === "billing-address" ? (
                     <Textarea
                       id={id}
                       name={field.key}
                       rows={mobile ? 3 : 1}
                       className="min-h-9 rounded-md border border-input bg-transparent"
-                      autoComplete="section-organization street-address"
+                      autoComplete={
+                        field.key === "billing-address"
+                          ? "billing street-address"
+                          : "section-organization street-address"
+                      }
+                      maxLength={field.key === "billing-address" ? 1000 : undefined}
                       value={typeof value?.value === "string" ? value.value : ""}
                       disabled={disabled}
                       aria-describedby={description ? `${id}-hint` : undefined}
@@ -490,7 +491,18 @@ export function SettingsView({
                           ? "section-organization tel"
                           : field.key === "ay-posta"
                             ? "section-organization email"
-                            : "off"
+                            : field.key === "billing-email"
+                              ? "billing email"
+                              : field.key === "billing-name"
+                                ? "billing organization"
+                                : "off"
+                      }
+                      maxLength={
+                        field.key === "billing-email"
+                          ? 320
+                          : field.key === "billing-name"
+                            ? 1000
+                            : undefined
                       }
                       autoCapitalize={
                         field.kind === "email" || field.key === "ay-py-slug" ? "none" : undefined
@@ -816,7 +828,7 @@ export function SettingsView({
           className={cn(
             "shrink-0 p-0!",
             mobile
-              ? "h-auto! min-h-14 w-full max-w-full flex-row! justify-start overflow-x-auto"
+              ? "h-auto! min-h-14 w-full max-w-full flex-row! flex-wrap justify-start"
               : "sticky top-4 w-44 self-start",
           )}
         >
@@ -826,7 +838,6 @@ export function SettingsView({
               <TabsTrigger
                 key={panel.key}
                 id={panel.key}
-                ref={panel.key === current ? revealSelectedTab : undefined}
                 isDisabled={locked}
                 className="relative min-h-9 shrink-0 data-selected:before:absolute data-selected:before:inset-y-1 data-selected:before:start-0 data-selected:before:border-s-2 data-selected:before:border-current"
               >
@@ -841,6 +852,7 @@ export function SettingsView({
             const content = (
               <div className="flex min-w-0 flex-col gap-4">
                 {panel.cards.map((card, index) => {
+                  if (card.key === "plan-billing" && !data.forms?.[card.key]?.read) return null;
                   const form =
                     panel.key !== "gecmis" &&
                     (card.fields.length > 0 ||
@@ -893,7 +905,7 @@ export function SettingsView({
                             </Button>
                           </CardAction>
                         )}
-                        {panel.key === "plan" && index === 0 && (
+                        {card.key === "plan-0" && (
                           <CardAction>
                             <Badge variant="secondary">
                               {data.plan?.name ?? t(($) => $.settings.unknown)}
@@ -927,7 +939,10 @@ export function SettingsView({
                             ) : panel.key === "ekip" ? (
                               permissions
                             ) : (
-                              fields(card)
+                              fields(
+                                card,
+                                (key) => card.key !== "plan-billing" || Boolean(data.fields?.[key]),
+                              )
                             )}
                             {card.key === "ay-genel" && (
                               <p className="mt-4 text-xs text-muted-foreground">
@@ -977,7 +992,7 @@ export function SettingsView({
                         </CardContent>
                       ) : panel.key === "ekip" ? (
                         <CardContent className="px-0">{permissions}</CardContent>
-                      ) : panel.key === "plan" && index === 0 ? (
+                      ) : card.key === "plan-0" ? (
                         <CardContent className="flex flex-col gap-5">
                           {data.metrics?.map((metric) => (
                             <div key={metric.id} className="flex flex-col gap-2">
@@ -1009,7 +1024,7 @@ export function SettingsView({
                             </Empty>
                           )}
                         </CardContent>
-                      ) : panel.key === "plan" && index === 1 ? (
+                      ) : card.key === "plan-1" ? (
                         <CardContent className="flex flex-col gap-4">
                           <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
@@ -1030,12 +1045,8 @@ export function SettingsView({
                               {t(($) => $.settings.reportPayment)}
                             </Button>
                           </div>
-                          <SettingsTable
-                            label={t(($) => $.settings.cards[card.key].title)}
-                            data={data.tables?.invoices}
-                          />
                         </CardContent>
-                      ) : panel.key === "plan" && index === 2 ? (
+                      ) : card.key === "plan-2" ? (
                         <CardContent>
                           <p className="text-sm text-muted-foreground">
                             {data.plan?.pendingDescription ?? t(($) => $.settings.unknown)}
@@ -1043,15 +1054,17 @@ export function SettingsView({
                         </CardContent>
                       ) : null}
                       {form && card.key !== "bildirim-0" && footer(card.key)}
+                      {card.key === "plan-billing" && data.billingTax}
+                      {card.key === "plan-1" && data.invoiceHistory}
                       {panel.key === "ekip" && index === 1 && !form && footer(card.key)}
-                      {panel.key === "plan" && index !== 1 && (
+                      {(card.key === "plan-0" || card.key === "plan-2") && (
                         <CardFooter className="flex-wrap justify-between gap-3">
                           <p className="text-xs text-muted-foreground">
-                            {index === 0
+                            {card.key === "plan-0"
                               ? (data.plan?.nextInvoice ?? t(($) => $.settings.unknown))
                               : (data.plan?.subscriptionState ?? t(($) => $.settings.unknown))}
                           </p>
-                          {index === 2 && (
+                          {card.key === "plan-2" && (
                             <Button
                               type="button"
                               variant="outline"
@@ -1061,7 +1074,7 @@ export function SettingsView({
                               {t(($) => $.settings.cancelChangeTitle)}
                             </Button>
                           )}
-                          {index === 0 && (
+                          {card.key === "plan-0" && (
                             <Button
                               type="button"
                               variant="outline"
@@ -1071,7 +1084,7 @@ export function SettingsView({
                               {t(($) => $.settings.upgradeQuoteTitle)}
                             </Button>
                           )}
-                          {index === 0 && (
+                          {card.key === "plan-0" && (
                             <Button
                               type="button"
                               variant="outline"
@@ -1086,13 +1099,15 @@ export function SettingsView({
                             variant="outline"
                             isDisabled={
                               locked ||
-                              !canAction(index === 0 ? "changePlan" : "cancelSubscription")
+                              !canAction(
+                                card.key === "plan-0" ? "changePlan" : "cancelSubscription",
+                              )
                             }
                             onPress={() =>
-                              action(index === 0 ? "changePlan" : "cancelSubscription")
+                              action(card.key === "plan-0" ? "changePlan" : "cancelSubscription")
                             }
                           >
-                            {index === 0
+                            {card.key === "plan-0"
                               ? t(($) => $.settings.changePlan)
                               : (data.plan?.renewalActionLabel ??
                                 t(($) => $.settings.cancelSubscription))}

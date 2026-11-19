@@ -26,7 +26,7 @@ export function personCreateIntent(
   };
 }
 export async function readPeoplePage(
-  scope: PeopleScope,
+  scope: Pick<PeopleScope, "accountId" | "orgId"> & Partial<Pick<PeopleScope, "centerId">>,
   query: string,
   cursor?: string,
   status?: "active" | "inactive",
@@ -37,7 +37,7 @@ export async function readPeoplePage(
     client_api_version: 1,
     request_id: uuidv7(),
     org_id: scope.orgId,
-    center_id: scope.centerId,
+    ...(scope.centerId ? { center_id: scope.centerId } : {}),
     ...(query.trim() ? { query: query.trim() } : {}),
     ...(status ? { student_status: status } : {}),
     ...(includeSummary ? { include_member_summary: true } : {}),

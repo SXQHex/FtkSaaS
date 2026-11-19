@@ -10,6 +10,10 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
   await mockAccount(page);
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
+  let releaseEarnings!: () => void;
+  const earningsGate = new Promise<void>((resolve) => {
+    releaseEarnings = resolve;
+  });
   const requests: {
     person_id: string;
     center_id: string;
@@ -20,8 +24,10 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     const req = route.request().postDataJSON();
     if (req.view !== "earnings") return route.fallback();
     requests.push(req);
+    expect(req.include_session_context).toBe(true);
     expect(req.person_id).toBe(I.instructor);
     expect(req.center_id).toBe(I.center);
+    await earningsGate;
     const row = {
       id: id(req.page.cursor ? 992 : 991),
       person_id: req.interval ? I.instructor : id(998),
@@ -37,6 +43,12 @@ test("own earnings preserves cursor scope and currency alongside native summarie
       closure_id: null,
       created_at: req.interval?.starts_at ?? "2019-01-01T00:00:00Z",
       version: 1,
+      session_context: {
+        title: req.page.cursor ? null : "Kapanıştaki Tango dersi",
+        scheduled_duration_seconds: req.page.cursor ? null : 5400,
+        attended_count: req.page.cursor ? 0 : 7,
+        agreement_version: req.page.cursor ? null : 3,
+      },
       basis: {
         source: "agreement_fixed",
         currency: req.page.cursor ? "USD" : "TRY",
@@ -60,7 +72,21 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   });
   await page.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
   await expect(page).toHaveTitle("Hakedişim · Fethiye Tango");
+  const lines = page.getByRole("tabpanel", { name: "Seans satırları", exact: true });
+  try {
+    await expect(lines.getByRole("status")).toHaveText("Hakedişler okunuyor…");
+    await expect(lines.locator('[data-slot="skeleton"]')).toHaveCount(1);
+    await expect(lines.getByText("Güncel hakediş satırları okunamadı.")).toHaveCount(0);
+    await expect(page.getByText("Bu dönemde parasal kayıt yok.", { exact: true })).toHaveCount(3);
+  } finally {
+    releaseEarnings();
+  }
   await expect(page.getByRole("gridcell", { name: /90.071.992.547.409,93/ })).toBeVisible();
+  await expect(lines.getByText("Kapanıştaki Tango dersi", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Planlanan süre 90 dk.", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Katılan kişi sayısı 7", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Anlaşma sürümü 3", { exact: true })).toBeVisible();
+  await expect(lines.locator('[data-slot="skeleton"]')).toHaveCount(0);
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
   expect(requests).toHaveLength(1);
   expect(requests[0]).not.toHaveProperty("interval");
@@ -68,6 +94,9 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   await expect(page.getByText(/2019/).first()).toBeVisible();
   await page.getByRole("button", { name: "Sonraki", exact: true }).click();
   await expect(page.getByText("Düzeltme", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Seans hakedişi", { exact: true })).toBeVisible();
+  await expect(lines.getByText("Katılan kişi sayısı 0", { exact: true })).toBeVisible();
+  await expect(lines.getByText(/Planlanan süre|Anlaşma sürümü/)).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Sonraki", exact: true })).toBeDisabled();
   expect(requests[1]!.page.cursor).toBe("second");
   await page.getByRole("combobox", { name: "Dönem", exact: true }).selectOption("2026-10");
@@ -88,6 +117,12 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     .toEqual({ starts_at: "2026-10-31T21:00:00Z", ends_at: "2026-11-30T21:00:00Z" });
   await page.setViewportSize({ width: 320, height: 950 });
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
+  const tableRegion = page.getByRole("region", { name: "Seans satırları", exact: true });
+  await expect(tableRegion).toHaveAttribute("tabindex", "0");
+  await tableRegion.focus();
+  await tableRegion.press("ArrowRight");
+  await expect.poll(() => tableRegion.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
 });
 test("own earnings denied read stays unknown until explicit retry", async ({ page }) => {
   await mockSessionDetail(page, { existing: true, instructor: true });

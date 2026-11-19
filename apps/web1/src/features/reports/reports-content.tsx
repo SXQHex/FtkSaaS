@@ -1,6 +1,7 @@
+import { saveDownload } from "../../lib/save-download";
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate, useParams, useRouter, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
@@ -10,6 +11,7 @@ import type {
   ReportKind,
   ReportView,
   ImportDirectoryItem,
+  JobState,
 } from "../../lib/api-contracts/generated";
 import { readWorkspace } from "../workspace/workspace";
 import { readTracking } from "../audit/audit-read";
@@ -19,6 +21,7 @@ import {
   type ReportTab,
   type ReportRange,
   type ReportBreakdown,
+  type ReportFileRow,
 } from "./reports-view";
 import { reportInterval, readReport, readImportDirectory } from "./reports-read";
 import {
@@ -47,7 +50,11 @@ export function ReportsContent({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const [tab, setTab] = useState<ReportTab>("summary"),
+  const navigate = useNavigate({ from: "/o/$orgId/c/$centerId/reports" });
+  const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/reports" });
+  const { action } = useSearch({ from: "/o/$orgId/c/$centerId/reports" });
+  const shortcut = scope.orgId === orgId && scope.centerId === centerId ? action : undefined;
+  const [selectedTab, setTab] = useState<ReportTab>("summary"),
     [range, setRange] = useState<ReportRange>("30"),
     [from, setFrom] = useState(""),
     [to, setTo] = useState(""),
@@ -55,9 +62,12 @@ export function ReportsContent({
   const [anchor, setAnchor] = useState(() => new Date().toISOString()),
     [locked, setLocked] = useState(false),
     [lost, setLost] = useState(false),
-    [fileError, setFileError] = useState(false);
+    [fileError, setFileError] = useState(false),
+    [checkedExport, setCheckedExport] = useState<JobState>();
   const [exporting, setExporting] = useState<ReportFilters>();
+  const [retryExport, setRetryExport] = useState<{ id: string; date: string }>();
   const [importing, setImporting] = useState<{ initial?: ImportDirectoryItem }>();
+  const tab = shortcut === "import" ? "files" : selectedTab;
   const [pages, setPages] = useState<
     Record<string, { cursors: (string | undefined)[]; index: number }>
   >({});
@@ -199,6 +209,9 @@ export function ReportsContent({
     [router, onLockChange],
   );
   const unknown = t(($) => $.reports.unknown);
+  const jobStates = t(($) => $.reports.jobStates, { returnObjects: true });
+  const jobState = (state: string) =>
+    Object.hasOwn(jobStates, state) ? jobStates[state as JobState] : unknown;
   const amount = (view: ReportView | undefined, metric: string) =>
     view ? reportMoney(view.totals, metric) || t(($) => $.reports.empty) : unknown;
   const proportion = (view: ReportView | undefined, metric: string) =>
@@ -208,9 +221,26 @@ export function ReportsContent({
           t(($) => $.reports.noDenominator),
         )
       : unknown;
+  const conversion = data.crm?.rows.items.find(
+    (row) => row.group_key === "crm_conversion" && row.center_id === scope.centerId,
+  );
+  const funnel = data.crm?.crm_funnel;
+  const formatCount = (value: number) => value.toLocaleString("tr-TR");
   const currentFinance = active && !finance.isError ? finance.data : undefined;
   const currentImports = active && !imports.isError ? imports.data : undefined,
     currentExports = active && !exports.isError ? exports.data : undefined;
+  const importReview =
+    importing ?? (shortcut === "import" && currentImports?.limits ? {} : undefined);
+  const exportFilters = exporting ?? (shortcut === "export" ? filters : undefined);
+  const exportReview = retryExport
+    ? { retry: retryExport }
+    : exportFilters && {
+        filters: exportFilters,
+        period: `${exportFilters.interval.starts_at} – ${exportFilters.interval.ends_at} · ${timezone}`,
+      };
+  function closeShortcut() {
+    if (shortcut) void navigate({ search: {}, replace: true });
+  }
   const date = (value: string) =>
     new Intl.DateTimeFormat("tr-TR", {
       timeZone: timezone!,
@@ -287,31 +317,27 @@ export function ReportsContent({
       queries.invalidateQueries({ queryKey: ["report-import-directory", scope] }),
     ]);
   }
-  async function file(
-    kind: "export" | "import",
-    id: string,
-    action: "download" | "retry" | "rows",
-  ) {
+  async function file(id: string, action: ReportFileRow["action"]) {
     if (locked) return;
     setFileError(false);
+    setCheckedExport(undefined);
     try {
-      if (kind === "export" && action === "download") {
+      if (action === "download") {
         const row = currentExports?.items.find((row) => row.id === id);
         if (!row || row.state !== "succeeded") throw Error("REPORT_FILE_UNAVAILABLE");
-        const blob = await downloadReport(scope, id, uuidv7());
-        const url = URL.createObjectURL(blob),
-          link = document.createElement("a");
-        link.href = url;
-        link.download = `report-${id}.csv`;
-        link.click();
-        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      } else if (kind === "import" && action === "rows") {
+        saveDownload(await downloadReport(scope, id, uuidv7()), `report-${id}.csv`);
+      } else if (action === "rows") {
         const row = currentImports?.items.find((row) => row.job_id === id);
         if (!row) throw Error("IMPORT_JOB_UNKNOWN");
         setImporting({ initial: row });
       } else {
-        await readJob(scope, id);
-        await refresh();
+        const job = await readJob(scope, id);
+        const refreshed = await exports.refetch({ throwOnError: true });
+        setCheckedExport(job.state);
+        if (action === "retry" && job.state === "failed") {
+          const row = refreshed.data?.items.find((row) => row.id === id && row.state === "failed");
+          if (row) setRetryExport({ id, date: date(row.created_at) });
+        }
       }
     } catch (error) {
       if (!accessLost(error)) setFileError(true);
@@ -321,7 +347,10 @@ export function ReportsContent({
     <>
       <ReportsView
         tab={tab}
-        onTab={setTab}
+        onTab={(value) => {
+          setTab(value);
+          closeShortcut();
+        }}
         range={range}
         onRange={(value) => {
           setRange(value);
@@ -340,7 +369,7 @@ export function ReportsContent({
           setPages({});
         }}
         onExport={() => {
-          if (filters) setExporting(structuredClone(filters));
+          if (filters) setExporting(filters);
         }}
         onPeople={() =>
           void router.navigate({
@@ -411,22 +440,48 @@ export function ReportsContent({
               : undefined,
           },
           earnings: data.balances ? instructorRows(data.balances, t) : undefined,
-          funnel: data.crm
-            ? data.crm.totals.map((row, index) => ({
-                id: String(index),
-                label: t(($) => $.reports.crmConverted),
-                value: row.count,
-                display: `${row.count.toLocaleString("tr-TR")} / ${row.basis_count?.toLocaleString("tr-TR") ?? unknown}`,
-              }))
-            : undefined,
-          funnelSummary: t(($) => $.reports.crmNative),
+          funnel: funnel
+            ? {
+                converted: formatCount(funnel.converted_count),
+                candidates: formatCount(funnel.cohort_count),
+                rate: reportRatio(
+                  funnel.cohort_count
+                    ? Math.round((funnel.converted_count / funnel.cohort_count) * 10000)
+                    : undefined,
+                  t(($) => $.reports.noDenominator),
+                ),
+              }
+            : conversion && {
+                converted: conversion.count?.toLocaleString("tr-TR") ?? unknown,
+                candidates: conversion.basis_count?.toLocaleString("tr-TR") ?? unknown,
+                rate: reportRatio(
+                  conversion.ratio_bps,
+                  t(($) => $.reports.noDenominator),
+                ),
+              },
+          funnelStages: funnel?.stages.map((row) => ({
+            id: row.stage_key ? `stage:${row.stage_key}` : "no-stage",
+            cells: [row.stage_key ?? t(($) => $.reports.crmNoStage), formatCount(row.count)],
+          })),
+          funnelSources: funnel?.sources.map((row) => ({
+            id: row.source,
+            cells: [
+              t(($) => $.reports.crmFunnelSourceNames[row.source]),
+              formatCount(row.count),
+              formatCount(row.converted_count),
+            ],
+          })),
+          funnelEmpty: data.crm ? t(($) => $.reports.empty) : unknown,
           exports: currentExports?.items.map((row) => ({
             id: row.id,
             name: t(($) => $.reports.exportTitle),
-            detail: date(row.created_at),
-            state: row.state,
-            canDownload: row.state === "succeeded",
-            canRetry: row.state !== "succeeded",
+            detail:
+              row.state === "retry_wait" && row.next_attempt_at
+                ? `${date(row.created_at)} · ${t(($) => $.reports.exportNextAttempt, { date: date(row.next_attempt_at) })}`
+                : date(row.created_at),
+            state: jobState(row.state),
+            action: row.state === "succeeded" ? "download" : "status",
+            canRetry: row.state === "failed",
             progress:
               row.progress_count !== null && row.total_count
                 ? (row.progress_count / row.total_count) * 100
@@ -439,8 +494,8 @@ export function ReportsContent({
                 ? t(($) => $.reports.studentImport)
                 : t(($) => $.reports.crmImport),
             detail: `${date(row.created_at)} · ${row.phase}`,
-            state: row.state,
-            canReadRows: true,
+            state: jobState(row.state),
+            action: "rows",
             progress: row.total_count ? (row.progress_count / row.total_count) * 100 : undefined,
           })),
         }}
@@ -481,13 +536,21 @@ export function ReportsContent({
               </Alert>
             )}
             {tab === "files" && (
-              <Button
-                variant="outline"
-                isDisabled={locked || !active || !currentImports?.limits}
-                onPress={() => setImporting({})}
-              >
-                {t(($) => $.reports.startImport)}
-              </Button>
+              <>
+                <p role="status" className="text-sm text-muted-foreground">
+                  {checkedExport &&
+                    t(($) => $.reports.exportChecked, {
+                      state: t(($) => $.reports.jobStates[checkedExport]),
+                    })}
+                </p>
+                <Button
+                  variant="outline"
+                  isDisabled={locked || !active || !currentImports?.limits}
+                  onPress={() => setImporting({})}
+                >
+                  {t(($) => $.reports.startImport)}
+                </Button>
+              </>
             )}
             <Button variant="outline" isDisabled={locked} onPress={() => void refresh()}>
               {t(($) => $.reports.readAgain)}
@@ -495,27 +558,33 @@ export function ReportsContent({
           </div>
         }
       />
-      {importing && active && (
+      {importReview && active && (
         <ReportImportEditor
-          key={importing.initial?.job_id ?? "new"}
+          key={importReview.initial?.job_id ?? "new"}
           scope={scope}
           limits={currentImports?.limits ?? null}
-          initial={importing.initial}
+          initial={importReview.initial}
           onClose={() => {
-            if (!locked) setImporting(undefined);
+            if (locked) return;
+            if (shortcut === "import") setTab("files");
+            setImporting(undefined);
+            closeShortcut();
           }}
           onLockChange={lock}
           onAccessLost={accessLost}
           onSaved={refresh}
         />
       )}
-      {exporting && active && (
+      {exportReview && active && (
         <ReportExportEditor
+          key={retryExport?.id ?? "export"}
           scope={scope}
-          filters={exporting}
-          period={`${exporting.interval.starts_at} – ${exporting.interval.ends_at} · ${timezone}`}
+          review={exportReview}
           onClose={() => {
-            if (!locked) setExporting(undefined);
+            if (locked) return;
+            setExporting(undefined);
+            setRetryExport(undefined);
+            closeShortcut();
           }}
           onLockChange={lock}
           onAccessLost={accessLost}

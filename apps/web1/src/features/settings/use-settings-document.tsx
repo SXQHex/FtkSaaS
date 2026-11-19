@@ -47,7 +47,12 @@ const reminderChoices = {
   package_reminder_days: [3, 7, 14],
   payment_reminder_days: [1, 3, 7],
 } as const;
-const fields = { ...generalFields, ...reminderFields };
+const billingFields = {
+  "billing-name": "billing_name",
+  "billing-address": "billing_address",
+  "billing-email": "billing_email",
+} as const;
+const fields = { ...generalFields, ...reminderFields, ...billingFields };
 const colors = {
   primaryColor: "primary_color",
   secondaryColor: "secondary_color",
@@ -57,6 +62,7 @@ const groups = {
   "ay-genel": Object.values(generalFields),
   "ay-marka": Object.values(colors),
   "ay-hat": Object.values(reminderFields),
+  "plan-billing": Object.values(billingFields),
 } as const;
 type Draft = Partial<Record<keyof SettingsDocumentPatch, string | boolean | null>>;
 export function useSettingsDocument({
@@ -263,6 +269,14 @@ export function useSettingsDocument({
         read: !!source,
         writable: Object.values(reminderFields).some(writable),
       },
+      "plan-billing": {
+        dirty: Object.values(billingFields).some((field) => Object.hasOwn(draft, field)),
+        pending: locked,
+        read:
+          level === "organization" &&
+          Object.values(billingFields).some((field) => current(field) !== undefined),
+        writable: level === "organization" && Object.values(billingFields).some(writable),
+      },
       "ay-marka": {
         dirty:
           logoDraft !== undefined ||
@@ -298,11 +312,13 @@ export function useSettingsDocument({
   function onField(presentation: SettingsFieldKey, value: string | boolean) {
     if (locked || review || !(presentation in fields)) return;
     const wire = fields[presentation as keyof typeof fields];
+    if (wire.startsWith("billing_") && level !== "organization") return;
     if (wire.endsWith("_enabled") ? typeof value !== "boolean" : typeof value !== "string") return;
     if (writable(wire))
       setDraft((previous) => ({
         ...previous,
-        [wire]: wire === "contact_email" && value === "" ? null : value,
+        [wire]:
+          (wire === "contact_email" || wire === "billing_email") && value === "" ? null : value,
       }));
   }
   function onColor(presentation: keyof typeof colors, value: string) {
@@ -326,6 +342,7 @@ export function useSettingsDocument({
   }
   function onSave(card: SettingsCardKey) {
     if (locked || review || !source || (card === "ay-marka" && logoError)) return;
+    if (card === "plan-billing" && level !== "organization") return;
     const keys = card in groups ? groups[card as keyof typeof groups] : [];
     let patch: SettingsDocumentPatch;
     try {
@@ -358,8 +375,8 @@ export function useSettingsDocument({
     setError(undefined);
     setReview({ source, patch, card, ...(logo !== undefined ? { logo } : {}) });
   }
-  const resetCards = (Object.keys(groups) as (keyof typeof groups)[]).filter((card) =>
-    groups[card].some(writable),
+  const resetCards = (Object.keys(groups) as (keyof typeof groups)[]).filter(
+    (card) => card !== "plan-billing" && groups[card].some(writable),
   );
   async function onReset(card: SettingsCardKey) {
     if (busy.current || locked || review || !source || !(card in groups)) return;

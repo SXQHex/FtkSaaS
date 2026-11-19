@@ -4,7 +4,6 @@ import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   ProductView,
   ProductTerms,
-  ProductScope,
   RequestProductPublish,
   RequestProductStateSet,
   ProductManagementEntry,
@@ -174,6 +173,7 @@ export function productIntent(
   draft: ProductDraft,
   base?: ProductView & { version?: number },
   disciplineIds: string[] = [],
+  usageCenterIds: string[] = [],
 ): ProductPublishIntent {
   const name = z.string().trim().min(1).max(2000).parse(draft.name);
   const booking_mode = z.enum(["priority", "flexible"]).parse(draft.bookingMode);
@@ -193,23 +193,40 @@ export function productIntent(
       .min(1)
       .refine((values) => new Set(values).size === values.length)
       .parse(draft.scopes) as ["lesson" | "event", ...("lesson" | "event")[]];
-    let scopeRow: ProductScope;
-    if (draft.scopeKind === "center_all_disciplines")
-      scopeRow = {
-        scope_kind: draft.scopeKind,
-        center_id: scope.centerId,
+    if (draft.scopeKind === "selected_centers") {
+      const [first, ...remaining] = [...new Set(draft.usageCenterIds ?? [])];
+      if (
+        !first ||
+        usageCenterIds.length < 2 ||
+        [first, ...remaining].some((id) => !usageCenterIds.includes(id))
+      )
+        throw new Error("PRODUCT_SCOPE_REQUIRED");
+      const centerScope = (id: string) => ({
+        scope_kind: "center_all_disciplines" as const,
+        center_id: z.uuid().parse(id),
         discipline_id: null,
         usage_targets,
-      };
+      });
+      scopes = [centerScope(first), ...remaining.map(centerScope)];
+    } else if (draft.scopeKind === "center_all_disciplines")
+      scopes = [
+        {
+          scope_kind: draft.scopeKind,
+          center_id: scope.centerId,
+          discipline_id: null,
+          usage_targets,
+        },
+      ];
     else if (draft.scopeKind === "center_discipline" && disciplineIds.includes(draft.disciplineId))
-      scopeRow = {
-        scope_kind: draft.scopeKind,
-        center_id: scope.centerId,
-        discipline_id: z.uuid().parse(draft.disciplineId),
-        usage_targets,
-      };
+      scopes = [
+        {
+          scope_kind: draft.scopeKind,
+          center_id: scope.centerId,
+          discipline_id: z.uuid().parse(draft.disciplineId),
+          usage_targets,
+        },
+      ];
     else throw new Error("PRODUCT_SCOPE_REQUIRED");
-    scopes = [scopeRow];
   }
   const terms: ProductTerms = {
     name,

@@ -1,6 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockEarnings, fillEarningsPayment, earningsIds } from "./earnings-fixture.js";
-import { studioIds as I } from "./studio-fixture.js";
+import type { DigitalAgreementView } from "../src/lib/api-contracts/generated.js";
+import { scanAccessibility } from "./accessibility.js";
+import { initialAgreement, studioIds as I } from "./studio-fixture.js";
 test("manager native directory preserves global currency totals, historical agreement, distinct session counts and cursor filters", async ({
   page,
 }) => {
@@ -219,4 +221,81 @@ test("invalid overpayment preserves a fully accessible dark mobile payment form 
   ).toBeVisible();
   await expect(dialog.getByLabel("Tutar · TRY", { exact: true })).toBeFocused();
   expect(f.writes).toHaveLength(0);
+});
+
+test("manager reads agreement evidence on demand and clears stale status on denial", async ({
+  page,
+}) => {
+  const content = {
+    name: "Anlaşma metni",
+    language: "tr" as const,
+    template_id: "instructor.agreement",
+    template_version: "1",
+    text: "Sentetik eğitmen anlaşması koşulları.",
+  };
+  const rendered: NonNullable<DigitalAgreementView["rendered_document"]> = {
+    id: earningsIds.earning,
+    source_version: I.agreement,
+    source_content_hash: "facts",
+    content_hash: "body",
+    language: "tr",
+    created_at: "2026-11-18T00:00:00Z",
+    content,
+  };
+  const accepted: NonNullable<DigitalAgreementView["acceptance"]> = {
+    id: earningsIds.payment,
+    account_id: earningsIds.created,
+    person_id: I.instructor,
+    agreement_id: I.agreement,
+    accepted_at: "2026-11-18T00:00:00Z",
+    rendered_document_id: rendered.id,
+    content_hash: rendered.content_hash,
+    source_content_hash: rendered.source_content_hash,
+    displayed_content: content,
+    evidence_kind: "server_document",
+  };
+  const view: DigitalAgreementView = {
+    agreement: initialAgreement,
+    source_content_hash: rendered.source_content_hash,
+    acceptance: null,
+    document_error: "POLICY_NOT_CONFIGURED",
+    rendered_document: null,
+  };
+  let denied = false;
+  const fixture = await mockEarnings(page, {
+    agreementDocument: () => (denied ? "FORBIDDEN" : view),
+  });
+  const row = page.getByRole("row").filter({ hasText: "Örnek Eğitmen" });
+  const open = row.getByRole("button", { name: "Metin kabul durumunu göster" });
+  const refresh = row.getByRole("button", { name: "Metin kabul durumunu yenile" });
+  await expect(open).toBeEnabled();
+  expect(fixture.agreementReads).toHaveLength(0);
+  await open.press("Enter");
+  await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Anlaşma metni yayımlanmadı");
+  await expect(refresh).toBeFocused();
+
+  view.rendered_document = rendered;
+  view.document_error = null;
+  await refresh.click();
+  await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Metin kabulü bekleniyor");
+
+  view.acceptance = { ...accepted, content_hash: "previous-body" };
+  await refresh.click();
+  await expect(row.getByRole("status")).toHaveText(
+    "Anlaşma v1 · Metni yeniden kabul etmesi gerekiyor",
+  );
+
+  view.acceptance = { ...accepted, person_id: earningsIds.correction };
+  await refresh.click();
+  await expect(row.getByRole("status")).toHaveText("Metin kabul durumu doğrulanamadı.");
+
+  view.acceptance = accepted;
+  await refresh.click();
+  await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Metin kabul edildi");
+  expect((await scanAccessibility(page, "manager-agreement-acceptance")).violations).toEqual([]);
+
+  denied = true;
+  await refresh.click();
+  await expect(row.getByRole("status")).toHaveText("Metin kabul durumu doğrulanamadı.");
+  expect(fixture.agreementReads).toEqual(Array.from({ length: 6 }, () => I.agreement));
 });

@@ -152,8 +152,8 @@ it("keeps a photo draft atomic with text and retries the exact intent until a co
   await userEvent.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
   expect(await screen.findByText("Profil kaydedildi. Güncel bilgiler yenilenemedi.")).toBeVisible();
   expect(save.mock.calls[1]).toEqual(save.mock.calls[0]);
-  expect(save.mock.calls[0][0].displayName).toBe("Changed");
-  expect(save.mock.calls[0][3]).toEqual(upload);
+  expect(save.mock.calls[0][1].display_name).toBe("Changed");
+  expect(save.mock.calls[0][1].photo).toEqual(upload);
   expect(screen.getByRole("button", { name: "Fotoğraf yükle" })).toBeDisabled();
   await userEvent.click(screen.getByRole("button", { name: "Yeniden dene" }));
   expect(save).toHaveBeenCalledTimes(2);
@@ -260,5 +260,6 @@ it("member presentation preserves hidden native names when updating its visible 
   await userEvent.type(screen.getByLabelText("Görünen ad"), "Member");
   await userEvent.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
   await waitFor(() => expect(save).toHaveBeenCalled());
-  expect(save.mock.calls[0][0]).toEqual({ ...source.values, displayName: "Member" });
+  expect(save.mock.calls[0][0]).toBe(source.account.id);
+  expect(save.mock.calls[0][1]).toEqual({ display_name: "Member", unverified_phone: null });
 });

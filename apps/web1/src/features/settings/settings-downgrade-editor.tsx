@@ -214,7 +214,7 @@ export function SettingsDowngradeEditor({
       options={
         before.subscription.billing?.downgrade_options?.map((row) => ({
           key: row.target.id,
-          label: row.plan,
+          label: t(($) => $.settings.subscriptionPlans[row.plan]),
           description: `${formatMinorAmount(row.target.amount_minor, row.target.currency)} · ${t(($) => $.settings.subscriptionPeriods[row.target.period])} · ${date(row.effective_at)}`,
         })) ?? null
       }

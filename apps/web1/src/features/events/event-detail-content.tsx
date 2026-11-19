@@ -142,11 +142,32 @@ export function EventDetailContent({
     },
     [onLockChange],
   );
-  async function refresh() {
-    await queries.refetchQueries({ queryKey: prefix, exact: true }, { throwOnError: true });
-    await queries.invalidateQueries({
-      queryKey: ["events", scope.accountId, scope.orgId, scope.centerId],
-    });
+  async function refresh(afterWrite?: { finance?: boolean; earnings?: boolean }) {
+    const scopeIds = [scope.accountId, scope.orgId, scope.centerId];
+    const affected: (readonly unknown[])[] = [["events", ...scopeIds]];
+    if (afterWrite) affected.push(["schedule-range", ...scopeIds]);
+    if (afterWrite?.finance) {
+      for (const name of [
+        "finance-directory",
+        "finance-directory-credit-debts",
+        "finance",
+        "profile-rights",
+        "member-entitlements",
+        "event-registration-rights",
+      ])
+        affected.push([name, ...scopeIds]);
+    }
+    if (afterWrite?.earnings) {
+      affected.push(["earnings-directory", scope], ["earnings-visible-counts", scope]);
+      affected.push(
+        ["instructor-earning-page", ...scopeIds],
+        ["instructor-account-payments", ...scopeIds],
+      );
+    }
+    await Promise.all([
+      queries.refetchQueries({ queryKey: prefix, exact: true }, { throwOnError: true }),
+      ...affected.map((queryKey) => queries.invalidateQueries({ queryKey })),
+    ]);
     setActual(undefined);
     setReason("");
   }
@@ -394,7 +415,7 @@ export function EventDetailContent({
           target={eventId}
           timezone={event.timezone}
           onClose={() => setEdit(false)}
-          onSaved={refresh}
+          onSaved={() => refresh({})}
           onLockChange={setPending}
           onAccessLost={accessLost}
         />
@@ -410,7 +431,24 @@ export function EventDetailContent({
               void refresh();
             }
           }}
-          onSaved={refresh}
+          onSaved={() =>
+            refresh({
+              finance: [
+                "cancel",
+                "cancel_registration",
+                "complete",
+                "close_attendance",
+                "correct_attendance",
+              ].includes(action.selection.action),
+              earnings: [
+                "verify_duty",
+                "cancel",
+                "complete",
+                "close_attendance",
+                "correct_attendance",
+              ].includes(action.selection.action),
+            })
+          }
           onLockChange={setPending}
           onAccessLost={accessLost}
         />
@@ -427,7 +465,7 @@ export function EventDetailContent({
               void refresh();
             }
           }}
-          onSaved={refresh}
+          onSaved={() => refresh({ finance: true })}
           onLockChange={setPending}
           onAccessLost={accessLost}
         />

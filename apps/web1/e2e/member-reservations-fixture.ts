@@ -1,7 +1,11 @@
 import { expect, type Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-import type { ReservationView, SessionView } from "../src/lib/api-contracts/generated.js";
+import type {
+  AttendanceView,
+  ReservationView,
+  SessionView,
+} from "../src/lib/api-contracts/generated.js";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 export async function mockOwnReservations(
   page: Page,
@@ -13,9 +17,17 @@ export async function mockOwnReservations(
     ackUnread?: boolean;
     cancelDenied?: boolean;
     staleLesson?: boolean;
+    weekStart?: "monday" | "sunday";
+    secondSessionCenter?: string;
+    closedLesson?: {
+      session: SessionView;
+      attendance: AttendanceView;
+      reservation: ReservationView;
+    };
   } = {},
 ) {
-  await mockStudio(page);
+  const { native } = await mockStudio(page);
+  if (options.weekStart) native.weekStart = options.weekStart;
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
   const reads: { operation: string; request: Record<string, unknown> }[] = [],
     writes: Record<string, unknown>[] = [];
@@ -72,6 +84,15 @@ export async function mockOwnReservations(
       sale_version: 1,
     },
   }));
+  const memberCenters = options.secondSessionCenter
+    ? [I.center, options.secondSessionCenter]
+    : [I.center];
+  const closedLesson = options.closedLesson;
+  const pastTitle = closedLesson ? "Sentetik seans" : "Sentetik geçmiş ders";
+  if (closedLesson) {
+    sessions[2] = closedLesson.session;
+    reservations[2] = closedLesson.reservation;
+  }
   let denied = Boolean(options.denied),
     unread = Boolean(options.ackUnread),
     saved = false;
@@ -97,20 +118,32 @@ export async function mockOwnReservations(
             self_context: {
               person_id: I.self,
               subscriber_number: null,
-              centers: [
-                {
-                  center_id: I.center,
-                  student: !options.noStudent,
-                  instructor: false,
-                  assistant: false,
-                },
-              ],
+              centers: memberCenters.map((centerId) => ({
+                center_id: centerId,
+                student: !options.noStudent,
+                instructor: false,
+                assistant: false,
+              })),
             },
           },
         ],
         next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",
       });
+    if (operation === "centers_list_v1" && options.secondSessionCenter) {
+      return send({
+        items: memberCenters.map((centerId) => ({
+          id: centerId,
+          name: centerId === I.center ? "Fixture Center" : "İkinci merkez",
+          timezone: "Europe/Istanbul",
+          state: "active",
+          accessible: true,
+          version: 1,
+        })),
+        next_cursor: null,
+        as_of: "2026-11-16T12:00:00Z",
+      });
+    }
     if (operation === "roles_list_v1")
       return options.noStudent
         ? send({
@@ -138,10 +171,20 @@ export async function mockOwnReservations(
     }
     if (operation === "reservation_list_v1") {
       expect(req.person_id).toBe(I.self);
-      expect(req.center_id).toBe(I.center);
+      expect(req.center_id).toBe(
+        options.secondSessionCenter && req.session_id === reservations[1]!.session_id
+          ? options.secondSessionCenter
+          : I.center,
+      );
       if (denied) return reject();
       const items = req.session_id
-        ? reservations.filter((row) => row.session_id === req.session_id)
+        ? reservations.filter(
+            (row, index) =>
+              row.session_id === req.session_id &&
+              (req.time_filter === "past"
+                ? index === 2
+                : req.time_filter !== "upcoming" || index !== 2),
+          )
         : req.time_filter === "past"
           ? [reservations[2]!]
           : [reservations[req.page.cursor ? 1 : 0]!];
@@ -149,12 +192,20 @@ export async function mockOwnReservations(
         items,
         next_cursor:
           !req.session_id && req.time_filter === "upcoming" && !req.page.cursor ? "own-next" : null,
-        as_of: "2026-11-16T12:00:00Z",
+        as_of:
+          closedLesson && req.time_filter === "past"
+            ? new Date().toISOString()
+            : "2026-11-16T12:00:00Z",
       });
     }
     if (operation === "session_get_v1")
       return send(sessions.find((row) => row.id === req.session_id));
     if (operation === "attendance_get_v1") {
+      if (closedLesson && closedLesson.session.id === req.session_id)
+        return send({
+          ...closedLesson.attendance,
+          entries: closedLesson.attendance.entries.filter((row) => row.person_id === I.self),
+        });
       const session = sessions.find((row) => row.id === req.session_id)!;
       return send({
         session_id: session.id,
@@ -191,8 +242,11 @@ export async function mockOwnReservations(
           .map((row) => ({
             id: row.id,
             type: "session",
-            center_id: I.center,
-            title: row.id === sessions[2]!.id ? "Sentetik geçmiş ders" : "Sentetik gelecek ders",
+            center_id:
+              row.id === reservations[1]!.session_id && options.secondSessionCenter
+                ? options.secondSessionCenter
+                : I.center,
+            title: row.id === sessions[2]!.id ? pastTitle : "Sentetik gelecek ders",
             starts_at: row.starts_at,
             ends_at: row.ends_at,
             ...(req.member_discovery

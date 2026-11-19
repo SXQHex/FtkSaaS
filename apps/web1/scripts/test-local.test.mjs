@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { localTestPlan } from "./test-local.mjs";
-test("local loop selects independent parallel test jobs without the full build/coverage chain", () => {
+test("local loop selects one-worker jobs in unit then browser order", () => {
   const plan = localTestPlan([
     "--unit",
     "src/features/member-profile",
@@ -12,8 +12,9 @@ test("local loop selects independent parallel test jobs without the full build/c
     plan.map((job) => job.name),
     ["unit", "browser"],
   );
-  assert.ok(plan[0].args.includes("--maxWorkers=2"));
-  assert.ok(plan[1].args.includes("--workers=2"));
+  assert.ok(plan[0].args.includes("--maxWorkers=1"));
+  assert.ok(plan[0].args.includes("--no-file-parallelism"));
+  assert.ok(plan[1].args.includes("--workers=1"));
   assert.ok(
     plan.every(
       (job) =>

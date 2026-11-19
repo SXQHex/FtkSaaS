@@ -17,16 +17,67 @@ export interface OwnWaitlistRow {
   entry: WaitlistEntryView;
   offer?: SeatOfferView;
 }
+export async function readSeatOffer(scope: ClientScope, offerId: string, personId?: string) {
+  z.uuid().parse(offerId);
+  const operation = "seat_offer_accept_v1";
+  const backend = await scopedBackend(scope);
+  const page = await backend.call("management_state_get_v1", {
+    client_api_version: 1,
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    request_id: uuidv7(),
+    operation,
+    selector: { operation, key: { offer_id: offerId } },
+    page: { limit: 1 },
+  });
+  const row = page.items[0];
+  const entry = row?.waitlist_detail;
+  const offer = entry?.offers.find((item) => item.id === offerId);
+  if (
+    page.items.length !== 1 ||
+    page.next_cursor ||
+    !row?.exists ||
+    row.operation !== operation ||
+    row.entity?.type !== "seat_offers" ||
+    row.entity.id !== offerId ||
+    !entry ||
+    !offer ||
+    entry.center_id !== scope.centerId ||
+    (personId && offer.person_id !== personId) ||
+    offer.entry_id !== entry.id ||
+    offer.person_id !== entry.person_id ||
+    offer.session_id !== entry.session_id ||
+    !Number.isSafeInteger(offer.version) ||
+    offer.version < 1 ||
+    row.versions.filter(
+      (item) =>
+        item.entity.type === "seat_offers" &&
+        item.entity.id === offerId &&
+        item.version === offer.version,
+    ).length !== 1
+  )
+    throw new Error("MEMBER_WAITLIST_UNAVAILABLE");
+  z.uuid().parse(offer.session_id);
+  z.iso.datetime({ offset: true }).parse(offer.expires_at);
+  return { entry, offer, asOf: z.iso.datetime({ offset: true }).parse(page.as_of) };
+}
+
 export async function readOwnWaitlist(
   scope: ClientScope,
   view: "entries" | "offers",
   cursor?: string,
+  exactOffer?: { id: string; personId: string },
 ) {
+  if (exactOffer) z.uuid().parse(exactOffer.id);
   const backend = await scopedBackend(scope);
   const key =
     view === "entries"
       ? { directory: "self" as const, view, status: "waiting" as const }
-      : { directory: "self" as const, view, status: "active" as const };
+      : {
+          directory: "self" as const,
+          view,
+          status: exactOffer ? ("all" as const) : ("active" as const),
+        };
   const page = await backend.call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -34,8 +85,11 @@ export async function readOwnWaitlist(
     center_id: scope.centerId,
     operation: "waitlist_join_v1",
     selector: { operation: "waitlist_join_v1", key },
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    ...(exactOffer ? { entity: { type: "seat_offers" as const, id: exactOffer.id } } : {}),
+    page: { limit: exactOffer ? 1 : 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
   });
+  if (exactOffer && (page.items.length !== 1 || page.next_cursor))
+    throw Error("MEMBER_WAITLIST_UNAVAILABLE");
   const ids = new Set<string>();
   const items: OwnWaitlistRow[] = page.items.map((row) => {
     const entry = row.waitlist_detail,
@@ -65,6 +119,7 @@ export async function readOwnWaitlist(
     const entityId = row.entity.id;
     if (
       ids.has(entityId) ||
+      (exactOffer && (entityId !== exactOffer.id || entry.person_id !== exactOffer.personId)) ||
       !row.versions.some(
         (v) =>
           v.entity.type === "waitlist_entries" &&
@@ -74,7 +129,7 @@ export async function readOwnWaitlist(
       (view === "entries" && (entityId !== entry.id || entry.state !== "waiting")) ||
       (view === "offers" &&
         (!offer ||
-          offer.state !== "active" ||
+          (!exactOffer && offer.state !== "active") ||
           offer.entry_id !== entry.id ||
           offer.person_id !== entry.person_id ||
           offer.session_id !== session.id ||
@@ -90,7 +145,11 @@ export async function readOwnWaitlist(
     ids.add(entityId);
     return { id: entityId, session, entry, offer };
   });
-  return { items, nextCursor: page.next_cursor ?? undefined, asOf: page.as_of };
+  return {
+    items,
+    nextCursor: page.next_cursor ?? undefined,
+    asOf: z.iso.datetime({ offset: true }).parse(page.as_of),
+  };
 }
 export async function ownWaitlistIntent(
   scope: ClientScope,
@@ -99,7 +158,7 @@ export async function ownWaitlistIntent(
   reviewed: boolean,
 ) {
   if (!reviewed) throw Error("MEMBER_WAITLIST_REVIEW_REQUIRED");
-  const entry = await readWaitlistTarget(
+  const { entry, asOf } = await readWaitlistTarget(
     scope,
     before.session.id,
     before.entry.person_id,
@@ -120,5 +179,6 @@ export async function ownWaitlistIntent(
     entry,
     offer,
     entry.person_id,
+    asOf,
   );
 }

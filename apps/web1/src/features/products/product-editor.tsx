@@ -42,7 +42,8 @@ export interface ProductDraft {
   refundMethod: "" | "none" | "credit_ratio" | "used_at_unit_price" | "time_ratio";
   refundUnit: string;
   extendsValidity: boolean;
-  scopeKind: "" | "center_all_disciplines" | "center_discipline";
+  scopeKind: "" | "center_all_disciplines" | "center_discipline" | "selected_centers";
+  usageCenterIds?: string[];
   disciplineId: string;
   credits: string;
   validityDays: string;
@@ -97,9 +98,11 @@ export function ProductEditor({
   onDeleteDraft,
   onArchive,
   disciplines = [],
+  usageCenters = [],
   scopesEditable = true,
 }: {
   disciplines?: { id: string; name: string }[];
+  usageCenters?: { id: string; name: string }[];
   scopesEditable?: boolean;
   open: boolean;
   editing: boolean;
@@ -365,6 +368,11 @@ export function ProductEditor({
                       <NativeSelectOption value="center_discipline">
                         {t(($) => $.products.centerDiscipline)}
                       </NativeSelectOption>
+                      {usageCenters.length > 1 && (
+                        <NativeSelectOption value="selected_centers">
+                          {t(($) => $.businessCenters.usageCenters)}
+                        </NativeSelectOption>
+                      )}
                     </NativeSelect>
                   </Field>
                   {draft.scopeKind === "center_discipline" && (
@@ -391,6 +399,37 @@ export function ProductEditor({
                     </Field>
                   )}
                 </FieldGroup>
+                {draft.scopeKind === "selected_centers" && (
+                  <FieldSet>
+                    <FieldLegend>{t(($) => $.businessCenters.usageCenters)}</FieldLegend>
+                    {usageCenters.map((center) => (
+                      <Field key={center.id} orientation="horizontal">
+                        <Checkbox
+                          id={"product-usage-" + center.id}
+                          aria-labelledby={"product-usage-label-" + center.id}
+                          isSelected={(draft.usageCenterIds ?? []).includes(center.id)}
+                          isDisabled={pending || readOnly || !scopesEditable}
+                          onChange={(selected) =>
+                            set(
+                              "usageCenterIds",
+                              selected
+                                ? [...(draft.usageCenterIds ?? []), center.id]
+                                : (draft.usageCenterIds ?? []).filter(
+                                    (value) => value !== center.id,
+                                  ),
+                            )
+                          }
+                        />
+                        <FieldLabel
+                          id={"product-usage-label-" + center.id}
+                          htmlFor={"product-usage-" + center.id}
+                        >
+                          {center.name}
+                        </FieldLabel>
+                      </Field>
+                    ))}
+                  </FieldSet>
+                )}
                 <FieldGroup className="gap-3">
                   {[
                     {

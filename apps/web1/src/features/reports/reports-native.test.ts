@@ -9,6 +9,7 @@ import {
   reportJobReceipt,
   readReportJob,
   downloadReport,
+  downloadSkippedImportRows,
   type ReportJobIntent,
 } from "./reports-command";
 import { readImportRows, readImportPreview } from "./import-read";
@@ -188,6 +189,29 @@ it("requires the native import summary and does not substitute a zero summary fo
   call.mockResolvedValue({ id: id(9), token: "synthetic", expires_at: "2099-01-01T00:00:00Z" });
   await expect(readImportPreview(scope, id(9))).rejects.toThrow();
 });
+it("validates final import totals without deriving them from the visible page", async () => {
+  const summary = {
+    applied_rows: 9,
+    skipped_rows: 4,
+    failed_rows: 3,
+    replayed_rows: 2,
+    total_rows: 18,
+  };
+  const page = { items: [], next_cursor: null, as_of: "2026-11-18T09:00:00Z" };
+  call
+    .mockResolvedValueOnce({ ...page, apply_summary: summary })
+    .mockResolvedValueOnce({ ...page, apply_summary: { ...summary, total_rows: 19 } });
+  await expect(readImportRows(scope, id(9), "failed", undefined, true)).resolves.toMatchObject({
+    apply_summary: summary,
+  });
+  expect(call).toHaveBeenLastCalledWith(
+    "import_rows_list_v1",
+    expect.objectContaining({ include_apply_summary: true, job_id: id(9), state: "failed" }),
+  );
+  await expect(readImportRows(scope, id(9), undefined, undefined, true)).rejects.toThrow(
+    "IMPORT_ROWS_INVALID",
+  );
+});
 it("downloads only a verified native-session CSV POST and rejects cross-origin metadata before sending the bearer", async () => {
   vi.stubEnv("VITE_SUPABASE_URL", "https://fixture.example.invalid");
   vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "synthetic-public-key");
@@ -225,6 +249,18 @@ it("downloads only a verified native-session CSV POST and rejects cross-origin m
     redirect: "error",
   });
   expect(JSON.parse(requests.at(-1)!.init.body as string).operation_key).toBe(id(11));
+  requests.length = 0;
+  await downloadSkippedImportRows(scope, id(12));
+  expect(requests).toHaveLength(2);
+  const skipped = requests.at(-1)!;
+  expect(new URL(skipped.url).pathname).toBe("/functions/v1/backend-v1/import_rows_list_v1");
+  expect(new URL(skipped.url).search).toBe("?download=skipped_csv");
+  expect(JSON.parse(skipped.init.body as string)).toMatchObject({
+    job_id: id(12),
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+  });
+  expect(JSON.parse(skipped.init.body as string)).not.toHaveProperty("operation_key");
   foreign = true;
   requests.length = 0;
   await expect(downloadReport(scope, id(12), id(11))).rejects.toThrow();

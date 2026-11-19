@@ -23,12 +23,13 @@ export function MemberClassesRoutePage() {
       active="classes"
       onScope={onScope}
     >
-      {({ scope, personId, timezone, onLockChange }) => (
+      {({ scope, personId, timezone, weekStart, onLockChange }) => (
         <MemberClassesContent
           key={`${scope.orgId}:${scope.centerId}:${personId}`}
           scope={scope}
           personId={personId}
           timezone={timezone}
+          weekStart={weekStart}
           onLockChange={onLockChange}
         />
       )}

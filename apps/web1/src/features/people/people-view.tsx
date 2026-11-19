@@ -1,4 +1,4 @@
-import { useState, type ReactNode, type RefObject } from "react";
+import { useId, useState, type ReactNode, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchIcon, LinkIcon, MergeIcon, UploadIcon, UserPlusIcon, XIcon } from "lucide-react";
 import { Button } from "../../components/ui/button";
@@ -106,6 +106,8 @@ export function PeopleView({
 }) {
   const { t } = useTranslation();
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const mergeCountId = useId();
+  const mergeCountLabel = mergeCount?.toLocaleString("tr-TR");
   const selected = rows.find((row) => row.id === selectedId);
   const unknown = t(($) => $.people.unknown);
   const status = (row: PeopleRow) => t(($) => $.people.states[row.state]);
@@ -167,10 +169,24 @@ export function PeopleView({
             <LinkIcon />
             {t(($) => $.people.invitations)}
           </Button>
-          <Button variant="outline" isDisabled={!actions.merge} onPress={actions.merge}>
+          {mergeCountLabel !== undefined && (
+            <span id={mergeCountId} hidden>
+              {t(($) => $.people.mergePendingCount, { total: mergeCountLabel })}
+            </span>
+          )}
+          <Button
+            variant="outline"
+            isDisabled={!actions.merge}
+            onPress={actions.merge}
+            aria-describedby={mergeCountLabel === undefined ? undefined : mergeCountId}
+          >
             <MergeIcon />
             {t(($) => $.people.merge)}
-            {mergeCount !== undefined && <Badge variant="secondary">{mergeCount}</Badge>}
+            {mergeCountLabel !== undefined && (
+              <Badge variant="secondary" aria-hidden="true">
+                {mergeCountLabel}
+              </Badge>
+            )}
           </Button>
           <Button variant="outline" isDisabled={!actions.import} onPress={actions.import}>
             <UploadIcon />
@@ -491,6 +507,7 @@ export function PeopleEntrySheet({
             </FieldLabel>
             <Input
               id="people-name"
+              autoFocus
               onBlur={onNameBlur}
               aria-invalid={Boolean(nameError)}
               aria-describedby={nameError ? "people-name-error" : undefined}

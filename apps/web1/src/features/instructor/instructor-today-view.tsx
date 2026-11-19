@@ -18,6 +18,7 @@ import {
 } from "../../components/ui/item";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
+import { Skeleton } from "../../components/ui/skeleton";
 
 export interface InstructorSessionRow {
   id: string;
@@ -45,11 +46,13 @@ export interface InstructorTodayData {
 }
 export function InstructorTodayView({
   data,
+  calendarLoading,
   notice,
   onSchedule,
   onOpen,
 }: {
   data: InstructorTodayData;
+  calendarLoading: boolean;
   notice?: ReactNode;
   onSchedule?: () => void;
   onOpen?: (id: string) => void;
@@ -80,10 +83,16 @@ export function InstructorTodayView({
           <Card key={key}>
             <CardHeader>
               <CardDescription>{metricLabels[key]}</CardDescription>
-              <CardTitle className="break-words text-2xl tabular-nums">
-                {data.metrics[key].value ?? "—"}
-              </CardTitle>
-              <CardDescription>{data.metrics[key].detail}</CardDescription>
+              {calendarLoading && key !== "earnings" ? (
+                <Skeleton aria-hidden="true" className="h-8 w-20 motion-reduce:animate-none" />
+              ) : (
+                <>
+                  <CardTitle className="break-words text-2xl tabular-nums">
+                    {data.metrics[key].value ?? "—"}
+                  </CardTitle>
+                  <CardDescription>{data.metrics[key].detail}</CardDescription>
+                </>
+              )}
             </CardHeader>
           </Card>
         ))}
@@ -99,7 +108,17 @@ export function InstructorTodayView({
             {key === "today" && <CardDescription>{data.attendanceHint}</CardDescription>}
           </CardHeader>
           <CardContent>
-            {data[key] === null ? (
+            {calendarLoading ? (
+              key === "today" ? (
+                <Skeleton
+                  role="progressbar"
+                  aria-label={t(($) => $.instructorSchedule.loading)}
+                  className="h-12 w-full motion-reduce:animate-none"
+                />
+              ) : (
+                <Skeleton aria-hidden="true" className="h-12 w-full motion-reduce:animate-none" />
+              )
+            ) : data[key] === null ? (
               <p role="status" className="text-sm text-muted-foreground">
                 {t(($) => $.instructorToday.unread)}
               </p>

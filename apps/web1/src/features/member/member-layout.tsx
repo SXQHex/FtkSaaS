@@ -20,6 +20,7 @@ import { MemberShellView } from "./member-shell-view";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
+import { MemberInboxLink } from "../inbox/member-inbox-link";
 export function MemberLayout({
   account,
   initial,
@@ -31,12 +32,13 @@ export function MemberLayout({
   account: AccountView;
   initial: { org?: string; center?: string };
   title: string;
-  active: "classes" | "reservations" | "entitlements" | "requests" | "account";
+  active: "classes" | "reservations" | "entitlements" | "requests" | "account" | "inbox";
   onScope: (selection: { org?: string; center?: string }) => void;
   children: (context: {
     scope: ClientScope;
     personId: string;
     timezone: string;
+    weekStart: "monday" | "sunday" | null;
     onLockChange: (locked: boolean) => void;
   }) => ReactNode;
 }) {
@@ -47,7 +49,7 @@ export function MemberLayout({
   const [locked, setLocked] = useState(false),
     [signingOut, setSigningOut] = useState(false),
     [signOutError, setSignOutError] = useState(false);
-  useAccountAppearance(account.id);
+  const appearance = useAccountAppearance(account.id);
   const workspace = useQuery(workspaceQuery(queries, account.id, initial.org));
   const source = !workspace.isError || locked ? workspace.data : undefined;
   const org = source?.selected;
@@ -124,6 +126,13 @@ export function MemberLayout({
       linksDisabled={locked || signingOut}
       actions={
         <div className="flex flex-wrap gap-2">
+          {org && center && student && (
+            <MemberInboxLink
+              scope={{ accountId: account.id, orgId: org.id, centerId: center.id }}
+              current={active === "inbox"}
+              disabled={locked || signingOut}
+            />
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -194,6 +203,9 @@ export function MemberLayout({
           scope: { accountId: account.id, orgId: org.id, centerId: center.id },
           personId: self.person_id,
           timezone: center.timezone,
+          weekStart: appearance.isPending
+            ? null
+            : ((appearance.isError ? undefined : appearance.data?.values.week_start) ?? "monday"),
           onLockChange: setLocked,
         })
       ) : (

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../lib/utils";
 import {
@@ -24,6 +24,17 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Field, FieldLabel } from "../../components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
+import { MemberReadSkeleton } from "../member/member-read-skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
+import type { InboxFilter, InboxVisibility } from "./inbox";
 export interface InboxRow {
   id: string;
   title: string;
@@ -35,8 +46,9 @@ export interface InboxRow {
   actionState?: string;
   context: { label: string; value: string }[];
 }
-export type InboxFilter = "all" | "unread" | "todo";
 export function InboxView({
+  member = false,
+  loading,
   rows,
   selected,
   filter,
@@ -48,8 +60,13 @@ export function InboxView({
   onMarkRead,
   canMarkRead,
   advancedAvailable = false,
-  canMarkAll = false,
-  onMarkAll,
+  canMarkSelection = false,
+  onMarkInboxRead,
+  onMarkSelected,
+  onMoveSelected,
+  undoVisibility = false,
+  onSelectVisible,
+  onUndo,
   locked = false,
   notice,
   detailNotice,
@@ -62,6 +79,8 @@ export function InboxView({
   summary,
   onSearch,
 }: {
+  member?: boolean;
+  loading: boolean;
   rows: InboxRow[] | null;
   selected: InboxRow | null;
   filter: InboxFilter;
@@ -73,8 +92,13 @@ export function InboxView({
   onMarkRead: () => void;
   canMarkRead: boolean;
   advancedAvailable?: boolean;
-  canMarkAll?: boolean;
-  onMarkAll: () => void;
+  canMarkSelection?: boolean;
+  onMarkInboxRead?: () => void;
+  onMarkSelected: (read: boolean) => void;
+  onMoveSelected: (visibility: InboxVisibility) => void;
+  undoVisibility?: boolean;
+  onSelectVisible: (value: boolean) => void;
+  onUndo?: () => void;
   locked?: boolean;
   notice?: ReactNode;
   detailNotice?: ReactNode;
@@ -92,6 +116,11 @@ export function InboxView({
     buttons = useRef(new Map<string, HTMLButtonElement>()),
     previous = useRef<string | null>(null);
   const selectedId = selected?.id;
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const outsideInbox = filter === "archived" || filter === "deleted";
+  const filters: InboxFilter[] = ["all", "unread", "todo"];
+  if (!member) filters.push("archived", "deleted");
+  const visibleChecked = rows?.filter((row) => checked.includes(row.id)).length ?? 0;
   useEffect(() => {
     if (selectedId) {
       previous.current = selectedId;
@@ -102,15 +131,78 @@ export function InboxView({
     <div className="flex min-w-0 flex-col gap-5">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">{t(($) => $.inbox.title)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t(($) => $.inbox.description)}</p>
+          <h1 className="text-2xl font-semibold">
+            {t(($) => (member ? $.workspace.notifications : $.inbox.title))}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t(($) => (member ? $.inbox.memberDescription : $.inbox.description))}
+          </p>
         </div>
-        <Button variant="outline" isDisabled={locked || !canMarkAll} onPress={onMarkAll}>
-          {t(($) => $.inbox.markSelected)}
-          {checked.length > 0 && <Badge variant="secondary">{checked.length}</Badge>}
-        </Button>
+        {member && (
+          <Button
+            variant="outline"
+            isDisabled={locked || !onMarkInboxRead}
+            onPress={onMarkInboxRead}
+          >
+            {t(($) => $.inbox.markInboxRead)}
+          </Button>
+        )}
+        <div
+          role="group"
+          aria-label={t(($) => $.inbox.selectionActions)}
+          className="flex flex-wrap items-center gap-2"
+        >
+          <Checkbox
+            isSelected={visibleChecked > 0 && visibleChecked === rows?.length}
+            isIndeterminate={visibleChecked > 0 && visibleChecked < (rows?.length ?? 0)}
+            isDisabled={locked || !rows?.length}
+            onChange={onSelectVisible}
+          >
+            {t(($) => $.inbox.selectVisible)}
+          </Checkbox>
+          <Button
+            variant="outline"
+            isDisabled={locked || !canMarkSelection}
+            onPress={() => onMarkSelected(true)}
+          >
+            {t(($) => $.inbox.markSelected)}
+            {checked.length > 0 && <Badge variant="secondary">{checked.length}</Badge>}
+          </Button>
+          <Button
+            variant="outline"
+            isDisabled={locked || !canMarkSelection}
+            onPress={() => onMarkSelected(false)}
+          >
+            {t(($) => $.inbox.markSelectedUnread)}
+          </Button>
+          {!member && (
+            <>
+              <Button
+                variant="outline"
+                isDisabled={locked || !canMarkSelection}
+                onPress={() => onMoveSelected(outsideInbox ? "inbox" : "archived")}
+              >
+                {t(($) => (outsideInbox ? $.inbox.restoreSelected : $.inbox.archiveSelected))}
+              </Button>
+              {filter !== "deleted" && (
+                <Button
+                  variant="outline"
+                  isDisabled={locked || !canMarkSelection}
+                  onPress={() => setDeleteOpen(true)}
+                >
+                  {t(($) => $.inbox.deleteSelected)}
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </header>
       {notice}
+      {onUndo && (
+        <Button variant="outline" className="self-start" isDisabled={locked} onPress={onUndo}>
+          {t(($) => (undoVisibility ? $.inbox.undoVisibilityChange : $.inbox.undoReadChange))}
+        </Button>
+      )}
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_26rem]">
         <Card className={cn("min-w-0", selected && "hidden xl:flex")}>
           <CardHeader>
@@ -149,12 +241,13 @@ export function InboxView({
                 selectedKeys={[filter]}
                 onSelectionChange={(keys) => {
                   const value = [...keys][0];
-                  if (value === "all" || value === "unread" || value === "todo") onFilter(value);
+                  const next = filters.find((filter) => filter === value);
+                  if (next) onFilter(next);
                 }}
                 variant="segmented"
                 className="max-w-full flex-wrap"
               >
-                {(["all", "unread", "todo"] as const).map((value) => (
+                {filters.map((value) => (
                   <ToggleGroupItem
                     aria-label={t(($) => $.inbox.filters[value])}
                     id={value}
@@ -162,7 +255,7 @@ export function InboxView({
                     isDisabled={locked || (value === "todo" && !advancedAvailable)}
                   >
                     {t(($) => $.inbox.filters[value])}
-                    {summary && (
+                    {summary && !outsideInbox && value !== "archived" && value !== "deleted" && (
                       <Badge variant="secondary">
                         {
                           summary[
@@ -177,64 +270,64 @@ export function InboxView({
             </div>
           </CardHeader>
           <CardContent>
-            {rows === null ? (
-              <p>{t(($) => $.inbox.loading)}</p>
-            ) : rows.length === 0 ? (
-              <Empty>
-                <EmptyDescription>{t(($) => $.inbox.empty)}</EmptyDescription>
-              </Empty>
-            ) : (
-              <ItemGroup>
-                {rows.map((row) => (
-                  <Item
-                    role="listitem"
-                    key={row.id}
-                    variant={selected?.id === row.id ? "muted" : "outline"}
-                    size="sm"
-                  >
-                    {onCheck && (
-                      <Checkbox
-                        aria-label={t(($) => $.inbox.selectMessage, { title: row.title })}
-                        isSelected={checked.includes(row.id)}
-                        isDisabled={locked}
-                        onChange={(value) => onCheck(row.id, value)}
-                      />
-                    )}
-                    <ItemContent className="min-w-0">
-                      <ItemTitle className="w-full">
-                        <Button
-                          ref={(node) => {
-                            if (node) buttons.current.set(row.id, node);
-                            else buttons.current.delete(row.id);
-                          }}
-                          variant="ghost"
-                          className="h-auto w-full min-w-0 justify-start px-0 text-start whitespace-normal"
+            {loading && <MemberReadSkeleton label={t(($) => $.inbox.loading)} />}
+            {rows &&
+              (rows.length === 0 ? (
+                <Empty>
+                  <EmptyDescription>{t(($) => $.inbox.empty)}</EmptyDescription>
+                </Empty>
+              ) : (
+                <ItemGroup>
+                  {rows.map((row) => (
+                    <Item
+                      role="listitem"
+                      key={row.id}
+                      variant={selected?.id === row.id ? "muted" : "outline"}
+                      size="sm"
+                    >
+                      {onCheck && (
+                        <Checkbox
+                          aria-label={t(($) => $.inbox.selectMessage, { title: row.title })}
+                          isSelected={checked.includes(row.id)}
                           isDisabled={locked}
-                          aria-controls="inbox-detail"
-                          aria-current={selected?.id === row.id ? true : undefined}
-                          onPress={() => onOpen(row.id)}
-                        >
-                          {row.title}
-                        </Button>
-                      </ItemTitle>
-                      <ItemDescription className="line-clamp-2 break-words" lang={row.language}>
-                        {row.body}
-                      </ItemDescription>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge variant="outline">{row.kind}</Badge>
-                        <Badge variant={row.read ? "secondary" : "default"}>
-                          {row.read ? t(($) => $.inbox.read) : t(($) => $.inbox.unread)}
-                        </Badge>
-                        {row.actionState && <Badge variant="outline">{row.actionState}</Badge>}
-                      </div>
-                    </ItemContent>
-                    <ItemActions className="max-w-full self-start text-xs text-muted-foreground tabular-nums">
-                      {row.created}
-                    </ItemActions>
-                  </Item>
-                ))}
-              </ItemGroup>
-            )}
+                          onChange={(value) => onCheck(row.id, value)}
+                        />
+                      )}
+                      <ItemContent className="min-w-0">
+                        <ItemTitle className="w-full">
+                          <Button
+                            ref={(node) => {
+                              if (node) buttons.current.set(row.id, node);
+                              else buttons.current.delete(row.id);
+                            }}
+                            variant="ghost"
+                            className="h-auto w-full min-w-0 justify-start px-0 text-start whitespace-normal"
+                            isDisabled={locked}
+                            aria-controls="inbox-detail"
+                            aria-current={selected?.id === row.id ? true : undefined}
+                            onPress={() => onOpen(row.id)}
+                          >
+                            {row.title}
+                          </Button>
+                        </ItemTitle>
+                        <ItemDescription className="line-clamp-2 break-words" lang={row.language}>
+                          {row.body}
+                        </ItemDescription>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Badge variant="outline">{row.kind}</Badge>
+                          <Badge variant={row.read ? "secondary" : "default"}>
+                            {row.read ? t(($) => $.inbox.read) : t(($) => $.inbox.unread)}
+                          </Badge>
+                          {row.actionState && <Badge variant="outline">{row.actionState}</Badge>}
+                        </div>
+                      </ItemContent>
+                      <ItemActions className="max-w-full self-start text-xs text-muted-foreground tabular-nums">
+                        {row.created}
+                      </ItemActions>
+                    </Item>
+                  ))}
+                </ItemGroup>
+              ))}
           </CardContent>
           <CardFooter className="flex-wrap justify-between gap-3">
             <span className="text-sm text-muted-foreground tabular-nums">
@@ -261,7 +354,7 @@ export function InboxView({
                     isDisabled={locked}
                     onPress={onBack}
                   >
-                    {t(($) => $.inbox.title)}
+                    {t(($) => (member ? $.workspace.notifications : $.inbox.title))}
                   </Button>
                   <CardTitle>
                     <h2
@@ -318,6 +411,24 @@ export function InboxView({
           </Card>
         </aside>
       </div>
+      <AlertDialog isOpen={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t(($) => $.inbox.deleteSelected)}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t(($) => $.inbox.deleteSelectedDescription, { count: checked.length })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel autoFocus>{t(($) => $.inbox.deleteCancel)}</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            isDisabled={locked || !canMarkSelection}
+            onPress={() => onMoveSelected("deleted")}
+          >
+            {t(($) => $.inbox.deleteConfirm)}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialog>
     </div>
   );
 }

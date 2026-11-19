@@ -14,6 +14,7 @@ import {
   WalletIcon,
   ChartNoAxesCombinedIcon,
   Building2Icon,
+  LayoutGridIcon,
   FileTextIcon,
   ShieldIcon,
   SlidersHorizontalIcon,
@@ -34,6 +35,8 @@ export function workspaceNavigation(
   view: NavigationView,
   orgId?: string,
   centerId?: string,
+  starter = false,
+  business = false,
 ): NavigationGroup[] {
   const base =
     orgId && centerId
@@ -55,7 +58,7 @@ export function workspaceNavigation(
     ];
   if (view === "account")
     return [{ key: "general", items: [{ key: "account", url: "/account", icon: <UserIcon /> }] }];
-  return [
+  const groups: NavigationGroup[] = [
     {
       key: "general",
       items: [
@@ -82,10 +85,18 @@ export function workspaceNavigation(
       key: "studio",
       items: [
         { key: "studio", url: scoped("studio"), icon: <Building2Icon /> },
+        ...(business
+          ? [{ key: "businessCenters" as const, url: scoped("centers"), icon: <LayoutGridIcon /> }]
+          : []),
         { key: "documents", url: scoped("documents"), icon: <FileTextIcon /> },
         { key: "audit", url: scoped("audit"), icon: <ShieldIcon /> },
         { key: "settings", url: scoped("settings"), icon: <SlidersHorizontalIcon /> },
       ],
     },
   ];
+  if (!starter) return groups;
+  return groups.map((group) => ({
+    ...group,
+    items: group.items.filter(({ key }) => !["events", "earnings", "automation"].includes(key)),
+  }));
 }

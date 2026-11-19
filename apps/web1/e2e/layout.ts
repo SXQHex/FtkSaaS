@@ -39,27 +39,15 @@ export async function verifyResponsiveLayout(page: Page) {
       // CSS zoom in a scenario scales the layout without resizing the Playwright viewport.
       const width = Math.ceil(cssWidth * rootZoom);
       await page.setViewportSize({ width, height: original?.height ?? 900 });
-      await expect
-        .poll(
-          async () => {
-            const layout = await readLayoutFit(page);
-            return (
-              layout.documentWidth <= layout.width + 1 &&
-              layout.dialogs.every(
-                (rect) =>
-                  rect.left >= -1 &&
-                  rect.right <= layout.width + 1 &&
-                  rect.top >= -1 &&
-                  rect.bottom <= layout.height + 1,
-              )
-            );
-          },
-          { message: `Page and dialogs must fit ${cssWidth} CSS px` },
-        )
-        .toBe(true);
-      const layout = await readLayoutFit(page);
-      observations.push({ ...layout, cssWidth });
-      assertLayoutFit(layout);
+      // Let media-query listeners replace the sidebar before measuring the new viewport.
+      await page.evaluate(
+        "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))",
+      );
+      await expect(async () => {
+        const layout = await readLayoutFit(page);
+        assertLayoutFit(layout);
+        observations.push({ ...layout, cssWidth });
+      }, `Page and dialogs must fit ${cssWidth} CSS px`).toPass({ timeout: 5_000 });
     }
   } finally {
     if (original && !page.isClosed()) await page.setViewportSize(original);

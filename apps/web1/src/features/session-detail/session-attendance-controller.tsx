@@ -10,6 +10,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
 import { SessionAttendance } from "./session-detail-view";
+import { AttendanceCorrectionRequests } from "./attendance-correction-requests";
 import { SessionAttendanceStart, SessionAttendanceClose } from "./session-detail-panels";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -18,8 +19,10 @@ import {
   attendanceStartIntent,
   attendanceMarkIntent,
   attendanceCloseIntent,
+  hasUnmarkedAttendance,
   previewAttendanceCorrection,
   attendanceCorrectionIntent,
+  attendanceWindowState,
   writeSessionAttendance,
   readSessionAttendanceReceipt,
   readSessionAttendanceResult,
@@ -32,6 +35,7 @@ import { Button } from "../../components/ui/button";
 export function SessionAttendanceController({
   scope,
   audience = "management",
+  canCorrectAttendance = false,
   startTime,
   session,
   attendance,
@@ -47,6 +51,7 @@ export function SessionAttendanceController({
 }: {
   scope: ClientScope;
   audience?: "management" | "instructor";
+  canCorrectAttendance?: boolean;
   startTime?: string;
   session: SessionView;
   attendance?: AttendanceView;
@@ -61,6 +66,17 @@ export function SessionAttendanceController({
   children: (view: { panel: ReactNode; overlays: ReactNode; onStart?: () => void }) => ReactNode;
 }) {
   const { t } = useTranslation();
+  const window = attendance?.attendance_window;
+  const [now, updateTime] = useState(Date.now);
+  const phase = attendanceWindowState(window, now);
+  const draftAllowed = phase !== "upcoming" && phase !== "elapsed";
+  useEffect(() => {
+    if (!window || phase === "elapsed") return;
+    const next = Date.parse(phase === "upcoming" ? window.opens_at : window.closes_at);
+    const delay = Math.min(Math.max(0, next - Date.now()), 2_147_483_647);
+    const timer = setTimeout(() => updateTime(Date.now()), delay);
+    return () => clearTimeout(timer);
+  }, [window, phase, now]);
   const [startOpen, setStartOpen] = useState(false),
     [closeOpen, setCloseOpen] = useState(false),
     [reason, setReason] = useState(""),
@@ -125,7 +141,12 @@ export function SessionAttendanceController({
       command.reset();
       await command.start(await intent());
     } catch (failure) {
-      if (!onAccessLost(failure)) setError(t(($) => $.sessionDetail.sourceChanged));
+      if (!onAccessLost(failure))
+        setError(
+          failure instanceof Error && failure.message === "SESSION_ATTENDANCE_WINDOW_CLOSED"
+            ? t(($) => $.sessionDetail.windowUnavailable)
+            : t(($) => $.sessionDetail.sourceChanged),
+        );
     } finally {
       setBusy(false);
     }
@@ -201,7 +222,15 @@ export function SessionAttendanceController({
       ];
     }) ?? [];
   async function preview() {
-    if (!attendance || locked || disabled || !reason.trim() || !corrections.length) return;
+    if (
+      !canCorrectAttendance ||
+      !attendance ||
+      locked ||
+      disabled ||
+      !reason.trim() ||
+      !corrections.length
+    )
+      return;
     reset();
     setBusy(true);
     setReview(undefined);
@@ -220,6 +249,15 @@ export function SessionAttendanceController({
       setBusy(false);
     }
   }
+  const incomplete = Boolean(
+    attendance && attendance.closure_state === "open" && hasUnmarkedAttendance(attendance),
+  );
+  const canClose = Boolean(attendance?.actual_started_at && !incomplete);
+  const dateLabel = new Intl.DateTimeFormat("tr-TR", {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: timezone,
+  });
   const panel = (
     <SessionAttendance
       rows={
@@ -242,15 +280,12 @@ export function SessionAttendanceController({
       }
       startedAt={
         attendance?.actual_started_at && timezone
-          ? new Intl.DateTimeFormat("tr-TR", {
-              dateStyle: "short",
-              timeStyle: "short",
-              timeZone: timezone,
-            }).format(new Date(attendance.actual_started_at))
+          ? dateLabel.format(new Date(attendance.actual_started_at))
           : undefined
       }
       unavailable={!attendance}
       closed={session.attendance_state === "closed"}
+      incomplete={incomplete}
       editing={editing}
       reason={reason}
       locked={locked || disabled}
@@ -264,7 +299,8 @@ export function SessionAttendanceController({
       }}
       onResult={
         attendance &&
-        (editing || (attendance.closure_state === "open" && attendance.actual_started_at))
+        (editing ||
+          (draftAllowed && attendance.closure_state === "open" && attendance.actual_started_at))
           ? (id, value) => {
               if (!locked) {
                 reset();
@@ -276,7 +312,7 @@ export function SessionAttendanceController({
           : undefined
       }
       onSaveRow={
-        attendance?.actual_started_at
+        draftAllowed && attendance?.actual_started_at
           ? (id) => {
               const entry = attendance.entries.find((row) => row.reservation_id === id),
                 result = results[id] ?? entry?.result;
@@ -286,7 +322,7 @@ export function SessionAttendanceController({
           : undefined
       }
       onBlock={
-        attendance?.actual_started_at
+        draftAllowed && attendance?.actual_started_at
           ? (id) => {
               const reason = attendance.entries.find((row) => row.reservation_id === id)
                 ?.eligibility_snapshot?.reason;
@@ -296,7 +332,7 @@ export function SessionAttendanceController({
           : undefined
       }
       onEdit={
-        attendance
+        attendance && canCorrectAttendance
           ? () => {
               reset();
               setResults({});
@@ -314,14 +350,14 @@ export function SessionAttendanceController({
         }
       }}
       onPreview={
-        corrections.length
+        canCorrectAttendance && corrections.length
           ? () => {
               void preview();
             }
           : undefined
       }
       onClose={
-        attendance?.actual_started_at
+        canClose
           ? () => {
               reset();
               setCloseOpen(true);
@@ -333,6 +369,17 @@ export function SessionAttendanceController({
       }
       notice={
         <>
+          {window && timezone && (
+            <p className="text-sm text-muted-foreground">
+              {t(($) => $.sessionDetail.attendanceWindow, {
+                opens: dateLabel.format(new Date(window.opens_at)),
+                closes: dateLabel.format(new Date(window.closes_at)),
+              })}
+              {!draftAllowed && attendance?.closure_state === "open"
+                ? ` ${t(($) => $.sessionDetail.windowUnavailable)}`
+                : ""}
+            </p>
+          )}
           {!attendance && (
             <Alert>
               <AlertDescription>
@@ -347,6 +394,17 @@ export function SessionAttendanceController({
           {recovery}
         </>
       }
+      correction={
+        attendance?.closure_state === "closed" &&
+        attendance.correction_requests && (
+          <AttendanceCorrectionRequests
+            key={attendance.revision}
+            revision={attendance.revision}
+            requests={attendance.correction_requests}
+            instructors={instructors}
+          />
+        )
+      }
     />
   );
   return children({
@@ -357,6 +415,7 @@ export function SessionAttendanceController({
       !attendance.actual_started_at &&
       attendance.closure_state === "open" &&
       session.state === "planned" &&
+      draftAllowed &&
       !disabled
         ? () => {
             if (!locked) {
@@ -404,6 +463,7 @@ export function SessionAttendanceController({
             attendance &&
             (audience === "management" || Boolean(startTime)) &&
             command.state !== "saved" &&
+            draftAllowed &&
             !attendance.actual_started_at
               ? () => {
                   if (liveAccepted)
@@ -445,7 +505,7 @@ export function SessionAttendanceController({
             if (!locked) setCloseOpen(false);
           }}
           onSubmit={
-            attendance && command.state !== "saved"
+            attendance && canClose && command.state !== "saved"
               ? () => {
                   if (liveAccepted)
                     void run(() =>
@@ -458,31 +518,25 @@ export function SessionAttendanceController({
           notice={notice}
           recovery={recovery}
         />
-        {review && (
+        {review && canCorrectAttendance && (
           <SettingsReviewDialog
             open
             title={t(($) => $.sessionDetail.previewCorrection)}
             description={review.reason}
-            rows={review.preview.effects
-              .filter(
-                (effect) =>
-                  audience === "management" ||
-                  ["sessions", "reservations"].includes(effect.entity.type),
-              )
-              .map((effect, i) => ({
-                id: `${effect.entity.type}:${effect.entity.id}:${i}`,
-                title: t(($) => $.sessionDetail.effectActions[effect.action]),
-                detail:
-                  [
-                    effect.quantity != null ? String(effect.quantity) : null,
-                    audience === "management" && effect.amount_minor != null && effect.currency
-                      ? formatMinorAmount(effect.amount_minor, effect.currency)
-                      : null,
-                    audience === "management" ? effect.reason : null,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ") || t(($) => $.memberProfile.nativeEffectsHint),
-              }))}
+            rows={review.preview.effects.map((effect, i) => ({
+              id: `${effect.entity.type}:${effect.entity.id}:${i}`,
+              title: t(($) => $.sessionDetail.effectActions[effect.action]),
+              detail:
+                [
+                  effect.quantity != null ? String(effect.quantity) : null,
+                  effect.amount_minor != null && effect.currency
+                    ? formatMinorAmount(effect.amount_minor, effect.currency)
+                    : null,
+                  effect.reason,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || t(($) => $.memberProfile.nativeEffectsHint),
+            }))}
             blockers={review.preview.blockers.map((blocker, i) => ({
               id: String(i),
               text: scheduleBackendError(blocker.code, t),

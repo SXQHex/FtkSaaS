@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useFilter } from "react-aria-components";
 import { SearchIcon } from "lucide-react";
 import type { NavigationGroup } from "./navigation";
 import { Button } from "../../components/ui/button";
 import { DialogFooter } from "../../components/ui/dialog";
+import { settingsLayout } from "../settings/settings-layout";
+import { readPeoplePage } from "../people/people";
+import type { ClientScope } from "../../lib/scoped-backend";
 import {
   Command,
   CommandDialog,
@@ -13,9 +18,86 @@ import {
   CommandGroup,
   CommandItem,
 } from "../../components/ui/command";
-export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
+export function NavigationSearch({
+  groups,
+  settingsUrl,
+  memberScope,
+  showActions,
+  managementActions,
+  onThemeChange,
+  onSignOut,
+}: {
+  groups: NavigationGroup[];
+  settingsUrl?: string;
+  memberScope?: ClientScope;
+  showActions: boolean;
+  managementActions: boolean;
+  onThemeChange?: () => void;
+  onSignOut: () => void;
+}) {
   const { t } = useTranslation();
+  const { contains } = useFilter({ sensitivity: "base" });
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [settled, setSettled] = useState("");
+  const query = input.trim();
+  const links = groups.flatMap(({ items }) => items);
+  const peopleUrl = managementActions ? links.find(({ key }) => key === "people")?.url : undefined;
+  const reportsUrl = managementActions
+    ? links.find(({ key }) => key === "reports")?.url
+    : undefined;
+  const canSearchMembers = open && !!memberScope && query.length >= 2;
+  useEffect(() => {
+    if (!canSearchMembers) return;
+    const timer = setTimeout(() => setSettled(query), 250);
+    return () => clearTimeout(timer);
+  }, [canSearchMembers, query]);
+  const searching = canSearchMembers && query === settled;
+  const memberSearch = useQuery({
+    queryKey: ["palette-members", memberScope, settled],
+    queryFn: async () => {
+      const page = await readPeoplePage(memberScope!, settled, undefined, "active");
+      return page.items.slice(0, 6).map(({ id, display_name: name }) => ({ id, name }));
+    },
+    enabled: searching,
+    retry: false,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
+  });
+  const members = searching && !memberSearch.isError ? (memberSearch.data ?? []) : [];
+  function changeOpen(next: boolean) {
+    setOpen(next);
+    if (!next) {
+      setInput("");
+      setSettled("");
+    }
+  }
+  const actions = [
+    ...(peopleUrl
+      ? [{ key: "invite", label: t(($) => $.people.invite), href: `${peopleUrl}?action=invite` }]
+      : []),
+    ...(reportsUrl
+      ? [
+          {
+            key: "import",
+            label: t(($) => $.workspace.importMembers),
+            href: `${reportsUrl}?action=import`,
+          },
+          {
+            key: "export",
+            label: t(($) => $.workspace.exportReport),
+            href: `${reportsUrl}?action=export`,
+          },
+        ]
+      : []),
+    {
+      key: "theme",
+      label: t(($) => $.workspace.changeTheme),
+      href: onThemeChange ? undefined : "/account#account-appearance",
+      run: onThemeChange,
+    },
+    { key: "sign-out", label: t(($) => $.auth.signout), run: onSignOut },
+  ];
   useEffect(() => {
     function shortcut(event: KeyboardEvent) {
       if (
@@ -50,12 +132,18 @@ export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
       </Button>
       <CommandDialog
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={changeOpen}
         title={t(($) => $.workspace.searchTitle)}
         description={t(($) => $.workspace.searchDescription)}
       >
         <search aria-label={t(($) => $.workspace.searchTitle)}>
-          <Command>
+          <Command
+            inputValue={input}
+            onInputChange={setInput}
+            filter={(label, value, node) =>
+              String(node.key).startsWith("member:") || contains(label, value)
+            }
+          >
             <CommandInput
               type="search"
               placeholder={t(($) => $.workspace.searchPlaceholder)}
@@ -65,9 +153,12 @@ export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
             />
             <CommandList
               aria-label={t(($) => $.workspace.searchResults)}
-              renderEmptyState={() => (
-                <CommandEmpty>{t(($) => $.workspace.noResults)}</CommandEmpty>
-              )}
+              renderEmptyState={() =>
+                !canSearchMembers ||
+                (searching && !memberSearch.isFetching && !memberSearch.isError) ? (
+                  <CommandEmpty>{t(($) => $.workspace.noResults)}</CommandEmpty>
+                ) : null
+              }
             >
               {groups.map((group) => (
                 <CommandGroup key={group.key} heading={t(($) => $.workspace.groups[group.key])}>
@@ -78,7 +169,7 @@ export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
                       href={item.url}
                       isDisabled={!item.url}
                       textValue={t(($) => $.workspace.links[item.key])}
-                      onAction={() => setOpen(false)}
+                      onAction={() => changeOpen(false)}
                     >
                       {item.icon}
                       <span>{t(($) => $.workspace.links[item.key])}</span>
@@ -86,11 +177,65 @@ export function NavigationSearch({ groups }: { groups: NavigationGroup[] }) {
                   ))}
                 </CommandGroup>
               ))}
+              {settingsUrl && (
+                <CommandGroup heading={t(($) => $.settings.title)}>
+                  {settingsLayout.map(({ key }) => {
+                    const label = t(($) => $.settings.tabs[key]);
+                    return (
+                      <CommandItem
+                        key={key}
+                        id={`settings-${key}`}
+                        href={`${settingsUrl}?${new URLSearchParams({ section: key })}`}
+                        textValue={label}
+                        onAction={() => changeOpen(false)}
+                      >
+                        {label}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              )}
+              {memberScope && members.length > 0 && (
+                <CommandGroup heading={t(($) => $.people.title)}>
+                  {members.map((member) => (
+                    <CommandItem
+                      key={member.id}
+                      id={`member:${member.id}`}
+                      href={`/o/${encodeURIComponent(memberScope.orgId)}/c/${encodeURIComponent(memberScope.centerId)}/people/${encodeURIComponent(member.id)}`}
+                      textValue={member.name}
+                      onAction={() => changeOpen(false)}
+                    >
+                      {member.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+              {showActions && query && (
+                <CommandGroup heading={t(($) => $.workspace.quickActions)}>
+                  {actions.map(({ key, label, href, run }) => (
+                    <CommandItem
+                      key={key}
+                      id={`action-${key}`}
+                      href={href}
+                      textValue={label}
+                      onAction={() => {
+                        changeOpen(false);
+                        run?.();
+                      }}
+                    >
+                      {label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
             </CommandList>
           </Command>
+          <p role="status" className="px-3 text-sm empty:hidden">
+            {searching && memberSearch.isError ? t(($) => $.workspace.searchMembersError) : ""}
+          </p>
         </search>
         <DialogFooter className="p-2">
-          <Button variant="outline" onPress={() => setOpen(false)}>
+          <Button variant="outline" onPress={() => changeOpen(false)}>
             {t(($) => $.security.close)}
           </Button>
         </DialogFooter>

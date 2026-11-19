@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { AutomationJobView, JobState } from "../../lib/api-contracts/generated";
@@ -170,22 +170,35 @@ export function AutomationContent({
         })
       : undefined;
   const jobRows = !jobsSource.isError
-    ? jobsSource.data?.items.map((row) => ({
-        id: row.id,
-        automationId: row.automation_id,
-        automation: row.automation_name,
-        when: format!.format(new Date(row.created_at)),
-        initiator: t(($) => $.automation.initiatorAutomation),
-        state: t(($) => $.automation.jobStates[row.state]),
-        targets: "1",
-        emailAccepted: t(($) => $.automation.notApplicable),
-        delivery: t(($) => $.automation.unsupportedDelivery),
-        canRetry: row.retry_available && row.state === "failed",
-      }))
+    ? jobsSource.data?.items.map((row) => {
+        const result = row.result_reference;
+        return {
+          id: row.id,
+          automationId: row.automation_id,
+          automation: row.automation_name,
+          when: format!.format(new Date(row.created_at)),
+          initiator: t(($) => $.automation.initiatorAutomation),
+          state: t(($) => $.automation.jobStates[row.state]),
+          result: result
+            ? { label: t(($) => $.automation.jobResults[result.type]), id: result.id }
+            : undefined,
+          targets: "1",
+          emailAccepted: t(($) => $.automation.notApplicable),
+          delivery: t(($) => $.automation.unsupportedDelivery),
+          canRetry: row.retry_available && row.state === "failed",
+        };
+      })
     : undefined;
   const pagination =
     tab === "jobs" ? (
       <div className="flex w-full flex-wrap items-end gap-3">
+        <Button
+          variant="outline"
+          isDisabled={locked || jobsSource.isFetching || !center}
+          onPress={() => void jobsSource.refetch()}
+        >
+          {t(($) => $.automation.reloadJobs)}
+        </Button>
         <Field className="w-full max-w-sm">
           <FieldLabel htmlFor="automation-job-target">{t(($) => $.automation.jobsFor)}</FieldLabel>
           <NativeSelect
@@ -328,7 +341,6 @@ export function AutomationContent({
                   ? t(($) => $.automation.jobStates[row.jobs![0]!.state])
                   : unknown,
                 enabled: row.definition.enabled,
-                canRun: false,
               })) ?? null)
             : null
         }
@@ -355,6 +367,20 @@ export function AutomationContent({
             : null
         }
         jobs={jobRows ?? null}
+        reportsLink={
+          center &&
+          !locked &&
+          !jobsSource.isError &&
+          jobsSource.data && (
+            <Link
+              to="/o/$orgId/c/$centerId/reports"
+              params={{ orgId: scope.orgId, centerId: scope.centerId }}
+              className="text-sm font-medium underline underline-offset-4"
+            >
+              {t(($) => $.automation.centerReports)}
+            </Link>
+          )
+        }
         jobsPlaceholder={
           <p>
             {jobsSource.isError ? t(($) => $.automation.readError) : t(($) => $.automation.loading)}
@@ -425,7 +451,6 @@ export function AutomationContent({
             if (row) setAction({ before: structuredClone(row), enabled });
           }
         }}
-        onRun={() => {}}
         onRetry={(automationId, id) => {
           if (locked || preflight.current) return;
           const job =

@@ -283,6 +283,12 @@ export const settingsLayout = [
         key: "ay-yayin",
         fields: [
           {
+            key: "ay-py-page",
+            kind: "switch",
+            readonly: false,
+            disabled: false,
+          },
+          {
             key: "ay-py-on",
             kind: "switch",
             readonly: false,
@@ -291,31 +297,7 @@ export const settingsLayout = [
           {
             key: "ay-py-slug",
             kind: "text",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-yer",
-            kind: "select",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-ders",
-            kind: "switch",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-etk",
-            kind: "switch",
-            readonly: false,
-            disabled: false,
-          },
-          {
-            key: "ay-py-egt",
-            kind: "switch",
-            readonly: false,
+            readonly: true,
             disabled: false,
           },
           {
@@ -357,6 +339,29 @@ export const settingsLayout = [
       {
         key: "plan-1",
         fields: [],
+      },
+      {
+        key: "plan-billing",
+        fields: [
+          {
+            key: "billing-name",
+            kind: "text",
+            readonly: false,
+            disabled: false,
+          },
+          {
+            key: "billing-address",
+            kind: "text",
+            readonly: false,
+            disabled: false,
+          },
+          {
+            key: "billing-email",
+            kind: "email",
+            readonly: false,
+            disabled: false,
+          },
+        ],
       },
       {
         key: "plan-2",

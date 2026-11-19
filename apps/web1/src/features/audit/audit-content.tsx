@@ -1,3 +1,4 @@
+import { saveDownload } from "../../lib/save-download";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -5,7 +6,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { readWorkspace } from "../workspace/workspace";
 import { AuditView, type AuditFilter } from "./audit-view";
 import { AuditDetailSheet } from "./audit-detail-sheet";
-import { auditModules, readAudit, readTracking } from "./audit-read";
+import { auditModules, readAudit, readAuditCsv, readTracking } from "./audit-read";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Field, FieldLabel } from "../../components/ui/field";
@@ -33,6 +34,8 @@ export function AuditContent({
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [index, setIndex] = useState(0);
   const [detailId, setDetail] = useState<string>();
+  const [exporting, setExporting] = useState(false);
+  const [exportFailed, setExportFailed] = useState(false);
   const workspace = useQuery({
     queryKey: ["workspace", scope.accountId, scope.orgId],
     queryFn: () => readWorkspace(scope.accountId, scope.orgId),
@@ -48,6 +51,7 @@ export function AuditContent({
     setCursors([undefined]);
     setIndex(0);
     setDetail(undefined);
+    setExportFailed(false);
   };
   useEffect(() => {
     const timer = window.setTimeout(() => setQuery(filter.query.trim()), 300);
@@ -87,15 +91,46 @@ export function AuditContent({
       timeStyle: "short",
     }).format(new Date(value)) + ` ${timezone}`;
   const formatCount = (value: number) => value.toLocaleString("tr-TR");
+  const modules = auditModules.map((id) => ({ id, label: t(($) => $.audit.modules[id]) }));
+  const trackingLabels: Readonly<Partial<Record<string, string>>> = t(
+    ($) => $.audit.trackingStates,
+    {
+      returnObjects: true,
+    },
+  );
   const next = !source.isError && timezone ? source.data?.next_cursor : undefined;
   const refresh = () => {
     reset();
     setAnchor(new Date().toISOString());
   };
+  async function exportCsv() {
+    if (!timezone || exporting || records.isError || query !== filter.query.trim()) return;
+    setExporting(true);
+    setExportFailed(false);
+    try {
+      const data = await readAuditCsv(scope, input);
+      saveDownload(new Blob([data.csv], { type: data.mime }), data.filename);
+    } catch {
+      setExportFailed(true);
+    } finally {
+      setExporting(false);
+    }
+  }
   return (
     <>
       <AuditView
         tab={tab}
+        headerAction={
+          tab === "records" && (
+            <Button
+              variant="outline"
+              isDisabled={!rows || records.isFetching || exporting || query !== filter.query.trim()}
+              onPress={() => void exportCsv()}
+            >
+              {t(($) => $.audit.exportCsv)}
+            </Button>
+          )
+        }
         onTab={(value) => {
           setTab(value);
           reset();
@@ -105,7 +140,7 @@ export function AuditContent({
           setFilter(value);
           reset();
         }}
-        modules={auditModules.map((id) => ({ id, label: id }))}
+        modules={modules}
         results={[{ id: "recorded", label: t(($) => $.audit.recorded) }]}
         filtersAvailable={!!timezone}
         rows={
@@ -119,31 +154,57 @@ export function AuditContent({
           })) ?? null
         }
         operations={
-          operations?.items.map((row) => ({
-            id: `${row.kind}:${row.id}`,
-            title: row.operation,
-            context: `${t(($) => $.audit.kinds[row.kind])} · ${date(row.created_at)}`,
-            state: row.state,
-            note: [
-              row.safe_error_code,
-              row.expires_at ? t(($) => $.audit.expiry, { time: date(row.expires_at) }) : undefined,
-              row.next_attempt_at
-                ? t(($) => $.audit.nextAttempt, { time: date(row.next_attempt_at) })
+          operations?.items.map((row) => {
+            const { progress_count: processed, total_count: total } = row;
+            const result = row.import_result;
+            const progressLabel =
+              processed === null
+                ? undefined
+                : total === null
+                  ? t(($) => $.audit.processed, { processed: formatCount(processed) })
+                  : t(($) => $.audit.processedTotal, {
+                      processed: formatCount(processed),
+                      total: formatCount(total),
+                    });
+            return {
+              id: `${row.kind}:${row.id}`,
+              title: row.operation,
+              context: `${t(($) => $.audit.kinds[row.kind])} · ${date(row.created_at)}`,
+              state: Object.hasOwn(trackingLabels, row.state)
+                ? (trackingLabels[row.state] ?? row.state)
+                : row.state,
+              definitiveResult: result
+                ? t(($) => $.audit.importResult, {
+                    outcome: t(($) => $.audit.importOutcomes[result.outcome]),
+                    applied: formatCount(result.applied_rows),
+                    replayed: formatCount(result.replayed_rows),
+                    skipped: formatCount(result.skipped_rows),
+                    failed: formatCount(result.failed_rows),
+                    unprocessed: formatCount(result.unprocessed_rows),
+                    total: formatCount(result.total_rows),
+                  })
                 : undefined,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-            ...(row.progress_count !== null
-              ? {
-                  progress: {
-                    count: row.progress_count,
-                    total: row.total_count,
-                    label: t(($) => $.audit.progress),
-                  },
-                }
-              : {}),
-            action: { label: t(($) => $.audit.refresh), onAction: () => void tracking.refetch() },
-          })) ?? null
+              note: [
+                progressLabel,
+                row.safe_error_code,
+                row.retry_mode === "report_export"
+                  ? t(($) => $.audit.reportRetryAvailable)
+                  : undefined,
+                row.expires_at
+                  ? t(($) => $.audit.expiry, { time: date(row.expires_at) })
+                  : undefined,
+                row.next_attempt_at
+                  ? t(($) => $.audit.nextAttempt, { time: date(row.next_attempt_at) })
+                  : undefined,
+              ]
+                .filter(Boolean)
+                .join(" · "),
+              progress:
+                processed !== null && total !== null && total > 0 && progressLabel
+                  ? { count: processed, total, label: progressLabel }
+                  : undefined,
+            };
+          }) ?? null
         }
         summary={{
           attention: operations ? formatCount(operations.summary.attention) : null,
@@ -251,6 +312,11 @@ export function AuditContent({
                 <AlertDescription role="alert">{t(($) => $.audit.unread)}</AlertDescription>
               </Alert>
             )}
+            {tab === "records" && exportFailed && (
+              <Alert variant="destructive">
+                <AlertDescription>{t(($) => $.audit.exportFailed)}</AlertDescription>
+              </Alert>
+            )}
             <Button variant="outline" isDisabled={source.isFetching || !timezone} onPress={refresh}>
               {t(($) => $.audit.refresh)}
             </Button>
@@ -265,7 +331,8 @@ export function AuditContent({
             subject: detail.subject_title ?? detail.subject.type,
             date: date(detail.created_at),
             actor: detail.actor_display,
-            module: detail.module ?? undefined,
+            module:
+              modules.find(({ id }) => id === detail.module)?.label ?? detail.module ?? undefined,
             result: t(($) => $.audit.recorded),
             reason: detail.reason ?? undefined,
             changes:

@@ -34,12 +34,13 @@ const offer: SeatOfferView = {
   created_at: entry.created_at,
   expires_at: "2099-01-01T00:00:00Z",
 };
+const asOf = "2026-11-16T12:00:00Z";
 beforeEach(() => {
   call.mockReset();
 });
 it("a manager cannot construct another person's offer decision, and an expired offer is not accepted", () => {
   expect(() =>
-    waitlistIntent(scope, sid, person, "accept", undefined, entry, offer, id(8)),
+    waitlistIntent(scope, sid, person, "accept", undefined, entry, offer, id(8), asOf),
   ).toThrow("SOURCE_UNAVAILABLE");
   expect(() =>
     waitlistIntent(
@@ -51,11 +52,22 @@ it("a manager cannot construct another person's offer decision, and an expired o
       entry,
       { ...offer, expires_at: "2020-01-01T00:00:00Z" },
       person,
+      asOf,
     ),
   ).toThrow("SOURCE_UNAVAILABLE");
 });
 it("the same frozen intent preserves operation key, offer ID and version on retransmission", async () => {
-  const intent = waitlistIntent(scope, sid, person, "reject", undefined, entry, offer, person);
+  const intent = waitlistIntent(
+    scope,
+    sid,
+    person,
+    "reject",
+    undefined,
+    entry,
+    offer,
+    person,
+    asOf,
+  );
   call.mockResolvedValue({ primary_id: offer.id });
   await writeWaitlist(intent);
   await writeWaitlist(intent);
@@ -69,7 +81,17 @@ it("the same frozen intent preserves operation key, offer ID and version on retr
   ).toEqual(Array(2).fill(["seat_offer_reject_v1", intent.key, offer.id, 4]));
 });
 it("an accepted offer receipt cannot be mistaken for a reservation receipt", async () => {
-  const intent = waitlistIntent(scope, sid, person, "accept", undefined, entry, offer, person);
+  const intent = waitlistIntent(
+    scope,
+    sid,
+    person,
+    "accept",
+    undefined,
+    entry,
+    offer,
+    person,
+    asOf,
+  );
   call.mockResolvedValue({
     operation: intent.operation,
     key: intent.key,
@@ -79,7 +101,17 @@ it("an accepted offer receipt cannot be mistaken for a reservation receipt", asy
   await expect(readWaitlistReceipt(intent)).rejects.toThrow("RECEIPT_UNAVAILABLE");
 });
 it("a terminal reject is confirmed from the original entry and offer, not a different latest offer", async () => {
-  const intent = waitlistIntent(scope, sid, person, "reject", undefined, entry, offer, person);
+  const intent = waitlistIntent(
+    scope,
+    sid,
+    person,
+    "reject",
+    undefined,
+    entry,
+    offer,
+    person,
+    asOf,
+  );
   call.mockResolvedValue({
     items: [
       {
@@ -105,7 +137,7 @@ it("a terminal reject is confirmed from the original entry and offer, not a diff
   await expect(readWaitlistResult(intent, id(9))).rejects.toThrow("RESULT_UNAVAILABLE");
 });
 it("session discovery uses separate server cursors and rejects an unrelated source row", async () => {
-  call.mockResolvedValue({ items: [], next_cursor: "next" });
+  call.mockResolvedValue({ items: [], next_cursor: "next", as_of: asOf });
   await readSessionWaitlist(scope, sid, "offers", "previous");
   expect(call).toHaveBeenCalledWith(
     "management_state_get_v1",

@@ -51,7 +51,7 @@ function SheetOverlay({
       data-slot="sheet-overlay"
       isDismissable
       className={cn(
-        "fixed inset-0 z-50 bg-black/45 transition-opacity duration-150 data-entering:opacity-0 data-exiting:opacity-0",
+        "fixed inset-0 z-50 overflow-clip bg-black/45 transition-opacity duration-150 data-entering:opacity-0 data-exiting:opacity-0",
         className,
       )}
       {...props}
@@ -62,6 +62,7 @@ function SheetOverlay({
 }
 
 function Sheet({
+  "aria-labelledby": labelledBy,
   className,
   children,
   side = "right",
@@ -69,6 +70,7 @@ function Sheet({
   ...props
 }: Omit<ModalOverlayPrimitiveProps, "className" | "children"> &
   Pick<React.ComponentProps<typeof ModalPrimitive>, "isDismissable"> & {
+    "aria-labelledby"?: string;
     className?: string;
     children: React.ReactNode;
     side?: "top" | "right" | "bottom" | "left";
@@ -80,12 +82,13 @@ function Sheet({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "fixed z-50 flex flex-col bg-background bg-clip-padding text-sm text-popover-foreground shadow-xl transition duration-200 ease-in-out data-entering:opacity-0 data-exiting:opacity-0 data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=bottom]:data-entering:translate-y-[2.5rem] data-[side=bottom]:data-exiting:translate-y-[2.5rem] data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=left]:data-entering:translate-x-[-2.5rem] data-[side=left]:data-exiting:translate-x-[-2.5rem] data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-[min(26rem,100%)] data-[side=right]:border-l data-[side=right]:data-entering:translate-x-[2.5rem] data-[side=right]:data-exiting:translate-x-[2.5rem] data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=top]:data-entering:translate-y-[-2.5rem] data-[side=top]:data-exiting:translate-y-[-2.5rem] data-[side=left]:sm:max-w-sm",
+          "fixed z-50 flex flex-col bg-background bg-clip-padding text-sm text-popover-foreground shadow-xl transition duration-200 ease-in-out data-entering:opacity-0 data-exiting:opacity-0 data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=bottom]:data-entering:translate-y-[40px] data-[side=bottom]:data-exiting:translate-y-[40px] data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=left]:data-entering:translate-x-[-40px] data-[side=left]:data-exiting:translate-x-[-40px] data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-[min(26rem,100%)] data-[side=right]:border-l data-[side=right]:data-entering:translate-x-[40px] data-[side=right]:data-exiting:translate-x-[40px] data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=top]:data-entering:translate-y-[-40px] data-[side=top]:data-exiting:translate-y-[-40px] data-[side=left]:sm:max-w-sm",
           className,
         )}
       >
         <SheetPrimitive
           data-slot="sheet"
+          aria-labelledby={labelledBy}
           className="[display:inherit] h-full max-h-[inherit] [flex-direction:inherit] [gap:inherit] outline-none"
         >
           {children}
@@ -157,7 +160,7 @@ function SheetDescription({ className, ...props }: Omit<React.ComponentProps<"di
   return (
     <div
       data-slot="sheet-description"
-      className={cn("text-[13px] text-muted-foreground", className)}
+      className={cn("text-[0.8125rem] text-muted-foreground", className)}
       {...props}
     />
   );

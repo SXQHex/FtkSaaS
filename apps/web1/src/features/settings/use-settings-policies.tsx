@@ -55,6 +55,11 @@ export function useSettingsPolicies({
           closes: value.closes_minutes_before,
           exception: value.manager_exception ? t(($) => $.settings.on) : t(($) => $.settings.off),
         });
+      case "attendance_window":
+        return t(($) => $.settings.nativePolicies.attendanceWindow, {
+          opens: value.opens_minutes_before,
+          closes: value.closes_minutes_after,
+        });
       case "cancellation":
         return t(($) => $.settings.nativePolicies.cancellation, {
           cutoff: value.terms.cutoff_minutes ?? t(($) => $.settings.unsetHint),

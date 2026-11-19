@@ -162,21 +162,18 @@ export function directorySummary(
   const count = (
     summary: ManagementStatePage["access_summary"],
     state: "pending" | "expired" | "linked" | "unlinked",
-  ) =>
-    summary
-      ? new Intl.NumberFormat("tr-TR").format(
-          summary.by_state.find((item) => item.state === state)?.count ?? 0,
-        )
-      : null;
+  ) => summary?.by_state.find((item) => item.state === state)?.count ?? 0;
+  const format = new Intl.NumberFormat("tr-TR");
+  const pending = count(invitationSummary, "pending");
+  const expired = count(invitationSummary, "expired");
+  const unlinked = count(accountSummary, "unlinked");
   return {
-    linked: count(accountSummary, "linked"),
-    unlinked: count(accountSummary, "unlinked"),
-    totalMembers: accountSummary
-      ? new Intl.NumberFormat("tr-TR").format(accountSummary.total)
-      : null,
-    pending: count(invitationSummary, "pending"),
-    expired: count(invitationSummary, "expired"),
-    invitationBadge: invitationSummary?.total ?? null,
-    accountBadge: accountSummary?.total ?? null,
+    linked: accountSummary ? format.format(count(accountSummary, "linked")) : null,
+    unlinked: accountSummary ? format.format(unlinked) : null,
+    totalMembers: accountSummary ? format.format(accountSummary.total) : null,
+    pending: invitationSummary ? format.format(pending) : null,
+    expired: invitationSummary ? format.format(expired) : null,
+    invitationBadge: invitationSummary ? pending + expired : null,
+    accountBadge: accountSummary ? unlinked : null,
   };
 }

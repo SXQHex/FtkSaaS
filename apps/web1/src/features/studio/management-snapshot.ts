@@ -7,9 +7,12 @@ import {
 } from "./studio-reads";
 import { readStudioSetup } from "./setup";
 import { BackendError } from "../../lib/backend";
-import type { ResourceRef } from "../../lib/api-contracts/generated";
+import type { ResourceRef, SubscriptionView } from "../../lib/api-contracts/generated";
 
-export async function readStudioSnapshot(scope: StudioScope, canReadPlan = false) {
+export async function readStudioSnapshot(
+  scope: StudioScope,
+  readPlan?: () => Promise<SubscriptionView>,
+) {
   const [resources, instructors] = await Promise.all([
     readStudioResources(scope),
     readStudioInstructors(scope),
@@ -42,7 +45,7 @@ export async function readStudioSnapshot(scope: StudioScope, canReadPlan = false
       })),
     ),
     Promise.all(closureResources.map((resource) => readStudioClosures(scope, resource))),
-    readStudioSetup(scope, resources, instructors, canReadPlan),
+    readStudioSetup(scope, resources, instructors, readPlan),
   ]);
   const agreementsPlanBlocked =
     agreements === null || (setup.plan.state === "known" && setup.plan.value?.plan === "starter");

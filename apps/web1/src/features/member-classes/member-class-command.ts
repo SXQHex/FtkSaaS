@@ -96,7 +96,7 @@ export async function memberClassIntent(
     b.own_waitlist.version !== d.own_waitlist.version
   )
     throw stale();
-  const entry = await readWaitlistTarget(scope, before.id, personId, d.own_waitlist.id);
+  const { entry, asOf } = await readWaitlistTarget(scope, before.id, personId, d.own_waitlist.id);
   if (entry.version !== d.own_waitlist.version) throw stale();
   const offer =
     action === "accept" || action === "reject"
@@ -106,7 +106,17 @@ export async function memberClassIntent(
     throw stale();
   return {
     kind: "waitlist",
-    value: waitlistIntent(scope, before.id, personId, action, undefined, entry, offer, personId),
+    value: waitlistIntent(
+      scope,
+      before.id,
+      personId,
+      action,
+      undefined,
+      entry,
+      offer,
+      personId,
+      asOf,
+    ),
   };
 }
 export async function writeMemberClass(intent: MemberClassIntent) {

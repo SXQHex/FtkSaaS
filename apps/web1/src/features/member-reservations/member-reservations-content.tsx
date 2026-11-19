@@ -12,15 +12,19 @@ import { readOwnWaitlist, type OwnWaitlistRow } from "./member-waitlist";
 import { MemberWaitlistEditor } from "./member-waitlist-editor";
 import type { WaitlistAction } from "../session-detail/session-waitlist";
 import { MemberReservationsView } from "./member-reservations-view";
-import { Button } from "../../components/ui/button";
+import { Button, LinkButton } from "../../components/ui/button";
 export function MemberReservationsContent({
   scope,
   personId,
+  sessionId,
+  offerId,
   timezone,
   onLockChange,
 }: {
   scope: ClientScope;
   personId: string;
+  sessionId?: string;
+  offerId?: string;
   timezone: string;
   onLockChange: (locked: boolean) => void;
 }) {
@@ -43,13 +47,15 @@ export function MemberReservationsContent({
   }>();
   const prefix = ["member-reservations", scope.accountId, scope.orgId, scope.centerId, personId];
   const up = useQuery({
-    queryKey: [...prefix, "upcoming", upCursors.at(-1)],
-    queryFn: () => readOwnReservations(scope, personId, "upcoming", upCursors.at(-1)),
+    queryKey: [...prefix, "upcoming", upCursors.at(-1), sessionId],
+    queryFn: () => readOwnReservations(scope, personId, "upcoming", upCursors.at(-1), sessionId),
+    ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const past = useQuery({
-    queryKey: [...prefix, "past", pastCursors.at(-1)],
-    queryFn: () => readOwnReservations(scope, personId, "past", pastCursors.at(-1)),
+    queryKey: [...prefix, "past", pastCursors.at(-1), sessionId],
+    queryFn: () => readOwnReservations(scope, personId, "past", pastCursors.at(-1), sessionId),
+    ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const waiting = useQuery({
@@ -58,8 +64,12 @@ export function MemberReservationsContent({
     retry: false,
   });
   const offers = useQuery({
-    queryKey: [...prefix, "offers", offerCursors.at(-1)],
-    queryFn: () => readOwnWaitlist(scope, "offers", offerCursors.at(-1)),
+    queryKey: [...prefix, "offers", offerCursors.at(-1), offerId],
+    queryFn: () =>
+      offerId
+        ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId })
+        : readOwnWaitlist(scope, "offers", offerCursors.at(-1)),
+    ...(offerId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const accessLost = useCallback(
@@ -84,8 +94,10 @@ export function MemberReservationsContent({
     for (const error of [up.error, past.error, waiting.error, offers.error])
       if (error) accessLost(error);
   }, [up.error, past.error, waiting.error, offers.error, accessLost]);
-  const upcoming = !up.isError ? up.data : undefined,
-    history = !past.isError ? past.data : undefined;
+  const loadingUpcoming = up.isPending || Boolean(sessionId && up.isFetching);
+  const loadingHistory = past.isPending || Boolean(sessionId && past.isFetching);
+  const upcoming = !up.isError && !loadingUpcoming ? up.data : undefined,
+    history = !past.isError && !loadingHistory ? past.data : undefined;
   const date = new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeZone: timezone });
   const time = new Intl.DateTimeFormat("tr-TR", { timeStyle: "short", timeZone: timezone });
   const historyRows = history ? memberReservationRows(history.items, timezone, [], t) : undefined;
@@ -139,9 +151,18 @@ export function MemberReservationsContent({
     if (upcomingResult.isError || pastResult.isError || waitlistReadFailed)
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
   }
+  const loadingOffers = offers.isPending || Boolean(offerId && offers.isFetching);
+  const offerPage = offers.isError || loadingOffers ? undefined : offers.data;
   return (
     <>
       <MemberReservationsView
+        pending={{
+          upcoming: loadingUpcoming,
+          waiting:
+            !offers.isError &&
+            (loadingOffers || (!offerId && !waiting.isError && waiting.isPending)),
+          history: loadingHistory,
+        }}
         upcoming={
           upcoming?.items.map((row) => ({
             id: row.reservation.id,
@@ -200,9 +221,9 @@ export function MemberReservationsContent({
           })) ?? null
         }
         waiting={
-          waiting.isError || offers.isError || !waiting.data || !offers.data
+          !offerPage || (!offerId && (waiting.isError || !waiting.data))
             ? null
-            : [...offers.data.items, ...waiting.data.items].map((row) => {
+            : [...offerPage.items, ...(offerId ? [] : (waiting.data?.items ?? []))].map((row) => {
                 const dateTime = new Intl.DateTimeFormat("tr-TR", {
                   dateStyle: "medium",
                   timeStyle: "short",
@@ -235,68 +256,84 @@ export function MemberReservationsContent({
                       })
                     : t(($) => $.memberReservations.queuePositionUnknown),
                   state: row.offer
-                    ? t(($) => $.memberReservations.activeOffer)
+                    ? t(($) =>
+                        row.offer?.state === "active"
+                          ? $.memberReservations.activeOffer
+                          : $.sessionDetail[row.offer!.state],
+                      )
                     : t(($) => $.memberClasses.waiting),
-                  action: (
-                    <div className="flex flex-wrap gap-2">
-                      {(row.offer ? (["accept", "reject"] as const) : (["leave"] as const)).map(
-                        (action) => (
-                          <Button
-                            key={action}
-                            size="sm"
-                            variant="outline"
-                            isDisabled={
-                              !eligible ||
-                              Boolean(row.offer && Date.parse(row.offer.expires_at) <= Date.now())
-                            }
-                            onPress={() => setWaitTarget({ row, action })}
-                          >
-                            {t(($) => $.memberClasses[action])}
-                          </Button>
-                        ),
-                      )}
-                    </div>
-                  ),
+                  action:
+                    row.offer && row.offer.state !== "active" ? undefined : (
+                      <div className="flex flex-wrap gap-2">
+                        {(row.offer ? (["accept", "reject"] as const) : (["leave"] as const)).map(
+                          (action) => (
+                            <Button
+                              key={action}
+                              size="sm"
+                              variant="outline"
+                              isDisabled={
+                                !eligible ||
+                                Boolean(
+                                  row.offer &&
+                                  Date.parse(row.offer.expires_at) <= Date.parse(offerPage.asOf),
+                                )
+                              }
+                              onPress={() => setWaitTarget({ row, action })}
+                            >
+                              {t(($) => $.memberClasses[action])}
+                            </Button>
+                          ),
+                        )}
+                      </div>
+                    ),
                 };
               })
         }
         waitingPagination={
-          <div className="flex flex-wrap gap-4">
-            {(["entries", "offers"] as const).map((view) => {
-              const query = view === "entries" ? waiting : offers,
-                cursors = view === "entries" ? entryCursors : offerCursors,
-                setCursors = view === "entries" ? setEntryCursors : setOfferCursors,
-                next = query.data?.nextCursor;
-              return (
-                <div
-                  key={view}
-                  role="group"
-                  aria-label={t(($) => $.memberReservations.queuePages[view])}
-                  className="flex flex-wrap items-center gap-2"
-                >
-                  <span className="text-xs">{t(($) => $.memberReservations.queuePages[view])}</span>
-                  <Button
-                    variant="outline"
-                    isDisabled={locked || query.isFetching || cursors.length === 1}
-                    onPress={() => setCursors((old) => old.slice(0, -1))}
+          offerId ? undefined : (
+            <div className="flex flex-wrap gap-4">
+              {(["entries", "offers"] as const).map((view) => {
+                const query = view === "entries" ? waiting : offers,
+                  cursors = view === "entries" ? entryCursors : offerCursors,
+                  setCursors = view === "entries" ? setEntryCursors : setOfferCursors,
+                  next = query.data?.nextCursor;
+                return (
+                  <div
+                    key={view}
+                    role="group"
+                    aria-label={t(($) => $.memberReservations.queuePages[view])}
+                    className="flex flex-wrap items-center gap-2"
                   >
-                    {t(($) => $.memberReservations.previous)}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    isDisabled={
-                      locked || query.isFetching || query.isError || !next || cursors.includes(next)
-                    }
-                    onPress={() => {
-                      if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
-                    }}
-                  >
-                    {t(($) => $.memberReservations.next)}
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
+                    <span className="text-xs">
+                      {t(($) => $.memberReservations.queuePages[view])}
+                    </span>
+                    <Button
+                      variant="outline"
+                      isDisabled={locked || query.isFetching || cursors.length === 1}
+                      onPress={() => setCursors((old) => old.slice(0, -1))}
+                    >
+                      {t(($) => $.memberReservations.previous)}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      isDisabled={
+                        locked ||
+                        query.isFetching ||
+                        query.isError ||
+                        !next ||
+                        cursors.includes(next)
+                      }
+                      onPress={() => {
+                        if (next && !cursors.includes(next)) setCursors((old) => [...old, next]);
+                      }}
+                    >
+                      {t(($) => $.memberReservations.next)}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )
         }
         history={
           historyRows?.map((row, index) => ({
@@ -310,12 +347,18 @@ export function MemberReservationsContent({
         historyPagination={pagination("past")}
         notice={
           <div className="space-y-3">
+            {(sessionId || offerId) && (
+              <LinkButton
+                variant="outline"
+                href={`/member/reservations?${new URLSearchParams({ org: scope.orgId, center: scope.centerId })}`}
+                isDisabled={locked}
+              >
+                {t(($) => $.memberReservations.allReservations)}
+              </LinkButton>
+            )}
             <p className="text-xs text-muted-foreground">
               {t(($) => $.memberReservations.historyHint)}
             </p>
-            {(up.isPending || past.isPending || waiting.isPending || offers.isPending) && (
-              <p role="status">{t(($) => $.memberReservations.loading)}</p>
-            )}
             <Button
               ref={retryButton}
               variant="outline"
@@ -329,12 +372,8 @@ export function MemberReservationsContent({
               onPress={() => {
                 void waiting.refetch();
                 void offers.refetch();
-                if (up.isError) void up.refetch();
-                if (past.isError) void past.refetch();
-                if (!up.isError && !past.isError) {
-                  void up.refetch();
-                  void past.refetch();
-                }
+                void up.refetch();
+                void past.refetch();
               }}
             >
               {t(($) => $.memberReservations.retry)}

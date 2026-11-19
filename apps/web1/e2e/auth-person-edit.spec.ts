@@ -28,7 +28,8 @@ async function setup(
     originalDisciplines = structuredClone(f.person.discipline_relationships);
   const writes: RequestPersonUpdate[] = [],
     receipts: { key: string }[] = [],
-    otherWrites: string[] = [];
+    otherWrites: string[] = [],
+    calendarCalls: string[] = [];
   const committed = new Map<string, unknown>();
   let unread = false,
     stale = false;
@@ -38,6 +39,10 @@ async function setup(
     const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
     const reject = (code: string) =>
       route.fulfill({ json: { ok: false, error: { code, retryable: false, trace_id: I.role } } });
+    if (op.startsWith("calendar_link")) {
+      calendarCalls.push(op);
+      return reject("FORBIDDEN");
+    }
     if (
       [
         "student_activate_v1",
@@ -113,6 +118,7 @@ async function setup(
     receipts,
     committed,
     otherWrites,
+    calendarCalls,
     panel,
     originalRelationships,
     originalDisciplines,
@@ -177,6 +183,11 @@ test("person details preserve native/unknown fields and save local name/contact 
   await expect(page.getByRole("textbox", { name: "E-posta 3", exact: true })).toHaveValue(
     "new@example.test",
   );
+  await expect(f.panel.getByLabel("Kişisel takvim bağlantısı", { exact: true })).toHaveCount(0);
+  await expect(
+    f.panel.getByRole("button", { name: "Takvim bağlantısı oluştur", exact: true }),
+  ).toHaveCount(0);
+  expect(f.calendarCalls).toEqual([]);
 });
 test("lost person update reply recovers its receipt without repeating the mutation", async ({
   page,

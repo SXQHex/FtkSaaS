@@ -4,6 +4,9 @@ import { AccountErrorPage } from "../features/auth/account-page";
 import { PeopleRoutePage } from "../features/people/people-page";
 
 export const Route = createFileRoute("/o/$orgId/c/$centerId/people")({
+  validateSearch: (search): { action?: "invite" } => ({
+    action: search.action === "invite" ? "invite" : undefined,
+  }),
   beforeLoad: requireAccountSession,
   loader: loadAccount,
   component: PeopleRoutePage,

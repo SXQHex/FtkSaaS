@@ -2,21 +2,62 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import common from "../src/locales/tr/common.json" with { type: "json" };
+import type {
+  ContentTemplateView,
+  DigitalDocumentContent,
+} from "../src/lib/api-contracts/generated.js";
 const fileId = "019ab7b0-0000-7000-8000-000000000090",
   documentId = "019ab7b0-0000-7000-8000-000000000091",
   previewId = "019ab7b0-0000-7000-8000-000000000092";
 async function setup(
   page: Page,
-  mode: "normal" | "unknown" | "unread" | "prepare-unknown" | "transfer-unknown" = "normal",
+  mode:
+    | "normal"
+    | "unknown"
+    | "unread"
+    | "prepare-unknown"
+    | "transfer-unknown"
+    | "digital"
+    | "catalog" = "normal",
 ) {
   await mockStudio(page);
   const state = {
     writes: [] as { op: string; r: Record<string, unknown> }[],
     checksum: "",
-    published: false,
+    published: mode === "catalog",
     failed: false,
     puts: 0,
+    digital: undefined as DigitalDocumentContent | undefined,
+    digitalPreview: undefined as DigitalDocumentContent | undefined,
   };
+  const catalog: ContentTemplateView[] = [
+    {
+      id: fileId,
+      org_id: I.org,
+      center_id: I.center,
+      scope_key: `center:${I.org}:${I.center}`,
+      code: `document.${documentId}`,
+      channel: "document",
+      language: "tr",
+      version: 1,
+      revision: 1,
+      source_version: fileId,
+      state: "published",
+      retired: false,
+      invalidated: false,
+      created_at: "2026-11-17T00:00:00Z",
+      published_at: "2026-11-17T00:00:00Z",
+      content: {
+        language: "tr",
+        name: "Sentetik belge",
+        text: "Sentetik kaynak metni",
+        template_id: "document.text",
+        template_version: "1",
+      },
+    },
+  ];
+  const translationId = "019ab7b0-0000-7000-8000-000000000093";
   const preview = {
     id: previewId,
     token: "synthetic",
@@ -107,7 +148,11 @@ async function setup(
       state.checksum = r.checksum;
       return send({ primary_id: fileId, operation_id: previewId });
     }
-    if (op === "document_publication_preview_v1")
+    if (op === "document_publication_preview_v1") {
+      if (mode === "digital") {
+        expect(r).not.toHaveProperty("file_id");
+        state.digitalPreview = r.digital_content;
+      }
       return send({
         preview,
         affected: [
@@ -120,10 +165,16 @@ async function setup(
         ],
         preserves_reservations: true,
       });
+    }
     if (op === "preview_get_v1") return send(preview);
     if (op === "document_version_publish_v1") {
       state.writes.push({ op, r });
       state.published = true;
+      if (mode === "digital") {
+        expect(r).not.toHaveProperty("file_id");
+        expect(r.digital_content).toEqual(state.digitalPreview);
+        state.digital = r.digital_content;
+      }
       if (mode === "unknown" && !state.failed) {
         state.failed = true;
         return route.abort("failed");
@@ -132,6 +183,79 @@ async function setup(
         primary_id: fileId,
         operation_id: previewId,
         related: [{ type: "documents", id: documentId }],
+      });
+    }
+    if (mode === "catalog" && op === "content_catalog_get_v1") {
+      expect(r).toMatchObject({
+        center_id: I.center,
+        scope_key: `center:${I.org}:${I.center}`,
+        code: `document.${documentId}`,
+        channel: "document",
+      });
+      return send({ items: catalog, as_of: "2026-11-17T00:00:00Z" });
+    }
+    if (mode === "catalog" && op === "content_catalog_save_v1") {
+      state.writes.push({ op, r });
+      expect(r).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        code: `document.${documentId}`,
+        source_version: fileId,
+        language: "en",
+        version: 1,
+      });
+      const translation = catalog.find((row) => row.id === translationId);
+      if (r.action === "draft") {
+        expect(r.expected_revision).toBeUndefined();
+        catalog.push({
+          ...catalog[0]!,
+          id: translationId,
+          language: "en",
+          content: r.content,
+          published_at: null,
+          state: "draft",
+        });
+      } else {
+        expect(r.expected_revision).toBe(translation?.revision);
+        if (!translation) throw Error("Expected catalogue translation");
+        if (r.action === "publish") {
+          translation.state = "published";
+          translation.revision++;
+        }
+        if (r.action === "retire") translation.retired = true;
+        if (r.action === "invalidate") translation.invalidated = true;
+      }
+      return send({ primary_id: translationId, operation_id: previewId });
+    }
+    if (op === "content_catalog_get_v1" && state.digital) {
+      expect(r).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        scope_key: `center:${I.org}:${I.center}`,
+        code: `document.${documentId}`,
+        channel: "document",
+      });
+      const content = state.failed ? state.digital : { ...state.digital, text: "Uyuşmayan metin" };
+      state.failed = true;
+      return send({
+        items: [
+          {
+            id: fileId,
+            org_id: I.org,
+            center_id: I.center,
+            scope_key: r.scope_key,
+            code: r.code,
+            channel: r.channel,
+            state: "published",
+            source_version: fileId,
+            language: content.language,
+            content,
+            version: 1,
+            revision: 1,
+            retired: false,
+            invalidated: false,
+          },
+        ],
       });
     }
     if (op === "operation_status_get_v1" && r.operation === "document_version_publish_v1")
@@ -183,7 +307,8 @@ async function setup(
   });
   await openStudio(page);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/documents`);
-  await page.getByRole("button", { name: "Belge yükle", exact: true }).click();
+  if (mode !== "catalog")
+    await page.getByRole("button", { name: "Belge yükle", exact: true }).click();
   return state;
 }
 async function fill(page: Page) {
@@ -265,3 +390,92 @@ for (const mode of ["prepare-unknown", "transfer-unknown"] as const)
     expect(state.puts).toBe(1);
     expect(state.writes.filter((w) => w.op === "file_upload_complete_v1")).toHaveLength(1);
   });
+
+test("digital publication confirms exact server content without any Storage upload", async ({
+  page,
+}) => {
+  const state = await setup(page, "digital");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Belge adı", { exact: true }).fill("Sentetik belge");
+  await dialog.getByLabel("Sürüm etiketi", { exact: true }).fill("v1");
+  await dialog.getByLabel("Belge biçimi", { exact: true }).selectOption("digital");
+  await expect(dialog.locator('input[type="file"]')).toHaveCount(0);
+  await dialog.getByRole("checkbox", { name: "Satış", exact: true }).press("Space");
+  const field = dialog.getByLabel("Dijital metin", { exact: true });
+  const preview = dialog.getByRole("button", { name: "Etkiyi göster", exact: true });
+  await preview.click();
+  await expect(field).toBeFocused();
+  const source = "İlk satır.  \nİkinci satır.";
+  await field.fill(source);
+  await preview.click();
+  await expect(dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true })).toBeVisible();
+  await dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await dialog.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await expect(
+    page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
+  ).toHaveCount(0);
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(
+    page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  expect(state.digitalPreview?.text).toBe(source);
+  expect(state.digital?.text).toBe(source);
+  expect(state.puts).toBe(0);
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_version_publish_v1"]);
+});
+
+test("content catalogue manages an exact source translation and acknowledges invalidation", async ({
+  page,
+}) => {
+  const state = await setup(page, "catalog");
+  await page.getByRole("tab", { name: "İçerik kataloğu" }).click();
+  await page.getByLabel("Belge", { exact: true }).selectOption({ label: "Sentetik belge" });
+  const grid = page.getByRole("grid", { name: "İçerik kataloğu" });
+  await expect(grid.getByRole("rowheader").last()).toHaveText(`document.${documentId}`);
+  await page.getByRole("button", { name: "Çeviri ekle" }).click();
+  const form = page.getByRole("form", { name: "Belge çevirisi" });
+  const field = form.getByLabel("Dijital metin");
+  await form.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await expect(field).toBeFocused();
+  await field.fill("Synthetic translation.");
+  const confirm = async (name: string) => {
+    const dialog = page.getByRole("dialog", { name, exact: true });
+    const apply = dialog.getByRole("button", { name: common.settings.applyReview });
+    await expect(apply).toBeDisabled();
+    await dialog.getByRole("checkbox").press("Space");
+    await apply.click();
+    await expect(
+      dialog.getByText(common.events.commandStates.saved, { exact: true }),
+    ).toBeVisible();
+    await dialog.getByRole("button", { name: "Vazgeç" }).click();
+  };
+  await form.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await confirm("Taslağı kaydet");
+  const row = grid
+    .getByRole("row")
+    .filter({ has: page.getByRole("gridcell", { name: "en", exact: true }) });
+  await expect(row.getByRole("gridcell", { name: "Taslak", exact: true })).toBeVisible();
+  await row.getByRole("button", { name: "Taslağı düzenle" }).click();
+  await expect(field).toHaveValue("Synthetic translation.");
+  await form.getByRole("button", { name: "Çeviriyi yayımla" }).click();
+  await confirm("Çeviriyi yayımla");
+  await expect(row.getByRole("gridcell", { name: "Yayın sürümü" })).toBeVisible();
+  await row.getByRole("button", { name: "Yayından kaldır" }).click();
+  await confirm("Yayından kaldır");
+  await expect(row.getByRole("gridcell", { name: "Kaldırıldı" })).toBeVisible();
+  await row.getByRole("button", { name: "Geçersiz kıl" }).click();
+  await confirm("Geçersiz kıl");
+  await expect(page.getByText("Sunucu, sürümü geçersiz kıldığını doğruladı.")).toBeVisible();
+  await expect(row.getByRole("gridcell", { name: "Geçersiz kılındı" })).toBeVisible();
+  await expect(row.getByRole("button", { name: "Geçersiz kıl" })).toHaveCount(0);
+  await page.reload();
+  await page.getByRole("tab", { name: "İçerik kataloğu" }).click();
+  await page.getByLabel("Belge", { exact: true }).selectOption({ label: "Sentetik belge" });
+  await expect(row.getByRole("gridcell", { name: "Geçersiz kılındı" })).toBeVisible();
+  expect(state.writes.map(({ r }) => r.action)).toEqual([
+    "draft",
+    "publish",
+    "retire",
+    "invalidate",
+  ]);
+});

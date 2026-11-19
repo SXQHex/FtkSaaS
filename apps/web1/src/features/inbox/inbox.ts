@@ -1,8 +1,41 @@
 import { z } from "zod";
+import { queryOptions } from "@tanstack/react-query";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import type { Page_NotificationView } from "../../lib/api-contracts/generated";
+import type {
+  Page_NotificationView,
+  RequestNotificationsList,
+} from "../../lib/api-contracts/generated";
+export type InboxVisibility = NonNullable<RequestNotificationsList["visibility"]>;
+export type InboxFilter = "all" | "unread" | "todo" | "archived" | "deleted";
+export const inboxKey = (scope: ClientScope) =>
+  ["inbox", scope.accountId, scope.orgId, scope.centerId] as const;
+
+export function inboxListQuery(
+  scope: ClientScope,
+  query = "",
+  filter: InboxFilter = "all",
+  cursor?: string,
+  visited: (string | undefined)[] = [],
+) {
+  return queryOptions({
+    queryKey: [...inboxKey(scope), "list", query, filter, cursor],
+    queryFn: async () => {
+      const page = await readInbox(scope, filter === "unread", cursor, {
+        query,
+        workState: filter === "todo" ? "pending" : "all",
+        visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
+      });
+      if (page.next_cursor && (page.next_cursor === cursor || visited.includes(page.next_cursor)))
+        throw new Error("INBOX_CURSOR_UNAVAILABLE");
+      return page;
+    },
+    retry: false,
+    staleTime: 15_000,
+    refetchOnWindowFocus: false,
+  });
+}
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -12,7 +45,7 @@ export async function readInbox(
   scope: ClientScope,
   unreadOnly: boolean,
   cursor?: string,
-  options?: { query: string; workState: "all" | "pending" },
+  options?: { query: string; workState: "all" | "pending"; visibility?: InboxVisibility },
 ): Promise<Page_NotificationView> {
   const page = await (
     await scopedBackend(scope)
@@ -26,6 +59,7 @@ export async function readInbox(
           work_state: options.workState,
           include_work: true,
           include_summary: true,
+          ...(options.visibility ? { visibility: options.visibility } : {}),
         }
       : {}),
     page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
@@ -41,6 +75,18 @@ export async function readInbox(
       throw new Error("INBOX_SOURCE_UNAVAILABLE");
     seen.add(item.id);
     z.uuid().parse(item.payload.subject.id);
+    const reservationTarget = item.work?.reservation_target;
+    if (reservationTarget) {
+      if (
+        item.kind !== "session_changed_for_participant" ||
+        item.work?.state !== "informational" ||
+        item.payload.subject.type !== "sessions" ||
+        reservationTarget.operation !== "reservation_list_v1" ||
+        reservationTarget.key.session_id !== item.payload.subject.id
+      )
+        throw new Error("INBOX_SOURCE_UNAVAILABLE");
+      z.uuid().parse(reservationTarget.center_id);
+    }
     if (item.payload.title !== undefined) z.string().parse(item.payload.title);
     if (item.payload.body !== undefined) z.string().parse(item.payload.body);
   }
@@ -60,6 +106,8 @@ export async function readInbox(
     for (const item of page.items) {
       z.number().int().positive().safe().parse(item.version);
       if (!item.work) throw new Error("INBOX_SOURCE_UNAVAILABLE");
+      if (options.visibility && item.visibility !== options.visibility)
+        throw new Error("INBOX_SOURCE_UNAVAILABLE");
       z.enum(["pending", "completed", "informational", "unavailable"]).parse(item.work.state);
       if (options.workState === "pending" && item.work.state !== "pending")
         throw new Error("INBOX_SOURCE_UNAVAILABLE");

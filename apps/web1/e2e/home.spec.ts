@@ -14,8 +14,16 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test("opens the Turkish application with fresh state", async ({ page }) => {
+test("opens the real sign-in at the default route", async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByRole("heading", { name: "Hesabına giriş yap", exact: true }),
+  ).toBeVisible();
+});
+
+test("opens the opt-in Turkish development example with fresh state", async ({ page }) => {
+  await page.goto("/?__home_example");
   await expect(page.locator("html")).toHaveAttribute("lang", "tr");
   await expect(page.getByRole("heading", { name: "FtkSaaS", exact: true })).toBeVisible();
   await expect(
@@ -26,7 +34,7 @@ test("opens the Turkish application with fresh state", async ({ page }) => {
 });
 
 test("supports React Aria pointer and keyboard presses", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?__home_example");
   const button = page.getByRole("button", { name: "Test Et", exact: true });
   const status = page.getByRole("status");
   await expect(status).toHaveText("Tıklama sayısı: 0");
@@ -42,10 +50,10 @@ test("supports React Aria pointer and keyboard presses", async ({ page }) => {
   await expect(status).toHaveText("Tıklama sayısı: 0");
 });
 
-test("has no automatically detectable accessibility violations on the home page", async ({
+test("has no automatically detectable accessibility violations in the home example", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?__home_example");
   await expect(page.getByRole("heading", { name: "FtkSaaS", exact: true })).toBeVisible();
   const results = await scanAccessibility(page);
   expect(results.violations).toEqual([]);

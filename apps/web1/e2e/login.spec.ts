@@ -52,7 +52,7 @@ test("callback provider errors remove query and fragment credentials without a f
     "/auth/callback?error=access_denied&code=fixture-code#access_token=fixture-token",
   );
   await expect(page).toHaveURL("http://127.0.0.1:4173/auth/callback");
-  await expect(page.getByRole("alert")).toContainText("Bağlantı tamamlanamadı");
+  await expect(page.getByRole("alert").filter({ hasText: "Bağlantı tamamlanamadı" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Girişe dön" })).toBeVisible();
   await expect(page.getByText("fixture-token")).toHaveCount(0);
 });

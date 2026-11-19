@@ -89,7 +89,7 @@ it("reads active offers independently and binds them to exact entry, person and 
     waitlist_detail: { ...entry, state: "offered", offers: [offer] },
     versions: [...row().versions, { entity: { type: "seat_offers", id: offer.id }, version: 2 }],
   };
-  call.mockResolvedValue({ items: [source] });
+  call.mockResolvedValue({ items: [source], as_of: entry.created_at });
   expect((await readOwnWaitlist(scope, "offers")).items[0]?.offer?.id).toBe(offer.id);
   expect(call.mock.calls[0]![1].selector.key).toEqual({
     directory: "self",
@@ -101,7 +101,7 @@ it("reads active offers independently and binds them to exact entry, person and 
 });
 it("requires explicit review and fresh exact entry before reusing native writer", async () => {
   const before = { id: entry.id, entry, session };
-  target.mockResolvedValue(entry);
+  target.mockResolvedValue({ entry, asOf: entry.created_at });
   await expect(ownWaitlistIntent(scope, before, "leave", false)).rejects.toThrow();
   await ownWaitlistIntent(scope, before, "leave", true);
   expect(intent).toHaveBeenCalledWith(
@@ -113,8 +113,9 @@ it("requires explicit review and fresh exact entry before reusing native writer"
     entry,
     undefined,
     entry.person_id,
+    entry.created_at,
   );
-  target.mockResolvedValue({ ...entry, version: 4 });
+  target.mockResolvedValue({ entry: { ...entry, version: 4 }, asOf: entry.created_at });
   await expect(ownWaitlistIntent(scope, before, "leave", true)).rejects.toThrow(
     "MEMBER_WAITLIST_STALE",
   );

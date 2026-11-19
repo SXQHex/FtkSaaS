@@ -48,9 +48,8 @@ export interface ReportFileRow {
   detail: string;
   state: string;
   progress?: number;
-  canDownload?: boolean;
+  action: "download" | "status" | "rows" | "retry";
   canRetry?: boolean;
-  canReadRows?: boolean;
 }
 export interface ReportPresentation {
   summary: ReportMetric[];
@@ -58,9 +57,11 @@ export interface ReportPresentation {
   instructors: ReportMetric[];
   weeks: ReportChartPoint[];
   packages: ReportChartPoint[];
-  funnel: ReportChartPoint[];
+  funnel: { converted: string; candidates: string; rate: string };
+  funnelStages: ReportRow[];
+  funnelSources: ReportRow[];
   packageSummary: string;
-  funnelSummary: string;
+  funnelEmpty: string;
   lessons: ReportRow[];
   breakdowns: Record<ReportBreakdown, { description: string; rows: ReportRow[] }>;
   earnings: ReportRow[];
@@ -73,12 +74,14 @@ export function ReportTable({
   columns,
   rows,
   action,
+  compact = false,
 }: {
   title: string;
   description?: string;
   columns: string[];
   rows: ReportRow[] | undefined;
   action?: ReactNode;
+  compact?: boolean;
 }) {
   const { t } = useTranslation(),
     id = useId();
@@ -100,7 +103,7 @@ export function ReportTable({
           tabIndex={0}
           className="overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-ring"
         >
-          <Table aria-labelledby={id} className="min-w-[36rem]">
+          <Table aria-labelledby={id} className={compact ? "min-w-0" : "min-w-[36rem]"}>
             <TableHeader>
               {columns.map((column, index) => (
                 <TableHead key={column} isRowHeader={index === 0}>
@@ -112,7 +115,12 @@ export function ReportTable({
               {(rows ?? []).map((row) => (
                 <TableRow key={row.id} id={row.id}>
                   {row.cells.map((cell, index) => (
-                    <TableCell key={index}>{cell}</TableCell>
+                    <TableCell
+                      key={index}
+                      className={compact ? "wrap-anywhere whitespace-normal" : undefined}
+                    >
+                      {cell}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
@@ -258,7 +266,7 @@ export function ReportsView({
   after?: Partial<Record<ReportTab, ReactNode>>;
   onExport: () => void;
   onPeople: () => void;
-  onFile: (kind: "export" | "import", id: string, action: "download" | "retry" | "rows") => void;
+  onFile: (id: string, action: ReportFileRow["action"]) => void;
   locked?: boolean;
   notice?: ReactNode;
 }) {
@@ -471,12 +479,48 @@ export function ReportsView({
               <CardDescription>{t(($) => $.reports.funnelHint)}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Bars points={data?.funnel} />
-              <p className="mt-3 text-sm text-muted-foreground">
-                {data?.funnelSummary ?? t(($) => $.reports.unknown)}
-              </p>
+              {data?.funnel ? (
+                <dl className="grid gap-3 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt>{t(($) => $.reports.crmCandidates)}</dt>
+                    <dd className="font-medium tabular-nums">{data.funnel.candidates}</dd>
+                  </div>
+                  <div>
+                    <dt>{t(($) => $.reports.crmConverted)}</dt>
+                    <dd className="font-medium tabular-nums">{data.funnel.converted}</dd>
+                  </div>
+                  <div>
+                    <dt>{t(($) => $.reports.crmConversionRate)}</dt>
+                    <dd className="font-medium tabular-nums">{data.funnel.rate}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {data?.funnelEmpty ?? t(($) => $.reports.unknown)}
+                </p>
+              )}
             </CardContent>
           </Card>
+          {data?.funnelStages && (
+            <ReportTable
+              compact
+              title={t(($) => $.reports.crmFunnelStages)}
+              columns={[t(($) => $.reports.crmStage), t(($) => $.reports.crmCandidates)]}
+              rows={data.funnelStages}
+            />
+          )}
+          {data?.funnelSources && (
+            <ReportTable
+              compact
+              title={t(($) => $.reports.crmFunnelSources)}
+              columns={[
+                t(($) => $.reports.crmSource),
+                t(($) => $.reports.crmCandidates),
+                t(($) => $.reports.crmConverted),
+              ]}
+              rows={data.funnelSources}
+            />
+          )}
           {after?.instructors}
         </TabsContent>
         <TabsContent id="files" className="flex flex-col gap-5">
@@ -531,23 +575,21 @@ export function ReportsView({
                           <Button
                             variant="ghost"
                             size="sm"
-                            isDisabled={
-                              locked || !(row.canDownload || row.canReadRows || row.canRetry)
-                            }
-                            onPress={() =>
-                              onFile(
-                                kind,
-                                row.id,
-                                row.canDownload ? "download" : row.canReadRows ? "rows" : "retry",
-                              )
-                            }
+                            isDisabled={locked}
+                            onPress={() => onFile(row.id, row.action)}
                           >
-                            {row.canReadRows
-                              ? t(($) => $.reports.rows)
-                              : row.canRetry
-                                ? t(($) => $.reports.retry)
-                                : t(($) => $.reports.download)}
+                            {t(($) => $.reports.fileActions[row.action])}
                           </Button>
+                          {row.canRetry && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              isDisabled={locked}
+                              onPress={() => onFile(row.id, "retry")}
+                            >
+                              {t(($) => $.reports.fileActions.retry)}
+                            </Button>
+                          )}
                         </div>
                       </li>
                     ))}

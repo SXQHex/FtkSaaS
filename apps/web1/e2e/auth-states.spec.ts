@@ -13,6 +13,7 @@ for (const [code, title] of [
   ["FORBIDDEN", "Bu sayfaya erişimin yok"],
   ["NOT_FOUND", "Sayfa bulunamadı"],
   ["PLAN_FEATURE_UNAVAILABLE", "Plan sınırına ulaşıldı"],
+  ["PLAN_LIMIT_REACHED", "Plan sınırına ulaşıldı"],
 ] as const)
   test(`states native ${code} route failure retains its actual meaning and safe exits`, async ({
     page,
@@ -21,7 +22,7 @@ for (const [code, title] of [
     await signIn(page);
     await page.route("**/functions/v1/backend-v1/account_get_v1", (route) =>
       route.fulfill({
-        status: 403,
+        status: code === "NOT_FOUND" ? 404 : 403,
         json: { ok: false, error: { code, retryable: false, trace_id: I.role } },
       }),
     );
@@ -54,8 +55,10 @@ test("states route transport retry only rereads the failed loader and recovers t
   });
   await page.goto(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Liste yüklenemedi", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Tekrar dene", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
+  const retry = page.getByRole("button", { name: "Tekrar dene", exact: true });
+  await retry.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeFocused();
   expect(attempts).toBeGreaterThanOrEqual(2);
   await expect(page.getByRole("button", { name: "Adresi kopyala", exact: true })).toBeEnabled();
 });
@@ -82,8 +85,10 @@ test("states native version conflict provides reread and never a force-overwrite
   ).toBeVisible();
   await expect(page.getByRole("button", { name: /üzerine yaz/i })).toHaveCount(0);
   conflict = false;
-  await page.getByRole("button", { name: "Güncel kaydı yükle", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
+  const reload = page.getByRole("button", { name: "Güncel kaydı yükle", exact: true });
+  await reload.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeFocused();
 });
 test("states offline notice follows the browser signal without losing the mounted page or replaying a writer", async ({
   page,

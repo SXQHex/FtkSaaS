@@ -15,11 +15,13 @@ export function MemberClassesContent({
   scope,
   personId,
   timezone,
+  weekStart,
   onLockChange,
 }: {
   scope: ClientScope;
   personId: string;
   timezone: string;
+  weekStart: "monday" | "sunday" | null;
   onLockChange: (locked: boolean) => void;
 }) {
   const { t } = useTranslation(),
@@ -32,16 +34,16 @@ export function MemberClassesContent({
     [target, setTarget] = useState<{ row: MemberClass; action: ClassAction | "cancel" }>();
   const prefix = ["member-classes", scope.accountId, scope.orgId, scope.centerId, personId];
   const period = useQuery({
-    queryKey: [...prefix, "week", timezone, now, offset],
-    queryFn: () => memberClassWeek(timezone, now, offset),
+    queryKey: [...prefix, "week", timezone, now, offset, weekStart],
+    queryFn: () => memberClassWeek(timezone, now, offset, weekStart!),
+    enabled: weekStart !== null,
     retry: false,
   });
   const lessons = useQuery({
-    queryKey: [...prefix, "lessons", period.data?.start],
+    queryKey: [...prefix, "lessons", period.data?.interval],
     queryFn: () => readMemberClasses(scope, period.data!.interval),
     enabled: !!period.data,
     retry: false,
-    refetchOnWindowFocus: false,
   });
   const lock = useCallback(
     (value: boolean) => {
@@ -92,6 +94,7 @@ export function MemberClassesContent({
     <>
       <MemberClassesView
         locked={locked}
+        loading={period.isPending || (!period.isError && lessons.isPending)}
         range={frame?.range ?? t(($) => $.memberClasses.unknown)}
         days={(frame?.days ?? []).map((value) => ({
           ...value,
@@ -141,6 +144,7 @@ export function MemberClassesContent({
                       ),
                     }),
                     title: row.title,
+                    priorityBooking: own && d.own_reservation?.mode === "priority",
                     metadata: [
                       d.instructor_labels.join(" · ") ||
                         t(($) => $.memberClasses.unassignedInstructor),

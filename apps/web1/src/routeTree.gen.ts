@@ -17,6 +17,7 @@ import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MfaRouteImport } from './routes/mfa'
+import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
@@ -38,6 +39,7 @@ import { Route as PublicSlugUnavailableRouteImport } from './routes/public.$slug
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdAuditRouteImport } from './routes/o.$orgId.c.$centerId.audit'
 import { Route as OOrgIdCCenterIdAutomationRouteImport } from './routes/o.$orgId.c.$centerId.automation'
+import { Route as OOrgIdCCenterIdCentersRouteImport } from './routes/o.$orgId.c.$centerId.centers'
 import { Route as OOrgIdCCenterIdDocumentsRouteImport } from './routes/o.$orgId.c.$centerId.documents'
 import { Route as OOrgIdCCenterIdEarningsRouteImport } from './routes/o.$orgId.c.$centerId.earnings'
 import { Route as OOrgIdCCenterIdEventsRouteImport } from './routes/o.$orgId.c.$centerId.events'
@@ -94,6 +96,11 @@ const LoginRoute = LoginRouteImport.update({
 const MfaRoute = MfaRouteImport.update({
   id: '/mfa',
   path: '/mfa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformRoute = PlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -203,6 +210,11 @@ const OOrgIdCCenterIdAutomationRoute =
     path: '/o/$orgId/c/$centerId/automation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const OOrgIdCCenterIdCentersRoute = OOrgIdCCenterIdCentersRouteImport.update({
+  id: '/o/$orgId/c/$centerId/centers',
+  path: '/o/$orgId/c/$centerId/centers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OOrgIdCCenterIdDocumentsRoute =
   OOrgIdCCenterIdDocumentsRouteImport.update({
     id: '/o/$orgId/c/$centerId/documents',
@@ -303,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
+  '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -324,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
+  '/o/$orgId/c/$centerId/centers': typeof OOrgIdCCenterIdCentersRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
   '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
   '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
@@ -351,6 +365,7 @@ export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
+  '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -372,6 +387,7 @@ export interface FileRoutesByTo {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
+  '/o/$orgId/c/$centerId/centers': typeof OOrgIdCCenterIdCentersRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
   '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
   '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
@@ -400,6 +416,7 @@ export interface FileRoutesById {
   '/invite': typeof InviteRoute
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
+  '/platform': typeof PlatformRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -421,6 +438,7 @@ export interface FileRoutesById {
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
+  '/o/$orgId/c/$centerId/centers': typeof OOrgIdCCenterIdCentersRoute
   '/o/$orgId/c/$centerId/documents': typeof OOrgIdCCenterIdDocumentsRoute
   '/o/$orgId/c/$centerId/earnings': typeof OOrgIdCCenterIdEarningsRoute
   '/o/$orgId/c/$centerId/events': typeof OOrgIdCCenterIdEventsRoute
@@ -450,6 +468,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/login'
     | '/mfa'
+    | '/platform'
     | '/reset-password'
     | '/signup'
     | '/verify-email'
@@ -471,6 +490,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
+    | '/o/$orgId/c/$centerId/centers'
     | '/o/$orgId/c/$centerId/documents'
     | '/o/$orgId/c/$centerId/earnings'
     | '/o/$orgId/c/$centerId/events'
@@ -498,6 +518,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/login'
     | '/mfa'
+    | '/platform'
     | '/reset-password'
     | '/signup'
     | '/verify-email'
@@ -519,6 +540,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
+    | '/o/$orgId/c/$centerId/centers'
     | '/o/$orgId/c/$centerId/documents'
     | '/o/$orgId/c/$centerId/earnings'
     | '/o/$orgId/c/$centerId/events'
@@ -546,6 +568,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/login'
     | '/mfa'
+    | '/platform'
     | '/reset-password'
     | '/signup'
     | '/verify-email'
@@ -567,6 +590,7 @@ export interface FileRouteTypes {
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
+    | '/o/$orgId/c/$centerId/centers'
     | '/o/$orgId/c/$centerId/documents'
     | '/o/$orgId/c/$centerId/earnings'
     | '/o/$orgId/c/$centerId/events'
@@ -595,6 +619,7 @@ export interface RootRouteChildren {
   InviteRoute: typeof InviteRoute
   LoginRoute: typeof LoginRoute
   MfaRoute: typeof MfaRoute
+  PlatformRoute: typeof PlatformRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
@@ -616,6 +641,7 @@ export interface RootRouteChildren {
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdAuditRoute: typeof OOrgIdCCenterIdAuditRoute
   OOrgIdCCenterIdAutomationRoute: typeof OOrgIdCCenterIdAutomationRoute
+  OOrgIdCCenterIdCentersRoute: typeof OOrgIdCCenterIdCentersRoute
   OOrgIdCCenterIdDocumentsRoute: typeof OOrgIdCCenterIdDocumentsRoute
   OOrgIdCCenterIdEarningsRoute: typeof OOrgIdCCenterIdEarningsRoute
   OOrgIdCCenterIdEventsRoute: typeof OOrgIdCCenterIdEventsRoute
@@ -691,6 +717,13 @@ declare module '@tanstack/react-router' {
       path: '/mfa'
       fullPath: '/mfa'
       preLoaderRoute: typeof MfaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform': {
+      id: '/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof PlatformRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -840,6 +873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OOrgIdCCenterIdAutomationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/o/$orgId/c/$centerId/centers': {
+      id: '/o/$orgId/c/$centerId/centers'
+      path: '/o/$orgId/c/$centerId/centers'
+      fullPath: '/o/$orgId/c/$centerId/centers'
+      preLoaderRoute: typeof OOrgIdCCenterIdCentersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/documents': {
       id: '/o/$orgId/c/$centerId/documents'
       path: '/o/$orgId/c/$centerId/documents'
@@ -971,6 +1011,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteRoute: InviteRoute,
   LoginRoute: LoginRoute,
   MfaRoute: MfaRoute,
+  PlatformRoute: PlatformRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
@@ -992,6 +1033,7 @@ const rootRouteChildren: RootRouteChildren = {
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdAuditRoute: OOrgIdCCenterIdAuditRoute,
   OOrgIdCCenterIdAutomationRoute: OOrgIdCCenterIdAutomationRoute,
+  OOrgIdCCenterIdCentersRoute: OOrgIdCCenterIdCentersRoute,
   OOrgIdCCenterIdDocumentsRoute: OOrgIdCCenterIdDocumentsRoute,
   OOrgIdCCenterIdEarningsRoute: OOrgIdCCenterIdEarningsRoute,
   OOrgIdCCenterIdEventsRoute: OOrgIdCCenterIdEventsRoute,

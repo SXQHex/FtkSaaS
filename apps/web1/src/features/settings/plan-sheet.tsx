@@ -66,6 +66,7 @@ export function PlanSheet({
   return (
     <Sheet
       isOpen={open}
+      aria-labelledby={`${id}-title`}
       onOpenChange={(value) => {
         if (!value && !locked) onClose();
       }}

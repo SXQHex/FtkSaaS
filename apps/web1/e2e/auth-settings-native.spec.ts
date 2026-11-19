@@ -17,6 +17,30 @@ async function confirm(page: import("@playwright/test").Page) {
     .click();
   return dialog;
 }
+test("command palette opens a settings section in the current managed center", async ({ page }) => {
+  const fixture = await mockSettingsCompletion(page);
+  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
+  const search = dialog.getByPlaceholder("Sayfa adı ara…");
+  await expect(search).toBeFocused();
+  await search.fill("Politikalar");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(
+    new RegExp(`/o/${I.org}/c/${I.center}/settings\\?section=politika$`),
+  );
+  await expect(page.getByRole("tab", { name: "Politikalar", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Politikalar", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  expect(fixture.writes).toEqual([]);
+});
+
 test("public settings explicitly bind the selected form and published consent source with native versioned readback", async ({
   page,
 }) => {
@@ -65,7 +89,135 @@ test("public settings explicitly bind the selected form and published consent so
     },
   });
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await expect(page.getByRole("switch", { name: "Sayfayı yayınla", exact: true })).toBeChecked();
+  await expect(
+    page.getByRole("switch", { name: "Ziyaretçi profili görünür", exact: true }),
+  ).toBeChecked();
+});
+test("publication settings share the scoped visitor route and preview live closed and open states", async ({
+  page,
+  context,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin });
+  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
+  const centerUrl = `${origin}/public/${I.org}/calendar?center_id=${I.center}`;
+  const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
+  await expect(address).toHaveValue(centerUrl);
+  await expect(address).toHaveAttribute("readonly", "");
+  await page.getByRole("button", { name: "Bağlantıyı kopyala", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Yayın bağlantısı kopyalandı." }),
+  ).toBeVisible();
+  expect(await page.evaluate("navigator.clipboard.readText()")).toBe(centerUrl);
+
+  let available = false;
+  await page.route("**/api/public/calendar", (route) => {
+    const request = route.request();
+    expect(request.headers()).not.toHaveProperty("authorization");
+    expect(request.headers()).not.toHaveProperty("apikey");
+    expect(request.postDataJSON()).toMatchObject({ slug: I.org, center_id: I.center });
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: [],
+          as_of: "2026-11-16T12:00:00Z",
+          next_cursor: null,
+          publication_state: available ? "available" : "unavailable",
+          application: { state: "closed", form: null },
+        },
+      },
+    });
+  });
+  const documentTime = await page.evaluate(() => performance.timeOrigin);
+  await page.getByRole("button", { name: "Sayfayı önizle", exact: true }).click();
+  await expect(page).toHaveURL(centerUrl);
+  await expect(
+    page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);
+  available = true;
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Bu aralıkta yayınlanan bir içerik yok.", { exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(0);
+});
+test("organization publication address uses versioned settings and closes old addresses and visitor access", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  f.state.values.organization!.public_page = { slug: "ilk-adres", enabled: true };
+  const publicReads: string[] = [];
+  await page.route("**/api/public/calendar", (route) => {
+    const request = route.request();
+    expect(request.headers()).not.toHaveProperty("authorization");
+    const { slug } = request.postDataJSON() as { slug: string };
+    publicReads.push(slug);
+    const current = f.state.values.organization!.public_page as { slug: string; enabled: boolean };
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: [],
+          as_of: "2026-11-16T12:00:00Z",
+          next_cursor: null,
+          publication_state: current.slug === slug && current.enabled ? "available" : "unavailable",
+          application: { state: "closed", form: null },
+        },
+      },
+    });
+  });
+  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
+  const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
+  const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
+  await expect(address).toHaveValue(`${origin}/public/ilk-adres/calendar?center_id=${I.center}`);
+  await scope.selectOption("organization");
+  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
+  const editor = page.getByRole("dialog");
+  const slug = editor.getByLabel("Yayın adresi kısa adı", { exact: true });
+  const reviewButton = editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true });
+  await slug.fill("Geçersiz Adres");
+  await reviewButton.click();
+  await expect(slug).toBeFocused();
+  await expect(slug).toHaveAttribute("aria-invalid", "true");
+  expect(f.writes).toHaveLength(0);
+  await slug.fill("yeni-adres");
+  await reviewButton.click();
+  const review = await confirm(page);
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  expect(f.writes[0]?.r).toMatchObject({
+    scope: "organization",
+    expected_version: 1,
+    patch: { public_page: { slug: "yeni-adres", enabled: true } },
+  });
+  expect(publicReads).toEqual(expect.arrayContaining(["ilk-adres", "yeni-adres"]));
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(address).toHaveValue(`${origin}/public/yeni-adres/calendar`);
+  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
+  await editor
+    .getByRole("checkbox", { name: "Ziyaretçi sayfasını yayına aç", exact: true })
+    .press("Space");
+  await reviewButton.click();
+  await confirm(page);
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  expect(f.writes[1]?.r).toMatchObject({
+    scope: "organization",
+    expected_version: 2,
+    patch: { public_page: { slug: "yeni-adres", enabled: false } },
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(
+    page.getByRole("switch", { name: "Ziyaretçi sayfası yayında", exact: true }),
+  ).not.toBeChecked();
+  await page.getByRole("button", { name: "Sayfayı önizle", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/public/yeni-adres/calendar`);
+  await expect(
+    page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
+  ).toBeVisible();
 });
 test("policy editing publishes a native protected change after review and keeps source scope and local instant", async ({
   page,
@@ -122,6 +274,50 @@ test("program duration changes only the reviewed center setting and survives a f
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");
   await expect(duration).toHaveValue("45");
+});
+test("V07.1 reviews organization billing fields and reloads the saved values without a center write", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const f = await mockSettingsCompletion(page);
+  const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
+  await scope.selectOption("organization");
+  const plan = page.getByRole("tab", { name: "Plan", exact: true });
+  await plan.click();
+  await expect(plan).toHaveAttribute("aria-selected", "true");
+  await expect(plan).toBeInViewport();
+  const form = page.getByRole("form", { name: "Fatura bilgileri", exact: true });
+  const name = form.getByRole("textbox", { name: "Fatura unvanı" });
+  const address = form.getByRole("textbox", { name: "Fatura adresi" });
+  const email = form.getByRole("textbox", { name: "Fatura e-postası" });
+  await expect(name).toHaveValue("Sentetik kuruluş");
+  await name.fill("Örnek Atölye");
+  await address.fill("Örnek Sokak\nAnkara");
+  await email.clear();
+  await name.press("Enter");
+  await expect(page.getByRole("dialog")).toContainText("Örnek Atölye");
+  expect(f.writes).toHaveLength(0);
+  const review = await confirm(page);
+  await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+  expect(f.writes).toHaveLength(1);
+  expect(f.writes[0]).toMatchObject({
+    op: "settings_update_v1",
+    r: { scope: "organization", org_id: I.org, expected_version: 1 },
+  });
+  expect(f.writes[0]?.r).not.toHaveProperty("center_id");
+  expect(f.writes[0]?.r.patch).toEqual({
+    billing_name: "Örnek Atölye",
+    billing_address: "Örnek Sokak\nAnkara",
+    billing_email: null,
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.reload();
+  await scope.selectOption("organization");
+  await expect(name).toHaveValue("Örnek Atölye");
+  await expect(address).toHaveValue("Örnek Sokak\nAnkara");
+  await expect(email).toHaveValue("");
+  await scope.selectOption("center");
+  await expect(form).toHaveCount(0);
 });
 test("E42 saves an automation preparation and restores the organization source with live scope", async ({
   page,
@@ -381,8 +577,8 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
     .selectOption("organization");
   await page.getByRole("tab", { name: "Plan", exact: true }).click();
   await page.getByRole("button", { name: "Planı değiştir", exact: true }).click();
-  const editor = page.getByRole("dialog");
-  await editor.getByRole("radio", { name: /starter/ }).press("Space");
+  const editor = page.getByRole("dialog", { name: "Planı daralt", exact: true });
+  await editor.getByRole("radio", { name: /^Starter/ }).press("Space");
   await editor
     .getByRole("combobox", { name: "Korunacak merkez", exact: true })
     .selectOption(I.center);

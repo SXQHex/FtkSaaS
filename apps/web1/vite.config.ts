@@ -32,6 +32,7 @@ export default defineConfig(({ command, mode }) => ({
     },
   ],
   test: {
+    ...(!process.env.CI ? { maxWorkers: 1, fileParallelism: false } : {}),
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],

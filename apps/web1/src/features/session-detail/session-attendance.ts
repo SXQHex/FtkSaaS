@@ -5,6 +5,7 @@ import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   AttendanceCorrection,
   AttendanceView,
+  AttendanceWindow,
   BlockReason,
   OrdinaryAttendanceResult,
   Preview,
@@ -35,6 +36,18 @@ export type SessionAttendanceIntent = Context &
         request: Omit<RequestAttendanceCorrectApply, "request_id">;
       }
   );
+
+export function attendanceWindowState(window: AttendanceWindow | null | undefined, now: number) {
+  if (window == null) return undefined;
+  if (now < Date.parse(window.opens_at)) return "upcoming";
+  return now < Date.parse(window.closes_at) ? "active" : "elapsed";
+}
+
+function assertDraftWindow(attendance: AttendanceView) {
+  const phase = attendanceWindowState(attendance.attendance_window, Date.now());
+  if (phase === "upcoming" || phase === "elapsed")
+    throw new Error("SESSION_ATTENDANCE_WINDOW_CLOSED");
+}
 function context(scope: ClientScope, session: SessionView, attendance: AttendanceView): Context {
   if (
     attendance.session_id !== session.id ||
@@ -57,6 +70,7 @@ export function attendanceStartIntent(
   actualStartedAt = new Date().toISOString(),
 ): SessionAttendanceIntent {
   const base = context(scope, session, attendance);
+  assertDraftWindow(attendance);
   if (
     session.state !== "planned" ||
     attendance.actual_started_at ||
@@ -87,6 +101,7 @@ export async function attendanceMarkIntent(
     entry = attendance.entries.find((row) => row.reservation_id === reservationId);
   if (!entry || !attendance.actual_started_at || attendance.closure_state !== "open")
     throw new Error("SESSION_ATTENDANCE_SOURCE_CHANGED");
+  assertDraftWindow(attendance);
   // Mark/block expect the reservation version, not AttendanceEntryView.version.
   const reservation = await readProfileReservation(
     scope,
@@ -105,6 +120,10 @@ export async function attendanceMarkIntent(
     ? { ...base, operation: "attendance_mark_v1", request: { ...request, result } }
     : { ...base, operation: "attendance_block_v1", request: { ...request, reason: result } };
 }
+export function hasUnmarkedAttendance(attendance: AttendanceView) {
+  return attendance.entries.some((row) => row.result === "unmarked");
+}
+
 export function attendanceCloseIntent(
   scope: ClientScope,
   session: SessionView,
@@ -116,6 +135,7 @@ export function attendanceCloseIntent(
   if (
     !attendance.actual_started_at ||
     attendance.closure_state !== "open" ||
+    hasUnmarkedAttendance(attendance) ||
     new Set(instructorIds).size !== instructorIds.length ||
     instructorIds.some(
       (id) => !session.assignments.some((row) => row.person_id === id && row.duty === "instructor"),
@@ -199,6 +219,7 @@ export function attendanceCorrectionIntent(review: AttendanceReview): SessionAtt
     },
   };
 }
+
 export async function writeSessionAttendance(intent: SessionAttendanceIntent) {
   const backend = await scopedBackend(intent.scope);
   switch (intent.operation) {

@@ -31,7 +31,7 @@ it("follows own metadata cursors while showing only selected organization links"
       supported_kinds: ["lessons"],
     })
     .mockResolvedValueOnce({
-      items: [{ id: "own", org_id: "org", version: 2 }],
+      items: [{ id: "own", org_id: "org", version: 2, kinds: ["lessons"] }],
       next_cursor: null,
       service_ready: true,
       supported_kinds: ["lessons"],
@@ -56,7 +56,7 @@ it("rejects repeated cursor metadata instead of looping or silently truncating",
 });
 it("creates only explicit own lesson links with the frozen operation key", async () => {
   call.mockResolvedValue({});
-  await writeMemberCalendar(scope, { action: "create", key: "frozen" });
+  await writeMemberCalendar(scope, { action: "create", key: "frozen", kind: "lessons" });
   expect(call).toHaveBeenCalledWith(
     "calendar_link_create_v1",
     expect.objectContaining({
@@ -64,6 +64,38 @@ it("creates only explicit own lesson links with the frozen operation key", async
       organization_scope: { org_id: "org" },
       kinds: ["lessons"],
     }),
+  );
+});
+it("requires the exact studio center in metadata and write scopes", async () => {
+  const studioScope = { ...scope, studioCenterId: scope.centerId };
+  const link = {
+    id: "studio",
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    kinds: ["studio_program"] as ["studio_program"],
+    state: "active" as const,
+    created_at: "2026-11-18T09:00:00Z",
+    version: 2,
+  };
+  const page = { items: [link], next_cursor: null, service_ready: true, supported_kinds: [] };
+  call.mockResolvedValueOnce(page);
+  await expect(readMemberCalendars(studioScope)).resolves.toMatchObject({
+    links: [link],
+    supportedKinds: ["studio_program"],
+  });
+  const selector = { org_id: "org", center_id: "center" };
+  expect(call).toHaveBeenLastCalledWith(
+    "calendar_links_get_v1",
+    expect.objectContaining({ studio_program_scope: selector }),
+  );
+  call.mockResolvedValueOnce({ ...page, items: [{ ...link, center_id: "other" }] });
+  await expect(readMemberCalendars(studioScope)).rejects.toThrow("CALENDAR_METADATA_UNAVAILABLE");
+  const rotate = { action: "rotate" as const, key: "rotate", link };
+  await expect(writeMemberCalendar(scope, rotate)).rejects.toThrow("CALENDAR_SCOPE_CHANGED");
+  await writeMemberCalendar(studioScope, rotate);
+  expect(call).toHaveBeenLastCalledWith(
+    "calendar_link_rotate_v1",
+    expect.objectContaining({ organization_scope: selector, expected_version: 2 }),
   );
 });
 it("writes member preferences separately from global reminder email opt-in", async () => {

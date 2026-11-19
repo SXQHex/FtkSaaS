@@ -237,6 +237,19 @@ export const runtimeOperationNames = [
   "instructor_finance_directory_get_v1",
   "import_directory_get_v1",
   "tracking_directory_get_v1",
-  "document_directory_get_v1"
+  "document_directory_get_v1",
+  "studio_setup_list_v1",
+  "studio_setup_open_v1",
+  "attendance_correction_request_v1",
+  "platform_directory_get_v1",
+  "organization_billing_tax_get_v1",
+  "organization_billing_tax_set_v1",
+  "platform_organization_suspension_set_v1",
+  "audit_center_export_v1",
+  "platform_invoice_upload_prepare_v1",
+  "platform_invoice_publish_v1",
+  "organization_invoices_list_v1",
+  "organization_invoice_file_get_v1",
+  "platform_operator_access_set_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

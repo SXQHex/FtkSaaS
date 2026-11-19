@@ -1,8 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest";
-const { call, account } = vi.hoisted(() => ({ call: vi.fn(), account: vi.fn() }));
+const { call, account, scope } = vi.hoisted(() => ({
+  call: vi.fn(),
+  account: vi.fn(),
+  scope: vi.fn(),
+}));
 vi.mock("../../lib/backend", () => ({ getBackend: () => ({ call }) }));
 vi.mock("../../lib/account", () => ({ readAccount: account }));
-import { readProfile, saveProfile } from "./profile";
+vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: scope }));
+import { profileChange, readProfile, saveProfile } from "./profile";
 afterEach(() => vi.resetAllMocks());
 const entity = { type: "accounts", id: "fixture-account" };
 function page(version = 7) {
@@ -56,11 +61,17 @@ it("rejects absent/mismatched management versions instead of fabricating an init
   await expect(readProfile("different-account")).rejects.toThrow("PROFILE_UNAVAILABLE");
 });
 it("writes only the explicit profile fields and clears optional names/phone with null", async () => {
+  scope.mockResolvedValue({ call });
   await saveProfile(
-    { displayName: " Fixture ", givenName: " ", familyName: " Name ", phone: "" },
+    entity.id,
+    profileChange(
+      { displayName: " Fixture ", givenName: " ", familyName: " Name ", phone: "" },
+      "account",
+    ),
     7,
     "same-intent",
   );
+  expect(scope).toHaveBeenCalledExactlyOnceWith({ accountId: entity.id });
   expect(call).toHaveBeenCalledWith("account_profile_update_v1", {
     client_api_version: 1,
     request_id: expect.any(String),
@@ -76,12 +87,21 @@ it("writes only the explicit profile fields and clears optional names/phone with
 });
 
 it("includes photo only for an explicit upload or removal", async () => {
+  scope.mockResolvedValue({ call });
   const values = { displayName: "Fixture", givenName: "", familyName: "", phone: "" };
-  await saveProfile(values, 7, "remove-photo", null);
+  await saveProfile(entity.id, profileChange(values, "account", null), 7, "remove-photo");
   expect(call.mock.calls[0][1].photo).toBeNull();
   const photo = { mime: "image/png" as const, data_base64: "YWJj", checksum: "fixture-checksum" };
-  await saveProfile(values, 7, "upload-photo", photo);
+  await saveProfile(entity.id, profileChange(values, "account", photo), 7, "upload-photo");
   expect(call.mock.calls[1][1].photo).toEqual(photo);
+});
+
+it("does not submit the previous account's profile after a session change", async () => {
+  scope.mockRejectedValue(new Error("ACCOUNT_CHANGED"));
+  await expect(
+    saveProfile(entity.id, { display_name: "Fixture" }, 7, "same-intent"),
+  ).rejects.toThrow("ACCOUNT_CHANGED");
+  expect(call).not.toHaveBeenCalled();
 });
 
 it("uses photo metadata from the same management snapshot as its write version", async () => {

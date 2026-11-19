@@ -7,7 +7,7 @@ export default defineConfig({
   forbidOnly: true,
   retries: 0,
   timeout: 45_000,
-  workers: 2,
+  workers: process.env.CI ? 2 : 1,
   outputDir: "./test-results/external",
   reporter: [["list"], ["json", { outputFile: "test-reports/external-playwright.json" }]],
   use: { ...devices["Desktop Chrome"], baseURL, locale: "tr-TR", serviceWorkers: "block" },

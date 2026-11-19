@@ -7,6 +7,18 @@ import type {
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 export type SettingsLevel = "organization" | "center";
+export const publicPageSlug = z
+  .string()
+  .min(3)
+  .max(63)
+  .regex(/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/)
+  .refine((value) => !/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(value));
+export const publicSettingsKeys = [
+  "public_page",
+  "public_profile_enabled",
+  "public_fields",
+  "public_application_form",
+] as const;
 export type InheritedPreparationFamily =
   | "event_templates"
   | "collection_templates"
@@ -131,6 +143,10 @@ const patchSchema = z
       .optional(),
     crm_templates: z.array(crmTemplate).max(100).refine(uniquePreparationKeys).optional(),
     public_profile_enabled: z.boolean().optional(),
+    public_page: z
+      .strictObject({ slug: publicPageSlug, enabled: z.boolean() })
+      .nullable()
+      .optional(),
     public_fields: z
       .array(
         z.enum([
@@ -174,6 +190,9 @@ const patchSchema = z
     program_duration_minutes: z.number().int().min(1).max(2147483647).optional(),
     contact_phone: z.string().max(100).optional(),
     contact_email: z.union([z.email().max(320), z.null()]).optional(),
+    billing_name: z.string().max(1000).optional(),
+    billing_address: z.string().max(1000).optional(),
+    billing_email: z.email().max(320).nullable().optional(),
     primary_color: z
       .string()
       .regex(/^#[0-9a-fA-F]{6}$/)
@@ -297,7 +316,12 @@ export async function settingsDocumentIntent(
         .strict()
         .parse(logo);
   }
-  if (level === "center" && keys.some((key) => key.endsWith("_color")))
+  if (
+    level === "center" &&
+    keys.some(
+      (key) => key === "public_page" || key.endsWith("_color") || key.startsWith("billing_"),
+    )
+  )
     throw Error("SETTINGS_PATCH_UNAVAILABLE");
   return {
     scope: { ...scope },
@@ -382,12 +406,10 @@ function settingsFieldMatches(key: string, expected: unknown, actual: unknown) {
         .sort((a, b) => a.localeCompare(b))
         .join()
     );
-  if (key === "public_application_form")
+  if (key === "public_application_form" || key === "public_page")
     return (
-      JSON.stringify(
-        patchSchema.parse({ public_application_form: expected }).public_application_form,
-      ) ===
-      JSON.stringify(patchSchema.parse({ public_application_form: actual }).public_application_form)
+      JSON.stringify(patchSchema.shape[key].parse(expected)) ===
+      JSON.stringify(patchSchema.shape[key].parse(actual))
     );
   return expected === actual;
 }

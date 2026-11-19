@@ -34,6 +34,7 @@ export function earningsPresentation(
           .slice(0, 2)
           .map((x) => x[0])
           .join(""),
+        agreementIds: row.current_agreement_ids,
         agreement: t(($) => $.earnings.activeAgreements, {
           count: row.current_agreement_ids.length,
         }),

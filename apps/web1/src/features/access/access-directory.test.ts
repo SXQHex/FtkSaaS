@@ -160,7 +160,15 @@ describe("scoped access directory", () => {
     const result = directorySummary(
       {
         ...page(invitation()),
-        access_summary: { total: 200, filtered: 100, by_state: [{ state: "pending", count: 100 }] },
+        access_summary: {
+          total: 200,
+          filtered: 103,
+          by_state: [
+            { state: "pending", count: 100 },
+            { state: "expired", count: 3 },
+            { state: "accepted", count: 97 },
+          ],
+        },
       },
       {
         ...page(account(true)),
@@ -178,10 +186,10 @@ describe("scoped access directory", () => {
       linked: "980",
       unlinked: "20",
       pending: "100",
-      expired: "0",
+      expired: "3",
       totalMembers: "1.000",
-      invitationBadge: 200,
-      accountBadge: 1000,
+      invitationBadge: 103,
+      accountBadge: 20,
     });
     expect(directorySummary()).toMatchObject({
       linked: null,

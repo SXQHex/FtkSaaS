@@ -38,15 +38,21 @@ export async function readMemberReservations(
   personId: string,
   cursor?: string,
   timeFilter: "all" | "upcoming" | "past" = "all",
-  options: { sort?: "created_at_desc" | "starts_at_asc"; includeSourceSummary?: boolean } = {},
+  options: {
+    sort?: "created_at_desc" | "starts_at_asc";
+    includeSourceSummary?: boolean;
+    sessionId?: string;
+  } = {},
 ) {
   z.uuid().parse(personId);
+  if (options.sessionId) z.uuid().parse(options.sessionId);
   const backend = await scopedBackend(scope),
     common = { client_api_version: 1 as const, org_id: scope.orgId, center_id: scope.centerId };
   const page = await backend.call("reservation_list_v1", {
     ...common,
     request_id: uuidv7(),
     person_id: personId,
+    ...(options.sessionId ? { session_id: options.sessionId } : {}),
     time_filter: timeFilter,
     ...(options.includeSourceSummary ? { include_source_summary: true } : {}),
     page: { limit: 20, sort: options.sort ?? "created_at_desc", ...(cursor ? { cursor } : {}) },
@@ -58,7 +64,11 @@ export async function readMemberReservations(
   for (const row of page.items) {
     z.uuid().parse(row.id);
     z.uuid().parse(row.session_id);
-    if (row.person_id !== personId || ids.has(row.id))
+    if (
+      row.person_id !== personId ||
+      (options.sessionId && row.session_id !== options.sessionId) ||
+      ids.has(row.id)
+    )
       throw new Error("PROFILE_RESERVATIONS_UNAVAILABLE");
     ids.add(row.id);
     z.enum(["active", "cancelled", "completed"]).parse(row.state);

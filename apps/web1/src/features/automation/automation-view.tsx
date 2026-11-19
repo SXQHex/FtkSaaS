@@ -22,7 +22,6 @@ export interface AutomationRow {
   action: string;
   lastJob: string;
   enabled: boolean;
-  canRun: boolean;
 }
 export interface SegmentRow {
   id: string;
@@ -38,6 +37,7 @@ export interface AutomationJobRow {
   when: string;
   initiator: string;
   state: string;
+  result?: { label: string; id: string };
   targets: string;
   emailAccepted: string;
   delivery: string;
@@ -49,11 +49,11 @@ export function AutomationView({
   automations,
   segments,
   jobs,
+  reportsLink,
   onAdd,
   onEdit,
   onSegment,
   onToggle,
-  onRun,
   onRetry,
   locked = false,
   notice,
@@ -67,11 +67,11 @@ export function AutomationView({
   automations: AutomationRow[] | null;
   segments: SegmentRow[] | null;
   jobs: AutomationJobRow[] | null;
+  reportsLink?: ReactNode;
   onAdd?: () => void;
   onEdit: (id: string) => void;
   onSegment: (id: string) => void;
   onToggle: (id: string, enabled: boolean) => void;
-  onRun: (id: string) => void;
   onRetry: (automationId: string, id: string) => void;
   locked?: boolean;
   notice?: ReactNode;
@@ -143,7 +143,6 @@ export function AutomationView({
                       <TableHead>{t(($) => $.automation.columns.when)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.action)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.lastJob)}</TableHead>
-                      <TableHead>{t(($) => $.automation.columns.operation)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.enabled)}</TableHead>
                     </TableHeader>
                     <TableBody renderEmptyState={() => empty}>
@@ -163,16 +162,6 @@ export function AutomationView({
                           <TableCell>{row.action}</TableCell>
                           <TableCell>
                             <Badge variant="outline">{row.lastJob}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              isDisabled={locked || !row.canRun}
-                              onPress={() => onRun(row.id)}
-                            >
-                              {t(($) => $.automation.run)}
-                            </Button>
                           </TableCell>
                           <TableCell>
                             <Switch
@@ -305,6 +294,7 @@ export function AutomationView({
                       <TableHead>{t(($) => $.automation.columns.automation)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.initiator)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.jobState)}</TableHead>
+                      <TableHead>{t(($) => $.automation.columns.result)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.targets)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.emailAccepted)}</TableHead>
                       <TableHead>{t(($) => $.automation.columns.delivery)}</TableHead>
@@ -318,6 +308,18 @@ export function AutomationView({
                           <TableCell>{row.initiator}</TableCell>
                           <TableCell>
                             <Badge variant="outline">{row.state}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            {row.result ? (
+                              <div className="min-w-40">
+                                <p>{row.result.label}</p>
+                                <p className="break-all font-mono text-xs text-muted-foreground">
+                                  {row.result.id}
+                                </p>
+                              </div>
+                            ) : (
+                              "—"
+                            )}
                           </TableCell>
                           <TableCell>{row.targets}</TableCell>
                           <TableCell>{row.emailAccepted}</TableCell>
@@ -339,8 +341,9 @@ export function AutomationView({
                 </div>
               )}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex-wrap items-start gap-3">
               <p className="text-sm text-muted-foreground">{t(($) => $.automation.jobHint)}</p>
+              {reportsLink}
               {pagination}
             </CardFooter>
           </Card>

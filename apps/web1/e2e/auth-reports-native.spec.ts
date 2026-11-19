@@ -33,6 +33,49 @@ async function importForm(page: import("@playwright/test").Page) {
   await dialog.getByRole("button", { name: "Önizle", exact: true }).click();
   return dialog;
 }
+test("command palette reuses the report and import review forms without starting jobs", async ({
+  page,
+}) => {
+  const f = await mockReports(page);
+  const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
+  const input = page.getByPlaceholder("Sayfa adı ara…");
+  await search.click();
+  await input.fill("Raporu dışa aktar");
+  await page.getByRole("menuitem", { name: "Raporu dışa aktar", exact: true }).click();
+  const report = page.getByRole("dialog");
+  await expect(report.getByRole("combobox", { name: "Rapor", exact: true })).toBeVisible();
+  await report.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await search.click();
+  await input.fill("Üyeleri içe aktar");
+  await page.getByRole("menuitem", { name: "Üyeleri içe aktar", exact: true }).click();
+  await expect(
+    page.getByRole("dialog").getByRole("combobox", { name: "Aktarım türü" }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("tab", { name: "Dosyalar", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  const initialDocument = await page.evaluate(() => performance.timeOrigin);
+  await page
+    .getByRole("navigation", { name: "Ana menü", exact: true })
+    .getByRole("link", { name: "Üyeler", exact: true })
+    .click();
+  const memberImport = page.getByRole("button", { name: "İçe aktar", exact: true });
+  await expect(memberImport).toBeEnabled();
+  await memberImport.press("Enter");
+  await expect(page).toHaveURL(
+    (url) =>
+      url.pathname === `/o/${I.org}/c/${I.center}/reports` &&
+      url.searchParams.get("action") === "import",
+  );
+  await expect(
+    page.getByRole("dialog").getByRole("combobox", { name: "Aktarım türü" }),
+  ).toHaveValue("students");
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialDocument);
+  expect(f.writes).toEqual([]);
+});
+
 test("reports bind all real sections, immutable product names, exact currencies and explicit custom dates", async ({
   page,
 }) => {
@@ -52,7 +95,24 @@ test("reports bind all real sections, immutable product names, exact currencies 
   await expect(page.getByText("TRY ₺20,00", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "Eğitmen ve adaylar", exact: true }).click();
   await expect(page.getByText("Native eğitmen · Hakediş", { exact: true })).toBeVisible();
-  await expect(page.getByText("Dönüşen aday", { exact: true })).toBeVisible();
+  const funnel = page.locator("dl").filter({ hasText: "Dönüşen aday" });
+  await expect(funnel.getByText("2", { exact: true })).toBeVisible();
+  await expect(funnel.getByText("5", { exact: true })).toBeVisible();
+  await expect(funnel.getByText("%40", { exact: true })).toBeVisible();
+  const stages = page.getByRole("region", { name: "Ulaşılan aşamalar", exact: true });
+  await expect(stages.getByRole("row").filter({ hasText: "review" })).toContainText("3");
+  const sources = page.getByRole("region", { name: "Aday kaynakları", exact: true });
+  await expect(
+    sources.getByRole("row").filter({ hasText: "Referans" }).getByRole("gridcell"),
+  ).toHaveText(["3", "2"]);
+  await page.setViewportSize({ width: 320, height: 840 });
+  await sources.focus();
+  await expect(sources).toBeFocused();
+  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
+  expect(f.requests.find((row) => row.r.report === "crm_conversion")?.r).toMatchObject({
+    include_crm_funnel: true,
+    filters: { interval: { starts_at: "2026-10-31T21:00:00Z", ends_at: "2026-11-16T21:00:00Z" } },
+  });
   expect(
     f.requests
       .filter((row) => row.op === "report_get_v1")
@@ -120,6 +180,69 @@ test("export ACK with failed readback never redispatches the accepted writer", a
   ).toBeDisabled();
   expect(f.writes.filter((row) => row.op === "report_export_start_v1")).toHaveLength(1);
 });
+test("file list rereads the same CSV job while its server retry is pending", async ({ page }) => {
+  const f = await mockReports(page);
+  f.setExportState("retry_wait");
+  const dialog = await exportForm(page);
+  await dialog.getByRole("button", { name: "Dışa aktarmayı başlat", exact: true }).click();
+  await expect(dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.")).toBeVisible();
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("tab", { name: "Dosyalar", exact: true }).click();
+  const files = page.getByRole("tabpanel", { name: "Dosyalar", exact: true });
+  await expect(files.getByText("Yeniden denemeyi bekliyor", { exact: true })).toBeVisible();
+  await expect(files.getByText(/Sonraki sunucu denemesi/)).toBeVisible();
+  await expect(files.getByRole("button", { name: "İndir", exact: true })).toHaveCount(0);
+  await expect(files.getByRole("button", { name: "Yeniden başlat", exact: true })).toHaveCount(0);
+  const readCount = f.requests.filter((row) => row.op === "job_status_get_v1").length;
+  f.setExportState("succeeded");
+  await files.getByRole("button", { name: "İş durumunu oku", exact: true }).click();
+  await expect(files.getByRole("button", { name: "İndir", exact: true })).toBeEnabled();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Dışa aktarma durumu: Tamamlandı" }),
+  ).toBeVisible();
+  const jobReads = f.requests.filter((row) => row.op === "job_status_get_v1");
+  expect(jobReads).toHaveLength(readCount + 1);
+  expect(jobReads.at(-1)!.r).toMatchObject({
+    job_id: f.exportId,
+    org_id: I.org,
+    center_id: I.center,
+  });
+  expect(f.writes.filter((row) => row.op === "report_export_start_v1")).toHaveLength(1);
+});
+test("failed CSV requires confirmation and starts one new job with the original scope", async ({
+  page,
+}) => {
+  const f = await mockReports(page);
+  f.setExportState("failed");
+  const original = await exportForm(page);
+  await original.getByRole("button", { name: "Dışa aktarmayı başlat", exact: true }).click();
+  await expect(original.getByText("İşlem kaydedildi; güncel kayıt okundu.")).toBeVisible();
+  await original.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("tab", { name: "Dosyalar", exact: true }).click();
+  const files = page.getByRole("tabpanel", { name: "Dosyalar", exact: true });
+  await files.getByRole("button", { name: "Yeniden başlat", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Başarısız dışa aktarımı yeniden başlat" });
+  const confirm = dialog.getByRole("button", { name: "Yeniden başlat", exact: true });
+  await expect(confirm).toBeDisabled();
+  await expect(dialog.getByRole("combobox")).toHaveCount(0);
+  await dialog.getByRole("checkbox").press("Space");
+  await confirm.click();
+  await expect(dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.")).toBeVisible();
+  await expect(confirm).toBeDisabled();
+  const writes = f.writes.filter((row) => row.op === "report_export_start_v1");
+  expect(writes).toHaveLength(2);
+  expect(writes[1]!.r).toEqual({
+    client_api_version: 1,
+    request_id: expect.any(String),
+    operation_key: expect.any(String),
+    org_id: I.org,
+    center_id: I.center,
+    retry_job_id: f.exportId,
+  });
+  expect(
+    f.requests.some((row) => row.op === "job_status_get_v1" && row.r.job_id === f.retryId),
+  ).toBe(true);
+});
 test("CRM import explicitly selects an off-page row and keeps same-job apply pending until native worker completion on mobile", async ({
   page,
 }) => {
@@ -147,9 +270,34 @@ test("CRM import explicitly selects an off-page row and keeps same-job apply pen
   f.releaseApply();
   await dialog.getByRole("button", { name: "İş durumunu oku", exact: true }).click();
   await expect(dialog.getByText(/İş: succeeded/)).toBeVisible();
+  await expect(
+    dialog.getByRole("status").filter({ hasText: "3 satır · 1 aktarıldı · 2 atlandı" }),
+  ).toBeVisible();
   await dialog.getByRole("button", { name: "Satırları gör", exact: true }).click();
   await dialog.getByRole("radio", { name: "Uygulandı", exact: true }).click();
   await expect(dialog.getByText("İkinci sentetik", { exact: true })).toBeVisible();
+  await expect(
+    dialog.getByRole("status").filter({ hasText: "3 satır · 1 aktarıldı · 2 atlandı" }),
+  ).toBeVisible();
+  await page.route(
+    "**/functions/v1/backend-v1/import_rows_list_v1?download=skipped_csv",
+    (route) => {
+      expect(route.request().method()).toBe("POST");
+      expect(route.request().postDataJSON()).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        job_id: f.jobId,
+      });
+      expect(route.request().postDataJSON()).not.toHaveProperty("state");
+      return route.fulfill({
+        contentType: "text/csv",
+        body: "row_number,outcome,error_code\r\n1,skipped,\r\n3,skipped,VALIDATION_FAILED\r\n",
+      });
+    },
+  );
+  const download = page.waitForEvent("download");
+  await dialog.getByRole("button", { name: "Aktarılmayan satırları indir (CSV)" }).click();
+  expect((await download).suggestedFilename()).toBe(`import-skipped-${f.jobId}.csv`);
   expect(f.writes.filter((row) => row.op === "import_apply_v1")).toHaveLength(1);
   expect(f.requests.some((row) => row.op === "import_rows_process_v1")).toBe(false);
   expect(

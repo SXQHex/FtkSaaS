@@ -128,6 +128,26 @@ export function validateSessionAttendance(view: AttendanceView, sessionId: strin
   nonnegative.parse(view.revision);
   z.enum(["open", "closed"]).parse(view.closure_state);
   if (view.actual_started_at) instant.parse(view.actual_started_at);
+  if (view.attendance_window != null) {
+    const { policy_id, opens_at, closes_at } = view.attendance_window;
+    z.uuid().parse(policy_id);
+    if (Date.parse(instant.parse(opens_at)) >= Date.parse(instant.parse(closes_at)))
+      throw new Error("SESSION_DETAIL_ATTENDANCE_UNAVAILABLE");
+  }
+  if (view.correction_requests !== undefined) {
+    z.array(
+      z.object({
+        id: z.uuid(),
+        instructor_id: z.uuid(),
+        closure_revision: positive,
+        reason: z.string().trim().min(1).max(1000),
+        state: z.enum(["pending", "accepted", "declined"]),
+        version: positive,
+        created_at: instant,
+        reviewed_at: instant.nullable(),
+      }),
+    ).parse(view.correction_requests);
+  }
   const ids = new Set<string>();
   for (const row of view.entries) {
     z.uuid().parse(row.reservation_id);
@@ -150,6 +170,7 @@ export async function readSessionAttendance(scope: ClientScope, sessionId: strin
       ...common(scope),
       request_id: uuidv7(),
       session_id: sessionId,
+      include_correction_requests: true,
     }),
     sessionId,
   );
@@ -308,5 +329,5 @@ export async function readSessionWaitlist(
     }
     return { id, name: row.waitlist_display_name, entry, offer };
   });
-  return { items, next_cursor: page.next_cursor };
+  return { items, next_cursor: page.next_cursor, asOf: instant.parse(page.as_of) };
 }

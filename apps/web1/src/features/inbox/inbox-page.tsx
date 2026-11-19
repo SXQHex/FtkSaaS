@@ -10,15 +10,60 @@ import { readWorkspace } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { InboxContent } from "./inbox-content";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+import { MemberLayout } from "../member/member-layout";
 export function InboxRoutePage() {
   const account = useLoaderData({ from: "/inbox" }),
     search = useSearch({ from: "/inbox" });
+  if (search.view === "member")
+    return (
+      <MemberInboxPage
+        key={`${account.id}:${search.org ?? ""}:${search.center ?? ""}`}
+        account={account}
+        initial={search}
+      />
+    );
   return (
     <InboxPage
       key={`${account.id}:${search.org ?? ""}:${search.center ?? ""}`}
       account={account}
       initial={search}
     />
+  );
+}
+function MemberInboxPage({
+  account,
+  initial,
+}: {
+  account: AccountView;
+  initial: { org?: string; center?: string };
+}) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const onScope = useCallback(
+    (selection: { org?: string; center?: string }) => {
+      void navigate({ to: "/inbox", search: { ...selection, view: "member" }, replace: true });
+    },
+    [navigate],
+  );
+  return (
+    <MemberLayout
+      account={account}
+      initial={initial}
+      title={t(($) => $.workspace.notifications)}
+      active="inbox"
+      onScope={onScope}
+    >
+      {({ scope, timezone, personId, onLockChange }) => (
+        <div className="mx-auto max-w-5xl p-4">
+          <InboxContent
+            scope={scope}
+            timezone={timezone}
+            memberPersonId={personId}
+            onLockChange={onLockChange}
+          />
+        </div>
+      )}
+    </MemberLayout>
   );
 }
 function InboxPage({

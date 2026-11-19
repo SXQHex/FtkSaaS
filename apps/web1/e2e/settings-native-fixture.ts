@@ -12,7 +12,7 @@ import {
 import { studioIds as I } from "./studio-fixture.js";
 export async function mockSettingsCompletion(
   page: Page,
-  options: { permissionUnknown?: boolean } = {},
+  options: { permissionUnknown?: boolean; billingOwner?: boolean } = {},
 ) {
   const writes: { op: string; r: NativeRequest }[] = [];
   const state = {
@@ -21,6 +21,9 @@ export async function mockSettingsCompletion(
     values: {
       organization: {
         address: "Sentetik adres",
+        billing_name: "Sentetik kuruluş",
+        billing_address: "Sentetik fatura adresi",
+        billing_email: "billing@example.invalid",
         program_duration_minutes: 45,
         program_templates: [],
         event_templates: [],
@@ -43,6 +46,7 @@ export async function mockSettingsCompletion(
         public_profile_enabled: false,
         public_fields: ["name"],
         public_application_form: null,
+        public_page: null,
       },
       center: {
         address: "Sentetik adres",
@@ -163,7 +167,13 @@ export async function mockSettingsCompletion(
       };
       await send(
         nativePage(
-          [...roles, self].filter(
+          [
+            ...roles,
+            self,
+            ...(options.billingOwner
+              ? [{ ...self, id: uid(104), role: "owner", scope_center_id: null }]
+              : []),
+          ].filter(
             (row) =>
               (!r.person_id || row.person_id === r.person_id) &&
               (!r.center_id || row.scope_center_id === r.center_id) &&
@@ -176,7 +186,7 @@ export async function mockSettingsCompletion(
     if (op === "settings_catalog_get_v1" && (r.scope === "organization" || r.scope === "center"))
       await send({
         scope: r.scope,
-        catalog_version: 24,
+        catalog_version: 25,
         fields: [
           "address",
           "collection_templates",
@@ -184,7 +194,9 @@ export async function mockSettingsCompletion(
           "event_templates",
           "automation_templates",
           "crm_templates",
-          ...(r.scope === "organization" ? ["billing_name"] : []),
+          ...(r.scope === "organization"
+            ? ["billing_name", "billing_address", "billing_email", "public_page"]
+            : []),
           "public_profile_enabled",
           "public_fields",
           "public_application_form",
@@ -274,6 +286,7 @@ export async function mockSettingsCompletion(
             created_at: at,
             published_at: at,
             retired: false,
+            invalidated: false,
           },
         ],
         as_of: at,

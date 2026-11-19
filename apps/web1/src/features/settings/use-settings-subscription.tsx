@@ -6,7 +6,7 @@ import { formatMinorAmount } from "../../lib/money";
 import { Button } from "../../components/ui/button";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import type { SettingsViewData } from "./settings-view";
-import { readSettingsSubscription } from "./settings-subscription";
+import { settingsSubscriptionQuery } from "./settings-subscription";
 
 export function useSettingsSubscription({
   scope,
@@ -22,19 +22,15 @@ export function useSettingsSubscription({
   onAccessLost: (cause: unknown) => boolean;
 }) {
   const { t } = useTranslation();
-  const query = useQuery({
-    queryKey: ["settings-subscription", scope.accountId, scope.orgId],
-    queryFn: () => readSettingsSubscription(scope),
-    enabled,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  const query = useQuery({ ...settingsSubscriptionQuery(scope), enabled });
   useEffect(() => {
     if (query.error) onAccessLost(query.error);
   }, [query.error, onAccessLost]);
-  const source =
-    enabled && !query.isError && !query.isFetching ? query.data?.subscription : undefined;
+  const scopedSource =
+    enabled && !query.isError && !query.isFetching && query.data
+      ? { ...query.data, scope }
+      : undefined;
+  const source = scopedSource?.subscription;
   const date = (value: string | null) =>
     value === null
       ? t(($) => $.settings.unsetHint)
@@ -102,29 +98,29 @@ export function useSettingsSubscription({
     data,
     downgradeSource:
       source?.subscription_version && source.billing?.downgrade_options?.length
-        ? query.data
+        ? scopedSource
         : undefined,
     upgradeSource:
       source?.subscription_version && source.billing?.upgrade_options?.length
-        ? query.data
+        ? scopedSource
         : undefined,
     cancelSource:
       source && (source.pending_change || source.billing?.pending_period_change)
-        ? query.data
+        ? scopedSource
         : undefined,
     periodSource:
       source?.subscription_version && source.billing?.period_change_options.length
-        ? query.data
+        ? scopedSource
         : undefined,
-    paymentSource: source?.billing?.current.currency ? query.data : undefined,
+    paymentSource: source?.billing?.current.currency ? scopedSource : undefined,
     renewalSource:
-      query.data &&
+      scopedSource &&
       source?.state === "active" &&
       source.period_end &&
-      Date.parse(source.period_end) > query.data.readAt &&
+      Date.parse(source.period_end) > scopedSource.readAt &&
       source.subscription_version &&
       !source.billing?.pending_period_change
-        ? query.data
+        ? scopedSource
         : undefined,
 
     notice:

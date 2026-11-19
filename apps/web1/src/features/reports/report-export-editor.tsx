@@ -15,22 +15,22 @@ import {
 } from "./reports-command";
 export function ReportExportEditor({
   scope,
-  filters,
-  period,
+  review: initialReview,
   onClose,
   onLockChange,
   onAccessLost,
   onSaved,
 }: {
   scope: ClientScope;
-  filters: ReportFilters;
-  period: string;
+  review: { filters: ReportFilters; period: string } | { retry: { id: string; date: string } };
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
   onSaved: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const [review] = useState(initialReview);
+  const retry = "retry" in review ? review.retry : undefined;
   const [kind, setKind] = useState<ExportReportKind | "">("");
   const [reviewed, setReviewed] = useState(false);
   const [error, setError] = useState(false);
@@ -53,7 +53,17 @@ export function ReportExportEditor({
   };
   function start() {
     const report = kind ? names[kind] : undefined;
-    if (!report || !reviewed || command.locked || command.state === "saved") {
+    if (!reviewed || command.locked || command.state === "saved") return;
+    const base = { ...reportsCommon(scope), operation_key: uuidv7() };
+    if ("retry" in review) {
+      void command.start({
+        scope: { ...scope },
+        operation: "report_export_start_v1",
+        request: { ...base, retry_job_id: review.retry.id },
+      });
+      return;
+    }
+    if (!report) {
       setError(true);
       return;
     }
@@ -61,10 +71,9 @@ export function ReportExportEditor({
       scope: { ...scope },
       operation: "report_export_start_v1",
       request: {
-        ...reportsCommon(scope),
-        operation_key: uuidv7(),
+        ...base,
         report,
-        filters: structuredClone(filters),
+        filters: structuredClone(review.filters),
         format: "csv",
         ...(["sales", "instructor_balances"].includes(report)
           ? {
@@ -94,7 +103,8 @@ export function ReportExportEditor({
           setError(false);
         }
       }}
-      period={period}
+      period={"period" in review ? review.period : review.retry.date}
+      retry={Boolean(retry)}
       fileDescription={t(($) => $.reports.nativeFiles)}
       preparation={t(($) => $.reports.exportAsync)}
       reviewed={reviewed}
@@ -103,13 +113,18 @@ export function ReportExportEditor({
       onClose={onClose}
       locked={command.locked}
       canStart={
-        !!kind && !!names[kind] && reviewed && !command.unavailable && command.state !== "saved"
+        Boolean(retry || (kind && names[kind])) &&
+        reviewed &&
+        !command.unavailable &&
+        command.state !== "saved"
       }
       unsupported={["debtors"]}
       error={error ? t(($) => $.reports.chooseExport) : undefined}
       notice={
         <>
-          <p className="text-sm">{t(($) => $.reports.exportScope)}</p>
+          <p className="text-sm">
+            {t(($) => (retry ? $.reports.exportRetryScope : $.reports.exportScope))}
+          </p>
           <EventCommandNotice command={command} onReload={() => command.reset()} />
         </>
       }

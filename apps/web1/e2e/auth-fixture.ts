@@ -93,6 +93,7 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
     theme: "system" as "system" | "light" | "dark",
     themeWritable: true,
     fontScale: null as number | null,
+    weekStart: "monday" as "monday" | "sunday",
     scaleWritable: true,
     settingsPatches: [] as { theme?: string; font_scale?: number | null }[],
     settingsWriteGate: undefined as Promise<void> | undefined,
@@ -368,7 +369,7 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
           trace_id: id,
           data: {
             scope: "user",
-            catalog_version: 24,
+            catalog_version: 25,
             fields: [
               {
                 key: "theme",
@@ -411,7 +412,7 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
               theme: calls.theme,
               font_scale: calls.fontScale,
               language: "tr",
-              week_start: "monday",
+              week_start: calls.weekStart,
               contrast: "system",
               timezone_mode: "auto",
               timezone_name: null,
@@ -514,10 +515,13 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
       }
       expect(request).not.toHaveProperty("email");
       profile = {
+        ...profile,
         display_name: request.display_name,
-        given_name: request.given_name,
-        family_name: request.family_name,
-        unverified_phone: request.unverified_phone,
+        ...(Object.hasOwn(request, "given_name") && { given_name: request.given_name }),
+        ...(Object.hasOwn(request, "family_name") && { family_name: request.family_name }),
+        ...(Object.hasOwn(request, "unverified_phone") && {
+          unverified_phone: request.unverified_phone,
+        }),
       };
       profileVersion++;
       return route.fulfill({
@@ -776,7 +780,10 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
       user.factors = user.factors.map((factor) => ({ ...factor, status: "verified" }));
       return route.fulfill({ json: session() });
     }
-    if (url.pathname === "/functions/v1/backend-v1/organizations_list_v1") {
+    if (
+      url.pathname === "/functions/v1/backend-v1/organizations_list_v1" ||
+      url.pathname === "/functions/v1/backend-v1/studio_setup_list_v1"
+    ) {
       return route.fulfill({
         json: {
           ok: true,

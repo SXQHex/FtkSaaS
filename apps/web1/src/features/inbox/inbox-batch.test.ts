@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { readInbox } from "./inbox";
 import {
   notificationSetIntent,
+  markAllNotificationsIntent,
   readNotificationSelection,
   setNotificationsRead,
   readNotificationSetReceipt,
@@ -38,8 +39,9 @@ const intent = {
     (typeof notifications)[number],
     (typeof notifications)[number],
   ],
-  read: true,
+  change: true,
   key: id(6),
+  changedIds: [id(4), id(5)],
 };
 beforeEach(() => call.mockReset());
 it("uses native search/work/options and accepts authoritative counts beyond the page, omitting empty query", async () => {
@@ -118,6 +120,32 @@ it("rejects one stale version before the whole atomic writer", async () => {
   });
   expect(call.mock.calls.some(([op]) => op === operation)).toBe(false);
 });
+it("keeps an organization-wide read command bound to its recipient and key", async () => {
+  const personId = id(10);
+  const intent = markAllNotificationsIntent(scope, personId);
+  call.mockResolvedValue({ primary_id: personId, related: [] });
+  await setNotificationsRead(intent);
+  await setNotificationsRead(intent);
+  for (const [name, request] of call.mock.calls) {
+    expect(name).toBe(operation);
+    expect(request).toEqual({
+      client_api_version: 1,
+      org_id: scope.orgId,
+      request_id: expect.any(String),
+      operation_key: intent.key,
+      read: true,
+      all_unread: true,
+    });
+  }
+  call.mockResolvedValue({
+    operation,
+    key: intent.key,
+    status: "succeeded",
+    result_reference: { type: "people", id: id(11) },
+  });
+  await expect(readNotificationSetReceipt(intent)).rejects.toThrow("INBOX_RECEIPT_UNAVAILABLE");
+  await expect(readNotificationSetResult(intent, personId)).resolves.toEqual([]);
+});
 it("requires all selected outcomes to advance with the requested state and first request ID", async () => {
   call.mockResolvedValue(states(1, true));
   await expect(readNotificationSetResult(intent, id(4))).resolves.toHaveLength(2);
@@ -135,9 +163,21 @@ it("requires all selected outcomes to advance with the requested state and first
     "INBOX_RESULT_UNAVAILABLE",
   );
   call.mockResolvedValue(states(1, false));
-  await expect(readNotificationSetResult({ ...intent, read: false }, id(4))).resolves.toHaveLength(
-    2,
-  );
+  await expect(
+    readNotificationSetResult({ ...intent, change: false }, id(4)),
+  ).resolves.toHaveLength(2);
+});
+it("moves only reviewed versions without including a read change", async () => {
+  call.mockResolvedValue(states());
+  const move = await notificationSetIntent(scope, notifications, {
+    visibility: "archived",
+    from: "inbox",
+  });
+  await setNotificationsRead(move);
+  expect(call.mock.calls.at(-1)?.[1]).toMatchObject({ visibility: "archived", notifications });
+  expect(call.mock.calls.at(-1)?.[1]).not.toHaveProperty("read");
+  call.mockResolvedValue(states(1, false));
+  await expect(readNotificationSetResult(move, id(4))).resolves.toHaveLength(2);
 });
 it("does not accept a receipt for another operation/key/primary notification", async () => {
   for (const change of [
@@ -275,15 +315,18 @@ it("validates the exact native seat offer without treating its read selector as 
     center_id: id(9),
     selector: { operation, key: { offer_id: offer.id } },
   };
-  call.mockResolvedValue({ items: [row], next_cursor: null });
+  call.mockResolvedValue({ items: [row], next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+  await expect(readInboxSource(scope, source, id(7))).rejects.toThrow(
+    "MEMBER_WAITLIST_UNAVAILABLE",
+  );
   expect(await readInboxSource(scope, source)).toMatchObject({
     kind: "offer",
     workState: "pending",
-    href: `/member/reservations?org=${scope.orgId}&center=${id(9)}`,
+    href: `/member/reservations?org=${scope.orgId}&center=${id(9)}&offer=${offer.id}`,
   });
   call.mockResolvedValue({
     items: [{ ...row, waitlist_detail: { ...row.waitlist_detail, center_id: id(99) } }],
   });
-  await expect(readInboxSource(scope, source)).rejects.toThrow("INBOX_SOURCE_UNAVAILABLE");
+  await expect(readInboxSource(scope, source)).rejects.toThrow("MEMBER_WAITLIST_UNAVAILABLE");
   expect(call.mock.calls.every(([op]) => op === "management_state_get_v1")).toBe(true);
 });

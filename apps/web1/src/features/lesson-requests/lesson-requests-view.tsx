@@ -311,7 +311,7 @@ export function LessonRequestSheet({
         {stage === "view" ? (
           <>
             <p className="text-sm text-muted-foreground">{t(($) => $.lessonRequests.intentNote)}</p>
-            <p className="rounded-lg border p-3 text-sm">
+            <p className="rounded-lg border p-3 text-sm wrap-anywhere whitespace-pre-wrap">
               {note ?? t(($) => $.lessonRequests.noteUnavailable)}
             </p>
             <section>

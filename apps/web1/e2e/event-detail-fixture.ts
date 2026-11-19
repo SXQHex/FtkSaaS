@@ -3,6 +3,7 @@ import { expect } from "@playwright/test";
 import type {
   EventPaymentPreparationView,
   EventRegistrationPaymentSummary,
+  Preview,
 } from "../src/lib/api-contracts/generated.js";
 import { mockEvents, eventId, product } from "./events-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -78,6 +79,7 @@ export async function mockEventDetail(
     unknownSent: false,
     receipts: new Map<string, { type: string; id: string }>(),
     cash: undefined as Record<string, unknown> | undefined,
+    cancellationEffects: [] as Preview["effects"],
   };
   if (options.existing) {
     const empty = {
@@ -210,7 +212,6 @@ export async function mockEventDetail(
       expect(r.center_id).toBe(I.center);
     }
     if (op === "event_get_v1") {
-      if (options.existing) expect(r.include_payment_summary).toBe(true);
       if (options.refreshFailure && state.cash && state.collectionReads++ === 1)
         return reject("SERVICE_UNAVAILABLE", true);
       if (state.failRead) {
@@ -247,7 +248,13 @@ export async function mockEventDetail(
             ],
           };
       }
-      return send(event);
+      if (r.include_payment_summary) return send(event);
+      return send({
+        ...event,
+        registrations: event.registrations?.map(
+          ({ payment_summary: _paymentSummary, ...row }) => row,
+        ),
+      });
     }
     if (op === "entitlements_get_v1") return send(options.practice ? [practiceRight] : []);
     if (op === "management_state_get_v1" && r.operation === "collection_record_v1")
@@ -311,7 +318,27 @@ export async function mockEventDetail(
         },
         effects:
           op === "event_cancel_preview_v1"
-            ? [{ entity: { type: "events", id: eventId }, action: "cancel" }]
+            ? [
+                ...state.cancellationEffects,
+                ...event.registrations!.flatMap((row) =>
+                  (row.payment_summary?.debts ?? []).flatMap((debt) => [
+                    {
+                      entity: { type: "debts", id: debt.id },
+                      action: "adjust",
+                      amount_minor: debt.remaining_minor,
+                      currency: debt.currency,
+                      reason: "remaining_debt_removed",
+                    },
+                    {
+                      entity: { type: "debts", id: debt.id },
+                      action: "create",
+                      amount_minor: debt.paid_minor,
+                      currency: debt.currency,
+                      reason: "student_credit_added",
+                    },
+                  ]),
+                ),
+              ]
             : [],
         blockers: [],
         expires_at: "2099-11-16T12:00:00Z",
@@ -367,6 +394,23 @@ export async function mockEventDetail(
           event.registrations!.forEach((row) => {
             row.state = "cancelled";
             row.version++;
+            const payment = row.payment_summary;
+            if (payment?.status === "available") {
+              Object.assign(payment, {
+                net_minor: "0",
+                remaining_minor: "0",
+                cancelled_minor: payment.amount_minor,
+                credited_minor: payment.paid_minor,
+              });
+              for (const debt of payment.debts)
+                Object.assign(debt, {
+                  version: debt.version + 1,
+                  net_minor: "0",
+                  remaining_minor: "0",
+                  cancelled_minor: debt.amount_minor,
+                  credited_minor: debt.paid_minor,
+                });
+            }
           });
         }
         if (op === "event_actual_start_record_v1" || op === "event_actual_start_correct_v1")

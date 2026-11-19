@@ -235,6 +235,10 @@ test("product management reads native center totals and sends search and lifecyc
 }) => {
   const { managementReads, writes } = await productsFixture(page);
   await expect(page.getByText(/90\.071\.992\.547\.409,93.*1,00/)).toBeVisible();
+  const recentSales = page.getByRole("article").filter({ hasText: "Son 30 gün satış" });
+  const activeHolders = page.getByRole("article").filter({ hasText: "Aktif hak sahibi" });
+  await expect(recentSales.getByText("3", { exact: true })).toBeVisible();
+  await expect(activeHolders.getByText("3", { exact: true })).toBeVisible();
   await page
     .getByRole("radiogroup", { name: "Durum", exact: true })
     .getByRole("radio", { name: "Kapalı", exact: true })
@@ -248,6 +252,8 @@ test("product management reads native center totals and sends search and lifecyc
     .getByRole("radio", { name: "Arşiv", exact: true })
     .click();
   await expect.poll(() => managementReads.at(-1)?.status).toBe("archived");
+  await expect(recentSales.getByText("3", { exact: true })).toBeVisible();
+  await expect(activeHolders.getByText("3", { exact: true })).toBeVisible();
   expect(writes).toHaveLength(0);
   await page.setViewportSize({ width: 320, height: 900 });
   await page.emulateMedia({ colorScheme: "dark" });

@@ -1,7 +1,9 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
+import { scopedUploadUrl, sha256Hex } from "../../lib/document-upload";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
+  DigitalDocumentContent,
   DocumentGate,
   DocumentRequirement,
   RequestDocumentUploadPrepare,
@@ -10,6 +12,7 @@ import type {
   SuccessDocumentPublicationPreview,
   UploadRef,
 } from "../../lib/api-contracts/generated";
+import { matchesDocumentText, readDocumentCatalog } from "./document-catalog";
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -32,9 +35,7 @@ export async function uploadIntent(
   z.number().int().min(1).max(maxBytes).parse(file.size);
   const body = new Uint8Array(await file.arrayBuffer());
   if (body.byteLength !== file.size) throw Error("DOCUMENT_FILE_CHANGED");
-  const checksum = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", body)), (b) =>
-    b.toString(16).padStart(2, "0"),
-  ).join("");
+  const checksum = await sha256Hex(body);
   return {
     scope: structuredClone(scope),
     request: {
@@ -71,18 +72,14 @@ export function uploadUrl(
   upload: UploadRef,
   base = import.meta.env.VITE_SUPABASE_URL,
 ) {
-  const origin = new URL(base);
-  const url = new URL(upload.upload_url, origin);
-  const path = `/storage/v1/object/upload/sign/ftksaas-documents/${scope.orgId}/${upload.file_id}`;
-  if (
-    url.origin !== origin.origin ||
-    url.pathname !== path ||
-    url.username ||
-    url.password ||
-    url.hash ||
-    !url.searchParams.get("token")
-  )
-    throw Error("DOCUMENT_UPLOAD_UNAVAILABLE");
+  const url = scopedUploadUrl(
+    base,
+    upload.upload_url,
+    "ftksaas-documents",
+    scope.orgId,
+    upload.file_id,
+  );
+  if (!url) throw Error("DOCUMENT_UPLOAD_UNAVAILABLE");
   return url;
 }
 export async function transferUpload(intent: UploadIntent, upload: UploadRef) {
@@ -147,16 +144,22 @@ export async function readComplete(intent: CompleteIntent, id?: string) {
     throw Error("DOCUMENT_RESULT_UNAVAILABLE");
   return intent.request.file_id;
 }
-export interface PublicationTarget {
+export const validDigitalDocumentText = (value: string) =>
+  Boolean(value.trim()) && new TextEncoder().encode(value).byteLength <= 262144;
+
+export type PublicationTarget = {
   scope: ClientScope;
-  fileId: string;
   documentId?: string;
   versionLabel: string;
   gates: DocumentGate[];
   renewedAcceptance: boolean;
   level?: "center" | "organization";
   baseRequirements?: DocumentRequirement[];
-}
+} & (
+  | { fileId: string; digitalContent?: never }
+  | { fileId?: never; digitalContent: DigitalDocumentContent }
+);
+
 function publicationRequest(target: PublicationTarget) {
   if (!target.gates.length || new Set(target.gates).size !== target.gates.length)
     throw Error("DOCUMENT_REQUIREMENTS_REQUIRED");
@@ -166,7 +169,9 @@ function publicationRequest(target: PublicationTarget) {
   return {
     ...common(target.scope),
     ...(target.level === "organization" ? { center_id: null } : {}),
-    file_id: z.uuid().parse(target.fileId),
+    ...(target.digitalContent
+      ? { digital_content: structuredClone(target.digitalContent) }
+      : { file_id: z.uuid().parse(target.fileId) }),
     ...(target.documentId ? { document_id: z.uuid().parse(target.documentId) } : {}),
     version_label: z.string().trim().min(1).max(500).parse(target.versionLabel),
     scope:
@@ -218,7 +223,12 @@ export async function previewPublication(target: PublicationTarget) {
 }
 export interface PublicationIntent {
   scope: ClientScope;
-  request: Omit<Extract<RequestDocumentVersionPublish, { file_id: string }>, "request_id">;
+  request:
+    | Omit<Extract<RequestDocumentVersionPublish, { file_id: string }>, "request_id">
+    | Omit<
+        Extract<RequestDocumentVersionPublish, { digital_content: DigitalDocumentContent }>,
+        "request_id"
+      >;
 }
 export async function publicationIntent(
   target: PublicationTarget,
@@ -267,7 +277,8 @@ export async function writePublication(intent: PublicationIntent) {
 }
 export async function readPublication(intent: PublicationIntent, id?: string) {
   const backend = await scopedBackend(intent.scope);
-  const fileId = z.uuid().parse(intent.request.file_id);
+  const digital = intent.request.digital_content;
+  const fileId = z.uuid().parse(digital ? id : intent.request.file_id);
   if (id && id !== fileId) throw Error("DOCUMENT_RESULT_UNAVAILABLE");
   const result = await backend.call("management_state_get_v1", {
     ...common(intent.scope),
@@ -319,8 +330,21 @@ export async function readPublication(intent: PublicationIntent, id?: string) {
     (intent.request.document_id && values.document_id !== intent.request.document_id)
   )
     throw Error("DOCUMENT_RESULT_UNAVAILABLE");
+  const documentId = z.uuid().parse(values.document_id);
+  if (digital) {
+    const catalog = await readDocumentCatalog(
+      intent.scope,
+      intent.request.scope.kind === "organization",
+      documentId,
+    );
+    const source = catalog.find(
+      (item) => item.id === fileId && item.source_version === fileId && item.state === "published",
+    );
+    if (!source || !matchesDocumentText(source.content, digital))
+      throw Error("DOCUMENT_RESULT_UNAVAILABLE");
+  }
   return {
-    documentId: z.uuid().parse(values.document_id),
+    documentId,
     versionId: fileId,
     versionLabel: values.version_label,
   };

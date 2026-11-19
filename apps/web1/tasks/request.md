@@ -1,47 +1,45 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
+Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında, Web1 uygulaması ve ekran kabulü [TODO](todo.md) içinde izlenir. W1-BE-42’nin yayımlı Web1 kabulü G-STARTER.2’ye, W1-BE-36’nın sağlayıcı kontrolleri ilgili TODO maddesine bağlıdır.
 
-İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
+İncelenen main `f7ded8d7baa8680e76d726e5ceaea24aead35a30`. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) aynı kaynakta başarılı.
 
-PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel typed snapshot güncellendi. Frontend tüketimi ve ekran kabulü TODO sahibindedir. Backend kaynak desteği; development dağıtımı, frontend tüketimi, ekran kabulü veya gerçek hosted/provider kabulü değildir. Ekran durumu yalnız [TODO](todo.md) sahibindedir.
-
-| Kimlik   | Ekran / işlev             | İhtiyaç                                                                          | Frontend tarafından bilinen durum                                                                                                                                                                                                         |
-| -------- | ------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| W1-BE-01 | E13 · P04                 | Merkez öğrencilik durumuna göre cursor’lı kişi filtresi                          | Backend karşılandı (PR311); tüketici kabulü TODO/E13 sahibinde.                                                                                                                                                                           |
-| W1-BE-02 | E13 · P04                 | Görünür kişi sayfası için hak, para birimine göre borç ve en yakın ders özeti    | Backend karşılandı (PR311); tüketici kabulü TODO/E13 sahibinde.                                                                                                                                                                           |
-| W1-BE-03 | E15 · P04.3               | Merkez geneli davet/hesap bağlantısı keşfi, filtreler ve sayaçlar                | PR313 kişi dizini düzeltmesi mevcut; önceki503 tarihsel gözlemdir, güncel hosted tekrar kabulü yapılmadı.                                                                                                                                 |
-| W1-BE-04 | E16 · P04.4               | Birleştirme gerekçesi, öneri/geçmiş keşfi ve kalıcı kopya-değil kararı           | Backend karşılandı (PR312); tüketici kabulü TODO/E16 sahibinde.                                                                                                                                                                           |
-| W1-BE-05 | E12 · P03.3               | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                      | Backend karşılandı (PR312); tüketici kabulü TODO/E12 sahibinde.                                                                                                                                                                           |
-| W1-BE-06 | E17 · P06                 | Sabit grup öğrenci üyeliğinin keşif ve ekle/çıkar native eşlemesi                | PR313 eşlemesi mevcut: sabit grup seans priority rezervasyonlarıdır; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                                                                                                 |
-| W1-BE-07 | E17 · P06.3/.4            | Seans düzenleme ve kalıcı telafi bağı için native okuma eşlemesi                 | PR313 typed düzenleme/telafi projeksiyonları mevcut; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                                                                                                                 |
-| W1-BE-08 | E17 · aynı-key kurtarma   | Native telafi komutu receipt okumasının typed request ile doğrulanması           | PR313 native capacity/receipt recovery düzeltmesi ve otomatik backend kabul testi mevcut; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                                                                            |
-| W1-BE-09 | E19 · P07                 | Paket yönetimi durum/arama/özet/geçmiş ve satışa kapatma/arşiv eşlemesi          | Backend karşılandı (PR313); yönetim/durum/geçmiş tüketiliyor, kabul sahibi TODO/E19.                                                                                                                                                      |
-| W1-BE-10 | E20 · P08                 | Merkez geneli finans hareket/borç/alacak keşfi ve para birimine ayrılmış özetler | Backend karşılandı (PR313): finance_directory_get_v1 mevcut; frontend tüketimi TODO/E20 sahibinde.                                                                                                                                        |
-| W1-BE-11 | E14 · P04/P07             | Üyelik başlangıcı ve hak hareket defteri                                         | Backend karşılandı (PR313): üyelik tarihi ve native satış ledger sayfası E14’e bağlı; ekran kabulü TODO/E14 sahibinde.                                                                                                                    |
-| W1-BE-12 | E14 · P07.2               | Yetkili indirimli native satış                                                   | PR313 sale.discount + sale_discount_percent_upper eşlemesi mevcut; açık yetki/politika gerekir, otomatik grant yok.                                                                                                                       |
-| W1-BE-13 | E14 · P09                 | Başlangıca göre rezervasyon zaman filtresi                                       | Backend karşılandı (PR314): time_filter sunucu/cursor kapsamında; E14 filtre bağlantısı ve yerel kabulü tamam.                                                                                                                            |
-| W1-BE-14 | E14 · P07.4               | Planlanmış dondurmayı tamamen iptal etme                                         | Backend karşılandı (PR314): ayrı cancel preview/apply E14’e bağlı; ekran kabulünün sahibi TODO/E14.                                                                                                                                       |
-| W1-BE-15 | E18 · P10/WF19            | Seans geneli bekleme listesi ve teklif geçmişi keşfi                             | Backend karşılandı (PR315): seans entries/offers dizini mevcut; E18 tüketiyor; kabul sahibi TODO/E18.                                                                                                                                     |
-| W1-BE-16 | E18 · P09/WF06            | Rezervasyona bağlı gerçek paket/hak özeti                                        | Backend karşılandı (PR315): include_source_summary gerçek kaynak/hak özetini sağlar; E18 tüketiyor; kabul sahibi TODO/E18.                                                                                                                |
-| W1-BE-17 | E21 · P06.5/WF06          | Özel ders taleplerinin native durum filtresi ve merkez sayaçları                 | PR316 main/development teslimi doğrulandı; frontend tüketimi ve yerel kabulü TODO/E21’de tamamlandı.                                                                                                                                      |
-| W1-BE-18 | E24–E26 · P11.2/WF03/WF07 | Atanmış seansın eğitmene görünür salon etiketi                                   | Backend karşılandı (PR317): opt-in room_labels yalnız canlı atanmış seanslarda; tüketici kabulü TODO/E24–E26 sahibinde.                                                                                                                   |
-| W1-BE-19 | E27 · P10/P11.2           | Kendi geçerli anlaşma/ödeme keşfi ve dönem toplamları                            | Backend karşılandı (PR321): self earnings tüm dönem/ay satırları tüketiliyor; E27 otomatik kabulü tamam, ekran kaydı TODO/E27 sahibinde.                                                                                                  |
-| W1-BE-20 | E28/E29 · P09/P11.1       | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası                      | Backend karşılandı (PR318): E28/E29 native keşif/politika tüketimi tamam; ekran kabulleri TODO sahibinde.                                                                                                                                 |
-| W1-BE-21 | E29 · P09/P11.1           | Öğrencinin kendi merkezindeki bekleme/teklif keşfi                               | Backend karşılandı (PR320): native self waitlist/offer dizini tüketiliyor; E29 otomatik kabulü tamam, kayıt TODO/E29 sahibinde.                                                                                                           |
-| W1-BE-22 | E30 · P07/P08/P11.1       | Satın alınan paket bilgisi ve ödeme para birimi keşfi                            | Backend karşılandı (PR320): immutable purchase_summary ve self finans para birimleri tüketiliyor; E30 otomatik kabulü tamam, kayıt TODO/E30 sahibinde.                                                                                    |
-| W1-BE-23 | E32 · P05                 | Kendi hesabının gerekli belgelerini gerçek işlem bağlamlarıyla keşfetme          | Backend karşılandı (PR320): aktif işlem/açık satın alma belge bağlamı keşfi tüketiliyor; E32 otomatik kabulü tamam, kayıt TODO/E32 sahibinde.                                                                                             |
-| W1-BE-24 | E33 · P12                 | CRM özet/filtre, merkez takipleri, sorumlu ve geçmiş deneme teklifi keşfi        | Backend karşılandı (PR322): lead filtre/özet, sorumlu/takip ve deneme geçmişi/ürün keşfi mevcut. Frontend tüketimi ve E33 otomatik kabulü tamam; ekran kaydı TODO/E33 sahibinde.                                                          |
-| W1-BE-25 | E34–36 · P12.5/WF09       | Public program türü/filtre, görünür doluluk ve başvuru/yayın durumu              | Backend karşılandı (PR322): public detay/filtre, ayrı kapalı görünürlük izinleri ve açık form/onay kaynağı keşfi mevcut. E34–36 tüketimi/kabulü bekliyor.                                                                                 |
-| W1-BE-26 | E37 · P13/WF15            | Etkinlik arama/durum filtresi, görünür kayıt sayısı ve merkez özetleri           | Backend karşılandı (PR319): native query/status, filtre geneli summary ve active_registration_count mevcut; E37 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E37 sahibinde.                                                        |
-| W1-BE-27 | E38 · P13/WF15            | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı                     | Backend karşılandı (PR319): event_get_v1(include_payment_summary:true) gerçek kayıt bedeli/borç/bakiye bağını sağlar; E38 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E38 sahibinde.                                              |
-| W1-BE-28 | E39 · P14/WF11            | Kendi inbox arama/iş durumu, toplu/ters okundu ve kaynak eylemi eşlemesi         | Backend karşılandı (PR321): arama, gerçek kaynak durumu/selector, kapsam sayaçları ve atomik tersinir seçili okuma var. Frontend tüketimi ve E39 otomatik kabulü tamam; ekran kaydı TODO/E39 sahibinde.                                   |
-| W1-BE-29 | E40 · P14.4/WF16          | Çizimin segment, tetikleme, eylem ve son işler eşlemesi                          | Backend karşılandı (PR321): native segment eşleşme/kullanım ve kapsam işi keşfi/özetleri var; kabul edilen dar WF16 sınırı korunuyor. Frontend tüketimi ve E40 otomatik kabulü tamam; ekran kaydı TODO/E40 sahibinde.                     |
-| W1-BE-30 | E41 · P16/WF10            | Çizimin satış/doluluk/hakediş raporu ve import görünür alanları                  | Backend karşılandı (PR323): yeni rapor kırılımları, import dizini/limitleri ve dosya geneli satır filtreleri mevcut; native destek sınırları aşağıda. E41 tüketimi/kabulü açık.                                                           |
-| W1-BE-31 | E22 · P15/WF11            | Merkez belge/sürüm dizini, kabul durumu ve özetler                               | Kaynak karşılandı (PR324): document_directory_get_v1 belge/taslak, sürüm, güncel gereksinim ve tarihsel kabul keşfini; aktif işlem/unexpired preview kitlesinin tekil kişi özetini sağlar. Development başarılı; E22 tüketim/kabulü açık. |
-| W1-BE-32 | E11 · P02                 | Merkez geneli yetkili bekleyen yönetim işleri keşfi                              | Backend karşılandı (PR322): seçili merkezin beş gerçek kaynak türünden yetkili yönetim işi kuyruğu ve özetleri mevcut. E11 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E11 sahibinde.                                             |
-| W1-BE-33 | E23 · P10/WF14            | Yönetici hakediş/ödeme keşfi, dönemler ve güvenli özetler                        | Backend karşılandı (PR323): instructor_finance_directory_get_v1 üç görünüm, tüm dönem keşfi ve para birimine göre özet sağlar. Not/avans desteği yok; frontend ekran durumu TODO/E23 sahibinde.                                           |
-| W1-BE-34 | E43 · WF00/P02/P14/P16    | Merkez denetim/işlem keşfi, filtreler ve dışa aktarma eşlemesi                   | Backend karşılandı (PR323): merkez audit keşfi ve kendi tracking_directory_get_v1 dizini mevcut. Ret logu/audit export/genel tekrar çalıştırma yok; E43 tüketimi/kabulü açık.                                                             |
+| Kimlik   | Ekran / işlev                  | İhtiyaç                                                                          | Frontend tarafından bilinen durum                                                                                                                                                                                                         |
+| -------- | ------------------------------ | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W1-BE-01 | E13 · P04                      | Merkez öğrencilik durumuna göre cursor’lı kişi filtresi                          | Backend karşılandı (PR311); tüketici kabulü TODO/E13 sahibinde.                                                                                                                                                                           |
+| W1-BE-02 | E13 · P04                      | Görünür kişi sayfası için hak, para birimine göre borç ve en yakın ders özeti    | Backend karşılandı (PR311); tüketici kabulü TODO/E13 sahibinde.                                                                                                                                                                           |
+| W1-BE-03 | E15 · P04.3                    | Merkez geneli davet/hesap bağlantısı keşfi, filtreler ve sayaçlar                | PR313 kişi dizini düzeltmesi mevcut; önceki503 tarihsel gözlemdir, güncel hosted tekrar kabulü yapılmadı.                                                                                                                                 |
+| W1-BE-04 | E16 · P04.4                    | Birleştirme gerekçesi, öneri/geçmiş keşfi ve kalıcı kopya-değil kararı           | Backend karşılandı (PR312); tüketici kabulü TODO/E16 sahibinde.                                                                                                                                                                           |
+| W1-BE-05 | E12 · P03.3                    | Son uygunluk kuralını kapatma ve mevcut kapanışı iptal etme                      | Backend karşılandı (PR312); tüketici kabulü TODO/E12 sahibinde.                                                                                                                                                                           |
+| W1-BE-06 | E17 · P06                      | Sabit grup öğrenci üyeliğinin keşif ve ekle/çıkar native eşlemesi                | PR313 eşlemesi mevcut: sabit grup seans priority rezervasyonlarıdır; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                                                                                                 |
+| W1-BE-07 | E17 · P06.3/.4                 | Seans düzenleme ve kalıcı telafi bağı için native okuma eşlemesi                 | PR313 typed düzenleme/telafi projeksiyonları mevcut; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                                                                                                                 |
+| W1-BE-08 | E17 · aynı-key kurtarma        | Native telafi komutu receipt okumasının typed request ile doğrulanması           | PR313 native capacity/receipt recovery düzeltmesi ve otomatik backend kabul testi mevcut; E17 tüketimi tamam; ekran kabulünün sahibi TODO/E17.                                                                                            |
+| W1-BE-09 | E19 · P07                      | Paket yönetimi durum/arama/özet/geçmiş ve satışa kapatma/arşiv eşlemesi          | Backend karşılandı (PR313); yönetim/durum/geçmiş tüketiliyor, kabul sahibi TODO/E19.                                                                                                                                                      |
+| W1-BE-10 | E20 · P08                      | Merkez geneli finans hareket/borç/alacak keşfi ve para birimine ayrılmış özetler | Backend karşılandı (PR313): finance_directory_get_v1 mevcut; frontend tüketimi TODO/E20 sahibinde.                                                                                                                                        |
+| W1-BE-11 | E14 · P04/P07                  | Üyelik başlangıcı ve hak hareket defteri                                         | Backend karşılandı (PR313): üyelik tarihi ve native satış ledger sayfası E14’e bağlı; ekran kabulü TODO/E14 sahibinde.                                                                                                                    |
+| W1-BE-12 | E14 · P07.2                    | Yetkili indirimli native satış                                                   | PR313 sale.discount + sale_discount_percent_upper eşlemesi mevcut; açık yetki/politika gerekir, otomatik grant yok.                                                                                                                       |
+| W1-BE-13 | E14 · P09                      | Başlangıca göre rezervasyon zaman filtresi                                       | Backend karşılandı (PR314): time_filter sunucu/cursor kapsamında; E14 filtre bağlantısı ve yerel kabulü tamam.                                                                                                                            |
+| W1-BE-14 | E14 · P07.4                    | Planlanmış dondurmayı tamamen iptal etme                                         | Backend karşılandı (PR314): ayrı cancel preview/apply E14’e bağlı; ekran kabulünün sahibi TODO/E14.                                                                                                                                       |
+| W1-BE-15 | E18 · P10/WF19                 | Seans geneli bekleme listesi ve teklif geçmişi keşfi                             | Backend karşılandı (PR315): seans entries/offers dizini mevcut; E18 tüketiyor; kabul sahibi TODO/E18.                                                                                                                                     |
+| W1-BE-16 | E18 · P09/WF06                 | Rezervasyona bağlı gerçek paket/hak özeti                                        | Backend karşılandı (PR315): include_source_summary gerçek kaynak/hak özetini sağlar; E18 tüketiyor; kabul sahibi TODO/E18.                                                                                                                |
+| W1-BE-17 | E21 · P06.5/WF06               | Özel ders taleplerinin native durum filtresi ve merkez sayaçları                 | PR316 main/development teslimi doğrulandı; frontend tüketimi ve yerel kabulü TODO/E21’de tamamlandı.                                                                                                                                      |
+| W1-BE-18 | E24–E26 · P11.2/WF03/WF07      | Atanmış seansın eğitmene görünür salon etiketi                                   | Backend karşılandı (PR317): opt-in room_labels yalnız canlı atanmış seanslarda; tüketici kabulü TODO/E24–E26 sahibinde.                                                                                                                   |
+| W1-BE-19 | E27 · P10/P11.2                | Kendi geçerli anlaşma/ödeme keşfi ve dönem toplamları                            | Backend karşılandı (PR321): self earnings tüm dönem/ay satırları tüketiliyor; E27 otomatik kabulü tamam, ekran kaydı TODO/E27 sahibinde.                                                                                                  |
+| W1-BE-20 | E28/E29 · P09/P11.1            | Üye ders keşfi, güvenli ders etiketleri ve iptal politikası                      | Backend karşılandı (PR318): E28/E29 native keşif/politika tüketimi tamam; ekran kabulleri TODO sahibinde.                                                                                                                                 |
+| W1-BE-21 | E29 · P09/P11.1                | Öğrencinin kendi merkezindeki bekleme/teklif keşfi                               | Backend karşılandı (PR320): native self waitlist/offer dizini tüketiliyor; E29 otomatik kabulü tamam, kayıt TODO/E29 sahibinde.                                                                                                           |
+| W1-BE-22 | E30 · P07/P08/P11.1            | Satın alınan paket bilgisi ve ödeme para birimi keşfi                            | Backend karşılandı (PR320): immutable purchase_summary ve self finans para birimleri tüketiliyor; E30 otomatik kabulü tamam, kayıt TODO/E30 sahibinde.                                                                                    |
+| W1-BE-23 | E32 · P05                      | Kendi hesabının gerekli belgelerini gerçek işlem bağlamlarıyla keşfetme          | Backend karşılandı (PR320): aktif işlem/açık satın alma belge bağlamı keşfi tüketiliyor; E32 otomatik kabulü tamam, kayıt TODO/E32 sahibinde.                                                                                             |
+| W1-BE-24 | E33 · P12                      | CRM özet/filtre, merkez takipleri, sorumlu ve geçmiş deneme teklifi keşfi        | Backend karşılandı (PR322): lead filtre/özet, sorumlu/takip ve deneme geçmişi/ürün keşfi mevcut. Frontend tüketimi ve E33 otomatik kabulü tamam; ekran kaydı TODO/E33 sahibinde.                                                          |
+| W1-BE-25 | E34–36 · P12.5/WF09            | Public program türü/filtre, görünür doluluk ve başvuru/yayın durumu              | Backend karşılandı (PR322). İstemci tüketimi ve otomatik kabul [E34–E36](todo.md#e34--public-takvim) sahibinde.                                                                                                                           |
+| W1-BE-26 | E37 · P13/WF15                 | Etkinlik arama/durum filtresi, görünür kayıt sayısı ve merkez özetleri           | Backend karşılandı (PR319): native query/status, filtre geneli summary ve active_registration_count mevcut; E37 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E37 sahibinde.                                                        |
+| W1-BE-27 | E38 · P13/WF15                 | Hazırlıksız oluşmuş etkinlik kaydının gerçek borç/ödeme bağı                     | Backend karşılandı (PR319): event_get_v1(include_payment_summary:true) gerçek kayıt bedeli/borç/bakiye bağını sağlar; E38 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E38 sahibinde.                                              |
+| W1-BE-28 | E39 · P14/WF11                 | Kendi inbox arama/iş durumu, toplu/ters okundu ve kaynak eylemi eşlemesi         | Backend karşılandı (PR321): arama, gerçek kaynak durumu/selector, kapsam sayaçları ve atomik tersinir seçili okuma var. Frontend tüketimi ve E39 otomatik kabulü tamam; ekran kaydı TODO/E39 sahibinde.                                   |
+| W1-BE-29 | E40 · P14.4/WF16               | Çizimin segment, tetikleme, eylem ve son işler eşlemesi                          | Backend karşılandı (PR321): native segment eşleşme/kullanım ve kapsam işi keşfi/özetleri var; kabul edilen dar WF16 sınırı korunuyor. Frontend tüketimi ve E40 otomatik kabulü tamam; ekran kaydı TODO/E40 sahibinde.                     |
+| W1-BE-30 | E41 · P16/WF10                 | Çizimin satış/doluluk/hakediş raporu ve import görünür alanları                  | Backend karşılandı (PR323): yeni rapor kırılımları, import dizini/limitleri ve dosya geneli satır filtreleri mevcut; native destek sınırları aşağıda. E41 tüketimi/kabulü açık.                                                           |
+| W1-BE-31 | E22 · P15/WF11                 | Merkez belge/sürüm dizini, kabul durumu ve özetler                               | Kaynak karşılandı (PR324): document_directory_get_v1 belge/taslak, sürüm, güncel gereksinim ve tarihsel kabul keşfini; aktif işlem/unexpired preview kitlesinin tekil kişi özetini sağlar. Development başarılı; E22 tüketim/kabulü açık. |
+| W1-BE-32 | E11 · P02                      | Merkez geneli yetkili bekleyen yönetim işleri keşfi                              | Backend karşılandı (PR322): seçili merkezin beş gerçek kaynak türünden yetkili yönetim işi kuyruğu ve özetleri mevcut. E11 tüketimi ve otomatik kabulü tamam; ekran kaydı TODO/E11 sahibinde.                                             |
+| W1-BE-33 | E23 · P10/WF14                 | Yönetici hakediş/ödeme keşfi, dönemler ve güvenli özetler                        | Backend karşılandı (PR323): instructor_finance_directory_get_v1 üç görünüm, tüm dönem keşfi ve para birimine göre özet sağlar. Not/avans desteği yok; frontend ekran durumu TODO/E23 sahibinde.                                           |
+| W1-BE-34 | E43 · V06.2 · WF00/P02/P14/P16 | Merkez denetim/işlem keşfi, filtreler ve dışa aktarma eşlemesi                   | Karşılandı (PR323 ve PR342).                                                                                                                                                                                                              |
 
 | W1-BE-35 | E42 · WF02/P17 | Yönetici rollerini filtreli ve cursor kapsamlı keşif | Kaynak/main/development karşılandı (PR327): native role/state filtreleri var; frontend kabulü TODO/E42 sahibinde. |
 | W1-BE-36 | P01 / G-PRO · WF01 | Native recovery kabul aracının doğru frontend callback kaynağı | Kaynak desteği karşılandı: PR328, zorunlu callback pini ve iki CLI modu. Sağlayıcı kontrolü P01.4’te. |
@@ -50,7 +48,30 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-39 | P09.2 · WF06 | Borç politikasından kaynaklanan rezervasyon reddinin ayırt edilmesi | Karşılandı (PR330). Yetkili rezervasyonda `DEBT_BOOKING_BLOCKED` ayrımı var. |
 | W1-BE-40 | P14.1 · WF11/WF12 | Ders değişikliğinde etkilenen öğrenciye uygulama içi bildirim | Karşılandı (PR330). Etkilenen aktif rezervasyon sahibine ders değişikliği bildirimi gider. |
 | W1-BE-41 | P01.4 · WF01 | Native ilk parola için izole kabul | Karşılandı (PR330). Native CI parolasız Google kimliğine ilk parolayı doğruladı. |
-| W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Açık. Starter2’de kendi rol okuması plan reddi veriyor, yayımlı Web1 yönetim menüsünü kuramıyor. |
+| W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Backend karşılandı. Yayımlı Web1 doğrulaması G-STARTER.2’de. |
+| W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | [Karşılandı](#w1-be-43--hesaptan-ilk-stüdyo-kurulumuna-yetkili-geçiş). |
+| W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Karşılandı](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
+| W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
+| W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Karşılandı](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
+| W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Karşılandı](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
+| W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Karşılandı](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
+| W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Karşılandı](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
+| W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
+| W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Karşılandı](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
+| W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Karşılandı](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
+| W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Karşılandı](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
+| W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Karşılandı](#w1-be-54--başvuru-durum-filtresi). |
+| W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Karşılandı](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
+| W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Karşılandı](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
+| W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Karşılandı](#w1-be-57--bildirim-arşivi-ve-silme). |
+| W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Karşılandı](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
+| W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Karşılandı](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
+| W1-BE-60 | E50.4 · WF02 | Platform için ilk plan sürümü keşfi | [Karşılandı](#w1-be-60--platform-için-ilk-plan-sürümü-keşfi). |
+| W1-BE-61 | E51.4 · WF13/WF17 | Platform ödeme dönemi ve ek süre uygunluğu | [Karşılandı](#w1-be-61--platform-ödeme-dönemi-ve-ek-süre-uygunluğu). |
+| W1-BE-62 | E52 · WF17 | Platform operatörü dizini ve yetki yönetimi | [Karşılandı](#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi). |
+| W1-BE-63 | E50.5 · WF17 | Seçili organizasyonun platform faturalarını okuma | [Backend desteği karşılandı](#w1-be-63--platform-organizasyon-ayrıntısında-fatura-dizini). |
+| W1-BE-64 | V09.3 · WF07/WF11 | Gelen kutusunda yoklama düzeltme hedefi ve karar akışı | [Geri çekildi](#w1-be-64--gelen-kutusunda-yoklama-düzeltme-keşfi-ve-kararı). |
+| W1-BE-65 | V09.1 · WF11 | Katalog sürümünün geçersiz kılındığını yeniden okuma | [Backend desteği karşılandı](#w1-be-65--içerik-kataloğunda-geçersiz-kılma-durumunun-okunması). |
 
 ## Bütün talepler için ortak sınır
 
@@ -337,7 +358,9 @@ Kesin kaynak/yetki ve DTO [WF11](https://github.com/SXQHex/FtkSaaS/blob/2045b942
 
 **Tüketim:** `audit_list_v1` subject atlanınca açık merkezde güvenli denetim keşfi, arama/modül/recorded filtresi ve isteğe bağlı dönem sunar; eski tek nesne yolu korunur. Her satır özgün nesne yetkisiyle, finans satırları ayrıca finance.read ile denetlenir. `tracking_directory_get_v1` yalnız kendi hesabının aynı merkezdeki yetkili receipt/preview ve rapor/import işlerini kind/state/query/interval ve cursor ile keşfeder. Gerçek ilerleme, nullable payda, güvenli hata ve yalnız uygun durumda next_attempt_at gelir. Sayaçlar yetkili query/interval kümesinde cursor/kind/state öncesidir; aynı akışın ayrı native kayıtları birleştirilmez. Kaynak eylemi kendi WF/getter/writer yolunda açıkça seçilir; başarı/yetki değişiminde dizin yeniden okunur.
 
-**Sınır:** Audit sonucu yalnız kesinleşmiş `recorded` kaydıdır; başarısız/ret logu, merkez audit export API’si veya sınırsız worker dizini yoktur. İşlem dizini başka hesabın kaydını, token/operation_key/onay/lease/request veya Auth kimliğini açmaz. Genel tekrar çalıştırma, başkası adına onay veya yerel ilerleme animasyonu üretilmez. Süresi dolan preview yeni kaynak/önizleme ister; kayıtlı başarı ile sonucun saklama süresinin dolması ayrıdır. Sahte tarih aralığı, cihaz veya saklama süresi uydurulmaz. Kesin tüketim [WF00](https://github.com/SXQHex/FtkSaaS/blob/3fdd825fe2656e9ae7077adbdd4d297017a69e9a/docs/workflows.md#wf00), sayaç kararı [FD10](https://github.com/SXQHex/FtkSaaS/blob/3fdd825fe2656e9ae7077adbdd4d297017a69e9a/docs/contracts/02-FtkSaaS-teknik-sozlesme.md#fd10--iş-otomasyonu-rapor-import-kabul-edildi), backend değerlendirmesi [XREQ-067](https://github.com/SXQHex/FtkSaaS/blob/3fdd825fe2656e9ae7077adbdd4d297017a69e9a/docs/requests.md#xreq-067) sahibindedir; ekran kabulü [TODO/E43](todo.md#sayfa-kabulu) sahibindedir.
+**Sınır:** Audit sonucu yalnız kesinleşmiş `recorded` kaydıdır; başarısız/ret logu veya sınırsız worker dizini yoktur. İşlem dizini başka hesabın kaydını, token/operation_key/onay/lease/request veya Auth kimliğini açmaz. Genel tekrar çalıştırma, başkası adına onay veya yerel ilerleme animasyonu üretilmez. Süresi dolan preview yeni kaynak/önizleme ister; kayıtlı başarı ile sonucun saklama süresinin dolması ayrıdır. Sahte tarih aralığı, cihaz veya saklama süresi uydurulmaz. Kesin tüketim [WF00](https://github.com/SXQHex/FtkSaaS/blob/3fdd825fe2656e9ae7077adbdd4d297017a69e9a/docs/workflows.md#wf00), sayaç kararı [FD10](https://github.com/SXQHex/FtkSaaS/blob/3fdd825fe2656e9ae7077adbdd4d297017a69e9a/docs/contracts/02-FtkSaaS-teknik-sozlesme.md#fd10--iş-otomasyonu-rapor-import-kabul-edildi), backend değerlendirmesi [XREQ-067](https://github.com/SXQHex/FtkSaaS/blob/3fdd825fe2656e9ae7077adbdd4d297017a69e9a/docs/requests.md#xreq-067) sahibindedir; ekran kabulü [TODO/E43](todo.md#sayfa-kabulu) sahibindedir.
+
+**Dışa aktarım ve kesin sonuç:** [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342) ile gelen sözleşme, `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı. `audit_center_export_v1` yetkili merkez ve filtre kapsamındaki kayıtları CSV döndürür. `tracking_directory_get_v1` kesin import sonucu ve kaynak yeniden deneme kipini sunar. [V06.2 Web1 kabulü](todo.md#v06).
 
 ## W1-BE-35 · Ekipte yönetici rolü keşfi
 
@@ -351,7 +374,7 @@ OM için organizasyon okuyucusu `center_id` atlar ve `role=org_manager` kullanı
 
 **Karşılandı:** [PR328](https://github.com/SXQHex/FtkSaaS/pull/328) main `b219f2be822338b40460f1bb981e00d07b6be70e` üzerinde native ve expired modlarına zorunlu origin/path/next pini ile stdin girdisi ekledi. Native Auth sözleşmesi korunuyor. Aynı SHA’da [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548), [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177737) ve [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı.
 
-Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü). Google-only ilk parola, doğal süre dolumu ve güvenlik postasının eylem hedefi dahil frontend kabulünün sahibi [P01.4](todo.md#p01--kimlik-hesap-ve-güvenlik-kapalı).
+Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü). Google-only ilk parola, doğal süre dolumu ve güvenlik postasının eylem hedefi dahil frontend kabulünün sahibi [P01.4](todo.md#p01).
 
 ## W1-BE-37 · Native güvenlik postasının kurtarma yolu
 
@@ -380,3 +403,129 @@ Kullanım ve kaynak sınırı [backend çalışma rehberinde](../../backend/docs
 İlk bulgu. 18 Kasım’da yayımlı Web1, sentetik Starter2 sahibiyle gerçek development Auth girişini tamamladı. Hesap, organizasyon ve erişilebilir tek merkez HTTP 200 ile okundu. Kendi kanonik `person_id` değeriyle `roles_list_v1` HTTP 200 zarfında `PLAN_FEATURE_UNAVAILABLE` döndürdü. Merkez filtresi olmadan açık `role=owner`, `state=active` isteği de aynı sonucu verdi. Web1 yönetim bağlantılarını kuramadı. Hesap ekranı açıldı ve test oturumu kapatıldı. [Web1 çağrı kaynağı](../src/features/workspace/workspace.ts) · [Güvenli hosted kanıtı](../.tmp/starter-hosted-web1-readback.json).
 
 Web1’in yalnız oturumun kendi etkin yönetim rolünü ve erişilebilir merkez kapsamını yayımlanmış bir okuyucudan edinmesi gerekiyor. İzinli Starter owner ve merkez yöneticisi durumlarını, rol geri alımını ve plan geçişini doğrula. Öğrencide ve kapsam dışı kişide yönetim kapsamı dönmemeli. Başka kişilerin rol dizini ve bağımsız personel yönetimi için F05 kapısı korunmalı. WF02’nin mevcut eğitmen ataması seçicisi kayıtlı eğitmen rolünü doğruluyor. Yönetici gezinmesi için gerekli kendi yönetim rolünü bu seçici sağlamıyor. [WF02](../../../docs/workflows.md#wf02).
+
+## W1-BE-43 · Hesaptan ilk stüdyo kurulumuna yetkili geçiş
+
+**Backend desteği karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
+
+Etkin organizasyon bağı olmayan doğrulanmış hesap `studio_setup_open_v1` ile talep açar, `studio_setup_list_v1` ile kendi talebini okur. Platform operatörü kuyruğu okur ve mevcut `organization_create_v1(studio_setup_id)` ile talebi kuruluşla atomik eşler. Kuruluş hazır olunca mevcut merkez kurulumuna geçilir. Hesabım talep açma, takip ve ilk merkez devri [E47 Web1 kabulünde](todo.md#e47-ilk-kurulum) doğrulandı. [WF02](../../../docs/workflows.md#wf02).
+
+## W1-BE-44 · Özel ders talebinde öğrencinin notu
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`lesson_request_create_v1` öğrencinin kendi talebinde isteğe bağlı `student_note` alır. Yetkili liste ve ayrıntı aynı alanı `request_detail` içinde döndürür. [Çizim](../read-only/tasarim-v2/app.js#L4332) · [WF06](../../../docs/workflows.md#wf06) · [V02.1 Web1 kabul kaydı](todo.md#v02).
+
+## W1-BE-45 · Eğitmenin hakedişinde tarihsel seans ve anlaşma bağlamı
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`instructor_account_get_v1(view:earnings,include_session_context:true)` ders hakedişinde ilk kapanışın ders adını ve planlı süresini, satıra bağlı kapanış revizyonunun katılım sayısını ve kullanılan anlaşma sürümünü döndürüyor. [WF14](../../../docs/workflows.md#wf14) · [V02.1 tüketim ve kabul kaydı](todo.md#v02).
+
+## W1-BE-46 · Yetkili yönetici için stüdyo programı ICS aboneliği
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`calendar_links_get_v1(studio_program_scope)` yetkili hesabın seçili merkez bağlantılarını listeler. `calendar_link_create_v1` ve `calendar_link_rotate_v1` merkez kapsamını alır ve izinli yanıtta URL açar. Feed yetki ve planı yeniden denetler. [Çizim](../read-only/tasarim-v2/app.js#L7176) · [WF09](../../../docs/workflows.md#wf09) · [V02.2 Web1 kabulü](todo.md#v02).
+
+## W1-BE-47 · Üye gelen kutusunda tümünü okundu yapma
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) ile gelen sözleşme, güncel `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı.
+
+`notifications_read_set_v1(all_unread:true,read:true)` seçili organizasyonda alıcının komut anındaki okunmamış iletilerini tek işlemde günceller. Makbuz alıcı kişi kimliğini döndürür. [WF11](../../../docs/workflows.md#wf11) · [E48 Web1 kabulü](todo.md#e48-uye-bildirim-merkezi).
+
+## W1-BE-48 · Ders değişikliği bildiriminde yetkili kaynak merkezi
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) ile yayımlanan sözleşme, güncel `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı.
+
+Üyenin canlı erişimi varsa `notifications_list_v1(include_work:true)` bilgilendirme satırına gerçek merkez ve seansı içeren `reservation_target` ekler. [WF11](../../../docs/workflows.md#wf11) · [E48 Web1 kabulü](todo.md#e48-uye-bildirim-merkezi).
+
+## W1-BE-49 · Eğitmen yoklama zaman sınırı ve düzeltme isteği
+
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), `82a5a37deb83d7de1978d82ffba738ecf4ce12b5` kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
+
+`attendance_get_v1(include_correction_requests:true)` etkin pencereyi ve canlı yetkiyle sınırlandırılmış talepleri döndürür. `attendance_correction_request_v1` atanmış eğitmende kapanış revizyonu ve gerekçeyi, merkez yöneticisinde talep sürümü ve kararı kullanır. Native test yetki kaybı, eski revizyon ve aynı anahtarla tekrarı doğrular. [WF07](../../../docs/workflows.md#wf07) · [Native kabul](../../backend/tests/starter-attendance-protection.test.mjs#L422) · [V03.3 Web1 kabulü](todo.md#v03).
+
+## W1-BE-50 · İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`import_rows_list_v1(include_apply_summary:true)` kesin uygulama sonucunu bütün iş için döndürür. Aynı yetkili okuyucunun `download=skipped_csv` biçimi, canlı kaynak dosyası ve iş sahibi denetimiyle aktarılmayan satırları indirir. [Çizim](../read-only/tasarim-v2/app.js#L4730) · [WF10](../../../docs/workflows.md#wf10) · [V04.3 Web1 kabulü](todo.md#v04).
+
+## W1-BE-51 · Başarısız CSV dışa aktarımını yeniden başlatma
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`report_export_start_v1(retry_job_id)` yalnız kesin başarısız işi özgün kapsamıyla yeniden başlatır. Yeni iş ayrı kimlikle durum ve dosya kaynaklarından okunur. [WF10](../../../docs/workflows.md#wf10) · [V04.3 Web1 kabulü](todo.md#v04).
+
+## W1-BE-52 · Aday hunisi aşamaları ve kaynak kırılımı
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`report_get_v1(report:crm_conversion,include_crm_funnel:true)` seçili filtrelerin dönem kohortunu, ulaşılmış aşamaları ve kaynak bazında aday ile dönüşüm sayılarını döndürür. [WF10](../../../docs/workflows.md#wf10) · [V04.3 Web1 kabulü](todo.md#v04).
+
+## W1-BE-53 · CRM aşama ve deneme sayaçları
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`leads_list_v1(include_pipeline_summary:true)` seçili merkez, arama ve sorumlu kapsamındaki aşama ve deneme sayaçlarını, aşama seçimi ve sayfadan bağımsız döndürür. [WF16](../../../docs/workflows.md#wf16) · [V05.1 Web1 kabulü](todo.md#v05).
+
+## W1-BE-54 · Başvuru durum filtresi
+
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
+
+`management_state_get_v1(public_application_review_v1)` seçici durumlarını sayfa ve cursor öncesinde uygular. [WF09](../../../docs/workflows.md#wf09) · [V05.1 Web1 kabulü](todo.md#v05).
+
+## W1-BE-55 · Ziyaretçinin etkinlik kayıt akışı
+
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
+
+Ziyaretçi `public_application_submit_v1(event_application:true,page_slug,publication_id,contact)` ile yayımlanmış etkinliğe e-postayla başvurur. Bot doğrulaması ve aynı işlem anahtarı korunur. Sonuç `application_state:pending` olarak okunur. Kontenjan, ödeme ve kayıt koşulları yetkili etkinlik akışında değerlendirilir. [WF09](../../../docs/workflows.md#wf09) · [V05.2 Web1 kabulü](todo.md#v05).
+
+## W1-BE-56 · Yayın adresi ve sayfanın açılıp kapatılması
+
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
+
+Yetkili kuruluş yöneticisi `settings_update_v1(scope:organization,patch:{public_page:{slug,enabled}})` ile adresi ve yayın durumunu sürüm denetimli yazar. Adres yenilenince eski adres kapanır. Sayfanın kapatılması programı ve bu sayfaya bağlı başvuruları durdurur. Kaynak yayın ve form ayarları korunur. [WF09](../../../docs/workflows.md#wf09) · [V05.2 Web1 kabulü](todo.md#v05).
+
+## W1-BE-57 · Bildirim arşivi ve silme
+
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341) ile gelen sözleşme, güncel `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı.
+
+`notifications_list_v1(visibility)` klasörün yetkili dizinini döndürür. `notifications_read_set_v1(visibility,notifications)` sürümlü kayıtları atomik taşır, okundu ve kaynak iş durumunu korur. [WF11](../../../docs/workflows.md#wf11) · [V06.1 Web1 kabulü](todo.md#v06).
+
+## W1-BE-58 · Fatura vergi bilgileri ve geçmişi
+
+**Backend desteği karşılandı.** Vergi profili için [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı. Orijinal ZIP/PDF ve fatura geçmişi için [PR #343](https://github.com/SXQHex/FtkSaaS/pull/343), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) başarılı.
+
+Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sürümle günceller. `organization_invoices_list_v1` yayımlanmış faturaları, `organization_invoice_file_get_v1?download=original` orijinal dosyayı yetkili sahibine verir. Profil düzenlemesi kesilmiş faturayı değiştirmez. Platform fatura dosyasını mevcut hazırlık/yayın komutlarıyla yayımlar. [V07.1 Web1 kabulü](todo.md#v07). [WF17](../../../docs/workflows.md#wf17).
+
+## W1-BE-59 · Platform konsolu kapsamı ve keşif okumaları
+
+**Backend desteği karşılandı.** [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı.
+
+`account_get_v1(include_platform_scope:true)` canlı platform erişimini, `platform_directory_get_v1` kuruluş, ödeme, organizasyon sahibi ve e-postayla doğrulanmış hesap keşfini döndürür. `platform_organization_suspension_set_v1` sürümlü askı/kaldırma sağlar. Web1 organizasyon, askı, ödeme kararı ve ek süre komutlarını E50.2–E51.3 altında kullanıyor. Platform operatörü yetki yönetimi [W1-BE-62](#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi) altında izleniyor. [WF17](../../../docs/workflows.md#wf17).
+
+## W1-BE-60 · Platform için ilk plan sürümü keşfi
+
+**Backend desteği karşılandı.** `platform_directory_get_v1(view:initial_plans)` her plan adı, dönem ve para birimi için yürürlükteki son plan sürümünü döndürüyor. Web1 kuruluş formu seçili sürümü `organization_create_v1.initial_plan_id` olarak gönderiyor. Stüdyo talebinde aynı talep, adı ve doğrulanmış sahibi korunuyor. [PR #344](https://github.com/SXQHex/FtkSaaS/pull/344) · [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44524823332) · [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44524920007) · [WF02](../../../docs/workflows.md#wf02).
+
+## W1-BE-61 · Platform ödeme dönemi ve ek süre uygunluğu
+
+**Backend desteği karşılandı.** Ödeme dizini kuruluş adını ve ödemenin özgün teklif dönemini döndürüyor. Eski, teklifsiz ödemelerde dönem null. Ek süre seçicisi `eligible` ve `until_after` veriyor, yazma aynı alt sınırı denetliyor. [Platform teslimi](#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) · [WF17](../../../docs/workflows.md#wf17).
+
+## W1-BE-62 · Platform operatörü dizini ve yetki yönetimi
+
+**Backend desteği karşılandı.** `view:operators` platform üyeliğini, `operator_manage` canlı izin durumunu gösteriyor. `platform_operator_access_set_v1` doğrulanmış hesaba gerekçeli yetki verip kaldırıyor. Native kabul son uygun operatörü ve eski oturumu denetliyor. `view:owners` seçili organizasyonun sahibi olarak kalıyor. [Platform teslimi](#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) · [WF17](../../../docs/workflows.md#wf17).
+
+## W1-BE-63 · Platform organizasyon ayrıntısında fatura dizini
+
+**Backend desteği karşılandı.** `platform_directory_get_v1(view:invoices,scope:{org_id},page)` yüklenmiş ve yayımlanmış faturaların üst verisini canlı platform yetkisiyle sayfalıyor. [WF17](../../../docs/workflows.md#wf17) · [Web1 kabulü](todo.md#e50).
+
+## W1-BE-64 · Gelen kutusunda yoklama düzeltme keşfi ve kararı
+
+**Geri çekildi · Kullanıcı kararı.** Web1’de düzeltmeyi ilgili Merkez yöneticisi mevcut seans ayrıntısı üzerinden gerçekleştirir. [V09.3](todo.md#v09) kabulün sahibidir.
+
+## W1-BE-65 · İçerik kataloğunda geçersiz kılma durumunun okunması
+
+**Backend desteği karşılandı.** `content_catalog_get_v1` izinli katalog satırlarında `retired` ve `invalidated` alanlarını ayrı döndürüyor. [WF11](../../../docs/workflows.md#wf11) · [Web1 kabulü](todo.md#v09).

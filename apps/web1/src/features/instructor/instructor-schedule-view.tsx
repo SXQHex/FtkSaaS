@@ -10,16 +10,33 @@ import {
   CardContent,
 } from "../../components/ui/card";
 import { Skeleton } from "../../components/ui/skeleton";
+import { Badge } from "../../components/ui/badge";
 const Calendar = lazy(() =>
   import("../../components/event-calendar").then((module) => ({ default: module.EventCalendar })),
 );
-const views = ["timeGridWeek"];
+const views = ["timeGridWeek", "listWeek"];
 const widths = { timeGridWeek: "52rem" };
+const viewOptions = {
+  listWeek: {
+    eventContent: (info: import("@fullcalendar/react").EventDisplayInfo) => (
+      <span className="flex min-w-0 flex-wrap items-center gap-2">
+        <span className="tabular-nums text-muted-foreground">{info.timeText}</span>
+        <span className="min-w-0 wrap-anywhere">{info.event.title}</span>
+        {typeof info.event.extendedProps.status === "string" && (
+          <Badge variant="outline" className="whitespace-normal">
+            {info.event.extendedProps.status}
+          </Badge>
+        )}
+      </span>
+    ),
+  },
+};
 export interface InstructorScheduleEvent {
   id: string;
   title: string;
   start: string;
   end: string;
+  status: string;
 }
 export function InstructorScheduleView({
   timezone,
@@ -53,6 +70,7 @@ export function InstructorScheduleView({
       todayText: t(($) => $.instructorSchedule.thisWeek),
       prevText: t(($) => $.instructorSchedule.previous),
       nextText: t(($) => $.instructorSchedule.next),
+      listText: t(($) => $.instructorSchedule.agenda),
       noEventsText:
         state === "error"
           ? t(($) => $.instructorToday.unread)
@@ -93,6 +111,7 @@ export function InstructorScheduleView({
             <Calendar
               initialView="timeGridWeek"
               availableViews={views}
+              views={viewOptions}
               viewMinWidths={widths}
               viewScrollHeight="min(65dvh,40rem)"
               scrollRegionLabel={t(($) => $.instructorSchedule.region)}
@@ -111,7 +130,12 @@ export function InstructorScheduleView({
               nowIndicator
               events={
                 state === "ready"
-                  ? events.map((row) => ({ ...row, interactive: Boolean(onOpen), editable: false }))
+                  ? events.map(({ status, ...row }) => ({
+                      ...row,
+                      extendedProps: { status },
+                      interactive: Boolean(onOpen),
+                      editable: false,
+                    }))
                   : []
               }
               datesSet={datesSet}

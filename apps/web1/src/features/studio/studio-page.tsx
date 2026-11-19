@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
+import { settingsSubscriptionQuery } from "../settings/settings-subscription";
 import { StudioView, type StudioViewData } from "./studio-view";
 import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
 import { StudioInstructorEditor } from "./instructor-editor";
@@ -197,7 +198,13 @@ function StudioContent({
     workspaceRoles(workspace.data, scope.centerId).includes("owner");
   const query = useQuery({
     queryKey: ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan],
-    queryFn: () => readStudioSnapshot(scope, canReadPlan),
+    queryFn: () =>
+      readStudioSnapshot(
+        scope,
+        canReadPlan
+          ? async () => (await queries.fetchQuery(settingsSubscriptionQuery(scope))).subscription
+          : undefined,
+      ),
     retry: false,
   });
   async function refreshStudio() {

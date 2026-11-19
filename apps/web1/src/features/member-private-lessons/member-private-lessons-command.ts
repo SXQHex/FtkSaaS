@@ -10,6 +10,7 @@ import type {
 import type { OwnRequestDraft } from "./member-private-lessons-view";
 import { scheduleInterval } from "../schedule/schedule-time";
 import { readOwnRequest } from "./member-private-lessons-read";
+import { studentNote } from "../lesson-requests/lesson-requests-read";
 type Context = { scope: ClientScope; personId: string };
 export type OwnRequestIntent = Context &
   (
@@ -35,6 +36,7 @@ export async function createOwnRequestIntent(
   timezone: string,
   disciplines: { id: string }[],
   instructors: { id: string }[],
+  asOf: string,
 ): Promise<OwnRequestIntent> {
   z.uuid().parse(personId);
   const values = z
@@ -45,6 +47,7 @@ export async function createOwnRequestIntent(
       time: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/),
       duration: z.enum(["45", "60"]),
       offset: z.string(),
+      studentNote: z.union([z.literal(""), studentNote]),
     })
     .parse(draft);
   if (
@@ -59,7 +62,7 @@ export async function createOwnRequestIntent(
     Number(values.duration),
     values.offset,
   );
-  if (Date.parse(interval.starts_at) <= Date.now()) throw new Error("OWN_REQUEST_PAST");
+  if (Date.parse(interval.starts_at) <= Date.parse(asOf)) throw new Error("OWN_REQUEST_PAST");
   return {
     scope: { ...scope },
     personId,
@@ -74,6 +77,7 @@ export async function createOwnRequestIntent(
       requested_start: interval.starts_at,
       duration_minutes: Number(values.duration),
       ...(values.instructorId ? { preferred_instructor_id: values.instructorId } : {}),
+      ...(values.studentNote ? { student_note: values.studentNote } : {}),
     },
   };
 }
@@ -83,13 +87,14 @@ export function existingOwnRequestIntent(
   before: LessonRequestView,
   mode: "withdraw" | "accept",
   draft: OwnRequestDraft,
+  asOf: string,
 ): OwnRequestIntent {
   if (
     before.person_id !== personId ||
     before.center_id !== scope.centerId ||
     !["pending", "alternative_offered"].includes(before.state) ||
     !draft.reviewed ||
-    (before.expires_at && Date.parse(before.expires_at) <= Date.now())
+    (before.expires_at && Date.parse(before.expires_at) <= Date.parse(asOf))
   )
     throw new Error("OWN_REQUEST_SOURCE_CHANGED");
   const context = { scope: { ...scope }, personId, before: structuredClone(before) },
@@ -110,7 +115,7 @@ export function existingOwnRequestIntent(
   if (
     before.state !== "alternative_offered" ||
     !alternative ||
-    Date.parse(alternative.starts_at) <= Date.now()
+    Date.parse(alternative.starts_at) <= Date.parse(asOf)
   )
     throw new Error("OWN_REQUEST_SOURCE_CHANGED");
   return {
@@ -154,13 +159,14 @@ export async function readOwnRequestResult(intent: OwnRequestIntent, id?: string
   z.uuid().parse(id);
   if ("before" in intent && id !== intent.before.id)
     throw new Error("OWN_REQUEST_RESULT_UNAVAILABLE");
-  const row = await readOwnRequest(intent.scope, intent.personId, id!);
+  const { request: row } = await readOwnRequest(intent.scope, intent.personId, id!);
   if (intent.operation === "lesson_request_create_v1") {
     const expected = intent.request;
     if (
       row.discipline_id !== expected.discipline_id ||
       Date.parse(row.requested_start) !== Date.parse(expected.requested_start) ||
       row.duration_minutes !== expected.duration_minutes ||
+      row.student_note !== expected.student_note ||
       (row.preferred_instructor_id ?? undefined) !== (expected.preferred_instructor_id ?? undefined)
     )
       throw new Error("OWN_REQUEST_RESULT_UNAVAILABLE");

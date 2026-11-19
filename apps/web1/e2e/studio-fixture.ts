@@ -189,6 +189,14 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
   });
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!;
+    if (op === "calendar_links_get_v1") {
+      if (!route.request().postDataJSON().studio_program_scope) return route.fallback();
+      return send(route, {
+        ...list([]),
+        service_ready: true,
+        supported_kinds: ["lessons", "duties"],
+      });
+    }
     if (
       ![
         "organizations_list_v1",
@@ -483,6 +491,14 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
             } satisfies ManagementStateView,
           ]),
         );
+      }
+      if (r.operation === "person_merge_preview_v1" && k.directory === "center") {
+        expect(k.status).toBe("suggested");
+        expect(r.page).toEqual({ limit: 1 });
+        return send(route, {
+          ...list([]),
+          merge_review_summary: { total: 0, filtered: 0, by_state: [] },
+        });
       }
       throw new Error(`Unexpected Studio selector: ${String(r.operation)}`);
     }

@@ -29,7 +29,11 @@ export async function mockSessionDetail(
     starterRoleGate?: boolean;
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
+    attendanceWindow?: AttendanceView["attendance_window"];
+    centerManager?: boolean;
+    now?: Date;
     origins?: Parameters<typeof mockStudio>[1];
+    source?: { session: SessionView; attendance: AttendanceView; reservation: ReservationView };
   } = {},
 ) {
   const studio = await mockStudio(page, options.origins);
@@ -43,8 +47,8 @@ export async function mockSessionDetail(
       { operation: string; type: "sessions" | "reservations"; id: string }
     >();
   const calendarReads: Record<string, unknown>[] = [];
-  const start = Date.now() + (options.existing ? -20 : 60) * 60000;
-  const session: SessionView = {
+  const start = (options.now?.getTime() ?? Date.now()) + (options.existing ? -20 : 60) * 60000;
+  const session: SessionView = options.source?.session ?? {
     id: S.session,
     class_id: I.lesson,
     discipline_id: I.discipline,
@@ -64,22 +68,26 @@ export async function mockSessionDetail(
       room_capacity: 20,
     },
   };
-  let reservation: ReservationView | undefined = options.existing
-    ? {
-        id: S.reservation,
-        session_id: S.session,
-        person_id: I.self,
-        state: "active",
-        mode: "flexible",
-        version: 2,
-      }
-    : undefined;
-  const attendance: AttendanceView = {
+  let reservation: ReservationView | undefined =
+    options.source?.reservation ??
+    (options.existing
+      ? {
+          id: S.reservation,
+          session_id: S.session,
+          person_id: I.self,
+          state: "active",
+          mode: "flexible",
+          version: 2,
+        }
+      : undefined);
+  const attendance: AttendanceView = options.source?.attendance ?? {
     session_id: S.session,
     session_version: 3,
     closure_state: "open",
     revision: 0,
     actual_started_at: null,
+    attendance_window: options.attendanceWindow ?? null,
+    correction_requests: [],
     entries: options.existing
       ? [
           {
@@ -138,6 +146,21 @@ export async function mockSessionDetail(
     }
     if (options.instructor && operation === "roles_list_v1")
       return reject(options.starterRoleGate ? "PLAN_FEATURE_UNAVAILABLE" : "FORBIDDEN");
+    if (options.centerManager && operation === "roles_list_v1")
+      return send({
+        items: [
+          {
+            id: I.role,
+            person_id: I.self,
+            role: "center_manager",
+            scope_center_id: I.center,
+            state: "active",
+            version: 1,
+          },
+        ],
+        next_cursor: null,
+        as_of: new Date().toISOString(),
+      });
     if (operation === "session_get_v1") {
       expect(req.session_id).toBe(S.session);
       if (attendanceUnread) {
@@ -250,6 +273,7 @@ export async function mockSessionDetail(
       return send({ items: [], next_cursor: null, as_of: new Date().toISOString() });
     if (operation === "attendance_get_v1") {
       if (options.attendanceDenied) return reject("FORBIDDEN");
+      expect(req.include_correction_requests).toBe(true);
       attendance.session_version = session.version;
       return send(attendance);
     }
@@ -400,6 +424,8 @@ export async function mockSessionDetail(
         return route.abort("failed");
       return send({ primary_id: id, changed: [], jobs: [] });
     }
+    if (operation === "attendance_correction_request_v1")
+      throw Error("Web1 must not write attendance correction requests");
     if (operation === "attendance_correct_preview_v1") {
       expect(req.reason).toBe("Sentetik yoklama düzeltmesi");
       expect(req.corrections).toEqual([{ reservation_id: S.reservation, result: "no_show" }]);

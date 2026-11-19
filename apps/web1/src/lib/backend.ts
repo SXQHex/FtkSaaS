@@ -22,28 +22,39 @@ export function createBackend(config: {
   publishableKey: string;
   getAccessToken: () => Promise<string | null>;
 }) {
+  async function post(path: string, request: { request_id: string }, options?: RequestInit) {
+    const token = await config.getAccessToken();
+    if (!token)
+      throw new BackendError({
+        code: "AUTH_REQUIRED",
+        retryable: false,
+        trace_id: request.request_id,
+      });
+    return fetchBackendOperation(config.functionsUrl, path, request, {
+      ...options,
+      method: "POST",
+      credentials: "omit",
+      headers: {
+        apikey: config.publishableKey,
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+    });
+  }
   return {
     async call<K extends keyof Operations & RuntimeOperationName>(
       operation: K,
       request: Operations[K]["request"],
     ): Promise<Operations[K]["response"]["data"]> {
-      const token = await config.getAccessToken();
-      if (!token)
-        throw new BackendError({
-          code: "AUTH_REQUIRED",
-          retryable: false,
-          trace_id: request.request_id,
-        });
-      const response = await fetchBackendOperation(config.functionsUrl, operation, request, {
-        method: "POST",
-        credentials: "omit",
-        headers: {
-          apikey: config.publishableKey,
-          authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
+      return readEnvelope<Operations[K]["response"]>(await post(operation, request));
+    },
+    downloadInvoice(request: Operations["organization_invoice_file_get_v1"]["request"]) {
+      return post("organization_invoice_file_get_v1?download=original", request, {
+        cache: "no-store",
+        redirect: "error",
+        referrerPolicy: "no-referrer",
+        signal: AbortSignal.timeout(30_000),
       });
-      return readEnvelope<Operations[K]["response"]>(response);
     },
   };
 }
