@@ -73,7 +73,7 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-end gap-3">
           {orgId && (
             <LinkButton href={paymentHref()} variant="outline">
               {t(($) => $.platform.billing.allOrganizations)}
@@ -107,16 +107,25 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
           <>
             <Table aria-label={title} scrollRegionLabel={title} className="min-w-[51rem]">
               <TableHeader>
-                <TableHead isRowHeader>{t(($) => $.platform.billing.reference)}</TableHead>
                 <TableHead>{t(($) => $.platform.organization)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.quotePeriod)}</TableHead>
+                <TableHead isRowHeader>{t(($) => $.platform.billing.reference)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.amount)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.occurred)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.state)}</TableHead>
+                <TableHead>{t(($) => $.platform.billing.actions)}</TableHead>
               </TableHeader>
               <TableBody items={rows}>
                 {(row) => (
                   <TableRow id={row.id}>
+                    <TableCell className="max-w-48 whitespace-normal wrap-anywhere">
+                      {row.org_name ?? row.org_id}
+                    </TableCell>
+                    <TableCell>
+                      {row.quote_period
+                        ? quotePeriod(row.quote_period)
+                        : t(($) => $.platform.billing.noQuotePeriod)}
+                    </TableCell>
                     <TableCell>
                       <LinkButton
                         variant="ghost"
@@ -126,14 +135,6 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
                       >
                         {row.reference || row.id}
                       </LinkButton>
-                    </TableCell>
-                    <TableCell className="max-w-48 whitespace-normal wrap-anywhere">
-                      {row.org_name ?? row.org_id}
-                    </TableCell>
-                    <TableCell>
-                      {row.quote_period
-                        ? quotePeriod(row.quote_period)
-                        : t(($) => $.platform.billing.noQuotePeriod)}
                     </TableCell>
                     <TableCell>{formatMinorAmount(row.amount_minor, row.currency)}</TableCell>
                     <TableCell>
@@ -145,6 +146,20 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
                       <Badge variant="outline">
                         {t(($) => $.platform.billing.states[row.state])}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {row.state === "pending" && (
+                        <LinkButton
+                          href={paymentHref(row.org_id, row.id)}
+                          variant="outline"
+                          size="sm"
+                          aria-label={t(($) => $.platform.billing.reviewPayment, {
+                            reference: row.reference || row.id,
+                          })}
+                        >
+                          {t(($) => $.platform.billing.review)}
+                        </LinkButton>
+                      )}
                     </TableCell>
                   </TableRow>
                 )}

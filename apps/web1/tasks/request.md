@@ -514,3 +514,9 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 ## W1-BE-62 · Platform operatörü dizini ve yetki yönetimi
 
 **Backend desteği karşılandı.** `view:operators` platform üyeliğini, `operator_manage` canlı izin durumunu gösteriyor. `platform_operator_access_set_v1` doğrulanmış hesaba gerekçeli yetki verip kaldırıyor. Native kabul son uygun operatörü ve eski oturumu denetliyor. `view:owners` seçili organizasyonun sahibi olarak kalıyor. [Platform teslimi](#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) · [WF17](../../../docs/workflows.md#wf17).
+
+## W1-BE-63 · Platform organizasyon ayrıntısında fatura dizini
+
+**Açık · Web1 talebi.** v69 platform organizasyon ayrıntısı hem yayına hazır hem yayımlanmış faturaları gösteriyor. [WF17](../../../docs/workflows.md#wf17) platforma hazırlama ve yayınlama komutlarını, organizasyon sahibine ise yalnız yayımlanmış faturaları okuma yetkisini tanımlıyor. Mevcut platform dizininde fatura görünümü bulunmuyor.
+
+[E50.5](todo.md#e50) için canlı platform sahibi yetkisiyle seçili organizasyonun faturalarını sayfalı okuyabilen bir sözleşme gerekiyor. Gereken alanlar fatura kimliği, numara, düzenlenme tarihi, dosya türü ve boyutu, sağlama özeti ve yayın durumu. Kuruluş sahibi ve yetkisiz platform rolü bu yönetim dizinine erişmemeli.

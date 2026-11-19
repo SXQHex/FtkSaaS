@@ -128,13 +128,6 @@ function PlatformPage({
           )}
         </nav>
       )}
-      {allowed && canReadQueue && !section && !organizationId && (
-        <div>
-          <LinkButton href="/platform?section=create">
-            {t(($) => $.platform.create.title)}
-          </LinkButton>
-        </div>
-      )}
       {unavailable ? (
         <Alert variant="destructive">
           <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
@@ -192,13 +185,22 @@ function PlatformPage({
           )}
         </>
       ) : (
-        <PlatformOrganizationList accountId={account.id} />
+        <>
+          {canReadQueue && <PlatformStudioQueue accountId={account.id} />}
+          <PlatformOrganizationList accountId={account.id} canCreate={canReadQueue} />
+        </>
       )}
     </main>
   );
 }
 
-function PlatformOrganizationList({ accountId }: { accountId: string }) {
+function PlatformOrganizationList({
+  accountId,
+  canCreate,
+}: {
+  accountId: string;
+  canCreate: boolean;
+}) {
   const { t } = useTranslation();
   const query = useInfiniteQuery({
     queryKey: platformOrganizationsKey(accountId),
@@ -223,10 +225,15 @@ function PlatformOrganizationList({ accountId }: { accountId: string }) {
     );
   return (
     <Card className="min-w-0">
-      <CardHeader>
+      <CardHeader className="flex flex-wrap items-center justify-between gap-3">
         <CardTitle>
           <h2>{title}</h2>
         </CardTitle>
+        {canCreate && (
+          <LinkButton href="/platform?section=create">
+            {t(($) => $.platform.create.title)}
+          </LinkButton>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         {query.isPending ? (

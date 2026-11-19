@@ -101,17 +101,17 @@ Her E*.6 kaydı, geçerli ölçütlerde klavye ve tuzaksız kullanım/odak sıra
 
 <a id="cizim-guncellemesi"></a>
 
-## 18 Kasım çizim ve uygulama uzlaştırması
+## Çizim ve uygulama uzlaştırması
 
 İlk çizim karşılaştırması PR335 sonrasındaki `eede58fc91d0f6e7576b6412bb6380409891fcd1` üzerinde yapıldı. Kabul kayıtları PR337 sonrası main `cfa9c13d063a1f1f8fdcf72d0ff4ac788b506154` ile eşitlendi. Bu kayıtta main'deki kod, test kaynakları, mevcut E/P/S kabul yazıları ve yeni arşiv incelendi. Kullanıcının bilgisayarındaki commit edilmemiş dosyalar bu incelemeye dahil değildir. Yerel geliştirme yeni kayıt taşıyorsa işe başlamadan ilgili E/P/S/V kaydına kanıtıyla uzlaştır; mevcut işi geri alma.
 
 ### Güncel görsel kaynak
 
-Aktif çizim kaynağı yerelde [`apps/web1/read-only/`](../read-only/) altındadır. Karşılaştırmayı [HTML](../read-only/tasarim-v2/index.html), [CSS](../read-only/tasarim-v2/app.css), [JS](../read-only/tasarim-v2/app.js) ve [tokenlardan](../read-only/tasarim-v2/tokens.css) yap. [Geçiş notu](../read-only/GECIS.md) ve [çizim günlüğü](../read-only/ILERLEME.md) görsel bağlam verir. Güncel yerel paket **v67**. Yerel çizimler uygulama bundle’ına girmez.
+Aktif çizim kaynağı yerelde [`apps/web1/read-only/`](../read-only/) altındadır. Karşılaştırmayı [HTML](../read-only/tasarim-v2/index.html), [CSS](../read-only/tasarim-v2/app.css), [JS](../read-only/tasarim-v2/app.js) ve [tokenlardan](../read-only/tasarim-v2/tokens.css) yap. [Geçiş notu](../read-only/GECIS.md) ve [çizim günlüğü](../read-only/ILERLEME.md) görsel bağlam verir. Güncel yerel paket **v69**. Yerel çizimler uygulama bundle’ına girmez.
 
-13 Kasım’daki özgün çizimlerle alınmış E/P kanıtları o sürüme aittir. Pro/Starter v67 farkları ve ek ekranlar V01–V08 ve E47–E52 altında takip edilir.
+13 Kasım’daki özgün çizimlerle alınmış E/P kanıtları o sürüme aittir. v67 farkları V01–V08 ve E47–E52 altında takip edilir. v68–v69 ekleri [aşağıdaki eşlemede](#v68-ve-v69-farklarının-durumu) yer alır.
 
-Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) karşılaştırma kanıtını yeniden üretmek için saklanır. Aktif yerel paketin dört kaynak dosyası ve üç notu bu arşivle SHA-256 düzeyinde eşleşti. Yerel önizleme için Web1 dizininden `python3 -m http.server 4184 --bind 127.0.0.1 --directory read-only/tasarim-v2` çalıştır.
+Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) karşılaştırma kanıtını yeniden üretmek için saklanır. Güncel v69 paketinde HTML, JS ve üç not v67 arşivinden farklı. CSS ve token dosyaları aynı. Aşağıdaki parmak izleri güncel yerel pakete aittir. Yerel önizleme için Web1 dizininden `python3 -m http.server 4184 --bind 127.0.0.1 --directory read-only/tasarim-v2` çalıştır.
 
 | Dosya         | SHA-256                                                            |
 | ------------- | ------------------------------------------------------------------ |
@@ -123,7 +123,19 @@ Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) ka
 | `index.html`  | `35fc4729999d9c2e5313222dd1ec331971341cbe3065f83c454a21183420c3c1` |
 | `tokens.css`  | `197742a8736bd7cb9ea3d7a3b99fa402e03cd321dd8593a76e259eef06c2d1b0` |
 
-Yeni HTML'de **50** `data-view` var. `taslak` çıkarıldığında 49 gerçek bölüm kalıyor. Eski 46 ekranın kimlikleri korunuyor; `a-kurulum`, `m-bildirim` ve `merkezler` eklenmiş. Platform operatörünün üç mantıksal görünümü `#opshell/#op-root` içine JS ile çiziliyor, `data-view` sayısına dahil değil. Böylece takip envanteri E01–E52 oluyor. Business kişi/başvuru/hesaplaşma ve organizasyon raporu bazı mevcut sayfalardaki sekme/çekmecelerle sunuluyor; yalnız HTML bölüm sayısını esas alarak bunları atlama.
+v67 HTML'sinde **50** `data-view` vardı. v69'da giriş sonrası `a-alan` ile sayı **51** oldu. Önizleme şablonu `taslak` dışarıda tutulduğunda 50 HTML görünümü var. Eski 46 ekranın kimlikleri korunuyor; `a-kurulum`, `m-bildirim` ve `merkezler` eklenmiş. Platform operatörünün üç mantıksal görünümü `#opshell/#op-root` içine JS ile çiziliyor, `data-view` sayısına dahil değil. Platformun üç JS görünümüyle takip envanteri E01–E53 oldu. Business kişi/başvuru/hesaplaşma ve organizasyon raporu bazı mevcut sayfalardaki sekme/çekmecelerle sunuluyor; yalnız HTML bölüm sayısını esas alarak bunları atlama.
+
+### v68 ve v69 farklarının durumu
+
+| Sürüm | Çizime eklenen                                                      | Web1 karşılığı                                                                                                                                                                            |
+| ----- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v68   | Giriş sonrası stüdyo ve merkez seçimi, erişimi olmayan hesap durumu | Mevcut hesap kabuğunda stüdyo ve merkez seçilebiliyor. Ayrı giriş adımları [E53](#e53).                                                                                                   |
+| v68   | Belgelerde Dijital metin, İçerik kataloğu ve Etkinlik kaydı         | Etkinlik kaydı gereksinimi belge formunda, önizleme bağlamı katılımcı ekleme akışında, dijital metin okuma ve kabul üye panelinde mevcut. Yönetici metin yayını ve katalog [V09.1](#v09). |
+| v68   | Eğitmen anlaşma metni ve kabul durumu                               | Eğitmen Hakedişim'de metni inceleyip kabul edebiliyor. Yönetici Hakediş satırında kabul durumu [V09.2](#v09).                                                                             |
+| v68   | Üye bildiriminde e-posta teslim durumu                              | [Bildirim ayrıntısında](../src/features/inbox/inbox-content.tsx) native e-posta işi ve sağlandığında teslim durumu gösteriliyor.                                                          |
+| v69   | Platform organizasyon ayrıntısında fatura yükleme ve yayınlama      | [E50.5](#e50). Plan'da yayımlanan faturaları listeleme ve ZIP/PDF indirme [mevcut](../src/features/settings/settings-invoice-history.tsx).                                                |
+| v69   | Gelen kutusunda yoklama düzeltme kararı                             | Kabul/ret [seans yoklama ayrıntısında](../src/features/session-detail/attendance-correction-requests.tsx) çalışıyor. Gelen kutusu üzerinden keşif ve karar [V09.3](#v09).                 |
+| v69   | Kurulum kuyruğundan organizasyon oluşturma                          | [E50.4](#e50) mevcut. Kuyruk organizasyon listesinin üstünde, seçilen talepten oluşturma formu açılıyor.                                                                                  |
 
 ### Uygulama ve kabul durumu
 
@@ -271,6 +283,14 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
       `5801d8794691ae0db51e5170b71e4d78e4949600` temiz çalışma ağacında [filtresiz yerel doğrulama](../test-reports/verification.md) geçti. 841 birim ve tek Chromium işçisiyle 574 tarayıcı testi başarılı. Önceki takvim ve SPA regresyonları tam pakette geçti. [Görsel rapor](../.tmp/v08-visuals/report/index.html), güncel çizim ve uygulamayı 390/1440 pikselde açık/koyu karşılaştırıyor. Axe’ın otomatik ölçemediği kurallar raporda ayrıca listeleniyor. Yayımlı Web1, 18 Kasım kontrolünde önceki `index-C8ClfQCQ.js` girişini sundu. Aynı adayın yayımlı rota/kapsam kabulü açık. [Yayın kontrolü](../.tmp/v08-before-5801d879/published-check.json)
 - [ ] **G-DESIGN** · V01–V08/E47/E48 ve önceki açık Starter kabulünün sonucunu kaydet. Kalan gerçek sağlayıcı/OS kontrolleri mevcut kullanıcı kabul/erteleme kuralına uysun. Kaynak/görsel/API değişikliği çözülmeden genel tamamlandı sonucu verme.
 
+<a id="v09"></a>
+
+### V09 · v68–v69 mevcut ekran ekleri
+
+- [ ] **V09.1** · Belgeler sayfasında dijital metin oluşturma ve yayınlamayı, ayrıca İçerik kataloğunun kod/kanal/revizyon/durum görünümünü ve sözleşmedeki yönetim eylemlerini tamamla. [WF11](../../../docs/workflows.md#wf11).
+- [ ] **V09.2** · Yetkili yönetici Hakediş görünümünde eğitmenin sürümlü anlaşma metni kabul durumunu doğrula ve göster. Eğitmenin mevcut [metin ve kabul akışını](../src/features/instructor/agreement-document-sheet.tsx) kullan.
+- [ ] **V09.3** · Yoklama düzeltme talebini yetkili yöneticinin Gelen kutusundan keşfetmesini ve mevcut sürümlü karar akışına ulaşmasını sağla. Sonucun eğitmenin yoklama ekranında görünmesini doğrula. [WF06](../../../docs/workflows.md#wf06).
+
 ### Yeni ekranların envanteri
 
 E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler aynı hazır bileşen ve sayfa kabul kurallarını izler. İşlev sahipliği P/S/B paketlerinde kalır.
@@ -299,7 +319,7 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 
 <a id="e49"></a>
 
-### E49 · Merkezler ve Business sekmeleri (kapandı)
+### E49 · Merkezler ve Business sekmeleri
 
 `data-view="merkezler"` ve JS C1–C4. Merkezler rotası Business ve canlı yönetim kapsamıyla açılıyor. [Business kabulü](#business).
 
@@ -307,9 +327,11 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 - [x] **E49.2** · Organizasyon kişi dizini Abone No ve merkez bağlarını, kuruluş başvuru kuyruğu da sürümlü yönlendirmeyi gösteriyor. Hesaplaşma hareketi, ödeme veya mahsup talebi, B kararı, geri çekme, açık yetki ve ürün kullanım kapsamı native kaynaklara bağlı. [Merkezler arası native kabul](../../backend/tests/cross-center-settlement.test.mjs).
 - [x] **E49.3** · Birleşik rapor yetkili merkez kümesini, daralma bağlantısı mevcut Plan düzenleyicisini kullanıyor. Beş aktif merkez ve 1.250 tekil aktif öğrenci sınırı [native kapasite kabulüne](../../backend/tests/commercial-plan-acceptance.mjs) bağlı. B01–B06 yayımlı kabulü açık.
 
+- [ ] **E49.4** · Referanstaki merkez bazında satış, tahsilat ve borç kırılımı ile mutabakat özetini tamamla. Kişi dizininde olası kopya kartını ve mevcut birleştirme akışına geçişi doğrula. [Business raporu](../src/features/business/business-report.tsx).
+
 <a id="e50"></a>
 
-### E50 · Platform organizasyonları (kapandı)
+### E50 · Platform organizasyonları
 
 JS `o-organizasyonlar`, `#opshell/#op-root`. WF02/WF17. Hazır Sidebar, Card, Table, Sheet, Dialog ve AlertDialog.
 
@@ -317,6 +339,8 @@ JS `o-organizasyonlar`, `#opshell/#op-root`. WF02/WF17. Hazır Sidebar, Card, Ta
 - [x] **E50.2** · `/platform` canlı `account_get_v1(include_platform_scope:true)` sonucuyla açılır. Organizasyonlar yetkili cursor ile, ayrıntı ve sahip seçili kuruluş kimliğiyle okunur. Müşteri sahibi ve personel doğrudan rotada reddedildi. Platform izni geri alınınca kayıt görünmedi. Native API reddi ayrı kaynak testinde doğrulandı. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native yetki testi](../../backend/tests/starter-studio-acceptance.mjs#L389).
 - [x] **E50.3** · Gerekçeli ve açık onaylı askı/kaldırma seçili kuruluşun sürümüne bağlı. Belirsiz yanıt aynı anahtarla toparlandı. Web1 aynı kuruluşu, değişmeyen abonelik ve sahip bilgisiyle tekrar okudu. [Native komut](../../backend/database/platform-organization-suspension.sql#L33) kuruluşun askı bayrağını değiştirir. [Native denetim kaydı](../../backend/database/dispatch.sql#L619) işlem için yeni olay ekler. 3 platform ve 2 ilgili regresyon senaryosu tek Chromium işçisiyle geçti.
 - [x] **E50.4** · Stüdyo talebinden ve doğrulanmış e-postayla doğrudan kuruluş formu çalışıyor. `view:initial_plans` üzerinden seçilen sürüm gerçek komuta bağlanıyor; kuruluş ve sahibi yeniden okunuyor. [W1-BE-60](request.md#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) · [Yerel kabul](../e2e/auth-platform.spec.ts).
+
+- [ ] **E50.5** · Platform organizasyon ayrıntısında Faturalar bölümünü ekle. Yetkili operatör için numara, tarih, PDF/ZIP yükleme, sağlama özeti ve yayını WF17 işlemlerine bağla. Hazırlanmış ve yayımlanmış kayıtların platform okuması [W1-BE-63](request.md#w1-be-63--platform-organizasyon-ayrıntısında-fatura-dizini). [WF17](../../../docs/workflows.md#wf17).
 
 <a id="e51"></a>
 
@@ -339,11 +363,21 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 - [x] **E52.2** · Son uygun operatör korunuyor. Yetki kaybeden oturumun görünümü kaldırılıyor ve müşteri rolüne erişim açılmıyor. [Yerel kabul](../e2e/auth-platform.spec.ts) · [Native kabul](../../backend/tests/starter-studio-acceptance.mjs).
 - [ ] **E52.3** · Yayımlı platform kabulü. Kuruluş, ödeme ve operatör ekranları yerel Chromium senaryolarında doğrulandı. Dağıtım sonrası geçerli platform oturumuyla rotaları ve yetki sınırını doğrula.
 
+- [ ] **E52.4** · Platform bölümlerinde referanstaki oturum içi operatör işlem kaydını, sunucuda sonucu doğrulanmış işlemlerle göster.
+
+<a id="e53"></a>
+
+### E53 · Giriş sonrası stüdyo ve merkez seçimi
+
+`data-view="a-alan"` · v68. Hesap kabuğundaki mevcut workspace okumasını ve seçicileri kullan.
+
+- [ ] **E53.1** · Çok stüdyolu hesabın yetkili stüdyo, ardından gerekli olduğunda merkez seçimi adımlarını tamamla. Askıdaki stüdyo için erişim sınırını, erişimi olmayan hesap durumunu ve seçimin sonraki ekranda aynı merkezle açılmasını doğrula.
+
 <a id="on-tarama"></a>
 
 ## Tamamlanan ürün geneli kaynak taraması
 
-**İlk inceleme tarihi:** 13 Kasım 2026. Güncel fark incelemesi [18 Kasım uzlaştırmasındadır](#cizim-guncellemesi). **Repo tabanı:** `1249532c0abe8d340b268b3d5dff33a547fea9e5` (main, PR303). İncelenenler: özgün dört çizim dosyasının tamamı ve arşiv eşitliği; uygulama manifesti, router/form/UI/i18n/test/CI temeli; ürün F01–F33 matrisi; WF00–WF20; API haritası/makine sözleşmesi; istemci protokolü/ayarlar; backend'in güncel S18 devri. Bu kayıt kaynak ve tasarım eşlemesidir. Tarayıcıda bütün etkileşimlerin çalıştığı, tüm adayların kurulup uyumlu olduğu veya canlı ürün kabulünün tamamlandığı iddia edilmez.
+**İlk inceleme tarihi:** 13 Kasım 2026. Güncel fark incelemesi [çizim uzlaştırmasındadır](#cizim-guncellemesi). **Repo tabanı:** `1249532c0abe8d340b268b3d5dff33a547fea9e5` (main, PR303). İncelenenler: özgün dört çizim dosyasının tamamı ve arşiv eşitliği; uygulama manifesti, router/form/UI/i18n/test/CI temeli; ürün F01–F33 matrisi; WF00–WF20; API haritası/makine sözleşmesi; istemci protokolü/ayarlar; backend'in güncel S18 devri. Bu kayıt kaynak ve tasarım eşlemesidir. Tarayıcıda bütün etkileşimlerin çalıştığı, tüm adayların kurulup uyumlu olduğu veya canlı ürün kabulünün tamamlandığı iddia edilmez.
 
 ### Kaynakların neyi sağladığı
 

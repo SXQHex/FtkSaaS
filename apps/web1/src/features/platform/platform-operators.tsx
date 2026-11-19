@@ -6,14 +6,6 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Field, FieldError, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../../components/ui/table";
 import { Textarea } from "../../components/ui/textarea";
 import { PlatformActionReview } from "./platform-action-review";
 import { billingReason } from "./platform-payment";
@@ -115,6 +107,57 @@ export function PlatformOperators({
           <p role="status">{t(($) => $.platform.loading)}</p>
         ) : (
           <>
+            {rows.length ? (
+              <ul aria-label={title} className="divide-y rounded-lg border">
+                {rows.map((row, index) => {
+                  const target = row.account_id;
+                  const label =
+                    row.display_name ?? target ?? t(($) => $.platform.operators.unlinked);
+                  const removable =
+                    target &&
+                    rows.some((candidate) => candidate.account_id !== target && candidate.eligible);
+                  return (
+                    <li
+                      key={target ?? "unlinked-" + index}
+                      className="flex flex-wrap items-center justify-between gap-3 px-3 py-3"
+                    >
+                      <div className="min-w-0 space-y-1 wrap-anywhere">
+                        <p className="font-medium">{label}</p>
+                        <p className="text-sm text-muted-foreground">
+                          <time dateTime={row.granted_at}>
+                            {grantedAt.format(new Date(row.granted_at))}
+                          </time>
+                        </p>
+                      </div>
+                      <div className="flex max-w-full flex-wrap items-center gap-2">
+                        <Badge variant="outline">
+                          {t(($) =>
+                            row.eligible
+                              ? $.platform.operators.eligible
+                              : $.platform.operators.ineligible,
+                          )}
+                        </Badge>
+                        {target && removable ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            isDisabled={roster.isFetching}
+                            aria-label={t(($) => $.platform.operators.removeMember, { label })}
+                            onPress={() => prepare(target, false, label)}
+                          >
+                            {t(($) => $.platform.operators.remove)}
+                          </Button>
+                        ) : target ? (
+                          <span className="text-sm">{t(($) => $.platform.operators.last)}</span>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p>{t(($) => $.platform.operators.empty)}</p>
+            )}
             <Field className="max-w-xl">
               <FieldLabel htmlFor={id + "-reason"}>{t(($) => $.platform.reason)}</FieldLabel>
               <Textarea
@@ -136,68 +179,6 @@ export function PlatformOperators({
                 </FieldError>
               )}
             </Field>
-            <Table aria-label={title} scrollRegionLabel={title} className="min-w-[36rem]">
-              <TableHeader>
-                <TableHead isRowHeader>{t(($) => $.platform.operators.member)}</TableHead>
-                <TableHead>{t(($) => $.platform.operators.state)}</TableHead>
-                <TableHead>{t(($) => $.platform.operators.grantedAt)}</TableHead>
-                <TableHead>{t(($) => $.platform.operators.actions)}</TableHead>
-              </TableHeader>
-              <TableBody
-                items={rows.map((row, index) => ({
-                  ...row,
-                  key: row.account_id ?? "unlinked-" + index,
-                }))}
-              >
-                {(row) => {
-                  const label =
-                    row.display_name ?? row.account_id ?? t(($) => $.platform.operators.unlinked);
-                  const removable =
-                    row.account_id &&
-                    rows.some(
-                      (candidate) => candidate.account_id !== row.account_id && candidate.eligible,
-                    );
-                  return (
-                    <TableRow id={row.key}>
-                      <TableCell className="max-w-56 whitespace-normal wrap-anywhere">
-                        {label}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {t(($) =>
-                            row.eligible
-                              ? $.platform.operators.eligible
-                              : $.platform.operators.ineligible,
-                          )}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <time dateTime={row.granted_at}>
-                          {grantedAt.format(new Date(row.granted_at))}
-                        </time>
-                      </TableCell>
-                      <TableCell>
-                        {row.account_id && removable ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            isDisabled={roster.isFetching}
-                            aria-label={t(($) => $.platform.operators.removeMember, { label })}
-                            onPress={() => prepare(row.account_id!, false, label)}
-                          >
-                            {t(($) => $.platform.operators.remove)}
-                          </Button>
-                        ) : row.account_id ? (
-                          t(($) => $.platform.operators.last)
-                        ) : (
-                          t(($) => $.platform.operators.unlinked)
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                }}
-              </TableBody>
-            </Table>
             <form
               method="post"
               noValidate

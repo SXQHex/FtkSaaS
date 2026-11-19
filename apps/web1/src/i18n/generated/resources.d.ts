@@ -3180,6 +3180,7 @@ export default interface Resources {
       "accountMissing": "Bu adrese bağlı uygun doğrulanmış hesap bulunamadı.",
       "billing": {
         "accept": "Ödemeyi onayla",
+        "actions": "Eylem",
         "allOrganizations": "Tüm organizasyonların ödemeleri",
         "allStates": "Tüm durumlar",
         "amount": "Tutar",
@@ -3203,6 +3204,8 @@ export default interface Resources {
         "quotePeriod": "Teklif dönemi",
         "reference": "Ödeme referansı",
         "reject": "Ödemeyi reddet",
+        "review": "İncele",
+        "reviewPayment": "{{reference}} ödemesini incele",
         "sourceChanged": "Güncel kaynak doğrulanamadı. İşleme devam etmek için kaydı yeniden oku.",
         "state": "Ödeme durumu",
         "states": {
@@ -3239,19 +3242,17 @@ export default interface Resources {
       "noOwner": "Sahip kaydı yok",
       "noSubscription": "Abonelik kaydı yok",
       "operators": {
-        "actions": "Eylemler",
         "add": "Platform sahibi ekle",
         "already": "Bu hesap zaten platform operatörü.",
         "eligible": "Hesap uygun",
+        "empty": "Görüntülenecek platform operatörü yok.",
         "grantEffect": "Hesap platform konsolunun yönetim yetkilerini kazanacak.",
-        "grantedAt": "Yetki tarihi (Türkiye saati)",
         "ineligible": "Hesap uygun değil",
         "last": "Son uygun operatör korunuyor",
         "member": "Platform operatörü",
         "remove": "Yetkiyi kaldır",
         "removeMember": "{{label}} için yetkiyi kaldır",
         "revokeEffect": "Hesabın açık oturumları sonraki platform işlemlerinde yetki kontrolünden geçemeyecek.",
-        "state": "Hesap durumu",
         "title": "Platform sahipleri",
         "unlinked": "Hesap eşleşmesi yok"
       },

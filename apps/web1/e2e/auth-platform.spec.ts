@@ -126,6 +126,8 @@ async function platformFixture(
           : list([{ ...initial, id: uid(211), name: "İlk sayfa organizasyonu" }], "next-org"),
       );
     }
+    if (operation === "studio_setup_list_v1" && request.platform_queue && permitted)
+      return send(list([]));
     if (operation === "management_state_get_v1" && request.operation === "saas_grace_extend_v1") {
       const entity = { type: "saas_subscriptions", id: uid(238) };
       return send(
