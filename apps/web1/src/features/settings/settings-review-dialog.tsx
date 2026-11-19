@@ -33,7 +33,7 @@ export function SettingsReviewDialog({
   open: boolean;
   title: string;
   description: string;
-  rows: { id: string; title: string; detail: string }[] | null;
+  rows: { id: string; title: string; detail: ReactNode }[] | null;
   blockers?: { id: string; text: string }[];
   accepted: boolean;
   locked?: boolean;

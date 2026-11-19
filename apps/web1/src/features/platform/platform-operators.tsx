@@ -275,7 +275,19 @@ export function PlatformOperators({
               : $.platform.operators.revokeEffect,
           )}
           rows={[
-            { id: "target", title: t(($) => $.platform.operators.member), detail: review.label },
+            {
+              id: "target",
+              title: review.intent.enabled
+                ? t(($) => $.platform.verifiedEmail)
+                : t(($) => $.platform.operators.member),
+              detail: review.intent.enabled ? (
+                <strong dir="ltr" className="wrap-anywhere font-semibold text-foreground">
+                  {review.label}
+                </strong>
+              ) : (
+                review.label
+              ),
+            },
             { id: "reason", title: t(($) => $.platform.reason), detail: review.intent.reason },
           ]}
           beforeWrite={confirmOperator}

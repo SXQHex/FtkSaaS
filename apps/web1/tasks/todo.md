@@ -107,35 +107,38 @@ Her E*.6 kaydı, geçerli ölçütlerde klavye ve tuzaksız kullanım/odak sıra
 
 ### Güncel görsel kaynak
 
-Aktif çizim kaynağı yerelde [`apps/web1/read-only/`](../read-only/) altındadır. Karşılaştırmayı [HTML](../read-only/tasarim-v2/index.html), [CSS](../read-only/tasarim-v2/app.css), [JS](../read-only/tasarim-v2/app.js) ve [tokenlardan](../read-only/tasarim-v2/tokens.css) yap. [Geçiş notu](../read-only/GECIS.md) ve [çizim günlüğü](../read-only/ILERLEME.md) görsel bağlam verir. Güncel yerel paket **v69**. Yerel çizimler uygulama bundle’ına girmez.
+Aktif çizim kaynağı yerelde [`apps/web1/read-only/`](../read-only/) altındadır. Karşılaştırmayı [HTML](../read-only/tasarim-v2/index.html), [CSS](../read-only/tasarim-v2/app.css), [JS](../read-only/tasarim-v2/app.js) ve [tokenlardan](../read-only/tasarim-v2/tokens.css) yap. [Geçiş notu](../read-only/GECIS.md) ve [çizim günlüğü](../read-only/ILERLEME.md) görsel bağlam verir. Güncel yerel paket **v70**. Yerel çizimler uygulama bundle’ına girmez.
 
-13 Kasım’daki özgün çizimlerle alınmış E/P kanıtları o sürüme aittir. v67 farkları V01–V08 ve E47–E52 altında takip edilir. v68–v69 ekleri [aşağıdaki eşlemede](#v68-ve-v69-farklarının-durumu) yer alır.
+13 Kasım’daki özgün çizimlerle alınmış E/P kanıtları o sürüme aittir. v67 farkları V01–V08 ve E47–E52 altında takip edilir. v68–v70 ekleri [aşağıdaki eşlemede](#v68-v70-farklarının-durumu) yer alır.
 
-Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) karşılaştırma kanıtını yeniden üretmek için saklanır. Güncel v69 paketinde HTML, JS ve üç not v67 arşivinden farklı. CSS ve token dosyaları aynı. Aşağıdaki parmak izleri güncel yerel pakete aittir. Yerel önizleme için Web1 dizininden `python3 -m http.server 4184 --bind 127.0.0.1 --directory read-only/tasarim-v2` çalıştır.
+Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) karşılaştırma kanıtını yeniden üretmek için saklanır. v69’a göre v70’te `app.js` ve üç paket belgesi değişti. HTML, CSS ve token dosyalarının parmak izleri v69 ile aynı. Aşağıdaki parmak izleri yerel v70 paketine aittir. Yerel önizleme için Web1 dizininden `python3 -m http.server 4184 --bind 127.0.0.1 --directory read-only/tasarim-v2` çalıştır.
 
 | Dosya         | SHA-256                                                            |
 | ------------- | ------------------------------------------------------------------ |
-| `GECIS.md`    | `535e92e308ad0c1cd473ec3d6bdb35c6dd31de9a2e13f1fc3433c886ea876237` |
-| `ILERLEME.md` | `9a2f40293494b20e139a54b626073dab70df4a01e62c47b2b9befcc5d1e8d5ae` |
-| `README.md`   | `bbc0d6d1405701e2c44e22ddac47caec831290e9dbf7c090297da5660e5295ea` |
+| `GECIS.md`    | `948499e0513520d8605b50532ea3121e264a5f22ae3ad24aafc8a5f9025a871a` |
+| `ILERLEME.md` | `bfea33ec32d7f2254e8db0d87c9c3007b2050d4a24f659583026f42156ead4bc` |
+| `README.md`   | `4085b1ae0fb286d8d91e6125906239539c3ada2e4028d48e7da279c96534535d` |
 | `app.css`     | `eb7581bec396d62d9cd182fb28e28edbbae4098039c4ede273ff7628bcb2199a` |
-| `app.js`      | `7641ef37a390f4a0fedd27d9ba4e0e65b550ed91f8d36e4018816700d34bcc90` |
+| `app.js`      | `171763a26c13a210adc93768a3be2ac39de091cbaa4281e8e75bd52d3510b500` |
 | `index.html`  | `f5aa3e1670b0d49eb7ba38730db09e71feb3d9a19f6a031e949337d1b127e7d4` |
 | `tokens.css`  | `197742a8736bd7cb9ea3d7a3b99fa402e03cd321dd8593a76e259eef06c2d1b0` |
 
-v67 HTML'sinde **50** `data-view` vardı. v69'da giriş sonrası `a-alan` ile sayı **51** oldu. Önizleme şablonu `taslak` dışarıda tutulduğunda 50 HTML görünümü var. Eski 46 ekranın kimlikleri korunuyor; `a-kurulum`, `m-bildirim` ve `merkezler` eklenmiş. Platform operatörünün üç mantıksal görünümü `#opshell/#op-root` içine JS ile çiziliyor, `data-view` sayısına dahil değil. Platformun üç JS görünümüyle takip envanteri E01–E53 oldu. Business kişi/başvuru/hesaplaşma ve organizasyon raporu bazı mevcut sayfalardaki sekme/çekmecelerle sunuluyor; yalnız HTML bölüm sayısını esas alarak bunları atlama.
+v67 HTML'sinde **50** `data-view` vardı. v69’da giriş sonrası `a-alan` ile sayı **51** oldu. v70 aynı 51 görünümü korur. Önizleme şablonu `taslak` dışarıda tutulduğunda 50 HTML görünümü var. Eski 46 ekranın kimlikleri korunuyor; `a-kurulum`, `m-bildirim` ve `merkezler` eklenmiş. Platform operatörünün üç mantıksal görünümü `#opshell/#op-root` içine JS ile çiziliyor, `data-view` sayısına dahil değil. Platformun üç JS görünümüyle takip envanteri E01–E53 oldu. Business kişi/başvuru/hesaplaşma ve organizasyon raporu bazı mevcut sayfalardaki sekme/çekmecelerle sunuluyor; yalnız HTML bölüm sayısını esas alarak bunları atlama.
 
-### v68 ve v69 farklarının durumu
+### v68-v70 farklarının durumu
 
-| Sürüm | Çizime eklenen                                                      | Web1 karşılığı                                                                                                                                                                                                     |
-| ----- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| v68   | Giriş sonrası stüdyo ve merkez seçimi, erişimi olmayan hesap durumu | Mevcut hesap kabuğunda stüdyo ve merkez seçilebiliyor. Girişteki stüdyo ve merkez adımları [E53](#e53) kapsamında doğrulandı.                                                                                      |
-| v68   | Belgelerde Dijital metin, İçerik kataloğu ve Etkinlik kaydı         | Etkinlik kaydı gereksinimi belge formunda, önizleme bağlamı katılımcı ekleme akışında, dijital metin okuma ve kabul üye panelinde mevcut. Yönetici dijital metin yayımlayabiliyor. İçerik kataloğu [V09.1](#v09).  |
-| v68   | Eğitmen anlaşma metni ve kabul durumu                               | Eğitmen Hakedişim'de metni inceleyip kabul edebiliyor. Yönetici Hakediş satırında sürümlü kabul durumu istek üzerine gösteriliyor. [V09.2](#v09).                                                                  |
-| v68   | Üye bildiriminde e-posta teslim durumu                              | [Bildirim ayrıntısında](../src/features/inbox/inbox-content.tsx) native e-posta işi ve sağlandığında teslim durumu gösteriliyor.                                                                                   |
-| v69   | Platform organizasyon ayrıntısında fatura yükleme ve yayınlama      | Platform yükleme, yayınlama ve sayfalı fatura geçmişi [E50.5](#e50) kapsamında mevcut. Plan'da yayımlanan faturaları listeleme ve ZIP/PDF indirme [mevcut](../src/features/settings/settings-invoice-history.tsx). |
-| v69   | Gelen kutusunda yoklama düzeltme kararı                             | Kapalı yoklamayı ilgili Merkez yöneticisi seans ayrıntısından düzeltir. [V09.3](#v09).                                                                                                                             |
-| v69   | Kurulum kuyruğundan organizasyon oluşturma                          | [E50.4](#e50) mevcut. Kuyruk organizasyon listesinin üstünde, seçilen talepten oluşturma formu açılıyor.                                                                                                           |
+| Sürüm | Çizime eklenen                                                                                                          | Web1 karşılığı                                                                                                                                                                                                                   |
+| ----- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v68   | Giriş sonrası stüdyo ve merkez seçimi, erişimi olmayan hesap durumu                                                     | Mevcut hesap kabuğunda stüdyo ve merkez seçilebiliyor. Girişteki stüdyo ve merkez adımları [E53](#e53) kapsamında doğrulandı.                                                                                                    |
+| v68   | Belgelerde Dijital metin, İçerik kataloğu ve Etkinlik kaydı                                                             | Etkinlik kaydı gereksinimi belge formunda, önizleme bağlamı katılımcı ekleme akışında, dijital metin okuma ve kabul üye panelinde mevcut. Yönetici dijital metin yayımlayabiliyor. İçerik kataloğu [V09.1](#v09).                |
+| v68   | Eğitmen anlaşma metni ve kabul durumu                                                                                   | Eğitmen Hakedişim'de metni inceleyip kabul edebiliyor. Yönetici Hakediş satırında sürümlü kabul durumu istek üzerine gösteriliyor. [V09.2](#v09).                                                                                |
+| v68   | Üye bildiriminde e-posta teslim durumu                                                                                  | [Bildirim ayrıntısında](../src/features/inbox/inbox-content.tsx) native e-posta işi ve sağlandığında teslim durumu gösteriliyor.                                                                                                 |
+| v69   | Platform organizasyon ayrıntısında fatura yükleme ve yayınlama                                                          | Platform yükleme, yayınlama ve sayfalı fatura geçmişi [E50.5](#e50) kapsamında mevcut. Plan'da yayımlanan faturaları listeleme ve ZIP/PDF indirme [mevcut](../src/features/settings/settings-invoice-history.tsx).               |
+| v69   | Gelen kutusunda yoklama düzeltme kararı                                                                                 | Kapalı yoklamayı ilgili Merkez yöneticisi seans ayrıntısından düzeltir. [V09.3](#v09).                                                                                                                                           |
+| v69   | Kurulum kuyruğundan organizasyon oluşturma                                                                              | [E50.4](#e50) mevcut. Kuyruk organizasyon listesinin üstünde, seçilen talepten oluşturma formu açılıyor.                                                                                                                         |
+| v70   | Platform sahipleri ekranında doğrulanmış hesap seçimi, ekleme/kaldırma gerekçesi ve gerekçenin işlem kaydında görünmesi | [E52](#e52) doğrulanmış hesabı tam e-posta eşleşmesiyle bulur. Ekleme ve kaldırma gerekçesi inceleme ekranında gösterilir ve native komutla denetime yazılır. E52.4 kapsamındaki operatör işlem listesi işlem sonucunu gösterir. |
+
+v70’in hesap açılır listesi sentetik doğrulanmış hesapları gösterir. [WF17](../../../docs/workflows.md#wf17) yalnız tam e-postayla tek hesap keşfini tanımlar. Web1 ekleme onayında doğrulanmış hesabın tam e-postasını belirgin gösterir. Çizim, tam gerekçeyi operatör işlem listesinde gösterir. [E52.4 kapsamındaki Web1 listesi](#e52) doğrulanmış işlem adını, zamanını ve varsa hedef kaydın görünen adını gösterir.
 
 ### Uygulama ve kabul durumu
 

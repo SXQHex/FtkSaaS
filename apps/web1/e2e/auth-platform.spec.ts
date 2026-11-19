@@ -759,6 +759,8 @@ test("platform operator protects the last eligible member, verifies an addition 
 }, testInfo) => {
   const authority = await platformFixture(page, "platform");
   const other = uid(250);
+  const operatorEmail =
+    "verified.platform.operator.for.access.review@team.operations.example.invalid";
   type Operator = {
     kind: "operator";
     account_id: string;
@@ -785,7 +787,7 @@ test("platform operator protects the last eligible member, verifies an addition 
       return list(roster);
     if (operation === "platform_directory_get_v1" && request.view === "verified_accounts") {
       lookupCount++;
-      expect(request.account_email).toBe("operator@example.invalid");
+      expect(request.account_email).toBe(operatorEmail);
       return list([{ kind: "verified_account", account_id: other }]);
     }
     if (operation === "platform_operator_access_set_v1") {
@@ -808,22 +810,29 @@ test("platform operator protects the last eligible member, verifies an addition 
   await page.goto("/platform?section=operators");
   await expect(page.getByText(text.operators.last, { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /için yetkiyi kaldır/ })).toHaveCount(0);
-  await page.getByLabel(text.verifiedEmail, { exact: true }).fill("operator@example.invalid");
+  await page.getByLabel(text.verifiedEmail, { exact: true }).fill(operatorEmail);
   await page.getByRole("button", { name: text.findAccount, exact: true }).click();
   await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
   const reason = page.getByLabel(text.reason, { exact: true });
   await reason.fill("Açık yetki verme gerekçesi");
+  const viewport = page.viewportSize()!;
+  await page.setViewportSize({ width: 320, height: viewport.height });
   await page.getByRole("button", { name: text.operators.add, exact: true }).click();
+  const review = page.getByRole("dialog", { name: text.operators.add, exact: true });
+  const accountRow = review.getByRole("listitem").filter({ hasText: text.verifiedEmail });
+  await expect(accountRow.locator("strong")).toHaveText(operatorEmail);
+  await expect(accountRow).toBeVisible();
+  expect(await review.evaluate((dialog) => dialog.scrollWidth <= dialog.clientWidth)).toBe(true);
+  expect(writes).toHaveLength(0);
   const grant = await applyBillingReview(page, text.operators.add);
   await expect(grant.getByRole("status")).toHaveText(common.events.commandStates.saved);
   await grant.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await page.setViewportSize(viewport);
   await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toContainText(
     activity.actions.operatorAdded,
   );
-  await expect(activityLog(page).getByRole("listitem")).not.toContainText(
-    "operator@example.invalid",
-  );
+  await expect(activityLog(page).getByRole("listitem")).not.toContainText(operatorEmail);
   await testInfo.attach("E52 Platform sahipleri", {
     body: await page.screenshot({ fullPage: true }),
     contentType: "image/png",
