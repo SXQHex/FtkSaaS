@@ -119,7 +119,7 @@ test("native attendance uses reservation versions then closes and corrects throu
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
-  const state = await mockSessionDetail(page, { existing: true });
+  const state = await mockSessionDetail(page, { existing: true, centerManager: true });
   await page.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
   let dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Seans şimdi başladı");

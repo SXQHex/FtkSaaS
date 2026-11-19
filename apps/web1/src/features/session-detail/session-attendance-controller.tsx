@@ -22,7 +22,6 @@ import {
   hasUnmarkedAttendance,
   previewAttendanceCorrection,
   attendanceCorrectionIntent,
-  attendanceCorrectionRequestIntent,
   attendanceWindowState,
   writeSessionAttendance,
   readSessionAttendanceReceipt,
@@ -36,8 +35,7 @@ import { Button } from "../../components/ui/button";
 export function SessionAttendanceController({
   scope,
   audience = "management",
-  instructorId,
-  canReviewRequests = false,
+  canCorrectAttendance = false,
   startTime,
   session,
   attendance,
@@ -53,8 +51,7 @@ export function SessionAttendanceController({
 }: {
   scope: ClientScope;
   audience?: "management" | "instructor";
-  instructorId?: string;
-  canReviewRequests?: boolean;
+  canCorrectAttendance?: boolean;
   startTime?: string;
   session: SessionView;
   attendance?: AttendanceView;
@@ -116,7 +113,7 @@ export function SessionAttendanceController({
       }
     },
     readReceipt: readSessionAttendanceReceipt,
-    readResult: (intent, id) => readSessionAttendanceResult(intent, audience === "management", id),
+    readResult: (intent) => readSessionAttendanceResult(intent, audience === "management"),
     onAccessLost,
     onRefresh: async (result) => {
       setRightsUnavailable(result.rightsUnavailable);
@@ -225,7 +222,15 @@ export function SessionAttendanceController({
       ];
     }) ?? [];
   async function preview() {
-    if (!attendance || locked || disabled || !reason.trim() || !corrections.length) return;
+    if (
+      !canCorrectAttendance ||
+      !attendance ||
+      locked ||
+      disabled ||
+      !reason.trim() ||
+      !corrections.length
+    )
+      return;
     reset();
     setBusy(true);
     setReview(undefined);
@@ -253,16 +258,6 @@ export function SessionAttendanceController({
     timeStyle: "short",
     timeZone: timezone,
   });
-  const canSubmitRequest =
-    instructorId &&
-    attendance?.closure_state === "closed" &&
-    attendance.revision > 0 &&
-    session.assignments.some(
-      (row) => row.person_id === instructorId && row.duty === "instructor",
-    ) &&
-    !attendance.correction_requests?.some(
-      (row) => row.instructor_id === instructorId && row.closure_revision === attendance.revision,
-    );
   const panel = (
     <SessionAttendance
       rows={
@@ -337,7 +332,7 @@ export function SessionAttendanceController({
           : undefined
       }
       onEdit={
-        attendance && audience === "management"
+        attendance && canCorrectAttendance
           ? () => {
               reset();
               setResults({});
@@ -355,7 +350,7 @@ export function SessionAttendanceController({
         }
       }}
       onPreview={
-        corrections.length
+        canCorrectAttendance && corrections.length
           ? () => {
               void preview();
             }
@@ -407,31 +402,6 @@ export function SessionAttendanceController({
             revision={attendance.revision}
             requests={attendance.correction_requests}
             instructors={instructors}
-            locked={locked || disabled || command.unavailable}
-            onSubmit={
-              canSubmitRequest
-                ? (reason) =>
-                    void run(() =>
-                      attendanceCorrectionRequestIntent(scope, session, attendance, {
-                        kind: "submit",
-                        instructorId,
-                        reason,
-                      }),
-                    )
-                : undefined
-            }
-            onReview={
-              canReviewRequests
-                ? (request, decision) =>
-                    void run(() =>
-                      attendanceCorrectionRequestIntent(scope, session, attendance, {
-                        kind: "review",
-                        request,
-                        decision,
-                      }),
-                    )
-                : undefined
-            }
           />
         )
       }
@@ -548,31 +518,25 @@ export function SessionAttendanceController({
           notice={notice}
           recovery={recovery}
         />
-        {review && (
+        {review && canCorrectAttendance && (
           <SettingsReviewDialog
             open
             title={t(($) => $.sessionDetail.previewCorrection)}
             description={review.reason}
-            rows={review.preview.effects
-              .filter(
-                (effect) =>
-                  audience === "management" ||
-                  ["sessions", "reservations"].includes(effect.entity.type),
-              )
-              .map((effect, i) => ({
-                id: `${effect.entity.type}:${effect.entity.id}:${i}`,
-                title: t(($) => $.sessionDetail.effectActions[effect.action]),
-                detail:
-                  [
-                    effect.quantity != null ? String(effect.quantity) : null,
-                    audience === "management" && effect.amount_minor != null && effect.currency
-                      ? formatMinorAmount(effect.amount_minor, effect.currency)
-                      : null,
-                    audience === "management" ? effect.reason : null,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ") || t(($) => $.memberProfile.nativeEffectsHint),
-              }))}
+            rows={review.preview.effects.map((effect, i) => ({
+              id: `${effect.entity.type}:${effect.entity.id}:${i}`,
+              title: t(($) => $.sessionDetail.effectActions[effect.action]),
+              detail:
+                [
+                  effect.quantity != null ? String(effect.quantity) : null,
+                  effect.amount_minor != null && effect.currency
+                    ? formatMinorAmount(effect.amount_minor, effect.currency)
+                    : null,
+                  effect.reason,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || t(($) => $.memberProfile.nativeEffectsHint),
+            }))}
             blockers={review.preview.blockers.map((blocker, i) => ({
               id: String(i),
               text: scheduleBackendError(blocker.code, t),

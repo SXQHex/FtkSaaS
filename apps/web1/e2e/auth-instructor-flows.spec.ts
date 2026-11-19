@@ -75,15 +75,15 @@ test("Starter instructor opens an assigned lesson from the daily panel after rol
   await expect(page.getByRole("link", { name: "Stüdyo", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
 });
-test("one lesson keeps instructor requests, manager decisions and student attendance separate", async ({
+test("a closed lesson allows only its center manager to correct the native attendance", async ({
   page,
 }) => {
+  test.setTimeout(60_000);
   await page.setViewportSize({ width: 320, height: 950 });
   const now = Date.now();
   const state = await mockSessionDetail(page, {
     existing: true,
     instructor: true,
-    correctionRequestUnknown: true,
     attendanceWindow: {
       policy_id: S.preview,
       opens_at: new Date(now - 40 * 60000).toISOString(),
@@ -140,25 +140,8 @@ test("one lesson keeps instructor requests, manager decisions and student attend
   const closedRevision = state.attendance.revision;
   const sessionVersion = state.session.version;
   await expect(page.getByRole("button", { name: "Yoklamayı düzenle", exact: true })).toHaveCount(0);
-  const requestForm = page.getByRole("form", { name: "Yoklama düzeltme talepleri" });
-  const sendRequest = requestForm.getByRole("button", { name: "Düzeltme talebi gönder" });
-  const reason = requestForm.getByLabel("Talep gerekçesi (zorunlu)");
-  await reason.fill("   ");
-  await sendRequest.click();
-  await expect(reason).toBeFocused();
-  await expect(reason).toHaveAccessibleDescription("Talep gerekçesini yazın.");
-  expect(state.writes).toHaveLength(4);
-  await reason.fill("  Sentetik yoklama düzeltmesi  ");
-  await sendRequest.click();
-  await page.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
-  await expect(page.getByText(/İnceleme bekliyor/)).toBeVisible();
-  await expect(sendRequest).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Talebi kabul et", exact: true })).toHaveCount(0);
-  expect(state.writes.at(-1)?.request).toMatchObject({
-    session_id: S.session,
-    closure_revision: closedRevision,
-    reason: "Sentetik yoklama düzeltmesi",
-  });
+  await expect(page.getByRole("button", { name: "Düzeltme talebi gönder" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Talebi kabul et" })).toHaveCount(0);
   expect(state.attendance.entries[0]!.result).toBe("attended");
   expect(
     state.reads.filter((op) =>
@@ -170,7 +153,6 @@ test("one lesson keeps instructor requests, manager decisions and student attend
     "attendance_mark_v1",
     "attendance_mark_v1",
     "attendance_close_v1",
-    "attendance_correction_request_v1",
   ]);
   const source = {
     session: state.session,
@@ -178,6 +160,18 @@ test("one lesson keeps instructor requests, manager decisions and student attend
     reservation: state.reservation!,
   };
   const browser = page.context().browser()!;
+  const owner = await browser.newPage();
+  try {
+    const ownerState = await mockSessionDetail(owner, { existing: true, source });
+    await owner.getByRole("tab", { name: "Yoklama", exact: true }).click();
+    await expect(owner.getByRole("combobox", { name: "Yoklama — Örnek öğrenci" })).toHaveValue(
+      "attended",
+    );
+    await expect(owner.getByRole("button", { name: "Yoklamayı düzenle" })).toHaveCount(0);
+    expect(ownerState.writes).toHaveLength(0);
+  } finally {
+    await owner.close();
+  }
   const manager = await browser.newPage();
   try {
     const management = await mockSessionDetail(manager, {
@@ -194,26 +188,37 @@ test("one lesson keeps instructor requests, manager decisions and student attend
     await expect(
       panel.getByRole("button", { name: "Yoklamayı düzenle", exact: true }),
     ).toBeEnabled();
-    const accept = panel.getByRole("button", { name: "Talebi kabul et", exact: true });
-    await accept.click();
-    await expect(panel.getByText(/Talep kabul edildi/)).toBeVisible();
-    await expect(accept).toHaveCount(0);
+    await expect(panel.getByRole("button", { name: /Talebi (kabul et|reddet)/ })).toHaveCount(0);
+    await panel.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
+    await panel.getByRole("combobox", { name: "Yoklama — Örnek öğrenci" }).selectOption("no_show");
+    await panel
+      .getByLabel("Düzeltme gerekçesi", { exact: true })
+      .fill("Sentetik yoklama düzeltmesi");
+    await panel.getByRole("button", { name: "Düzeltmeyi incele", exact: true }).click();
+    const review = manager.getByRole("dialog");
+    await expect(review.getByText("Serbest bırakma", { exact: true })).toBeVisible();
+    expect(management.writes).toHaveLength(0);
+    await review.getByRole("checkbox").press("Space");
+    await review.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
+    await expect(review.getByText(saved, { exact: true })).toBeVisible();
     expect(management.writes).toEqual([
       {
-        operation: "attendance_correction_request_v1",
+        operation: "attendance_correct_apply_v1",
         request: expect.objectContaining({
-          session_id: S.session,
-          correction_request_id: S.correctionRequest,
-          expected_version: 1,
-          decision: "accepted",
+          org_id: I.org,
+          center_id: I.center,
+          preview: { id: S.preview, token: "synthetic-attendance-preview" },
         }),
       },
     ]);
-    expect(source.attendance.entries[0]!.result).toBe("attended");
-    expect(source.attendance.revision).toBe(closedRevision);
-    expect(source.session.version).toBe(sessionVersion);
+    expect(source.attendance.entries[0]!.result).toBe("no_show");
+    expect(source.attendance.revision).toBe(closedRevision + 1);
+    expect(source.session.version).toBeGreaterThan(sessionVersion);
     await page.reload();
-    await expect(page.getByText(/Talep kabul edildi/)).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "Yoklama — Örnek öğrenci" })).toHaveValue(
+      "no_show",
+    );
+    await expect(page.getByRole("button", { name: "Düzeltme talebi gönder" })).toHaveCount(0);
   } finally {
     await manager.close();
   }
@@ -225,7 +230,7 @@ test("one lesson keeps instructor requests, manager decisions and student attend
       has: member.getByRole("gridcell", { name: "Sentetik seans", exact: true }),
     });
     await expect(
-      lesson.getByRole("gridcell", { name: "Tamamlandı · Geldi", exact: true }),
+      lesson.getByRole("gridcell", { name: "Tamamlandı · Gelmedi", exact: true }),
     ).toBeVisible();
     await expect(
       member.getByRole("button", { name: /Yoklamayı (başlat|kapat|düzenle)/ }),

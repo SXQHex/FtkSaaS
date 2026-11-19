@@ -242,9 +242,10 @@ export function SessionDetailContent({
       {(waitlistUi) => (
         <SessionAttendanceController
           scope={scope}
-          canReviewRequests={workspaceRoles(workspace.data, scope.centerId).includes(
-            "center_manager",
-          )}
+          canCorrectAttendance={
+            !workspace.isError &&
+            workspaceRoles(workspace.data, scope.centerId).includes("center_manager")
+          }
           session={native}
           attendance={currentAttendance}
           names={

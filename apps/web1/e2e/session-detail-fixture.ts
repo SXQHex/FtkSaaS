@@ -13,7 +13,6 @@ export const sessionIds = {
   sale: "019a7b00-0000-7000-8000-000000000086",
   reservation: "019a7b00-0000-7000-8000-000000000087",
   preview: "019a7b00-0000-7000-8000-000000000090",
-  correctionRequest: "019a7b00-0000-7000-8000-000000000091",
 };
 export async function mockSessionDetail(
   page: Page,
@@ -30,7 +29,6 @@ export async function mockSessionDetail(
     starterRoleGate?: boolean;
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
-    correctionRequestUnknown?: boolean;
     attendanceWindow?: AttendanceView["attendance_window"];
     centerManager?: boolean;
     now?: Date;
@@ -426,42 +424,8 @@ export async function mockSessionDetail(
         return route.abort("failed");
       return send({ primary_id: id, changed: [], jobs: [] });
     }
-    if (operation === "attendance_correction_request_v1") {
-      writes.push({ operation, request: req });
-      expect(req.session_id).toBe(S.session);
-      expect(attendance.closure_state).toBe("closed");
-      if (req.correction_request_id) {
-        const row = attendance.correction_requests?.find(
-          (item) => item.id === req.correction_request_id,
-        );
-        if (!options.centerManager || !row) return reject("FORBIDDEN");
-        if (row.version !== req.expected_version || row.closure_revision !== attendance.revision)
-          return reject("VERSION_CONFLICT");
-        expect(row.state).toBe("pending");
-        row.state = req.decision;
-        row.version++;
-        row.reviewed_at = new Date().toISOString();
-      } else {
-        if (!options.instructor) return reject("FORBIDDEN");
-        expect(req.closure_revision).toBe(attendance.revision);
-        expect(attendance.correction_requests).toEqual([]);
-        attendance.correction_requests = [
-          {
-            id: S.correctionRequest,
-            instructor_id: I.instructor,
-            closure_revision: req.closure_revision,
-            reason: req.reason,
-            state: "pending",
-            version: 1,
-            created_at: new Date().toISOString(),
-            reviewed_at: null,
-          },
-        ];
-      }
-      receipts.set(req.operation_key, { operation, type: "sessions", id: S.session });
-      if (options.correctionRequestUnknown) return route.abort("failed");
-      return send({ primary_id: S.correctionRequest, changed: [], jobs: [] });
-    }
+    if (operation === "attendance_correction_request_v1")
+      throw Error("Web1 must not write attendance correction requests");
     if (operation === "attendance_correct_preview_v1") {
       expect(req.reason).toBe("Sentetik yoklama düzeltmesi");
       expect(req.corrections).toEqual([{ reservation_id: S.reservation, result: "no_show" }]);

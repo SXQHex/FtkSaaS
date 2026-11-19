@@ -70,7 +70,7 @@ Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında,
 | W1-BE-61 | E51.4 · WF13/WF17 | Platform ödeme dönemi ve ek süre uygunluğu | [Karşılandı](#w1-be-61--platform-ödeme-dönemi-ve-ek-süre-uygunluğu). |
 | W1-BE-62 | E52 · WF17 | Platform operatörü dizini ve yetki yönetimi | [Karşılandı](#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi). |
 | W1-BE-63 | E50.5 · WF17 | Seçili organizasyonun platform faturalarını okuma | [Açık](#w1-be-63--platform-organizasyon-ayrıntısında-fatura-dizini). |
-| W1-BE-64 | V09.3 · WF07/WF11 | Gelen kutusunda yoklama düzeltme hedefi ve karar akışı | [Açık](#w1-be-64--gelen-kutusunda-yoklama-düzeltme-keşfi-ve-kararı). |
+| W1-BE-64 | V09.3 · WF07/WF11 | Gelen kutusunda yoklama düzeltme hedefi ve karar akışı | [Geri çekildi](#w1-be-64--gelen-kutusunda-yoklama-düzeltme-keşfi-ve-kararı). |
 
 ## Bütün talepler için ortak sınır
 
@@ -525,8 +525,4 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 
 ## W1-BE-64 · Gelen kutusunda yoklama düzeltme keşfi ve kararı
 
-**Açık · Web1 talebi.** [WF07](../../../docs/workflows.md#wf07) kapsamında talep ve karar seans ayrıntısında çalışıyor. `attendance_get_v1` önce seans kimliği gerektiriyor; [WF11](../../../docs/workflows.md#wf11) Gelen kutusu okumasında bu talepler için yetkili seans ve talep hedefi bulunmuyor.
-
-[V09.3](todo.md#v09) için yetkili yönetici, kendi merkezindeki bekleyen talebi Gelen kutusundan gerçek seans ve talep kimliğiyle keşfedebilmeli. Karar öncesi güncel kapanış revizyonu, talep sürümü ve izin seansın mevcut okuyucusundan doğrulanmalı. Eğitmen kendi talebinin sonucunu görmeye devam etmeli.
-
-v69 çizimindeki gerekçeli ret ve sonrasında yeni gerekçeyle yeniden başvurma davranışı da açık bir sözleşme farkı. Mevcut karar isteği ret gerekçesi almıyor ve aynı eğitmen, seans ve kapanış revizyonu için ikinci talebi engelliyor. Çizimdeki davranış için karar gerekçesinin görünürlüğünü ve geçerli tekrar koşulunu backend ve ürün değerlendirmesi belirlemeli.
+**Geri çekildi · Kullanıcı kararı.** Web1’de düzeltmeyi ilgili Merkez yöneticisi mevcut seans ayrıntısı üzerinden gerçekleştirir. [V09.3](todo.md#v09) kabulün sahibidir.
