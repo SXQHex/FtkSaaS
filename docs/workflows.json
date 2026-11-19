@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "701df68d6d7181cccf5cf11b69e4cc11f8cec80117ecb06fe51e0bdbe8ea5e97",
-        "reason": "Reviewed the source-bound inventory for native MFA and the isolated mandatory-factor regression."
+        "fingerprint": "620ceb61a0a2afd92e1e8e71f0df39118d0b5e47b492938a646dbd97c5cc6d4e",
+        "reason": "Platform fatura görünümü ve katalog durum alanı sözleşmeden mevcut Edge dağıtımı ve tip üretimine yansıtıldı."
       }
     },
     {
@@ -530,8 +530,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "4a5f976b78b03d664d107df787574edcac0452b7915bfd66d46390e9997cc0d0",
-        "reason": "Reviewed shared organization MFA and the centers list Edge and Data API cases with and without the verified factor."
+        "fingerprint": "727a3bee4e5789ebe90f919020298f60a6a7206895fb8f0e965af3056a8f771e",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -648,8 +648,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8422dac06f1c9defafafeacf0a624049c256af771e8bb8237707ef1c7acb63e3",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "e2e6cbefb6642febe801b270dff59f4d64427d0a02a0727175b0645aeae80fd1",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -765,8 +765,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "de6f725a2cd8f4bcf3563cdd181aa3e3b2df73b7f1c966e967679aaec860f52d",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "4932010ba99fe1656744ee539fa8ce43ce72234983280501d257dd0ab9695eb2",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -893,8 +893,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "24d9b01ee325c0632666c4ace5ccb56732cd1c46e117abde7a5617281aba272f",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "dc771dc86236d8f49015b6b9ce4edafab9898f26d6f693e38cb316c6f93a03c1",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1003,8 +1003,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "aafdb50d3ef0d730a54eda62a1ee9835f309c197f70f2b1443b5de92ad26e875",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "5f174cb64a9f2d28fb61efe5ceceab845062bf0a2afa75f8fde220b2506ee712",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1075,8 +1075,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "70ade57f2d45e67aa4b51cd399849afb701efe9ab454e776502112091455d821",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "835cd3ae66fcdafe742125077278deb34044fdf8b0284e8a9e748ba9dd3b8594",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1150,8 +1150,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "2458276cb661b33d7309572e87a76332a098d4798abcde58c033317bba2dbd8a",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "e1e0c251c0bda24f983103e378a4f9abb6696144eb88d472bc3c2fdc4c10b119",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1267,8 +1267,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "d4d61c4c5273db619f18428054908fcf4faf2509d5430157f371446804cdb5b7",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "5dc5b37da213ab7807099b81ddefd4c10884e6d31266c85464143962c9da46ab",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1341,8 +1341,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "73450b65cdde438ba114e0306bf3be38856eafc356fd586a13eccec0401d0f45",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "f48b4c06d434d75b8a0ad67571130a0dff5f45a947b86448f76f67e5d8d7dcf1",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1413,7 +1413,9 @@
         "apps/backend/database/member-inbox-actions.sql",
         "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql",
         "apps/backend/database/member-inbox-visibility.sql",
-        "apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql"
+        "apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql",
+        "apps/backend/database/catalog-status-read.sql",
+        "apps/backend/supabase/migrations/20261119161031_catalog_status_read.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1430,8 +1432,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "ae4cfbb72612c14cd312c499c2c4649d8bb74d322599c11b0ae6267cb81db5bf",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "6785a65c5aee6e3bb00534de1f44e75c3c92803b60e9815aab21dbe8c4ca5455",
+        "reason": "Katalog okuması geçersiz kılma kaydını ayrı gösterir. Mevcut yetki ve belge kabul akışı korunur."
       }
     },
     {
@@ -1647,8 +1649,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "aabd84f7fb9dc1907cd7e721ac52619a1b978d2a1e599a38736c6969e40422ba",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "43ba16589e2c2ae9f6f2292f6d5e734755909f8419689ae2f6814ba461ae4aa2",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1870,8 +1872,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "9c51194f8e5548853410e033111fcee5413a9ac5de6bca8c22da3fbf916191cf",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "008b0bc7e52db5cace8526dc255af9d1499acf911bc617e258506426f52ab141",
+        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
       }
     },
     {
@@ -1959,7 +1961,9 @@
         "apps/backend/supabase/functions/backend-v1/document-storage.ts",
         "apps/backend/supabase/functions/backend-v1/handler.ts",
         "apps/backend/database/platform-console-completion.sql",
-        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
+        "apps/backend/database/platform-invoice-directory.sql",
+        "apps/backend/supabase/migrations/20261119161030_platform_invoice_directory.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1984,8 +1988,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "ca3821d7f2231dc40608dc6a835dcbb2d61823edef5492618916d45cb0690af5",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "75bf6b7c9510736302899427a6c3fff44f87a259b9af68d8ada7146fe7e3ef6e",
+        "reason": "Yetkili platform fatura dizini seçili organizasyon ve aynı sayfa sınırında yüklenmiş veya yayımlanmış üst veriyi döndürür."
       }
     },
     {
@@ -2183,8 +2187,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "df741ea831c80d571cbe501e41bcd78b75d04f3aacb80d22cb90f5e0babf97f6",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "234f3b83deee7997bf369393ba2133dd18d18a5d4172a46d5fcc926324b8a84e",
+        "reason": "Ortak katalog kabul dosyasına yönetim okuması doğrulamaları eklendi. Teslim ve worker davranışı korunur."
       }
     }
   ]

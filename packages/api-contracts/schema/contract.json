@@ -60638,6 +60638,9 @@
         },
         "retired": {
           "type": "boolean"
+        },
+        "invalidated": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -60655,7 +60658,8 @@
         "revision",
         "created_at",
         "published_at",
-        "retired"
+        "retired",
+        "invalidated"
       ],
       "additionalProperties": false
     },
@@ -67197,7 +67201,8 @@
             "payments",
             "verified_accounts",
             "initial_plans",
-            "operators"
+            "operators",
+            "invoices"
           ]
         },
         "page": {
@@ -67293,6 +67298,20 @@
               "scope": false
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "const": "invoices"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "scope"
+            ]
+          }
         }
       ]
     },
@@ -67320,6 +67339,9 @@
               },
               {
                 "$ref": "#/$defs/PlatformDirectoryOperator"
+              },
+              {
+                "$ref": "#/$defs/PlatformDirectoryInvoice"
               }
             ]
           }
@@ -68383,6 +68405,62 @@
       "required": [
         "operation",
         "values"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryInvoice": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "invoice"
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "invoice_number": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "\\S"
+        },
+        "issued_on": {
+          "$ref": "#/$defs/Date"
+        },
+        "mime": {
+          "enum": [
+            "application/zip",
+            "application/pdf"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2097152
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checksum": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "invoice_number",
+        "issued_on",
+        "mime",
+        "bytes",
+        "published_at",
+        "checksum"
       ],
       "additionalProperties": false
     }
@@ -117917,6 +117995,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryInvoice/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -118427,7 +118511,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 209,
+      "migration_count": 211,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
