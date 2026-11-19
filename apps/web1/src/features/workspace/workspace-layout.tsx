@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
 import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
 import { workspaceQuery } from "./workspace-query";
-import { workspaceNavigation, type NavigationView } from "./navigation";
+import { workspaceNavigation, workspacePersonalHref, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
 import { BackendError } from "../../lib/backend";
 import { AppSidebar } from "../../components/app-sidebar";
@@ -165,6 +165,7 @@ export function WorkspaceLayout({
       ? !businessAccess.isError && businessAccess.data === true
       : canManageCenters && manyCenters;
   const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter, business);
+  const accountHref = workspacePersonalHref("/account", resolvedOrganizationId, centerId);
   const memberSearchScope =
     mode === "management" &&
     view?.selected?.id &&
@@ -196,6 +197,7 @@ export function WorkspaceLayout({
       <AppSidebar
         key={accountId}
         name={name}
+        accountHref={accountHref}
         pending={pending}
         scopeLocked={scopeLocked || scopeControl?.locked}
         onSignOut={onSignOut}
@@ -291,7 +293,9 @@ export function WorkspaceLayout({
                     items: [
                       ...(groups.some((group) => group.items.some((item) => item.key === "account"))
                         ? []
-                        : [{ key: "account" as const, url: "/account", icon: <UsersRoundIcon /> }]),
+                        : [
+                            { key: "account" as const, url: accountHref, icon: <UsersRoundIcon /> },
+                          ]),
                       { key: "help", url: "/help", icon: <UsersRoundIcon /> },
                     ],
                   },
@@ -308,7 +312,7 @@ export function WorkspaceLayout({
               <MoonIcon />
             </Button>
             <LinkButton
-              href="/inbox"
+              href={workspacePersonalHref("/inbox", resolvedOrganizationId, centerId)}
               variant="ghost"
               size="icon-sm"
               aria-label={t(($) => $.workspace.notifications)}

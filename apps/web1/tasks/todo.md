@@ -372,6 +372,8 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 
 `data-view="a-alan"` · v68. Hesap kabuğundaki mevcut workspace okumasını ve seçicileri kullan.
 
+Yönetimden **Hesabım** bağlantısı ve sayfa araması seçili organizasyon ile merkezi URL’de taşır. Hesap rotası bu kapsamı canlı çalışma alanından doğrular ve profili açar. Yenileme aynı kapsamı korur. Girişte kapsam belirlenmemişse mevcut seçim adımı çalışır. [Tarayıcı kabulü](../e2e/auth-workspace.spec.ts).
+
 - [x] **E53.1** · Girişte mevcut çalışma alanı okuması yetkili stüdyoları ve erişilebilir merkezleri sağlar. Çok stüdyolu hesap stüdyo seçer, birden çok etkin merkezi varsa merkez adımı açılır. Askıdaki stüdyo seçilmedi ve merkez okuması gönderilmedi. Klavyeyle seçilen merkez Hesabım kabuğunda ve merkez rotalarının bağlantılarında korundu. Erişimsiz hesapta davet açıklaması ve doğrulanmış hesabın mevcut stüdyo kurulum yolu birlikte doğrulandı. Tek Chromium işçisiyle 17 hedefli senaryo ve erişimsiz hesap assertion’ı eklendikten sonra ilgili kurulum senaryosu geçti. [Çalışma alanı kabulü](../e2e/auth-workspace.spec.ts) · [Kurulum kabulü](../e2e/auth-studio-setup.spec.ts).
 
 <a id="on-tarama"></a>
@@ -1067,6 +1069,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
   - [x] **E39.5** · Native entegrasyon:
     - [x] Kendi kuruluş inbox’ı, native unread_only ve cursor; yerelleştirilmiş güvenli düz metin, açık saat dilimi ve sağlayıcı kabulü/teslim ayrımı. Eksik başlık/metin ve reddedilen kaynak boş başarı sayılmaz.
     - [x] Özgün management selector’ünden gerçek sürüm → açık Okundu yap → aynı-key receipt/ACK → ilerlemiş read durumunu yeniden okuma. Liste ve ayrıntı ayrı; mobil ayrıntı başlığı/geri dönüş odağı bağlı.
+    - [x] Yönetim menüsü ve bildirim zili Gelen kutusu bağlantısına seçili organizasyon ve merkezi ekler. İkinci merkezin bildirimi aynı SPA geçişinde kendi kapsamıyla okunur. Yenileme merkez seçimini, etkin Ders programı bağlantısını ve Gelen kutusu sayfa işaretini korur. [Çok merkezli tarayıcı kabulü](../e2e/auth-workspace.spec.ts).
     - [x] PR321: native literal arama/iş filtresi ve kapsam sayaçları; açık seçilmiş sürümlü atomik okundu/okunmadı, aynı-key receipt/ACK ve liste yenileme. Kaynak gerçek merkez/selector ile ayrı okunur; mevcut kaynak ekranına geçilir, talep bağlantısı exact ID taşır. Kullanıcı kararıyla bağımsız tamamlandı/yanıt yoktur.
   - [x] **E39.6** · Bağlı çekirdek:7 birim ve7 farklı Chromium senaryosu geçti; gerçek sürüm, native filtre, kaynak/ACK/receipt kurtarması, stale ret, düz metin güvenliği, global giriş ve mobil odak; ortak Axe/reflow. İlk5 tarayıcı + locator düzeltmesi/yeni giriş için son2 raporu `.tmp/e39-{first,final}-local.json`. Sürüm ilerleme koşulu ters denemesi regresyonca reddedildi.
   - [x] **E39.7** · Kaynak, test ve görsel kanıtı kaydet. Bu sayfadaki bütün uygulanabilir işlemler ve izinli farklar doğrulanınca üst kutuyu kapat, devam kaydını güncelle.

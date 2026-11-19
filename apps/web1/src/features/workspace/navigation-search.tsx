@@ -42,6 +42,7 @@ export function NavigationSearch({
   const [settled, setSettled] = useState("");
   const query = input.trim();
   const links = groups.flatMap(({ items }) => items);
+  const accountUrl = links.find(({ key }) => key === "account")?.url ?? "/account";
   const peopleUrl = managementActions ? links.find(({ key }) => key === "people")?.url : undefined;
   const reportsUrl = managementActions
     ? links.find(({ key }) => key === "reports")?.url
@@ -93,7 +94,7 @@ export function NavigationSearch({
     {
       key: "theme",
       label: t(($) => $.workspace.changeTheme),
-      href: onThemeChange ? undefined : "/account#account-appearance",
+      href: onThemeChange ? undefined : `${accountUrl}#account-appearance`,
       run: onThemeChange,
     },
     { key: "sign-out", label: t(($) => $.auth.signout), run: onSignOut },

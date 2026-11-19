@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/ta
 import { SessionsPanel } from "../account/sessions-panel";
 import { SecurityPanel } from "../account/security-panel";
 import { useRef, useState } from "react";
-import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
+import { useLoaderData, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription } from "../../components/ui/alert";
@@ -25,6 +25,7 @@ import { hasWorkspaceManagementScope, workspaceRoles, readWorkspace } from "../w
 export function AccountPage() {
   const mobile = useIsMobile();
   const account = useLoaderData({ from: "/account" });
+  const search = useSearch({ from: "/account" });
   const appearance = useAccountAppearance(account.id);
   const appearanceActions = useRef<AppearanceActions>(null);
   const [appearanceDisabled, setAppearanceDisabled] = useState(true);
@@ -32,8 +33,8 @@ export function AccountPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const queries = useQueryClient();
-  const [organizationChoice, setOrganizationChoice] = useState<string>();
-  const [centerChoice, setCenterChoice] = useState<string>();
+  const [organizationChoice, setOrganizationChoice] = useState(search.org);
+  const [centerChoice, setCenterChoice] = useState(search.center);
   const accountHeading = useRef<HTMLHeadingElement>(null);
   const [entryDismissed, setEntryDismissed] = useState(false);
   const [failed, setFailed] = useState(false);

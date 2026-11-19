@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 export function AppSidebar({
   name,
+  accountHref,
   pending,
   scopeLocked,
   onSignOut,
@@ -34,6 +35,7 @@ export function AppSidebar({
   pathname,
 }: {
   name: string;
+  accountHref: string;
   pending: boolean;
   scopeLocked?: boolean;
   onSignOut: () => void;
@@ -117,7 +119,13 @@ export function AppSidebar({
             ]}
           />
         </nav>
-        <NavUser name={name} detail={roleLabel} pending={pending} onSignOut={onSignOut} />
+        <NavUser
+          name={name}
+          accountHref={accountHref}
+          detail={roleLabel}
+          pending={pending}
+          onSignOut={onSignOut}
+        />
       </SidebarFooter>
       <SidebarRail
         aria-label={t(($) => $.workspace.toggleNavigation)}

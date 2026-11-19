@@ -30,7 +30,7 @@ test("command palette reaches appearance, switches the saved theme and signs out
   await search.click();
   await input.fill("Temayı değiştir");
   await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
-  await expect(page).toHaveURL(`${origin}/account#account-appearance`);
+  await expect(page).toHaveURL(`${origin}/account?org=${org}&center=${center}#account-appearance`);
   const appearance = page.locator("#account-appearance");
   await expect(appearance.getByRole("radiogroup", { name: "Tema", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Temayı değiştir", exact: true })).toBeEnabled();
@@ -271,6 +271,7 @@ test("workspace entry offers authorized studios and keeps the selected center on
   const otherCenter = "019a7b00-0000-7000-8000-000000000016";
   const unreadableCenter = "019a7b00-0000-7000-8000-000000000017";
   const orgReads: string[] = [];
+  const inboxReads: unknown[] = [];
   const listed = { version: 1, state: "active" as const };
   const pagination = { next_cursor: null, as_of: "2026-11-14T06:00:00Z" };
   await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
@@ -332,6 +333,12 @@ test("workspace entry offers authorized studios and keeps the selected center on
       } satisfies SuccessRolesList,
     }),
   );
+  await page.route("**/functions/v1/backend-v1/notifications_list_v1", (route) => {
+    inboxReads.push(route.request().postDataJSON());
+    return route.fulfill({
+      json: { ok: true, trace_id: org, data: { ...pagination, items: [] } },
+    });
+  });
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
@@ -363,4 +370,41 @@ test("workspace entry offers authorized studios and keeps the selected center on
   expect(links.some((href) => href?.startsWith(`/o/${org}/c/${otherCenter}/`))).toBe(true);
   expect(orgReads).toContain(org);
   expect(orgReads).not.toContain(closedOrg);
+
+  const inboxHref = `/inbox?org=${org}&center=${otherCenter}`;
+  const sidebarInbox = page
+    .getByRole("navigation", { name: "Ana menü" })
+    .getByRole("link", { name: "Gelen kutusu", exact: true });
+  await page.evaluate("document.documentElement.dataset.inboxNavigationProbe='management'");
+  await sidebarInbox.press("Enter");
+  await expect(page).toHaveURL(`${origin}${inboxHref}`);
+  await expect(page.getByRole("searchbox", { name: "İletilerde ara" })).toBeEnabled();
+  await expect(page.locator("html")).toHaveAttribute("data-inbox-navigation-probe", "management");
+  await expect
+    .poll(() => inboxReads)
+    .toContainEqual(expect.objectContaining({ org_id: org, center_id: otherCenter }));
+  await expect(page.getByRole("link", { name: "Bildirimler", exact: true })).toHaveAttribute(
+    "href",
+    inboxHref,
+  );
+  await page.reload();
+  await expect(page.getByRole("searchbox", { name: "İletilerde ara" })).toBeEnabled();
+  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
+  await expect(sidebarInbox).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("link", { name: "Ders programı", exact: true })).toHaveAttribute(
+    "href",
+    `/o/${org}/c/${otherCenter}/schedule`,
+  );
+
+  const accountHref = `/account?org=${org}&center=${otherCenter}`;
+  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
+  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Çalışacağın merkezi seç" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
 });
