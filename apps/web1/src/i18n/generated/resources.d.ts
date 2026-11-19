@@ -599,6 +599,16 @@ export default interface Resources {
       "empty": "Bu kapsamda kayıt yok.",
       "inactive": "Pasif",
       "incoming": "{{peer}} merkezinden kullanım",
+      "mergeSuggestions": {
+        "empty": "Bu merkezde bekleyen kopya kişi önerisi yok.",
+        "error": "Kopya kişi önerileri okunamadı.",
+        "matches": {
+          "email": "E-posta eşleşmesi",
+          "phone": "Telefon eşleşmesi"
+        },
+        "open": "Birleştirme ve onayları aç",
+        "title": "Olası kopya kişiler"
+      },
       "more": "Daha fazla kayıt",
       "open": "Merkezi aç",
       "outgoing": "{{peer}} merkezine kullanım",
@@ -608,6 +618,19 @@ export default interface Resources {
       "quota": "{{used}} / {{max}} aktif merkez kullanılıyor.",
       "reportDays": "Son {{count}} gün" | "Son {{count}} gün",
       "reportError": "Birleşik rapor okunamadı.",
+      "reportFinance": {
+        "collections": "Tahsilat",
+        "crossCenter": "Merkezler arası kullanım",
+        "debt": "Açık borç",
+        "description": "Satış ve tahsilat kendi merkezinde gösterilir. Açık borç seçili dönemde vadesi gelen kalemlerin kalanıdır.",
+        "difference": "Organizasyon toplamı ile merkez toplamları arasındaki fark",
+        "error": "Merkez kırılımı doğrulanamadı.",
+        "match": "Merkez toplamları, organizasyon raporundaki tutarlarla eşleşiyor.",
+        "reconciliation": "Mutabakat",
+        "sales": "Satış",
+        "title": "Merkez kırılımı",
+        "total": "Organizasyon toplamı"
+      },
       "reportPeriod": "Rapor dönemi",
       "required": "Bu alan zorunlu.",
       "review": "İncele",

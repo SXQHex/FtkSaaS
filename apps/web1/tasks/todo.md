@@ -319,7 +319,7 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 
 <a id="e49"></a>
 
-### E49 · Merkezler ve Business sekmeleri
+### E49 · Merkezler ve Business sekmeleri (kapandı)
 
 `data-view="merkezler"` ve JS C1–C4. Merkezler rotası Business ve canlı yönetim kapsamıyla açılıyor. [Business kabulü](#business).
 
@@ -327,7 +327,7 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 - [x] **E49.2** · Organizasyon kişi dizini Abone No ve merkez bağlarını, kuruluş başvuru kuyruğu da sürümlü yönlendirmeyi gösteriyor. Hesaplaşma hareketi, ödeme veya mahsup talebi, B kararı, geri çekme, açık yetki ve ürün kullanım kapsamı native kaynaklara bağlı. [Merkezler arası native kabul](../../backend/tests/cross-center-settlement.test.mjs).
 - [x] **E49.3** · Birleşik rapor yetkili merkez kümesini, daralma bağlantısı mevcut Plan düzenleyicisini kullanıyor. Beş aktif merkez ve 1.250 tekil aktif öğrenci sınırı [native kapasite kabulüne](../../backend/tests/commercial-plan-acceptance.mjs) bağlı. B01–B06 yayımlı kabulü açık.
 
-- [ ] **E49.4** · Referanstaki merkez bazında satış, tahsilat ve borç kırılımı ile mutabakat özetini tamamla. Kişi dizininde olası kopya kartını ve mevcut birleştirme akışına geçişi doğrula. [Business raporu](../src/features/business/business-report.tsx).
+- [x] **E49.4** · Birleşik raporda merkez bazında satış, tahsilat ve seçili dönemde vadesi gelen açık borç aynı rapor dönemiyle okunur. Organizasyon mutabakatı ayrı native toplamı merkez tutarlarıyla para birimi bazında karşılaştırır ve farkı gösterir. Olası kopya kartı yalnız seçili merkezin Merkez yöneticisine native önerileri gösterir ve mevcut birleştirme ekranını açar. 9 rapor birim testi ve 5 Business tarayıcı senaryosu seri doğrulandı. [WF04](../../../docs/workflows.md#wf04) · [WF10](../../../docs/workflows.md#wf10) · [Tarayıcı kabulü](../e2e/auth-business-centers.spec.ts).
 
 <a id="e50"></a>
 

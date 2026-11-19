@@ -25,6 +25,7 @@ import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace
 import { BusinessCenterResources } from "./business-center-resources";
 import { BusinessCenterCreate } from "./business-center-create";
 import { BusinessReport } from "./business-report";
+import { BusinessMergeSuggestions } from "./business-merge-suggestions";
 import { BusinessProductScope } from "./business-product-scope";
 import { BusinessSettlement } from "./business-settlement";
 import { BusinessSettlementAuthority } from "./business-settlement-authority";
@@ -291,7 +292,7 @@ function BusinessCenterPanels({
             />
           </TabsContent>
         ))}
-        <TabsContent id="people">
+        <TabsContent id="people" className="space-y-3">
           {owner || orgManager ? (
             <BusinessPeople scope={scope} centers={centers} />
           ) : (
@@ -299,6 +300,7 @@ function BusinessCenterPanels({
               {t(($) => $.workspace.links.people)}
             </LinkButton>
           )}
+          {roles.includes("center_manager") && <BusinessMergeSuggestions scope={scope} />}
         </TabsContent>
         <TabsContent id="applications">
           {owner || orgManager ? (

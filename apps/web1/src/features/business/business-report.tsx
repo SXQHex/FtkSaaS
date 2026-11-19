@@ -1,7 +1,6 @@
 import { useId, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { v7 as uuidv7 } from "uuid";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
@@ -16,9 +15,10 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import type { CenterView } from "../../lib/api-contracts/generated";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
-import { reportInterval, reportRowKey } from "../reports/reports-read";
+import { readScopedReport, reportInterval, reportRowKey } from "../reports/reports-read";
+import { BusinessFinanceReport } from "./business-finance-report";
 
 export function BusinessReport({
   scope,
@@ -44,31 +44,23 @@ export function BusinessReport({
       scope.orgId,
       scope.centerId,
       centerIds,
+      aggregate,
       days,
       anchor,
     ],
     initialPageParam: undefined as string | undefined,
     queryFn: async ({ pageParam }) => {
-      const backend = await scopedBackend(scope);
       const interval = await reportInterval(timezone, days, "", "", anchor);
-      const result = await backend.call("report_get_v1", {
-        client_api_version: 1,
-        request_id: uuidv7(),
-        org_id: scope.orgId,
-        ...(aggregate ? {} : { center_id: scope.centerId }),
-        report: "cross_center_usage",
-        filters: { interval, center_ids: centerIds },
-        page: { limit: 25, ...(pageParam ? { cursor: pageParam } : {}) },
-      });
-      if (
-        result.report_kind !== "cross_center_usage" ||
-        result.filters.center_ids.length !== centerIds.length ||
-        !result.filters.center_ids.every((id) => centerIds.includes(id)) ||
-        result.rows.items.some((row) => row.center_id && !centerIds.includes(row.center_id)) ||
-        (pageParam && result.rows.next_cursor === pageParam)
-      )
-        throw Error("BUSINESS_REPORT_SCOPE_INVALID");
-      return result;
+      return readScopedReport(
+        scope,
+        "cross_center_usage",
+        { interval, center_ids: centerIds },
+        {
+          aggregate,
+          limit: 25,
+          cursor: pageParam,
+        },
+      );
     },
     getNextPageParam: (last) => last.rows.next_cursor ?? undefined,
     enabled: centerIds.length > 0,
@@ -111,6 +103,17 @@ export function BusinessReport({
             ))}
           </NativeSelect>
         </Field>
+        {centerIds.length > 0 && (
+          <BusinessFinanceReport
+            scope={scope}
+            centers={centers.filter((center) => centerIds.includes(center.id))}
+            aggregate={aggregate}
+            range={days}
+            timezone={timezone}
+            anchor={anchor}
+          />
+        )}
+        <h3 className="font-semibold">{t(($) => $.businessCenters.reportFinance.crossCenter)}</h3>
         {!centerIds.length ? (
           <p>{t(($) => $.businessCenters.empty)}</p>
         ) : report.isPending ? (

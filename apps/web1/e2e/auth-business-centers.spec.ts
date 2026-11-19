@@ -40,6 +40,7 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
   let state = "";
   let proposal: unknown;
   let granted = true;
+  let discrepancy = false;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!;
     const request = route.request().postDataJSON();
@@ -86,6 +87,90 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
       expect(request.org_id).toBe(I.org);
       centers.push({ ...centers[0]!, id: third, name: request.name, timezone: request.timezone });
       return send(nativeMutation(third));
+    }
+    if (op === "report_get_v1" && ["sales", "collections_debts"].includes(request.report)) {
+      const requested: string[] = request.filters.center_ids;
+      const amount = requested.reduce((sum, id) => sum + (id === second ? 200 : 100), 0);
+      const delta = !request.center_id && discrepancy ? 50 : 0;
+      return send({
+        report_kind: request.report,
+        as_of: at,
+        filters: request.filters,
+        rows: nativePage([]),
+        totals:
+          request.report === "sales"
+            ? [
+                {
+                  group_key: "gross_sales:2026-11-09",
+                  currency: "TRY",
+                  count: 1,
+                  amount_minor: String(amount + delta),
+                },
+                {
+                  group_key: "gross_sales:2026-11-09",
+                  currency: "EUR",
+                  count: 1,
+                  amount_minor: String(amount * 2),
+                },
+              ]
+            : [
+                {
+                  group_key: "collections",
+                  currency: "TRY",
+                  count: 1,
+                  amount_minor: String(amount * 2),
+                },
+                {
+                  group_key: "outstanding_debt",
+                  currency: "TRY",
+                  count: 1,
+                  amount_minor: String(amount * 3),
+                },
+              ],
+      });
+    }
+    if (
+      op === "management_state_get_v1" &&
+      request.operation === "person_merge_preview_v1" &&
+      (role === "center_manager" || request.page?.limit === 3)
+    ) {
+      expect(role).not.toBe("org_manager");
+      expect(request.center_id).toBe(I.center);
+      expect(request.selector.key).toMatchObject({ directory: "center", status: "suggested" });
+      const source = { id: I.self, display_name: "Sentetik birinci kişi", version: 1 };
+      const target = { id: I.instructor, display_name: "Sentetik ikinci kişi", version: 1 };
+      return send({
+        ...nativePage([
+          {
+            operation: "person_merge_preview_v1",
+            exists: true,
+            entity: { type: "people", id: target.id },
+            state: "pending",
+            as_of: at,
+            versions: [source, target].map(({ id, version }) => ({
+              entity: { type: "people", id },
+              version,
+            })),
+            current: {
+              operation: "person_merge_preview_v1",
+              values: { source_id: source.id, target_id: target.id },
+            },
+            merge_review: {
+              state: "suggested",
+              source,
+              target,
+              matching_kinds: ["email"],
+              reason: null,
+              recorded_at: null,
+            },
+          },
+        ]),
+        merge_review_summary: {
+          total: 1,
+          filtered: 1,
+          by_state: [{ state: "suggested", count: 1 }],
+        },
+      });
     }
     if (op === "report_get_v1" && request.report === "cross_center_usage")
       return send({
@@ -191,6 +276,9 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
     return route.fallback();
   });
   return {
+    setDiscrepancy: () => {
+      discrepancy = true;
+    },
     calls,
     revoke: () => {
       granted = false;
@@ -258,14 +346,41 @@ test("Business owner manages centers, reads native center resources, routes an a
   await expect(
     report.getByText("Sentetik Merkez B merkezine kullanım", { exact: true }),
   ).toBeVisible();
-  expect(f.calls.filter(({ op }) => op === "report_get_v1").at(-1)?.request).toMatchObject({
+  const usageRequest = f.calls.findLast(
+    ({ op, request }) =>
+      op === "report_get_v1" &&
+      request.report === "cross_center_usage" &&
+      (request.page as { limit: number }).limit === 25,
+  )?.request;
+  expect(usageRequest).toMatchObject({
     org_id: I.org,
-    report: "cross_center_usage",
     filters: { center_ids: [I.center, second, third] },
   });
+  expect(usageRequest?.center_id).toBeUndefined();
+  const finance = page.getByRole("grid", { name: text.reportFinance.title });
+  const centerB = finance.getByRole("row").filter({ hasText: "Sentetik Merkez B" });
+  await expect(centerB.getByRole("gridcell", { name: "€4,00 · ₺2,00", exact: true })).toBeVisible();
+  await expect(centerB.getByRole("gridcell", { name: "₺6,00", exact: true })).toBeVisible();
+  await expect(page.getByText(text.reportFinance.match, { exact: true })).toBeVisible();
+  const reads = f.calls.filter(
+    ({ op, request }) =>
+      op === "report_get_v1" && ["sales", "collections_debts"].includes(String(request.report)),
+  );
+  for (const id of [I.center, second, third]) {
+    expect(reads.filter(({ request }) => request.center_id === id)).toHaveLength(2);
+  }
+  expect(reads.filter(({ request }) => request.center_id === undefined)).toHaveLength(2);
   expect(
-    f.calls.filter(({ op }) => op === "report_get_v1").at(-1)?.request.center_id,
-  ).toBeUndefined();
+    new Set(
+      reads.map(({ request }) =>
+        JSON.stringify((request.filters as { interval: unknown }).interval),
+      ),
+    ).size,
+  ).toBe(1);
+  f.setDiscrepancy();
+  await page.getByLabel(text.reportPeriod, { exact: true }).selectOption("7");
+  await expect(page.getByText(text.reportFinance.difference, { exact: true })).toBeVisible();
+  await expect(page.getByText("Satış · ₺0,50", { exact: true })).toBeVisible();
 });
 
 test("authorized Business managers submit a real movement in A, decide in B and lose the ledger after revocation", async ({
@@ -335,4 +450,39 @@ test("a Business organization manager can create a center without opening the ow
   ).toBeVisible();
   expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
   expect(f.calls.filter(({ op }) => op === "subscription_get_v1")).toEqual([]);
+  await page.getByRole("tab", { name: text.tabs.people, exact: true }).click();
+  await expect(page.getByRole("grid", { name: text.tabs.people })).toBeVisible();
+  await expect(page.getByRole("heading", { name: text.mergeSuggestions.title })).toHaveCount(0);
+  expect(
+    f.calls.filter(
+      ({ request }) =>
+        request.operation === "person_merge_preview_v1" &&
+        (request.page as { limit: number }).limit === 3,
+    ),
+  ).toHaveLength(0);
+});
+
+test("a center manager sees scoped duplicate suggestions and opens the native merge queue", async ({
+  page,
+}) => {
+  const fixture = await businessFixture(page, "center_manager");
+  await page.goto(centerUrl());
+  await page.getByRole("tab", { name: text.tabs.people, exact: true }).click();
+  await expect(page.getByRole("heading", { name: text.mergeSuggestions.title })).toBeVisible();
+  await expect(
+    page.getByText("Sentetik birinci kişi · Sentetik ikinci kişi", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(text.mergeSuggestions.matches.email, { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: text.mergeSuggestions.open }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/${I.center}/people/merge$`));
+  expect(
+    fixture.calls.find(
+      ({ request }) =>
+        request.operation === "person_merge_preview_v1" &&
+        (request.page as { limit: number }).limit === 3,
+    )?.request,
+  ).toMatchObject({
+    center_id: I.center,
+    page: { limit: 3 },
+  });
 });

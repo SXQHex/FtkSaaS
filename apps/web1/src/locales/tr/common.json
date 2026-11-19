@@ -5362,6 +5362,29 @@
     "resumeMotion": "Animasyonu sürdür"
   },
   "businessCenters": {
+    "mergeSuggestions": {
+      "title": "Olası kopya kişiler",
+      "empty": "Bu merkezde bekleyen kopya kişi önerisi yok.",
+      "error": "Kopya kişi önerileri okunamadı.",
+      "open": "Birleştirme ve onayları aç",
+      "matches": {
+        "email": "E-posta eşleşmesi",
+        "phone": "Telefon eşleşmesi"
+      }
+    },
+    "reportFinance": {
+      "title": "Merkez kırılımı",
+      "description": "Satış ve tahsilat kendi merkezinde gösterilir. Açık borç seçili dönemde vadesi gelen kalemlerin kalanıdır.",
+      "sales": "Satış",
+      "collections": "Tahsilat",
+      "debt": "Açık borç",
+      "total": "Organizasyon toplamı",
+      "reconciliation": "Mutabakat",
+      "difference": "Organizasyon toplamı ile merkez toplamları arasındaki fark",
+      "match": "Merkez toplamları, organizasyon raporundaki tutarlarla eşleşiyor.",
+      "error": "Merkez kırılımı doğrulanamadı.",
+      "crossCenter": "Merkezler arası kullanım"
+    },
     "title": "Merkezler",
     "description": "Organizasyonun merkezlerini, ekip yetkilerini ve merkezler arası hareketlerini yönet.",
     "sections": "Merkez bölümleri",
