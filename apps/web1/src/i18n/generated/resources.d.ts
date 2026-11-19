@@ -3332,7 +3332,7 @@ export default interface Resources {
       "findAccount": "Hesabı bul",
       "graceUntil": "Ek sürenin sonu",
       "invoices": {
-        "bytes": "{{count}} bayt",
+        "bytes": "{{count}} bayt" | "{{count}} bayt" | "{{count}} bayt",
         "date": "Düzenlenme tarihi",
         "dateError": "Düzenlenme tarihini seç.",
         "description": "Dışarıda düzenlenen faturanın orijinalini yükle. Yayımlanınca organizasyon sahibi Plan ekranında indirebilir.",

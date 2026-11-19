@@ -5551,7 +5551,9 @@
       "published": "Fatura yayımlandı ve sunucu sonucu doğrulandı.",
       "newInvoice": "Başka fatura yükle",
       "hash": "SHA-256",
-      "bytes": "{{count}} bayt"
+      "bytes": "{{count}} bayt",
+      "bytes_one": "{{count}} bayt",
+      "bytes_other": "{{count}} bayt"
     },
     "activity": {
       "title": "Operatör işlem kaydı",
