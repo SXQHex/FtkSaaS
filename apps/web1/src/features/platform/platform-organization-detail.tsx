@@ -10,6 +10,8 @@ import { Textarea } from "../../components/ui/textarea";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
+import { usePlatformActivity } from "./platform-activity-context";
+import { PlatformReadError } from "./platform-read-error";
 import {
   platformAccessDenied,
   platformOrganizationsKey,
@@ -35,6 +37,7 @@ export function PlatformOrganizationDetail({
 }) {
   const { t } = useTranslation();
   const queries = useQueryClient();
+  const { record } = usePlatformActivity();
   const labelId = useId();
   const field = useRef<HTMLTextAreaElement>(null);
   const [reason, setReason] = useState("");
@@ -58,6 +61,12 @@ export function PlatformOrganizationDetail({
       return true;
     },
     onRefresh: async (data) => {
+      if (intent)
+        record({
+          key: intent.key,
+          kind: data.organization.platform_suspended ? "suspended" : "resumed",
+          subject: data.organization.name,
+        });
       queries.setQueryData(key, data);
       await queries.invalidateQueries({ queryKey: platformOrganizationsKey(accountId) });
       await queries.invalidateQueries({ queryKey: ["platform-grace", accountId, organizationId] });
@@ -75,11 +84,7 @@ export function PlatformOrganizationDetail({
     (intent ? !intent.suspended : row?.platform_suspended) ? $.platform.resume : $.platform.suspend,
   );
   if (platformAccessDenied(detail.error))
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
-      </Alert>
-    );
+    return <PlatformReadError error={detail.error} onRetry={() => void detail.refetch()} />;
   return (
     <>
       {detail.isPending ? (

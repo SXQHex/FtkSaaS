@@ -5466,6 +5466,21 @@
     }
   },
   "platform": {
+    "activity": {
+      "title": "Operatör işlem kaydı",
+      "description": "{{actor}} · Bu konsol oturumunda sonucu doğrulanan işlemler. Doğrulama saatleri Türkiye saatiyle gösterilir.",
+      "empty": "Henüz doğrulanmış işlem yok.",
+      "actions": {
+        "created": "Organizasyon oluşturuldu",
+        "suspended": "Organizasyon askıya alındı",
+        "resumed": "Organizasyon askısı kaldırıldı",
+        "paymentAccepted": "Ödeme doğrulandı",
+        "paymentDeclined": "Ödeme reddedildi",
+        "graceExtended": "Ek süre uzatıldı",
+        "operatorAdded": "Platform yetkisi verildi",
+        "operatorRemoved": "Platform yetkisi kaldırıldı"
+      }
+    },
     "title": "Platform konsolu",
     "sections": "Platform bölümleri",
     "organizations": "Organizasyonlar",

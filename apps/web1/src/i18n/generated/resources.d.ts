@@ -3190,6 +3190,21 @@ export default interface Resources {
       },
       "accountFound": "Doğrulanmış hesap bulundu.",
       "accountMissing": "Bu adrese bağlı uygun doğrulanmış hesap bulunamadı.",
+      "activity": {
+        "actions": {
+          "created": "Organizasyon oluşturuldu",
+          "graceExtended": "Ek süre uzatıldı",
+          "operatorAdded": "Platform yetkisi verildi",
+          "operatorRemoved": "Platform yetkisi kaldırıldı",
+          "paymentAccepted": "Ödeme doğrulandı",
+          "paymentDeclined": "Ödeme reddedildi",
+          "resumed": "Organizasyon askısı kaldırıldı",
+          "suspended": "Organizasyon askıya alındı"
+        },
+        "description": "{{actor}} · Bu konsol oturumunda sonucu doğrulanan işlemler. Doğrulama saatleri Türkiye saatiyle gösterilir.",
+        "empty": "Henüz doğrulanmış işlem yok.",
+        "title": "Operatör işlem kaydı"
+      },
       "billing": {
         "accept": "Ödemeyi onayla",
         "actions": "Eylem",

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -27,6 +27,9 @@ import { PlatformPaymentDetail, PlatformPayments } from "./platform-payments";
 import { PlatformStudioQueue } from "./platform-studio-queue";
 import { PlatformCreate } from "./platform-create";
 import { PlatformOperators } from "./platform-operators";
+import { PlatformReadError } from "./platform-read-error";
+import { PlatformActivityLog } from "./platform-activity";
+import { PlatformActivityContext, type PlatformActivityEntry } from "./platform-activity-context";
 
 const route = getRouteApi("/platform");
 export function PlatformRoutePage() {
@@ -34,7 +37,7 @@ export function PlatformRoutePage() {
   const { organization_id, section, payment_id, studio_request_id } = route.useSearch();
   return (
     <PlatformPage
-      key={account.id}
+      key={`${account.id}:${account.platform_scope?.organizations === true}`}
       account={account}
       organizationId={organization_id}
       section={section}
@@ -73,7 +76,21 @@ function PlatformPage({
     (payments && !canVerify) ||
     ((studioRequests || create) && !canReadQueue) ||
     (operators && !canManageOperators);
-  const deny = () => setDenied(true);
+  const [entries, setEntries] = useState<PlatformActivityEntry[]>([]);
+  const clear = useCallback(() => setEntries([]), []);
+  const record = useCallback(
+    ({ kind, key, subject }: Omit<PlatformActivityEntry, "verifiedAt">) => {
+      const entry = { verifiedAt: new Date().toISOString(), kind, key, subject };
+      setEntries((current) =>
+        current.some((row) => row.key === key) ? current : [entry, ...current],
+      );
+    },
+    [],
+  );
+  const deny = () => {
+    clear();
+    setDenied(true);
+  };
   const title = t(($) => $.platform.title);
   useEffect(() => {
     const previous = document.title;
@@ -128,68 +145,71 @@ function PlatformPage({
           )}
         </nav>
       )}
-      {unavailable ? (
-        <Alert variant="destructive">
-          <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
-        </Alert>
-      ) : studioRequests ? (
-        <PlatformStudioQueue accountId={account.id} />
-      ) : create ? (
-        <PlatformCreate
-          key={studioRequestId ?? "direct"}
-          accountId={account.id}
-          requestId={studioRequestId}
-          onDenied={deny}
-        />
-      ) : operators ? (
-        <PlatformOperators accountId={account.id} onDenied={deny} />
-      ) : payments ? (
-        paymentId ? (
-          organizationId ? (
-            <PlatformPaymentDetail
-              key={organizationId + paymentId}
-              accountId={account.id}
-              orgId={organizationId}
-              paymentId={paymentId}
-              onDenied={deny}
-            />
-          ) : (
-            <Alert variant="destructive">
-              <AlertDescription>{t(($) => $.platform.billing.missing)}</AlertDescription>
-            </Alert>
-          )
-        ) : (
-          <PlatformPayments
-            key={organizationId ?? "all"}
+      <PlatformActivityContext value={{ record, clear }}>
+        {unavailable ? (
+          <Alert variant="destructive">
+            <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
+          </Alert>
+        ) : studioRequests ? (
+          <PlatformStudioQueue accountId={account.id} />
+        ) : create ? (
+          <PlatformCreate
+            key={studioRequestId ?? "direct"}
             accountId={account.id}
-            orgId={organizationId}
-          />
-        )
-      ) : organizationId ? (
-        <>
-          <PlatformOrganizationDetail
-            key={organizationId}
-            accountId={account.id}
-            organizationId={organizationId}
-            canSuspend={account.platform_scope?.organization_suspend === true}
-            paymentsHref={canVerify ? paymentHref(organizationId) : undefined}
+            requestId={studioRequestId}
             onDenied={deny}
           />
-          {canGrace && (
-            <PlatformGrace
-              key={"grace-" + organizationId}
+        ) : operators ? (
+          <PlatformOperators accountId={account.id} onDenied={deny} />
+        ) : payments ? (
+          paymentId ? (
+            organizationId ? (
+              <PlatformPaymentDetail
+                key={organizationId + paymentId}
+                accountId={account.id}
+                orgId={organizationId}
+                paymentId={paymentId}
+                onDenied={deny}
+              />
+            ) : (
+              <Alert variant="destructive">
+                <AlertDescription>{t(($) => $.platform.billing.missing)}</AlertDescription>
+              </Alert>
+            )
+          ) : (
+            <PlatformPayments
+              key={organizationId ?? "all"}
               accountId={account.id}
               orgId={organizationId}
+            />
+          )
+        ) : organizationId ? (
+          <>
+            <PlatformOrganizationDetail
+              key={organizationId}
+              accountId={account.id}
+              organizationId={organizationId}
+              canSuspend={account.platform_scope?.organization_suspend === true}
+              paymentsHref={canVerify ? paymentHref(organizationId) : undefined}
               onDenied={deny}
             />
-          )}
-        </>
-      ) : (
-        <>
-          {canReadQueue && <PlatformStudioQueue accountId={account.id} />}
-          <PlatformOrganizationList accountId={account.id} canCreate={canReadQueue} />
-        </>
-      )}
+            {canGrace && (
+              <PlatformGrace
+                key={"grace-" + organizationId}
+                accountId={account.id}
+                orgId={organizationId}
+                onDenied={deny}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {canReadQueue && <PlatformStudioQueue accountId={account.id} />}
+            <PlatformOrganizationList accountId={account.id} canCreate={canReadQueue} />
+          </>
+        )}
+        {!unavailable && <PlatformActivityLog actor={account.display_name} entries={entries} />}
+      </PlatformActivityContext>
     </main>
   );
 }
@@ -218,11 +238,7 @@ function PlatformOrganizationList({
     (!!cursor && query.data?.pageParams.includes(cursor));
   const title = t(($) => $.platform.organizations);
   if (platformAccessDenied(query.error))
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
-      </Alert>
-    );
+    return <PlatformReadError error={query.error} onRetry={() => void query.refetch()} />;
   return (
     <Card className="min-w-0">
       <CardHeader className="flex flex-wrap items-center justify-between gap-3">

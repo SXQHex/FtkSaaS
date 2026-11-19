@@ -7,6 +7,7 @@ import { Field, FieldError, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { studioSetupName } from "../workspace/studio-setup-request";
+import { usePlatformActivity } from "./platform-activity-context";
 import { PlatformActionReview } from "./platform-action-review";
 import { platformOrganizationsKey } from "./platform-directory";
 import { PlatformReadError } from "./platform-read-error";
@@ -33,6 +34,7 @@ export function PlatformCreate({
 }) {
   const { t } = useTranslation();
   const client = useQueryClient();
+  const { record } = usePlatformActivity();
   const id = useId();
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -258,6 +260,7 @@ export function PlatformCreate({
           write={createPlatformOrganization}
           read={readProvisionedOrganization}
           onResult={async (orgId) => {
+            record({ key: review.key, kind: "created", subject: review.name });
             setCreatedId(orgId);
             await client.invalidateQueries({ queryKey: platformOrganizationsKey(accountId) });
           }}

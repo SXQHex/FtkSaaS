@@ -6,6 +6,9 @@ import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 const text = common.platform;
+const activity = text.activity;
+const activityLog = (page: import("@playwright/test").Page) =>
+  page.getByRole("region", { name: activity.title, exact: true });
 const target = uid(210);
 const initial = {
   kind: "organization",
@@ -212,11 +215,15 @@ test("platform console pages organizations, reads an independent detail and veri
   };
   const suspend = await approve(text.suspend, "Sentetik askı nedeni");
   await expect(suspend.getByRole("status")).toHaveText(common.events.commandStates.unknown);
+  await expect(page.getByText(activity.empty, { exact: true })).toBeAttached();
   await suspend.getByRole("button", { name: common.studio.retrySameRequest, exact: true }).click();
   await expect(suspend.getByRole("status")).toHaveText(common.events.commandStates.saved);
   await suspend.getByRole("button", { name: common.settings.discard, exact: true }).click();
   await expect(page.getByText(text.suspended, { exact: true })).toBeVisible();
   await expect(page.getByText(text.subscriptions.active, { exact: true })).toBeVisible();
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(1);
+  await expect(activityLog(page)).toContainText(activity.actions.suspended);
+  await expect(activityLog(page)).not.toContainText("Sentetik askı nedeni");
   const resume = await approve(text.resume, "Sentetik açma nedeni");
   await expect(resume.getByRole("status")).toHaveText(common.events.commandStates.saved);
   await resume.getByRole("button", { name: common.settings.discard, exact: true }).click();
@@ -228,10 +235,18 @@ test("platform console pages organizations, reads an independent detail and veri
   expect(writes).toHaveLength(3);
   expect(writes[0]!.request.operation_key).toBe(writes[1]!.request.operation_key);
   expect(writes[2]!.request.expected_version).toBe(2);
+  await page.getByRole("link", { name: text.organizations, exact: true }).click();
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(2);
+  await expect(activityLog(page).getByRole("listitem").first()).toContainText(
+    activity.actions.resumed,
+  );
+  await page.getByRole("link", { name: text.studioRequests.title, exact: true }).click();
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(2);
   f.revoke();
   await page.getByRole("link", { name: text.organizations, exact: true }).click();
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
   await expect(page.getByText(initial.name, { exact: true })).toHaveCount(0);
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(0);
 });
 
 for (const role of ["owner", "staff"] as const)
@@ -512,6 +527,13 @@ test("operator filters a native payment queue, rejects a report and replays one 
   expect(f.writes).toHaveLength(3);
   expect(f.writes[1]!.request.operation_key).toBe(f.writes[2]!.request.operation_key);
   expect(f.subscription.version).toBe(2);
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(2);
+  await expect(activityLog(page).getByRole("listitem").first()).toContainText(
+    activity.actions.paymentAccepted,
+  );
+  await expect(activityLog(page).getByRole("listitem").last()).toContainText(
+    activity.actions.paymentDeclined,
+  );
 
   const customer = await browser.newPage({ baseURL });
   try {
@@ -595,6 +617,9 @@ test("operator sees the live grace limit and only extends it after reviewing an 
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
   await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
   await expect(page.getByText(/25 Kas 2026.*13:30 UTC/)).toBeVisible();
+  await expect(activityLog(page).getByRole("listitem")).toContainText(
+    activity.actions.graceExtended,
+  );
   expect(f.subscription.grace_until).toBe(extendedGrace);
   expect(f.writes).toHaveLength(1);
 });
@@ -701,6 +726,8 @@ test("platform creates a queued studio and a direct organization with a publishe
   };
   await create();
   await expect(page.getByRole("heading", { name: queued.name })).toBeVisible();
+  await expect(activityLog(page).getByRole("listitem")).toContainText(activity.actions.created);
+  await expect(activityLog(page).getByRole("listitem")).toContainText(queued.name);
   expect(writes[0]).toMatchObject({
     studio_setup_id: queued.id,
     verified_account_id: queued.account_id,
@@ -715,6 +742,8 @@ test("platform creates a queued studio and a direct organization with a publishe
   await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
   await create();
   await expect(page.getByRole("heading", { name })).toBeVisible();
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(1);
+  await expect(activityLog(page).getByRole("listitem")).toContainText(name);
   expect(writes[1]).toMatchObject({ verified_account_id: uid(243), name });
   expect(writes[1]?.studio_setup_id).toBeUndefined();
   expect(accountLookups).toBe(2);
@@ -784,6 +813,12 @@ test("platform operator protects the last eligible member, verifies an addition 
   await expect(grant.getByRole("status")).toHaveText(common.events.commandStates.saved);
   await grant.getByRole("button", { name: common.settings.discard, exact: true }).click();
   await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toBeVisible();
+  await expect(activityLog(page).getByRole("listitem")).toContainText(
+    activity.actions.operatorAdded,
+  );
+  await expect(activityLog(page).getByRole("listitem")).not.toContainText(
+    "operator@example.invalid",
+  );
   await testInfo.attach("E52 Platform sahipleri", {
     body: await page.screenshot({ fullPage: true }),
     contentType: "image/png",
@@ -795,6 +830,7 @@ test("platform operator protects the last eligible member, verifies an addition 
   await applyBillingReview(page, text.operators.remove);
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toHaveCount(0);
+  await expect(activityLog(page)).toHaveCount(0);
   await page.reload();
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
   expect(lookupCount).toBe(2);

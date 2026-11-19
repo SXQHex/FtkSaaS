@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Field, FieldError, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
+import { usePlatformActivity } from "./platform-activity-context";
 import { PlatformActionReview } from "./platform-action-review";
 import { billingReason } from "./platform-payment";
 import { PlatformReadError } from "./platform-read-error";
@@ -38,6 +39,7 @@ export function PlatformOperators({
   const { t } = useTranslation();
   const id = useId();
   const client = useQueryClient();
+  const { record } = usePlatformActivity();
   const reasonRef = useRef<HTMLTextAreaElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState("");
@@ -284,6 +286,14 @@ export function PlatformOperators({
               onDenied();
               return;
             }
+            const roster = review.intent.enabled ? current : rows;
+            record({
+              key: review.intent.key,
+              kind: review.intent.enabled ? "operatorAdded" : "operatorRemoved",
+              subject:
+                roster.find((row) => row.account_id === review.intent.target)?.display_name ??
+                undefined,
+            });
             client.setQueryData(key, current);
             setEmail("");
             setLookup(undefined);

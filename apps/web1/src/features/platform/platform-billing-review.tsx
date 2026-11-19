@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { usePlatformActivity } from "./platform-activity-context";
 import { PlatformActionReview } from "./platform-action-review";
 import { platformOrganizationsKey } from "./platform-directory";
 import {
@@ -27,6 +28,7 @@ export function PlatformBillingReview({
 }) {
   const { t } = useTranslation();
   const queries = useQueryClient();
+  const { record } = usePlatformActivity();
   return (
     <PlatformActionReview
       intent={intent}
@@ -37,6 +39,16 @@ export function PlatformBillingReview({
       write={writePlatformBilling}
       read={readBillingResult}
       onResult={async ({ data }) => {
+        record({
+          key: intent.key,
+          kind:
+            intent.kind === "grace"
+              ? "graceExtended"
+              : intent.accepted
+                ? "paymentAccepted"
+                : "paymentDeclined",
+          subject: data.organization?.name,
+        });
         queries.setQueryData(sourceKey, data);
         await Promise.all([
           queries.invalidateQueries({ queryKey: platformPaymentsKey(intent.accountId) }),

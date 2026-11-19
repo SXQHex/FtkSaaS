@@ -363,7 +363,7 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 - [x] **E52.2** · Son uygun operatör korunuyor. Yetki kaybeden oturumun görünümü kaldırılıyor ve müşteri rolüne erişim açılmıyor. [Yerel kabul](../e2e/auth-platform.spec.ts) · [Native kabul](../../backend/tests/starter-studio-acceptance.mjs).
 - [ ] **E52.3** · Yayımlı platform kabulü. Kuruluş, ödeme ve operatör ekranları yerel Chromium senaryolarında doğrulandı. Dağıtım sonrası geçerli platform oturumuyla rotaları ve yetki sınırını doğrula.
 
-- [ ] **E52.4** · Platform bölümlerinde referanstaki oturum içi operatör işlem kaydını, sunucuda sonucu doğrulanmış işlemlerle göster.
+- [x] **E52.4** · Operatör işlem kaydı kuruluş, askı/kaldırma, ödeme kararı, ek süre ve operatör yetkisi işlemlerini mevcut native sonuç doğrulamasından sonra gösterir. Aynı işlem anahtarı tek satır üretir. Kayıt konsol bölümleri arasında korunur, konsoldan ayrılınca, belge yenilenince veya yetki reddinde temizlenir. Gerekçe ve hesap e-postası kayda alınmaz. Tek Chromium işçisiyle 9 platform senaryosu geçti. [Yerel kabul](../e2e/auth-platform.spec.ts).
 
 <a id="e53"></a>
 
