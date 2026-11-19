@@ -26,6 +26,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@babel/parser": "7.29.11",
     "@ftksaas/api-contracts": "workspace:*",
     "@ftksaas/typescript-config": "workspace:*",
     "ajv": "8.20.0",

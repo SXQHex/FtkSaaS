@@ -1,5 +1,11 @@
 # Güncel kaynak ve kabul
 
+## Edge doğrulayıcı boyutu
+
+Taban `46c9dd22484bb9a46e939e562e654a6c044e6283` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44524823332) başarılı. Aynı derleme ayarlarıyla ham Edge kaynağı 4.006.148 → 3.277.440 bayt, JSON yükü 4.129.792 → 3.362.342 bayt (%18,58) oldu. Operasyon ve sözleşme dosyaları ile Worker doğrulayıcısı birebir eşleşiyor.
+
+Yerel karşılaştırmada 503 doğrulayıcı için 118.505 olumlu ve olumsuz örnek, hata nesneleri ve serileştirilmiş hata dizileri dahil, tabanla birebir eşleşti. Sözleşme, yönetişim ve restore doğrulaması tek seri Node runner ile 459/459 geçti. Üretim, typecheck ve floor guard kontrolleri geçti. CI yardımcıları, gerçek geçici yol ile doğrulanan hook testi dahil 148/149 yerel sonuç verdi. Linux `/proc` örneği isteyen aynı gözlemci testi macOS tabanında da başarısız. Aday CI ve hosted teslim ayrı kanıttır.
+
 <a id="platform-console-completion"></a>
 ## W1-BE-60–62 · Platform konsolu
 
