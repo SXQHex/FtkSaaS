@@ -115,12 +115,12 @@ Git’teki [18 Kasım v67 arşivi](../design-reference/revisions/2026-11-18/) ka
 
 | Dosya         | SHA-256                                                            |
 | ------------- | ------------------------------------------------------------------ |
-| `GECIS.md`    | `008be52420bc000df596496237004bbbd7336207f58a350bb37929759d876219` |
-| `ILERLEME.md` | `0419e6d06d88f21092b669bc322df32696db5ba884b6947681258fbafda74fd4` |
-| `README.md`   | `62d88ee6bfb27e3bc9fc597aee70431f473b6a5f80d0f91e1818b5060f121f0c` |
+| `GECIS.md`    | `535e92e308ad0c1cd473ec3d6bdb35c6dd31de9a2e13f1fc3433c886ea876237` |
+| `ILERLEME.md` | `9a2f40293494b20e139a54b626073dab70df4a01e62c47b2b9befcc5d1e8d5ae` |
+| `README.md`   | `bbc0d6d1405701e2c44e22ddac47caec831290e9dbf7c090297da5660e5295ea` |
 | `app.css`     | `eb7581bec396d62d9cd182fb28e28edbbae4098039c4ede273ff7628bcb2199a` |
-| `app.js`      | `0a8b428a148d30089c42eed1e9f8950b30fe0b9d68d9df375a4c7081090b3284` |
-| `index.html`  | `35fc4729999d9c2e5313222dd1ec331971341cbe3065f83c454a21183420c3c1` |
+| `app.js`      | `7641ef37a390f4a0fedd27d9ba4e0e65b550ed91f8d36e4018816700d34bcc90` |
+| `index.html`  | `f5aa3e1670b0d49eb7ba38730db09e71feb3d9a19f6a031e949337d1b127e7d4` |
 | `tokens.css`  | `197742a8736bd7cb9ea3d7a3b99fa402e03cd321dd8593a76e259eef06c2d1b0` |
 
 v67 HTML'sinde **50** `data-view` vardı. v69'da giriş sonrası `a-alan` ile sayı **51** oldu. Önizleme şablonu `taslak` dışarıda tutulduğunda 50 HTML görünümü var. Eski 46 ekranın kimlikleri korunuyor; `a-kurulum`, `m-bildirim` ve `merkezler` eklenmiş. Platform operatörünün üç mantıksal görünümü `#opshell/#op-root` içine JS ile çiziliyor, `data-view` sayısına dahil değil. Platformun üç JS görünümüyle takip envanteri E01–E53 oldu. Business kişi/başvuru/hesaplaşma ve organizasyon raporu bazı mevcut sayfalardaki sekme/çekmecelerle sunuluyor; yalnız HTML bölüm sayısını esas alarak bunları atlama.
