@@ -183,21 +183,25 @@ test('Typed settings catalog round-trip in every scope',async t=>{
  const {org,center,person}=await settingsTenant(fixture);
  await publishSyntheticSharingNotices(owner,org);
  const weakOwner=owner;owner=await nativeTotp(t,owner);
-  await t.test('all declared fields in five scopes round-trip through real typed APIs; unsupported branding cannot fake success',async()=>{
-   const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
-   const orgScope={scope:'organization',org_id:org},centerScope={scope:'center',org_id:org,center_id:center};
-   await fail('AUTH_REQUIRED',weakOwner,'settings_update_v1',{...orgScope,expected_version:(await read(owner,orgScope)).version,patch:{security_policy:fields.find(f=>f.key==='security_policy').default}},key());
+  const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
+  const orgScope={scope:'organization',org_id:org},centerScope={scope:'center',org_id:org,center_id:center};
+  await t.test('organization assurance and center override gates before catalog writes',async()=>{
+   const initial=await read(owner,orgScope);
+   await fail('AUTH_REQUIRED',weakOwner,'settings_update_v1',{...orgScope,expected_version:initial.version,patch:{security_policy:fields.find(f=>f.key==='security_policy').default}},key());
    assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='lesson_reminder_hours').writable,false);
-   await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{lesson_reminder_hours:1}},key());
-   await write(owner,orgScope,{reminder_center_overrides_enabled:true,allow_center_sharing_restrictions:true},(await read(owner,orgScope)).version);
-   const pipeline=(await read(owner,orgScope)).values.crm_pipeline;
+   const centerInitial=await read(owner,centerScope);
+   await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:centerInitial.version,patch:{lesson_reminder_hours:1}},key());
+   await write(owner,orgScope,{reminder_center_overrides_enabled:true,allow_center_sharing_restrictions:true},initial.version);
+   const current=await read(owner,orgScope),pipeline=current.values.crm_pipeline;
    assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='crm_local_tags').writable,false);
    await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{crm_local_tags:[]}},key());
-   await write(owner,orgScope,{crm_pipeline:{...pipeline,allow_center_tags:true}},(await read(owner,orgScope)).version);
-   const operator=await authUser('settings-field-operator');await must(operator,'account_get_v1');
-   await db.query('insert into private.platform_operators(auth_user_id) values($1)',[operator.id]);
-   try{
-    for(const scope of ['user','member','center','organization','platform']){
+   await write(owner,orgScope,{crm_pipeline:{...pipeline,allow_center_tags:true}},current.version);
+  });
+  const operator=await authUser('settings-field-operator');await must(operator,'account_get_v1');
+  await db.query('insert into private.platform_operators(auth_user_id) values($1)',[operator.id]);
+  try{
+   for(const scope of ['user','member','center','organization','platform']){
+    await t.test(scope+' fields round-trip through real typed APIs and unsupported fields are rejected',async()=>{
      const actor=scope==='platform'?operator:owner,q={scope,...['member','center','organization'].includes(scope)?{org_id:org}:{},...scope==='center'?{center_id:center}:{}};
      const catalog=await must(actor,'settings_catalog_get_v1',q),expected=fields.filter(f=>f.scope===scope);
      assert.deepEqual(catalog.fields.map(f=>f.key).sort(),expected.map(f=>f.key).sort());
@@ -209,9 +213,9 @@ test('Typed settings catalog round-trip in every scope',async t=>{
      assert((await write(actor,q,patch,before.version,operationKey)).replayed);
      const after=await read(actor,q);for(const [name,value] of Object.entries(patch))assert.deepEqual(after.values[name],value,scope+'.'+name);
      for(const field of expected.filter(f=>f.schema.type==='null'))await fail('SERVICE_UNAVAILABLE',actor,'settings_update_v1',{...q,expected_version:after.version,patch:{[field.key]:null}},key());
-    }
-   }finally{await db.query('delete from private.platform_operators where auth_user_id=$1',[operator.id]);}
-  });
+    });
+   }
+  }finally{await db.query('delete from private.platform_operators where auth_user_id=$1',[operator.id]);}
  }finally{if(trigger){await db.query(`drop trigger if exists ${trigger} on private.frontend_settings_history`);await db.query(`drop function if exists private.${trigger}()`);}await db.end();}
 });
 

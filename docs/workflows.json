@@ -308,8 +308,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7fcef8a80f863687293866c2f4d6a6de60b1ad60075e5447bdea1ef75464be26",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "a180f9c01eb62b8ed38f9e583e048f78aeedddddc66a529910d73740e2ae0c99",
+        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
       }
     },
     {
@@ -1564,8 +1564,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "b3d76826fca93491b14f32d62dce03aa93298a8f0be804a216d58aa0a36f4454",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "4ba74eaf1b6e0e1e9844a5652c1e9b921442ae92267416165f2b819c65a53056",
+        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
       }
     },
     {

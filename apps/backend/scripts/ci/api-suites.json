@@ -846,7 +846,7 @@
         {
           "line": 11,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "d999781cb6a286b703f038fb40ec172941bff842a97595e74a563a33cbe7d277",
+          "sha256": "49b931d8c0feef32afaefdb69587db3e06470f6b9dc68cd767b039701d2a45f0",
           "shared": [
             [
               1,
@@ -861,12 +861,12 @@
               177
             ],
             [
-              217,
-              218
+              221,
+              222
             ],
             [
-              259,
-              260
+              263,
+              264
             ]
           ],
           "parts": [
@@ -888,7 +888,7 @@
                 ],
                 [
                   178,
-                  216
+                  220
                 ]
               ]
             },
@@ -896,8 +896,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  219,
-                  258
+                  223,
+                  262
                 ]
               ]
             },
@@ -905,8 +905,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  261,
-                  297
+                  265,
+                  301
                 ]
               ]
             }
