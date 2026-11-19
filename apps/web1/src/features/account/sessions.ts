@@ -27,8 +27,9 @@ export function saveSessionLabel(input: {
   });
 }
 
-export function revokeSession(sessionId: string, operationKey: string) {
-  return getBackend().call("account_sessions_revoke_v1", {
+export function revokeSession(sessionId: string, operationKey: string, accessToken?: string) {
+  const backend = accessToken ? getBackend(accessToken) : getBackend();
+  return backend.call("account_sessions_revoke_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
     mode: "selected",

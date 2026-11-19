@@ -3,7 +3,7 @@ import { z } from "zod";
 import { BackendError, createBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import type { Preview } from "../../lib/api-contracts/generated";
-import { MfaRequiredError } from "./fresh-session";
+import { MfaRequiredError, retirePreviousPasswordSession } from "./fresh-session";
 
 // Private, tab-scoped recovery data. Neither proof nor password is persisted.
 const storageKey = "ftk-account-deletion";
@@ -66,6 +66,7 @@ export function prepareDeletion(actor: string, accountId: string, preview: Previ
       request_id: uuidv7(),
     });
     if (account.id !== accountId) throw new Error("ACCOUNT_CHANGED");
+    await retirePreviousPasswordSession(session);
     // Commit recovery intent before transport; a lost ACK can only replay this key/payload.
     save(intent);
     try {

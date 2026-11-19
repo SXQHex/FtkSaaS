@@ -21,13 +21,9 @@ vi.mock("../../lib/supabase", () => ({
     auth: { getSession: session, mfa: { getAuthenticatorAssuranceLevel: assurance } },
   }),
 }));
-vi.mock("../account/fresh-session", () => ({
+vi.mock("../account/fresh-session", async (original) => ({
+  ...(await original<typeof import("../account/fresh-session")>()),
   freshPasswordSession: password,
-  MfaRequiredError: class extends Error {
-    constructor() {
-      super("MFA_REQUIRED");
-    }
-  },
 }));
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`;
 const scope = { accountId: id(1), orgId: id(2), centerId: id(3) };

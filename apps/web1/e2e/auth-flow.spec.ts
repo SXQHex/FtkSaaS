@@ -229,6 +229,8 @@ test("fresh native password session is adopted and exact proof survives others r
     page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }),
   ).toBeVisible();
   await captureAuth(page, "e10-others-confirm", testInfo);
+  expect(calls.previousSessionRevocations).toBe(1);
+  expect(calls.revokeKeys).toHaveLength(0);
   expect(calls.othersKeys).toHaveLength(0);
   calls.rejectNextOthers = true;
   await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
@@ -263,10 +265,22 @@ test("fresh password requiring TOTP uses the canonical MFA route before others c
   await page.getByRole("button", { name: "Devam et", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/mfa`);
   expect(calls.othersKeys).toHaveLength(0);
+  expect(calls.previousSessionRevocations).toBe(0);
+  await page.getByLabel("Doğrulama kodu").fill("654321");
+  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await expect.poll(() => calls.verify).toBe(2);
+  await expect(page).toHaveURL(`${origin}/mfa`);
+  expect(calls.previousSessionRevocations).toBe(0);
   await page.getByLabel("Doğrulama kodu").fill("123456");
   await page.getByRole("button", { name: "Doğrula", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  expect(calls.previousSessionRevocations).toBe(1);
+  expect(calls.revokeKeys).toHaveLength(0);
+  expect(calls.othersKeys).toHaveLength(0);
   await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await page.getByRole("button", { name: "Daha fazla", exact: true }).click();
+  await expect(page.getByText("Firefox, fixture phone")).toBeVisible();
+  await expect(page.getByText("Previous fixture browser")).toHaveCount(0);
   await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
   await page.getByRole("button", { name: "Yeni giriş yaptım", exact: true }).click();
   await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
