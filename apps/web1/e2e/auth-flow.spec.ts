@@ -737,7 +737,8 @@ test("font scale preserves exact pending intents, system choice, keyboard access
       .locator('[data-slot="card"]')
       .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
   );
-  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  const emailTrigger = page.getByRole("button", { name: "E-postayı değiştir", exact: true });
+  await emailTrigger.click();
   const emailDialog = page.getByRole("dialog");
   await expect(emailDialog.getByLabel("Yeni e-posta", { exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "email-sheet-200-percent")).violations).toEqual([]);
@@ -747,6 +748,8 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   expect(dialogBounds!.x + dialogBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
   await page.screenshot({ path: ".tmp/e10-appearance-scale-sheet-200-390-dark.png" });
   await emailDialog.getByLabel("Kapat", { exact: true }).click();
+  await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
+  await expect(emailTrigger).toBeFocused();
   await scale.focus();
   await expect(scale).toBeFocused();
   await page.keyboard.press("Shift+Tab");
