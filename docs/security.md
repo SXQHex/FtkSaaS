@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `741bfe47e6e1391fcc79f4b8b4c0a714a89cfe9b1ef74539110ea6ad005f2744`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `4c4a68e3cc3e0843a0d54beed0b2425cd70d13496f69865feee5e598c486d83e`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -440,6 +440,9 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261118215000_platform_invoices.sql](../apps/backend/supabase/migrations/20261118215000_platform_invoices.sql) | `943240737ff53d7098fbe65f8f49784671c51f68804a485ffc32e3c260749bb7` |
 | [20261119060000_platform_console_completion.sql](../apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql) | `13cfe5a203253a227b60eb5d9ab793c3cb9b7ce734d4a80cd3d919af26b28331` |
 | [20261119150000_centers_list_rls.sql](../apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql) | `c4cdd1d762b136544af0bc6b528ac3e03bd89819da190e0eb50761d2a49f85a9` |
+| [20261119170000_shared_center_authorization.sql](../apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql) | `2172b023fd54d51a750254c7dde7681c3535238ec7b6b761f245cb69cce097a2` |
+| [20261119170002_sql_list_pagination.sql](../apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql) | `603d662160050a5dc691775cebbddd8b036138c44d60cb7952a74f00de3247d8` |
+| [20261119170003_sql_report_pagination.sql](../apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql) | `d8eec8a72677fe772fab5630bd254e21c37aa48028192b8da95d31d2cc31265f` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

@@ -373,6 +373,14 @@ test('W1-BE-43 verified account requests first setup and only the platform fulfi
  const list=(actor,platform_queue=false)=>must(actor,'studio_setup_list_v1',{platform_queue,page:{limit:200}});
  assert.deepEqual((await list(other)).items,[]);
  assert.equal((await call(applicant,'studio_setup_list_v1',{platform_queue:true,page:{}})).result.error.code,'FORBIDDEN');
+ await must(other,'studio_setup_open_v1',{name:'Second synthetic setup request'},key());
+ const queue={platform_queue:true,page:{limit:1}};
+ const first=await must(platform,'studio_setup_list_v1',queue);
+ assert(first.next_cursor);
+ const continuation={...queue,page:{limit:1,cursor:first.next_cursor}};
+ const second=await must(platform,'studio_setup_list_v1',continuation);
+ assert.deepEqual([...first.items,...second.items],(await list(platform,true)).items.slice(0,2));
+ assert.equal((await call(applicant,'studio_setup_list_v1',{page:continuation.page})).result.error.code,'VALIDATION_FAILED');
  assert.equal((await list(platform,true)).items.find(row=>row.id===requested.primary_id).account_id,account.id);
  const create={verified_account_id:account.id,name:open.name,initial_plan_id:plan,studio_setup_id:requested.primary_id};
  assert.equal((await call(applicant,'organization_create_v1',create,key())).result.error.code,'FORBIDDEN');
@@ -382,6 +390,7 @@ test('W1-BE-43 verified account requests first setup and only the platform fulfi
  assert.equal(linked.state,'fulfilled');
  assert.equal(linked.organization_id,organization.primary_id);
  assert(!(await list(platform,true)).items.some(row=>row.id===requested.primary_id));
+ assert.equal((await call(platform,'studio_setup_list_v1',continuation)).result.error.code,'VERSION_CONFLICT');
  assert((await must(applicant,'organizations_list_v1',{page:{}})).items.some(row=>row.id===organization.primary_id));
  assert.equal((await call(applicant,'studio_setup_open_v1',open,key())).result.error.code,'INVALID_STATE_TRANSITION');
 });
@@ -551,6 +560,9 @@ test('W1-BE-58 invoices publish verified ZIP and PDF originals to the live organ
  await db.query("insert into core.saas_change_requests(id,org_id,target_plan_id,effective_at,state) values($1,$2,$3,now()-interval '1 minute','scheduled')",[key(),org,subscription.plan_version_id]);
  assert.equal((await list()).items.length,2);
  assert.equal((await download(owner,zipScope)).ok,true);
+ await db.query(`insert into private.platform_invoices(id,org_id,invoice_number,issued_on,mime,bytes,checksum,published_at)
+  values($1,$2,'DEMO-cursor-change',current_date,'application/pdf',32,repeat('0',64),clock_timestamp())`,[key(),org]);
+ assert.equal((await call(owner,'organization_invoices_list_v1',{org_id:org,page:{limit:1,cursor:first.next_cursor}})).result.error.code,'VERSION_CONFLICT');
 });
 
 test('W1-BE-60 platform plan discovery uses effective native versions that a new organization can select',async t=>{

@@ -12,7 +12,10 @@ function totp(secret){
 }
 
 test('Native TOTP enrollment, proof, stale-token rejection, mandatory security history and removal',async t=>{
- const guard=resources(t),user=await authUser('native-totp'),other=await authUser('native-totp-other');await must(user,'account_get_v1');await must(other,'account_get_v1');const {env}=context();
+ const guard=resources(t),user=await authUser('native-totp'),other=await authUser('native-totp-other');
+ const [firstAccount,secondAccount]=await Promise.all([must(user,'account_get_v1'),must(user,'account_get_v1')]);
+ assert.equal(secondAccount.id,firstAccount.id);
+ await must(other,'account_get_v1');const {env}=context();
  const db=await guard.connect(env.DB_URL);const previousConfig=(await db.query('select * from private.p07_lifecycle_config')).rows;let factor,backup,backupSecret,backupCounter;let strong=user;let securityScope;
  const native=async(path,method,body,u=user)=>{const response=await fetch(env.API_URL+'/auth/v1'+path,{method,headers:{apikey:env.ANON_KEY,authorization:'Bearer '+u.jwt,'content-type':'application/json'},...(body!==undefined?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(60000)});const text=await response.text();return {response,data:text?JSON.parse(text):null};};
  const fail=async(code,u,op,body={},k)=>{const r=await call(u,op,body,k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
@@ -57,7 +60,7 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
     await db.query('rollback to savepoint factor_rows');
    }finally{await db.query('rollback');}
   });
-  await t.test('organization MFA and stricter reauthentication cover direct and recursive discovery paths',async()=>{
+  await t.test('organization MFA and stricter reauthentication cover commands and management discovery',async()=>{
    await db.query('insert into private.p07_lifecycle_config values(true,300) on conflict(singleton) do nothing');
    const {platform,plan}=await fixturePlatform(),account=await must(strong,'account_get_v1');
    const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Native organization security',initial_plan_id:plan},key())).primary_id;
@@ -69,13 +72,14 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    await must(strong,'role_assign_v1',{org_id:org,center_id:center,person_id:person,role:'staff',scope:{center_id:center}},key());
    securityScope={org,center};
    const rooms={org_id:org,center_id:center,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}},page:{limit:10}};
+   const permission={org_id:org,center_id:center,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:person,permission:'attendance.draft'}}};
    const q={scope:'organization',org_id:org},none={mfa_roles:[],sensitive_reauth_max_age_seconds:null};
    let current=await must(strong,'settings_get_v1',q);
    await must(strong,'settings_update_v1',{...q,expected_version:current.version,patch:{security_policy:{...none,mfa_roles:['owner']}}},key());
    await must(strong,'organization_get_v1',{org_id:org});
    await centers(strong,securityScope,true);
    await centers(user,securityScope,false);
-   const discovered=await must(strong,'management_state_get_v1',{org_id:org,center_id:center,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:person,permission:'attendance.draft'}}});
+   const discovered=await must(strong,'management_state_get_v1',permission);
    assert.equal(discovered.items[0].entity.id,person);
    await fail('AUTH_REQUIRED',user,'management_state_get_v1',rooms);
    current=await must(strong,'settings_get_v1',q);
@@ -86,6 +90,7 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    try{
     await db.query("update auth.sessions set created_at=clock_timestamp()-interval '1 minute' where id=$1",[strong.session_id]);
     await fail('AUTH_REQUIRED',strong,'center_manager_assign_v1',{org_id:org,center_id:center,person_id:person},key());
+    await fail('FORBIDDEN',strong,'management_state_get_v1',permission);
     await must(strong,'management_state_get_v1',rooms);
    }finally{await db.query('update auth.sessions set created_at=$2 where id=$1',[strong.session_id,created]);}
    await db.query("update private.frontend_settings set values=jsonb_set(values,'{security_policy}',$2::jsonb),version=version+1 where scope_key=$1",['organization:'+org,JSON.stringify(none)]);

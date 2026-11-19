@@ -390,7 +390,7 @@
         {
           "line": 421,
           "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-          "sha256": "8ad4908308bd709ed4b3dd071f7e51da6c52ebd372d26861a3bb51e1dd31de57"
+          "sha256": "9f83c37de1653f7b08734d9b56515a45fd4ecc38d5c080a13db3bb7a70d4e365"
         },
         {
           "line": 422,
@@ -636,7 +636,7 @@
         {
           "line": 5,
           "path": "apps/backend/tests/account-mfa-acceptance.mjs",
-          "sha256": "272afa438aaa07b976cc22032284ec1576be32faeecd081252962aa47b4e6319"
+          "sha256": "c5f7b86edd1699bfa5ba391b1412a863c1170f7fdc9e58c9cd602372a7329a4a"
         },
         {
           "line": 6,
@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "a7de714dc2ef738c13572693b499fcd0d9a8a749825c590ffea130fbe4a6259b"
+          "sha256": "0765a38b8a18f27a8bf3b9e3a7359fecd4dcccaa63df60156bf4a6bc7050ea80"
         },
         {
           "line": 147,
