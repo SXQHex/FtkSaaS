@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
 import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
 import { workspaceQuery } from "./workspace-query";
-import { workspaceNavigation, type NavigationView } from "./navigation";
+import { workspaceNavigation, workspacePersonalHref, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
 import { BackendError } from "../../lib/backend";
 import { AppSidebar } from "../../components/app-sidebar";
@@ -308,7 +308,7 @@ export function WorkspaceLayout({
               <MoonIcon />
             </Button>
             <LinkButton
-              href="/inbox"
+              href={workspacePersonalHref("/inbox", resolvedOrganizationId, centerId)}
               variant="ghost"
               size="icon-sm"
               aria-label={t(($) => $.workspace.notifications)}

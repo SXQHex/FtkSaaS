@@ -31,6 +31,13 @@ export interface NavigationGroup {
   key: keyof typeof common.workspace.groups;
   items: NavigationItem[];
 }
+
+export function workspacePersonalHref(path: string, orgId?: string, centerId?: string) {
+  return orgId && centerId
+    ? `${path}?${new URLSearchParams({ org: orgId, center: centerId })}`
+    : path;
+}
+
 export function workspaceNavigation(
   view: NavigationView,
   orgId?: string,
@@ -43,8 +50,7 @@ export function workspaceNavigation(
       ? `/o/${encodeURIComponent(orgId)}/c/${encodeURIComponent(centerId)}`
       : undefined;
   const scoped = (path: string) => (base ? `${base}/${path}` : undefined);
-  const personal = (path: string) =>
-    orgId && centerId ? `${path}?${new URLSearchParams({ org: orgId, center: centerId })}` : path;
+  const personal = (path: string) => workspacePersonalHref(path, orgId, centerId);
   if (view === "instructor")
     return [
       {
@@ -68,7 +74,7 @@ export function workspaceNavigation(
         { key: "people", url: scoped("people"), icon: <UsersIcon /> },
         { key: "leads", url: scoped("leads"), icon: <TargetIcon /> },
         { key: "automation", url: scoped("automation"), icon: <ZapIcon /> },
-        { key: "inbox", url: "/inbox", icon: <InboxIcon /> },
+        { key: "inbox", url: personal("/inbox"), icon: <InboxIcon /> },
         { key: "requests", url: scoped("requests"), icon: <ClockIcon /> },
       ],
     },
