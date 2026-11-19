@@ -692,6 +692,8 @@ test("account theme uses versioned user settings, exact retry and read-only reco
 test("font scale preserves exact pending intents, system choice, keyboard access and reflow at 200 percent", async ({
   page,
 }, testInfo) => {
+  // This scenario scans both saved scales at four viewport and theme combinations each.
+  test.setTimeout(60_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
