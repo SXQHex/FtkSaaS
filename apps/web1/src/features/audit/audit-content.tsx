@@ -1,3 +1,4 @@
+import { saveDownload } from "../../lib/save-download";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -6,7 +7,6 @@ import { readWorkspace } from "../workspace/workspace";
 import { AuditView, type AuditFilter } from "./audit-view";
 import { AuditDetailSheet } from "./audit-detail-sheet";
 import { auditModules, readAudit, readAuditCsv, readTracking } from "./audit-read";
-import { saveCsv } from "../reports/reports-command";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Field, FieldLabel } from "../../components/ui/field";
@@ -109,7 +109,7 @@ export function AuditContent({
     setExportFailed(false);
     try {
       const data = await readAuditCsv(scope, input);
-      saveCsv(new Blob([data.csv], { type: data.mime }), data.filename);
+      saveDownload(new Blob([data.csv], { type: data.mime }), data.filename);
     } catch {
       setExportFailed(true);
     } finally {

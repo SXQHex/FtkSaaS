@@ -1,3 +1,4 @@
+import { saveDownload } from "../../lib/save-download";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
@@ -31,7 +32,6 @@ import {
   readReportJob,
   readJob,
   downloadSkippedImportRows,
-  saveCsv,
   type ImportUploadIntent,
   type ReportJobIntent,
 } from "./reports-command";
@@ -372,7 +372,7 @@ export function ReportImportEditor({
     setDownloadingSkipped(true);
     try {
       const blob = await downloadSkippedImportRows(scope, jobId);
-      if (mounted.current) saveCsv(blob, `import-skipped-${jobId}.csv`);
+      if (mounted.current) saveDownload(blob, `import-skipped-${jobId}.csv`);
     } catch (cause) {
       if (mounted.current && !lost(cause)) setSkippedDownloadFailed(true);
     } finally {
@@ -388,7 +388,7 @@ export function ReportImportEditor({
       ],
       { type: "text/csv;charset=utf-8" },
     );
-    saveCsv(blob, `${kind}-template.csv`);
+    saveDownload(blob, `${kind}-template.csv`);
   }
   return (
     <ReportImportSheet

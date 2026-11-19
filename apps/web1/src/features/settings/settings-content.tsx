@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { readWorkspace } from "../workspace/workspace";
+import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { Button } from "../../components/ui/button";
@@ -40,6 +40,8 @@ import { useSettingsDocument } from "./use-settings-document";
 import { useSettingsTeam } from "./use-settings-team";
 import { useSettingsNotifications } from "./use-settings-notifications";
 import { readOrganizationSettingsCatalog } from "./settings-reader";
+import { SettingsTaxProfile } from "./settings-tax-profile";
+import { SettingsInvoiceHistory } from "./settings-invoice-history";
 
 export function SettingsContent({
   scope,
@@ -110,6 +112,7 @@ export function SettingsContent({
         ) === true
       }
       canOrganization={canOrganization}
+      owner={workspaceRoles(current, scope.centerId).includes("owner")}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
       organizationLoading={catalog.isPending || catalog.isFetching}
@@ -125,6 +128,7 @@ function SettingsManagement({
   centerLabel,
   timezone,
   canOrganization,
+  owner,
   canSubscription,
   canWriteOrganization,
   readOnly,
@@ -137,6 +141,7 @@ function SettingsManagement({
   centerLabel: string;
   timezone: string;
   canOrganization: boolean;
+  owner: boolean;
   canSubscription: boolean;
   canWriteOrganization: boolean;
   readOnly: boolean;
@@ -367,6 +372,21 @@ function SettingsManagement({
   const data: SettingsViewData = {
     ...document.data,
     ...subscription.data,
+    ...(section === "plan" && level === "organization" && owner && !readOnly && canOrganization
+      ? {
+          billingTax: (
+            <SettingsTaxProfile
+              scope={scope}
+              locked={locked}
+              onLockChange={publishLock}
+              onAccessLost={accessLost}
+            />
+          ),
+          invoiceHistory: (
+            <SettingsInvoiceHistory scope={scope} locked={locked} onAccessLost={accessLost} />
+          ),
+        }
+      : {}),
     permissions: team.matrix,
     fields: {
       ...document.data.fields,

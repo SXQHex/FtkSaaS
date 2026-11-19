@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan            | İşlev                      | Durum                         | Sonraki eylem                                                   |
-| ---------- | --------------- | -------------------------- | ----------------------------- | --------------------------------------------------------------- |
-| **V07.1**  | Starter + çizim | Vergi profili ve faturalar | Backend development hazır.    | Sahip ekranını doğrulanmış profil, geçmiş ve dosya API’lerine bağla. |
+| Aktif adım | Plan            | İşlev              | Durum                       | Sonraki eylem                                                   |
+| ---------- | --------------- | ------------------ | --------------------------- | --------------------------------------------------------------- |
+| **E47**    | Starter + çizim | İlk stüdyo talebi  | Backend development hazır.  | Hesabım’da yetkili talep açma ve takip ekranını mevcut kuruluma bağla. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -256,9 +256,10 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 <a id="v07"></a>
 
-### V07 · Ayarlar, Starter ve yaşam döngüsü
+### V07 · Ayarlar, Starter ve yaşam döngüsü (kapandı)
 
-- [ ] **V07.1** · E12/E42 ekip, plan, havale, merkez adı ve organizasyon yaşam döngüsü mevcut yetki ve kaynak komutlarına bağlı. Fatura unvanı, adresi ve e-postası organizasyon ayarından okunur, sürümlü değişiklik onaylandıktan sonra yeniden doğrulanır. Statik derleme, 52 ayar birim testi ve tek Chromium işçisiyle seri ayar/yaşam döngüsü paketi 22/22 geçti. Vergi profili, yetkili fatura geçmişi ve orijinal ZIP/PDF backend development’a teslim edildi. Sahip ekranındaki bağlantı, indirme ve yeniden okuma kabulü açık. [W1-BE-58](request.md#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi).
+- [x] **V07.1** · E12/E42 ekip, plan, havale, merkez adı, organizasyon yaşam döngüsü ve fatura iletişim alanları mevcut yetkili akışlarında doğrulandı. Organizasyon sahibi `organization_billing_tax_get_v1/set_v1` ile vergi dairesini ve vergi kimliğini sürümlü okuyor, onaylıyor ve açık null ile temizliyor. Belirsiz yanıt ilk işlem yazısını tekrarlamadan doğrulandı.
+      Sahibin fatura geçmişi `organization_invoices_list_v1` üzerinden sayfalanıyor. `organization_invoice_file_get_v1?download=original` ile indirilen PDF ve ZIP dosyalarının baytları profil değişikliğinden sonra kaynakla eşleşti. Yetki reddi eski fatura satırlarını gizledi, organizasyon yöneticisi sahip uçlarını çağırmadı. 18 hedefli birim testi ve tek Chromium işçisiyle 5 farklı senaryo geçti. [Sahip ve yönetici kabulü](../e2e/auth-settings-invoices.spec.ts) · [W1-BE-58](request.md#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi).
 - [x] **V07.2** · Sahip gezinmesi ve sayfa araması, doğrulanmış `subscription_get_v1` Starter sonucuyla Etkinlikler, Hakediş ve Otomasyon bağlantılarını gizler. Doğrudan URL ve işlem izinleri native denetimde kalır. Tek Chromium işçisiyle Starter paketi 11/11 geçti. Temel CRM, açık başvuru, satış, tahsilat, kesin rezervasyon, yoklama ve rapor korunuyor. Tek salon reddinde mevcut salon kaldı. 100 aktif üye ve diğer kaynak sınırlarının native kanıtı [S01’de](#starter), yayımlı aday kabulü G-STARTER.2’de.
 - [x] **V07.3** · Planı daralt çekmecesi erişilebilir başlığı, kaynak Starter seçeneğini ve merkez saat dilimindeki yürürlük tarihini gösterir. `kept_scope` açık seçilir, onaylanır ve `subscription_get_v1` ile doğrulanır. Bekleyen Pro dönemi, dönem sınırından sonra eski Pro yazısının reddi ve aynı rezervasyon/hak/borç/yoklama geçmişi tek Chromium işçisiyle 2/2 geçti. Native dönem geçişi kanıtı [S05.2’de](#starter).
 
@@ -1043,6 +1044,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
     - [x] Disiplin kaynak/sürüm/deaktivasyon kanıtı ile belirsiz sonuç ve ACK sonrası yalnız okuma regresyonları ayarlar paketinde geçti.
     - [x] Politika etki/yayın, public profil/form/onay kaynağı, operasyonel ekip rolleri/tekil izin, açık Starter kapsamlı plan daraltma bağlı. Bildirim kanal desteği gerçek katalogdan; sistem metni yazımı platform yetkisinde olduğu için tenant düzenlemesi üretilmez.
     - [x] OM/CM ekip keşfi PR327’nin native rol/durum filtrelerine bağlandı; yönetici atama/geri alma ayrı native komutları ve rol sürümünü kullanır.
+    - [x] Sahip vergi profili ve orijinal fatura indirme kanıtı [V07.1](#v07) altında.
   - [x] **E42.6** · 38 birim ve7 tarayıcı senaryosu geçti. Native yaşam döngüsü, canlı alan/sürüm/yetki, frozen key/ACK kurtarma, OM/CM scope, açık daralma kapsamı ve son durum Axe/1440–320 reflow otomatik raporda; manuel mikro kanıt yok.
   - [x] **E42.7** · Uygulanabilir ekran kapsamı kapandı; ödeme bildirimi platform ödeme doğrulaması, teklif veya dönem talebi anlık plan değişimi sayılmaz.
 

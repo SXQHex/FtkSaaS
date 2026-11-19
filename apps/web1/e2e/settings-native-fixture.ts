@@ -12,7 +12,7 @@ import {
 import { studioIds as I } from "./studio-fixture.js";
 export async function mockSettingsCompletion(
   page: Page,
-  options: { permissionUnknown?: boolean } = {},
+  options: { permissionUnknown?: boolean; billingOwner?: boolean } = {},
 ) {
   const writes: { op: string; r: NativeRequest }[] = [];
   const state = {
@@ -167,7 +167,13 @@ export async function mockSettingsCompletion(
       };
       await send(
         nativePage(
-          [...roles, self].filter(
+          [
+            ...roles,
+            self,
+            ...(options.billingOwner
+              ? [{ ...self, id: uid(104), role: "owner", scope_center_id: null }]
+              : []),
+          ].filter(
             (row) =>
               (!r.person_id || row.person_id === r.person_id) &&
               (!r.center_id || row.scope_center_id === r.center_id) &&

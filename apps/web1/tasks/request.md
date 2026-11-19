@@ -492,7 +492,7 @@ Yetkili kuruluş yöneticisi `settings_update_v1(scope:organization,patch:{publi
 
 **Backend desteği karşılandı.** Vergi profili için [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı. Orijinal ZIP/PDF ve fatura geçmişi için [PR #343](https://github.com/SXQHex/FtkSaaS/pull/343), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) başarılı.
 
-Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sürümle günceller. `organization_invoices_list_v1` yayımlanmış faturaları, `organization_invoice_file_get_v1?download=original` orijinal dosyayı yetkili sahibine verir. Profil düzenlemesi kesilmiş faturayı değiştirmez. Platform fatura dosyasını mevcut hazırlık/yayın komutlarıyla yayımlar. Web1 tüketimi [V07.1](todo.md#v07) kapsamındadır. [WF17](../../../docs/workflows.md#wf17).
+Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sürümle günceller. `organization_invoices_list_v1` yayımlanmış faturaları, `organization_invoice_file_get_v1?download=original` orijinal dosyayı yetkili sahibine verir. Profil düzenlemesi kesilmiş faturayı değiştirmez. Platform fatura dosyasını mevcut hazırlık/yayın komutlarıyla yayımlar. [V07.1 Web1 kabulü](todo.md#v07). [WF17](../../../docs/workflows.md#wf17).
 
 ## W1-BE-59 · Platform konsolu kapsamı ve keşif okumaları
 

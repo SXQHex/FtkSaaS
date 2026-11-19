@@ -1,3 +1,4 @@
+import { saveDownload } from "../../lib/save-download";
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouter, useSearch } from "@tanstack/react-router";
@@ -34,7 +35,7 @@ import {
 } from "./reports-presentation";
 import { ReportImportEditor } from "./report-import-editor";
 import { ReportExportEditor } from "./report-export-editor";
-import { downloadReport, readJob, saveCsv } from "./reports-command";
+import { downloadReport, readJob } from "./reports-command";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 export function ReportsContent({
@@ -324,7 +325,7 @@ export function ReportsContent({
       if (action === "download") {
         const row = currentExports?.items.find((row) => row.id === id);
         if (!row || row.state !== "succeeded") throw Error("REPORT_FILE_UNAVAILABLE");
-        saveCsv(await downloadReport(scope, id, uuidv7()), `report-${id}.csv`);
+        saveDownload(await downloadReport(scope, id, uuidv7()), `report-${id}.csv`);
       } else if (action === "rows") {
         const row = currentImports?.items.find((row) => row.job_id === id);
         if (!row) throw Error("IMPORT_JOB_UNKNOWN");

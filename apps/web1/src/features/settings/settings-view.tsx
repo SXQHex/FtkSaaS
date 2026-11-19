@@ -157,6 +157,8 @@ export interface SettingsViewData {
   };
   reminderPreview?: { id: string; lesson: string; delivery: string | null }[];
   preparationManagement?: ReactNode;
+  billingTax?: ReactNode;
+  invoiceHistory?: ReactNode;
 }
 export type SettingsAction =
   | { kind: "reset"; card: SettingsCardKey }
@@ -1052,6 +1054,8 @@ export function SettingsView({
                         </CardContent>
                       ) : null}
                       {form && card.key !== "bildirim-0" && footer(card.key)}
+                      {card.key === "plan-billing" && data.billingTax}
+                      {card.key === "plan-1" && data.invoiceHistory}
                       {panel.key === "ekip" && index === 1 && !form && footer(card.key)}
                       {(card.key === "plan-0" || card.key === "plan-2") && (
                         <CardFooter className="flex-wrap justify-between gap-3">

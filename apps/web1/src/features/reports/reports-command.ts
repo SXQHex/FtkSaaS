@@ -156,14 +156,6 @@ async function requestCsv(url: URL, bearer: string, request: object) {
   return response.blob();
 }
 
-export function saveCsv(blob: Blob, name: string) {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = name;
-  link.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
 export interface ImportUploadIntent {
   scope: ClientScope;
   request: Omit<RequestImportUploadPrepare, "request_id">;
