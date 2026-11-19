@@ -297,7 +297,8 @@
         "apps/backend/database/audit-export-tracking-results.sql",
         "apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql",
         "apps/backend/database/tracking-media-redaction.sql",
-        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql"
+        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -309,8 +310,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "dcb7699e0466ee75c17253d169e4f9b7a2db23b80a8ae81a320e48250f4fc860",
-        "reason": "Güncellenen iki backend kabul dosyasının SHA-256 kayıtları mevcut suite sahipliği, shard ve test politikası içinde eşlendi."
+        "fingerprint": "20c0160df0e6d96ee9ebff903b5fec5852f6dff2baebe66641e7ea55e0c50404",
+        "reason": "Ortak SQL dağıtımı, migration envanteri ve API test kanıtı incelendi. Wire sözleşmesi aynı."
       }
     },
     {
@@ -387,7 +388,8 @@
         "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql",
         "apps/backend/scripts/acceptance/s08-hosted-password.mjs",
         "apps/backend/scripts/acceptance/s08-hosted-recovery.mjs",
-        "apps/backend/transports/spa-ingress-worker.mjs"
+        "apps/backend/transports/spa-ingress-worker.mjs",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -399,8 +401,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "6dec610dcdd503b80a5daef7177090105a49ed3fd2ff2968501be6f2024ca564",
-        "reason": "Reviewed native enrollment, session, access grants and the separate mandatory-factor check on both transports."
+        "fingerprint": "11dd836ed8f08caf30c2d7dd1ed1bb79bbba1220c1eaa54a168a48283603c9d6",
+        "reason": "İlk hesabın eşzamanlı açılması ve canlı Auth, MFA ve hassas reauth kontrolleri incelendi."
       }
     },
     {
@@ -502,7 +504,8 @@
         "apps/backend/database/platform-console-completion.sql",
         "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
         "apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql",
-        "packages/api-contracts/src/read-transport.ts"
+        "packages/api-contracts/src/read-transport.ts",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -530,8 +533,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "727a3bee4e5789ebe90f919020298f60a6a7206895fb8f0e965af3056a8f771e",
-        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
+        "fingerprint": "fd421c70576025355599f82ad38bc1232fdf6a03f162fc06648e3530004f26dd",
+        "reason": "İzin keşfinin canlı merkez rolü, abonelik, kısa reauth ve geri alma kanıtı incelendi."
       }
     },
     {
@@ -625,7 +628,8 @@
         "apps/backend/database/member-lesson-discovery.sql",
         "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
-        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -648,8 +652,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "e2e6cbefb6642febe801b270dff59f4d64427d0a02a0727175b0645aeae80fd1",
-        "reason": "Ortak Starter kabul dosyasındaki platform fatura senaryosu genişletildi. Bu akışın kaynakları ve senaryoları korunur."
+        "fingerprint": "ee5b6d4df7728efd1024e210685238380ed24fe226853193a528cfb117f7d8cb",
+        "reason": "Seans değişikliği ve yerine seans kaynak keşfinin kapsamı, sürümleri ve hata sırası incelendi."
       }
     },
     {
@@ -1555,7 +1559,8 @@
         "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
         "apps/backend/database/public-form-discovery.sql",
         "apps/backend/database/settings-catalog-v24.sql",
-        "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql"
+        "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
+        "apps/backend/supabase/migrations/20261119170001_lazy_settings_projection.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1570,8 +1575,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "2ceea6fdc482d4236f09ff95ed6c0c53a3e4fa5da378f81a75a5c8f7e60c28a8",
-        "reason": "Reviewed mandatory role MFA after native removal and with a stale persisted AAL2 session in the isolated fixture."
+        "fingerprint": "1656a52d1237d33ae3b4d8cc9d23225260e091fc0ba89fd27dc4c1774f825516",
+        "reason": "Ayar kataloğu, geçmiş, scope, cursor ve değer projeksiyonlarıyla MFA kapsamı incelendi."
       }
     },
     {

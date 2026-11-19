@@ -1,5 +1,16 @@
 # Güncel kaynak ve kabul
 
+<a id="shared-sql-settings"></a>
+## Ortak SQL yetkilendirmesi ve ayar okumaları
+
+Taban `5efb6eade48030035d7f51d4d4b643399a826ae4`. Aynı SHA’nın [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44570599408) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44570708292) başarılı.
+
+İzin düzenleme ve iki seans yönetimi okuması kilitli hesap ve organizasyon bağlamını kullanıyor. Komut ön kontrolü canlı oturumu, MFA’yı, platform yetkisini ve ticari kapıları denetliyor. İlk hesap yalnız eksikse oluşturuluyor. Ayar kataloğu ve geçmiş etkili ayar değerlerini hesaplamadan kendi projeksiyonlarını kullanıyor. API sözleşmesi ve istemci kodu aynı.
+
+Sentetik organizasyon fixture’ında PostgreSQL sunucu saatiyle dönüşümlü önce/sonra koşuldu. Her operasyon ve sürüm için 480 ölçüm alındı. p95, izin yönetimi okumasında 1,299 → 1,100 ms, mevcut hesap okumasında 0,480 → 0,393 ms, ayar kataloğunda 7,857 → 6,592 ms ve ayar geçmişinde 2,118 → 0,557 ms oldu. Kontrol olarak ölçülen etkili ayar okuması 2,171 → 2,144 ms verdi. Bunlar yerel SQL ölçümleridir. Organizasyon kilidi beklenirken platform rolü kaldırıldığında taban ve aday aynı `BILLING_OPERATION_RESTRICTED` hatasını döndürdü.
+
+İzole loopback Supabase’te 213 migration temiz uygulandı. Seri runner’da 31/31 native izin, Auth/MFA, seans ve ayar testi, ayrıca 13/13 PostgreSQL taşıma ve bütünlük testi geçti. İki ilk erişim aynı hesap kimliğini döndürdü. Süresi dolmuş hassas doğrulama izin okumasında `FORBIDDEN` verdi. Aday CI ve hosted kabulü bekliyor.
+
 <a id="invoice-directory-catalog-status"></a>
 ## W1-BE-63 ve 65 · Platform fatura dizini ve katalog durumu
 
