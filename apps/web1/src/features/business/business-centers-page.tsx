@@ -199,7 +199,9 @@ function BusinessCenterPanels({
     );
   const max = data?.limits.entries.find((row) => row.key === "centers" && "value" in row);
   const usage = data?.usage.entries.find((row) => row.key === "centers")?.value;
-  const canCreate = owner && max && "value" in max && usage !== undefined && usage < max.value;
+  const ownerQuotaAllowsCreate =
+    owner && max && "value" in max && usage !== undefined && usage < max.value;
+  const canCreate = orgManager || ownerQuotaAllowsCreate;
   const root = (center: string) => `/o/${scope.orgId}/c/${center}`;
   return (
     <>

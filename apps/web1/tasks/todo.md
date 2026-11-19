@@ -303,7 +303,7 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 
 `data-view="merkezler"` ve JS C1–C4. Merkezler rotası Business ve canlı yönetim kapsamıyla açılıyor. [Business kabulü](#business).
 
-- [x] **E49.1** · Merkez oluşturma ve organizasyon kotası native kaynaktan okunuyor. Yönetici, etkili politika ve disiplin görünümleri seçilen merkezde okunuyor ve mevcut düzenleyicilere bağlanıyor. [Merkez ekranı](../src/features/business/business-centers-page.tsx) · Üç hedefli Chromium senaryosu geçti. [Yerel kabul](../e2e/auth-business-centers.spec.ts).
+- [x] **E49.1** · Merkez oluşturma ve organizasyon kotası native kaynaktan okunuyor. Yönetici, etkili politika ve disiplin görünümleri seçilen merkezde okunuyor ve mevcut düzenleyicilere bağlanıyor. [Merkez ekranı](../src/features/business/business-centers-page.tsx) · Dört hedefli Chromium senaryosu geçti. Organizasyon yöneticisi, sahip abonelik okuması olmadan merkez ekledi. [Yerel kabul](../e2e/auth-business-centers.spec.ts).
 - [x] **E49.2** · Organizasyon kişi dizini Abone No ve merkez bağlarını, kuruluş başvuru kuyruğu da sürümlü yönlendirmeyi gösteriyor. Hesaplaşma hareketi, ödeme veya mahsup talebi, B kararı, geri çekme, açık yetki ve ürün kullanım kapsamı native kaynaklara bağlı. [Merkezler arası native kabul](../../backend/tests/cross-center-settlement.test.mjs).
 - [x] **E49.3** · Birleşik rapor yetkili merkez kümesini, daralma bağlantısı mevcut Plan düzenleyicisini kullanıyor. Beş aktif merkez ve 1.250 tekil aktif öğrenci sınırı [native kapasite kabulüne](../../backend/tests/commercial-plan-acceptance.mjs) bağlı. B01–B06 yayımlı kabulü açık.
 

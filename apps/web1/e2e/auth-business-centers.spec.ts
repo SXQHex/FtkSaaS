@@ -12,7 +12,7 @@ const application = uid(262);
 const movement = uid(263);
 const settlement = uid(264);
 const centerUrl = (center = I.center) => `/o/${I.org}/c/${center}/centers`;
-type Role = "owner" | "center_manager";
+type Role = "owner" | "org_manager" | "center_manager";
 type Calls = { op: string; request: Record<string, unknown> }[];
 async function businessFixture(page: Page, role: Role, plan = "business") {
   await mockSettingsCompletion(page, { billingOwner: role === "owner" });
@@ -46,10 +46,10 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
     calls.push({ op, request });
     const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
     if (op === "centers_list_v1") return send(nativePage(centers));
-    if (op === "roles_list_v1" && role === "center_manager" && request.person_id === I.self)
+    if (op === "roles_list_v1" && role !== "owner" && request.person_id === I.self)
       return send(
         nativePage(
-          [I.center, second].map((center, index) => ({
+          (role === "org_manager" ? [null] : [I.center, second]).map((center, index) => ({
             id: uid(265 + index),
             person_id: I.self,
             role,
@@ -315,4 +315,24 @@ test("Pro owner cannot open the Business centers or request Business data", asyn
   expect(
     f.calls.filter(({ op }) => op === "report_get_v1" || op.startsWith("settlement_")),
   ).toEqual([]);
+});
+
+test("a Business organization manager can create a center without opening the owner's subscription", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "org_manager");
+  await page.goto(centerUrl());
+  await page.getByRole("button", { name: text.add, exact: true }).click();
+  const form = page.getByRole("form", { name: text.add, exact: true });
+  await form.getByLabel(text.center, { exact: true }).fill("Yöneticinin yeni merkezi");
+  await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
+  await form.getByRole("button", { name: text.review, exact: true }).click();
+  await confirm(page, text.add);
+  await expect(
+    page
+      .getByRole("grid", { name: text.title })
+      .getByText("Yöneticinin yeni merkezi", { exact: true }),
+  ).toBeVisible();
+  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
+  expect(f.calls.filter(({ op }) => op === "subscription_get_v1")).toEqual([]);
 });
