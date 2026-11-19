@@ -24,11 +24,13 @@ export function PlatformOrganizationDetail({
   accountId,
   organizationId,
   canSuspend,
+  paymentsHref,
   onDenied,
 }: {
   accountId: string;
   organizationId: string;
   canSuspend: boolean;
+  paymentsHref?: string;
   onDenied: () => void;
 }) {
   const { t } = useTranslation();
@@ -58,6 +60,7 @@ export function PlatformOrganizationDetail({
     onRefresh: async (data) => {
       queries.setQueryData(key, data);
       await queries.invalidateQueries({ queryKey: platformOrganizationsKey(accountId) });
+      await queries.invalidateQueries({ queryKey: ["platform-grace", accountId, organizationId] });
       setReason("");
     },
   });
@@ -151,6 +154,11 @@ export function PlatformOrganizationDetail({
                 </div>
               )}
             </dl>
+            {paymentsHref && (
+              <LinkButton href={paymentsHref} variant="outline" isDisabled={command.locked}>
+                {t(($) => $.platform.billing.organizationPayments)}
+              </LinkButton>
+            )}
             {canSuspend && (row.state === "active" || row.platform_suspended) && (
               <form
                 className="space-y-3 border-t pt-4"

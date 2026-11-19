@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan     | İşlev              | Durum                      | Sonraki eylem                                                   |
-| ---------- | -------- | ------------------ | -------------------------- | --------------------------------------------------------------- |
-| **E51.2**  | Platform | Ödeme ve ek süre   | Backend development hazır. | Ödeme kuyruğunu, yetkili kararları ve güncel sonucu konsola bağla. |
+| Aktif adım              | Plan          | İşlev                         | Durum                                               | Sonraki eylem                                                                                                |
+| ----------------------- | ------------- | ----------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **V08.2 / G-STARTER.2** | Pro / Starter | Teslim adayı ve yayımlı kabul | Geliştirilen akışlar hedefli paketlerde doğrulandı. | Kullanıcı dağıtımından sonra güncel adayın tam seri doğrulamasını ve yayımlı Starter/çizim kabulünü tamamla. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -296,7 +296,7 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
         Ders değişikliği bildirimi native `reservation_target` içindeki merkez ve seansı kullanır. İkinci merkezin rezervasyonu kendi kişi kapsamından tekrar okundu ve klavyeyle doğrudan açıldı. Geri/ileri veya yenilemede erişim reddi ayrıntıyı gizledi. Native hedef bulunmadığında bağlantı gösterilmedi ve başka merkezde okuma denenmedi. [W1-BE-48](request.md#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi) · [Ders değişikliği testi](../e2e/auth-inbox.spec.ts#L449).
         Yer teklifi bağlantısı tam teklif kimliğini taşıyor. Hedef, native self dizinini `entity` ile tek kayda daraltıp teklif sahibini ve seansı kontrol ediyor. Özel ders yanıtı tam talebi açıyor. Geri/ileri ve yenilemede güncel kayıt yeniden okunuyor. Yabancı teklif ve yabancı talep gizlendi, bildirim ya da rezervasyon yazısı oluşmadı. Statik derleme ile tek işçili 10 tarayıcı ve 33 birim testi geçti. [Teklif](../e2e/auth-inbox.spec.ts#L473) · [Özel ders](../e2e/auth-inbox.spec.ts#L503).
 
-- [ ] **E49** · **Merkezler ve Business sekmeleri** — `data-view="merkezler"` ve JS'nin C1–C4 alanları. B01–B06. Hazır Tabs, Card, Table, Sheet, Dialog, Combobox, Checkbox, AlertDialog. Starter ve yeni çizim kabulünden sonra.
+- [ ] **E49** · **Merkezler ve Business sekmeleri** — `data-view="merkezler"` ve JS'nin C1–C4 alanları. B01–B06. Hazır Tabs, Card, Table, Sheet, Dialog, Combobox, Checkbox, AlertDialog. Başlangıç [Business teslim koşullarına](#business) bağlı. Mevcut çalışma alanı erişilebilir merkezleri okuyor, ayarlar organizasyon ve merkez kapsamlarını ayırıyor. Bu yolların Business'a özgü işlem ve kabul zincirleri aşağıda izleniyor. [Çalışma alanı](../src/features/workspace/workspace.ts) · [Ayar kapsamı](../src/routes/o.$orgId.c.$centerId.settings.tsx).
   - [ ] **E49.1** · Merkez listesi, yönetici, politika mirası ve disiplin görünümlerini B01'e bağla. Gerçek merkez değişiminde cache/izinler yeniden okunur.
   - [ ] **E49.2** · Organizasyon kişi/başvuru kutusunu E13/E16/E33 ile B02'ye; hesaplaşma hareket/talep/kullanım/yetki sekmelerini E20 ve B03/B04'e bağla. Ayrı HTML bölümü olmayan JS panellerini de eşle.
   - [ ] **E49.3** · Birleşik rapor ve daralma kaynak seçimini E41/E42, B05/B06 ile bağla. Beş merkez ve1250tekil öğrenci sınırı, merkezler arası izolasyon, tekrar güvenliği ve finans yetkisini native/otomatik kabulde doğrula.
@@ -309,12 +309,13 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 
 - [ ] **E51** · **Platform ödeme ve ek süre** — JS `o-odemeler`. WF13/WF17. Hazır Tabs, Table, Sheet, Field ve AlertDialog. E50 yetki temeli gerekir.
   - [x] **E51.1** · Native ödeme kuyruğu `platform_directory_get_v1(view:payments)` ile okunur. `saas_payment_verify_v1` gerçek ödeme kimliğiyle `accepted:true/false` ve gerekçe alır. `saas_grace_extend_v1` mevcut yetkili ek süre yoludur. Arayüz bağlantısı E51.2’de. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
-  - [ ] **E51.2** · Yetkili açık karar→dönem/ödeme yeniden okuması→müşteri plan görünümü zincirini bağla; ikinci onay dönem uzatmasın.
-  - [ ] **E51.3** · Yetkisiz karar, stale/tekrar ve ek süre sınırlarını native kaynak/otomatik UI kabulüyle doğrula.
+  - [x] **E51.2** · Platform ödemeleri native durum filtresiyle okunuyor. Gerekçeli onay/ret öncesi aynı bildirim, kuruluş ve sürüm doğrulanıyor. Karar sonrası aynı bildirim ile kuruluş yeniden okunuyor. Tarayıcıdaki sentetik zincirde ret dönemi değiştirmedi, kayıp onay yanıtı aynı anahtarla bir kez uygulandı ve kuruluş sahibinin Plan ekranı yeni dönemi gösterdi. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native dönem ve tekrar kabulü](../../backend/tests/subscription-period-acceptance.mjs#L84).
+  - [x] **E51.3** · Ödeme sürümü değiştiğinde veya platform izni geri alındığında karar gönderilmedi ve izin kaybında ayrıntı kaldırıldı. Ek süre için mevcut son ve sürüm yetkili seçiciden okundu, eşit tarih formda reddedildi ve gerekçeli UTC bitiş yeniden okumayla doğrulandı. Alt sınır ve abonelik koşulları native yazma işlemiyle denetleniyor. Altı hedefli senaryo tek Chromium işçisiyle geçti. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native kurallar](../../backend/database/p07-subscriptions.sql#L93).
+  - [ ] **E51.4** · Çizimdeki kuruluş/dönem bilgisi ve ek süre uygunluğu için operatöre yetkili güncel okuma gerekiyor. [W1-BE-61](request.md#w1-be-61--platform-ödeme-dönemi-ve-ek-süre-uygunluğu).
 
 - [ ] **E52** · **Platform sahipleri** — JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
-  - [ ] **E52.1** · Çizimdeki sahip dizini ve gerekçeli onayı, development’a teslim edilmiş `platform_directory_get_v1(view:owners|verified_accounts)` ve `platform_owner_set_v1/remove_v1` ile bağla. Karar öncesi yetkiyi ve doğrulanmış hesabı yeniden oku. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
-  - [ ] **E52.2** · Son sahip koruması, yetki kaldırma, açık oturumda eski izinle tekrar ve müşteri rolünün reddini doğrula.
+  - [ ] **E52.1** · Çizimdeki platform operatörü dizini ve gerekçeli ekleme/kaldırma [W1-BE-62](request.md#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi) bekliyor. Mevcut `view:owners` ve `platform_owner_set_v1/remove_v1` seçili organizasyonun stüdyo sahibini okur ve değiştirir. [Native organizasyon sahipliği](../../backend/database/dispatch.sql#L133).
+  - [ ] **E52.2** · W1-BE-62 tesliminden sonra son platform sahibi korumasını, izin geri alımını, açık oturumda eski izinle tekrarı ve müşteri rolünün reddini doğrula.
   - [ ] **E52.3** · E50–E52'nin görsel/otomatik/gerçek ortam kanıtlarını kendi platform tesliminde bağla. Bu çizimlerin eklenmesi Business veya platform kabulünü kendiliğinden kapatmaz.
 
 <a id="on-tarama"></a>

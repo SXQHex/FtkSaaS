@@ -67,6 +67,8 @@ Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında,
 | W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Karşılandı](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
 | W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Karşılandı](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
 | W1-BE-60 | E50.4 · WF02 | Platform için ilk plan sürümü keşfi | [Açık](#w1-be-60--platform-için-ilk-plan-sürümü-keşfi). |
+| W1-BE-61 | E51.4 · WF13/WF17 | Platform ödeme dönemi ve ek süre uygunluğu | [Açık](#w1-be-61--platform-ödeme-dönemi-ve-ek-süre-uygunluğu). |
+| W1-BE-62 | E52 · WF17 | Platform operatörü dizini ve yetki yönetimi | [Açık](#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi). |
 
 ## Bütün talepler için ortak sınır
 
@@ -499,10 +501,22 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 
 **Backend desteği karşılandı.** [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı.
 
-`account_get_v1(include_platform_scope:true)` canlı platform erişimini, `platform_directory_get_v1` kuruluş, ödeme, sahip ve e-postayla doğrulanmış hesap keşfini döndürür. `platform_organization_suspension_set_v1` sürümlü askı/kaldırma sağlar. Ödeme kararı, ek süre ve sahiplik mevcut yetkili komutları kullanır. Web1 organizasyon ve askı tüketimi E50.2–E50.3 altında doğrulandı. Ödeme ve sahip arayüzü E51–E52 kapsamındadır. [WF17](../../../docs/workflows.md#wf17).
+`account_get_v1(include_platform_scope:true)` canlı platform erişimini, `platform_directory_get_v1` kuruluş, ödeme, organizasyon sahibi ve e-postayla doğrulanmış hesap keşfini döndürür. `platform_organization_suspension_set_v1` sürümlü askı/kaldırma sağlar. Web1 organizasyon, askı, ödeme kararı ve ek süre komutlarını E50.2–E51.3 altında kullanıyor. Platform operatörü yetki yönetimi [W1-BE-62](#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi) altında izleniyor. [WF17](../../../docs/workflows.md#wf17).
 
 ## W1-BE-60 · Platform için ilk plan sürümü keşfi
 
 **Açık · backend değerlendirmesi.** `organization_create_v1` zorunlu `initial_plan_id` kabul ediyor. Mevcut yönetim seçicisi de ilk plan kimliğini girdi olarak istiyor. [Platform dizini](../../../docs/workflows.md#wf17) kuruluş, sahip, ödeme ve doğrulanmış hesap okuyor. Kuruluş oluşturma ve stüdyo talebini tamamlama bağlamında seçilebilir plan sürümlerini veren yayımlanmış bir kaynak bulunamadı. [WF02](../../../docs/workflows.md#wf02) · [E50.4](todo.md#yeni-ekranların-envanteri).
 
 Organizasyon oluşturma yetkisi olan platform hesabına, yeni kuruluş için seçilebilir planların gerçek sürüm kimliğini ve gösterilecek adını döndüren bir kaynak gerekiyor. Başka kuruluşun aboneliği veya tasarım örneği ilk plan kaynağı olarak kullanılmamalı. Oluşturma komutundaki mevcut plan ve hesap doğrulaması korunmalı.
+
+## W1-BE-61 · Platform ödeme dönemi ve ek süre uygunluğu
+
+**Açık · backend değerlendirmesi.** `platform_directory_get_v1(view:payments)` kuruluş kimliği, tutar, referans ve ödeme durumunu döndürüyor. Çizimdeki tablo kuruluş adıyla ödemenin bağlandığı teklif dönemini de gerektiriyor. Kuruluş adı ayrıntıda yetkili dizinden okunuyor ve müşteri Plan ekranı kendi dönemini `subscription_get_v1` üzerinden gösteriyor. [Ödeme ve kuruluş projeksiyonu](../../backend/database/platform-directory.sql#L33) · [WF13](../../../docs/workflows.md#wf13).
+
+Operatör ödeme satırında kuruluş adı ve özgün teklif dönemi ile ek süre seçicisinde yürürlükteki uygunluğu ve en erken kabul edilen bitiş sınırını okuyabilmeli. Bugünkü `management_state_get_v1` seçicisi abonelik sürümünü ve kayıtlı ek süre bitişini veriyor. Kayıtlı bitiş yoksa uygulanan varsayılan alt sınır ve dönem sonunda iptal koşulu yazma sırasında denetleniyor. Müşteri sahibinin abonelik okuma yetkisi ve mevcut yazma doğrulamaları korunmalı. [Seçici](../../backend/database/p07-subscription-bind.sql#L20) · [Yazma doğrulaması](../../backend/database/p07-subscriptions.sql#L93).
+
+## W1-BE-62 · Platform operatörü dizini ve yetki yönetimi
+
+**Açık · backend değerlendirmesi.** Çizimdeki E52, platform konsolunun sahiplerini listelemeyi ve yönetmeyi istiyor. Native yetki, platform operatörü üyeliğinden geliyor. `platform_directory_get_v1(view:owners)` ise organizasyonun `owner_person_id` kaydını döndürüyor. `platform_owner_set_v1/remove_v1` aynı kuruluşun sahipliğini aktarıyor. [Platform yetkisi](../../backend/database/dispatch.sql#L39) · [Kuruluş sahipliği yazması](../../backend/database/dispatch.sql#L133).
+
+Platform düzeyinde yetkili dizin ve doğrulanmış hedef hesapla gerekçeli yetki verme/kaldırma komutlarına ihtiyaç var. Son platform sahibinin silinmesini eşzamanlı işlemlerde de engelleyen native kabul, açık oturumda izin kaybı ve müşteri rolünün reddi bu teslimin parçası olmalı. [E52](todo.md#yeni-ekranların-envanteri) · [WF17](../../../docs/workflows.md#wf17).

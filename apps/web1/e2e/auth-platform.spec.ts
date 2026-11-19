@@ -1,7 +1,8 @@
 import { test, expect } from "./test.js";
 import { mockNative } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
-import { uid } from "./pro-completion-fixture.js";
+import { nativeMutation, uid } from "./pro-completion-fixture.js";
+import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 const text = common.platform;
@@ -223,3 +224,277 @@ for (const role of ["owner", "staff"] as const)
     await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
     expect(f.calls.filter(({ operation }) => operation.startsWith("platform_"))).toEqual([]);
   });
+
+const billing = text.billing;
+const billingOrg = I.org;
+const paymentsUrl = "/platform?section=payments&organization_id=" + billingOrg;
+const billingOrgUrl = "/platform?organization_id=" + billingOrg;
+const paymentIds = [uid(212), uid(213), uid(214)];
+const paymentTime = "2026-11-16T12:00:00Z";
+const initialPeriod = "2026-11-15T00:00:00Z";
+const paidPeriod = "2026-12-15T00:00:00Z";
+const initialGrace = "2026-11-22T12:00:00Z";
+const extendedGrace = "2026-11-25T13:30:00Z";
+const intendedGraceInput = "2026-11-25T13:30";
+
+async function billingFixture(page: import("@playwright/test").Page) {
+  const authority = await platformFixture(page, "platform");
+  const subscription = {
+    id: uid(215),
+    version: 1,
+    period_end: initialPeriod,
+    grace_until: initialGrace,
+  };
+  const payments = paymentIds.map((id, index) => ({
+    kind: "payment",
+    id,
+    org_id: billingOrg,
+    version: 1,
+    amount_minor: "100000",
+    currency: "TRY",
+    reference: "Sentetik bildirim " + (index + 1),
+    state: "pending",
+    occurred_at: paymentTime,
+    verified_at: null as string | null,
+  }));
+  const writes: { operation: string; request: Record<string, unknown> }[] = [];
+  let decisionKey: string | undefined;
+  let operator = true;
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const operation = new URL(route.request().url()).pathname.split("/").at(-1)!;
+    const request = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
+    const list = (items: unknown[]) => send({ items, next_cursor: null, as_of: paymentTime });
+    const deny = () =>
+      route.fulfill({
+        status: 403,
+        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+      });
+    if (operation === "platform_directory_get_v1" && request.view === "payments") {
+      if (!operator) return deny();
+      if (request.scope) expect(request.scope).toEqual({ org_id: billingOrg });
+      return list(
+        payments.filter(
+          (row) =>
+            (!request.payment_id || row.id === request.payment_id) &&
+            (!request.payment_state || row.state === request.payment_state),
+        ),
+      );
+    }
+    if (operation === "platform_directory_get_v1" && request.scope?.org_id === billingOrg) {
+      if (!operator) return deny();
+      const paid = subscription.period_end === paidPeriod;
+      if (request.view === "owners") return list([]);
+      expect(request.view).toBe("organizations");
+      return list([
+        {
+          ...initial,
+          id: billingOrg,
+          version: subscription.version,
+          name: "Sentetik ödeme organizasyonu",
+          access_mode: paid ? "normal" : "grace",
+          subscription_state: paid ? "active" : "grace",
+          grace_until: subscription.grace_until,
+        },
+      ]);
+    }
+    if (operation === "management_state_get_v1" && request.operation === "saas_grace_extend_v1") {
+      if (!operator) return deny();
+      expect(request.org_id).toBe(billingOrg);
+      expect(request.selector).toEqual({ operation: "saas_grace_extend_v1", key: {} });
+      const entity = { type: "saas_subscriptions", id: subscription.id };
+      return list([
+        {
+          operation: request.operation,
+          exists: true,
+          entity,
+          state: "grace",
+          as_of: paymentTime,
+          versions: [{ entity, version: subscription.version }],
+          current: { operation: request.operation, values: { until: subscription.grace_until } },
+        },
+      ]);
+    }
+    if (operation === "saas_payment_verify_v1") {
+      writes.push({ operation, request });
+      if (!operator) return deny();
+      expect(request.org_id).toBe(billingOrg);
+      const row = payments.find((item) => item.id === request.payment_id)!;
+      if (decisionKey && decisionKey === request.operation_key)
+        return send({ ...nativeMutation(row.id), version: row.version, replayed: true });
+      expect(row.state).toBe("pending");
+      expect(request.reason).toBe("Sentetik işlem gerekçesi");
+      row.version++;
+      row.state = request.accepted ? "accepted" : "rejected";
+      row.verified_at = paymentTime;
+      if (request.accepted) {
+        subscription.period_end = paidPeriod;
+        subscription.grace_until = "2026-12-22T00:00:00Z";
+        subscription.version++;
+        decisionKey = request.operation_key;
+        return route.abort("failed");
+      }
+      return send({ ...nativeMutation(row.id), version: row.version });
+    }
+    if (operation === "saas_grace_extend_v1") {
+      writes.push({ operation, request });
+      if (!operator) return deny();
+      expect(request).toMatchObject({
+        org_id: billingOrg,
+        until: extendedGrace,
+        reason: "Sentetik işlem gerekçesi",
+      });
+      subscription.grace_until = request.until;
+      subscription.version++;
+      return send({ ...nativeMutation(subscription.id), version: subscription.version });
+    }
+    if (operation === "subscription_get_v1")
+      throw Error("Platform session attempted a customer-only subscription read");
+    return route.fallback();
+  });
+  return {
+    writes,
+    payments,
+    subscription,
+    revoke: () => {
+      operator = false;
+      authority.revoke();
+    },
+  };
+}
+
+async function applyBillingReview(page: import("@playwright/test").Page, action: string) {
+  const dialog = page.getByRole("dialog", { name: action, exact: true });
+  const apply = dialog.getByRole("button", { name: common.settings.applyReview, exact: true });
+  await expect(apply).toBeDisabled();
+  await dialog.getByRole("checkbox").press("Space");
+  await apply.click();
+  return dialog;
+}
+
+async function openDecision(page: import("@playwright/test").Page, index: number, action: string) {
+  await page.getByRole("link", { name: "Sentetik bildirim " + (index + 1), exact: true }).click();
+  await page.getByLabel(text.reason, { exact: true }).fill("Sentetik işlem gerekçesi");
+  await page.getByRole("button", { name: action, exact: true }).click();
+}
+
+test("operator filters a native payment queue, rejects a report and replays one accepted report without a second period change", async ({
+  page,
+  browser,
+  baseURL,
+}) => {
+  const f = await billingFixture(page);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await signIn(page);
+  await page.goto(paymentsUrl);
+  const region = page.getByRole("region", { name: billing.payments, exact: true });
+  await region.focus();
+  await expect(region).toBeFocused();
+  await page.getByLabel(billing.state, { exact: true }).selectOption("pending");
+
+  await openDecision(page, 1, billing.reject);
+  const rejection = await applyBillingReview(page, billing.reject);
+  await expect(rejection.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await rejection.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await expect(page.getByText(billing.states.rejected, { exact: true })).toBeVisible();
+  expect(f.subscription.period_end).toBe(initialPeriod);
+
+  await page.getByRole("link", { name: billing.payments, exact: true }).click();
+  await openDecision(page, 0, billing.accept);
+  const approval = await applyBillingReview(page, billing.accept);
+  await expect(approval.getByRole("status")).toHaveText(common.events.commandStates.unknown);
+  await approval.getByRole("button", { name: common.studio.retrySameRequest, exact: true }).click();
+  await expect(approval.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await approval.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await expect(page.getByText(billing.states.accepted, { exact: true })).toBeVisible();
+  await expect(page.getByText(text.subscriptions.active, { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: billing.accept, exact: true })).toHaveCount(0);
+  expect(f.writes).toHaveLength(3);
+  expect(f.writes[1]!.request.operation_key).toBe(f.writes[2]!.request.operation_key);
+  expect(f.subscription.version).toBe(2);
+
+  const customer = await browser.newPage({ baseURL });
+  try {
+    await mockSettingsCompletion(customer, { billingOwner: true });
+    await customer.route("**/functions/v1/backend-v1/subscription_get_v1", (route) =>
+      route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            state: "active",
+            plan: "pro",
+            period_start: initialPeriod,
+            period_end: f.subscription.period_end,
+            grace_until: f.subscription.grace_until,
+            subscription_version: f.subscription.version,
+            cancel_at_period_end: false,
+            pending_change: null,
+            limits: { entries: [] },
+            usage: { entries: [] },
+            billing: {
+              current: { id: uid(216), period: "monthly", amount_minor: "100000", currency: "TRY" },
+              period_change_options: [],
+              downgrade_options: [],
+              upgrade_options: [],
+              pending_period_change: null,
+            },
+          },
+        },
+      }),
+    );
+    await customer.goto(`/o/${I.org}/c/${I.center}/settings?section=plan`);
+    await customer.getByRole("combobox", { name: "Ayar kapsamı" }).selectOption("organization");
+    await expect(customer.getByText(/15\.12\.2026/)).toBeVisible();
+  } finally {
+    await customer.close();
+  }
+});
+
+test("operator detects a changed payment before writing and refuses a decision after platform access is revoked", async ({
+  page,
+}) => {
+  const f = await billingFixture(page);
+  await signIn(page);
+  await page.goto(paymentsUrl);
+  await openDecision(page, 2, billing.accept);
+  f.payments[2]!.version++;
+  const dialog = await applyBillingReview(page, billing.accept);
+  await expect(dialog.getByRole("status")).toHaveText(billing.sourceChanged);
+  expect(f.writes).toEqual([]);
+  await dialog.getByRole("button", { name: common.profile.loadCurrent, exact: true }).click();
+  await page.getByRole("button", { name: billing.accept, exact: true }).click();
+  f.revoke();
+  await applyBillingReview(page, billing.accept);
+  await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sentetik bildirim 3", exact: true })).toHaveCount(
+    0,
+  );
+  expect(f.writes).toEqual([]);
+});
+
+test("operator sees the live grace limit and only extends it after reviewing an absolute UTC deadline", async ({
+  page,
+}) => {
+  const f = await billingFixture(page);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await signIn(page);
+  await page.goto(billingOrgUrl);
+  const form = page.getByRole("form", { name: billing.extend, exact: true });
+  const until = form.getByLabel(billing.newUntil, { exact: true });
+  const action = form.getByRole("button", { name: billing.extend, exact: true });
+  await until.fill("2026-11-22T12:00");
+  await action.click();
+  await expect(until).toBeFocused();
+  await expect(until).toHaveAccessibleDescription(billing.untilError);
+  expect(f.writes).toEqual([]);
+  await until.fill(intendedGraceInput);
+  await form.getByLabel(text.reason, { exact: true }).fill("Sentetik işlem gerekçesi");
+  await action.click();
+  const dialog = await applyBillingReview(page, billing.extend);
+  await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await expect(page.getByText(/25 Kas 2026.*13:30 UTC/)).toBeVisible();
+  expect(f.subscription.grace_until).toBe(extendedGrace);
+  expect(f.writes).toHaveLength(1);
+});

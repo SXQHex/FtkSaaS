@@ -21,24 +21,42 @@ import {
   readPlatformOrganizations,
 } from "./platform-directory";
 import { PlatformOrganizationDetail } from "./platform-organization-detail";
+import { PlatformGrace } from "./platform-grace";
+import { paymentHref } from "./platform-payment";
+import { PlatformPaymentDetail, PlatformPayments } from "./platform-payments";
 
 const route = getRouteApi("/platform");
 export function PlatformRoutePage() {
   const account = route.useLoaderData();
-  const { organization_id } = route.useSearch();
-  return <PlatformPage key={account.id} account={account} organizationId={organization_id} />;
+  const { organization_id, section, payment_id } = route.useSearch();
+  return (
+    <PlatformPage
+      key={account.id}
+      account={account}
+      organizationId={organization_id}
+      payments={section === "payments"}
+      paymentId={payment_id}
+    />
+  );
 }
 
 function PlatformPage({
   account,
   organizationId,
+  payments,
+  paymentId,
 }: {
   account: AccountView;
   organizationId?: string;
+  payments: boolean;
+  paymentId?: string;
 }) {
   const { t } = useTranslation();
   const [denied, setDenied] = useState(false);
   const allowed = !denied && account.platform_scope?.organizations === true;
+  const canVerify = allowed && account.platform_scope?.payment_verify === true;
+  const canGrace = allowed && account.platform_scope?.grace_extend === true;
+  const deny = () => setDenied(true);
   const title = t(($) => $.platform.title);
   useEffect(() => {
     const previous = document.title;
@@ -55,18 +73,64 @@ function PlatformPage({
           {t(($) => $.auth.account)}
         </LinkButton>
       </header>
-      {!allowed ? (
+      {canVerify && (
+        <nav aria-label={title} className="flex flex-wrap gap-2">
+          {payments ? (
+            <LinkButton href="/platform" variant="outline">
+              {t(($) => $.platform.organizations)}
+            </LinkButton>
+          ) : (
+            <LinkButton href={paymentHref()} variant="outline">
+              {t(($) => $.platform.billing.payments)}
+            </LinkButton>
+          )}
+        </nav>
+      )}
+      {!allowed || (payments && !canVerify) ? (
         <Alert variant="destructive">
           <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
         </Alert>
+      ) : payments ? (
+        paymentId ? (
+          organizationId ? (
+            <PlatformPaymentDetail
+              key={organizationId + paymentId}
+              accountId={account.id}
+              orgId={organizationId}
+              paymentId={paymentId}
+              onDenied={deny}
+            />
+          ) : (
+            <Alert variant="destructive">
+              <AlertDescription>{t(($) => $.platform.billing.missing)}</AlertDescription>
+            </Alert>
+          )
+        ) : (
+          <PlatformPayments
+            key={organizationId ?? "all"}
+            accountId={account.id}
+            orgId={organizationId}
+          />
+        )
       ) : organizationId ? (
-        <PlatformOrganizationDetail
-          key={organizationId}
-          accountId={account.id}
-          organizationId={organizationId}
-          canSuspend={account.platform_scope?.organization_suspend === true}
-          onDenied={() => setDenied(true)}
-        />
+        <>
+          <PlatformOrganizationDetail
+            key={organizationId}
+            accountId={account.id}
+            organizationId={organizationId}
+            canSuspend={account.platform_scope?.organization_suspend === true}
+            paymentsHref={canVerify ? paymentHref(organizationId) : undefined}
+            onDenied={deny}
+          />
+          {canGrace && (
+            <PlatformGrace
+              key={"grace-" + organizationId}
+              accountId={account.id}
+              orgId={organizationId}
+              onDenied={deny}
+            />
+          )}
+        </>
       ) : (
         <PlatformOrganizationList accountId={account.id} />
       )}

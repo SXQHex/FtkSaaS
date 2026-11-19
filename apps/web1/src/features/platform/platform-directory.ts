@@ -30,15 +30,15 @@ const owner = z.object({
 });
 const size = 50;
 type Backend = Awaited<ReturnType<typeof scopedBackend>>;
-const common = () => ({ client_api_version: 1 as const, request_id: uuidv7() });
+export const platformRequest = () => ({ client_api_version: 1 as const, request_id: uuidv7() });
 export const platformOrganizationsKey = (accountId: string) => [
   "platform-organizations",
   accountId,
 ];
 
-async function readDirectory<T>(
+export async function readDirectory<T>(
   backend: Backend,
-  options: Pick<RequestPlatformDirectoryGet, "view" | "scope">,
+  options: Pick<RequestPlatformDirectoryGet, "view" | "scope" | "payment_id" | "payment_state">,
   item: z.ZodType<T>,
   cursor?: string,
 ) {
@@ -50,7 +50,7 @@ async function readDirectory<T>(
     })
     .parse(
       await backend.call("platform_directory_get_v1", {
-        ...common(),
+        ...platformRequest(),
         ...options,
         page: { limit: size, ...(cursor ? { cursor } : {}) },
       }),
@@ -68,7 +68,7 @@ export async function readPlatformOrganizations(accountId: string, cursor?: stri
   return readDirectory(backend, { view: "organizations" }, platformOrganization, cursor);
 }
 
-async function organizationAt(backend: Backend, id: string) {
+export async function organizationAt(backend: Backend, id: string) {
   const scope = { org_id: z.uuid().parse(id) };
   const result = await readDirectory(
     backend,
@@ -113,7 +113,7 @@ type SuspensionIntent = ReturnType<typeof suspensionIntent>;
 export async function writeSuspension(intent: SuspensionIntent) {
   const backend = await scopedBackend(intent);
   return backend.call("platform_organization_suspension_set_v1", {
-    ...common(),
+    ...platformRequest(),
     org_id: intent.orgId,
     expected_version: intent.version,
     suspended: intent.suspended,
