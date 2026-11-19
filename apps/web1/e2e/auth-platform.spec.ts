@@ -846,3 +846,110 @@ test("platform operator protects the last eligible member, verifies an addition 
     reason: "Kendi yetkimi kaldırıyorum",
   });
 });
+
+test("platform stages and publishes one exact private invoice through lost responses", async ({
+  page,
+}) => {
+  const fixture = await platformFixture(page, "platform");
+  const invoiceId = uid(280);
+  const body = Buffer.from("%PDF-1.4\nSynthetic invoice fixture");
+  const attempts: { preparation: string[]; publication: string[] } = {
+    preparation: [],
+    publication: [],
+  };
+  const invoice = text.invoices;
+  let uploads = 0;
+  await page.route(
+    `**/storage/v1/object/upload/sign/ftksaas-invoices/${target}/${invoiceId}*`,
+    (route) => {
+      expect(route.request().method()).toBe("PUT");
+      expect(route.request().postDataBuffer()).toEqual(body);
+      expect(route.request().headers()["content-type"]).toBe("application/pdf");
+      uploads++;
+      return route.abort("failed");
+    },
+  );
+  await page.route("**/functions/v1/backend-v1/platform_invoice_upload_prepare_v1", (route) => {
+    const request = route.request().postDataJSON();
+    expect(request).toMatchObject({
+      org_id: target,
+      invoice_number: "WEB1-1",
+      issued_on: "2026-11-19",
+      mime: "application/pdf",
+      bytes: body.length,
+      checksum: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
+    attempts.preparation.push(request.operation_key);
+    const capability = `/storage/v1/object/upload/sign/ftksaas-invoices/${target}/${invoiceId}?token=synthetic`;
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: target,
+        data: {
+          invoice_id: invoiceId,
+          upload_url: uploads ? null : capability,
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/platform_invoice_publish_v1", (route) => {
+    const request = route.request().postDataJSON();
+    expect(request).toMatchObject({ org_id: target, invoice_id: invoiceId });
+    attempts.publication.push(request.operation_key);
+    if (attempts.publication.length === 1) return route.abort("failed");
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: target,
+        data: {
+          id: invoiceId,
+          invoice_number: "WEB1-1",
+          issued_on: "2026-11-19",
+          mime: "application/pdf",
+          bytes: body.length,
+          published_at: "2026-11-19T12:00:00Z",
+        },
+      },
+    });
+  });
+  await signIn(page);
+  await page.goto(`/platform?organization_id=${target}`);
+  const form = page.getByRole("form", { name: invoice.title });
+  const upload = form.getByRole("button", { name: invoice.upload });
+  await upload.click();
+  await expect(form.getByLabel(invoice.number)).toBeFocused();
+  await form.getByLabel(invoice.number).fill("WEB1-1");
+  await form.getByLabel(invoice.date).fill("2026-11-19");
+  const field = form.getByLabel(invoice.file);
+  await field.setInputFiles({
+    name: "bad.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("not a PDF"),
+  });
+  await upload.click();
+  await expect(field).toBeFocused();
+  await expect(field).toHaveAccessibleDescription(/Geçerli bir PDF veya ZIP dosyası seç/);
+  expect(attempts.preparation).toHaveLength(0);
+  await field.setInputFiles({ name: "invoice.pdf", mimeType: "application/pdf", buffer: body });
+  await upload.click();
+  await form.getByRole("button", { name: common.studio.retrySameRequest }).click();
+  await expect(page.getByText(invoice.staged, { exact: true })).toBeVisible();
+  expect(attempts.preparation).toHaveLength(2);
+  expect(new Set(attempts.preparation).size).toBe(1);
+  expect(uploads).toBe(1);
+  expect(attempts.publication).toHaveLength(0);
+  await page.getByRole("button", { name: invoice.publish, exact: true }).click();
+  const review = await applyBillingReview(page, invoice.publish);
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.unknown);
+  await review.getByRole("button", { name: common.studio.retrySameRequest }).click();
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await review.getByRole("button", { name: common.settings.discard }).click();
+  await expect(page.getByText(invoice.published, { exact: true })).toBeVisible();
+  await expect(activityLog(page).getByRole("listitem")).toHaveCount(1);
+  await expect(activityLog(page)).toContainText(text.activity.actions.invoicePublished);
+  expect(attempts.publication).toHaveLength(2);
+  expect(new Set(attempts.publication).size).toBe(1);
+  expect(
+    fixture.calls.filter(({ operation }) => operation === "organization_invoices_list_v1"),
+  ).toEqual([]);
+});

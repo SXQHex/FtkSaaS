@@ -8,7 +8,8 @@ type ActivityKind =
   | "paymentDeclined"
   | "graceExtended"
   | "operatorAdded"
-  | "operatorRemoved";
+  | "operatorRemoved"
+  | "invoicePublished";
 
 type VerifiedActivity = { kind: ActivityKind; key: string; subject?: string };
 export type PlatformActivityEntry = VerifiedActivity & { verifiedAt: string };

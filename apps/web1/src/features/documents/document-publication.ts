@@ -1,5 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
+import { scopedUploadUrl, sha256Hex } from "../../lib/document-upload";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   DigitalDocumentContent,
@@ -34,9 +35,7 @@ export async function uploadIntent(
   z.number().int().min(1).max(maxBytes).parse(file.size);
   const body = new Uint8Array(await file.arrayBuffer());
   if (body.byteLength !== file.size) throw Error("DOCUMENT_FILE_CHANGED");
-  const checksum = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", body)), (b) =>
-    b.toString(16).padStart(2, "0"),
-  ).join("");
+  const checksum = await sha256Hex(body);
   return {
     scope: structuredClone(scope),
     request: {
@@ -73,18 +72,14 @@ export function uploadUrl(
   upload: UploadRef,
   base = import.meta.env.VITE_SUPABASE_URL,
 ) {
-  const origin = new URL(base);
-  const url = new URL(upload.upload_url, origin);
-  const path = `/storage/v1/object/upload/sign/ftksaas-documents/${scope.orgId}/${upload.file_id}`;
-  if (
-    url.origin !== origin.origin ||
-    url.pathname !== path ||
-    url.username ||
-    url.password ||
-    url.hash ||
-    !url.searchParams.get("token")
-  )
-    throw Error("DOCUMENT_UPLOAD_UNAVAILABLE");
+  const url = scopedUploadUrl(
+    base,
+    upload.upload_url,
+    "ftksaas-documents",
+    scope.orgId,
+    upload.file_id,
+  );
+  if (!url) throw Error("DOCUMENT_UPLOAD_UNAVAILABLE");
   return url;
 }
 export async function transferUpload(intent: UploadIntent, upload: UploadRef) {

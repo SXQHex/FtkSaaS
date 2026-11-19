@@ -5534,6 +5534,25 @@
     }
   },
   "platform": {
+    "invoices": {
+      "title": "Faturalar",
+      "description": "Dışarıda düzenlenen faturanın orijinalini yükle. Yayımlanınca organizasyon sahibi Plan ekranında indirebilir.",
+      "number": "Fatura numarası",
+      "date": "Düzenlenme tarihi",
+      "file": "Fatura dosyası",
+      "fileHint": "Orijinal PDF veya ZIP, en fazla 2 MiB.",
+      "numberError": "1–128 karakterlik fatura numarasını yaz.",
+      "dateError": "Düzenlenme tarihini seç.",
+      "fileError": "Geçerli bir PDF veya ZIP dosyası seç.",
+      "upload": "Fatura yükle",
+      "staged": "Dosya yüklendi. Fatura yayın bekliyor.",
+      "publish": "Faturayı yayımla",
+      "publishEffect": "Sunucu dosya bütünlüğünü doğrular ve faturayı organizasyon sahibine açar.",
+      "published": "Fatura yayımlandı ve sunucu sonucu doğrulandı.",
+      "newInvoice": "Başka fatura yükle",
+      "hash": "SHA-256",
+      "bytes": "{{count}} bayt"
+    },
     "activity": {
       "title": "Operatör işlem kaydı",
       "description": "{{actor}} · Bu konsol oturumunda sonucu doğrulanan işlemler. Doğrulama saatleri Türkiye saatiyle gösterilir.",
@@ -5546,7 +5565,8 @@
         "paymentDeclined": "Ödeme reddedildi",
         "graceExtended": "Ek süre uzatıldı",
         "operatorAdded": "Platform yetkisi verildi",
-        "operatorRemoved": "Platform yetkisi kaldırıldı"
+        "operatorRemoved": "Platform yetkisi kaldırıldı",
+        "invoicePublished": "Fatura yayımlandı"
       }
     },
     "title": "Platform konsolu",

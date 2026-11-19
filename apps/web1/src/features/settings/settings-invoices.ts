@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
+import { platformInvoice } from "../../lib/invoice";
 import { readEnvelope } from "../../lib/backend";
 import type {
   OrganizationBillingTaxProfile,
@@ -17,18 +18,9 @@ const taxProfile = taxFields.extend({
   org_id: z.uuid(),
   version: z.number().int().nonnegative().safe(),
 });
-const maxInvoiceBytes = 2 * 1024 * 1024;
-const invoice = z.object({
-  id: z.uuid(),
-  invoice_number: z.string().min(1).max(128),
-  issued_on: z.iso.date(),
-  mime: z.enum(["application/zip", "application/pdf"]),
-  bytes: z.number().int().positive().max(maxInvoiceBytes),
-  published_at: z.iso.datetime({ offset: true }),
-});
 const pageSize = 50;
 const invoicePage = z.object({
-  items: z.array(invoice).max(pageSize),
+  items: z.array(platformInvoice).max(pageSize),
   next_cursor: z.string().min(1).nullable(),
   as_of: z.iso.datetime({ offset: true }),
 });
@@ -126,7 +118,7 @@ export async function readInvoicePage(scope: ClientScope, cursor: string | null)
 }
 
 export async function downloadInvoice(scope: ClientScope, row: PlatformInvoice) {
-  const file = invoice.parse(row);
+  const file = platformInvoice.parse(row);
   const backend = await scopedBackend(scope);
   const response = await backend.downloadInvoice({
     ...organizationRequest(scope),

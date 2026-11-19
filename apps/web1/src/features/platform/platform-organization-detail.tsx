@@ -11,6 +11,7 @@ import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
 import { usePlatformActivity } from "./platform-activity-context";
+import { PlatformInvoices } from "./platform-invoices";
 import { PlatformReadError } from "./platform-read-error";
 import {
   platformAccessDenied,
@@ -215,6 +216,15 @@ export function PlatformOrganizationDetail({
         <Alert>
           <AlertDescription>{t(($) => $.platform.missing)}</AlertDescription>
         </Alert>
+      )}
+      {row && (
+        <PlatformInvoices
+          key={row.id}
+          accountId={accountId}
+          orgId={row.id}
+          name={row.name}
+          onDenied={onDenied}
+        />
       )}
       {intent && (
         <SettingsReviewDialog
