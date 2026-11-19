@@ -18,6 +18,7 @@ export async function mockOwnReservations(
     cancelDenied?: boolean;
     staleLesson?: boolean;
     weekStart?: "monday" | "sunday";
+    secondSessionCenter?: string;
     closedLesson?: {
       session: SessionView;
       attendance: AttendanceView;
@@ -83,6 +84,9 @@ export async function mockOwnReservations(
       sale_version: 1,
     },
   }));
+  const memberCenters = options.secondSessionCenter
+    ? [I.center, options.secondSessionCenter]
+    : [I.center];
   const closedLesson = options.closedLesson;
   const pastTitle = closedLesson ? "Sentetik seans" : "Sentetik geçmiş ders";
   if (closedLesson) {
@@ -114,20 +118,32 @@ export async function mockOwnReservations(
             self_context: {
               person_id: I.self,
               subscriber_number: null,
-              centers: [
-                {
-                  center_id: I.center,
-                  student: !options.noStudent,
-                  instructor: false,
-                  assistant: false,
-                },
-              ],
+              centers: memberCenters.map((centerId) => ({
+                center_id: centerId,
+                student: !options.noStudent,
+                instructor: false,
+                assistant: false,
+              })),
             },
           },
         ],
         next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",
       });
+    if (operation === "centers_list_v1" && options.secondSessionCenter) {
+      return send({
+        items: memberCenters.map((centerId) => ({
+          id: centerId,
+          name: centerId === I.center ? "Fixture Center" : "İkinci merkez",
+          timezone: "Europe/Istanbul",
+          state: "active",
+          accessible: true,
+          version: 1,
+        })),
+        next_cursor: null,
+        as_of: "2026-11-16T12:00:00Z",
+      });
+    }
     if (operation === "roles_list_v1")
       return options.noStudent
         ? send({
@@ -155,7 +171,11 @@ export async function mockOwnReservations(
     }
     if (operation === "reservation_list_v1") {
       expect(req.person_id).toBe(I.self);
-      expect(req.center_id).toBe(I.center);
+      expect(req.center_id).toBe(
+        options.secondSessionCenter && req.session_id === reservations[1]!.session_id
+          ? options.secondSessionCenter
+          : I.center,
+      );
       if (denied) return reject();
       const items = req.session_id
         ? reservations.filter(
@@ -222,7 +242,10 @@ export async function mockOwnReservations(
           .map((row) => ({
             id: row.id,
             type: "session",
-            center_id: I.center,
+            center_id:
+              row.id === reservations[1]!.session_id && options.secondSessionCenter
+                ? options.secondSessionCenter
+                : I.center,
             title: row.id === sessions[2]!.id ? pastTitle : "Sentetik gelecek ders",
             starts_at: row.starts_at,
             ends_at: row.ends_at,

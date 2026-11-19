@@ -60,25 +60,27 @@ export function InboxContent({
   const prefix = inboxKey(scope);
   const list = useQuery(inboxListQuery(scope, query, filter, cursors[index], cursors));
   const [openedSource, setOpenedSource] = useState<string>();
-  const memberSessionId =
-    memberPersonId &&
-    selected?.kind === "session_changed_for_participant" &&
-    selected.payload.subject.type === "sessions"
-      ? selected.payload.subject.id
+  const memberSessionTarget =
+    memberPersonId && selected?.kind === "session_changed_for_participant"
+      ? selected.work?.reservation_target
       : undefined;
   const sourceOperation = selected?.work?.selector?.operation;
   const canReadSource = Boolean(
-    memberSessionId ||
+    memberSessionTarget ||
     (sourceOperation &&
       (!memberPersonId ||
         sourceOperation === "lesson_request_create_v1" ||
         sourceOperation === "seat_offer_accept_v1")),
   );
   const nativeSource = useQuery({
-    queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work, memberSessionId],
+    queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work],
     queryFn: async () =>
-      memberPersonId && memberSessionId
-        ? readMemberSessionNotice(scope, memberPersonId, memberSessionId)
+      memberPersonId && memberSessionTarget
+        ? readMemberSessionNotice(
+            { ...scope, centerId: memberSessionTarget.center_id },
+            memberPersonId,
+            memberSessionTarget.key.session_id,
+          )
         : readInboxSource(scope, selected!.work!, memberPersonId),
     enabled: canReadSource && openedSource === selected?.id,
     staleTime: 0,

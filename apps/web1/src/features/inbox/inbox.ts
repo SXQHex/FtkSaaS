@@ -69,6 +69,18 @@ export async function readInbox(
       throw new Error("INBOX_SOURCE_UNAVAILABLE");
     seen.add(item.id);
     z.uuid().parse(item.payload.subject.id);
+    const reservationTarget = item.work?.reservation_target;
+    if (reservationTarget) {
+      if (
+        item.kind !== "session_changed_for_participant" ||
+        item.work?.state !== "informational" ||
+        item.payload.subject.type !== "sessions" ||
+        reservationTarget.operation !== "reservation_list_v1" ||
+        reservationTarget.key.session_id !== item.payload.subject.id
+      )
+        throw new Error("INBOX_SOURCE_UNAVAILABLE");
+      z.uuid().parse(reservationTarget.center_id);
+    }
     if (item.payload.title !== undefined) z.string().parse(item.payload.title);
     if (item.payload.body !== undefined) z.string().parse(item.payload.body);
   }

@@ -56,7 +56,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Karşılandı](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
-| W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Açık](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
+| W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Karşılandı](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
 | W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
 | W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
 | W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Karşılandı](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
@@ -432,9 +432,9 @@ Gelen kutusu kapsamının tamamını okundu yapacak işlem için canlı alıcı 
 
 ## W1-BE-48 · Ders değişikliği bildiriminde yetkili kaynak merkezi
 
-**Açık · backend değerlendirmesi.** Kendi organizasyon gelen kutusundaki `session_changed_for_participant` bildirimi seans kimliğini taşıyor. Bilgilendirme satırında seansın yetkili kaynak merkezi ve seans seçicisi yayımlanmıyor. Web1, seçili merkezdeki kendi rezervasyonunu seans kimliğiyle doğrulayabildiğinde hedef bağlantısını sunuyor. Başka bir merkezdeki seans, kaynak merkezi yayımlanana kadar o merkez seçildiğinde açılabiliyor. [WF11](../../../docs/workflows.md#wf11).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) ile yayımlanan sözleşme, güncel `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı.
 
-Canlı rezervasyon, öğrenci ve merkez yetkisi geçerliyken bildirimin gerçek kaynak merkezini döndürmeyi değerlendirin. İptal edilmiş, silinmiş ya da erişim dışı kayıtta hedef kapalı kalmalı. Diğer bildirimlerin organizasyon kapsamı ve bilgilendirme durumu korunmalı. [E48](todo.md#e48--üye-bildirim-merkezi).
+Üyenin canlı erişimi varsa `notifications_list_v1(include_work:true)` bilgilendirme satırına gerçek merkez ve seansı içeren `reservation_target` ekler. [WF11](../../../docs/workflows.md#wf11) · [E48 Web1 kabulü](todo.md#e48-uye-bildirim-merkezi).
 
 ## W1-BE-49 · Eğitmen yoklama zaman sınırı ve düzeltme isteği
 

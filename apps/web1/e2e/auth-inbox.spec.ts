@@ -26,7 +26,12 @@ async function fixture(
 ) {
   const privateLessons = mode === "member-request" ? await mockOwnPrivateLessons(page) : undefined;
   const participant =
-    mode === "participant" || mode === "member-offer" ? await mockOwnReservations(page) : undefined;
+    mode === "participant" || mode === "member-offer"
+      ? await mockOwnReservations(
+          page,
+          mode === "participant" ? { secondSessionCenter: sourceCenter } : {},
+        )
+      : undefined;
   const member = Boolean(participant || privateLessons);
   if (!member) await mockStudio(page);
   const offerId = sourceId;
@@ -47,6 +52,7 @@ async function fixture(
     keys: new Set<string>(),
     sourceReads: [] as Record<string, unknown>[],
     sourceDenied: false,
+    participantTargetUnavailable: false,
     foreignOffer: false,
     participant,
     privateLessons,
@@ -80,7 +86,20 @@ async function fixture(
                   key: { lesson_request_id: requestId },
                 },
               }
-            : { state: "informational", center_id: null, selector: null },
+            : {
+                state: "informational",
+                center_id: null,
+                selector: null,
+                ...(mode === "participant" && !state.participantTargetUnavailable
+                  ? {
+                      reservation_target: {
+                        operation: "reservation_list_v1",
+                        center_id: sourceCenter,
+                        key: { session_id: participant!.reservations[1]!.session_id },
+                      },
+                    }
+                  : {}),
+              },
     payload:
       mode === "participant"
         ? {
@@ -437,13 +456,13 @@ test("member change notice opens the exact reservation and rechecks access on re
   const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
   await expect(target).toHaveCount(0);
   await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
-  const path = `/member/reservations?org=${I.org}&center=${I.center}&session=${sessionId}`;
+  const path = `/member/reservations?org=${I.org}&center=${sourceCenter}&session=${sessionId}`;
   await expect(target).toHaveAttribute("href", path);
   expect(participant.reads).toContainEqual(
     expect.objectContaining({
       operation: "reservation_list_v1",
       request: expect.objectContaining({
-        center_id: I.center,
+        center_id: sourceCenter,
         person_id: I.self,
         session_id: sessionId,
         time_filter: "all",
@@ -469,6 +488,17 @@ test("member change notice opens the exact reservation and rechecks access on re
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toHaveCount(0);
   expect(participant.writes).toHaveLength(0);
   expect(state.writes).toHaveLength(0);
+  state.participantTargetUnavailable = true;
+  await page.goto(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`);
+  const readCount = participant.reads.filter(
+    (row) => row.operation === "reservation_list_v1",
+  ).length;
+  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await expect(page.getByText("Kaynak şu anda erişilebilir değil.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Kaynağı aç", exact: true })).toHaveCount(0);
+  expect(participant.reads.filter((row) => row.operation === "reservation_list_v1")).toHaveLength(
+    readCount,
+  );
 });
 test("member offer notice opens only the exact offer and rejects a foreign owner on return", async ({
   page,

@@ -13,9 +13,7 @@ export async function readMemberSessionNotice(
 ) {
   const page = await readMemberReservations(scope, personId, undefined, "all", { sessionId });
   const own = page.items.find(
-    ({ reservation, session }) =>
-      session?.id === sessionId &&
-      (reservation.state === "active" || reservation.state === "completed"),
+    ({ reservation, session }) => session?.id === sessionId && reservation.state === "active",
   );
   if (!own?.session) throw new Error("INBOX_SOURCE_UNAVAILABLE");
   const search = new URLSearchParams({
