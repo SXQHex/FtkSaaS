@@ -59,13 +59,13 @@ export function createBackend(config: {
   };
 }
 
-export function getBackend() {
-  const client = getSupabaseClient();
+export function getBackend(accessToken?: string) {
   return createBackend({
     functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
     publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     getAccessToken: async () => {
-      const { data, error } = await client.auth.getSession();
+      if (accessToken) return accessToken;
+      const { data, error } = await getSupabaseClient().auth.getSession();
       if (error) throw error;
       return data.session?.access_token ?? null;
     },

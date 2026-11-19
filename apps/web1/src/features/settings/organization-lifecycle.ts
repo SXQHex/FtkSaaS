@@ -2,7 +2,11 @@ import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { getSupabaseClient } from "../../lib/supabase";
-import { freshPasswordSession, MfaRequiredError } from "../account/fresh-session";
+import {
+  freshPasswordSession,
+  MfaRequiredError,
+  retirePreviousPasswordSession,
+} from "../account/fresh-session";
 import type {
   Preview,
   RequestOrganizationCloseApply,
@@ -76,6 +80,7 @@ export async function organizationDeletionProof(scope: ClientScope, password: st
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
     throw new MfaRequiredError();
   await scopedBackend(scope);
+  await retirePreviousPasswordSession(session);
   return session.access_token;
 }
 export async function prepareOrganizationLifecycle(

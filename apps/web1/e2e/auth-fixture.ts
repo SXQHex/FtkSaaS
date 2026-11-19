@@ -129,6 +129,7 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
     rejectNextRevoke: false,
     labelKeys: [] as string[],
     revokeKeys: [] as string[],
+    previousSessionRevocations: 0,
     rejectNextOthers: false,
     rejectNextProfile: false,
     conflictNextProfile: false,
@@ -677,30 +678,51 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
             } satisfies FailureEnvelope,
           });
         }
+        const affected = Number(otherActive) + Number(previousActive);
         otherActive = false;
         previousActive = false;
         return route.fulfill({
           json: {
             ok: true,
-            data: { operation_id: id, affected_count: 2, current_revoked: false, replayed: false },
+            data: {
+              operation_id: id,
+              affected_count: affected,
+              current_revoked: false,
+              replayed: false,
+            },
             trace_id: id,
           } satisfies SuccessAccountSessionsRevoke,
         });
       }
-      calls.revokeKeys.push(request.operation_key);
       expect(request.mode).toBe("selected");
-      expect(request.session_id).toBe(otherSessionId);
-      if (calls.rejectNextRevoke) {
-        calls.rejectNextRevoke = false;
-        return route.fulfill({
-          status: 403,
-          json: {
-            ok: false,
-            error: { code: "FORBIDDEN", retryable: false, trace_id: id },
-          } satisfies FailureEnvelope,
-        });
+      if (request.session_id === id) {
+        const bearer = JSON.parse(
+          Buffer.from(
+            route.request().headers().authorization.split(".")[1],
+            "base64url",
+          ).toString(),
+        );
+        expect(previousActive).toBe(true);
+        expect(bearer.session_id).toBe(nativeSessionId);
+        expect(bearer.session_id).not.toBe(request.session_id);
+        expect(bearer.aal).toBe(mfa ? "aal2" : "aal1");
+        previousActive = false;
+        calls.previousSessionRevocations++;
+      } else {
+        calls.revokeKeys.push(request.operation_key);
+        expect(request.session_id).toBe(otherSessionId);
+        if (calls.rejectNextRevoke) {
+          calls.rejectNextRevoke = false;
+          return route.fulfill({
+            status: 403,
+            json: {
+              ok: false,
+              error: { code: "FORBIDDEN", retryable: false, trace_id: id },
+            } satisfies FailureEnvelope,
+          });
+        }
+        otherActive = false;
       }
-      otherActive = false;
       return route.fulfill({
         json: {
           ok: true,

@@ -1,6 +1,10 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import { readAccount } from "../../lib/account";
 import { hasDeletionReceipt } from "../account/deletion";
+import {
+  hasPendingPasswordReplacement,
+  retirePreviousPasswordSession,
+} from "../account/fresh-session";
 import { hasRecoverySession } from "./password-recovery";
 
 export async function readTotpFactors() {
@@ -18,18 +22,23 @@ export async function verifyTotp(factorId: string, code: string) {
   await requireAal2();
 }
 
-async function requireAal2() {
-  const { data, error } = await getSupabaseClient().auth.mfa.getAuthenticatorAssuranceLevel();
+async function requireAal2(accessToken?: string) {
+  const { data, error } =
+    await getSupabaseClient().auth.mfa.getAuthenticatorAssuranceLevel(accessToken);
   if (error) throw error;
   if (data.currentLevel !== "aal2") throw new Error("MFA_REQUIRED");
 }
 
 export async function continueAfterMfa() {
-  await requireAal2();
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error) throw error;
-  if (data.session && hasDeletionReceipt(data.session.user.id) && !(await hasRecoverySession()))
+  if (!data.session) throw new Error("MFA_REQUIRED");
+  await requireAal2(
+    hasPendingPasswordReplacement(data.session) ? data.session.access_token : undefined,
+  );
+  if (hasDeletionReceipt(data.session.user.id) && !(await hasRecoverySession()))
     return "/account/deletion" as const;
   await readAccount();
+  await retirePreviousPasswordSession(data.session);
   return (await hasRecoverySession()) ? "/reset-password" : "/account";
 }
