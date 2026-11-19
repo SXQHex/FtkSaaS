@@ -1,5 +1,32 @@
 # Güncel kaynak ve kabul
 
+<a id="platform-invoice-files"></a>
+## W1-BE-58 · Manuel platform faturaları
+
+Kaynak tabanı `4d1e45ab590737afaeafdfd5b21aac94e5657d4a`. Aynı SHA’nın [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) sonuçları başarılı. Dışarıda düzenlenen faturanın manuel ZIP/PDF yüklemesi ve organizasyon sahibinin orijinal eki indirmesi `codex/platform-invoice-files` dalında yerel. Tüketim [WF17](../../../docs/workflows.md#wf17) sahibindedir.
+
+207 migration izole loopback Supabase üzerinde temiz uygulandı. Tek seri Node runner’da 6/6 test geçti. Orijinal baytlar, yükleme ve yayın tekrarları, organizasyon izolasyonu, askı ile vadesi gelmiş plan geçişi sırasında sahip erişimi ve mevcut belge akışı doğrulandı. Sözleşme, workflow kapsamı, 142 API test birimi, typecheck ve floor guard geçti. Edge JSON yükü 4.113.269 bayt. Yerel stack kapatıldı.
+
+<a id="web1-v67-platform-billing"></a>
+## Web1 v67 denetim, vergi profili ve platform konsolu
+
+Güncel taban `82a5a37deb83d7de1978d82ffba738ecf4ce12b5`. Aynı kaynak için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı. W1-BE-58/59 yeni `codex/web1-audit-platform-billing` dalına taşındı. W1-BE-34’ün açık denetim dışa aktarımı ve kesin kaynak sonucu aynı dalda. Tüketim [WF00](../../../docs/workflows.md#wf00) ve [WF17](../../../docs/workflows.md#wf17), kabul ölçütleri [backend backlog’u](remaining-work.md#web1-v67-backend) sahibindedir.
+
+İzole loopback Supabase üzerinde 205 migration temiz uygulandı. Tek seri Node runner ile son kaynakta hedefli 9/9 test geçti ve yerel stack kapatıldı. Sözleşme, workflow, backend typecheck, 142 API birimi ve trusted CI politika karşılaştırması doğrulandı. Edge JSON yükü 4.081.566 bayt. Aday CI ve hosted kabulü ayrı izlenir.
+
+[PR #342 API-3](https://github.com/SXQHex/FtkSaaS/actions/runs/44400355798/job/135141531172), vergi filtresi eklenirken medya alanlarının takip kaydından çıkarılmasının kaybolduğunu gösterdi. 206. migration vergi filtrelerini koruyarak `logo_image` ve `photo` filtrelerini geri getirdi. Temiz loopback kurulumunda medya ve vergi senaryoları dahil tek seri runner 9/9 geçti.
+
+<a id="web1-v67-final-five"></a>
+## Web1 v67 son beş backend talebi
+
+[Draft PR #341 core](https://github.com/SXQHex/FtkSaaS/actions/runs/44390514622/job/135106763662), `76f6542d` head’inde yoklama düzeltme talebinin eksik audit modül eşlemesi nedeniyle sözleşme testinde durdu. Yerel düzeltme komutu ve audit eşlemesini mevcut yoklama modülü M05’e bağladı. 201. migration temiz uygulandı. Çalışan SQL’deki 236 audit modül eşlemesi kaynakla aynı ve mevcut assertion dahil ilgili seri paket 509/509 geçti.
+
+W1-BE-43/49/55/56/57, PR #340 merge edildikten sonra aynı kaynak ağacına sahip güncel main `42172f48feb02dc81b86a1723888f80acc3a3bd3` üzerinden `codex/web1-backend-remaining` yerel dalına alındı. [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) bu taban için başarılı. Onaylanmış davranışlar [WF02](../../../docs/workflows.md#wf02), [WF07](../../../docs/workflows.md#wf07), [WF09](../../../docs/workflows.md#wf09) ve [WF11](../../../docs/workflows.md#wf11) sahibindedir.
+
+200 migration izole loopback veritabanında uygulandı. Tek Node runner ve `--test-concurrency=1` ile hedefli backend kabulü 14/14 geçti ve yerel stack kapatıldı. Makine sözleşmesi, kayıtlı 241 runtime yetki kapısı, workflow eşlemesi, test envanteri ve backend typecheck doğrulandı. Kullanıcının güncel Edge JSON yükü sınırı 4.999.999 bayt. Ölçülen yük 4.020.077 bayt. Üretilen Ajv hata biçimi önceki kaynakla aynı kuralı kullanır.
+
+PR #340’ın önceki [Backend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/44379848566) denemesinde `attendance_close_v1` HTTP 503 döndü. Merge edilen tabanın doğrulaması ve Main acceptance başarılı. Güncel boyut eşiği ve katalog sürümüne ait üç test beklentisinin süreli kalite kaydı kullanıcı onayıyla eklendi. Yerel floor guard sıfır bulguyla geçti. Yeni yerel dilim için aday CI ve hosted kabulü bekler.
+
 <a id="web1-v67-studio-import-report"></a>
 ## Web1 v67 stüdyo takvimi ve dosya işleri
 

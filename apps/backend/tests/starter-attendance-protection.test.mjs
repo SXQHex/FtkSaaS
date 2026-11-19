@@ -419,3 +419,34 @@ test('Starter policy impact, effective boundaries and sale snapshots',async t=>{
   assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[rv]))[0].state,'released');
  });
 });
+
+test('W1-BE-49 live attendance policy and independent review of one closure revision',async t=>{
+ const {owner,student,instructor,db,org,scope,mut,fail,publish,makeSession,fixturePastSession}=await attendanceFixture(t);
+ const session_id=(await makeSession({assignments:[{person_id:instructor.p,duty:'instructor'}]})).primary_id;
+ const read=(actor=owner)=>must(actor,'attendance_get_v1',scope({session_id,include_correction_requests:true}));
+ assert.equal((await read()).attendance_window,null);
+ await publish('attendance_window',{kind:'attendance_window',opens_minutes_before:0,closes_minutes_after:0});
+ const view=await read();
+ assert(Date.parse(view.attendance_window.closes_at)>Date.parse(view.attendance_window.opens_at));
+ await fail('attendance_start_v1',{session_id,expected_version:view.session_version,reason:'Too early',actual_started_at:new Date().toISOString()},'INVALID_STATE_TRANSITION');
+ await fixturePastSession(session_id);
+ const closed=await mut('attendance_close_v1',{session_id,expected_version:(await read()).session_version});
+ const closure=(await read()).revision;
+ const r={session_id,closure_revision:closure,reason:'Synthetic correction request'},k=key();
+ await fail('attendance_correction_request_v1',r,'FORBIDDEN',student.u);
+ await fail('attendance_correction_request_v1',{...r,closure_revision:closure+1},'VERSION_CONFLICT',instructor.u);
+ const ack=await mut('attendance_correction_request_v1',r,k,instructor.u);
+ assert.equal((await mut('attendance_correction_request_v1',r,k,instructor.u)).primary_id,ack.primary_id);
+ await fail('attendance_correction_request_v1',r,'OPEN_OPERATIONS_EXIST',instructor.u);
+ const [queued]=(await read()).correction_requests;
+ assert.equal(queued.state,'pending');assert.equal(queued.id,ack.primary_id);
+ const review={session_id,correction_request_id:ack.primary_id,expected_version:queued.version,decision:'accepted'};
+ await fail('attendance_correction_request_v1',review,'FORBIDDEN',instructor.u);
+ await mut('attendance_correction_request_v1',review);
+ const result=await read(instructor.u);
+ assert.equal(result.correction_requests[0].state,'accepted');
+ assert.equal(result.revision,closure);
+ assert.equal(result.session_version,closed.version);
+ await db.query("update core.role_assignments set state='inactive' where org_id=$1 and person_id=$2 and role='instructor'",[org,instructor.p]);
+ await fail('attendance_correction_request_v1',r,'FORBIDDEN',instructor.u,k);
+});

@@ -67,6 +67,25 @@ test('W1-BE-28 native inbox search, source state and atomic reversible read stat
  assert.equal(await deny('notifications_read_set_v1',{read:false,notifications:[{id:n1,expected_version:2},{id:n2,expected_version:1}]}),'VERSION_CONFLICT');assert.equal((await db.query('select version::int version from core.notifications where id=$1',[n1])).rows[0].version,2);
  assert.equal(await deny('notifications_read_set_v1',{read:false,notifications:[{id:n1,expected_version:2},{id:foreign,expected_version:1}]}),'NOT_FOUND');assert.equal((await db.query('select version::int version from core.notifications where id=$1',[n1])).rows[0].version,2);
  await api('notifications_read_set_v1',{read:false,notifications:[{id:n1,expected_version:2},{id:n2,expected_version:2}]},student);rows=(await read({page:{}})).items;assert(rows.filter(x=>[n1,n2].includes(x.id)).every(x=>x.read_at===null&&x.version===3));
+ await t.test('W1-BE-57 archive and recover visibility without changing source or read state',async()=>{
+  const set=(visibility,id,expected_version)=>({visibility,notifications:[{id,expected_version}]});
+  const archive=set('archived',n1,3),archiveKey=key();
+  await api('notifications_read_set_v1',archive,student,archiveKey);
+  assert.equal((await api('notifications_read_set_v1',archive,student,archiveKey)).replayed,true);
+  assert(!(await api('notifications_list_v1',{page:{},unread_only:false},student)).items.some(row=>row.id===n1));
+  let archived=await read({visibility:'archived',page:{}});
+  assert.equal(archived.summary.pending,1);assert.equal(archived.items[0].version,4);
+  assert.equal(archived.items[0].read_at,null);assert.equal(archived.items[0].work.state,'pending');
+  await api('notifications_read_set_v1',set('deleted',n1,4),student);
+  const deleted=await read({visibility:'deleted',page:{}});
+  assert.equal(deleted.items[0].visibility,'deleted');
+  assert.equal(await deny('notifications_read_set_v1',set('inbox',foreign,1)),'NOT_FOUND');
+  await api('notifications_read_set_v1',set('inbox',n1,5),student);
+  archived=await read({visibility:'archived',page:{}});
+  assert.equal(archived.items.length,0);
+  const restored=(await read({page:{}})).items.find(row=>row.id===n1);
+  assert.equal(restored.read_at,null);assert.equal(restored.work.state,'pending');
+ });
  const replacement=(await api('person_create_v1',{display_name:'Synthetic replacement recipient',contacts:[]})).primary_id;await api('student_activate_v1',{person_id:replacement});const account=(await must(student,'account_get_v1')).id;await db.query('update core.account_links set person_id=$1 where org_id=$2 and account_id=$3',[replacement,org,account]);try{assert.equal(await deny('notifications_read_set_v1',batch,student,k),'NOT_FOUND');}finally{await db.query('update core.account_links set person_id=$1 where org_id=$2 and account_id=$3',[studentPerson,org,account]);}
  await api('seat_offer_reject_v1',{offer_id:offer,expected_version:1},student);assert.equal((await read({})).summary.pending,0);const completed=await read({work_state:'completed',page:{}});assert(completed.items.some(x=>x.id===n1));assert.equal(completed.items.find(x=>x.id===n1).read_at,null);
  const outsider=await authUser('inbox-outsider');await deny('notifications_list_v1',body,outsider);await deny('notifications_read_set_v1',{read:true,notifications:[{id:n1,expected_version:3}]},outsider);

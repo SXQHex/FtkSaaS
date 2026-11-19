@@ -375,7 +375,7 @@
         {
           "line": 418,
           "path": "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
-          "sha256": "82dd4c62c993e9f4f40b08a0e628a464c8fae28fe2860b75ca55b4dcb1cf9af3"
+          "sha256": "80c62275af3876de54a4ead8a2973586ad3bff1f61d4172035b2b97437b3fff3"
         },
         {
           "line": 419,
@@ -385,12 +385,12 @@
         {
           "line": 420,
           "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
-          "sha256": "11551bf0545e0a00ce854a1fa6f2bba65a377b1841ea0463af3c5c43894176c5"
+          "sha256": "5be408ac803de78a934c9aee8ab8b588596a553b4ad4eb8ace698e0ed987a106"
         },
         {
           "line": 421,
           "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-          "sha256": "273cf74b7cf76d79fca157d9580c776cf763362b1bb64b63e1ede2e613f5f7ad"
+          "sha256": "8ad4908308bd709ed4b3dd071f7e51da6c52ebd372d26861a3bb51e1dd31de57"
         },
         {
           "line": 422,
@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "a2dacfbf173167e7ab7b38fde92bcaafb8354a5fa129a6f4edb159448231680f"
+          "sha256": "6ccd7c75fd6aee3604d945e733b553695f6799617fabd7e85d3b440bba3a6442"
         },
         {
           "line": 147,
@@ -1328,7 +1328,7 @@
     },
     {
       "path": "apps/backend/tests/starter-attendance-protection.test.mjs",
-      "sha256": "d2dbf7734f1f6e6915690c4d7b03498a927488088d2c5a86e2adf27c08a342ca",
+      "sha256": "e324a1ace2ad72919867a8355ad1c8f454058ad176066dbe6a3f3c26672da826",
       "shared": [
         [
           3,
@@ -1380,7 +1380,7 @@
           "ranges": [
             [
               329,
-              421
+              452
             ]
           ]
         }

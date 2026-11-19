@@ -137,6 +137,29 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    catch{return failure('VALIDATION_FAILED');}
   }
   const download=new URL(req.url).searchParams.get('download');
+  if(operation==='platform_invoice_publish_v1'||(operation==='organization_invoice_file_get_v1'&&download==='original')){
+   const publishing=operation==='platform_invoice_publish_v1';
+   const context=await rpcContext({phase:publishing?'invoice_upload_context':'invoice_download'});
+   if(!context._internal_invoice){
+    const code=context.error?.code;
+    return json(context,publishing?200:code==='NOT_FOUND'?404:code==='AUTH_REQUIRED'||code==='SESSION_REVOKED'?401:403,true);
+   }
+   const {object_key,...meta}=context._internal_invoice;
+   const invoices=documentStorage(base,key,fetch,'ftksaas-invoices');
+   if(publishing){
+    if(!meta.published){
+     try{await invoices.download(object_key,meta);}catch{return failure('VALIDATION_FAILED');}
+    }
+    invite={invoice_verified:true,checksum:meta.checksum};
+   }else{
+    const file=await invoices.download(object_key,meta);
+    const extension=file.mime==='application/zip'?'zip':'pdf';
+    return new Response(file.bytes,{headers:{
+     'content-type':file.mime,'content-disposition':'attachment; filename="invoice-'+request.invoice_id+'.'+extension+'"',
+     'cache-control':'private, no-store','x-content-type-options':'nosniff','access-control-expose-headers':'Content-Disposition'
+    }});
+   }
+  }
   const importDownload=operation==='import_rows_list_v1'&&download==='skipped_csv';
   if(importDownload||(operation==='report_file_get_v1'&&download==='csv')){
    const context=await rpcContext({phase:importDownload?'p06_import_skipped_download':'p06_download'});
@@ -166,6 +189,15 @@ const handleRequest=async(req:Request):Promise<Response>=>{
     if(Date.parse(result.data.expires_at)<=Date.now())return failure('VALIDATION_FAILED');
     result.data.upload_url=await imports.upload(result.data.upload_url);
    }
+   if(operation==='platform_invoice_upload_prepare_v1'){
+    const invoices=documentStorage(base,key,fetch,'ftksaas-invoices'),objectKey=result.data.upload_url;
+    try{result.data.upload_url=await invoices.upload(objectKey);}
+    catch(error){
+     try{await invoices.download(objectKey,{bytes:request.bytes,mime:request.mime,checksum:request.checksum});}
+     catch{throw error;}
+     result.data.upload_url=null;
+    }
+   }
    if(operation==='document_upload_prepare_v1'){
     if(Date.parse(result.data.expires_at)<=Date.now())return failure('VALIDATION_FAILED');
     result.data.upload_url=await storage.upload(result.data.upload_url);
@@ -184,7 +216,7 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    }
    if(calendarCredential&&calendarPublicOrigin)result.data.subscription_url=calendarSubscriptionUrl(calendarPublicOrigin,calendarCredential.token);
    const success=(validators as any)["success_"+operation];if(!success?.(result))return failure("INTEGRITY_VIOLATION",500);}
-  return json(result,200,operation==='media_get_v1'||operation.startsWith('calendar_'));
+  return json(result,200,operation.includes('_invoice')||operation==='audit_center_export_v1'||operation==='media_get_v1'||operation.startsWith('calendar_'));
   }
   return failure("TEMPORARY_FAILURE",503);
  }catch{return failure("TEMPORARY_FAILURE",503,true);}

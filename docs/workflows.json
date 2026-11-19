@@ -291,7 +291,12 @@
         "apps/backend/supabase/migrations/20261115213357_native_read_recovery.sql",
         "apps/backend/scripts/compact-validator-errors.mjs",
         "apps/backend/database/tracking-discovery.sql",
-        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql"
+        "apps/backend/supabase/migrations/20261117034926_tracking_discovery.sql",
+        "apps/backend/supabase/migrations/20261118214400_attendance_correction_audit_module.sql",
+        "apps/backend/database/audit-export-tracking-results.sql",
+        "apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql",
+        "apps/backend/database/tracking-media-redaction.sql",
+        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -299,11 +304,12 @@
         "job_status_get_v1",
         "audit_list_v1",
         "management_state_get_v1",
-        "tracking_directory_get_v1"
+        "tracking_directory_get_v1",
+        "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "99142bacdd615cfe8163fe8added34dfcbc5a69a4553a938f7fb6d7302df38a4",
-        "reason": "Reviewed shared Edge request and response contract changes, authenticated skip CSV dispatch, and updated acceptance bindings."
+        "fingerprint": "6927035395be8fad4857c63d275c73ca5286395e50f402a7b89366f74f7e495b",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -392,8 +398,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "51e42c8230d5084fdb5c7edfbdfca3e2d84dca2c50e16da051ba1cf4a93dd0e2",
-        "reason": "Reviewed native password security notice URL composition, independent Auth config readback and unchanged callback contract. Reviewed W1-BE-39/40/41 source and generated contract/test evidence in this workflow."
+        "fingerprint": "02b1954b2266da78d5284b1547360c61c451736c7594b8ecda0df65e262fa250",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -418,7 +424,8 @@
         "apps/backend/tests/web1-review-acceptance.mjs",
         "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
         "apps/backend/tests/role-directory-filter-unit.mjs",
-        "apps/backend/tests/role-directory-filter-acceptance.mjs"
+        "apps/backend/tests/role-directory-filter-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -487,7 +494,9 @@
         "apps/backend/database/role-directory-filters.sql",
         "apps/backend/supabase/migrations/20261117152419_role_directory_filters.sql",
         "apps/backend/database/account-self-management-scope.sql",
-        "apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql"
+        "apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql",
+        "apps/backend/database/studio-setup-requests.sql",
+        "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -510,11 +519,13 @@
         "disciplines_list_v1",
         "discipline_save_v1",
         "center_discipline_set_v1",
-        "role_revoke_preview_v1"
+        "role_revoke_preview_v1",
+        "studio_setup_list_v1",
+        "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "23ed990f7c5f1a347c8ec51867a9757d2e4c8e8fa5e74f6f87b04abe914f0e7f",
-        "reason": "Reviewed W1-BE-42 opt-in live self scope for owner, org manager and accessible center managers, the native Starter denial and role transition tests, and the unchanged filtered role directory. The new before-and-after reads supplement the existing Starter role and resource write denials."
+        "fingerprint": "ac6bc0fb4220c4d1d1c093ff7b9e2b5f27e70b2096673af05065b06fe4a2ddcc",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -631,8 +642,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "467c76c2df0bc6e8a8a73aaafd938f20e6df6c529dcff28a67babcda6971f5bf",
-        "reason": "Reviewed additive inbox acceptance and the source-bound API inventory for the changed native test files."
+        "fingerprint": "174df80b01b3c18f612625e82e8a2842f70e765595103e6b8ae3e785713fc065",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -748,8 +759,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "327f539d74ae3dc96c30159e6c865ef816026cfb768c7908ed4aaa4d837921ad",
-        "reason": "Reviewed changed canonical DTO and additive native acceptance without changing existing visibility or lifecycle."
+        "fingerprint": "ee2da06186838efc23b4b7ccfd9793cad94ed33ff447e8cb0f7eaade2dcbf806",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -876,8 +887,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "33f68384f6943a77f2b32587d61299c141e4be9d0c64385d7fdaa2e9e47022d7",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Added cross-flow regression coverage for event registration document discovery. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "b17e2b238555011a59e49eca26e97d4463d90899a15ccd5f72af161d868bcee8",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -986,8 +997,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "b0a59a9dfd2d75ac65083f127ddbcb6032515ede34b35c1cfca5581657f1392f",
-        "reason": "Reviewed optional self-authored note, live reviewer visibility, closed validation, receipt identity and native regression coverage."
+        "fingerprint": "3f8085f55405033e0f44db81c2226268d5ef4af319627df41d65c5c801683c31",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1043,7 +1054,9 @@
         "apps/backend/database/event-capacity-practice.sql",
         "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
         "apps/backend/database/assigned-session-room-labels.sql",
-        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql"
+        "apps/backend/supabase/migrations/20261116143645_assigned_session_room_labels.sql",
+        "apps/backend/database/attendance-window-requests.sql",
+        "apps/backend/supabase/migrations/20261118214300_attendance_window_requests.sql"
       ],
       "operations": [
         "attendance_get_v1",
@@ -1052,11 +1065,12 @@
         "attendance_correct_preview_v1",
         "attendance_correct_apply_v1",
         "attendance_block_v1",
-        "attendance_start_v1"
+        "attendance_start_v1",
+        "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "f13fccf09d382c571385c62e7d35bdff7b7d6a30458a8db3aa601938a74a48e6",
-        "reason": "Reviewed native regression evidence and canonical contract references for optional student notes and own earning history."
+        "fingerprint": "9dca3ab21a2fc17f61b5baa00027216507e100cf4dd6b25680b156ad45b33dd7",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1130,8 +1144,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "43172ba5555a681324edcb52eff15f14d760eb5c3dd7aecd4de2c62d0f379421",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "84e52850e66e9b3d83de2e2632dc77da4fd28be20d4c15feccb90308da946d58",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1229,7 +1243,11 @@
         "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
         "apps/backend/database/crm-funnel-and-directory.sql",
         "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
-        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql",
+        "apps/backend/database/public-page-event-applications.sql",
+        "apps/backend/database/settings-catalog-v25.sql",
+        "apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql",
+        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1243,8 +1261,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "5d90208f2e9893aca84b4235c19828a8d98fb5cd2b3a8604dc2d2c2b2205902c",
-        "reason": "Reviewed center-manager and F08 gating, credential lifecycle, and personal list compatibility for studio schedule subscriptions."
+        "fingerprint": "1a8dc1ce41525ab050b81a82e76ab83d0352eacdf3c6cbe7cff553ac71794843",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1317,8 +1335,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "b05e8506c2d2ef0d746e80f8dfe4f451170a9ad694e24209e2356d9331c8c192",
-        "reason": "Reviewed terminal import outcomes across CRM selection and partial student application, authenticated CSV, and exact report retry parameters."
+        "fingerprint": "c4d392298fdb4a8e4aa34fcd14ae9c0d5b0438fa46dc09ce15762f56bbdb5f30",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1387,7 +1405,9 @@
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
         "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
         "apps/backend/database/member-inbox-actions.sql",
-        "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql"
+        "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql",
+        "apps/backend/database/member-inbox-visibility.sql",
+        "apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1404,8 +1424,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f2b352c76b703ec34b0f1857cee2ef64d2a828bb96b6af97ad052dfced3260eb",
-        "reason": "Reviewed canonical recipient matching and fail-closed missing identities on replay and recovery, and scoped participant navigation."
+        "fingerprint": "0f0efacab4273b64222e9404c7816bbc18fb1541f6551924755ca10247218415",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1542,8 +1562,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "1bdd0d03d113ff1bb54efde7ad548243d29a12799e263c6363823f1146848a2f",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. Verified that UTC fixture times preserve existing event and report assertions. Verified the specific debt denial and preserved permission denial in the affected acceptance paths."
+        "fingerprint": "e1fef1cf3fad5051606fb6a61a4e084d65d27c684d33cea4c1f57e353dd7f774",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1618,8 +1638,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "7f4adf6afe7c7a68641e7f93013e00cd9a15eb9348338c604acffde273f699a0",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged. The native test compares the same reservation, entitlement balance, outstanding debt and closed attendance before and after the Pro to Starter period boundary."
+        "fingerprint": "0419f36a5536a8af89ad02182a51d51a81794f48c63aeb0527899823c151fad9",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1686,8 +1706,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "8d02681331cd35805a9626f52f1b5bed2f0dea4679e9e71f88ad18c0573da1d5",
-        "reason": "Reviewed frozen own lesson earning context, exact closure revision, unchanged live authorization and existing cursor semantics."
+        "fingerprint": "f7a89aaa7433e50cc2d82ccc86a3933000e2a31e6171cece89b0b5759cf9c206",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1765,8 +1785,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "81031d4c4f3089e762d81a8274db9c916f6cb751f8333c7f8298694865b36d83",
-        "reason": "Reviewed native member discovery from current event registration previews, strict live preview context, actual selected product scope and preserved document acceptance authority."
+        "fingerprint": "4783e596041d781541f6318db621e20e8f68538c0280296b238721139d407b70",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1841,8 +1861,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "f2899eb5db1436eff820f387d1f04282120d871f9e15f752f042ce1a4bec14d7",
-        "reason": "Reviewed exact report authorization, native state filtering, visible CRM metrics and a live open-lead requirement for current trial offers."
+        "fingerprint": "70190d4239b510de0de60a048e6f752c118d40ce51d1bbfc57ef4a62a9436665",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -1859,7 +1879,9 @@
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/native-account-erasure-unit.mjs",
         "apps/backend/tests/postgres-restore-acceptance.mjs",
-        "apps/backend/tests/export-retention-acceptance.mjs"
+        "apps/backend/tests/export-retention-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/public-program-discovery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1914,7 +1936,19 @@
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
         "apps/backend/scripts/postgres-restore.mjs",
         "apps/backend/database/account-export-erasure.sql",
-        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql"
+        "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/database/platform-directory.sql",
+        "apps/backend/supabase/migrations/20261118214500_platform_directory.sql",
+        "apps/backend/database/organization-billing-tax.sql",
+        "apps/backend/database/platform-organization-suspension.sql",
+        "apps/backend/supabase/migrations/20261118214600_organization_billing_tax.sql",
+        "apps/backend/supabase/migrations/20261118214700_platform_organization_suspension.sql",
+        "apps/backend/database/tracking-media-redaction.sql",
+        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql",
+        "apps/backend/database/platform-invoices.sql",
+        "apps/backend/supabase/migrations/20261118215000_platform_invoices.sql",
+        "apps/backend/supabase/functions/backend-v1/document-storage.ts",
+        "apps/backend/supabase/functions/backend-v1/handler.ts"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1927,11 +1961,19 @@
         "saas_payment_verify_v1",
         "saas_grace_extend_v1",
         "platform_owner_set_v1",
-        "platform_owner_remove_v1"
+        "platform_owner_remove_v1",
+        "platform_directory_get_v1",
+        "organization_billing_tax_get_v1",
+        "organization_billing_tax_set_v1",
+        "platform_organization_suspension_set_v1",
+        "platform_invoice_upload_prepare_v1",
+        "platform_invoice_publish_v1",
+        "organization_invoices_list_v1",
+        "organization_invoice_file_get_v1"
       ],
       "review": {
-        "fingerprint": "401d201f7ef655e9d87e6d75267983fe54bee5171ce1e8b435bcfafec4fa246c",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "dadadd8e0cd448929b1e3a0085247b960472e6b137b0c9bb066c11fd9ad6cb73",
+        "reason": "Reviewed manual invoice storage, platform publishing authority, immutable original bytes and live owner history/download."
       }
     },
     {
@@ -1963,8 +2005,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "ddf1b49f454d40efd32ab2200f0131d91061517fd74e174a642c321214c0f332",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "25bec99f46c734a98d7f5bfcc409169b8407081e3d98f01f7881a9327c2165f2",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -2004,8 +2046,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "582177a641883702389eb79a87f9dacc0fc794f3294f18773d7038e142bc00c2",
-        "reason": "Reviewed shared wrapper/contract inventory delta: one service-only document management read registration; existing operations and their behavior unchanged."
+        "fingerprint": "de1952d9d3caffc5bd56825f7d438d06ec9136d20ce0bdf765ce3b80935bc796",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     },
     {
@@ -2129,8 +2171,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "44aa84a9d4f3081e9edd809bc61be2bf465aa2ae855a4989e1f3124c04ff093f",
-        "reason": "Reviewed the shared contract and acceptance inventory digest after report scope coverage was updated."
+        "fingerprint": "4628fc88c556aa0356d6a39b91e99c0f99b12add659b1fcc9dbca5e429ab8217",
+        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
       }
     }
   ]
