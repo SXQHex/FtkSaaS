@@ -14,7 +14,7 @@ import {
   readGraceDetail,
   type BillingIntent,
 } from "./platform-payment";
-import { BillingReadError } from "./platform-payments";
+import { PlatformReadError } from "./platform-read-error";
 
 const utcFormat = new Intl.DateTimeFormat("tr-TR", {
   dateStyle: "medium",
@@ -93,7 +93,7 @@ export function PlatformGrace({
         {query.isPending ? (
           <p role="status">{t(($) => $.platform.loading)}</p>
         ) : query.isError ? (
-          <BillingReadError error={query.error} onRetry={() => void query.refetch()} />
+          <PlatformReadError error={query.error} onRetry={() => void query.refetch()} />
         ) : grace ? (
           <>
             <dl>

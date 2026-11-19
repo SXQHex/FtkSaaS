@@ -222,8 +222,70 @@ for (const role of ["owner", "staff"] as const)
     await expect(page.getByRole("link", { name: text.title, exact: true })).toHaveCount(0);
     await page.goto(`/platform?organization_id=${target}`);
     await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
-    expect(f.calls.filter(({ operation }) => operation.startsWith("platform_"))).toEqual([]);
+    await page.goto("/platform?section=studio-requests");
+    await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
+    expect(
+      f.calls.filter(
+        ({ operation }) =>
+          operation.startsWith("platform_") || operation === "studio_setup_list_v1",
+      ),
+    ).toEqual([]);
   });
+
+test("platform reads the live studio request queue with native pagination and hides revoked rows", async ({
+  page,
+}) => {
+  await platformFixture(page, "platform");
+  await page.setViewportSize({ width: 320, height: 900 });
+  const queue = text.studioRequests;
+  const rows = ["Birinci sentetik stüdyo", "İkinci sentetik stüdyo"].map((name, index) => ({
+    id: uid(230 + index),
+    account_id: uid(232 + index),
+    name,
+    state: "pending",
+    organization_id: null,
+    created_at: "2026-11-16T12:00:00Z",
+  }));
+  let permitted = true;
+  await page.route("**/functions/v1/backend-v1/studio_setup_list_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    expect(request.platform_queue).toBe(true);
+    expect(request.page.limit).toBe(50);
+    if (!permitted)
+      return route.fulfill({
+        status: 403,
+        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+      });
+    const second = request.page.cursor === "second";
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: [rows[second ? 1 : 0]],
+          as_of: rows[0]!.created_at,
+          next_cursor: second ? null : "second",
+        },
+      },
+    });
+  });
+  await signIn(page);
+  await page.getByRole("link", { name: text.title, exact: true }).click();
+  await page.getByRole("link", { name: queue.title, exact: true }).click();
+  await expect(page).toHaveURL(/\/platform\?section=studio-requests$/);
+  const region = page.getByRole("region", { name: queue.title, exact: true });
+  await region.focus();
+  await expect(region).toBeFocused();
+  await expect(region.getByText(rows[0]!.name, { exact: true })).toBeVisible();
+  await expect(region.getByText(rows[1]!.name, { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: queue.more, exact: true }).click();
+  await expect(region.getByText(rows[1]!.name, { exact: true })).toBeVisible();
+  permitted = false;
+  await page.getByRole("button", { name: queue.refresh, exact: true }).click();
+  await expect(page.getByRole("alert")).toHaveText(text.denied);
+  await expect(region).toHaveCount(0);
+  await expect(page.getByText(rows[0]!.name, { exact: true })).toHaveCount(0);
+});
 
 const billing = text.billing;
 const billingOrg = I.org;

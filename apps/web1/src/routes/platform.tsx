@@ -8,7 +8,7 @@ export const Route = createFileRoute("/platform")({
   loader: loadPlatformAccount,
   validateSearch: z.object({
     organization_id: z.uuid().optional(),
-    section: z.literal("payments").optional(),
+    section: z.enum(["payments", "studio-requests"]).optional(),
     payment_id: z.uuid().optional(),
   }),
   component: PlatformRoutePage,

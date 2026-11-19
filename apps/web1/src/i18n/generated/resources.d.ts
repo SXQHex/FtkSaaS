@@ -3127,6 +3127,15 @@ export default interface Resources {
         "deleted": "Silindi",
         "deletion_pending": "Silme bekliyor"
       },
+      "studioRequests": {
+        "empty": "Bekleyen stüdyo kurulum talebi yok.",
+        "more": "Daha fazla talep",
+        "name": "Talep edilen stüdyo adı",
+        "refresh": "Talepleri yenile",
+        "request": "Talep numarası",
+        "requestedAt": "Talep tarihi (Türkiye saati)",
+        "title": "Stüdyo kurulum talepleri"
+      },
       "subscription": "Abonelik durumu",
       "subscriptions": {
         "active": "Abonelik etkin",

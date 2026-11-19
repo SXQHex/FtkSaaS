@@ -5365,6 +5365,15 @@
     "empty": "Görüntülenecek organizasyon yok.",
     "missing": "Organizasyon bulunamadı.",
     "more": "Daha fazla organizasyon",
+    "studioRequests": {
+      "title": "Stüdyo kurulum talepleri",
+      "name": "Talep edilen stüdyo adı",
+      "requestedAt": "Talep tarihi (Türkiye saati)",
+      "request": "Talep numarası",
+      "empty": "Bekleyen stüdyo kurulum talebi yok.",
+      "more": "Daha fazla talep",
+      "refresh": "Talepleri yenile"
+    },
     "billing": {
       "payments": "Platform ödemeleri",
       "organizationPayments": "Organizasyonun ödemeleri",

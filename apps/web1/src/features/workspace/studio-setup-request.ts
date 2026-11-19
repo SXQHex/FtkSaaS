@@ -21,18 +21,35 @@ const page = z.object({
 });
 const common = () => ({ client_api_version: 1 as const, request_id: uuidv7() });
 
+async function readStudioSetupPage(
+  backend: Awaited<ReturnType<typeof scopedBackend>>,
+  cursor: string | undefined,
+  platformQueue = false,
+) {
+  return page.parse(
+    await backend.call("studio_setup_list_v1", {
+      ...common(),
+      ...(platformQueue ? { platform_queue: true } : {}),
+      page: { limit: pageSize, ...(cursor ? { cursor } : {}) },
+    }),
+  );
+}
+
+export async function readPlatformStudioQueue(accountId: string, cursor?: string) {
+  const backend = await scopedBackend({ accountId });
+  const result = await readStudioSetupPage(backend, cursor, true);
+  if (result.items.some((row) => row.state !== "pending"))
+    throw Error("STUDIO_SETUP_SOURCE_INVALID");
+  return result;
+}
+
 export async function readOwnStudioSetup(accountId: string) {
   const backend = await scopedBackend({ accountId });
   const rows = new Map<string, z.infer<typeof request>>();
   const cursors = new Set<string>();
   let cursor: string | undefined;
   do {
-    const result = page.parse(
-      await backend.call("studio_setup_list_v1", {
-        ...common(),
-        page: { limit: pageSize, ...(cursor ? { cursor } : {}) },
-      }),
-    );
+    const result = await readStudioSetupPage(backend, cursor);
     for (const row of result.items) {
       if (row.account_id !== accountId || rows.has(row.id))
         throw Error("STUDIO_SETUP_SOURCE_INVALID");

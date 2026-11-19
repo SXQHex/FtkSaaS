@@ -24,6 +24,7 @@ import { PlatformOrganizationDetail } from "./platform-organization-detail";
 import { PlatformGrace } from "./platform-grace";
 import { paymentHref } from "./platform-payment";
 import { PlatformPaymentDetail, PlatformPayments } from "./platform-payments";
+import { PlatformStudioQueue } from "./platform-studio-queue";
 
 const route = getRouteApi("/platform");
 export function PlatformRoutePage() {
@@ -34,7 +35,7 @@ export function PlatformRoutePage() {
       key={account.id}
       account={account}
       organizationId={organization_id}
-      payments={section === "payments"}
+      section={section}
       paymentId={payment_id}
     />
   );
@@ -43,12 +44,12 @@ export function PlatformRoutePage() {
 function PlatformPage({
   account,
   organizationId,
-  payments,
+  section,
   paymentId,
 }: {
   account: AccountView;
   organizationId?: string;
-  payments: boolean;
+  section?: "payments" | "studio-requests";
   paymentId?: string;
 }) {
   const { t } = useTranslation();
@@ -56,6 +57,9 @@ function PlatformPage({
   const allowed = !denied && account.platform_scope?.organizations === true;
   const canVerify = allowed && account.platform_scope?.payment_verify === true;
   const canGrace = allowed && account.platform_scope?.grace_extend === true;
+  const canReadQueue = allowed && account.platform_scope?.organization_create === true;
+  const payments = section === "payments";
+  const studioRequests = section === "studio-requests";
   const deny = () => setDenied(true);
   const title = t(($) => $.platform.title);
   useEffect(() => {
@@ -73,23 +77,31 @@ function PlatformPage({
           {t(($) => $.auth.account)}
         </LinkButton>
       </header>
-      {canVerify && (
+      {allowed && (section || canVerify || canReadQueue) && (
         <nav aria-label={title} className="flex flex-wrap gap-2">
-          {payments ? (
+          {section && (
             <LinkButton href="/platform" variant="outline">
               {t(($) => $.platform.organizations)}
             </LinkButton>
-          ) : (
+          )}
+          {canVerify && !payments && (
             <LinkButton href={paymentHref()} variant="outline">
               {t(($) => $.platform.billing.payments)}
             </LinkButton>
           )}
+          {canReadQueue && !studioRequests && (
+            <LinkButton href="/platform?section=studio-requests" variant="outline">
+              {t(($) => $.platform.studioRequests.title)}
+            </LinkButton>
+          )}
         </nav>
       )}
-      {!allowed || (payments && !canVerify) ? (
+      {!allowed || (payments && !canVerify) || (studioRequests && !canReadQueue) ? (
         <Alert variant="destructive">
           <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
         </Alert>
+      ) : studioRequests ? (
+        <PlatformStudioQueue accountId={account.id} />
       ) : payments ? (
         paymentId ? (
           organizationId ? (

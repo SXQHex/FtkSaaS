@@ -17,6 +17,7 @@ import {
 } from "../../components/ui/table";
 import { Textarea } from "../../components/ui/textarea";
 import { formatMinorAmount } from "../../lib/money";
+import { PlatformReadError } from "./platform-read-error";
 import { PlatformBillingReview } from "./platform-billing-review";
 import { platformAccessDenied } from "./platform-directory";
 import {
@@ -29,23 +30,6 @@ import {
   readPayments,
   type BillingIntent,
 } from "./platform-payment";
-
-export function BillingReadError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
-  const { t } = useTranslation();
-  const denied = platformAccessDenied(error);
-  return (
-    <Alert variant="destructive" role="alert">
-      <AlertDescription className="space-y-2">
-        <p>{t(($) => (denied ? $.platform.denied : $.platform.readError))}</p>
-        {!denied && (
-          <Button variant="outline" onPress={onRetry}>
-            {t(($) => $.auth.retry)}
-          </Button>
-        )}
-      </AlertDescription>
-    </Alert>
-  );
-}
 
 const occurredFormat = new Intl.DateTimeFormat("tr-TR", {
   dateStyle: "medium",
@@ -73,7 +57,7 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
     (!!cursor && query.data?.pageParams.includes(cursor));
   const title = t(($) => $.platform.billing.payments);
   if (platformAccessDenied(query.error))
-    return <BillingReadError error={query.error} onRetry={() => void query.refetch()} />;
+    return <PlatformReadError error={query.error} onRetry={() => void query.refetch()} />;
   return (
     <Card className="min-w-0">
       <CardHeader>
@@ -109,7 +93,7 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
         {query.isPending ? (
           <p role="status">{t(($) => $.platform.loading)}</p>
         ) : query.isError || invalid ? (
-          <BillingReadError error={query.error} onRetry={() => void query.refetch()} />
+          <PlatformReadError error={query.error} onRetry={() => void query.refetch()} />
         ) : rows.length === 0 ? (
           <p>{t(($) => $.platform.billing.empty)}</p>
         ) : (
@@ -226,7 +210,7 @@ export function PlatformPaymentDetail({
       {query.isPending ? (
         <p role="status">{t(($) => $.platform.loading)}</p>
       ) : query.isError ? (
-        <BillingReadError error={query.error} onRetry={() => void query.refetch()} />
+        <PlatformReadError error={query.error} onRetry={() => void query.refetch()} />
       ) : result && row ? (
         <Card className="min-w-0">
           <CardHeader>
