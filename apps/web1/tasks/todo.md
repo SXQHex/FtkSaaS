@@ -16,7 +16,7 @@ Bu çalışmanın hedefi Starter kabulünü, 18 Kasım çizim farklarını ve E4
 | Aktif adım           | Plan                | İşlev                         | Durum                              | Sonraki eylem                                                                                |
 | -------------------- | ------------------- | ----------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------- |
 | **V08.2 / G-DESIGN** | Pro / Starter       | Teslim adayı ve çizim kabulü  | Starter yayımlı kabulü tamamlandı. | Teslim adayını tek Chromium işçisiyle doğrula ve kalan yayımlı rota/kapsam kabulünü tamamla. |
-| **E49–E52**          | Business / Platform | Merkezler ve platform konsolu | E49–E51 kapandı.                   | E52 yayımlı kabulünü platform dağıtımından sonra doğrula.                                    |
+| **E49–E52**          | Business / Platform | Merkezler ve platform konsolu | E49–E52 kapandı.                   | Yayımlı platform sonucu E52.3’te.                                                            |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -356,13 +356,13 @@ JS `o-odemeler`. WF13/WF17. Hazır Tabs, Table, Sheet, Field ve AlertDialog. E50
 
 <a id="e52"></a>
 
-### E52 · Platform sahipleri
+### E52 · Platform sahipleri (kapandı)
 
 JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 
 - [x] **E52.1** · Platform sahipleri `operator_manage` ve `view:operators` ile açılıyor. Doğrulanmış e-posta ve gerekçe yeniden okunarak `platform_operator_access_set_v1` ile inceleme sonrası uygulanıyor. [W1-BE-62](request.md#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi).
 - [x] **E52.2** · Son uygun operatör korunuyor. Yetki kaybeden oturumun görünümü kaldırılıyor ve müşteri rolüne erişim açılmıyor. [Yerel kabul](../e2e/auth-platform.spec.ts) · [Native kabul](../../backend/tests/starter-studio-acceptance.mjs).
-- [ ] **E52.3** · Yayımlı platform kabulü. Kuruluş, ödeme ve operatör ekranları yerel Chromium senaryolarında doğrulandı. Dağıtım sonrası geçerli platform oturumuyla rotaları ve yetki sınırını doğrula.
+- [x] **E52.3** · Yayımlı Web1’de `index-HGo_1OJL.js` ile mevcut yetkili Chrome oturumunda Organizasyonlar ve Platform ödemeleri tabloları ile Platform sahipleri dizini yüklendi. Oturumsuz Chrome penceresinde operatör bağlantısı giriş ekranına döndü. Kuruluş sahibi ve personel oturumlarının dizin okumalarından önce reddi [yerel yetki senaryolarında](../e2e/auth-platform.spec.ts#L256) doğrulandı. Canlı kontrol salt okunur yürütüldü.
 
 - [x] **E52.4** · Operatör işlem kaydı kuruluş, askı/kaldırma, ödeme kararı, ek süre ve operatör yetkisi işlemlerini mevcut native sonuç doğrulamasından sonra gösterir. Aynı işlem anahtarı tek satır üretir. Kayıt konsol bölümleri arasında korunur, konsoldan ayrılınca, belge yenilenince veya yetki reddinde temizlenir. Gerekçe ve hesap e-postası kayda alınmaz. Tek Chromium işçisiyle 9 platform senaryosu geçti. [Yerel kabul](../e2e/auth-platform.spec.ts).
 
