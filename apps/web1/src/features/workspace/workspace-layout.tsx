@@ -165,6 +165,7 @@ export function WorkspaceLayout({
       ? !businessAccess.isError && businessAccess.data === true
       : canManageCenters && manyCenters;
   const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter, business);
+  const accountHref = workspacePersonalHref("/account", resolvedOrganizationId, centerId);
   const memberSearchScope =
     mode === "management" &&
     view?.selected?.id &&
@@ -196,6 +197,7 @@ export function WorkspaceLayout({
       <AppSidebar
         key={accountId}
         name={name}
+        accountHref={accountHref}
         pending={pending}
         scopeLocked={scopeLocked || scopeControl?.locked}
         onSignOut={onSignOut}
@@ -291,7 +293,9 @@ export function WorkspaceLayout({
                     items: [
                       ...(groups.some((group) => group.items.some((item) => item.key === "account"))
                         ? []
-                        : [{ key: "account" as const, url: "/account", icon: <UsersRoundIcon /> }]),
+                        : [
+                            { key: "account" as const, url: accountHref, icon: <UsersRoundIcon /> },
+                          ]),
                       { key: "help", url: "/help", icon: <UsersRoundIcon /> },
                     ],
                   },

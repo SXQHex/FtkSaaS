@@ -30,7 +30,7 @@ test("command palette reaches appearance, switches the saved theme and signs out
   await search.click();
   await input.fill("Temayı değiştir");
   await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
-  await expect(page).toHaveURL(`${origin}/account#account-appearance`);
+  await expect(page).toHaveURL(`${origin}/account?org=${org}&center=${center}#account-appearance`);
   const appearance = page.locator("#account-appearance");
   await expect(appearance.getByRole("radiogroup", { name: "Tema", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Temayı değiştir", exact: true })).toBeEnabled();
@@ -396,4 +396,15 @@ test("workspace entry offers authorized studios and keeps the selected center on
     "href",
     `/o/${org}/c/${otherCenter}/schedule`,
   );
+
+  const accountHref = `/account?org=${org}&center=${otherCenter}`;
+  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
+  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Çalışacağın merkezi seç" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
 });

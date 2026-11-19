@@ -16,11 +16,13 @@ import {
 } from "@/components/ui/sidebar";
 export function NavUser({
   name,
+  accountHref,
   detail,
   pending,
   onSignOut,
 }: {
   name: string;
+  accountHref: string;
   detail: string;
   pending: boolean;
   onSignOut: () => void;
@@ -53,7 +55,7 @@ export function NavUser({
             aria-label={t(($) => $.workspace.accountMenu)}
           >
             <DropdownMenuGroup>
-              <DropdownMenuItem href="/account">
+              <DropdownMenuItem href={accountHref}>
                 <UserIcon />
                 {t(($) => $.auth.account)}
               </DropdownMenuItem>

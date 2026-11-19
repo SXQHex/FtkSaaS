@@ -63,7 +63,12 @@ export function workspaceNavigation(
       },
     ];
   if (view === "account")
-    return [{ key: "general", items: [{ key: "account", url: "/account", icon: <UserIcon /> }] }];
+    return [
+      {
+        key: "general",
+        items: [{ key: "account", url: personal("/account"), icon: <UserIcon /> }],
+      },
+    ];
   const groups: NavigationGroup[] = [
     {
       key: "general",

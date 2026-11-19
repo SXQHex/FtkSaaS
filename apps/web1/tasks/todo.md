@@ -372,6 +372,8 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 
 `data-view="a-alan"` · v68. Hesap kabuğundaki mevcut workspace okumasını ve seçicileri kullan.
 
+Yönetimden **Hesabım** bağlantısı ve sayfa araması seçili organizasyon ile merkezi URL’de taşır. Hesap rotası bu kapsamı canlı çalışma alanından doğrular ve profili açar. Yenileme aynı kapsamı korur. Girişte kapsam belirlenmemişse mevcut seçim adımı çalışır. [Tarayıcı kabulü](../e2e/auth-workspace.spec.ts).
+
 - [x] **E53.1** · Girişte mevcut çalışma alanı okuması yetkili stüdyoları ve erişilebilir merkezleri sağlar. Çok stüdyolu hesap stüdyo seçer, birden çok etkin merkezi varsa merkez adımı açılır. Askıdaki stüdyo seçilmedi ve merkez okuması gönderilmedi. Klavyeyle seçilen merkez Hesabım kabuğunda ve merkez rotalarının bağlantılarında korundu. Erişimsiz hesapta davet açıklaması ve doğrulanmış hesabın mevcut stüdyo kurulum yolu birlikte doğrulandı. Tek Chromium işçisiyle 17 hedefli senaryo ve erişimsiz hesap assertion’ı eklendikten sonra ilgili kurulum senaryosu geçti. [Çalışma alanı kabulü](../e2e/auth-workspace.spec.ts) · [Kurulum kabulü](../e2e/auth-studio-setup.spec.ts).
 
 <a id="on-tarama"></a>
