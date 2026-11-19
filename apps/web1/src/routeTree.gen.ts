@@ -18,6 +18,7 @@ import { Route as InviteRouteImport } from './routes/invite'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MfaRouteImport } from './routes/mfa'
 import { Route as PlatformRouteImport } from './routes/platform'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
@@ -101,6 +102,11 @@ const MfaRoute = MfaRouteImport.update({
 const PlatformRoute = PlatformRouteImport.update({
   id: '/platform',
   path: '/platform',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -316,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
   '/platform': typeof PlatformRoute
+  '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -366,6 +373,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
   '/platform': typeof PlatformRoute
+  '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -417,6 +425,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mfa': typeof MfaRoute
   '/platform': typeof PlatformRoute
+  '/reports': typeof ReportsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -469,6 +478,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mfa'
     | '/platform'
+    | '/reports'
     | '/reset-password'
     | '/signup'
     | '/verify-email'
@@ -519,6 +529,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mfa'
     | '/platform'
+    | '/reports'
     | '/reset-password'
     | '/signup'
     | '/verify-email'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mfa'
     | '/platform'
+    | '/reports'
     | '/reset-password'
     | '/signup'
     | '/verify-email'
@@ -620,6 +632,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MfaRoute: typeof MfaRoute
   PlatformRoute: typeof PlatformRoute
+  ReportsRoute: typeof ReportsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
@@ -724,6 +737,13 @@ declare module '@tanstack/react-router' {
       path: '/platform'
       fullPath: '/platform'
       preLoaderRoute: typeof PlatformRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1012,6 +1032,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MfaRoute: MfaRoute,
   PlatformRoute: PlatformRoute,
+  ReportsRoute: ReportsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,

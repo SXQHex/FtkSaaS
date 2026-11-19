@@ -1,5 +1,11 @@
 import { useCallback, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import {
+  useLoaderData,
+  useParams,
+  useNavigate,
+  useRouter,
+  useSearch,
+} from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
@@ -9,26 +15,41 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { ReportsContent } from "./reports-content";
 import type { AccountView } from "../../lib/api-contracts/generated";
 
+import type { ReportAction } from "./report-search";
+
 export function ReportsRoutePage() {
-  const account = useLoaderData({ from: "/o/$orgId/c/$centerId/reports" });
-  const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/reports" });
+  const from = "/o/$orgId/c/$centerId/reports";
+  const account = useLoaderData({ from });
+  const { orgId, centerId } = useParams({ from });
+  const { action } = useSearch({ from });
   return (
     <ReportsPage
       key={`${account.id}:${orgId}:${centerId}`}
       account={account}
       orgId={orgId}
       centerId={centerId}
+      action={action}
     />
   );
 }
+
+export function ShortReportsRoutePage() {
+  const from = "/reports";
+  const account = useLoaderData({ from });
+  const { action } = useSearch({ from });
+  return <ReportsPage key={account.id} account={account} action={action} />;
+}
+
 function ReportsPage({
   account,
   orgId,
   centerId,
+  action,
 }: {
   account: AccountView;
-  orgId: string;
-  centerId: string;
+  orgId?: string;
+  centerId?: string;
+  action?: ReportAction;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -47,10 +68,11 @@ function ReportsPage({
         void navigate({
           to: "/o/$orgId/c/$centerId/reports",
           params: { orgId: selection.organizationId, centerId: selection.centerId },
+          search: orgId && centerId ? {} : { action },
           replace: true,
         });
     },
-    [locked, orgId, centerId, navigate],
+    [locked, orgId, centerId, action, navigate],
   );
   async function signOut() {
     if (locked || signingOut) return;
@@ -106,6 +128,12 @@ function ReportsPage({
                 }}
                 onLockChange={setLocked}
                 preservePending={locked}
+                shortcut={
+                  (!orgId || selection.organizationId === orgId) &&
+                  (!centerId || selection.centerId === centerId)
+                    ? action
+                    : undefined
+                }
               />
             ) : (
               <div className="p-6">

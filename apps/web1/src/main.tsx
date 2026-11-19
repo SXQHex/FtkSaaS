@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { createRouteMask, createRouter, RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nextProvider } from "react-i18next";
 import { I18nProvider } from "react-aria-components/I18nProvider";
@@ -35,6 +35,14 @@ window.addEventListener("hashchange", captureInvitationNavigation, { capture: tr
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
+  routeMasks: [
+    createRouteMask({
+      routeTree,
+      from: "/o/$orgId/c/$centerId/reports",
+      to: "/reports",
+      search: {},
+    }),
+  ],
 });
 
 declare module "@tanstack/react-router" {
