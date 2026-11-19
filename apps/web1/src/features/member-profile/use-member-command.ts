@@ -12,7 +12,7 @@ export function useMemberCommand<Intent, Result>({
 }: {
   // Some native operations acknowledge with a typed domain view. Adapters only extract its real primary ID.
   write: (intent: Intent) => Promise<Pick<Mutation, "primary_id">>;
-  readReceipt: (intent: Intent) => Promise<OperationStatusView>;
+  readReceipt?: (intent: Intent) => Promise<OperationStatusView>;
   readResult: (intent: Intent, id?: string) => Promise<Result>;
   onRefresh: (result: Result) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
@@ -118,11 +118,17 @@ export function useMemberCommand<Intent, Result>({
     await execute();
   }
   async function recoverReceipt() {
-    if (terminal.current || executing.current || !intent.current) return;
+    if (
+      terminal.current ||
+      executing.current ||
+      !intent.current ||
+      (!acknowledged.current && !readReceipt)
+    )
+      return;
     executing.current = true;
     setBusy(true);
     try {
-      if (!acknowledged.current) {
+      if (!acknowledged.current && readReceipt) {
         const receipt = await readReceipt(intent.current);
         if (receipt.status === "succeeded" || receipt.status === "result_expired") {
           acknowledged.current = true;

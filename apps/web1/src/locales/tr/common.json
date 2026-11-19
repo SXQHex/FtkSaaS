@@ -5341,6 +5341,50 @@
     "pauseMotion": "Animasyonu durdur",
     "resumeMotion": "Animasyonu sürdür"
   },
+  "platform": {
+    "title": "Platform konsolu",
+    "organizations": "Organizasyonlar",
+    "organization": "Organizasyon",
+    "lifecycle": "Organizasyon durumu",
+    "subscription": "Abonelik durumu",
+    "access": "Erişim",
+    "owner": "Organizasyon sahibi",
+    "noOwner": "Sahip kaydı yok",
+    "noSubscription": "Abonelik kaydı yok",
+    "graceUntil": "Ek sürenin sonu",
+    "suspended": "Platform askısında",
+    "suspend": "Askıya al",
+    "resume": "Askıyı kaldır",
+    "reason": "İşlem gerekçesi (zorunlu)",
+    "reasonError": "1–1000 karakter arasında bir gerekçe yaz.",
+    "suspendEffect": "Askı stüdyo işlemlerini ve ziyaretçi yayınını kapatır. Organizasyon ve abonelik kayıtları korunur.",
+    "resumeEffect": "Askı kaldırıldığında erişim canlı organizasyon ve abonelik durumuna göre yeniden belirlenir.",
+    "denied": "Platform konsoluna erişim yetkin yok.",
+    "loading": "Platform kayıtları okunuyor.",
+    "readError": "Platform kayıtları okunamadı.",
+    "empty": "Görüntülenecek organizasyon yok.",
+    "missing": "Organizasyon bulunamadı.",
+    "more": "Daha fazla organizasyon",
+    "states": {
+      "active": "Aktif",
+      "closed": "Kapatıldı",
+      "deletion_pending": "Silme bekliyor",
+      "deleted": "Silindi"
+    },
+    "subscriptions": {
+      "pending_payment": "Ödeme bekliyor",
+      "active": "Abonelik etkin",
+      "grace": "Ek sürede",
+      "suspended": "Abonelik askıda",
+      "ended": "Abonelik sona erdi"
+    },
+    "accessModes": {
+      "normal": "Normal erişim",
+      "grace": "Ek süre erişimi",
+      "bootstrap": "Kurulum erişimi",
+      "closed": "Erişim kapalı"
+    }
+  },
   "studioSetup": {
     "title": "İlk stüdyo kurulumu",
     "description": "Stüdyo adını gönder. Kuruluş hazır olduğunda ilk merkezini kurabilirsin.",

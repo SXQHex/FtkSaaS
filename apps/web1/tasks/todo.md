@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan      | İşlev                  | Durum                         | Sonraki eylem                                                                |
-| ---------- | --------- | ---------------------- | ----------------------------- | ---------------------------------------------------------------------------- |
-| **E50.2**  | Platform  | Organizasyon konsolu   | Backend development hazır.    | Canlı platform kapsamıyla konsolu ve yetkili organizasyon ayrıntısını bağla. |
+| Aktif adım | Plan     | İşlev              | Durum                      | Sonraki eylem                                                   |
+| ---------- | -------- | ------------------ | -------------------------- | --------------------------------------------------------------- |
+| **E51.2**  | Platform | Ödeme ve ek süre   | Backend development hazır. | Ödeme kuyruğunu, yetkili kararları ve güncel sonucu konsola bağla. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -303,8 +303,9 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 
 - [ ] **E50** · **Platform organizasyonları** — JS `o-organizasyonlar`, `#opshell/#op-root`. WF02/WF17. Hazır Sidebar, Card, Table, Sheet, Dialog ve AlertDialog. Sonraki platform operatörü teslimi.
   - [x] **E50.1** · Platform kapsamı hesap opt-in alanıyla, organizasyon dizini `platform_directory_get_v1` ile ve askı `platform_organization_suspension_set_v1` ile backend development’ta mevcut. Platform kuruluş oluşturma ve stüdyo talebi kuyruğu WF02 kapsamındadır. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
-  - [ ] **E50.2** · Gerçek platform kapsamı ile kabuğu ve organizasyon detayını çizime uyarla; müşteri sahibi/personelde doğrudan route/API reddini doğrula.
-  - [ ] **E50.3** · Desteklenen askı/kaldırma etkisini kaynak organizasyonda yeniden oku, mevcut verinin ve audit geçmişinin korunduğunu doğrula.
+  - [x] **E50.2** · `/platform` canlı `account_get_v1(include_platform_scope:true)` sonucuyla açılır. Organizasyonlar yetkili cursor ile, ayrıntı ve sahip seçili kuruluş kimliğiyle okunur. Müşteri sahibi ve personel doğrudan rotada reddedildi. Platform izni geri alınınca kayıt görünmedi. Native API reddi ayrı kaynak testinde doğrulandı. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native yetki testi](../../backend/tests/starter-studio-acceptance.mjs#L389).
+  - [x] **E50.3** · Gerekçeli ve açık onaylı askı/kaldırma seçili kuruluşun sürümüne bağlı. Belirsiz yanıt aynı anahtarla toparlandı. Web1 aynı kuruluşu, değişmeyen abonelik ve sahip bilgisiyle tekrar okudu. [Native komut](../../backend/database/platform-organization-suspension.sql#L33) kuruluşun askı bayrağını değiştirir. [Native denetim kaydı](../../backend/database/dispatch.sql#L619) işlem için yeni olay ekler. 3 platform ve 2 ilgili regresyon senaryosu tek Chromium işçisiyle geçti.
+  - [ ] **E50.4** · Stüdyo talepleri kuyruğundan ve yetkili hesap seçiminden kuruluş oluşturma. Komutun zorunlu ilk plan sürümünü operatöre sunmak için [W1-BE-60](request.md#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) açık.
 
 - [ ] **E51** · **Platform ödeme ve ek süre** — JS `o-odemeler`. WF13/WF17. Hazır Tabs, Table, Sheet, Field ve AlertDialog. E50 yetki temeli gerekir.
   - [x] **E51.1** · Native ödeme kuyruğu `platform_directory_get_v1(view:payments)` ile okunur. `saas_payment_verify_v1` gerçek ödeme kimliğiyle `accepted:true/false` ve gerekçe alır. `saas_grace_extend_v1` mevcut yetkili ek süre yoludur. Arayüz bağlantısı E51.2’de. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).

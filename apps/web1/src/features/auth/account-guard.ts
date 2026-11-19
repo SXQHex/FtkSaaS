@@ -19,8 +19,16 @@ export async function requireAccountSession() {
 }
 
 export async function loadAccount() {
+  return loadAccountProjection(false);
+}
+
+export async function loadPlatformAccount() {
+  return loadAccountProjection(true);
+}
+
+async function loadAccountProjection(includePlatformScope: boolean) {
   try {
-    return await readAccount();
+    return await readAccount(includePlatformScope);
   } catch (error) {
     if (error instanceof BackendError && ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code))
       throw redirect({ to: "/login" });

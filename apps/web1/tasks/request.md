@@ -66,6 +66,7 @@ Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında,
 | W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Karşılandı](#w1-be-57--bildirim-arşivi-ve-silme). |
 | W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Karşılandı](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
 | W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Karşılandı](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
+| W1-BE-60 | E50.4 · WF02 | Platform için ilk plan sürümü keşfi | [Açık](#w1-be-60--platform-için-ilk-plan-sürümü-keşfi). |
 
 ## Bütün talepler için ortak sınır
 
@@ -498,4 +499,10 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 
 **Backend desteği karşılandı.** [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı.
 
-`account_get_v1(include_platform_scope:true)` canlı platform erişimini, `platform_directory_get_v1` kuruluş, ödeme, sahip ve e-postayla doğrulanmış hesap keşfini döndürür. `platform_organization_suspension_set_v1` sürümlü askı/kaldırma sağlar. Ödeme kararı, ek süre ve sahiplik mevcut yetkili komutları kullanır. Web1 tüketimi E50–E52 kapsamındadır. [WF17](../../../docs/workflows.md#wf17).
+`account_get_v1(include_platform_scope:true)` canlı platform erişimini, `platform_directory_get_v1` kuruluş, ödeme, sahip ve e-postayla doğrulanmış hesap keşfini döndürür. `platform_organization_suspension_set_v1` sürümlü askı/kaldırma sağlar. Ödeme kararı, ek süre ve sahiplik mevcut yetkili komutları kullanır. Web1 organizasyon ve askı tüketimi E50.2–E50.3 altında doğrulandı. Ödeme ve sahip arayüzü E51–E52 kapsamındadır. [WF17](../../../docs/workflows.md#wf17).
+
+## W1-BE-60 · Platform için ilk plan sürümü keşfi
+
+**Açık · backend değerlendirmesi.** `organization_create_v1` zorunlu `initial_plan_id` kabul ediyor. Mevcut yönetim seçicisi de ilk plan kimliğini girdi olarak istiyor. [Platform dizini](../../../docs/workflows.md#wf17) kuruluş, sahip, ödeme ve doğrulanmış hesap okuyor. Kuruluş oluşturma ve stüdyo talebini tamamlama bağlamında seçilebilir plan sürümlerini veren yayımlanmış bir kaynak bulunamadı. [WF02](../../../docs/workflows.md#wf02) · [E50.4](todo.md#yeni-ekranların-envanteri).
+
+Organizasyon oluşturma yetkisi olan platform hesabına, yeni kuruluş için seçilebilir planların gerçek sürüm kimliğini ve gösterilecek adını döndüren bir kaynak gerekiyor. Başka kuruluşun aboneliği veya tasarım örneği ilk plan kaynağı olarak kullanılmamalı. Oluşturma komutundaki mevcut plan ve hesap doğrulaması korunmalı.

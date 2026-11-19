@@ -6,9 +6,11 @@ import { Button } from "../../components/ui/button";
 export function EventCommandNotice({
   command,
   onReload,
+  receiptAvailable = true,
 }: {
   command: Pick<ReturnType<typeof useMemberCommand>, "state" | "busy" | "retry" | "readReceipt">;
   onReload: () => void;
+  receiptAvailable?: boolean;
 }) {
   const { t } = useTranslation();
   if (command.state === "ready") return null;
@@ -21,7 +23,8 @@ export function EventCommandNotice({
       <AlertDescription>
         <p role="status">{t(($) => $.events.commandStates[command.state])}</p>
         <div className="mt-2 flex flex-wrap gap-2">
-          {["unknown", "pending", "saved-unread"].includes(command.state) && (
+          {(command.state === "saved-unread" ||
+            (receiptAvailable && ["unknown", "pending"].includes(command.state))) && (
             <Button
               variant="outline"
               size="sm"
@@ -33,7 +36,7 @@ export function EventCommandNotice({
               {t(($) => $.finance.readResult)}
             </Button>
           )}
-          {command.state === "unknown" && (
+          {(command.state === "unknown" || (!receiptAvailable && command.state === "pending")) && (
             <Button
               variant="outline"
               size="sm"

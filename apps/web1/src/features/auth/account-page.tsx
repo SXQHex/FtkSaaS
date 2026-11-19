@@ -14,7 +14,7 @@ import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription } from "../../components/ui/alert";
-import { Button } from "../../components/ui/button";
+import { Button, LinkButton } from "../../components/ui/button";
 import { getSupabaseClient } from "../../lib/supabase";
 import { MemberCalendarPanel } from "../member-account/member-calendar-panel";
 import { PersonalCalendarCard } from "../member-account/member-account-view";
@@ -109,15 +109,24 @@ export function AccountPage() {
               <h1 className="text-2xl font-semibold">{t(($) => $.auth.account)}</h1>
               <p className="text-muted-foreground">{t(($) => $.auth.accountDescription)}</p>
             </div>
-            <Button
-              variant="outline"
-              isDisabled={pending || accountLocked}
-              onPress={() => {
-                void signOut();
-              }}
-            >
-              {t(($) => $.auth.signout)}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              {account.platform_scope?.organizations === true && (
+                <LinkButton
+                  href="/platform"
+                  variant="outline"
+                  isDisabled={pending || accountLocked}
+                >
+                  {t(($) => $.platform.title)}
+                </LinkButton>
+              )}
+              <Button
+                variant="outline"
+                isDisabled={pending || accountLocked}
+                onPress={() => void signOut()}
+              >
+                {t(($) => $.auth.signout)}
+              </Button>
+            </div>
           </header>
           {failed && (
             <Alert variant="destructive">

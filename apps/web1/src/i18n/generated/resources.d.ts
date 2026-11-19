@@ -3065,6 +3065,50 @@ export default interface Resources {
       "typeError": "PNG, JPEG veya WebP seç.",
       "upload": "Fotoğraf yükle"
     },
+    "platform": {
+      "access": "Erişim",
+      "accessModes": {
+        "bootstrap": "Kurulum erişimi",
+        "closed": "Erişim kapalı",
+        "grace": "Ek süre erişimi",
+        "normal": "Normal erişim"
+      },
+      "denied": "Platform konsoluna erişim yetkin yok.",
+      "empty": "Görüntülenecek organizasyon yok.",
+      "graceUntil": "Ek sürenin sonu",
+      "lifecycle": "Organizasyon durumu",
+      "loading": "Platform kayıtları okunuyor.",
+      "missing": "Organizasyon bulunamadı.",
+      "more": "Daha fazla organizasyon",
+      "noOwner": "Sahip kaydı yok",
+      "noSubscription": "Abonelik kaydı yok",
+      "organization": "Organizasyon",
+      "organizations": "Organizasyonlar",
+      "owner": "Organizasyon sahibi",
+      "readError": "Platform kayıtları okunamadı.",
+      "reason": "İşlem gerekçesi (zorunlu)",
+      "reasonError": "1–1000 karakter arasında bir gerekçe yaz.",
+      "resume": "Askıyı kaldır",
+      "resumeEffect": "Askı kaldırıldığında erişim canlı organizasyon ve abonelik durumuna göre yeniden belirlenir.",
+      "states": {
+        "active": "Aktif",
+        "closed": "Kapatıldı",
+        "deleted": "Silindi",
+        "deletion_pending": "Silme bekliyor"
+      },
+      "subscription": "Abonelik durumu",
+      "subscriptions": {
+        "active": "Abonelik etkin",
+        "ended": "Abonelik sona erdi",
+        "grace": "Ek sürede",
+        "pending_payment": "Ödeme bekliyor",
+        "suspended": "Abonelik askıda"
+      },
+      "suspend": "Askıya al",
+      "suspendEffect": "Askı stüdyo işlemlerini ve ziyaretçi yayınını kapatır. Organizasyon ve abonelik kayıtları korunur.",
+      "suspended": "Platform askısında",
+      "title": "Platform konsolu"
+    },
     "products": {
       "activeHolders": "Aktif hak sahibi",
       "activeRights": "Aktif hak",
