@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `50e434000d1d1f0df6a4256b302ba75b8a18554fe18de874c4390751083c253c`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `4be9648fcd15e5b80b56391a30c2ee5e35b3f9250eae0f5bc515a4addcb4fefa`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 208. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 209. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -216,3 +216,4 @@ Sıralı migration: 208. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261118214900_tracking_media_redaction.sql](../apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql) | `4d4ec589be8b16e726254a96c207888d2f027e9059f9270e611454eb2966b2d5` |
 | [20261118215000_platform_invoices.sql](../apps/backend/supabase/migrations/20261118215000_platform_invoices.sql) | `943240737ff53d7098fbe65f8f49784671c51f68804a485ffc32e3c260749bb7` |
 | [20261119060000_platform_console_completion.sql](../apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql) | `13cfe5a203253a227b60eb5d9ab793c3cb9b7ce734d4a80cd3d919af26b28331` |
+| [20261119150000_centers_list_rls.sql](../apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql) | `c4cdd1d762b136544af0bc6b528ac3e03bd89819da190e0eb50761d2a49f85a9` |

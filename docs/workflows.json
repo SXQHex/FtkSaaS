@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "8133189a7c892c48065da0f743cc040546793a5c389d6ce78cb33ded1fba63fe",
-        "reason": "Üretilmiş Edge kodu ortak hata nesneleri ve okunabilen şema sabitleri ile küçülür. Aynı API sözleşmesi, hata zarfı, şema yolları ve Worker doğrulaması korunur."
+        "fingerprint": "701df68d6d7181cccf5cf11b69e4cc11f8cec80117ecb06fe51e0bdbe8ea5e97",
+        "reason": "Reviewed the source-bound inventory for native MFA and the isolated mandatory-factor regression."
       }
     },
     {
@@ -399,8 +399,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "d5a90a442b69e48a650329eb0c257699b00279854e6ad88aa04b788714c3b65e",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "6dec610dcdd503b80a5daef7177090105a49ed3fd2ff2968501be6f2024ca564",
+        "reason": "Reviewed native enrollment, session, access grants and the separate mandatory-factor check on both transports."
       }
     },
     {
@@ -421,6 +421,7 @@
         "apps/backend/tests/permission-preparation-acceptance.mjs",
         "apps/backend/tests/discipline-presentation-acceptance.mjs",
         "apps/backend/tests/studio-setup-status-acceptance.mjs",
+        "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/web1-review-acceptance.mjs",
         "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
@@ -499,7 +500,9 @@
         "apps/backend/database/studio-setup-requests.sql",
         "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql",
         "apps/backend/database/platform-console-completion.sql",
-        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
+        "apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql",
+        "packages/api-contracts/src/read-transport.ts"
       ],
       "operations": [
         "organizations_list_v1",
@@ -527,8 +530,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "9dc8481690042bdc1d3e55f111b7922664d8ddae1724b7a1d592eed02308a019",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "4a5f976b78b03d664d107df787574edcac0452b7915bfd66d46390e9997cc0d0",
+        "reason": "Reviewed shared organization MFA and the centers list Edge and Data API cases with and without the verified factor."
       }
     },
     {
@@ -1565,8 +1568,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "4ba74eaf1b6e0e1e9844a5652c1e9b921442ae92267416165f2b819c65a53056",
-        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
+        "fingerprint": "2ceea6fdc482d4236f09ff95ed6c0c53a3e4fa5da378f81a75a5c8f7e60c28a8",
+        "reason": "Reviewed mandatory role MFA after native removal and with a stale persisted AAL2 session in the isolated fixture."
       }
     },
     {

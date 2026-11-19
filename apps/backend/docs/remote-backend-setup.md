@@ -96,6 +96,12 @@ Migration içeriği manifest ve uzak migration geçmişiyle karşılaştırılı
 
 Smoke, dış e-posta göndermeyen sentetik native kullanıcıyla Auth→Edge→RPC, tenant/RPC/JWT/session, RLS/ACL ve fixture cleanup doğrular. Kullanıcının UUID’sine bağlı dar temizlik hata halinde de uygulanır. Smoke tüm workflow/sağlayıcı/restore kabulü değildir. CD metadata/DB-tip artifact’ının kapsam ve sınırı [dokümantasyon rehberindedir](documentation-development.md).
 
+### Merkez listesi Data API
+
+Migration mevcut PostgREST şema listesine `api_read` ekler. Bu şemada yalnız `authenticated` rolü `centers_list_v1(jsonb)` çağırabilir. `api_v1` servis RPC kapısı ve core/private erişim sınırları geçerlidir. Açılıştan sonra native kullanıcıyla [WF02](../../../docs/workflows.md#wf02) yetkisini ve Data API çağrısını hedef ortamda sınayın.
+
+Tarayıcı erişimini açmak için hedef ortamın etkin `FTK_BROWSER_ORIGINS` listesinden seçilen tam origin'leri `private.centers_read_browser_origins` tablosuna ekleyin. Migration tabloyu boş kurar ve tarayıcı Edge üzerinden çalışmaya devam eder. Bir origin'i devreden çıkarırken önce Data API kaydını, sonra Edge kaydını kaldırın. `Origin` başlığı olmayan sunucu çağrıları native JWT ile değerlendirilir.
+
 ## Kimlik bilgileri ve sağlayıcı ayarları
 
 Actions secret adları `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`; değerler log/rapor/kaynağa yazılmaz. Token yalnız gerekli proje/işlem yetkisine sahip olmalı, expiry ve rotasyonu operatör izlemelidir. `SUPABASE_NATIVE_DEPLOY_DISABLED=true` küçük harfle tutulur; native ve Actions dağıtıcıları aynı projeye birlikte yazmamalıdır. Variable, dashboard ayarının bağımsız kanıtı değildir. Environment main sınırı gerçek yönetim readback’iyle doğrulanır.

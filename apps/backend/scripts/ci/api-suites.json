@@ -636,7 +636,7 @@
         {
           "line": 5,
           "path": "apps/backend/tests/account-mfa-acceptance.mjs",
-          "sha256": "dc8a6b43e6306cbe71298252175a3787dcc6cba17d980b03a5ef6dc199d1e43f"
+          "sha256": "272afa438aaa07b976cc22032284ec1576be32faeecd081252962aa47b4e6319"
         },
         {
           "line": 6,
@@ -1262,7 +1262,7 @@
         {
           "line": 311,
           "path": "apps/backend/tests/studio-setup-status-acceptance.mjs",
-          "sha256": "c01b3a3e076ab2098271d31e03679b965a95fa1a7431078b2d2833c1c74486d6"
+          "sha256": "b46feeb5bca4a343255841e9a914ff9a94307832d5c78d3894ff43bb66b58d08"
         },
         {
           "line": 312,

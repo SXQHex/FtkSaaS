@@ -5,7 +5,7 @@ import {pathToFileURL} from 'node:url';
 import {repoFile,backendRoot,repositoryRoot} from './paths.mjs';
 import {updateDocs} from './update-docs.mjs';
 
-export const appSchemas='core,private,api_v1';
+export const appSchemas='core,private,api_v1,api_read';
 const sha=s=>createHash('sha256').update(s).digest('hex');
 export const canonical=value=>JSON.stringify(value&&typeof value==='object'?Array.isArray(value)?value.map(v=>JSON.parse(canonical(v))):Object.fromEntries(Object.keys(value).sort().map(k=>[k,JSON.parse(canonical(value[k]))])):value);
 // Environment worker LOGIN memberships/ACL can differ. Report grants verbatim
