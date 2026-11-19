@@ -238,8 +238,14 @@ test("directory denial is not empty and unknown join recovers without rewrite", 
   await dialog.getByRole("button", { name: "Bekleme listesine ekle", exact: true }).click();
   await dialog.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
-  expect(state.writes).toHaveLength(1);
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expectGridButtonTarget(
+    page.getByRole("grid", { name: "Bekleme listesi", exact: true }).getByRole("button", {
+      name: "Listeden çıkar — Örnek öğrenci",
+      exact: true,
+    }),
+  );
+  expect(state.writes).toHaveLength(1);
 });
 test("another person's visible offer does not expose accept or reject controls", async ({
   page,

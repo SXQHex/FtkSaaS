@@ -220,9 +220,15 @@ test("multiple roles reset navigation when the selected organization changes to 
   await expect(
     nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
   ).toHaveCount(0);
+  const accountLink = nav.getByRole("link", { name: common.workspace.links.account, exact: true });
+  const accountHref = `/account?org=${B.org}&center=${B.center}`;
+  await expect(accountLink).toHaveAttribute("href", accountHref);
+  await accountLink.press("Enter");
+  await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await expect(switcher).toContainText("Londra merkezi");
   await expect(
-    nav.getByRole("link", { name: common.workspace.links.account, exact: true }),
-  ).toHaveAttribute("href", "/account");
+    nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
+  ).toHaveCount(0);
 });
 
 test("a late previous-org calendar cannot replace the selected member, and revoked history URLs expose no old data", async ({

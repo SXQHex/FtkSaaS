@@ -7,6 +7,7 @@ import type {
 } from "../src/lib/api-contracts/generated.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import { at, nativePage } from "./pro-completion-fixture.js";
 const autoId = "019ab7b0-0000-7000-8000-000000000201",
   segmentId = "019ab7b0-0000-7000-8000-000000000202",
   jobId = "019ab7b0-0000-7000-8000-000000000203",
@@ -445,12 +446,31 @@ test("automation retry advances only the failed job and keeps the automation ver
   await expect(grid.getByRole("row").filter({ hasText: resultId })).toContainText(
     "Takip oluşturuldu",
   );
-  await expect(page.getByRole("link", { name: "Merkez raporları", exact: true })).toHaveAttribute(
-    "href",
-    `/o/${I.org}/c/${I.center}/reports`,
-  );
   expect(state.jobs[0]!.id).toBe(jobId);
   expect(state.writes).toHaveLength(1);
+
+  const reportEndpoint = "**/functions/v1/backend-v1/report_get_v1";
+  await page.route(reportEndpoint, (route) => {
+    const { report, filters } = route.request().postDataJSON();
+    return route.fulfill({
+      json: {
+        ok: true,
+        data: { report_kind: report, filters, rows: nativePage([]), totals: [], as_of: at },
+        trace_id: I.role,
+      },
+    });
+  });
+  const reportsLink = page.getByRole("link", { name: "Merkez raporları", exact: true });
+  await expect(reportsLink).toHaveAttribute("href", "/reports");
+  const reportRequest = page.waitForRequest(reportEndpoint);
+  await reportsLink.press("Enter");
+  await expect(page).toHaveURL(`${origin}/reports`);
+  await expect(page.getByRole("tab", { name: "Özet", exact: true })).toBeVisible();
+  expect((await reportRequest).postDataJSON()).toMatchObject({
+    org_id: I.org,
+    center_id: I.center,
+    filters: { center_ids: [I.center] },
+  });
 });
 test("automation notification preparation uses the actual template and explicit self recipient", async ({
   page,
