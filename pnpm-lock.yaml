@@ -185,6 +185,9 @@ importers:
         specifier: 14.0.3
         version: 14.0.3
     devDependencies:
+      '@babel/parser':
+        specifier: 7.29.11
+        version: 7.29.11
       '@ftksaas/api-contracts':
         specifier: workspace:*
         version: link:../../packages/api-contracts

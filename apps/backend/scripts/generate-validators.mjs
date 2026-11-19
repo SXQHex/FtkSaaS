@@ -1,4 +1,5 @@
 import {compactValidatorErrors} from './compact-validator-errors.mjs';
+import {optimizeStandaloneValidators} from './optimize-standalone-validators.mjs';
 import fs from 'node:fs';import assert from 'node:assert/strict';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import standalone from 'ajv/dist/standalone/index.js';
 const contract=JSON.parse(fs.readFileSync('supabase/functions/backend-v1/contract.json'));
 const nestedMaps=['properties','patternProperties','$defs','definitions','dependentSchemas'];
@@ -54,14 +55,14 @@ const ajv=new Ajv({strict:false,allErrors:false,messages:false,inlineRefs:false,
 exports.failure_envelope='contract#/$defs/FailureEnvelope';
 for(const op of contract['x-contract'].operations){exports['request_'+op.name]='contract'+op.request.$ref;exports['success_'+op.name]='contract'+op.success.$ref;}
 const modules={'ajv/dist/runtime/ucs2length':['ucs','ajv/dist/runtime/ucs2length.js'],'ajv/dist/runtime/equal':['equal','ajv/dist/runtime/equal.js'],'ajv-formats/dist/formats':['formats','ajv-formats/dist/formats.js']};
-function writeValidators(selected,path){
+function writeValidators(selected,path,optimize=code=>code){
  let code=compactValidatorErrors(standalone(ajv,selected)),imports='// Generated from the authoritative closed JSON contract; no runtime schema compiler.\n';
  for(const [name,[binding,url]] of Object.entries(modules)){const ref='require('+JSON.stringify(name)+')';if(code.includes(ref)){imports+='import '+binding+' from '+JSON.stringify(url)+';\n';code=code.replaceAll(ref,binding);}}
- assert(!code.includes('require('));code=imports+code+'\n';
+ assert(!code.includes('require('));code=imports+optimize(code)+'\n';
  if(process.argv.includes('--check'))assert.equal(fs.readFileSync(path,'utf8'),code,'Runtime validator drift: '+path);else fs.writeFileSync(path,code);
  console.log('Generated standalone request/response validators: '+Object.keys(selected).length+' ('+path+')');
 }
-writeValidators(exports,'supabase/functions/backend-v1/validators.js');
+writeValidators(exports,'supabase/functions/backend-v1/validators.js',optimizeStandaloneValidators);
 // One canonical schema/compiler, only the four public validators needed by Worker.
 const publicNames=['failure_envelope','request_public_calendar_get_v1','success_public_calendar_get_v1','request_public_application_submit_v1'];
 writeValidators(Object.fromEntries(publicNames.map(name=>[name,exports[name]])),'transports/spa-validators.mjs');

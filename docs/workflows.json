@@ -146,6 +146,7 @@
         "apps/backend/scripts/generate.mjs",
         "apps/backend/scripts/governance.mjs",
         "apps/backend/scripts/health.mjs",
+        "apps/backend/scripts/optimize-standalone-validators.mjs",
         "apps/backend/scripts/paths.mjs",
         "apps/backend/scripts/probe-db.mjs",
         "apps/backend/scripts/remote-backend-verify.sql",
@@ -308,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "a180f9c01eb62b8ed38f9e583e048f78aeedddddc66a529910d73740e2ae0c99",
-        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
+        "fingerprint": "8133189a7c892c48065da0f743cc040546793a5c389d6ce78cb33ded1fba63fe",
+        "reason": "Üretilmiş Edge kodu ortak hata nesneleri ve okunabilen şema sabitleri ile küçülür. Aynı API sözleşmesi, hata zarfı, şema yolları ve Worker doğrulaması korunur."
       }
     },
     {
