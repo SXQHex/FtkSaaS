@@ -3,11 +3,49 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
+import {optimizeStandaloneValidators} from '../scripts/optimize-standalone-validators.mjs';
 import * as validators from '../supabase/functions/backend-v1/validators.js';
 
 test('Edge upload keeps JSON-encoded source within 4,999,999 bytes',()=>{
  const source=fs.readFileSync('supabase/functions/backend-v1/index.ts','utf8');
  assert(Buffer.byteLength(JSON.stringify(source))<=4_999_999,'Edge API source upload exceeds budget');
+});
+
+test('Standalone optimization preserves exact errors and live schema constants',()=>{
+ const source=`
+"use strict";
+const schema0 = {"properties":{"value":{"enum":["one","two"],"default":"unused-marker"},"unused":{"type":"number"}}};
+const schema1 = {"enum":["one","two"],"default":"dynamic-marker"};
+function validate1(data){
+ const instancePath = "";
+ if (data?.checkDirective) return this;
+ if (data === null) {
+  validate1.errors = [{instancePath,schemaPath:"",keyword:"type",params:{type:"object"}}];
+  return false;
+ }
+ if (data.branch !== undefined) return schema1[data.branch];
+ if (!schema0.properties.value.enum.includes(data.value)) {
+  validate1.errors = [
+   {instancePath:instancePath+"/value",schemaPath:"#/properties/value/enum",keyword:"enum",params:{allowedValues:schema0.properties.value.enum}},
+   {instancePath,schemaPath:"",keyword:"required",params:{missingProperty:"value"}}
+  ];
+  return false;
+ }
+ validate1.errors = null;
+ return true;
+}
+module.exports = validate1;`;
+ const load=code=>{const mod={};new Function('module',code)(mod);return mod.exports;};
+ const optimized=optimizeStandaloneValidators(source);
+ assert.doesNotMatch(optimized,/unused-marker/);
+ assert.match(optimized,/dynamic-marker/);
+ assert.match(optimized,/return rejectStandalone\(validate1,/);
+ const reference=load(source),candidate=load(optimized);
+ for(const payload of [null,{}, {value:'invalid'}, {value:'one'}, {branch:'default'}, {checkDirective:true}]){
+  assert.equal(candidate(payload),reference(payload));
+  assert.deepEqual(candidate.errors,reference.errors);
+  assert.equal(JSON.stringify(candidate.errors),JSON.stringify(reference.errors));
+ }
 });
 
 test('Standalone validators retain authoritative acceptance and reject malformed shared references',()=>{
