@@ -270,8 +270,7 @@ test("manager reads agreement evidence on demand and clears stale status on deni
   const refresh = row.getByRole("button", { name: "Metin kabul durumunu yenile" });
   await expect(open).toBeEnabled();
   expect(fixture.agreementReads).toHaveLength(0);
-  await open.focus();
-  await page.keyboard.press("Enter");
+  await open.press("Enter");
   await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Anlaşma metni yayımlanmadı");
   await expect(refresh).toBeFocused();
 
