@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9b7e017737e9c66204a20e748eff6cb6357da35315eeae891592b9656de42671`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `d615d67822159610256a2e719c64bb116915cffd6a6fe98873df04bcec68afac`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 207. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 208. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -215,3 +215,4 @@ Sıralı migration: 207. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261118214800_audit_export_tracking_results.sql](../apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql) | `22a7dc583102741342c06530b78a21c9a113ea5bc31bb1c09c69eba869824a84` |
 | [20261118214900_tracking_media_redaction.sql](../apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql) | `4d4ec589be8b16e726254a96c207888d2f027e9059f9270e611454eb2966b2d5` |
 | [20261118215000_platform_invoices.sql](../apps/backend/supabase/migrations/20261118215000_platform_invoices.sql) | `943240737ff53d7098fbe65f8f49784671c51f68804a485ffc32e3c260749bb7` |
+| [20261119060000_platform_console_completion.sql](../apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql) | `13cfe5a203253a227b60eb5d9ab793c3cb9b7ce734d4a80cd3d919af26b28331` |
