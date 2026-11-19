@@ -14,7 +14,7 @@ import {
 } from "./session-detail-read";
 import { readScheduleSession } from "../schedule/schedule-read";
 import { readStudioResource } from "../studio/studio";
-import { readWorkspace } from "../workspace/workspace";
+import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import { readPeoplePage } from "../people/people";
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { BackendError } from "../../lib/backend";
@@ -242,6 +242,9 @@ export function SessionDetailContent({
       {(waitlistUi) => (
         <SessionAttendanceController
           scope={scope}
+          canReviewRequests={workspaceRoles(workspace.data, scope.centerId).includes(
+            "center_manager",
+          )}
           session={native}
           attendance={currentAttendance}
           names={

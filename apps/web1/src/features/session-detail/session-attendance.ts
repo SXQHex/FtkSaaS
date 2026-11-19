@@ -4,7 +4,9 @@ import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type {
   AttendanceCorrection,
+  AttendanceCorrectionRequest,
   AttendanceView,
+  AttendanceWindow,
   BlockReason,
   OrdinaryAttendanceResult,
   Preview,
@@ -13,6 +15,7 @@ import type {
   RequestAttendanceBlock,
   RequestAttendanceClose,
   RequestAttendanceCorrectApply,
+  RequestAttendanceCorrectionRequest,
   SessionView,
 } from "../../lib/api-contracts/generated";
 import { readScheduleSession } from "../schedule/schedule-read";
@@ -24,6 +27,15 @@ function common(scope: ClientScope) {
   return { client_api_version: 1 as const, org_id: scope.orgId, center_id: scope.centerId };
 }
 type Context = { scope: ClientScope; sessionId: string; before: AttendanceView; people: string[] };
+type CorrectionRequestAction =
+  | { kind: "submit"; instructorId: string; reason: string }
+  | { kind: "review"; request: AttendanceCorrectionRequest; decision: "accepted" | "declined" };
+type CorrectionRequestPayload = ReturnType<typeof common> &
+  Pick<RequestAttendanceCorrectionRequest, "operation_key" | "session_id"> &
+  (
+    | { closure_revision: number; reason: string }
+    | { correction_request_id: string; expected_version: number; decision: "accepted" | "declined" }
+  );
 export type SessionAttendanceIntent = Context &
   (
     | { operation: "attendance_start_v1"; request: Omit<RequestAttendanceStart, "request_id"> }
@@ -34,7 +46,24 @@ export type SessionAttendanceIntent = Context &
         operation: "attendance_correct_apply_v1";
         request: Omit<RequestAttendanceCorrectApply, "request_id">;
       }
+    | {
+        operation: "attendance_correction_request_v1";
+        request: CorrectionRequestPayload;
+        action: CorrectionRequestAction;
+      }
   );
+
+export function attendanceWindowState(window: AttendanceWindow | null | undefined, now: number) {
+  if (window == null) return undefined;
+  if (now < Date.parse(window.opens_at)) return "upcoming";
+  return now < Date.parse(window.closes_at) ? "active" : "elapsed";
+}
+
+function assertDraftWindow(attendance: AttendanceView) {
+  const phase = attendanceWindowState(attendance.attendance_window, Date.now());
+  if (phase === "upcoming" || phase === "elapsed")
+    throw new Error("SESSION_ATTENDANCE_WINDOW_CLOSED");
+}
 function context(scope: ClientScope, session: SessionView, attendance: AttendanceView): Context {
   if (
     attendance.session_id !== session.id ||
@@ -57,6 +86,7 @@ export function attendanceStartIntent(
   actualStartedAt = new Date().toISOString(),
 ): SessionAttendanceIntent {
   const base = context(scope, session, attendance);
+  assertDraftWindow(attendance);
   if (
     session.state !== "planned" ||
     attendance.actual_started_at ||
@@ -87,6 +117,7 @@ export async function attendanceMarkIntent(
     entry = attendance.entries.find((row) => row.reservation_id === reservationId);
   if (!entry || !attendance.actual_started_at || attendance.closure_state !== "open")
     throw new Error("SESSION_ATTENDANCE_SOURCE_CHANGED");
+  assertDraftWindow(attendance);
   // Mark/block expect the reservation version, not AttendanceEntryView.version.
   const reservation = await readProfileReservation(
     scope,
@@ -204,6 +235,50 @@ export function attendanceCorrectionIntent(review: AttendanceReview): SessionAtt
     },
   };
 }
+
+export function attendanceCorrectionRequestIntent(
+  scope: ClientScope,
+  session: SessionView,
+  attendance: AttendanceView,
+  action: CorrectionRequestAction,
+): SessionAttendanceIntent {
+  const base = context(scope, session, attendance);
+  const requests = attendance.correction_requests;
+  if (attendance.closure_state !== "closed" || attendance.revision < 1 || !requests)
+    throw new Error("SESSION_ATTENDANCE_SOURCE_CHANGED");
+  const current = requests.filter((row) => row.closure_revision === attendance.revision);
+  const request = { ...common(scope), operation_key: uuidv7(), session_id: session.id };
+  if (action.kind === "submit") {
+    const reason = z.string().trim().min(1).max(1000).parse(action.reason);
+    if (
+      !session.assignments.some(
+        (row) => row.duty === "instructor" && row.person_id === action.instructorId,
+      ) ||
+      current.some((row) => row.instructor_id === action.instructorId)
+    )
+      throw new Error("SESSION_ATTENDANCE_SOURCE_CHANGED");
+    return {
+      ...base,
+      operation: "attendance_correction_request_v1",
+      action: { ...action, reason },
+      request: { ...request, closure_revision: attendance.revision, reason },
+    };
+  }
+  const row = current.find((item) => item.id === action.request.id);
+  if (row?.state !== "pending" || row.version !== action.request.version)
+    throw new Error("SESSION_ATTENDANCE_SOURCE_CHANGED");
+  return {
+    ...base,
+    operation: "attendance_correction_request_v1",
+    action,
+    request: {
+      ...request,
+      correction_request_id: row.id,
+      expected_version: row.version,
+      decision: action.decision,
+    },
+  };
+}
 export async function writeSessionAttendance(intent: SessionAttendanceIntent) {
   const backend = await scopedBackend(intent.scope);
   switch (intent.operation) {
@@ -216,6 +291,8 @@ export async function writeSessionAttendance(intent: SessionAttendanceIntent) {
     case "attendance_close_v1":
       return backend.call(intent.operation, { ...intent.request, request_id: uuidv7() });
     case "attendance_correct_apply_v1":
+      return backend.call(intent.operation, { ...intent.request, request_id: uuidv7() });
+    case "attendance_correction_request_v1":
       return backend.call(intent.operation, { ...intent.request, request_id: uuidv7() });
   }
 }
@@ -244,12 +321,29 @@ export async function readSessionAttendanceReceipt(intent: SessionAttendanceInte
 export async function readSessionAttendanceResult(
   intent: SessionAttendanceIntent,
   readMemberRights = true,
+  primaryId?: string,
 ) {
   const [session, attendance] = await Promise.all([
     readScheduleSession(intent.scope, intent.sessionId),
     readSessionAttendance(intent.scope, intent.sessionId),
   ]);
   context(intent.scope, session, attendance);
+  if (intent.operation === "attendance_correction_request_v1") {
+    const { action } = intent;
+    const row = attendance.correction_requests?.find((candidate) =>
+      action.kind === "submit"
+        ? candidate.instructor_id === action.instructorId &&
+          candidate.reason === action.reason &&
+          candidate.closure_revision === intent.before.revision
+        : candidate.id === action.request.id &&
+          candidate.state === action.decision &&
+          candidate.version > action.request.version,
+    );
+    // A normal ACK names the request. A recovered receipt points to its session.
+    if (!row || (primaryId && primaryId !== intent.sessionId && row.id !== primaryId))
+      throw new Error("SESSION_ATTENDANCE_RESULT_UNAVAILABLE");
+    return { session, attendance, rightsUnavailable: false };
+  }
   if (
     session.version <= intent.before.session_version ||
     ((intent.operation === "attendance_mark_v1" || intent.operation === "attendance_block_v1") &&

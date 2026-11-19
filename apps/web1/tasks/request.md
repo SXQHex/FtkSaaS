@@ -57,7 +57,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Karşılandı](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
 | W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Karşılandı](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Karşılandı](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
-| W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
+| W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Karşılandı](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
 | W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
 | W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Karşılandı](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
 | W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Karşılandı](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
@@ -438,9 +438,9 @@ Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişi
 
 ## W1-BE-49 · Eğitmen yoklama zaman sınırı ve düzeltme isteği
 
-**Açık · backend değerlendirmesi.** Eğitmen çizimi, seans için yoklamanın ne zaman açılacağını ve kapanmış yoklamaya gerekçeli düzeltme isteği vermeyi gösteriyor. `attendance_get_v1` fiilî başlangıç, kapanış durumu, revizyon ve kayıtları sağlıyor. Yayımlanmış okuma sözleşmesinde seansa özel açma veya kapatma zaman sınırı bulunmuyor. `attendance_correct_preview_v1` ve `attendance_correct_apply_v1` düzeltme yetkisi olan operatörün işlemleri. Eğitmenin yöneticiye ilettiği ayrı isteği oluşturma ve durumunu okuma desteği bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L3885) · [WF07](../../../docs/workflows.md#wf07).
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), `82a5a37deb83d7de1978d82ffba738ecf4ce12b5` kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
 
-Yoklama için izinli zaman aralığı varsa bu aralığın canlı politika ve yetkiyle nasıl okunacağını değerlendirin. Kapanmış yoklamada yalnız atanmış eğitmenin, seans ve kapanış revizyonuna bağlı gerekçeli isteği gönderebilmesi ve durumunu okuyabilmesi ayrı değerlendirme gerektiriyor. İsteğin kendisi yoklamayı, hakkı veya hakedişi değiştirmemeli. Yetki kaybı, değişen kapanış sürümü ve aynı anahtarla tekrar deneme doğrulanmalı.
+`attendance_get_v1(include_correction_requests:true)` etkin pencereyi ve canlı yetkiyle sınırlandırılmış talepleri döndürür. `attendance_correction_request_v1` atanmış eğitmende kapanış revizyonu ve gerekçeyi, merkez yöneticisinde talep sürümü ve kararı kullanır. Native test yetki kaybı, eski revizyon ve aynı anahtarla tekrarı doğrular. [WF07](../../../docs/workflows.md#wf07) · [Native kabul](../../backend/tests/starter-attendance-protection.test.mjs#L422) · [V03.3 Web1 kabulü](todo.md#v03).
 
 ## W1-BE-50 · İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası
 

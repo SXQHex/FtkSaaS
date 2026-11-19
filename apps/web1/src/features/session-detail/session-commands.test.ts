@@ -26,6 +26,7 @@ import {
   attendanceStartIntent,
   attendanceMarkIntent,
   attendanceCloseIntent,
+  attendanceCorrectionRequestIntent,
   previewAttendanceCorrection,
   readSessionAttendanceReceipt,
   readSessionAttendanceResult,
@@ -69,6 +70,52 @@ const attendance: AttendanceView = {
     },
   ],
 };
+
+it("recovers a correction request from its exact closure and reason without reading member rights", async () => {
+  const closed: SessionView = { ...session, state: "occurred", attendance_state: "closed" };
+  const before: AttendanceView = {
+    ...attendance,
+    closure_state: "closed",
+    revision: 2,
+    correction_requests: [],
+  };
+  const intent = attendanceCorrectionRequestIntent(scope, closed, before, {
+    kind: "submit",
+    instructorId: id(10),
+    reason: "  Katılım kaydını inceleyin.  ",
+  });
+  expect(intent.request).toMatchObject({
+    closure_revision: 2,
+    reason: "Katılım kaydını inceleyin.",
+  });
+  readSession.mockResolvedValue(closed);
+  const row = {
+    id: id(11),
+    instructor_id: id(10),
+    closure_revision: 2,
+    reason: "Katılım kaydını inceleyin.",
+    state: "pending",
+    version: 1,
+    created_at: attendance.actual_started_at,
+    reviewed_at: null,
+  };
+  readAttendance.mockResolvedValueOnce({
+    ...before,
+    correction_requests: [{ ...row, closure_revision: 1 }],
+  });
+  await expect(readSessionAttendanceResult(intent, false, closed.id)).rejects.toThrow(
+    "SESSION_ATTENDANCE_RESULT_UNAVAILABLE",
+  );
+  readAttendance.mockResolvedValue({ ...before, correction_requests: [row] });
+  await expect(readSessionAttendanceResult(intent, false, id(12))).rejects.toThrow(
+    "SESSION_ATTENDANCE_RESULT_UNAVAILABLE",
+  );
+  await expect(readSessionAttendanceResult(intent, true, closed.id)).resolves.toMatchObject({
+    attendance: { revision: 2, correction_requests: [row] },
+    rightsUnavailable: false,
+  });
+  expect(readRights).not.toHaveBeenCalled();
+});
 const sale: EntitlementView = {
   sale_id: id(8),
   person_id: id(7),

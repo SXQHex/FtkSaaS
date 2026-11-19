@@ -75,11 +75,22 @@ test("Starter instructor opens an assigned lesson from the daily panel after rol
   await expect(page.getByRole("link", { name: "Stüdyo", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
 });
-test("instructor selects actual start, explicitly marks, closes and corrects without member finance reads", async ({
+test("one lesson keeps instructor requests, manager decisions and student attendance separate", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
-  const state = await mockSessionDetail(page, { existing: true, instructor: true });
+  const now = Date.now();
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    instructor: true,
+    correctionRequestUnknown: true,
+    attendanceWindow: {
+      policy_id: S.preview,
+      opens_at: new Date(now - 40 * 60000).toISOString(),
+      closes_at: new Date(now + 55 * 60000).toISOString(),
+    },
+  });
+  await expect(page.getByText(/Yoklama başlangıç ve işaretleme aralığı/)).toBeVisible();
   const { dialog, time } = await begin(page);
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   const request = state.writes.find((row) => row.operation === "attendance_start_v1")!.request;
@@ -126,20 +137,29 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
   await close.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
   await expect(close.getByText(saved, { exact: true })).toBeVisible();
   await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
-  await page
-    .getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true })
-    .selectOption("no_show");
-  await page.getByLabel("Düzeltme gerekçesi", { exact: true }).fill("Sentetik yoklama düzeltmesi");
-  await page.getByRole("button", { name: "Düzeltmeyi incele", exact: true }).click();
-  const review = page.getByRole("dialog");
-  await expect(review.getByText(/9\.999,99/)).toHaveCount(0);
-  await expect(review.getByText("Sentetik gizli mali açıklama", { exact: true })).toHaveCount(0);
-  await review.getByRole("checkbox").press("Space");
-  await review.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
-  await expect(review.getByText(saved, { exact: true })).toBeVisible();
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  expect(state.attendance.entries[0]!.result).toBe("no_show");
+  const closedRevision = state.attendance.revision;
+  const sessionVersion = state.session.version;
+  await expect(page.getByRole("button", { name: "Yoklamayı düzenle", exact: true })).toHaveCount(0);
+  const requestForm = page.getByRole("form", { name: "Yoklama düzeltme talepleri" });
+  const sendRequest = requestForm.getByRole("button", { name: "Düzeltme talebi gönder" });
+  const reason = requestForm.getByLabel("Talep gerekçesi (zorunlu)");
+  await reason.fill("   ");
+  await sendRequest.click();
+  await expect(reason).toBeFocused();
+  await expect(reason).toHaveAccessibleDescription("Talep gerekçesini yazın.");
+  expect(state.writes).toHaveLength(4);
+  await reason.fill("  Sentetik yoklama düzeltmesi  ");
+  await sendRequest.click();
+  await page.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
+  await expect(page.getByText(/İnceleme bekliyor/)).toBeVisible();
+  await expect(sendRequest).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Talebi kabul et", exact: true })).toHaveCount(0);
+  expect(state.writes.at(-1)?.request).toMatchObject({
+    session_id: S.session,
+    closure_revision: closedRevision,
+    reason: "Sentetik yoklama düzeltmesi",
+  });
+  expect(state.attendance.entries[0]!.result).toBe("attended");
   expect(
     state.reads.filter((op) =>
       ["entitlements_get_v1", "finance_get_v1", "people_list_v1"].includes(op),
@@ -150,7 +170,7 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
     "attendance_mark_v1",
     "attendance_mark_v1",
     "attendance_close_v1",
-    "attendance_correct_apply_v1",
+    "attendance_correction_request_v1",
   ]);
   const source = {
     session: state.session,
@@ -160,17 +180,40 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
   const browser = page.context().browser()!;
   const manager = await browser.newPage();
   try {
-    const management = await mockSessionDetail(manager, { existing: true, source });
+    const management = await mockSessionDetail(manager, {
+      existing: true,
+      source,
+      centerManager: true,
+    });
     await manager.getByRole("tab", { name: "Yoklama", exact: true }).click();
     const panel = manager.getByRole("tabpanel", { name: "Yoklama", exact: true });
     await expect(panel.getByText(new RegExp(`Başlangıç: .*${time}`))).toBeVisible();
     await expect(
       panel.getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true }),
-    ).toHaveValue("no_show");
+    ).toHaveValue("attended");
     await expect(
       panel.getByRole("button", { name: "Yoklamayı düzenle", exact: true }),
     ).toBeEnabled();
-    expect(management.writes).toHaveLength(0);
+    const accept = panel.getByRole("button", { name: "Talebi kabul et", exact: true });
+    await accept.click();
+    await expect(panel.getByText(/Talep kabul edildi/)).toBeVisible();
+    await expect(accept).toHaveCount(0);
+    expect(management.writes).toEqual([
+      {
+        operation: "attendance_correction_request_v1",
+        request: expect.objectContaining({
+          session_id: S.session,
+          correction_request_id: S.correctionRequest,
+          expected_version: 1,
+          decision: "accepted",
+        }),
+      },
+    ]);
+    expect(source.attendance.entries[0]!.result).toBe("attended");
+    expect(source.attendance.revision).toBe(closedRevision);
+    expect(source.session.version).toBe(sessionVersion);
+    await page.reload();
+    await expect(page.getByText(/Talep kabul edildi/)).toBeVisible();
   } finally {
     await manager.close();
   }
@@ -182,7 +225,7 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
       has: member.getByRole("gridcell", { name: "Sentetik seans", exact: true }),
     });
     await expect(
-      lesson.getByRole("gridcell", { name: "Tamamlandı · Gelmedi", exact: true }),
+      lesson.getByRole("gridcell", { name: "Tamamlandı · Geldi", exact: true }),
     ).toBeVisible();
     await expect(
       member.getByRole("button", { name: /Yoklamayı (başlat|kapat|düzenle)/ }),
@@ -193,10 +236,36 @@ test("instructor selects actual start, explicitly marks, closes and corrects wit
         request: expect.objectContaining({ session_id: S.session, center_id: I.center }),
       }),
     );
+    await expect(member.getByText("Sentetik yoklama düzeltmesi")).toHaveCount(0);
     expect(own.writes).toHaveLength(0);
   } finally {
     await member.close();
   }
+});
+test("native attendance window opens and closes without reloading the session", async ({
+  page,
+}) => {
+  const now = new Date();
+  await page.clock.install({ time: now });
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    instructor: true,
+    now,
+    attendanceWindow: {
+      policy_id: S.preview,
+      opens_at: new Date(now.getTime() + 60_000).toISOString(),
+      closes_at: new Date(now.getTime() + 120_000).toISOString(),
+    },
+  });
+  const start = page.getByRole("button", { name: "Yoklamayı başlat", exact: true });
+  await expect(start).toBeDisabled();
+  await expect(page.getByText(/Şu anda yoklama başlatılamaz/)).toBeVisible();
+  await page.clock.fastForward(60_000);
+  await expect(start).toBeEnabled();
+  await page.clock.fastForward(60_000);
+  await expect(start).toBeDisabled();
+  await expect(page.getByText(/Şu anda yoklama başlatılamaz/)).toBeVisible();
+  expect(state.writes).toHaveLength(0);
 });
 test("instructor unknown attendance outcome retains one write and recovers its receipt", async ({
   page,

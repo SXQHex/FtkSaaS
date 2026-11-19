@@ -551,11 +551,11 @@ export function SessionAttendance({
                   {t(($) => $.sessionDetail.previewCorrection)}
                 </Button>
               </>
-            ) : (
-              <Button variant="outline" isDisabled={locked || !onEdit} onPress={onEdit}>
+            ) : onEdit ? (
+              <Button variant="outline" isDisabled={locked} onPress={onEdit}>
                 {t(($) => $.sessionDetail.editAttendance)}
               </Button>
-            )
+            ) : null
           ) : (
             <Button
               aria-describedby={incomplete ? incompleteId : undefined}

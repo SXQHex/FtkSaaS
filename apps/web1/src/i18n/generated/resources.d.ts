@@ -3791,6 +3791,7 @@ export default interface Resources {
     },
     "sessionDetail": {
       "absent": "Gelmedi",
+      "acceptRequest": "Talebi kabul et",
       "accepted": "Kabul edildi",
       "actions": "İşlemler",
       "active": "Kesin",
@@ -3814,6 +3815,7 @@ export default interface Resources {
         "unknown": "Sonuç bilinmiyor. Aynı isteği yeniden dene veya işlem durumunu oku.",
         "writing": "Yoklama işlemi kaydediliyor…"
       },
+      "attendanceWindow": "Yoklama başlangıç ve işaretleme aralığı {{opens}} – {{closes}}.",
       "back": "Ders programı",
       "blockAttendance": "Engelli işaretle",
       "blockReason": "Engel nedeni",
@@ -3858,10 +3860,12 @@ export default interface Resources {
       "confirm": "Onayla",
       "converted": "Rezervasyona dönüştü",
       "correctionReason": "Düzeltme gerekçesi",
+      "correctionRequests": "Yoklama düzeltme talepleri",
       "correctionReview": "Düzeltme etkilerini kontrol ettim.",
       "createReservation": "Rezervasyon oluştur",
       "credits": "{{available}} ders",
       "date": "Tarih",
+      "declineRequest": "Talebi reddet",
       "duration": "Süre",
       "editAttendance": "Yoklamayı düzenle",
       "editSession": "Seansı düzenle",
@@ -3896,6 +3900,7 @@ export default interface Resources {
       "male": "Erkek",
       "mark": "Kaydet — {{name}}",
       "minutes": "{{minutes}} dk",
+      "missingRequestReason": "Talep gerekçesini yazın.",
       "mode": "Rezervasyon türü",
       "next": "Sonraki sayfa",
       "noCategory": "Kategori belirtilmedi",
@@ -3925,6 +3930,7 @@ export default interface Resources {
       "present": "Geldi",
       "previewCorrection": "Düzeltmeyi incele",
       "previous": "Önceki sayfa",
+      "previousClosure": "Önceki yoklama kapanışına ait.",
       "priority": "Öncelikli",
       "private": "Özel ders",
       "protected": "Korumalı kayıt",
@@ -3934,6 +3940,14 @@ export default interface Resources {
       "reason": "Gerekçe",
       "rejected": "Reddedildi",
       "remaining": "{{remaining}} yer boş",
+      "requestEffect": "Talep kararı yoklamayı değiştirmez. Gereken düzeltmeyi yönetici ayrıca kaydeder.",
+      "requestInstructor": "Eğitmen",
+      "requestStates": {
+        "accepted": "Talep kabul edildi",
+        "declined": "Talep reddedildi",
+        "pending": "İnceleme bekliyor"
+      },
+      "requiredRequestReason": "Talep gerekçesi (zorunlu)",
       "reservation": "Rezervasyon",
       "result": "Sonuç",
       "retry": "Yeniden oku",
@@ -3965,6 +3979,7 @@ export default interface Resources {
       "startDescription": "Onayladığında şu an seansın fiilî başlangıcı olarak kaydedilir. Planlı saat, gerçekleşmiş başlangıç yerine kullanılmaz.",
       "startReview": "Seansın şu an başladığını onaylıyorum.",
       "state": "Durum",
+      "submitCorrectionRequest": "Düzeltme talebi gönder",
       "teacher": "Eğitmen",
       "time": "Saat",
       "timedRight": "Süreli hak",
@@ -3986,6 +4001,7 @@ export default interface Resources {
         "unknown": "Sonuç bilinmiyor; aynı isteği yeniden dene veya işlem durumunu oku.",
         "writing": "İşlem kaydediliyor…"
       },
+      "windowUnavailable": "Şu anda yoklama başlatılamaz veya işaretlenemez.",
       "withdrawn": "Geri çekildi"
     },
     "sessions": {

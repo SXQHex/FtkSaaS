@@ -193,6 +193,7 @@ export function InstructorSessionContent({
       key={`${personId}:${sessionId}`}
       scope={scope}
       audience="instructor"
+      instructorId={personId}
       startTime={startAt}
       session={source.session}
       attendance={attendance}

@@ -2700,6 +2700,22 @@
     }
   },
   "sessionDetail": {
+    "attendanceWindow": "Yoklama başlangıç ve işaretleme aralığı {{opens}} – {{closes}}.",
+    "windowUnavailable": "Şu anda yoklama başlatılamaz veya işaretlenemez.",
+    "correctionRequests": "Yoklama düzeltme talepleri",
+    "requestInstructor": "Eğitmen",
+    "requestStates": {
+      "pending": "İnceleme bekliyor",
+      "accepted": "Talep kabul edildi",
+      "declined": "Talep reddedildi"
+    },
+    "previousClosure": "Önceki yoklama kapanışına ait.",
+    "requiredRequestReason": "Talep gerekçesi (zorunlu)",
+    "missingRequestReason": "Talep gerekçesini yazın.",
+    "requestEffect": "Talep kararı yoklamayı değiştirmez. Gereken düzeltmeyi yönetici ayrıca kaydeder.",
+    "submitCorrectionRequest": "Düzeltme talebi gönder",
+    "acceptRequest": "Talebi kabul et",
+    "declineRequest": "Talebi reddet",
     "title": "Seans detayı",
     "back": "Ders programı",
     "cancelSession": "Seansı iptal et",
