@@ -13,10 +13,10 @@ Bu çalışmanın hedefi Starter kabulünü, 18 Kasım çizim farklarını ve E4
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım           | Plan                | İşlev                         | Durum                              | Sonraki eylem                                                                                |
-| -------------------- | ------------------- | ----------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------- |
-| **V08.2 / G-DESIGN** | Pro / Starter       | Teslim adayı ve çizim kabulü  | Starter yayımlı kabulü tamamlandı. | Teslim adayını tek Chromium işçisiyle doğrula ve kalan yayımlı rota/kapsam kabulünü tamamla. |
-| **E49–E52**          | Business / Platform | Merkezler ve platform konsolu | E49–E52 kapandı.                   | Yayımlı platform sonucu E52.3’te.                                                            |
+| Aktif adım           | Plan                | İşlev                         | Durum            | Sonraki eylem                              |
+| -------------------- | ------------------- | ----------------------------- | ---------------- | ------------------------------------------ |
+| **V08.2 / G-DESIGN** | Pro / Starter       | Teslim adayı ve çizim kabulü  | Kapandı.         | Otomatik ve yayımlı kabul kanıtı V08.2’de. |
+| **E49–E52**          | Business / Platform | Merkezler ve platform konsolu | E49–E52 kapandı. | Yayımlı platform sonucu E52.3’te.          |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -276,13 +276,13 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 - [x] **V07.2** · Sahip gezinmesi ve sayfa araması, doğrulanmış `subscription_get_v1` Starter sonucuyla Etkinlikler, Hakediş ve Otomasyon bağlantılarını gizler. Doğrudan URL ve işlem izinleri native denetimde kalır. Tek Chromium işçisiyle Starter paketi 11/11 geçti. Temel CRM, açık başvuru, satış, tahsilat, kesin rezervasyon, yoklama ve rapor korunuyor. Tek salon reddinde mevcut salon kaldı. 100 aktif üye ve diğer kaynak sınırlarının native kanıtı [S01’de](#starter), yayımlı aday kabulü G-STARTER.2’de.
 - [x] **V07.3** · Planı daralt çekmecesi erişilebilir başlığı, kaynak Starter seçeneğini ve merkez saat dilimindeki yürürlük tarihini gösterir. `kept_scope` açık seçilir, onaylanır ve `subscription_get_v1` ile doğrulanır. Bekleyen Pro dönemi, dönem sınırından sonra eski Pro yazısının reddi ve aynı rezervasyon/hak/borç/yoklama geçmişi tek Chromium işçisiyle 2/2 geçti. Native dönem geçişi kanıtı [S05.2’de](#starter).
 
-### V08 · Yeni çizim kabulünün kapanışı
+### V08 · Yeni çizim kabulünün kapanışı (kapandı)
 
 - [x] **V08.1** · [Ekran eşlemesi](#cizim-guncellemesi), ilgili V01–V07/E47/E48 uygulama sonuçlarına, [mevcut ekran kabulüne](#sayfa-kabulu), [Pro işlevlerine](#pro) ve [Starter kanıtına](#starter) bağlı. Karşılanmayan farklar ilgili V/E satırında ve bağlı backend talebinde açık.
-- [ ] **V08.2** · Değişen alanların ilgili birim/tarayıcı paketlerini seri çalıştır. Otomatik ölçümler, yeni WCAG bulguları ve referans/uygulama görselleri raporda yer alsın. Teslim adayında filtresiz `npm run verify` ve yayımlı adayın gerekli route/kapsam kabulü yapılsın.
-      `35ded662571d01f9623760b83f5522280317a04e` üzerindeki [filtresiz doğrulamada](../.tmp/final-v69-full-35ded662/verification.md) 860 birim ve tek Chromium işçisiyle 607/608 tarayıcı senaryosu geçti. Tek başarısız Hakediş senaryosunda Enter ilgili düğmeye yöneltildi. Düzeltme yalnız test kodunda, senaryo seri üç tekrarda geçti. Kullanıcı kararıyla geçen senaryolar topluca tekrarlanmadı. [Hedefli tekrar](../.tmp/final-v69-earnings-verify.log)
-      [v69 görsel karşılaştırması](../.tmp/e49-e52-visuals/index.html), E49–E52 için 390/1440 pikselde açık/koyu eşlemeleri, Business raporunu ve fatura geçmişindeki bekleyen ve yayımlanmış satırları kapsıyor. Kalan kabul güncel adayın yayımlı rota ve yetki kapsamıdır.
-- [ ] **G-DESIGN** · V01–V08/E47/E48 ve önceki açık Starter kabulünün sonucunu kaydet. Kalan gerçek sağlayıcı/OS kontrolleri mevcut kullanıcı kabul/erteleme kuralına uysun. Kaynak/görsel/API değişikliği çözülmeden genel tamamlandı sonucu verme.
+- [x] **V08.2** · `78d0781020b1893f849237a762e54e512814b5e8` üzerinde filtresiz `npm run verify` çalıştı. Lint, format, i18n, statik build, CI korumaları ve 864 birim testi geçti. Tek Chromium işçisiyle 605/608 tarayıcı senaryosu geçti. İki senaryo eski Raporlar ve Hesabım bağlantılarını bekliyordu. Kısa Raporlar adresinin aynı merkeze istek gönderdiğini ve Hesabım’ın yeni merkezi koruyup önceki yönetim menüsünü açmadığını doğrulayacak şekilde testler güncellendi. Girişte `ERR_NETWORK_CHANGED` alan Stüdyo senaryosu değişmeden tekrarlandı. Üçünün seri tekrarı 3/3 geçti. [Tam doğrulama](../test-reports/verification.md) · [Hedefli tekrar](../.tmp/goal-1309-final-retest.json).
+      907 Axe taramasında ihlaller yalnız kasıtlı negatif politika senaryosunda bildirildi. Ürün ekranındaki tek ölçüm adayı, bekleme listesi işlemi doğrulandıktan sonraki eylem hücresiydi. Gerçek düğme iki eksende en az 24 CSS pikseli ve işlem göndermeden tıklanabilirlik denetimini geçti. [Hedef ölçümü](../.tmp/goal-1309-waitlist-final.json).
+      [v69 görsel karşılaştırması](../.tmp/e49-e52-visuals/index.html) E49–E52 için 390/1440 piksel açık/koyu eşlemelerini, Business raporunu ve fatura geçmişindeki bekleyen ve yayımlanmış satırları kapsar. Yayımlı `index-HGo_1OJL.js` adayında Starter sahip/öğrenci kapsamı [Starter kabulünde](#starter), platform rotaları ve oturum sınırı [E52.3’te](#e52) doğrulandı.
+- [x] **G-DESIGN** · V01–V08, E47/E48, E49–E52 ve Starter kabulü kanıtlarıyla kapandı. Gerçek sağlayıcı ve OS sonuçları [Pro teslim sonrası kontrollerinde](#post-pro-kontroller) kayıtlı.
 
 <a id="v09"></a>
 
