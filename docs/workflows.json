@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "620ceb61a0a2afd92e1e8e71f0df39118d0b5e47b492938a646dbd97c5cc6d4e",
-        "reason": "Platform fatura görünümü ve katalog durum alanı sözleşmeden mevcut Edge dağıtımı ve tip üretimine yansıtıldı."
+        "fingerprint": "dcb7699e0466ee75c17253d169e4f9b7a2db23b80a8ae81a320e48250f4fc860",
+        "reason": "Güncellenen iki backend kabul dosyasının SHA-256 kayıtları mevcut suite sahipliği, shard ve test politikası içinde eşlendi."
       }
     },
     {

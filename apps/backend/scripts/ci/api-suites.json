@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "2bdbd733a6e2c45fd11b283de2379f1401542bf1b1e016f261ef51a21300ff77"
+          "sha256": "a7de714dc2ef738c13572693b499fcd0d9a8a749825c590ffea130fbe4a6259b"
         },
         {
           "line": 147,
@@ -1218,7 +1218,7 @@
         {
           "line": 166,
           "path": "apps/backend/tests/content-catalog-acceptance.mjs",
-          "sha256": "61d7e757ed9f90a2b319f8682a72c9d4aedc2d7948edb47454bf75ed54b2f69c"
+          "sha256": "89bf4f2c48f63ac3d6a2a0be2541645c1cd75739c953e4e474e9ba49221ade84"
         },
         {
           "line": 167,
