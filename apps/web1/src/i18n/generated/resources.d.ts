@@ -5555,6 +5555,19 @@ export default interface Resources {
       "chooseCenter": "Merkez seç",
       "chooseOrganization": "Stüdyo seç",
       "closeNavigation": "Menüyü kapat",
+      "entry": {
+        "account": "Hesabıma geç",
+        "back": "Stüdyo seçimine dön",
+        "center": "Çalışacağın merkezi seç",
+        "closed": "Erişim kapalı",
+        "continue": "Devam et",
+        "instructions": "Devam etmek için bir seçenek seç.",
+        "loading": "Çalışma alanı yükleniyor.",
+        "noAccess": "Bir stüdyoya erişimin yok",
+        "noAccessHint": "Var olan bir stüdyoya katılmak için stüdyodan davet iste.",
+        "openCenter": "Merkezi aç",
+        "organization": "Hangi stüdyoyla devam edeceksin?"
+      },
       "exportReport": "Raporu dışa aktar",
       "general": "Genel",
       "groups": {

@@ -1,6 +1,8 @@
 import { FirstCenterSetup } from "../workspace/first-center-setup";
 import { StudioSetupRequestCard } from "../workspace/studio-setup-request-card";
 import { WorkspaceLayout } from "../workspace/workspace-layout";
+import { WorkspaceEntry } from "../workspace/workspace-entry";
+import { Skeleton } from "../../components/ui/skeleton";
 import { AppearancePanel, type AppearanceActions } from "../account/appearance-panel";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { ProfilePanel } from "../account/profile-panel";
@@ -30,6 +32,10 @@ export function AccountPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const queries = useQueryClient();
+  const [organizationChoice, setOrganizationChoice] = useState<string>();
+  const [centerChoice, setCenterChoice] = useState<string>();
+  const accountHeading = useRef<HTMLHeadingElement>(null);
+  const [entryDismissed, setEntryDismissed] = useState(false);
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
   const [setupLocked, setSetupLocked] = useState(false);
@@ -38,6 +44,10 @@ export function AccountPage() {
   const [studioCalendarLocked, setStudioCalendarLocked] = useState(false);
   const calendarLocked = instructorCalendarLocked || studioCalendarLocked;
   const accountLocked = setupLocked || requestLocked || calendarLocked;
+  function chooseOrganization(id?: string) {
+    setOrganizationChoice(id);
+    setCenterChoice(undefined);
+  }
   async function signOut() {
     if (accountLocked || pending) return;
     setPending(true);
@@ -93,6 +103,12 @@ export function AccountPage() {
       name={account.display_name}
       pending={pending || accountLocked}
       scopeLocked={accountLocked}
+      scopeControl={{
+        organizationId: organizationChoice,
+        centerId: centerChoice,
+        onOrganization: chooseOrganization,
+        onCenter: setCenterChoice,
+      }}
       onSignOut={() => {
         void signOut();
       }}
@@ -102,111 +118,191 @@ export function AccountPage() {
           : () => appearanceActions.current?.toggleTheme()
       }
     >
-      {({ organizationId, centerId, workspace }) => (
-        <div className="account-view flex min-w-0 w-full max-w-[76rem] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
-          <header className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-semibold">{t(($) => $.auth.account)}</h1>
-              <p className="text-muted-foreground">{t(($) => $.auth.accountDescription)}</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {account.platform_scope?.organizations === true && (
-                <LinkButton
-                  href="/platform"
+      {({ organizationId, centerId, workspace, loading }) => {
+        const organizations = workspace?.organizations ?? [];
+        const activeCenters =
+          workspace?.centers.filter((center) => center.state === "active") ?? [];
+        const needsOrganization = organizations.length > 1 && !organizationId;
+        const needsCenter = Boolean(
+          organizationId &&
+          workspace?.selected?.access_mode !== "closed" &&
+          activeCenters.length > 1 &&
+          !activeCenters.some((center) => center.id === centerId),
+        );
+        const showEntry = !entryDismissed && (needsOrganization || needsCenter);
+        const waitingForEntry = !entryDismissed && Boolean(organizationChoice) && !workspace;
+        const continueToAccount = () => {
+          setEntryDismissed(true);
+          accountHeading.current?.focus();
+        };
+        return (
+          <div className="account-view flex min-w-0 w-full max-w-[76rem] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
+            <header className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-semibold" ref={accountHeading} tabIndex={-1}>
+                  {t(($) => $.auth.account)}
+                </h1>
+                <p className="text-muted-foreground">{t(($) => $.auth.accountDescription)}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {account.platform_scope?.organizations === true && (
+                  <LinkButton
+                    href="/platform"
+                    variant="outline"
+                    isDisabled={pending || accountLocked}
+                  >
+                    {t(($) => $.platform.title)}
+                  </LinkButton>
+                )}
+                <Button
                   variant="outline"
                   isDisabled={pending || accountLocked}
+                  onPress={() => void signOut()}
                 >
-                  {t(($) => $.platform.title)}
-                </LinkButton>
-              )}
-              <Button
-                variant="outline"
-                isDisabled={pending || accountLocked}
-                onPress={() => void signOut()}
-              >
-                {t(($) => $.auth.signout)}
-              </Button>
-            </div>
-          </header>
-          {failed && (
-            <Alert variant="destructive">
-              <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
-            </Alert>
-          )}
-          {setupPanel(organizationId, centerId, workspace)}
-          <Tabs
-            orientation={mobile ? "horizontal" : "vertical"}
-            className="account-tabs"
-            defaultSelectedKey="profile"
-            disabledKeys={calendarLocked ? ["security", "sessions"] : undefined}
-          >
-            <TabsList variant="sidebar" aria-label={t(($) => $.security.sections)}>
-              <TabsTrigger id="profile">
-                <UserIcon />
-                {t(($) => $.security.profile)}
-              </TabsTrigger>
-              <TabsTrigger id="security">
-                <ShieldIcon />
-                {t(($) => $.security.tab)}
-              </TabsTrigger>
-              <TabsTrigger id="sessions">
-                <MonitorIcon />
-                {t(($) => $.sessions.tab)}
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent
-              id="profile"
-              shouldForceMount
-              className="flex flex-col gap-4 data-inert:hidden"
-            >
-              <ProfilePanel accountId={account.id} disabled={calendarLocked} />
-              {organizationId && centerId && hasWorkspaceManagementScope(workspace, centerId) && (
-                <PersonalCalendarCard kind="studio_program">
-                  <MemberCalendarPanel
-                    key={`${account.id}:${organizationId}:${centerId}`}
-                    scope={{
-                      accountId: account.id,
-                      orgId: organizationId,
-                      studioCenterId: centerId,
-                    }}
-                    kind="studio_program"
-                    onLockChange={setStudioCalendarLocked}
-                    disabled={setupLocked || pending || instructorCalendarLocked}
-                  />
-                </PersonalCalendarCard>
-              )}
-              {organizationId && hasInstructorCalendarScope(workspace) && (
-                <PersonalCalendarCard kind="duties">
-                  <MemberCalendarPanel
-                    key={`${account.id}:${organizationId}`}
-                    scope={{ accountId: account.id, orgId: organizationId }}
-                    kind="duties"
-                    onLockChange={setInstructorCalendarLocked}
-                    disabled={setupLocked || pending || studioCalendarLocked}
-                  />
-                </PersonalCalendarCard>
-              )}
-              <AppearancePanel
-                ref={appearanceActions}
-                onDisabledChange={setAppearanceDisabled}
-                snapshot={appearance.data}
-                readError={appearance.isError}
-                onRefresh={async () => {
-                  const result = await appearance.refetch({ throwOnError: true });
-                  if (!result.data) throw new Error("APPEARANCE_UNAVAILABLE");
-                  return result.data;
+                  {t(($) => $.auth.signout)}
+                </Button>
+              </div>
+            </header>
+            {failed && (
+              <Alert variant="destructive">
+                <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
+              </Alert>
+            )}
+            {waitingForEntry ? (
+              loading ? (
+                <div role="status" className="grid max-w-xl gap-3">
+                  <span>{t(($) => $.workspace.entry.loading)}</span>
+                  <Skeleton className="h-24 w-full" />
+                </div>
+              ) : (
+                <Alert variant="destructive">
+                  <AlertDescription className="flex flex-wrap items-center gap-2">
+                    {t(($) => $.auth.readError)}
+                    <Button variant="outline" onPress={() => chooseOrganization()}>
+                      {t(($) => $.workspace.entry.back)}
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )
+            ) : showEntry ? (
+              <WorkspaceEntry
+                key={needsOrganization ? "organization" : organizationId}
+                step={needsOrganization ? "organization" : "center"}
+                options={
+                  needsOrganization
+                    ? organizations.map((organization) => ({
+                        id: organization.id,
+                        name: organization.name,
+                        disabled:
+                          organization.state !== "active" || organization.access_mode === "closed",
+                      }))
+                    : activeCenters
+                }
+                onChoose={(id) => {
+                  if (needsOrganization) {
+                    chooseOrganization(id);
+                    accountHeading.current?.focus();
+                  } else {
+                    setCenterChoice(id);
+                    continueToAccount();
+                  }
                 }}
+                onBack={
+                  needsCenter && organizations.length > 1 ? () => chooseOrganization() : undefined
+                }
+                onAccount={continueToAccount}
               />
-            </TabsContent>
-            <TabsContent id="security">
-              <SecurityPanel accountId={account.id} />
-            </TabsContent>
-            <TabsContent id="sessions">
-              <SessionsPanel accountId={account.id} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      )}
+            ) : (
+              <>
+                {workspace && organizations.length === 0 && (
+                  <section aria-labelledby="workspace-no-access" className="space-y-1">
+                    <h2 id="workspace-no-access" className="font-semibold">
+                      {t(($) => $.workspace.entry.noAccess)}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {t(($) => $.workspace.entry.noAccessHint)}
+                    </p>
+                  </section>
+                )}
+                {setupPanel(organizationId, centerId, workspace)}
+                <Tabs
+                  orientation={mobile ? "horizontal" : "vertical"}
+                  className="account-tabs"
+                  defaultSelectedKey="profile"
+                  disabledKeys={calendarLocked ? ["security", "sessions"] : undefined}
+                >
+                  <TabsList variant="sidebar" aria-label={t(($) => $.security.sections)}>
+                    <TabsTrigger id="profile">
+                      <UserIcon />
+                      {t(($) => $.security.profile)}
+                    </TabsTrigger>
+                    <TabsTrigger id="security">
+                      <ShieldIcon />
+                      {t(($) => $.security.tab)}
+                    </TabsTrigger>
+                    <TabsTrigger id="sessions">
+                      <MonitorIcon />
+                      {t(($) => $.sessions.tab)}
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent
+                    id="profile"
+                    shouldForceMount
+                    className="flex flex-col gap-4 data-inert:hidden"
+                  >
+                    <ProfilePanel accountId={account.id} disabled={calendarLocked} />
+                    {organizationId &&
+                      centerId &&
+                      hasWorkspaceManagementScope(workspace, centerId) && (
+                        <PersonalCalendarCard kind="studio_program">
+                          <MemberCalendarPanel
+                            key={`${account.id}:${organizationId}:${centerId}`}
+                            scope={{
+                              accountId: account.id,
+                              orgId: organizationId,
+                              studioCenterId: centerId,
+                            }}
+                            kind="studio_program"
+                            onLockChange={setStudioCalendarLocked}
+                            disabled={setupLocked || pending || instructorCalendarLocked}
+                          />
+                        </PersonalCalendarCard>
+                      )}
+                    {organizationId && hasInstructorCalendarScope(workspace) && (
+                      <PersonalCalendarCard kind="duties">
+                        <MemberCalendarPanel
+                          key={`${account.id}:${organizationId}`}
+                          scope={{ accountId: account.id, orgId: organizationId }}
+                          kind="duties"
+                          onLockChange={setInstructorCalendarLocked}
+                          disabled={setupLocked || pending || studioCalendarLocked}
+                        />
+                      </PersonalCalendarCard>
+                    )}
+                    <AppearancePanel
+                      ref={appearanceActions}
+                      onDisabledChange={setAppearanceDisabled}
+                      snapshot={appearance.data}
+                      readError={appearance.isError}
+                      onRefresh={async () => {
+                        const result = await appearance.refetch({ throwOnError: true });
+                        if (!result.data) throw new Error("APPEARANCE_UNAVAILABLE");
+                        return result.data;
+                      }}
+                    />
+                  </TabsContent>
+                  <TabsContent id="security">
+                    <SecurityPanel accountId={account.id} />
+                  </TabsContent>
+                  <TabsContent id="sessions">
+                    <SessionsPanel accountId={account.id} />
+                  </TabsContent>
+                </Tabs>
+              </>
+            )}
+          </div>
+        );
+      }}
     </WorkspaceLayout>
   );
 }

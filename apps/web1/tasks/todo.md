@@ -129,7 +129,7 @@ v67 HTML'sinde **50** `data-view` vardı. v69'da giriş sonrası `a-alan` ile sa
 
 | Sürüm | Çizime eklenen                                                      | Web1 karşılığı                                                                                                                                                                            |
 | ----- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v68   | Giriş sonrası stüdyo ve merkez seçimi, erişimi olmayan hesap durumu | Mevcut hesap kabuğunda stüdyo ve merkez seçilebiliyor. Ayrı giriş adımları [E53](#e53).                                                                                                   |
+| v68   | Giriş sonrası stüdyo ve merkez seçimi, erişimi olmayan hesap durumu | Mevcut hesap kabuğunda stüdyo ve merkez seçilebiliyor. Girişteki stüdyo ve merkez adımları [E53](#e53) kapsamında doğrulandı.                                                             |
 | v68   | Belgelerde Dijital metin, İçerik kataloğu ve Etkinlik kaydı         | Etkinlik kaydı gereksinimi belge formunda, önizleme bağlamı katılımcı ekleme akışında, dijital metin okuma ve kabul üye panelinde mevcut. Yönetici metin yayını ve katalog [V09.1](#v09). |
 | v68   | Eğitmen anlaşma metni ve kabul durumu                               | Eğitmen Hakedişim'de metni inceleyip kabul edebiliyor. Yönetici Hakediş satırında kabul durumu [V09.2](#v09).                                                                             |
 | v68   | Üye bildiriminde e-posta teslim durumu                              | [Bildirim ayrıntısında](../src/features/inbox/inbox-content.tsx) native e-posta işi ve sağlandığında teslim durumu gösteriliyor.                                                          |
@@ -367,11 +367,11 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 
 <a id="e53"></a>
 
-### E53 · Giriş sonrası stüdyo ve merkez seçimi
+### E53 · Giriş sonrası stüdyo ve merkez seçimi (kapandı)
 
 `data-view="a-alan"` · v68. Hesap kabuğundaki mevcut workspace okumasını ve seçicileri kullan.
 
-- [ ] **E53.1** · Çok stüdyolu hesabın yetkili stüdyo, ardından gerekli olduğunda merkez seçimi adımlarını tamamla. Askıdaki stüdyo için erişim sınırını, erişimi olmayan hesap durumunu ve seçimin sonraki ekranda aynı merkezle açılmasını doğrula.
+- [x] **E53.1** · Girişte mevcut çalışma alanı okuması yetkili stüdyoları ve erişilebilir merkezleri sağlar. Çok stüdyolu hesap stüdyo seçer, birden çok etkin merkezi varsa merkez adımı açılır. Askıdaki stüdyo seçilmedi ve merkez okuması gönderilmedi. Klavyeyle seçilen merkez Hesabım kabuğunda ve merkez rotalarının bağlantılarında korundu. Erişimsiz hesapta davet açıklaması ve doğrulanmış hesabın mevcut stüdyo kurulum yolu birlikte doğrulandı. Tek Chromium işçisiyle 17 hedefli senaryo ve erişimsiz hesap assertion’ı eklendikten sonra ilgili kurulum senaryosu geçti. [Çalışma alanı kabulü](../e2e/auth-workspace.spec.ts) · [Kurulum kabulü](../e2e/auth-studio-setup.spec.ts).
 
 <a id="on-tarama"></a>
 

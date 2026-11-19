@@ -96,6 +96,7 @@ test("verified account submits one studio setup request and hands the fulfilled 
     return route.fallback();
   });
   await signIn(page);
+  await expect(page.getByRole("heading", { name: "Bir stüdyoya erişimin yok" })).toBeVisible();
   const studio = page.getByRole("textbox", { name: text.name, exact: true });
   const review = page.getByRole("button", { name: text.review, exact: true });
   await review.click();

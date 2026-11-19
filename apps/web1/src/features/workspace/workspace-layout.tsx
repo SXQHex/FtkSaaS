@@ -68,7 +68,10 @@ export function WorkspaceLayout({
   children:
     | ReactNode
     | ((
-        selection: WorkspaceSelection & { workspace?: Awaited<ReturnType<typeof readWorkspace>> },
+        selection: WorkspaceSelection & {
+          workspace?: Awaited<ReturnType<typeof readWorkspace>>;
+          loading: boolean;
+        },
       ) => ReactNode);
   scopeControl?: WorkspaceScopeControl;
   scopeLocked?: boolean;
@@ -316,7 +319,12 @@ export function WorkspaceLayout({
         </header>
         {view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />}
         {typeof children === "function"
-          ? children({ organizationId: resolvedOrganizationId, centerId, workspace: view })
+          ? children({
+              organizationId: resolvedOrganizationId,
+              centerId,
+              workspace: view,
+              loading: scope.isPending,
+            })
           : children}
       </SidebarInset>
     </SidebarProvider>

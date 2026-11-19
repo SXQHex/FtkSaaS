@@ -261,3 +261,106 @@ test("Starter self management opens the native owner navigation and removes it a
   await expect(palette.getByText("Eşleşen sayfa yok.", { exact: true })).toBeVisible();
   await expect(palette.getByRole("menuitem", { name: "Politikalar", exact: true })).toHaveCount(0);
 });
+
+test("workspace entry offers authorized studios and keeps the selected center on the next screen", async ({
+  page,
+}) => {
+  await mockNative(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const closedOrg = "019a7b00-0000-7000-8000-000000000015";
+  const otherCenter = "019a7b00-0000-7000-8000-000000000016";
+  const unreadableCenter = "019a7b00-0000-7000-8000-000000000017";
+  const orgReads: string[] = [];
+  const listed = { version: 1, state: "active" as const };
+  const pagination = { next_cursor: null, as_of: "2026-11-14T06:00:00Z" };
+  await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        trace_id: org,
+        data: {
+          ...pagination,
+          items: [
+            {
+              ...listed,
+              id: org,
+              name: "Açık stüdyo",
+              access_mode: "normal",
+              self_context: { person_id: person, subscriber_number: null, centers: [] },
+            },
+            { ...listed, id: closedOrg, name: "Askıdaki stüdyo", access_mode: "closed" },
+          ],
+        },
+      } satisfies SuccessOrganizationsList,
+    }),
+  );
+  await page.route("**/functions/v1/backend-v1/centers_list_v1", (route) => {
+    const request = route.request().postDataJSON() as { org_id: string };
+    orgReads.push(request.org_id);
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: org,
+        data: {
+          ...pagination,
+          items: [
+            { id: center, name: "İlk merkez", accessible: true },
+            { id: otherCenter, name: "Seçilen merkez", accessible: true },
+            { id: unreadableCenter, name: "Yetkisiz merkez", accessible: false },
+          ].map((item) => ({ ...listed, timezone: "Europe/Istanbul", ...item })),
+        },
+      } satisfies SuccessCentersList,
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        trace_id: org,
+        data: {
+          ...pagination,
+          items: [
+            {
+              ...listed,
+              id: person,
+              person_id: person,
+              role: "owner",
+              scope_center_id: null,
+            },
+          ],
+        },
+      } satisfies SuccessRolesList,
+    }),
+  );
+  await page.goto(`${origin}/login`);
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  const studioHeading = page.getByRole("heading", { name: "Hangi stüdyoyla devam edeceksin?" });
+  await expect(studioHeading).toBeFocused();
+  await expect(page.getByRole("radio", { name: /Askıdaki stüdyo/ })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Devam et", exact: true })).toBeDisabled();
+  await page.getByRole("radio", { name: "Açık stüdyo", exact: true }).check();
+  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Çalışacağın merkezi seç" })).toBeFocused();
+  await expect(page.getByRole("radio", { name: "Yetkisiz merkez" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Stüdyo seçimine dön" }).click();
+  await expect(studioHeading).toBeFocused();
+  await page.getByRole("radio", { name: "Açık stüdyo", exact: true }).check();
+  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  const selected = page.getByRole("radio", { name: "Seçilen merkez", exact: true });
+  await selected.focus();
+  await page.keyboard.press("Space");
+  expect((await scanAccessibility(page, "workspace-entry-center")).violations).toEqual([]);
+  assertLayoutFit(await readLayoutFit(page));
+  await page.getByRole("button", { name: "Merkezi aç" }).press("Enter");
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
+  const links = await page
+    .locator("a")
+    .evaluateAll((items) => items.map((item) => item.getAttribute("href")));
+  expect(links.some((href) => href?.startsWith(`/o/${org}/c/${otherCenter}/`))).toBe(true);
+  expect(orgReads).toContain(org);
+  expect(orgReads).not.toContain(closedOrg);
+});

@@ -421,6 +421,19 @@
     }
   },
   "workspace": {
+    "entry": {
+      "organization": "Hangi stüdyoyla devam edeceksin?",
+      "center": "Çalışacağın merkezi seç",
+      "instructions": "Devam etmek için bir seçenek seç.",
+      "closed": "Erişim kapalı",
+      "back": "Stüdyo seçimine dön",
+      "continue": "Devam et",
+      "openCenter": "Merkezi aç",
+      "account": "Hesabıma geç",
+      "loading": "Çalışma alanı yükleniyor.",
+      "noAccess": "Bir stüdyoya erişimin yok",
+      "noAccessHint": "Var olan bir stüdyoya katılmak için stüdyodan davet iste."
+    },
     "navigation": "Ana menü",
     "navigationDescription": "Stüdyo, merkez ve hesap gezinmesi.",
     "closeNavigation": "Menüyü kapat",
