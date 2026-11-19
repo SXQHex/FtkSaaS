@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="invoice-directory-catalog-status"></a>
+## W1-BE-63 ve 65 · Platform fatura dizini ve katalog durumu
+
+Taban `5abf8749cba4088b30ddbab2ff1dd4363191e61b`. Aynı SHA için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44561613234) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44561730523) başarılı. Fatura dizini [WF17](../../../docs/workflows.md#wf17), katalog durum okuması [WF11](../../../docs/workflows.md#wf11) sahibindedir. PR339'daki W1-BE-64 geri çekildi.
+
+İzole loopback Supabase'e 211 migration temiz uygulandı. Tek seri Node runner'da 8/8 native backend testi geçti. Canlı platform yetkisi, organizasyon ve cursor kapsamı, yeni yüklemenin eski sayfaya katılmaması, mevcut orijinal ZIP/PDF indirmesi ve ayrı katalog durumları doğrulandı. Üretilen Edge kaynağı 3.281.049 bayt. Aday CI ve hosted kabulü açık.
+
 <a id="centers-list-data-api"></a>
 ## Merkez listesi Data API pilotu
 

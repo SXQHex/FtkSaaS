@@ -478,6 +478,11 @@ test('W1-BE-58 invoices publish verified ZIP and PDF originals to the live organ
  const {rows:[subscription]}=await db.query('select plan_version_id from core.saas_subscriptions where org_id=$1',[org]);
  const otherOrg=(await must(platform,'organization_create_v1',{verified_account_id:otherAccount.id,name:'Synthetic other invoice org',initial_plan_id:subscription.plan_version_id},key())).primary_id;
  const list=(extra={})=>must(owner,'organization_invoices_list_v1',{org_id:org,page:{},...extra});
+ const invoiceDirectory={view:'invoices',scope:{org_id:org},page:{}};
+ const platformList=(page={})=>must(platform,'platform_directory_get_v1',{...invoiceDirectory,page});
+ assert.equal((await call(owner,'platform_directory_get_v1',invoiceDirectory)).result.error.code,'FORBIDDEN');
+ assert.equal((await call(member,'platform_directory_get_v1',invoiceDirectory)).result.error.code,'FORBIDDEN');
+ assert.equal((await call(platform,'platform_directory_get_v1',{view:'invoices',page:{}})).result.error.code,'VALIDATION_FAILED');
  const {env}=context();
  const upload=(d,body,mime)=>fetch(new URL(d.upload_url,env.API_URL),{method:'PUT',headers:{apikey:env.ANON_KEY,'content-type':mime},body});
  const download=(who,body)=>fetch(env.API_URL+'/functions/v1/backend-v1/organization_invoice_file_get_v1?download=original',{
@@ -494,7 +499,12 @@ test('W1-BE-58 invoices publish verified ZIP and PDF originals to the live organ
  assert.equal((await call(platform,'platform_invoice_publish_v1',{...zipScope,org_id:otherOrg},key())).result.error.code,'NOT_FOUND');
  assert.equal((await call(platform,'platform_invoice_publish_v1',zipScope,key())).result.error.code,'VALIDATION_FAILED');
  assert.equal((await download(owner,zipScope)).status,404);
+ assert.deepEqual((await platformList()).items,[]);
  assert.equal((await upload(z,zip,'application/zip')).ok,true);
+ assert.deepEqual((await platformList()).items,[{
+  kind:'invoice',id:z.invoice_id,invoice_number:zipRequest.invoice_number,issued_on:zipRequest.issued_on,
+  mime:zipRequest.mime,bytes:zipRequest.bytes,checksum:zipRequest.checksum,published_at:null,
+ }]);
  assert.deepEqual(await prepare(zipRequest,prepKey),{invoice_id:z.invoice_id,upload_url:null});
  assert.equal((await upload(z,zip,'application/zip')).ok,false);
  assert.deepEqual((await list()).items,[]);
@@ -504,12 +514,24 @@ test('W1-BE-58 invoices publish verified ZIP and PDF originals to the live organ
  assert.equal((await must(platform,'platform_invoice_publish_v1',zipScope,publishKey)).id,z.invoice_id);
  assert.equal((await call(platform,'platform_invoice_upload_prepare_v1',zipRequest,key())).result.error.code,'VERSION_CONFLICT');
  assert.deepEqual(await prepare(zipRequest,prepKey),{invoice_id:z.invoice_id,upload_url:null});
- const wrong=await prepare(descriptor('DEMO-invalid','application/pdf',zip));
- assert.equal((await upload(wrong,zip,'application/pdf')).ok,true);
- assert.equal((await call(platform,'platform_invoice_publish_v1',{org_id:org,invoice_id:wrong.invoice_id},key())).result.error.code,'VALIDATION_FAILED');
  const p=await prepare(descriptor('DEMO-2','application/pdf',pdf)),pdfScope={org_id:org,invoice_id:p.invoice_id};
  assert.equal((await upload(p,pdf,'application/pdf')).ok,true);
+ const wrong=await prepare(descriptor('DEMO-invalid','application/pdf',zip));
+ const directoryFirst=await platformList({limit:1});
+ assert.equal((await upload(wrong,zip,'application/pdf')).ok,true);
+ assert.equal(directoryFirst.items[0].id,z.invoice_id);
+ assert(directoryFirst.items[0].published_at);
+ assert(directoryFirst.next_cursor);
+ const directorySecond=await platformList({limit:1,cursor:directoryFirst.next_cursor});
+ assert.equal(directorySecond.as_of,directoryFirst.as_of);
+ assert.equal(directorySecond.items[0].id,p.invoice_id);
+ assert.equal(directorySecond.items[0].published_at,null);
+ assert.equal(directorySecond.next_cursor,null);
+ const isolated={...invoiceDirectory,scope:{org_id:otherOrg}};
+ assert.deepEqual((await must(platform,'platform_directory_get_v1',isolated)).items,[]);
+ assert.equal((await call(platform,'platform_directory_get_v1',{...isolated,page:{cursor:directoryFirst.next_cursor}})).result.error.code,'VALIDATION_FAILED');
  await must(platform,'platform_invoice_publish_v1',pdfScope,key());
+ assert.equal((await call(platform,'platform_invoice_publish_v1',{org_id:org,invoice_id:wrong.invoice_id},key())).result.error.code,'VALIDATION_FAILED');
  const first=await list({page:{limit:1}});
  assert.equal(first.items.length,1);assert(first.next_cursor);
  const second=await list({page:{limit:1,cursor:first.next_cursor}});

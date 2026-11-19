@@ -3792,7 +3792,7 @@ client_api_version: 1
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 request_id: string
-view: ("organizations" | "owners" | "payments" | "verified_accounts" | "initial_plans" | "operators")
+view: ("organizations" | "owners" | "payments" | "verified_accounts" | "initial_plans" | "operators" | "invoices")
 page: Page
 scope?: {
 /**
@@ -5379,6 +5379,7 @@ PlatformOperatorChange?: PlatformOperatorChange
 Success_platform_operator_access_set?: SuccessPlatformOperatorAccessSet
 ManagementSelector_platform_operator_access_set_v1?: ManagementSelectorPlatformOperatorAccessSetV1
 ManagementProjection_platform_operator_access_set_v1?: ManagementProjectionPlatformOperatorAccessSetV1
+PlatformDirectoryInvoice?: PlatformDirectoryInvoice
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21803,6 +21804,7 @@ revision: PositiveInt
 created_at: Instant
 published_at: (Instant | null)
 retired: boolean
+invalidated: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -32241,7 +32243,7 @@ account_id: string
  * via the `definition` "Page_PlatformDirectory".
  */
 export interface Page_PlatformDirectory {
-items: (PlatformDirectoryOrganization | PlatformDirectoryOwner | PlatformDirectoryPayment | PlatformDirectoryAccount | PlatformDirectoryInitialPlan | PlatformDirectoryOperator)[]
+items: (PlatformDirectoryOrganization | PlatformDirectoryOwner | PlatformDirectoryPayment | PlatformDirectoryAccount | PlatformDirectoryInitialPlan | PlatformDirectoryOperator | PlatformDirectoryInvoice)[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
 }
@@ -32269,6 +32271,23 @@ account_id: (string | null)
 display_name: (Text | null)
 eligible: boolean
 granted_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PlatformDirectoryInvoice".
+ */
+export interface PlatformDirectoryInvoice {
+kind: "invoice"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+invoice_number: string
+issued_on: Date
+mime: ("application/zip" | "application/pdf")
+bytes: number
+published_at: (Instant | null)
+checksum: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
