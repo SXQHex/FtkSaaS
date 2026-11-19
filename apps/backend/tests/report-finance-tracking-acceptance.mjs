@@ -40,6 +40,18 @@ test('W1-BE-30 native reports keep gross sales separate from collections and exp
  for(const [id,amount,currency,state] of [[sale,100,'TRY','active'],[key(),200,'TRY','terminated'],[key(),300,'USD','expired']])await db.query("insert into core.sales(id,org_id,center_id,person_id,product_version_id,net_minor,currency,valid_from,state,terms_hash,start_date,end_date,timezone,paid_days,created_at) values($1,$2,$3,$4,$5,$6,$7,'2026-01-01',$8,$9,'2026-01-01','2026-02-01','UTC',31,'2026-01-12T10:00:00Z')",[id,org,center,person,product,amount,currency,state,'a'.repeat(64)]);
  const report=(kind,extra={})=>api('report_get_v1',{report:kind,filters:{interval,center_ids:[center],...extra},page:{limit:1}});
  const gross=await report('sales');assert.equal(gross.rows.items.length,1);assert(gross.rows.next_cursor);assert.deepEqual(gross.totals.map(x=>[x.currency,x.amount_minor]),[['TRY','300'],['USD','300']]);assert.equal(gross.rows.items[0].period_start,'2026-01-12');
+ const salesPage={report:'sales',filters:{interval,center_ids:[center]},page:{limit:1,cursor:gross.rows.next_cursor}};
+ const grossNext=await api('report_get_v1',salesPage);
+ assert.equal(grossNext.rows.items[0].currency,'USD');
+ assert.deepEqual(grossNext.totals,gross.totals);
+ const {rows:[{legacy_cursor}]}=await db.query(`select private.p06_page(
+  private.p06_report_rows($1,$2,array[$3::uuid]),'{"limit":1}',
+  convert_from(decode($4,'hex'),'UTF8')::jsonb->>'scope',statement_timestamp())->>'next_cursor' legacy_cursor`,
+  [salesPage,org,center,gross.rows.next_cursor]);
+ const legacyNext=await api('report_get_v1',{...salesPage,page:{limit:1,cursor:legacy_cursor}});
+ assert.deepEqual(legacyNext.rows.items,grossNext.rows.items);
+ assert.deepEqual(legacyNext.totals,grossNext.totals);
+ assert.equal((await call(f.owner,'report_get_v1',{...salesPage,org_id:org,center_id:center,filters:{...salesPage.filters,currency:'TRY'}})).result.error.code,'VALIDATION_FAILED');
  const packages=await report('sales',{breakdown:'product'});assert.equal(packages.rows.items[0].product_name,'Immutable report package');assert.equal(packages.rows.items[0].product_version_id,product);
  const debt=key();await db.query("insert into core.debts(id,org_id,center_id,person_id,sale_id,amount_minor,currency,due_at,state) values($1,$2,$3,$4,$5,100,'TRY','2026-01-12','open')",[debt,org,center,person,sale]);
  await api('collection_record_v1',{person_id:person,amount_minor:'50',currency:'TRY',occurred_at:'2026-01-12T12:00:00Z',debt_ids:[debt],payment:{method:'cash'}});
@@ -58,6 +70,10 @@ test('W1-BE-30 native reports keep gross sales separate from collections and exp
  const emptyBalances=await report('instructor_balances');assert.deepEqual(emptyBalances.rows.items,[]);assert.equal(emptyBalances.totals.find(x=>x.group_key==='closed_sessions').count,0);
  // Historical native ledger fixtures: two earning roots, one actually closed source session.
  const receipt=(await db.query('select id from core.operation_receipts where org_id=$1 order by created_at,id limit 1',[org])).rows[0].id;await db.query("update core.sessions set attendance_state='closed' where id=$1",[session]);
+ assert(metrics.rows.next_cursor);
+ const staleMetrics=await call(f.owner,'report_get_v1',{org_id:org,center_id:center,report:'session_metrics',
+  filters:{interval,center_ids:[center]},page:{limit:1,cursor:metrics.rows.next_cursor}});
+ assert.equal(staleMetrics.result.error.code,'VERSION_CONFLICT');
  for(const amount of [10,20])await db.query("insert into core.earnings(id,org_id,center_id,person_id,session_id,amount_minor,currency,basis,operation_id,direction,created_at) values($1,$2,$3,$4,$5,$6,'TRY',$7,$8,'add','2026-01-12T10:00:00Z')",[key(),org,center,f.person,session,amount,{source:'event_fee',currency:'TRY',quantity:1,excluded_blocked:0},receipt]);
  const balances=await api('report_get_v1',{report:'instructor_balances',filters:{interval,center_ids:[center]},page:{limit:1}});assert.equal(balances.totals.find(x=>x.group_key==='closed_sessions').count,1);assert.equal(balances.totals.find(x=>x.group_key==='earning_accrual').amount_minor,'30');assert.equal(balances.rows.items.length,1);
 

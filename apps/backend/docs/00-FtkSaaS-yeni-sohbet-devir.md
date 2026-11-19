@@ -11,6 +11,14 @@ Sentetik organizasyon fixture’ında PostgreSQL sunucu saatiyle dönüşümlü 
 
 İzole loopback Supabase’te 213 migration temiz uygulandı. Seri runner’da 31/31 native izin, Auth/MFA, seans ve ayar testi, ayrıca 13/13 PostgreSQL taşıma ve bütünlük testi geçti. İki ilk erişim aynı hesap kimliğini döndürdü. Süresi dolmuş hassas doğrulama izin okumasında `FORBIDDEN` verdi. Aday CI ve hosted kabulü bekliyor.
 
+### Rapor, stüdyo ve fatura sayfaları
+
+Performans listesinin beşinci maddesi [PR #348](https://github.com/SXQHex/FtkSaaS/pull/348) dalına yerel olarak eklendi. Ölçüm tabanı `7be36689e1c0dc353ba84c55f5697c0517d425a5`. [Rapor](../../../docs/workflows.md#wf10), [stüdyo kuyruğu](../../../docs/workflows.md#wf02) ve [fatura](../../../docs/workflows.md#wf17) okumaları yanıt JSON’unu SQL’de seçilen sayfadan üretiyor. Rapor toplamları filtrelenmiş tam kümeyi kapsıyor. Offset cursor’ları canlı değişiklikte aynı hataları veriyor ve eski cursor’lar kabul ediliyor. Platform fatura dizininde mevcut as_of ve anahtar sırası kullanılıyor.
+
+Her yol için 1.500 sentetik kayıtta 20 satırlık ilk sayfanın PostgreSQL sunucu süresi ölçüldü. Dönüşümlü önce/sonra bloklarında sürüm başına 100 ölçümle p95 raporda 25,25 → 12,25 ms, stüdyo kuyruğunda 5,47 → 2,27 ms, sahip faturalarında 6,87 → 1,94 ms, platform fatura dizininde 6,26 → 0,73 ms oldu. Eski cursor’la ikinci sayfa ve rapor toplamları eşleşti. Kuyruk ve sahip faturası cursor’ları farklı tarih biçimiyle de devam etti.
+
+Temiz loopback kurulumunda 215 migration uygulandı ve 9/9 hedefli native kabul testi geçti. Rapor filtre ve tam kapsam toplamları, eski ve güncel cursor, değişen verinin reddi, CSV çıktısı ve fatura dosyalarının canlı kapsamı doğrulandı. Beşinci madde yerel dalda push bekliyor.
+
 <a id="invoice-directory-catalog-status"></a>
 ## W1-BE-63 ve 65 · Platform fatura dizini ve katalog durumu
 
