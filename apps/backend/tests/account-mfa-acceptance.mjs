@@ -16,6 +16,21 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
  const db=await guard.connect(env.DB_URL);const previousConfig=(await db.query('select * from private.p07_lifecycle_config')).rows;let factor,backup,backupSecret,backupCounter;let strong=user;let securityScope;
  const native=async(path,method,body,u=user)=>{const response=await fetch(env.API_URL+'/auth/v1'+path,{method,headers:{apikey:env.ANON_KEY,authorization:'Bearer '+u.jwt,'content-type':'application/json'},...(body!==undefined?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(60000)});const text=await response.text();return {response,data:text?JSON.parse(text):null};};
  const fail=async(code,u,op,body={},k)=>{const r=await call(u,op,body,k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+ const centers=async(u,{org,center},allowed)=>{
+  const body={org_id:org,page:{}};
+  const edge=await call(u,'centers_list_v1',body);
+  const response=await fetch(env.API_URL+'/rest/v1/rpc/centers_list_v1',{
+   method:'POST',signal:AbortSignal.timeout(60000),
+   headers:{apikey:env.ANON_KEY,authorization:'Bearer '+u.jwt,'content-type':'application/json','content-profile':'api_read'},
+   body:JSON.stringify({p_request:{client_api_version:1,request_id:key(),...body}}),
+  });
+  assert.equal(response.status,edge.status);
+  for(const result of [edge.result,await response.json()]){
+   assert.equal(result.ok,allowed,JSON.stringify(result));
+   if(allowed)assert.deepEqual(result.data.items.map(item=>item.id),[center]);
+   else assert.equal(result.error.code,'AUTH_REQUIRED');
+  }
+ };
  try{
   await t.test('enrollment is unverified until a real TOTP challenge succeeds',async()=>{
    const enrolled=await native('/factors','POST',{factor_type:'totp',friendly_name:'Development authenticator',issuer:'FtkSaaS'});assert.equal(enrolled.response.ok,true,'Native TOTP must be configured');factor=enrolled.data.id;assert(enrolled.data.totp.secret);
@@ -58,6 +73,8 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    let current=await must(strong,'settings_get_v1',q);
    await must(strong,'settings_update_v1',{...q,expected_version:current.version,patch:{security_policy:{...none,mfa_roles:['owner']}}},key());
    await must(strong,'organization_get_v1',{org_id:org});
+   await centers(strong,securityScope,true);
+   await centers(user,securityScope,false);
    const discovered=await must(strong,'management_state_get_v1',{org_id:org,center_id:center,operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:person,permission:'attendance.draft'}}});
    assert.equal(discovered.items[0].entity.id,person);
    await fail('AUTH_REQUIRED',user,'management_state_get_v1',rooms);
@@ -124,8 +141,20 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    await db.query("update private.frontend_settings set values=jsonb_set(values,'{security_policy,mfa_roles}','[\"owner\"]'::jsonb) where scope_key=$1",['organization:'+org]);
    await fail('AUTH_REQUIRED',strong,'management_state_get_v1',{org_id:org,center_id:center,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}},page:{limit:10}});
    await fail('AUTH_REQUIRED',strong,'organization_get_v1',{org_id:org});
+   await centers(strong,securityScope,false);
+   // Isolate the factor requirement from native unenrollment's session downgrade.
+   // Keep the real signed AAL2 token and temporarily restore only its fixture row.
+   const {rows:[session]}=await db.query('select aal::text from auth.sessions where id=$1 and user_id=$2',[strong.session_id,user.id]);
+   assert(session);
+   try{
+    await db.query("update auth.sessions set aal='aal2' where id=$1 and user_id=$2",[strong.session_id,user.id]);
+    await centers(strong,securityScope,false);
+   }finally{
+    await db.query('update auth.sessions set aal=$3 where id=$1 and user_id=$2',[strong.session_id,user.id,session.aal]);
+   }
    await must(strong,'account_get_v1');
    await db.query("update private.frontend_settings set values=jsonb_set(values,'{security_policy,mfa_roles}','[]'::jsonb) where scope_key=$1",['organization:'+org]);
+   await centers(strong,securityScope,true);
   });
  }finally{
   let cleanupFailed=false;

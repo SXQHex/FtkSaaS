@@ -51,25 +51,31 @@ alter function private.centers_read_rows(uuid,uuid,boolean) owner to ftk_centers
 revoke create on schema private from ftk_centers_read;
 grant execute on function private.centers_read_rows(uuid,uuid,boolean) to current_user,service_role;
 
--- Reuse the native factor and stored session AAL check on both transports.
-create function private.account_mfa_check_verified(auth_id uuid,session uuid,aux jsonb) returns void
-language plpgsql stable set search_path='' as $$
+-- Extend only the caller check. Keep the installed native MFA policy and ACLs,
+-- including the mandatory-factor check added by the organization policy.
+do $patch$
+declare
+ body text:=pg_get_functiondef('private.account_mfa_assert(uuid,uuid,jsonb)'::regprocedure);
+ guard text:=$old$begin
+ if coalesce(current_setting('request.jwt.claim.role',true),'')<>'service_role' and coalesce(nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'role','')<>'service_role' then perform private.fail('FORBIDDEN');end if;$old$;
 begin
- if exists(select 1 from auth.mfa_factors f where f.user_id=auth_id and f.status::text='verified')
-  and (aux->>'verified_aal' is distinct from 'aal2' or not exists(select 1 from auth.sessions s
-   where s.id=session and s.user_id=auth_id and to_jsonb(s)->>'aal'='aal2'))
- then perform private.fail('AUTH_REQUIRED');end if;
-end$$;
-revoke all on function private.account_mfa_check_verified(uuid,uuid,jsonb) from public,anon,authenticated,service_role;
-
-create or replace function private.account_mfa_assert(auth_id uuid,session uuid,aux jsonb) returns void
-language plpgsql stable security definer set search_path='' as $$
+ if cardinality(string_to_array(body,guard))<>2 then
+  raise exception 'Center Data API native MFA caller check changed';
+ end if;
+ execute replace(body,guard,$new$declare
+ claims jsonb:=nullif(current_setting('request.jwt.claims',true),'')::jsonb;
 begin
  if coalesce(current_setting('request.jwt.claim.role',true),'')<>'service_role'
-  and coalesce(nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'role','')<>'service_role'
- then perform private.fail('FORBIDDEN');end if;
- perform private.account_mfa_check_verified(auth_id,session,aux);
-end$$;
+  and coalesce(claims->>'role','')<>'service_role'
+  and not coalesce(
+   aux->'centers_list_data_api'='true'::jsonb
+   and claims->>'role'='authenticated'
+   and claims->>'sub'=auth_id::text
+   and claims->>'session_id'=session::text
+   and aux->>'verified_aal'=case when claims->>'aal'='aal2' then 'aal2' else 'aal1' end,
+   false)
+ then perform private.fail('FORBIDDEN');end if;$new$);
+end$patch$;
 
 -- Keep all lifecycle, tenant, permission, billing and response logic in the existing dispatcher.
 do $patch$
@@ -86,10 +92,9 @@ declare
         $new$  and coalesce(claims->>'role','')<>'service_role' and not coalesce(data_api,false) then perform private.fail('FORBIDDEN');end if;$new$],
   array[$old$ if not (p_operation='account_sessions_revoke_v1' and r->>'mode'='current') then perform private.account_mfa_assert(usr.id,p_session_id,p_aux);end if;$old$,
         $new$ if data_api then
-  perform private.account_mfa_check_verified(usr.id,p_session_id,jsonb_build_object('verified_aal',claims->>'aal'));
- elsif not (p_operation='account_sessions_revoke_v1' and r->>'mode'='current') then
-  perform private.account_mfa_assert(usr.id,p_session_id,p_aux);
- end if;$new$],
+  p_aux:=jsonb_build_object('centers_list_data_api',true,'verified_aal',case when claims->>'aal'='aal2' then 'aal2' else 'aal1' end);
+ end if;
+ if not (p_operation='account_sessions_revoke_v1' and r->>'mode'='current') then perform private.account_mfa_assert(usr.id,p_session_id,p_aux);end if;$new$],
   array[$old$  select owner_person_id into owner from core.organizations where id=org for update;$old$,
         $new$  if data_api then
    select owner_person_id into owner from core.organizations where id=org for share;
@@ -201,7 +206,7 @@ begin
    'code',error_code,'retryable',error_code='TEMPORARY_FAILURE','trace_id',(private.ops_uuid_bank(1))[1]));
  end if;
  result:=private.execute_operation('centers_list_v1',p_request,auth_id,session_id,
-  private.ops_uuid_bank(10),jsonb_build_object('verified_aal',claims->>'aal'));
+  private.ops_uuid_bank(10),null);
  -- UUID, states, item shape and media properties are fixed by the SQL projection.
  -- The legacy success validator also rejects empty timezones and missing versions.
  if result->'ok'='true'::jsonb and exists(

@@ -9,6 +9,8 @@ Temiz loopback Supabase kurulumunda 209 migration uygulandı ve 10/10 hedefli ka
 
 Kısa ömürlü native JWT ile açık oturumun süresi dolmuş token'ının her iki yolda 401 ve `AUTH_REQUIRED` verdiği doğrulandı. Native REST ön isteği `Content-Profile` başlığını kabul etti. Web1'de 16 taşıma birim testi ve tek Chromium çalışanındaki kayıt sonrası merkez keşfi ile kurulum özeti senaryoları geçti.
 
+[Aday API-3](https://github.com/SXQHex/FtkSaaS/actions/runs/44553762546/job/135664830150) pilot migration'da zorunlu faktör kontrolünün kaybolduğunu gösterdi. Düzeltme mevcut MFA yordamının faktör, oturum ve ACL kurallarını koruyup yalnız düz merkez listesinin imzalı Data API çağrısını aynı kontrole bağlıyor. İzole native Supabase'te 10 merkez ve 7 MFA kabul testi geçti. İki taşıma da doğrulanmış faktörle AAL2'yi kabul etti, AAL1'i ve faktör kaldırıldıktan sonra hâlâ AAL2 olan JWT'yi reddetti. Son durumda oturum kaydı da AAL2 olacak şekilde izole fixture ile zorunlu faktör reddi ayrıca doğrulandı.
+
 Geniş yerel kaynak doğrulamasında 615/617 test geçti. CI zaman aşımı ve `/proc` bellek gözlemcisi testleri macOS'ta hem adayda hem değişikliksiz main tabanında yeniden aynı şekilde başarısız oldu.
 
 Yerel uçtan uca p95, Edge ve Data API sırasıyla seri çağrıda 1.183,41 → 20,92 ms, dörder eşzamanlı aynı organizasyon çağrısında 4.189,57 → 32,24 ms ve dörder eşzamanlı karma organizasyon çağrısında 4.832,63 → 36,78 ms olarak ölçüldü. Paylaşımlı organizasyon kilidi altında Edge 16/16 bekledi ve örneklenen bekleme p95'i 210,85 ms oldu. Data API 0/16 bekledi. Yazma kilidinde iki yol da 16/16 bekledi ve tamamlanan askıya alma işleminden sonra `SERVICE_UNAVAILABLE` döndürdü. Bu ölçümler yerel pilot koşullarına aittir. Aday CI ve hosted kabulü ayrı izlenir.

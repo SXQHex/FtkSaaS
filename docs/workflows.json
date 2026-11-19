@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "4d1d601294ac2934c8f1dd5ea76adc13bdedf1f211c55dce823baa9d1beccd04",
-        "reason": "Reviewed the compact generated Edge validator and the plain centers Data API transport together. The published DTO, error details and isolation boundaries remain intact."
+        "fingerprint": "701df68d6d7181cccf5cf11b69e4cc11f8cec80117ecb06fe51e0bdbe8ea5e97",
+        "reason": "Reviewed the source-bound inventory for native MFA and the isolated mandatory-factor regression."
       }
     },
     {
@@ -399,8 +399,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "62b2b18cb87812dc985c1b0589d00c38e1fda57f78f2f263ff6c4c2ade383073",
-        "reason": "Reviewed the local PostgREST schema addition against the existing native Auth, session and MFA configuration."
+        "fingerprint": "6dec610dcdd503b80a5daef7177090105a49ed3fd2ff2968501be6f2024ca564",
+        "reason": "Reviewed native enrollment, session, access grants and the separate mandatory-factor check on both transports."
       }
     },
     {
@@ -421,6 +421,7 @@
         "apps/backend/tests/permission-preparation-acceptance.mjs",
         "apps/backend/tests/discipline-presentation-acceptance.mjs",
         "apps/backend/tests/studio-setup-status-acceptance.mjs",
+        "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/web1-review-acceptance.mjs",
         "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
@@ -529,8 +530,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "23beb4410ce90e21a1adbaff68bce405aca7dcd81f9076edd986dd3c51ff555e",
-        "reason": "Reviewed the renamed centers list RLS migration. Its version, SQL bytes, published contract and existing acceptance scenarios are unchanged."
+        "fingerprint": "4a5f976b78b03d664d107df787574edcac0452b7915bfd66d46390e9997cc0d0",
+        "reason": "Reviewed shared organization MFA and the centers list Edge and Data API cases with and without the verified factor."
       }
     },
     {
@@ -1567,8 +1568,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "4ba74eaf1b6e0e1e9844a5652c1e9b921442ae92267416165f2b819c65a53056",
-        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
+        "fingerprint": "2ceea6fdc482d4236f09ff95ed6c0c53a3e4fa5da378f81a75a5c8f7e60c28a8",
+        "reason": "Reviewed mandatory role MFA after native removal and with a stale persisted AAL2 session in the isolated fixture."
       }
     },
     {
