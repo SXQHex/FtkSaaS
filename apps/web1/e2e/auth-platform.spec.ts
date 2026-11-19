@@ -57,6 +57,7 @@ async function platformFixture(
           owner_manage: permitted,
           payment_verify: permitted,
           grace_extend: permitted,
+          operator_manage: permitted,
         },
       });
     }
@@ -123,6 +124,24 @@ async function platformFixture(
         request.page.cursor
           ? list([row])
           : list([{ ...initial, id: uid(211), name: "İlk sayfa organizasyonu" }], "next-org"),
+      );
+    }
+    if (operation === "management_state_get_v1" && request.operation === "saas_grace_extend_v1") {
+      const entity = { type: "saas_subscriptions", id: uid(238) };
+      return send(
+        list([
+          {
+            operation: request.operation,
+            entity,
+            exists: true,
+            versions: [{ entity, version: 1 }],
+            current: {
+              operation: request.operation,
+              values: { eligible: false, until_after: null },
+            },
+            as_of: "2026-11-16T12:00:00Z",
+          },
+        ]),
       );
     }
     if (operation === "platform_organization_suspension_set_v1") {
@@ -224,6 +243,8 @@ for (const role of ["owner", "staff"] as const)
     await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
     await page.goto("/platform?section=studio-requests");
     await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
+    await page.goto("/platform?section=operators");
+    await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
     expect(
       f.calls.filter(
         ({ operation }) =>
@@ -314,6 +335,8 @@ async function billingFixture(page: import("@playwright/test").Page) {
     version: 1,
     amount_minor: "100000",
     currency: "TRY",
+    org_name: "Sentetik ödeme organizasyonu",
+    quote_period: index === 2 ? null : { starts_at: initialPeriod, ends_at: paidPeriod },
     reference: "Sentetik bildirim " + (index + 1),
     state: "pending",
     occurred_at: paymentTime,
@@ -373,7 +396,14 @@ async function billingFixture(page: import("@playwright/test").Page) {
           state: "grace",
           as_of: paymentTime,
           versions: [{ entity, version: subscription.version }],
-          current: { operation: request.operation, values: { until: subscription.grace_until } },
+          current: {
+            operation: request.operation,
+            values: {
+              until: subscription.grace_until,
+              eligible: true,
+              until_after: subscription.grace_until,
+            },
+          },
         },
       ]);
     }
@@ -444,7 +474,7 @@ test("operator filters a native payment queue, rejects a report and replays one 
   page,
   browser,
   baseURL,
-}) => {
+}, testInfo) => {
   const f = await billingFixture(page);
   await page.setViewportSize({ width: 320, height: 900 });
   await signIn(page);
@@ -452,6 +482,12 @@ test("operator filters a native payment queue, rejects a report and replays one 
   const region = page.getByRole("region", { name: billing.payments, exact: true });
   await region.focus();
   await expect(region).toBeFocused();
+  await expect(region.getByText("Sentetik ödeme organizasyonu", { exact: true })).toHaveCount(3);
+  await expect(region.getByText(billing.noQuotePeriod, { exact: true })).toBeVisible();
+  await testInfo.attach("E51 Platform ödemeleri", {
+    body: await page.screenshot({ fullPage: true }),
+    contentType: "image/png",
+  });
   await page.getByLabel(billing.state, { exact: true }).selectOption("pending");
 
   await openDecision(page, 1, billing.reject);
@@ -461,7 +497,7 @@ test("operator filters a native payment queue, rejects a report and replays one 
   await expect(page.getByText(billing.states.rejected, { exact: true })).toBeVisible();
   expect(f.subscription.period_end).toBe(initialPeriod);
 
-  await page.getByRole("link", { name: billing.payments, exact: true }).click();
+  await page.getByRole("link", { name: billing.backToQueue, exact: true }).click();
   await openDecision(page, 0, billing.accept);
   const approval = await applyBillingReview(page, billing.accept);
   await expect(approval.getByRole("status")).toHaveText(common.events.commandStates.unknown);
@@ -559,4 +595,216 @@ test("operator sees the live grace limit and only extends it after reviewing an 
   await expect(page.getByText(/25 Kas 2026.*13:30 UTC/)).toBeVisible();
   expect(f.subscription.grace_until).toBe(extendedGrace);
   expect(f.writes).toHaveLength(1);
+});
+
+test("platform creates a queued studio and a direct organization with a published initial plan", async ({
+  page,
+}, testInfo) => {
+  await platformFixture(page, "platform");
+  const plan = {
+    kind: "initial_plan",
+    id: uid(240),
+    name: "Pro",
+    period: "monthly",
+    currency: "TRY",
+  };
+  const queued = {
+    id: uid(241),
+    account_id: uid(242),
+    name: "Sentetik bekleyen stüdyo",
+    state: "pending",
+    organization_id: null,
+    created_at: paymentTime,
+  };
+  const created: { id: string; name: string; owner: string }[] = [];
+  const writes: Record<string, unknown>[] = [];
+  let accountLookups = 0;
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const operation = new URL(route.request().url()).pathname.split("/").at(-1)!;
+    const request = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
+    const list = (items: unknown[]) => send({ items, next_cursor: null, as_of: paymentTime });
+    if (operation === "studio_setup_list_v1" && request.platform_queue)
+      return list(created.length ? [] : [queued]);
+    if (operation === "platform_directory_get_v1") {
+      if (request.view === "initial_plans") return list([plan]);
+      if (request.view === "verified_accounts") {
+        accountLookups++;
+        expect(request.account_email).toBe("kurulus@example.invalid");
+        return list([{ kind: "verified_account", account_id: uid(243) }]);
+      }
+      const org = created.find((row) => row.id === request.scope?.org_id);
+      if (org && request.view === "organizations")
+        return list([
+          {
+            ...initial,
+            id: org.id,
+            name: org.name,
+            access_mode: "bootstrap",
+            subscription_state: "pending_payment",
+          },
+        ]);
+      if (org && request.view === "owners")
+        return list([
+          {
+            kind: "owner",
+            org_id: org.id,
+            person_id: uid(245),
+            account_id: org.owner,
+            display_name: "Sentetik sahip",
+          },
+        ]);
+    }
+    if (operation === "organization_create_v1") {
+      writes.push(request);
+      expect(request.initial_plan_id).toBe(plan.id);
+      const id = uid(247 + created.length);
+      created.push({ id, name: request.name, owner: request.verified_account_id });
+      return send(nativeMutation(id));
+    }
+    if (operation === "management_state_get_v1" && request.operation === "saas_grace_extend_v1") {
+      const entity = { type: "saas_subscriptions", id: uid(249) };
+      return list([
+        {
+          operation: request.operation,
+          current: { operation: request.operation, values: { eligible: false, until_after: null } },
+          entity,
+          versions: [{ entity, version: 1 }],
+          exists: true,
+          as_of: paymentTime,
+        },
+      ]);
+    }
+    return route.fallback();
+  });
+  await signIn(page);
+  await page.goto("/platform?section=studio-requests");
+  await page.getByRole("link", { name: queued.name, exact: true }).click();
+  await expect(page.getByLabel(text.create.name, { exact: true })).toHaveValue(queued.name);
+  await expect(page.getByLabel(text.create.name, { exact: true })).toHaveJSProperty(
+    "readOnly",
+    true,
+  );
+  await testInfo.attach("E50 Organizasyon oluşturma", {
+    body: await page.screenshot({ fullPage: true }),
+    contentType: "image/png",
+  });
+  const create = async () => {
+    await page.getByLabel(text.create.plan, { exact: true }).selectOption(plan.id);
+    await page.getByRole("button", { name: text.create.review, exact: true }).click();
+    const dialog = await applyBillingReview(page, text.create.title);
+    await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
+    await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+    await page.getByRole("link", { name: text.create.openCreated, exact: true }).click();
+  };
+  await create();
+  await expect(page.getByRole("heading", { name: queued.name })).toBeVisible();
+  expect(writes[0]).toMatchObject({
+    studio_setup_id: queued.id,
+    verified_account_id: queued.account_id,
+    name: queued.name,
+  });
+
+  await page.goto("/platform?section=create");
+  const name = "Sentetik doğrudan kuruluş";
+  await page.getByLabel(text.create.name, { exact: true }).fill(name);
+  await page.getByLabel(text.verifiedEmail, { exact: true }).fill("kurulus@example.invalid");
+  await page.getByRole("button", { name: text.findAccount, exact: true }).click();
+  await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
+  await create();
+  await expect(page.getByRole("heading", { name })).toBeVisible();
+  expect(writes[1]).toMatchObject({ verified_account_id: uid(243), name });
+  expect(writes[1]?.studio_setup_id).toBeUndefined();
+  expect(accountLookups).toBe(2);
+});
+
+test("platform operator protects the last eligible member, verifies an addition and loses access after self-removal", async ({
+  page,
+}, testInfo) => {
+  const authority = await platformFixture(page, "platform");
+  const other = uid(250);
+  type Operator = {
+    kind: "operator";
+    account_id: string;
+    display_name: string;
+    eligible: boolean;
+    granted_at: string;
+  };
+  const operator = (account_id: string, display_name: string): Operator => ({
+    kind: "operator",
+    account_id,
+    display_name,
+    eligible: true,
+    granted_at: paymentTime,
+  });
+  const roster = [operator(I.account, "Sentetik İlk Operatör")];
+  const writes: { verified_account_id: string; enabled: boolean; reason: string }[] = [];
+  let lookupCount = 0;
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    const operation = new URL(route.request().url()).pathname.split("/").at(-1)!;
+    const request = route.request().postDataJSON();
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
+    const list = (items: unknown[]) => send({ items, next_cursor: null, as_of: paymentTime });
+    if (operation === "platform_directory_get_v1" && request.view === "operators")
+      return list(roster);
+    if (operation === "platform_directory_get_v1" && request.view === "verified_accounts") {
+      lookupCount++;
+      expect(request.account_email).toBe("operator@example.invalid");
+      return list([{ kind: "verified_account", account_id: other }]);
+    }
+    if (operation === "platform_operator_access_set_v1") {
+      writes.push(request);
+      if (request.enabled) roster.push(operator(other, "Sentetik Yeni Operatör"));
+      else {
+        expect(request.verified_account_id).toBe(I.account);
+        roster.shift();
+        authority.revoke();
+      }
+      return send({
+        operation_id: uid(251),
+        account_id: request.verified_account_id,
+        enabled: request.enabled,
+      });
+    }
+    return route.fallback();
+  });
+  await signIn(page);
+  await page.goto("/platform?section=operators");
+  await expect(page.getByText(text.operators.last, { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /için yetkiyi kaldır/ })).toHaveCount(0);
+  await page.getByLabel(text.verifiedEmail, { exact: true }).fill("operator@example.invalid");
+  await page.getByRole("button", { name: text.findAccount, exact: true }).click();
+  await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
+  const reason = page.getByLabel(text.reason, { exact: true });
+  await reason.fill("Açık yetki verme gerekçesi");
+  await page.getByRole("button", { name: text.operators.add, exact: true }).click();
+  const grant = await applyBillingReview(page, text.operators.add);
+  await expect(grant.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await grant.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toBeVisible();
+  await testInfo.attach("E52 Platform sahipleri", {
+    body: await page.screenshot({ fullPage: true }),
+    contentType: "image/png",
+  });
+  await reason.fill("Kendi yetkimi kaldırıyorum");
+  await page
+    .getByRole("button", { name: "Sentetik İlk Operatör için yetkiyi kaldır", exact: true })
+    .click();
+  await applyBillingReview(page, text.operators.remove);
+  await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
+  expect(lookupCount).toBe(2);
+  expect(writes).toHaveLength(2);
+  expect(writes[0]).toMatchObject({
+    verified_account_id: other,
+    enabled: true,
+    reason: "Açık yetki verme gerekçesi",
+  });
+  expect(writes[1]).toMatchObject({
+    verified_account_id: I.account,
+    enabled: false,
+    reason: "Kendi yetkimi kaldırıyorum",
+  });
 });

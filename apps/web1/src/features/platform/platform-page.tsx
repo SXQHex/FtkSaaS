@@ -25,11 +25,13 @@ import { PlatformGrace } from "./platform-grace";
 import { paymentHref } from "./platform-payment";
 import { PlatformPaymentDetail, PlatformPayments } from "./platform-payments";
 import { PlatformStudioQueue } from "./platform-studio-queue";
+import { PlatformCreate } from "./platform-create";
+import { PlatformOperators } from "./platform-operators";
 
 const route = getRouteApi("/platform");
 export function PlatformRoutePage() {
   const account = route.useLoaderData();
-  const { organization_id, section, payment_id } = route.useSearch();
+  const { organization_id, section, payment_id, studio_request_id } = route.useSearch();
   return (
     <PlatformPage
       key={account.id}
@@ -37,6 +39,7 @@ export function PlatformRoutePage() {
       organizationId={organization_id}
       section={section}
       paymentId={payment_id}
+      studioRequestId={studio_request_id}
     />
   );
 }
@@ -46,11 +49,13 @@ function PlatformPage({
   organizationId,
   section,
   paymentId,
+  studioRequestId,
 }: {
   account: AccountView;
   organizationId?: string;
-  section?: "payments" | "studio-requests";
+  section?: "payments" | "studio-requests" | "create" | "operators";
   paymentId?: string;
+  studioRequestId?: string;
 }) {
   const { t } = useTranslation();
   const [denied, setDenied] = useState(false);
@@ -58,8 +63,16 @@ function PlatformPage({
   const canVerify = allowed && account.platform_scope?.payment_verify === true;
   const canGrace = allowed && account.platform_scope?.grace_extend === true;
   const canReadQueue = allowed && account.platform_scope?.organization_create === true;
+  const canManageOperators = allowed && account.platform_scope?.operator_manage === true;
   const payments = section === "payments";
   const studioRequests = section === "studio-requests";
+  const create = section === "create";
+  const operators = section === "operators";
+  const unavailable =
+    !allowed ||
+    (payments && !canVerify) ||
+    ((studioRequests || create) && !canReadQueue) ||
+    (operators && !canManageOperators);
   const deny = () => setDenied(true);
   const title = t(($) => $.platform.title);
   useEffect(() => {
@@ -77,31 +90,66 @@ function PlatformPage({
           {t(($) => $.auth.account)}
         </LinkButton>
       </header>
-      {allowed && (section || canVerify || canReadQueue) && (
-        <nav aria-label={title} className="flex flex-wrap gap-2">
-          {section && (
-            <LinkButton href="/platform" variant="outline">
-              {t(($) => $.platform.organizations)}
-            </LinkButton>
-          )}
-          {canVerify && !payments && (
-            <LinkButton href={paymentHref()} variant="outline">
+      {allowed && (
+        <nav aria-label={t(($) => $.platform.sections)} className="flex flex-wrap gap-2">
+          <LinkButton
+            href="/platform"
+            aria-current={!section ? "page" : undefined}
+            variant={!section ? "default" : "outline"}
+          >
+            {t(($) => $.platform.organizations)}
+          </LinkButton>
+          {canVerify && (
+            <LinkButton
+              href={paymentHref()}
+              aria-current={payments ? "page" : undefined}
+              variant={payments ? "default" : "outline"}
+            >
               {t(($) => $.platform.billing.payments)}
             </LinkButton>
           )}
-          {canReadQueue && !studioRequests && (
-            <LinkButton href="/platform?section=studio-requests" variant="outline">
+          {canManageOperators && (
+            <LinkButton
+              href="/platform?section=operators"
+              aria-current={operators ? "page" : undefined}
+              variant={operators ? "default" : "outline"}
+            >
+              {t(($) => $.platform.operators.title)}
+            </LinkButton>
+          )}
+          {canReadQueue && (
+            <LinkButton
+              href="/platform?section=studio-requests"
+              aria-current={studioRequests ? "page" : undefined}
+              variant={studioRequests ? "default" : "outline"}
+            >
               {t(($) => $.platform.studioRequests.title)}
             </LinkButton>
           )}
         </nav>
       )}
-      {!allowed || (payments && !canVerify) || (studioRequests && !canReadQueue) ? (
+      {allowed && canReadQueue && !section && !organizationId && (
+        <div>
+          <LinkButton href="/platform?section=create">
+            {t(($) => $.platform.create.title)}
+          </LinkButton>
+        </div>
+      )}
+      {unavailable ? (
         <Alert variant="destructive">
           <AlertDescription>{t(($) => $.platform.denied)}</AlertDescription>
         </Alert>
       ) : studioRequests ? (
         <PlatformStudioQueue accountId={account.id} />
+      ) : create ? (
+        <PlatformCreate
+          key={studioRequestId ?? "direct"}
+          accountId={account.id}
+          requestId={studioRequestId}
+          onDenied={deny}
+        />
+      ) : operators ? (
+        <PlatformOperators accountId={account.id} onDenied={deny} />
       ) : payments ? (
         paymentId ? (
           organizationId ? (

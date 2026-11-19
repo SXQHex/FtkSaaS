@@ -38,7 +38,10 @@ export const platformOrganizationsKey = (accountId: string) => [
 
 export async function readDirectory<T>(
   backend: Backend,
-  options: Pick<RequestPlatformDirectoryGet, "view" | "scope" | "payment_id" | "payment_state">,
+  options: Pick<
+    RequestPlatformDirectoryGet,
+    "view" | "scope" | "payment_id" | "payment_state" | "account_email"
+  >,
   item: z.ZodType<T>,
   cursor?: string,
 ) {

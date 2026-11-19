@@ -82,11 +82,6 @@ export function PlatformOrganizationDetail({
     );
   return (
     <>
-      <div>
-        <LinkButton href="/platform" variant="outline" isDisabled={command.locked}>
-          {t(($) => $.platform.organizations)}
-        </LinkButton>
-      </div>
       {detail.isPending ? (
         <p role="status">{t(($) => $.platform.loading)}</p>
       ) : detail.isError ? (

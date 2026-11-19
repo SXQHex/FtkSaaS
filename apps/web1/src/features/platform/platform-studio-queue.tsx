@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Button } from "../../components/ui/button";
+import { Button, LinkButton } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import {
   Table,
@@ -69,8 +69,14 @@ export function PlatformStudioQueue({ accountId }: { accountId: string }) {
               <TableBody items={rows}>
                 {(row) => (
                   <TableRow id={row.id}>
-                    <TableCell className="max-w-xs whitespace-normal wrap-anywhere">
-                      {row.name}
+                    <TableCell>
+                      <LinkButton
+                        className="max-w-xs whitespace-normal wrap-anywhere"
+                        variant="ghost"
+                        href={"/platform?section=create&studio_request_id=" + row.id}
+                      >
+                        {row.name}
+                      </LinkButton>
                     </TableCell>
                     <TableCell>
                       <time dateTime={row.created_at}>

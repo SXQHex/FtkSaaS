@@ -50,6 +50,10 @@ export function PlatformGrace({
   const source = query.isError ? undefined : query.data;
   if (!source?.organization && !query.isPending && !query.isError) return null;
   const grace = source?.grace;
+  const floorIsCurrent =
+    !!grace?.until &&
+    !!grace.untilAfter &&
+    Date.parse(grace.until) === Date.parse(grace.untilAfter);
   function prepare() {
     if (!grace || !source?.organization || query.isFetching) return;
     let date: string;
@@ -94,10 +98,16 @@ export function PlatformGrace({
           <p role="status">{t(($) => $.platform.loading)}</p>
         ) : query.isError ? (
           <PlatformReadError error={query.error} onRetry={() => void query.refetch()} />
-        ) : grace ? (
+        ) : grace?.untilAfter ? (
           <>
             <dl>
-              <dt>{t(($) => $.platform.billing.currentUntil)}</dt>
+              <dt>
+                {t(($) =>
+                  floorIsCurrent
+                    ? $.platform.billing.currentIsFloor
+                    : $.platform.billing.currentUntil,
+                )}
+              </dt>
               <dd>
                 {grace.until ? (
                   <time dateTime={grace.until}>{utcFormat.format(new Date(grace.until))} UTC</time>
@@ -105,6 +115,16 @@ export function PlatformGrace({
                   t(($) => $.platform.billing.noCurrentUntil)
                 )}
               </dd>
+              {!floorIsCurrent && (
+                <>
+                  <dt className="mt-2">{t(($) => $.platform.billing.deadlineFloor)}</dt>
+                  <dd>
+                    <time dateTime={grace.untilAfter}>
+                      {utcFormat.format(new Date(grace.untilAfter))} UTC
+                    </time>
+                  </dd>
+                </>
+              )}
             </dl>
             <form
               method="post"

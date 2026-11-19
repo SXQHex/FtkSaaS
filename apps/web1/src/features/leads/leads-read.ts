@@ -247,14 +247,16 @@ async function readActivities(
   return { ...page, items };
 }
 export async function readApplicationsPage(
-  scope: ClientScope,
+  scope: Pick<ClientScope, "accountId" | "orgId"> & Partial<Pick<ClientScope, "centerId">>,
   cursor?: string,
   applicationId?: string,
   states?: ManagementSelectorPublicApplicationReviewV1["key"]["states"],
 ) {
   const backend = await scopedBackend(scope),
     page = await backend.call("management_state_get_v1", {
-      ...base(scope),
+      client_api_version: 1,
+      org_id: scope.orgId,
+      ...(scope.centerId ? { center_id: scope.centerId } : {}),
       request_id: uuidv7(),
       operation: "public_application_review_v1",
       selector: {

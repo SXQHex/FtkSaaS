@@ -12,7 +12,7 @@ import type {
 import type { ReportRange } from "./reports-view";
 export async function reportInterval(
   timezone: string,
-  range: ReportRange,
+  range: ReportRange | "7",
   from: string,
   to: string,
   anchor: string,

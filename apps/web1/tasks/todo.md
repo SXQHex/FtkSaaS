@@ -1,22 +1,22 @@
 # FtkSaaS · Frontend geliştirme ve kabul listesi
 
 **Sıradaki iş** · Güncel adım ve teslim sayısının sahibi [başlangıç ve devam kaydı](#başlangıç-ve-devam-kaydı); yerel doğrulamanın ayrıntısı [otomatik rapordadır](../test-reports/verification.md).
-**Aktif hedef** · Açık Starter kabulü ve 18 Kasım çizim farkları (V01–V08, E47/E48, G-DESIGN).<br>
-**Açık sayfalar** · [Business merkezleri ve platform konsolu](#yeni-ekranların-envanteri).<br>
+**Aktif hedef** · Açık Starter kabulü, 18 Kasım çizim farkları ve E49–E52 teslimi.<br>
+**E49–E52** · [Merkezler](#e49) · [Organizasyonlar](#e50) · [Ödeme ve ek süre](#e51) · [Platform sahipleri](#e52).<br>
 **Çalışma alanı** · `apps/web1`, kendi npm kurulumu, testleri ve yayın süreci olan bağımsız uygulamadır. Üç plan aynı uygulamayı ve ortak backend sözleşmelerini kullanır.
 
 [Yeni çizim farkları](#cizim-guncellemesi) · [Ön tarama](#on-tarama) · [Sayfa kabulü](#sayfa-kabulu) · [Başlangıç](#baslangic) · [Pro](#pro) · [Pro kabulü](#pro-kabulu) · [Starter](#starter) · [Business](#business) · [Kaynaklar](#kaynaklar) · [Backend talepleri](request.md)
 
 ## /goal yürütme talimatı
 
-Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapshot’ının Pro/Starter görsel farklarını yayımlanmış API sözleşmesiyle tamamlamaktır. Yeni işlerin sırası ve kanıtı [çizim uzlaştırmasındadır](#cizim-guncellemesi). **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#post-pro-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
+Bu çalışmanın hedefi Starter kabulünü, 18 Kasım çizim farklarını ve E49–E52 sayfalarını yayımlanmış API sözleşmesiyle tamamlamaktır. Yeni işlerin sırası ve kanıtı [çizim uzlaştırmasındadır](#cizim-guncellemesi). **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#post-pro-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım              | Plan                | İşlev                         | Durum                 | Sonraki eylem                                                                                                |
-| ----------------------- | ------------------- | ----------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| **V08.2 / G-STARTER.2** | Pro / Starter       | Teslim adayı ve yayımlı kabul | Yayımlı kabul açık.   | Kullanıcı dağıtımından sonra güncel adayın tam seri doğrulamasını ve yayımlı Starter/çizim kabulünü tamamla. |
-| **E49–E52**             | Business / Platform | Merkezler ve platform konsolu | Sayfa düzeyinde açık. | Her sayfanın kalan koşulu ve kanıtı [envanterde](#yeni-ekranların-envanteri).                                |
+| Aktif adım              | Plan                | İşlev                         | Durum               | Sonraki eylem                                                                                          |
+| ----------------------- | ------------------- | ----------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------ |
+| **V08.2 / G-STARTER.2** | Pro / Starter       | Teslim adayı ve yayımlı kabul | Yayımlı kabul açık. | Adayı tek işçiyle tam doğrula. Kullanıcı dağıtımından sonra yayımlı Starter ve çizim kabulünü tamamla. |
+| **E49–E52**             | Business / Platform | Merkezler ve platform konsolu | E49–E51 kapandı.    | E52 yayımlı kabulünü platform dağıtımından sonra doğrula.                                              |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -87,7 +87,7 @@ Bir H3 bölümünün bütün iş kutuları tamamlandığında başlığın sonun
 
 Her işaretli madde ilgili kaynak/PR veya test koşusuna, ortamına ve gözlenen sonuca bağlanır. Görsel adımın tamamlanması ve gerçek entegrasyon kabulü kendi kutularında kaydedilir. Yerel doğrulama ve tam kabul komutlarının sahibi [başlangıç ve devam kuralıdır](#başlangıç-ve-devam-kaydı). Komutları `apps/web1` içinde çalıştır. Ortak izolasyon kurallarını koru. Yeni gerçek veri yazısı üretmek yerine tekrarlanabilir kabulü yerel zincirde çalıştır; yalnız CI ile yapılamayan kontrolleri yukarıdaki kabul ve erteleme kuralıyla teslim sonrası listesine bağla.
 
-Aktif goal, mevcut S01–S05/G-STARTER açıkları ile V01–V08/E47/E48 kapsamı G-DESIGN altında kanıtıyla kapandığında biter. Önceki G-PRO ve POST-PRO kayıtları korunur. Business ve platform operatörü teslimi bu goal sonrasında ayrıca başlatılır. Dış engel nedeniyle bitmiyorsa açık maddelerin kimliğini, yapılan işi ve devam için eksik girdiyi bu kayıtta bırak. Her turun sonunda bu dosyadaki devam kaydını esas al.
+Aktif goal, Starter ve çizim kabulü ile E49–E52 kapsamı kanıtıyla kapandığında biter. Önceki G-PRO ve POST-PRO kayıtları korunur. Business ve platformun yayımlı kabulü kendi bölümünde izlenir. Dış engel nedeniyle bitmiyorsa açık maddelerin kimliğini, yapılan işi ve devam için eksik girdiyi bu kayıtta bırak. Her turun sonunda bu dosyadaki devam kaydını esas al.
 
 <a id="wcag-22-aa-kabulu"></a>
 
@@ -134,7 +134,7 @@ Yeni HTML'de **50** `data-view` var. `taslak` çıkarıldığında 49 gerçek b�
 | Starter              | G-STARTER.1 gerçek zincir kaydı mevcut. PR337 ile S02.1 development’ta, S05.2 izole native kabul ve kaynak bağlı CI’da doğrulandı.            | G-STARTER.2 için yayımlı Web1’de W1-BE-42 kontrolü ve ardından G-STARTER kapanışı. Yeni çizimin Starter farkı V07’de.                                         |
 | Gerçek kabul         | POST-PRO.AUTH/CHAIN/HOSTED kayıtları kapalı.                                                                                                  | Aynı hosted yazıları tekrar oynatma. Yalnız yeni davranışın eksik kanıtını mevcut erteleme kuralına göre kaydet.                                              |
 | Backend talepleri    | W1-BE-01–42 değerlendirmeleri `request.md` sahibinde. W1-BE-42 kaynak/development ve aday tüketimi karşılanmış; yayımlı uygulama kabulü açık. | Eski talebi tekrar açmadan yeni görsel işlemin güvenli DTO/action karşılığını incele. Somut yeni boşluğu ilgili V/E maddesine ve `request.md` talebine bağla. |
-| Business             | B01–B06 açık. Yeni pakette merkez/kişi/başvuru/hesaplaşma/rapor çizimleri var.                                                                | G-STARTER ve G-DESIGN sonrası ayrıca başlatılacak. E49 ve mevcut sayfalardaki Business sekmeleri B maddelerinde tüketilir.                                    |
+| Business             | B01–B06 açık. Yeni pakette merkez/kişi/başvuru/hesaplaşma/rapor çizimleri var.                                                                | E49 geliştirmesi ve yerel doğrulama dağıtımdan önce. Yayımlı kabul B maddelerinde izlenir.                                                                    |
 | Platform operatörü   | Web1 adayında canlı yetkiyle açılan `/platform` rotası var.                                                                                   | E50–E52'nin tamamlanan akışları ve açık API bağımlılıkları [envanterde](#yeni-ekranların-envanteri).                                                          |
 
 `test-reports/` ve `.tmp/` bağlantıları yerel kanıt yollarıdır, temiz checkout'ta bulunmayabilir. Mevcut kanıtı varsayımla yeniden üretme veya başarılı sayma. İlgili kaynak/PR/CI artifact'ı varsa kullan; eksik raporu kanıt eksikliği olarak yaz. Bu doküman güncellemesinde uygulama işlev veya canlı kabul testleri çalıştırılmış sayılmaz.
@@ -297,29 +297,47 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
         Ders değişikliği bildirimi native `reservation_target` içindeki merkez ve seansı kullanır. İkinci merkezin rezervasyonu kendi kişi kapsamından tekrar okundu ve klavyeyle doğrudan açıldı. Geri/ileri veya yenilemede erişim reddi ayrıntıyı gizledi. Native hedef bulunmadığında bağlantı gösterilmedi ve başka merkezde okuma denenmedi. [W1-BE-48](request.md#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi) · [Ders değişikliği testi](../e2e/auth-inbox.spec.ts#L449).
         Yer teklifi bağlantısı tam teklif kimliğini taşıyor. Hedef, native self dizinini `entity` ile tek kayda daraltıp teklif sahibini ve seansı kontrol ediyor. Özel ders yanıtı tam talebi açıyor. Geri/ileri ve yenilemede güncel kayıt yeniden okunuyor. Yabancı teklif ve yabancı talep gizlendi, bildirim ya da rezervasyon yazısı oluşmadı. Statik derleme ile tek işçili 10 tarayıcı ve 33 birim testi geçti. [Teklif](../e2e/auth-inbox.spec.ts#L473) · [Özel ders](../e2e/auth-inbox.spec.ts#L503).
 
-- [ ] **E49** · **Merkezler ve Business sekmeleri** — `data-view="merkezler"` ve JS'nin C1–C4 alanları. B01–B06. Hazır Tabs, Card, Table, Sheet, Dialog, Combobox, Checkbox, AlertDialog. Başlangıç [Business teslim koşullarına](#business) bağlı. Mevcut çalışma alanı erişilebilir merkezleri okuyor, ayarlar organizasyon ve merkez kapsamlarını ayırıyor. Bu yolların Business'a özgü işlem ve kabul zincirleri aşağıda izleniyor. [Çalışma alanı](../src/features/workspace/workspace.ts) · [Ayar kapsamı](../src/routes/o.$orgId.c.$centerId.settings.tsx).
-      Adayda ayrı Merkezler rotası ve merkezler arası hesaplaşma ekranı bulunmuyor. Native merkez ve hesaplaşma desteği mevcut. Business ekranları B01–B06 üzerinden bu yetkili akışları tüketmeli. [Native merkez kabulü](../../backend/tests/business-location-acceptance.mjs) · [Native hesaplaşma kabulü](../../backend/tests/cross-center-settlement.test.mjs).
-  - [ ] **E49.1** · Merkez listesi, yönetici, politika mirası ve disiplin görünümlerini B01'e bağla. Gerçek merkez değişiminde cache/izinler yeniden okunur.
-  - [ ] **E49.2** · Organizasyon kişi/başvuru kutusunu E13/E16/E33 ile B02'ye; hesaplaşma hareket/talep/kullanım/yetki sekmelerini E20 ve B03/B04'e bağla. Ayrı HTML bölümü olmayan JS panellerini de eşle.
-  - [ ] **E49.3** · Birleşik rapor ve daralma kaynak seçimini E41/E42, B05/B06 ile bağla. Beş merkez ve1250tekil öğrenci sınırı, merkezler arası izolasyon, tekrar güvenliği ve finans yetkisini native/otomatik kabulde doğrula.
+<a id="e49"></a>
 
-- [ ] **E50** · **Platform organizasyonları** — JS `o-organizasyonlar`, `#opshell/#op-root`. WF02/WF17. Hazır Sidebar, Card, Table, Sheet, Dialog ve AlertDialog. Sonraki platform operatörü teslimi.
-  - [x] **E50.1** · Platform kapsamı hesap opt-in alanıyla, organizasyon dizini `platform_directory_get_v1` ile ve askı `platform_organization_suspension_set_v1` ile backend development’ta mevcut. Platform kuruluş oluşturma ve stüdyo talebi kuyruğu WF02 kapsamındadır. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
-  - [x] **E50.2** · `/platform` canlı `account_get_v1(include_platform_scope:true)` sonucuyla açılır. Organizasyonlar yetkili cursor ile, ayrıntı ve sahip seçili kuruluş kimliğiyle okunur. Müşteri sahibi ve personel doğrudan rotada reddedildi. Platform izni geri alınınca kayıt görünmedi. Native API reddi ayrı kaynak testinde doğrulandı. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native yetki testi](../../backend/tests/starter-studio-acceptance.mjs#L389).
-  - [x] **E50.3** · Gerekçeli ve açık onaylı askı/kaldırma seçili kuruluşun sürümüne bağlı. Belirsiz yanıt aynı anahtarla toparlandı. Web1 aynı kuruluşu, değişmeyen abonelik ve sahip bilgisiyle tekrar okudu. [Native komut](../../backend/database/platform-organization-suspension.sql#L33) kuruluşun askı bayrağını değiştirir. [Native denetim kaydı](../../backend/database/dispatch.sql#L619) işlem için yeni olay ekler. 3 platform ve 2 ilgili regresyon senaryosu tek Chromium işçisiyle geçti.
-  - [ ] **E50.4** · Stüdyo talepleri kuyruğundan ve yetkili hesap seçiminden kuruluş oluşturma. Komutun zorunlu ilk plan sürümünü operatöre sunmak için [W1-BE-60](request.md#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) açık.
-        Kurulum talepleri `/platform?section=studio-requests` içinde canlı `platform_queue:true` okumasıyla sayfalanıyor. Müşteri sahibi ve personel doğrudan erişimde reddedildi. Operatör izni geri alındığında yenileme önceki satırları kaldırdı. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native talep ve yetki kabulü](../../backend/tests/starter-studio-acceptance.mjs#L373).
+### E49 · Merkezler ve Business sekmeleri (kapandı)
 
-- [ ] **E51** · **Platform ödeme ve ek süre** — JS `o-odemeler`. WF13/WF17. Hazır Tabs, Table, Sheet, Field ve AlertDialog. E50 yetki temeli gerekir.
-  - [x] **E51.1** · Native ödeme kuyruğu `platform_directory_get_v1(view:payments)` ile okunur. `saas_payment_verify_v1` gerçek ödeme kimliğiyle `accepted:true/false` ve gerekçe alır. `saas_grace_extend_v1` mevcut yetkili ek süre yoludur. Arayüz bağlantısı E51.2’de. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
-  - [x] **E51.2** · Platform ödemeleri native durum filtresiyle okunuyor. Gerekçeli onay/ret öncesi aynı bildirim, kuruluş ve sürüm doğrulanıyor. Karar sonrası aynı bildirim ile kuruluş yeniden okunuyor. Tarayıcıdaki sentetik zincirde ret dönemi değiştirmedi, kayıp onay yanıtı aynı anahtarla bir kez uygulandı ve kuruluş sahibinin Plan ekranı yeni dönemi gösterdi. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native dönem ve tekrar kabulü](../../backend/tests/subscription-period-acceptance.mjs#L84).
-  - [x] **E51.3** · Ödeme sürümü değiştiğinde veya platform izni geri alındığında karar gönderilmedi ve izin kaybında ayrıntı kaldırıldı. Ek süre için mevcut son ve sürüm yetkili seçiciden okundu, eşit tarih formda reddedildi ve gerekçeli UTC bitiş yeniden okumayla doğrulandı. Alt sınır ve abonelik koşulları native yazma işlemiyle denetleniyor. Altı hedefli senaryo tek Chromium işçisiyle geçti. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native kurallar](../../backend/database/p07-subscriptions.sql#L93).
-  - [ ] **E51.4** · Çizimdeki kuruluş/dönem bilgisi ve ek süre uygunluğu için operatöre yetkili güncel okuma gerekiyor. [W1-BE-61](request.md#w1-be-61--platform-ödeme-dönemi-ve-ek-süre-uygunluğu).
+`data-view="merkezler"` ve JS C1–C4. Merkezler rotası Business ve canlı yönetim kapsamıyla açılıyor. [Business kabulü](#business).
 
-- [ ] **E52** · **Platform sahipleri** — JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
-  - [ ] **E52.1** · Çizimdeki platform operatörü dizini ve gerekçeli ekleme/kaldırma [W1-BE-62](request.md#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi) bekliyor. Mevcut `view:owners` ve `platform_owner_set_v1/remove_v1` seçili organizasyonun stüdyo sahibini okur ve değiştirir. [Native organizasyon sahipliği](../../backend/database/dispatch.sql#L133).
-  - [ ] **E52.2** · W1-BE-62 tesliminden sonra son platform sahibi korumasını, izin geri alımını, açık oturumda eski izinle tekrarı ve müşteri rolünün reddini doğrula.
-  - [ ] **E52.3** · E50–E52'nin görsel/otomatik/gerçek ortam kanıtlarını kendi platform tesliminde bağla. Bu çizimlerin eklenmesi Business veya platform kabulünü kendiliğinden kapatmaz.
+- [x] **E49.1** · Merkez oluşturma ve organizasyon kotası native kaynaktan okunuyor. Yönetici, etkili politika ve disiplin görünümleri seçilen merkezde okunuyor ve mevcut düzenleyicilere bağlanıyor. [Merkez ekranı](../src/features/business/business-centers-page.tsx) · Üç hedefli Chromium senaryosu geçti. [Yerel kabul](../e2e/auth-business-centers.spec.ts).
+- [x] **E49.2** · Organizasyon kişi dizini Abone No ve merkez bağlarını, kuruluş başvuru kuyruğu da sürümlü yönlendirmeyi gösteriyor. Hesaplaşma hareketi, ödeme veya mahsup talebi, B kararı, geri çekme, açık yetki ve ürün kullanım kapsamı native kaynaklara bağlı. [Merkezler arası native kabul](../../backend/tests/cross-center-settlement.test.mjs).
+- [x] **E49.3** · Birleşik rapor yetkili merkez kümesini, daralma bağlantısı mevcut Plan düzenleyicisini kullanıyor. Beş aktif merkez ve 1.250 tekil aktif öğrenci sınırı [native kapasite kabulüne](../../backend/tests/commercial-plan-acceptance.mjs) bağlı. B01–B06 yayımlı kabulü açık.
+
+<a id="e50"></a>
+
+### E50 · Platform organizasyonları (kapandı)
+
+JS `o-organizasyonlar`, `#opshell/#op-root`. WF02/WF17. Hazır Sidebar, Card, Table, Sheet, Dialog ve AlertDialog.
+
+- [x] **E50.1** · Platform kapsamı hesap opt-in alanıyla, organizasyon dizini `platform_directory_get_v1` ile ve askı `platform_organization_suspension_set_v1` ile backend development’ta mevcut. Platform kuruluş oluşturma ve stüdyo talebi kuyruğu WF02 kapsamındadır. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
+- [x] **E50.2** · `/platform` canlı `account_get_v1(include_platform_scope:true)` sonucuyla açılır. Organizasyonlar yetkili cursor ile, ayrıntı ve sahip seçili kuruluş kimliğiyle okunur. Müşteri sahibi ve personel doğrudan rotada reddedildi. Platform izni geri alınınca kayıt görünmedi. Native API reddi ayrı kaynak testinde doğrulandı. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native yetki testi](../../backend/tests/starter-studio-acceptance.mjs#L389).
+- [x] **E50.3** · Gerekçeli ve açık onaylı askı/kaldırma seçili kuruluşun sürümüne bağlı. Belirsiz yanıt aynı anahtarla toparlandı. Web1 aynı kuruluşu, değişmeyen abonelik ve sahip bilgisiyle tekrar okudu. [Native komut](../../backend/database/platform-organization-suspension.sql#L33) kuruluşun askı bayrağını değiştirir. [Native denetim kaydı](../../backend/database/dispatch.sql#L619) işlem için yeni olay ekler. 3 platform ve 2 ilgili regresyon senaryosu tek Chromium işçisiyle geçti.
+- [x] **E50.4** · Stüdyo talebinden ve doğrulanmış e-postayla doğrudan kuruluş formu çalışıyor. `view:initial_plans` üzerinden seçilen sürüm gerçek komuta bağlanıyor; kuruluş ve sahibi yeniden okunuyor. [W1-BE-60](request.md#w1-be-60--platform-için-ilk-plan-sürümü-keşfi) · [Yerel kabul](../e2e/auth-platform.spec.ts).
+
+<a id="e51"></a>
+
+### E51 · Platform ödeme ve ek süre (kapandı)
+
+JS `o-odemeler`. WF13/WF17. Hazır Tabs, Table, Sheet, Field ve AlertDialog. E50 yetki temeli gerekir.
+
+- [x] **E51.1** · Native ödeme kuyruğu `platform_directory_get_v1(view:payments)` ile okunur. `saas_payment_verify_v1` gerçek ödeme kimliğiyle `accepted:true/false` ve gerekçe alır. `saas_grace_extend_v1` mevcut yetkili ek süre yoludur. Arayüz bağlantısı E51.2’de. [W1-BE-59](request.md#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları).
+- [x] **E51.2** · Platform ödemeleri native durum filtresiyle okunuyor. Gerekçeli onay/ret öncesi aynı bildirim, kuruluş ve sürüm doğrulanıyor. Karar sonrası aynı bildirim ile kuruluş yeniden okunuyor. Tarayıcıdaki sentetik zincirde ret dönemi değiştirmedi, kayıp onay yanıtı aynı anahtarla bir kez uygulandı ve kuruluş sahibinin Plan ekranı yeni dönemi gösterdi. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native dönem ve tekrar kabulü](../../backend/tests/subscription-period-acceptance.mjs#L84).
+- [x] **E51.3** · Ödeme sürümü değiştiğinde veya platform izni geri alındığında karar gönderilmedi ve izin kaybında ayrıntı kaldırıldı. Ek süre için mevcut son ve sürüm yetkili seçiciden okundu, eşit tarih formda reddedildi ve gerekçeli UTC bitiş yeniden okumayla doğrulandı. Alt sınır ve abonelik koşulları native yazma işlemiyle denetleniyor. Altı hedefli senaryo tek Chromium işçisiyle geçti. [Web1 kabulü](../e2e/auth-platform.spec.ts) · [Native kurallar](../../backend/database/p07-subscriptions.sql#L93).
+- [x] **E51.4** · Ödeme tablosu ve ayrıntı kuruluş ve özgün teklif dönemini okuyor. Ek süre formu yalnız native uygunlukta açılıyor ve sunucunun bildirdiği UTC alt sınırını gösteriyor. Sentetik tarayıcı testi teklifsiz eski kaydı ve sınırdaki tarihin reddini doğruladı. [W1-BE-61](request.md#w1-be-61--platform-ödeme-dönemi-ve-ek-süre-uygunluğu).
+
+<a id="e52"></a>
+
+### E52 · Platform sahipleri
+
+JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
+
+- [x] **E52.1** · Platform sahipleri `operator_manage` ve `view:operators` ile açılıyor. Doğrulanmış e-posta ve gerekçe yeniden okunarak `platform_operator_access_set_v1` ile inceleme sonrası uygulanıyor. [W1-BE-62](request.md#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi).
+- [x] **E52.2** · Son uygun operatör korunuyor. Yetki kaybeden oturumun görünümü kaldırılıyor ve müşteri rolüne erişim açılmıyor. [Yerel kabul](../e2e/auth-platform.spec.ts) · [Native kabul](../../backend/tests/starter-studio-acceptance.mjs).
+- [ ] **E52.3** · Yayımlı platform kabulü. Kuruluş, ödeme ve operatör ekranları yerel Chromium senaryolarında doğrulandı. Dağıtım sonrası geçerli platform oturumuyla rotaları ve yetki sınırını doğrula.
 
 <a id="on-tarama"></a>
 
@@ -418,7 +436,7 @@ S18 backend transport ve hosted kabulü main'de kapanmıştır. Backend'e aynı 
 
 ### Business çizimlerinin durumu
 
-18 Kasım snapshot’ı Business merkez yönetimi, ortak kişi/başvuru, hesaplaşma, birleşik rapor ve daralma görsellerini sağlıyor. E49 bu görselleri B01–B06’ya bağlar. Business teslimi G-STARTER ve G-DESIGN sonrasında ayrıca başlatılır. Platform operatörü çizimleri E50–E52’de sonraki kapsam olarak kayıtlıdır.
+18 Kasım snapshot’ı Business merkez yönetimi, ortak kişi/başvuru, hesaplaşma, birleşik rapor ve daralma görsellerini sağlıyor. E49 bu görselleri B01–B06’ya bağlar. Business’ın yayımlı kabulü G-STARTER ve G-DESIGN sonrasında kapanır. Yerel Business ve platform uygulaması E49–E52 altında izlenir.
 
 <a id="sayfa-kabulu"></a>
 
@@ -1541,7 +1559,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 
 ## Business
 
-Bu bölüm sonraki teslimdir, aktif Pro goal kapsamında yürütülmez. Başlangıç koşulu **G-STARTER**, **G-DESIGN** ve Business tesliminin başlatılmasıdır. E49 ile güncel snapshot’taki Business görsellerini B01–B06’ya bağla. Çizim/ekran üretimini Pro çalışmasına ekleme. Çok merkezli işlemleri A ve B merkezlerinde farklı izinleri olan test hesaplarıyla çalıştır.
+Yayımlı Business kabulü **G-STARTER** ve **G-DESIGN** sonrasında kapanır. Kullanıcı, E49–E52 çizimlerinin ve yerel doğrulamanın dağıtımdan önce yapılmasını istedi. E49 ile güncel snapshot’taki Business görsellerini B01–B06’ya bağla. Çok merkezli işlemleri A ve B merkezlerinde farklı izinleri olan test hesaplarıyla çalıştır.
 
 ### B01 · Merkezler, yönetici kapsamı ve politikalar
 

@@ -160,6 +160,20 @@ const base: ProductView = {
   },
 };
 beforeEach(() => call.mockReset());
+it("publishes explicit Business usage centers without changing the selling center", () => {
+  const second = "019a7b00-0000-7000-8000-000000000090";
+  const foreign = "019a7b00-0000-7000-8000-000000000091";
+  const draft = productDraft(base);
+  draft.scopeKind = "selected_centers";
+  draft.usageCenterIds = [scope.centerId, second];
+  const intent = productIntent(scope, draft, undefined, [], [scope.centerId, second]);
+  expect(intent.request.center_id).toBe(scope.centerId);
+  expect(intent.request.terms.scopes.map((row) => row.center_id)).toEqual([scope.centerId, second]);
+  draft.usageCenterIds = [scope.centerId, foreign];
+  expect(() => productIntent(scope, draft, undefined, [], [scope.centerId, second])).toThrow(
+    "PRODUCT_SCOPE_REQUIRED",
+  );
+});
 it("preserves exact minor money and narrow existing scopes without broadening to the selected center", () => {
   const draft = productDraft(base);
   draft.scopes = ["event"];

@@ -36,6 +36,13 @@ const occurredFormat = new Intl.DateTimeFormat("tr-TR", {
   timeStyle: "short",
   timeZone: "Europe/Istanbul",
 });
+const periodFormat = new Intl.DateTimeFormat("tr-TR", {
+  dateStyle: "medium",
+  timeZone: "Europe/Istanbul",
+});
+function quotePeriod(period: { starts_at: string; ends_at: string }) {
+  return periodFormat.formatRange(new Date(period.starts_at), new Date(period.ends_at));
+}
 
 export function PlatformPayments({ accountId, orgId }: { accountId: string; orgId?: string }) {
   const { t } = useTranslation();
@@ -98,9 +105,11 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
           <p>{t(($) => $.platform.billing.empty)}</p>
         ) : (
           <>
-            <Table aria-label={title} scrollRegionLabel={title} className="min-w-[34rem]">
+            <Table aria-label={title} scrollRegionLabel={title} className="min-w-[51rem]">
               <TableHeader>
                 <TableHead isRowHeader>{t(($) => $.platform.billing.reference)}</TableHead>
+                <TableHead>{t(($) => $.platform.organization)}</TableHead>
+                <TableHead>{t(($) => $.platform.billing.quotePeriod)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.amount)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.occurred)}</TableHead>
                 <TableHead>{t(($) => $.platform.billing.state)}</TableHead>
@@ -117,6 +126,14 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
                       >
                         {row.reference || row.id}
                       </LinkButton>
+                    </TableCell>
+                    <TableCell className="max-w-48 whitespace-normal wrap-anywhere">
+                      {row.org_name ?? row.org_id}
+                    </TableCell>
+                    <TableCell>
+                      {row.quote_period
+                        ? quotePeriod(row.quote_period)
+                        : t(($) => $.platform.billing.noQuotePeriod)}
                     </TableCell>
                     <TableCell>{formatMinorAmount(row.amount_minor, row.currency)}</TableCell>
                     <TableCell>
@@ -204,7 +221,7 @@ export function PlatformPaymentDetail({
     <>
       <div>
         <LinkButton href={paymentHref(orgId)} variant="outline">
-          {t(($) => $.platform.billing.payments)}
+          {t(($) => $.platform.billing.backToQueue)}
         </LinkButton>
       </div>
       {query.isPending ? (
@@ -227,6 +244,14 @@ export function PlatformPaymentDetail({
           </CardHeader>
           <CardContent className="space-y-4">
             <dl className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <dt>{t(($) => $.platform.billing.quotePeriod)}</dt>
+                <dd>
+                  {row.quote_period
+                    ? quotePeriod(row.quote_period)
+                    : t(($) => $.platform.billing.noQuotePeriod)}
+                </dd>
+              </div>
               <div>
                 <dt>{t(($) => $.platform.billing.amount)}</dt>
                 <dd>{formatMinorAmount(row.amount_minor, row.currency)}</dd>

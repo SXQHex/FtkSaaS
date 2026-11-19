@@ -17,6 +17,11 @@ const payment = z.object({
   reference: z.string(),
   occurred_at: instant,
   verified_at: instant.nullable(),
+  org_name: z.string().min(1).optional(),
+  quote_period: z
+    .object({ starts_at: instant, ends_at: instant })
+    .refine((period) => Date.parse(period.starts_at) < Date.parse(period.ends_at))
+    .nullish(),
 });
 export const billingReason = z.string().trim().min(1).max(1000);
 export const platformPaymentsKey = (accountId: string) => ["platform-payments", accountId];
@@ -96,11 +101,15 @@ async function graceAt(backend: Backend, orgId: string) {
     (entry) => entry.entity.type === "saas_subscriptions" && entry.entity.id === id,
   );
   if (versions.length !== 1) throw Error("PLATFORM_GRACE_SOURCE_INVALID");
+  const values = row.current.values;
+  const eligible = z.boolean().parse(values.eligible);
+  const untilAfter = instant.nullable().parse(values.until_after);
+  if (eligible !== (untilAfter !== null)) throw Error("PLATFORM_GRACE_SOURCE_INVALID");
   return {
     id,
     version: z.number().int().positive().safe().parse(versions[0]?.version),
-    until: instant.nullish().parse(row.current.values.until) ?? null,
-    asOf: instant.parse(result.as_of),
+    until: instant.nullish().parse(values.until) ?? null,
+    untilAfter,
   };
 }
 export async function readGraceDetail(accountId: string, orgId: string) {
@@ -110,8 +119,7 @@ export async function readGraceDetail(accountId: string, orgId: string) {
     !organization ||
     organization.state !== "active" ||
     organization.platform_suspended ||
-    organization.access_mode === "normal" ||
-    !["active", "grace", "suspended"].includes(organization.subscription_state ?? "")
+    !organization.subscription_state
   )
     return { organization, grace: null };
   return { organization, grace: await graceAt(backend, orgId) };
@@ -147,10 +155,7 @@ export function parseGraceUntil(
   current: NonNullable<Awaited<ReturnType<typeof readGraceDetail>>["grace"]>,
 ) {
   const until = z.iso.datetime({ precision: 0 }).parse(`${value}:00Z`);
-  if (
-    Date.parse(until) <=
-    Math.max(Date.parse(current.asOf), current.until ? Date.parse(current.until) : 0)
-  )
+  if (!current.untilAfter || Date.parse(until) <= Date.parse(current.untilAfter))
     throw Error("PLATFORM_GRACE_UNTIL_INVALID");
   return until;
 }
@@ -185,7 +190,9 @@ export async function confirmBillingSource(intent: BillingIntent) {
     if (
       source.id !== intent.id ||
       source.version !== intent.version ||
-      source.until !== intent.previous
+      source.until !== intent.previous ||
+      !source.untilAfter ||
+      Date.parse(intent.until) <= Date.parse(source.untilAfter)
     )
       throw stale(uuidv7());
   }

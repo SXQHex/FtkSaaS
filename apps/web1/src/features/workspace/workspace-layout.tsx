@@ -28,6 +28,7 @@ import {
 } from "../../components/ui/breadcrumb";
 import { StateBanner } from "../states/state-view";
 import { settingsSubscriptionQuery } from "../settings/settings-subscription";
+import { businessWorkspaceQuery } from "../business/business-workspace";
 export interface WorkspaceSelection {
   organizationId?: string;
   centerId?: string;
@@ -133,7 +134,34 @@ export function WorkspaceLayout({
   );
   const starter =
     !!ownerScope && !subscription.isError && subscription.data?.subscription.plan === "starter";
-  const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter);
+  const subscriptionPlan = subscription.isError ? undefined : subscription.data?.subscription.plan;
+  const manyCenters = (view?.centers.filter((center) => center.state === "active").length ?? 0) > 1;
+  const canManageCenters = roles.some(
+    (role) => role === "org_manager" || role === "center_manager",
+  );
+  const businessScope =
+    !ownerScope &&
+    !scope.isError &&
+    resolvedOrganizationId &&
+    centerId &&
+    canManageCenters &&
+    (pathname.endsWith("/studio") || pathname.endsWith("/centers"))
+      ? { accountId, orgId: resolvedOrganizationId, centerId }
+      : undefined;
+  const businessAccess = useQuery(
+    businessScope
+      ? businessWorkspaceQuery(businessScope)
+      : {
+          queryKey: ["business-workspace-inactive", accountId],
+          queryFn: skipToken,
+        },
+  );
+  const business = ownerScope
+    ? subscriptionPlan === "business"
+    : businessScope
+      ? !businessAccess.isError && businessAccess.data === true
+      : canManageCenters && manyCenters;
+  const groups = workspaceNavigation(mode, resolvedOrganizationId, centerId, starter, business);
   const memberSearchScope =
     mode === "management" &&
     view?.selected?.id &&
