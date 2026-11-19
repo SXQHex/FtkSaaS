@@ -51,7 +51,8 @@ export function InboxView({
   onMarkRead,
   canMarkRead,
   advancedAvailable = false,
-  canMarkAll = false,
+  canMarkSelection = false,
+  onMarkInboxRead,
   onMarkSelected,
   onSelectVisible,
   onUndo,
@@ -80,7 +81,8 @@ export function InboxView({
   onMarkRead: () => void;
   canMarkRead: boolean;
   advancedAvailable?: boolean;
-  canMarkAll?: boolean;
+  canMarkSelection?: boolean;
+  onMarkInboxRead?: () => void;
   onMarkSelected: (read: boolean) => void;
   onSelectVisible: (value: boolean) => void;
   onUndo?: () => void;
@@ -119,6 +121,15 @@ export function InboxView({
             {t(($) => (member ? $.inbox.memberDescription : $.inbox.description))}
           </p>
         </div>
+        {member && (
+          <Button
+            variant="outline"
+            isDisabled={locked || !onMarkInboxRead}
+            onPress={onMarkInboxRead}
+          >
+            {t(($) => $.inbox.markInboxRead)}
+          </Button>
+        )}
         <div
           role="group"
           aria-label={t(($) => $.inbox.selectionActions)}
@@ -134,7 +145,7 @@ export function InboxView({
           </Checkbox>
           <Button
             variant="outline"
-            isDisabled={locked || !canMarkAll}
+            isDisabled={locked || !canMarkSelection}
             onPress={() => onMarkSelected(true)}
           >
             {t(($) => $.inbox.markSelected)}
@@ -142,7 +153,7 @@ export function InboxView({
           </Button>
           <Button
             variant="outline"
-            isDisabled={locked || !canMarkAll}
+            isDisabled={locked || !canMarkSelection}
             onPress={() => onMarkSelected(false)}
           >
             {t(($) => $.inbox.markSelectedUnread)}

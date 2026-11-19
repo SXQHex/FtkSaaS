@@ -4113,6 +4113,7 @@
       "failed": "Teslim başarısız"
     },
     "markSelected": "Seçilenleri okundu yap",
+    "markInboxRead": "Tümünü okundu yap",
     "markSelectedUnread": "Seçilenleri okunmadı yap",
     "selectVisible": "Görünen iletilerin tümünü seç",
     "selectionActions": "İleti seçimi ve toplu işlemler",

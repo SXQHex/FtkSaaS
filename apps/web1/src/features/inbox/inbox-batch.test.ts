@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { readInbox } from "./inbox";
 import {
   notificationSetIntent,
+  markAllNotificationsIntent,
   readNotificationSelection,
   setNotificationsRead,
   readNotificationSetReceipt,
@@ -118,6 +119,32 @@ it("rejects one stale version before the whole atomic writer", async () => {
     code: "VERSION_CONFLICT",
   });
   expect(call.mock.calls.some(([op]) => op === operation)).toBe(false);
+});
+it("keeps an organization-wide read command bound to its recipient and key", async () => {
+  const personId = id(10);
+  const intent = markAllNotificationsIntent(scope, personId);
+  call.mockResolvedValue({ primary_id: personId, related: [] });
+  await setNotificationsRead(intent);
+  await setNotificationsRead(intent);
+  for (const [name, request] of call.mock.calls) {
+    expect(name).toBe(operation);
+    expect(request).toEqual({
+      client_api_version: 1,
+      org_id: scope.orgId,
+      request_id: expect.any(String),
+      operation_key: intent.key,
+      read: true,
+      all_unread: true,
+    });
+  }
+  call.mockResolvedValue({
+    operation,
+    key: intent.key,
+    status: "succeeded",
+    result_reference: { type: "people", id: id(11) },
+  });
+  await expect(readNotificationSetReceipt(intent)).rejects.toThrow("INBOX_RECEIPT_UNAVAILABLE");
+  await expect(readNotificationSetResult(intent, personId)).resolves.toEqual([]);
 });
 it("requires all selected outcomes to advance with the requested state and first request ID", async () => {
   call.mockResolvedValue(states(1, true));

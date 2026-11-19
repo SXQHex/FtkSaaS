@@ -23,13 +23,17 @@ async function fixture(
     | "member-offer"
     | "member-request"
     | "participant" = "normal",
+  options: { crossCenter?: boolean; allUnreadUnknown?: boolean } = {},
 ) {
+  const participantCenter = options.crossCenter ? sourceCenter : I.center;
   const privateLessons = mode === "member-request" ? await mockOwnPrivateLessons(page) : undefined;
   const participant =
     mode === "participant" || mode === "member-offer"
       ? await mockOwnReservations(
           page,
-          mode === "participant" ? { secondSessionCenter: sourceCenter } : {},
+          mode === "participant" && options.crossCenter
+            ? { secondSessionCenter: participantCenter }
+            : {},
         )
       : undefined;
   const member = Boolean(participant || privateLessons);
@@ -94,7 +98,7 @@ async function fixture(
                   ? {
                       reservation_target: {
                         operation: "reservation_list_v1",
-                        center_id: sourceCenter,
+                        center_id: participantCenter,
                         key: { session_id: participant!.reservations[1]!.session_id },
                       },
                     }
@@ -174,11 +178,11 @@ async function fixture(
         ),
         summary: member
           ? {
-              total: 1,
-              unread: state.read ? 0 : 1,
+              total: options.allUnreadUnknown ? 2 : 1,
+              unread: Number(!state.read) + Number(!!options.allUnreadUnknown && !state.secondRead),
               pending: 0,
               completed: 0,
-              informational: 1,
+              informational: options.allUnreadUnknown ? 2 : 1,
               unavailable: 0,
             }
           : {
@@ -324,6 +328,19 @@ async function fixture(
     }
     if (op === "notifications_read_set_v1") {
       state.writes.push(r);
+      if (r.all_unread) {
+        expect(r).not.toHaveProperty("center_id");
+        expect(r).not.toHaveProperty("notifications");
+        if (!state.keys.has(r.operation_key)) {
+          state.keys.add(r.operation_key);
+          state.effects++;
+          state.read = true;
+          state.secondRead = true;
+          state.version++;
+          if (options.allUnreadUnknown) return route.abort("failed");
+        }
+        return send({ operation_id: I.role, primary_id: I.self, replayed: true, related: [] });
+      }
       if (!state.keys.has(r.operation_key)) {
         for (const selected of r.notifications)
           expect(selected.expected_version).toBe(
@@ -357,7 +374,9 @@ async function fixture(
         key: r.key,
         status: "succeeded",
         result_available: true,
-        result_reference: { type: "notifications", id },
+        result_reference: options.allUnreadUnknown
+          ? { type: "people", id: I.self }
+          : { type: "notifications", id },
       });
     return route.fallback();
   });
@@ -369,7 +388,9 @@ async function fixture(
   if (member) {
     await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
     const bell = page.getByRole("link", { name: "Bildirimler", exact: true });
-    await expect(bell).toHaveAccessibleDescription("1 okunmamış bildirim");
+    await expect(bell).toHaveAccessibleDescription(
+      options.allUnreadUnknown ? "2 okunmamış bildirim" : "1 okunmamış bildirim",
+    );
     const initialReads = state.lists.length;
     await page.evaluate("document.documentElement.dataset.inboxNavigationProbe='member'");
     await bell.press("Enter");
@@ -446,10 +467,29 @@ test("participant sees a native session change notice and retains its exact read
   await expect(page.getByRole("button", { name: changeTitle, exact: true })).toHaveCount(0);
   expect(state.lists).toHaveLength(listsBefore);
 });
+test("member all-read covers the entire inbox and recovers the receipt without a second write", async ({
+  page,
+}) => {
+  const state = await fixture(page, "participant", { allUnreadUnknown: true });
+  await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
+  await page.getByRole("button", { name: "Tümünü okundu yap", exact: true }).click();
+  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(
+    page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Bu kapsamda görünür ileti yok.", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Bildirimler", exact: true }),
+  ).toHaveAccessibleDescription("0 okunmamış bildirim");
+  expect(state.secondRead).toBe(true);
+  expect(state.effects).toBe(1);
+  expect(state.writes).toHaveLength(1);
+  expect(state.writes[0]).toMatchObject({ org_id: I.org, read: true, all_unread: true });
+});
 test("member change notice opens the exact reservation and rechecks access on reload", async ({
   page,
 }) => {
-  const state = await fixture(page, "participant");
+  const state = await fixture(page, "participant", { crossCenter: true });
   const participant = state.participant!;
   const sessionId = participant.reservations[1]!.session_id;
   await page.getByRole("button", { name: changeTitle, exact: true }).click();

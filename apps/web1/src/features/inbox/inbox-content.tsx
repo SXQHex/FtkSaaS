@@ -15,6 +15,7 @@ import { InboxView, type InboxRow } from "./inbox-view";
 import { inboxKey, inboxListQuery, readNotificationState, type InboxFilter } from "./inbox";
 import {
   notificationSetIntent,
+  markAllNotificationsIntent,
   setNotificationsRead,
   readNotificationSetReceipt,
   readNotificationSetResult,
@@ -131,6 +132,15 @@ export function InboxContent({
     }),
     onAccessLost: accessLost,
     onRefresh: async ({ intent, rows }) => {
+      if ("personId" in intent) {
+        await queries.invalidateQueries({ queryKey: prefix.slice(0, 3) }, { throwOnError: true });
+        setChecked([]);
+        setSelected(undefined);
+        setUndo(undefined);
+        setCursors([undefined]);
+        setIndex(0);
+        return;
+      }
       for (const row of rows) queries.setQueryData([...prefix, "state", row.id], row);
       await queries.invalidateQueries({ queryKey: [...prefix, "list"] }, { throwOnError: true });
       setChecked([]);
@@ -163,6 +173,22 @@ export function InboxContent({
       void source.refetch();
       void list.refetch();
     }
+  }
+  function markInboxRead() {
+    if (
+      !memberPersonId ||
+      pending.current ||
+      locked ||
+      command.unavailable ||
+      !["ready", "saved"].includes(command.state) ||
+      list.isError ||
+      !list.data
+    )
+      return;
+    command.reset();
+    setError(undefined);
+    setUndo(undefined);
+    void command.start({ ...markAllNotificationsIntent(scope, memberPersonId), undoing: false });
   }
   async function markRead(read = true, target: "detail" | "selection" | "undo" = "detail") {
     if (pending.current || locked || command.unavailable) return;
@@ -307,8 +333,18 @@ export function InboxContent({
         void markRead(false);
       }}
       canUnread={!source.isError && source.data?.state === "read" && command.state === "ready"}
-      canMarkAll={
+      canMarkSelection={
         !list.isFetching && !list.isError && checked.length > 0 && command.state === "ready"
+      }
+      onMarkInboxRead={
+        memberPersonId &&
+        !list.isError &&
+        list.data &&
+        !list.isFetching &&
+        ["ready", "saved"].includes(command.state) &&
+        !command.unavailable
+          ? markInboxRead
+          : undefined
       }
       onMarkSelected={(read) => {
         void markRead(read, "selection");

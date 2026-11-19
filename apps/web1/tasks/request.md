@@ -55,7 +55,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Karşılandı](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Karşılandı](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
-| W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Açık](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
+| W1-BE-47 | E48 · WF11 | Üye gelen kutusunda tümünü okundu yapma | [Karşılandı](#w1-be-47--üye-gelen-kutusunda-tümünü-okundu-yapma). |
 | W1-BE-48 | E48 · WF11 | Ders değişikliği bildiriminde yetkili kaynak merkezi | [Karşılandı](#w1-be-48--ders-değişikliği-bildiriminde-yetkili-kaynak-merkezi). |
 | W1-BE-49 | V03.3/E26 · WF07 | Eğitmen yoklama zaman sınırı ve düzeltme isteği | [Açık](#w1-be-49--eğitmen-yoklama-zaman-sınırı-ve-düzeltme-isteği). |
 | W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
@@ -426,9 +426,9 @@ Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişi
 
 ## W1-BE-47 · Üye gelen kutusunda tümünü okundu yapma
 
-**Açık · backend değerlendirmesi.** Üye çizimi, gelen kutusunun tamamını tek eylemle okundu yapıyor. `notifications_read_set_v1` yalnız açıkça seçilen 1–100 kimlik ve sürümü güncelliyor. Web1 üye kabuğunda mevcut seçili iletileri okundu yapma akışı çalışıyor. [v67 çizimi](../design-reference/revisions/2026-11-18/index.html#L1498) · [WF11](../../../docs/workflows.md#wf11).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340) ile gelen sözleşme, güncel `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı.
 
-Gelen kutusu kapsamının tamamını okundu yapacak işlem için canlı alıcı ve organizasyon sınırlarını, aynı anahtarla yeniden denemeyi ve işlem sırasında gelen yeni bildirimlerin davranışını değerlendirin. İlk sayfayı güncellemek bütün kutunun tamamlandığı anlamına gelmemeli. Okundu durumu kaynak işi kapatmamalı. [E48](todo.md#e48--üye-bildirim-merkezi).
+`notifications_read_set_v1(all_unread:true,read:true)` seçili organizasyonda alıcının komut anındaki okunmamış iletilerini tek işlemde günceller. Makbuz alıcı kişi kimliğini döndürür. [WF11](../../../docs/workflows.md#wf11) · [E48 Web1 kabulü](todo.md#e48-uye-bildirim-merkezi).
 
 ## W1-BE-48 · Ders değişikliği bildiriminde yetkili kaynak merkezi
 

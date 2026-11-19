@@ -50,18 +50,28 @@ export async function readNotificationSelection(scope: ClientScope, ids: string[
     };
   });
 }
-export interface NotificationSetIntent {
+interface NotificationSelectionIntent {
   scope: ClientScope;
   notifications: [NotificationReadSelection, ...NotificationReadSelection[]];
   read: boolean;
   key: string;
   changedIds: string[];
 }
+export type NotificationSetIntent =
+  | NotificationSelectionIntent
+  | { scope: ClientScope; personId: string; key: string };
+
+export function markAllNotificationsIntent(
+  scope: ClientScope,
+  personId: string,
+): NotificationSetIntent {
+  return { scope: { ...scope }, personId: z.uuid().parse(personId), key: uuidv7() };
+}
 export async function notificationSetIntent(
   scope: ClientScope,
   notifications: NotificationReadSelection[],
   read: boolean,
-): Promise<NotificationSetIntent> {
+): Promise<NotificationSelectionIntent> {
   selection.parse(notifications);
   const current = await readNotificationSelection(
     scope,
@@ -80,7 +90,18 @@ export async function notificationSetIntent(
   };
 }
 export async function setNotificationsRead(intent: NotificationSetIntent) {
-  return (await scopedBackend(intent.scope)).call(operation, {
+  const backend = await scopedBackend(intent.scope);
+  if ("personId" in intent) {
+    return backend.call(operation, {
+      client_api_version: 1,
+      org_id: intent.scope.orgId,
+      request_id: uuidv7(),
+      operation_key: intent.key,
+      read: true,
+      all_unread: true,
+    });
+  }
+  return backend.call(operation, {
     ...common(intent.scope),
     request_id: uuidv7(),
     operation_key: intent.key,
@@ -98,17 +119,24 @@ export async function readNotificationSetReceipt(intent: NotificationSetIntent) 
     operation,
     key: intent.key,
   });
+  const expected =
+    "personId" in intent
+      ? { type: "people", id: intent.personId }
+      : { type: "notifications", id: intent.notifications[0].id };
   if (
     value.operation !== operation ||
     value.key !== intent.key ||
     (value.result_reference &&
-      (value.result_reference.type !== "notifications" ||
-        value.result_reference.id !== intent.notifications[0].id))
+      (value.result_reference.type !== expected.type || value.result_reference.id !== expected.id))
   )
     throw new Error("INBOX_RECEIPT_UNAVAILABLE");
   return value;
 }
 export async function readNotificationSetResult(intent: NotificationSetIntent, id?: string) {
+  if ("personId" in intent) {
+    if (id !== intent.personId) throw new Error("INBOX_RESULT_UNAVAILABLE");
+    return [];
+  }
   if (id !== intent.notifications[0].id) throw new Error("INBOX_RESULT_UNAVAILABLE");
   const rows = await readNotificationSelection(
     intent.scope,

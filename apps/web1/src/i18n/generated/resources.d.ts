@@ -1552,6 +1552,7 @@ export default interface Resources {
       "limitHint": "Okundu işareti kaynak işini tamamlamaz. Toplu işlem yalnız seçtiğin iletilere uygulanır.",
       "loading": "İletiler okunuyor…",
       "markAll": "Tümünü okundu yap",
+      "markInboxRead": "Tümünü okundu yap",
       "markRead": "Okundu yap",
       "markSelected": "Seçilenleri okundu yap",
       "markSelectedUnread": "Seçilenleri okunmadı yap",
