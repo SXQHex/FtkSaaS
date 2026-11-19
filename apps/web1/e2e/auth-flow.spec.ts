@@ -889,15 +889,17 @@ test("signup validates policy, stops existing accounts and requests native confi
   page,
 }, testInfo) => {
   await mockStudio(page);
-  const scopeReads: { operation: string; request: Record<string, unknown> }[] = [];
+  const scopeReads: { operation: string; path: string; request: Record<string, unknown> }[] = [];
   page.on("request", (request) => {
-    const operation = new URL(request.url()).pathname.split("/").at(-1)!;
+    const path = new URL(request.url()).pathname;
+    const operation = path.split("/").at(-1)!;
     if (
+      request.method() === "POST" &&
       ["account_get_v1", "organizations_list_v1", "centers_list_v1", "roles_list_v1"].includes(
         operation,
       )
     )
-      scopeReads.push({ operation, request: request.postDataJSON() });
+      scopeReads.push({ operation, path, request: request.postDataJSON() });
   });
   let status = "account_exists";
   let checks = 0;
@@ -998,7 +1000,14 @@ test("signup validates policy, stops existing accounts and requests native confi
   await page.keyboard.press("Escape");
   expect(scopeReads.some((row) => row.operation === "account_get_v1")).toBe(true);
   expect(scopeReads.some((row) => row.operation === "organizations_list_v1")).toBe(true);
-  expect(scopeReads.find((row) => row.operation === "centers_list_v1")?.request).toMatchObject({
+  expect(
+    scopeReads.find((row) => row.path === "/rest/v1/rpc/centers_list_v1")?.request,
+  ).toMatchObject({
+    p_request: { org_id: studioIds.org },
+  });
+  expect(
+    scopeReads.find((row) => row.path.endsWith("/backend-v1/centers_list_v1"))?.request,
+  ).toMatchObject({
     org_id: studioIds.org,
   });
   expect(scopeReads.find((row) => row.operation === "roles_list_v1")?.request).toMatchObject({

@@ -390,7 +390,7 @@
         {
           "line": 421,
           "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-          "sha256": "8ad4908308bd709ed4b3dd071f7e51da6c52ebd372d26861a3bb51e1dd31de57"
+          "sha256": "9f83c37de1653f7b08734d9b56515a45fd4ecc38d5c080a13db3bb7a70d4e365"
         },
         {
           "line": 422,
@@ -636,7 +636,7 @@
         {
           "line": 5,
           "path": "apps/backend/tests/account-mfa-acceptance.mjs",
-          "sha256": "dc8a6b43e6306cbe71298252175a3787dcc6cba17d980b03a5ef6dc199d1e43f"
+          "sha256": "c5f7b86edd1699bfa5ba391b1412a863c1170f7fdc9e58c9cd602372a7329a4a"
         },
         {
           "line": 6,
@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "2bdbd733a6e2c45fd11b283de2379f1401542bf1b1e016f261ef51a21300ff77"
+          "sha256": "0765a38b8a18f27a8bf3b9e3a7359fecd4dcccaa63df60156bf4a6bc7050ea80"
         },
         {
           "line": 147,
@@ -1218,7 +1218,7 @@
         {
           "line": 166,
           "path": "apps/backend/tests/content-catalog-acceptance.mjs",
-          "sha256": "61d7e757ed9f90a2b319f8682a72c9d4aedc2d7948edb47454bf75ed54b2f69c"
+          "sha256": "89bf4f2c48f63ac3d6a2a0be2541645c1cd75739c953e4e474e9ba49221ade84"
         },
         {
           "line": 167,
@@ -1262,7 +1262,7 @@
         {
           "line": 311,
           "path": "apps/backend/tests/studio-setup-status-acceptance.mjs",
-          "sha256": "c01b3a3e076ab2098271d31e03679b965a95fa1a7431078b2d2833c1c74486d6"
+          "sha256": "b46feeb5bca4a343255841e9a914ff9a94307832d5c78d3894ff43bb66b58d08"
         },
         {
           "line": 312,

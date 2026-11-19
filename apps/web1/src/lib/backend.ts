@@ -2,6 +2,7 @@ import type { Operations } from "./api-contracts/operations";
 import type { RuntimeOperationName } from "./api-contracts/runtime";
 import type { SafeError } from "./api-contracts/generated";
 import { getSupabaseClient } from "./supabase";
+import { fetchBackendOperation } from "./backend-read-transport";
 
 export class BackendError extends Error {
   readonly code: SafeError["code"] | "TRANSPORT_ERROR";
@@ -29,7 +30,7 @@ export function createBackend(config: {
         retryable: false,
         trace_id: request.request_id,
       });
-    return fetch(`${config.functionsUrl.replace(/\/$/, "")}/${path}`, {
+    return fetchBackendOperation(config.functionsUrl, path, request, {
       ...options,
       method: "POST",
       credentials: "omit",
@@ -38,7 +39,6 @@ export function createBackend(config: {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify(request),
     });
   }
   return {

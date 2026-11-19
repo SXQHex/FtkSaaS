@@ -297,7 +297,8 @@
         "apps/backend/database/audit-export-tracking-results.sql",
         "apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql",
         "apps/backend/database/tracking-media-redaction.sql",
-        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql"
+        "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -309,8 +310,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "8133189a7c892c48065da0f743cc040546793a5c389d6ce78cb33ded1fba63fe",
-        "reason": "Üretilmiş Edge kodu ortak hata nesneleri ve okunabilen şema sabitleri ile küçülür. Aynı API sözleşmesi, hata zarfı, şema yolları ve Worker doğrulaması korunur."
+        "fingerprint": "03f0f2f26ad4e9f4e682e97dd0751f8513a959b4cb009a5915d8b40594b2bb8f",
+        "reason": "Ortak rapor REST kabulünde yeni ve eski cursor ile kapsam reddi senaryoları incelendi."
       }
     },
     {
@@ -387,7 +388,8 @@
         "apps/backend/supabase/migrations/20261108014454_organization_security_native_proof.sql",
         "apps/backend/scripts/acceptance/s08-hosted-password.mjs",
         "apps/backend/scripts/acceptance/s08-hosted-recovery.mjs",
-        "apps/backend/transports/spa-ingress-worker.mjs"
+        "apps/backend/transports/spa-ingress-worker.mjs",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -399,8 +401,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "d5a90a442b69e48a650329eb0c257699b00279854e6ad88aa04b788714c3b65e",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "11dd836ed8f08caf30c2d7dd1ed1bb79bbba1220c1eaa54a168a48283603c9d6",
+        "reason": "İlk hesabın eşzamanlı açılması ve canlı Auth, MFA ve hassas reauth kontrolleri incelendi."
       }
     },
     {
@@ -421,6 +423,7 @@
         "apps/backend/tests/permission-preparation-acceptance.mjs",
         "apps/backend/tests/discipline-presentation-acceptance.mjs",
         "apps/backend/tests/studio-setup-status-acceptance.mjs",
+        "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/web1-review-acceptance.mjs",
         "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
@@ -499,7 +502,11 @@
         "apps/backend/database/studio-setup-requests.sql",
         "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql",
         "apps/backend/database/platform-console-completion.sql",
-        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
+        "apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql",
+        "packages/api-contracts/src/read-transport.ts",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
+        "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -527,8 +534,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "9dc8481690042bdc1d3e55f111b7922664d8ddae1724b7a1d592eed02308a019",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "f96e83c9a87729abee38684b0287b59c317fc31f982edd08117e3adf9b4f353e",
+        "reason": "Stüdyo kuyruğunda rol, kendi talep kapsamı, aynı sıra ve canlı veri değişikliğinde cursor reddi incelendi."
       }
     },
     {
@@ -622,7 +629,8 @@
         "apps/backend/database/member-lesson-discovery.sql",
         "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
-        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql"
+        "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -645,8 +653,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8422dac06f1c9defafafeacf0a624049c256af771e8bb8237707ef1c7acb63e3",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "d285994dd6f5380ee474186d44b23e3677331a7c40cda5f417096c8b229e2739",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -762,8 +770,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "de6f725a2cd8f4bcf3563cdd181aa3e3b2df73b7f1c966e967679aaec860f52d",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "5e5c5805938ae331a35419e06b267f2eefd2153b2970d68ac0792a390dc9a545",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -890,8 +898,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "24d9b01ee325c0632666c4ace5ccb56732cd1c46e117abde7a5617281aba272f",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "13c64e4a7ee008ef2dbf315826cf2d226a7c3bdc8885529ec6b4a650f4709f9d",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1000,8 +1008,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "aafdb50d3ef0d730a54eda62a1ee9835f309c197f70f2b1443b5de92ad26e875",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "a07270e7e2e659eee59d5f2cfde59322f243597c46fc94abb51b8ca597d3e2b1",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1072,8 +1080,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "70ade57f2d45e67aa4b51cd399849afb701efe9ab454e776502112091455d821",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "870a24550ca20452bb2757b87e9f0c4ae94406d9d6c104d34ff440ef499fae2f",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1147,8 +1155,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "2458276cb661b33d7309572e87a76332a098d4798abcde58c033317bba2dbd8a",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "7069035f18bd6f1c8378897e36db4052df9963eef298fa0121762a3966c0eb0c",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1264,8 +1272,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "d4d61c4c5273db619f18428054908fcf4faf2509d5430157f371446804cdb5b7",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "9121d54dac374de9b9df1cbe54e2a32ee6ab8b72b5487e579abb86ff170bf5b5",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1324,7 +1332,8 @@
         "apps/backend/tests/report-worker-fixture.mjs",
         "apps/backend/database/crm-funnel-and-directory.sql",
         "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
-        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql"
+        "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql",
+        "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1338,8 +1347,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "73450b65cdde438ba114e0306bf3be38856eafc356fd586a13eccec0401d0f45",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "df71242511a57c8a37590c91eb8be6a78fddc9dd3837e7410b69851759080c67",
+        "reason": "Raporun tipli SQL sayfası, tam kapsam toplamı, eski cursor devamı ve CSV satır kaynağı incelendi."
       }
     },
     {
@@ -1410,7 +1419,9 @@
         "apps/backend/database/member-inbox-actions.sql",
         "apps/backend/supabase/migrations/20261118205000_member_inbox_actions.sql",
         "apps/backend/database/member-inbox-visibility.sql",
-        "apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql"
+        "apps/backend/supabase/migrations/20261118213900_member_inbox_visibility.sql",
+        "apps/backend/database/catalog-status-read.sql",
+        "apps/backend/supabase/migrations/20261119161031_catalog_status_read.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1427,8 +1438,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "ae4cfbb72612c14cd312c499c2c4649d8bb74d322599c11b0ae6267cb81db5bf",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "72640aa14485d2b22dfedbfb2d798d703bdb4db4789b8e954c3ee40bf0b61ad1",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1550,7 +1561,8 @@
         "apps/backend/supabase/migrations/20261113090200_content_documents.sql",
         "apps/backend/database/public-form-discovery.sql",
         "apps/backend/database/settings-catalog-v24.sql",
-        "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql"
+        "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
+        "apps/backend/supabase/migrations/20261119170001_lazy_settings_projection.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1565,8 +1577,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "4ba74eaf1b6e0e1e9844a5652c1e9b921442ae92267416165f2b819c65a53056",
-        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
+        "fingerprint": "1656a52d1237d33ae3b4d8cc9d23225260e091fc0ba89fd27dc4c1774f825516",
+        "reason": "Ayar kataloğu, geçmiş, scope, cursor ve değer projeksiyonlarıyla MFA kapsamı incelendi."
       }
     },
     {
@@ -1644,8 +1656,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "aabd84f7fb9dc1907cd7e721ac52619a1b978d2a1e599a38736c6969e40422ba",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "e4cc97bf2d694c2ee099161221abf1be4b9a28fbf0ffcb10f5a9a4b4ea6f09ae",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1712,8 +1724,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f871d3afd11b8e4882cdf9d643b332ec09266a96419907f36cb2534be310e15e",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "6664d2a56002d1d0e4a95b375989aadf88a10d434e3c31e6e11a8cdfa305930d",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1867,8 +1879,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "9c51194f8e5548853410e033111fcee5413a9ac5de6bca8c22da3fbf916191cf",
-        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
+        "fingerprint": "9a874ff5a54d183b81349d0e72cc4aeafc5903f593057a1abb1eb1081b70859b",
+        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
       }
     },
     {
@@ -1956,7 +1968,10 @@
         "apps/backend/supabase/functions/backend-v1/document-storage.ts",
         "apps/backend/supabase/functions/backend-v1/handler.ts",
         "apps/backend/database/platform-console-completion.sql",
-        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
+        "apps/backend/database/platform-invoice-directory.sql",
+        "apps/backend/supabase/migrations/20261119161030_platform_invoice_directory.sql",
+        "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1981,8 +1996,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "ca3821d7f2231dc40608dc6a835dcbb2d61823edef5492618916d45cb0690af5",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "19501113d2dea1f23fd400666dad2b59dbddfe0d1abddec2a5879fb504ec7331",
+        "reason": "Sahip faturaları ve platform dizininde mevcut zaman, kapsam, cursor ve sayfa sırası incelendi."
       }
     },
     {
@@ -2165,7 +2180,8 @@
         "apps/backend/database/content-delivery.sql",
         "apps/backend/database/content-platform-v1.sql",
         "apps/backend/config/content/platform-v1.json",
-        "apps/backend/supabase/migrations/20261113090100_content_delivery.sql"
+        "apps/backend/supabase/migrations/20261113090100_content_delivery.sql",
+        "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2180,8 +2196,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "df741ea831c80d571cbe501e41bcd78b75d04f3aacb80d22cb90f5e0babf97f6",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "5231edcd80ec3eafb77846147383f5aa55314d05c0c51e84e7ec20a82686a7c2",
+        "reason": "Worker CSV kolonları, gruplama ve satır sırası raporun ortak tipli satır kaynağında incelendi."
       }
     }
   ]

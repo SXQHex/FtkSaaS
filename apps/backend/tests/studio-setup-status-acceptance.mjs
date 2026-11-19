@@ -1,8 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {authUser,fixturePlatform,must,call} from './api-client.mjs';
+import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import {nativeTotp} from './native-totp-fixture.mjs';
+import {success_centers_list_v1} from '../supabase/functions/backend-v1/validators.js';
 
 async function fixture(t,label){
  const {platform,plan}=await fixturePlatform(),owner=await authUser(label+'-owner'),stranger=await authUser(label+'-stranger');
@@ -21,6 +23,87 @@ async function fixture(t,label){
  const counts=async()=>JSON.stringify(await rows('select (select count(*) from core.audit_events where org_id=$1) a,(select count(*) from core.operation_receipts where org_id=$1) r,(select count(*) from core.outbox_jobs where org_id=$1) o',[org]));
  return {db,rows,org,center,other,owner,stranger,person,api,fail,counts};
 }
+
+test('Centers Data API preserves the plain list contract and live authorization',{timeout:300000},async t=>{
+ const {db,org,center,other,owner,stranger,api,counts}=await fixture(t,'centers-data-api');
+ const {env}=context();
+ const read=(user,body={},origin)=>fetch(env.API_URL+'/rest/v1/rpc/centers_list_v1',{
+  method:'POST',signal:AbortSignal.timeout(30000),
+  headers:{apikey:env.ANON_KEY,authorization:'Bearer '+user.jwt,'content-type':'application/json',
+   'content-profile':'api_read',...(origin?{origin}:{})},
+  body:JSON.stringify({p_request:{client_api_version:1,request_id:key(),org_id:org,page:{},...body}}),
+ });
+ const compare=async(user,body={},expected,origin)=>{
+  const legacy=await call(user,'centers_list_v1',{org_id:org,page:{},...body});
+  const response=await read(user,body,origin),result=await response.json();
+  assert.equal(response.status,legacy.status,JSON.stringify(result));
+  if(!legacy.result.ok){
+   assert.deepEqual(result,{ok:false,error:{...legacy.result.error,trace_id:result.error?.trace_id}});
+   assert.match(result.error.trace_id,/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+   assert.equal(result.error.code,expected);
+   return;
+  }
+  assert(success_centers_list_v1(result),JSON.stringify(success_centers_list_v1.errors));
+  const businessData=({as_of,items,...rest})=>{
+   assert(Number.isFinite(Date.parse(as_of)));
+   return {...rest,items:items.toSorted((a,b)=>a.id.localeCompare(b.id))};
+  };
+  assert.deepEqual(businessData(result.data),businessData(legacy.result.data));
+  assert.deepEqual(result.data.items.map(x=>x.id).sort(),expected.toSorted());
+ };
+ const before=await counts();
+ const browserOrigin='https://centers.ftksaas.invalid';
+ await db.query('insert into private.centers_read_browser_origins(origin) values($1)',[browserOrigin]);
+ try{await compare(owner,{},[center,other],browserOrigin);}
+ finally{await db.query('delete from private.centers_read_browser_origins where origin=$1',[browserOrigin]);}
+ await compare(owner,{include_setup_status:false,page:{limit:1,cursor:null}},[center,other]);
+ await compare(stranger,{},'NOT_FOUND');
+ await compare(owner,{center_id:key()},'NOT_FOUND');
+ await compare(owner,{org_id:key()},'NOT_FOUND');
+ await compare(owner,{page:{limit:0}},'VALIDATION_FAILED');
+ await compare(owner,{client_api_version:2,page:null},'CLIENT_UPDATE_REQUIRED');
+ assert.equal(await counts(),before);
+ const deniedOrigin=await read(owner,{},browserOrigin);
+ assert.equal(deniedOrigin.status,403);
+ assert.equal((await deniedOrigin.json()).error.code,'FORBIDDEN');
+ await db.query("update auth.users set banned_until=now()+interval '1 hour' where id=$1",[owner.id]);
+ try{await compare(owner,{},'AUTH_REQUIRED');}
+ finally{await db.query('update auth.users set banned_until=null where id=$1',[owner.id]);}
+ await db.query("update core.centers set timezone='' where id=$1",[other]);
+ try{await compare(owner,{},'INTEGRITY_VIOLATION');}
+ finally{await db.query("update core.centers set timezone='UTC' where id=$1",[other]);}
+
+ const member=await authUser('centers-data-api-member'),account=await must(member,'account_get_v1');
+ const person=(await api('person_create_v1',{display_name:'Synthetic member',contacts:[]})).primary_id,link=key();
+ await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[link,org,account.id,person]);
+ await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now())",[key(),org,center,person]);
+ await compare(member,{},[center]);
+ const strong=await nativeTotp(t,member);
+ await compare(member,{},'AUTH_REQUIRED');
+ await compare(strong,{},[center]);
+ await db.query("update core.account_links set state='revoked' where id=$1",[link]);
+ await compare(strong,{},'NOT_FOUND');
+ await db.query('delete from auth.sessions where id=$1',[stranger.session_id]);
+ await compare(stranger,{},'AUTH_REQUIRED');
+
+ const {rows:[grants]}=await db.query(`select
+  has_schema_privilege('anon','api_read','usage') as anon_schema,
+  has_function_privilege('anon','api_read.centers_list_v1(jsonb)','execute') as anon_rpc,
+  has_any_column_privilege('authenticated','core.centers','select') as core_columns,
+  has_function_privilege('authenticated','api_v1.centers_list_v1(jsonb,uuid,uuid,uuid[],jsonb)','execute') as service_rpc,
+  has_function_privilege('authenticated','private.centers_read_rows(uuid,uuid,boolean)','execute') as projection,
+  (select rolbypassrls from pg_roles where rolname='ftk_centers_read') as bypass_rls`);
+ assert(Object.values(grants).every(value=>value===false),JSON.stringify(grants));
+
+ // Shared readers complete concurrently. The existing exclusive writer fence stays in place.
+ await db.query('begin');
+ try{
+  await db.query('select id from core.organizations where id=$1 for share',[org]);
+  const response=await read(owner);
+  assert.equal(response.status,200);
+  assert.equal((await response.json()).ok,true);
+ }finally{await db.query('rollback');}
+});
 
 test('Center setup summaries expose only scoped publication and provider handoff facts',{timeout:300000},async t=>{
  const f=await fixture(t,'setup-summary'),{db,org,center,other,owner,stranger,person,api,fail,counts}=f;

@@ -1,6 +1,49 @@
 # Güncel kaynak ve kabul
 
+<a id="shared-sql-settings"></a>
+## Ortak SQL yetkilendirmesi ve ayar okumaları
+
+Taban `5efb6eade48030035d7f51d4d4b643399a826ae4`. Aynı SHA’nın [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44570599408) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44570708292) başarılı.
+
+İzin düzenleme ve iki seans yönetimi okuması kilitli hesap ve organizasyon bağlamını kullanıyor. Komut ön kontrolü canlı oturumu, MFA’yı, platform yetkisini ve ticari kapıları denetliyor. İlk hesap yalnız eksikse oluşturuluyor. Ayar kataloğu ve geçmiş etkili ayar değerlerini hesaplamadan kendi projeksiyonlarını kullanıyor. API sözleşmesi ve istemci kodu aynı.
+
+Sentetik organizasyon fixture’ında PostgreSQL sunucu saatiyle dönüşümlü önce/sonra koşuldu. Her operasyon ve sürüm için 480 ölçüm alındı. p95, izin yönetimi okumasında 1,299 → 1,100 ms, mevcut hesap okumasında 0,480 → 0,393 ms, ayar kataloğunda 7,857 → 6,592 ms ve ayar geçmişinde 2,118 → 0,557 ms oldu. Kontrol olarak ölçülen etkili ayar okuması 2,171 → 2,144 ms verdi. Bunlar yerel SQL ölçümleridir. Organizasyon kilidi beklenirken platform rolü kaldırıldığında taban ve aday aynı `BILLING_OPERATION_RESTRICTED` hatasını döndürdü.
+
+İzole loopback Supabase’te 213 migration temiz uygulandı. Seri runner’da 31/31 native izin, Auth/MFA, seans ve ayar testi, ayrıca 13/13 PostgreSQL taşıma ve bütünlük testi geçti. İki ilk erişim aynı hesap kimliğini döndürdü. Süresi dolmuş hassas doğrulama izin okumasında `FORBIDDEN` verdi. Aday CI ve hosted kabulü bekliyor.
+
+### Rapor, stüdyo ve fatura sayfaları
+
+Performans listesinin beşinci maddesi [PR #348](https://github.com/SXQHex/FtkSaaS/pull/348) dalına yerel olarak eklendi. Ölçüm tabanı `7be36689e1c0dc353ba84c55f5697c0517d425a5`. [Rapor](../../../docs/workflows.md#wf10), [stüdyo kuyruğu](../../../docs/workflows.md#wf02) ve [fatura](../../../docs/workflows.md#wf17) okumaları yanıt JSON’unu SQL’de seçilen sayfadan üretiyor. Rapor toplamları filtrelenmiş tam kümeyi kapsıyor. Offset cursor’ları canlı değişiklikte aynı hataları veriyor ve eski cursor’lar kabul ediliyor. Platform fatura dizininde mevcut as_of ve anahtar sırası kullanılıyor.
+
+Her yol için 1.500 sentetik kayıtta 20 satırlık ilk sayfanın PostgreSQL sunucu süresi ölçüldü. Dönüşümlü önce/sonra bloklarında sürüm başına 100 ölçümle p95 raporda 25,25 → 12,25 ms, stüdyo kuyruğunda 5,47 → 2,27 ms, sahip faturalarında 6,87 → 1,94 ms, platform fatura dizininde 6,26 → 0,73 ms oldu. Eski cursor’la ikinci sayfa ve rapor toplamları eşleşti. Kuyruk ve sahip faturası cursor’ları farklı tarih biçimiyle de devam etti.
+
+Temiz loopback kurulumunda 215 migration uygulandı ve 9/9 hedefli native kabul testi geçti. Rapor filtre ve tam kapsam toplamları, eski ve güncel cursor, değişen verinin reddi, CSV çıktısı ve fatura dosyalarının canlı kapsamı doğrulandı. Beşinci madde yerel dalda push bekliyor.
+
+<a id="invoice-directory-catalog-status"></a>
+## W1-BE-63 ve 65 · Platform fatura dizini ve katalog durumu
+
+Taban `5abf8749cba4088b30ddbab2ff1dd4363191e61b`. Aynı SHA için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44561613234) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44561730523) başarılı. Fatura dizini [WF17](../../../docs/workflows.md#wf17), katalog durum okuması [WF11](../../../docs/workflows.md#wf11) sahibindedir. PR339'daki W1-BE-64 geri çekildi.
+
+İzole loopback Supabase'e 211 migration temiz uygulandı. Tek seri Node runner'da 8/8 native backend testi geçti. Canlı platform yetkisi, organizasyon ve cursor kapsamı, yeni yüklemenin eski sayfaya katılmaması, mevcut orijinal ZIP/PDF indirmesi ve ayrı katalog durumları doğrulandı. Üretilen Edge kaynağı 3.281.049 bayt. Aday CI ve hosted kabulü açık.
+
+<a id="centers-list-data-api"></a>
+## Merkez listesi Data API pilotu
+
+Yerel pilot ölçümünün tabanı `46c9dd22484bb9a46e939e562e654a6c044e6283` ve [aynı kaynak main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44524823332) başarılı. Aday, [doğrulayıcı küçültmesini içeren main](#edge-doğrulayıcı-boyutu) ile senkronize edildi. Taşıma sözleşmesi [istemci protokolünde](../../../docs/client-integration.md#gerçek-sözleşme), tarayıcı açılımı [ortam rehberindedir](remote-backend-setup.md#merkez-listesi-data-api).
+
+Temiz loopback Supabase kurulumunda 209 migration uygulandı ve 10/10 hedefli kabul testi geçti. Düz liste karşılaştırmasında 21 senaryo HTTP durumu, DTO veya hata kodu ve retryability bakımından eşleşti. Owner, merkez yöneticisi, üye, yabancı kapsam, canlı hesap bağı, oturum iptali ve native MFA kontrol edildi.
+
+Kısa ömürlü native JWT ile açık oturumun süresi dolmuş token'ının her iki yolda 401 ve `AUTH_REQUIRED` verdiği doğrulandı. Native REST ön isteği `Content-Profile` başlığını kabul etti. Web1'de 16 taşıma birim testi ve tek Chromium çalışanındaki kayıt sonrası merkez keşfi ile kurulum özeti senaryoları geçti.
+
+[Aday API-3](https://github.com/SXQHex/FtkSaaS/actions/runs/44553762546/job/135664830150) pilot migration'da zorunlu faktör kontrolünün kaybolduğunu gösterdi. Düzeltme mevcut MFA yordamının faktör, oturum ve ACL kurallarını koruyup yalnız düz merkez listesinin imzalı Data API çağrısını aynı kontrole bağlıyor. İzole native Supabase'te 10 merkez ve 7 MFA kabul testi geçti. İki taşıma da doğrulanmış faktörle AAL2'yi kabul etti, AAL1'i ve faktör kaldırıldıktan sonra hâlâ AAL2 olan JWT'yi reddetti. Son durumda oturum kaydı da AAL2 olacak şekilde izole fixture ile zorunlu faktör reddi ayrıca doğrulandı.
+
+Geniş yerel kaynak doğrulamasında 615/617 test geçti. CI zaman aşımı ve `/proc` bellek gözlemcisi testleri macOS'ta hem adayda hem değişikliksiz main tabanında yeniden aynı şekilde başarısız oldu.
+
+Yerel uçtan uca p95, Edge ve Data API sırasıyla seri çağrıda 1.183,41 → 20,92 ms, dörder eşzamanlı aynı organizasyon çağrısında 4.189,57 → 32,24 ms ve dörder eşzamanlı karma organizasyon çağrısında 4.832,63 → 36,78 ms olarak ölçüldü. Paylaşımlı organizasyon kilidi altında Edge 16/16 bekledi ve örneklenen bekleme p95'i 210,85 ms oldu. Data API 0/16 bekledi. Yazma kilidinde iki yol da 16/16 bekledi ve tamamlanan askıya alma işleminden sonra `SERVICE_UNAVAILABLE` döndürdü. Bu ölçümler yerel pilot koşullarına aittir. Aday CI ve hosted kabulü ayrı izlenir.
+
 ## Edge doğrulayıcı boyutu
+
+[PR #345](https://github.com/SXQHex/FtkSaaS/pull/345) kaynak bağlı [Backend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/44538629561) ardından `71c7ecb2ae674d9da8932f12c2517d2935e9197b` ile main’e alındı. Bu merge SHA’sının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44551412947) başarılı.
 
 Taban `46c9dd22484bb9a46e939e562e654a6c044e6283` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44524823332) başarılı. Aynı derleme ayarlarıyla ham Edge kaynağı 4.006.148 → 3.277.440 bayt, JSON yükü 4.129.792 → 3.362.342 bayt (%18,58) oldu. Operasyon ve sözleşme dosyaları ile Worker doğrulayıcısı birebir eşleşiyor.
 

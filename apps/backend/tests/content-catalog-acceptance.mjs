@@ -42,4 +42,16 @@ test('Catalog native API: operator publishes new language data, user cannot publ
  // Publication command sends data to the same native API; auth is never bypassed.
  const {context}=await import('./api-client.mjs');const {env}=context();
  await publishContent({url:env.API_URL,key:env.PUBLISHABLE_KEY??env.ANON_KEY,token:platform.jwt,entries:[{...body,version:102}],send:fetch});
+ const scope={scope_key:'platform',code:entry.code,channel:entry.channel};
+ const initial=read.items.find(t=>t.id===created.primary_id);
+ assert.equal(initial.retired,false);
+ assert.equal(initial.invalidated,false);
+ await must(platform,'content_catalog_save_v1',{...body,action:'invalidate'},id());
+ await must(platform,'content_catalog_save_v1',{...body,version:102,action:'retire'},id());
+ const reread=await must(platform,'content_catalog_get_v1',scope);
+ const invalidated=reread.items.find(t=>t.id===created.primary_id);
+ const retired=reread.items.find(t=>t.version===102&&t.language==='qad');
+ assert.deepEqual({retired:invalidated.retired,invalidated:invalidated.invalidated},{retired:false,invalidated:true});
+ assert.deepEqual({retired:retired.retired,invalidated:retired.invalidated},{retired:true,invalidated:false});
+ assert.equal((await call(user,'content_catalog_get_v1',scope)).result.error.code,'FORBIDDEN');
 });
