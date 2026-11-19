@@ -60,12 +60,13 @@ export function DocumentsView({
   pagination,
   locked = false,
   acceptancePrompt,
+  contentCatalog,
   loading = false,
 }: {
   documents: DocumentRow[] | null;
   acceptances: DocumentAcceptanceRow[] | null;
-  tab: "documents" | "acceptance";
-  onTab: (value: "documents" | "acceptance") => void;
+  tab: "documents" | "acceptance" | "catalog";
+  onTab: (value: "documents" | "acceptance" | "catalog") => void;
   filter: "pending" | "all";
   onFilter: (value: "pending" | "all") => void;
   summary: {
@@ -81,6 +82,7 @@ export function DocumentsView({
   pagination?: ReactNode;
   locked?: boolean;
   acceptancePrompt?: string;
+  contentCatalog?: ReactNode;
   loading?: boolean;
 }) {
   const { t } = useTranslation();
@@ -115,7 +117,8 @@ export function DocumentsView({
         <Tabs
           selectedKey={tab}
           onSelectionChange={(key) => {
-            if (!locked && (key === "documents" || key === "acceptance")) onTab(key);
+            if (!locked && (key === "documents" || key === "acceptance" || key === "catalog"))
+              onTab(key);
           }}
         >
           <CardHeader className="flex flex-wrap items-center justify-between gap-3">
@@ -126,6 +129,9 @@ export function DocumentsView({
               <TabsTrigger id="acceptance" isDisabled={locked}>
                 {t(($) => $.documents.acceptanceTab)}{" "}
                 {pendingCount !== undefined && <Badge variant="secondary">{pendingCount}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger id="catalog" isDisabled={locked}>
+                {t(($) => $.documents.contentCatalog.title)}
               </TabsTrigger>
             </TabsList>
             {tab === "acceptance" && (
@@ -338,6 +344,9 @@ export function DocumentsView({
               <p className="text-xs text-muted-foreground">{t(($) => $.documents.selfOnly)}</p>
               {pagination}
             </CardFooter>
+          </TabsContent>
+          <TabsContent id="catalog">
+            <CardContent className="min-w-0">{contentCatalog}</CardContent>
           </TabsContent>
         </Tabs>
       </Card>

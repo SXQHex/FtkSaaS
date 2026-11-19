@@ -2,7 +2,11 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-import type { DigitalDocumentContent } from "../src/lib/api-contracts/generated.js";
+import common from "../src/locales/tr/common.json" with { type: "json" };
+import type {
+  ContentTemplateView,
+  DigitalDocumentContent,
+} from "../src/lib/api-contracts/generated.js";
 const fileId = "019ab7b0-0000-7000-8000-000000000090",
   documentId = "019ab7b0-0000-7000-8000-000000000091",
   previewId = "019ab7b0-0000-7000-8000-000000000092";
@@ -14,18 +18,45 @@ async function setup(
     | "unread"
     | "prepare-unknown"
     | "transfer-unknown"
-    | "digital" = "normal",
+    | "digital"
+    | "catalog" = "normal",
 ) {
   await mockStudio(page);
   const state = {
     writes: [] as { op: string; r: Record<string, unknown> }[],
     checksum: "",
-    published: false,
+    published: mode === "catalog",
     failed: false,
     puts: 0,
     digital: undefined as DigitalDocumentContent | undefined,
     digitalPreview: undefined as DigitalDocumentContent | undefined,
   };
+  const catalog: ContentTemplateView[] = [
+    {
+      id: fileId,
+      org_id: I.org,
+      center_id: I.center,
+      scope_key: `center:${I.org}:${I.center}`,
+      code: `document.${documentId}`,
+      channel: "document",
+      language: "tr",
+      version: 1,
+      revision: 1,
+      source_version: fileId,
+      state: "published",
+      retired: false,
+      created_at: "2026-11-17T00:00:00Z",
+      published_at: "2026-11-17T00:00:00Z",
+      content: {
+        language: "tr",
+        name: "Sentetik belge",
+        text: "Sentetik kaynak metni",
+        template_id: "document.text",
+        template_version: "1",
+      },
+    },
+  ];
+  const translationId = "019ab7b0-0000-7000-8000-000000000093";
   const preview = {
     id: previewId,
     token: "synthetic",
@@ -153,6 +184,47 @@ async function setup(
         related: [{ type: "documents", id: documentId }],
       });
     }
+    if (mode === "catalog" && op === "content_catalog_get_v1") {
+      expect(r).toMatchObject({
+        center_id: I.center,
+        scope_key: `center:${I.org}:${I.center}`,
+        code: `document.${documentId}`,
+        channel: "document",
+      });
+      return send({ items: catalog, as_of: "2026-11-17T00:00:00Z" });
+    }
+    if (mode === "catalog" && op === "content_catalog_save_v1") {
+      state.writes.push({ op, r });
+      expect(r).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        code: `document.${documentId}`,
+        source_version: fileId,
+        language: "en",
+        version: 1,
+      });
+      const translation = catalog.find((row) => row.id === translationId);
+      if (r.action === "draft") {
+        expect(r.expected_revision).toBeUndefined();
+        catalog.push({
+          ...catalog[0]!,
+          id: translationId,
+          language: "en",
+          content: r.content,
+          published_at: null,
+          state: "draft",
+        });
+      } else {
+        expect(r.expected_revision).toBe(translation?.revision);
+        if (!translation) throw Error("Expected catalogue translation");
+        if (r.action === "publish") {
+          translation.state = "published";
+          translation.revision++;
+        }
+        if (r.action === "retire") translation.retired = true;
+      }
+      return send({ primary_id: translationId, operation_id: previewId });
+    }
     if (op === "content_catalog_get_v1" && state.digital) {
       expect(r).toMatchObject({
         org_id: I.org,
@@ -232,7 +304,8 @@ async function setup(
   });
   await openStudio(page);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/documents`);
-  await page.getByRole("button", { name: "Belge yükle", exact: true }).click();
+  if (mode !== "catalog")
+    await page.getByRole("button", { name: "Belge yükle", exact: true }).click();
   return state;
 }
 async function fill(page: Page) {
@@ -346,4 +419,54 @@ test("digital publication confirms exact server content without any Storage uplo
   expect(state.digital?.text).toBe(source);
   expect(state.puts).toBe(0);
   expect(state.writes.map(({ op }) => op)).toEqual(["document_version_publish_v1"]);
+});
+
+test("content catalogue manages an exact source translation and acknowledges invalidation", async ({
+  page,
+}) => {
+  const state = await setup(page, "catalog");
+  await page.getByRole("tab", { name: "İçerik kataloğu" }).click();
+  await page.getByLabel("Belge", { exact: true }).selectOption({ label: "Sentetik belge" });
+  const grid = page.getByRole("grid", { name: "İçerik kataloğu" });
+  await expect(grid.getByRole("rowheader").last()).toHaveText(`document.${documentId}`);
+  await page.getByRole("button", { name: "Çeviri ekle" }).click();
+  const form = page.getByRole("form", { name: "Belge çevirisi" });
+  const field = form.getByLabel("Dijital metin");
+  await form.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await expect(field).toBeFocused();
+  await field.fill("Synthetic translation.");
+  const confirm = async (name: string) => {
+    const dialog = page.getByRole("dialog", { name, exact: true });
+    const apply = dialog.getByRole("button", { name: common.settings.applyReview });
+    await expect(apply).toBeDisabled();
+    await dialog.getByRole("checkbox").press("Space");
+    await apply.click();
+    await expect(
+      dialog.getByText(common.events.commandStates.saved, { exact: true }),
+    ).toBeVisible();
+    await dialog.getByRole("button", { name: "Vazgeç" }).click();
+  };
+  await form.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await confirm("Taslağı kaydet");
+  const row = grid
+    .getByRole("row")
+    .filter({ has: page.getByRole("gridcell", { name: "en", exact: true }) });
+  await expect(row.getByRole("gridcell", { name: "Taslak", exact: true })).toBeVisible();
+  await row.getByRole("button", { name: "Taslağı düzenle" }).click();
+  await expect(field).toHaveValue("Synthetic translation.");
+  await form.getByRole("button", { name: "Çeviriyi yayımla" }).click();
+  await confirm("Çeviriyi yayımla");
+  await expect(row.getByRole("gridcell", { name: "Yayın sürümü" })).toBeVisible();
+  await row.getByRole("button", { name: "Yayından kaldır" }).click();
+  await confirm("Yayından kaldır");
+  await expect(row.getByRole("gridcell", { name: "Kaldırıldı" })).toBeVisible();
+  await row.getByRole("button", { name: "Geçersiz kıl" }).click();
+  await confirm("Geçersiz kıl");
+  await expect(page.getByText("Sunucu, sürümü geçersiz kıldığını doğruladı.")).toBeVisible();
+  expect(state.writes.map(({ r }) => r.action)).toEqual([
+    "draft",
+    "publish",
+    "retire",
+    "invalidate",
+  ]);
 });

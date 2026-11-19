@@ -4631,6 +4631,45 @@
     "offerContext": "Seçtiğin hakkın gerektirdiği belgeleri inceleyebilirsin. Teklif kabulünde kullanılacak uygun hakkı sunucu yeniden belirler."
   },
   "documents": {
+    "contentCatalog": {
+      "title": "İçerik kataloğu",
+      "unread": "Bu belgenin içerik kataloğu okunamadı.",
+      "empty": "Bu belge için katalog sürümü yok.",
+      "statusLimit": "Yayın satırı sürüm geçmişini gösterir. Geçersiz kılma durumu katalog okumasında ayrı gösterilemiyor.",
+      "code": "Kod",
+      "channel": "Kanal",
+      "channelDocument": "Belge",
+      "language": "Dil",
+      "source": "Kaynak belge sürümü",
+      "revision": "Sürüm ve revizyon",
+      "status": "Durum",
+      "actions": "İşlemler",
+      "retired": "Kaldırıldı",
+      "draft": "Taslak",
+      "published": "Yayın sürümü",
+      "edit": "Taslağı düzenle",
+      "newTranslation": "Çeviri ekle",
+      "translation": "Belge çevirisi",
+      "name": "Çeviri adı",
+      "action": {
+        "draft": "Taslağı kaydet",
+        "publish": "Çeviriyi yayımla",
+        "retire": "Yayından kaldır",
+        "invalidate": "Geçersiz kıl"
+      },
+      "effect": {
+        "draft": "Çeviri taslağı kaydedilir.",
+        "publish": "Seçili kaynak sürümünün çevirisi yayımlanır.",
+        "retire": "Bu sürüm yeni belge seçimlerinde kullanılmaz.",
+        "invalidate": "Bu sürümden önceden hazırlanmış metinler de yeni kabul için geçersiz olur."
+      },
+      "result": {
+        "draft": "Taslak kaydedildi ve yeniden okundu.",
+        "publish": "Çeviri yayımlandı ve yeniden okundu.",
+        "retire": "Kaldırılan sürüm yeniden okundu.",
+        "invalidate": "Sunucu, sürümü geçersiz kıldığını doğruladı."
+      }
+    },
     "title": "Belgeler",
     "description": "Üyelerin kabul etmesi gereken metinler. Yeni sürüm yayınlamadan önce etkisini görürsün.",
     "add": "Belge yükle",

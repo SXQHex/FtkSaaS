@@ -530,6 +530,6 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 
 ## W1-BE-65 · İçerik kataloğunda geçersiz kılma durumunun okunması
 
-**Açık · Web1 talebi.** `content_catalog_save_v1(action:invalidate)` sürümü geçersiz kılar. `content_catalog_get_v1` okuması `retired` alanını yalnız kaldırma kaydından üretir ve geçersiz kılma durumunu dönmez. Geçersiz sürüm bu nedenle yenilemeden sonra da kataloğun yayın satırında etkin görünebilir.
+**Açık · Web1 talebi.** `content_catalog_save_v1(action:invalidate)` sürümü geçersiz kılar. `content_catalog_get_v1` okuması `retired` alanını yalnız kaldırma kaydından üretir ve geçersiz kılma durumunu dönmez. Geçersiz sürüm bu nedenle katalog okumasında diğer yayımlanmış sürümlerden ayrılamaz. Web1, aynı oturumda sunucunun doğruladığı komut sonucunu gösterir.
 
 [V09.1](todo.md#v09) için aynı yetkili kapsam ve kaynak sürümü içinde kaldırılmış ve geçersiz kılınmış sürümlerin kalıcı olarak ayrıştırılabilmesi gerekiyor. Mevcut erişim ve belge kabul kuralları [WF11](../../../docs/workflows.md#wf11) kapsamında geçerli.

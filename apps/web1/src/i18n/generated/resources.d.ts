@@ -780,6 +780,45 @@ export default interface Resources {
         "state": "Durum",
         "version": "Sürüm"
       },
+      "contentCatalog": {
+        "action": {
+          "draft": "Taslağı kaydet",
+          "invalidate": "Geçersiz kıl",
+          "publish": "Çeviriyi yayımla",
+          "retire": "Yayından kaldır"
+        },
+        "actions": "İşlemler",
+        "channel": "Kanal",
+        "channelDocument": "Belge",
+        "code": "Kod",
+        "draft": "Taslak",
+        "edit": "Taslağı düzenle",
+        "effect": {
+          "draft": "Çeviri taslağı kaydedilir.",
+          "invalidate": "Bu sürümden önceden hazırlanmış metinler de yeni kabul için geçersiz olur.",
+          "publish": "Seçili kaynak sürümünün çevirisi yayımlanır.",
+          "retire": "Bu sürüm yeni belge seçimlerinde kullanılmaz."
+        },
+        "empty": "Bu belge için katalog sürümü yok.",
+        "language": "Dil",
+        "name": "Çeviri adı",
+        "newTranslation": "Çeviri ekle",
+        "published": "Yayın sürümü",
+        "result": {
+          "draft": "Taslak kaydedildi ve yeniden okundu.",
+          "invalidate": "Sunucu, sürümü geçersiz kıldığını doğruladı.",
+          "publish": "Çeviri yayımlandı ve yeniden okundu.",
+          "retire": "Kaldırılan sürüm yeniden okundu."
+        },
+        "retired": "Kaldırıldı",
+        "revision": "Sürüm ve revizyon",
+        "source": "Kaynak belge sürümü",
+        "status": "Durum",
+        "statusLimit": "Yayın satırı sürüm geçmişini gösterir. Geçersiz kılma durumu katalog okumasında ayrı gösterilemiyor.",
+        "title": "İçerik kataloğu",
+        "translation": "Belge çevirisi",
+        "unread": "Bu belgenin içerik kataloğu okunamadı."
+      },
       "currentOnly": "Bu yetkiyle yalnız güncel işlem gereksinimleri gösterilir; tarihsel kabuller açılmaz.",
       "description": "Üyelerin kabul etmesi gereken metinler. Yeni sürüm yayınlamadan önce etkisini görürsün.",
       "digitalLanguage": "Metin dili",

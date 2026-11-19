@@ -7,6 +7,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import type { DocumentDirectoryDocument } from "../../lib/api-contracts/generated";
 import { readWorkspace } from "../workspace/workspace";
 import { DocumentsView, type DocumentRow, type DocumentAcceptanceRow } from "./documents-view";
+import { DocumentCatalogPanel } from "./document-catalog-panel";
 import { DocumentEditor } from "./document-editor";
 import { DocumentDirectorySheet } from "./document-directory-sheet";
 import { readDocumentDirectory, directoryDocuments, directoryVersions } from "./document-directory";
@@ -32,7 +33,7 @@ export function DocumentsContent({
     [locked, setLocked] = useState(false),
     [lost, setLost] = useState(false),
     [saved, setSaved] = useState<string>();
-  const [tab, setTab] = useState<"documents" | "acceptance">("documents"),
+  const [tab, setTab] = useState<"documents" | "acceptance" | "catalog">("documents"),
     [filter, setFilter] = useState<"pending" | "all">("pending"),
     [level, setLevel] = useState<"center" | "organization">("center"),
     [documentId, setDocument] = useState(""),
@@ -114,7 +115,7 @@ export function DocumentsContent({
         query: query || undefined,
         cursor: cursors[index],
       }),
-    enabled: active && (tab === "documents" || !!documentId),
+    enabled: active && (tab === "documents" || (tab === "acceptance" && !!documentId)),
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -243,7 +244,9 @@ export function DocumentsContent({
       : null;
   const summary =
     readable?.summary ??
-    (tab === "acceptance" && !documentId ? catalog.data?.pages[0]?.summary : undefined);
+    (tab === "catalog" || (tab === "acceptance" && !documentId)
+      ? catalog.data?.pages[0]?.summary
+      : undefined);
   const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
   async function refresh() {
     const results = await Promise.all([page.refetch(), catalog.refetch()]);
@@ -263,6 +266,19 @@ export function DocumentsContent({
         loading={active && page.isPending}
         acceptancePrompt={
           tab === "acceptance" && !documentId ? t(($) => $.documents.chooseDocument) : undefined
+        }
+        contentCatalog={
+          tab === "catalog" && !invalid && active && selected ? (
+            <DocumentCatalogPanel
+              key={selected.key}
+              scope={scope}
+              document={selected}
+              onLockChange={lock}
+              onAccessLost={accessLost}
+            />
+          ) : (
+            <p>{t(($) => $.documents.chooseDocument)}</p>
+          )
         }
         documents={documents}
         acceptances={acceptances}
@@ -330,7 +346,7 @@ export function DocumentsContent({
                   </NativeSelectOption>
                 </NativeSelect>
               </Field>
-              {tab === "acceptance" && (
+              {tab !== "documents" && (
                 <>
                   <Field>
                     <FieldLabel htmlFor="acceptance-document">
@@ -358,7 +374,7 @@ export function DocumentsContent({
                         ))}
                     </NativeSelect>
                   </Field>
-                  {documentId && (
+                  {tab === "acceptance" && documentId && (
                     <Field>
                       <FieldLabel htmlFor="acceptance-version">
                         {t(($) => $.documents.columns.version)}
@@ -386,36 +402,38 @@ export function DocumentsContent({
                 </>
               )}
             </div>
-            <search aria-label={t(($) => $.documents.search)}>
-              <form
-                className="flex flex-wrap items-end gap-2"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setQuery(search.trim());
-                  reset();
-                }}
-              >
-                <Field className="min-w-0 flex-1">
-                  <FieldLabel htmlFor="document-search">
-                    {tab === "documents"
-                      ? t(($) => $.documents.searchDocument)
-                      : t(($) => $.documents.searchPerson)}
-                  </FieldLabel>
-                  <Input
-                    id="document-search"
-                    name="query"
-                    type="search"
-                    maxLength={200}
-                    value={search}
-                    disabled={locked}
-                    onChange={(event) => setSearch(event.target.value)}
-                  />
-                </Field>
-                <Button type="submit" variant="outline" isDisabled={locked}>
-                  {t(($) => $.documents.search)}
-                </Button>
-              </form>
-            </search>
+            {tab !== "catalog" && (
+              <search aria-label={t(($) => $.documents.search)}>
+                <form
+                  className="flex flex-wrap items-end gap-2"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    setQuery(search.trim());
+                    reset();
+                  }}
+                >
+                  <Field className="min-w-0 flex-1">
+                    <FieldLabel htmlFor="document-search">
+                      {tab === "documents"
+                        ? t(($) => $.documents.searchDocument)
+                        : t(($) => $.documents.searchPerson)}
+                    </FieldLabel>
+                    <Input
+                      id="document-search"
+                      name="query"
+                      type="search"
+                      maxLength={200}
+                      value={search}
+                      disabled={locked}
+                      onChange={(event) => setSearch(event.target.value)}
+                    />
+                  </Field>
+                  <Button type="submit" variant="outline" isDisabled={locked}>
+                    {t(($) => $.documents.search)}
+                  </Button>
+                </form>
+              </search>
+            )}
             {catalog.hasNextPage && (
               <Button
                 variant="outline"

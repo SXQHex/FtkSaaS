@@ -11,7 +11,7 @@ import type {
   SuccessDocumentPublicationPreview,
   UploadRef,
 } from "../../lib/api-contracts/generated";
-import { readDocumentCatalog } from "./document-catalog";
+import { matchesDocumentText, readDocumentCatalog } from "./document-catalog";
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -345,15 +345,7 @@ export async function readPublication(intent: PublicationIntent, id?: string) {
     const source = catalog.find(
       (item) => item.id === fileId && item.source_version === fileId && item.state === "published",
     );
-    if (
-      !source ||
-      !("name" in source.content) ||
-      source.content.name !== digital.name ||
-      source.content.text !== digital.text ||
-      source.content.language !== digital.language ||
-      source.content.template_id !== digital.template_id ||
-      source.content.template_version !== digital.template_version
-    )
+    if (!source || !matchesDocumentText(source.content, digital))
       throw Error("DOCUMENT_RESULT_UNAVAILABLE");
   }
   return {
