@@ -65,7 +65,7 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Karşılandı](#w1-be-54--başvuru-durum-filtresi). |
 | W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Açık](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
 | W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Açık](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
-| W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Açık](#w1-be-57--bildirim-arşivi-ve-silme). |
+| W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Karşılandı](#w1-be-57--bildirim-arşivi-ve-silme). |
 | W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Açık](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
 | W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Açık](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
 
@@ -486,9 +486,9 @@ Yönetilebilir kanonik adresi, adres değişimi sonrası eski bağlantının dur
 
 ## W1-BE-57 · Bildirim arşivi ve silme
 
-**Açık · backend değerlendirmesi.** Gelen kutusu çiziminde arşivleme, silme, toplu seçim ve bunları geri alma bulunuyor. `notifications_read_set_v1` yalnız seçilen bildirimlerin okundu/okunmadı durumunu değiştiriyor. Web1 okuma değişikliğini doğrulanan sürümlerle geri alabiliyor. Arşiv ve silme için yayımlanmış liste durumu veya yazma işlemi yok. [Güncel çizim](../read-only/tasarim-v2/index.html#L682) · [WF11](../../../docs/workflows.md#wf11).
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341) ile gelen sözleşme, güncel `f7ded8d7baa8680e76d726e5ceaea24aead35a30` kaynağının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) içinde doğrulandı.
 
-Kendi alıcı kapsamındaki seçilmiş bildirimler için arşiv, silme, görünürlük ve geri alma kurallarını değerlendirin. Saklama politikası, sürüm çakışması, atomik toplu seçim, aynı işlem niyetinin tekrar güvenliği ve filtre sayaçları açıklanmalı. Bildirim görünürlüğü değiştiğinde kaynak işin durumu korunmalı.
+`notifications_list_v1(visibility)` klasörün yetkili dizinini döndürür. `notifications_read_set_v1(visibility,notifications)` sürümlü kayıtları atomik taşır, okundu ve kaynak iş durumunu korur. [WF11](../../../docs/workflows.md#wf11) · [V06.1 Web1 kabulü](todo.md#v06).
 
 ## W1-BE-58 · Fatura vergi bilgileri ve geçmişi
 

@@ -1519,9 +1519,14 @@ export default interface Resources {
       "title": "Yardım"
     },
     "inbox": {
+      "archiveSelected": "Seçilenleri arşivle",
       "bodyMissing": "Bildirim metni paylaşılmıyor",
       "choose": "Okumak için bir ileti seç.",
       "complete": "İşlem tamamlandı",
+      "deleteCancel": "Vazgeç",
+      "deleteConfirm": "Silinenler’e taşı",
+      "deleteSelected": "Seçilenleri sil",
+      "deleteSelectedDescription": "{{count}} ileti Silinenler’e taşınacak. İletiyi oradan geri alabilirsin." | "{{count}} ileti Silinenler’e taşınacak. İletileri oradan geri alabilirsin.",
       "deliveryJob": "E-posta işlemi",
       "deliveryStates": {
         "accepted": "Sağlayıcı kabul etti",
@@ -1538,6 +1543,8 @@ export default interface Resources {
       "filter": "Süzgeç",
       "filters": {
         "all": "Tümü",
+        "archived": "Arşiv",
+        "deleted": "Silinenler",
         "todo": "İşlem bekleyen",
         "unread": "Okunmamış"
       },
@@ -1566,6 +1573,7 @@ export default interface Resources {
       "readError": "Bildirim kaynağı okunamadı. Güncel yetkili kaynağı yeniden oku.",
       "reply": "Yanıt",
       "replyPlaceholder": "Yanıtını yaz",
+      "restoreSelected": "Gelen kutusuna taşı",
       "scope": "Kapsam",
       "scopeHint": "Kuruluş kapsamındaki kendi bildirimlerin. Saatler {{timezone}} ile gösterilir.",
       "search": "İletilerde ara",
@@ -1587,6 +1595,7 @@ export default interface Resources {
       "title": "Gelen kutusu",
       "titleMissing": "Başlık paylaşılmıyor",
       "undoReadChange": "Okuma değişikliğini geri al",
+      "undoVisibilityChange": "Taşımayı geri al",
       "unknown": "Bilgi paylaşılmıyor",
       "unread": "Okunmamış",
       "unreadCount": "{{count}} okunmamış bildirim" | "{{count}} okunmamış bildirim",

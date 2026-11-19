@@ -39,7 +39,7 @@ const intent = {
     (typeof notifications)[number],
     (typeof notifications)[number],
   ],
-  read: true,
+  change: true,
   key: id(6),
   changedIds: [id(4), id(5)],
 };
@@ -163,9 +163,21 @@ it("requires all selected outcomes to advance with the requested state and first
     "INBOX_RESULT_UNAVAILABLE",
   );
   call.mockResolvedValue(states(1, false));
-  await expect(readNotificationSetResult({ ...intent, read: false }, id(4))).resolves.toHaveLength(
-    2,
-  );
+  await expect(
+    readNotificationSetResult({ ...intent, change: false }, id(4)),
+  ).resolves.toHaveLength(2);
+});
+it("moves only reviewed versions without including a read change", async () => {
+  call.mockResolvedValue(states());
+  const move = await notificationSetIntent(scope, notifications, {
+    visibility: "archived",
+    from: "inbox",
+  });
+  await setNotificationsRead(move);
+  expect(call.mock.calls.at(-1)?.[1]).toMatchObject({ visibility: "archived", notifications });
+  expect(call.mock.calls.at(-1)?.[1]).not.toHaveProperty("read");
+  call.mockResolvedValue(states(1, false));
+  await expect(readNotificationSetResult(move, id(4))).resolves.toHaveLength(2);
 });
 it("does not accept a receipt for another operation/key/primary notification", async () => {
   for (const change of [

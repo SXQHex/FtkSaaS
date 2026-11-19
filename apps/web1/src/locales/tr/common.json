@@ -4068,7 +4068,9 @@
     "filters": {
       "all": "Tümü",
       "unread": "Okunmamış",
-      "todo": "İşlem bekleyen"
+      "todo": "İşlem bekleyen",
+      "archived": "Arşiv",
+      "deleted": "Silinenler"
     },
     "read": "Okundu",
     "unread": "Okunmamış",
@@ -4118,6 +4120,14 @@
     "selectVisible": "Görünen iletilerin tümünü seç",
     "selectionActions": "İleti seçimi ve toplu işlemler",
     "undoReadChange": "Okuma değişikliğini geri al",
+    "archiveSelected": "Seçilenleri arşivle",
+    "deleteSelected": "Seçilenleri sil",
+    "restoreSelected": "Gelen kutusuna taşı",
+    "undoVisibilityChange": "Taşımayı geri al",
+    "deleteSelectedDescription_one": "{{count}} ileti Silinenler’e taşınacak. İletiyi oradan geri alabilirsin.",
+    "deleteSelectedDescription_other": "{{count}} ileti Silinenler’e taşınacak. İletileri oradan geri alabilirsin.",
+    "deleteCancel": "Vazgeç",
+    "deleteConfirm": "Silinenler’e taşı",
     "searchSubmit": "Ara",
     "selectMessage": "Seç: {{title}}",
     "sourceOpen": "Kaynağı aç",

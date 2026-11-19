@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../lib/utils";
 import {
@@ -25,7 +25,16 @@ import { Field, FieldLabel } from "../../components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 import { MemberReadSkeleton } from "../member/member-read-skeleton";
-import type { InboxFilter } from "./inbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
+import type { InboxFilter, InboxVisibility } from "./inbox";
 export interface InboxRow {
   id: string;
   title: string;
@@ -54,6 +63,8 @@ export function InboxView({
   canMarkSelection = false,
   onMarkInboxRead,
   onMarkSelected,
+  onMoveSelected,
+  undoVisibility = false,
   onSelectVisible,
   onUndo,
   locked = false,
@@ -84,6 +95,8 @@ export function InboxView({
   canMarkSelection?: boolean;
   onMarkInboxRead?: () => void;
   onMarkSelected: (read: boolean) => void;
+  onMoveSelected: (visibility: InboxVisibility) => void;
+  undoVisibility?: boolean;
   onSelectVisible: (value: boolean) => void;
   onUndo?: () => void;
   locked?: boolean;
@@ -103,6 +116,10 @@ export function InboxView({
     buttons = useRef(new Map<string, HTMLButtonElement>()),
     previous = useRef<string | null>(null);
   const selectedId = selected?.id;
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const outsideInbox = filter === "archived" || filter === "deleted";
+  const filters: InboxFilter[] = ["all", "unread", "todo"];
+  if (!member) filters.push("archived", "deleted");
   const visibleChecked = rows?.filter((row) => checked.includes(row.id)).length ?? 0;
   useEffect(() => {
     if (selectedId) {
@@ -158,12 +175,32 @@ export function InboxView({
           >
             {t(($) => $.inbox.markSelectedUnread)}
           </Button>
+          {!member && (
+            <>
+              <Button
+                variant="outline"
+                isDisabled={locked || !canMarkSelection}
+                onPress={() => onMoveSelected(outsideInbox ? "inbox" : "archived")}
+              >
+                {t(($) => (outsideInbox ? $.inbox.restoreSelected : $.inbox.archiveSelected))}
+              </Button>
+              {filter !== "deleted" && (
+                <Button
+                  variant="outline"
+                  isDisabled={locked || !canMarkSelection}
+                  onPress={() => setDeleteOpen(true)}
+                >
+                  {t(($) => $.inbox.deleteSelected)}
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </header>
       {notice}
       {onUndo && (
         <Button variant="outline" className="self-start" isDisabled={locked} onPress={onUndo}>
-          {t(($) => $.inbox.undoReadChange)}
+          {t(($) => (undoVisibility ? $.inbox.undoVisibilityChange : $.inbox.undoReadChange))}
         </Button>
       )}
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_26rem]">
@@ -204,12 +241,13 @@ export function InboxView({
                 selectedKeys={[filter]}
                 onSelectionChange={(keys) => {
                   const value = [...keys][0];
-                  if (value === "all" || value === "unread" || value === "todo") onFilter(value);
+                  const next = filters.find((filter) => filter === value);
+                  if (next) onFilter(next);
                 }}
                 variant="segmented"
                 className="max-w-full flex-wrap"
               >
-                {(["all", "unread", "todo"] as const).map((value) => (
+                {filters.map((value) => (
                   <ToggleGroupItem
                     aria-label={t(($) => $.inbox.filters[value])}
                     id={value}
@@ -217,7 +255,7 @@ export function InboxView({
                     isDisabled={locked || (value === "todo" && !advancedAvailable)}
                   >
                     {t(($) => $.inbox.filters[value])}
-                    {summary && (
+                    {summary && !outsideInbox && value !== "archived" && value !== "deleted" && (
                       <Badge variant="secondary">
                         {
                           summary[
@@ -373,6 +411,24 @@ export function InboxView({
           </Card>
         </aside>
       </div>
+      <AlertDialog isOpen={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t(($) => $.inbox.deleteSelected)}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t(($) => $.inbox.deleteSelectedDescription, { count: checked.length })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel autoFocus>{t(($) => $.inbox.deleteCancel)}</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            isDisabled={locked || !canMarkSelection}
+            onPress={() => onMoveSelected("deleted")}
+          >
+            {t(($) => $.inbox.deleteConfirm)}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialog>
     </div>
   );
 }

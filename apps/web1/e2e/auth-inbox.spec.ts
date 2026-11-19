@@ -53,6 +53,8 @@ async function fixture(
     advanced: false,
     secondRead: false,
     secondVersion: 9,
+    visibility: "inbox",
+    secondVisibility: "inbox",
     keys: new Set<string>(),
     sourceReads: [] as Record<string, unknown>[],
     sourceDenied: false,
@@ -158,7 +160,7 @@ async function fixture(
         items: (r.work_state === "pending" && mode !== "source"
           ? []
           : [
-              row(),
+              { ...row(), ...(r.visibility ? { visibility: state.visibility } : {}) },
               ...(mode === "batch"
                 ? [
                     {
@@ -167,12 +169,15 @@ async function fixture(
                       payload: { ...row().payload, title: "İkinci bildirim" },
                       version: state.secondVersion,
                       read_at: state.secondRead ? "2026-11-16T12:05:00Z" : null,
+                      ...(r.visibility ? { visibility: state.secondVisibility } : {}),
                     },
                   ]
                 : []),
             ]
         ).filter(
           (n) =>
+            (n.id === secondId ? state.secondVisibility : state.visibility) ===
+              (r.visibility ?? "inbox") &&
             (!r.unread_only || !n.read_at) &&
             (!r.query || n.payload.title.toLowerCase().includes(r.query.toLowerCase())),
         ),
@@ -351,10 +356,12 @@ async function fixture(
         for (const selected of r.notifications) {
           if (selected.id === id) {
             state.version++;
-            state.read = r.read;
+            if (r.visibility) state.visibility = r.visibility;
+            else state.read = r.read;
           } else {
             state.secondVersion++;
-            state.secondRead = r.read;
+            if (r.visibility) state.secondVisibility = r.visibility;
+            else state.secondRead = r.read;
           }
         }
         if (mode === "unknown") return route.abort("failed");
@@ -692,6 +699,62 @@ test("inbox explicit selection uses atomic batch and reverse read remains a sepa
   });
   expect(state.writes[1]!.operation_key).not.toBe(state.writes[0]!.operation_key);
   expect(state.effects).toBe(2);
+});
+test("inbox archives, deletes with confirmation, and restores the exact selected notification", async ({
+  page,
+}) => {
+  const state = await fixture(page, "batch");
+  const message = page.getByRole("button", { name: "Örnek bildirim", exact: true });
+  const select = page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true });
+  const saved = page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true });
+
+  await select.press("Space");
+  await page.getByRole("button", { name: "Seçilenleri arşivle", exact: true }).click();
+  await expect(saved).toBeVisible();
+  await expect(message).toHaveCount(0);
+  expect(state.writes[0]).toMatchObject({
+    visibility: "archived",
+    notifications: [{ id, expected_version: 7 }],
+  });
+  expect(state.writes[0]).not.toHaveProperty("read");
+  await page.getByRole("radio", { name: "Arşiv", exact: true }).click();
+  await expect(message).toBeVisible();
+  await select.press("Space");
+  await page.getByRole("button", { name: "Seçilenleri sil", exact: true }).click();
+  const dialog = page.getByRole("alertdialog");
+  const cancel = dialog.getByRole("button", { name: "Vazgeç", exact: true });
+  await expect(cancel).toBeFocused();
+  await cancel.click();
+  expect(state.writes).toHaveLength(1);
+  await page.getByRole("button", { name: "Seçilenleri sil", exact: true }).click();
+  await dialog.getByRole("button", { name: "Silinenler’e taşı", exact: true }).click();
+  await expect(saved).toBeVisible();
+  await expect(message).toHaveCount(0);
+  await page.getByRole("radio", { name: "Silinenler", exact: true }).click();
+  await expect(message).toBeVisible();
+  await page.getByRole("button", { name: "Taşımayı geri al", exact: true }).click();
+  await expect(message).toHaveCount(0);
+  await page.getByRole("radio", { name: "Arşiv", exact: true }).click();
+  await expect(message).toBeVisible();
+  expect(state.writes[2]).toMatchObject({
+    visibility: "archived",
+    notifications: [{ id, expected_version: 9 }],
+  });
+  await select.press("Space");
+  await page.getByRole("button", { name: "Gelen kutusuna taşı", exact: true }).click();
+  await expect(message).toHaveCount(0);
+  await page.getByRole("radio", { name: "Silinenler", exact: true }).click();
+  await expect(message).toHaveCount(0);
+  await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
+  await expect(message).toBeVisible();
+  expect(state.read).toBe(false);
+  expect(state.secondVisibility).toBe("inbox");
+  expect(state.writes.map((write) => write.visibility)).toEqual([
+    "archived",
+    "deleted",
+    "archived",
+    "inbox",
+  ]);
 });
 test("inbox bulk selection undoes only changed read states using confirmed versions", async ({
   page,

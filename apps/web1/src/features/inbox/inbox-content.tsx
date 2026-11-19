@@ -20,6 +20,7 @@ import {
   readNotificationSetReceipt,
   readNotificationSetResult,
   type NotificationSetIntent,
+  type NotificationChange,
 } from "./inbox-batch";
 import { readInboxSource, readMemberSessionNotice } from "./inbox-source";
 import { readWorkspace } from "../workspace/workspace";
@@ -46,7 +47,10 @@ export function InboxContent({
     [query, setQuery] = useState(""),
     [draftQuery, setDraftQuery] = useState(""),
     [checked, setChecked] = useState<string[]>([]),
-    [undo, setUndo] = useState<{ read: boolean; notifications: NotificationReadSelection[] }>(),
+    [undo, setUndo] = useState<{
+      change: NotificationChange;
+      notifications: NotificationReadSelection[];
+    }>(),
     [selected, setSelected] = useState<NotificationView>(),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState<string>();
@@ -144,6 +148,7 @@ export function InboxContent({
       for (const row of rows) queries.setQueryData([...prefix, "state", row.id], row);
       await queries.invalidateQueries({ queryKey: [...prefix, "list"] }, { throwOnError: true });
       setChecked([]);
+      if (typeof intent.change !== "boolean") setSelected(undefined);
       const changed = new Set(intent.changedIds);
       const exact = rows.every(
         (row, index) =>
@@ -152,7 +157,10 @@ export function InboxContent({
       setUndo(
         !intent.undoing && exact && changed.size
           ? {
-              read: !intent.read,
+              change:
+                typeof intent.change === "boolean"
+                  ? !intent.change
+                  : { visibility: intent.change.from, from: intent.change.visibility },
               notifications: rows
                 .filter((row) => changed.has(row.id))
                 .map((row) => ({ id: row.id, expected_version: row.version })),
@@ -190,7 +198,10 @@ export function InboxContent({
     setUndo(undefined);
     void command.start({ ...markAllNotificationsIntent(scope, memberPersonId), undoing: false });
   }
-  async function markRead(read = true, target: "detail" | "selection" | "undo" = "detail") {
+  async function changeSelected(
+    change: NotificationChange = true,
+    target: "detail" | "selection" | "undo" = "detail",
+  ) {
     if (pending.current || locked || command.unavailable) return;
     if (target === "undo") {
       if (!undo || !["ready", "saved"].includes(command.state)) return;
@@ -215,7 +226,7 @@ export function InboxContent({
               ? [{ id: source.data.id, expected_version: source.data.version }]
               : [];
       setUndo(undefined);
-      const intent = await notificationSetIntent(scope, notifications, read);
+      const intent = await notificationSetIntent(scope, notifications, change);
       if (mounted.current) await command.start({ ...intent, undoing: target === "undo" });
     } catch (cause) {
       if (mounted.current && !accessLost(cause))
@@ -326,11 +337,11 @@ export function InboxContent({
         }
       }}
       onMarkRead={() => {
-        void markRead();
+        void changeSelected();
       }}
       canMarkRead={!source.isError && source.data?.state === "unread" && command.state === "ready"}
       onUnread={() => {
-        void markRead(false);
+        void changeSelected(false);
       }}
       canUnread={!source.isError && source.data?.state === "read" && command.state === "ready"}
       canMarkSelection={
@@ -347,8 +358,14 @@ export function InboxContent({
           : undefined
       }
       onMarkSelected={(read) => {
-        void markRead(read, "selection");
+        void changeSelected(read, "selection");
       }}
+      onMoveSelected={(visibility) =>
+        void changeSelected(
+          { visibility, from: filter === "archived" || filter === "deleted" ? filter : "inbox" },
+          "selection",
+        )
+      }
       onSelectVisible={(value) => {
         if (locked || list.isError || list.isFetching) return;
         command.reset();
@@ -356,9 +373,10 @@ export function InboxContent({
       }}
       onUndo={
         undo && ["ready", "saved"].includes(command.state)
-          ? () => void markRead(undo.read, "undo")
+          ? () => void changeSelected(undo.change, "undo")
           : undefined
       }
+      undoVisibility={undo !== undefined && typeof undo.change !== "boolean"}
       locked={locked}
       sourceAction={
         canReadSource &&

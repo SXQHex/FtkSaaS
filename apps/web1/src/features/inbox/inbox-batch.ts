@@ -3,6 +3,7 @@ import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { NotificationReadSelection } from "../../lib/api-contracts/generated";
+import type { InboxVisibility } from "./inbox";
 const operation = "notifications_read_set_v1" as const;
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
@@ -50,10 +51,11 @@ export async function readNotificationSelection(scope: ClientScope, ids: string[
     };
   });
 }
+export type NotificationChange = boolean | { visibility: InboxVisibility; from: InboxVisibility };
 interface NotificationSelectionIntent {
   scope: ClientScope;
   notifications: [NotificationReadSelection, ...NotificationReadSelection[]];
-  read: boolean;
+  change: NotificationChange;
   key: string;
   changedIds: string[];
 }
@@ -70,7 +72,7 @@ export function markAllNotificationsIntent(
 export async function notificationSetIntent(
   scope: ClientScope,
   notifications: NotificationReadSelection[],
-  read: boolean,
+  change: NotificationChange,
 ): Promise<NotificationSelectionIntent> {
   selection.parse(notifications);
   const current = await readNotificationSelection(
@@ -82,10 +84,10 @@ export async function notificationSetIntent(
   return {
     scope: { ...scope },
     notifications: [notifications[0]!, ...notifications.slice(1)],
-    read,
+    change,
     key: uuidv7(),
     changedIds: current
-      .filter((row) => row.state !== (read ? "read" : "unread"))
+      .filter((row) => typeof change !== "boolean" || row.state !== (change ? "read" : "unread"))
       .map((row) => row.id),
   };
 }
@@ -105,8 +107,10 @@ export async function setNotificationsRead(intent: NotificationSetIntent) {
     ...common(intent.scope),
     request_id: uuidv7(),
     operation_key: intent.key,
-    read: intent.read,
     notifications: intent.notifications,
+    ...(typeof intent.change === "boolean"
+      ? { read: intent.change }
+      : { visibility: intent.change.visibility }),
   });
 }
 export async function readNotificationSetReceipt(intent: NotificationSetIntent) {
@@ -145,7 +149,7 @@ export async function readNotificationSetResult(intent: NotificationSetIntent, i
   if (
     rows.some(
       (row, i) =>
-        row.state !== (intent.read ? "read" : "unread") ||
+        (typeof intent.change === "boolean" && row.state !== (intent.change ? "read" : "unread")) ||
         row.version <= intent.notifications[i]!.expected_version,
     )
   )
