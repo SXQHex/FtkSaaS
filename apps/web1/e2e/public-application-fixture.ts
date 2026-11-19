@@ -20,7 +20,7 @@ export async function prepareApplication(
       },
     );
   const mutations: Record<string, unknown>[] = [];
-  let response: "success" | "abort" | "bot" | "expired" = "success";
+  let response: "success" | "abort" | "bot" | "expired" | "unavailable" = "success";
   await page.route("**/api/public/application", async (route) => {
     const request = route.request();
     expect(request.headers()["authorization"]).toBeUndefined();
@@ -39,11 +39,23 @@ export async function prepareApplication(
     }
     const data =
       response === "success"
-        ? { ok: true, data: { accepted: true }, trace_id: publicForm.form_id }
+        ? {
+            ok: true,
+            data: {
+              accepted: true,
+              ...(payload.event_application === true ? { application_state: "pending" } : {}),
+            },
+            trace_id: publicForm.form_id,
+          }
         : {
             ok: false,
             error: {
-              code: response === "bot" ? "BOT_VERIFICATION_FAILED" : "OPERATION_RESULT_EXPIRED",
+              code:
+                response === "bot"
+                  ? "BOT_VERIFICATION_FAILED"
+                  : response === "unavailable"
+                    ? "SERVICE_UNAVAILABLE"
+                    : "OPERATION_RESULT_EXPIRED",
               retryable: false,
               trace_id: publicForm.form_id,
             },

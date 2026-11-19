@@ -16,7 +16,12 @@ import { DisciplineEditor } from "./discipline-editor";
 import { OrganizationLifecyclePanel } from "./organization-lifecycle-panel";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
 import { SettingsPublicEditor } from "./settings-public-editor";
-import type { SettingsDocumentSource } from "./settings-document";
+import {
+  publicSettingsKeys,
+  readSettingsDocument,
+  type SettingsDocumentSource,
+} from "./settings-document";
+import { publicCalendarInterval, readPublicCalendar } from "../public-program/public-calendar-read";
 import { SettingsPolicyEditor } from "./settings-policy-editor";
 import type { PolicyView } from "../../lib/api-contracts/generated";
 import { SettingsDowngradeEditor } from "./settings-downgrade-editor";
@@ -295,15 +300,61 @@ function SettingsManagement({
   }, [query.error, router]);
   const source = query.isError || query.isFetching ? undefined : query.data;
   const publicValues = document.source?.document.values;
-  const publicTarget = document.source
-    ? {
-        to: "/public/$slug/calendar" as const,
-        params: { slug: scope.orgId },
-        search: level === "center" ? { center_id: scope.centerId } : {},
-      }
-    : undefined;
+  const organizationSource = useQuery({
+    queryKey: ["settings-document", scope.accountId, scope.orgId, scope.centerId, "organization"],
+    queryFn: () => readSettingsDocument(scope, "organization"),
+    enabled: section === "yayin" && level === "center" && canOrganization && !readOnly,
+    retry: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+  const legacyCenter = useQuery({
+    queryKey: ["settings-public-legacy-center", scope.orgId, scope.centerId],
+    queryFn: async ({ signal }) =>
+      readPublicCalendar(
+        {
+          slug: scope.orgId,
+          centerId: scope.centerId,
+          interval: await publicCalendarInterval(),
+        },
+        signal,
+      ),
+    enabled:
+      section === "yayin" &&
+      level === "center" &&
+      !canOrganization &&
+      !organizationLoading &&
+      !readOnly,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const organizationDocument =
+    level === "organization"
+      ? document.source?.document
+      : canOrganization && !organizationSource.isError && !organizationSource.isFetching
+        ? organizationSource.data?.document
+        : undefined;
+  const managedPage =
+    organizationDocument?.scope === "organization"
+      ? organizationDocument.values.public_page
+      : undefined;
+  const publicTarget =
+    document.source &&
+    !readOnly &&
+    (organizationDocument ||
+      (!canOrganization &&
+        !legacyCenter.isError &&
+        !legacyCenter.isFetching &&
+        legacyCenter.data?.publication_state === "available"))
+      ? {
+          to: "/public/$slug/calendar" as const,
+          params: { slug: managedPage?.slug ?? scope.orgId },
+          search: level === "center" ? { center_id: scope.centerId } : {},
+        }
+      : undefined;
   const publicHref =
     publicTarget && new URL(router.buildLocation(publicTarget).href, window.location.origin).href;
+  const copyable = !!publicHref && managedPage?.enabled !== false;
   async function copyPublicLink(href: string) {
     setCopyFeedback(undefined);
     try {
@@ -320,6 +371,7 @@ function SettingsManagement({
     fields: {
       ...document.data.fields,
       ...notifications.fields,
+      ...(managedPage ? { "ay-py-page": { value: managedPage.enabled, writable: false } } : {}),
       ...(publicValues?.public_profile_enabled !== undefined
         ? {
             "ay-py-on": { value: publicValues.public_profile_enabled, writable: false },
@@ -543,12 +595,13 @@ function SettingsManagement({
           }
         }}
         availableActions={[
-          ...(publicHref ? ["preview" as const, "copyLink" as const] : []),
+          ...(publicHref ? ["preview" as const] : []),
+          ...(copyable ? ["copyLink" as const] : []),
           ...(team.canCreate ? ["invite" as const] : []),
           ...(document.source?.catalog.fields.some(
             (row) =>
-              ["public_profile_enabled", "public_fields", "public_application_form"].includes(
-                row.key,
+              publicSettingsKeys.some(
+                (key) => key === row.key && (key !== "public_page" || level === "organization"),
               ) && row.writable,
           ) && !readOnly
             ? ["publicSettings" as const]
@@ -574,7 +627,7 @@ function SettingsManagement({
         onAction={(action) => {
           if (locked) return;
           if (action.kind === "preview" && publicTarget) void router.navigate(publicTarget);
-          if (action.kind === "copyLink" && publicHref) void copyPublicLink(publicHref);
+          if (action.kind === "copyLink" && publicHref && copyable) void copyPublicLink(publicHref);
           if (action.kind === "invite") team.create();
           if (action.kind === "publicSettings" && document.source)
             setPublicSettings(structuredClone(document.source));
@@ -636,6 +689,14 @@ function SettingsManagement({
             );
             await queries.invalidateQueries({
               queryKey: ["settings-history", scope.accountId, scope.orgId],
+            });
+            await queries.invalidateQueries({ queryKey: ["public-calendar"], refetchType: "none" });
+            await queries.invalidateQueries({
+              queryKey: ["public-application-discovery"],
+              refetchType: "none",
+            });
+            await queries.invalidateQueries({
+              queryKey: ["settings-public-legacy-center", scope.orgId],
             });
           }}
           onClose={() => {

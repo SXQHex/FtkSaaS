@@ -73,7 +73,15 @@ export function PublicCalendarPage({ slug, centerId }: { slug: string; centerId?
         <PublicUnavailableView />
       ) : (
         <PublicCalendarView
-          rows={(presentation.data?.rows ?? []).map((row) => ({ ...row, applyHref }))}
+          rows={(presentation.data?.rows ?? []).map((row) => ({
+            ...row,
+            applyHref:
+              row.kind === "event"
+                ? !program.isError && latest?.publication_state === "available"
+                  ? `/public/${encodeURIComponent(slug)}/apply?${new URLSearchParams({ ...Object.fromEntries(params), event: row.id })}`
+                  : undefined
+                : applyHref,
+          }))}
           address={profile?.address}
           timezone={presentation.data?.timezone}
           disciplines={

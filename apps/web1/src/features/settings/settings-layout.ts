@@ -283,6 +283,12 @@ export const settingsLayout = [
         key: "ay-yayin",
         fields: [
           {
+            key: "ay-py-page",
+            kind: "switch",
+            readonly: false,
+            disabled: false,
+          },
+          {
             key: "ay-py-on",
             kind: "switch",
             readonly: false,

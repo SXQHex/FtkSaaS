@@ -1478,6 +1478,7 @@
       "ay-q-a": "Başlangıç",
       "ay-q-b": "Bitiş",
       "ay-q-tz": "Saat dilimi",
+      "ay-py-page": "Ziyaretçi sayfası yayında",
       "ay-py-on": "Ziyaretçi profili görünür",
       "ay-py-slug": "Sayfa adresi",
       "ay-py-form": "Başvuru formu bağlı",
@@ -1885,6 +1886,10 @@
       "version": "Kaynak sürüm {{version}}"
     },
     "publicEditor": {
+      "address": "Yayın adresi kısa adı",
+      "addressHint": "Küçük harfle başlayan 3–63 karakter kullan. Küçük harf, rakam ve tek tire kabul edilir.",
+      "invalidAddress": "Kurallara uygun bir yayın adresi gir.",
+      "pageEnabled": "Ziyaretçi sayfasını yayına aç",
       "title": "Yayın ayarlarını düzenle",
       "review": "Public profil alanları ve açık form/onay kaynağı birlikte gözden geçirilir. Kullanıcı adına hukuki kabul verilmez.",
       "visible": "Public profili göster",
@@ -1915,7 +1920,7 @@
       "chooseText": "Metin sürümü seç",
       "purpose": "Onay amacı",
       "add": "Onay kaynağını ekle",
-      "nativeBoundary": "Özel slug, tüm ders/etkinlikler için toplu yayın ve genel eğitmen görünürlüğü ayarı yoktur. Ders/etkinlik yayını ile doluluk ve eğitmen izni her gerçek yayında ayrı yönetilir.",
+      "nativeBoundary": "Yayın adresi değiştiğinde eski bağlantı kapanır. Ders ve etkinlik görünürlüğü, doluluk ve eğitmen bilgisi her yayın için ayrı ayarlanır.",
       "error": "Form veya onay kaynağı okunamadı ya da ayar kaynağı değişti. Güncel kaynağı okuyup yeniden incele."
     },
     "teamNative": {
@@ -3767,6 +3772,10 @@
     "checkAgain": "Yayın durumunu yeniden kontrol et"
   },
   "publicApplication": {
+    "eventDescription": "Stüdyonun başvurunla ilgili sana ulaşabilmesi için e-posta adresini gir.",
+    "eventEmail": "E-posta (zorunlu)",
+    "eventPending": "Etkinlik başvurun inceleme bekliyor.",
+    "eventPendingHint": "Stüdyo başvurunu inceleyip yer ve ödeme koşullarını bildirecek.",
     "title": "Başvur",
     "description": "Bilgilerini bırak, stüdyo sana dönsün. Üye olmak zorunda değilsin.",
     "name": "Ad soyad (zorunlu)",

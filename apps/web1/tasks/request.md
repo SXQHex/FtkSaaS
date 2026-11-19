@@ -1,10 +1,8 @@
 # Web1 · Backend talepleri
 
-18 Kasım 2026 · Frontend talep kaydı. Bu dosya backend ihtiyaçlarının ve karşılanma durumlarının ayrıntı sahibidir. Ekran sırası, uygulama ilerlemesi ve frontend kabulü [TODO](todo.md) içinde kalır. **41 talebin kaynak desteği karşılandı. W1-BE-42 backend development’a teslim edildi ve Web1 adayında doğrulandı. Yayımlı Web1 kabulü açık. W1-BE-43–50 backend değerlendirmesi için açık.** W1-BE-36’nın sağlayıcı kontrolleri TODO’da izlenir. W1-BE-35’in aynı kaynaklı development teslimi başarılı.
+Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında, Web1 uygulaması ve ekran kabulü [TODO](todo.md) içinde izlenir. W1-BE-42’nin yayımlı Web1 kabulü G-STARTER.2’ye, W1-BE-36’nın sağlayıcı kontrolleri ilgili TODO maddesine bağlıdır.
 
-İncelenen main `b219f2be822338b40460f1bb981e00d07b6be70e`. PR328’in kurtarma aracı [W1-BE-36](#w1-be-36--native-auth-recovery-kabul-aracının-callback-kaynağı) kaydında, önceki yönetici rolü keşfi W1-BE-35 kaydındadır. [Aynı SHA'nın Main proof sonucu](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) başarılı.
-
-PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel typed snapshot güncellendi. Frontend tüketimi ve ekran kabulü TODO sahibindedir. Backend kaynak desteği; development dağıtımı, frontend tüketimi, ekran kabulü veya gerçek hosted/provider kabulü değildir. Ekran durumu yalnız [TODO](todo.md) sahibindedir.
+İncelenen main `f7ded8d7baa8680e76d726e5ceaea24aead35a30`. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) aynı kaynakta başarılı.
 
 | Kimlik   | Ekran / işlev                  | İhtiyaç                                                                          | Frontend tarafından bilinen durum                                                                                                                                                                                                         |
 | -------- | ------------------------------ | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -50,8 +48,8 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-39 | P09.2 · WF06 | Borç politikasından kaynaklanan rezervasyon reddinin ayırt edilmesi | Karşılandı (PR330). Yetkili rezervasyonda `DEBT_BOOKING_BLOCKED` ayrımı var. |
 | W1-BE-40 | P14.1 · WF11/WF12 | Ders değişikliğinde etkilenen öğrenciye uygulama içi bildirim | Karşılandı (PR330). Etkilenen aktif rezervasyon sahibine ders değişikliği bildirimi gider. |
 | W1-BE-41 | P01.4 · WF01 | Native ilk parola için izole kabul | Karşılandı (PR330). Native CI parolasız Google kimliğine ilk parolayı doğruladı. |
-| W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Açık. Starter2’de kendi rol okuması plan reddi veriyor, yayımlı Web1 yönetim menüsünü kuramıyor. |
-| W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | Açık. Organizasyonu olmayan hesabın kuruluma nasıl alınacağı ve ilk merkezden sonra yönetim yetkisinin nasıl açılacağı için backend sözleşmesi gerekiyor. |
+| W1-BE-42 | S04 / G-STARTER · WF02 | Starter oturumunun kendi yönetim kapsamını keşfetmesi | Backend karşılandı. Yayımlı Web1 doğrulaması G-STARTER.2’de. |
+| W1-BE-43 | E47 · WF02 | Hesaptan ilk stüdyo kurulumuna yetkili geçiş | [Karşılandı](#w1-be-43--hesaptan-ilk-stüdyo-kurulumuna-yetkili-geçiş). |
 | W1-BE-44 | E31 · WF06 | Özel ders talebinde öğrencinin isteğe bağlı notu | [Karşılandı](#w1-be-44--özel-ders-talebinde-öğrencinin-notu). |
 | W1-BE-45 | E27 · WF14 | Kendi hakediş satırının tarihsel seans ve anlaşma bağlamı | [Kaynak, development ve tüketim doğrulandı](#w1-be-45--eğitmenin-hakedişinde-tarihsel-seans-ve-anlaşma-bağlamı). |
 | W1-BE-46 | E10 · WF09 | Yetkili yönetici için stüdyo programı ICS aboneliği | [Karşılandı](#w1-be-46--yetkili-yönetici-için-stüdyo-programı-ics-aboneliği). |
@@ -63,11 +61,11 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Karşılandı](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
 | W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Karşılandı](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
 | W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Karşılandı](#w1-be-54--başvuru-durum-filtresi). |
-| W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Açık](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
-| W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Açık](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
+| W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Karşılandı](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
+| W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Karşılandı](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
 | W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Karşılandı](#w1-be-57--bildirim-arşivi-ve-silme). |
-| W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Açık](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
-| W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Açık](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
+| W1-BE-58 | V07.1/E42 · WF17 | Fatura vergi bilgileri ve kesilmiş faturaların okunması | [Karşılandı](#w1-be-58--fatura-vergi-bilgileri-ve-geçmişi). |
+| W1-BE-59 | E50–E52 · WF02/WF13/WF17 | Platform konsolu kapsamı, organizasyon/ödeme/sahip dizini ve askı işlemleri | [Karşılandı](#w1-be-59--platform-konsolu-kapsamı-ve-keşif-okumaları). |
 
 ## Bütün talepler için ortak sınır
 
@@ -402,9 +400,9 @@ Web1’in yalnız oturumun kendi etkin yönetim rolünü ve erişilebilir merkez
 
 ## W1-BE-43 · Hesaptan ilk stüdyo kurulumuna yetkili geçiş
 
-**Açık · backend değerlendirmesi.** v67 ilk kurulum ekranı yeni hesabın stüdyo, ilk salon ve ders türü adımlarını sunuyor. Web1’in native kayıt akışı hesap oluşturuyor. WF02’de `organization_create_v1` platform sahibine ayrılmış. `center_create_v1` var olan organizasyonda `org.manage` istiyor. Salon ve merkez disiplini yazıları etkin merkez ve ayrı canlı `center.manage` yetkisi gerektiriyor. Sahiplik kendiliğinden bu merkez yetkisini vermiyor. [API kataloğu](../../../docs/functions.md) · [WF02](../../../docs/workflows.md#wf02).
+**Backend desteği karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
 
-Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişini, organizasyonu hazırlayan aktörü ve ilk merkez oluşturulduktan sonra merkez yönetim kapsamının hangi doğrulanmış kaynaktan açılacağını belirleyin. Mevcut platform sınırı, Starter limitleri ve yeniden denemede tek sonuç korunmalı. Sahipliği veya merkez yönetimini dolaylı varsaydıran bir istemci kuralı eklenmemeli. Mevcut destekle Web1, yetkili hazır organizasyonda gerçek ilk merkezi oluşturuyor; canlı merkez yöneticisine eksik salon/disiplin için mevcut ayar akışlarını sunuyor. [E47](todo.md#e47-ilk-kurulum).
+Etkin organizasyon bağı olmayan doğrulanmış hesap `studio_setup_open_v1` ile talep açar, `studio_setup_list_v1` ile kendi talebini okur. Platform operatörü kuyruğu okur ve mevcut `organization_create_v1(studio_setup_id)` ile talebi kuruluşla atomik eşler. Kuruluş hazır olunca mevcut merkez kurulumuna geçilir. Web1 bağlantısı [E47](todo.md#e47-ilk-kurulum) kapsamındadır. [WF02](../../../docs/workflows.md#wf02).
 
 ## W1-BE-44 · Özel ders talebinde öğrencinin notu
 
@@ -474,15 +472,15 @@ Organizasyonu olmayan doğrulanmış stüdyo hesabının yetkili kurulum girişi
 
 ## W1-BE-55 · Ziyaretçinin etkinlik kayıt akışı
 
-**Açık · backend değerlendirmesi.** Çizim, anonim ziyaretçinin etkinlik kartındaki formdan doğrudan kayıt olmasını gösteriyor. `public_calendar_get_v1` yayımlanan etkinliği ve izinli kapasite bilgisini okuyabilir. `public_application_submit_v1` eski yayın başvurusunda etkinlik yayınına bağlı **bekleyen başvuru**, bağlı form üzerinden ise CRM başvurusu oluşturur. Başvurunun kabulü etkinlik kaydı veya kontenjan garantisi vermiyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L4469) · [WF09](../../../docs/workflows.md#wf09).
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
 
-Ürün kararıyla anonim başvurunun mu yoksa doğrudan etkinlik kaydının mı sunulacağını ve sonucunun nasıl okunacağını değerlendirin. Canlı yayın, kontenjan, belge sürümü/onay, ödeme gerekiyorsa ödeme koşulu, bot doğrulaması ve aynı iş niyetinin tekrar güvenliği korunmalı. Genel ders başvurusu mevcut bağ ve onay kaynağıyla çalışmaya devam etmeli.
+Ziyaretçi `public_application_submit_v1(event_application:true,page_slug,publication_id,contact)` ile yayımlanmış etkinliğe e-postayla başvurur. Bot doğrulaması ve aynı işlem anahtarı korunur. Sonuç `application_state:pending` olarak okunur. Kontenjan, ödeme ve kayıt koşulları yetkili etkinlik akışında değerlendirilir. [WF09](../../../docs/workflows.md#wf09) · [V05.2 Web1 kabulü](todo.md#v05).
 
 ## W1-BE-56 · Yayın adresi ve sayfanın açılıp kapatılması
 
-**Açık · backend değerlendirmesi.** Çizim, yayın adresini değiştirip eski adresi kapatıyor ve ziyaretçi sayfasını tek ayardan açıp kapatıyor. Yeni native yayınlar organizasyon kimliğini adres olarak kullanıyor. `public_profile_enabled` yalnız profil görünürlüğünü yönetiyor. Anonim yanıt, açık bağlı form veya geçerli ders/etkinlik yayını varsa profil kapalıyken de kullanılabilir. Web1 mevcut organizasyon ya da merkez adresini kopyalıyor ve gerçek ziyaretçi rotasında açıyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L2287) · [WF09](../../../docs/workflows.md#wf09).
+**Karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
 
-Yönetilebilir kanonik adresi, adres değişimi sonrası eski bağlantının durumunu ve bütün ziyaretçi sayfasını açıp kapatmanın bağlı form ile kaynak yayınlara etkisini değerlendirin. Yönetim yetkisi, organizasyon/merkez kapsamı ve başvuru sürümü/onayı korunmalı.
+Yetkili kuruluş yöneticisi `settings_update_v1(scope:organization,patch:{public_page:{slug,enabled}})` ile adresi ve yayın durumunu sürüm denetimli yazar. Adres yenilenince eski adres kapanır. Sayfanın kapatılması programı ve bu sayfaya bağlı başvuruları durdurur. Kaynak yayın ve form ayarları korunur. [WF09](../../../docs/workflows.md#wf09) · [V05.2 Web1 kabulü](todo.md#v05).
 
 ## W1-BE-57 · Bildirim arşivi ve silme
 
@@ -492,12 +490,12 @@ Yönetilebilir kanonik adresi, adres değişimi sonrası eski bağlantının dur
 
 ## W1-BE-58 · Fatura vergi bilgileri ve geçmişi
 
-**Açık · backend değerlendirmesi.** Web1 organizasyon ayarlarının `billing_name`, `billing_address` ve `billing_email` alanlarını sürüm denetimli okuyup yazıyor. Çizimde bunlara ek olarak vergi dairesi, vergi kimliği ve kesilmiş fatura geçmişi var. `subscription_get_v1` abonelik ve ödeme koşullarını sağlıyor. Kesilmiş fatura, fatura dosyası ve ilave vergi alanları için yayımlanmış sözleşme bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/index.html#L987) · [WF17](../../../docs/workflows.md#wf17).
+**Backend desteği karşılandı.** Vergi profili için [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı. Orijinal ZIP/PDF ve fatura geçmişi için [PR #343](https://github.com/SXQHex/FtkSaaS/pull/343), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) başarılı.
 
-Vergi alanlarının ürün kapsamını ve erişim kurallarını, yayımlanmış faturaların değişmez kimliği ve yetkili geçmiş/dosya keşfiyle birlikte değerlendirin. Düzenlenen organizasyon bilgilerinin kesilmiş bir faturaya etkisi ayrı tanımlanmalı. Kart işlemleri mevcut ürün kapsamı dışındadır.
+Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sürümle günceller. `organization_invoices_list_v1` yayımlanmış faturaları, `organization_invoice_file_get_v1?download=original` orijinal dosyayı yetkili sahibine verir. Profil düzenlemesi kesilmiş faturayı değiştirmez. Platform fatura dosyasını mevcut hazırlık/yayın komutlarıyla yayımlar. Web1 tüketimi [V07.1](todo.md#v07) kapsamındadır. [WF17](../../../docs/workflows.md#wf17).
 
 ## W1-BE-59 · Platform konsolu kapsamı ve keşif okumaları
 
-**Açık · backend değerlendirmesi.** E50–E52 için hesabın canlı platform yetkisini ve izinli kaynakları açan konsol keşfi gerekli. `organizations_list_v1` hesabın erişilebilir organizasyonlarını, `organization_get_v1` `org.read` kapsamındaki tek hedefi okuyor. `organization_create_v1` platform sahibine ayrılmış. Organizasyon sahibine ait kapatma/yeniden açma işlemlerinden platform askısı çıkarılamaz. Platforma özgü dizin ve askıya alma/kaldırma sözleşmesini değerlendirin.
+**Backend desteği karşılandı.** [PR #342](https://github.com/SXQHex/FtkSaaS/pull/342), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44412561300) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44412637759) başarılı.
 
-`saas_payment_verify_v1` bilinen `payment_id` ile `accepted` kararı alıyor. `saas_grace_extend_v1` mevcut operatör yetkisini kullanıyor. Ödeme kuyruğunu, işlem için güncel hedefi ve doğrulanmış sonucu aynı kapsamda okuyabilmek gerekiyor. `platform_owner_set_v1` doğrulanmış hesap kimliği ister. `platform_owner_remove_v1` isteğinde ikame doğrulanmış hesap alanı bulunur. Bu komutlar sahipleri veya atamaya uygun doğrulanmış hesapları keşfetmez. Canlı operatör ve platform sahibi kapsamı, ayrı eylem yetkileri ve sadece gerekli alanları döndüren keşif birlikte tanımlanmalı. [Güncel çizim](../read-only/tasarim-v2/app.js#L3420) · [WF02](../../../docs/workflows.md#wf02) · [WF13](../../../docs/workflows.md#wf13) · [WF17](../../../docs/workflows.md#wf17).
+`account_get_v1(include_platform_scope:true)` canlı platform erişimini, `platform_directory_get_v1` kuruluş, ödeme, sahip ve e-postayla doğrulanmış hesap keşfini döndürür. `platform_organization_suspension_set_v1` sürümlü askı/kaldırma sağlar. Ödeme kararı, ek süre ve sahiplik mevcut yetkili komutları kullanır. Web1 tüketimi E50–E52 kapsamındadır. [WF17](../../../docs/workflows.md#wf17).

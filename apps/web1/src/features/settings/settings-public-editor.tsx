@@ -10,7 +10,7 @@ import {
   SheetDescription,
   SheetFooter,
 } from "../../components/ui/sheet";
-import { Field, FieldLabel, FieldDescription } from "../../components/ui/field";
+import { Field, FieldLabel, FieldDescription, FieldError } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Checkbox } from "../../components/ui/checkbox";
@@ -23,10 +23,12 @@ import {
   writeSettingsDocument,
   readSettingsDocumentReceipt,
   readSettingsDocumentResult,
+  publicPageSlug,
   type SettingsDocumentIntent,
   type SettingsDocumentSource,
 } from "./settings-document";
 import { readPublicForms, readPublicConsentSources } from "./settings-public-reader";
+import { publicCalendarInterval, readPublicCalendar } from "../public-program/public-calendar-read";
 type PublicBinding = {
   form_id: string;
   consents: { purpose: string; version: string; required: boolean; content_template_id: string }[];
@@ -51,6 +53,17 @@ export function SettingsPublicEditor({
       ("name" | "description" | "logo" | "address" | "contact" | "hours" | "location" | "website")[]
     >(values.public_fields ?? []),
     [binding, setBinding] = useState<PublicBinding | null>(values.public_application_form ?? null),
+    [slug, setSlug] = useState(
+      before.document.scope === "organization"
+        ? (before.document.values.public_page?.slug ?? "")
+        : "",
+    ),
+    [pageEnabled, setPageEnabled] = useState(
+      before.document.scope === "organization"
+        ? (before.document.values.public_page?.enabled ?? false)
+        : false,
+    ),
+    [slugError, setSlugError] = useState(false),
     [code, setCode] = useState(""),
     [lookup, setLookup] = useState(""),
     [sourceId, setSource] = useState(""),
@@ -61,7 +74,10 @@ export function SettingsPublicEditor({
     [error, setError] = useState(false),
     [preparing, setPreparing] = useState(false);
   const busy = useRef(false),
-    mounted = useRef(true);
+    mounted = useRef(true),
+    slugInput = useRef<HTMLInputElement>(null);
+  const publicPage =
+    before.document.scope === "organization" ? before.document.values.public_page : undefined;
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -86,7 +102,26 @@ export function SettingsPublicEditor({
   const command = useMemberCommand({
     write: writeSettingsDocument,
     readReceipt: readSettingsDocumentReceipt,
-    readResult: readSettingsDocumentResult,
+    readResult: async (intent, id) => {
+      const result = await readSettingsDocumentResult(intent, id);
+      const page = intent.patch.public_page;
+      if (page) {
+        const interval = await publicCalendarInterval();
+        const read = (address: string) =>
+          readPublicCalendar({ slug: address, interval }, AbortSignal.timeout(15_000));
+        const previous = publicPage?.slug ?? before.scope.orgId;
+        const [current, former] = await Promise.all([
+          read(page.slug),
+          page.slug !== previous ? read(previous) : undefined,
+        ]);
+        if (
+          (!page.enabled && current.publication_state !== "unavailable") ||
+          (former && former.publication_state !== "unavailable")
+        )
+          throw Error("PUBLIC_PAGE_STATE_UNAVAILABLE");
+      }
+      return result;
+    },
     onAccessLost,
     onRefresh: async () => onSaved(),
   });
@@ -97,20 +132,41 @@ export function SettingsPublicEditor({
   }, [locked, onLockChange]);
   const writable = (key: string) =>
     before.catalog.fields.some((row) => row.key === key && row.writable);
+  const pageWritable = before.level === "organization" && writable("public_page");
+  const changePage =
+    pageWritable &&
+    (slug.trim() !== (publicPage?.slug ?? "") || pageEnabled !== (publicPage?.enabled ?? false));
+  const currentFields: readonly (typeof fields)[number][] = values.public_fields ?? [];
+  const patch = {
+    ...(changePage ? { public_page: { slug: slug.trim(), enabled: pageEnabled } } : {}),
+    ...(writable("public_profile_enabled") &&
+    typeof enabled === "boolean" &&
+    enabled !== values.public_profile_enabled
+      ? { public_profile_enabled: enabled }
+      : {}),
+    ...(writable("public_fields") &&
+    (fields.length !== currentFields.length ||
+      fields.some((field) => !currentFields.includes(field)))
+      ? { public_fields: fields }
+      : {}),
+    ...(writable("public_application_form") && binding !== (values.public_application_form ?? null)
+      ? { public_application_form: binding }
+      : {}),
+  };
   const available = !forms.isError
     ? (forms.data?.pages.flatMap((page) => page.items).filter((row) => row.enabled) ?? [])
     : [];
   async function prepare() {
     if (busy.current || locked) return;
+    if (changePage && !publicPageSlug.safeParse(slug.trim()).success) {
+      setSlugError(true);
+      slugInput.current?.focus();
+      return;
+    }
     busy.current = true;
     setPreparing(true);
     setError(false);
     try {
-      const patch: Record<string, unknown> = {};
-      if (writable("public_profile_enabled") && typeof enabled === "boolean")
-        patch.public_profile_enabled = enabled;
-      if (writable("public_fields")) patch.public_fields = [...fields];
-      if (writable("public_application_form")) patch.public_application_form = binding;
       const intent = await settingsDocumentIntent(
         before.scope,
         before.level,
@@ -137,6 +193,22 @@ export function SettingsPublicEditor({
         title={title}
         description={t(($) => $.settings.publicEditor.review)}
         rows={[
+          ...(review.patch.public_page
+            ? [
+                {
+                  id: "public-address",
+                  title: t(($) => $.settings.publicEditor.address),
+                  detail: review.patch.public_page.slug,
+                },
+                {
+                  id: "public-state",
+                  title: t(($) => $.settings.publicEditor.pageEnabled),
+                  detail: t(($) =>
+                    review.patch.public_page?.enabled ? $.settings.on : $.settings.off,
+                  ),
+                },
+              ]
+            : []),
           {
             id: "profile",
             title: t(($) => $.settings.publicEditor.visible),
@@ -207,6 +279,44 @@ export function SettingsPublicEditor({
         <SheetDescription>{t(($) => $.settings.publicEditor.hint)}</SheetDescription>
       </SheetHeader>
       <div className="space-y-5 overflow-y-auto p-5">
+        {pageWritable && (
+          <>
+            <Checkbox isSelected={pageEnabled} isDisabled={locked} onChange={setPageEnabled}>
+              {t(($) => $.settings.publicEditor.pageEnabled)}
+            </Checkbox>
+            <Field>
+              <FieldLabel htmlFor="settings-public-slug">
+                {t(($) => $.settings.publicEditor.address)}
+              </FieldLabel>
+              <Input
+                ref={slugInput}
+                id="settings-public-slug"
+                value={slug}
+                maxLength={63}
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                disabled={locked}
+                aria-invalid={slugError}
+                aria-describedby={
+                  slugError ? "settings-public-slug-error" : "settings-public-slug-hint"
+                }
+                onChange={(event) => {
+                  setSlug(event.target.value);
+                  setSlugError(false);
+                }}
+              />
+              <FieldDescription id="settings-public-slug-hint">
+                {t(($) => $.settings.publicEditor.addressHint)}
+              </FieldDescription>
+              {slugError && (
+                <FieldError id="settings-public-slug-error">
+                  {t(($) => $.settings.publicEditor.invalidAddress)}
+                </FieldError>
+              )}
+            </Field>
+          </>
+        )}
         <Checkbox
           isSelected={enabled ?? false}
           isDisabled={locked || !writable("public_profile_enabled") || enabled === undefined}
@@ -433,12 +543,7 @@ export function SettingsPublicEditor({
             locked ||
             command.unavailable ||
             binding?.consents.length === 0 ||
-            !before.catalog.fields.some(
-              (row) =>
-                ["public_profile_enabled", "public_fields", "public_application_form"].includes(
-                  row.key,
-                ) && row.writable,
-            )
+            !Object.keys(patch).length
           }
           onPress={() => void prepare()}
         >

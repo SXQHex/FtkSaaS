@@ -145,6 +145,80 @@ test("publication settings share the scoped visitor route and preview live close
   ).toBeVisible();
   expect(f.writes).toHaveLength(0);
 });
+test("organization publication address uses versioned settings and closes old addresses and visitor access", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page);
+  f.state.values.organization!.public_page = { slug: "ilk-adres", enabled: true };
+  const publicReads: string[] = [];
+  await page.route("**/api/public/calendar", (route) => {
+    const request = route.request();
+    expect(request.headers()).not.toHaveProperty("authorization");
+    const { slug } = request.postDataJSON() as { slug: string };
+    publicReads.push(slug);
+    const current = f.state.values.organization!.public_page as { slug: string; enabled: boolean };
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: [],
+          as_of: "2026-11-16T12:00:00Z",
+          next_cursor: null,
+          publication_state: current.slug === slug && current.enabled ? "available" : "unavailable",
+          application: { state: "closed", form: null },
+        },
+      },
+    });
+  });
+  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
+  const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
+  const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
+  await expect(address).toHaveValue(`${origin}/public/ilk-adres/calendar?center_id=${I.center}`);
+  await scope.selectOption("organization");
+  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
+  const editor = page.getByRole("dialog");
+  const slug = editor.getByLabel("Yayın adresi kısa adı", { exact: true });
+  const reviewButton = editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true });
+  await slug.fill("Geçersiz Adres");
+  await reviewButton.click();
+  await expect(slug).toBeFocused();
+  await expect(slug).toHaveAttribute("aria-invalid", "true");
+  expect(f.writes).toHaveLength(0);
+  await slug.fill("yeni-adres");
+  await reviewButton.click();
+  const review = await confirm(page);
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  expect(f.writes[0]?.r).toMatchObject({
+    scope: "organization",
+    expected_version: 1,
+    patch: { public_page: { slug: "yeni-adres", enabled: true } },
+  });
+  expect(publicReads).toEqual(expect.arrayContaining(["ilk-adres", "yeni-adres"]));
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(address).toHaveValue(`${origin}/public/yeni-adres/calendar`);
+  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
+  await editor
+    .getByRole("checkbox", { name: "Ziyaretçi sayfasını yayına aç", exact: true })
+    .press("Space");
+  await reviewButton.click();
+  await confirm(page);
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  expect(f.writes[1]?.r).toMatchObject({
+    scope: "organization",
+    expected_version: 2,
+    patch: { public_page: { slug: "yeni-adres", enabled: false } },
+  });
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(
+    page.getByRole("switch", { name: "Ziyaretçi sayfası yayında", exact: true }),
+  ).not.toBeChecked();
+  await page.getByRole("button", { name: "Sayfayı önizle", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/public/yeni-adres/calendar`);
+  await expect(
+    page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
+  ).toBeVisible();
+});
 test("policy editing publishes a native protected change after review and keeps source scope and local instant", async ({
   page,
 }) => {

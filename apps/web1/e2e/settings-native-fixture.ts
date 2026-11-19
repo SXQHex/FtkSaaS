@@ -46,6 +46,7 @@ export async function mockSettingsCompletion(
         public_profile_enabled: false,
         public_fields: ["name"],
         public_application_form: null,
+        public_page: null,
       },
       center: {
         address: "Sentetik adres",
@@ -179,7 +180,7 @@ export async function mockSettingsCompletion(
     if (op === "settings_catalog_get_v1" && (r.scope === "organization" || r.scope === "center"))
       await send({
         scope: r.scope,
-        catalog_version: 24,
+        catalog_version: 25,
         fields: [
           "address",
           "collection_templates",
@@ -188,7 +189,7 @@ export async function mockSettingsCompletion(
           "automation_templates",
           "crm_templates",
           ...(r.scope === "organization"
-            ? ["billing_name", "billing_address", "billing_email"]
+            ? ["billing_name", "billing_address", "billing_email", "public_page"]
             : []),
           "public_profile_enabled",
           "public_fields",
