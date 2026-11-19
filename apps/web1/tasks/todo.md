@@ -9,7 +9,7 @@
 
 ## /goal yürütme talimatı
 
-Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapshot’ının Pro/Starter görsel farklarını yayımlanmış API sözleşmesiyle tamamlamaktır. Yeni işlerin sırası ve kanıtı [çizim uzlaştırmasındadır](#cizim-guncellemesi). **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#pro-teslim-sonrası-gerçek-kontroller-kapalı) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
+Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapshot’ının Pro/Starter görsel farklarını yayımlanmış API sözleşmesiyle tamamlamaktır. Yeni işlerin sırası ve kanıtı [çizim uzlaştırmasındadır](#cizim-guncellemesi). **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#post-pro-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
 
 ### Başlangıç ve devam kaydı
 
@@ -69,7 +69,7 @@ Ortak kullanılan bir işin sahibi kendi alanıdır. Örneğin öğrenci profili
 | Sonraki teslim: Starter  | S01 → S02 → S03 → S04 → S05 → G-STARTER maddeleri                                                                 | G-PRO-05 ve bu teslimin ayrıca başlatılması                                                                                                            |
 | Sonraki teslim: Business | B01 → B02 → B03 → B04 → B05 → B06 → G-BUSINESS maddeleri                                                          | G-STARTER, G-DESIGN ve bu teslimin ayrıca başlatılması                                                                                                 |
 
-Teslim sayısı yerel ekran kabulünü gösterir; Pro teslim sonrası gerçek kontroller ayrı kalır. Güncel sayı ve tamamlanan ekranlar yalnız [başlangıç ve devam kaydında](#başlangıç-ve-devam-kaydı) tutulur. Kısmi sayfa çalışmasında biten alt adımlar işaretli kalır. Örneğin E23 anlaşmalarıyla programı mümkün kıldıktan sonra E17’ye geç, E23 hakedişini yoklama hazır olduğunda bitir. Sayfanın üst kutusu, işlevleri ve CI ile yapılabilen kontrolleri tamamlanınca kapanır. Yalnız CI ile yapılması mümkün olmayan kontroller, CI ile yapılamama gerekçesiyle [Pro teslim sonrası gerçek kontroller](#pro-teslim-sonrası-gerçek-kontroller-kapalı) listesine yazılır; bu işler açık kalsa da sayfa kapatılır ve teslim sayısına eklenir. E numarası çizim kimliğidir, mutlak yürütme sırası yukarıdaki tablodan gelir.
+Teslim sayısı yerel ekran kabulünü gösterir; Pro teslim sonrası gerçek kontroller ayrı kalır. Güncel sayı ve tamamlanan ekranlar yalnız [başlangıç ve devam kaydında](#başlangıç-ve-devam-kaydı) tutulur. Kısmi sayfa çalışmasında biten alt adımlar işaretli kalır. Örneğin E23 anlaşmalarıyla programı mümkün kıldıktan sonra E17’ye geç, E23 hakedişini yoklama hazır olduğunda bitir. Sayfanın üst kutusu, işlevleri ve CI ile yapılabilen kontrolleri tamamlanınca kapanır. Yalnız CI ile yapılması mümkün olmayan kontroller, CI ile yapılamama gerekçesiyle [Pro teslim sonrası gerçek kontroller](#post-pro-kontroller) listesine yazılır; bu işler açık kalsa da sayfa kapatılır ve teslim sayısına eklenir. E numarası çizim kimliğidir, mutlak yürütme sırası yukarıdaki tablodan gelir.
 
 ### Engel ve durma davranışı
 
@@ -81,6 +81,8 @@ Teslim sayısı yerel ekran kabulünü gösterir; Pro teslim sonrası gerçek ko
 - Pro kabulü karşılanmadan Starter kabulüne, Starter karşılanmadan Business kabulüne geçme. Plan kapanışı bu dosyadaki işlev kapsamı ve yerel otomatik kabul kanıtlarına dayanır; ertelenmiş gerçek kontroller ayrı açık kalır. İnsan değerlendirmesi veya gereken işlem anı onayı ayrıca kaydedilir, verilmemiş onay varsayılmaz.
 
 ### Kutuları kapatma ve hedefin bitişi
+
+Bir H3 bölümünün bütün iş kutuları tamamlandığında başlığın sonuna `(kapandı)` ekle.
 
 Her işaretli madde ilgili kaynak/PR veya test koşusuna, ortamına ve gözlenen sonuca bağlanır. Görsel adımın tamamlanması ve gerçek entegrasyon kabulü kendi kutularında kaydedilir. Yerel doğrulama ve tam kabul komutlarının sahibi [başlangıç ve devam kuralıdır](#başlangıç-ve-devam-kaydı). Komutları `apps/web1` içinde çalıştır. Ortak izolasyon kurallarını koru. Yeni gerçek veri yazısı üretmek yerine tekrarlanabilir kabulü yerel zincirde çalıştır; yalnız CI ile yapılamayan kontrolleri yukarıdaki kabul ve erteleme kuralıyla teslim sonrası listesine bağla.
 
@@ -188,7 +190,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 <a id="v01"></a>
 
-### V01 · Ortak kabuk, tema ve bütün ekranların fark envanteri (kapalı)
+### V01 · Ortak kabuk, tema ve bütün ekranların fark envanteri (kapandı)
 
 - [x] **V01.1** · Var olan ekran eşlemesi üzerinden v67 ortak kabuk ve tema envanteri çıkarıldı. Yönetim gezinmesinde Genel, Satış ve Stüdyo grupları, Satış altındaki Hakediş ve eğitmen çalışma grubu mevcut. Merkezler bağlantısı E49 kapsamına bağlı. Komut paleti mevcut gezinme bağlantılarını kullanıyor. v67’deki Ayarlar bölümleri, üye araması ve kısayol eylemlerinin uygulama kapsamı V01.2’de doğrulanacak. Geist, açık/koyu tema, kontrast ve %100/110/125 ölçek seçenekleri mevcut. Görünüm tercihleri native hesaba bağlı. Eğitmen takvimi kayıtlı hafta başlangıcını uyguluyor, yönetim takvimi Pazartesi sabit. Bağlama V01.2’de, ortak ekran ölçümleri V01.3’te ve ekran özelindeki Sheet/Dialog durumları ilgili V/E/B maddelerinde doğrulanacak. [v67 davranışı](../design-reference/revisions/2026-11-18/app.js) · [Gezinme](../src/features/workspace/navigation.tsx) · [Komut paleti](../src/features/workspace/navigation-search.tsx) · [Görünüm](../src/features/account/appearance-panel.tsx) · [Yönetim takvimi](../src/features/schedule/schedule-view.tsx).
 - [x] **V01.2** · Mevcut hazır kabuk, komut paleti ve hesap görünümünü yeni navigasyon grupları, Hakediş'in Satış grubu, tema/kontrast/hafta başlangıcı/ölçek tercihleriyle eşle. Token/font farkını ilgili hazır tema kaynağında çöz; CSS zoom veya özel UI primitive'i ekleme.
@@ -198,7 +200,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 <a id="v02"></a>
 
-### V02 · Üye ve eğitmen kişisel akışları (kapalı)
+### V02 · Üye ve eğitmen kişisel akışları (kapandı)
 
 - [x] **V02.1** · E24–E32'de kendi seans/rezervasyon/hak/ödeme okumalarını koruyarak yeni kart ve etki görünümlerini uyarla. Tek seans ve seri değişikliği sonrası üye/eğitmen takvimleri aynı kaynak olayı okusun; kapanmış yoklamada eğitmen sınırı korunsun.
       İlk dilim Üye Dersler ekranında tamamlandı. Haftanın başlangıcı kayıtlı hesap tercihinden, tarih aralığı seçili merkezin saat diliminden geliyor. Kart tek eylem denetimi sunuyor; öncelikli kayıt yalnız native rezervasyon türüyle gösteriliyor ve ilk okuma sırasında Skeleton kullanılıyor. Seri tarayıcıda Pazar–Pazar isteği ve kaynak seans aynı kimlikle yeni gün, saat ve salona taşındığında eski kartın kaldırılması doğrulandı. Eğitmen Programım’da mevcut FullCalendar Ajanda görünümü seçili haftayı günlere ayırıyor ve aynı atanmış seanslardan saat, salon ve yoklama durumunu gösteriyor. Seri tarayıcıda tek seans ve iki seansın birlikte değiştiği kaynak yanıtları sonrası mevcut kimlikler yeni saatlerinde birer kez göründü. Kapanmış yoklama klavyeyle açıldı; başlatma ve kapatma komutu sunulmadı. Rezervasyon ve bekleme kartları artık her eylemi bir kez sunuyor. Rezervasyon, hak ve ödeme bölümleri gerçek okuma beklerken Skeleton gösteriyor. Birden çok paket veya para biriminde açık seçim bekleniyor; yalnız seçilen kaynak okunuyor. Ödeme yüklenirken bağımsız doğrulanmış borç bakiyesi görünür kaldı. Birleşik tarayıcı kabulünde yönetici önce tek seansı, sonra seri kapsamını önizleyip onayladı. Üye Dersler ve eğitmen Ajanda aynı seans kimliklerini seçili kapsamda, yeni saatleriyle birer kez gösterdi. Tek seans değişiminde sonraki kayıt korundu; seri değişiminde iki kaydın sürümü ilerledi. Ortak takvim ve statik build paketi tek işçiyle 14/14 geçti. Eğitmen Bugün ekranında atanmış program yanıtı beklenirken seans listeleri ve takvim sayaçları Skeleton gösteriyor. Geciktirilen yanıtta 320 CSS px’de yükleme durumu göründü, yanıt gelince gerçek seanslar geldi. Takvim reddinde hata mesajı gösterildi. Haklarım, güncel kullanılan/ayrılan/kullanılabilir sayaçlar satın alınan toplama eşitse mevcut Progress üzerinde üç bölümü gösteriyor. Rezervasyon iptali sonrası dağılım aynı paket kaynağından güncellendi. Sayaçlar ile satın alınan toplam ayrıştığında kullanım göstergesi ve ayrı sayaçlar korunuyor. [Hak dağılımı](../e2e/auth-own-entitlements.spec.ts#L213) · [Eğitmen Bugün](../e2e/auth-instructor-today.spec.ts#L245) · [Birleşik takvim kabulü](../e2e/auth-schedule.spec.ts#L926) · [Statik build kabulü](../e2e/static-build.spec.ts#L60). [Rezervasyon](../e2e/auth-own-reservations.spec.ts#L4) · [Hak ve ödeme](../e2e/auth-own-entitlements.spec.ts#L465). [Eğitmen ajandası](../e2e/auth-instructor-today.spec.ts#L198). [Üye ders kabulü](../e2e/auth-member-classes.spec.ts#L511).
@@ -225,7 +227,7 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 <a id="v04"></a>
 
-### V04 · Kişi, paket, finans, hakediş ve rapor tutarlılığı (kapalı)
+### V04 · Kişi, paket, finans, hakediş ve rapor tutarlılığı (kapandı)
 
 - [x] **V04.1** · E13–E16/E19'daki davet, birleşim, içe aktarılan kişi, aktif hak sahibi ve satış sayacı görsellerini mevcut typed özet/keşif okumalarıyla eşle. Bütün kişileri veya işlem geçmişini tarayıp sayaç üretme. Üyeler rozeti, bir satır istenen `management_state_get_v1` yanıtının filtreli öneri toplamını okuyor ve birleşimden sonra güncelleniyor. Davetler rozeti bekleyen ile süresi dolan davetleri, hesap rozeti bağlantısız üyeleri native durum özetinden alıyor. Paketler aktif hak sahibi ve son 30 gün satış sayılarını merkez özetinden, geliri ayrı para birimleriyle gösteriyor. Üyeler’den açılan içe aktarma mevcut yetkili öğrenci formunu kullanıyor. İçe aktarılan kişiler aynı native iş ve satır sonuçlarında okunuyor. Statik üretim derlemesi, 54 birim testi ve 11 farklı Chromium senaryosu tek işçiyle doğrulandı. [Birleşim](../e2e/auth-merge.spec.ts#L402) · [Davet](../e2e/auth-access.spec.ts#L237) · [Paket](../e2e/auth-products.spec.ts#L233) · [İçe aktarma](../e2e/auth-reports-native.spec.ts#L229).
 - [x] **V04.2** · E14/E20/E23/E27/E30'da tahsilat iptali, birleşim borcu, etkinlik ödemesi ve hakediş için aynı kaynak kimlikleriyle yeniden okumayı doğrula. Demo tarih/tutar/satır toplamını üretim hesaplaması gibi taşıma. Sözleşmeye uygun sentetik yanıtlarla E20 tam tahsilat düzeltmesi kaynak harekete bağlı tek kayıt oluşturdu. E14 aynı SPA belgesinde güncel borç özetini, birleşimden sonra da aynı merkez/kişi/para biriminde hem önceki borcu hem taşınan borcu okudu. E23 ve E27 aynı etkinlik görevi ve hakediş kimliğini okudu. E20 etkinlik ödemesi ve E30 hak iadesi V03.2’deki kaynak hareketleriyle yeniden doğrulandı. E27 tarihsel seans ve anlaşma ayrıntısı için [V02.1](#v02) kabulüne bak. 41 finans birim testi, statik derlemeden 3 doğrudan URL/yenileme senaryosu ve son kapsamda 13 seri Chromium senaryosu geçti. [Tahsilat düzeltmesi](../e2e/auth-finance.spec.ts#L468) · [Birleşim](../e2e/auth-merge.spec.ts#L403) · [Etkinlik hakedişi](../e2e/auth-event-detail.spec.ts#L553).
@@ -243,10 +245,10 @@ Bu eşleme yeni paket ve mevcut feature/route kaynakları üzerinden önden çı
 
 <a id="v06"></a>
 
-### V06 · Gelen kutusu, denetim ve ortak durumlar
+### V06 · Gelen kutusu, denetim ve ortak durumlar (kapandı)
 
 - [x] **V06.1** · E39 gelen kutusu görünür sayfayı seçebiliyor ve seçilenleri `notifications_read_set_v1` ile topluca okundu ya da okunmadı yapıyor. Okuma değişikliğini geri alma yalnız gerçekten değişen iletilere doğrulanmış sürümleriyle uygulanıyor. Araya giren sürüm değişikliğinde geri alma yeni yazma yapmıyor. Statik derleme, 17 birim testi ve tek Chromium işçisiyle seri gelen kutusu paketi 15/15 geçti. Okundu ve kaynak işin durumu [W1-BE-28](request.md#w1-be-28--kendi-gelen-kutusunun-kalan-çizim-eşlemesi) sınırında ayrı. Seçilenler gerçek sürümleriyle Arşiv veya Silinenler’e taşınır; silme açık onay ister. Arşiv ve Silinenler native görünürlük filtresini kullanır. Taşıma okundu durumunu korur. Geri alma yalnız ACK sonrasında sürümü tam bir artan kayıtlara önceki klasörü yazar. Silinen ileti geri alındığında Arşiv’e, ayrı taşıma eylemiyle Gelen kutusu’na döndü. 12 birim ve 3 hedefli Chromium senaryosu tek işçiyle geçti. [W1-BE-57](request.md#w1-be-57--bildirim-arşivi-ve-silme) · [Arşiv/silme kabulü](../e2e/auth-inbox.spec.ts#L703).
-- [ ] **V06.2** · E43, `audit_list_v1` modüllerini adlarıyla gösterir ve kayıt ayrıntısını aynı yanıttan açar. `tracking_directory_get_v1` durumunu, işlenen sayısını, varsa toplamı ve sonraki deneme zamanını gösterir. Sayfalama ve yenileme aynı okuyucuya bağlıdır. Statik derleme, 6 birim testi ve tek Chromium işçisiyle 3/3 denetim testi geçti. Denetim dışa aktarımı ve kesin kısmi sonuç ayrımı [W1-BE-34](request.md#w1-be-34--denetim-ve-işlem-durumu-ekranı) kapsamında açık.
+- [x] **V06.2** · E43, `audit_list_v1` modüllerini adlarıyla gösterir ve kayıt ayrıntısını aynı yanıttan açar. `tracking_directory_get_v1` durumunu, işlenen sayısını, varsa toplamı ve sonraki deneme zamanını gösterir. Sayfalama ve yenileme aynı okuyucuya bağlıdır. Statik derleme, 6 birim testi ve tek Chromium işçisiyle 3/3 denetim testi geçti. `audit_center_export_v1` seçili merkez, dönem, modül, kayıt sonucu ve arama kapsamında sayfadan bağımsız CSV indirir. İzin reddi gösterilir. İşlemler ekranı gerçek import sonucunu kuyruk ve işlenen satır sayısından ayrı gösterir; Raporlar ekranından yeniden başlatılabilirlik native kipten gelir. 7 birim testi ve 4 hedefli Chromium senaryosu tek işçiyle geçti. [W1-BE-34](request.md#w1-be-34--denetim-ve-işlem-durumu-ekranı) · [Denetim ve işlem kabulü](../e2e/auth-audit-native.spec.ts#L49).
 - [x] **V06.3** · E44–E46 yardım ve ortak durumları gerçek rota, kaynak hatası, tarayıcı bağlantısı ve organizasyon erişim moduna bağlı. 403/404, 409, plan özelliği ve plan limiti, bağlantı kesintisi, salt okunur erişim ve klavye odağı doğrulandı. Kaynak yeniden okununca odak açılan sayfanın başlığına gider. Geliştirme kataloğu kendi modunda çalışır. Statik derleme, 14 birim testi ve tek Chromium işçisiyle seri yardım/durum paketi 17/17 geçti.
       Üretim kök adresi mevcut hesap/oturum akışına bağlandı. [Statik build kabulü](../e2e/static-build.spec.ts#L60).
 
@@ -439,7 +441,7 @@ Her aktif sayfanın altına şu alanları doldur. Durum ve kanıt ilerledikçe a
 | Doğrulama       | Kaynak/build, test/ortam sonucu, referans ve uygulama karşılaştırması               |
 | Fark veya engel | İzinli farkın gerekçesi veya eksik girdinin devam koşulu                            |
 
-### Sayfa envanteri (kapalı)
+### Sayfa envanteri (kapandı)
 
 Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdır; mevcut çalışan route kabulü değildir. `$orgId/$centerId` kapsam parametreleri backend verisinden gelir. `/auth/callback`, `/forgot-password` ve `/reset-password` mevcut SPA protokolünün yollarıdır; callback ortak teknik route olarak E01–E05 ile birlikte uygulanır. Route adları yeni API veya izin üretmez.
 
@@ -1081,7 +1083,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 
 ## Başlangıç
 
-### T01 · Mevcut temeli çalıştır (kapalı)
+### T01 · Mevcut temeli çalıştır (kapandı)
 
 | Önkoşul | Sözleşme  | Doğrulama                       |
 | ------- | --------- | ------------------------------- |
@@ -1093,7 +1095,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 
 **Başlangıç doğrulaması** · 13 Kasım 2026, Linux, Node 24.22.1 / npm 11.9.0. Taban `91af14abc2584af9977fe64e40e5e01e9fbeaa2a` ve bu hazırlık düzeltmeleriyle temiz kurulum, tam `npm run verify` (10 birim, 4 Playwright testi, production build) ve build önizlemesinde açılış/yenileme geçti. Dört özgün referans byte düzeyinde eşleşti. Ayrı yerel portta 47 çizim görünümü açıldı. Bu ortamda Playwright'ın kilitlediği Chrome for Testing 158.0.8127.18 headless shell resmi Google dağıtımından alındı. MSW testleri Node ortam proxy'si kapalı çalıştırıldı. Yeni VS Code checkout'unda uygulama README'sine göre yerel kurulumu yap, ardından devam kaydındaki ilk işten ilerle.
 
-### T02 · Tamamlanan ürün taramasının uygulama hazırlığı (kapalı)
+### T02 · Tamamlanan ürün taramasının uygulama hazırlığı (kapandı)
 
 | Önkoşul                                | Kaynak                                                   | Doğrulama                                     |
 | -------------------------------------- | -------------------------------------------------------- | --------------------------------------------- |
@@ -1107,7 +1109,7 @@ Aşağıdaki route'lar frontend için bu taramada önerilen uygulama yollarıdı
 
 T02.3 kabulü: güncel public env yalnız publishable/anon anahtarla fixture projesine eşleşti. Gerçek development Pro yönetici ve öğrenci Native Auth → hesap/organizasyon/merkez, yönetim alanı/kendi hakları okuması geçti; yalnız bu probe’un oturumları local scope ile kapatıldı. Eğitmen/personel kapsamının native izole CI kanıtı P02/G-PRO kaynağındadır; development’ta yeni rol verilmedi. Edge ve Worker127.0.0.1:5173 OPTIONS204; production build1697 modül/217 JS parçası, etkin Devtools yok. `static-build.spec.ts`2/2, gerçek dist üzerinde doğrudan URL/yenileme/korunan hedef, açık-koyu tema ve ortak Axe/reflow geçti. PII/secrets içermeyen yerel kanıtlar `.tmp/t02-env-access.json`, `.tmp/t02-build.log` ve otomatik rapordadır. Production/DNS/CD değiştirilmedi.
 
-### T03 · Salt okunur tasarım referansını kullanıma hazırla (kapalı)
+### T03 · Salt okunur tasarım referansını kullanıma hazırla (kapandı)
 
 - [x] **T03.1** · Özgün HTML/CSS/JS ve arşiv tarandı, 47 `data-view` içinden 46 ekran eşlendi; `taslak` ürün ekranı sayılmadı. Dört dosyanın arşiv içeriğiyle birebir eşitliği doğrulandı. Hazır kaynak adayları bütün E satırlarına işlendi. Kaynak kimlikleri ve SHA-256 değerleri [referans kaydında](../design-reference/README.md).
 - [x] **T03.2** · Uygulamaya başlamadan referans hash'lerini doğrula. Referansı yalnız yerel HTTP önizlemesiyle ayrı portta aç; `src`/`public` altına taşıma veya bundle'a import etme. Kaynak dosyalarını biçimlendirme/yeniden yazma. Referans demo JS’si test backend'i değildir.
@@ -1115,7 +1117,7 @@ T02.3 kabulü: güncel public env yalnız publishable/anon anahtarla fixture pro
 
 T03.3 kabulü: hazır sidebar/Auth kabuğu ve46/46 ekranın token, tipografi ve durum eşlemesi E kayıtlarında tamam. Yeni tasarım veya primitive üretilmedi; dört özgün referans hash’i yeniden eşleşti. Gerçek production artifact’in iki tema/ortak Axe/reflow kabulü T02.3 kaynağındadır; menü SPA entegrasyonu ayrı T04 işidir.
 
-### T04 · SPA yönlendirmesi ve ortak okuma tekrarları (kapalı)
+### T04 · SPA yönlendirmesi ve ortak okuma tekrarları (kapandı)
 
 T03 tamamlandıktan sonraki ilk iş; kullanıcının React Aria/TanStack Router entegrasyon bulgusu. Resmî [React Aria routing kaynağı](https://reactspectrum.blob.core.windows.net/reactspectrum/4a81f323df36d401b5fc05c4985a0ec166769163/docs/react-aria/routing.html) esas alınır.
 
@@ -1130,7 +1132,9 @@ T04 kabulü: React Aria RouterProvider → TanStack navigate; mevcut menüler ve
 
 Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun sayfayı izler. İlk Auth sayfası P01.2/P01.3 kapsamındaki giriştir, ardından P01.1 kayıt akışına geçilir. P15.1’i ilk belge gerektiren işlemden önce ele al. P15.2–P15.4’ü ilgili tüketiciyle birlikte doğrula. P17.1’deki ayarları da ilk kullanıldıkları pakette bağla.
 
-### P01 · Kimlik, hesap ve güvenlik (kapalı)
+<a id="p01"></a>
+
+### P01 · Kimlik, hesap ve güvenlik (kapandı)
 
 | Önkoşul                                | Sözleşme                                                                              | Doğrulama                     |
 | -------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------- |
@@ -1163,7 +1167,7 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
   - [x] Salt okunur önizleme: `deletion-preview.ts` tek native bearer ile account kimliği→typed preview; token/ID yalnız taşıma katmanında, UI görünümü güvenli alanlardan oluşur. Hazır sağ Sheet26rem, Card/Item/Badge kullanıldı; owner engeli ve gerçek lifecycle sayıları gösterilir. 14 Kasım2026 gerçek development Pro Owner önizlemesi OWNER_TRANSFER_REQUIRED verdi; apply çağrısı0. 182 birim,5 Chromium senaryosu;320px/200%, açık/koyu, text spacing, ortak WCAG2.2AA Axe, tam ileri/geri klavye ve PageDown/Home kaydırması geçti. Kanıt `.tmp/e09-preview-{all-unit,browser,build}.log`; final1440/390px karşılaştırması `.tmp/e09-preview-{app,reference}-<genişlik>-<tema>.png`. Çizimdeki statik etki metinleri yerine gerçek DTO alanları gösterilir; fiziksel silme kabulü iddia edilmez. Bağımsız son kaynak incelemesinde zorunlu bulgu yok.
   - [x] Taze native doğrulama, açık SİL onayı, aynı key/payload kayıp-ACK kurtarması ve native hesaba bağlı sonuç takibi. Gerçek development dedicated synthetic alias native kayıt/gerçek Gmail doğrulaması→izinli preview→parolayla fresh native login→apply HTTP200→sonuç route→aynı hesapla native yeniden giriş→job_status_get(org_id:null) HTTP200→reload/status200 geçti. Sunucu partial, beş pending scope ve profile_erasure:unbound verdi; bunlar tamamlandı sayılmaz. Test hesabı dışındaki hesap/kişi/organizasyon silinmedi, hosted reset/seed/cleanup yok. Yalnız kendi yeni takip oturumu native local çıkışla kapatıldı. Boolean/HTTP kanıt `.tmp/e09-hosted-result.json`; kimlik/token/parola/canlı ekran görüntüsü kaydedilmedi.
 
-### P02 · Rol, organizasyon ve gezinme (kapalı)
+### P02 · Rol, organizasyon ve gezinme (kapandı)
 
 | Önkoşul         | Sözleşme                                                                                                                                                                    | Doğrulama                            |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -1175,7 +1179,7 @@ Paket numaraları sabittir. Sayfa uygulama sırası E envanterindeki ilk uygun s
 
 P02/P01.5 kabulü:141 ilgili birim ve40 farklı tarayıcı senaryosu denetlendi; yeni kapsam dosyasının iki senaryosu sözlükteki gerçek kontrol etiketi düzeltildikten sonra2/2 geçti, geniş koşuda39/40 senaryo başarılıydı. Çok rol → organizasyon değişimi menüyü sıfırlar; önceki merkezin yanıtı gerçekten tamamlandıktan sonra yeni merkez korunur. Hak/kişi okumaları yeni organizasyonun canonical kişisini kullanır; geri dönüş ve erişimi kaldırılmış doğrudan URL eski kaydı açmaz. Auth/AAL2 ve eğitmen doğrudan erişim retleri aynı pakette geçti; önceki gerçek native AAL2 kanıtı E06 kaydındadır. Kaynaklar `auth-scope-transition`, `auth-flow`, `auth-workspace`, `auth-instructor-flows`, `auth-member-account`; son rapor [otomatik rapordadır](../test-reports/local-verification.md).
 
-### P03 · Tek merkez kurulumu, kaynak ve ekip (kapalı)
+### P03 · Tek merkez kurulumu, kaynak ve ekip (kapandı)
 
 | Önkoşul | Sözleşme                                                                                                                                                                                                                                                | Doğrulama                               |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
@@ -1197,7 +1201,7 @@ P03.1 kabulü: E10’un merkezsiz çalışma alanına kurulu Card/Sheet/Field/In
 
 P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sinde `person.manage` ayrı onaylarla verildi/geri alındı; güncel kişi sürümleri4→5 ve farklı işlem anahtarları doğrulandı. Ayrı staff arayüzü senaryosunda izin öncesi ve geri alındıktan sonraki açık taslak reddedildi; yalnız izin açıkken tek kişi oluştu. Sunucu sonucu bu tarayıcı testinde fixture’dır; gerçek native Pro staff aktörüyle grant → person_create → revoke → eski-key replay FORBIDDEN kabulü `class-duty-management-acceptance.mjs:120–131`, `program-session-lifecycle.test.mjs` ve [G-PRO-03.1](#pro-kabulu) kaynak/run bağında karşılanır. Tip/lint ve ortak Axe/reflow temiz; [otomatik rapor](../test-reports/local-verification.md).
 
-### P04 · Kişi, öğrencilik ve davet (kapalı)
+### P04 · Kişi, öğrencilik ve davet (kapandı)
 
 | Önkoşul        | Sözleşme                                                                                                                                                          | Doğrulama                                           |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
@@ -1212,7 +1216,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 - [x] **P04.4** · İzinli kişi birleştirmesini önizleyip uygula. Ortaya çıkan tek kişi üzerinden eski hak ve borçlar aynı tutarla okunur.
       P04.4 kabulü: birleştirme sonrası aktör/organizasyona bağlı kişi/hak/finans önbelleği bütün ilgili merkezlerde geçersizleşir.10 birim/6 tarayıcı geçti; aynı SPA ömründe profile dönüş güncel hakkı ve aynı borcu yeniden okur. Gerçek veri/merkez onayı `p07-account-profile-merge-acceptance.mjs:69–141` ve `registry.test.mjs:139` ithalinde doğrulanır: canlı sürümlü onay, atomik ret/replay, eski borcun iki kimlikten aynı1700 minor okunması ve eski satış hakkının kullanılabilirliği. [G-PRO-03.1](#pro-kabulu) aynı kaynak/run bağı; [otomatik rapor](../test-reports/local-verification.md).
 
-### P05 · Eğitmen anlaşması ve görevlendirme (kapalı)
+### P05 · Eğitmen anlaşması ve görevlendirme (kapandı)
 
 | Önkoşul  | Sözleşme                                                                                                                                                          | Doğrulama                            |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -1226,7 +1230,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 - [x] **P05.4** · Ücretli görevlendirmeyi geçersiz veya eksik anlaşmayla dene. Ret nedenini göster, geçerli anlaşmayla yeni önizleme al.
       P05.2/.4 kabulü:20 birim/8 tarayıcı geçti. Aynı SPA’da süresi dolmuş anlaşma native POLICY_NOT_CONFIGURED engelini gösterir ve uygulama açılmaz; yeni sürüm sonrası yeni program önizlemesi güncel anlaşmayla açılır, eski kimlik istemciden pinlenmez. Eski şartlar aynen korunur; onay düzenlemede sıfırlanır, kayıp yayın aynı anahtarla tek etkidir. Native dönem/sürüm çözümü `program-configuration-acceptance.mjs:57–68`; eski seans/hakediş şartlarının korunması `instructor-earnings.test.mjs:232–249`, [G-PRO-03.1](#pro-kabulu) aynı kaynak/run bağında. [Otomatik rapor](../test-reports/local-verification.md).
 
-### P06 · Program, takvim ve özel ders (kapalı)
+### P06 · Program, takvim ve özel ders (kapandı)
 
 | Önkoşul                  | Sözleşme                                                                                                                                                                              | Doğrulama                                       |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -1244,7 +1248,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 - [x] **P06.5** · Öğrenciden özel ders talebi gönder. Yetkili kullanıcı onay, ret veya alternatif saat verdiğinde öğrenci güncel sonucu görür.
       P06.5 kabulü:18 birim/16 tarayıcı geçti. Öğrenci create/withdraw/alternatif kabulü; merkez gerekçeli ret, alternatif ve mevcut/yeni seansla ayrı onay; öğrencide güncel onay/ret ve reload doğrulandı. Teklif veya öğrenci kabulü rezervasyon/hak tutmaz; native rezervasyon bağı yalnız merkez onayından sonra okunur. Belirsiz sonuç, ACK read-only kurtarma, stale kaynak ve yetki sınırları dahil. Gerçek aktör/atomik sınır `p01-lesson-requests.test.mjs:68–114`, [G-PRO-03.1](#pro-kabulu) kaynak/run bağı; UI fixture gerçek provider kabulü sayılmadı. [Otomatik rapor](../test-reports/local-verification.md).
 
-### P15 · Sürümlü belge ve açık onay (kapalı)
+### P15 · Sürümlü belge ve açık onay (kapandı)
 
 | Önkoşul                                           | Sözleşme                                                                              | Doğrulama                                 |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------- |
@@ -1259,7 +1263,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
   - [x] Satış aynı açık satın alma bağlamını korur, belge onayından sonra yeni önizleme ve ayrı satış onayı ister. Etkinlikte kendi kayıt belgesi ve hesapta mevcut rezervasyon/yoklama ile etkinlik belgeleri gerçek native bağlamları kullanır. 10 birim/19 tarayıcı, ortak Axe/reflow ve tip/lint geçti. [Otomatik rapor](../test-reports/local-verification.md).
   - [x] İlk kayıt önizleme kimliği ve gerçek ürün sürümü üyenin belge okuma/onayında korundu. Yönetici başka kişi adına onay veremiyor. Playwright etkinlik ve üye belge paketleri geçti. Üye onayı sonrası yöneticinin ilk kaydı tamamlaması [W1-BE-38](request.md#w1-be-38--etkinlik-kaydı-öncesi-üyenin-kendi-belge-bağlamını-keşfi) native kabulünde doğrulandı.
 
-### P07 · Ürün, satış ve paket hakları (kapalı)
+### P07 · Ürün, satış ve paket hakları (kapandı)
 
 | Önkoşul                                                | Sözleşme                                                                                        | Doğrulama                      |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------ |
@@ -1279,7 +1283,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 - [x] **P07.5** · Değişim, yenileme ve sonlandırma işlemlerini uygun satışlarda ayrı ayrı uygula. Her sonucun hak hareketleri ve eski satış geçmişi izlenebilir.
       P07.5 kabulü: değişimde korunan rezervasyonun yeni satışa bağlı olduğu yetkili envanterden doğrulanır. Bağ okunmadan ACK sonucu tekrar yazılmaz. Yenileme, sonlandırma ve ayrı değişim için 7 birim/10 tarayıcı, Axe/reflow ve tip/lint geçti. Native `pro-lifecycle-earnings-acceptance.mjs` eski satış, korunan rezervasyon ve yeni hak bakiyesini doğruladı. [Otomatik rapor](../test-reports/local-verification.md).
 
-### P08 · Manuel tahsilat ve öğrenci alacağı (kapalı)
+### P08 · Manuel tahsilat ve öğrenci alacağı (kapandı)
 
 | Önkoşul   | Sözleşme                                                                              | Doğrulama                                       |
 | --------- | ------------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -1294,7 +1298,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
   - [x] Yetkili native nakit alacak iadesi ve gerçek bakiye okuması E20 native nakit alacak iadesi kaydında doğrulandı.
   - [x] Native self bağından ve yetkili merkez görünümünden aynı sentetik kişinin borç/alacağı yerel CI’da karşılaştırıldı. Gerçek oturum mutabakatının sahibi POST-PRO.CHAIN; yerel sonuç gerçek sağlayıcı kanıtı sayılmaz.
 
-### P09 · Rezervasyon, bekleme ve teklif (kapalı)
+### P09 · Rezervasyon, bekleme ve teklif (kapandı)
 
 | Önkoşul                                              | Sözleşme                                                                                                                                                                    | Doğrulama                                    |
 | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
@@ -1311,7 +1315,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 - [x] **P09.5** · Teklif kabulünü, reddini ve süre dolmasını ayrı örneklerde çalıştır. Kabulde güncel uygunluk denetlenir ve liste, hak ve rezervasyon sonuçları uyuşur.
       Tarayıcıda ayrı kabul ve ret geçti. Native `p01-waitlist-workers.test.mjs` hak yetersizken aktif teklifin korunduğunu, uygun hakla tek rezervasyon oluştuğunu, reddin ve süre dolumunun sırayı ilerlettiğini ve tekrarın ek kayıt üretmediğini doğruladı.
 
-### P10 · Yoklama, hakediş ve eğitmen ödemesi (kapalı)
+### P10 · Yoklama, hakediş ve eğitmen ödemesi (kapandı)
 
 | Önkoşul  | Sözleşme                                                                                                                                                               | Doğrulama                                               |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
@@ -1325,7 +1329,7 @@ P03.5 kabulü:34 birim/7 tarayıcı ilk toplu koşuda geçti. Yönetici UI’sin
 
 P10 kabulü: eğitmen yolunda gelmedi ve katıldı taslakları kapanış revizyonunu değiştirmedi; ayrı gerçekleşen eğitmen onayı, kapanış ve gerekçeli düzeltme ile 8 tarayıcı senaryosu ve ortak Axe/reflow geçti. Native `starter-attendance-protection.test.mjs` taslakta tahsisin korunmasını ve kapanış/düzeltmede tüketim/iade bağını, `pro-lifecycle-earnings-acceptance.mjs` geçerli anlaşma ve kaynak hakediş farkı, gerçek ödeme/düzeltme, eşzamanlı fazla ödeme reddi ve bakiye mutabakatını doğruladı. Yönetici ödeme, düzeltme ve erişilebilir fazla ödeme reddi E23 kayıtlarında. [Native kaynak kabulü](#pro-kabulu).
 
-### P11 · Günlük paneller ve kişisel takvim (kapalı)
+### P11 · Günlük paneller ve kişisel takvim (kapandı)
 
 | Önkoşul            | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                   |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
@@ -1334,11 +1338,11 @@ P10 kabulü: eğitmen yolunda gelmedi ve katıldı taslakları kapanış revizyo
 - [x] **P11.1** · Öğrenci kendi yaklaşan dersini, haklarını ve borcunu görür. Rezervasyon iptali paneli yeniler.
       P11.1 kabulü: iptal doğrulandıktan sonra aynı hesap/merkez/kişi kapsamındaki ders, rezervasyon ve hak önbellekleri geçersiz kılınır. Aynı SPA oturumunda önceden açılmış Haklarım paneli 3 → 4 kullanılabilir hak ve doğru borç durumunu yeniden okudu. 11 birim/16 tarayıcı, ortak Axe/reflow, tip ve lint geçti. [Otomatik rapor](../test-reports/local-verification.md).
 - [x] **P11.2** · Eğitmen kendi programından seansı açar ve yetkili yoklamaya ulaşır. Başka eğitmenin kapalı görevine doğrudan erişim reddedilir.
-- [x] **P11.3** · Kişisel takvimin native HTTP/ICS, yetkili ders/saat ve eski bağlantının iptalini otomatik doğrula. Kullanıcının harici takvim istemcisindeki insan onayı [POST-PRO.CHAIN](#pro-teslim-sonrası-gerçek-kontroller-kapalı) kapsamındadır; bu otomatik kabulü engellemez.
+- [x] **P11.3** · Kişisel takvimin native HTTP/ICS, yetkili ders/saat ve eski bağlantının iptalini otomatik doğrula. Kullanıcının harici takvim istemcisindeki insan onayı [POST-PRO.CHAIN](#post-pro-kontroller) kapsamındadır; bu otomatik kabulü engellemez.
 
 P11.2/.3 kabulü: `auth-instructor-flows`8/8 ve `auth-member-account`8/8, eğitmen gün/hafta/atanmış seans ve kişisel takvim oluşturma/döndürme/geri alma yollarını doğruladı. Aynı kabul ağacındaki `personal-calendar-acceptance` (`schedule-reads.test.mjs`, API shard manifesti) gerçek native Auth + HTTP GET/HEAD, ICS ders/saat, canlı üyelik/rol sınırı ve eski URL retlerini doğrular; [G-PRO-03.1](#pro-kabulu) kaynak/run bağı kullanılır. Harici OS/takvim istemcisinde insan etkileşimi POST-PRO.CHAIN’de kalır.
 
-### P12 · Manuel CRM, deneme ve public başvuru (kapalı)
+### P12 · Manuel CRM, deneme ve public başvuru (kapandı)
 
 | Önkoşul                         | Sözleşme                                                                                                                                                                         | Doğrulama                                  |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
@@ -1354,7 +1358,7 @@ P11.2/.3 kabulü: `auth-instructor-flows`8/8 ve `auth-member-account`8/8, eğitm
 
 P12.2–P12.5 kabulü: E33/E34/E35 tarayıcı raporları aşama, takip, deneme onayı, aynı kişi dönüşümü, native öğrenci listeleri ve anonim form/ret akışlarını doğruladı. CI’da `person-registry.test.mjs` atanmış personelin faaliyet okuması, kapsam dışı ret, ücretsiz denemede sıfır borç ve ayrı ücretli hak, `crm-followup-projections-acceptance.mjs` gerçek yenileme/hareketsizlik kapsamını doğruladı. İndirim yetkisi P07.2’de. `public-program-discovery-acceptance.mjs` aynı yayımlı form/consent → tek inbox kaydı, `crm-application-intake-acceptance.mjs` bot reddi ve sıfır rezervasyon, `crm-application-review-acceptance.mjs` yetkili incelemeyi doğruladı. Gerçek etkileşimli widget tekrarı POST-PRO.AUTH altında. [Native kaynak kabulü](#pro-kabulu).
 
-### P13 · Etkinlik, atölye ve Pratik (kapalı)
+### P13 · Etkinlik, atölye ve Pratik (kapandı)
 
 | Önkoşul                                 | Sözleşme                                                                              | Doğrulama                                     |
 | --------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------- |
@@ -1366,7 +1370,7 @@ P12.2–P12.5 kabulü: E33/E34/E35 tarayıcı raporları aşama, takip, deneme o
 
 P13 kabulü: 11 etkinlik detay senaryosu yayımlama, kayıt, belge, kapasite, açık yoklama ve iptali doğruladı. Pratik seçili paketle kaydedilip ödeme komutu olmadan kapandı; seçili tekrar gerçek panel düğmesiyle geçti (`.tmp/p13-events-first-playwright.json`, `.tmp/p13-practice-retry.log`). Native `event-capacity-package-acceptance.mjs` Pro son yer yarışı, canlı uygunluk, yoklama sonrası değişmeyen kredi ve sıfır hak hareketini; `event-cancellation.test.mjs` ayrı iptal, finans/iade ve atomikliği doğruladı. Başkası için ilk kayıt öncesi belge keşfi P15.4’te doğrulandı. [Native kaynak kabulü](#pro-kabulu).
 
-### P14 · Bildirimler, hatırlatmalar ve CRM otomasyonu (kapalı)
+### P14 · Bildirimler, hatırlatmalar ve CRM otomasyonu (kapandı)
 
 | Önkoşul                           | Sözleşme                                                                                                                                                                                                                                                                                                                       | Doğrulama                                          |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
@@ -1380,7 +1384,7 @@ P13 kabulü: 11 etkinlik detay senaryosu yayımlama, kayıt, belge, kapasite, a�
 
 P14.2–P14.4 kanıtı: İşlemsel e-posta anahtarı hatırlatmadan bağımsız çalıştı ve seçim yenilemede korundu. Gelen kutusu ve hesap paketinde 20 tarayıcı senaryosu geçti. Ders/paket zamanlaması ve dil native `reminder-scheduling-acceptance.mjs` ile `transactional-email-acceptance.mjs` kapsamındadır. Yetkili yeniden deneme ve segment kaydı E40 otomasyonunda doğrulandı. Gerçek Pro [işlemsel e-posta](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı), [etkinlik hatırlatması ve CRM takibi](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p15p16-kaynak-kabulü-ve-xreq-021-canlı-doğrulaması) kendi backend kabullerindedir. [Otomatik rapor](../test-reports/local-verification.md).
 
-### P16 · Rapor, CSV ve kontrollü içe aktarma (kapalı)
+### P16 · Rapor, CSV ve kontrollü içe aktarma (kapandı)
 
 | Önkoşul                                     | Sözleşme                                                                              | Doğrulama                                             |
 | ------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
@@ -1393,7 +1397,7 @@ P14.2–P14.4 kanıtı: İşlemsel e-posta anahtarı hatırlatmadan bağımsız 
 
 P16 kabulü: `auth-reports-native.spec.ts`7/7 ve rapor birim paketi8/8 geçti; para birimine ayrılmış kesin tutarlar, CSV baytları/aynı filtre, öğrenci açılış hakkı/borç eşlemesi, hatalı satır ve aynı native işin tamamlanması doğrulandı. Sunucu mutabakatı/tekrarsızlık kanıtı aynı main ağacındaki `p06-acceptance` ve `report-finance-tracking-acceptance` native paketleridir; kaynak/run bağı [G-PRO-03.1](#pro-kabulu) altında. Mock DB/worker kanıtı sayılmadı. Ayrıntı [otomatik yerel raporda](../test-reports/local-verification.md).
 
-### P17 · İşletme ayarları, abonelik ve yaşam döngüsü (kapalı)
+### P17 · İşletme ayarları, abonelik ve yaşam döngüsü (kapandı)
 
 | Önkoşul                                                 | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                       |
 | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
@@ -1446,7 +1450,9 @@ G-PRO-01 kabulü: `auth-pro-chain.spec.ts` aynı Pro merkezinin kurulum kaynakla
 - [x] **G-PRO-05** · P01–P17 ile yukarıdaki Pro senaryolarının açıklarını kontrol et. Yayımlanmış backend sözleşmesinin sürümünü, yerel otomatik raporu, frontend build’ini ve teslim tarihini bu maddeye ekle. Teslim sonrası gerçek kontrol listesinin açıkları görünür kalır ve gerçek kabul kazanılmış sayılmaz. İnsan değerlendirmesi ayrıca varsa kaydedilir; verilmiş sayılmaz.
       18 Kasım 2026, 06.07 TSİ. P01–P17 ve teslim tarihindeki G-PRO-01–04.2 kabul edildi. [Yayımlanmış backend sözleşmesi](../src/lib/api-contracts/manifest.json) main `d48dc4d17abed6f6cc686639a4d763e0979937d2` kaynaklı. [Tam yerel rapor](../test-reports/verification.md), statik build kanıtı G-PRO-04.2 ve [aday PR331](https://github.com/SXQHex/FtkSaaS/pull/331). İnsan ve cihaz kontrolleri aşağıdaki Pro sonrası listede açık.
 
-### Pro teslim sonrası gerçek kontroller (kapalı)
+<a id="post-pro-kontroller"></a>
+
+### Pro teslim sonrası gerçek kontroller (kapandı)
 
 Bu liste yalnız [/goal kabul ve erteleme kuralındaki](#goal-yürütme-talimatı) CI ile yapılamayan kontrolleri taşır. Her kayıtta CI ile yapılamama gerekçesi bulunur. Önceki kanıtlar korunur; ACK almış yazılar tekrar oynatılmaz.
 
@@ -1462,7 +1468,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 
 18 Kasım kapsam kararıyla Starter kabulü başladı. G-PRO-05 kapalı. Ortak akışlar ve plan farkları Web1 tarayıcısı, native backend CI ve gerekli gerçek ortam kanıtıyla doğrulanır. [Native Starter kaynak ve koşu kaydı](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kısıt-kabulü--backend-kabulü-tamamlandı).
 
-### S01 · Starter kaynak ve öğrenci limitleri (kapalı)
+### S01 · Starter kaynak ve öğrenci limitleri (kapandı)
 
 | Önkoşul  | Sözleşme                                                                                                                                                                                                                                           | Doğrulama                                                 |
 | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -1472,7 +1478,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 - [x] **S01.2** · Aynı mantıksal odadaki çakışma `RESOURCE_CONFLICT` ile reddedildi. Native Starter’da oda kapasitesi 50, ayrı seans kontenjanları 40 ve 5 olarak okundu. Web1’in seans kapasite görünümü E18 kabulünde. [Native kaynak](../../backend/tests/starter-studio-acceptance.mjs#L60).
 - [x] **S01.3** · 99 aktif öğrenciden son yer için eşzamanlı iki etkinleştirme tek başarı ve tek `PLAN_LIMIT_REACHED` üretti. Son okuma 100 aktif öğrenci, ayrı geçiş testinde 101. öğrenci reddedildi. [Native kaynak](../../backend/tests/starter-plan-gates-acceptance.mjs#L87) · [G01 CI](https://github.com/SXQHex/FtkSaaS/actions/runs/43428246986).
 
-### S02 · Starter stüdyoda bir ders günü (kapalı)
+### S02 · Starter stüdyoda bir ders günü (kapandı)
 
 | Önkoşul | Sözleşme                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Doğrulama                                    |
 | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
@@ -1483,7 +1489,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 - [x] **S02.3** · Starter varsayılanlarında borç rezervasyon ve katılım engelleri açık. Native testte borçlu self rezervasyonu `DEBT_BOOKING_BLOCKED` ile reddedildi, tahsilattan sonra aynı satışla kabul edildi. Katılım politikası native yoklamada sınandı. Web1 Starter tarayıcısı ret sonrası 8 hakkı korudu ve tahsilattan sonra aynı satıştan rezervasyon yaptı. [Native rezervasyon](../../backend/tests/starter-studio-acceptance.mjs#L101) · [Native yoklama](../../backend/tests/starter-attendance-protection.test.mjs#L188) · [Web1 tarayıcı testi](../e2e/auth-pro-chain.spec.ts).
 - [x] **S02.4** · Atanmış eğitmen yoklama akışı E26’da doğrulandı. Gerçek Starter2’de atanmış eğitmenin seansı anlaşma olmadan kapandı, bir hak tüketildi. Kapanış makbuzunda hakediş yok, hakediş ve eğitmen bakiye okuması plan reddi verdi. Native CI kapalı yoklama ve sıfır hakediş kaydını veri kaynağında doğruladı. Aynı öğrenci için 1.000 TRY alt birim tahsilat ve sıfır borç raporla uyuştu. [G-STARTER.1](#starter-kabulü) · [Native yoklama](../../backend/tests/starter-studio-acceptance.mjs#L263).
 
-### S03 · Starter öğrenci, aday ve destek akışları (kapalı)
+### S03 · Starter öğrenci, aday ve destek akışları (kapandı)
 
 | Önkoşul                         | Sözleşme                                                                                                                                                                                                                                                                                                                                           | Doğrulama                                              |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
@@ -1495,7 +1501,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 - [x] **S03.4** · Web1’in bildirim okuma ve işlem bağlamlı açık belge onayı P14/P15’te doğrulandı. Native Starter bildirimi yalnız gerçek alıcıda okundu ve sürümlü tekrar tek kayıt üretti. G01 onayı aynı öğrencinin satış bağlamına yazdı ve tekrar okumayla doğruladı. [Native bildirim](../../backend/tests/starter-operations-acceptance.mjs#L298) · [Native belge](../../backend/tests/starter-studio-acceptance.mjs#L140).
 - [x] **S03.5** · Web1 Starter zincirinde satış ve tahsilat raporu aynı ürün ve kişiyle eşleşti. Öğrenci CSV tarayıcı senaryosu açılış hakkı ve borcu map edip tek işte uyguladı. Native Starter testi aynı içe aktarımı, açılış hakkını, tahsilatı ve kalan borcu kaynak okumalara bağladı. [Web1 rapor ve içe aktarım testi](../e2e/auth-reports-native.spec.ts) · [Native Starter işlemleri](../../backend/tests/starter-operations-acceptance.mjs#L109).
 
-### S04 · Starter üst plan erişim retleri (kapalı)
+### S04 · Starter üst plan erişim retleri (kapandı)
 
 | Önkoşul | Sözleşme                                                                                                                     | Doğrulama                                                    |
 | ------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
@@ -1506,7 +1512,7 @@ CI ile yapılabilen eski teslim sonrası başlıklarının sahipleri: kişi/dave
 - [x] **S04.3** · Gerçek development’a bağlı aday build, gezinme ve doğrudan adreste pipeline plan reddinden sonra temel aday listesini ayrıntı ve özetle açtı. Pano kapalı, aday ekleme ve elle takip açıktı. Seri Chromium aday notunu ve kapalı deneme/dönüşüm eylemlerini doğruladı. İleri yenileme takibi, segment ve otomasyon native plan reddi verdi. Segment ve otomasyon ekleme kapalı kaldı. Hatırlatma lisansı S04.4’te doğrulandı. [Native çağrı karşılaştırması](../.tmp/goal-1309-starter-crm-native.json) · [Development tarayıcısı](../.tmp/goal-1309-starter-gates-live.json) · [Seri Web1](../.tmp/goal-1309-starter-crm-regression.json).
 - [x] **S04.4** · Starter2’de tek erişilebilir merkez, kullanılamayan işlemsel e-posta ve e-posta hatırlatma tercihleri ile zorunlu uygulama içi teslim native okundu. Web1 seri Chromium’da iki e-posta tercihini kapalı ve değiştirilemez gösterdi, kapsam dışı merkezin doğrudan adresinde tercih okumadı. Native Auth e-posta doğrulaması P01.1’de. [Development tercihleri](../.tmp/goal-1309-starter-self-delivery.json) · [Seri tarayıcı raporu](../.tmp/goal-1309-starter-and-auth-playwright.json).
 
-### S05 · Pro’dan Starter’a geçiş (kapalı)
+### S05 · Pro’dan Starter’a geçiş (kapandı)
 
 | Önkoşul  | Sözleşme                                                                                                                                                                    | Doğrulama                                                      |
 | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |

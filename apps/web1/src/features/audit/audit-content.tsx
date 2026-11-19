@@ -5,7 +5,8 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { readWorkspace } from "../workspace/workspace";
 import { AuditView, type AuditFilter } from "./audit-view";
 import { AuditDetailSheet } from "./audit-detail-sheet";
-import { auditModules, readAudit, readTracking } from "./audit-read";
+import { auditModules, readAudit, readAuditCsv, readTracking } from "./audit-read";
+import { saveCsv } from "../reports/reports-command";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
 import { Field, FieldLabel } from "../../components/ui/field";
@@ -33,6 +34,8 @@ export function AuditContent({
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [index, setIndex] = useState(0);
   const [detailId, setDetail] = useState<string>();
+  const [exporting, setExporting] = useState(false);
+  const [exportFailed, setExportFailed] = useState(false);
   const workspace = useQuery({
     queryKey: ["workspace", scope.accountId, scope.orgId],
     queryFn: () => readWorkspace(scope.accountId, scope.orgId),
@@ -48,6 +51,7 @@ export function AuditContent({
     setCursors([undefined]);
     setIndex(0);
     setDetail(undefined);
+    setExportFailed(false);
   };
   useEffect(() => {
     const timer = window.setTimeout(() => setQuery(filter.query.trim()), 300);
@@ -99,10 +103,34 @@ export function AuditContent({
     reset();
     setAnchor(new Date().toISOString());
   };
+  async function exportCsv() {
+    if (!timezone || exporting || records.isError || query !== filter.query.trim()) return;
+    setExporting(true);
+    setExportFailed(false);
+    try {
+      const data = await readAuditCsv(scope, input);
+      saveCsv(new Blob([data.csv], { type: data.mime }), data.filename);
+    } catch {
+      setExportFailed(true);
+    } finally {
+      setExporting(false);
+    }
+  }
   return (
     <>
       <AuditView
         tab={tab}
+        headerAction={
+          tab === "records" && (
+            <Button
+              variant="outline"
+              isDisabled={!rows || records.isFetching || exporting || query !== filter.query.trim()}
+              onPress={() => void exportCsv()}
+            >
+              {t(($) => $.audit.exportCsv)}
+            </Button>
+          )
+        }
         onTab={(value) => {
           setTab(value);
           reset();
@@ -128,6 +156,7 @@ export function AuditContent({
         operations={
           operations?.items.map((row) => {
             const { progress_count: processed, total_count: total } = row;
+            const result = row.import_result;
             const progressLabel =
               processed === null
                 ? undefined
@@ -144,9 +173,23 @@ export function AuditContent({
               state: Object.hasOwn(trackingLabels, row.state)
                 ? (trackingLabels[row.state] ?? row.state)
                 : row.state,
+              definitiveResult: result
+                ? t(($) => $.audit.importResult, {
+                    outcome: t(($) => $.audit.importOutcomes[result.outcome]),
+                    applied: formatCount(result.applied_rows),
+                    replayed: formatCount(result.replayed_rows),
+                    skipped: formatCount(result.skipped_rows),
+                    failed: formatCount(result.failed_rows),
+                    unprocessed: formatCount(result.unprocessed_rows),
+                    total: formatCount(result.total_rows),
+                  })
+                : undefined,
               note: [
                 progressLabel,
                 row.safe_error_code,
+                row.retry_mode === "report_export"
+                  ? t(($) => $.audit.reportRetryAvailable)
+                  : undefined,
                 row.expires_at
                   ? t(($) => $.audit.expiry, { time: date(row.expires_at) })
                   : undefined,
@@ -267,6 +310,11 @@ export function AuditContent({
             {(source.isError || !timezone) && (
               <Alert variant="destructive">
                 <AlertDescription role="alert">{t(($) => $.audit.unread)}</AlertDescription>
+              </Alert>
+            )}
+            {tab === "records" && exportFailed && (
+              <Alert variant="destructive">
+                <AlertDescription>{t(($) => $.audit.exportFailed)}</AlertDescription>
               </Alert>
             )}
             <Button variant="outline" isDisabled={source.isFetching || !timezone} onPress={refresh}>

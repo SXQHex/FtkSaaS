@@ -2,7 +2,10 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
-import type { RequestAuditList, TrackingDirectory } from "../../lib/api-contracts/generated";
+import type {
+  RequestAuditCenterExport,
+  TrackingDirectory,
+} from "../../lib/api-contracts/generated";
 export const auditModules = [
   "M01",
   "M02",
@@ -47,14 +50,16 @@ async function interval(input: AuditInput) {
     ends_at: end.equals(start) ? end.add({ nanoseconds: 1 }).toString() : end.toString(),
   };
 }
-function base(scope: ClientScope, cursor?: string) {
+function auditScope(scope: ClientScope) {
   return {
     client_api_version: 1 as const,
     request_id: uuidv7(),
     org_id: scope.orgId,
     center_id: scope.centerId,
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
   };
+}
+function pageFor(cursor?: string) {
+  return { limit: 20, ...(cursor ? { cursor } : {}) };
 }
 function validatePage(
   data: { as_of: string; next_cursor?: string | null; items: { id: string; created_at: string }[] },
@@ -68,14 +73,26 @@ function validatePage(
     instant.parse(item.created_at);
   }
 }
-export async function readAudit(scope: ClientScope, input: AuditInput) {
-  const request: RequestAuditList = { ...base(scope, input.cursor) };
+async function auditRequest(
+  scope: ClientScope,
+  input: AuditInput,
+): Promise<RequestAuditCenterExport> {
+  const request: RequestAuditCenterExport = auditScope(scope);
   const range = await interval(input);
   if (range) request.interval = range;
   if (input.query?.trim()) request.query = z.string().max(200).parse(input.query.trim());
   if (input.module) request.module = z.enum(auditModules).parse(input.module);
   if (input.result) request.result = z.literal("recorded").parse(input.result);
-  const data = await (await scopedBackend(scope)).call("audit_list_v1", request);
+  return request;
+}
+export async function readAudit(scope: ClientScope, input: AuditInput) {
+  const request = await auditRequest(scope, input);
+  const data = await (
+    await scopedBackend(scope)
+  ).call("audit_list_v1", {
+    ...request,
+    page: pageFor(input.cursor),
+  });
   validatePage(data, input.cursor);
   if (new Set(data.items.map((row) => row.id)).size !== data.items.length)
     throw Error("AUDIT_SOURCE_INVALID");
@@ -87,6 +104,16 @@ export async function readAudit(scope: ClientScope, input: AuditInput) {
   }
   return data;
 }
+export async function readAuditCsv(scope: ClientScope, input: AuditInput) {
+  const request = await auditRequest(scope, input);
+  const data = await (await scopedBackend(scope)).call("audit_center_export_v1", request);
+  if (data.filename !== `audit-${scope.centerId}.csv` || data.mime !== "text/csv")
+    throw Error("AUDIT_SOURCE_INVALID");
+  instant.parse(data.as_of);
+  count.parse(data.row_count);
+  z.string().min(1).parse(data.csv);
+  return data;
+}
 export async function readTracking(
   scope: ClientScope,
   input: AuditInput & { kind?: "all" | "operation" | "preview" | "job"; state?: string },
@@ -95,7 +122,8 @@ export async function readTracking(
   const data = await (
     await scopedBackend(scope)
   ).call("tracking_directory_get_v1", {
-    ...base(scope, input.cursor),
+    ...auditScope(scope),
+    page: pageFor(input.cursor),
     kind: input.kind ?? "all",
     ...(range ? { interval: range } : {}),
     ...(input.query?.trim() ? { query: z.string().max(200).parse(input.query.trim()) } : {}),
@@ -114,6 +142,27 @@ export async function readTracking(
     if (row.next_attempt_at) instant.parse(row.next_attempt_at);
     if (row.progress_count !== null) count.parse(row.progress_count);
     if (row.total_count !== null) count.parse(row.total_count);
+    const result = row.import_result;
+    if (result) {
+      const {
+        total_rows,
+        applied_rows,
+        replayed_rows,
+        skipped_rows,
+        failed_rows,
+        unprocessed_rows,
+      } = result;
+      z.enum(["complete", "partial", "not_applied"]).parse(result.outcome);
+      const counts = [applied_rows, replayed_rows, skipped_rows, failed_rows, unprocessed_rows];
+      for (const value of [total_rows, ...counts]) count.parse(value);
+      if (
+        row.kind !== "job" ||
+        row.operation !== "import_rows_process_v1" ||
+        (row.state !== "succeeded" && row.state !== "failed") ||
+        counts.reduce((sum, value) => sum + value, 0) !== total_rows
+      )
+        throw Error("AUDIT_SOURCE_INVALID");
+    }
     if (
       row.progress_count !== null &&
       row.total_count !== null &&

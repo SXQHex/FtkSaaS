@@ -31,7 +31,6 @@ import {
   ItemTitle,
   ItemDescription,
   ItemActions,
-  ItemSeparator,
 } from "../../components/ui/item";
 import { Empty, EmptyDescription } from "../../components/ui/empty";
 export interface AuditFilter {
@@ -55,10 +54,12 @@ export interface AuditOperationRow {
   context: string;
   state: string;
   note?: string;
+  definitiveResult?: string;
   progress?: { count: number; total: number; label: string };
 }
 export function AuditView({
   tab,
+  headerAction,
   onTab,
   filter,
   onFilter,
@@ -76,6 +77,7 @@ export function AuditView({
   filtersAvailable = false,
 }: {
   tab: "records" | "operations";
+  headerAction?: ReactNode;
   onTab: (value: "records" | "operations") => void;
   filter: AuditFilter;
   onFilter: (value: AuditFilter) => void;
@@ -102,6 +104,7 @@ export function AuditView({
             {t(($) => $.audit.description)}
           </p>
         </div>
+        {headerAction}
       </header>
       {notice}
       <Tabs
@@ -278,34 +281,35 @@ export function AuditView({
                     </EmptyDescription>
                   </Empty>
                 ) : (
-                  <ItemGroup>
-                    {operations.map((row, index) => (
-                      <div key={row.id}>
-                        {index > 0 && <ItemSeparator />}
-                        <Item
-                          role="listitem"
-                          className="flex-col items-start px-0 @sm:flex-row @sm:items-center"
-                        >
-                          <ItemContent className="w-full min-w-0">
-                            <ItemTitle className="wrap-anywhere">{row.title}</ItemTitle>
-                            <ItemDescription className="wrap-anywhere">
-                              {row.context}
-                              {row.note ? ` · ${row.note}` : ""}
-                            </ItemDescription>
-                            {row.progress && (
-                              <Progress
-                                aria-label={t(($) => $.audit.progress)}
-                                value={row.progress.count}
-                                maxValue={row.progress.total}
-                                valueLabel={row.progress.label}
-                              />
-                            )}
-                          </ItemContent>
-                          <ItemActions className="flex-wrap">
-                            <Badge variant="secondary">{row.state}</Badge>
-                          </ItemActions>
-                        </Item>
-                      </div>
+                  <ItemGroup className="divide-y">
+                    {operations.map((row) => (
+                      <Item
+                        key={row.id}
+                        role="listitem"
+                        className="flex-col items-start px-0 @sm:flex-row @sm:items-center"
+                      >
+                        <ItemContent className="w-full min-w-0">
+                          <ItemTitle className="wrap-anywhere">{row.title}</ItemTitle>
+                          <ItemDescription className="wrap-anywhere">
+                            {row.context}
+                            {row.note ? ` · ${row.note}` : ""}
+                          </ItemDescription>
+                          {row.definitiveResult && (
+                            <p className="text-sm wrap-anywhere">{row.definitiveResult}</p>
+                          )}
+                          {row.progress && (
+                            <Progress
+                              aria-label={t(($) => $.audit.progress)}
+                              value={row.progress.count}
+                              maxValue={row.progress.total}
+                              valueLabel={row.progress.label}
+                            />
+                          )}
+                        </ItemContent>
+                        <ItemActions className="flex-wrap">
+                          <Badge variant="secondary">{row.state}</Badge>
+                        </ItemActions>
+                      </Item>
                     ))}
                   </ItemGroup>
                 )}

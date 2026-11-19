@@ -242,7 +242,15 @@ export default interface Resources {
       "empty": "Bu filtreye uyan kayıt yok.",
       "emptyOperations": "Bu kapsamda işlem yok.",
       "expiry": "Son geçerlilik: {{time}}",
+      "exportCsv": "Denetim kayıtlarını indir (CSV)",
+      "exportFailed": "Bu kapsamdaki denetim kayıtları indirilemedi.",
       "immutable": "Bu kayıt değiştirilemez ve silinemez.",
+      "importOutcomes": {
+        "complete": "Tam uygulandı",
+        "not_applied": "Uygulanmadı",
+        "partial": "Kısmen uygulandı"
+      },
+      "importResult": "{{outcome}} · {{total}} satır · {{applied}} uygulandı · {{replayed}} önceki işlemden kullanıldı · {{skipped}} atlandı · {{failed}} başarısız · {{unprocessed}} işlenmedi",
       "kind": "Kayıt türü",
       "kinds": {
         "all": "Tüm kayıt türleri",
@@ -302,6 +310,7 @@ export default interface Resources {
       "recorded": "Kaydedildi",
       "records": "Denetim kaydı",
       "refresh": "Durumu güncelle",
+      "reportRetryAvailable": "Dışa aktarma Raporlar ekranından yeniden başlatılabilir.",
       "result": "Sonuç",
       "searchLabel": "Denetim kaydında ara",
       "searchPlaceholder": "Kişi, işlem veya nesne ara",

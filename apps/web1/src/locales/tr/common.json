@@ -4946,6 +4946,15 @@
     "progress": "İşlenen kayıtlar",
     "processed": "{{processed}} kayıt işlendi",
     "processedTotal": "{{total}} kaydın {{processed}} tanesi işlendi",
+    "exportCsv": "Denetim kayıtlarını indir (CSV)",
+    "exportFailed": "Bu kapsamdaki denetim kayıtları indirilemedi.",
+    "reportRetryAvailable": "Dışa aktarma Raporlar ekranından yeniden başlatılabilir.",
+    "importResult": "{{outcome}} · {{total}} satır · {{applied}} uygulandı · {{replayed}} önceki işlemden kullanıldı · {{skipped}} atlandı · {{failed}} başarısız · {{unprocessed}} işlenmedi",
+    "importOutcomes": {
+      "complete": "Tam uygulandı",
+      "partial": "Kısmen uygulandı",
+      "not_applied": "Uygulanmadı"
+    },
     "expiry": "Son geçerlilik: {{time}}",
     "nextAttempt": "Sonraki deneme: {{time}}",
     "pageCount_one": "Bu sayfada {{count}} kayıt",
