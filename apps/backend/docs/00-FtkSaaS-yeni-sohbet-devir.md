@@ -1,6 +1,21 @@
 # Güncel kaynak ve kabul
 
+<a id="centers-list-data-api"></a>
+## Merkez listesi Data API pilotu
+
+Yerel pilot ölçümünün tabanı `46c9dd22484bb9a46e939e562e654a6c044e6283` ve [aynı kaynak main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44524823332) başarılı. Aday, [doğrulayıcı küçültmesini içeren main](#edge-doğrulayıcı-boyutu) ile senkronize edildi. Taşıma sözleşmesi [istemci protokolünde](../../../docs/client-integration.md#gerçek-sözleşme), tarayıcı açılımı [ortam rehberindedir](remote-backend-setup.md#merkez-listesi-data-api).
+
+Temiz loopback Supabase kurulumunda 209 migration uygulandı ve 10/10 hedefli kabul testi geçti. Düz liste karşılaştırmasında 21 senaryo HTTP durumu, DTO veya hata kodu ve retryability bakımından eşleşti. Owner, merkez yöneticisi, üye, yabancı kapsam, canlı hesap bağı, oturum iptali ve native MFA kontrol edildi.
+
+Kısa ömürlü native JWT ile açık oturumun süresi dolmuş token'ının her iki yolda 401 ve `AUTH_REQUIRED` verdiği doğrulandı. Native REST ön isteği `Content-Profile` başlığını kabul etti. Web1'de 16 taşıma birim testi ve tek Chromium çalışanındaki kayıt sonrası merkez keşfi ile kurulum özeti senaryoları geçti.
+
+Geniş yerel kaynak doğrulamasında 615/617 test geçti. CI zaman aşımı ve `/proc` bellek gözlemcisi testleri macOS'ta hem adayda hem değişikliksiz main tabanında yeniden aynı şekilde başarısız oldu.
+
+Yerel uçtan uca p95, Edge ve Data API sırasıyla seri çağrıda 1.183,41 → 20,92 ms, dörder eşzamanlı aynı organizasyon çağrısında 4.189,57 → 32,24 ms ve dörder eşzamanlı karma organizasyon çağrısında 4.832,63 → 36,78 ms olarak ölçüldü. Paylaşımlı organizasyon kilidi altında Edge 16/16 bekledi ve örneklenen bekleme p95'i 210,85 ms oldu. Data API 0/16 bekledi. Yazma kilidinde iki yol da 16/16 bekledi ve tamamlanan askıya alma işleminden sonra `SERVICE_UNAVAILABLE` döndürdü. Bu ölçümler yerel pilot koşullarına aittir. Aday CI ve hosted kabulü ayrı izlenir.
+
 ## Edge doğrulayıcı boyutu
+
+[PR #345](https://github.com/SXQHex/FtkSaaS/pull/345) kaynak bağlı [Backend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/44538629561) ardından `71c7ecb2ae674d9da8932f12c2517d2935e9197b` ile main’e alındı. Bu merge SHA’sının [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44551412947) başarılı.
 
 Taban `46c9dd22484bb9a46e939e562e654a6c044e6283` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44524823332) başarılı. Aynı derleme ayarlarıyla ham Edge kaynağı 4.006.148 → 3.277.440 bayt, JSON yükü 4.129.792 → 3.362.342 bayt (%18,58) oldu. Operasyon ve sözleşme dosyaları ile Worker doğrulayıcısı birebir eşleşiyor.
 

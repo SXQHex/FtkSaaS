@@ -1,8 +1,8 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `50e434000d1d1f0df6a4256b302ba75b8a18554fe18de874c4390751083c253c`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `b0a23878930c2b342eb635ffbaef628ae41070a39d3439d769e8fbb3f6301ddb`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
-İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
+İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
 Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant kümesi veya başarılı güvenlik denetimi olduğu iddia edilmez. Etkin RLS/ACL/fonksiyon security flag/policy ifadeleri CD pg_catalog artifact'ından okunur. Auth/public/storage şemaları bu uygulama katalog snapshot'ına dahil değildir; sağlayıcı ayarları ayrıca kabul edilir.
 
@@ -439,6 +439,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261118214800_audit_export_tracking_results.sql](../apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql) | `22a7dc583102741342c06530b78a21c9a113ea5bc31bb1c09c69eba869824a84` |
 | [20261118215000_platform_invoices.sql](../apps/backend/supabase/migrations/20261118215000_platform_invoices.sql) | `943240737ff53d7098fbe65f8f49784671c51f68804a485ffc32e3c260749bb7` |
 | [20261119060000_platform_console_completion.sql](../apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql) | `13cfe5a203253a227b60eb5d9ab793c3cb9b7ce734d4a80cd3d919af26b28331` |
+| [20261119150000_centers_list_rls.sql](../apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql) | `f919e1f512933946f8af6577fa9e7c73016d5bd6248fcc2b32825f166b4ada19` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "8133189a7c892c48065da0f743cc040546793a5c389d6ce78cb33ded1fba63fe",
-        "reason": "Üretilmiş Edge kodu ortak hata nesneleri ve okunabilen şema sabitleri ile küçülür. Aynı API sözleşmesi, hata zarfı, şema yolları ve Worker doğrulaması korunur."
+        "fingerprint": "4d1d601294ac2934c8f1dd5ea76adc13bdedf1f211c55dce823baa9d1beccd04",
+        "reason": "Reviewed the compact generated Edge validator and the plain centers Data API transport together. The published DTO, error details and isolation boundaries remain intact."
       }
     },
     {
@@ -399,8 +399,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "d5a90a442b69e48a650329eb0c257699b00279854e6ad88aa04b788714c3b65e",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "62b2b18cb87812dc985c1b0589d00c38e1fda57f78f2f263ff6c4c2ade383073",
+        "reason": "Reviewed the local PostgREST schema addition against the existing native Auth, session and MFA configuration."
       }
     },
     {
@@ -499,7 +499,9 @@
         "apps/backend/database/studio-setup-requests.sql",
         "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql",
         "apps/backend/database/platform-console-completion.sql",
-        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
+        "apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql",
+        "packages/api-contracts/src/read-transport.ts"
       ],
       "operations": [
         "organizations_list_v1",
@@ -527,8 +529,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "9dc8481690042bdc1d3e55f111b7922664d8ddae1724b7a1d592eed02308a019",
-        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
+        "fingerprint": "23beb4410ce90e21a1adbaff68bce405aca7dcd81f9076edd986dd3c51ff555e",
+        "reason": "Reviewed the renamed centers list RLS migration. Its version, SQL bytes, published contract and existing acceptance scenarios are unchanged."
       }
     },
     {
