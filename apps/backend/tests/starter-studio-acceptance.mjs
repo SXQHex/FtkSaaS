@@ -530,3 +530,101 @@ test('W1-BE-58 invoices publish verified ZIP and PDF originals to the live organ
  assert.equal((await list()).items.length,2);
  assert.equal((await download(owner,zipScope)).ok,true);
 });
+
+test('W1-BE-60 platform plan discovery uses effective native versions that a new organization can select',async t=>{
+ const {platform,plan}=await fixturePlatform(),customer=await authUser('new-plan-customer'),db=await connect();t.after(()=>db.end());
+ const put=async at=>{
+  const id=key();
+  await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,'pro',$2,price_minor,'CHF','yearly',limits,features from core.saas_plan_versions where id=$3",[id,at,plan]);
+  return id;
+ };
+ const expired=await put('2020-01-01'),effective=await put(new Date(Date.now()-60000)),future=await put('2099-01-01');
+ const body={view:'initial_plans',page:{limit:200}};
+ assert.equal((await call(customer,'platform_directory_get_v1',body)).result.error.code,'FORBIDDEN');
+ const {items}=await must(platform,'platform_directory_get_v1',body);
+ const selected=items.find(x=>x.id===effective);
+ assert.equal(selected.name,'pro');assert.equal(selected.period,'yearly');assert.equal(selected.currency,'CHF');
+ assert(!items.some(x=>x.id===expired||x.id===future));
+ const account=await must(customer,'account_get_v1');
+ const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic discovered plan',initial_plan_id:selected.id},key())).primary_id;
+ assert.equal((await db.query('select plan_version_id from core.saas_subscriptions where org_id=$1',[org])).rows[0].plan_version_id,effective);
+});
+
+test('W1-BE-61 platform reads original quote periods and the exact grace bound guarded by the writer',async t=>{
+ const f=await preparationFixture(),{platform,owner,db,org,plan}=f;t.after(()=>db.end());
+ const projected=async()=> (await must(platform,'management_state_get_v1',{org_id:org,operation:'saas_grace_extend_v1',selector:{operation:'saas_grace_extend_v1',key:{}},page:{}})).items[0].current.values;
+ const payList=()=>must(platform,'platform_directory_get_v1',{view:'payments',scope:{org_id:org},page:{limit:200}});
+ const old=(await payList()).items[0];assert(old.org_name);assert.equal(old.quote_period,null);
+ assert.equal((await projected()).eligible,false);
+ assert.equal((await call(owner,'management_state_get_v1',{org_id:org,operation:'saas_grace_extend_v1',selector:{operation:'saas_grace_extend_v1',key:{}},page:{}})).result.error.code,'FORBIDDEN');
+ await db.query('insert into private.p07_billing_config(singleton,quote_ttl_seconds) values(true,900) on conflict do nothing');
+ const upgrade=key();
+ await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,'pro',now(),price_minor+1000,currency,period,limits,features from core.saas_plan_versions where id=$2",[upgrade,plan]);
+ const quote=await must(owner,'subscription_upgrade_quote_v1',{org_id:org,target_plan_id:upgrade},key());
+ const paid=(await must(owner,'saas_payment_submit_v1',{org_id:org,quote_id:quote.id,amount_minor:quote.amount_minor,currency:quote.currency,reference:'Synthetic quote-period payment',occurred_at:new Date().toISOString()},key())).primary_id;
+ const payment=(await payList()).items.find(x=>x.id===paid);
+ assert.equal(payment.org_name,old.org_name);
+ assert.equal(Date.parse(payment.quote_period.starts_at),Date.parse(quote.period_start));
+ assert.equal(Date.parse(payment.quote_period.ends_at),Date.parse(quote.period_end));
+ await db.query("update core.saas_subscriptions set period_end=now()-interval '1 day',grace_until=null where org_id=$1",[org]);
+ const grace=await projected();
+ const floor=(await db.query("select period_end+interval '7 days' as cutoff from core.saas_subscriptions where org_id=$1",[org])).rows[0].cutoff;
+ assert.equal(grace.eligible,true);assert.equal(Date.parse(grace.until_after),+floor);
+ const req={org_id:org,until:grace.until_after,reason:'Synthetic grace preview'};
+ assert.equal((await call(platform,'saas_grace_extend_v1',req,key())).result.error.code,'VALIDATION_FAILED');
+ const next=new Date(+floor+86400000).toISOString();
+ await must(platform,'saas_grace_extend_v1',{...req,until:next},key());
+ assert.equal(Date.parse((await projected()).until_after),Date.parse(next));
+ await db.query('update core.saas_subscriptions set cancel_at_period_end=true where org_id=$1',[org]);
+ assert.equal((await projected()).eligible,false);assert.equal((await projected()).until_after,null);
+});
+
+test('W1-BE-62 platform grants and revokes verified operators with live authority and a last operator fence',async t=>{
+ const {platform}=await fixturePlatform(),next=await authUser('operator-candidate'),outsider=await authUser('operator-customer');
+ const a=(await must(platform,'account_get_v1')).id,b=(await must(next,'account_get_v1')).id;
+ const db=await connect();t.after(()=>db.end());
+ const directory={view:'operators',page:{limit:200}};
+ const mutation=(verified_account_id,enabled)=>({verified_account_id,enabled,reason:'Synthetic operator access change'});
+ assert.equal((await call(outsider,'platform_directory_get_v1',directory)).result.error.code,'FORBIDDEN');
+ assert.equal((await call(outsider,'platform_operator_access_set_v1',mutation(b,true),key())).result.error.code,'FORBIDDEN');
+ const grant=mutation(b,true),grantKey=key();
+ const receipt=await must(platform,'platform_operator_access_set_v1',grant,grantKey);
+ assert.equal(receipt.account_id,b);
+ assert.equal((await must(platform,'platform_operator_access_set_v1',grant,grantKey)).operation_id,receipt.operation_id);
+ const newDirectory=await must(next,'platform_directory_get_v1',directory);
+ const target=newDirectory.items.find(x=>x.account_id===b);
+ assert.equal(target.eligible,true);
+ assert.deepEqual(Object.keys(target).sort(),['account_id','display_name','eligible','granted_at','kind']);
+ assert.equal((await must(next,'account_get_v1',{include_platform_scope:true})).platform_scope.operator_manage,true);
+ assert((await must(next,'account_delete_preview_v1')).blockers.some(x=>x.code==='OWNER_TRANSFER_REQUIRED'));
+ const legacy=await authUser('operator-legacy-unprovisioned');
+ await db.query('insert into private.platform_operators(auth_user_id) values($1)',[legacy.id]);
+ const legacyRow=(await must(platform,'platform_directory_get_v1',directory)).items.find(x=>x.account_id===null&&x.display_name==='operator-legacy-unprovisioned');
+ assert.equal(legacyRow.eligible,true);
+ await db.query('delete from private.platform_operators where auth_user_id=$1',[legacy.id]);
+ const audit=await db.query("select detail from private.p07_lifecycle_events where operation_id=$1",[receipt.operation_id]);
+ assert.deepEqual(audit.rows[0].detail,{target_account_id:b,enabled:true,reason:grant.reason});
+ // Two live sessions attempt to revoke each other under one backend test.
+ const attempts=await Promise.all([
+  call(platform,'platform_operator_access_set_v1',mutation(b,false),key()),
+  call(next,'platform_operator_access_set_v1',mutation(a,false),key())
+ ]);
+ assert.equal(attempts.filter(x=>x.result.ok).length,1);
+ assert.equal(attempts.find(x=>!x.result.ok).result.error.code,'FORBIDDEN');
+ const kept=attempts[0].result.ok?platform:next, removed=attempts[0].result.ok?next:platform;
+ assert.equal((await call(removed,'platform_directory_get_v1',directory)).result.error.code,'FORBIDDEN');
+ assert.equal((await must(removed,'account_get_v1',{include_platform_scope:true})).platform_scope.operator_manage,false);
+ const keptAccount=attempts[0].result.ok?a:b;
+ // In a rolled-back DB transaction isolate the final-member invariant without altering other API fixtures.
+ await db.query('begin');
+ try{
+  await db.query("set local request.jwt.claim.role='service_role'");
+  await db.query('lock table private.platform_operators in share row exclusive mode');
+  await db.query('delete from private.platform_operators where auth_user_id<>$1',[kept.id]);
+  const {rows:[probe]}=await db.query('select api_v1.platform_operator_access_set_v1($1,$2,$3,$4,null) as response',[
+   {client_api_version:1,request_id:key(),operation_key:key(),...mutation(keptAccount,false)},kept.id,kept.session_id,Array.from({length:32},key)
+  ]);
+  assert.equal(probe.response.error.code,'INVALID_STATE_TRANSITION');
+  assert.equal((await db.query('select count(*)::int as n from private.platform_operators')).rows[0].n,1);
+ }finally{await db.query('rollback');}
+});

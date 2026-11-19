@@ -308,8 +308,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "6927035395be8fad4857c63d275c73ca5286395e50f402a7b89366f74f7e495b",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "a180f9c01eb62b8ed38f9e583e048f78aeedddddc66a529910d73740e2ae0c99",
+        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
       }
     },
     {
@@ -398,8 +398,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "02b1954b2266da78d5284b1547360c61c451736c7594b8ecda0df65e262fa250",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "d5a90a442b69e48a650329eb0c257699b00279854e6ad88aa04b788714c3b65e",
+        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
       }
     },
     {
@@ -496,7 +496,9 @@
         "apps/backend/database/account-self-management-scope.sql",
         "apps/backend/supabase/migrations/20261118110633_account_self_management_scope.sql",
         "apps/backend/database/studio-setup-requests.sql",
-        "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql"
+        "apps/backend/supabase/migrations/20261118214200_studio_setup_requests.sql",
+        "apps/backend/database/platform-console-completion.sql",
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -524,8 +526,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "ac6bc0fb4220c4d1d1c093ff7b9e2b5f27e70b2096673af05065b06fe4a2ddcc",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "9dc8481690042bdc1d3e55f111b7922664d8ddae1724b7a1d592eed02308a019",
+        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
       }
     },
     {
@@ -642,8 +644,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "174df80b01b3c18f612625e82e8a2842f70e765595103e6b8ae3e785713fc065",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "8422dac06f1c9defafafeacf0a624049c256af771e8bb8237707ef1c7acb63e3",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -759,8 +761,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "ee2da06186838efc23b4b7ccfd9793cad94ed33ff447e8cb0f7eaade2dcbf806",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "de6f725a2cd8f4bcf3563cdd181aa3e3b2df73b7f1c966e967679aaec860f52d",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -887,8 +889,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "b17e2b238555011a59e49eca26e97d4463d90899a15ccd5f72af161d868bcee8",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "24d9b01ee325c0632666c4ace5ccb56732cd1c46e117abde7a5617281aba272f",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -997,8 +999,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "3f8085f55405033e0f44db81c2226268d5ef4af319627df41d65c5c801683c31",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "aafdb50d3ef0d730a54eda62a1ee9835f309c197f70f2b1443b5de92ad26e875",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1069,8 +1071,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "9dca3ab21a2fc17f61b5baa00027216507e100cf4dd6b25680b156ad45b33dd7",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "70ade57f2d45e67aa4b51cd399849afb701efe9ab454e776502112091455d821",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1144,8 +1146,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "84e52850e66e9b3d83de2e2632dc77da4fd28be20d4c15feccb90308da946d58",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "2458276cb661b33d7309572e87a76332a098d4798abcde58c033317bba2dbd8a",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1261,8 +1263,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "1a8dc1ce41525ab050b81a82e76ab83d0352eacdf3c6cbe7cff553ac71794843",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "d4d61c4c5273db619f18428054908fcf4faf2509d5430157f371446804cdb5b7",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1335,8 +1337,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "c4d392298fdb4a8e4aa34fcd14ae9c0d5b0438fa46dc09ce15762f56bbdb5f30",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "73450b65cdde438ba114e0306bf3be38856eafc356fd586a13eccec0401d0f45",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1424,8 +1426,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "0f0efacab4273b64222e9404c7816bbc18fb1541f6551924755ca10247218415",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "ae4cfbb72612c14cd312c499c2c4649d8bb74d322599c11b0ae6267cb81db5bf",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1562,8 +1564,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "e1fef1cf3fad5051606fb6a61a4e084d65d27c684d33cea4c1f57e353dd7f774",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "4ba74eaf1b6e0e1e9844a5652c1e9b921442ae92267416165f2b819c65a53056",
+        "reason": "Reviewed native settings acceptance grouped by scope while preserving field, replay and permission assertions."
       }
     },
     {
@@ -1579,7 +1581,8 @@
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
         "apps/backend/tests/subscription-period-acceptance.mjs",
         "apps/backend/tests/commercial-plan-acceptance.mjs",
-        "apps/backend/tests/plan-target-discovery-acceptance.mjs"
+        "apps/backend/tests/plan-target-discovery-acceptance.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1626,7 +1629,9 @@
         "apps/backend/database/owner-downgrade-resource-discovery.sql",
         "apps/backend/supabase/migrations/20261107225730_owner_downgrade_resource_discovery.sql",
         "apps/backend/database/pro-upgrade-brand-discovery.sql",
-        "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql"
+        "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql",
+        "apps/backend/database/platform-console-completion.sql",
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1638,8 +1643,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "0419f36a5536a8af89ad02182a51d51a81794f48c63aeb0527899823c151fad9",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "aabd84f7fb9dc1907cd7e721ac52619a1b978d2a1e599a38736c6969e40422ba",
+        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
       }
     },
     {
@@ -1706,8 +1711,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f7a89aaa7433e50cc2d82ccc86a3933000e2a31e6171cece89b0b5759cf9c206",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "f871d3afd11b8e4882cdf9d643b332ec09266a96419907f36cb2534be310e15e",
+        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
       }
     },
     {
@@ -1785,8 +1790,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "4783e596041d781541f6318db621e20e8f68538c0280296b238721139d407b70",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "47caeb0ae7e358b98b1e7242a59b5eacb9778b2461b7906f817c0058ec51e371",
+        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
       }
     },
     {
@@ -1861,8 +1866,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "70190d4239b510de0de60a048e6f752c118d40ce51d1bbfc57ef4a62a9436665",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "9c51194f8e5548853410e033111fcee5413a9ac5de6bca8c22da3fbf916191cf",
+        "reason": "Reviewed the platform console source bindings, billing data provenance and shared operator authority and lifecycle guards."
       }
     },
     {
@@ -1948,7 +1953,9 @@
         "apps/backend/database/platform-invoices.sql",
         "apps/backend/supabase/migrations/20261118215000_platform_invoices.sql",
         "apps/backend/supabase/functions/backend-v1/document-storage.ts",
-        "apps/backend/supabase/functions/backend-v1/handler.ts"
+        "apps/backend/supabase/functions/backend-v1/handler.ts",
+        "apps/backend/database/platform-console-completion.sql",
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1969,11 +1976,12 @@
         "platform_invoice_upload_prepare_v1",
         "platform_invoice_publish_v1",
         "organization_invoices_list_v1",
-        "organization_invoice_file_get_v1"
+        "organization_invoice_file_get_v1",
+        "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "dadadd8e0cd448929b1e3a0085247b960472e6b137b0c9bb066c11fd9ad6cb73",
-        "reason": "Reviewed manual invoice storage, platform publishing authority, immutable original bytes and live owner history/download."
+        "fingerprint": "ca3821d7f2231dc40608dc6a835dcbb2d61823edef5492618916d45cb0690af5",
+        "reason": "Reviewed platform membership audit module and the installed operator and billing capability bindings."
       }
     },
     {
@@ -2005,8 +2013,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "25bec99f46c734a98d7f5bfcc409169b8407081e3d98f01f7881a9327c2165f2",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "e9d58146ab73aff481a9a9901dcf5e08235830e922a635a27c05180bbcb8a441",
+        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
       }
     },
     {
@@ -2046,8 +2054,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "de1952d9d3caffc5bd56825f7d438d06ec9136d20ce0bdf765ce3b80935bc796",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "831871a5fd8461cceffb6289c026c7ed6df516b5f90c82dbd196b2cda4f4ebdc",
+        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
       }
     },
     {
@@ -2171,8 +2179,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "4628fc88c556aa0356d6a39b91e99c0f99b12add659b1fcc9dbca5e429ab8217",
-        "reason": "Reviewed invoice-specific shared runtime and test bindings against existing workflow authority."
+        "fingerprint": "df741ea831c80d571cbe501e41bcd78b75d04f3aacb80d22cb90f5e0babf97f6",
+        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
       }
     }
   ]

@@ -249,6 +249,7 @@ export const runtimeOperationNames = [
   "platform_invoice_upload_prepare_v1",
   "platform_invoice_publish_v1",
   "organization_invoices_list_v1",
-  "organization_invoice_file_get_v1"
+  "organization_invoice_file_get_v1",
+  "platform_operator_access_set_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];
