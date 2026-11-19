@@ -138,7 +138,7 @@ v67 HTML'sinde **50** `data-view` vardı. v69’da giriş sonrası `a-alan` ile 
 | v69   | Kurulum kuyruğundan organizasyon oluşturma                                                                              | [E50.4](#e50) mevcut. Kuyruk organizasyon listesinin üstünde, seçilen talepten oluşturma formu açılıyor.                                                                                                                         |
 | v70   | Platform sahipleri ekranında doğrulanmış hesap seçimi, ekleme/kaldırma gerekçesi ve gerekçenin işlem kaydında görünmesi | [E52](#e52) doğrulanmış hesabı tam e-posta eşleşmesiyle bulur. Ekleme ve kaldırma gerekçesi inceleme ekranında gösterilir ve native komutla denetime yazılır. E52.4 kapsamındaki operatör işlem listesi işlem sonucunu gösterir. |
 
-v70’in hesap açılır listesi sentetik doğrulanmış hesapları gösterir. [WF17](../../../docs/workflows.md#wf17) yalnız tam e-postayla tek hesap keşfini tanımlar. Çizim, tam gerekçeyi operatör işlem listesinde gösterir. [E52.4 kapsamındaki Web1 listesi](#e52) doğrulanmış işlem adını, zamanını ve varsa hedef kaydın görünen adını gösterir.
+v70’in hesap açılır listesi sentetik doğrulanmış hesapları gösterir. [WF17](../../../docs/workflows.md#wf17) yalnız tam e-postayla tek hesap keşfini tanımlar. Web1 ekleme onayında doğrulanmış hesabın tam e-postasını belirgin gösterir. Çizim, tam gerekçeyi operatör işlem listesinde gösterir. [E52.4 kapsamındaki Web1 listesi](#e52) doğrulanmış işlem adını, zamanını ve varsa hedef kaydın görünen adını gösterir.
 
 ### Uygulama ve kabul durumu
 

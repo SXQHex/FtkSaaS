@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/button";
 import { EventCommandNotice } from "../events/event-command-notice";
@@ -21,7 +21,7 @@ export function PlatformActionReview<Intent, Result>({
   intent: Intent;
   title: string;
   description: string;
-  rows: { id: string; title: string; detail: string }[];
+  rows: { id: string; title: string; detail: ReactNode }[];
   beforeWrite: (intent: Intent) => Promise<void>;
   write: (intent: Intent) => Promise<{ primary_id: string }>;
   read: (intent: Intent, id?: string) => Promise<Result>;
