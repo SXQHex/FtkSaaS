@@ -1,4 +1,5 @@
 import { FirstCenterSetup } from "../workspace/first-center-setup";
+import { StudioSetupRequestCard } from "../workspace/studio-setup-request-card";
 import { WorkspaceLayout } from "../workspace/workspace-layout";
 import { AppearancePanel, type AppearanceActions } from "../account/appearance-panel";
 import { useAccountAppearance } from "../account/use-account-appearance";
@@ -17,13 +18,8 @@ import { Button } from "../../components/ui/button";
 import { getSupabaseClient } from "../../lib/supabase";
 import { MemberCalendarPanel } from "../member-account/member-calendar-panel";
 import { PersonalCalendarCard } from "../member-account/member-account-view";
-import {
-  hasWorkspaceManagementScope,
-  workspaceRoles,
-  type readWorkspace,
-} from "../workspace/workspace";
+import { hasWorkspaceManagementScope, workspaceRoles, readWorkspace } from "../workspace/workspace";
 
-// E10 is implemented in slices; the remaining scope is tracked in tasks/todo.md.
 export function AccountPage() {
   const mobile = useIsMobile();
   const account = useLoaderData({ from: "/account" });
@@ -37,10 +33,11 @@ export function AccountPage() {
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState(false);
   const [setupLocked, setSetupLocked] = useState(false);
+  const [requestLocked, setRequestLocked] = useState(false);
   const [instructorCalendarLocked, setInstructorCalendarLocked] = useState(false);
   const [studioCalendarLocked, setStudioCalendarLocked] = useState(false);
   const calendarLocked = instructorCalendarLocked || studioCalendarLocked;
-  const accountLocked = setupLocked || calendarLocked;
+  const accountLocked = setupLocked || requestLocked || calendarLocked;
   async function signOut() {
     if (accountLocked || pending) return;
     setPending(true);
@@ -54,6 +51,41 @@ export function AccountPage() {
     queries.clear();
     await navigate({ to: "/login", replace: true });
     await router.invalidate();
+  }
+  async function continueStudioSetup(organizationId: string) {
+    const workspace = await readWorkspace(account.id);
+    if (!workspace.organizations.some((organization) => organization.id === organizationId))
+      throw Error("STUDIO_SETUP_ORGANIZATION_UNAVAILABLE");
+    queries.setQueryData(["workspace", account.id, null], workspace);
+  }
+  function setupPanel(
+    organizationId: string | undefined,
+    centerId: string | undefined,
+    workspace: Awaited<ReturnType<typeof readWorkspace>> | undefined,
+  ) {
+    const eligible = Boolean(
+      account.identity?.email_verified_at && workspace && workspace.organizations.length === 0,
+    );
+    if (eligible || requestLocked)
+      return (
+        <StudioSetupRequestCard
+          key={account.id}
+          accountId={account.id}
+          eligible={eligible}
+          onLockChange={setRequestLocked}
+          onOrganizationReady={continueStudioSetup}
+        />
+      );
+    return (
+      <FirstCenterSetup
+        key={`${account.id}:${organizationId ?? "none"}`}
+        accountId={account.id}
+        organizationId={organizationId}
+        centerId={centerId}
+        workspace={workspace}
+        onLockChange={setSetupLocked}
+      />
+    );
   }
   return (
     <WorkspaceLayout
@@ -92,14 +124,7 @@ export function AccountPage() {
               <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
             </Alert>
           )}
-          <FirstCenterSetup
-            key={`${account.id}:${organizationId ?? "none"}`}
-            accountId={account.id}
-            organizationId={organizationId}
-            centerId={centerId}
-            workspace={workspace}
-            onLockChange={setSetupLocked}
-          />
+          {setupPanel(organizationId, centerId, workspace)}
           <Tabs
             orientation={mobile ? "horizontal" : "vertical"}
             className="account-tabs"

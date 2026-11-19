@@ -5341,6 +5341,19 @@
     "pauseMotion": "Animasyonu durdur",
     "resumeMotion": "Animasyonu sürdür"
   },
+  "studioSetup": {
+    "title": "İlk stüdyo kurulumu",
+    "description": "Stüdyo adını gönder. Kuruluş hazır olduğunda ilk merkezini kurabilirsin.",
+    "name": "Stüdyo adı (zorunlu)",
+    "nameError": "1–200 karakter arasında bir stüdyo adı yaz.",
+    "review": "Talebi incele",
+    "submit": "Stüdyo talebini gönder",
+    "loading": "Stüdyo talebi okunuyor.",
+    "pending": "Stüdyo talebi inceleme bekliyor.",
+    "fulfilled": "Kuruluş hazır. Merkez kurulumuna geçmek için durumu yeniden oku.",
+    "refresh": "Talep durumunu yeniden oku",
+    "readError": "Stüdyo talebi veya hazır kuruluş okunamadı."
+  },
   "centerSetup": {
     "title": "İlk merkezini oluştur",
     "description": "Organizasyon hazır. Ders ve kayıt işlemleri için merkezin adını ve saat dilimini belirle.",

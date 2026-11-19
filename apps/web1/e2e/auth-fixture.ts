@@ -780,7 +780,10 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
       user.factors = user.factors.map((factor) => ({ ...factor, status: "verified" }));
       return route.fulfill({ json: session() });
     }
-    if (url.pathname === "/functions/v1/backend-v1/organizations_list_v1") {
+    if (
+      url.pathname === "/functions/v1/backend-v1/organizations_list_v1" ||
+      url.pathname === "/functions/v1/backend-v1/studio_setup_list_v1"
+    ) {
       return route.fulfill({
         json: {
           ok: true,

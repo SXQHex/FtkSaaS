@@ -13,9 +13,9 @@ Bu çalışmanın hedefi main’de kalan Starter kabulünü ve 18 Kasım snapsho
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım | Plan            | İşlev              | Durum                       | Sonraki eylem                                                   |
-| ---------- | --------------- | ------------------ | --------------------------- | --------------------------------------------------------------- |
-| **E47**    | Starter + çizim | İlk stüdyo talebi  | Backend development hazır.  | Hesabım’da yetkili talep açma ve takip ekranını mevcut kuruluma bağla. |
+| Aktif adım | Plan      | İşlev                  | Durum                         | Sonraki eylem                                                                |
+| ---------- | --------- | ---------------------- | ----------------------------- | ---------------------------------------------------------------------------- |
+| **E50.2**  | Platform  | Organizasyon konsolu   | Backend development hazır.    | Canlı platform kapsamıyla konsolu ve yetkili organizasyon ayrıntısını bağla. |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -276,8 +276,9 @@ E01–E46'nın mevcut kutu ve kanıtları korunur. Aşağıdaki yeni kimlikler a
 
 <a id="e47-ilk-kurulum"></a>
 
-- [ ] **E47** · **İlk kurulum** — `data-view="a-kurulum"`, P02/P03/E12. Hesap ve erişilebilir merkez okuması sonrası gerektiğinde açılan kurulum kompozisyonu. Önerilen yol `/setup`, gerçek route kararı mevcut workspace yönlendirmesiyle verilir. Hazır Card, Field, Input, Select, Progress ve Button.
-      W1-BE-43 backend development’a teslim edildi. Web1’de organizasyonu olmayan doğrulanmış hesabın `studio_setup_open_v1` ve `studio_setup_list_v1` ile talep açma/takip ekranı açık. Hazır organizasyonda mevcut yetkili merkez kurulumu çalışıyor. [W1-BE-43](request.md#w1-be-43--hesaptan-ilk-stüdyo-kurulumuna-yetkili-geçiş).
+- [x] **E47** · **İlk kurulum** — `data-view="a-kurulum"`, P02/P03/E12. Mevcut `/account` girişi doğrulanmış, organizasyon bağı olmayan hesabın ilk stüdyo talebini açar. Hazır organizasyonda gerçek merkez ve kaynak kurulumuna geçilir.
+      `studio_setup_list_v1` yalnız kendi hesabının talebini okur. Ad açıkça onaylandıktan sonra `studio_setup_open_v1` çalışır. Belirsiz sonuç aynı işlem anahtarıyla toparlandı ve bekleyen talep yenilemede korundu. Platformun hazırladığı kuruluş kimliği canlı çalışma alanından doğrulanınca ilk merkez kartı açıldı. Yabancı veri ve okuma hatası talep formunu açmadı.
+      Tek Chromium işçisiyle 10 mevcut ilk merkez, iki yeni stüdyo talebi ve bir Auth giriş senaryosu geçti. [Yeni talep ve devir](../e2e/auth-studio-setup.spec.ts) · [İlk merkez](../e2e/auth-first-center.spec.ts) · [W1-BE-43](request.md#w1-be-43--hesaptan-ilk-stüdyo-kurulumuna-yetkili-geçiş).
   - [x] **E47.1** · Mevcut `features/workspace/first-center-setup.tsx` ve native organizasyon/merkez oluşturma yetkisini incele. Stüdyo→oda/disiplin→özet ve Sonra yaparım adımlarını mevcut hesap/merkez akışına eşle.
         `/account` mevcut giriş olarak kalır. Kurulum kartı seçili ve kuruluşa açık organizasyonda merkez bulunmadığında native katalog yetkisini okur. İlk adım stüdyo için merkez adı ve saat dilimini toplar. `organization_create_v1` platform sahibine ayrıdır. Onaylı `center_create_v1` sonrası gerçek merkez yeniden okunur; salon ve merkez disiplini işlemleri etkin merkez kimliği ve canlı yetki varsa mevcut Stüdyo/Ayarlar akışlarına bağlanır. Özet doğrulanmış kaynakları gösterir. Sonra yaparım yazma çağrısı olmadan Hesabım’a döner. Yeniden girişte eksik kurulum native merkez ve kaynak okumalarından belirlenir. [WF02](../../../docs/workflows.md#wf02) · [İlk merkez formu](../src/features/workspace/first-center-setup.tsx) · [Mevcut kabul](../e2e/auth-first-center.spec.ts).
   - [x] **E47.2** · Hazır parçalardan görseli kur, mobil/tema/klavye karşılaştırmasını yap. Atlamada erişilebilir hedefe dön; tekrar girişte gerçek eksik kurulum kaydını oku.

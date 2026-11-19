@@ -5282,6 +5282,19 @@ export default interface Resources {
       "weeklyEstimate": "Haftalık tahmin",
       "weeklySessions": "Haftalık seans"
     },
+    "studioSetup": {
+      "description": "Stüdyo adını gönder. Kuruluş hazır olduğunda ilk merkezini kurabilirsin.",
+      "fulfilled": "Kuruluş hazır. Merkez kurulumuna geçmek için durumu yeniden oku.",
+      "loading": "Stüdyo talebi okunuyor.",
+      "name": "Stüdyo adı (zorunlu)",
+      "nameError": "1–200 karakter arasında bir stüdyo adı yaz.",
+      "pending": "Stüdyo talebi inceleme bekliyor.",
+      "readError": "Stüdyo talebi veya hazır kuruluş okunamadı.",
+      "refresh": "Talep durumunu yeniden oku",
+      "review": "Talebi incele",
+      "submit": "Stüdyo talebini gönder",
+      "title": "İlk stüdyo kurulumu"
+    },
     "workCalendar": {
       "add": "Çalışma aralığı ekle",
       "after": "Yeni çalışma saatleri",

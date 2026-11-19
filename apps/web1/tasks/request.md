@@ -402,7 +402,7 @@ Web1’in yalnız oturumun kendi etkin yönetim rolünü ve erişilebilir merkez
 
 **Backend desteği karşılandı.** [PR #341](https://github.com/SXQHex/FtkSaaS/pull/341), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44397049048) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44397203785) başarılı.
 
-Etkin organizasyon bağı olmayan doğrulanmış hesap `studio_setup_open_v1` ile talep açar, `studio_setup_list_v1` ile kendi talebini okur. Platform operatörü kuyruğu okur ve mevcut `organization_create_v1(studio_setup_id)` ile talebi kuruluşla atomik eşler. Kuruluş hazır olunca mevcut merkez kurulumuna geçilir. Web1 bağlantısı [E47](todo.md#e47-ilk-kurulum) kapsamındadır. [WF02](../../../docs/workflows.md#wf02).
+Etkin organizasyon bağı olmayan doğrulanmış hesap `studio_setup_open_v1` ile talep açar, `studio_setup_list_v1` ile kendi talebini okur. Platform operatörü kuyruğu okur ve mevcut `organization_create_v1(studio_setup_id)` ile talebi kuruluşla atomik eşler. Kuruluş hazır olunca mevcut merkez kurulumuna geçilir. Hesabım talep açma, takip ve ilk merkez devri [E47 Web1 kabulünde](todo.md#e47-ilk-kurulum) doğrulandı. [WF02](../../../docs/workflows.md#wf02).
 
 ## W1-BE-44 · Özel ders talebinde öğrencinin notu
 
