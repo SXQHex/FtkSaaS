@@ -407,4 +407,21 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
+
+  await page.getByRole("link", { name: "Raporlar", exact: true }).press("Enter");
+  await expect(page).toHaveURL(`${origin}/reports`);
+  await page.goBack();
+  await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await page.goForward();
+  await expect(page).toHaveURL(`${origin}/reports`);
+  await page.reload();
+  await expect(page).toHaveURL(`${origin}/reports`);
+  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
+  await page.goto("/account");
+  await page.goto("/reports");
+  await expect(
+    page.getByText("Devam etmek için organizasyon ve merkez seç.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Özet", exact: true })).toHaveCount(0);
 });

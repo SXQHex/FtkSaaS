@@ -1,7 +1,7 @@
 import { saveDownload } from "../../lib/save-download";
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams, useRouter, useSearch } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
@@ -35,6 +35,7 @@ import {
 } from "./reports-presentation";
 import { ReportImportEditor } from "./report-import-editor";
 import { ReportExportEditor } from "./report-export-editor";
+import type { ReportAction } from "./report-search";
 import { downloadReport, readJob } from "./reports-command";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
@@ -42,18 +43,17 @@ export function ReportsContent({
   scope,
   onLockChange,
   preservePending = false,
+  shortcut,
 }: {
   scope: ClientScope;
   onLockChange: (value: boolean) => void;
   preservePending?: boolean;
+  shortcut?: ReportAction;
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const navigate = useNavigate({ from: "/o/$orgId/c/$centerId/reports" });
-  const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/reports" });
-  const { action } = useSearch({ from: "/o/$orgId/c/$centerId/reports" });
-  const shortcut = scope.orgId === orgId && scope.centerId === centerId ? action : undefined;
+  const navigate = useNavigate();
   const [selectedTab, setTab] = useState<ReportTab>("summary"),
     [range, setRange] = useState<ReportRange>("30"),
     [from, setFrom] = useState(""),
@@ -239,7 +239,13 @@ export function ReportsContent({
         period: `${exportFilters.interval.starts_at} – ${exportFilters.interval.ends_at} · ${timezone}`,
       };
   function closeShortcut() {
-    if (shortcut) void navigate({ search: {}, replace: true });
+    if (!shortcut) return;
+    void navigate({
+      to: "/o/$orgId/c/$centerId/reports",
+      params: { orgId: scope.orgId, centerId: scope.centerId },
+      search: {},
+      replace: true,
+    });
   }
   const date = (value: string) =>
     new Intl.DateTimeFormat("tr-TR", {

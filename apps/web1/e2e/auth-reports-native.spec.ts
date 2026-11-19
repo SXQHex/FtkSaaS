@@ -64,16 +64,23 @@ test("command palette reuses the report and import review forms without starting
   const memberImport = page.getByRole("button", { name: "İçe aktar", exact: true });
   await expect(memberImport).toBeEnabled();
   await memberImport.press("Enter");
-  await expect(page).toHaveURL(
-    (url) =>
-      url.pathname === `/o/${I.org}/c/${I.center}/reports` &&
-      url.searchParams.get("action") === "import",
-  );
+  await expect(page).toHaveURL((url) => url.pathname === "/reports" && !url.search);
   await expect(
     page.getByRole("dialog").getByRole("combobox", { name: "Aktarım türü" }),
   ).toHaveValue("students");
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialDocument);
   expect(f.writes).toEqual([]);
+  await page.keyboard.press("Escape");
+  await page.reload();
+  await expect(page).toHaveURL((url) => url.pathname === "/reports" && !url.search);
+  await expect(page.getByRole("tab", { name: "Özet", exact: true })).toBeVisible();
+  const reportsLink = page
+    .getByRole("navigation", { name: "Ana menü", exact: true })
+    .getByRole("link", { name: "Raporlar", exact: true });
+  await expect(reportsLink).toHaveAttribute("aria-current", "page");
+  await page.goto("/reports");
+  await expect(page).toHaveURL((url) => url.pathname === "/reports");
+  await expect(page.getByRole("tab", { name: "Özet", exact: true })).toBeVisible();
 });
 
 test("reports bind all real sections, immutable product names, exact currencies and explicit custom dates", async ({
