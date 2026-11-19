@@ -60,9 +60,13 @@ export async function readPublicConsentSources(
   });
   if (
     data.items.some(
-      (row) => row.scope_key !== scopeKey || row.code !== code || row.channel !== "document",
+      (row) =>
+        row.scope_key !== scopeKey ||
+        row.code !== code ||
+        row.channel !== "document" ||
+        typeof row.invalidated !== "boolean",
     )
   )
     throw Error("PUBLIC_CONSENT_SOURCE_INVALID");
-  return data.items.filter((row) => row.state === "published" && !row.retired);
+  return data.items.filter((row) => row.state === "published" && !row.retired && !row.invalidated);
 }

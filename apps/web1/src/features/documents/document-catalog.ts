@@ -44,7 +44,8 @@ export async function readDocumentCatalog(
         row.center_id !== source.center_id ||
         row.scope_key !== source.scope_key ||
         row.code !== source.code ||
-        row.channel !== source.channel,
+        row.channel !== source.channel ||
+        typeof row.invalidated !== "boolean",
     )
   )
     throw Error("DOCUMENT_CATALOG_SOURCE_INVALID");
@@ -119,6 +120,8 @@ export async function readCatalogResult(intent: DocumentCatalogIntent, id?: stri
   );
   if (!row) throw Error("DOCUMENT_CATALOG_RESULT_INVALID");
   if (request.action === "retire" && !row.retired) throw Error("DOCUMENT_CATALOG_RESULT_INVALID");
+  if (request.action === "invalidate" && !row.invalidated)
+    throw Error("DOCUMENT_CATALOG_RESULT_INVALID");
   if (
     (request.action === "draft" || request.action === "publish") &&
     (row.state !== (request.action === "draft" ? "draft" : "published") ||
@@ -128,6 +131,5 @@ export async function readCatalogResult(intent: DocumentCatalogIntent, id?: stri
       (request.expected_revision !== undefined && row.revision <= request.expected_revision))
   )
     throw Error("DOCUMENT_CATALOG_RESULT_INVALID");
-  // The exact writer ACK authorizes invalidation. The directory exposes only retirement.
   return list;
 }

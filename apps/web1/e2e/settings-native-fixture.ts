@@ -286,6 +286,7 @@ export async function mockSettingsCompletion(
             created_at: at,
             published_at: at,
             retired: false,
+            invalidated: false,
           },
         ],
         as_of: at,

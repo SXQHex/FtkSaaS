@@ -10,6 +10,11 @@ const activity = text.activity;
 const activityLog = (page: import("@playwright/test").Page) =>
   page.getByRole("region", { name: activity.title, exact: true });
 const target = uid(210);
+const list = (items: unknown[], next_cursor: string | null = null) => ({
+  items,
+  next_cursor,
+  as_of: "2026-11-16T12:00:00Z",
+});
 const initial = {
   kind: "organization",
   id: target,
@@ -43,11 +48,6 @@ async function platformFixture(
     const request = route.request().postDataJSON();
     calls.push({ operation, request });
     const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
-    const list = (items: unknown[], next_cursor: string | null = null) => ({
-      items,
-      next_cursor,
-      as_of: "2026-11-16T12:00:00Z",
-    });
     if (operation === "account_get_v1" && request.include_platform_scope) {
       return send({
         id: I.account,
@@ -109,6 +109,10 @@ async function platformFixture(
           status: 403,
           json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
         });
+      if (request.view === "invoices") {
+        expect(request.scope).toEqual({ org_id: target });
+        return send(list([]));
+      }
       if (request.scope?.org_id === target && request.view === "owners")
         return send(
           list([
@@ -386,7 +390,7 @@ async function billingFixture(page: import("@playwright/test").Page) {
     if (operation === "platform_directory_get_v1" && request.scope?.org_id === billingOrg) {
       if (!operator) return deny();
       const paid = subscription.period_end === paidPeriod;
-      if (request.view === "owners") return list([]);
+      if (request.view === "owners" || request.view === "invoices") return list([]);
       expect(request.view).toBe("organizations");
       return list([
         {
@@ -661,6 +665,7 @@ test("platform creates a queued studio and a direct organization with a publishe
         return list([{ kind: "verified_account", account_id: uid(243) }]);
       }
       const org = created.find((row) => row.id === request.scope?.org_id);
+      if (org && request.view === "invoices") return list([]);
       if (org && request.view === "organizations")
         return list([
           {
@@ -859,6 +864,25 @@ test("platform stages and publishes one exact private invoice through lost respo
   };
   const invoice = text.invoices;
   let uploads = 0;
+  let publishedAt: string | null = null;
+  await page.route("**/functions/v1/backend-v1/platform_directory_get_v1", (route) => {
+    const request = route.request().postDataJSON();
+    if (request.view !== "invoices") return route.fallback();
+    expect(request.scope).toEqual({ org_id: target });
+    const row = {
+      kind: "invoice",
+      id: invoiceId,
+      invoice_number: "WEB1-1",
+      issued_on: "2026-11-19",
+      mime: "application/pdf",
+      bytes: body.length,
+      published_at: publishedAt,
+      checksum: "ab".repeat(32),
+    };
+    return route.fulfill({
+      json: { ok: true, trace_id: target, data: list(uploads ? [row] : []) },
+    });
+  });
   await page.route(
     `**/storage/v1/object/upload/sign/ftksaas-invoices/${target}/${invoiceId}*`,
     (route) => {
@@ -897,6 +921,7 @@ test("platform stages and publishes one exact private invoice through lost respo
     expect(request).toMatchObject({ org_id: target, invoice_id: invoiceId });
     attempts.publication.push(request.operation_key);
     if (attempts.publication.length === 1) return route.abort("failed");
+    publishedAt = "2026-11-19T12:00:00Z";
     return route.fulfill({
       json: {
         ok: true,
@@ -907,7 +932,7 @@ test("platform stages and publishes one exact private invoice through lost respo
           issued_on: "2026-11-19",
           mime: "application/pdf",
           bytes: body.length,
-          published_at: "2026-11-19T12:00:00Z",
+          published_at: publishedAt,
         },
       },
     });
@@ -952,4 +977,73 @@ test("platform stages and publishes one exact private invoice through lost respo
   expect(
     fixture.calls.filter(({ operation }) => operation === "organization_invoices_list_v1"),
   ).toEqual([]);
+  await page.reload();
+  await expect(page.getByRole("grid", { name: invoice.history })).toContainText(
+    invoice.publishedStatus,
+  );
+  await expect(page.getByRole("rowheader", { name: "WEB1-1" })).toBeVisible();
+});
+
+test("platform invoices paginate and publish a pending invoice discovered after reload", async ({
+  page,
+}) => {
+  await platformFixture(page, "platform");
+  const invoice = text.invoices;
+  let denied = false;
+  const pending = {
+    kind: "invoice",
+    id: uid(281),
+    invoice_number: "BEKLEYEN-1",
+    issued_on: "2026-11-18",
+    mime: "application/zip",
+    bytes: 24,
+    checksum: "cd".repeat(32),
+    published_at: null as string | null,
+  };
+  const historical = {
+    ...pending,
+    id: uid(282),
+    invoice_number: "ESKI-2",
+    published_at: "2026-11-17T12:00:00Z",
+  };
+  await page.route("**/functions/v1/backend-v1/platform_directory_get_v1", (route) => {
+    const request = route.request().postDataJSON();
+    if (request.view !== "invoices") return route.fallback();
+    expect(request.scope).toEqual({ org_id: target });
+    if (denied)
+      return route.fulfill({
+        status: 403,
+        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: target } },
+      });
+    const data =
+      request.page.cursor === "next-invoice" ? list([historical]) : list([pending], "next-invoice");
+    return route.fulfill({ json: { ok: true, trace_id: target, data } });
+  });
+  await page.route("**/functions/v1/backend-v1/platform_invoice_publish_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: target,
+      invoice_id: pending.id,
+    });
+    pending.published_at = "2026-11-19T12:00:00Z";
+    return route.fulfill({ json: { ok: true, trace_id: target, data: pending } });
+  });
+  await signIn(page);
+  await page.goto(`/platform?organization_id=${target}`);
+  const grid = page.getByRole("grid", { name: invoice.history });
+  await expect(grid).toContainText(invoice.pendingStatus);
+  await page.reload();
+  await page.getByRole("button", { name: invoice.more }).click();
+  await expect(grid.getByRole("rowheader", { name: historical.invoice_number })).toBeVisible();
+  await grid.getByRole("button", { name: invoice.publish, exact: true }).click();
+  const review = await applyBillingReview(page, invoice.publish);
+  await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await review.getByRole("button", { name: common.settings.discard }).click();
+  await expect(grid.getByRole("row").filter({ hasText: pending.invoice_number })).toContainText(
+    invoice.publishedStatus,
+  );
+  denied = true;
+  await page.reload();
+  await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
+  await expect(grid).toHaveCount(0);
+  await expect(page.getByRole("form", { name: invoice.title })).toHaveCount(0);
 });

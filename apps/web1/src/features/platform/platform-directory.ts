@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
+import { platformInvoice } from "../../lib/invoice";
 import { scopedBackend } from "../../lib/scoped-backend";
 import type {
   PlatformDirectoryOrganization,
@@ -69,6 +70,22 @@ export function platformAccessDenied(error: unknown) {
 export async function readPlatformOrganizations(accountId: string, cursor?: string) {
   const backend = await scopedBackend({ accountId });
   return readDirectory(backend, { view: "organizations" }, platformOrganization, cursor);
+}
+
+const directoryInvoice = platformInvoice.extend({
+  kind: z.literal("invoice"),
+  checksum: z.hash("sha256"),
+  published_at: timestamp.nullable(),
+});
+
+export async function readPlatformInvoices(accountId: string, orgId: string, cursor?: string) {
+  const backend = await scopedBackend({ accountId });
+  return readDirectory(
+    backend,
+    { view: "invoices", scope: { org_id: z.uuid().parse(orgId) } },
+    directoryInvoice,
+    cursor,
+  );
 }
 
 export async function organizationAt(backend: Backend, id: string) {

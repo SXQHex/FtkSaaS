@@ -48,7 +48,7 @@ export async function invoiceUploadIntent(
 
 export type InvoiceUploadIntent = Awaited<ReturnType<typeof invoiceUploadIntent>>;
 export type StagedInvoice = {
-  intent: InvoiceUploadIntent;
+  intent: Omit<InvoiceUploadIntent, "body" | "uploadKey"> & { bytes: number };
   id: string;
 };
 
@@ -109,7 +109,7 @@ export async function publishPlatformInvoice({
     row.invoice_number !== intent.invoice_number ||
     row.issued_on !== intent.issued_on ||
     row.mime !== intent.mime ||
-    row.bytes !== intent.body.byteLength
+    row.bytes !== intent.bytes
   )
     throw Error("INVOICE_PUBLISH_RESULT_INVALID");
   return row;

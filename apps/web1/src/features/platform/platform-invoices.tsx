@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { v7 as uuidv7 } from "uuid";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -10,12 +12,21 @@ import {
 } from "../../components/ui/card";
 import { Field, FieldDescription, FieldError, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 import type { PlatformInvoice } from "../../lib/api-contracts/generated";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
 import { usePlatformActivity } from "./platform-activity-context";
-import { platformAccessDenied } from "./platform-directory";
+import { platformAccessDenied, readPlatformInvoices } from "./platform-directory";
+import { PlatformReadError } from "./platform-read-error";
 import {
   invoiceDate,
   invoiceFileMime,
@@ -50,8 +61,22 @@ export function PlatformInvoices({
   const [invalid, setInvalid] = useState<"number" | "date" | "file">();
   const [staged, setStaged] = useState<StagedInvoice>();
   const [published, setPublished] = useState<PlatformInvoice>();
-  const [open, setOpen] = useState(false);
+  const [review, setReview] = useState<StagedInvoice>();
   const [accepted, setAccepted] = useState(false);
+  const history = useInfiniteQuery({
+    queryKey: ["platform-invoices", accountId, orgId],
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }) => readPlatformInvoices(accountId, orgId, pageParam),
+    getNextPageParam: (last) => last.next_cursor ?? undefined,
+    retry: false,
+    refetchOnMount: "always",
+    gcTime: 0,
+  });
+  const rows = history.data?.pages.flatMap((page) => page.items) ?? [];
+  const cursor = history.data?.pages.at(-1)?.next_cursor;
+  const invalidHistory =
+    new Set(rows.map((row) => row.id)).size !== rows.length ||
+    Boolean(cursor && history.data?.pageParams.includes(cursor));
   const onAccessLost = (error: unknown) => {
     if (!platformAccessDenied(error)) return false;
     onDenied();
@@ -61,9 +86,24 @@ export function PlatformInvoices({
     write: uploadPlatformInvoice,
     readResult: async (intent, invoiceId) => {
       if (!invoiceId) throw Error("INVOICE_UPLOAD_RESULT_INVALID");
-      return { id: invoiceId, intent };
+      const { scope, body, invoice_number, issued_on, mime, checksum, publishKey } = intent;
+      return {
+        id: invoiceId,
+        intent: {
+          scope,
+          invoice_number,
+          issued_on,
+          mime,
+          checksum,
+          publishKey,
+          bytes: body.byteLength,
+        },
+      };
     },
-    onRefresh: async (result) => setStaged(result),
+    onRefresh: async (result) => {
+      await history.refetch({ throwOnError: true });
+      setStaged(result);
+    },
     onAccessLost,
   });
   const publish = useMemberCommand({
@@ -79,9 +119,10 @@ export function PlatformInvoices({
       return result;
     },
     onRefresh: async (row) => {
-      if (!staged) throw Error("INVOICE_PUBLISH_RESULT_INVALID");
-      setPublished(row);
-      record({ kind: "invoicePublished", key: staged.intent.publishKey, subject: name });
+      if (!review) throw Error("INVOICE_PUBLISH_RESULT_INVALID");
+      await history.refetch({ throwOnError: true });
+      if (staged?.id === row.id) setPublished(row);
+      record({ kind: "invoicePublished", key: review.intent.publishKey, subject: name });
     },
     onAccessLost,
   });
@@ -118,7 +159,7 @@ export function PlatformInvoices({
   function reset() {
     upload.reset();
     publish.reset();
-    setOpen(false);
+    setReview(undefined);
     setAccepted(false);
     setStaged(undefined);
     setPublished(undefined);
@@ -128,11 +169,13 @@ export function PlatformInvoices({
   }
   function closeReview() {
     if (publish.locked) return;
-    setOpen(false);
+    setReview(undefined);
     setAccepted(false);
-    if (publish.state !== "saved") publish.reset();
+    publish.reset();
   }
 
+  if (platformAccessDenied(history.error))
+    return <PlatformReadError error={history.error} onRetry={() => void history.refetch()} />;
   return (
     <Card className="min-w-0">
       <CardHeader>
@@ -142,6 +185,86 @@ export function PlatformInvoices({
         <CardDescription>{copy.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <h3 className="font-semibold">{copy.history}</h3>
+        {history.isError || invalidHistory ? (
+          <PlatformReadError error={history.error} onRetry={() => void history.refetch()} />
+        ) : history.isPending ? (
+          <p role="status">{t(($) => $.platform.loading)}</p>
+        ) : rows.length ? (
+          <>
+            <Table
+              aria-label={copy.history}
+              scrollRegionLabel={copy.history}
+              className="min-w-[40rem]"
+            >
+              <TableHeader>
+                <TableHead isRowHeader>{copy.number}</TableHead>
+                <TableHead>{copy.date}</TableHead>
+                <TableHead>{copy.file}</TableHead>
+                <TableHead>{copy.hash}</TableHead>
+                <TableHead>{copy.status}</TableHead>
+              </TableHeader>
+              <TableBody items={rows}>
+                {(row) => (
+                  <TableRow id={row.id}>
+                    <TableCell className="whitespace-normal wrap-anywhere">
+                      {row.invoice_number}
+                    </TableCell>
+                    <TableCell>
+                      <time dateTime={row.issued_on}>{row.issued_on}</time>
+                    </TableCell>
+                    <TableCell>
+                      {row.mime === "application/pdf" ? "PDF" : "ZIP"} ·{" "}
+                      {t(($) => $.platform.invoices.bytes, { count: row.bytes })}
+                    </TableCell>
+                    <TableCell className="max-w-48 font-mono whitespace-normal wrap-anywhere">
+                      {row.checksum}
+                    </TableCell>
+                    <TableCell focusMode="child">
+                      {row.published_at ? (
+                        <span>{copy.publishedStatus}</span>
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span>{copy.pendingStatus}</span>
+                          {row.id !== staged?.id && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              isDisabled={locked || Boolean(review)}
+                              onPress={() =>
+                                setReview({
+                                  id: row.id,
+                                  intent: {
+                                    ...row,
+                                    scope: { accountId, orgId },
+                                    publishKey: uuidv7(),
+                                  },
+                                })
+                              }
+                            >
+                              {copy.publish}
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            {history.hasNextPage && (
+              <Button
+                variant="outline"
+                isDisabled={history.isFetching}
+                onPress={() => void history.fetchNextPage()}
+              >
+                {copy.more}
+              </Button>
+            )}
+          </>
+        ) : (
+          <p>{copy.empty}</p>
+        )}
         {!staged && (
           <form
             aria-labelledby={`${id}-title`}
@@ -212,7 +335,7 @@ export function PlatformInvoices({
             </p>
             <p className="text-sm text-muted-foreground">
               {staged.intent.mime === "application/pdf" ? "PDF" : "ZIP"} ·{" "}
-              {t(($) => $.platform.invoices.bytes, { count: staged.intent.body.byteLength })}
+              {t(($) => $.platform.invoices.bytes, { count: staged.intent.bytes })}
             </p>
             <p className="text-sm">
               {copy.hash} <span className="font-mono wrap-anywhere">{staged.intent.checksum}</span>
@@ -220,7 +343,7 @@ export function PlatformInvoices({
             <p role="status">{published ? copy.published : copy.staged}</p>
             <div className="flex flex-wrap gap-2">
               {!published && (
-                <Button isDisabled={locked} onPress={() => setOpen(true)}>
+                <Button isDisabled={locked} onPress={() => setReview(staged)}>
                   {copy.publish}
                 </Button>
               )}
@@ -230,23 +353,23 @@ export function PlatformInvoices({
             </div>
           </div>
         )}
-        {open && staged && (
+        {review && (
           <SettingsReviewDialog
             open
             title={copy.publish}
             description={copy.publishEffect}
             rows={[
               {
-                id: staged.id,
+                id: review.id,
                 title: name,
-                detail: staged.intent.invoice_number + " · " + staged.intent.issued_on,
+                detail: review.intent.invoice_number + " · " + review.intent.issued_on,
               },
             ]}
             accepted={accepted}
             onAccepted={setAccepted}
             onClose={closeReview}
             locked={publish.locked}
-            onApply={publish.state === "ready" ? () => void publish.start(staged) : undefined}
+            onApply={publish.state === "ready" ? () => void publish.start(review) : undefined}
             recoveryActions={
               <EventCommandNotice
                 command={publish}

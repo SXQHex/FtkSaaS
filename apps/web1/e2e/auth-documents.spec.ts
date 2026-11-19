@@ -45,6 +45,7 @@ async function setup(
       source_version: fileId,
       state: "published",
       retired: false,
+      invalidated: false,
       created_at: "2026-11-17T00:00:00Z",
       published_at: "2026-11-17T00:00:00Z",
       content: {
@@ -222,6 +223,7 @@ async function setup(
           translation.revision++;
         }
         if (r.action === "retire") translation.retired = true;
+        if (r.action === "invalidate") translation.invalidated = true;
       }
       return send({ primary_id: translationId, operation_id: previewId });
     }
@@ -251,6 +253,7 @@ async function setup(
             version: 1,
             revision: 1,
             retired: false,
+            invalidated: false,
           },
         ],
       });
@@ -463,6 +466,12 @@ test("content catalogue manages an exact source translation and acknowledges inv
   await row.getByRole("button", { name: "Geçersiz kıl" }).click();
   await confirm("Geçersiz kıl");
   await expect(page.getByText("Sunucu, sürümü geçersiz kıldığını doğruladı.")).toBeVisible();
+  await expect(row.getByRole("gridcell", { name: "Geçersiz kılındı" })).toBeVisible();
+  await expect(row.getByRole("button", { name: "Geçersiz kıl" })).toHaveCount(0);
+  await page.reload();
+  await page.getByRole("tab", { name: "İçerik kataloğu" }).click();
+  await page.getByLabel("Belge", { exact: true }).selectOption({ label: "Sentetik belge" });
+  await expect(row.getByRole("gridcell", { name: "Geçersiz kılındı" })).toBeVisible();
   expect(state.writes.map(({ r }) => r.action)).toEqual([
     "draft",
     "publish",

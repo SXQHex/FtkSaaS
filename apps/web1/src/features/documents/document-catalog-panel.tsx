@@ -183,7 +183,6 @@ export function DocumentCatalogPanel({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">{copy.statusLimit}</p>
       {rows.length ? (
         <Table aria-label={copy.title} scrollRegionLabel={copy.title} className="min-w-[46rem]">
           <TableHeader>
@@ -210,7 +209,13 @@ export function DocumentCatalogPanel({
                   {row.version} · {row.revision}
                 </TableCell>
                 <TableCell>
-                  {row.retired ? copy.retired : row.state === "draft" ? copy.draft : copy.published}
+                  {row.invalidated
+                    ? copy.invalidated
+                    : row.retired
+                      ? copy.retired
+                      : row.state === "draft"
+                        ? copy.draft
+                        : copy.published}
                 </TableCell>
                 <TableCell focusMode="child">
                   <div className="flex flex-wrap gap-2">
@@ -234,7 +239,7 @@ export function DocumentCatalogPanel({
                         {copy.action.retire}
                       </Button>
                     )}
-                    {row.state === "published" && (
+                    {row.state === "published" && !row.invalidated && (
                       <Button
                         isDisabled={!canEdit}
                         variant="outline"
