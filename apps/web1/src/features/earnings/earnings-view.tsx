@@ -30,6 +30,7 @@ export interface EarningsInstructorRow {
   name: string;
   initials: string;
   agreement: string;
+  agreementIds: string[];
   agreementDetail: string;
   sessions: string;
   earned: string;
@@ -72,6 +73,7 @@ export function EarningsView({
   payments,
   onPay,
   onAgreement,
+  agreementStatus,
   onCorrect,
   notice,
   pagination,
@@ -92,6 +94,7 @@ export function EarningsView({
   payments: EarningsPaymentRow[] | null;
   onPay: (personId?: string) => void;
   onAgreement: (personId: string) => void;
+  agreementStatus: (row: EarningsInstructorRow) => ReactNode;
   onCorrect: (id: string) => void;
   notice?: ReactNode;
   pagination?: ReactNode;
@@ -228,6 +231,7 @@ export function EarningsView({
                             {row.agreement}
                           </Button>
                           <p className="text-xs text-muted-foreground">{row.agreementDetail}</p>
+                          {agreementStatus(row)}
                         </TableCell>
                         <TableCell className="tabular-nums">{row.sessions}</TableCell>
                         <TableCell className="tabular-nums">{row.earned}</TableCell>

@@ -4897,6 +4897,18 @@
     "cancel": "Vazgeç",
     "savePayment": "Ödemeyi kaydet",
     "saveCorrection": "Düzeltmeyi kaydet",
+    "agreementAcceptance": {
+      "open": "Metin kabul durumunu göster",
+      "refresh": "Metin kabul durumunu yenile",
+      "loading": "Metin kabul durumu okunuyor…",
+      "unavailable": "Metin kabul durumu doğrulanamadı.",
+      "states": {
+        "accepted": "Metin kabul edildi",
+        "pending": "Metin kabulü bekleniyor",
+        "renewal": "Metni yeniden kabul etmesi gerekiyor",
+        "unpublished": "Anlaşma metni yayımlanmadı"
+      }
+    },
     "activeAgreements": "{{count}} etkin anlaşma",
     "activeAgreements_one": "{{count}} etkin anlaşma",
     "activeAgreements_other": "{{count}} etkin anlaşma",

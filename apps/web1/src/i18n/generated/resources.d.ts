@@ -865,6 +865,18 @@ export default interface Resources {
       "activeAgreements": "{{count}} etkin anlaşma" | "{{count}} etkin anlaşma" | "{{count}} etkin anlaşma",
       "adjustmentLine": "Düzeltme",
       "agreement": "Anlaşma",
+      "agreementAcceptance": {
+        "loading": "Metin kabul durumu okunuyor…",
+        "open": "Metin kabul durumunu göster",
+        "refresh": "Metin kabul durumunu yenile",
+        "states": {
+          "accepted": "Metin kabul edildi",
+          "pending": "Metin kabulü bekleniyor",
+          "renewal": "Metni yeniden kabul etmesi gerekiyor",
+          "unpublished": "Anlaşma metni yayımlanmadı"
+        },
+        "unavailable": "Metin kabul durumu doğrulanamadı."
+      },
       "agreementVersion": "Anlaşma v{{version}}",
       "agreementVersions": "{{count}} değişmez sürüm" | "{{count}} değişmez sürüm" | "{{count}} değişmez sürüm",
       "all": "Tümü",

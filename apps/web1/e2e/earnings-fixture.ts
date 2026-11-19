@@ -2,6 +2,7 @@ import { expect, type Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import type {
+  DigitalAgreementView,
   InstructorFinanceEarning,
   InstructorFinancePayment,
   InstructorFinancePerson,
@@ -23,12 +24,14 @@ export async function mockEarnings(
     peoplePagination?: boolean;
     staleCorrect?: boolean;
     denyWrite?: boolean;
+    agreementDocument?: () => DigitalAgreementView | "FORBIDDEN";
   } = {},
 ) {
   const studio = await mockStudio(page);
   const reads: Record<string, any>[] = [],
     writes: Record<string, any>[] = [],
     receipts: Record<string, any>[] = [];
+  const agreementReads: string[] = [];
   const earning: InstructorFinanceEarning = {
     kind: "earning",
     display_name: "Örnek Eğitmen",
@@ -112,6 +115,14 @@ export async function mockEarnings(
         route.fulfill({
           json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
         });
+    if (op === "instructor_agreement_get_v1" && options.agreementDocument) {
+      expect(r).toMatchObject({ org_id: I.org, center_id: I.center, agreement_id: I.agreement });
+      agreementReads.push(r.agreement_id);
+      const agreement = options.agreementDocument();
+      return agreement === "FORBIDDEN" ? deny() : send(agreement);
+    }
+    if (op === "instructor_agreement_accept_v1")
+      throw Error("Manager must never accept an instructor's agreement");
     if (op === "instructor_account_get_v1")
       throw Error("Manager must never impersonate a self instructor");
     if (op === "instructor_finance_directory_get_v1") {
@@ -309,7 +320,7 @@ export async function mockEarnings(
   await page.clock.setFixedTime(new Date("2026-11-17T12:00:00Z"));
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/earnings`);
   await expect(page.getByRole("heading", { name: "Hakediş", exact: true })).toBeVisible();
-  return { studio, reads, writes, receipts, payments, earning, committed };
+  return { studio, reads, agreementReads, writes, receipts, payments, earning, committed };
 }
 export async function fillEarningsPayment(page: Page) {
   const row = page.getByRole("row").filter({ hasText: "Örnek Eğitmen" });

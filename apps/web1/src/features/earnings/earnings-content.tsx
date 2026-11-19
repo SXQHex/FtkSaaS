@@ -9,6 +9,7 @@ import { readWorkspace } from "../workspace/workspace";
 import { instructorEarningMonths } from "../instructor/instructor-earnings-read";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { StudioAgreementEditor } from "../studio/agreement-editor";
+import { EarningsAgreementStatus } from "./earnings-agreement-status";
 import { EarningsView, type EarningsTab } from "./earnings-view";
 import { EarningsPaymentEditor } from "./earnings-payment-editor";
 import { readEarningsDirectory } from "./earnings-read";
@@ -226,6 +227,17 @@ export function EarningsContent({
         onPay={(id) => {
           if (!mutating) setEditor({ kind: "pay", personId: id });
         }}
+        agreementStatus={(row) =>
+          row.agreementIds.length > 0 && (
+            <EarningsAgreementStatus
+              key={[scope.accountId, scope.orgId, scope.centerId, ...row.agreementIds].join(":")}
+              scope={scope}
+              personId={row.id}
+              agreementIds={row.agreementIds}
+              locked={mutating}
+            />
+          )
+        }
         onAgreement={(id) => {
           const person = page.data?.items.find(
             (row) => row.kind === "instructor" && row.person_id === id,
