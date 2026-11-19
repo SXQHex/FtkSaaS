@@ -1725,6 +1725,7 @@
       "release": "Hak iade edilir",
       "consume": "Hak düşülür",
       "window": "Açılış: {{opens}} dakika önce · Kapanış: {{closes}} dakika önce · Yönetici istisnası: {{exception}}",
+      "attendanceWindow": "Açılış: başlangıçtan {{opens}} dakika önce · Kapanış: bitişten {{closes}} dakika sonra",
       "cancellation": "Sınır: {{cutoff}} dakika · Öncesi: {{before}} · Sonrası: {{after}} · Gelmeme: {{absent}}",
       "minutes_one": "{{count}} dakika",
       "minutes_other": "{{count}} dakika",
@@ -1736,6 +1737,7 @@
         "student_cancel_private": "Özel ders iptali",
         "student_cancel_group": "Grup dersi iptali",
         "reservation_window": "Rezervasyon penceresi",
+        "attendance_window": "Yoklama penceresi",
         "request_window": "Talep penceresi",
         "negative_default": "Varsayılan negatif hak",
         "negative_upper": "Negatif hak üst sınırı",
@@ -3682,6 +3684,17 @@
     "loading": "CRM kayıtları yükleniyor…",
     "reload": "Güncel kaydı yükle",
     "applicationReadFailed": "Başvuru okunamadı.",
+    "applicationFilterLabel": "Başvuru durumu",
+    "applicationFilters": {
+      "open": "Açık",
+      "completed": "Tamamlanan"
+    },
+    "trialTotals": "Deneme dersi sayaçları",
+    "trialTotalsLabels": {
+      "offered": "Aktif deneme teklifi",
+      "registered": "Deneme kaydı",
+      "attended": "Denemeye katılan"
+    },
     "matches": "Telefon eşleşmesi önerileri",
     "matchesTruncated": "Öneri listesi sınırlı. Gerekirse kişi aramasını kullan; eşleşme kimlik kanıtı değildir.",
     "noMatches": "Eşleşme önerisi bulunmuyor; bu, kişinin hiç kaydı olmadığı anlamına gelmez.",

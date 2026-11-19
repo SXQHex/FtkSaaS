@@ -91,7 +91,7 @@ async function setup(
         trace_id: I.role,
         data: {
           scope: "organization",
-          catalog_version: 24,
+          catalog_version: 25,
           fields: [
             { key: "address", group: "O01", consumer: "public_profile", writable: !options.denied },
           ],

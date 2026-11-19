@@ -5,6 +5,20 @@ import { studioIds as I } from "./studio-fixture.js";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
 const footer = (page: import("@playwright/test").Page) =>
   page.locator('[data-slot="sheet-footer"]');
+test("CRM stage and trial totals use the native summary instead of the visible cards", async ({
+  page,
+}) => {
+  const state = await mockLeads(page);
+  await expect(page.getByText("24", { exact: true })).toBeVisible();
+  const totals = page.getByLabel("Deneme dersi sayaçları", { exact: true });
+  await expect(totals.locator("dd")).toHaveText(["8", "5", "3"]);
+  await page.getByRole("radio", { name: "Görüşülüyor", exact: true }).click();
+  await expect
+    .poll(() => state.reads.filter((read) => read.operation === "leads_list_v1").at(-1)?.request)
+    .toMatchObject({ stage_key: "talk", include_pipeline_summary: true });
+  await expect(page.getByText("24", { exact: true })).toBeVisible();
+  await expect(totals.locator("dd")).toHaveText(["8", "5", "3"]);
+});
 test("Starter plan allows the basic candidate list after pipeline denial", async ({ page }) => {
   const state = await mockLeads(page, { starter: true });
   await expect(page.getByRole("button", { name: "Aday ekle", exact: true })).toBeEnabled();
@@ -257,6 +271,17 @@ test("application close preserves its intake without creating a lead", async ({ 
   expect(state.leads).toHaveLength(1);
   await closeLead(page);
   await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 0");
+  const tab = page.getByRole("tabpanel", { name: "Başvurular", exact: true });
+  await expect(tab.getByRole("button", { name: "Başvuran Örnek", exact: true })).toHaveCount(0);
+  await tab.getByRole("radio", { name: "Tamamlanan", exact: true }).click();
+  await expect(tab.getByRole("button", { name: "Başvuran Örnek", exact: true })).toBeVisible();
+  expect(
+    state.reads.filter((read) => read.request.operation === "public_application_review_v1").at(-1)
+      ?.request,
+  ).toMatchObject({
+    selector: { key: { states: ["reviewed", "closed"] } },
+    page: { limit: 20 },
+  });
 });
 test("denied lead listing has read recovery and no invented totals", async ({ page }) => {
   const state = await mockLeads(page, { denied: true });

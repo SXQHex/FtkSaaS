@@ -3,6 +3,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
+import type { ManagementSelectorPublicApplicationReviewV1 } from "../../lib/api-contracts/generated";
 import { BackendError } from "../../lib/backend";
 import { readWorkspace } from "../workspace/workspace";
 import { readOverviewWork } from "../overview/overview-work";
@@ -25,6 +26,14 @@ import {
 } from "./leads-read";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Button } from "../../components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "../../components/ui/toggle-group";
+const applicationStates = {
+  open: ["pending"],
+  completed: ["reviewed", "closed"],
+} satisfies Record<
+  string,
+  NonNullable<ManagementSelectorPublicApplicationReviewV1["key"]["states"]>
+>;
 export function LeadsContent({
   scope,
   onLockChange,
@@ -46,6 +55,7 @@ export function LeadsContent({
     [index, setIndex] = useState(0),
     [appCursors, setAppCursors] = useState<(string | undefined)[]>([undefined]),
     [appIndex, setAppIndex] = useState(0),
+    [appFilter, setAppFilter] = useState<keyof typeof applicationStates>("open"),
     [followupCursors, setFollowupCursors] = useState<(string | undefined)[]>([undefined]),
     [followupIndex, setFollowupIndex] = useState(0),
     [followupKind, setFollowupKind] = useState<LeadFollowupKind>("manual"),
@@ -166,9 +176,11 @@ export function LeadsContent({
       scope.accountId,
       scope.orgId,
       scope.centerId,
+      appFilter,
       appCursors[appIndex],
     ],
-    queryFn: () => readApplicationsPage(scope, appCursors[appIndex]),
+    queryFn: () =>
+      readApplicationsPage(scope, appCursors[appIndex], undefined, applicationStates[appFilter]),
     enabled: Boolean(current) && tab === "apps",
     retry: false,
   });
@@ -243,6 +255,7 @@ export function LeadsContent({
       <LeadsView
         rows={rows}
         stages={data?.pipeline_catalog?.stages ?? []}
+        pipelineSummary={data?.pipeline_summary}
         summary={{
           open: data?.summary ? String(data.summary.open_leads) : null,
           today: data?.summary ? String(data.summary.followups_today) : null,
@@ -496,8 +509,33 @@ export function LeadsContent({
         }
         applications={
           <div className="flex flex-col gap-3">
-            {applications.isPending && <p role="status">{t(($) => $.leads.loading)}</p>}
-            {applications.isError ? (
+            <ToggleGroup
+              aria-label={t(($) => $.leads.applicationFilterLabel)}
+              selectionMode="single"
+              disallowEmptySelection
+              selectedKeys={new Set([appFilter])}
+              isDisabled={locked}
+              onSelectionChange={(keys) => {
+                const filter = [...keys][0];
+                if (filter === "open" || filter === "completed") {
+                  setAppFilter(filter);
+                  setAppCursors([undefined]);
+                  setAppIndex(0);
+                }
+              }}
+              variant="outline"
+              className="flex-wrap"
+            >
+              <ToggleGroupItem id="open">
+                {t(($) => $.leads.applicationFilters.open)}
+              </ToggleGroupItem>
+              <ToggleGroupItem id="completed">
+                {t(($) => $.leads.applicationFilters.completed)}
+              </ToggleGroupItem>
+            </ToggleGroup>
+            {applications.isPending ? (
+              <p role="status">{t(($) => $.leads.loading)}</p>
+            ) : applications.isError ? (
               <Alert variant="destructive">
                 <AlertDescription>
                   {t(($) => $.leads.applicationReadFailed)}{" "}

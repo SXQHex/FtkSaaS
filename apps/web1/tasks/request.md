@@ -61,8 +61,8 @@ PR322–324 ve PR327 tüketici dalına birleştirildi; kanonik üreticiden yerel
 | W1-BE-50 | V04.3/E41 · WF10 | İçe aktarmanın kesin sonuç özeti ve atlanan satır dosyası | [Karşılandı](#w1-be-50--içe-aktarmanın-kesin-sonuç-özeti-ve-atlanan-satır-dosyası). |
 | W1-BE-51 | V04.3/E41 · WF10 | Başarısız CSV dışa aktarımını aynı kapsamla yeniden başlatma | [Karşılandı](#w1-be-51--başarısız-csv-dışa-aktarımını-yeniden-başlatma). |
 | W1-BE-52 | V04.3/E41 · WF10/WF12 | Döneme göre aday hunisi aşamaları ve kaynak kırılımı | [Karşılandı](#w1-be-52--aday-hunisi-aşamaları-ve-kaynak-kırılımı). |
-| W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Açık](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
-| W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Açık](#w1-be-54--başvuru-durum-filtresi). |
+| W1-BE-53 | V05.1/E33 · WF12 | Merkez geneli CRM aşama ve deneme sayaçları | [Karşılandı](#w1-be-53--crm-aşama-ve-deneme-sayaçları). |
+| W1-BE-54 | V05.1/E33 · WF12 | Başvuru dizininde açık ve tamamlanan durum filtresi | [Karşılandı](#w1-be-54--başvuru-durum-filtresi). |
 | W1-BE-55 | V05.2/E34–E36 · WF09 | Ziyaretçinin yayımlanmış etkinliğe kayıt akışı | [Açık](#w1-be-55--ziyaretçinin-etkinlik-kayıt-akışı). |
 | W1-BE-56 | V05.2/E42 · WF09 | Düzenlenebilir yayın adresi ve sayfayı açma/kapatma | [Açık](#w1-be-56--yayın-adresi-ve-sayfanın-açılıp-kapatılması). |
 | W1-BE-57 | V06.1/E39 · WF11 | Seçilen bildirimleri arşivleme, silme ve geri alma | [Açık](#w1-be-57--bildirim-arşivi-ve-silme). |
@@ -462,15 +462,15 @@ Yoklama için izinli zaman aralığı varsa bu aralığın canlı politika ve ye
 
 ## W1-BE-53 · CRM aşama ve deneme sayaçları
 
-**Açık · backend değerlendirmesi.** Çizim aynı görünümde bütün satış aşamalarının sayılarını ve deneme planlanan veya gerçekleşen adayları gösteriyor. `leads_list_v1` seçilen tek aşamayı filtreleyebiliyor ve filtreli toplam sağlıyor. Aşama kataloğu iş anlamı olarak `open`, `won` ve `lost` ayrımını taşıyor. `trial_offer_create_v1` geçmiş seçicisi tek adayın gerçek teklif ve ders kaydı bağını döndürüyor. Tüm görünür aşamaların ve deneme sonuçlarının birlikte sayıldığı bir yanıt bulunmuyor. [Güncel çizim](../read-only/tasarim-v2/app.js#L6725) · [WF12](../../../docs/workflows.md#wf12).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-Merkez ve canlı aday görünürlüğü altında, arama ve sorumlu filtresiyle uyumlu aşama sayaçlarını ve gerçek deneme durumlarının güvenli özetini değerlendirin. Teklif, ders kaydı ve fiilî katılım ayrı ölçüler olmalı. Aday veya teklif geçmişi sayaç üretmek için sayfa sayfa taranmamalı.
+`leads_list_v1(include_pipeline_summary:true)` seçili merkez, arama ve sorumlu kapsamındaki aşama ve deneme sayaçlarını, aşama seçimi ve sayfadan bağımsız döndürür. [WF16](../../../docs/workflows.md#wf16) · [V05.1 Web1 kabulü](todo.md#v05).
 
 ## W1-BE-54 · Başvuru durum filtresi
 
-**Açık · backend değerlendirmesi.** Çizim, Başvurular sekmesinde açık ve tamamlanan kayıtları ayrı gösteriyor. `management_state_get_v1(operation: "public_application_review_v1")` satırın gerçek durumunu veriyor. Seçici, durumu sayfalama öncesinde filtrelemiyor. `management_work_list_v1` yalnız bekleyen, işlem yapılabilir yönetim işlerini döndürüyor. [Güncel çizim](../read-only/tasarim-v2/index.html#L1335) · [WF12](../../../docs/workflows.md#wf12).
+**Karşılandı.** [PR #340](https://github.com/SXQHex/FtkSaaS/pull/340), `42172f48feb02dc81b86a1723888f80acc3a3bd3` main kaynağında [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44389017468) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44389127657) başarılı.
 
-Mevcut başvuru görünürlüğü ve inceleme yetkisiyle, cursor kapsamına bağlı bir durum filtresini değerlendirin. Açık, incelenmiş ve kapatılmış kayıtların eşlemesi, merkezsiz başvurular ve istemciye gösterilen iletişim verisinin sınırı korunmalı.
+`management_state_get_v1(public_application_review_v1)` seçici durumlarını sayfa ve cursor öncesinde uygular. [WF09](../../../docs/workflows.md#wf09) · [V05.1 Web1 kabulü](todo.md#v05).
 
 ## W1-BE-55 · Ziyaretçinin etkinlik kayıt akışı
 

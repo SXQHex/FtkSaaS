@@ -369,7 +369,7 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
           trace_id: id,
           data: {
             scope: "user",
-            catalog_version: 24,
+            catalog_version: 25,
             fields: [
               {
                 key: "theme",

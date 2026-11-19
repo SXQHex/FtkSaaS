@@ -2,7 +2,10 @@ import { BackendError } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import type { FollowupKind } from "../../lib/api-contracts/generated";
+import type {
+  FollowupKind,
+  ManagementSelectorPublicApplicationReviewV1,
+} from "../../lib/api-contracts/generated";
 const base = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -24,7 +27,7 @@ export async function readLeadsPage(
     backend.call("leads_list_v1", {
       ...base(scope),
       request_id: uuidv7(),
-      ...(pipeline ? { include_pipeline: true } : {}),
+      ...(pipeline ? { include_pipeline: true, include_pipeline_summary: true } : {}),
       include_details: true,
       include_summary: true,
       ...(query.trim() ? { query: query.trim() } : {}),
@@ -62,6 +65,16 @@ export async function readLeadsPage(
     z.number().int().nonnegative().safe().parse(value);
   if (page.summary.total < page.items.length || (cursor && cursor === page.next_cursor))
     throw new Error("LEAD_PAGE_UNAVAILABLE");
+  const pipelineSummary = page.pipeline_summary;
+  if (pipelineSummary) {
+    const { stages, trials } = pipelineSummary;
+    const count = z.number().int().nonnegative().safe();
+    if (!pipelineAvailable || new Set(stages.map((row) => row.stage_key)).size !== stages.length)
+      throw new Error("LEAD_SUMMARY_UNAVAILABLE");
+    for (const stage of stages) count.parse(stage.count);
+    for (const value of [trials.offered, trials.registered, trials.attended]) count.parse(value);
+    if (trials.attended > trials.registered) throw new Error("LEAD_SUMMARY_UNAVAILABLE");
+  }
   return { ...page, pipelineAvailable };
 }
 export async function readLeadAssignees(scope: ClientScope, cursor?: string) {
@@ -237,6 +250,7 @@ export async function readApplicationsPage(
   scope: ClientScope,
   cursor?: string,
   applicationId?: string,
+  states?: ManagementSelectorPublicApplicationReviewV1["key"]["states"],
 ) {
   const backend = await scopedBackend(scope),
     page = await backend.call("management_state_get_v1", {
@@ -247,6 +261,7 @@ export async function readApplicationsPage(
         operation: "public_application_review_v1",
         key: {
           ...(applicationId ? { application_id: applicationId } : {}),
+          ...(states ? { states } : {}),
           include_contact_intake: true,
         },
       },
@@ -265,14 +280,22 @@ export async function readApplicationsPage(
         version.entity.type === "public_applications" && version.entity.id === item.entity?.id,
     );
     if (versions.length !== 1) throw new Error("APPLICATION_VERSION_UNAVAILABLE");
+    const state = z.enum(["pending", "reviewed", "closed"]).parse(item.state);
+    if (states && !states.includes(state)) throw new Error("APPLICATION_SOURCE_UNAVAILABLE");
     return {
       id: item.entity.id,
       version: z.number().int().positive().parse(versions[0].version),
-      state: z.enum(["pending", "reviewed", "closed"]).parse(item.state),
+      state,
       asOf: item.as_of,
       values: item.current.values,
     };
   });
+  if (
+    items.length > 20 ||
+    new Set(items.map((row) => row.id)).size !== items.length ||
+    (cursor && cursor === page.next_cursor)
+  )
+    throw new Error("APPLICATION_SOURCE_UNAVAILABLE");
   return { ...page, items };
 }
 

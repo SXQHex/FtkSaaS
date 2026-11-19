@@ -138,7 +138,10 @@ export async function mockLeads(
       expect(req.org_id).toBe(I.org);
       expect(req.center_id).toBe(I.center);
       if (options.starter && req.include_pipeline) return reject("PLAN_FEATURE_UNAVAILABLE");
-      if (!options.starter) expect(req.include_pipeline).toBe(true);
+      if (!options.starter) {
+        expect(req.include_pipeline).toBe(true);
+        expect(req.include_pipeline_summary).toBe(true);
+      }
       if (denied) return reject();
       expect(req.include_details).toBe(true);
       expect(req.include_summary).toBe(true);
@@ -163,6 +166,17 @@ export async function mockLeads(
           })),
         ),
         ...(options.starter ? {} : { pipeline_catalog: catalog }),
+        ...(req.include_pipeline_summary
+          ? {
+              pipeline_summary: {
+                stages: catalog.stages.map((stage) => ({
+                  stage_key: stage.key,
+                  count: stage.key === "new" ? 24 : 0,
+                })),
+                trials: { offered: 8, registered: 5, attended: 3 },
+              },
+            }
+          : {}),
         summary: {
           total: visible.length,
           open_leads: visible.filter((row) => row.state === "open").length,
@@ -344,7 +358,9 @@ export async function mockLeads(
               ),
           ),
         );
-      if (req.operation === "public_application_review_v1")
+      if (req.operation === "public_application_review_v1") {
+        const states = req.selector?.key?.states;
+        if (states && !states.includes(app.state)) return send(list([]));
         return send(
           list([
             entity("public_applications", app.id, app.version, app.state, {
@@ -358,6 +374,7 @@ export async function mockLeads(
             }),
           ]),
         );
+      }
     }
     if (operation === "operation_status_get_v1") {
       const receipt = receipts.get(req.key);

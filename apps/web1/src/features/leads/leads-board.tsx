@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GripVerticalIcon } from "lucide-react";
 import {
@@ -12,7 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
-import type { CrmPipelineStage } from "../../lib/api-contracts/generated";
+import type { CrmPipelineStage, CrmStageCount } from "../../lib/api-contracts/generated";
 export interface LeadRow {
   id: string;
   name: string;
@@ -29,38 +29,33 @@ export interface LeadRow {
 export function LeadsBoard({
   rows,
   stages,
+  stageCounts,
   disabled,
   onSelect,
   onStage,
 }: {
   rows: LeadRow[];
   stages: CrmPipelineStage[];
+  stageCounts?: CrmStageCount[];
   disabled: boolean;
   onSelect: (id: string) => void;
   onStage?: (id: string, stage: string) => void;
 }) {
   const { t } = useTranslation();
-  const columns = useMemo(
-    () =>
-      Object.fromEntries(
-        [
-          ...stages.map((stage) => stage.key),
-          ...(rows.some(
-            (row) => !row.stageKey || !stages.some((stage) => stage.key === row.stageKey),
-          )
-            ? ["__unassigned"]
-            : []),
-        ].map((key) => [
-          key,
-          rows.filter((row) =>
-            key === "__unassigned"
-              ? !row.stageKey || !stages.some((stage) => stage.key === row.stageKey)
-              : row.stageKey === key,
-          ),
-        ]),
-      ),
-    [rows, stages],
-  );
+  const unassignedCount = stageCounts
+    ?.filter((row) => !stages.some((stage) => stage.key === row.stage_key))
+    .reduce((sum, row) => sum + row.count, 0);
+  const columnCount = (key: string) =>
+    key === "__unassigned"
+      ? unassignedCount
+      : stageCounts?.find((row) => row.stage_key === key)?.count;
+  const stageKeys = stages.map((stage) => stage.key);
+  const columns = Object.fromEntries(stageKeys.map((key) => [key, [] as LeadRow[]]));
+  if (unassignedCount) columns.__unassigned = [];
+  for (const row of rows) {
+    const key = row.stageKey && stageKeys.includes(row.stageKey) ? row.stageKey : "__unassigned";
+    (columns[key] ??= []).push(row);
+  }
   const [preview, setPreview] = useState<Record<string, LeadRow[]>>(),
     dragging = useRef(false);
   const value = preview ?? columns;
@@ -160,7 +155,9 @@ export function LeadsBoard({
             >
               <div className="flex items-center justify-between gap-2 px-1 py-2">
                 <h2 className="min-w-0 break-words font-medium">{stageLabel(key)}</h2>
-                <Badge variant="secondary">{items.length}</Badge>
+                <Badge variant="secondary">
+                  {columnCount(key)?.toLocaleString("tr-TR") ?? "—"}
+                </Badge>
               </div>
               {items.map((row) => (
                 <KanbanItem

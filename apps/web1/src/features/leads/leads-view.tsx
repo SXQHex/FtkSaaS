@@ -1,7 +1,7 @@
 import { useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { PlusIcon, SearchIcon } from "lucide-react";
-import type { CrmPipelineStage } from "../../lib/api-contracts/generated";
+import type { CrmPipelineStage, CrmPipelineSummary } from "../../lib/api-contracts/generated";
 import { LeadsBoard, type LeadRow } from "./leads-board";
 import {
   Card,
@@ -35,6 +35,7 @@ export interface LeadsSummary {
 export function LeadsView({
   rows,
   stages,
+  pipelineSummary,
   summary,
   pendingCounts,
   tab,
@@ -60,6 +61,7 @@ export function LeadsView({
 }: {
   rows: LeadRow[];
   stages: CrmPipelineStage[];
+  pipelineSummary?: CrmPipelineSummary;
   summary: LeadsSummary;
   pendingCounts: Partial<Record<LeadTab, number>>;
   tab: LeadTab;
@@ -222,10 +224,28 @@ export function LeadsView({
           </CardHeader>
           <TabsContent id="board" className="mt-0">
             <p className="px-5 text-xs text-muted-foreground">{t(($) => $.leads.boardHint)}</p>
+            {pipelineSummary && (
+              <dl
+                aria-label={t(($) => $.leads.trialTotals)}
+                className="flex flex-wrap gap-4 px-5 py-3 text-sm"
+              >
+                {(["offered", "registered", "attended"] as const).map((key) => (
+                  <div key={key}>
+                    <dt className="text-muted-foreground">
+                      {t(($) => $.leads.trialTotalsLabels[key])}
+                    </dt>
+                    <dd className="font-semibold tabular-nums">
+                      {pipelineSummary.trials[key].toLocaleString("tr-TR")}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
             {stages.length ? (
               <LeadsBoard
                 rows={rows}
                 stages={stages}
+                stageCounts={pipelineSummary?.stages}
                 disabled={disabled}
                 onSelect={onSelect}
                 onStage={onStage}

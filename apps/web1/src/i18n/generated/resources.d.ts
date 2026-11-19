@@ -1807,6 +1807,11 @@ export default interface Resources {
         "create_candidate": "Yeni aday oluştur",
         "match_existing": "Mevcut kişiyle eşleştir"
       },
+      "applicationFilterLabel": "Başvuru durumu",
+      "applicationFilters": {
+        "completed": "Tamamlanan",
+        "open": "Açık"
+      },
       "applicationReadFailed": "Başvuru okunamadı.",
       "applicationReview": "Başvuruyu değerlendir",
       "applicationStates": {
@@ -1972,6 +1977,12 @@ export default interface Resources {
       },
       "trialTerms": "Teklif koşulları",
       "trialTermsHint": "Geçerlilik, fiyat ve tekrar sınırı yayımlanmış ürün koşullarından gelir; bu ekrandan indirim veya süre uydurulmaz.",
+      "trialTotals": "Deneme dersi sayaçları",
+      "trialTotalsLabels": {
+        "attended": "Denemeye katılan",
+        "offered": "Aktif deneme teklifi",
+        "registered": "Deneme kaydı"
+      },
       "unassigned": "Atanmamış",
       "unknownPerson": "Kişi adı okunamadı",
       "validationFailed": "İşlem hazırlanamadı. İşaretli alanları kontrol et; gerekirse güncel kaydı yeniden yükle.",
@@ -4265,11 +4276,13 @@ export default interface Resources {
       "logoUploadReview": "Seçilen ve doğrulanan görsel organizasyon logosu olacak.",
       "nativePolicies": {
         "advisory": "Tavsiye",
+        "attendanceWindow": "Açılış: başlangıçtan {{opens}} dakika önce · Kapanış: bitişten {{closes}} dakika sonra",
         "cancellation": "Sınır: {{cutoff}} dakika · Öncesi: {{before}} · Sonrası: {{after}} · Gelmeme: {{absent}}",
         "center": "Merkez",
         "consume": "Hak düşülür",
         "documents": "{{count}} belge gereksinimi" | "{{count}} belge gereksinimi",
         "keys": {
+          "attendance_window": "Yoklama penceresi",
           "class_reminder_hours": "Ders hatırlatma politikası",
           "debt_booking": "Borçta rezervasyon engeli",
           "debt_participation": "Borçta katılım engeli",
