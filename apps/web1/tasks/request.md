@@ -71,6 +71,7 @@ Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında,
 | W1-BE-62 | E52 · WF17 | Platform operatörü dizini ve yetki yönetimi | [Karşılandı](#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi). |
 | W1-BE-63 | E50.5 · WF17 | Seçili organizasyonun platform faturalarını okuma | [Açık](#w1-be-63--platform-organizasyon-ayrıntısında-fatura-dizini). |
 | W1-BE-64 | V09.3 · WF07/WF11 | Gelen kutusunda yoklama düzeltme hedefi ve karar akışı | [Geri çekildi](#w1-be-64--gelen-kutusunda-yoklama-düzeltme-keşfi-ve-kararı). |
+| W1-BE-65 | V09.1 · WF11 | Katalog sürümünün geçersiz kılındığını yeniden okuma | [Açık](#w1-be-65--içerik-kataloğunda-geçersiz-kılma-durumunun-okunması). |
 
 ## Bütün talepler için ortak sınır
 
@@ -526,3 +527,9 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 ## W1-BE-64 · Gelen kutusunda yoklama düzeltme keşfi ve kararı
 
 **Geri çekildi · Kullanıcı kararı.** Web1’de düzeltmeyi ilgili Merkez yöneticisi mevcut seans ayrıntısı üzerinden gerçekleştirir. [V09.3](todo.md#v09) kabulün sahibidir.
+
+## W1-BE-65 · İçerik kataloğunda geçersiz kılma durumunun okunması
+
+**Açık · Web1 talebi.** `content_catalog_save_v1(action:invalidate)` sürümü geçersiz kılar. `content_catalog_get_v1` okuması `retired` alanını yalnız kaldırma kaydından üretir ve geçersiz kılma durumunu dönmez. Geçersiz sürüm bu nedenle yenilemeden sonra da kataloğun yayın satırında etkin görünebilir.
+
+[V09.1](todo.md#v09) için aynı yetkili kapsam ve kaynak sürümü içinde kaldırılmış ve geçersiz kılınmış sürümlerin kalıcı olarak ayrıştırılabilmesi gerekiyor. Mevcut erişim ve belge kabul kuralları [WF11](../../../docs/workflows.md#wf11) kapsamında geçerli.

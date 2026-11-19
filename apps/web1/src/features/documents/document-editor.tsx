@@ -25,6 +25,7 @@ import {
   previewPublication,
   publicationIntent,
   writePublication,
+  validDigitalDocumentText,
   readPublication,
   type UploadIntent,
   type PublicationPreview,
@@ -53,6 +54,9 @@ export function DocumentEditor({
   const { t } = useTranslation();
   const [draft, setDraft] = useState<DocumentDraft>({
     name: target?.name ?? "",
+    format: "file",
+    language: "tr",
+    digitalText: "",
     versionLabel: "",
     gates: [...new Set(target?.latest_version?.requirements?.map((row) => row.gate) ?? [])],
     renewedAcceptance: target?.latest_version?.requirements?.length
@@ -69,7 +73,7 @@ export function DocumentEditor({
     [unknownUpload, setUnknownUpload] = useState(false),
     [error, setError] = useState(false);
   const [errors, setErrors] = useState<
-    Partial<Record<"name" | "versionLabel" | "file" | "gates", string>>
+    Partial<Record<"name" | "versionLabel" | "file" | "digitalText" | "gates", string>>
   >({});
   const upload = useRef<UploadIntent | undefined>(undefined),
     prepared = useRef<UploadRef | undefined>(undefined),
@@ -120,7 +124,7 @@ export function DocumentEditor({
   const terminal = completion.unavailable || publication.unavailable;
   function change(next: DocumentDraft, nextFile: File | undefined) {
     if (locked || terminal) return;
-    if (next.name !== draft.name || nextFile !== file) {
+    if (next.name !== draft.name || nextFile !== file || next.format !== draft.format) {
       upload.current = undefined;
       prepared.current = undefined;
       setCanVerify(false);
@@ -129,7 +133,7 @@ export function DocumentEditor({
     }
     publication.reset();
     setDraft(next);
-    setFile(nextFile);
+    setFile(next.format === "file" ? nextFile : undefined);
     setErrors({});
     setError(false);
     setPreview(undefined);
@@ -142,11 +146,18 @@ export function DocumentEditor({
   async function review(verifyOnly = false) {
     if (executing.current || completion.locked || publication.locked || terminal) return;
     const nextErrors: typeof errors = {};
-    if (!draft.name.trim() || draft.name.trim().length > 500)
-      nextErrors.name = t(($) => $.documents.requiredName);
+    const digital = draft.format === "digital";
+    const name = draft.name.trim();
+    if (!name || name.length > (digital ? 200 : 500))
+      nextErrors.name = t(($) =>
+        digital ? $.documents.requiredDigitalName : $.documents.requiredName,
+      );
+    if (digital && !validDigitalDocumentText(draft.digitalText))
+      nextErrors.digitalText = t(($) => $.documents.requiredDigitalText);
     if (!draft.versionLabel.trim() || draft.versionLabel.trim().length > 500)
       nextErrors.versionLabel = t(($) => $.documents.requiredVersion);
     if (
+      !digital &&
       !ready.current &&
       (!file ||
         !["application/pdf", "text/plain"].includes(file.type) ||
@@ -164,7 +175,7 @@ export function DocumentEditor({
     setError(false);
     let transferStarted = false;
     try {
-      if (!ready.current) {
+      if (!digital && !ready.current) {
         if (!upload.current)
           upload.current = await uploadIntent(scope, draft.name, file!, target?.scope ?? level);
         if (!verifyOnly) {
@@ -178,10 +189,20 @@ export function DocumentEditor({
         setUnknownUpload(false);
         await complete();
       }
-      if (!mounted.current || !ready.current) return;
+      if (!mounted.current || (!digital && !ready.current)) return;
       const result = await previewPublication({
         scope,
-        fileId: ready.current,
+        ...(digital
+          ? {
+              digitalContent: {
+                name,
+                language: draft.language,
+                text: draft.digitalText,
+                template_id: "document.text",
+                template_version: "1",
+              },
+            }
+          : { fileId: ready.current! }),
         versionLabel: draft.versionLabel,
         gates: draft.gates,
         renewedAcceptance: z.boolean().parse(draft.renewedAcceptance),

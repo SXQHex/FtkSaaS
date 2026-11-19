@@ -17,6 +17,8 @@ import {
   FieldDescription,
   FieldError,
 } from "../../components/ui/field";
+import { Textarea } from "../../components/ui/textarea";
+import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
 import { Input } from "../../components/ui/input";
 import { Checkbox } from "../../components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
@@ -25,6 +27,9 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { ItemGroup, Item, ItemContent, ItemTitle, ItemDescription } from "../../components/ui/item";
 export interface DocumentDraft {
   name: string;
+  format: "file" | "digital";
+  language: "tr" | "en";
+  digitalText: string;
   versionLabel: string;
   gates: DocumentGate[];
   renewedAcceptance: boolean | undefined;
@@ -69,7 +74,7 @@ export function DocumentSheet({
   locked?: boolean;
   readOnly?: boolean;
   fixedName?: boolean;
-  errors?: Partial<Record<"name" | "versionLabel" | "file" | "gates", string>>;
+  errors?: Partial<Record<"name" | "versionLabel" | "file" | "digitalText" | "gates", string>>;
   notice?: ReactNode;
 }) {
   const { t } = useTranslation(),
@@ -168,24 +173,81 @@ export function DocumentSheet({
               <FieldError id={`${id}-version-error`}>{errors.versionLabel}</FieldError>
             )}
           </Field>
-          <Field data-invalid={Boolean(errors?.file)}>
-            <FieldLabel htmlFor={`${id}-file`}>{t(($) => $.documents.file)}</FieldLabel>
-            <Input
-              id={`${id}-file`}
-              name="file"
-              type="file"
-              accept=".pdf,.txt,application/pdf,text/plain"
-              disabled={disabled}
-              aria-invalid={Boolean(errors?.file)}
-              aria-describedby={`${id}-file-hint${errors?.file ? ` ${id}-file-error` : ""}`}
-              onChange={(e) => onFile(e.target.files?.[0])}
-            />
-            <FieldDescription id={`${id}-file-hint`}>
-              {t(($) => $.documents.fileHint)}
-              {fileLabel && <span className="mt-1 block wrap-anywhere">{fileLabel}</span>}
-            </FieldDescription>
-            {errors?.file && <FieldError id={`${id}-file-error`}>{errors.file}</FieldError>}
-          </Field>
+          {mode !== "draft" && (
+            <Field>
+              <FieldLabel htmlFor={`${id}-format`}>{t(($) => $.documents.format)}</FieldLabel>
+              <NativeSelect
+                id={`${id}-format`}
+                disabled={disabled}
+                value={draft.format}
+                onChange={(event) =>
+                  set("format", event.target.value === "digital" ? "digital" : "file")
+                }
+              >
+                <NativeSelectOption value="file">
+                  {t(($) => $.documents.formatFile)}
+                </NativeSelectOption>
+                <NativeSelectOption value="digital">
+                  {t(($) => $.documents.formatDigital)}
+                </NativeSelectOption>
+              </NativeSelect>
+            </Field>
+          )}
+          {draft.format === "digital" ? (
+            <>
+              <Field>
+                <FieldLabel htmlFor={`${id}-language`}>
+                  {t(($) => $.documents.digitalLanguage)}
+                </FieldLabel>
+                <NativeSelect
+                  id={`${id}-language`}
+                  value={draft.language}
+                  disabled={disabled}
+                  onChange={(event) => set("language", event.target.value === "en" ? "en" : "tr")}
+                >
+                  <NativeSelectOption value="tr">Türkçe</NativeSelectOption>
+                  <NativeSelectOption value="en">English</NativeSelectOption>
+                </NativeSelect>
+              </Field>
+              <Field data-invalid={Boolean(errors?.digitalText)}>
+                <FieldLabel htmlFor={`${id}-digital`}>
+                  {t(($) => $.documents.formatDigital)}
+                </FieldLabel>
+                <Textarea
+                  id={`${id}-digital`}
+                  rows={7}
+                  required
+                  value={draft.digitalText}
+                  disabled={disabled}
+                  aria-invalid={Boolean(errors?.digitalText)}
+                  aria-describedby={errors?.digitalText ? `${id}-digital-error` : undefined}
+                  onChange={(event) => set("digitalText", event.target.value)}
+                />
+                {errors?.digitalText && (
+                  <FieldError id={`${id}-digital-error`}>{errors.digitalText}</FieldError>
+                )}
+              </Field>
+            </>
+          ) : (
+            <Field data-invalid={Boolean(errors?.file)}>
+              <FieldLabel htmlFor={`${id}-file`}>{t(($) => $.documents.file)}</FieldLabel>
+              <Input
+                id={`${id}-file`}
+                name="file"
+                type="file"
+                accept=".pdf,.txt,application/pdf,text/plain"
+                disabled={disabled}
+                aria-invalid={Boolean(errors?.file)}
+                aria-describedby={`${id}-file-hint${errors?.file ? ` ${id}-file-error` : ""}`}
+                onChange={(e) => onFile(e.target.files?.[0])}
+              />
+              <FieldDescription id={`${id}-file-hint`}>
+                {t(($) => $.documents.fileHint)}
+                {fileLabel && <span className="mt-1 block wrap-anywhere">{fileLabel}</span>}
+              </FieldDescription>
+              {errors?.file && <FieldError id={`${id}-file-error`}>{errors.file}</FieldError>}
+            </Field>
+          )}
           <FieldSet>
             <FieldLegend>{t(($) => $.documents.needTitle)}</FieldLegend>
             {(["sale", "reservation", "attendance", "event_registration"] as const).map((gate) => (

@@ -2,12 +2,19 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import type { DigitalDocumentContent } from "../src/lib/api-contracts/generated.js";
 const fileId = "019ab7b0-0000-7000-8000-000000000090",
   documentId = "019ab7b0-0000-7000-8000-000000000091",
   previewId = "019ab7b0-0000-7000-8000-000000000092";
 async function setup(
   page: Page,
-  mode: "normal" | "unknown" | "unread" | "prepare-unknown" | "transfer-unknown" = "normal",
+  mode:
+    | "normal"
+    | "unknown"
+    | "unread"
+    | "prepare-unknown"
+    | "transfer-unknown"
+    | "digital" = "normal",
 ) {
   await mockStudio(page);
   const state = {
@@ -16,6 +23,8 @@ async function setup(
     published: false,
     failed: false,
     puts: 0,
+    digital: undefined as DigitalDocumentContent | undefined,
+    digitalPreview: undefined as DigitalDocumentContent | undefined,
   };
   const preview = {
     id: previewId,
@@ -107,7 +116,11 @@ async function setup(
       state.checksum = r.checksum;
       return send({ primary_id: fileId, operation_id: previewId });
     }
-    if (op === "document_publication_preview_v1")
+    if (op === "document_publication_preview_v1") {
+      if (mode === "digital") {
+        expect(r).not.toHaveProperty("file_id");
+        state.digitalPreview = r.digital_content;
+      }
       return send({
         preview,
         affected: [
@@ -120,10 +133,16 @@ async function setup(
         ],
         preserves_reservations: true,
       });
+    }
     if (op === "preview_get_v1") return send(preview);
     if (op === "document_version_publish_v1") {
       state.writes.push({ op, r });
       state.published = true;
+      if (mode === "digital") {
+        expect(r).not.toHaveProperty("file_id");
+        expect(r.digital_content).toEqual(state.digitalPreview);
+        state.digital = r.digital_content;
+      }
       if (mode === "unknown" && !state.failed) {
         state.failed = true;
         return route.abort("failed");
@@ -132,6 +151,36 @@ async function setup(
         primary_id: fileId,
         operation_id: previewId,
         related: [{ type: "documents", id: documentId }],
+      });
+    }
+    if (op === "content_catalog_get_v1" && state.digital) {
+      expect(r).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        scope_key: `center:${I.org}:${I.center}`,
+        code: `document.${documentId}`,
+        channel: "document",
+      });
+      const content = state.failed ? state.digital : { ...state.digital, text: "Uyuşmayan metin" };
+      state.failed = true;
+      return send({
+        items: [
+          {
+            id: fileId,
+            org_id: I.org,
+            center_id: I.center,
+            scope_key: r.scope_key,
+            code: r.code,
+            channel: r.channel,
+            state: "published",
+            source_version: fileId,
+            language: content.language,
+            content,
+            version: 1,
+            revision: 1,
+            retired: false,
+          },
+        ],
       });
     }
     if (op === "operation_status_get_v1" && r.operation === "document_version_publish_v1")
@@ -265,3 +314,36 @@ for (const mode of ["prepare-unknown", "transfer-unknown"] as const)
     expect(state.puts).toBe(1);
     expect(state.writes.filter((w) => w.op === "file_upload_complete_v1")).toHaveLength(1);
   });
+
+test("digital publication confirms exact server content without any Storage upload", async ({
+  page,
+}) => {
+  const state = await setup(page, "digital");
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Belge adı", { exact: true }).fill("Sentetik belge");
+  await dialog.getByLabel("Sürüm etiketi", { exact: true }).fill("v1");
+  await dialog.getByLabel("Belge biçimi", { exact: true }).selectOption("digital");
+  await expect(dialog.locator('input[type="file"]')).toHaveCount(0);
+  await dialog.getByRole("checkbox", { name: "Satış", exact: true }).press("Space");
+  const field = dialog.getByLabel("Dijital metin", { exact: true });
+  const preview = dialog.getByRole("button", { name: "Etkiyi göster", exact: true });
+  await preview.click();
+  await expect(field).toBeFocused();
+  const source = "İlk satır.  \nİkinci satır.";
+  await field.fill(source);
+  await preview.click();
+  await expect(dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true })).toBeVisible();
+  await dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await dialog.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await expect(
+    page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
+  ).toHaveCount(0);
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(
+    page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  expect(state.digitalPreview?.text).toBe(source);
+  expect(state.digital?.text).toBe(source);
+  expect(state.puts).toBe(0);
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_version_publish_v1"]);
+});

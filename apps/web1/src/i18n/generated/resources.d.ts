@@ -782,6 +782,7 @@ export default interface Resources {
       },
       "currentOnly": "Bu yetkiyle yalnız güncel işlem gereksinimleri gösterilir; tarihsel kabuller açılmaz.",
       "description": "Üyelerin kabul etmesi gereken metinler. Yeni sürüm yayınlamadan önce etkisini görürsün.",
+      "digitalLanguage": "Metin dili",
       "directoryUnavailable": "Merkez belge ve kabul listesi şu anda okunamıyor. Yeni belge yükleyebilir ve yayımlayabilirsin.",
       "documentsUnread": "Belge listesi okunamadı.",
       "editorDescriptions": {
@@ -800,6 +801,9 @@ export default interface Resources {
         "pending": "Bekleyen"
       },
       "fixedName": "Yeni sürümde ad değişmez.",
+      "format": "Belge biçimi",
+      "formatDigital": "Dijital metin",
+      "formatFile": "Dosya",
       "gateHints": {
         "attendance": "Seansa katılım işaretlenirken",
         "event_registration": "Etkinliğe kayıt olurken",
@@ -852,6 +856,8 @@ export default interface Resources {
       "renewAll": "Tüm üyelerden yeniden kabul iste",
       "renewAllHint": "Eski sürümü kabul etmiş olmak yetmez.",
       "renewal": "Yeni sürümde kabul",
+      "requiredDigitalName": "Belge adı 1–200 karakter arasında olmalı.",
+      "requiredDigitalText": "Boş olmayan ve UTF-8 boyutu en fazla 256 KiB olan metni yaz.",
       "requiredFile": "En fazla 2 MiB boyutunda, boş olmayan PDF veya düz metin dosyası seç.",
       "requiredGates": "En az bir işlem seç.",
       "requiredName": "1–500 karakterlik belge adı gir.",
