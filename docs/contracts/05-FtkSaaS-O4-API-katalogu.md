@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-250 sözleşme operasyonu; 250 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+251 sözleşme operasyonu; 251 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -247,7 +247,7 @@
 | `studio_setup_list_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; platform_queue?: boolean; page: Page | Success_studio_setup_list |
 | `studio_setup_open_v1` | runtime / ilgili WF’yi oku | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; name: string | Success_studio_setup_open |
 | `attendance_correction_request_v1` | runtime / ilgili WF’yi oku | `attendance.draft` | W / maintenance | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid; closure_revision?: PositiveInt; reason?: string; correction_request_id?: FtkUuid; expected_version?: PositiveInt; decision?: accepted / declined | Success_attendance_correction_request |
-| `platform_directory_get_v1` | runtime / ilgili WF’yi oku | `platform.owner` | R / exempt | client_api_version: 1; request_id: FtkUuid; view: organizations / owners / payments / verified_accounts; page: Page; scope?: object; account_email?: string; payment_state?: ApprovalState; payment_id?: FtkUuid | Success_platform_directory_get |
+| `platform_directory_get_v1` | runtime / ilgili WF’yi oku | `platform.owner` | R / exempt | client_api_version: 1; request_id: FtkUuid; view: organizations / owners / payments / verified_accounts / initial_plans / operators; page: Page; scope?: object; account_email?: string; payment_state?: ApprovalState; payment_id?: FtkUuid | Success_platform_directory_get |
 | `organization_billing_tax_get_v1` | runtime / ilgili WF’yi oku | `org.owner` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid | Success_organization_billing_tax_get |
 | `organization_billing_tax_set_v1` | runtime / ilgili WF’yi oku | `org.owner` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; expected_version: Count; tax_office: string ∣ null; tax_identifier: string ∣ null | Success_organization_billing_tax_set |
 | `platform_organization_suspension_set_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; suspended: boolean; reason: string | Success_platform_organization_suspension_set |
@@ -256,6 +256,7 @@
 | `platform_invoice_publish_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; invoice_id: FtkUuid | Success_platform_invoice_publish |
 | `organization_invoices_list_v1` | runtime / ilgili WF’yi oku | `org.owner` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; page: Page | Success_organization_invoices_list |
 | `organization_invoice_file_get_v1` | runtime / ilgili WF’yi oku | `org.owner` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; invoice_id: FtkUuid | Success_organization_invoice_file_get |
+| `platform_operator_access_set_v1` | runtime / ilgili WF’yi oku | `platform.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; verified_account_id: FtkUuid; enabled: boolean; reason: string | Success_platform_operator_access_set |
 
 ## Sürüm ve okuma desteği
 
@@ -513,6 +514,7 @@
 | platform_invoice_publish_v1 | command | append_or_current_scope_lock | platform_directory_get_v1 | implemented | platform_invoice_publish, receipt, audit |
 | organization_invoices_list_v1 | read | none | None | not_required |  |
 | organization_invoice_file_get_v1 | read | none | None | not_required |  |
+| platform_operator_access_set_v1 | command | append_or_current_scope_lock | platform_directory_get_v1 | implemented | platform_membership, receipt, audit |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

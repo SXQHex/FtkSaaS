@@ -251,4 +251,5 @@ export interface Operations {
   platform_invoice_publish_v1: {request: T.RequestPlatformInvoicePublish; response: T.SuccessPlatformInvoicePublish};
   organization_invoices_list_v1: {request: T.RequestOrganizationInvoicesList; response: T.SuccessOrganizationInvoicesList};
   organization_invoice_file_get_v1: {request: T.RequestOrganizationInvoiceFileGet; response: T.SuccessOrganizationInvoiceFileGet};
+  platform_operator_access_set_v1: {request: T.RequestPlatformOperatorAccessSet; response: T.SuccessPlatformOperatorAccessSet};
 }

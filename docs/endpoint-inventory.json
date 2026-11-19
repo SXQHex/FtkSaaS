@@ -6755,6 +6755,27 @@
       "limits": [
         "Read invoice metadata and authorize an original attachment download for the live owner."
       ]
+    },
+    {
+      "name": "platform_operator_access_set_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/platform_operator_access_set_v1",
+      "permission": "platform.owner",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_operator_access_set"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Grant requires an active account with verified native Auth identity. Revocation must leave an eligible operator."
+      ]
     }
   ]
 }

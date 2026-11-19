@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+<a id="platform-console-completion"></a>
+## W1-BE-60–62 · Platform konsolu
+
+Taban `f7ded8d7baa8680e76d726e5ceaea24aead35a30`. Aynı SHA’nın [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) başarılı. İlk plan keşfi [WF02](../../../docs/workflows.md#wf02), ödeme dönemi, ek süre ve operatör üyeliği [WF17](../../../docs/workflows.md#wf17) sahibindedir.
+
+Yerel adayda 208 migration izole loopback Supabase’e temiz uygulandı. Tek seri Node runner’da 10/10 test geçti. Yeni planla kuruluş, özgün teklif dönemi, ortak ek süre sınırı, eşzamanlı yetki kaldırma, son uygun operatör ve açık oturumun canlı yetkisi doğrulandı. Sözleşme, typecheck, workflow, 142 API birimi ve trusted CI politika karşılaştırması geçti. Edge JSON yükü 4.129.792 bayt. Yerel stack kapatıldı.
+
+[PR #344 API-1](https://github.com/SXQHex/FtkSaaS/actions/runs/44453485575/job/135322995368) ayar senaryosu 120 saniyelik alt test sınırını aştı. Logda tamamlanan 41 seri ayar isteği yaklaşık 115 saniye aldı. Yetki hazırlığı ve her ayar kapsamı ayrı mevcut süre bütçesine bağlandı. İki tekrarlanan organizasyon okuması kaldırıldı. Ayar kabul dosyası izole loopback üzerinde tek seri runner’da 22/22 geçti. Düzeltilen bölümde en uzun yerel alt test 6,7 saniye sürdü.
+
 <a id="platform-invoice-files"></a>
 ## W1-BE-58 · Manuel platform faturaları
 

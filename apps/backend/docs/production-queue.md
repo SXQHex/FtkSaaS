@@ -4,7 +4,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 ## Uygulama sırası
 
-**18 Kasım Web1 v67:** PR #340’ın ilk on maddesi main’de. Onaylanan ilk kurulum, yoklama, etkinlik başvurusu, yayın adresi ve bildirim görünürlüğü (43/49/55–57) PR #341 ile main’e alındı. PR #342, denetim aktarımını (34), vergi profilini (58) ve platform konsolunu (59) main’e aldı. Sıradaki dar dilim, dışarıda düzenlenen platform faturalarının manuel ZIP/PDF yüklemesi ve sahip kapsamındaki geçmişidir (58). Ölçütler [backend backlog’undadır](remaining-work.md#web1-v67-backend).
+**18 Kasım Web1 v67:** PR #340’ın ilk on maddesi main’de. Onaylanan ilk kurulum, yoklama, etkinlik başvurusu, yayın adresi ve bildirim görünürlüğü (43/49/55–57) PR #341 ile main’e alındı. PR #342, denetim aktarımını (34), vergi profilini (58) ve platform konsolunu (59) main’e aldı. PR #343, manuel fatura ve sahip geçmişini (58) main’e aldı. Sıradaki platform konsolu dilimi ilk plan keşfi, ödeme dönemi ve ek süre, ardından operatör üyeliğidir (60–62). Ölçütler [backend backlog’undadır](remaining-work.md#web1-v67-backend).
 
 **17 Kasım Web1 görevi:** İlk35 talebin backend kaynak/main/development teslimi tamamlandı. Yeni W1-BE-36 kabul aracı callback düzeltmesi ve P01/G-PRO gerçek sağlayıcı devamı yürür; frontend sayfa kabulü yeniden açılmaz. Görev/kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/run/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. G03 kapsamı ve sonraki sıra korunur; unit veya eski başka callback kanıtı yeni hosted kabulü değildir.
 

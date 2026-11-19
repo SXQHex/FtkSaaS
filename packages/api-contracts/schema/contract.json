@@ -956,7 +956,8 @@
         "platform_invoice_upload_prepare_v1",
         "platform_invoice_publish_v1",
         "organization_invoices_list_v1",
-        "organization_invoice_file_get_v1"
+        "organization_invoice_file_get_v1",
+        "platform_operator_access_set_v1"
       ]
     },
     "EntityType": {
@@ -3515,6 +3516,9 @@
               "type": "boolean"
             },
             "organization_suspend": {
+              "type": "boolean"
+            },
+            "operator_manage": {
               "type": "boolean"
             }
           },
@@ -36845,6 +36849,19 @@
           "properties": {
             "until": {
               "$ref": "#/$defs/Instant"
+            },
+            "eligible": {
+              "type": "boolean"
+            },
+            "until_after": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Instant"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [],
@@ -38528,6 +38545,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_platform_invoice_publish_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_platform_operator_access_set_v1"
         }
       ]
     },
@@ -38698,7 +38718,8 @@
         "organization_billing_tax_set_v1",
         "platform_organization_suspension_set_v1",
         "platform_invoice_upload_prepare_v1",
-        "platform_invoice_publish_v1"
+        "platform_invoice_publish_v1",
+        "platform_operator_access_set_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -43808,6 +43829,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_platform_invoice_publish_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_platform_operator_access_set_v1"
         }
       ]
     },
@@ -67112,6 +67136,19 @@
               "type": "null"
             }
           ]
+        },
+        "org_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "quote_period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Interval"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -67158,7 +67195,9 @@
             "organizations",
             "owners",
             "payments",
-            "verified_accounts"
+            "verified_accounts",
+            "initial_plans",
+            "operators"
           ]
         },
         "page": {
@@ -67237,6 +67276,23 @@
               "payment_state": false
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "view": {
+                "enum": [
+                  "initial_plans",
+                  "operators"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "scope": false
+            }
+          }
         }
       ]
     },
@@ -67258,6 +67314,12 @@
               },
               {
                 "$ref": "#/$defs/PlatformDirectoryAccount"
+              },
+              {
+                "$ref": "#/$defs/PlatformDirectoryInitialPlan"
+              },
+              {
+                "$ref": "#/$defs/PlatformDirectoryOperator"
               }
             ]
           }
@@ -68116,6 +68178,196 @@
       "properties": {
         "operation": {
           "const": "platform_invoice_publish_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/Text"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryInitialPlan": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "initial_plan"
+        },
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "period": {
+          "enum": [
+            "monthly",
+            "yearly"
+          ]
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "name",
+        "period",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformDirectoryOperator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "operator"
+        },
+        "account_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "eligible": {
+          "type": "boolean"
+        },
+        "granted_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "kind",
+        "account_id",
+        "display_name",
+        "eligible",
+        "granted_at"
+      ],
+      "additionalProperties": false
+    },
+    "Request_platform_operator_access_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "verified_account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "verified_account_id",
+        "enabled",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "PlatformOperatorChange": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "operation_id",
+        "account_id",
+        "enabled"
+      ],
+      "additionalProperties": false
+    },
+    "Success_platform_operator_access_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/PlatformOperatorChange"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_platform_operator_access_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "platform_operator_access_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_platform_operator_access_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "platform_operator_access_set_v1"
         },
         "values": {
           "type": "object",
@@ -99574,6 +99826,123 @@
             "$ref": "#/$defs/Request_organization_invoice_file_get"
           }
         }
+      },
+      {
+        "name": "platform_operator_access_set_v1",
+        "module": "M02",
+        "features": [],
+        "permission": "platform.owner",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_platform_operator_access_set"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_platform_operator_access_set"
+        },
+        "errors": [
+          "ACCOUNT_LINK_REQUIRED",
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "OPEN_OPERATIONS_EXIST",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "job",
+        "transaction_guarantee": "Live platform authority, serial last-operator fence and an append-only reasoned audit event.",
+        "transition": {
+          "effect": "platform_operator_access_set",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Global platform membership lock taken before live authorization or receipt replay.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A30",
+          "A31",
+          "A46",
+          "A47",
+          "A51",
+          "A52",
+          "A53",
+          "A54",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "accounts",
+          "version_mode": "append_or_current_scope_lock",
+          "version_field": null,
+          "read_operation": "platform_directory_get_v1",
+          "atomic_effects": [
+            "platform_membership",
+            "receipt",
+            "audit"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_platform_operator_access_set"
+          }
+        },
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/platform_operator_access_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/platform_operator_access_set_v1",
+        "runtime_rpc": "api_v1.platform_operator_access_set_v1",
+        "runtime_limits": [
+          "Grant requires an active account with verified native Auth identity. Revocation must leave an eligible operator."
+        ]
       }
     ],
     "policy_value_map": {
@@ -117500,6 +117869,54 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_operator_access_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_operator_access_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_platform_operator_access_set/properties/verified_account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_platform_operator_access_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformOperatorChange/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformOperatorChange/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryInitialPlan/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PlatformDirectoryOperator/properties/account_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -118003,13 +118420,14 @@
         "platform_invoice_upload_prepare_v1",
         "platform_invoice_publish_v1",
         "organization_invoices_list_v1",
-        "organization_invoice_file_get_v1"
+        "organization_invoice_file_get_v1",
+        "platform_operator_access_set_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 207,
+      "migration_count": 208,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -118737,7 +119155,8 @@
         "platform_invoice_upload_prepare_v1",
         "platform_invoice_publish_v1",
         "organization_invoices_list_v1",
-        "organization_invoice_file_get_v1"
+        "organization_invoice_file_get_v1",
+        "platform_operator_access_set_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {

@@ -5,7 +5,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="web1-v67-backend"></a>
 ## Web1 v67 backend talepleri
 
-Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/85f83409075180819ff2f91b43b983b1cafe2deb/apps/web1/tasks/request.md) W1-BE-34 ile W1-BE-43–59 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-platform-billing) kalır.
+Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/abbb036786a5f9d0fd291ed0f161e9bafa34ee56/apps/web1/tasks/request.md) W1-BE-34 ile W1-BE-43–62 maddeleridir. Sıra [kuyrukta](production-queue.md), kaynak ve ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-v67-platform-billing) kalır.
 
 | Talep | Backend kabul ölçütü |
 |---|---|
@@ -26,6 +26,9 @@ Kapsam [PR #339 talep dosyasındaki](https://github.com/SXQHex/FtkSaaS/blob/85f8
 | W1-BE-57 | [WF11](../../../docs/workflows.md#wf11) alıcı görünürlüğünde arşiv, silme ve geri alma. Canlı alıcı, seçili sürümler, atomik tekrar, mevcut saklama ve kaynak iş durumu doğrulanmalı. |
 | W1-BE-58 | [WF17](../../../docs/workflows.md#wf17) sahip kapsamındaki sürümlü vergi dairesi ve kimliğini doğrulamalı. Yetkisiz erişim, temizleme, eski sürüm, replay ve takip kaydı sınanmalı. Platformun dışarıda düzenlediği faturada yetkili ZIP/PDF yükleme, doğrulanmadan görünmeme ve canlı sahip kapsamındaki geçmiş/orijinal indirme sınanmalı. |
 | W1-BE-59 | [WF17](../../../docs/workflows.md#wf17) canlı platform kapsamı, organizasyon/sahip/ödeme dizini ve tam eşleşmeli doğrulanmış hesap keşfi. Gerekçeli askı, eski sürüm, tekrar, anonim yayın, olağan stüdyo erişimi ve yine açılan yollar sınanmalı. Abonelik, ödeme ve gizlilik yetkileri korunmalı. |
+| W1-BE-60 | [WF02](../../../docs/workflows.md#wf02) canlı platform yetkisiyle etkin ilk plan sürümü keşfi. Gelecek ve eski sürüm ayrımı ile seçilen sürümle kuruluş sınanmalı. |
+| W1-BE-61 | [WF17](../../../docs/workflows.md#wf17) ödeme satırında özgün teklif dönemi ve kuruluş adı. Ek süre okuyucusu yazma doğrulamasıyla aynı sınırı vermeli. |
+| W1-BE-62 | [WF17](../../../docs/workflows.md#wf17) operatör dizini ve gerekçeli yetki değişikliği. Son uygun üye, eşzamanlı geri alma ve açık oturumun canlı yetkisi sınanmalı. |
 
 <a id="s18"></a>
 ## S18 — Statik SPA backend transportu
