@@ -16,7 +16,7 @@ const application = uid(262);
 const movement = uid(263);
 const settlement = uid(264);
 const centerUrl = (center = I.center) => `/o/${I.org}/c/${center}/centers`;
-type Role = "owner" | "org_manager" | "center_manager";
+type Role = "owner" | "org_manager" | "center_manager" | "staff";
 type Calls = { op: string; request: Record<string, unknown> }[];
 async function businessFixture(page: Page, role: Role, plan = "business", activeCenters = 2) {
   await mockSettingsCompletion(page, { billingOwner: role === "owner" });
@@ -991,31 +991,33 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
   });
 });
 
-test("Business direct person, CRM and finance links never use a center outside the actor's scope", async ({
-  page,
-}) => {
-  const f = await businessFixture(page, "center_manager");
-  f.restrictSecondCenter();
+for (const role of ["center_manager", "staff"] as const) {
+  test(`Business direct person, CRM and finance links stay in scope for ${role}`, async ({
+    page,
+  }) => {
+    const f = await businessFixture(page, role);
+    f.restrictSecondCenter();
 
-  const personInB = uid(299);
-  const destinations = [
-    [`people/${personInB}`, "people", "people_list_v1"],
-    ["leads", "leads", "leads_list_v1"],
-    ["finance", "finance", "finance_directory_get_v1"],
-  ];
-  for (const [direct, safe, operation] of destinations) {
-    await page.goto(`/o/${I.org}/c/${second}/${direct}`);
-    await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
-    await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
-    await expect
-      .poll(() =>
-        f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
-      )
-      .toBe(true);
-  }
+    const personInB = uid(299);
+    const destinations = [
+      [`people/${personInB}`, "people", "people_list_v1"],
+      ["leads", "leads", "leads_list_v1"],
+      ["finance", "finance", "finance_directory_get_v1"],
+    ];
+    for (const [direct, safe, operation] of destinations) {
+      await page.goto(`/o/${I.org}/c/${second}/${direct}`);
+      await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
+      await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
+      await expect
+        .poll(() =>
+          f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
+        )
+        .toBe(true);
+    }
 
-  expect(f.calls.filter(({ request }) => request.center_id === second)).toEqual([]);
-  expect(f.calls.filter(({ request }) => request.person_id === personInB)).toEqual([]);
-  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toEqual([]);
-});
+    expect(f.calls.filter(({ request }) => request.center_id === second)).toEqual([]);
+    expect(f.calls.filter(({ request }) => request.person_id === personInB)).toEqual([]);
+    expect(f.calls.filter(({ op }) => op === "center_create_v1")).toEqual([]);
+  });
+}
