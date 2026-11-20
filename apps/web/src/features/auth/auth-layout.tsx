@@ -13,7 +13,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           if (!target.matches(":focus-visible")) return;
           requestAnimationFrame(() => {
             // Native scrolling can leave the focused control partially outside the viewport.
-            if (document.activeElement === target) target.scrollIntoView({ block: "nearest" });
+            if (document.activeElement === target) target.scrollIntoView?.({ block: "nearest" });
           });
         }}
       >
