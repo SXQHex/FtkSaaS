@@ -1,6 +1,6 @@
 import test,{resources} from './p07-diagnostics.mjs';
 import assert from 'node:assert/strict';
-import {authUser,must,call,context} from './api-client.mjs';
+import {authUser,must,call,context,fixturePlatform} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
 test('Global identity current projections, safe links, immutable scope and transactional failure',async t=>{
@@ -274,4 +274,50 @@ test('W1-BE-41 native first password for a synthetic Google-only account',async 
    assert([204,401,403].includes(loggedOut.status));
   }
  }
+});
+
+test('W1-BE-67 account labels use canonical names and verified fallback within live directory authority',async t=>{
+ const guard=resources(t),{platform}=await fixturePlatform(),user=await authUser('operator-label');
+ const db=await guard.connect(context().env.DB_URL);
+ const mine=(await must(platform,'account_get_v1')).id;
+ const peer=(await must(user,'account_get_v1')).id;
+ const directory={view:'operators',page:{limit:200}};
+ const label=async account=>(await must(platform,'platform_directory_get_v1',directory)).items.find(x=>x.account_id===account);
+ assert.equal((await call(user,'platform_directory_get_v1',directory)).result.error.code,'FORBIDDEN');
+
+ for(const [actor,account] of [[platform,mine],[user,peer]]){
+  // Legacy auth bootstrap stored the login email as the profile label.
+  await db.query('update private.p07_profiles set display_name=$2,display_name_explicit=null where account_id=$1',[account,actor.email]);
+  await db.query('insert into private.account_identity_names(account_id,given_name,family_name) values($1,$2,$3)',[account,'Synthetic','Name']);
+ }
+ await must(platform,'platform_operator_access_set_v1',{verified_account_id:peer,enabled:true,reason:'Synthetic label acceptance'},key());
+ const assertLabel=async(actor,account,expected)=>{
+  const value=await label(account);
+  assert.equal(value.display_name,expected);
+  assert.equal((await must(actor,'account_get_v1')).display_name,expected);
+  assert.deepEqual(Object.keys(value).sort(),['account_id','display_name','eligible','granted_at','kind']);
+ };
+ await assertLabel(platform,mine,'Synthetic Name');
+ await assertLabel(user,peer,'Synthetic Name');
+ await db.query('update private.p07_profiles set display_name=$2 where account_id=$1',[peer,user.email.split('@')[0]]);
+ await assertLabel(user,peer,'Synthetic Name');
+ await db.query('update private.account_identity_names set given_name=null where account_id=$1',[peer]);
+ await assertLabel(user,peer,'Name');
+ await db.query('delete from private.account_identity_names where account_id=$1',[peer]);
+ await assertLabel(user,peer,user.email);
+ const {rows:[restricted]}=await db.query(`select private.account_display_label(p,n,u,false) as display_name
+  from core.accounts a join auth.users u on u.id=a.auth_user_id
+  left join private.p07_profiles p on p.account_id=a.id
+  left join private.account_identity_names n on n.account_id=a.id where a.id=$1`,[peer]);
+ assert.equal(restricted.display_name,null);
+
+ const version=(await db.query('select version from core.accounts where id=$1',[peer])).rows[0].version;
+ await must(user,'account_profile_update_v1',{expected_version:Number(version),display_name:'Chosen display',given_name:'Other',family_name:'Identity'},key());
+ await assertLabel(user,peer,'Chosen display');
+
+ const legacy=await authUser('operator-label-no-verified-name');
+ await db.query("update auth.users set raw_user_meta_data='{}',email_confirmed_at=null where id=$1",[legacy.id]);
+ await db.query('insert into private.platform_operators(auth_user_id) values($1)',[legacy.id]);
+ const unresolved=(await must(platform,'platform_directory_get_v1',directory)).items.find(x=>x.account_id===null);
+ assert.equal(unresolved.display_name,null);
 });

@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="account-display-label"></a>
+## W1-BE-67 · Ortak hesap etiketi
+
+Taban `841e6a3cd3aab5b8feec40b2e36ccf209e278b2f`. [Aynı kaynak main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44756824552) başarılı. Hesap ve platform tüketimi [WF01](../../../docs/workflows.md#wf01) ve [WF17](../../../docs/workflows.md#wf17) sahibindedir.
+
+Tabanda sentetik operatör adı regresyonu doğrulandı. 217 migration izole loopback Supabase’e temiz uygulandı. Tek seri runner’da 15/15 native backend testi geçti. Açık görünen ad, bir veya iki ad parçası, doğrulanmış e-posta ve etiketsiz eski operatör sınandı. E-posta yedeği kapalı çözümleme ve canlı operatör yetkisi ayrıca doğrulandı. Backend adayı yerelde.
+
 <a id="reservation-selected-sale-scope"></a>
 ## W1-BE-66 · Rezervasyonda seçilen satışın kapsamı
 
