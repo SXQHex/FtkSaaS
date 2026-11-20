@@ -149,12 +149,12 @@ jobs:
           report=apps/web/test-reports/playwright.json
           rm -f "$report"
           if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
-            pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web
+            pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web --log-order=stream
           else
-            pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web --affected
+            pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web --affected --log-order=stream
             if [[ ! -f "$report" ]]; then
               echo "The exact-source scope requires tests even though Turbo selected no package tasks."
-              pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web
+              pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web --log-order=stream
             fi
           fi
       - name: Verify browser shard ran
