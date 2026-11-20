@@ -2,7 +2,7 @@
 
 ## Kaynak yerleşimi
 
-Kök dizin yalnız workspace yönetimi ve zorunlu araç yapılandırmalarını içerir. Backend kendi manifesti, bağımlılıkları ve çalışma dizini olan uygulamadır. Frontend apps/web, ortak UI packages/ui içindedir; çalışma rehberi apps/web/docs/development.md sahibindedir.
+Kök dizin yalnız workspace yönetimi ve zorunlu araç yapılandırmalarını içerir. Backend kendi manifesti, bağımlılıkları ve çalışma dizini olan uygulamadır. Ürün frontend’i apps/web altındaki Vite SPA’dır. Ortak UI packages/ui içindedir; çalışma rehberi apps/web/docs/development.md sahibindedir.
 
 | Yol | Tek sorumluluk |
 |---|---|
@@ -25,7 +25,7 @@ Root package.json yalnız workspace komutları ve Turbo bağımlılığını ta�
 
 .nvmrc Node patch seçiminin sahibidir; engines destek aralığını sınırlar. .node-version çiftliği kaldırılmıştır. CI .nvmrc’den okur; devcontainer aynı patch’in resmi Docker image digest’ine sabittir ve eşliği test edilir. package.json packageManager alanı pnpm sürümünü, pnpm-lock.yaml tek çözüm kilidini belirler. Ortak TypeScript sürümü pnpm-workspace.yaml catalog içinde bir kez tanımlanır.
 
-Node için yayımlanmış güncel LTS yaması; ayrı LTS kanalı olmayan ortak araçlarda uyumlu stable sürüm seçilir. Canary/beta/RC veya Node Current otomatik alınmaz. Güncel sürüm pinleri manifestlerin kendisindedir; frontend Next/React/Vitest/Playwright bağımlılıkları kendi paketlerinin sahibidir.
+Node için yayımlanmış güncel LTS yaması; ayrı LTS kanalı olmayan ortak araçlarda uyumlu stable sürüm seçilir. Canary/beta/RC veya Node Current otomatik alınmaz. Güncel sürüm pinleri manifestlerin kendisindedir; frontend Vite/React/Vitest/Playwright bağımlılıkları kendi paketlerinin sahibidir.
 
 ## Çalıştırma
 

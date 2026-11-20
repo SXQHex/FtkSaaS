@@ -59,5 +59,13 @@
   "docs/schedule-read-handover.md": "docs/workflows.md",
   "docs/settlement-handover.md": "docs/workflows.md",
   "docs/starter-attendance-protection-handover.md": "docs/workflows.md",
-  "docs/starter-plan-gates-handover.md": "docs/workflows.md"
+  "docs/starter-plan-gates-handover.md": "docs/workflows.md",
+  "apps/web1/README.md": "apps/web/README.md",
+  "apps/web1/AGENTS.md": "apps/web/AGENTS.md",
+  "apps/web1/tasks/todo.md": "apps/web/docs/todo.md",
+  "apps/web1/tasks/request.md": "apps/web/docs/request.md",
+  "apps/web1/design-reference/README.md": "apps/web/design-reference/README.md",
+  "apps/web1/design-reference/revisions/2026-11-18/GECIS.md": "apps/web/design-reference/revisions/2026-11-18/GECIS.md",
+  "apps/web1/design-reference/revisions/2026-11-18/ILERLEME.md": "apps/web/design-reference/revisions/2026-11-18/ILERLEME.md",
+  "apps/web1/design-reference/revisions/2026-11-18/README.md": "apps/web/design-reference/revisions/2026-11-18/README.md"
 }

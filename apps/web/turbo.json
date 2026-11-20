@@ -3,19 +3,24 @@
   "tasks": {
     "build": {
       "dependsOn": ["^typecheck"],
-      "outputs": [".next/**", "!.next/cache/**"],
+      "outputs": ["dist/**", ".tmp/production-modules.json"],
       "env": [
-        "NEXT_PUBLIC_SUPABASE_URL",
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-        "NEXT_PUBLIC_APP_ORIGIN",
-        "NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY"
+        "VITE_SUPABASE_URL",
+        "VITE_SUPABASE_PUBLISHABLE_KEY",
+        "VITE_APP_ORIGIN",
+        "VITE_PUBLIC_GATEWAY_URL",
+        "VITE_TURNSTILE_SITE_KEY"
       ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*",
-        "$TURBO_ROOT$/apps/backend/transports/account-signup-gateway.mjs",
-        "$TURBO_ROOT$/apps/backend/scripts/p04-public-ingress.mjs",
-        "$TURBO_ROOT$/apps/backend/scripts/uuid.mjs"
+      "inputs": ["$TURBO_DEFAULT$", ".env*"]
+    },
+    "test:e2e": {
+      "env": [
+        "$TURBO_EXTENDS$",
+        "VITE_SUPABASE_URL",
+        "VITE_SUPABASE_PUBLISHABLE_KEY",
+        "VITE_APP_ORIGIN",
+        "VITE_PUBLIC_GATEWAY_URL",
+        "VITE_TURNSTILE_SITE_KEY"
       ]
     }
   }

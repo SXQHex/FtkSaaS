@@ -131,7 +131,6 @@
         "apps/backend/scripts/ci/source.mjs",
         "apps/backend/scripts/ci/suite-durations.json",
         "apps/backend/scripts/ci/summarize-timings.mjs",
-        "apps/backend/scripts/ci/vercel-deployment.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/db.mjs",
@@ -310,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "9d95a09dbd5a790b5300ea0ce7e9353c93efb2fb635226ce28a429dea00ab02f",
-        "reason": "Rezervasyon kapsam kuralı mevcut operasyon sözleşmelerine işlendi. Aday test envanteri aynı birimleri koruyarak satırları yeniden bağlar."
+        "fingerprint": "7bb1aead14be4f5dde8f867dcbf99d9d99e1b2cd242ba0dd4b108e629293a31e",
+        "reason": "Ortak CI kaynağı ürün SPA geçişine uyarlandı. Vercel teslim modülü ve testleri kaldırıldı; Supabase kanıtları ile geçişin exact-path kalite kaydı incelendi."
       }
     },
     {

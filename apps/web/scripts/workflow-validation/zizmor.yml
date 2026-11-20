@@ -4,7 +4,7 @@ rules:
       # Trusted-main deployment resolver validates successful exact-source main
       # acceptance before exposing deployment credentials to the accepted source.
       - cd-development.yml:4:3
-      - vercel.yml:3:3
+      - cd-cloudflare.yml:3:3
       # The privileged verifier checks out trusted main only; candidate code
       # executes separately with contents:read and no deployment secrets.
       - ci-gate.yml:4:3

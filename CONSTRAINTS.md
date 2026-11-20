@@ -2,7 +2,7 @@
 
 1 Kasım 2026 kararı: mevcut tabanı koru; güvenlik ve mimari ihlallerini engelle; yeni yerel kalite kontrolünü en fazla 90 saniyede tamamla. Bu dosya iki alanın ortak kalite sözleşmesidir. Alanların geliştirme durumu burada tutulmaz. Ürün/API davranışı [kaynak indeksindeki](docs/source-index.md) sahiplerde, CI kabul protokolü [CI politikasında](docs/ci-policy.md) kalır.
 
-Kapsam: `apps/web1/**` deneysel tasarım alanı kullanıcı kararıyla bu CI kalite tabanının dışındadır; izolasyon ve karma değişiklik kuralları [CI politikasında](docs/ci-policy.md#deneysel-tasarım-alanı) tanımlıdır. Diğer bütün yollar mevcut tabana tabidir.
+Kapsam: Bu kalite tabanı ürün frontend’i, backend ve ortak paketlere uygulanır.
 
 ## Değiştirilemeyen taban
 
@@ -29,7 +29,7 @@ Kapsam: `apps/web1/**` deneysel tasarım alanı kullanıcı kararıyla bu CI kal
 
 Frontend/backend aynı monoreponun alanlarıdır. Backend sözleşmeyi geliştirir; frontend yayımlanan `@ftksaas/api-contracts` üzerinden adapte olur. Frontend contract compatibility tanı sinyalidir; backend’in bağımsız teslimini engelleyen yeni kapı yapılmaz. Paket/tip ve görev grafiği izolasyonu [monorepo rehberi](docs/monorepo.md) ve mevcut isolation kontrolüyle korunur.
 
-Frontend kaynakları backend iç dosyalarını import edemez. Mevcut, bilinçli sunucu köprüsü yalnız `apps/web/src/app/api/auth/signup-check/route.ts` → `apps/backend/transports/account-signup-gateway.mjs` için korunur; bu izin istemci bileşenlerine yayılmaz. UI paketi uygulama iç dosyalarını import edemez. Oxlint statik ve literal import yollarını denetler; hesaplanan dinamik yollar ve transitif istemci/sunucu grafiği için tam analiz iddiası yoktur.
+Frontend kaynakları backend iç dosyalarını import edemez. Statik web, yayımlanan public Worker ve JWT doğrulanan Edge girişlerini kullanır. UI paketi uygulama iç dosyalarını import edemez. Oxlint statik ve literal import yollarını denetler; hesaplanan dinamik yollar ve transitif istemci/sunucu grafiği için tam analiz iddiası yoktur.
 
 Ortak `docs` yalnız iki alanı ilgilendiren sözleşme/kuralları içerir. Alan README/AGENTS girişleri ve geliştirme planı/ilerleme/kabul/devir kayıtları kendi klasörlerinde kalır. Makine belge sicili bu ayrımı denetler; bir belgenin anlamsal olarak iki tarafı ilgilendirmesi ayrıca inceleme konusudur.
 

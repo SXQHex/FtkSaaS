@@ -1,60 +1,58 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "react", "jsx-a11y", "vitest", "nextjs"],
-  "categories": {
-    "correctness": "error"
-  },
-  "env": {
-    "browser": true,
-    "node": true
-  },
-  "ignorePatterns": ["node_modules/**", ".next/**", "coverage/**", "next-env.d.ts"],
+  "plugins": ["react", "typescript", "oxc"],
   "rules": {
-    "vitest/valid-expect": [
-      "error",
-      {
-        "maxArgs": 2
-      }
-    ],
     "no-restricted-imports": [
       "error",
       {
         "patterns": [
           {
-            "group": ["@ftksaas/backend", "@ftksaas/backend/**", "**/backend/**"],
-            "message": "Use the public shared package contract; application internals are owned by their application."
+            "group": [
+              "@ftksaas/backend",
+              "@ftksaas/backend/**",
+              "**/apps/backend/**",
+              "**/apps/web1/**",
+              "**/backend/**"
+            ],
+            "message": "Use the public backend API and shared contract types."
           }
         ]
       }
-    ]
+    ],
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error"
   },
   "overrides": [
     {
-      "files": ["src/components/preferences.tsx"],
+      "files": ["src/components/ui/**/*.{ts,tsx}"],
       "rules": {
-        "react/set-state-in-effect": "off"
-      }
-    },
-    {
-      "files": ["src/app/api/auth/signup-check/route.ts"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "patterns": [
-              {
-                "group": [
-                  "@ftksaas/backend",
-                  "@ftksaas/backend/**",
-                  "**/backend/**",
-                  "!../../../../../../backend/transports/account-signup-gateway.mjs"
-                ],
-                "message": "Use the public shared package contract; application internals are owned by their application."
-              }
-            ]
-          }
-        ]
+        "react/only-export-components": "off"
       }
     }
+  ],
+  "options": {
+    "typeAware": true,
+    "maxWarnings": 0
+  },
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    "src/i18n/generated/**",
+    ".npm-cache/**",
+    ".tmp/**",
+    ".playwright-browsers/**",
+    ".tanstack/**",
+    "coverage/**",
+    "dist/**",
+    "playwright-report/**",
+    "test-results/**",
+    "test-reports/**",
+    "design-reference/**"
   ]
 }
