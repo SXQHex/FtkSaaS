@@ -844,6 +844,15 @@ test("Business center switching keeps resource and policy reads scoped to the se
     const { org_id, center_id } = route.request().postDataJSON();
     expect(org_id).toBe(I.org);
     readPolicyIn.push(center_id);
+    const published =
+      center_id === second
+        ? f.calls.findLast(
+            ({ op, request }) =>
+              op === "policy_publish_v1" &&
+              request.center_id === second &&
+              request.key === "reservation_window",
+          )?.request
+        : undefined;
     return route.fulfill({
       json: {
         ok: true,
@@ -863,15 +872,15 @@ test("Business center switching keeps resource and policy reads scoped to the se
               center_id === second
                 ? { kind: "center", center_id: second }
                 : { kind: "organization" },
-            value: {
+            value: published?.value ?? {
               kind: "window",
               opens_minutes_before: 10080,
               closes_minutes_before: center_id === second ? 90 : 60,
               manager_exception: false,
             },
-            effective_at: at,
+            effective_at: published?.effective_at ?? at,
             mandatory: false,
-            version: 3,
+            version: published ? 4 : 3,
           },
         ],
       },
@@ -941,6 +950,39 @@ test("Business center switching keeps resource and policy reads scoped to the se
   await expect(editPolicy(common.settings.nativePolicies.keys.debt_booking)).toBeDisabled();
   await expect(editPolicy(common.settings.nativePolicies.keys.reservation_window)).toBeEnabled();
   expect(f.calls.some(({ op }) => op === "policy_publish_v1")).toBe(false);
+
+  await editPolicy(common.settings.nativePolicies.keys.reservation_window).click();
+  const editor = page.getByRole("dialog");
+  await editor.getByRole("spinbutton", { name: "Kapanış (dakika önce)", exact: true }).fill("120");
+  await editor.locator('input[type="datetime-local"]').fill("2026-11-18T15:00");
+  await editor
+    .getByRole("textbox", { name: "Değişiklik gerekçesi", exact: true })
+    .fill("Sentetik B rezervasyon penceresi");
+  await editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }).click();
+  const apply = editor.getByRole("button", { name: common.settings.applyReview, exact: true });
+  await expect(apply).toBeDisabled();
+  expect(f.calls.filter(({ op }) => op === "policy_publish_v1")).toEqual([]);
+  await editor.getByRole("checkbox").press("Space");
+  await apply.click();
+  await expect(editor.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  const writes = f.calls.filter(({ op }) => op === "policy_publish_v1");
+  expect(writes).toHaveLength(1);
+  expect(writes[0]?.request).toMatchObject({
+    org_id: I.org,
+    center_id: second,
+    key: "reservation_window",
+    value: { kind: "window", closes_minutes_before: 120 },
+    effective_at: "2026-11-18T12:00:00Z",
+    mandatory: false,
+    accepted_reservation_ids: [],
+  });
+  await page.goto(centerUrl(second));
+  await selectTab(text.tabs.policies);
+  await expect(advisory).toContainText("Kapanış: 120 dakika önce");
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+  await page.getByLabel(text.center, { exact: true }).selectOption(I.center);
+  await expect(advisory).toContainText("Kapanış: 60 dakika önce");
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
 });
 
 test("a Business organization manager sees the native sixth-center rejection", async ({ page }) => {
