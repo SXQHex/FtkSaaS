@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `fa13bf45a515b2d3ffd8d26c8547658b450b2222265b3c26097eef9880748f72`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c9be9f00e5b81a4fb18e0415471f24e786fd5aa7030dbc1ea261eb96ece99b1e`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 216. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 217. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -224,3 +224,4 @@ Sıralı migration: 216. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261119170002_sql_list_pagination.sql](../apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql) | `603d662160050a5dc691775cebbddd8b036138c44d60cb7952a74f00de3247d8` |
 | [20261119170003_sql_report_pagination.sql](../apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql) | `d8eec8a72677fe772fab5630bd254e21c37aa48028192b8da95d31d2cc31265f` |
 | [20261120005843_reservation_selected_sale_scope.sql](../apps/backend/supabase/migrations/20261120005843_reservation_selected_sale_scope.sql) | `9078c9dc636e9f27bba0b2a4190c7cf0e1938eeed835753b424e757dc9f7193f` |
+| [20261120145403_account_display_label.sql](../apps/backend/supabase/migrations/20261120145403_account_display_label.sql) | `9ad08d75b7ba5fa897a4dd6b7faa1f68e0c35f1d0eae99e344e3aa9eed9d3f5d` |

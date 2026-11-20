@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `fa13bf45a515b2d3ffd8d26c8547658b450b2222265b3c26097eef9880748f72`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c9be9f00e5b81a4fb18e0415471f24e786fd5aa7030dbc1ea261eb96ece99b1e`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -9,6 +9,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | Güvenlik kaynağı | SHA256 |
 |---|---|
 | [access-directory.sql](../apps/backend/database/access-directory.sql) | `6d9808ac3c28b1511001c54e3e9009d66a363d0f01e2eef22fe486e4fe0bccdf` |
+| [account-display-label.sql](../apps/backend/database/account-display-label.sql) | `9ad08d75b7ba5fa897a4dd6b7faa1f68e0c35f1d0eae99e344e3aa9eed9d3f5d` |
 | [account-export-erasure.sql](../apps/backend/database/account-export-erasure.sql) | `043d4df218cf40d1fad04ee3de9b2c852634524f8558f88bdfd57ac221d30d18` |
 | [account-identity-projection.sql](../apps/backend/database/account-identity-projection.sql) | `a04d73dca3c04b224c287447fd1f6639604a5a4c9caa76571b7348f271c9fe21` |
 | [account-native-erasure.sql](../apps/backend/database/account-native-erasure.sql) | `00d3050d2b411ca6319f7b75615ce32622b53ea6944bddb94b4fce7c825e6999` |
@@ -443,6 +444,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261119170000_shared_center_authorization.sql](../apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql) | `2172b023fd54d51a750254c7dde7681c3535238ec7b6b761f245cb69cce097a2` |
 | [20261119170002_sql_list_pagination.sql](../apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql) | `603d662160050a5dc691775cebbddd8b036138c44d60cb7952a74f00de3247d8` |
 | [20261119170003_sql_report_pagination.sql](../apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql) | `d8eec8a72677fe772fab5630bd254e21c37aa48028192b8da95d31d2cc31265f` |
+| [20261120145403_account_display_label.sql](../apps/backend/supabase/migrations/20261120145403_account_display_label.sql) | `9ad08d75b7ba5fa897a4dd6b7faa1f68e0c35f1d0eae99e344e3aa9eed9d3f5d` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |
