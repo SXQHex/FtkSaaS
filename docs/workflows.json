@@ -131,7 +131,6 @@
         "apps/backend/scripts/ci/source.mjs",
         "apps/backend/scripts/ci/suite-durations.json",
         "apps/backend/scripts/ci/summarize-timings.mjs",
-        "apps/backend/scripts/ci/vercel-deployment.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/db.mjs",
@@ -310,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "710a56f1224492511d4b160bfc7f0515f47349ccdf242b5ff904d9c66d6dedff",
-        "reason": "Mevcut hesap ve operatör okuma sözleşmesi ile kimlik kabul testinin SHA-256 kaydı güncellendi."
+        "fingerprint": "202da8b0faffa2c518551cb58a3e73f98a837ba56a4c3bf86124246362cbbae0",
+        "reason": "Belge taşıma kaydı ve exact source sınıflandırması birlikte incelendi. Sicile alınmış emekli belge yolları iki uçta denetlenir ve diğer deneysel dosyalar kendi kapsamındaki kabulü alır."
       }
     },
     {

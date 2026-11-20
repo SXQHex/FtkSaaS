@@ -1,18 +1,19 @@
 {
-  "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "printWidth": 100,
-  "tabWidth": 2,
-  "useTabs": false,
-  "sortImports": false,
-  "sortPackageJson": false,
-  "sortTailwindcss": false,
   "ignorePatterns": [
-    "node_modules/**",
-    ".next/**",
+    "src/routeTree.gen.ts",
+    "src/i18n/generated/**",
+    "package-lock.json",
+    ".npm-cache/**",
+    ".tmp/**",
+    ".playwright-browsers/**",
+    ".tanstack/**",
     "coverage/**",
-    "next-env.d.ts",
-    "*.tsbuildinfo",
-    ".env*",
-    "**/*.md"
+    "dist/**",
+    "playwright-report/**",
+    "test-results/**",
+    "AGENTS.md",
+    "test-reports/**",
+    "design-reference/**",
+    "src/lib/api-contracts/**"
   ]
 }

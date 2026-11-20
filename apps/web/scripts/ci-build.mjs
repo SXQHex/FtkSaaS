@@ -26,7 +26,7 @@ const source = {
   inputs: sha256(
     JSON.stringify(
       Object.entries(env)
-        .filter(([key]) => key.startsWith("NEXT_PUBLIC_"))
+        .filter(([key]) => key.startsWith("VITE_"))
         .sort(([a], [b]) => a.localeCompare(b)),
     ),
   ),
@@ -35,9 +35,12 @@ const dir = ".artifacts/frontend-build";
 const archive = resolve(dir, "app.tar");
 const mode = process.argv[2];
 if (mode === "package") {
-  assert(readFileSync("apps/web/.next/BUILD_ID", "utf8").trim(), "PRODUCTION_BUILD_REQUIRED");
+  assert(
+    readFileSync("apps/web/dist/index.html", "utf8").includes("/assets/"),
+    "PRODUCTION_BUILD_REQUIRED",
+  );
   mkdirSync(dir, { recursive: true });
-  execFileSync("tar", ["--exclude=.next/cache", "-cf", archive, "-C", "apps/web", ".next"]);
+  execFileSync("tar", ["-cf", archive, "-C", "apps/web", "dist"]);
   const digest = sha256(readFileSync(archive));
   writeFileSync(
     resolve(dir, "binding.json"),
@@ -59,7 +62,10 @@ if (mode === "package") {
   );
   assert.equal(sha256(readFileSync(archive)), env.EXPECTED_BUILD_SHA256, "BUILD_DIGEST_MISMATCH");
   // Extract only after matching the producer job's output digest and source.
-  rmSync("apps/web/.next", { recursive: true, force: true });
+  rmSync("apps/web/dist", { recursive: true, force: true });
   execFileSync("tar", ["-xf", archive, "-C", "apps/web"]);
-  assert(readFileSync("apps/web/.next/BUILD_ID", "utf8").trim(), "PRODUCTION_BUILD_REQUIRED");
+  assert(
+    readFileSync("apps/web/dist/index.html", "utf8").includes("/assets/"),
+    "PRODUCTION_BUILD_REQUIRED",
+  );
 } else throw Error("EXPECTED_PACKAGE_OR_RESTORE");

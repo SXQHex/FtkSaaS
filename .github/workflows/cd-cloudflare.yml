@@ -1,0 +1,139 @@
+name: Cloudflare delivery
+on:
+  workflow_run:
+    workflows: [Main acceptance]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      acceptance_run_id:
+        description: Successful Main acceptance run ID for current main
+        required: true
+        type: string
+permissions: {}
+concurrency:
+  group: cloudflare-ftksaas-app
+  cancel-in-progress: false
+jobs:
+  source:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+      run: ${{ steps.source.outputs.run }}
+      attempt: ${{ steps.source.outputs.attempt }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - id: source
+        name: Select accepted frontend source
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const { selectCloudflareSource } = await import(`${process.env.GITHUB_WORKSPACE}/apps/web/scripts/cloudflare-source.mjs`);
+            const source = await selectCloudflareSource(github, context);
+            if (source) {
+              for (const [key, value] of Object.entries(source)) core.setOutput(key, value);
+            }
+  build:
+    needs: source
+    if: needs.source.outputs.sha != ''
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+      digest: ${{ steps.package.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: '.nvmrc'
+      - run: corepack enable
+      - run: pnpm --filter @ftksaas/web... --filter ftksaas install --frozen-lockfile
+      - name: Build the Cloudflare SPA
+        env:
+          VITE_APP_ORIGIN: https://app.fethiyetango.com
+          VITE_SUPABASE_URL: https://gwyprhenabtpkbojephw.supabase.co
+          VITE_PUBLIC_GATEWAY_URL: https://ftksaas-spa-ingress-dev.erkinkunbuk.workers.dev
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+        run: |
+          set -euo pipefail
+          [[ "$VITE_SUPABASE_PUBLISHABLE_KEY" =~ ^sb_publishable_[A-Za-z0-9_-]+$ ]]
+          test -n "$VITE_TURNSTILE_SITE_KEY"
+          pnpm build:web
+      - id: package
+        name: Package production assets
+        run: |
+          set -euo pipefail
+          tar -cf "$RUNNER_TEMP/web.tar" -C apps/web dist
+          digest="$(sha256sum "$RUNNER_TEMP/web.tar")"
+          printf 'digest=%s\n' "${digest%% *}" >> "$GITHUB_OUTPUT"
+      - id: upload
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cloudflare-static-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/web.tar
+          if-no-files-found: error
+          retention-days: 7
+  deploy:
+    needs: [source, build]
+    if: github.ref == 'refs/heads/main' && needs.build.result == 'success'
+    permissions:
+      contents: read
+      actions: read
+    environment: cloudflare-production
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact }}
+          path: ${{ runner.temp }}/cloudflare-web
+          merge-multiple: true
+          digest-mismatch: error
+      - name: Verify and extract static assets
+        env:
+          ARCHIVE_HASH: ${{ needs.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/cloudflare-web"
+          printf '%s  web.tar\n' "$ARCHIVE_HASH" | sha256sum --check --strict
+          tar -xf web.tar
+      - name: Deploy exact version and verify the static SPA
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          ACCEPTED_SHA: ${{ needs.source.outputs.sha }}
+          ACCEPTANCE_RUN: ${{ needs.source.outputs.run }}
+          ACCEPTANCE_ATTEMPT: ${{ needs.source.outputs.attempt }}
+          ARCHIVE_HASH: ${{ needs.build.outputs.digest }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        with:
+          script: |
+            const { verifyCloudflareSource } = await import(`${process.env.GITHUB_WORKSPACE}/apps/web/scripts/cloudflare-source.mjs`);
+            const { deliverCloudflare } = await import(`${process.env.GITHUB_WORKSPACE}/apps/web/scripts/cloudflare-delivery.mjs`);
+            const source = { sha: process.env.ACCEPTED_SHA, run: Number(process.env.ACCEPTANCE_RUN), attempt: Number(process.env.ACCEPTANCE_ATTEMPT) };
+            const receipt = await deliverCloudflare({
+              source,
+              archiveHash: process.env.ARCHIVE_HASH,
+              token: process.env.CLOUDFLARE_API_TOKEN,
+              directory: `${process.env.RUNNER_TEMP}/cloudflare-web/dist`,
+              revalidate: () => verifyCloudflareSource(github, context.repo, source),
+            });
+            await core.summary.addCodeBlock(JSON.stringify(receipt, null, 2), 'json').write();

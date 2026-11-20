@@ -17,7 +17,7 @@
 | [apps/backend/docs/remote-backend-setup.md](../apps/backend/docs/remote-backend-setup.md) | guide | Dağıtım, worker ve restore işletimi | backend-operations |
 | [apps/web/AGENTS.md](../apps/web/AGENTS.md) | authority | Frontend ajan çalışma yükümlülükleri | frontend-agent |
 | [apps/web/README.md](../apps/web/README.md) | entry | Frontend başlangıcı | frontend-entry |
-| [apps/web/docs/development.md](../apps/web/docs/development.md) | guide | Web geliştirme ve mevcut ekran davranışları | frontend-development |
+| [apps/web/docs/development.md](../apps/web/docs/development.md) | guide | Vite SPA geliştirme, ortak paketler ve yerel doğrulama | frontend-development |
 | [apps/web/docs/handover.md](../apps/web/docs/handover.md) | status | Frontend sohbet devri ve çalışma bağlamı | frontend-handover |
 | [apps/web/docs/todo.md](../apps/web/docs/todo.md) | backlog | Frontend bölüm adımları, aktif bölüm, bağımlılık ve kabul | frontend-delivery-plan |
 | [docs/ci-policy.md](ci-policy.md) | authority | Kaynak bağlı CI ve teslim kapıları | ci-acceptance-policy |
@@ -39,3 +39,8 @@
 | [docs/source-index.md](source-index.md) | entry | Başlangıç, konu seçimi ve arşiv sınırı | source-routing |
 | [docs/workflows.md](workflows.md) | guide | Kullanıcı amacından API sırasına ortak akışlar | project-workflows |
 | [packages/api-contracts/README.md](../packages/api-contracts/README.md) | entry | Ortak sözleşme paketi kullanımı | contract-package-entry |
+| [apps/web/docs/request.md](../apps/web/docs/request.md) | guide | Taşınan W1-BE frontend entegrasyon kanıtı | frontend-integration-evidence |
+| [apps/web/design-reference/README.md](../apps/web/design-reference/README.md) | guide | Salt okunur frontend tasarım kaynakları | frontend-design-references |
+| [apps/web/design-reference/revisions/2026-11-18/GECIS.md](../apps/web/design-reference/revisions/2026-11-18/GECIS.md) | guide | 18 Kasım çizim revizyonu ve izlenebilirlik kaydı | frontend-design-revision-2026-11-18-gecis |
+| [apps/web/design-reference/revisions/2026-11-18/ILERLEME.md](../apps/web/design-reference/revisions/2026-11-18/ILERLEME.md) | guide | 18 Kasım çizim revizyonu ve izlenebilirlik kaydı | frontend-design-revision-2026-11-18-ilerleme |
+| [apps/web/design-reference/revisions/2026-11-18/README.md](../apps/web/design-reference/revisions/2026-11-18/README.md) | guide | 18 Kasım çizim revizyonu ve izlenebilirlik kaydı | frontend-design-revision-2026-11-18-readme |

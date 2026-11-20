@@ -11,7 +11,10 @@
       "types": "./src/client.ts",
       "import": "./src/client.ts"
     },
-    "./schema": "./schema/contract.json"
+    "./schema": "./schema/contract.json",
+    "./runtime": {
+      "types": "./src/runtime.ts"
+    }
   },
   "description": "Generated shared backend contract types; runtime validation uses authoritative 08 JSON",
   "scripts": {

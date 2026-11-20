@@ -1,0 +1,776 @@
+import { test, expect } from "./test.js";
+import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
+import { mockSessionDetail } from "./session-detail-fixture.js";
+import { studioIds as I } from "./studio-fixture.js";
+import { origin } from "./auth-fixture.js";
+import type { Page } from "@playwright/test";
+import type {
+  EventView,
+  FinanceDirectoryEntry,
+  InstructorFinanceEarning,
+} from "@ftksaas/api-contracts";
+const saved = "İşlem kaydedildi; güncel kayıt okundu.";
+test("event registration reads and accepts only the chosen member's own document before renewed review", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "normal", { documents: true });
+  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  const next = sheet.getByRole("button", { name: "Devam", exact: true });
+  const person = sheet.getByLabel("Kişi", { exact: true });
+  const read = sheet.getByRole("button", { name: "Etkinlik koşulları belgesini oku", exact: true });
+  await person.selectOption(I.instructor);
+  await next.click();
+  const back = sheet.getByRole("button", { name: "Geri", exact: true });
+  await expect(back).toBeVisible();
+  await expect(read).toHaveCount(0);
+  expect(state.reads.some(({ op }) => op === "document_requirements_get_v1")).toBe(false);
+  await next.click();
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await expect(
+    sheet.getByText(
+      "Üye, kaydı tamamlamadan önce kendi hesabından etkinlik belgesini kabul etmeli.",
+    ),
+  ).toBeVisible();
+  expect(state.event.registrations).toEqual([]);
+  expect(state.writes).toEqual([]);
+  await back.click();
+  await back.click();
+  await person.selectOption(I.self);
+  await next.click();
+  await read.click();
+  await expect(sheet.getByText("Sentetik etkinlik koşulları", { exact: true })).toBeVisible();
+  await sheet
+    .getByRole("checkbox", { name: "Belgeyi okudum, bu işlem için kabul ediyorum.", exact: true })
+    .press("Space");
+  await sheet.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await expect(sheet.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1"]);
+  expect(state.writes[0]?.request.context).toMatchObject({
+    gate: "event_registration",
+    event_registration_preview_id: D.preview,
+  });
+  const previews = () =>
+    state.reads.filter(({ op }) => op === "event_registration_preview_v1").length;
+  const before = previews();
+  await next.click();
+  const save = sheet.getByRole("button", { name: "Kaydı onayla", exact: true });
+  await expect(save).toBeDisabled();
+  expect(previews()).toBe(before + 1);
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await save.click();
+  await expect(sheet.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1", "event_register_v1"]);
+  expect(state.event.registrations?.[0]?.person_id).toBe(I.self);
+});
+async function accept(page: import("@playwright/test").Page, button: string) {
+  const dialog = page.getByRole("alertdialog");
+  await dialog
+    .getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim, onaylıyorum.", exact: true })
+    .press("Space");
+  await dialog.getByRole("button", { name: button, exact: true }).click();
+  return dialog;
+}
+test("event detail shows native unknown payment and requires reviewed actual start and one-person attendance", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  state.event.registrations!.push({
+    id: D.registration,
+    person_id: I.self,
+    display_name: "Örnek kişi",
+    state: "active",
+    attendance_result: "unmarked",
+    version: 1,
+  });
+  await page.reload();
+  await expect(page.getByRole("row", { name: /Örnek kişi/ })).toContainText(
+    "Ödeme kaynağı paylaşılmıyor",
+  );
+  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await page.getByLabel("Fiilî başlangıç", { exact: true }).fill("2026-11-15T18:05");
+  await page.getByLabel("Gerekçe", { exact: true }).fill("Müzik sistemi geç açıldı");
+  await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+  const start = await accept(page, "Fiilî başlangıcı kaydet");
+  await expect(start.getByText(saved, { exact: true })).toBeVisible();
+  await start.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.event.actual_started_at).toBe("2026-11-15T15:05:00Z");
+  await page.getByRole("radio", { name: "Geldi", exact: true }).click();
+  const mark = await accept(page, "Örnek kişi için yoklama");
+  await expect(mark.getByText(saved, { exact: true })).toBeVisible();
+  await mark.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.event.registrations![0]!.attendance_result).toBe("attended");
+  await page.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  const close = await accept(page, "Yoklamayı kapat");
+  await expect(close.getByText(saved, { exact: true })).toBeVisible();
+  await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.event.attendance_state).toBe("closed");
+});
+test("package practice uses the selected right for eligibility and closes without a payment command", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "normal", { practice: true });
+  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
+  await sheet
+    .getByLabel("Kayıt için paket", { exact: true })
+    .selectOption(state.practiceRight.sale_id);
+  const next = sheet.getByRole("button", { name: "Devam", exact: true });
+  await next.click();
+  await next.click();
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await expect(sheet.getByText(saved, { exact: true })).toBeVisible();
+  await sheet.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toContainText("Paket uygun");
+  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await page.getByLabel("Fiilî başlangıç", { exact: true }).fill("2026-11-15T18:05");
+  await page.getByLabel("Gerekçe", { exact: true }).fill("Sentetik Pratik başladı");
+  await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+  const start = await accept(page, "Fiilî başlangıcı kaydet");
+  await expect(start.getByText(saved, { exact: true })).toBeVisible();
+  await start.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("radio", { name: "Geldi", exact: true }).click();
+  const mark = await accept(page, "Örnek Eğitmen için yoklama");
+  await expect(mark.getByText(saved, { exact: true })).toBeVisible();
+  await mark.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  const close = await accept(page, "Yoklamayı kapat");
+  await expect(close.getByText(saved, { exact: true })).toBeVisible();
+  await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.event.attendance_state).toBe("closed");
+  expect(state.event.registrations?.[0]).toMatchObject({
+    person_id: I.instructor,
+    attendance_result: "attended",
+    state: "completed",
+  });
+  expect(state.writes.map(({ op }) => op)).toEqual([
+    "event_register_v1",
+    "event_actual_start_record_v1",
+    "event_attendance_mark_v1",
+    "event_attendance_close_v1",
+  ]);
+});
+test("event unknown result keeps the frozen action and recovers its exact receipt without another write", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "unknown");
+  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  const dialog = await accept(page, "Etkinliği tamamla");
+  await expect(dialog.getByText(/Sonuç bilinmiyor/)).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  expect(state.effects).toBe(1);
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+});
+test("event acknowledged write retries result reads and never repeats the command", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "unread");
+  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  const dialog = await accept(page, "Etkinliği tamamla");
+  await expect(dialog.getByText(/güncel sonuç henüz okunamadı/)).toBeVisible();
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+});
+test("event native authority denial does not manufacture a successful mutation", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "denied");
+  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  const dialog = await accept(page, "Etkinliği tamamla");
+  await expect(dialog.getByRole("alert").last()).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+  expect(state.event.state).toBe("published");
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+});
+test("event cancellation exposes server effects before its separately reviewed apply", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "normal", { existing: "available" });
+  await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
+  await mockCalendarEvent(page, state.event);
+  const participant = state.event.registrations![0]!;
+  const debt = participant.payment_summary!.debts[0]!;
+  const timestamp = "2026-11-15T18:00:00Z";
+  const financeReads: string[] = [];
+  await page.route("**/functions/v1/backend-v1/finance_directory_get_v1", async (route) => {
+    const request = route.request().postDataJSON();
+    expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+    const { view } = request;
+    const remaining = debt.remaining_minor;
+    const credit = debt.credited_minor;
+    const items: FinanceDirectoryEntry[] = [];
+    const row = {
+      person_id: participant.person_id,
+      display_name: participant.display_name,
+      version: debt.version,
+      created_at: timestamp,
+      occurred_at: timestamp,
+      currency: debt.currency,
+      source_sale_id: null,
+      product_name: null,
+      due_at: null,
+      method: null,
+    };
+    if (view === "debts" && remaining !== "0")
+      items.push({
+        ...row,
+        id: debt.id,
+        entity: { type: "debts", id: debt.id },
+        kind: "debt",
+        amount_minor: remaining,
+      });
+    if (view === "credits" && credit !== "0")
+      items.push({
+        ...row,
+        id: row.person_id,
+        entity: { type: "people", id: row.person_id },
+        kind: "credit",
+        amount_minor: credit,
+      });
+    if (view === "movements")
+      items.push({
+        ...row,
+        id: D.cash,
+        entity: { type: "cash_movements", id: D.cash },
+        version: 1,
+        kind: "collection",
+        amount_minor: debt.paid_minor,
+        method: "bank_transfer",
+      });
+    financeReads.push(
+      `${view}:${items.map(({ id, amount_minor }) => `${id}:${amount_minor}`).join(",")}`,
+    );
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          view,
+          items,
+          next_cursor: null,
+          as_of: timestamp,
+          totals: [
+            {
+              currency: debt.currency,
+              sales_minor: "0",
+              collections_minor: debt.paid_minor,
+              refunds_minor: "0",
+              debt_minor: remaining,
+              credit_minor: credit,
+              debt_people: Number(remaining !== "0"),
+              credit_people: Number(credit !== "0"),
+            },
+          ],
+        },
+      },
+    });
+  });
+  await page.route("**/functions/v1/backend-v1/finance_get_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      center_id: I.center,
+      person_id: participant.person_id,
+      currency: debt.currency,
+    });
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          person_id: participant.person_id,
+          currency: debt.currency,
+          credit_available_minor: debt.credited_minor,
+          debts: [],
+          movements: { items: [], next_cursor: null, as_of: timestamp },
+        },
+      },
+    });
+  });
+  const finance = page.getByRole("link", { name: "Finans", exact: true });
+  const credits = page.getByRole("grid", { name: "Alacaklar", exact: true });
+  const debts = page.getByRole("grid", { name: "Açık borçlar", exact: true });
+  const debtTab = page.getByRole("tab", { name: /Açık borçlar/ });
+  const movements = page.getByRole("grid", { name: "Hareketler", exact: true });
+  await finance.click();
+  await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
+  await debtTab.click();
+  await expect(debts.getByRole("gridcell", { name: "TRY ₺400,00", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await expect.poll(() => financeReads.at(-1)).toBe("credits:");
+  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
+  const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await page.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog
+    .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
+    .fill("Salon kullanılamıyor");
+  await accept(page, "İptal etkilerini oku");
+  expect(state.writes).toHaveLength(0);
+  await expect(dialog.getByText(/sunucunun güncel önizlemesidir/)).toBeVisible();
+  await expect(dialog.getByText(/₺400,00/)).toBeVisible();
+  await expect(dialog.getByText(/₺100,00/)).toBeVisible();
+  await accept(page, "Etkinliği iptal et");
+  await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.event.state).toBe("cancelled");
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await finance.click();
+  await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
+  await expect
+    .poll(() => financeReads.filter((read) => read.startsWith("movements:")).length)
+    .toBe(2);
+  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  const creditRow = credits.getByRole("row").filter({ hasText: participant.display_name! });
+  await expect(creditRow).toContainText("₺100,00");
+  await debtTab.click();
+  await expect
+    .poll(() => financeReads.filter((read) => read.startsWith("debts:")).at(-1))
+    .toBe("debts:");
+  await expect(debts.getByText(participant.display_name!, { exact: true })).toHaveCount(0);
+  expect(financeReads).toContain(`debts:${debt.id}:40000`);
+  expect(financeReads).toContain(`credits:${participant.person_id}:10000`);
+  expect(financeReads.filter((read) => read.startsWith("movements:"))).toEqual([
+    `movements:${D.cash}:10000`,
+    `movements:${D.cash}:10000`,
+  ]);
+  const calendarRead = page.waitForResponse((response) =>
+    response.url().endsWith("/calendar_get_v1"),
+  );
+  await schedule.click();
+  const calendar = await (await calendarRead).json();
+  expect(calendar.data.items).toMatchObject([{ id: state.event.id, resources: [] }]);
+  const eventRead = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/event_get_v1") &&
+      response.request().postDataJSON().include_payment_summary === true,
+  );
+  await calendarEvent.press("Enter");
+  const result = await (await eventRead).json();
+  expect(result.data).toMatchObject({
+    id: state.event.id,
+    state: "cancelled",
+    registrations: [
+      {
+        id: participant.id,
+        payment_summary: { net_minor: "0", credited_minor: "10000", debts: [{ id: debt.id }] },
+      },
+    ],
+  });
+  await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Etkinliği iptal et", exact: true }),
+  ).toBeDisabled();
+  expect(state.writes.map(({ op }) => op)).toEqual(["event_cancel_apply_v1"]);
+});
+async function mockCalendarEvent(page: Page, row: EventView) {
+  await page.route("**/functions/v1/backend-v1/calendar_get_v1", async (route) => {
+    const { interval: range } = route.request().postDataJSON();
+    const included =
+      Date.parse(row.interval.starts_at) < Date.parse(range.ends_at) &&
+      Date.parse(row.interval.ends_at) > Date.parse(range.starts_at);
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          items: included
+            ? [
+                {
+                  id: row.id,
+                  type: "event",
+                  center_id: I.center,
+                  title: row.name,
+                  starts_at: row.interval.starts_at,
+                  ends_at: row.interval.ends_at,
+                  resources: row.state === "cancelled" ? [] : [{ kind: "room", id: I.room }],
+                },
+              ]
+            : [],
+          next_cursor: null,
+          as_of: "2026-11-16T12:00:00Z",
+        },
+      },
+    });
+  });
+}
+async function paidRegistration(page: Page) {
+  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
+  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  await sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }).click();
+  const prepare = await accept(page, "Ödeme hazırlığını oluştur");
+  await expect(prepare.getByText(saved, { exact: true })).toBeVisible();
+  await prepare.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }).click();
+  await sheet.getByLabel("Tutar (alt birim)", { exact: true }).fill("45000");
+  await sheet.getByLabel("Yöntem", { exact: true }).selectOption("bank_transfer");
+  await sheet.getByLabel("Referans", { exact: true }).fill("SENTETIK-ODEME");
+  await sheet.getByLabel("Tahsilat tarihi ve saati", { exact: true }).fill("2026-11-16T15:00");
+  await sheet.getByRole("button", { name: "Tahsilatı incele", exact: true }).click();
+  const collect = await accept(page, "Tahsilatı kaydet");
+  await expect(collect.getByText(saved, { exact: true })).toBeVisible();
+  await collect.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
+  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  return sheet;
+}
+test("event paid registration separates reviewed debt preparation, targeted bank collection and final native registration", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
+  state.event.interval = { starts_at: "2026-11-18T15:00:00Z", ends_at: "2026-11-18T16:00:00Z" };
+  const financeSnapshots: string[][] = [];
+  await page.route("**/functions/v1/backend-v1/finance_directory_get_v1", async (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      view: "movements",
+    });
+    const cash = state.cash;
+    const items = cash
+      ? [
+          {
+            id: cash.id,
+            entity: { type: "cash_movements", id: cash.id },
+            person_id: I.instructor,
+            display_name: "Örnek Eğitmen",
+            created_at: cash.occurred_at,
+            occurred_at: cash.occurred_at,
+            version: 1,
+            kind: "collection",
+            amount_minor: cash.amount_minor,
+            currency: cash.currency,
+            method: "bank_transfer",
+            source_sale_id: null,
+            product_name: null,
+            due_at: null,
+          },
+        ]
+      : [];
+    financeSnapshots.push(items.map((item) => String(item.id)));
+    await route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: {
+          view: "movements",
+          items,
+          next_cursor: null,
+          as_of: "2026-11-16T12:00:00Z",
+          totals: [
+            {
+              currency: "TRY",
+              sales_minor: "0",
+              collections_minor: cash?.amount_minor ?? "0",
+              refunds_minor: "0",
+              debt_minor: "0",
+              credit_minor: "0",
+              debt_people: 0,
+              credit_people: 0,
+            },
+          ],
+        },
+      },
+    });
+  });
+  await mockCalendarEvent(page, state.event);
+  const finance = page.getByRole("link", { name: "Finans", exact: true });
+  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
+  const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  const ledger = page.getByRole("grid", { name: "Hareketler", exact: true });
+  const firstLedgerRead = page.waitForResponse(
+    "**/functions/v1/backend-v1/finance_directory_get_v1",
+  );
+  await finance.click();
+  await (await firstLedgerRead).finished();
+  await expect(ledger).toBeVisible();
+  expect(financeSnapshots).toEqual([[]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
+  const sheet = await paidRegistration(page);
+  await expect(sheet.getByText(saved, { exact: true }).first()).toBeVisible();
+  expect(state.writes.map((row) => row.op)).toEqual([
+    "event_payment_prepare_v1",
+    "collection_record_v1",
+    "event_register_v1",
+  ]);
+  expect(state.writes[1]!.request).toMatchObject({
+    person_id: I.instructor,
+    currency: "TRY",
+    debt_ids: [D.debt],
+    payment: { method: "bank_transfer", reference: "SENTETIK-ODEME" },
+  });
+  expect(state.writes[2]!.request).toMatchObject({
+    person_id: I.instructor,
+    preparation_id: D.preparation,
+    preview: { id: D.preview },
+  });
+  expect(state.event.registrations).toHaveLength(1);
+  await sheet.getByRole("button", { name: "Geri", exact: true }).click();
+  // The registration is already acknowledged; dismiss through the ready sheet's close control.
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
+  await finance.click();
+  await expect(ledger.getByRole("gridcell", { name: "TRY ₺450,00", exact: true })).toBeVisible();
+  expect(financeSnapshots).toEqual([[], [D.cash]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual([
+    "event_payment_prepare_v1",
+    "collection_record_v1",
+    "event_register_v1",
+  ]);
+});
+test("event capacity race reports settled preparation without a participant or duplicate registration", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page, "capacity");
+  const sheet = await paidRegistration(page);
+  await expect(sheet.getByText(/Kayıt sırasında kontenjan doldu/)).toBeVisible();
+  expect(state.event.registrations).toHaveLength(0);
+  expect(state.payment).toMatchObject({
+    state: "capacity_closed",
+    remaining_minor: "0",
+    credited_minor: "45000",
+    registration_id: null,
+  });
+  expect(state.writes.filter((row) => row.op === "event_register_v1")).toHaveLength(1);
+  await page.keyboard.press("Escape");
+});
+test("event closed attendance correction and performed duty each require a separate reviewed native command", async ({
+  page,
+  browser,
+}) => {
+  const state = await mockEventDetail(page);
+  await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
+  await mockCalendarEvent(page, state.event);
+  state.event.attendance_state = "closed";
+  state.event.registrations!.push({
+    id: D.registration,
+    person_id: I.self,
+    display_name: "Örnek kişi",
+    state: "completed",
+    attendance_result: "attended",
+    version: 2,
+  });
+  state.event.duties!.push({
+    id: D.debt,
+    person_id: I.instructor,
+    duty: "instructor",
+    fee_minor: "12000",
+    currency: "TRY",
+    performed: null,
+    verified_at: null,
+    version: 1,
+  });
+  const assignment = state.event.duties![0]!;
+  const earningId = "019ab7b0-0000-7000-8000-000000000105";
+  const eventEarning = (): InstructorFinanceEarning["earning"] => ({
+    id: earningId,
+    person_id: assignment.person_id,
+    center_id: I.center,
+    session_id: null,
+    event_assignment_id: assignment.id,
+    amount_minor: "12000",
+    currency: "TRY",
+    paid_minor: "0",
+    remaining_minor: "12000",
+    previous_id: null,
+    closure_id: null,
+    direction: "add",
+    created_at: assignment.verified_at!,
+    version: 1,
+    basis: { source: "event_fee", currency: "TRY", quantity: 1, excluded_blocked: 0 },
+  });
+  const earningSnapshots: string[][] = [];
+  await page.route(
+    "**/functions/v1/backend-v1/instructor_finance_directory_get_v1",
+    async (route) => {
+      const request = route.request().postDataJSON();
+      expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+      const items: InstructorFinanceEarning[] =
+        request.view === "earnings" && assignment.performed
+          ? [
+              {
+                kind: "earning",
+                display_name: "Örnek Eğitmen",
+                session_name: state.event.name,
+                agreement_id: null,
+                agreement_version: null,
+                earning: eventEarning(),
+              },
+            ]
+          : [];
+      if (request.view === "earnings")
+        earningSnapshots.push(
+          items.map(({ earning }) => `${earning.id}:${earning.event_assignment_id}`),
+        );
+      await route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            view: request.view,
+            items,
+            next_cursor: null,
+            as_of: "2026-11-15T19:00:00Z",
+            closed_session_count: 0,
+            totals: assignment.performed
+              ? [
+                  {
+                    currency: "TRY",
+                    earned_minor: "12000",
+                    paid_minor: "0",
+                    remaining_minor: "12000",
+                    overpaid_minor: "0",
+                  },
+                ]
+              : [],
+          },
+        },
+      });
+    },
+  );
+  const earnings = page.getByRole("link", { name: "Hakediş", exact: true });
+  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
+  const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
+  const lines = page.getByRole("tab", { name: "Satırlar", exact: true });
+  await earnings.click();
+  const initialEarnings = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/instructor_finance_directory_get_v1") &&
+      response.request().postDataJSON().view === "earnings",
+  );
+  await lines.click();
+  await (await initialEarnings).finished();
+  expect(earningSnapshots).toEqual([[]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await page.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByLabel("Düzeltilecek katılımcı", { exact: true }).selectOption(D.registration);
+  await dialog.getByRole("radio", { name: "Gelmedi", exact: true }).click();
+  await dialog
+    .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
+    .fill("Katılımcı kaydı kontrol edildi");
+  await accept(page, "Yoklamayı düzenle");
+  await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.event.registrations![0]!.attendance_result).toBe("no_show");
+  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  const complete = await accept(page, "Etkinliği tamamla");
+  await expect(complete.getByText(saved, { exact: true })).toBeVisible();
+  await complete.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await expect(
+    page.getByRole("alertdialog").getByRole("button", { name: "Doğrula", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("radio", { name: "Görev yapıldı", exact: true }).click();
+  const duty = await accept(page, "Doğrula");
+  await expect(duty.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.event.duties![0]!.performed).toBe(true);
+  expect(state.writes.map((row) => row.op)).toEqual([
+    "event_attendance_correct_v1",
+    "event_complete_v1",
+    "event_duty_verify_v1",
+  ]);
+  await duty.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await earnings.click();
+  await lines.click();
+  const earningRow = page.getByRole("row").filter({ hasText: state.event.name });
+  await expect(earningRow).toContainText("₺120,00");
+  expect(earningSnapshots).toEqual([[], [`${earningId}:${assignment.id}`]]);
+  await schedule.click();
+  await calendarEvent.press("Enter");
+  await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
+  expect(state.writes.filter(({ op }) => op === "event_duty_verify_v1")).toHaveLength(1);
+
+  const instructor = await browser.newPage({ locale: "tr-TR", serviceWorkers: "block" });
+  try {
+    const self = await mockSessionDetail(instructor, { existing: true, instructor: true });
+    await instructor.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
+    const selfSnapshots: string[] = [];
+    await instructor.route("**/functions/v1/backend-v1/instructor_account_get_v1", (route) => {
+      const request = route.request().postDataJSON();
+      expect(request).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        person_id: I.instructor,
+      });
+      const row = request.view === "earnings" ? eventEarning() : undefined;
+      if (row) selfSnapshots.push(`${row.id}:${row.event_assignment_id}`);
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: I.role,
+          data: {
+            view: request.view,
+            items: row ? [row] : [],
+            totals: [],
+            next_cursor: null,
+            as_of: "2026-11-15T19:00:00Z",
+          },
+        },
+      });
+    });
+    await instructor.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
+    const selfRow = instructor.getByRole("row").filter({ hasText: "Etkinlik ücreti" });
+    await expect(selfRow).toContainText("₺120,00");
+    expect(selfSnapshots).toEqual(earningSnapshots.at(-1));
+    expect(self.writes).toHaveLength(0);
+  } finally {
+    await instructor.close();
+  }
+});
+test("event draft publication and participant cancellation preserve separate reviewed native targets", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  state.event.state = "draft";
+  state.event.registrations!.push({
+    id: D.registration,
+    person_id: I.self,
+    display_name: "Örnek kişi",
+    state: "active",
+    attendance_result: "unmarked",
+    version: 1,
+  });
+  await page.reload();
+  await page.getByRole("button", { name: "Yayımla", exact: true }).click();
+  const publish = await accept(page, "Yayımla");
+  await expect(publish.getByText(saved, { exact: true })).toBeVisible();
+  await publish.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const row = page.getByRole("row", { name: /Örnek kişi/ });
+  await row.getByRole("button", { name: "Kaydı iptal et", exact: true }).click();
+  const cancel = page.getByRole("alertdialog");
+  await cancel
+    .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
+    .fill("Katılımcı talebi");
+  await accept(page, "Kaydı iptal et");
+  await expect(cancel.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes.map((entry) => entry.op)).toEqual([
+    "event_publish_v1",
+    "event_registration_cancel_v1",
+  ]);
+  expect(state.writes[1]!.request).toMatchObject({
+    registration_id: D.registration,
+    expected_version: 1,
+    reason: "Katılımcı talebi",
+  });
+  expect(state.event.registrations![0]!.state).toBe("cancelled");
+  await cancel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+});

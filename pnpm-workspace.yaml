@@ -13,3 +13,6 @@ allowBuilds:
   "@swc/core": false
   esbuild: true
   supabase: true
+
+overrides:
+  "@tanstack/form-core>@tanstack/devtools-event-client": 0.5.1

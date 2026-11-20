@@ -7,7 +7,7 @@ Dans ve fitness stüdyolarının organizasyon, merkez, ders, öğrenci, üyelik 
 | Konum | Sorumluluk | Başlangıç |
 |---|---|---|
 | `apps/backend` | Supabase, SQL/migration, Edge, backend test ve işletim araçları | [README](apps/backend/README.md) · [AGENTS](apps/backend/AGENTS.md) |
-| `apps/web` | Next.js uygulaması, ekranlar ve frontend testleri | [README](apps/web/README.md) · [AGENTS](apps/web/AGENTS.md) |
+| `apps/web` | Vite SPA, ekranlar ve frontend testleri | [README](apps/web/README.md) · [AGENTS](apps/web/AGENTS.md) |
 | `packages/api-contracts` | Ortak makine sözleşmesi, üretilmiş tipler ve istemci transport’u | [README](packages/api-contracts/README.md) |
 | `packages/ui` | Paylaşılan UI bileşenleri | [Frontend rehberi](apps/web/docs/development.md) |
 | `packages/typescript-config` | Ortak TypeScript ayarları | [Monorepo rehberi](docs/monorepo.md) |

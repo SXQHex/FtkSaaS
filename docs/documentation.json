@@ -111,7 +111,7 @@
       "topics": [
         "frontend-development"
       ],
-      "purpose": "Web geliştirme ve mevcut ekran davranışları"
+      "purpose": "Vite SPA geliştirme, ortak paketler ve yerel doğrulama"
     },
     {
       "path": "apps/web/docs/handover.md",
@@ -280,6 +280,46 @@
         "contract-package-entry"
       ],
       "purpose": "Ortak sözleşme paketi kullanımı"
+    },
+    {
+      "path": "apps/web/docs/request.md",
+      "role": "guide",
+      "purpose": "Taşınan W1-BE frontend entegrasyon kanıtı",
+      "topics": [
+        "frontend-integration-evidence"
+      ]
+    },
+    {
+      "path": "apps/web/design-reference/README.md",
+      "role": "guide",
+      "purpose": "Salt okunur frontend tasarım kaynakları",
+      "topics": [
+        "frontend-design-references"
+      ]
+    },
+    {
+      "path": "apps/web/design-reference/revisions/2026-11-18/GECIS.md",
+      "role": "guide",
+      "purpose": "18 Kasım çizim revizyonu ve izlenebilirlik kaydı",
+      "topics": [
+        "frontend-design-revision-2026-11-18-gecis"
+      ]
+    },
+    {
+      "path": "apps/web/design-reference/revisions/2026-11-18/ILERLEME.md",
+      "role": "guide",
+      "purpose": "18 Kasım çizim revizyonu ve izlenebilirlik kaydı",
+      "topics": [
+        "frontend-design-revision-2026-11-18-ilerleme"
+      ]
+    },
+    {
+      "path": "apps/web/design-reference/revisions/2026-11-18/README.md",
+      "role": "guide",
+      "purpose": "18 Kasım çizim revizyonu ve izlenebilirlik kaydı",
+      "topics": [
+        "frontend-design-revision-2026-11-18-readme"
+      ]
     }
   ]
 }
