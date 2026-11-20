@@ -1,3 +1,4 @@
+import { closeWorkspaceNavigation, openWorkspaceNavigation } from "./auth-fixture.js";
 import type { Page } from "@playwright/test";
 import { test, expect } from "./test.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
@@ -1047,7 +1048,9 @@ for (const role of ["center_manager", "staff"] as const) {
       await page.goto(`/o/${I.org}/c/${second}/${direct}`);
       await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
       await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+      await openWorkspaceNavigation(page);
       await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
+      await closeWorkspaceNavigation(page);
       await expect
         .poll(() =>
           f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),

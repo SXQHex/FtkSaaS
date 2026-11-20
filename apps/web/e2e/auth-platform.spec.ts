@@ -33,6 +33,7 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 }
 async function platformFixture(
   page: import("@playwright/test").Page,

@@ -10,7 +10,7 @@ import type {
   InstructorRevocationPreview,
   ContactView,
 } from "@ftksaas/api-contracts";
-import { mockNative, origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, mockNative, origin } from "./auth-fixture.js";
 
 export const studioIds = {
   account: "019a7b00-0000-7000-8000-000000000002",
@@ -721,10 +721,8 @@ export async function openStudio(page: Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Stüdyo", exact: true })
-    .click();
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  await clickWorkspaceLink(page, "Stüdyo");
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/studio`);
   await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Örnek Eğitmen/ })).toBeVisible();
@@ -732,15 +730,14 @@ export async function openStudio(page: Page) {
 
 // Warm and revisit the real assignment picker in the same document/query lifetime.
 export async function studioScheduleChoice(page: Page, instructorId: string, eligible: boolean) {
-  const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
-  await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+  await clickWorkspaceLink(page, "Ders programı");
   await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
   const panel = page.getByRole("dialog");
   await expect(
     panel.locator(`#schedule-create-instructor option[value="${instructorId}"]`),
   ).toHaveCount(eligible ? 1 : 0);
   await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+  await clickWorkspaceLink(page, "Stüdyo");
   await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
 }
 export async function mockStudioCalendar(page: Page) {

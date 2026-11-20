@@ -2,7 +2,7 @@ import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
 import { mockSessionDetail } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, origin } from "./auth-fixture.js";
 import type { Page } from "@playwright/test";
 import type {
   EventView,
@@ -293,20 +293,18 @@ test("event cancellation exposes server effects before its separately reviewed a
       },
     });
   });
-  const finance = page.getByRole("link", { name: "Finans", exact: true });
   const credits = page.getByRole("grid", { name: "Alacaklar", exact: true });
   const debts = page.getByRole("grid", { name: "Açık borçlar", exact: true });
   const debtTab = page.getByRole("tab", { name: /Açık borçlar/ });
   const movements = page.getByRole("grid", { name: "Hareketler", exact: true });
-  await finance.click();
+  await clickWorkspaceLink(page, "Finans");
   await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
   await debtTab.click();
   await expect(debts.getByRole("gridcell", { name: "TRY ₺400,00", exact: true })).toBeVisible();
   await page.getByRole("tab", { name: /Alacaklar/ }).click();
   await expect.poll(() => financeReads.at(-1)).toBe("credits:");
-  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
   const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
-  await schedule.click();
+  await clickWorkspaceLink(page, "Ders programı");
   await calendarEvent.press("Enter");
   await page.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
   const dialog = page.getByRole("alertdialog");
@@ -322,7 +320,7 @@ test("event cancellation exposes server effects before its separately reviewed a
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.event.state).toBe("cancelled");
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await finance.click();
+  await clickWorkspaceLink(page, "Finans");
   await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
   await expect
     .poll(() => financeReads.filter((read) => read.startsWith("movements:")).length)
@@ -344,7 +342,7 @@ test("event cancellation exposes server effects before its separately reviewed a
   const calendarRead = page.waitForResponse((response) =>
     response.url().endsWith("/calendar_get_v1"),
   );
-  await schedule.click();
+  await clickWorkspaceLink(page, "Ders programı");
   const calendar = await (await calendarRead).json();
   expect(calendar.data.items).toMatchObject([{ id: state.event.id, resources: [] }]);
   const eventRead = page.waitForResponse(
@@ -485,18 +483,16 @@ test("event paid registration separates reviewed debt preparation, targeted bank
     });
   });
   await mockCalendarEvent(page, state.event);
-  const finance = page.getByRole("link", { name: "Finans", exact: true });
-  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
   const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
   const ledger = page.getByRole("grid", { name: "Hareketler", exact: true });
   const firstLedgerRead = page.waitForResponse(
     "**/functions/v1/backend-v1/finance_directory_get_v1",
   );
-  await finance.click();
+  await clickWorkspaceLink(page, "Finans");
   await (await firstLedgerRead).finished();
   await expect(ledger).toBeVisible();
   expect(financeSnapshots).toEqual([[]]);
-  await schedule.click();
+  await clickWorkspaceLink(page, "Ders programı");
   await calendarEvent.press("Enter");
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   const sheet = await paidRegistration(page);
@@ -522,10 +518,10 @@ test("event paid registration separates reviewed debt preparation, targeted bank
   // The registration is already acknowledged; dismiss through the ready sheet's close control.
   await page.keyboard.press("Escape");
   await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
-  await finance.click();
+  await clickWorkspaceLink(page, "Finans");
   await expect(ledger.getByRole("gridcell", { name: "TRY ₺450,00", exact: true })).toBeVisible();
   expect(financeSnapshots).toEqual([[], [D.cash]]);
-  await schedule.click();
+  await clickWorkspaceLink(page, "Ders programı");
   await calendarEvent.press("Enter");
   await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
   expect(state.writes.map(({ op }) => op)).toEqual([
@@ -644,11 +640,9 @@ test("event closed attendance correction and performed duty each require a separ
       });
     },
   );
-  const earnings = page.getByRole("link", { name: "Hakediş", exact: true });
-  const schedule = page.getByRole("link", { name: "Ders programı", exact: true });
   const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
   const lines = page.getByRole("tab", { name: "Satırlar", exact: true });
-  await earnings.click();
+  await clickWorkspaceLink(page, "Hakediş");
   const initialEarnings = page.waitForResponse(
     (response) =>
       response.url().endsWith("/instructor_finance_directory_get_v1") &&
@@ -657,7 +651,7 @@ test("event closed attendance correction and performed duty each require a separ
   await lines.click();
   await (await initialEarnings).finished();
   expect(earningSnapshots).toEqual([[]]);
-  await schedule.click();
+  await clickWorkspaceLink(page, "Ders programı");
   await calendarEvent.press("Enter");
   await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
   await page.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
@@ -689,12 +683,12 @@ test("event closed attendance correction and performed duty each require a separ
     "event_duty_verify_v1",
   ]);
   await duty.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await earnings.click();
+  await clickWorkspaceLink(page, "Hakediş");
   await lines.click();
   const earningRow = page.getByRole("row").filter({ hasText: state.event.name });
   await expect(earningRow).toContainText("₺120,00");
   expect(earningSnapshots).toEqual([[], [`${earningId}:${assignment.id}`]]);
-  await schedule.click();
+  await clickWorkspaceLink(page, "Ders programı");
   await calendarEvent.press("Enter");
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   expect(state.writes.filter(({ op }) => op === "event_duty_verify_v1")).toHaveLength(1);

@@ -203,6 +203,7 @@ test("foreign receipt cannot read or recover another account's deletion", async 
   });
   await login(page);
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/account/deletion`);
   await expect(page.getByText(/Durumu görmek için isteği başlattığın hesapla/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Durumu yenile", exact: true })).toHaveCount(0);

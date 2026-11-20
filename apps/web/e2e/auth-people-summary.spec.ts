@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { openWorkspaceSearch, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { RequestPeopleList, SuccessPeopleList } from "@ftksaas/api-contracts";
 
@@ -9,7 +9,7 @@ test("command palette opens the existing invitation form without creating a pers
 }) => {
   const state = await mockStudio(page);
   await openStudio(page);
-  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  await openWorkspaceSearch(page);
   const input = page.getByPlaceholder("Sayfa adı ara…");
   await input.fill("Üye davet et");
   await expect(page.getByRole("menuitem", { name: "Üye davet et", exact: true })).toBeVisible();
@@ -61,7 +61,7 @@ test("command palette searches active members through the selected center and op
     });
   });
   await openStudio(page);
-  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  await openWorkspaceSearch(page);
   const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
   const input = palette.getByPlaceholder("Sayfa adı ara…");
   expect(requests).toHaveLength(0);

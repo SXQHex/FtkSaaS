@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import { mockNative, origin } from "./auth-fixture.js";
+import { mockNative, openWorkspaceNavigation, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 async function setup(page: Page) {
   await mockNative(page);
@@ -9,6 +9,7 @@ async function setup(page: Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
 }
@@ -137,9 +138,13 @@ for (const failure of ["denied", "missing"] as const)
   });
 test("help remains protected after native signout", async ({ page }) => {
   await setup(page);
+  await openWorkspaceNavigation(page);
   await page.getByRole("button", { name: /Fixture Account/ }).click();
   await page.getByRole("menuitem", { name: "Çıkış yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/login`);
+  await expect(
+    page.getByRole("heading", { name: "Hesabına giriş yap", exact: true }),
+  ).toBeVisible();
   await page.goto(`${origin}/help`);
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(

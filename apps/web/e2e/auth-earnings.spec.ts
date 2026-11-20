@@ -1,3 +1,4 @@
+import { checkLockedWorkspaceScope } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockEarnings, fillEarningsPayment, earningsIds } from "./earnings-fixture.js";
 import type { DigitalAgreementView } from "@ftksaas/api-contracts";
@@ -57,7 +58,9 @@ test("unknown payment freezes the draft and scope and same-key retry creates one
     dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
   ).toBeVisible();
   await expect(dialog.getByLabel("Tutar · TRY", { exact: true })).toBeDisabled();
-  await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+  await checkLockedWorkspaceScope(page, async () => {
+    await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+  });
   await page.keyboard.press("Escape");
   await expect(dialog).toBeVisible();
   await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();

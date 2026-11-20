@@ -1,11 +1,11 @@
 import { expect, type Page } from "@playwright/test";
-import { preparePublicCalendar, publicForm } from "./public-calendar-fixture.js";
+import { mockPublicCalendar, publicForm } from "./public-calendar-fixture.js";
 export async function prepareApplication(
   page: Page,
   state: "open" | "closed" | "unavailable" = "open",
   verifyProof?: (proof: string) => Promise<boolean>,
 ) {
-  const fixture = await preparePublicCalendar(page, "normal", Boolean(verifyProof));
+  const fixture = await mockPublicCalendar(page, "normal", Boolean(verifyProof));
   fixture.packet.next_cursor = null;
   fixture.packet.application =
     state === "open" ? { state, form: structuredClone(publicForm) } : { state, form: null };

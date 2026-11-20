@@ -139,6 +139,7 @@ test("overview add action opens the existing real single-session editor", async 
   await expect(page.locator("#schedule-create-class")).toBeVisible();
   expect(state.writes).toHaveLength(0);
   await page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Tek seans ekle", exact: true })).toBeHidden();
 });
 test("overview program and participant actions retain real scoped targets", async ({ page }) => {
   const state = await setup(page);

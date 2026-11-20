@@ -182,6 +182,7 @@ async function setup(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(origin + "/account");
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
   await page.getByRole("button", { name: common.memberProfile.cancelFreeze, exact: true }).click();
   const panel = page.getByRole("dialog", {

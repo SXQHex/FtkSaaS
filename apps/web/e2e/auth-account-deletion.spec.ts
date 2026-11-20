@@ -99,7 +99,7 @@ for (const colorScheme of ["light", "dark"] as const)
         expect(await effectsRegion.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
         await page.keyboard.press("PageDown");
         await expect.poll(() => effectsRegion.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
-        await page.keyboard.press("Home");
+        await page.keyboard.press("PageUp");
         await expect.poll(() => effectsRegion.evaluate((el) => el.scrollTop)).toBe(0);
       }
       await page.keyboard.press("Tab");

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import axe, { type Result } from "axe-core";
+import axe, { type AxeResults, type Result } from "axe-core";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const conformanceTags = [
@@ -103,7 +103,19 @@ async function checkEmptyGrids(page: Page, incomplete: readonly Result[]) {
   return checks;
 }
 
-export async function scanAccessibility(page: Page, state = "rendered-state") {
+interface AccessibilityScope {
+  selector: string;
+  documentScan: AxeResults;
+}
+
+export async function scanAccessibility(
+  page: Page,
+  state = "rendered-state",
+  scope?: AccessibilityScope,
+) {
+  await expect(
+    page.locator('[data-slot^="sheet-"]:is([data-entering], [data-exiting])'),
+  ).toHaveCount(0);
   // Read affected styles before checking animations so WebKit registers pending transitions.
   await expect
     .poll(() =>
@@ -120,7 +132,9 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
     )
     .toBe(0);
   // Preserve all default rules and explicitly enable every available WCAG 2.2 A/AA rule.
-  const results = await new AxeBuilder({ page })
+  const axeBuilder = new AxeBuilder({ page });
+  if (scope) axeBuilder.include(scope.selector);
+  const results = await axeBuilder
     .options({
       rules: Object.fromEntries(conformanceRules.map((id) => [id, { enabled: true }])),
     })
@@ -130,8 +144,17 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
       (rule) => rule.id,
     ),
   );
+  const documentRules = new Set<string>();
+  if (scope) {
+    // Axe requires the complete document to evaluate bypass mechanisms.
+    const { passes, incomplete, inapplicable, violations } = scope.documentScan;
+    expect(violations).toEqual([]);
+    if ([...passes, ...incomplete, ...inapplicable].some(({ id }) => id === "bypass")) {
+      documentRules.add("bypass");
+    }
+  }
   expect(
-    conformanceRules.filter((id) => !evaluated.has(id)),
+    conformanceRules.filter((id) => !evaluated.has(id) && !documentRules.has(id)),
     "Every supported WCAG A/AA rule must run",
   ).toEqual([]);
   const emptyGridChecks = await checkEmptyGrids(page, results.incomplete);
@@ -161,6 +184,7 @@ export async function scanAccessibility(page: Page, state = "rendered-state") {
         state,
         axeVersion: results.testEngine.version,
         evaluatedConformanceRules: conformanceRules,
+        ...(scope && { selector: scope.selector, documentRules: [...documentRules] }),
         violations: results.violations.map((rule) => rule.id),
         emptyGridChecks,
         gridTargetChecks,

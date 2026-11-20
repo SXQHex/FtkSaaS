@@ -392,6 +392,7 @@ async function fixture(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   if (member) {
     await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
     const bell = page.getByRole("link", { name: "Bildirimler", exact: true });
@@ -611,7 +612,13 @@ test("inbox unknown write recovers its exact receipt and never marks twice", asy
   await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
   await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
   await expect(page.getByText(/Sonuç bilinmiyor/)).toBeVisible();
-  await expect(page.getByRole("radio", { name: "Tümü", exact: true })).toBeDisabled();
+  const all = page.getByRole("radio", { name: "Tümü", exact: true, includeHidden: true });
+  await expect(all).toBeDisabled();
+  if (await all.isVisible()) {
+    await expect(page.getByRole("radio", { name: "Tümü", exact: true })).toBeDisabled();
+  } else {
+    await expect(all).toBeHidden();
+  }
   await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),

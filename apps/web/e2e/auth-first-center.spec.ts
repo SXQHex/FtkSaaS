@@ -1,5 +1,11 @@
 import { test, expect } from "./test.js";
-import { mockNative, origin } from "./auth-fixture.js";
+import {
+  checkLockedWorkspaceScope,
+  closeWorkspaceNavigation,
+  openWorkspaceNavigation,
+  mockNative,
+  origin,
+} from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import { assertLayoutFit, readLayoutFit } from "./layout.js";
@@ -193,7 +199,9 @@ test("first center validates the ready form, records its explicit zone and resto
     `/o/${I.org}/c/${I.center}/settings`,
   );
   await page.reload();
+  await openWorkspaceNavigation(page);
   await expect(page.locator("[data-workspace-logo]").locator("..")).toContainText(f.center.name);
+  await closeWorkspaceNavigation(page);
   await expect(page.getByRole("button", { name: text.action, exact: true })).toHaveCount(0);
   expect(
     f.reads.filter((op) => ["organization_create_v1", "center_manager_assign_v1"].includes(op)),
@@ -251,7 +259,9 @@ test("unknown first-center outcome freezes scope and reuses one immutable comman
     panel = await fill(page);
   await panel.getByRole("button", { name: text.action, exact: true }).click();
   await expect(panel.getByRole("status")).toContainText(text.states.unknown);
-  await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+  await checkLockedWorkspaceScope(page, async () => {
+    await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+  });
   await expect(panel.getByRole("button", { name: text.back, exact: true })).toHaveCount(0);
   await expect(panel.getByRole("button", { name: text.later, exact: true })).toBeDisabled();
   await expect(panel.getByRole("textbox", { name: text.name, exact: true })).toHaveCount(0);

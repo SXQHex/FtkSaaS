@@ -1,5 +1,11 @@
 import { test, expect } from "./test.js";
-import { mockNative, origin } from "./auth-fixture.js";
+import {
+  closeWorkspaceNavigation,
+  openWorkspaceNavigation,
+  openWorkspaceSearch,
+  mockNative,
+  origin,
+} from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
@@ -25,21 +31,20 @@ test("command palette reaches appearance, switches the saved theme and signs out
   const { native } = await mockStudio(page);
   await page.emulateMedia({ colorScheme: "light" });
   await openStudio(page);
-  const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
   const input = page.getByPlaceholder("Sayfa adı ara…");
-  await search.click();
+  await openWorkspaceSearch(page);
   await input.fill("Temayı değiştir");
   await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account?org=${org}&center=${center}#account-appearance`);
   const appearance = page.locator("#account-appearance");
   await expect(appearance.getByRole("radiogroup", { name: "Tema", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Temayı değiştir", exact: true })).toBeEnabled();
-  await search.click();
+  await openWorkspaceSearch(page);
   await input.fill("Temayı değiştir");
   await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   expect(native.settingsPatches).toEqual([{ theme: "dark" }]);
-  await search.click();
+  await openWorkspaceSearch(page);
   await input.fill("Çıkış yap");
   await page.getByRole("menuitem", { name: "Çıkış yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/login`);
@@ -243,6 +248,7 @@ test("Starter self management opens the native owner navigation and removes it a
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await openWorkspaceNavigation(page);
   const studio = page.locator("nav a[href$='/studio']");
   await expect(studio).toBeVisible();
   await expect(page.getByRole("button", { name: /Stüdyo sahibi/ })).toBeVisible();
@@ -252,7 +258,8 @@ test("Starter self management opens the native owner navigation and removes it a
   for (const path of ["leads", "finance", "reports"]) {
     await expect(page.locator(`nav a[href$='/${path}']`)).toBeVisible();
   }
-  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  await closeWorkspaceNavigation(page);
+  await openWorkspaceSearch(page);
   const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
   await palette.getByPlaceholder("Sayfa adı ara…").fill("Otomasyon");
   await expect(palette.getByRole("menuitem", { name: "Otomasyon", exact: true })).toHaveCount(0);
@@ -260,11 +267,16 @@ test("Starter self management opens the native owner navigation and removes it a
   scope = null;
   await page.reload();
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  await openWorkspaceNavigation(page);
   await expect(studio).toHaveCount(0);
-  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  await closeWorkspaceNavigation(page);
+  await openWorkspaceSearch(page);
   await palette.getByPlaceholder("Sayfa adı ara…").fill("Politikalar");
   await expect(palette.getByText("Eşleşen sayfa yok.", { exact: true })).toBeVisible();
   await expect(palette.getByRole("menuitem", { name: "Politikalar", exact: true })).toHaveCount(0);
+  await palette.getByPlaceholder("Sayfa adı ara…").clear();
+  await page.keyboard.press("Escape");
+  await expect(palette).toBeHidden();
 });
 
 test("workspace entry offers authorized studios and keeps the selected center on the next screen", async ({
@@ -424,6 +436,7 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
   await page.goto("/account");
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto("/reports");
   await expect(
     page.getByText("Devam etmek için organizasyon ve merkez seç.", { exact: true }),

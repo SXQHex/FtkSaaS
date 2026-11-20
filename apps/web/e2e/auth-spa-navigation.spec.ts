@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
-import { mockNative, origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, mockNative, origin } from "./auth-fixture.js";
 
 test("sidebar navigation preserves the document and cached studio reads", async ({
   page,
@@ -27,10 +27,9 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   expect(before.organizations_list_v1).toBe(1);
   expect(before.roles_list_v1).toBe(1);
   const initialDocuments = documents;
-  const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
-  await menu.getByRole("link", { name: "Üyeler", exact: true }).click();
+  await clickWorkspaceLink(page, "Üyeler");
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
-  await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+  await clickWorkspaceLink(page, "Stüdyo");
   await expect(page.getByRole("button", { name: /Örnek Eğitmen/ })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();

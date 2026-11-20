@@ -1,3 +1,4 @@
+import { checkLockedWorkspaceScope } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockMemberLifecycle } from "./member-lifecycle-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -160,7 +161,9 @@ for (const recovery of ["retry", "receipt"] as const)
       dialog = await review(page, f.panel, true);
     await apply(dialog);
     await expect(dialog.getByRole("status")).toContainText(text.states.unknown);
-    await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+    await checkLockedWorkspaceScope(page, async () => {
+      await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+    });
     await page.keyboard.press("Escape");
     await expect(dialog).toBeVisible();
     await dialog

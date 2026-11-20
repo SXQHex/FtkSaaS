@@ -2,7 +2,7 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { SessionView } from "@ftksaas/api-contracts";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { closeWorkspaceNavigation, openWorkspaceNavigation, origin } from "./auth-fixture.js";
 const uid = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 async function fixture(
   page: Page,
@@ -185,6 +185,7 @@ async function fixture(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
   await expect(page.getByRole("heading", { name: "Bugün", exact: true })).toBeVisible();
   return {
@@ -269,11 +270,13 @@ test("instructor day reads all scoped week pages and exact monthly currencies wi
   await expect(page.getByText("Sentetik atanmış 3", { exact: true })).toBeVisible();
   await expect(page.getByText(/90\.071\.992\.547\.409,90.*1,00/)).toBeVisible();
   await page.setViewportSize(viewport);
+  await openWorkspaceNavigation(page);
   await expect(
     page
       .getByRole("navigation", { name: "Ana menü", exact: true })
       .getByRole("link", { name: "Bugün", exact: true }),
   ).toBeVisible();
+  await closeWorkspaceNavigation(page);
   expect(reads.filter((row) => row.operation === "calendar_get_v1")).toHaveLength(2);
   expect(reads.filter((row) => row.operation === "earnings_list_v1")).toHaveLength(2);
   expect(

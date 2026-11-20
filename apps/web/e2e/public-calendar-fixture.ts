@@ -43,7 +43,7 @@ const item: PublicCalendarItem = {
   occupancy: null,
   instructors: null,
 };
-export async function preparePublicCalendar(
+export async function mockPublicCalendar(
   page: Page,
   mode: "normal" | "error" | "empty" | "malformed" | "timezone" = "normal",
   useProviderClock = false,
@@ -135,7 +135,6 @@ export async function preparePublicCalendar(
         : packet;
     return route.fulfill({ json: { ok: true, trace_id: publicCalendarId, data } });
   });
-  await page.goto(`/public/test-studio/calendar?center_id=${publicCalendarId}`);
   return {
     calls,
     packet,
@@ -152,4 +151,14 @@ export async function preparePublicCalendar(
       fail = value;
     },
   };
+}
+
+export async function preparePublicCalendar(
+  page: Page,
+  mode: "normal" | "error" | "empty" | "malformed" | "timezone" = "normal",
+  useProviderClock = false,
+) {
+  const fixture = await mockPublicCalendar(page, mode, useProviderClock);
+  await page.goto(`/public/test-studio/calendar?center_id=${publicCalendarId}`);
+  return fixture;
 }

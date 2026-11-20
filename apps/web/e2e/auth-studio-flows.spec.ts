@@ -1,3 +1,4 @@
+import { clickWorkspaceLink } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { reviewStudioAccessibility } from "./studio-accessibility-review.js";
@@ -181,8 +182,7 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
     });
   });
   async function programReview(blocked: boolean) {
-    const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
-    await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+    await clickWorkspaceLink(page, "Ders programı");
     await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
     const panel = page.getByRole("dialog");
     await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
@@ -208,7 +208,7 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
       await expect(panel.getByRole("alert")).toHaveCount(0);
     }
     await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
-    await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+    await clickWorkspaceLink(page, "Stüdyo");
   }
   await openStudio(page);
   const documentTime = await page.evaluate(() => performance.timeOrigin);

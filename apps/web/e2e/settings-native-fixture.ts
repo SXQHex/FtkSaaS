@@ -17,6 +17,7 @@ export async function mockSettingsCompletion(
     billingOwner?: boolean;
     businessDowngrade?: boolean;
     bootstrapBilling?: "owner" | "member";
+    startUrl?: string;
   } = {},
 ) {
   const writes: { op: string; r: NativeRequest }[] = [];
@@ -617,6 +618,6 @@ export async function mockSettingsCompletion(
   f.studio.people[0]!.display_name = "Sentetik personel";
   f.studio.people.push({ ...f.studio.people[0]!, id: I.self, display_name: "Sentetik hesap" });
   f.studio.people.push({ ...f.studio.people[0]!, id: uid(130), display_name: "Sentetik yönetici" });
-  await page.goto(completionUrl("settings"));
+  await page.goto(options.startUrl ?? completionUrl("settings"));
   return { ...f, writes, state };
 }

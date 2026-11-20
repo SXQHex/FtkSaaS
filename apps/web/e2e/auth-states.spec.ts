@@ -8,6 +8,7 @@ async function signIn(page: Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 }
 for (const [code, title] of [
   ["FORBIDDEN", "Bu sayfaya erişimin yok"],

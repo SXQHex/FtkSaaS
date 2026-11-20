@@ -12,7 +12,7 @@ test("public event application keeps the exact publication address and recovers 
     ...f.packet.items,
     { ...f.packet.items[0]!, publication_id: event, kind: "event", title: "Örnek atölye" },
   ];
-  await page.reload();
+  await page.goto(`/public/test-studio/calendar?center_id=${publicCalendarId}`);
   await page.getByRole("link", { name: "Örnek atölye için başvur", exact: true }).click();
   const application = page.getByRole("form", { name: "Örnek atölye" });
   const email = application.getByLabel("E-posta (zorunlu)");
