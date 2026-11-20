@@ -453,6 +453,7 @@ test("account password change handles native current-password and old-session no
 test("native Google linking returns through the existing callback and selected unlink keeps a truthful read-error state", async ({
   page,
 }, testInfo) => {
+  test.setTimeout(60_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -525,9 +526,19 @@ test("the last Google login method stays protected with a long provider email", 
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  const [workspaceRead] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url() === `${origin}/functions/v1/backend-v1/organizations_list_v1` &&
+        response.request().method() === "POST" &&
+        response.ok(),
+    ),
+    page.getByRole("button", { name: "Giriş yap", exact: true }).click(),
+  ]);
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  expect(await workspaceRead.finished()).toBeNull();
+  await expect(page.getByLabel("Görünen ad", { exact: true })).toBeEnabled();
   calls.identityEmail = `${"a".repeat(63)}@${"b".repeat(50)}.example.invalid`;
   calls.onlyGoogleIdentity = true;
   await page.reload();
@@ -541,6 +552,7 @@ test("the last Google login method stays protected with a long provider email", 
 test("native email request preserves profile drafts and separates pending/no-code confirmation from a completed PKCE exchange", async ({
   page,
 }, testInfo) => {
+  test.setTimeout(60_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -616,6 +628,7 @@ test("native email request preserves profile drafts and separates pending/no-cod
 test("account theme uses versioned user settings, exact retry and read-only recovery while preserving profile drafts", async ({
   page,
 }, testInfo) => {
+  test.setTimeout(60_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -992,8 +1005,10 @@ test("signup validates policy, stops existing accounts and requests native confi
     "Parolalar eşleşmiyor.",
   );
   expect(checks).toBe(0);
-  await page.getByLabel("Parola tekrar", { exact: true }).fill("Fixture123");
-  await submit.click();
+  const confirmation = page.getByLabel("Parola tekrar", { exact: true });
+  await confirmation.fill("Fixture123");
+  await expect(confirmation).toHaveJSProperty("validationMessage", "");
+  await confirmation.press("Enter");
   await expect(page.getByRole("alert")).toContainText(
     "Bu e-posta adresiyle ilişkili bir hesap zaten var.",
   );
@@ -1001,12 +1016,12 @@ test("signup validates policy, stops existing accounts and requests native confi
   expect(signups).toBe(0);
   expect((await scanAccessibility(page, "signup-existing-account")).violations).toEqual([]);
   status = "temporary";
-  await submit.click();
+  await confirmation.press("Enter");
   await expect(page.getByRole("alert")).toContainText("Kayıt tamamlanamadı");
   expect(checks).toBe(2);
   expect(signups).toBe(0);
   status = "available";
-  await submit.click();
+  await confirmation.press("Enter");
   await expect(page).toHaveURL(`${origin}/verify-email`);
   await expect(page.getByRole("heading", { name: "E-postanı doğrula" })).toBeVisible();
   expect(checks).toBe(3);

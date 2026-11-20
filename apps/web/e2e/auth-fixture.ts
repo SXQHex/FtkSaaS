@@ -67,17 +67,10 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo, 
       await page.setViewportSize(viewport);
       await page.emulateMedia({ colorScheme });
       await focus?.scrollIntoViewIfNeeded();
-      // Scan the stable requested theme, after the registry controls finish their CSS transitions.
-      await expect
-        .poll(() =>
-          page.evaluate(
-            "document.getAnimations().filter(animation => animation.playState === 'running' || animation.pending).length",
-          ),
-        )
-        .toBe(0);
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
       expect((await scanAccessibility(page, name)).violations).toEqual([]);
       const body = await page.screenshot({
+        scale: "css",
         path: `.tmp/${name}-app-${viewport.width}-${colorScheme}.png`,
       });
       await testInfo.attach(`${name}-${viewport.width}-${colorScheme}`, {

@@ -158,11 +158,16 @@ for (const colorScheme of ["light", "dark"] as const)
     await expect(dialog).toHaveCount(0);
     await expect(toggle).toBeFocused();
     await toggle.click();
-    await dialog.getByRole("button", { name: /Fixture Studio Fixture Center/ }).click();
-    await expect(page.getByRole("menu", { name: /Fixture Studio Fixture Center/ })).toBeVisible();
+    const studioPicker = dialog.getByRole("button", { name: /Fixture Studio Fixture Center/ });
+    const studioMenu = page.getByRole("menu", { name: /Fixture Studio Fixture Center/ });
+    await studioPicker.click();
+    await expect(studioMenu).toBeVisible();
     await page.keyboard.press("Escape");
-    await expect(page.getByRole("menu", { name: /Fixture Studio Fixture Center/ })).toHaveCount(0);
+    await expect(studioMenu).toHaveCount(0);
+    await expect(page.locator('[data-slot="dropdown-menu-content"]')).toHaveCount(0);
+    await expect(studioPicker).toBeFocused();
     await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
     await expect(toggle).toBeFocused();
     await page.setViewportSize({ width: 640, height: 1000 });
     await page.addStyleTag({

@@ -471,7 +471,9 @@ export function MemberProfileView({
                           </TableCell>
                           <TableCell>{row.attendance}</TableCell>
                           <TableCell>{row.credit}</TableCell>
-                          <TableCell>
+                          <TableCell
+                            className={row.onCancel ? "pl-[max(26px,1.75rem)]" : undefined}
+                          >
                             {row.onCancel && (
                               <Button
                                 size="sm"

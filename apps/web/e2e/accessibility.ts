@@ -104,12 +104,19 @@ async function checkEmptyGrids(page: Page, incomplete: readonly Result[]) {
 }
 
 export async function scanAccessibility(page: Page, state = "rendered-state") {
-  // Scan settled colors and geometry, including newly opened modal transitions.
+  // Read affected styles before checking animations so WebKit registers pending transitions.
   await expect
     .poll(() =>
-      page.evaluate(
-        "document.getAnimations().filter(animation => animation.playState === 'running' || animation.pending).length",
-      ),
+      page.evaluate(`new Promise(resolve => requestAnimationFrame(() => {
+        for (const element of document.querySelectorAll("button, p, [data-slot$='-overlay'], [data-slot$='-content']")) {
+          const style = getComputedStyle(element);
+          void style.color;
+          void style.opacity;
+        }
+        requestAnimationFrame(() => resolve(document.getAnimations().filter(
+          animation => animation.playState === "running" || animation.pending
+        ).length));
+      }))`),
     )
     .toBe(0);
   // Preserve all default rules and explicitly enable every available WCAG 2.2 A/AA rule.

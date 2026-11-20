@@ -119,11 +119,21 @@ test("production artifact reads the center calendar in its own timezone after a 
   await page.setViewportSize({ width: 320, height: 950 });
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.name));
-  const state = await mockSessionDetail(page, {
-    existing: true,
-    allowEditor: true,
-    origins: { app: artifact.origin, auth: authOrigin },
-  });
+  const [workspaceRead, state] = await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url() === `${authOrigin}/functions/v1/backend-v1/roles_list_v1` &&
+        response.request().method() === "POST" &&
+        response.ok(),
+    ),
+    mockSessionDetail(page, {
+      existing: true,
+      openDetail: false,
+      allowEditor: true,
+      origins: { app: artifact.origin, auth: authOrigin },
+    }),
+  ]);
+  expect(await workspaceRead.finished()).toBeNull();
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
   state.session.starts_at = "2026-11-16T13:00:00Z";
   state.session.ends_at = "2026-11-16T14:00:00Z";

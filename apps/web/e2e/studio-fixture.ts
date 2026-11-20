@@ -172,6 +172,27 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
   const fail = (route: Route, code: string, retryable = false) =>
     route.fulfill({ json: { ok: false, error: { code, retryable, trace_id: uid(99) } } });
   const list = <T>(items: T[]) => ({ items, next_cursor: null, as_of: now });
+  const centers = (includeSetupStatus = false) =>
+    list([
+      {
+        id: I.center,
+        name: "Fixture Center",
+        timezone: "Europe/Istanbul",
+        state: "active",
+        accessible: true,
+        version: state.centerVersion,
+        ...(includeSetupStatus ? { setup_status: state.setupStatus } : {}),
+      },
+    ]);
+  if (origins && origins.app !== origins.auth) {
+    await page.route(`${origins.auth}/rest/v1/rpc/centers_list_v1`, (route) => {
+      const request = route.request();
+      expect(request.method()).toBe("POST");
+      expect(request.headers()["content-profile"]).toBe("api_read");
+      expect(request.postDataJSON()).toMatchObject({ p_request: { org_id: I.org } });
+      return send(route, centers());
+    });
+  }
   const item = (
     entityType: NonNullable<ManagementStateView["entity"]>["type"],
     id: string,
@@ -247,21 +268,7 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
           },
         ]),
       );
-    if (op === "centers_list_v1")
-      return send(
-        route,
-        list([
-          {
-            id: I.center,
-            name: "Fixture Center",
-            timezone: "Europe/Istanbul",
-            state: "active",
-            accessible: true,
-            version: state.centerVersion,
-            ...(r.include_setup_status ? { setup_status: state.setupStatus } : {}),
-          },
-        ]),
-      );
+    if (op === "centers_list_v1") return send(route, centers(Boolean(r.include_setup_status)));
     if (op === "role_revoke_preview_v1") {
       const role = state.roles.find((role) => role.id === r.assignment_id && role.active);
       if (!role || role.version !== r.expected_version) return fail(route, "VERSION_CONFLICT");

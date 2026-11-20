@@ -18,6 +18,7 @@ export async function mockSessionDetail(
   page: Page,
   options: {
     existing?: boolean;
+    openDetail?: boolean;
     unknown?: boolean;
     ackUnread?: boolean;
     full?: boolean;
@@ -474,12 +475,14 @@ export async function mockSessionDetail(
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${appOrigin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
-  await page.goto(
-    options.instructor
-      ? `${appOrigin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`
-      : `${appOrigin}/o/${I.org}/c/${I.center}/sessions/${S.session}`,
-  );
-  await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
+  if (options.openDetail !== false) {
+    await page.goto(
+      options.instructor
+        ? `${appOrigin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`
+        : `${appOrigin}/o/${I.org}/c/${I.center}/sessions/${S.session}`,
+    );
+    await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
+  }
   return {
     studio,
     session,

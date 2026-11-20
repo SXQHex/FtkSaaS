@@ -76,6 +76,7 @@ test("command palette searches active members through the selected center and op
   await input.press("ArrowDown");
   await input.press("Enter");
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
+  await expect(page.locator('[data-slot="dialog-overlay"]')).toHaveCount(0);
   expect(state.writes).toEqual([]);
 });
 

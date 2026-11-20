@@ -66,11 +66,15 @@ export default defineConfig({
       reuseExistingServer: false,
       env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
     },
-    {
-      command: "pnpm dev --host 127.0.0.1 --port 4174 --strictPort --mode development",
-      url: "http://127.0.0.1:4174",
-      reuseExistingServer: false,
-      env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
-    },
+    ...(fullSuite
+      ? [
+          {
+            command: "pnpm dev --host 127.0.0.1 --port 4174 --strictPort --mode development",
+            url: "http://127.0.0.1:4174",
+            reuseExistingServer: false,
+            env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
+          },
+        ]
+      : []),
   ],
 });
