@@ -44,6 +44,10 @@ pnpm stop:backend
 
 Backend komutları pnpm filtrelemesiyle apps/backend çalışma dizininde yürür. Backend içinden `pnpm verify`, yalnız kendi yapısal doğrulamasını çalıştırır; kökten `pnpm verify`, Turbo üzerinden backend doğrulaması ve ortak paket typecheck bağımlılığını birlikte çalıştırır. API suite kimlikleri repo-root yollarıdır; Node test süreçleri fixture/config için backend CWD’sini korur. Git diff/tree analizi daima repo kökü üzerinden yapılır; root ve backend CWD eşliği regresyonla doğrulanır.
 
+Oxlint ve Oxfmt ayarlarının sahibi kökteki [.oxlintrc.json](../.oxlintrc.json) ve [.oxfmtrc.json](../.oxfmtrc.json) dosyalarıdır. Ortak UI'ın ek Oxlint eklentileri kökteki [UI profilinde](../.oxlintrc.ui.json) tanımlıdır. Sürüm pinleri workspace catalog sahibindedir.
+
+`pnpm lint` ve `pnpm format:check` mevcut web ve ortak UI kontrollerini çalıştırır. Backend dosyalarını aynı kurallarla tek tek kontrol etmek için repo kökünden `pnpm exec apps/web/node_modules/.bin/oxlint apps/backend/<dosya>` ve `pnpm exec apps/web/node_modules/.bin/oxfmt --check apps/backend/<dosya>` çalıştırın. Üretilmiş kaynaklar, arşiv ve migration dosyaları biçimlendirme kapsamının dışındadır.
+
 Tam izole kabul `pnpm test:clean` ile mevcut backend runner’ına gider; GitHub Actions dört API shard ve source-bound collector sahibidir. İstemci ve gerçek DB/API kabulü cache’den üretilmez. Turbo verify/typecheck/test/test:clean görevlerinde cache kapalıdır. Geniş passThroughEnv yıldızı ve backend’i root task gibi gösteren //# görevi yoktur. Frontend build görevleri apps/web/turbo.json içindedir; çıktı/ortam girdisi backend görevine taşınmaz.
 
 ## Ortam ve veri sınırı

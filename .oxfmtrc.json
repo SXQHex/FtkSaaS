@@ -1,0 +1,53 @@
+{
+  "$schema": "./apps/web/node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "sortImports": false,
+  "sortPackageJson": false,
+  "sortTailwindcss": false,
+  "ignorePatterns": [
+    "**/.env*",
+    "**/*.tsbuildinfo",
+    "**/coverage/**",
+    "**/dist/**",
+    ".artifacts/**",
+    "pnpm-lock.yaml",
+    "docs/history/**",
+    "docs/database.md",
+    "docs/documentation-map.md",
+    "docs/feature-delivery.md",
+    "docs/functions.md",
+    "docs/security.md",
+    "docs/contracts/04-FtkSaaS-O4-veri-semasi.md",
+    "docs/contracts/05-FtkSaaS-O4-API-katalogu.md",
+    "apps/backend/database/migrations.sha256.json",
+    "apps/backend/supabase/migrations/**",
+    "apps/backend/supabase/functions/backend-v1/index.ts",
+    "apps/backend/supabase/functions/backend-v1/validators.js",
+    "apps/web/src/routeTree.gen.ts",
+    "apps/web/src/i18n/generated/**",
+    "apps/web/src/lib/api-contracts/**",
+    "apps/web/design-reference/**",
+    "apps/web/AGENTS.md",
+    "apps/web/package-lock.json",
+    "apps/web/.npm-cache/**",
+    "apps/web/.tmp/**",
+    "apps/web/.playwright-browsers/**",
+    "apps/web/.tanstack/**",
+    "apps/web/playwright-report/**",
+    "apps/web/test-results/**",
+    "apps/web/test-reports/**",
+    "packages/api-contracts/src/**",
+    "packages/api-contracts/schema/contract.json",
+    "packages/ui/.next/**",
+    "packages/ui/next-env.d.ts",
+    "packages/ui/**/*.md"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/web/package.json"],
+      "options": { "sortPackageJson": true }
+    }
+  ]
+}

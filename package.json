@@ -18,6 +18,8 @@
     "test:frontend:e2e": "turbo run test:e2e --filter=@ftksaas/web",
     "test:frontend:coverage": "turbo run test:coverage --filter=@ftksaas/web --filter=@ftksaas/ui",
     "test:backend": "turbo run test --filter=@ftksaas/backend",
+    "lint": "turbo run lint --filter=@ftksaas/web --filter=@ftksaas/ui",
+    "format:check": "turbo run format:check --filter=@ftksaas/web --filter=@ftksaas/ui",
     "check:frontend": "turbo run lint typecheck test build --filter=@ftksaas/web --filter=@ftksaas/ui",
     "dev:web": "turbo run dev --filter=@ftksaas/web",
     "build:web": "turbo run build --filter=@ftksaas/web",

@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "202da8b0faffa2c518551cb58a3e73f98a837ba56a4c3bf86124246362cbbae0",
-        "reason": "Belge taşıma kaydı ve exact source sınıflandırması birlikte incelendi. Sicile alınmış emekli belge yolları iki uçta denetlenir ve diğer deneysel dosyalar kendi kapsamındaki kabulü alır."
+        "fingerprint": "40816415c5fe1c3eeff589e065b0dc143159f03932bf4e5df40a3e9ec8232907",
+        "reason": "Ortak Oxlint ve Oxfmt yapılandırması kökte toplandı. Kök dosyalar frontend kapsamını seçer ve kaynak politikası bunları korur."
       }
     },
     {
