@@ -3,6 +3,10 @@ import { test, expect } from "./test.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { at, metadata, nativeMutation, nativePage, uid } from "./pro-completion-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
+import type {
+  SettlementProposal,
+  SettlementRequestView,
+} from "../src/lib/api-contracts/generated.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 const text = common.businessCenters;
@@ -12,9 +16,9 @@ const application = uid(262);
 const movement = uid(263);
 const settlement = uid(264);
 const centerUrl = (center = I.center) => `/o/${I.org}/c/${center}/centers`;
-type Role = "owner" | "org_manager" | "center_manager";
+type Role = "owner" | "org_manager" | "center_manager" | "staff";
 type Calls = { op: string; request: Record<string, unknown> }[];
-async function businessFixture(page: Page, role: Role, plan = "business") {
+async function businessFixture(page: Page, role: Role, plan = "business", activeCenters = 2) {
   await mockSettingsCompletion(page, { billingOwner: role === "owner" });
   const calls: Calls = [];
   const centers = [
@@ -35,10 +39,18 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
       version: 1,
     },
   ];
+  for (let index = centers.length; index < activeCenters; index++) {
+    centers.push({ ...centers[0]!, id: uid(280 + index), name: `Sentetik Merkez ${index + 1}` });
+  }
+  const centerLimit = 5;
   let targetCenter = null as string | null;
   let applicationVersion = 1;
-  let state = "";
-  let proposal: unknown;
+  let state: SettlementRequestView["state"] | undefined;
+  let proposal: SettlementProposal | undefined;
+  let settlementReason = "";
+  let approveBeforeRead = false;
+  let loseDecisionResponse = false;
+  let approvalKey: unknown;
   let granted = true;
   let discrepancy = false;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
@@ -47,10 +59,85 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
     calls.push({ op, request });
     const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
     if (op === "centers_list_v1") return send(nativePage(centers));
+    if (!centers[1]!.accessible && request.center_id === I.center) {
+      if (op === "finance_directory_get_v1") return send({ ...nativePage([]), view: request.view });
+      if (
+        op === "leads_list_v1" ||
+        op === "management_work_list_v1" ||
+        (op === "management_state_get_v1" && request.operation === "lead_save_v1")
+      )
+        return send(nativePage([]));
+    }
+    if (op === "disciplines_list_v1" && request.center_id === second)
+      return send(
+        nativePage([
+          {
+            id: uid(290),
+            name: "Sentetik Salsa",
+            state: "active",
+            version: 1,
+            presentation: {
+              organization: {
+                description: null,
+                color: null,
+                icon: null,
+                display_order: 0,
+                public_visible: false,
+                allow_center_description: true,
+              },
+              center: {
+                id: uid(291),
+                state: "active",
+                version: 1,
+                presentation: { description: null, public_visible: false },
+              },
+            },
+          },
+        ]),
+      );
+    if (op === "management_state_get_v1" && request.center_id === second) {
+      if (request.operation === "class_save_v1") return send(nativePage([]));
+      if (request.operation === "room_save_v1") {
+        const room = uid(292);
+        return send(
+          nativePage([
+            metadata("room_save_v1", "rooms", room, {
+              room_id: room,
+              name: "Sentetik B salonu",
+              capacity: 24,
+            }),
+          ]),
+        );
+      }
+    }
+    if (op === "roles_list_v1" && role === "owner" && request.person_id === I.self)
+      return send(
+        nativePage([
+          {
+            id: uid(296),
+            person_id: I.self,
+            role: "owner",
+            state: "active",
+            version: 1,
+            scope_center_id: null,
+          },
+          ...[I.center, second].map((center, index) => ({
+            id: uid(297 + index),
+            person_id: I.self,
+            role: "center_manager",
+            state: "active",
+            version: 1,
+            scope_center_id: center,
+          })),
+        ]),
+      );
     if (op === "roles_list_v1" && role !== "owner" && request.person_id === I.self)
       return send(
         nativePage(
-          (role === "org_manager" ? [null] : [I.center, second]).map((center, index) => ({
+          (role === "org_manager"
+            ? [null]
+            : centers.filter((center) => center.accessible).map((center) => center.id)
+          ).map((center, index) => ({
             id: uid(265 + index),
             person_id: I.self,
             role,
@@ -67,7 +154,7 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
         subscription_version: 1,
         limits: {
           entries: [
-            { key: "centers", value: 5 },
+            { key: "centers", value: centerLimit },
             { key: "active_students", value: 1250 },
           ],
         },
@@ -85,6 +172,14 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
       });
     if (op === "center_create_v1") {
       expect(request.org_id).toBe(I.org);
+      if (centers.length >= centerLimit)
+        return route.fulfill({
+          status: 409,
+          json: {
+            ok: false,
+            error: { code: "PLAN_LIMIT_REACHED", retryable: false, trace_id: I.role },
+          },
+        });
       centers.push({ ...centers[0]!, id: third, name: request.name, timezone: request.timezone });
       return send(nativeMutation(third));
     }
@@ -243,39 +338,137 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
             previous_id: null,
             created_at: at,
           },
+          ...(state === "approved"
+            ? [
+                {
+                  id: uid(302),
+                  version: 1,
+                  debtor_center_id: second,
+                  creditor_center_id: I.center,
+                  kind: "payment",
+                  currency: "TRY",
+                  amount_minor: "12000",
+                  open_minor: "0",
+                  source_allocation_id: null,
+                  source_sale_id: null,
+                  previous_id: movement,
+                  created_at: at,
+                },
+              ]
+            : []),
         ]),
       );
-    const row = () => ({
-      id: settlement,
-      version: state === "approved" ? 2 : 1,
-      from_center_id: I.center,
-      to_center_id: second,
-      currency: "TRY",
-      state,
-      reason: "Sentetik hesaplaşma",
-      initiator_account_id: I.account,
-      proposal,
-    });
+    const row = (): SettlementRequestView => {
+      if (!state || !proposal) throw Error("Missing settlement fixture data");
+      const authority = {
+        account_id: I.account,
+        person_id: I.self,
+        org_id: I.org,
+        manager_role_version: 1,
+        settlement_grant_version: 1,
+        checked_at: at,
+      };
+      const decided = state === "approved" || state === "rejected";
+      return {
+        id: settlement,
+        version: state === "pending" ? 1 : 2,
+        from_center_id: I.center,
+        to_center_id: second,
+        currency: "TRY",
+        state,
+        reason: settlementReason,
+        initiator_account_id: I.account,
+        decision_account_id: decided ? I.account : null,
+        previous_id: null,
+        proposal,
+        initiator_authority: {
+          ...authority,
+          center_id: I.center,
+          permission: "settlement.request",
+          manager_role_id: uid(265),
+        },
+        decision_authority: decided
+          ? {
+              ...authority,
+              center_id: second,
+              permission: "settlement.decide",
+              manager_role_id: uid(266),
+            }
+          : null,
+        record:
+          state === "approved"
+            ? {
+                id: uid(300),
+                version: 1,
+                request_id: settlement,
+                kind: "payment",
+                amount_minor: "12000",
+                currency: "TRY",
+                approved_by_account_id: I.account,
+                original_record_id: null,
+                created_at: at,
+                allocations: [
+                  {
+                    id: uid(301),
+                    version: 1,
+                    movement_id: movement,
+                    side: "payment",
+                    amount_minor: "12000",
+                    unreversed_minor: "12000",
+                  },
+                ],
+              }
+            : null,
+      };
+    };
     if (op === "settlement_requests_list_v1") return send(nativePage(state ? [row()] : []));
     if (op === "settlement_request_submit_v1") {
       expect(request.from_center_id).toBe(I.center);
       expect(request.to_center_id).toBe(second);
       expect(request.center_id).toBe(I.center);
       proposal = request.proposal;
-      state = "pending";
+      settlementReason = request.reason;
+      state = approveBeforeRead ? "approved" : "pending";
       return send(nativeMutation(settlement));
     }
     if (op === "settlement_request_decide_v1") {
       expect(request.settlement_request_id).toBe(settlement);
       expect(request.expected_version).toBe(1);
       expect(request.center_id).toBe(second);
-      state = "approved";
+      if (approvalKey) {
+        expect(request.operation_key).toBe(approvalKey);
+        return send({ ...nativeMutation(settlement), replayed: true });
+      }
+      approvalKey = request.operation_key;
+      state = request.decision === "approve" ? "approved" : "rejected";
+      settlementReason = request.reason;
+      if (loseDecisionResponse) return route.abort("failed");
+      return send(nativeMutation(settlement));
+    }
+    if (op === "settlement_request_withdraw_v1") {
+      expect(request.center_id).toBe(I.center);
+      expect(request.settlement_request_id).toBe(settlement);
+      expect(request.expected_version).toBe(1);
+      state = "withdrawn";
+      settlementReason = request.reason;
       return send(nativeMutation(settlement));
     }
     if (op === "settlement_request_get_v1") return send(row());
     return route.fallback();
   });
   return {
+    addConcurrentCenter: () => {
+      centers.push({ ...centers[0]!, id: uid(294), name: "Başka oturumun merkezi" });
+    },
+    restrictSecondCenter: () => {
+      centers[1]!.accessible = false;
+    },
+    approveBeforeFirstRead: () => {
+      approveBeforeRead = true;
+    },
+    loseNextDecisionResponse: () => {
+      loseDecisionResponse = true;
+    },
     setDiscrepancy: () => {
       discrepancy = true;
     },
@@ -294,6 +487,24 @@ async function confirm(page: Page, title: string) {
   await apply.click();
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
   await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+}
+
+async function reviewSettlement(page: Page) {
+  await page.getByLabel(common.platform.reason, { exact: true }).fill("Sentetik ödeme gerekçesi");
+  await page.getByLabel(text.settlement.debit, { exact: true }).selectOption(movement);
+  await page.getByLabel(text.settlement.minor, { exact: true }).fill("12000");
+  await page.getByLabel(text.settlement.occurred, { exact: true }).fill("2026-01-10T10:00");
+  await page
+    .getByRole("form", { name: text.settlement.submit, exact: true })
+    .getByRole("button", { name: text.review, exact: true })
+    .click();
+}
+
+function settlementMovementRow(page: Page, name: string) {
+  return page
+    .getByRole("grid", { name: text.settlement.movements, exact: true })
+    .getByRole("row")
+    .filter({ has: page.getByRole("gridcell", { name, exact: true }) });
 }
 
 test("Business owner manages centers, reads native center resources, routes an application and reads a combined report", async ({
@@ -383,44 +594,183 @@ test("Business owner manages centers, reads native center resources, routes an a
   await expect(page.getByText("Satış · ₺0,50", { exact: true })).toBeVisible();
 });
 
-test("authorized Business managers submit a real movement in A, decide in B and lose the ledger after revocation", async ({
+test("Business keeps the open balance until B approves, retries a lost response once and hides the revoked ledger", async ({
   page,
 }) => {
   const f = await businessFixture(page, "center_manager");
   await page.goto(centerUrl());
   const openLedger = () =>
     page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+  const openBalance = settlementMovementRow(page, text.settlement.movementsState.accrual)
+    .getByRole("gridcell")
+    .last();
   await openLedger();
-  await page.getByLabel(common.platform.reason, { exact: true }).fill("Sentetik ödeme gerekçesi");
-  await page.getByLabel(text.settlement.debit, { exact: true }).selectOption(movement);
-  await page.getByLabel(text.settlement.minor, { exact: true }).fill("12000");
-  await page.getByLabel(text.settlement.occurred, { exact: true }).fill("2026-01-10T10:00");
-  await page
-    .getByRole("form", { name: text.settlement.submit, exact: true })
-    .getByRole("button", { name: text.review, exact: true })
-    .click();
+  await reviewSettlement(page);
   await confirm(page, text.settlement.submit);
   await expect(page.getByText(text.settlement.requestState.pending, { exact: true })).toBeVisible();
+  await expect(openBalance).toHaveText("₺120,00");
   await expect(
     page.getByRole("button", { name: text.settlement.approve, exact: true }),
   ).toHaveCount(0);
   await page.goto(centerUrl(second));
   await openLedger();
+  await expect(openBalance).toHaveText("₺120,00");
   await page.getByLabel(common.platform.reason, { exact: true }).fill("Yetkili B kararı");
   await page.getByRole("button", { name: text.settlement.approve, exact: true }).click();
-  await confirm(page, text.settlement.approve);
+  const dialog = page.getByRole("dialog", { name: text.settlement.approve, exact: true });
+  await dialog.getByRole("checkbox").press("Space");
+  f.loseNextDecisionResponse();
+  await dialog.getByRole("button", { name: common.settings.applyReview, exact: true }).click();
+  await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.unknown);
+  await dialog.getByRole("button", { name: common.studio.retrySameRequest }).click();
+  await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
   await expect(
     page.getByText(text.settlement.requestState.approved, { exact: true }),
   ).toBeVisible();
-  expect(f.calls.filter(({ op }) => op === "settlement_request_decide_v1")).toHaveLength(1);
+  await expect(openBalance).toHaveText("₺0,00");
+  const payment = settlementMovementRow(page, text.settlement.movementsState.payment);
+  await expect(payment).toHaveCount(1);
+  await expect(payment.getByRole("gridcell", { name: "₺120,00", exact: true })).toBeVisible();
+  const decisions = f.calls.filter(({ op }) => op === "settlement_request_decide_v1");
+  expect(decisions).toHaveLength(2);
+  expect(decisions[0]!.request.operation_key).toBe(decisions[1]!.request.operation_key);
+  await page.goto(centerUrl());
+  await openLedger();
+  await expect(openBalance).toHaveText("₺0,00");
+  await expect(payment).toHaveCount(1);
+  await expect(
+    page.getByText(text.settlement.requestState.approved, { exact: true }),
+  ).toBeVisible();
   f.revoke();
-  await page.reload();
+  await page.goto(centerUrl(second));
   await openLedger();
   await expect(page.getByText(text.settlement.unauthorized, { exact: true })).toBeVisible();
   await expect(page.getByText(text.settlement.requestState.approved, { exact: true })).toHaveCount(
     0,
   );
 });
+
+test("Business confirms the submitted request when B decides before the first readback", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "center_manager");
+  await page.goto(centerUrl());
+  await page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+  await reviewSettlement(page);
+  f.approveBeforeFirstRead();
+  await confirm(page, text.settlement.submit);
+  await expect(
+    page.getByText(text.settlement.requestState.approved, { exact: true }),
+  ).toBeVisible();
+  expect(f.calls.filter(({ op }) => op === "settlement_request_submit_v1")).toHaveLength(1);
+});
+
+test("Business removes the pending request when B's delegated settlement grant is withdrawn", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "center_manager");
+  const openLedger = () =>
+    page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+  await page.goto(centerUrl());
+  await openLedger();
+  await reviewSettlement(page);
+  await confirm(page, text.settlement.submit);
+  await page.goto(centerUrl(second));
+  await openLedger();
+  const approve = page.getByRole("button", { name: text.settlement.approve, exact: true });
+  await expect(approve).toBeEnabled();
+
+  f.revoke();
+  await page.getByRole("tab", { name: text.tabs.centers, exact: true }).click();
+  await openLedger();
+  await expect(page.getByText(text.settlement.unauthorized, { exact: true })).toBeVisible();
+  await expect(approve).toHaveCount(0);
+  await expect(page.getByText(text.settlement.requestState.pending, { exact: true })).toHaveCount(
+    0,
+  );
+  expect(f.calls.filter(({ op }) => op === "settlement_request_decide_v1")).toEqual([]);
+});
+
+test("Business refreshes a revoked center in the same document and preserves A's authorized history", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "center_manager");
+  await page.clock.install();
+  const openLedger = () =>
+    page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+  await page.goto(centerUrl());
+  await openLedger();
+  await reviewSettlement(page);
+  await confirm(page, text.settlement.submit);
+  await page.goto(centerUrl(second));
+  await openLedger();
+  const approve = page.getByRole("button", { name: text.settlement.approve, exact: true });
+  await expect(approve).toBeEnabled();
+  const documentStart = await page.evaluate(() => performance.timeOrigin);
+
+  f.restrictSecondCenter();
+  await page.clock.fastForward(31_000);
+  await page.evaluate("window.dispatchEvent(new Event('visibilitychange'))");
+  await expect(page).toHaveURL(new RegExp(`/c/${I.center}/centers$`));
+  await expect(approve).toHaveCount(0);
+  await openLedger();
+  await expect(page.getByText(text.settlement.requestState.pending, { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: text.settlement.withdraw, exact: true }),
+  ).toBeEnabled();
+  await expect(approve).toHaveCount(0);
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentStart);
+});
+
+for (const [action, outcome, decidingCenter] of [
+  ["reject", "rejected", second],
+  ["withdraw", "withdrawn", I.center],
+] as const) {
+  test(`Business ${action} leaves both center balances intact and shows the reason`, async ({
+    page,
+  }) => {
+    const f = await businessFixture(page, "center_manager");
+    const openLedger = () =>
+      page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+    await page.goto(centerUrl());
+    await openLedger();
+    await reviewSettlement(page);
+    await confirm(page, text.settlement.submit);
+    if (decidingCenter === second) {
+      await page.goto(centerUrl(second));
+      await openLedger();
+    }
+    const reason = "Sentetik gerekçeli kapanış";
+    await page.getByLabel(common.platform.reason, { exact: true }).fill(reason);
+    await page.getByRole("button", { name: text.settlement[action], exact: true }).click();
+    await confirm(page, text.settlement[action]);
+
+    const expectClosedUnpaid = async () => {
+      await expect(
+        page.getByText(text.settlement.requestState[outcome], { exact: true }),
+      ).toBeVisible();
+      await expect(page.getByText(reason, { exact: true })).toBeVisible();
+      const movements = page.getByRole("grid", { name: text.settlement.movements, exact: true });
+      await expect(movements.getByRole("row")).toHaveCount(2);
+      await expect(
+        settlementMovementRow(page, text.settlement.movementsState.accrual)
+          .getByRole("gridcell")
+          .last(),
+      ).toHaveText("₺120,00");
+    };
+    await expectClosedUnpaid();
+    await page.goto(centerUrl(decidingCenter === second ? I.center : second));
+    await openLedger();
+    await expectClosedUnpaid();
+    expect(
+      f.calls.filter(
+        ({ op }) =>
+          op === "settlement_request_decide_v1" || op === "settlement_request_withdraw_v1",
+      ),
+    ).toHaveLength(1);
+  });
+}
 
 test("Pro owner cannot open the Business centers or request Business data", async ({ page }) => {
   const f = await businessFixture(page, "owner", "pro");
@@ -462,6 +812,202 @@ test("a Business organization manager can create a center without opening the ow
   ).toHaveLength(0);
 });
 
+test("a Business owner sees why adding a sixth active center is unavailable", async ({ page }) => {
+  const f = await businessFixture(page, "owner", "business", 4);
+  await page.goto(centerUrl());
+  const add = page.getByRole("button", { name: text.add, exact: true });
+  const form = page.getByRole("form", { name: text.add, exact: true });
+  await add.press("Enter");
+  await form.getByLabel(text.center, { exact: true }).fill("Beşinci merkez");
+  await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
+  await form.getByRole("button", { name: text.review, exact: true }).press("Enter");
+  await confirm(page, text.add);
+
+  const grid = page.getByRole("grid", { name: text.title });
+  await expect(grid.getByRole("row", { name: /Beşinci merkez/ })).toBeVisible();
+  await expect(grid.getByRole("row")).toHaveCount(6);
+  await expect(page.getByText("5 / 5 aktif merkez kullanılıyor.", { exact: true })).toBeVisible();
+  await expect(add).toBeDisabled();
+  await expect(add).toHaveAccessibleDescription(text.quotaReached);
+  await add.press("Enter");
+  await expect(add).toBeFocused();
+  await expect(form).toHaveCount(0);
+  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
+});
+
+test("Business center switching keeps resource and policy reads scoped to the selected center", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "owner");
+  const readPolicyIn: string[] = [];
+  await page.route("**/functions/v1/backend-v1/policies_get_v1", async (route) => {
+    const { org_id, center_id } = route.request().postDataJSON();
+    expect(org_id).toBe(I.org);
+    readPolicyIn.push(center_id);
+    const published =
+      center_id === second
+        ? f.calls.findLast(
+            ({ op, request }) =>
+              op === "policy_publish_v1" &&
+              request.center_id === second &&
+              request.key === "reservation_window",
+          )?.request
+        : undefined;
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: [
+          {
+            key: "debt_booking",
+            scope: { kind: "organization" },
+            value: { kind: "boolean", value: true },
+            effective_at: at,
+            mandatory: true,
+            version: 2,
+          },
+          {
+            key: "reservation_window",
+            scope:
+              center_id === second
+                ? { kind: "center", center_id: second }
+                : { kind: "organization" },
+            value: published?.value ?? {
+              kind: "window",
+              opens_minutes_before: 10080,
+              closes_minutes_before: center_id === second ? 90 : 60,
+              manager_exception: false,
+            },
+            effective_at: published?.effective_at ?? at,
+            mandatory: false,
+            version: published ? 4 : 3,
+          },
+        ],
+      },
+    });
+  });
+  await page.goto(centerUrl());
+  const selectTab = (name: string) => page.getByRole("tab", { name, exact: true }).click();
+  await selectTab(text.tabs.managers);
+  await expect(page.getByText("Sentetik yönetici", { exact: true })).toBeVisible();
+  await page.getByLabel(text.center, { exact: true }).selectOption(second);
+  await expect(page.getByText(text.empty, { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik yönetici", { exact: true })).toHaveCount(0);
+  expect(
+    f.calls
+      .filter(({ op, request }) => op === "roles_list_v1" && request.role === "center_manager")
+      .map(({ request }) => request.center_id),
+  ).toEqual([I.center, second]);
+
+  await selectTab(text.tabs.policies);
+  const mandatory = page.getByRole("listitem").filter({ hasText: "Borçta rezervasyon engeli" });
+  const advisory = page.getByRole("listitem").filter({ hasText: "Rezervasyon penceresi" });
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+  await expect(advisory).toContainText("Organizasyon · Tavsiye");
+  await expect(advisory).toContainText("Kapanış: 60 dakika önce");
+  await page.getByLabel(text.center, { exact: true }).selectOption(second);
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+  await expect(advisory).toContainText("Merkez · Tavsiye");
+  await expect(advisory).toContainText("Kapanış: 90 dakika önce");
+  expect(readPolicyIn).toEqual([I.center, second]);
+
+  await selectTab(text.tabs.disciplines);
+  const disciplines = page.getByRole("tabpanel", { name: text.tabs.disciplines });
+  await expect(disciplines.getByRole("listitem").filter({ hasText: "Tango" })).toBeVisible();
+  await page.getByLabel(text.center, { exact: true }).selectOption(second);
+  await expect(
+    disciplines.getByRole("listitem").filter({ hasText: "Sentetik Salsa" }),
+  ).toBeVisible();
+  await expect(disciplines.getByRole("listitem").filter({ hasText: "Tango" })).toHaveCount(0);
+  expect(
+    f.calls
+      .filter(({ op }) => op === "disciplines_list_v1")
+      .map(({ request }) => ({ center: request.center_id, include: request.include_presentation })),
+  ).toEqual([
+    { center: I.center, include: true },
+    { center: second, include: true },
+  ]);
+
+  await page.getByRole("link", { name: text.edit, exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/${second}/settings\\?section=salonlar`));
+  await expect(page.getByText("Sentetik B salonu", { exact: true })).toBeVisible();
+  await expect
+    .poll(() =>
+      f.calls.some(
+        ({ op, request }) =>
+          op === "management_state_get_v1" &&
+          request.operation === "room_save_v1" &&
+          request.center_id === second,
+      ),
+    )
+    .toBe(true);
+  await selectTab(text.tabs.policies);
+  const editPolicy = (label: string) =>
+    page.getByRole("row", { name: new RegExp(label) }).getByRole("button", {
+      name: common.settings.policyNative.edit,
+      exact: true,
+    });
+  await expect(editPolicy(common.settings.nativePolicies.keys.debt_booking)).toBeDisabled();
+  await expect(editPolicy(common.settings.nativePolicies.keys.reservation_window)).toBeEnabled();
+  expect(f.calls.some(({ op }) => op === "policy_publish_v1")).toBe(false);
+
+  await editPolicy(common.settings.nativePolicies.keys.reservation_window).click();
+  const editor = page.getByRole("dialog");
+  await editor.getByRole("spinbutton", { name: "Kapanış (dakika önce)", exact: true }).fill("120");
+  await editor.locator('input[type="datetime-local"]').fill("2026-11-18T15:00");
+  await editor
+    .getByRole("textbox", { name: "Değişiklik gerekçesi", exact: true })
+    .fill("Sentetik B rezervasyon penceresi");
+  await editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }).click();
+  const apply = editor.getByRole("button", { name: common.settings.applyReview, exact: true });
+  await expect(apply).toBeDisabled();
+  expect(f.calls.filter(({ op }) => op === "policy_publish_v1")).toEqual([]);
+  await editor.getByRole("checkbox").press("Space");
+  await apply.click();
+  await expect(editor.getByRole("status")).toHaveText(common.events.commandStates.saved);
+  const writes = f.calls.filter(({ op }) => op === "policy_publish_v1");
+  expect(writes).toHaveLength(1);
+  expect(writes[0]?.request).toMatchObject({
+    org_id: I.org,
+    center_id: second,
+    key: "reservation_window",
+    value: { kind: "window", closes_minutes_before: 120 },
+    effective_at: "2026-11-18T12:00:00Z",
+    mandatory: false,
+    accepted_reservation_ids: [],
+  });
+  await page.goto(centerUrl(second));
+  await selectTab(text.tabs.policies);
+  await expect(advisory).toContainText("Kapanış: 120 dakika önce");
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+  await page.getByLabel(text.center, { exact: true }).selectOption(I.center);
+  await expect(advisory).toContainText("Kapanış: 60 dakika önce");
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+});
+
+test("a Business organization manager sees the native sixth-center rejection", async ({ page }) => {
+  const f = await businessFixture(page, "org_manager", "business", 4);
+  await page.goto(centerUrl());
+  await page.getByRole("button", { name: text.add, exact: true }).click();
+  const form = page.getByRole("form", { name: text.add, exact: true });
+  await form.getByLabel(text.center, { exact: true }).fill("Altıncı merkez");
+  await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
+  await form.getByRole("button", { name: text.review, exact: true }).click();
+
+  const dialog = page.getByRole("dialog", { name: text.add, exact: true });
+  await dialog.getByRole("checkbox").press("Space");
+  f.addConcurrentCenter();
+  await dialog.getByRole("button", { name: common.settings.applyReview, exact: true }).click();
+  await expect(dialog.getByRole("status")).toHaveText(text.quotaReached);
+  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  const grid = page.getByRole("grid", { name: text.title });
+  await expect(grid.getByText("Başka oturumun merkezi", { exact: true })).toBeVisible();
+  await expect(grid.getByRole("row")).toHaveCount(6);
+  await expect(grid.getByText("Altıncı merkez", { exact: true })).toHaveCount(0);
+  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
+  expect(f.calls.filter(({ op }) => op === "subscription_get_v1")).toEqual([]);
+});
+
 test("a center manager sees scoped duplicate suggestions and opens the native merge queue", async ({
   page,
 }) => {
@@ -486,3 +1032,34 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
     page: { limit: 3 },
   });
 });
+
+for (const role of ["center_manager", "staff"] as const) {
+  test(`Business direct person, CRM and finance links stay in scope for ${role}`, async ({
+    page,
+  }) => {
+    const f = await businessFixture(page, role);
+    f.restrictSecondCenter();
+
+    const personInB = uid(299);
+    const destinations = [
+      [`people/${personInB}`, "people", "people_list_v1"],
+      ["leads", "leads", "leads_list_v1"],
+      ["finance", "finance", "finance_directory_get_v1"],
+    ];
+    for (const [direct, safe, operation] of destinations) {
+      await page.goto(`/o/${I.org}/c/${second}/${direct}`);
+      await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
+      await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
+      await expect
+        .poll(() =>
+          f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
+        )
+        .toBe(true);
+    }
+
+    expect(f.calls.filter(({ request }) => request.center_id === second)).toEqual([]);
+    expect(f.calls.filter(({ request }) => request.person_id === personInB)).toEqual([]);
+    expect(f.calls.filter(({ op }) => op === "center_create_v1")).toEqual([]);
+  });
+}

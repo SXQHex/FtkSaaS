@@ -21,6 +21,7 @@ export async function mockSessionDetail(
     unknown?: boolean;
     ackUnread?: boolean;
     full?: boolean;
+    noBookingRights?: boolean;
     overrideDenied?: boolean;
     attendanceDenied?: boolean;
     writeDenied?: boolean;
@@ -207,6 +208,7 @@ export async function mockSessionDetail(
       return send({ items: [person], next_cursor: null, as_of: new Date().toISOString() });
     if (operation === "entitlements_get_v1") {
       expect(req.person_id).toBe(I.self);
+      if (options.noBookingRights && req.session_id === S.session) return send([]);
       const rights: EntitlementView = {
         sale_id: S.sale,
         person_id: I.self,

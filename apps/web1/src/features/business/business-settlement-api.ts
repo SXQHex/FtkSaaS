@@ -98,21 +98,28 @@ export async function readSettlementResult(intent: SettlementIntent, id?: string
     ...settlementRequest(intent.scope),
     settlement_request_id: id,
   });
-  const expected = {
-    submit: "pending",
-    approve: "approved",
-    reject: "rejected",
-    withdraw: "withdrawn",
-  }[intent.action];
   if (
     result.id !== id ||
-    result.state !== expected ||
     (result.from_center_id !== intent.scope.centerId &&
-      result.to_center_id !== intent.scope.centerId) ||
-    (intent.action === "submit" &&
-      (result.from_center_id !== intent.scope.centerId || result.to_center_id !== intent.peer)) ||
-    (intent.action !== "submit" && result.version <= intent.before.version)
+      result.to_center_id !== intent.scope.centerId)
   )
+    throw Error("SETTLEMENT_RESULT_INVALID");
+  if (intent.action === "submit") {
+    // A decision can advance this same request before the initiating center reads it back.
+    if (
+      result.from_center_id !== intent.scope.centerId ||
+      result.to_center_id !== intent.peer ||
+      result.currency !== intent.currency ||
+      result.proposal.kind !== intent.proposal.kind ||
+      result.proposal.amount_minor !== intent.proposal.amount_minor
+    )
+      throw Error("SETTLEMENT_RESULT_INVALID");
+    return result;
+  }
+  const expected = { approve: "approved", reject: "rejected", withdraw: "withdrawn" }[
+    intent.action
+  ];
+  if (result.state !== expected || result.version <= intent.before.version)
     throw Error("SETTLEMENT_RESULT_INVALID");
   return result;
 }

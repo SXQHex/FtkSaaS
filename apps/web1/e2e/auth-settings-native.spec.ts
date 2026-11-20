@@ -660,6 +660,66 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
   await expect(page.getByText("Starter", { exact: true }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Planı değiştir", exact: true })).toBeDisabled();
 });
+for (const target of [
+  { name: "Pro", id: uid(140) },
+  { name: "Starter", id: uid(101) },
+] as const) {
+  test(`Business downgrade review names the kept center and submits the selected ${target.name} scope`, async ({
+    page,
+  }) => {
+    const f = await mockSettingsCompletion(page, { billingOwner: true, businessDowngrade: true });
+    await page
+      .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
+      .selectOption("organization");
+    await page.getByRole("tab", { name: "Plan", exact: true }).click();
+    await page.getByRole("button", { name: "Planı değiştir", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Planı daralt", exact: true });
+    await dialog.getByRole("radio", { name: new RegExp(`^${target.name}`) }).press("Space");
+    await dialog
+      .getByRole("combobox", { name: "Korunacak merkez", exact: true })
+      .selectOption(uid(141));
+    if (target.name === "Starter") {
+      await dialog.getByRole("combobox", { name: "Salon", exact: true }).selectOption(I.room);
+      await dialog
+        .getByRole("combobox", { name: "Disiplin", exact: true })
+        .selectOption(I.discipline);
+      await dialog
+        .getByRole("combobox", { name: "Eğitmen", exact: true })
+        .selectOption(I.instructor);
+      await dialog.getByRole("checkbox", { name: "Sentetik öğrenci", exact: true }).press("Space");
+    } else {
+      await expect(dialog.getByRole("combobox", { name: "Salon", exact: true })).toHaveCount(0);
+    }
+    await dialog.getByRole("button", { name: "Teklifi incele", exact: true }).click();
+    await expect(
+      dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+    ).toBeDisabled();
+    await expect(dialog.getByText("Korunacak merkez", { exact: true })).toBeVisible();
+    await expect(dialog.getByText("İkinci merkez", { exact: true })).toBeVisible();
+    await expect(dialog.getByText("1.01.2099 03:00", { exact: true })).toBeVisible();
+    expect(f.writes).toHaveLength(0);
+    const review = await confirm(page);
+    await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
+    const writes = f.writes.filter(({ op }) => op === "subscription_downgrade_request_v1");
+    expect(writes).toHaveLength(1);
+    expect(writes[0]?.r).toMatchObject({
+      target_plan_id: target.id,
+      expected_version: 2,
+      kept_center_id: uid(141),
+    });
+    if (target.name === "Starter") {
+      expect(writes[0]?.r.kept_scope).toEqual({
+        room_id: I.room,
+        discipline_id: I.discipline,
+        instructor_id: I.instructor,
+        student_person_ids: [uid(114)],
+      });
+    } else {
+      expect(writes[0]?.r).not.toHaveProperty("kept_scope");
+    }
+  });
+}
+
 test("team permission unknown state blocks scope and retries exactly one frozen grant before rereading effective permissions", async ({
   page,
 }) => {

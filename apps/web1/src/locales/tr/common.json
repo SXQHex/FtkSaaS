@@ -5445,6 +5445,7 @@
     "add": "Merkez ekle",
     "plan": "Plan ve kaynak seçimini aç",
     "quota": "{{used}} / {{max}} aktif merkez kullanılıyor.",
+    "quotaReached": "Planın aktif merkez sınırı doldu. Yeni merkez eklenemiyor.",
     "chooseTimezone": "Saat dilimi seç",
     "required": "Bu alan zorunlu.",
     "review": "İncele",

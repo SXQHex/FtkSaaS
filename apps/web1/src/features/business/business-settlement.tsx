@@ -266,7 +266,7 @@ function Ledger({
           {t(($) => $.businessCenters.settlement.filter)}
         </Button>
       </form>
-      <section aria-label={t(($) => $.businessCenters.settlement.movements)} className="space-y-3">
+      <section className="space-y-3">
         <h3 className="font-semibold">{t(($) => $.businessCenters.settlement.movements)}</h3>
         {movements.isPending ? (
           <p role="status">{t(($) => $.platform.loading)}</p>

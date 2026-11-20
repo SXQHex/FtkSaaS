@@ -53,6 +53,31 @@ test("mobile session booking keeps explicit sale selection and reads native capa
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
   expect((await scanAccessibility(page, "session-booking-result")).violations).toEqual([]);
 });
+test("booking with no eligible source in the selected session cannot submit or request an override", async ({
+  page,
+}) => {
+  const state = await mockSessionDetail(page, { noBookingRights: true });
+  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  const panel = page.getByRole("dialog");
+  await panel.getByRole("button", { name: "Ara", exact: true }).click();
+  const rightsRead = page.waitForResponse((response) =>
+    response.url().endsWith("/entitlements_get_v1"),
+  );
+  await panel.getByLabel("Üye", { exact: true }).selectOption(I.self);
+  expect((await rightsRead).request().postDataJSON()).toMatchObject({
+    center_id: I.center,
+    person_id: I.self,
+    session_id: S.session,
+  });
+  await expect(panel.getByLabel("Hak kaynağı", { exact: true }).locator("option")).toHaveCount(1);
+  await expect(
+    panel.getByRole("button", { name: "Rezervasyon oluştur", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    panel.getByRole("checkbox", { name: "Kontenjanı aşarak ekle", exact: true }),
+  ).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+});
 test("native capacity override is a separate reasoned command and never silently replaces ordinary booking", async ({
   page,
 }) => {
