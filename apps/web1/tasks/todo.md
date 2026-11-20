@@ -366,11 +366,11 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 
 - [x] **E52.1** · Platform sahipleri `operator_manage` ve `view:operators` ile açılıyor. Doğrulanmış e-posta ve gerekçe yeniden okunarak `platform_operator_access_set_v1` ile inceleme sonrası uygulanıyor. [W1-BE-62](request.md#w1-be-62--platform-operatörü-dizini-ve-yetki-yönetimi).
 - [x] **E52.2** · Son uygun operatör korunuyor. Yetki kaybeden oturumun görünümü kaldırılıyor ve müşteri rolüne erişim açılmıyor. [Yerel kabul](../e2e/auth-platform.spec.ts) · [Native kabul](../../backend/tests/starter-studio-acceptance.mjs).
-
-Görünen ad düzeltmesi: Dizin adı boşsa oturum sahibinin satırında mevcut hesap profilindeki ad gösterilir. Adı bulunmayan diğer operatörlerde durum etiketi gösterilir. 11 Platform Chromium testi geçti. 20 Kasım 2026 17.22 TSİ’de yerel üretim derlemesi development oturumunda profil adını gösterdi. Listede ham UUID görünmedi ve test oturumu kapandı. [Dizin adı talebi](request.md#w1-be-67--platform-sahiplerinin-görünen-adı).
 - [x] **E52.3** · Yayımlı Web1’de `index-HGo_1OJL.js` ile mevcut yetkili Chrome oturumunda Organizasyonlar ve Platform ödemeleri tabloları ile Platform sahipleri dizini yüklendi. Oturumsuz Chrome penceresinde operatör bağlantısı giriş ekranına döndü. Kuruluş sahibi ve personel oturumlarının dizin okumalarından önce reddi [yerel yetki senaryolarında](../e2e/auth-platform.spec.ts#L256) doğrulandı. Canlı kontrol salt okunur yürütüldü.
 
 - [x] **E52.4** · Operatör işlem kaydı kuruluş, askı/kaldırma, ödeme kararı, ek süre ve operatör yetkisi işlemlerini mevcut native sonuç doğrulamasından sonra gösterir. Aynı işlem anahtarı tek satır üretir. Kayıt konsol bölümleri arasında korunur, konsoldan ayrılınca, belge yenilenince veya yetki reddinde temizlenir. Gerekçe ve hesap e-postası kayda alınmaz. Tek Chromium işçisiyle 9 platform senaryosu geçti. [Yerel kabul](../e2e/auth-platform.spec.ts).
+
+Görünen ad düzeltmesinde oturum sahibinin satırı ilk dolu değeri kullanır. Sıra görünen ad, ad soyad ve doğrulanmış e-postadır. Görünen ad giriş e-postasından türetilmişse ad soyad önceliklidir. Platform grubunda 12 Chromium testi, dizinde e-posta görünen son varyantta iki ilgili operatör testi geçti. Adı bulunmayan diğer operatörler için dizin desteği [W1-BE-67](request.md#w1-be-67--platform-sahiplerinin-görünen-adı) altında. 20 Kasım 2026 17.22 TSİ’de ilk yerel üretim derlemesi development oturumunda profil adını gösterdi. Listede ham UUID görünmedi ve test oturumu kapandı.
 
 <a id="e53"></a>
 

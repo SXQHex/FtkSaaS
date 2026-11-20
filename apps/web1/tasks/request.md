@@ -73,7 +73,7 @@ Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında,
 | W1-BE-64 | V09.3 · WF07/WF11 | Gelen kutusunda yoklama düzeltme hedefi ve karar akışı | [Geri çekildi](#w1-be-64--gelen-kutusunda-yoklama-düzeltme-keşfi-ve-kararı). |
 | W1-BE-65 | V09.1 · WF11 | Katalog sürümünün geçersiz kılındığını yeniden okuma | [Backend desteği karşılandı](#w1-be-65--içerik-kataloğunda-geçersiz-kılma-durumunun-okunması). |
 | W1-BE-66 | B03.1 · WF06 | Açıkça seçilen satışın hedef merkezde kullanım uygunluğunu rezervasyonda doğrulama | [Karşılandı](#w1-be-66--rezervasyonda-açık-satışın-merkez-kapsamı). |
-| W1-BE-67 | E52 · WF17 | Platform sahibi dizininde hesap profilinden görünen ad | [Backend ihtiyacı](#w1-be-67--platform-sahiplerinin-görünen-adı). |
+| W1-BE-67 | E52 · WF17 | Platform sahibi dizininde görünen ad, ad soyad ve doğrulanmış e-posta sırası | [Backend ihtiyacı](#w1-be-67--platform-sahiplerinin-görünen-adı). |
 
 ## Bütün talepler için ortak sınır
 
@@ -538,4 +538,4 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 
 ## W1-BE-67 · Platform sahiplerinin görünen adı
 
-**Backend ihtiyacı.** `platform_directory_get_v1(view:operators)` development’ta profil adı bulunan bir platform sahibi için `display_name:null` döndürüyor. Dizin görünür adı Auth metadata’sından alıyor. Mevcut `operator_manage` yetki sınırı içinde `display_name` alanı için hesap profilindeki görünür adı da değerlendir. Hesap UUID’si eylemlerde kimlik eşlemesi için kullanılır. [WF17](../../../docs/workflows.md#wf17) · [Web1 ekranı](todo.md#e52).
+**Backend ihtiyacı.** `platform_directory_get_v1(view:operators)` development’ta profil adı bulunan bir platform sahibi için `display_name:null` döndürüyor. Mevcut `operator_manage` yetkisi altında her satırın `display_name` değerini sırayla görünen addan, ad soyaddan veya doğrulanmış e-postadan seç. İstemciye yalnız seçilen gösterim değeri gerekir. Tümü boşsa `display_name:null` dönebilir. Hesap UUID’si eylemlerde kimlik eşlemesi için kullanılır. [WF17](../../../docs/workflows.md#wf17) · [Web1 ekranı](todo.md#e52).

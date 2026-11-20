@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Field, FieldError, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
+import type { AccountView } from "../../lib/api-contracts/generated";
 import { usePlatformActivity } from "./platform-activity-context";
 import { PlatformActionReview } from "./platform-action-review";
 import { billingReason } from "./platform-payment";
@@ -29,15 +30,25 @@ const grantedAt = new Intl.DateTimeFormat("tr-TR", {
   timeZone: "Europe/Istanbul",
 });
 
+function nameBeforeEmail(value: string | null) {
+  return platformEmail.safeParse(value).success ? undefined : value?.trim();
+}
+
 export function PlatformOperators({
-  accountId,
-  accountName,
+  currentAccount,
   onDenied,
 }: {
-  accountId: string;
-  accountName: string;
+  currentAccount: Pick<AccountView, "id" | "display_name" | "identity">;
   onDenied: () => void;
 }) {
+  const { id: accountId, display_name, identity } = currentAccount;
+  // The account projection can use the login email when a profile name is absent.
+  const profileName = nameBeforeEmail(display_name);
+  const fullName = [identity?.given_name?.trim(), identity?.family_name?.trim()]
+    .filter(Boolean)
+    .join(" ");
+  const verifiedEmail = identity?.email_verified_at ? identity.email?.trim() : undefined;
+  const currentAccountLabels = [profileName, fullName, verifiedEmail];
   const { t } = useTranslation();
   const id = useId();
   const client = useQueryClient();
@@ -115,12 +126,12 @@ export function PlatformOperators({
               <ul aria-label={title} className="divide-y rounded-lg border">
                 {rows.map((row, index) => {
                   const target = row.account_id;
-                  const name = row.display_name?.trim();
                   const isSelf = target === accountId;
-                  const profileName = isSelf ? accountName.trim() : undefined;
+                  const labels = isSelf
+                    ? [nameBeforeEmail(row.display_name), ...currentAccountLabels]
+                    : [row.display_name?.trim()];
                   const label =
-                    (name !== target && name) ||
-                    (profileName !== target && profileName) ||
+                    labels.find((candidate) => candidate && candidate !== target) ??
                     t(($) =>
                       isSelf
                         ? $.platform.operators.currentAccount

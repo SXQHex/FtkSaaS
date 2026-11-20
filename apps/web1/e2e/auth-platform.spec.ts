@@ -3,6 +3,7 @@ import { mockNative } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { nativeMutation, uid } from "./pro-completion-fixture.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
+import type { AccountView } from "../src/lib/api-contracts/generated.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 const text = common.platform;
@@ -39,6 +40,9 @@ async function platformFixture(
 ) {
   await mockNative(page);
   const calls: { operation: string; request: Record<string, unknown> }[] = [];
+  let profile: Pick<AccountView, "display_name" | "identity"> = {
+    display_name: "Sentetik Platform",
+  };
   let permitted = role === "platform";
   let row = { ...initial };
   let changes = 0;
@@ -52,7 +56,7 @@ async function platformFixture(
       return send({
         id: I.account,
         state: "active",
-        display_name: "Sentetik Platform",
+        ...profile,
         platform_scope: {
           organizations: permitted,
           organization_create: permitted,
@@ -178,6 +182,9 @@ async function platformFixture(
   });
   return {
     calls,
+    setProfile: (next: typeof profile) => {
+      profile = next;
+    },
     revoke: () => {
       permitted = false;
     },
@@ -862,6 +869,68 @@ test("platform operator protects the last eligible member, verifies an addition 
     enabled: false,
     reason: "Kendi yetkimi kaldırıyorum",
   });
+});
+
+test("platform owner label prefers display name, full name, and verified email in order", async ({
+  page,
+}) => {
+  const fixture = await platformFixture(page, "platform");
+  const other = uid(253);
+  let directoryName: string | null = null;
+  await page.route("**/functions/v1/backend-v1/platform_directory_get_v1", async (route) => {
+    if (route.request().postDataJSON().view !== "operators") return route.fallback();
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: list(
+          [I.account, other].map((account_id) => ({
+            kind: "operator",
+            account_id,
+            display_name: account_id === I.account ? directoryName : null,
+            eligible: true,
+            granted_at: paymentTime,
+          })),
+        ),
+      },
+    });
+  });
+  await signIn(page);
+  const email = "verified.operator@example.invalid";
+  const identity: NonNullable<AccountView["identity"]> = {
+    email,
+    given_name: "  Ada ",
+    family_name: " Kaya ",
+    email_verified_at: "2026-11-16T12:00:00Z",
+    phone: null,
+    pending_email: null,
+    pending_phone: null,
+    phone_verified_at: null,
+    unverified_phone: null,
+  };
+  const withoutName = { ...identity, given_name: null, family_name: null };
+  const cases = [
+    { display_name: "Konsol Adı", identity, label: "Konsol Adı", directory: null },
+    { display_name: email, identity, label: "Ada Kaya", directory: email },
+    { display_name: "", identity: withoutName, label: email, directory: null },
+    {
+      display_name: email,
+      identity: { ...withoutName, email_verified_at: null, pending_email: email },
+      label: text.operators.currentAccount,
+      directory: email,
+    },
+  ];
+  for (const { label, directory, ...profile } of cases) {
+    directoryName = directory;
+    fixture.setProfile(profile);
+    await page.goto("/platform?section=operators");
+    const roster = page.getByRole("list", { name: text.operators.title, exact: true });
+    await expect(roster.getByText(label, { exact: true })).toHaveCount(1);
+    await expect(roster.getByText(text.operators.unnamed, { exact: true })).toHaveCount(1);
+    await expect(roster).not.toContainText(I.account);
+    await expect(roster).not.toContainText(other);
+    if (label !== email) await expect(roster).not.toContainText(email);
+  }
 });
 
 test("platform stages and publishes one exact private invoice through lost responses", async ({
