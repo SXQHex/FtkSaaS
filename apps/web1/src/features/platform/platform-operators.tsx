@@ -31,9 +31,11 @@ const grantedAt = new Intl.DateTimeFormat("tr-TR", {
 
 export function PlatformOperators({
   accountId,
+  accountName,
   onDenied,
 }: {
   accountId: string;
+  accountName: string;
   onDenied: () => void;
 }) {
   const { t } = useTranslation();
@@ -113,8 +115,19 @@ export function PlatformOperators({
               <ul aria-label={title} className="divide-y rounded-lg border">
                 {rows.map((row, index) => {
                   const target = row.account_id;
+                  const name = row.display_name?.trim();
+                  const isSelf = target === accountId;
+                  const profileName = isSelf ? accountName.trim() : undefined;
                   const label =
-                    row.display_name ?? target ?? t(($) => $.platform.operators.unlinked);
+                    (name !== target && name) ||
+                    (profileName !== target && profileName) ||
+                    t(($) =>
+                      isSelf
+                        ? $.platform.operators.currentAccount
+                        : target
+                          ? $.platform.operators.unnamed
+                          : $.platform.operators.unlinked,
+                    );
                   const removable =
                     target &&
                     rows.some((candidate) => candidate.account_id !== target && candidate.eligible);

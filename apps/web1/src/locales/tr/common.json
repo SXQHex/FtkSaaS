@@ -5627,10 +5627,12 @@
       "eligible": "Hesap uygun",
       "ineligible": "Hesap uygun değil",
       "unlinked": "Hesap eşleşmesi yok",
+      "unnamed": "Adı kayıtlı olmayan platform sahibi",
+      "currentAccount": "Kendi hesabınız",
       "last": "Son uygun operatör korunuyor",
       "add": "Platform sahibi ekle",
       "remove": "Yetkiyi kaldır",
-      "removeMember": "{{label}} için yetkiyi kaldır",
+      "removeMember": "Yetkiyi kaldır ({{label}})",
       "already": "Bu hesap zaten platform operatörü.",
       "grantEffect": "Hesap platform konsolunun yönetim yetkilerini kazanacak.",
       "revokeEffect": "Hesabın açık oturumları sonraki platform işlemlerinde yetki kontrolünden geçemeyecek."

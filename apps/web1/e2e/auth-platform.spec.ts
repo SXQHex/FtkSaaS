@@ -764,18 +764,18 @@ test("platform operator protects the last eligible member, verifies an addition 
   type Operator = {
     kind: "operator";
     account_id: string;
-    display_name: string;
+    display_name: string | null;
     eligible: boolean;
     granted_at: string;
   };
-  const operator = (account_id: string, display_name: string): Operator => ({
+  const operator = (account_id: string, display_name: string | null): Operator => ({
     kind: "operator",
     account_id,
     display_name,
     eligible: true,
     granted_at: paymentTime,
   });
-  const roster = [operator(I.account, "Sentetik İlk Operatör")];
+  const roster = [operator(I.account, null)];
   const writes: { verified_account_id: string; enabled: boolean; reason: string }[] = [];
   let lookupCount = 0;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
@@ -808,8 +808,11 @@ test("platform operator protects the last eligible member, verifies an addition 
   });
   await signIn(page);
   await page.goto("/platform?section=operators");
+  const operatorList = page.getByRole("list", { name: text.operators.title, exact: true });
+  await expect(operatorList.getByText("Sentetik Platform", { exact: true })).toBeVisible();
+  await expect(operatorList).not.toContainText(I.account);
   await expect(page.getByText(text.operators.last, { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /için yetkiyi kaldır/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Yetkiyi kaldır/ })).toHaveCount(0);
   await page.getByLabel(text.verifiedEmail, { exact: true }).fill(operatorEmail);
   await page.getByRole("button", { name: text.findAccount, exact: true }).click();
   await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
@@ -839,7 +842,7 @@ test("platform operator protects the last eligible member, verifies an addition 
   });
   await reason.fill("Kendi yetkimi kaldırıyorum");
   await page
-    .getByRole("button", { name: "Sentetik İlk Operatör için yetkiyi kaldır", exact: true })
+    .getByRole("button", { name: "Yetkiyi kaldır (Sentetik Platform)", exact: true })
     .click();
   await applyBillingReview(page, text.operators.remove);
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
