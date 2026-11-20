@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="reservation-selected-sale-scope"></a>
+## W1-BE-66 · Rezervasyonda seçilen satışın kapsamı
+
+Taban `4af32ff2f97ba73f3f13fe1fdccde41c27a26f4f`. [Aynı kaynak main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44635755692) başarılı. Tüketim [WF06](../../../docs/workflows.md#wf06) sahibindedir.
+
+215 migration içeren tabanda sentetik kapsam regresyonu doğrulandı. 216 migration ile izole loopback Supabase üzerinde tek seri runner’da 8/8 native backend testi geçti. Kapsam dışı satış rezervasyon ve kapasite istisnası yollarında iz bırakmadan reddedildi. Business’ta hedef merkez kapsamına giren satışın tahsisi, satış seçilmeden borçlanma ve mevcut borç kapısı doğrulandı. Aday CI ve hosted kabulü açık.
+
 <a id="shared-sql-settings"></a>
 ## Ortak SQL yetkilendirmesi ve ayar okumaları
 

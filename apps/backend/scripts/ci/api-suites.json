@@ -109,7 +109,7 @@
     },
     {
       "path": "apps/backend/tests/cross-center-settlement.test.mjs",
-      "sha256": "3b41aa0bef300a12549e79f89cd3d329fa35f106d65f1b888531c0827d157dd2",
+      "sha256": "c60f25c9bbeab0490cc291828fa7823e76dc2f72bea0e633b2166be9b31f80e5",
       "shared": [
         [
           1,
@@ -158,7 +158,7 @@
           "ranges": [
             [
               289,
-              314
+              347
             ]
           ]
         },
@@ -166,8 +166,8 @@
           "id": "cross-center-authority",
           "ranges": [
             [
-              315,
-              395
+              348,
+              428
             ]
           ]
         },
@@ -175,8 +175,8 @@
           "id": "cross-center-atomic",
           "ranges": [
             [
-              396,
-              447
+              429,
+              480
             ]
           ]
         }
