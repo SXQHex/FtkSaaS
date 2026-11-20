@@ -65,10 +65,11 @@ export function SettingsContent({
       : undefined;
   const organization = current?.selected,
     center = current?.centers.find((item) => item.id === scope.centerId && item.accessible);
+  const subscriptionSetup = organization?.access_mode === "bootstrap";
   const catalog = useQuery({
     queryKey: ["settings-organization-catalog", scope.accountId, scope.orgId],
     queryFn: () => readOrganizationSettingsCatalog(scope),
-    enabled: Boolean(organization && center && !workspace.isError),
+    enabled: Boolean(organization && center && !subscriptionSetup && !workspace.isError),
     retry: false,
   });
   useEffect(() => {
@@ -92,7 +93,9 @@ export function SettingsContent({
   // Owner is stored on the organization, not necessarily as a role-assignment row.
   // Native organization field access represents Owner/OM settings scope; each domain writer still rechecks its own gates.
   const organizationCatalog =
-    !catalog.isError && catalog.data?.state === "known" ? catalog.data.catalog : undefined;
+    !subscriptionSetup && !catalog.isError && catalog.data?.state === "known"
+      ? catalog.data.catalog
+      : undefined;
   const canOrganization = Boolean(organizationCatalog);
   const canWriteOrganization =
     organizationCatalog?.fields.some((field) => field.key === "address" && field.writable) === true;
@@ -106,6 +109,7 @@ export function SettingsContent({
       organizationLabel={organization.name}
       centerLabel={center.name}
       timezone={center.timezone}
+      subscriptionSetup={subscriptionSetup}
       canSubscription={
         organizationCatalog?.fields.some(
           (field) => field.key === "billing_name" && field.writable,
@@ -127,6 +131,7 @@ function SettingsManagement({
   organizationLabel,
   centerLabel,
   timezone,
+  subscriptionSetup,
   canOrganization,
   owner,
   canSubscription,
@@ -140,6 +145,7 @@ function SettingsManagement({
   organizationLabel: string;
   centerLabel: string;
   timezone: string;
+  subscriptionSetup: boolean;
   canOrganization: boolean;
   owner: boolean;
   canSubscription: boolean;
@@ -231,7 +237,7 @@ function SettingsManagement({
   });
   const subscription = useSettingsSubscription({
     scope,
-    enabled: allowed && canSubscription && level === "organization",
+    enabled: level === "organization" && (subscriptionSetup || (allowed && canSubscription)),
     timezone,
     locked,
     onAccessLost: accessLost,

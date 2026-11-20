@@ -126,13 +126,16 @@ export function WorkspaceLayout({
       : pathname.startsWith("/instructor/") && modes.includes("instructor")
         ? "instructor"
         : (modes[0] ?? "account");
-  const ownerScope =
-    !scope.isError && resolvedOrganizationId && centerId && roles.includes("owner")
+  const scopedAccount =
+    !scope.isError && resolvedOrganizationId && centerId
       ? { accountId, orgId: resolvedOrganizationId, centerId }
       : undefined;
+  const ownerScope = roles.includes("owner") ? scopedAccount : undefined;
+  const setupScope = view?.selected?.access_mode === "bootstrap" ? scopedAccount : undefined;
+  const subscriptionScope = ownerScope ?? setupScope;
   const subscription = useQuery(
-    ownerScope
-      ? settingsSubscriptionQuery(ownerScope)
+    subscriptionScope
+      ? settingsSubscriptionQuery(subscriptionScope)
       : { queryKey: ["settings-subscription-inactive", accountId], queryFn: skipToken },
   );
   const starter =
@@ -248,6 +251,19 @@ export function WorkspaceLayout({
             </BreadcrumbList>
           </Breadcrumb>
           <div className="ml-auto flex shrink-0 items-center gap-2">
+            {setupScope &&
+              !subscription.isError &&
+              !subscription.isFetching &&
+              subscription.data?.subscription.state === "pending_payment" && (
+                <LinkButton
+                  href={`/o/${setupScope.orgId}/c/${setupScope.centerId}/settings?section=plan`}
+                  variant="outline"
+                  size="sm"
+                  isDisabled={pending || scopeLocked || scopeControl?.locked}
+                >
+                  {t(($) => $.settings.tabs.plan)}
+                </LinkButton>
+              )}
             {modes.length > 1 && (
               <>
                 <ToggleGroup

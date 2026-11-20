@@ -73,7 +73,8 @@ export async function readWorkspace(accountId: string, organizationId?: string) 
           );
         if (
           error.code !== "FORBIDDEN" &&
-          !(error.code === "PLAN_FEATURE_UNAVAILABLE" && ownScopeAvailable)
+          !(error.code === "PLAN_FEATURE_UNAVAILABLE" && ownScopeAvailable) &&
+          !(error.code === "SUBSCRIPTION_NOT_STARTED" && selected.access_mode === "bootstrap")
         )
           throw error;
         // The denied directory contributes no roles. Native own scope remains authoritative.
