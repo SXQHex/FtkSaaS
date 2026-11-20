@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Field, FieldError, FieldLabel } from "../../components/ui/field";
 import { Input } from "../../components/ui/input";
 import { NativeSelect, NativeSelectOption } from "../../components/ui/native-select";
+import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -20,9 +21,11 @@ import {
 
 export function BusinessCenterCreate({
   scope,
+  quotaReached,
   onLockChange,
 }: {
   scope: ClientScope;
+  quotaReached: boolean;
   onLockChange: (locked: boolean) => void;
 }) {
   const { t } = useTranslation();
@@ -37,8 +40,17 @@ export function BusinessCenterCreate({
   const [intent, setIntent] = useState<ReturnType<typeof centerCreateIntent>>();
   const [accepted, setAccepted] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [quotaRejected, setQuotaRejected] = useState(false);
   const command = useMemberCommand({
-    write: writeCenter,
+    write: async (intent: Parameters<typeof writeCenter>[0]) => {
+      try {
+        return await writeCenter(intent);
+      } catch (error) {
+        if (error instanceof BackendError && error.code === "PLAN_LIMIT_REACHED")
+          setQuotaRejected(true);
+        throw error;
+      }
+    },
     readReceipt: centerCreateReceipt,
     readResult: readCreatedCenter,
     onAccessLost: () => false,
@@ -53,17 +65,21 @@ export function BusinessCenterCreate({
     return () => onLockChange(false);
   }, [command.locked, onLockChange]);
   const title = t(($) => $.businessCenters.add);
+  const quotaMessage = t(($) => $.businessCenters.quotaReached);
   function close() {
     if (command.locked) return;
     command.reset();
     setIntent(undefined);
     setAccepted(false);
+    setQuotaRejected(false);
+    if (quotaRejected) void client.invalidateQueries({ queryKey: ["workspace", scope.accountId] });
+    if (saved || quotaRejected)
+      void client.invalidateQueries({ queryKey: settingsSubscriptionQuery(scope).queryKey });
     if (saved) {
       setOpen(false);
       setSaved(false);
       setName("");
       setTimezone("");
-      void client.invalidateQueries({ queryKey: settingsSubscriptionQuery(scope).queryKey });
     }
   }
   function prepare() {
@@ -80,10 +96,24 @@ export function BusinessCenterCreate({
   }
   return (
     <div className="space-y-3">
-      <Button onPress={() => setOpen(!open)} aria-expanded={open} isDisabled={command.locked}>
-        {title}
-      </Button>
-      {open && (
+      <div className="flex flex-wrap items-center gap-x-3">
+        <Button
+          onPress={() => {
+            if (!quotaReached) setOpen(!open);
+          }}
+          aria-expanded={open && !quotaReached}
+          aria-disabled={quotaReached || undefined}
+          aria-describedby={quotaReached ? id + "-quota" : undefined}
+          isDisabled={command.locked}
+          variant={quotaReached ? "outline" : "default"}
+        >
+          {title}
+        </Button>
+        <p id={id + "-quota"} role="status" className="min-w-0 text-sm text-muted-foreground">
+          {quotaReached ? quotaMessage : null}
+        </p>
+      </div>
+      {open && !quotaReached && (
         <form
           className="max-w-xl space-y-3 rounded-lg border p-4"
           method="post"
@@ -156,7 +186,15 @@ export function BusinessCenterCreate({
           locked={command.locked}
           onClose={close}
           onApply={command.state === "ready" ? () => void command.start(intent) : undefined}
-          recoveryActions={<EventCommandNotice command={command} onReload={close} />}
+          recoveryActions={
+            quotaRejected ? (
+              <p role="status" className="text-sm text-destructive">
+                {quotaMessage}
+              </p>
+            ) : (
+              <EventCommandNotice command={command} onReload={close} />
+            )
+          }
         />
       )}
     </div>

@@ -200,13 +200,18 @@ function BusinessCenterPanels({
     );
   const max = data?.limits.entries.find((row) => row.key === "centers" && "value" in row);
   const usage = data?.usage.entries.find((row) => row.key === "centers")?.value;
-  const ownerQuotaAllowsCreate =
-    owner && max && "value" in max && usage !== undefined && usage < max.value;
-  const canCreate = orgManager || ownerQuotaAllowsCreate;
+  const hasQuota = max && "value" in max && usage !== undefined;
+  const quotaReached = Boolean(hasQuota && usage >= max.value);
   const root = (center: string) => `/o/${scope.orgId}/c/${center}`;
   return (
     <>
-      {canCreate && <BusinessCenterCreate scope={scope} onLockChange={onLockChange} />}
+      {(orgManager || (owner && hasQuota)) && (
+        <BusinessCenterCreate
+          scope={scope}
+          quotaReached={quotaReached}
+          onLockChange={onLockChange}
+        />
+      )}
       <Tabs defaultSelectedKey="centers" className="min-w-0">
         <div className="max-w-full overflow-x-auto pb-2">
           <TabsList aria-label={t(($) => $.businessCenters.sections)} variant="line">
@@ -225,7 +230,7 @@ function BusinessCenterPanels({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {max && "value" in max && usage !== undefined && (
+              {hasQuota && (
                 <p>{t(($) => $.businessCenters.quota, { used: usage, max: max.value })}</p>
               )}
               <Table

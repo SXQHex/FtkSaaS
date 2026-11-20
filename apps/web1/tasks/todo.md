@@ -1,7 +1,7 @@
 # FtkSaaS · Frontend geliştirme ve kabul listesi
 
 **Sıradaki iş** · Güncel adım ve teslim sayısının sahibi [başlangıç ve devam kaydı](#başlangıç-ve-devam-kaydı); yerel doğrulamanın ayrıntısı [otomatik rapordadır](../test-reports/verification.md).
-**Aktif hedef** · Açık Starter kabulü, 18 Kasım çizim farkları ve E49–E52 teslimi.<br>
+**Aktif hedef** · B01–B06 ve yayımlı Business kabulü.<br>
 **E49–E52** · [Merkezler](#e49) · [Organizasyonlar](#e50) · [Ödeme ve ek süre](#e51) · [Platform sahipleri](#e52).<br>
 **Çalışma alanı** · `apps/web1`, kendi npm kurulumu, testleri ve yayın süreci olan bağımsız uygulamadır. Üç plan aynı uygulamayı ve ortak backend sözleşmelerini kullanır.
 
@@ -9,14 +9,15 @@
 
 ## /goal yürütme talimatı
 
-Bu çalışmanın hedefi Starter kabulünü, 18 Kasım çizim farklarını ve E49–E52 sayfalarını yayımlanmış API sözleşmesiyle tamamlamaktır. Yeni işlerin sırası ve kanıtı [çizim uzlaştırmasındadır](#cizim-guncellemesi). **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#post-pro-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
+Bu çalışmanın güncel sırası ve kabul ölçütleri [Business bölümündedir](#business). 18 Kasım çizim farkları ve E49–E52 teslimi [çizim uzlaştırmasında](#cizim-guncellemesi) kayıtlıdır. **Kabul ve erteleme kuralı:** CI ile yapılabilen bütün kontroller otomasyonda tamamlanır; Pro sonrasına ertelenmez. **Yalnız CI ile yapılması mümkün olmayan kontroller**, gerekçesiyle [Pro teslim sonrası gerçek kontroller](#post-pro-kontroller) listesine yazılır. **Bu listedeki işler sayfa kapanışını, sayfa teslimini veya G-PRO-05’i engellemez.** Eksik işlev, yanlış API bağlantısı ve yapılabilir olduğu hâlde tamamlanmamış ya da başarısız otomatik kontrol teslim engelidir. Gerçek sağlayıcı kabulü ve native backend CI kanıtı ilgili kapsamda kaynak ve ortamıyla kaydedilir. İlk açık ve önkoşulları karşılanmış işi uygula, doğrula, kaydet ve sıradakine devam et. Teknik olarak karara bağlanabilen ayrıntıları mevcut kaynaklardan çöz.
 
 ### Başlangıç ve devam kaydı
 
-| Aktif adım           | Plan                | İşlev                         | Durum            | Sonraki eylem                              |
-| -------------------- | ------------------- | ----------------------------- | ---------------- | ------------------------------------------ |
-| **V08.2 / G-DESIGN** | Pro / Starter       | Teslim adayı ve çizim kabulü  | Kapandı.         | Otomatik ve yayımlı kabul kanıtı V08.2’de. |
-| **E49–E52**          | Business / Platform | Merkezler ve platform konsolu | E49–E52 kapandı. | Yayımlı platform sonucu E52.3’te.          |
+| Aktif adım           | Plan                | İşlev                         | Durum            | Sonraki eylem                                                                     |
+| -------------------- | ------------------- | ----------------------------- | ---------------- | --------------------------------------------------------------------------------- |
+| **V08.2 / G-DESIGN** | Pro / Starter       | Teslim adayı ve çizim kabulü  | Kapandı.         | Otomatik ve yayımlı kabul kanıtı V08.2’de.                                        |
+| **E49–E52**          | Business / Platform | Merkezler ve platform konsolu | E49–E52 kapandı. | Yayımlı platform sonucu E52.3’te.                                                 |
+| **B01**              | Business            | Merkez, kapsam ve politika    | Devam ediyor.    | Kanıt ve kalan adımlar [B01’de](#b01--merkezler-yönetici-kapsamı-ve-politikalar). |
 
 Git devamı: [PR333](https://github.com/SXQHex/FtkSaaS/pull/333) Starter zincirini, [PR335](https://github.com/SXQHex/FtkSaaS/pull/335) erişilebilirlik kabulünü, [PR337](https://github.com/SXQHex/FtkSaaS/pull/337) özel ders ve dönem sınırı kanıtını main’e taşıdı. [Backend desteği ve güncel CI kanıtı](request.md).
 
@@ -1609,9 +1610,11 @@ Yayımlı Business kabulü **G-STARTER** ve **G-DESIGN** sonrasında kapanır. K
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
 | G-STARTER | F01, F03, F04, F05, F32 · [WF02](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf02), [WF12](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf12), [WF13](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf13) | Organizasyon ve merkez bazlı ayrı test oturumları |
 
-- [ ] **B01.1** · A ve B merkezlerini oluştur. Merkez değişince oda, disiplin, görev ve sorgular doğru merkeze geçer.
-- [ ] **B01.2** · Organizasyonun zorunlu ve tavsiye ayarını iki merkezde dene. Yalnız izinli ayar merkezde değiştirilebilir, etkili değer ilgili işlemde kullanılır.
-- [ ] **B01.3** · Beşinci aktif merkezi aç, altıncıyı dene. Aktif merkez sayısı beşte kalır ve sonuç gerekçesiyle gösterilir.
+- [ ] **B01.1** · A ve B merkezlerini oluştur. Merkez değişince oda, disiplin, görev ve sorgular doğru merkeze geçer. Yerel Chromium iki merkezde ayrı yönetici ve disiplin sorgularını, önceki merkezin satırlarının kalkmasını ve yetkili B merkezinin salon okumasına geçişi doğruladı. [Web1 tarayıcı testi](../e2e/auth-business-centers.spec.ts).
+- [ ] **B01.2** · Organizasyonun zorunlu ve tavsiye ayarını iki merkezde dene. Yalnız izinli ayar merkezde değiştirilebilir, etkili değer ilgili işlemde kullanılır. Yerel Chromium, iki merkezde ortak zorunlu politikayı ve B’nin etkili tavsiye değerini gösterdi. B’de yalnız düzenlemeye uygun politika eylemi açıldı. [Web1 tarayıcı testi](../e2e/auth-business-centers.spec.ts) · [Native politika kabulü](../../backend/tests/settings-domain-closure-acceptance.mjs#L53).
+- [ ] **B01.3** · Beşinci aktif merkezi aç, altıncıyı dene. Aktif merkez sayısı beşte kalır ve sonuç gerekçesiyle gösterilir. Yerel Chromium, sahibin `5 / 5` okumasında klavyeyle erişilen kota açıklamasını doğruladı. Başka oturum son yeri aldığında organizasyon yöneticisi `PLAN_LIMIT_REACHED` gerekçesini gördü ve son merkez listesi yeniden okundu. [Web1 tarayıcı testi](../e2e/auth-business-centers.spec.ts) · [Native yarış testi](../../backend/tests/commercial-plan-acceptance.mjs#L64).
+
+B01 için yayımlı Web1 kabulü açık. Yerel ve native kanıtlar [Business teslimini](#business-kabulü) besler.
 
 ### B02 · Birleşik kişi ve CRM
 

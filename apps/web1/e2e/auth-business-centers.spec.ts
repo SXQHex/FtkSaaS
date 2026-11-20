@@ -14,7 +14,7 @@ const settlement = uid(264);
 const centerUrl = (center = I.center) => `/o/${I.org}/c/${center}/centers`;
 type Role = "owner" | "org_manager" | "center_manager";
 type Calls = { op: string; request: Record<string, unknown> }[];
-async function businessFixture(page: Page, role: Role, plan = "business") {
+async function businessFixture(page: Page, role: Role, plan = "business", activeCenters = 2) {
   await mockSettingsCompletion(page, { billingOwner: role === "owner" });
   const calls: Calls = [];
   const centers = [
@@ -35,6 +35,10 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
       version: 1,
     },
   ];
+  for (let index = centers.length; index < activeCenters; index++) {
+    centers.push({ ...centers[0]!, id: uid(280 + index), name: `Sentetik Merkez ${index + 1}` });
+  }
+  const centerLimit = 5;
   let targetCenter = null as string | null;
   let applicationVersion = 1;
   let state = "";
@@ -47,6 +51,69 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
     calls.push({ op, request });
     const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
     if (op === "centers_list_v1") return send(nativePage(centers));
+    if (op === "disciplines_list_v1" && request.center_id === second)
+      return send(
+        nativePage([
+          {
+            id: uid(290),
+            name: "Sentetik Salsa",
+            state: "active",
+            version: 1,
+            presentation: {
+              organization: {
+                description: null,
+                color: null,
+                icon: null,
+                display_order: 0,
+                public_visible: false,
+                allow_center_description: true,
+              },
+              center: {
+                id: uid(291),
+                state: "active",
+                version: 1,
+                presentation: { description: null, public_visible: false },
+              },
+            },
+          },
+        ]),
+      );
+    if (op === "management_state_get_v1" && request.center_id === second) {
+      if (request.operation === "class_save_v1") return send(nativePage([]));
+      if (request.operation === "room_save_v1") {
+        const room = uid(292);
+        return send(
+          nativePage([
+            metadata("room_save_v1", "rooms", room, {
+              room_id: room,
+              name: "Sentetik B salonu",
+              capacity: 24,
+            }),
+          ]),
+        );
+      }
+    }
+    if (op === "roles_list_v1" && role === "owner" && request.person_id === I.self)
+      return send(
+        nativePage([
+          {
+            id: uid(296),
+            person_id: I.self,
+            role: "owner",
+            state: "active",
+            version: 1,
+            scope_center_id: null,
+          },
+          ...[I.center, second].map((center, index) => ({
+            id: uid(297 + index),
+            person_id: I.self,
+            role: "center_manager",
+            state: "active",
+            version: 1,
+            scope_center_id: center,
+          })),
+        ]),
+      );
     if (op === "roles_list_v1" && role !== "owner" && request.person_id === I.self)
       return send(
         nativePage(
@@ -67,7 +134,7 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
         subscription_version: 1,
         limits: {
           entries: [
-            { key: "centers", value: 5 },
+            { key: "centers", value: centerLimit },
             { key: "active_students", value: 1250 },
           ],
         },
@@ -85,6 +152,14 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
       });
     if (op === "center_create_v1") {
       expect(request.org_id).toBe(I.org);
+      if (centers.length >= centerLimit)
+        return route.fulfill({
+          status: 409,
+          json: {
+            ok: false,
+            error: { code: "PLAN_LIMIT_REACHED", retryable: false, trace_id: I.role },
+          },
+        });
       centers.push({ ...centers[0]!, id: third, name: request.name, timezone: request.timezone });
       return send(nativeMutation(third));
     }
@@ -276,6 +351,9 @@ async function businessFixture(page: Page, role: Role, plan = "business") {
     return route.fallback();
   });
   return {
+    addConcurrentCenter: () => {
+      centers.push({ ...centers[0]!, id: uid(294), name: "Başka oturumun merkezi" });
+    },
     setDiscrepancy: () => {
       discrepancy = true;
     },
@@ -460,6 +538,160 @@ test("a Business organization manager can create a center without opening the ow
         (request.page as { limit: number }).limit === 3,
     ),
   ).toHaveLength(0);
+});
+
+test("a Business owner sees why adding a sixth active center is unavailable", async ({ page }) => {
+  const f = await businessFixture(page, "owner", "business", 4);
+  await page.goto(centerUrl());
+  const add = page.getByRole("button", { name: text.add, exact: true });
+  const form = page.getByRole("form", { name: text.add, exact: true });
+  await add.press("Enter");
+  await form.getByLabel(text.center, { exact: true }).fill("Beşinci merkez");
+  await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
+  await form.getByRole("button", { name: text.review, exact: true }).press("Enter");
+  await confirm(page, text.add);
+
+  const grid = page.getByRole("grid", { name: text.title });
+  await expect(grid.getByRole("row", { name: /Beşinci merkez/ })).toBeVisible();
+  await expect(grid.getByRole("row")).toHaveCount(6);
+  await expect(page.getByText("5 / 5 aktif merkez kullanılıyor.", { exact: true })).toBeVisible();
+  await expect(add).toBeDisabled();
+  await expect(add).toHaveAccessibleDescription(text.quotaReached);
+  await add.press("Enter");
+  await expect(add).toBeFocused();
+  await expect(form).toHaveCount(0);
+  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
+});
+
+test("Business center switching keeps resource and policy reads scoped to the selected center", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "owner");
+  const readPolicyIn: string[] = [];
+  await page.route("**/functions/v1/backend-v1/policies_get_v1", async (route) => {
+    const { org_id, center_id } = route.request().postDataJSON();
+    expect(org_id).toBe(I.org);
+    readPolicyIn.push(center_id);
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: I.role,
+        data: [
+          {
+            key: "debt_booking",
+            scope: { kind: "organization" },
+            value: { kind: "boolean", value: true },
+            effective_at: at,
+            mandatory: true,
+            version: 2,
+          },
+          {
+            key: "reservation_window",
+            scope:
+              center_id === second
+                ? { kind: "center", center_id: second }
+                : { kind: "organization" },
+            value: {
+              kind: "window",
+              opens_minutes_before: 10080,
+              closes_minutes_before: center_id === second ? 90 : 60,
+              manager_exception: false,
+            },
+            effective_at: at,
+            mandatory: false,
+            version: 3,
+          },
+        ],
+      },
+    });
+  });
+  await page.goto(centerUrl());
+  const selectTab = (name: string) => page.getByRole("tab", { name, exact: true }).click();
+  await selectTab(text.tabs.managers);
+  await expect(page.getByText("Sentetik yönetici", { exact: true })).toBeVisible();
+  await page.getByLabel(text.center, { exact: true }).selectOption(second);
+  await expect(page.getByText(text.empty, { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik yönetici", { exact: true })).toHaveCount(0);
+  expect(
+    f.calls
+      .filter(({ op, request }) => op === "roles_list_v1" && request.role === "center_manager")
+      .map(({ request }) => request.center_id),
+  ).toEqual([I.center, second]);
+
+  await selectTab(text.tabs.policies);
+  const mandatory = page.getByRole("listitem").filter({ hasText: "Borçta rezervasyon engeli" });
+  const advisory = page.getByRole("listitem").filter({ hasText: "Rezervasyon penceresi" });
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+  await expect(advisory).toContainText("Organizasyon · Tavsiye");
+  await expect(advisory).toContainText("Kapanış: 60 dakika önce");
+  await page.getByLabel(text.center, { exact: true }).selectOption(second);
+  await expect(mandatory).toContainText("Organizasyon · Zorunlu");
+  await expect(advisory).toContainText("Merkez · Tavsiye");
+  await expect(advisory).toContainText("Kapanış: 90 dakika önce");
+  expect(readPolicyIn).toEqual([I.center, second]);
+
+  await selectTab(text.tabs.disciplines);
+  const disciplines = page.getByRole("tabpanel", { name: text.tabs.disciplines });
+  await expect(disciplines.getByRole("listitem").filter({ hasText: "Tango" })).toBeVisible();
+  await page.getByLabel(text.center, { exact: true }).selectOption(second);
+  await expect(
+    disciplines.getByRole("listitem").filter({ hasText: "Sentetik Salsa" }),
+  ).toBeVisible();
+  await expect(disciplines.getByRole("listitem").filter({ hasText: "Tango" })).toHaveCount(0);
+  expect(
+    f.calls
+      .filter(({ op }) => op === "disciplines_list_v1")
+      .map(({ request }) => ({ center: request.center_id, include: request.include_presentation })),
+  ).toEqual([
+    { center: I.center, include: true },
+    { center: second, include: true },
+  ]);
+
+  await page.getByRole("link", { name: text.edit, exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/${second}/settings\\?section=salonlar`));
+  await expect(page.getByText("Sentetik B salonu", { exact: true })).toBeVisible();
+  await expect
+    .poll(() =>
+      f.calls.some(
+        ({ op, request }) =>
+          op === "management_state_get_v1" &&
+          request.operation === "room_save_v1" &&
+          request.center_id === second,
+      ),
+    )
+    .toBe(true);
+  await selectTab(text.tabs.policies);
+  const editPolicy = (label: string) =>
+    page.getByRole("row", { name: new RegExp(label) }).getByRole("button", {
+      name: common.settings.policyNative.edit,
+      exact: true,
+    });
+  await expect(editPolicy(common.settings.nativePolicies.keys.debt_booking)).toBeDisabled();
+  await expect(editPolicy(common.settings.nativePolicies.keys.reservation_window)).toBeEnabled();
+  expect(f.calls.some(({ op }) => op === "policy_publish_v1")).toBe(false);
+});
+
+test("a Business organization manager sees the native sixth-center rejection", async ({ page }) => {
+  const f = await businessFixture(page, "org_manager", "business", 4);
+  await page.goto(centerUrl());
+  await page.getByRole("button", { name: text.add, exact: true }).click();
+  const form = page.getByRole("form", { name: text.add, exact: true });
+  await form.getByLabel(text.center, { exact: true }).fill("Altıncı merkez");
+  await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
+  await form.getByRole("button", { name: text.review, exact: true }).click();
+
+  const dialog = page.getByRole("dialog", { name: text.add, exact: true });
+  await dialog.getByRole("checkbox").press("Space");
+  f.addConcurrentCenter();
+  await dialog.getByRole("button", { name: common.settings.applyReview, exact: true }).click();
+  await expect(dialog.getByRole("status")).toHaveText(text.quotaReached);
+  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  const grid = page.getByRole("grid", { name: text.title });
+  await expect(grid.getByText("Başka oturumun merkezi", { exact: true })).toBeVisible();
+  await expect(grid.getByRole("row")).toHaveCount(6);
+  await expect(grid.getByText("Altıncı merkez", { exact: true })).toHaveCount(0);
+  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
+  expect(f.calls.filter(({ op }) => op === "subscription_get_v1")).toEqual([]);
 });
 
 test("a center manager sees scoped duplicate suggestions and opens the native merge queue", async ({

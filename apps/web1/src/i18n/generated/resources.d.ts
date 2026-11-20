@@ -616,6 +616,7 @@ export default interface Resources {
       "plan": "Plan ve kaynak seçimini aç",
       "quantity": "Adet",
       "quota": "{{used}} / {{max}} aktif merkez kullanılıyor.",
+      "quotaReached": "Planın aktif merkez sınırı doldu. Yeni merkez eklenemiyor.",
       "reportDays": "Son {{count}} gün" | "Son {{count}} gün",
       "reportError": "Birleşik rapor okunamadı.",
       "reportFinance": {
