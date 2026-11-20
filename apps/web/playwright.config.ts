@@ -46,6 +46,7 @@ export default defineConfig({
       url: "http://127.0.0.1:4175",
       reuseExistingServer: false,
       env: {
+        FTK_VITE_CACHE_DIR: "node_modules/.vite-e2e-auth",
         VITE_SUPABASE_URL: "http://127.0.0.1:4175",
         VITE_SUPABASE_PUBLISHABLE_KEY: "public-test-key",
         VITE_APP_ORIGIN: "http://127.0.0.1:4175",
@@ -57,13 +58,21 @@ export default defineConfig({
       command: "pnpm dev --host 127.0.0.1 --port 4173 --strictPort --mode e2e",
       url: baseURL,
       reuseExistingServer: false,
-      env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
+      env: {
+        FTK_VITE_CACHE_DIR: "node_modules/.vite-e2e-public",
+        VITE_SUPABASE_URL: "",
+        VITE_SUPABASE_PUBLISHABLE_KEY: "",
+      },
     },
     {
       command: "pnpm dev --host 127.0.0.1 --port 4174 --strictPort --mode development",
       url: "http://127.0.0.1:4174",
       reuseExistingServer: false,
-      env: { VITE_SUPABASE_URL: "", VITE_SUPABASE_PUBLISHABLE_KEY: "" },
+      env: {
+        FTK_VITE_CACHE_DIR: "node_modules/.vite-e2e-devtools",
+        VITE_SUPABASE_URL: "",
+        VITE_SUPABASE_PUBLISHABLE_KEY: "",
+      },
     },
   ],
 });

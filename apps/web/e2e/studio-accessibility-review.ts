@@ -13,6 +13,7 @@ export async function reviewStudioAccessibility(page: Page, state: string) {
         typeof selector === "string"
           ? await page.evaluate(`(() => {
               const element = document.querySelector(${JSON.stringify(selector)});
+              if (!element) return null;
               const style = getComputedStyle(element),
                 box = element.getBoundingClientRect();
               const pixel = (color) => {

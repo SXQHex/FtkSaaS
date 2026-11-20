@@ -549,7 +549,7 @@ test("operator filters a native payment queue, rejects a report and replays one 
 
   const customer = await browser.newPage({ baseURL });
   try {
-    await mockSettingsCompletion(customer, { billingOwner: true });
+    await mockSettingsCompletion(customer, { billingOwner: true, startUrl: null });
     await customer.route("**/functions/v1/backend-v1/subscription_get_v1", (route) =>
       route.fulfill({
         json: {

@@ -66,9 +66,15 @@ test("event registration reads and accepts only the chosen member's own document
 });
 async function accept(page: import("@playwright/test").Page, button: string) {
   const dialog = page.getByRole("alertdialog");
-  await dialog
-    .getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim, onaylıyorum.", exact: true })
-    .press("Space");
+  const acknowledgement = dialog.getByRole("checkbox", {
+    name: "İşlemi ve etkilerini inceledim, onaylıyorum.",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  await acknowledgement.focus();
+  await expect(acknowledgement).toBeFocused();
+  await acknowledgement.press("Space");
+  await expect(acknowledgement).toBeChecked();
   await dialog.getByRole("button", { name: button, exact: true }).click();
   return dialog;
 }

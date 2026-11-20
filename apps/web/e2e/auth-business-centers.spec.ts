@@ -17,7 +17,7 @@ const centerUrl = (center = I.center) => `/o/${I.org}/c/${center}/centers`;
 type Role = "owner" | "org_manager" | "center_manager" | "staff";
 type Calls = { op: string; request: Record<string, unknown> }[];
 async function businessFixture(page: Page, role: Role, plan = "business", activeCenters = 2) {
-  await mockSettingsCompletion(page, { billingOwner: role === "owner" });
+  await mockSettingsCompletion(page, { billingOwner: role === "owner", startUrl: null });
   const calls: Calls = [];
   const centers = [
     {

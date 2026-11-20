@@ -53,7 +53,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
       await controls[1]!.click();
       await expect(page).toHaveURL(`${origin}/invite`);
-      await expect(page.getByLabel("E-posta", { exact: true })).toBeVisible();
+      await expect(page.getByRole("alert")).toContainText("Davet bağlantısı bulunamadı.");
       expect(writes).toBe(0);
       await page.goto("/login");
       await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
@@ -72,6 +72,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(writes).toBe(1);
       await page.getByRole("link", { name: "Doğru hesabı kontrol et", exact: true }).click();
       await expect(page).toHaveURL(`${origin}/invite`);
+      await expect(page.getByLabel("E-posta", { exact: true })).toBeVisible();
       await expect(page.getByLabel("E-posta", { exact: true })).toHaveValue(
         "fixture@example.invalid",
       );

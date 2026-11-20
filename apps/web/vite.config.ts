@@ -7,6 +7,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig(({ command, mode }) => ({
+  cacheDir: command === "serve" ? process.env.FTK_VITE_CACHE_DIR : undefined,
   plugins: [
     ...(command === "serve" && mode === "development" ? [devtools()] : []),
     {
