@@ -13,17 +13,22 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { parse } from "yaml";
 import { expect, test } from "vitest";
-import { eventScope, selectScope } from "../scripts/ci-scope.mjs";
+import { affectedBrowserSpecs, eventScope, selectScope } from "../scripts/ci-scope.mjs";
+import { browserMatrix } from "../scripts/browser-profiles.mjs";
 function workflow(name: string) {
   return parse(readFileSync(resolve(process.cwd(), "../../.github/workflows", name), "utf8"));
 }
 test("frontend checks retain build, coverage, isolation and all four browsers", () => {
   const config = workflow("frontend.yml");
-  expect(config.jobs.browsers.strategy.matrix.browser).toEqual([
-    "chromium",
-    "firefox",
-    "webkit",
-    "mobile",
+  expect(config.jobs.browsers.strategy.matrix).toBe(
+    "${{ fromJSON(needs.scope.outputs.e2e_matrix) }}",
+  );
+  expect(browserMatrix).toHaveLength(12);
+  expect(browserMatrix.filter(({ shard }) => shard === 1)).toEqual([
+    { profile: "chromium", engine: "chromium", shard: 1 },
+    { profile: "mobile-chromium", engine: "chromium", shard: 1 },
+    { profile: "mobile-webkit", engine: "webkit", shard: 1 },
+    { profile: "webkit", engine: "webkit", shard: 1 },
   ]);
   const commands = config.jobs.checks.steps.map((step: { run?: string }) => step.run);
   expect(commands).toContain(
@@ -34,10 +39,10 @@ test("frontend checks retain build, coverage, isolation and all four browsers", 
   const browserCommands = config.jobs.browsers.steps.map(
     (step: { run?: string }) => step.run ?? "",
   );
-  expect(browserCommands).toContain("pnpm --filter @ftksaas/web test:e2e:ci");
-  expect(browserCommands.some((command: string) => command.includes("turbo run test:e2e"))).toBe(
-    false,
+  expect(browserCommands.join("\n")).toContain(
+    "turbo run test:e2e:ci --filter=@ftksaas/web --affected",
   );
+  expect(config.jobs.browsers.steps[0].with["fetch-depth"]).toBe(0);
   const download = config.jobs.browsers.steps.find(
     (step: { name?: string }) => step.name === "Download verified build",
   );
@@ -45,6 +50,31 @@ test("frontend checks retain build, coverage, isolation and all four browsers", 
   expect(download.with["digest-mismatch"]).toBe("error");
   expect(commands).not.toContain("pnpm test:frontend:coverage");
   expect(commands).toContain("pnpm --filter @ftksaas/web test:isolation");
+});
+test("affected tests combine feature suites with smoke and expand on uncertain impact", () => {
+  const scope = (...paths: string[]) => ({
+    paths: paths.map((path) => ({
+      path,
+      document: false,
+      frontend: true,
+      compatibility: false,
+      regularSource: true,
+    })),
+  });
+  const help = "apps/web/src/features/help/help-view.tsx";
+  expect(
+    affectedBrowserSpecs(scope(help, "apps/web/e2e/auth-events.spec.ts"), "synchronize"),
+  ).toEqual([
+    "auth-events.spec.ts",
+    "auth-help.spec.ts",
+    "auth-states.spec.ts",
+    "login.spec.ts",
+    "states.spec.ts",
+    "static-build.spec.ts",
+  ]);
+  expect(affectedBrowserSpecs(scope(help, "packages/ui/src/components/button.tsx"))).toEqual([]);
+  expect(affectedBrowserSpecs(scope(help, "apps/web/e2e/auth-fixture.ts"))).toEqual([]);
+  expect(affectedBrowserSpecs(scope(help), "ready_for_review")).toEqual([]);
 });
 test("shared compatibility workflow performs type and graph checks without either application's test suite", () => {
   const config = workflow("frontend-compatibility.yml");
@@ -76,7 +106,13 @@ test.each([
       expect(config.on[event]["paths-ignore"]).toBeUndefined();
       expect(config.on[event].branches).toEqual(["main"]);
     }
-    expect(config.on.pull_request.types).toEqual(["opened", "synchronize", "reopened", "edited"]);
+    expect(config.on.pull_request.types).toEqual([
+      "opened",
+      "synchronize",
+      "reopened",
+      "edited",
+      ...(output === "frontend" ? ["ready_for_review"] : []),
+    ]);
     expect(config.on.workflow_dispatch).toBeNull();
     expect(config.on.push).toBeUndefined();
     expect(config.concurrency.group).toContain(
@@ -215,6 +251,15 @@ test("deletions and both rename endpoints are inspected", () =>
     write("apps/web/src/new.ts", "plain text");
     rmSync(join(dir, reviewed[0]));
     expect(selectScope(renamed, commit(), dir)).toMatchObject({ frontend: true });
+  }));
+
+test("a renamed or removed browser spec forces full discovery", () =>
+  fixture(({ dir, write, commit }) => {
+    const oldSpec = "apps/web/e2e/old.spec.ts";
+    write(oldSpec, "test fixture");
+    const base = commit();
+    renameSync(join(dir, oldSpec), join(dir, "apps/web/e2e/new.spec.ts"));
+    expect(affectedBrowserSpecs(selectScope(base, commit(), dir))).toEqual([]);
   }));
 
 test.each(["mode", "symlink", "nul", "utf8"])("%s cannot masquerade as reviewed prose", (kind) =>

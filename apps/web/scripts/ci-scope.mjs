@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import { browserMatrix } from "./browser-profiles.mjs";
 
 const documentRegistry = "apps/backend/scripts/ci/document-paths.json";
 const selector = "apps/web/scripts/ci-scope.mjs";
@@ -33,10 +34,51 @@ const selectionPaths = {
   ],
 };
 
+const smokeSpecs = ["login.spec.ts", "static-build.spec.ts"];
+const featureSpecs = [
+  {
+    paths: ["apps/web/src/features/help/**", "apps/web/src/routes/help.tsx"],
+    specs: ["auth-help.spec.ts", "auth-states.spec.ts", "states.spec.ts"],
+  },
+  {
+    paths: [
+      "apps/web/src/features/member-reservations/**",
+      "apps/web/src/routes/member.reservations.tsx",
+    ],
+    specs: [
+      "auth-inbox.spec.ts",
+      "auth-member-account.spec.ts",
+      "auth-own-entitlements.spec.ts",
+      "auth-own-reservations.spec.ts",
+      "auth-own-waitlist.spec.ts",
+    ],
+  },
+];
+
 function selected(path, patterns) {
   return patterns.some((pattern) =>
     pattern.endsWith("/**") ? path.startsWith(pattern.slice(0, -2)) : path === pattern,
   );
+}
+
+// An empty list selects the full suite. Only reviewed feature boundaries and
+// executable spec edits can use a narrower list.
+export function affectedBrowserSpecs(scope, action) {
+  if (action === "ready_for_review" || scope.paths.length === 0) return [];
+  const specs = new Set(smokeSpecs);
+  for (const change of scope.paths) {
+    if (change.document || (!change.frontend && !change.compatibility)) continue;
+    if (!change.regularSource) return [];
+    const spec = /^apps\/web\/e2e\/([a-z0-9-]+\.spec\.ts)$/.exec(change.path);
+    if (spec) {
+      specs.add(spec[1]);
+      continue;
+    }
+    const feature = featureSpecs.find(({ paths }) => selected(change.path, paths));
+    if (!feature) return [];
+    for (const file of feature.specs) specs.add(file);
+  }
+  return [...specs].sort();
 }
 
 export function selectScope(base, head, cwd = process.cwd()) {
@@ -95,7 +137,9 @@ export function selectScope(base, head, cwd = process.cwd()) {
     const compatibility = !document && selected(path, selectionPaths.compatibility);
     result.frontend ||= frontend;
     result.compatibility ||= compatibility;
-    result.paths.push({ path, document, frontend, compatibility });
+    const regularSource =
+      (metadata[1] === "000000" || metadata[1] === "100644") && metadata[2] === "100644";
+    result.paths.push({ path, document, frontend, compatibility, regularSource });
   }
   return result;
 }
@@ -131,16 +175,21 @@ export function eventScope(event, payload, sha, cwd = process.cwd()) {
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const { readFileSync } = await import("node:fs");
-  const scope = eventScope(
-    process.env.GITHUB_EVENT_NAME,
-    JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")),
-    process.env.GITHUB_SHA,
-  );
+  const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
+  const scope = eventScope(process.env.GITHUB_EVENT_NAME, event, process.env.GITHUB_SHA);
+  const e2e = affectedBrowserSpecs(scope, event.action);
   appendFileSync(
     process.env.GITHUB_OUTPUT,
-    `frontend=${scope.frontend}\ncompatibility=${scope.compatibility}\n`,
+    [
+      `frontend=${scope.frontend}`,
+      `compatibility=${scope.compatibility}`,
+      `e2e_base=${event.pull_request?.base?.sha ?? process.env.GITHUB_SHA}`,
+      `e2e_specs=${JSON.stringify(e2e)}`,
+      `e2e_matrix=${JSON.stringify({ include: browserMatrix })}`,
+      "",
+    ].join("\n"),
   );
-  const summary = `Frontend scope (selection only; skipped jobs are not test acceptance):\n\n\`\`\`json\n${JSON.stringify(scope, null, 2)}\n\`\`\`\n`;
+  const summary = `Frontend scope (selection only):\n\n\`\`\`json\n${JSON.stringify({ ...scope, e2e: e2e.length ? e2e : "full" }, null, 2)}\n\`\`\`\n`;
   console.log(summary);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
 }

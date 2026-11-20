@@ -4,10 +4,11 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "vitest";
 import { readBinding, validateProof, verifyMain } from "../scripts/ci-proof.mjs";
+import { browserMatrix } from "../scripts/browser-profiles.mjs";
 
 function fixture(kind = "frontend", attempt = 1) {
   const binding = {
-    version: 1,
+    version: 2,
     kind,
     repository: "owner/repo",
     pr: 108,
@@ -17,6 +18,7 @@ function fixture(kind = "frontend", attempt = 1) {
     tree: "tree",
     run: 10,
     source_attempt: 1,
+    e2e_specs: [],
   };
   const commit = { sha: "main", tree: { sha: "tree" }, parents: [{ sha: "b" }, { sha: "h" }] };
   const pr = {
@@ -48,13 +50,14 @@ function fixture(kind = "frontend", attempt = 1) {
             "Upload verified build",
           ],
           ...Object.fromEntries(
-            ["chromium", "firefox", "webkit", "mobile"].map((b) => [
-              `browsers (${b})`,
+            browserMatrix.map(({ profile, shard }) => [
+              `browsers (${profile}, ${shard})`,
               [
                 "Install selected browser",
                 "Download verified build",
                 "Verify and restore build",
                 "Test selected browser",
+                "Verify browser shard ran",
               ],
             ]),
           ),
@@ -90,6 +93,7 @@ function fixture(kind = "frontend", attempt = 1) {
       candidate: { ...commit, sha: "candidate" },
       run,
       jobs,
+      affectedSpecs: ["login.spec.ts", "static-build.spec.ts"],
     },
   };
 }
@@ -103,6 +107,14 @@ test.each(["frontend"])(
     }
   },
 );
+test("main accepts exactly the affected list or full scope for the same candidate", () => {
+  const { binding, proof } = fixture();
+  expect(() => validateProof({ ...binding, e2e_specs: ["login.spec.ts"] }, proof)).toThrow(
+    "BROWSER_SCOPE_MISMATCH",
+  );
+  expect(() => validateProof({ ...binding, e2e_specs: proof.affectedSpecs }, proof)).not.toThrow();
+  expect(() => validateProof(binding, proof)).not.toThrow();
+});
 test.each(["cancelled", "failure", "skipped", "timed_out"])(
   "rejects a required job still %s after rerun",
   (conclusion) => {
@@ -224,6 +236,7 @@ test.each(["success", "attempt-race", "late-artifact", "old-then-current", "expi
     const result = verifyMain({
       github,
       kind: "frontend",
+      readScope: () => ({ frontend: true, compatibility: false, paths: [] }),
       context: {
         eventName: "push",
         sha: "main",
@@ -248,6 +261,7 @@ test.each(["success", "attempt-race", "late-artifact", "old-then-current", "expi
               run: 10,
               attempt: 2,
               source_attempt: 1,
+              e2e_specs: [],
             },
             error: null,
           },
@@ -296,6 +310,7 @@ test("candidate receipt records the event merge and rejects changed checkout", (
       merge,
       run: 10,
       source_attempt: 1,
+      e2e_specs: [],
       tree: git("rev-parse", "HEAD^{tree}"),
     });
     git("checkout", "topic");

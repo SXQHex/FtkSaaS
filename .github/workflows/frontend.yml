@@ -2,7 +2,7 @@ name: Frontend checks
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened, edited]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
   workflow_dispatch:
 permissions: {}
 env:
@@ -20,6 +20,9 @@ jobs:
     timeout-minutes: 5
     outputs:
       frontend: ${{ steps.scope.outputs.frontend }}
+      e2e_base: ${{ steps.scope.outputs.e2e_base }}
+      e2e_specs: ${{ steps.scope.outputs.e2e_specs }}
+      e2e_matrix: ${{ steps.scope.outputs.e2e_matrix }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -92,20 +95,20 @@ jobs:
             packages/ui/coverage
           if-no-files-found: ignore
   browsers:
+    name: browsers (${{ matrix.profile }}, ${{ matrix.shard }})
     permissions:
       contents: read
     needs: [scope, checks]
     if: needs.scope.outputs.frontend == 'true'
     runs-on: ubuntu-24.04
-    # Chromium runs the complete end-to-end suite.
-    timeout-minutes: ${{ matrix.browser == 'chromium' && 65 || 45 }}
+    timeout-minutes: 65
     strategy:
       fail-fast: false
-      matrix:
-        browser: [chromium, firefox, webkit, mobile]
+      matrix: ${{ fromJSON(needs.scope.outputs.e2e_matrix) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -120,7 +123,7 @@ jobs:
       - name: Install selected browser
         timeout-minutes: 8
         env:
-          BROWSER: ${{ matrix.browser == 'mobile' && 'webkit' || matrix.browser }}
+          BROWSER: ${{ matrix.engine }}
         run: pnpm --filter @ftksaas/web exec node scripts/playwright.mjs install --with-deps "$BROWSER"
       # Exact artifact ID/output binding also supports a retained checks job on rerun.
       - name: Download verified build
@@ -137,12 +140,29 @@ jobs:
         run: node apps/web/scripts/ci-build.mjs restore
       - name: Test selected browser
         env:
-          FTK_BROWSER_PROJECT: ${{ matrix.browser }}
-        run: pnpm --filter @ftksaas/web test:e2e:ci
+          FTK_BROWSER_PROJECT: ${{ matrix.profile }}
+          FTK_BROWSER_SHARD: ${{ matrix.shard }}
+          FTK_E2E_SPECS: ${{ needs.scope.outputs.e2e_specs }}
+          TURBO_SCM_BASE: ${{ needs.scope.outputs.e2e_base }}
+          TURBO_SCM_HEAD: ${{ github.sha }}
+        run: |
+          report=apps/web/test-reports/playwright.json
+          rm -f "$report"
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web
+          else
+            pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web --affected
+            if [[ ! -f "$report" ]]; then
+              echo "The exact-source scope requires tests even though Turbo selected no package tasks."
+              pnpm exec turbo run test:e2e:ci --filter=@ftksaas/web
+            fi
+          fi
+      - name: Verify browser shard ran
+        run: node apps/web/scripts/check-test-results.mjs playwright apps/web/test-reports/playwright.json
       - if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: frontend-browser-${{ matrix.browser }}
+          name: frontend-browser-${{ matrix.profile }}-${{ matrix.shard }}
           path: |
             apps/web/test-results/
             apps/web/playwright-report/
