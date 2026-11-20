@@ -72,6 +72,7 @@ Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında,
 | W1-BE-63 | E50.5 · WF17 | Seçili organizasyonun platform faturalarını okuma | [Backend desteği karşılandı](#w1-be-63--platform-organizasyon-ayrıntısında-fatura-dizini). |
 | W1-BE-64 | V09.3 · WF07/WF11 | Gelen kutusunda yoklama düzeltme hedefi ve karar akışı | [Geri çekildi](#w1-be-64--gelen-kutusunda-yoklama-düzeltme-keşfi-ve-kararı). |
 | W1-BE-65 | V09.1 · WF11 | Katalog sürümünün geçersiz kılındığını yeniden okuma | [Backend desteği karşılandı](#w1-be-65--içerik-kataloğunda-geçersiz-kılma-durumunun-okunması). |
+| W1-BE-66 | B03.1 · WF06 | Açıkça seçilen satışın hedef merkezde kullanım uygunluğunu rezervasyonda doğrulama | [Development farkı doğrulandı](#w1-be-66--rezervasyonda-açık-satışın-merkez-kapsamı). |
 
 ## Bütün talepler için ortak sınır
 
@@ -529,3 +530,9 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 ## W1-BE-65 · İçerik kataloğunda geçersiz kılma durumunun okunması
 
 **Backend desteği karşılandı.** `content_catalog_get_v1` izinli katalog satırlarında `retired` ve `invalidated` alanlarını ayrı döndürüyor. [WF11](../../../docs/workflows.md#wf11) · [Web1 kabulü](todo.md#v09).
+
+## W1-BE-66 · Rezervasyonda açık satışın merkez kapsamı
+
+**Development farkı doğrulandı.** 20 Kasım Business denemesinde iki merkezde aktif bir sentetik öğrencinin A’ya özel satışı A seansı için uygun bulundu. B seansının `entitlements_get_v1` yanıtında satış yer almadı. Aynı satışla `reservation_create_v1` B’de başarılı oldu ve `reservation_list_v1` oluşan rezervasyonu bu satışa bağlı gösterdi. Sentetik rezervasyon iptal edildi, satış sonlandırıldı ve test bakiyesi kapatıldı. [Ana kabul](todo.md#b03--merkezler-arası-kullanım-hakkı) · [Development yeniden okuması](../.tmp/business-scoped-package-reconciliation.json).
+
+**İstenen doğrulama.** Açık `source_sale_id` gönderildiğinde yazar seçili satışın gerçek seans ve merkez kapsamını yeniden denetlemeli. A’ya özel satış B’de reddedilmeli. Ret rezervasyon, hak ayırma, negatif kredi hareketi veya bakiye değişikliği üretmemeli. Business’ta B kapsamını içeren A satışının yer ayırabildiği pozitif senaryo ve satış seçimi yapılmadan yürüyen mevcut borçlanma politikası korunmalı. [WF06](../../../docs/workflows.md#wf06).
