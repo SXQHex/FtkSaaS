@@ -1622,9 +1622,9 @@ B01 için yayımlı Web1 kabulü açık. Yerel ve native kanıtlar [Business tes
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | B01     | F04, F07, F21, F25 · [WF04](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf04), [WF09](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf09), [WF16](https://github.com/SXQHex/FtkSaaS/blob/main/docs/workflows.md#wf16) | A, B ve organizasyon gelen kutularının karşılaştırılması |
 
-- [ ] **B02.1** · Organizasyon gelen kutusundaki başvuruyu yetkili merkeze yönlendir veya izinli aktarımı yap. Kaynak ve karar geçmişi korunur.
-- [ ] **B02.2** · Merkezlerin ilgili kayıtları için yetkili kişi birleştirmesini tamamla. Tek organizasyon kişisi ve Abone No üzerinden ilişkiler izlenir.
-- [ ] **B02.3** · A merkezinin personeliyle yalnız B’ye ait kişi, CRM ve finans kaydını doğrudan açmayı dene. Yetkisiz sonuçta kişisel bilgi görünmez.
+- [ ] **B02.1** · Organizasyon gelen kutusundaki başvuruyu yetkili merkeze yönlendir veya izinli aktarımı yap. Kaynak ve karar geçmişi korunur. Yerel Chromium aynı başvuruyu sürümlü komutla B’ye yönlendirip yeniden okudu. [Web1 tarayıcı testi](../e2e/auth-business-centers.spec.ts) · [Native kaynak ve karar geçmişi](../../backend/tests/crm-application-review-acceptance.mjs).
+- [ ] **B02.2** · Merkezlerin ilgili kayıtları için yetkili kişi birleştirmesini tamamla. Tek organizasyon kişisi ve Abone No üzerinden ilişkiler izlenir. Yerel Chromium, merkez yöneticisinin yetkili öneri kuyruğuna geçişini, kapsamlı onayı ve birleştirme sonucunda önceki hak ve borçların okunmasını doğruladı. [Business tarayıcı testi](../e2e/auth-business-centers.spec.ts) · [Birleştirme testleri](../e2e/auth-merge.spec.ts).
+- [ ] **B02.3** · A merkezinin personeliyle yalnız B’ye ait kişi, CRM ve finans kaydını doğrudan açmayı dene. Yerel Chromium üç adreste de A’nın yetkili listesine döndü ve B kapsamı ile B kişi kimliği için API isteği göndermedi. [Web1 tarayıcı testi](../e2e/auth-business-centers.spec.ts).
 
 ### B03 · Merkezler arası kullanım hakkı
 

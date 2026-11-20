@@ -51,6 +51,15 @@ async function businessFixture(page: Page, role: Role, plan = "business", active
     calls.push({ op, request });
     const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
     if (op === "centers_list_v1") return send(nativePage(centers));
+    if (!centers[1]!.accessible && request.center_id === I.center) {
+      if (op === "finance_directory_get_v1") return send({ ...nativePage([]), view: request.view });
+      if (
+        op === "leads_list_v1" ||
+        op === "management_work_list_v1" ||
+        (op === "management_state_get_v1" && request.operation === "lead_save_v1")
+      )
+        return send(nativePage([]));
+    }
     if (op === "disciplines_list_v1" && request.center_id === second)
       return send(
         nativePage([
@@ -117,7 +126,10 @@ async function businessFixture(page: Page, role: Role, plan = "business", active
     if (op === "roles_list_v1" && role !== "owner" && request.person_id === I.self)
       return send(
         nativePage(
-          (role === "org_manager" ? [null] : [I.center, second]).map((center, index) => ({
+          (role === "org_manager"
+            ? [null]
+            : centers.filter((center) => center.accessible).map((center) => center.id)
+          ).map((center, index) => ({
             id: uid(265 + index),
             person_id: I.self,
             role,
@@ -353,6 +365,9 @@ async function businessFixture(page: Page, role: Role, plan = "business", active
   return {
     addConcurrentCenter: () => {
       centers.push({ ...centers[0]!, id: uid(294), name: "Başka oturumun merkezi" });
+    },
+    restrictSecondCenter: () => {
+      centers[1]!.accessible = false;
     },
     setDiscrepancy: () => {
       discrepancy = true;
@@ -717,4 +732,33 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
     center_id: I.center,
     page: { limit: 3 },
   });
+});
+
+test("Business direct person, CRM and finance links never use a center outside the actor's scope", async ({
+  page,
+}) => {
+  const f = await businessFixture(page, "center_manager");
+  f.restrictSecondCenter();
+
+  const personInB = uid(299);
+  const destinations = [
+    [`people/${personInB}`, "people"],
+    ["leads", "leads"],
+    ["finance", "finance"],
+  ];
+  for (const [direct, safe] of destinations) {
+    await page.goto(`/o/${I.org}/c/${second}/${direct}`);
+    await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
+    await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
+  }
+
+  expect(f.calls.filter(({ request }) => request.center_id === second)).toEqual([]);
+  expect(f.calls.filter(({ request }) => request.person_id === personInB)).toEqual([]);
+  for (const operation of ["people_list_v1", "leads_list_v1", "finance_directory_get_v1"]) {
+    expect(
+      f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
+    ).toBe(true);
+  }
+  expect(f.calls.filter(({ op }) => op === "center_create_v1")).toEqual([]);
 });
