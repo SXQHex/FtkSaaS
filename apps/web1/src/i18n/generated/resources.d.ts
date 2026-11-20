@@ -3366,6 +3366,7 @@ export default interface Resources {
       "operators": {
         "add": "Platform sahibi ekle",
         "already": "Bu hesap zaten platform operatörü.",
+        "currentAccount": "Kendi hesabınız",
         "eligible": "Hesap uygun",
         "empty": "Görüntülenecek platform operatörü yok.",
         "grantEffect": "Hesap platform konsolunun yönetim yetkilerini kazanacak.",
@@ -3373,10 +3374,11 @@ export default interface Resources {
         "last": "Son uygun operatör korunuyor",
         "member": "Platform operatörü",
         "remove": "Yetkiyi kaldır",
-        "removeMember": "{{label}} için yetkiyi kaldır",
+        "removeMember": "Yetkiyi kaldır ({{label}})",
         "revokeEffect": "Hesabın açık oturumları sonraki platform işlemlerinde yetki kontrolünden geçemeyecek.",
         "title": "Platform sahipleri",
-        "unlinked": "Hesap eşleşmesi yok"
+        "unlinked": "Hesap eşleşmesi yok",
+        "unnamed": "Adı kayıtlı olmayan platform sahibi"
       },
       "organization": "Organizasyon",
       "organizations": "Organizasyonlar",

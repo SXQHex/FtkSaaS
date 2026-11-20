@@ -160,7 +160,7 @@ function PlatformPage({
             onDenied={deny}
           />
         ) : operators ? (
-          <PlatformOperators accountId={account.id} onDenied={deny} />
+          <PlatformOperators currentAccount={account} onDenied={deny} />
         ) : payments ? (
           paymentId ? (
             organizationId ? (

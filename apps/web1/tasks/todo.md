@@ -370,6 +370,8 @@ JS `o-sahipler`. WF17. Hazır Card, Table, Sheet ve AlertDialog.
 
 - [x] **E52.4** · Operatör işlem kaydı kuruluş, askı/kaldırma, ödeme kararı, ek süre ve operatör yetkisi işlemlerini mevcut native sonuç doğrulamasından sonra gösterir. Aynı işlem anahtarı tek satır üretir. Kayıt konsol bölümleri arasında korunur, konsoldan ayrılınca, belge yenilenince veya yetki reddinde temizlenir. Gerekçe ve hesap e-postası kayda alınmaz. Tek Chromium işçisiyle 9 platform senaryosu geçti. [Yerel kabul](../e2e/auth-platform.spec.ts).
 
+Görünen ad düzeltmesinde oturum sahibinin satırı ilk dolu değeri kullanır. Sıra görünen ad, ad soyad ve doğrulanmış e-postadır. Görünen ad giriş e-postasından türetilmişse ad soyad önceliklidir. Platform grubunda 12 Chromium testi, dizinde e-posta görünen son varyantta iki ilgili operatör testi geçti. Adı bulunmayan diğer operatörler için dizin desteği [W1-BE-67](request.md#w1-be-67--platform-sahiplerinin-görünen-adı) altında. 20 Kasım 2026 17.22 TSİ’de ilk yerel üretim derlemesi development oturumunda profil adını gösterdi. Listede ham UUID görünmedi ve test oturumu kapandı.
+
 <a id="e53"></a>
 
 ### E53 · Giriş sonrası stüdyo ve merkez seçimi (kapandı)
