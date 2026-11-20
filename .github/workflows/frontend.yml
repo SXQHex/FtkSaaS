@@ -97,7 +97,8 @@ jobs:
     needs: [scope, checks]
     if: needs.scope.outputs.frontend == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    # Chromium runs the complete end-to-end suite.
+    timeout-minutes: ${{ matrix.browser == 'chromium' && 65 || 45 }}
     strategy:
       fail-fast: false
       matrix:

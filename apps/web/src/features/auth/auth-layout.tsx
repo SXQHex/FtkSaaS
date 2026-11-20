@@ -7,7 +7,16 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   return (
     <main className="auth-layout">
-      <div className="auth-left">
+      <div
+        className="auth-left"
+        onFocus={({ target }) => {
+          if (!target.matches(":focus-visible")) return;
+          requestAnimationFrame(() => {
+            // Native scrolling can leave the focused control partially outside the viewport.
+            if (document.activeElement === target) target.scrollIntoView({ block: "nearest" });
+          });
+        }}
+      >
         <AriaLink href="/login" className="auth-brand">
           <span className="auth-logo">{t(($) => $.auth.brandInitials)}</span>
           {t(($) => $.auth.brand)}

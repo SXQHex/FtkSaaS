@@ -9,6 +9,19 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig(({ command, mode }) => ({
   plugins: [
     ...(command === "serve" && mode === "development" ? [devtools()] : []),
+    {
+      name: "e2e-oauth-redirect",
+      apply: (_config, env) => env.command === "serve" && env.mode === "e2e",
+      configureServer(server) {
+        server.middlewares.use((request, response, next) => {
+          if (request.method !== "GET" || request.url?.split("?")[0] !== "/auth/v1/authorize") {
+            return next();
+          }
+          response.writeHead(302, { Location: "/auth/callback?code=fixture-google-code" });
+          response.end();
+        });
+      },
+    },
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,

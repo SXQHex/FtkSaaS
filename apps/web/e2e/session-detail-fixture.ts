@@ -473,6 +473,7 @@ export async function mockSessionDetail(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${appOrigin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(
     options.instructor
       ? `${appOrigin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`

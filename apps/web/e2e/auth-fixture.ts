@@ -227,11 +227,8 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
       );
       return route.fulfill({ json: {} });
     }
-    if (url.pathname === "/auth/v1/authorize")
-      return route.fulfill({
-        status: 302,
-        headers: { location: `${origin}/auth/callback?code=fixture-google-code` },
-      });
+    if (url.pathname === "/auth/v1/authorize" && url.origin === origins.auth)
+      return route.continue();
     if (url.pathname === "/auth/v1/token") {
       calls.exchange++;
       if (

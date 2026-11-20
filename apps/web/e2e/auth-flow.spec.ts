@@ -18,6 +18,7 @@ test("native recovery callback survives URL cleaning, reload and password save",
   expect(calls.recover).toBe(1);
   await page.goto("/auth/callback?code=fixture-recovery-code&next=/reset-password");
   await expect(page).toHaveURL(`${origin}/reset-password`);
+  await expect(page.getByLabel("Yeni parola")).toBeVisible();
   await page.reload();
   await expect(page.getByLabel("Yeni parola")).toBeVisible();
   const otherTab = await page.context().newPage();
@@ -77,6 +78,7 @@ test("native TOTP keeps the protected target closed until verification and AAL2 
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/mfa`);
+  await expect(page.getByLabel("Doğrulama kodu")).toBeVisible();
   await page.reload();
   await captureAuth(page, "e06", testInfo);
   expect(calls.account).toBe(0);
@@ -525,6 +527,7 @@ test("the last Google login method stays protected with a long provider email", 
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   calls.identityEmail = `${"a".repeat(63)}@${"b".repeat(50)}.example.invalid`;
   calls.onlyGoogleIdentity = true;
   await page.reload();
@@ -784,7 +787,15 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   await expect(scale).toBeEnabled();
   await expect(scale).toBeFocused();
   await scale.selectOption("1.1");
-  await expect(page.locator("html")).toHaveCSS("font-size", "17.6px");
+  // Browser layout rounds fractional CSS pixels at different precisions.
+  await expect
+    .poll(async () => {
+      const size = await page.evaluate<string>(
+        "getComputedStyle(document.documentElement).fontSize",
+      );
+      return Math.abs(Number.parseFloat(size) - 17.6);
+    })
+    .toBeLessThan(0.01);
   await expect(scale).toBeEnabled();
   await scale.selectOption("1");
   await expect(page.locator("html")).toHaveCSS("font-size", "16px");
@@ -1030,8 +1041,11 @@ test("signup validates policy, stops existing accounts and requests native confi
   });
   await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/login`);
+  await expect(page.getByRole("button", { name: "Giriş yap", exact: true })).toBeVisible();
   const beforeExpired = scopeReads.length;
-  await page.goto("/auth/callback?error=access_denied&error_code=otp_expired");
+  await page.goto("/auth/callback?error=access_denied&error_code=otp_expired", {
+    waitUntil: "commit",
+  });
   await expect(page).toHaveURL(`${origin}/auth/callback`);
   await expect(page.getByRole("alert")).toBeVisible();
   expect(scopeReads).toHaveLength(beforeExpired);

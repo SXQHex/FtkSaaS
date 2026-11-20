@@ -343,8 +343,11 @@ test("denied account sources stay unavailable and recover by reading", async ({ 
   ).toBeDisabled();
   expect(state.writes).toHaveLength(0);
   state.setDenied(false);
-  for (const button of await page.getByRole("button", { name: "Yeniden dene", exact: true }).all())
-    await button.click();
+  for (const message of ["Takvim bağlantıları okunamadı.", "Bildirim tercihleri okunamadı."]) {
+    const alert = page.getByRole("alert").filter({ hasText: message });
+    await alert.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+    await expect(alert).toHaveCount(0);
+  }
   await expect(
     page.getByRole("button", { name: "Takvim bağlantısı oluştur", exact: true }),
   ).toBeEnabled();

@@ -808,6 +808,7 @@ test("reservation cancellation denies a missing native action grant without losi
   await expect(dialog.getByRole("button", { name: "İptal et", exact: true })).toBeDisabled();
   expect(cancelWrites).toHaveLength(0);
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(page.locator('[data-slot="alert-dialog-overlay"]')).toHaveCount(0);
   await expect(opener).toBeFocused();
 });
 test("reservation cancellation keeps the frozen key after an unknown result and failed receipt read", async ({

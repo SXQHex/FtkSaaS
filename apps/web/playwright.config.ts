@@ -16,10 +16,10 @@ const crossBrowserAuth = ["**/auth-flow.spec.ts", "**/auth-recovery.spec.ts"];
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: Boolean(process.env.CI),
+  fullyParallel: fullSuite && Boolean(process.env.CI),
   forbidOnly: true,
   retries: 0,
-  workers: process.env.CI ? 2 : 1,
+  workers: fullSuite && process.env.CI ? 2 : 1,
   outputDir: "./test-results",
   reporter: [
     ["list"],

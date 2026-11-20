@@ -146,6 +146,7 @@ export function NavigationSearch({
             }
           >
             <CommandInput
+              autoFocus
               type="search"
               placeholder={t(($) => $.workspace.searchPlaceholder)}
               autoCorrect="off"
