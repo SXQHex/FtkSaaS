@@ -310,8 +310,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "9d95a09dbd5a790b5300ea0ce7e9353c93efb2fb635226ce28a429dea00ab02f",
-        "reason": "Rezervasyon kapsam kuralı mevcut operasyon sözleşmelerine işlendi. Aday test envanteri aynı birimleri koruyarak satırları yeniden bağlar."
+        "fingerprint": "710a56f1224492511d4b160bfc7f0515f47349ccdf242b5ff904d9c66d6dedff",
+        "reason": "Mevcut hesap ve operatör okuma sözleşmesi ile kimlik kabul testinin SHA-256 kaydı güncellendi."
       }
     },
     {
@@ -389,7 +389,9 @@
         "apps/backend/scripts/acceptance/s08-hosted-password.mjs",
         "apps/backend/scripts/acceptance/s08-hosted-recovery.mjs",
         "apps/backend/transports/spa-ingress-worker.mjs",
-        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
+        "apps/backend/database/account-display-label.sql",
+        "apps/backend/supabase/migrations/20261120145403_account_display_label.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -401,8 +403,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "11dd836ed8f08caf30c2d7dd1ed1bb79bbba1220c1eaa54a168a48283603c9d6",
-        "reason": "İlk hesabın eşzamanlı açılması ve canlı Auth, MFA ve hassas reauth kontrolleri incelendi."
+        "fingerprint": "3e560723c5a043787775bb6e8348663b59f0d4b1680fd564ddfac6ec0c9f7c79",
+        "reason": "Kendi hesap okuması kayıtlı ad ve doğrulanmış kimliği ortak etiket kuralıyla gösterir. Profil yazma ve native kimlik kaynağı korunur."
       }
     },
     {
@@ -1902,7 +1904,8 @@
         "apps/backend/tests/postgres-restore-acceptance.mjs",
         "apps/backend/tests/export-retention-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
-        "apps/backend/tests/public-program-discovery-acceptance.mjs"
+        "apps/backend/tests/public-program-discovery-acceptance.mjs",
+        "apps/backend/tests/account-identity-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1999,8 +2002,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "19501113d2dea1f23fd400666dad2b59dbddfe0d1abddec2a5879fb504ec7331",
-        "reason": "Sahip faturaları ve platform dizininde mevcut zaman, kapsam, cursor ve sayfa sırası incelendi."
+        "fingerprint": "dca96ff840a14114a89e688101c79113b2614891c8ab0e49d1e705b8ec13e0fb",
+        "reason": "Operatör dizini mevcut canlı yetki altında ortak hesap etiketini döndürür. Kapalı yanıt alanları korunur."
       }
     },
     {
