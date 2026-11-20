@@ -9,13 +9,13 @@ export const ownership=JSON.parse(fs.readFileSync(new URL('./scope.json',import.
 const documents=new Set(JSON.parse(fs.readFileSync(new URL('./document-paths.json',import.meta.url))));
 export function ownerOf(p){
  if(typeof p!=='string'||!p||p.includes('\\')||p.startsWith('/')||p.split('/').some(s=>!s||s==='.'||s==='..'))throw Error('INVALID_SOURCE_PATH '+p);
- if(isDesignSandbox(p))return 'sandbox';
  if(isAgentTooling(p)){
   if(/(?:^|\/)\.env(?!\.example$)/.test(p))throw Error('TRACKED_AGENT_ENVIRONMENT '+p);
   return 'agents';
  }
  // Reviewed prose wins over its containing application directory.
  if(documents.has(p))return 'documentation';
+ if(isDesignSandbox(p))return 'sandbox';
  for(const owner of ['frontend','backend'])if(ownership[owner+'Files'].includes(p)||ownership[owner+'Prefixes'].some(prefix=>p.startsWith(prefix)))return owner;
  // Generated JSON inventories remain backend inputs, never documentation.
  if(/^docs\/[a-z0-9-]+\.json$/.test(p))return 'backend';

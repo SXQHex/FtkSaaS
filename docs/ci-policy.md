@@ -145,4 +145,4 @@ Aday full clean başlayınca run/PR/head/base/tested merge/kuyruk/sonraki adım�
 
 ## Emekli deneysel alan
 
-`apps/web1/**` emekli kaynak yoludur. Eski adayların kaynak farkları ve taşımanın silinen ucu mevcut sandbox sınıflandırmasıyla okunur. Ürün kaynağı ve kalite kabulü `apps/web/**` kapsamındadır. Emekli yol workspace dışında kalır.
+`apps/web1/**` emekli kaynak yoludur. Taşıma sicilinde kayıtlı emekli belge yolları belge olarak sınıflandırılır. Diğer eski kaynak yolları sandbox sınıflandırmasıyla okunur. Ürün kaynağı ve kalite kabulü `apps/web/**` kapsamındadır. Emekli yol workspace dışında kalır.
