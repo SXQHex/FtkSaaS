@@ -538,4 +538,13 @@ Sahip `organization_billing_tax_get_v1/set_v1` ile vergi profilini okur ve sür�
 
 ## W1-BE-67 · Platform sahiplerinin görünen adı
 
-**Backend ihtiyacı.** `platform_directory_get_v1(view:operators)` development’ta profil adı bulunan bir platform sahibi için `display_name:null` döndürüyor. Mevcut `operator_manage` yetkisi altında her satırın `display_name` değerini sırayla görünen addan, ad soyaddan veya doğrulanmış e-postadan seç. İstemciye yalnız seçilen gösterim değeri gerekir. Tümü boşsa `display_name:null` dönebilir. Hesap UUID’si eylemlerde kimlik eşlemesi için kullanılır. [WF17](../../../docs/workflows.md#wf17) · [Web1 ekranı](todo.md#e52).
+**Backend ihtiyacı.** `platform_directory_get_v1(view:operators)` development’ta profil adı bulunan bir platform sahibi için `display_name:null` döndürüyor. Mevcut `operator_manage` yetkisi altında her operatör için sırayla açıkça tanımlanmış görünen adı, dolu ad ve soyad parçalarından oluşan adı, ardından doğrulanmış e-postayı değerlendir. Giriş e-postasından türetilmiş varsayılan görünen ad varsa ad soyad e-postadan önce gelir. Yalnız seçilen etiket mevcut `display_name` alanında döner. Uygun etiket yoksa `display_name:null` döner. Hesap UUID’si eylemlerde kimlik eşlemesi için kullanılır.
+
+**Kabul ölçütleri**
+
+- Açıkça tanımlanmış görünen ad, ad soyad ve doğrulanmış e-posta birlikte doluyken dizin görünen adı döndürür.
+- Görünen ad boşsa veya giriş e-postasından türetilmişse dizin dolu ad ve soyad parçalarını birleştirerek döndürür.
+- Ad parçaları da boşsa dizin doğrulanmış e-postayı döndürür. Doğrulanmış e-posta da yoksa sonuç `null` olur.
+- Sıralama oturum sahibine ve diğer operatörlere uygulanır. `operator_manage` yetkisi olmayan oturum dizini okuyamaz. Dizin seçilen etiket dışında ek kişisel alan döndürmez.
+
+[WF17](../../../docs/workflows.md#wf17) · [Web1 ekranı](todo.md#e52).
