@@ -12,7 +12,11 @@ import {
 import { studioIds as I } from "./studio-fixture.js";
 export async function mockSettingsCompletion(
   page: Page,
-  options: { permissionUnknown?: boolean; billingOwner?: boolean } = {},
+  options: {
+    permissionUnknown?: boolean;
+    billingOwner?: boolean;
+    businessDowngrade?: boolean;
+  } = {},
 ) {
   const writes: { op: string; r: NativeRequest }[] = [];
   const state = {
@@ -74,6 +78,7 @@ export async function mockSettingsCompletion(
     pending: false,
     transitioned: false,
     kept: undefined as NativeRequest | undefined,
+    keptCenterId: undefined as string | undefined,
     failed: false,
   };
   const target = {
@@ -82,6 +87,16 @@ export async function mockSettingsCompletion(
     effective_at: "2099-01-01T00:00:00Z",
     kept_center_required: true,
   };
+  const targets = options.businessDowngrade
+    ? [
+        {
+          ...target,
+          plan: "pro",
+          target: { ...target.target, id: uid(140), amount_minor: "90000" },
+        },
+        target,
+      ]
+    : [target];
   const staff = {
     id: uid(102),
     person_id: I.instructor,
@@ -155,6 +170,17 @@ export async function mockSettingsCompletion(
     },
   };
   const f = await mockCompletion(page, async ({ op, r, send, abort }) => {
+    if (op === "centers_list_v1" && options.businessDowngrade) {
+      const center = {
+        id: I.center,
+        name: "Fixture Center",
+        timezone: "Europe/Istanbul",
+        state: "active",
+        accessible: true,
+        version: 1,
+      };
+      await send(nativePage([center, { ...center, id: uid(141), name: "İkinci merkez" }]));
+    }
     if (op === "roles_list_v1") {
       const self = {
         id: uid(103),
@@ -316,7 +342,7 @@ export async function mockSettingsCompletion(
     if (op === "subscription_get_v1")
       await send({
         state: "active",
-        plan: state.transitioned ? "starter" : "pro",
+        plan: state.transitioned ? "starter" : options.businessDowngrade ? "business" : "pro",
         period_start: state.transitioned ? target.effective_at : at,
         period_end: state.transitioned ? "2099-02-01T00:00:00Z" : target.effective_at,
         grace_until: null,
@@ -329,14 +355,16 @@ export async function mockSettingsCompletion(
         limits: { entries: [] },
         usage: { entries: [] },
         pending_starter_scope:
-          state.pending && !state.transitioned ? { center_id: I.center, scope: state.kept } : null,
+          state.pending && !state.transitioned && state.kept
+            ? { center_id: state.keptCenterId, scope: state.kept }
+            : null,
         billing: {
           current: state.transitioned
             ? target.target
             : { id: uid(110), period: "monthly", amount_minor: "100000", currency: "TRY" },
           period_change_options: [],
           pending_period_change: null,
-          downgrade_options: state.transitioned ? [] : [target],
+          downgrade_options: state.transitioned ? [] : targets,
           upgrade_options: [],
         },
       });
@@ -344,6 +372,7 @@ export async function mockSettingsCompletion(
       writes.push({ op, r });
       state.pending = true;
       state.kept = structuredClone(r.kept_scope);
+      state.keptCenterId = r.kept_center_id;
       state.subVersion++;
       await send(nativeMutation(uid(109)));
     }
@@ -434,7 +463,9 @@ export async function mockSettingsCompletion(
           "saas_subscriptions",
           uid(113),
           {
-            target_plan_id: target.target.id,
+            target_plan_id:
+              targets.find((item) => item.target.id === key.target_plan_id)?.target.id ??
+              target.target.id,
             kept_center_id: key.kept_center_id ?? null,
             expected_version: state.subVersion,
           },

@@ -49,7 +49,7 @@ export function SettingsDowngradeEditor({
   const [targetId, setTarget] = useState<string | null>(null),
     [centerId, setCenter] = useState(""),
     [kept, setKept] = useState<StarterRetainedScope>(structuredClone(blank)),
-    [review, setReview] = useState<SettingsDowngradeIntent>(),
+    [review, setReview] = useState<SettingsDowngradeIntent & { centerName?: string }>(),
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState(false);
@@ -89,6 +89,9 @@ export function SettingsDowngradeEditor({
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const activeCenters = (
+    centers.isError ? [] : (centers.data?.pages.flatMap((page) => page.items) ?? [])
+  ).filter((center) => center.state === "active");
   const sources = useQueries({
     queries: kinds.map((kind) => ({
       queryKey: [
@@ -126,10 +129,12 @@ export function SettingsDowngradeEditor({
     setError(false);
     try {
       const intent = await settingsDowngradeIntent(before, targetId, centerId || undefined, kept);
+      const centerName = activeCenters.find((center) => center.id === intent.centerId)?.name;
+      if (intent.centerId && !centerName) throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");
       if (active.current) {
         command.reset();
         setAccepted(false);
-        setReview(intent);
+        setReview({ ...intent, centerName });
       }
     } catch (cause) {
       if (active.current && !onAccessLost(cause)) setError(true);
@@ -155,6 +160,15 @@ export function SettingsDowngradeEditor({
             title: t(($) => $.settings.downgrade.effective),
             detail: date(review.target.effective_at),
           },
+          ...(review.centerName
+            ? [
+                {
+                  id: "center",
+                  title: t(($) => $.settings.downgrade.center),
+                  detail: review.centerName,
+                },
+              ]
+            : []),
           ...(review.kept
             ? [
                 {
@@ -267,13 +281,11 @@ export function SettingsDowngradeEditor({
                 <NativeSelectOption value="">
                   {t(($) => $.settings.downgrade.choose)}
                 </NativeSelectOption>
-                {(!centers.isError ? (centers.data?.pages.flatMap((page) => page.items) ?? []) : [])
-                  .filter((row) => row.state === "active")
-                  .map((row) => (
-                    <NativeSelectOption key={row.id} value={row.id}>
-                      {row.name}
-                    </NativeSelectOption>
-                  ))}
+                {activeCenters.map((center) => (
+                  <NativeSelectOption key={center.id} value={center.id}>
+                    {center.name}
+                  </NativeSelectOption>
+                ))}
               </NativeSelect>
               {centers.hasNextPage && (
                 <Button
