@@ -17,6 +17,39 @@ async function confirm(page: import("@playwright/test").Page) {
     .click();
   return dialog;
 }
+test("a pending subscription owner can reach the first payment form through the Plan link", async ({
+  page,
+}) => {
+  const fixture = await mockSettingsCompletion(page, { bootstrapBilling: "owner" });
+  await page.goto(`${origin}/account?org=${I.org}&center=${I.center}`);
+  await page.getByRole("link", { name: common.settings.tabs.plan, exact: true }).press("Enter");
+  await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/settings?section=plan`);
+  const plan = page.getByRole("tabpanel", { name: common.settings.tabs.plan, exact: true });
+  await expect(plan.getByText(/Ödeme bekliyor/)).toBeVisible();
+  await expect(plan.getByRole("button", { name: common.settings.changePlan })).toBeDisabled();
+  await plan
+    .getByRole("button", { name: common.settings.reportPayment, exact: true })
+    .press("Enter");
+  await expect(
+    page.getByRole("dialog", { name: common.settings.paymentEditor.title }),
+  ).toBeVisible();
+  expect(fixture.writes).toEqual([]);
+});
+
+test("a pending organization's member gets no billing link or payment action", async ({ page }) => {
+  const fixture = await mockSettingsCompletion(page, { bootstrapBilling: "member" });
+  await page.goto(`${origin}/o/${I.org}/c/${I.center}/settings?section=plan`);
+  await expect(
+    page.getByRole("alert").filter({ hasText: common.settings.subscriptionReadError }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: common.settings.tabs.plan, exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: common.settings.reportPayment, exact: true }),
+  ).toBeDisabled();
+  expect(fixture.writes).toEqual([]);
+});
 test("command palette opens a settings section in the current managed center", async ({ page }) => {
   const fixture = await mockSettingsCompletion(page);
   await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();

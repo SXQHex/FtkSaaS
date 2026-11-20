@@ -16,6 +16,7 @@ export async function mockSettingsCompletion(
     permissionUnknown?: boolean;
     billingOwner?: boolean;
     businessDowngrade?: boolean;
+    bootstrapBilling?: "owner" | "member";
   } = {},
 ) {
   const writes: { op: string; r: NativeRequest }[] = [];
@@ -169,7 +170,48 @@ export async function mockSettingsCompletion(
       exceptions: ["security", "center_cancellation", "near_24h_change", "expiring_seat_offer"],
     },
   };
-  const f = await mockCompletion(page, async ({ op, r, send, abort }) => {
+  const f = await mockCompletion(page, async ({ op, r, send, fail, abort }) => {
+    if (options.bootstrapBilling) {
+      if (op === "organizations_list_v1") {
+        return send(
+          nativePage([
+            {
+              id: I.org,
+              name: "Fixture Studio",
+              state: "active",
+              access_mode: "bootstrap",
+              version: 1,
+              self_context: { person_id: I.self, subscriber_number: null, centers: [] },
+              self_management_scope: null,
+            },
+          ]),
+        );
+      }
+      if (op === "roles_list_v1" || (op === "settings_catalog_get_v1" && r.org_id))
+        return fail("SUBSCRIPTION_NOT_STARTED");
+      if (op === "subscription_get_v1") {
+        if (options.bootstrapBilling === "member") return fail("FORBIDDEN");
+        return send({
+          state: "pending_payment",
+          plan: "business",
+          period_start: null,
+          period_end: null,
+          grace_until: null,
+          cancel_at_period_end: false,
+          pending_change: null,
+          subscription_version: 1,
+          limits: { entries: [] },
+          usage: { entries: [] },
+          billing: {
+            current: { id: uid(110), period: "monthly", amount_minor: "100000", currency: "TRY" },
+            period_change_options: [],
+            pending_period_change: null,
+            downgrade_options: [],
+            upgrade_options: [],
+          },
+        });
+      }
+    }
     if (op === "centers_list_v1" && options.businessDowngrade) {
       const center = {
         id: I.center,

@@ -13,6 +13,7 @@ let empty: boolean, multiple: boolean, scopeChanged: boolean;
 let selfRole: "instructor" | "student" | undefined;
 let roleReadError: string | undefined;
 let selfManagement: OrganizationView["self_management_scope"];
+let organizationAccess: OrganizationView["access_mode"];
 const requests: { operation: string; bearer: string | null; body: Record<string, unknown> }[] = [];
 beforeEach(() => {
   empty = false;
@@ -21,6 +22,7 @@ beforeEach(() => {
   selfRole = undefined;
   roleReadError = undefined;
   selfManagement = undefined;
+  organizationAccess = "normal";
   requests.length = 0;
   vi.stubEnv("VITE_SUPABASE_URL", "https://backend.invalid");
   vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "public-test-key");
@@ -47,7 +49,7 @@ beforeEach(() => {
                     id: orgId,
                     name: "Owned fixture",
                     state: "active",
-                    access_mode: "normal",
+                    access_mode: organizationAccess,
                     version: 1,
                     ...(selfManagement !== undefined
                       ? { self_management_scope: selfManagement }
@@ -219,6 +221,20 @@ it("treats explicit null and center-specific scope as authoritative over old rol
 });
 it("surfaces a management plan denial when there is no verified personal scope", async () => {
   roleReadError = "PLAN_FEATURE_UNAVAILABLE";
+  await expect(readWorkspace(accountId, orgId)).rejects.toMatchObject({ code: roleReadError });
+});
+it("keeps verified setup centers readable while a subscription has yet to start", async () => {
+  organizationAccess = "bootstrap";
+  selfManagement = null;
+  roleReadError = "SUBSCRIPTION_NOT_STARTED";
+  const result = await readWorkspace(accountId, orgId);
+  expect(result.selected?.access_mode).toBe("bootstrap");
+  expect(result.centers.map(({ id }) => id)).toEqual([centerId]);
+  expect(result.roles).toEqual([]);
+  expect(hasWorkspaceManagementScope(result, centerId)).toBe(false);
+});
+it("surfaces a subscription denial outside organization setup", async () => {
+  roleReadError = "SUBSCRIPTION_NOT_STARTED";
   await expect(readWorkspace(accountId, orgId)).rejects.toMatchObject({ code: roleReadError });
 });
 it("surfaces a temporary role read failure even when the actor has personal scope", async () => {
