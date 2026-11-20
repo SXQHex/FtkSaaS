@@ -64,13 +64,20 @@ test("event registration reads and accepts only the chosen member's own document
   expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1", "event_register_v1"]);
   expect(state.event.registrations?.[0]?.person_id).toBe(I.self);
 });
-async function accept(page: import("@playwright/test").Page, button: string) {
+async function accept(page: Page, button: string, options?: { dialogAlreadyOpen: true }) {
   const dialog = page.getByRole("alertdialog");
   const acknowledgement = dialog.getByRole("checkbox", {
     name: "İşlemi ve etkilerini inceledim, onaylıyorum.",
     exact: true,
   });
   await expect(dialog).toBeVisible();
+  // React Aria places initial focus after mounting the modal and its enter state.
+  await page.evaluate(
+    "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))",
+  );
+  if (!options?.dialogAlreadyOpen) {
+    await expect(dialog.and(page.locator(":focus-within"))).toBeVisible();
+  }
   await acknowledgement.focus();
   await expect(acknowledgement).toBeFocused();
   await acknowledgement.press("Space");
@@ -322,7 +329,7 @@ test("event cancellation exposes server effects before its separately reviewed a
   await expect(dialog.getByText(/sunucunun güncel önizlemesidir/)).toBeVisible();
   await expect(dialog.getByText(/₺400,00/)).toBeVisible();
   await expect(dialog.getByText(/₺100,00/)).toBeVisible();
-  await accept(page, "Etkinliği iptal et");
+  await accept(page, "Etkinliği iptal et", { dialogAlreadyOpen: true });
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.event.state).toBe("cancelled");
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
