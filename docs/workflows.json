@@ -310,8 +310,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "03f0f2f26ad4e9f4e682e97dd0751f8513a959b4cb009a5915d8b40594b2bb8f",
-        "reason": "Ortak rapor REST kabulünde yeni ve eski cursor ile kapsam reddi senaryoları incelendi."
+        "fingerprint": "9d95a09dbd5a790b5300ea0ce7e9353c93efb2fb635226ce28a429dea00ab02f",
+        "reason": "Rezervasyon kapsam kuralı mevcut operasyon sözleşmelerine işlendi. Aday test envanteri aynı birimleri koruyarak satırları yeniden bağlar."
       }
     },
     {
@@ -930,7 +930,8 @@
         "apps/backend/tests/fixtures/lesson-request-status-summary.sql",
         "apps/backend/tests/member-lesson-discovery-unit.mjs",
         "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
-        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs"
+        "apps/backend/tests/ledger-inbox-automation-acceptance.mjs",
+        "apps/backend/tests/cross-center-settlement.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -993,7 +994,9 @@
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
         "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
         "apps/backend/database/lesson-request-student-note.sql",
-        "apps/backend/supabase/migrations/20261118211500_lesson_request_student_note.sql"
+        "apps/backend/supabase/migrations/20261118211500_lesson_request_student_note.sql",
+        "apps/backend/database/reservation-selected-sale-scope.sql",
+        "apps/backend/supabase/migrations/20261120005843_reservation_selected_sale_scope.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -1008,8 +1011,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "a07270e7e2e659eee59d5f2cfde59322f243597c46fc94abb51b8ca597d3e2b1",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "50db31bc17cf6e7978f53f36d8e8df6a3798511839f805a65ce673dc67d8c9c3",
+        "reason": "Rezervasyon ve kapasite istisnası açık satışın gerçek seans kapsamını borçlanma öncesi doğrular. Yerel hak ve borçlanma senaryoları eklendi."
       }
     },
     {
@@ -2029,8 +2032,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "e9d58146ab73aff481a9a9901dcf5e08235830e922a635a27c05180bbcb8a441",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "41b1c9cf20533037fb8814529cff155a4933b99cd8463dd159f072a1b54f55b0",
+        "reason": "Ortak merkezler arası kabul kaynağı B kapsamındaki A satışının hak ayırmasını ve kaynak seçilmeden borçlanmayı doğrular."
       }
     },
     {

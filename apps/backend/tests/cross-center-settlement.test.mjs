@@ -288,6 +288,39 @@ test("Cross-center largest remainder, release and reconsume",async t=>{
 });
 test("Cross-center source scope and independent earning override",async t=>{
  const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
+ await t.test('W1-BE-66 selected sale respects the session scope and source-less borrowing still works',async()=>{
+  const local=await sell(await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]));
+  const starts=new Date(Date.now()+86400000);
+  const session=await mut('session_create_v1',{discipline_id:D,format:'group',
+   interval:{starts_at:starts.toISOString(),ends_at:new Date(+starts+1800000).toISOString()},resources:[],
+   assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{total:10}},B);
+  const booking={person_id:student.p,session_id:session.primary_id,mode:'flexible'};
+  const available=async()=>read('entitlements_get_v1',{person_id:student.p,session_id:session.primary_id,booking_mode:'flexible'},B);
+  assert(!(await available()).some(x=>x.sale_id===local));
+  const snapshot=()=>rows(`select
+   (select count(*) from core.reservations where org_id=$1) as reservations,
+   (select count(*) from core.entitlement_allocations where org_id=$1) as allocations,
+   (select count(*) from core.entitlement_movements where org_id=$1) as movements,
+   (select count(*) from core.credit_deficits where org_id=$1) as deficits,
+   (select count(*) from private.lesson_deficit_movements where org_id=$1) as deficit_movements,
+   (select balance_version from core.entitlement_accounts where org_id=$1 and sale_id=$2) as balance_version,
+   (select count(*) from core.operation_receipts where org_id=$1) as receipts`,[org,local]);
+  const before=await snapshot();
+  await fail('reservation_create_v1',{...booking,source_sale_id:local},'ENTITLEMENT_UNAVAILABLE',B,student.u);
+  await fail('reservation_capacity_override_v1',{...booking,source_sale_id:local,reason:'Synthetic capacity exception'},'ENTITLEMENT_UNAVAILABLE',B);
+  assert.deepEqual(await snapshot(),before);
+
+  const borrowed=await mut('reservation_create_v1',booking,B,student.u);
+  assert.deepEqual(await rows(`select r.source_sale_id,d.state,d.center_id from core.reservations r
+   join core.credit_deficits d on d.org_id=r.org_id and d.reservation_id=r.id where r.id=$1`,[borrowed.primary_id]),
+  [{source_sale_id:null,state:'reserved',center_id:B}]);
+
+  const eligible=await sell(baseProduct,A,manager.p);
+  const paid=await mut('reservation_create_v1',{...booking,person_id:manager.p,source_sale_id:eligible},B);
+  assert.deepEqual(await rows(`select r.source_sale_id,a.sale_id,a.state from core.reservations r
+   join core.entitlement_allocations a on a.org_id=r.org_id and a.reservation_id=r.id where r.id=$1`,[paid.primary_id]),
+  [{source_sale_id:eligible,sale_id:eligible,state:'reserved'}]);
+ });
  await t.test('DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden',async()=>{
   const p=await linked('settlement-local-only'),negative=await lesson(null,true,'attended',p.p);
   const prod=await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]);

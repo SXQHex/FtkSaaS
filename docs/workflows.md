@@ -245,6 +245,8 @@ Cursor aktör/hesap/org/merkez/aralık/keşif modu ve kronolojik sıralamaya ba�
 
 **Kapasite eylemi keşfi:** `management_state_get_v1(operation:reservation_capacity_override_v1,selector:{operation:reservation_capacity_override_v1,key:{person_id,session_id,source_sale_id?}})` açık merkezde mevcut writer'ın canlı CM/izinli personel/atanmış eğitmen yetkisini denetler. Yanıt tek gerçek seans entity/sürümü ve aynı typed anahtarları içerir; miktar, mode veya gerekçe uydurmaz. Opsiyonel satış aynı org ve canonical kişiye ait olmalıdır; Business'ta başka merkezdeki satış sırf merkezi farklı diye reddedilmez. Kaynak/ürün uygunluğu, fiziksel oda ve ders kapasitesi, hak/borç/belge kapıları gerçek komutta yeniden uygulanır. Reader başarısı rezervasyon garantisi değildir; okuyucu hiçbir rezervasyon/hak/preview/receipt yazmaz.
 
+**Açık satış seçimi.** `reservation_create_v1` ve `reservation_capacity_override_v1`, açık `source_sale_id` ile hak ayrılamadığında, borçlanmaya geçmeden önce satışın seçili öğrenciye, organizasyona ve gerçek seans kapsamına uygunluğunu denetler. Kapsam dışı seçim `ENTITLEMENT_UNAVAILABLE` döndürür. Rezervasyon, hak tahsisi, negatif kredi hareketi, bakiye değişikliği veya başarılı makbuz oluşmaz. Business’ta başka merkezde düzenlenen satış hedef seansı kapsıyorsa native hak ayrılabilir. Satış seçilmezse mevcut otomatik hak seçimi ve borçlanma politikası uygulanır.
+
 **Yeni rezervasyonda borç politikası:** `reservation_create_v1`, mevcut yazma yetkileri doğrulandıktan sonra etkin `debt_booking` ve ödenmemiş borç nedeniyle `DEBT_BOOKING_BLOCKED` döndürür. Hata borç kimliği veya tutar taşımaz. Yetki reddi mevcut genel koduyla kalır. Hata halinde rezervasyon, tahsis veya başarılı işlem makbuzu oluşmaz.
 
 ## WF07
