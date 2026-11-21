@@ -36,6 +36,15 @@ test("frontend checks retain build, coverage, isolation and all four browsers", 
   );
   expect(commands).not.toContain("pnpm check:frontend");
   expect(config.jobs.browsers.needs).toEqual(["scope", "checks"]);
+  expect(config.jobs.browsers["runs-on"]).toBe(
+    "${{ matrix.profile == 'mobile-webkit' && 'macos-26' || 'ubuntu-24.04' }}",
+  );
+  // The source proof requires successful steps on both operating systems.
+  for (const name of ["Prepare Ubuntu package sources", "Install selected browser"]) {
+    const step = config.jobs.browsers.steps.find((item: { name?: string }) => item.name === name);
+    expect(step.if).toBeUndefined();
+    expect(step.run).toContain('if [[ "$RUNNER_OS" == Linux ]]');
+  }
   const browserCommands = config.jobs.browsers.steps.map(
     (step: { run?: string }) => step.run ?? "",
   );
