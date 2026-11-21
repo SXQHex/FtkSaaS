@@ -8,6 +8,7 @@ async function signIn(page: Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 }
 for (const [code, title] of [
   ["FORBIDDEN", "Bu sayfaya erişimin yok"],
@@ -48,15 +49,17 @@ test("states route transport retry only rereads the failed loader and recovers t
   await mockNative(page);
   await signIn(page);
   let attempts = 0;
+  let transportUnavailable = true;
   await page.route("**/functions/v1/backend-v1/account_get_v1", async (route) => {
     attempts++;
-    if (attempts === 1) return route.abort("failed");
+    if (transportUnavailable) return route.abort("failed");
     await route.fallback();
   });
   await page.goto(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Liste yüklenemedi", exact: true })).toBeVisible();
   const retry = page.getByRole("button", { name: "Tekrar dene", exact: true });
   await retry.focus();
+  transportUnavailable = false;
   await page.keyboard.press("Enter");
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeFocused();
   expect(attempts).toBeGreaterThanOrEqual(2);

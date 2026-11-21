@@ -498,6 +498,7 @@ export async function mockMemberLifecycle(
   await page.getByLabel("Parola", { exact: true }).fill("synthetic-password");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(origin + "/account");
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
   await expect(page.getByRole("heading", { name: person.display_name, exact: true })).toBeVisible();
   return { writes, previews, inventoryReads, rights, debts, reservations, person, event };

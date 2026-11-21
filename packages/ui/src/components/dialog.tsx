@@ -48,7 +48,7 @@ function DialogOverlay({
     <ModalOverlayPrimitive
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/30 duration-100 data-entering:animate-in data-entering:fade-in-0 data-exiting:animate-out data-exiting:fade-out-0 supports-backdrop-filter:backdrop-blur-sm",
+        "fixed inset-0 isolate z-50 bg-black/30 transition-[background-color] duration-100 data-entering:bg-transparent data-exiting:bg-transparent motion-reduce:duration-0 supports-backdrop-filter:backdrop-blur-sm",
         className,
       )}
       {...props}
@@ -75,7 +75,7 @@ function Dialog({
       <ModalPrimitive
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-5 text-sm text-popover-foreground shadow-xl ring-1 ring-foreground/5 duration-100 outline-none data-entering:animate-in data-entering:fade-in-0 data-entering:zoom-in-95 data-exiting:animate-out data-exiting:fade-out-0 data-exiting:zoom-out-95 sm:max-w-lg dark:ring-foreground/10",
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-5 text-sm text-popover-foreground shadow-xl ring-1 ring-foreground/5 transition-[scale] duration-100 outline-none motion-safe:data-entering:scale-95 motion-safe:data-exiting:scale-95 motion-reduce:duration-0 sm:max-w-lg dark:ring-foreground/10",
           className,
         )}
       >

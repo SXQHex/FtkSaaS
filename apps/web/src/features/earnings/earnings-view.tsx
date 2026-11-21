@@ -150,7 +150,12 @@ export function EarningsView({
           <CardHeader className="flex flex-wrap items-center justify-between gap-3">
             <TabsList variant="line" aria-label={t(($) => $.earnings.tabsLabel)}>
               {(["instructors", "lines", "payments"] as const).map((key) => (
-                <TabsTrigger key={key} id={key} isDisabled={locked}>
+                <TabsTrigger
+                  key={key}
+                  id={key}
+                  isDisabled={locked}
+                  className="text-muted-foreground transition-shadow"
+                >
                   {t(($) => $.earnings.tabs[key])}
                 </TabsTrigger>
               ))}

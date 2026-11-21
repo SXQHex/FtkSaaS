@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { scanAccessibility } from "./accessibility.js";
-import { verifyResponsiveLayout } from "./layout.js";
+import { assertLayoutFit, readLayoutFit, verifyResponsiveLayout } from "./layout.js";
 
 test("WCAG 2.2 AA catches adjacent undersized targets while keeping default landmark checks", async ({
   page,
@@ -22,13 +22,18 @@ test("WCAG 2.2 AA catches adjacent undersized targets while keeping default land
 
 test("the reflow measurement detects genuine horizontal overflow under CSS zoom", async ({
   page,
+  isMobile,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page.setContent(
-    '<html lang="tr" style="zoom:2"><head><title>Negative reflow specimen</title></head><body><main style="width:500px">Oversized content</main></body></html>',
+    '<html lang="tr" style="zoom:2"><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Negative reflow specimen</title></head><body><main style="width:500px">Oversized content</main></body></html>',
   );
-  expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(true);
+  const layout = await readLayoutFit(page);
+  expect(() => assertLayoutFit(layout)).toThrow("The page must not overflow horizontally");
+  if (!isMobile) {
+    expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(true);
+  }
 });
 
 test("shared reflow keeps a 320 CSS pixel minimum under scenario zoom", async ({ page }) => {
@@ -36,7 +41,7 @@ test("shared reflow keeps a 320 CSS pixel minimum under scenario zoom", async ({
   await page.setViewportSize(viewport);
   await page.goto("/");
   await page.setContent(
-    '<html lang="tr" style="zoom:2"><head><title>Reflow specimen</title></head><body><main style="width:300px">Content fits</main></body></html>',
+    '<html lang="tr" style="zoom:2"><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Reflow specimen</title></head><body><main style="width:300px">Content fits</main></body></html>',
   );
   await verifyResponsiveLayout(page);
   expect(page.viewportSize()).toEqual(viewport);

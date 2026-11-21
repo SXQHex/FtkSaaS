@@ -357,6 +357,7 @@ export async function mockOwnReservations(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
   await expect(page.getByRole("heading", { name: "Rezervasyonlarım", exact: true })).toBeVisible();
   return {

@@ -53,12 +53,14 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
       await controls[1]!.click();
       await expect(page).toHaveURL(`${origin}/invite`);
+      await expect(page.getByRole("alert")).toContainText("Davet bağlantısı bulunamadı.");
       expect(writes).toBe(0);
       await page.goto("/login");
       await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
       await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
       await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
       await expect(page).toHaveURL(`${origin}/account`);
+      await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
       await page.goto("/invite#token=fixture-unavailable");
       await page.getByRole("button", { name: "Daveti kabul et", exact: true }).click();
       await expect(page.getByRole("alert")).toContainText("Davet kullanılamıyor");
@@ -70,6 +72,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(writes).toBe(1);
       await page.getByRole("link", { name: "Doğru hesabı kontrol et", exact: true }).click();
       await expect(page).toHaveURL(`${origin}/invite`);
+      await expect(page.getByLabel("E-posta", { exact: true })).toBeVisible();
       await expect(page.getByLabel("E-posta", { exact: true })).toHaveValue(
         "fixture@example.invalid",
       );

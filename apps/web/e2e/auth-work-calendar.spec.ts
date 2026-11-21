@@ -1,3 +1,4 @@
+import { clickWorkspaceLink } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 import type { CenterWorkCalendar } from "@ftksaas/api-contracts";
@@ -170,10 +171,7 @@ async function fixture(page: import("@playwright/test").Page) {
     return route.fallback();
   });
   await openStudio(page);
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Ayarlar", exact: true })
-    .click();
+  await clickWorkspaceLink(page, "Ayarlar");
   await page.getByRole("tab", { name: "Salonlar", exact: true }).click();
   await page.getByRole("button", { name: "Merkez çalışma saatleri", exact: true }).click();
   const sheet = page.getByRole("dialog", { name: "Merkez çalışma saatleri", exact: true });
@@ -241,10 +239,7 @@ test("work calendar saves only after native impact and explicit review; local da
   await expect(f.sheet.getByLabel("Başlangıç saati", { exact: true })).toHaveValue("09:00:00");
   await f.sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Ders programı", exact: true })
-    .click();
+  await clickWorkspaceLink(page, "Ders programı");
   await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
   const panel = page.getByRole("dialog");
   await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();

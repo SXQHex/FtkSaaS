@@ -3,6 +3,8 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { browserMatrix } from "./browser-profiles.mjs";
+import { affectedBrowserSpecs, selectScope } from "./ci-scope.mjs";
 
 const workflows = {
   frontend: {
@@ -10,7 +12,7 @@ const workflows = {
     jobs: [
       "scope",
       "checks",
-      ...["chromium", "firefox", "webkit", "mobile"].map((b) => `browsers (${b})`),
+      ...browserMatrix.map(({ profile, shard }) => `browsers (${profile}, ${shard})`),
     ],
   },
 };
@@ -20,7 +22,7 @@ const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
 export function recordSource(kind, env = process.env) {
   if (!workflows[kind] || env.GITHUB_EVENT_NAME !== "pull_request")
     throw Error("PR_SOURCE_REQUIRED");
-  const pr = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8")).pull_request;
+  const { pull_request: pr, action } = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8"));
   const merge = env.GITHUB_SHA;
   const parents = git("show", "-s", "--format=%P", merge).split(" ");
   if (
@@ -31,7 +33,7 @@ export function recordSource(kind, env = process.env) {
   )
     throw Error("CANDIDATE_SOURCE_MISMATCH");
   const binding = {
-    version: 1,
+    version: 2,
     kind,
     repository: env.GITHUB_REPOSITORY,
     pr: pr.number,
@@ -41,17 +43,21 @@ export function recordSource(kind, env = process.env) {
     tree: git("rev-parse", `${merge}^{tree}`),
     run: Number(env.GITHUB_RUN_ID),
     source_attempt: Number(env.GITHUB_RUN_ATTEMPT),
+    e2e_specs: affectedBrowserSpecs(selectScope(pr.base.sha, merge), action),
   };
   mkdirSync(".artifacts/ci", { recursive: true });
   writeFileSync(".artifacts/ci/frontend-source.json", JSON.stringify(binding));
   return binding;
 }
 
-export function validateProof(binding, { kind, repository, pr, commit, candidate, run, jobs }) {
+export function validateProof(
+  binding,
+  { kind, repository, pr, commit, candidate, run, jobs, affectedSpecs },
+) {
   const spec = workflows[kind];
   if (
     !spec ||
-    binding.version !== 1 ||
+    binding.version !== 2 ||
     binding.kind !== kind ||
     binding.repository !== repository ||
     binding.pr !== pr.number ||
@@ -66,6 +72,12 @@ export function validateProof(binding, { kind, repository, pr, commit, candidate
     candidate.tree.sha !== commit.tree.sha
   )
     throw Error("CANDIDATE_BINDING_MISMATCH");
+  if (
+    !Array.isArray(binding.e2e_specs) ||
+    (binding.e2e_specs.length > 0 &&
+      JSON.stringify(binding.e2e_specs) !== JSON.stringify(affectedSpecs))
+  )
+    throw Error("BROWSER_SCOPE_MISMATCH");
   for (const c of [commit, candidate]) {
     if (
       c.parents.length !== 2 ||
@@ -123,6 +135,7 @@ function requiredSteps(name) {
     "Download verified build",
     "Verify and restore build",
     "Test selected browser",
+    "Verify browser shard ran",
   ];
 }
 
@@ -142,7 +155,7 @@ export function readBinding(archive) {
 }
 
 // Main executes only this verifier, never candidate code or artifact executables.
-export async function verifyMain({ github, context, kind }) {
+export async function verifyMain({ github, context, kind, readScope = selectScope }) {
   const spec = workflows[kind];
   if (
     !spec ||
@@ -171,6 +184,7 @@ export async function verifyMain({ github, context, kind }) {
   if (matching.length !== 1) throw Error("MERGED_PR_REQUIRED");
   const pr = (await github.rest.pulls.get({ ...repo, pull_number: matching[0].number })).data;
   if (!pr.merged || pr.merge_commit_sha !== context.sha) throw Error("MERGED_PR_CHANGED");
+  const affectedSpecs = affectedBrowserSpecs(readScope(context.payload.before, context.sha));
   const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
     ...repo,
     workflow_id: spec.file,
@@ -222,7 +236,16 @@ export async function verifyMain({ github, context, kind }) {
         if (artifact.name !== artifactName(kind, binding.source_attempt)) continue;
         const candidate = (await github.rest.git.getCommit({ ...repo, commit_sha: binding.merge }))
           .data;
-        validateProof(binding, { kind, repository, pr, commit, candidate, run, jobs });
+        validateProof(binding, {
+          kind,
+          repository,
+          pr,
+          commit,
+          candidate,
+          run,
+          jobs,
+          affectedSpecs,
+        });
         const live = (await github.rest.actions.getWorkflowRun({ ...repo, run_id: run.id })).data;
         if (
           live.run_attempt !== run.run_attempt ||
@@ -239,6 +262,7 @@ export async function verifyMain({ github, context, kind }) {
           run: run.id,
           attempt: run.run_attempt,
           source_attempt: binding.source_attempt,
+          e2e_specs: binding.e2e_specs,
         };
       }
     } catch (error) {

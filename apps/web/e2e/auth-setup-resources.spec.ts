@@ -1,3 +1,4 @@
+import { clickWorkspaceLink } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 
@@ -17,12 +18,11 @@ test("new rooms and capacities replace cached calendar choices without a documen
   );
   await openStudio(page);
   const lifetime = await page.evaluate("window.__setupLifetime = performance.timeOrigin");
-  const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
-  await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+  await clickWorkspaceLink(page, "Ders programı");
   const rooms = page.getByRole("combobox", { name: "Salon", exact: true });
   await expect(page.getByRole("button", { name: "Seans ekle", exact: true })).toBeEnabled();
   await expect(rooms.locator("option")).toHaveCount(2);
-  await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+  await clickWorkspaceLink(page, "Stüdyo");
   await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
   for (const [name, capacity] of [
     ["Yeni küçük salon", 0],
@@ -40,7 +40,7 @@ test("new rooms and capacities replace cached calendar choices without a documen
     );
     await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
   }
-  await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+  await clickWorkspaceLink(page, "Ders programı");
   await expect(rooms.locator("option")).toHaveCount(4);
   for (const name of ["Yeni küçük salon", "Yeni büyük salon"])
     await expect(rooms.getByRole("option", { name, exact: true })).toHaveCount(1);

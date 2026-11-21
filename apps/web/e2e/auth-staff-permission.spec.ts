@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, origin } from "./auth-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 test("staff person.manage permits creation only while the native grant is active, including an already open form", async ({
@@ -52,10 +52,7 @@ test("staff person.manage permits creation only while the native grant is active
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Üyeler", exact: true })
-    .click();
+  await clickWorkspaceLink(page, "Üyeler");
   const open = async (name: string) => {
     await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
     const dialog = page.getByRole("dialog");
