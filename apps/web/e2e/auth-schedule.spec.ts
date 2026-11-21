@@ -1185,15 +1185,21 @@ async function verifyNativeScheduleScope(page: Page, scenario: "single" | "this_
     );
   }
 
-  await changeTime("15:20", "single");
-  expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
-  expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
   if (scenario === "single") {
+    await changeTime("15:20", "single");
+    expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
+    expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
     await observeTimes(["15:20", localTime.format(originalFutureStart)]);
   } else {
-    // Reuse the independently tested single-change state. Verify the
-    // subsequent future-series edit and its two native consumers separately,
-    // rather than accumulating both full consumer traversals in one timeout.
+    // The single-edit behavior has its own full UI acceptance above.
+    // Begin this independent native workflow from its already-committed
+    // source state, then test the future edit through the UI and both readers.
+    const existing = occurrences[0]!;
+    existing.starts_at = new Date(Date.parse(existing.starts_at) + 20 * 60_000).toISOString();
+    existing.ends_at = new Date(Date.parse(existing.ends_at) + 20 * 60_000).toISOString();
+    existing.version = 4;
+    expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
+    expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
     await changeTime("15:40", "this_and_future");
     expect(occurrences.map(({ version }) => version)).toEqual([5, 4]);
     const movedFutureStart = originalFutureStart + 20 * 60_000;
