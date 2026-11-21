@@ -232,6 +232,14 @@ test('positive ownership separates backend frontend prose and shared inputs, rej
  assert.equal(policyPath('.github/workflows/frontend.yml'),true);assert.equal(policyPath('.github/workflows/ci-full.yml'),true);
 });
 
+test('root Oxc configuration selects frontend acceptance without database tests',()=>{
+ for(const path of ['.oxfmtrc.json','.oxlintrc.json','.oxlintrc.ui.json']){
+  const changes=[change(path)];
+  assert.equal(classifyChanges(changes).kind,'frontend');
+  assert.equal(select(changes).db,false);
+ }
+});
+
 test('agent tooling is outside application acceptance while mixed source keeps its required scope',()=>{
  for(const path of ['.agents/skills/README.md','.agents/skills/example/SKILL.md','.agents/skills/example/agents/openai.yaml','.agents/skills/example/assets/icon.svg','.agents/skills/example/run.mjs','.agents/skills/example/package.json']){
   assert.equal(ownerOf(path),'agents');assert.equal(classifyChanges([change(path)]).kind,'agents');

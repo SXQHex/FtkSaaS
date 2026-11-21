@@ -17,6 +17,9 @@ const selectionPaths = {
   frontend: [
     "apps/web/**",
     "packages/ui/**",
+    ".oxlintrc.json",
+    ".oxlintrc.ui.json",
+    ".oxfmtrc.json",
     "vercel.json",
     ".github/workflows/frontend.yml",
     documentRegistry,

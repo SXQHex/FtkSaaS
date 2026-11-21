@@ -36,6 +36,16 @@
       "persistent": true
     },
     "lint": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/.oxlintrc.json",
+        "$TURBO_ROOT$/.oxlintrc.ui.json",
+        "$TURBO_ROOT$/.oxfmtrc.json"
+      ],
+      "outputs": []
+    },
+    "format:check": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/.oxfmtrc.json"],
       "outputs": []
     },
     "build": {

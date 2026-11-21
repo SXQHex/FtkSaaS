@@ -59,10 +59,10 @@ export async function backendUnchanged(github,repo,base,head){
 }
 // Protect the commands and config that define the bar, including new nested configs.
 export const policyPath=p=>!isDesignSandbox(p)&&!isAgentTooling(p)&&(
- ['CONSTRAINTS.md','turbo.json','.gitignore','docs/history/manifest.json','.github/dependabot.yml'].includes(p)
+ ['CONSTRAINTS.md','turbo.json','.oxfmtrc.json','.gitignore','docs/history/manifest.json','.github/dependabot.yml'].includes(p)
  || /(^|\/)(?:package\.json|\.gitignore|\.ignore|\.eslintignore|\.oxlintignore)$/.test(p)
  || /(^|\/)tsconfig(?:\.[^/]+)?\.json$/.test(p)
- || /(^|\/)(?:\.oxlintrc\.json|(?:oxlint|eslint|vitest|playwright)\.config\.[^/]+)$/.test(p)
+ || /(^|\/)(?:\.oxlintrc(?:\.[^/]+)?\.json|(?:oxlint|eslint|vitest|playwright)\.config\.[^/]+)$/.test(p)
  || p.startsWith('packages/typescript-config/') || p.startsWith('apps/web/scripts/')
  || p.startsWith('.github/workflows/') || p.startsWith('apps/backend/scripts/ci/')
  || ['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p));

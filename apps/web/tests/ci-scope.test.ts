@@ -201,6 +201,9 @@ test("reviewed frontend and shared prose skip heavy work; mixed cumulative code 
 
 test.each([
   ["apps/web/docs/new.md", true, false],
+  [".oxlintrc.json", true, false],
+  [".oxlintrc.ui.json", true, false],
+  [".oxfmtrc.json", true, false],
   ["packages/ui/src/button.tsx", true, false],
   ["vercel.json", true, false],
   [".github/workflows/frontend.yml", true, false],

@@ -270,6 +270,8 @@ test('v2 merge proof retains source and upload obligations for inherited jobs',(
 
 test('quality thresholds and nested checker config cannot escape trusted policy', () => {
  for(const file of ['CONSTRAINTS.md','apps/web/.gitignore','apps/web/src/.ignore','apps/web/tsconfig.json','packages/typescript-config/base.json','packages/api-contracts/package.json','apps/web/src/nested/.oxlintrc.json','apps/web/vitest.config.ts','apps/web/scripts/verify-isolation.mjs','turbo.json']) assert(policyPath(file),file);
+ assert(policyPath('.oxlintrc.ui.json'));
+ assert(policyPath('.oxfmtrc.json'));
 });
 
 test('sandbox merge proves exact source without borrowing application acceptance',async()=>{

@@ -5,6 +5,9 @@ packages:
   - packages/*
 
 catalog:
+  oxfmt: 0.78.0
+  oxlint: 1.93.0
+  oxlint-tsgolint: 7.0.2006
   typescript: 7.0.2
 
 allowBuilds:

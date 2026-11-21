@@ -1,0 +1,94 @@
+{
+  "$schema": "./apps/web/node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "oxc", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "options": {
+    "maxWarnings": 0
+  },
+  "ignorePatterns": [
+    "**/coverage/**",
+    "**/dist/**",
+    "docs/history/**",
+    "apps/backend/supabase/functions/backend-v1/index.ts",
+    "apps/backend/supabase/functions/backend-v1/validators.js",
+    "apps/web/src/routeTree.gen.ts",
+    "apps/web/src/i18n/generated/**",
+    "apps/web/design-reference/**",
+    "apps/web/.npm-cache/**",
+    "apps/web/.tmp/**",
+    "apps/web/.playwright-browsers/**",
+    "apps/web/.tanstack/**",
+    "apps/web/playwright-report/**",
+    "apps/web/test-results/**",
+    "apps/web/test-reports/**",
+    "packages/api-contracts/src/**",
+    "packages/ui/.next/**",
+    "packages/ui/next-env.d.ts"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/backend/**/*.{js,mjs,cjs,ts,mts,cts}"],
+      "env": { "node": true }
+    },
+    {
+      "files": ["apps/web/**"],
+      "plugins": ["react", "typescript", "oxc"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@ftksaas/backend",
+                  "@ftksaas/backend/**",
+                  "**/apps/backend/**",
+                  "**/apps/web1/**",
+                  "**/backend/**"
+                ],
+                "message": "Use the public backend API and shared contract types."
+              }
+            ]
+          }
+        ],
+        "react/rules-of-hooks": "error",
+        "react/only-export-components": ["warn", { "allowConstantExport": true }],
+        "typescript/no-floating-promises": "error",
+        "typescript/no-misused-promises": "error"
+      }
+    },
+    {
+      "files": ["apps/web/src/components/ui/**/*.{ts,tsx}"],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    },
+    {
+      "files": ["packages/ui/**"],
+      "env": { "browser": true, "node": true },
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@ftksaas/backend",
+                  "@ftksaas/backend/**",
+                  "@ftksaas/web",
+                  "@ftksaas/web/**",
+                  "**/apps/**",
+                  "**/backend/**",
+                  "**/web/src/**"
+                ],
+                "message": "Use the public shared package contract; application internals are owned by their application."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

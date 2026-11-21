@@ -267,7 +267,7 @@ import {repositoryRoot,repoFile} from '../scripts/paths.mjs';
 import {execFileSync} from 'node:child_process';
 test('workspace layout keeps application ownership and a configuration-only repository root',()=>{
  const roots=new Set(['.github','.devcontainer','.agents','apps','packages','docs']);
- const files=new Set(['.gitignore','.nvmrc','AGENTS.md','CONSTRAINTS.md','CHANGELOG.md','README.md','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','vercel.json']);
+ const files=new Set(['.gitignore','.nvmrc','.oxfmtrc.json','.oxlintrc.json','.oxlintrc.ui.json','AGENTS.md','CONSTRAINTS.md','CHANGELOG.md','README.md','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','vercel.json']);
  const tracked=execFileSync('git',['ls-files','-z'],{cwd:repositoryRoot,encoding:'utf8'}).split('\0').filter(Boolean);
  for(const file of tracked){const top=file.split('/')[0];assert(roots.has(top)||files.has(file),'Unexpected repository root source: '+file);assert(!/(?:^|\/)\.env(?!\.example$)/.test(file),'Tracked environment secret file: '+file);}
  const root=JSON.parse(fs.readFileSync(repoFile('package.json'))),backend=JSON.parse(fs.readFileSync(repoFile('apps/backend/package.json')));

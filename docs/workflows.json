@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b5baabbab018fe12f71a9ba7affee6c60b21b57fb232c86e2d3ad0f0135c26ca",
-        "reason": "Onaylanan dört frontend CI assertion kaydı ve yeni Turbo affected matrisi incelendi. Kayıtlar yalnız eski CI beklentilerinin dört kesin parmak izine bağlıdır."
+        "fingerprint": "b45490bb33fdb5e887853fadc7a81155ff9ff190617f15c4db7a896de023658e",
+        "reason": "Kök Oxlint ve Oxfmt ayarlarının üç dosyası workspace yerleşim testinde tam dosya adlarıyla tanındı. Frontend kapsamı, kaynak koruması ve Turbo affected matrisi aynı kurallarla çalışır."
       }
     },
     {
