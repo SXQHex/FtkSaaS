@@ -21,13 +21,13 @@ import type {
 } from "@ftksaas/api-contracts";
 export const origin = "http://127.0.0.1:4175";
 
-export async function openWorkspaceNavigation(page: Page) {
+export async function openWorkspaceNavigation(page: Page, activation: "click" | "tap" = "click") {
   const navigation = page.getByRole("navigation", { name: "Ana menü", exact: true });
   const open = page
     .getByRole("button", { name: "Menüyü aç veya kapat", exact: true })
     .and(page.locator('[aria-controls="workspace-sidebar"]'));
   await expect(navigation.or(open).first()).toBeVisible();
-  if (!(await navigation.isVisible())) await open.click();
+  if (!(await navigation.isVisible())) await open[activation]();
   await expect(navigation).toBeVisible();
   return navigation;
 }

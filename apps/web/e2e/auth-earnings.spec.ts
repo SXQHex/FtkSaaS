@@ -273,6 +273,11 @@ test("manager reads agreement evidence on demand and clears stale status on deni
   const refresh = row.getByRole("button", { name: "Metin kabul durumunu yenile" });
   await expect(open).toBeEnabled();
   expect(fixture.agreementReads).toHaveLength(0);
+  await open.scrollIntoViewIfNeeded();
+  // Establish the grid row focus before moving focus to its action.
+  await row.focus();
+  await expect(row).toBeFocused();
+  await expect(row).toHaveAttribute("tabindex", "0");
   await open.focus();
   await expect(open).toBeFocused();
   await page.keyboard.press("Enter");
