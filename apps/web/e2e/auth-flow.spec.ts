@@ -100,7 +100,12 @@ test("native TOTP keeps the protected target closed until verification and AAL2 
 
 test("native TOTP enrollment cancels safely then verifies and rereads without repeating the code", async ({
   page,
+  browserName,
+  isMobile,
 }, testInfo) => {
+  // CI trace: the native assertions completed; the full final WCAG/layout
+  // teardown exceeded the 30s budget on mobile WebKit. Keep both scans.
+  if (browserName === "webkit" && isMobile) testInfo.setTimeout(testInfo.timeout + 20_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -340,7 +345,12 @@ test("profile uses management versions, preserves conflicting drafts and retries
 
 test("private photo stays a profile draft until save, reloads through authenticated media and removes explicitly", async ({
   page,
+  browserName,
+  isMobile,
 }, testInfo) => {
+  // CI trace: all photo assertions passed before the automatic WCAG/layout
+  // fixture teardown exceeded its total budget on mobile WebKit.
+  if (browserName === "webkit" && isMobile) testInfo.setTimeout(testInfo.timeout + 20_000);
   const calls = await mockNative(page);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
