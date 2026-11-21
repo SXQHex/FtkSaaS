@@ -48,6 +48,8 @@ Oxlint ve Oxfmt ayarlarının sahibi kökteki [.oxlintrc.json](../.oxlintrc.json
 
 `pnpm lint` ve `pnpm format:check` mevcut web ve ortak UI kontrollerini çalıştırır. Backend dosyalarını aynı kurallarla tek tek kontrol etmek için repo kökünden `pnpm exec apps/web/node_modules/.bin/oxlint apps/backend/<dosya>` ve `pnpm exec apps/web/node_modules/.bin/oxfmt --check apps/backend/<dosya>` çalıştırın. Üretilmiş kaynaklar, arşiv ve migration dosyaları biçimlendirme kapsamının dışındadır.
 
+Workspace'lerdeki JavaScript ve TypeScript kaynakları için kullanılmayan dosya, export ve bağımlılık raporunu repo kökünden `pnpm knip` ile alın. Workspace girişleri kök `package.json` içindeki `knip` alanında tanımlıdır. Bu komut elle çalıştırılır.
+
 Tam izole kabul `pnpm test:clean` ile mevcut backend runner’ına gider; GitHub Actions dört API shard ve source-bound collector sahibidir. İstemci ve gerçek DB/API kabulü cache’den üretilmez. Turbo verify/typecheck/test/test:clean görevlerinde cache kapalıdır. Geniş passThroughEnv yıldızı ve backend’i root task gibi gösteren //# görevi yoktur. Frontend build görevleri apps/web/turbo.json içindedir; çıktı/ortam girdisi backend görevine taşınmaz.
 
 ## Ortam ve veri sınırı

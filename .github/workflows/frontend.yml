@@ -100,7 +100,7 @@ jobs:
       contents: read
     needs: [scope, checks]
     if: needs.scope.outputs.frontend == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.profile == 'mobile-webkit' && 'macos-26' || 'ubuntu-24.04' }}
     timeout-minutes: 65
     strategy:
       fail-fast: false
@@ -117,14 +117,24 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Prepare Ubuntu package sources
         timeout-minutes: 2
+        shell: bash
         run: |
           set -euo pipefail
-          sudo -- "$(command -v node)" apps/web/scripts/ci-apt.mjs
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            sudo -- "$(command -v node)" apps/web/scripts/ci-apt.mjs
+          fi
       - name: Install selected browser
         timeout-minutes: 8
         env:
           BROWSER: ${{ matrix.engine }}
-        run: pnpm --filter @ftksaas/web exec node scripts/playwright.mjs install --with-deps "$BROWSER"
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            pnpm --filter @ftksaas/web exec node scripts/playwright.mjs install --with-deps "$BROWSER"
+          else
+            pnpm --filter @ftksaas/web exec node scripts/playwright.mjs install "$BROWSER"
+          fi
       # Exact artifact ID/output binding also supports a retained checks job on rerun.
       - name: Download verified build
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -135,6 +145,7 @@ jobs:
           digest-mismatch: error
       - name: Verify and restore build
         env:
+          FTK_BROWSER_PROJECT: ${{ matrix.profile }}
           EXPECTED_BUILD_SHA256: ${{ needs.checks.outputs.build_sha256 }}
           EXPECTED_BUILD_ATTEMPT: ${{ needs.checks.outputs.build_attempt }}
         run: node apps/web/scripts/ci-build.mjs restore
