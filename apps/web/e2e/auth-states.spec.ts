@@ -154,17 +154,13 @@ test("states SPA navigation shares account cache while direct URL reload recheck
   await signIn(page);
   await expect(page.getByRole("heading", { name: "Profil", exact: true })).toBeVisible();
   const before = calls.account;
-  await page.evaluate(() => {
-    (window as Window & { __spaMarker?: boolean }).__spaMarker = true;
-  });
+  await page.evaluate("globalThis.__spaMarker = true");
   await openWorkspaceNavigation(page);
   const helpNavigation = page.getByRole("navigation", { name: "Yardım", exact: true });
   await helpNavigation.getByRole("link", { name: "Yardım", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
-  const spaMarker = await page.evaluate(
-    () => (window as Window & { __spaMarker?: boolean }).__spaMarker,
-  );
+  const spaMarker = await page.evaluate("globalThis.__spaMarker");
   expect(spaMarker).toBe(true);
   // The first non-platform route creates one ordinary projection. Workspace
   // must reuse it rather than issue its own second account_get_v1 call.
