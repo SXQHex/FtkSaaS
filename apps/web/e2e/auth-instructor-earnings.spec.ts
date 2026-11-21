@@ -6,6 +6,8 @@ import { origin } from "./auth-fixture.js";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 test("own earnings preserves cursor scope and currency alongside native summaries and payment history", async ({
   page,
+  browserName,
+  isMobile,
 }) => {
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
   await mockAccount(page);
@@ -120,7 +122,12 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   const tableRegion = page.getByRole("region", { name: "Seans satırları", exact: true });
   await expect(tableRegion).toHaveAttribute("tabindex", "0");
   await tableRegion.focus();
-  await tableRegion.press("ArrowRight");
+  if (browserName === "webkit" && isMobile) {
+    // iPhone emulation has no keyboard scrolling path, so scroll programmatically.
+    await tableRegion.evaluate((element) => element.scrollBy(40, 0));
+  } else {
+    await tableRegion.press("ArrowRight");
+  }
   await expect.poll(() => tableRegion.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
 });

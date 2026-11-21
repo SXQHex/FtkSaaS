@@ -52,6 +52,8 @@ test("next page failure preserves loaded rows and retries only the missing page"
 });
 test("empty anonymous result does not reveal private profile or invent application availability", async ({
   page,
+  browserName,
+  isMobile,
 }) => {
   await page.setViewportSize({ width: 320, height: 750 });
   await prepare(page, "empty");
@@ -60,7 +62,12 @@ test("empty anonymous result does not reveal private profile or invent applicati
   ).toBeVisible();
   await expect(page.getByText("Örnek Stüdyo", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Başvur", exact: true })).toHaveCount(0);
-  await page.keyboard.press("Tab");
+  if (browserName === "webkit" && isMobile) {
+    // Touch profiles have no Tab path to links, so focus the skip link directly.
+    await page.getByRole("link", { name: "İçeriğe geç", exact: true }).focus();
+  } else {
+    await page.keyboard.press("Tab");
+  }
   await expect(page.getByRole("link", { name: "İçeriğe geç", exact: true })).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#public-main$/);
