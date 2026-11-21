@@ -28,7 +28,6 @@
     "audit:production": "node scripts/audit.mjs production",
     "audit:all": "node scripts/audit.mjs all",
     "verify:ci": "node scripts/verify.mjs",
-    "knip": "knip",
     "check:bundle": "node --test scripts/production-policy.test.mjs && node scripts/check-production-bundle.mjs",
     "test:local": "node scripts/test-local.mjs",
     "test:isolation": "node scripts/verify-isolation.mjs"

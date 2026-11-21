@@ -23,9 +23,21 @@
     "check:frontend": "turbo run lint typecheck test build --filter=@ftksaas/web --filter=@ftksaas/ui",
     "dev:web": "turbo run dev --filter=@ftksaas/web",
     "build:web": "turbo run build --filter=@ftksaas/web",
-    "check:quality": "turbo run quality --filter=@ftksaas/backend"
+    "check:quality": "turbo run quality --filter=@ftksaas/backend",
+    "knip": "pnpm --filter @ftksaas/web exec knip --directory ../.."
   },
   "devDependencies": {
     "turbo": "2.11.10"
+  },
+  "knip": {
+    "workspaces": {
+      "apps/backend": {
+        "entry": ["scripts/ci/cleanup.mjs", "supabase/functions/*/{handler,index}.ts"]
+      },
+      "apps/web": {
+        "entry": ["i18next.config.ts", "playwright.external.config.ts", "scripts/ci-apt.mjs"],
+        "ignore": ["src/i18n/generated/**", "design-reference/**"]
+      }
+    }
   }
 }
