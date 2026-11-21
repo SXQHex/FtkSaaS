@@ -1195,8 +1195,12 @@ async function verifyNativeScheduleScope(page: Page, scenario: "single" | "this_
     // Begin this independent native workflow from its already-committed
     // source state, then test the future edit through the UI and both readers.
     const existing = occurrences[0]!;
-    existing.starts_at = new Date(Date.parse(existing.starts_at) + 20 * 60_000).toISOString();
-    existing.ends_at = new Date(Date.parse(existing.ends_at) + 20 * 60_000).toISOString();
+    // The single edit previously committed 15:20 Europe/Istanbul (12:20 UTC),
+    // a six-hour move from the fixture's original 09:20 local start.
+    const committedStart = Date.parse("2026-11-16T12:20:00.000Z");
+    const committedDelta = committedStart - Date.parse(existing.starts_at);
+    existing.starts_at = new Date(committedStart).toISOString();
+    existing.ends_at = new Date(Date.parse(existing.ends_at) + committedDelta).toISOString();
     existing.version = 4;
     expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
     expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
