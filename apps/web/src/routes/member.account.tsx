@@ -6,6 +6,7 @@ import { MemberAccountRoutePage } from "../features/member-account/member-accoun
 const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
 export const Route = createFileRoute("/member/account")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: MemberAccountRoutePage,

@@ -1,11 +1,12 @@
 import { useCallback } from "react";
-import { useLoaderData, useSearch, useNavigate } from "@tanstack/react-router";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import type { WorkspaceSelection } from "../workspace/workspace-layout";
 import { InstructorLayout } from "./instructor-layout";
 import { InstructorEarningsContent } from "./instructor-earnings-content";
 export function InstructorEarningsRoutePage() {
-  const account = useLoaderData({ from: "/instructor/earnings" }),
+  const account = useAccountProjection(),
     search = useSearch({ from: "/instructor/earnings" }),
     navigate = useNavigate();
   const { t } = useTranslation();

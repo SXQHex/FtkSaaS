@@ -10,6 +10,7 @@ const search = z.object({
 });
 export const Route = createFileRoute("/member/private-lessons")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: MemberPrivateLessonsRoutePage,

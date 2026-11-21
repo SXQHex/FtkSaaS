@@ -6,6 +6,7 @@ import { InstructorSessionRoutePage } from "../features/instructor/instructor-se
 const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
 export const Route = createFileRoute("/instructor/sessions/$sessionId")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: InstructorSessionRoutePage,

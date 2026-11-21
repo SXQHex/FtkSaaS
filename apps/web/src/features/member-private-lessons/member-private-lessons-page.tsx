@@ -1,10 +1,11 @@
 import { useCallback } from "react";
-import { useLoaderData, useSearch, useNavigate } from "@tanstack/react-router";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { MemberLayout } from "../member/member-layout";
 import { MemberPrivateLessonsContent } from "./member-private-lessons-content";
 export function MemberPrivateLessonsRoutePage() {
-  const account = useLoaderData({ from: "/member/private-lessons" }),
+  const account = useAccountProjection(),
     search = useSearch({ from: "/member/private-lessons" }),
     navigate = useNavigate();
   const { t } = useTranslation();

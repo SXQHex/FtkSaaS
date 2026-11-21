@@ -1,13 +1,13 @@
 import { redirect } from "@tanstack/react-router";
-import { getSupabaseClient } from "../../lib/supabase";
 import type { QueryClient } from "@tanstack/react-query";
-import { accountQuery } from "./account-query";
+import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
+import { accountQuery } from "./account-query";
+import { workspaceQuery } from "../workspace/workspace-query";
 import { hasDeletionReceipt } from "../account/deletion";
 import { takeInvitationReturn } from "../invitations/invitation";
 
-// Shared by protected product pages; native Auth/AAL and account lifecycle stay
-// identical to the accepted account route.
+// Route guards own native authentication, MFA and lifecycle. Query owns fetched data.
 export async function requireAccountSession() {
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error || !data.session) throw redirect({ to: "/login" });
@@ -22,25 +22,44 @@ export async function requireAccountSession() {
 
 type AccountLoaderContext = {
   context: { queryClient: QueryClient; authUserId: string };
+  params: { orgId?: string };
+  deps: { org?: string };
 };
 
-export async function loadAccount({ context }: AccountLoaderContext) {
-  return loadAccountProjection(context, false);
-}
-
-export async function loadPlatformAccount({ context }: AccountLoaderContext) {
-  return loadAccountProjection(context, true);
-}
-
 async function loadAccountProjection(
-  context: AccountLoaderContext["context"],
+  { queryClient, authUserId }: AccountLoaderContext["context"],
   includePlatformScope: boolean,
 ) {
   try {
-    return await context.queryClient.query(accountQuery(context.authUserId, includePlatformScope));
+    return await queryClient.query(accountQuery(authUserId, includePlatformScope));
   } catch (error) {
     if (error instanceof BackendError && ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code))
       throw redirect({ to: "/login" });
     throw error;
   }
+}
+
+async function prepareAccountAndWorkspace(
+  { context, params, deps }: AccountLoaderContext,
+  includePlatformScope: boolean,
+) {
+  const account = await loadAccountProjection(context, includePlatformScope);
+  // Non-blocking: the workspace is the same Query consumed by both shells.
+  // Its failure remains visible in the shell, rather than failing the account route.
+  void context.queryClient
+    .query(workspaceQuery(context.queryClient, account.id, params.orgId ?? deps.org))
+    .catch(() => {});
+  // Return no account DTO: Router coordinates; Query is the sole account cache.
+}
+
+export async function loadAccount(options: AccountLoaderContext) {
+  await prepareAccountAndWorkspace(options, false);
+}
+
+export async function loadAccountWithPlatformWorkspace(options: AccountLoaderContext) {
+  await prepareAccountAndWorkspace(options, true);
+}
+
+export async function loadPlatformAccount({ context }: AccountLoaderContext) {
+  await loadAccountProjection(context, true);
 }

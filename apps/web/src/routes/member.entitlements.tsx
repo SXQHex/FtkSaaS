@@ -6,6 +6,7 @@ import { MemberEntitlementsRoutePage } from "../features/member-entitlements/mem
 const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
 export const Route = createFileRoute("/member/entitlements")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: MemberEntitlementsRoutePage,

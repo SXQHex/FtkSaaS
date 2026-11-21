@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter, useRouterState, type ErrorComponentProps } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
 import { StateView } from "./state-view";
 import { routeErrorState } from "./route-state";
@@ -35,13 +36,16 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
     router = useRouter(),
     main = useRef<HTMLElement>(null);
   const loading = useRouterState({ select: (state) => state.isLoading });
+  const { reset: resetQueryError } = useQueryErrorResetBoundary();
   const state = routeErrorState(error);
   useEffect(() => {
+    resetQueryError();
     main.current?.querySelector<HTMLElement>("h1")?.focus();
-  }, [error]);
+  }, [error, resetQueryError]);
   async function reload() {
     const errorPage = main.current;
     const locationKey = router.state.location.state.__TSR_key;
+    resetQueryError();
     await router.invalidate();
     if (
       errorPage?.isConnected ||

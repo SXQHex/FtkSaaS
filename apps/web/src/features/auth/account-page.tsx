@@ -12,9 +12,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@ftksaas/ui/components
 import { SessionsPanel } from "../account/sessions-panel";
 import { SecurityPanel } from "../account/security-panel";
 import { useRef, useState } from "react";
-import { useLoaderData, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "./use-account-projection";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -24,7 +25,7 @@ import { hasWorkspaceManagementScope, workspaceRoles, readWorkspace } from "../w
 
 export function AccountPage() {
   const mobile = useIsMobile();
-  const account = useLoaderData({ from: "/account" });
+  const account = useAccountProjection(true);
   const search = useSearch({ from: "/account" });
   const appearance = useAccountAppearance(account.id);
   const appearanceActions = useRef<AppearanceActions>(null);

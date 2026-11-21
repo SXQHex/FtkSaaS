@@ -6,6 +6,7 @@ import { InstructorEarningsRoutePage } from "../features/instructor/instructor-e
 const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
 export const Route = createFileRoute("/instructor/earnings")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: InstructorEarningsRoutePage,

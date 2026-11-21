@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Badge } from "@ftksaas/ui/components/badge";
 import { LinkButton } from "@ftksaas/ui/components/button";
@@ -45,7 +46,7 @@ const sections = [
 ] as const;
 
 export function BusinessCentersRoutePage() {
-  const account = route.useLoaderData();
+  const account = useAccountProjection();
   const { orgId, centerId } = route.useParams();
   return (
     <BusinessCentersPage

@@ -11,6 +11,7 @@ const search = z.object({
 });
 export const Route = createFileRoute("/member/reservations")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: MemberReservationsRoutePage,

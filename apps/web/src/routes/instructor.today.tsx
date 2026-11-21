@@ -6,6 +6,7 @@ import { InstructorTodayRoutePage } from "../features/instructor/instructor-toda
 const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
 export const Route = createFileRoute("/instructor/today")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: InstructorTodayRoutePage,

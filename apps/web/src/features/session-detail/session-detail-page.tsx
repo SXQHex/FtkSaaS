@@ -1,13 +1,8 @@
 import { useCallback, useState } from "react";
-import {
-  useLoaderData,
-  useParams,
-  useSearch,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { useParams, useSearch, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -17,7 +12,7 @@ import type { AccountView } from "@ftksaas/api-contracts";
 
 export function SessionDetailRoutePage() {
   const search = useSearch({ from: "/o/$orgId/c/$centerId/sessions/$sessionId" });
-  const account = useLoaderData({ from: "/o/$orgId/c/$centerId/sessions/$sessionId" });
+  const account = useAccountProjection();
   const { orgId, centerId, sessionId } = useParams({
     from: "/o/$orgId/c/$centerId/sessions/$sessionId",
   });

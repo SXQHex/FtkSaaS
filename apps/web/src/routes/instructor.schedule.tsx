@@ -6,6 +6,7 @@ import { InstructorScheduleRoutePage } from "../features/instructor/instructor-s
 const search = z.object({ org: z.uuid().optional(), center: z.uuid().optional() });
 export const Route = createFileRoute("/instructor/schedule")({
   beforeLoad: requireAccountSession,
+  loaderDeps: ({ search: { org } }) => ({ org }),
   loader: loadAccount,
   validateSearch: (input) => search.parse(input),
   component: InstructorScheduleRoutePage,

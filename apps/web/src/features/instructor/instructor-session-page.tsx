@@ -1,11 +1,12 @@
 import { useCallback } from "react";
-import { useLoaderData, useSearch, useParams, useNavigate } from "@tanstack/react-router";
+import { useSearch, useParams, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import type { WorkspaceSelection } from "../workspace/workspace-layout";
 import { InstructorLayout } from "./instructor-layout";
 import { InstructorSessionContent } from "./instructor-session-content";
 export function InstructorSessionRoutePage() {
-  const account = useLoaderData({ from: "/instructor/sessions/$sessionId" }),
+  const account = useAccountProjection(),
     search = useSearch({ from: "/instructor/sessions/$sessionId" }),
     { sessionId } = useParams({ from: "/instructor/sessions/$sessionId" }),
     navigate = useNavigate();

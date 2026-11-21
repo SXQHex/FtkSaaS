@@ -1,10 +1,11 @@
 import { useCallback } from "react";
-import { useLoaderData, useSearch, useNavigate } from "@tanstack/react-router";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { MemberLayout } from "../member/member-layout";
 import { MemberClassesContent } from "./member-classes-content";
 export function MemberClassesRoutePage() {
-  const account = useLoaderData({ from: "/member/classes" }),
+  const account = useAccountProjection(),
     search = useSearch({ from: "/member/classes" }),
     navigate = useNavigate();
   const { t } = useTranslation();

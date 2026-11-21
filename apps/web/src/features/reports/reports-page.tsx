@@ -1,13 +1,8 @@
 import { useCallback, useState } from "react";
-import {
-  useLoaderData,
-  useParams,
-  useNavigate,
-  useRouter,
-  useSearch,
-} from "@tanstack/react-router";
+import { useParams, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -19,7 +14,7 @@ import type { ReportAction } from "./report-search";
 
 export function ReportsRoutePage() {
   const from = "/o/$orgId/c/$centerId/reports";
-  const account = useLoaderData({ from });
+  const account = useAccountProjection();
   const { orgId, centerId } = useParams({ from });
   const { action } = useSearch({ from });
   return (
@@ -35,7 +30,7 @@ export function ReportsRoutePage() {
 
 export function ShortReportsRoutePage() {
   const from = "/reports";
-  const account = useLoaderData({ from });
+  const account = useAccountProjection();
   const { action } = useSearch({ from });
   return <ReportsPage key={account.id} account={account} action={action} />;
 }

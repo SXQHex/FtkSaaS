@@ -25,5 +25,7 @@ export function workspaceQuery(queries: QueryClient, accountId: string, organiza
     initialData: initial?.data,
     initialDataUpdatedAt: initial?.dataUpdatedAt,
     retry: false,
+    // A loader prefetch error is shown by the workspace shell, not retried on mount.
+    retryOnMount: false,
   });
 }
