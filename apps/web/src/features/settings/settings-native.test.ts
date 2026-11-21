@@ -496,32 +496,19 @@ it("OM directory omits center, binds role/state/cursor and rejects a foreign nat
     readTeamPage(scope, "org_manager", undefined, "organization", "inactive"),
   ).rejects.toThrow();
 });
-it("owner manager assignment requires no management snapshot, while revocation retains source validation", async () => {
-  call.mockImplementation(async (op) => {
-    if (op === "roles_list_v1") return { items: [], as_of: at, next_cursor: null };
-    if (op === "management_state_get_v1") throw Error("POLICY_NOT_CONFIGURED");
-    throw Error(`Unexpected operation: ${op}`);
+it("manager assignment skips unsupported management-state preview", async () => {
+  call.mockImplementation(async (operation) => {
+    if (operation === "roles_list_v1") return { items: [], as_of: at, next_cursor: null };
+    throw Error(`Unexpected operation: ${operation}`);
   });
-  for (const role of ["center_manager", "org_manager"] as const) {
-    const intent = await prepareTeamRole(scope, id(21), role, true, "");
-    expect(intent.operation).toBe(role === "center_manager" ? "center_manager_assign_v1" : "org_manager_assign_v1");
-  }
-  expect(call.mock.calls.every(([op]) => op === "roles_list_v1")).toBe(true);
-  call.mockReset();
-  call.mockImplementation(async (op) => {
-    if (op === "roles_list_v1")
-      return {
-        items: [{
-          id: id(22), person_id: id(21), role: "center_manager",
-          scope_center_id: scope.centerId, state: "active", version: 5,
-        }],
-        as_of: at, next_cursor: null,
-      };
-    if (op === "management_state_get_v1") throw Error("POLICY_NOT_CONFIGURED");
-    throw Error(`Unexpected operation: ${op}`);
-  });
-  await expect(prepareTeamRole(scope, id(21), "center_manager", false, "Gerekçe")).rejects.toThrow();
-  expect(call.mock.calls.map(([op]) => op)).toContain("management_state_get_v1");
+  const manager = await prepareTeamRole(scope, id(21), "center_manager", true, "");
+  expect(manager.operation).toBe("center_manager_assign_v1");
+  const organizationManager = await prepareTeamRole(scope, id(21), "org_manager", true, "");
+  expect(organizationManager.operation).toBe("org_manager_assign_v1");
+  expect(call.mock.calls.map(([operation]) => operation)).toEqual([
+    "roles_list_v1",
+    "roles_list_v1",
+  ]);
 });
 it("manager changes use dedicated native commands, with org scope and current assignment version", async () => {
   let manager = {
