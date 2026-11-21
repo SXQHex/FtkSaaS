@@ -104,13 +104,23 @@ export function LeadsBoard({
           setPreview(undefined);
         }}
         onDragEnd={(event) => {
-          const key = event.over
-            ? Object.keys(value).find(
-                (key) =>
-                  key === event.over?.id || value[key].some((row) => row.id === event.over?.id),
+          // The sortable preview is the actual destination after a drag-over.
+          // Native keyboard sensors (notably WebKit) can finish with `over=null`
+          // after the focused handle is moved across columns. In that case,
+          // use the preview's current column rather than discarding the move.
+          const previewColumn = preview
+            ? Object.keys(preview).find((key) =>
+                preview[key]?.some((item) => item.id === event.active.id),
               )
             : undefined;
-          const row = rows.find((row) => row.id === event.active.id);
+          const overColumn = event.over
+            ? Object.keys(value).find(
+                (key) =>
+                  key === event.over?.id || value[key].some((item) => item.id === event.over?.id),
+              )
+            : undefined;
+          const key = previewColumn ?? overColumn;
+          const row = rows.find((item) => item.id === event.active.id);
           dragging.current = false;
           activeHandle.current = undefined;
           keyboardDrag.current = false;

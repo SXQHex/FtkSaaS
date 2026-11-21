@@ -258,25 +258,30 @@ async function prepareManagerRole(
         ? "center_manager_assign_v1"
         : "center_manager_revoke_v1";
   const scoped = role === "org_manager" ? organizationCommon(scope) : common(scope);
-  const page = await (
-    await scopedBackend(scope)
-  ).call("management_state_get_v1", {
-    ...scoped,
-    request_id: uuidv7(),
-    operation,
-    selector: { operation, key: { person_id: personId } },
-    page: { limit: 1 },
-  });
-  const row = page.items[0];
-  if (
-    page.items.length !== 1 ||
-    page.next_cursor ||
-    row?.operation !== operation ||
-    (!enabled && !row.exists) ||
-    (row.current &&
-      (row.current.operation !== operation || row.current.values.person_id !== personId))
-  )
-    throw Error("TEAM_SOURCE_INVALID");
+  // Assignment is an organization-owner command; no existing assignment or
+  // center-manager inspection authority is required to prepare it.
+  // Keep the source/version read for revocation, where a real assignment exists.
+  if (!enabled) {
+    const page = await (
+      await scopedBackend(scope)
+    ).call("management_state_get_v1", {
+      ...scoped,
+      request_id: uuidv7(),
+      operation,
+      selector: { operation, key: { person_id: personId } },
+      page: { limit: 1 },
+    });
+    const row = page.items[0];
+    if (
+      page.items.length !== 1 ||
+      page.next_cursor ||
+      row?.operation !== operation ||
+      (!enabled && !row.exists) ||
+      (row.current &&
+        (row.current.operation !== operation || row.current.values.person_id !== personId))
+    )
+      throw Error("TEAM_SOURCE_INVALID");
+  }
   const request = { ...scoped, operation_key: uuidv7(), person_id: personId };
   if (enabled)
     return role === "org_manager"
