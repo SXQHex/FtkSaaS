@@ -40,9 +40,7 @@ describe("shared account projections", () => {
   it("keeps privileged account projection separate and reusable in workspace", async () => {
     const queries = new QueryClient();
     await queries.query(accountQuery("native-a", true));
-    expect(await verifiedWorkspaceAccount(queries, "native-a")).toMatchObject({
-      id: "account-a",
-    });
+    expect(await verifiedWorkspaceAccount(queries, "native-a")).toMatchObject({ id: "account-a" });
     expect(reader).toHaveBeenCalledTimes(1);
     expect(accountQueryKeys.projection("native-a", true)).not.toEqual(
       accountQueryKeys.projection("native-a", false),
@@ -53,12 +51,8 @@ describe("shared account projections", () => {
     const queries = new QueryClient();
     await queries.query(accountQuery("native-a"));
     native.getSession.mockResolvedValue(session("native-b"));
-    await expect(verifiedWorkspaceAccount(queries, "native-a")).rejects.toThrow(
-      "ACCOUNT_CHANGED",
-    );
-    await expect(queries.query(accountQuery("native-a", true))).rejects.toThrow(
-      "ACCOUNT_CHANGED",
-    );
+    await expect(verifiedWorkspaceAccount(queries, "native-a")).rejects.toThrow("ACCOUNT_CHANGED");
+    await expect(queries.query(accountQuery("native-a", true))).rejects.toThrow("ACCOUNT_CHANGED");
     expect(reader).toHaveBeenCalledTimes(1);
   });
 

@@ -17,8 +17,7 @@ export const accountQueryKeys = {
 async function verifiedSession(nativeUserId: string) {
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error) throw error;
-  if (!data.session || data.session.user.id !== nativeUserId)
-    throw new Error("ACCOUNT_CHANGED");
+  if (!data.session || data.session.user.id !== nativeUserId) throw new Error("ACCOUNT_CHANGED");
   return data.session;
 }
 
@@ -45,8 +44,8 @@ export async function verifiedWorkspaceAccount(queries: QueryClient, nativeUserI
     const cached = queries.getQueryState<Account>(
       accountQueryKeys.projection(nativeUserId, includePlatformScope),
     );
-    if (cached?.status !== "success" || cached.data === undefined || cached.isInvalidated)
-      continue;
+    if (!cached || cached.status !== "success") continue;
+    if (cached.data === undefined || cached.isInvalidated) continue;
     if (Date.now() - cached.dataUpdatedAt < accountStaleTime) return cached.data;
   }
   return queries.query(accountQuery(nativeUserId));
