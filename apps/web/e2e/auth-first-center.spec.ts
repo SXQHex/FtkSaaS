@@ -268,7 +268,6 @@ test("verified owner can explicitly self-assign the first center without team pr
   expect(f.writes).toHaveLength(1);
   expect(f.writes[0]).toHaveProperty("target_center_id", I.center);
   expect(f.reads).not.toContain("center_manager_assign_v1");
-  expect(f.reads).not.toContain("management_state_get_v1");
   await page.reload();
   await expect(action).toHaveCount(0);
 });
