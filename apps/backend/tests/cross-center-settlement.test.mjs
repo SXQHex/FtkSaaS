@@ -67,18 +67,10 @@ async function settlementFixture(t){
   const pr=await read('sale_preview_v1',{person_id:target,product_version_id:p.primary_id,start_date:'2026-01-01',end_date:'2027-12-31'},c);
   return (await mut('sale_apply_v1',{preview:{id:pr.id,token:pr.token}},c)).primary_id;
  }
- const nextSessionStart=new Date();
- nextSessionStart.setUTCDate(nextSessionStart.getUTCDate()+1);
- nextSessionStart.setUTCHours(9,0,0,0);
- function nextSessionInterval(){
-  // Both booking and attendance scenarios share the instructor across centers.
-  const startsAt=nextSessionStart.toISOString();
-  const endsAt=new Date(+nextSessionStart+1800000).toISOString();
-  nextSessionStart.setUTCDate(nextSessionStart.getUTCDate()+1);
-  return {starts_at:startsAt,ends_at:endsAt};
- }
+ let seq=0;
  async function lesson(sale,performed=true,result='attended',p=student.p,c=B,cancel=false){
-  const ss=await mut('session_create_v1',{discipline_id:D,format:'group',interval:nextSessionInterval(),resources:[],assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{total:10}},c);
+  seq++;const start=new Date(Date.now()+seq*3600000+86400000);start.setUTCMinutes(10,0,0);
+  const ss=await mut('session_create_v1',{discipline_id:D,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+1800000).toISOString()},resources:[],assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{total:10}},c);
   const rid=(await mut('reservation_create_v1',{session_id:ss.primary_id,person_id:p,mode:'flexible',...(sale?{source_sale_id:sale}:{})},c)).primary_id;
   // Preserve all30 minutes and legacy actual_started_at=null without crossing Istanbul midnight.
   const elapsed=new Date();elapsed.setUTCHours(9,0,0,0);if(+elapsed>=Date.now())elapsed.setUTCDate(elapsed.getUTCDate()-1);
@@ -96,11 +88,11 @@ async function settlementFixture(t){
   const pr=await read('attendance_correct_preview_v1',{session_id:l.sid,reason:'Reasoned attendance correction',corrections:result?[{reservation_id:l.rid,result}]:[],...(performed===undefined?{}:{performed,performed_instructor_ids:performed?[teacher.p]:[]})},l.c);
   return mut('attendance_correct_apply_v1',{preview:{id:pr.id,token:pr.token}},l.c);
  }
- return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,nextSessionInterval,lesson,correct};
+ return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct};
 }
 
 async function provenanceFixture(t){
- const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,nextSessionInterval,lesson,correct}=await settlementFixture(t);
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
  let sale,l1,m1,pending,approved,baseProduct;
  // These are real source sales, actual attendance and approved payment; no synthetic movement rows.
  await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
@@ -108,7 +100,7 @@ async function provenanceFixture(t){
  await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:authorityVersion.version,granted:true,reason:'Native independent settlement fixture'},null);
  await grant(manager.p,B,true,om.u);
  baseProduct=await product();
- return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,nextSessionInterval,lesson,correct,baseProduct};
+ return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct};
 }
 test('Cross-center payment, correction, reversal and scope chain',async t=>{
  const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
@@ -295,11 +287,12 @@ test("Cross-center largest remainder, release and reconsume",async t=>{
  });
 });
 test("Cross-center source scope and independent earning override",async t=>{
- const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,nextSessionInterval,lesson,correct,baseProduct}=await provenanceFixture(t);
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
  await t.test('W1-BE-66 selected sale respects the session scope and source-less borrowing still works',async()=>{
   const local=await sell(await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]));
+  const starts=new Date(Date.now()+86400000);
   const session=await mut('session_create_v1',{discipline_id:D,format:'group',
-   interval:nextSessionInterval(),resources:[],
+   interval:{starts_at:starts.toISOString(),ends_at:new Date(+starts+1800000).toISOString()},resources:[],
    assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{total:10}},B);
   const booking={person_id:student.p,session_id:session.primary_id,mode:'flexible'};
   const available=async()=>read('entitlements_get_v1',{person_id:student.p,session_id:session.primary_id,booking_mode:'flexible'},B);
