@@ -9,6 +9,7 @@ import { eligibleDisciplines, readStudioRooms } from "../studio/studio";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { readOrganizationSettingsCatalog } from "../settings/settings-reader";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { SelfCenterManagerSetup } from "./self-center-manager-setup";
 import {
   centerDraftSchema,
   centerCreateIntent,
@@ -200,8 +201,26 @@ export function FirstCenterSetup({
     if (step !== "studio") stepHeading.current?.focus();
   }, [step]);
   if (initial && catalog.isPending && !locked) return <SetupLoading />;
-  if (!allowed && !created && !locked && !unavailable)
-    return resourceScope ? <NextCenterSetup scope={resourceScope} /> : null;
+  if (!allowed && !created && !locked && !unavailable) {
+    if (resourceScope) return <NextCenterSetup scope={resourceScope} />;
+    // The owner can see a center without being its center manager.
+    // Do not route first-center onboarding through the generic team editor:
+    // its management selector may be unavailable before the first assignment.
+    if (
+      org?.id === organizationId &&
+      org.access_mode === "normal" &&
+      org.self_management_scope?.owner === true &&
+      activeCenter &&
+      !workspaceRoles(workspace, activeCenter.id).includes("center_manager")
+    )
+      return (
+        <SelfCenterManagerSetup
+          scope={{ accountId, orgId: org.id, centerId: activeCenter.id }}
+          onLockChange={onLockChange}
+        />
+      );
+    return null;
+  }
   function change(field: keyof typeof draft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
     if (errors[field])
