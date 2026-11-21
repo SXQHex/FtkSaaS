@@ -37,7 +37,7 @@ describe("shared account projections", () => {
     expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBe(a);
   });
 
-  it("keeps platform projections separate but reuses their verified identity in workspace", async () => {
+  it("keeps privileged account projection separate and reusable in workspace", async () => {
     const queries = new QueryClient();
     await queries.query(accountQuery("native-a", true));
     expect(await verifiedWorkspaceAccount(queries, "native-a")).toMatchObject({

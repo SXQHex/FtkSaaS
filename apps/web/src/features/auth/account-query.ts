@@ -45,13 +45,9 @@ export async function verifiedWorkspaceAccount(queries: QueryClient, nativeUserI
     const cached = queries.getQueryState<Account>(
       accountQueryKeys.projection(nativeUserId, includePlatformScope),
     );
-    if (
-      cached?.status === "success" &&
-      cached.data !== undefined &&
-      !cached.isInvalidated &&
-      Date.now() - cached.dataUpdatedAt < accountStaleTime
-    )
-      return cached.data;
+    if (cached?.status !== "success" || cached.data === undefined || cached.isInvalidated)
+      continue;
+    if (Date.now() - cached.dataUpdatedAt < accountStaleTime) return cached.data;
   }
   return queries.query(accountQuery(nativeUserId));
 }

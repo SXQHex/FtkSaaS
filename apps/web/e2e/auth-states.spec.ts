@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import { mockNative, openWorkspaceNavigation, origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, mockNative, origin } from "./auth-fixture.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 async function signIn(page: Page) {
   await page.goto(`${origin}/login`);
@@ -157,14 +157,13 @@ test("states SPA navigation shares account cache while direct URL reload recheck
   await page.evaluate(() => {
     (window as Window & { __spaMarker?: boolean }).__spaMarker = true;
   });
-  await openWorkspaceNavigation(page);
-  await page.getByRole("navigation", { name: "Yardım", exact: true })
-    .getByRole("link", { name: "Yardım", exact: true }).click();
+  await clickWorkspaceLink(page, "Yardım");
   await expect(page).toHaveURL(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
-  expect(await page.evaluate(() =>
-    (window as Window & { __spaMarker?: boolean }).__spaMarker,
-  )).toBe(true);
+  const spaMarker = await page.evaluate(
+    () => (window as Window & { __spaMarker?: boolean }).__spaMarker,
+  );
+  expect(spaMarker).toBe(true);
   // The first non-platform route creates one ordinary projection. Workspace
   // must reuse it rather than issue its own second account_get_v1 call.
   expect(calls.account - before).toBe(1);
