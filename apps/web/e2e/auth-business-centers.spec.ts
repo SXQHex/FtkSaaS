@@ -1034,7 +1034,6 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
 for (const role of ["center_manager", "staff"] as const) {
   test(`Business direct person, CRM and finance links stay in scope for ${role}`, async ({
     page,
-    browserName,
     hasTouch,
   }) => {
     const f = await businessFixture(page, role);
@@ -1050,23 +1049,17 @@ for (const role of ["center_manager", "staff"] as const) {
       await page.goto(`/o/${I.org}/c/${second}/${direct}`);
       await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
       await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
-      if (
-        role === "center_manager" &&
-        safe === "people" &&
-        browserName === "chromium" &&
-        hasTouch
-      ) {
-        // The redirected people page can replace the menu trigger after the URL changes.
-        await page.waitForTimeout(2000);
-      }
-      await openWorkspaceNavigation(page, hasTouch ? "tap" : "click");
-      await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
-      await closeWorkspaceNavigation(page);
+      // Wait for the redirected center's actual native read before opening the
+      // mobile drawer. Otherwise the destination view can remount its trigger
+      // immediately after a tap and close the drawer.
       await expect
         .poll(() =>
           f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
         )
         .toBe(true);
+      await openWorkspaceNavigation(page, hasTouch ? "tap" : "click");
+      await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
+      await closeWorkspaceNavigation(page);
     }
 
     expect(f.calls.filter(({ request }) => request.center_id === second)).toEqual([]);
