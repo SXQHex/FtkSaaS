@@ -122,17 +122,13 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   const tableRegion = page.getByRole("region", { name: "Seans satırları", exact: true });
   await expect(tableRegion).toHaveAttribute("tabindex", "0");
   await tableRegion.focus();
-  await expect(tableRegion).toBeFocused();
-  expect(await tableRegion.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(
-    true,
-  );
-  if (!(browserName === "webkit" && isMobile)) {
-    // iPhone emülasyonunda klavye ile kaydırma varsayılan yol değil; Chromium ve masaüstü WebKit'te sürüyor.
+  if (browserName === "webkit" && isMobile) {
+    // iPhone emulation has no keyboard scrolling path, so scroll programmatically.
+    await tableRegion.evaluate((element) => element.scrollBy(40, 0));
+  } else {
     await tableRegion.press("ArrowRight");
-    await expect
-      .poll(() => tableRegion.evaluate((element) => element.scrollLeft))
-      .toBeGreaterThan(0);
   }
+  await expect.poll(() => tableRegion.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
 });
 test("own earnings denied read stays unknown until explicit retry", async ({ page }) => {

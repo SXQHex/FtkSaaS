@@ -62,14 +62,13 @@ test("empty anonymous result does not reveal private profile or invent applicati
   ).toBeVisible();
   await expect(page.getByText("Örnek Stüdyo", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Başvur", exact: true })).toHaveCount(0);
-  const iphone = browserName === "webkit" && isMobile;
-  const skip = page.getByRole("link", { name: "İçeriğe geç", exact: true });
-  if (iphone) {
-    await skip.focus(); // dokunmatik profilde Tab ile bağlantıya odaklanma yok
+  if (browserName === "webkit" && isMobile) {
+    // Touch profiles have no Tab path to links, so focus the skip link directly.
+    await page.getByRole("link", { name: "İçeriğe geç", exact: true }).focus();
   } else {
     await page.keyboard.press("Tab");
   }
-  await expect(skip).toBeFocused();
+  await expect(page.getByRole("link", { name: "İçeriğe geç", exact: true })).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#public-main$/);
 });
