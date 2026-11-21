@@ -34,6 +34,7 @@ window.addEventListener("hashchange", captureInvitationNavigation, { capture: tr
 
 const router = createRouter({
   routeTree,
+  context: { queryClient },
   defaultPreload: "intent",
   routeMasks: [
     createRouteMask({

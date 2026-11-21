@@ -1,6 +1,7 @@
 import { redirect } from "@tanstack/react-router";
 import { getSupabaseClient } from "../../lib/supabase";
-import { readAccount } from "../../lib/account";
+import type { QueryClient } from "@tanstack/react-query";
+import { accountQuery } from "./account-query";
 import { BackendError } from "../../lib/backend";
 import { hasDeletionReceipt } from "../account/deletion";
 import { takeInvitationReturn } from "../invitations/invitation";
@@ -16,19 +17,27 @@ export async function requireAccountSession() {
     throw redirect({ to: "/mfa" });
   if (hasDeletionReceipt(data.session.user.id)) throw redirect({ to: "/account/deletion" });
   if (takeInvitationReturn()) throw redirect({ to: "/invite" });
+  return { authUserId: data.session.user.id };
 }
 
-export async function loadAccount() {
-  return loadAccountProjection(false);
+type AccountLoaderContext = {
+  context: { queryClient: QueryClient; authUserId: string };
+};
+
+export async function loadAccount({ context }: AccountLoaderContext) {
+  return loadAccountProjection(context, false);
 }
 
-export async function loadPlatformAccount() {
-  return loadAccountProjection(true);
+export async function loadPlatformAccount({ context }: AccountLoaderContext) {
+  return loadAccountProjection(context, true);
 }
 
-async function loadAccountProjection(includePlatformScope: boolean) {
+async function loadAccountProjection(
+  context: AccountLoaderContext["context"],
+  includePlatformScope: boolean,
+) {
   try {
-    return await readAccount(includePlatformScope);
+    return await context.queryClient.query(accountQuery(context.authUserId, includePlatformScope));
   } catch (error) {
     if (error instanceof BackendError && ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code))
       throw redirect({ to: "/login" });

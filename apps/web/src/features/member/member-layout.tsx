@@ -77,9 +77,11 @@ export function MemberLayout({
       (error instanceof BackendError &&
         ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
       (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
-    )
+    ) {
+      queries.clear();
       void router.invalidate();
-  }, [workspace.error, router]);
+    }
+  }, [workspace.error, queries, router]);
   const links = (
     [
       { id: "classes", icon: <CalendarDaysIcon /> },
