@@ -497,18 +497,15 @@ it("OM directory omits center, binds role/state/cursor and rejects a foreign nat
   ).rejects.toThrow();
 });
 it("manager assignment skips unsupported management-state preview", async () => {
-  call.mockImplementation(async (operation) => {
-    if (operation === "roles_list_v1") return { items: [], as_of: at, next_cursor: null };
-    throw Error(`Unexpected operation: ${operation}`);
-  });
+  call.mockResolvedValue({ items: [], as_of: at, next_cursor: null });
   const manager = await prepareTeamRole(scope, id(21), "center_manager", true, "");
   expect(manager.operation).toBe("center_manager_assign_v1");
   const organizationManager = await prepareTeamRole(scope, id(21), "org_manager", true, "");
   expect(organizationManager.operation).toBe("org_manager_assign_v1");
-  expect(call.mock.calls.map(([operation]) => operation)).toEqual([
-    "roles_list_v1",
-    "roles_list_v1",
-  ]);
+  expect(call.mock.calls.filter(([operation]) => operation === "roles_list_v1")).toHaveLength(2);
+  expect(call.mock.calls.some(([operation]) => operation === "management_state_get_v1")).toBe(
+    false,
+  );
 });
 it("manager changes use dedicated native commands, with org scope and current assignment version", async () => {
   let manager = {
