@@ -545,7 +545,7 @@ test("management calendar reads the Sunday week selected in account settings", a
   expect(state.writes).toEqual([]);
 });
 
-test("empty mobile week keeps all days and hours reachable with the native keyboard scroll", async ({
+test("empty mobile week supports native horizontal scrolling and keyboard vertical scrolling", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 900 });
@@ -563,8 +563,18 @@ test("empty mobile week keeps all days and hours reachable with the native keybo
     outline: el.ownerDocument.defaultView!.getComputedStyle(el).outlineStyle,
   }));
   expect(before.outline).not.toBe("none");
-  await page.keyboard.press("ArrowRight");
+  // Horizontal overflow is native. On mobile WebKit, ArrowRight does not
+  // consistently map to horizontal scrolling; use native horizontal wheel
+  // input rather than installing an application-specific keyboard handler.
+  await expect
+    .poll(() => scroll.evaluate((el) => el.scrollWidth - el.clientWidth))
+    .toBeGreaterThan(0);
+  const bounds = await scroll.boundingBox();
+  expect(bounds).not.toBeNull();
+  await page.mouse.move(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
+  await page.mouse.wheel(500, 0);
   await expect.poll(() => scroll.evaluate((el) => el.scrollLeft)).toBeGreaterThan(before.left);
+  await scroll.focus();
   await page.keyboard.press("PageDown");
   await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(before.top);
   expect((await scanAccessibility(page, "empty-mobile-week")).violations).toEqual([]);
