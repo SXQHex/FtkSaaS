@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import { clickWorkspaceLink, mockNative, origin } from "./auth-fixture.js";
+import { mockNative, openWorkspaceNavigation, origin } from "./auth-fixture.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 async function signIn(page: Page) {
   await page.goto(`${origin}/login`);
@@ -157,7 +157,9 @@ test("states SPA navigation shares account cache while direct URL reload recheck
   await page.evaluate(() => {
     (window as Window & { __spaMarker?: boolean }).__spaMarker = true;
   });
-  await clickWorkspaceLink(page, "Yardım");
+  await openWorkspaceNavigation(page);
+  const helpNavigation = page.getByRole("navigation", { name: "Yardım", exact: true });
+  await helpNavigation.getByRole("link", { name: "Yardım", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
   const spaMarker = await page.evaluate(
