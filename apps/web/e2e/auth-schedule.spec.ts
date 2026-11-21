@@ -1157,17 +1157,22 @@ for (const scenario of ["single", "this_and_future"] as const) {
         panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
       ).toBeVisible();
       expect(f.changes).toHaveLength(previous + 1);
-      expect(f.previews.at(-1)).toMatchObject({ scope: changeScope, session_id: occurrences[0]!.id });
+      expect(f.previews.at(-1)).toMatchObject({
+        scope: changeScope,
+        session_id: occurrences[0]!.id,
+      });
     }
   
     async function observeTimes(times: readonly [string, string]) {
       reader = "member";
       await page.goto(`${origin}/member/classes${scope}`);
       const monday = page.locator(`#member-class-${occurrences[0]!.id}`);
-      await expect(monday.locator("xpath=ancestor::*[@role='listitem'][1]")).toContainText(times[0]);
+      const mondayRow = monday.locator("xpath=ancestor::*[@role='listitem'][1]");
+      await expect(mondayRow).toContainText(times[0]);
       await page.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }).click();
       const tuesday = page.locator(`#member-class-${occurrences[1]!.id}`);
-      await expect(tuesday.locator("xpath=ancestor::*[@role='listitem'][1]")).toContainText(times[1]);
+      const tuesdayRow = tuesday.locator("xpath=ancestor::*[@role='listitem'][1]");
+      await expect(tuesdayRow).toContainText(times[1]);
   
       reader = "instructor";
       const beforeRead = instructorReads.length;
