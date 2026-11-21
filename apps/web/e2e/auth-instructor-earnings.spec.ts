@@ -5,7 +5,9 @@ import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 test("own earnings preserves cursor scope and currency alongside native summaries and payment history", async ({
-  page, browserName,isMobile,
+  page,
+  browserName,
+  isMobile,
 }) => {
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
   await mockAccount(page);
