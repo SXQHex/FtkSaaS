@@ -4,27 +4,63 @@ import { mockEarnings, fillEarningsPayment, earningsIds } from "./earnings-fixtu
 import type { DigitalAgreementView } from "@ftksaas/api-contracts";
 import { scanAccessibility } from "./accessibility.js";
 import { initialAgreement, studioIds as I } from "./studio-fixture.js";
+import type { Locator } from "@playwright/test";
 test("manager native directory preserves global currency totals, historical agreement, distinct session counts and cursor filters", async ({
   page,
+  browserName,
+  isMobile,
 }) => {
   const f = await mockEarnings(page, { paginate: true });
   await expect(page.getByText("7 tekil kapalı ders seansı", { exact: true })).toBeVisible();
   const row = page.getByRole("row").filter({ hasText: "Örnek Eğitmen" });
   await expect(row.getByRole("gridcell", { name: "3", exact: true })).toBeVisible();
   await expect(page.getByText("₺1.000,00 · €50,00", { exact: true }).first()).toBeVisible();
-  await page.getByRole("tab", { name: "Eğitmenler", exact: true }).focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("tab", { name: "Satırlar", exact: true })).toBeFocused();
-  await page.keyboard.press("Enter");
+  const instructorTab = page.getByRole("tab", { name: "Eğitmenler", exact: true });
+  const linesTab = page.getByRole("tab", { name: "Satırlar", exact: true });
+  const inputProfile = `${browserName}:${isMobile ? "mobile" : "desktop"}`;
+  // Check the interaction each browser/device actually offers. Touch profiles
+  // must not inherit a desktop keyboard-navigation acceptance scenario.
+  await test.step(`Earnings tab interaction: ${inputProfile}`, async () => {
+    switch (inputProfile) {
+      case "chromium:desktop":
+        await instructorTab.focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(linesTab).toBeFocused();
+        await page.keyboard.press("Enter");
+        break;
+      case "webkit:desktop":
+        await instructorTab.focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(linesTab).toBeFocused();
+        await page.keyboard.press("Enter");
+        break;
+      case "chromium:mobile":
+        await linesTab.tap();
+        break;
+      case "webkit:mobile":
+        await linesTab.tap();
+        break;
+      default:
+        throw new Error(`Unsupported browser input profile: ${inputProfile}`);
+    }
+  });
+  await expect(linesTab).toHaveAttribute("aria-selected", "true");
+  const activate = async (control: Locator) => {
+    if (isMobile) await control.tap();
+    else await control.click();
+  };
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
   await expect(page.getByText("Ders anlaşması · Anlaşma v1", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
   expect(f.reads.at(-1)).toMatchObject({ view: "earnings", page: { cursor: "native-next" } });
+  // selectOption checks the native select's value/change behavior, not an OS picker UI.
   await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
   expect(f.reads.at(-1)?.page.cursor).toBeUndefined();
-  await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
+  const paymentsTab = page.getByRole("tab", { name: "Ödemeler", exact: true });
+  await activate(paymentsTab);
+  await expect(paymentsTab).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("Nakit", { exact: true })).toBeVisible();
 });
 test("record payment requires explicit native earning, currency, real reference and center-local instant then rereads all views", async ({
