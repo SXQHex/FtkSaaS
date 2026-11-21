@@ -1010,7 +1010,8 @@ test("time and instructor changes apply an explicitly reviewed future scope and 
   await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
 });
 
-test("single and future schedule changes reach the assigned instructor and member from one source", async ({
+for (const scenario of ["single", "this_and_future"] as const) {
+  test(`schedule ${scenario} changes reach the assigned instructor and member from one native source`, async ({
   page,
 }) => {
   await page.clock.setFixedTime(new Date("2026-11-16T06:00:00Z"));
@@ -1187,11 +1188,18 @@ test("single and future schedule changes reach the assigned instructor and membe
   await changeTime("15:20", "single");
   expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
   expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
-  await observeTimes(["15:20", localTime.format(originalFutureStart)]);
-  await changeTime("15:40", "this_and_future");
-  expect(occurrences.map(({ version }) => version)).toEqual([5, 4]);
-  const movedFutureStart = originalFutureStart + 20 * 60_000;
-  expect(Date.parse(occurrences[1]!.starts_at)).toBe(movedFutureStart);
-  await observeTimes(["15:40", localTime.format(movedFutureStart)]);
+  if (scenario === "single") {
+    await observeTimes(["15:20", localTime.format(originalFutureStart)]);
+  } else {
+    // Reuse the independently tested single-change state. Verify the
+    // subsequent future-series edit and its two native consumers separately,
+    // rather than accumulating both full consumer traversals in one timeout.
+    await changeTime("15:40", "this_and_future");
+    expect(occurrences.map(({ version }) => version)).toEqual([5, 4]);
+    const movedFutureStart = originalFutureStart + 20 * 60_000;
+    expect(Date.parse(occurrences[1]!.starts_at)).toBe(movedFutureStart);
+    await observeTimes(["15:40", localTime.format(movedFutureStart)]);
+  }
   expect(f.writes).toEqual([]);
-});
+  });
+}
