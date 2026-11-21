@@ -13,7 +13,8 @@ export default defineConfig({
   fullyParallel: Boolean(process.env.CI),
   forbidOnly: true,
   retries: 0,
-  workers: process.env.GITHUB_ACTIONS === "true" ? 2 : 1,
+  // Keep shard parallelism, but give WebKit the runner's resources for each test.
+  workers: process.env.GITHUB_ACTIONS === "true" && engine === "chromium" ? 2 : 1,
   outputDir: "./test-results",
   reporter: [
     ["list"],

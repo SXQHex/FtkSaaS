@@ -1,4 +1,5 @@
 import { test, expect } from "./test.js";
+import { scanAccessibility } from "./accessibility.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { uid } from "./pro-completion-fixture.js";
@@ -850,10 +851,27 @@ test("operational team role is a separate reviewed command and native channel/te
   });
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  const documentScan = await scanAccessibility(page, "settings-template-list");
+  expect(documentScan.violations).toEqual([]);
   await page.getByRole("button", { name: "Yönetim sınırı", exact: true }).first().click();
   const sheet = page.getByRole("dialog");
   await expect(sheet).toContainText("platform içerik kataloğunda");
   await expect(sheet.getByRole("textbox").first()).toHaveAttribute("readonly", "");
+  // The modal hides the document landmarks. Check the modal and its owning page separately.
+  const backgroundIsHidden = () =>
+    page
+      .locator("main")
+      .evaluate((element) => Boolean(element.closest('[inert], [aria-hidden="true"]')));
+  await expect.poll(backgroundIsHidden).toBe(true);
+  const sheetScan = await scanAccessibility(page, "settings-read-only-template", {
+    selector: '[data-slot="sheet"]',
+    documentScan,
+  });
+  expect(sheetScan.violations).toEqual([]);
+  await sheet.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await expect(sheet).toHaveCount(0);
+  await expect.poll(backgroundIsHidden).toBe(false);
+  await expect(page.getByRole("main")).toBeVisible();
   expect(f.writes.some((row) => row.op === "content_catalog_save_v1")).toBe(false);
 });
 

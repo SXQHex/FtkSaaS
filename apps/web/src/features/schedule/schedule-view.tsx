@@ -270,7 +270,9 @@ export function ScheduleView({
           )}
           <Suspense
             fallback={
-              <Skeleton className="mx-5 h-[34rem]" aria-label={t(($) => $.schedule.loading)} />
+              <Skeleton className="mx-5 h-[34rem]">
+                <progress className="sr-only" aria-label={t(($) => $.schedule.loading)} />
+              </Skeleton>
             }
           >
             <Calendar

@@ -23,7 +23,7 @@ async function fixture(
     | "member-offer"
     | "member-request"
     | "participant" = "normal",
-  options: { crossCenter?: boolean; allUnreadUnknown?: boolean } = {},
+  options: { crossCenter?: boolean; allUnreadUnknown?: boolean; secondRead?: boolean } = {},
 ) {
   const participantCenter = options.crossCenter ? sourceCenter : I.center;
   const privateLessons = mode === "member-request" ? await mockOwnPrivateLessons(page) : undefined;
@@ -51,7 +51,7 @@ async function fixture(
     failResult: false,
     denied: mode === "denied",
     advanced: false,
-    secondRead: false,
+    secondRead: options.secondRead ?? false,
     secondVersion: 9,
     visibility: "inbox",
     secondVisibility: "inbox",
@@ -766,13 +766,15 @@ test("inbox archives, deletes with confirmation, and restores the exact selected
 test("inbox bulk selection undoes only changed read states using confirmed versions", async ({
   page,
 }) => {
-  const state = await fixture(page, "batch");
-  state.secondRead = true;
-  await page.reload();
+  const state = await fixture(page, "batch", { secondRead: true });
   const selectPage = page.getByRole("checkbox", {
     name: "Görünen iletilerin tümünü seç",
     exact: true,
   });
+  await expect(
+    page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }),
+  ).toBeVisible();
+  await expect(selectPage).toBeEnabled();
   await selectPage.press("Space");
   await expect(
     page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }),
@@ -793,6 +795,7 @@ test("inbox bulk selection undoes only changed read states using confirmed versi
   expect(state.secondRead).toBe(true);
   await expect(undo).toHaveCount(0);
 
+  await expect(selectPage).toBeEnabled();
   await selectPage.press("Space");
   await page.getByRole("button", { name: "Seçilenleri okunmadı yap", exact: true }).click();
   await expect(undo).toBeEnabled();

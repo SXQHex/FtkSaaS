@@ -116,7 +116,7 @@ export async function scanAccessibility(
   await expect(
     page.locator('[data-slot^="sheet-"]:is([data-entering], [data-exiting])'),
   ).toHaveCount(0);
-  // Read affected styles before checking animations so WebKit registers pending transitions.
+  // Flush styles before checking the transitions that could change the scan.
   await expect
     .poll(() =>
       page.evaluate(`new Promise(resolve => requestAnimationFrame(() => {
@@ -125,12 +125,17 @@ export async function scanAccessibility(
           void style.color;
           void style.opacity;
         }
-        requestAnimationFrame(() => resolve(document.getAnimations().filter(
-          animation => animation.playState === "running" || animation.pending
-        ).length));
+        requestAnimationFrame(() => resolve(document.getAnimations().filter(animation => {
+          if (animation.playState !== "running" && !animation.pending) return false;
+          const effect = animation.effect;
+          const isLoadingDecoration = effect?.target?.matches?.(
+            "[data-slot='skeleton'], [data-slot='spinner']"
+          ) && effect.getComputedTiming().iterations === Infinity;
+          return !isLoadingDecoration;
+        }).map(animation => animation.animationName || animation.transitionProperty || "animation")));
       }))`),
     )
-    .toBe(0);
+    .toEqual([]);
   // Preserve all default rules and explicitly enable every available WCAG 2.2 A/AA rule.
   const axeBuilder = new AxeBuilder({ page });
   if (scope) axeBuilder.include(scope.selector);

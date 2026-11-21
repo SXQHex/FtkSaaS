@@ -3,6 +3,7 @@ import type { Page } from "@playwright/test";
 import { mockSessionDetail, sessionIds as S } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import { scanAccessibility } from "./accessibility.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 async function setup(
   page: Page,
@@ -150,9 +151,34 @@ test("overview program and participant actions retain real scoped targets", asyn
     "true",
   );
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/overview`);
-  await page.getByRole("button", { name: "Programı aç", exact: true }).click();
-  await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/schedule`);
-  await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
+  let releaseCalendar!: () => void;
+  const calendarChunk = new Promise<void>((resolve) => {
+    releaseCalendar = resolve;
+  });
+  await page.route(
+    (url) => url.pathname === "/src/components/event-calendar.tsx",
+    async (route) => {
+      await calendarChunk;
+      await route.fallback();
+    },
+  );
+  const loading = page
+    .getByRole("progressbar", { name: common.schedule.loading, exact: true })
+    .and(page.locator("progress"));
+  try {
+    await page.getByRole("button", { name: "Programı aç", exact: true }).click();
+    await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/schedule`);
+    await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
+    await expect(loading).toBeVisible();
+    await expect(loading).not.toHaveAttribute("value");
+    expect((await scanAccessibility(page, "schedule-loading")).violations).toEqual([]);
+  } finally {
+    releaseCalendar();
+  }
+  await expect(loading).toHaveCount(0);
+  await expect(
+    page.getByRole("region", { name: common.schedule.daysScroll, exact: true }),
+  ).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
 test("overview denied day remains unread and recovers through explicit source reading", async ({

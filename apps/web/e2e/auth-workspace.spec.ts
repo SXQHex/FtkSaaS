@@ -139,6 +139,18 @@ for (const colorScheme of ["light", "dark"] as const)
     expect((await rail.boundingBox())?.width).toBeGreaterThanOrEqual(24);
     await rail.click();
     await expect(page.locator('[data-slot="sidebar"][data-state="collapsed"]')).toBeVisible();
+    // The rail moves with the sidebar width when the collapsed state is applied.
+    await expect
+      .poll(() =>
+        page.evaluate(`new Promise(resolve => requestAnimationFrame(() => {
+          const sidebar = document.querySelector('[data-slot="sidebar"]');
+          resolve(sidebar?.getAnimations({ subtree: true }).filter(animation =>
+            ["width", "left", "right"].includes(animation.transitionProperty) &&
+            (animation.playState === "running" || animation.pending)
+          ).length ?? 0);
+        }))`),
+      )
+      .toBe(0);
     await rail.click();
     await expect(page.locator('[data-slot="sidebar"][data-state="expanded"]')).toBeVisible();
     for (const viewport of shellViewports) {
