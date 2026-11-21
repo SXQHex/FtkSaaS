@@ -33,6 +33,7 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(/\/account$/);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 }
 async function platformFixture(
   page: import("@playwright/test").Page,
@@ -548,7 +549,7 @@ test("operator filters a native payment queue, rejects a report and replays one 
 
   const customer = await browser.newPage({ baseURL });
   try {
-    await mockSettingsCompletion(customer, { billingOwner: true });
+    await mockSettingsCompletion(customer, { billingOwner: true, startUrl: null });
     await customer.route("**/functions/v1/backend-v1/subscription_get_v1", (route) =>
       route.fulfill({
         json: {

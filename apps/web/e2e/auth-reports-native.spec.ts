@@ -1,3 +1,9 @@
+import {
+  clickWorkspaceLink,
+  closeWorkspaceNavigation,
+  openWorkspaceNavigation,
+  openWorkspaceSearch,
+} from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockReports } from "./reports-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -37,15 +43,14 @@ test("command palette reuses the report and import review forms without starting
   page,
 }) => {
   const f = await mockReports(page);
-  const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
   const input = page.getByPlaceholder("Sayfa adı ara…");
-  await search.click();
+  await openWorkspaceSearch(page);
   await input.fill("Raporu dışa aktar");
   await page.getByRole("menuitem", { name: "Raporu dışa aktar", exact: true }).click();
   const report = page.getByRole("dialog");
   await expect(report.getByRole("combobox", { name: "Rapor", exact: true })).toBeVisible();
   await report.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await search.click();
+  await openWorkspaceSearch(page);
   await input.fill("Üyeleri içe aktar");
   await page.getByRole("menuitem", { name: "Üyeleri içe aktar", exact: true }).click();
   await expect(
@@ -57,10 +62,7 @@ test("command palette reuses the report and import review forms without starting
     "true",
   );
   const initialDocument = await page.evaluate(() => performance.timeOrigin);
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Üyeler", exact: true })
-    .click();
+  await clickWorkspaceLink(page, "Üyeler");
   const memberImport = page.getByRole("button", { name: "İçe aktar", exact: true });
   await expect(memberImport).toBeEnabled();
   await memberImport.press("Enter");
@@ -74,10 +76,10 @@ test("command palette reuses the report and import review forms without starting
   await page.reload();
   await expect(page).toHaveURL((url) => url.pathname === "/reports" && !url.search);
   await expect(page.getByRole("tab", { name: "Özet", exact: true })).toBeVisible();
-  const reportsLink = page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Raporlar", exact: true });
+  const navigation = await openWorkspaceNavigation(page);
+  const reportsLink = navigation.getByRole("link", { name: "Raporlar", exact: true });
   await expect(reportsLink).toHaveAttribute("aria-current", "page");
+  await closeWorkspaceNavigation(page);
   await page.goto("/reports");
   await expect(page).toHaveURL((url) => url.pathname === "/reports");
   await expect(page.getByRole("tab", { name: "Özet", exact: true })).toBeVisible();

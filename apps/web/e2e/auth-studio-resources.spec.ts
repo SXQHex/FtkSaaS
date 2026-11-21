@@ -58,6 +58,10 @@ test("Studio resource: split availability retries only the unknown step and pres
   const retry = page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   await expect(page.locator("#availability-instructor")).toBeDisabled();
+  await expect(page.getByRole("region", { name: "Stüdyo bölümleri", exact: true })).toHaveAttribute(
+    "tabindex",
+    "0",
+  );
   expect((await scanAccessibility(page, "studio-availability-unknown-step")).violations).toEqual(
     [],
   );

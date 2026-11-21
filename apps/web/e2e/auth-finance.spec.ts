@@ -2,7 +2,7 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { CashSummary, FinanceView, MemberPageSummary } from "@ftksaas/api-contracts";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 const cashId = "019a7b00-0000-7000-8000-000000000061",
   debtId = "019a7b00-0000-7000-8000-000000000062",
@@ -220,11 +220,12 @@ async function setup(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   const centerPath = `${origin}/o/${I.org}/c/${I.center}`;
   if (options.openProfileFirst) {
     await page.goto(`${centerPath}/people/${I.instructor}`);
     await expect(page.getByRole("definition").filter({ hasText: "₺600,00" })).toBeVisible();
-    await page.getByRole("link", { name: "Finans", exact: true }).click();
+    await clickWorkspaceLink(page, "Finans");
   } else {
     await page.goto(`${centerPath}/finance`);
   }

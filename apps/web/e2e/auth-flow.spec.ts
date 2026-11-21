@@ -408,10 +408,15 @@ test("account password change handles native current-password and old-session no
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
   await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  const documentScans = await captureAuth(page, "e10-password-page", testInfo);
   await page.getByRole("button", { name: "Parolayı değiştir", exact: true }).click();
   const dialog = page.getByRole("dialog");
   const submit = dialog.getByRole("button", { name: "Parolayı değiştir", exact: true });
-  await captureAuth(page, "e10-password-sheet", testInfo);
+  await expect(dialog).toBeVisible();
+  await captureAuth(page, "e10-password-sheet", testInfo, undefined, {
+    selector: '[data-slot="sheet"]',
+    documentScans,
+  });
   await page.getByLabel("Mevcut parola", { exact: true }).fill("fixture-current-password");
   await page.getByLabel("Yeni parola", { exact: true }).fill("fixture-new-password");
   await page.getByLabel("Yeni parola tekrar", { exact: true }).fill("mismatch");

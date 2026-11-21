@@ -294,7 +294,12 @@ export function StudioView({
         keyboardActivation="manual"
         className="min-w-0 gap-4"
       >
-        <div className="-m-1 min-w-0 overflow-x-auto p-1">
+        <div
+          className="-m-1 min-w-0 overflow-x-auto p-1 focus-visible:outline-2 focus-visible:outline-ring"
+          tabIndex={interactionLocked ? 0 : undefined}
+          role={interactionLocked ? "region" : undefined}
+          aria-label={interactionLocked ? t(($) => $.studio.sections) : undefined}
+        >
           <TabsList
             aria-label={t(($) => $.studio.sections)}
             className="h-9! gap-0.5 rounded-lg [&_[data-slot=tabs-trigger]]:flex-none [&_[data-slot=tabs-trigger]]:rounded-md [&_[data-slot=tabs-trigger]]:px-3 [&_[data-slot=tabs-trigger]]:data-selected:after:bottom-0 [&_[data-slot=tabs-trigger]]:data-selected:after:border-b-2 [&_[data-slot=tabs-trigger]]:data-selected:after:opacity-0 [&_[data-slot=tabs-trigger]]:forced-colors:data-selected:after:opacity-100"

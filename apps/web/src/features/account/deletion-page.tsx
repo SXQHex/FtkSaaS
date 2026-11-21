@@ -77,7 +77,9 @@ function DeletionDetails({ context }: { context: Context }) {
         </EmptyHeader>
         {!context.owned && <p>{t(($) => $.accountDeletion.loginForStatus)}</p>}
         {pending && (
-          <Skeleton className="h-16 w-full" aria-label={t(($) => $.accountDeletion.loading)} />
+          <Skeleton className="h-16 w-full">
+            <progress className="sr-only" aria-label={t(($) => $.accountDeletion.loading)} />
+          </Skeleton>
         )}
         {failed && (
           <Alert variant="destructive">

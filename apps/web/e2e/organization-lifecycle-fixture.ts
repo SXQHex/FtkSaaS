@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 import type { OrganizationView, JobStatusView, Preview } from "@ftksaas/api-contracts";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
-import { uid, nativePage, nativeMutation } from "./pro-completion-fixture.js";
+import { completionUrl, uid, nativePage, nativeMutation } from "./pro-completion-fixture.js";
 export async function mockOrganizationLifecycle(
   page: Page,
   options: {
@@ -15,7 +15,7 @@ export async function mockOrganizationLifecycle(
     staleClose?: boolean;
   } = {},
 ) {
-  const settings = await mockSettingsCompletion(page);
+  const settings = await mockSettingsCompletion(page, { startUrl: null });
   const organization: OrganizationView = {
     id: I.org,
     name: "Fixture Studio",
@@ -151,7 +151,7 @@ export async function mockOrganizationLifecycle(
       });
     return route.fallback();
   });
-  await page.reload();
+  await page.goto(completionUrl("settings"));
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");

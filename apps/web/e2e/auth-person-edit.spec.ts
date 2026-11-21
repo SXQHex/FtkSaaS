@@ -188,6 +188,8 @@ test("person details preserve native/unknown fields and save local name/contact 
     f.panel.getByRole("button", { name: "Takvim bağlantısı oluştur", exact: true }),
   ).toHaveCount(0);
   expect(f.calendarCalls).toEqual([]);
+  await f.panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
+  await expect(f.panel).toBeHidden();
 });
 test("lost person update reply recovers its receipt without repeating the mutation", async ({
   page,

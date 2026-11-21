@@ -31,6 +31,9 @@ test("shares Query, Router and live Form state in one development panel", async 
   await page.getByRole("button", { name: "TanStack Router", exact: true }).click();
   await expect(page.getByRole("button", { name: "Routes", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "TanStack Form", exact: true }).click();
+  // Give the nested Form inspector the full panel width after checking Query and Router.
+  await page.getByRole("button", { name: "Close TanStack Query", exact: true }).click();
+  await page.getByRole("button", { name: "Close TanStack Router", exact: true }).click();
 
   const input = page.getByRole("textbox", { name: "Örnek metin", exact: true });
   await input.fill("ab");
@@ -50,6 +53,7 @@ test("shares Query, Router and live Form state in one development panel", async 
   await expect(panel).toContainText("En az 3 karakter girin.");
 
   await input.fill("örnek");
+  await input.press("Tab");
   await expect(panel).toContainText('"text": "örnek"');
   await expect(panel).toContainText('"isValid": true');
   await expect(panel).not.toContainText("En az 3 karakter girin.");

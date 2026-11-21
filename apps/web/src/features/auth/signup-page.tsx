@@ -5,6 +5,7 @@ import { loginWithGoogle } from "./auth";
 import { SignupForm } from "../../components/signup-form";
 import { useTranslation } from "react-i18next";
 import { AuthPitch } from "./auth-layout";
+import { revealFocusedAuthControl } from "./auth-focus";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { GalleryVerticalEndIcon } from "lucide-react";
 
@@ -92,9 +93,10 @@ export function SignupPage() {
 
   return (
     <main className="grid min-h-svh lg:grid-cols-2">
-      <div className="flex flex-col gap-4 p-6">
+      <div className="flex flex-col gap-4 p-6" onFocus={revealFocusedAuthControl}>
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
+          {/* Keep the brand in Safari’s sequential keyboard navigation. */}
+          <a href="#" tabIndex={0} className="flex items-center gap-2 font-medium">
             <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEndIcon className="size-4" />
             </div>

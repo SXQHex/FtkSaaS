@@ -73,6 +73,17 @@
         "coverage/**"
       ]
     },
+    "test:e2e:ci": {
+      "cache": false,
+      "env": [
+        "CI",
+        "GITHUB_ACTIONS",
+        "FTK_BROWSER_PROJECT",
+        "FTK_BROWSER_SHARD",
+        "FTK_E2E_SPECS",
+        "PLAYWRIGHT_BROWSERS_PATH"
+      ]
+    },
     "quality": {
       "cache": false,
       "env": [

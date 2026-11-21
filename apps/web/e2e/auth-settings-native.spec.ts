@@ -1,8 +1,9 @@
 import { test, expect } from "./test.js";
+import { scanAccessibility } from "./accessibility.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { uid } from "./pro-completion-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { openWorkspaceSearch, origin } from "./auth-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 async function confirm(page: import("@playwright/test").Page) {
   const dialog = page.getByRole("dialog");
@@ -20,8 +21,10 @@ async function confirm(page: import("@playwright/test").Page) {
 test("a pending subscription owner can reach the first payment form through the Plan link", async ({
   page,
 }) => {
-  const fixture = await mockSettingsCompletion(page, { bootstrapBilling: "owner" });
-  await page.goto(`${origin}/account?org=${I.org}&center=${I.center}`);
+  const fixture = await mockSettingsCompletion(page, {
+    bootstrapBilling: "owner",
+    startUrl: `${origin}/account?org=${I.org}&center=${I.center}`,
+  });
   await page.getByRole("link", { name: common.settings.tabs.plan, exact: true }).press("Enter");
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/settings?section=plan`);
   const plan = page.getByRole("tabpanel", { name: common.settings.tabs.plan, exact: true });
@@ -33,12 +36,21 @@ test("a pending subscription owner can reach the first payment form through the 
   await expect(
     page.getByRole("dialog", { name: common.settings.paymentEditor.title }),
   ).toBeVisible();
+  await page
+    .getByRole("dialog", { name: common.settings.paymentEditor.title })
+    .getByRole("button", { name: common.settings.discard, exact: true })
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: common.settings.paymentEditor.title }),
+  ).toBeHidden();
   expect(fixture.writes).toEqual([]);
 });
 
 test("a pending organization's member gets no billing link or payment action", async ({ page }) => {
-  const fixture = await mockSettingsCompletion(page, { bootstrapBilling: "member" });
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/settings?section=plan`);
+  const fixture = await mockSettingsCompletion(page, {
+    bootstrapBilling: "member",
+    startUrl: `${origin}/o/${I.org}/c/${I.center}/settings?section=plan`,
+  });
   await expect(
     page.getByRole("alert").filter({ hasText: common.settings.subscriptionReadError }),
   ).toBeVisible();
@@ -52,7 +64,7 @@ test("a pending organization's member gets no billing link or payment action", a
 });
 test("command palette opens a settings section in the current managed center", async ({ page }) => {
   const fixture = await mockSettingsCompletion(page);
-  await page.getByRole("button", { name: "Ara… Ctrl K", exact: true }).click();
+  await openWorkspaceSearch(page);
   const dialog = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
   const search = dialog.getByPlaceholder("Sayfa adı ara…");
   await expect(search).toBeFocused();
@@ -129,9 +141,25 @@ test("public settings explicitly bind the selected form and published consent so
 test("publication settings share the scoped visitor route and preview live closed and open states", async ({
   page,
   context,
+  browserName,
 }) => {
+  if (browserName === "webkit") {
+    await page.addInitScript(() => {
+      let copied = "";
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async (text: string) => {
+            copied = text;
+          },
+          readText: async () => copied,
+        },
+      });
+    });
+  } else {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin });
+  }
   const f = await mockSettingsCompletion(page);
-  await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin });
   await page.getByRole("tab", { name: "Yayın", exact: true }).click();
   const centerUrl = `${origin}/public/${I.org}/calendar?center_id=${I.center}`;
   const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
@@ -823,10 +851,27 @@ test("operational team role is a separate reviewed command and native channel/te
   });
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  const documentScan = await scanAccessibility(page, "settings-template-list");
+  expect(documentScan.violations).toEqual([]);
   await page.getByRole("button", { name: "Yönetim sınırı", exact: true }).first().click();
   const sheet = page.getByRole("dialog");
   await expect(sheet).toContainText("platform içerik kataloğunda");
   await expect(sheet.getByRole("textbox").first()).toHaveAttribute("readonly", "");
+  // The modal hides the document landmarks. Check the modal and its owning page separately.
+  const backgroundIsHidden = () =>
+    page
+      .locator("main")
+      .evaluate((element) => Boolean(element.closest('[inert], [aria-hidden="true"]')));
+  await expect.poll(backgroundIsHidden).toBe(true);
+  const sheetScan = await scanAccessibility(page, "settings-read-only-template", {
+    selector: '[data-slot="sheet"]',
+    documentScan,
+  });
+  expect(sheetScan.violations).toEqual([]);
+  await sheet.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await expect(sheet).toHaveCount(0);
+  await expect.poll(backgroundIsHidden).toBe(false);
+  await expect(page.getByRole("main")).toBeVisible();
   expect(f.writes.some((row) => row.op === "content_catalog_save_v1")).toBe(false);
 });
 

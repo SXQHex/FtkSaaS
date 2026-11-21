@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "40816415c5fe1c3eeff589e065b0dc143159f03932bf4e5df40a3e9ec8232907",
-        "reason": "Ortak Oxlint ve Oxfmt yapılandırması kökte toplandı. Kök dosyalar frontend kapsamını seçer ve kaynak politikası bunları korur."
+        "fingerprint": "8640416d547dc4dbeff69110aab8227f3fbd1a9ddd14eba44395c188c2f91e66",
+        "reason": "Kök Oxlint ve Oxfmt ayarlarının frontend kapsamı ve kaynak koruması, onaylı dört frontend CI assertion kaydı ve Turbo affected tarayıcı matrisiyle birlikte incelendi."
       }
     },
     {

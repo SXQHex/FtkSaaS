@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { DisciplinePresentation, DisciplineView } from "@ftksaas/api-contracts";
 
@@ -174,10 +174,9 @@ test("settings creates a master and an explicitly selected center relation with 
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
   const lifetime = await page.evaluate("window.__disciplineLifetime = performance.timeOrigin");
-  const menu = page.getByRole("navigation", { name: "Ana menü", exact: true });
-  await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+  await clickWorkspaceLink(page, "Ders programı");
   await expect(page.getByRole("button", { name: "Seans ekle", exact: true })).toBeEnabled();
-  await menu.getByRole("link", { name: "Ayarlar", exact: true }).click();
+  await clickWorkspaceLink(page, "Ayarlar");
   const scope = page.getByLabel("Ayar kapsamı", { exact: true });
   await expect(scope).toBeEnabled();
   for (const [index, name] of ["Sentetik yeni disiplin", "Sentetik ikinci disiplin"].entries()) {
@@ -237,11 +236,11 @@ test("settings creates a master and an explicitly selected center relation with 
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
   await page.setViewportSize({ width: 1440, height: 900 });
   const beforeCalendar = catalogReads;
-  await menu.getByRole("link", { name: "Ders programı", exact: true }).click();
+  await clickWorkspaceLink(page, "Ders programı");
   await expect(page.getByRole("button", { name: "Seans ekle", exact: true })).toBeEnabled();
   await expect.poll(() => catalogReads).toBeGreaterThan(beforeCalendar);
   expect(await page.evaluate("performance.timeOrigin")).toBe(lifetime);
-  await menu.getByRole("link", { name: "Stüdyo", exact: true }).click();
+  await clickWorkspaceLink(page, "Stüdyo");
   await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
   await page.getByRole("button", { name: "Ders türü ekle", exact: true }).click();
   const choices = page.getByRole("dialog").getByRole("combobox", { name: "Disiplin", exact: true });

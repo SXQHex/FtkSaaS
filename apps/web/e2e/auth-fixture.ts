@@ -1,3 +1,4 @@
+import type { AxeResults } from "axe-core";
 import type { UserIdentity } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { expect, type Locator, type Page, type TestInfo } from "@playwright/test";
@@ -19,6 +20,55 @@ import type {
   SuccessSettingsUpdate,
 } from "@ftksaas/api-contracts";
 export const origin = "http://127.0.0.1:4175";
+
+export async function openWorkspaceNavigation(page: Page, activation: "click" | "tap" = "click") {
+  const navigation = page.getByRole("navigation", { name: "Ana menü", exact: true });
+  const open = page
+    .getByRole("button", { name: "Menüyü aç veya kapat", exact: true })
+    .and(page.locator('[aria-controls="workspace-sidebar"]'));
+  await expect(navigation.or(open).first()).toBeVisible();
+  if (!(await navigation.isVisible())) await open[activation]();
+  await expect(navigation).toBeVisible();
+  return navigation;
+}
+
+export async function clickWorkspaceLink(page: Page, name: string) {
+  const navigation = await openWorkspaceNavigation(page);
+  await navigation.getByRole("link", { name, exact: true }).click();
+}
+
+export async function closeWorkspaceNavigation(page: Page) {
+  const close = page.getByRole("button", { name: "Menüyü kapat", exact: true });
+  if (await close.isVisible()) {
+    await close.click();
+    await expect(close).toBeHidden();
+  }
+}
+
+export async function checkLockedWorkspaceScope(page: Page, checkSwitcher: () => Promise<void>) {
+  const viewport = page.viewportSize();
+  const switcher = page.locator("[data-workspace-logo]").locator("..");
+  if (!viewport || (await switcher.count()) > 0) {
+    await checkSwitcher();
+    return;
+  }
+  // The closed drawer does not mount its switcher at the mobile breakpoint.
+  await expect(page.getByRole("dialog").last()).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Ana menü", exact: true })).toBeHidden();
+  await page.setViewportSize({ ...viewport, width: 1024 });
+  try {
+    await checkSwitcher();
+  } finally {
+    await page.setViewportSize(viewport);
+  }
+}
+
+export async function openWorkspaceSearch(page: Page) {
+  const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
+  await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+  if (await page.evaluate("matchMedia('(min-width: 641px)').matches")) await search.click();
+  else await page.keyboard.press("Control+k");
+}
 const id = "019a7b00-0000-7000-8000-000000000001";
 const accountId = "019a7b00-0000-7000-8000-000000000002";
 const fixtureUser = {
@@ -57,8 +107,15 @@ const token = (aal: "aal1" | "aal2" = "aal1", sessionId = id) =>
     Buffer.from("fixture-signature").toString("base64url"),
   ].join(".");
 
-export async function captureAuth(page: Page, name: string, testInfo: TestInfo, focus?: Locator) {
+export async function captureAuth(
+  page: Page,
+  name: string,
+  testInfo: TestInfo,
+  focus?: Locator,
+  dialog?: { selector: string; documentScans: ReadonlyMap<string, AxeResults> },
+) {
   await expect(page.locator("main h1")).toBeVisible();
+  const scans = new Map<string, AxeResults>();
   for (const viewport of [
     { width: 1440, height: 900 },
     { width: 390, height: 844 },
@@ -68,7 +125,21 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo, 
       await page.emulateMedia({ colorScheme });
       await focus?.scrollIntoViewIfNeeded();
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
-      expect((await scanAccessibility(page, name)).violations).toEqual([]);
+      const key = `${viewport.width}-${colorScheme}`;
+      let scope;
+      if (
+        dialog &&
+        (await page
+          .locator("main")
+          .evaluate((element) => Boolean(element.closest('[inert], [aria-hidden="true"]'))))
+      ) {
+        const documentScan = dialog.documentScans.get(key);
+        if (!documentScan) throw new Error(`Missing document scan for ${key}`);
+        scope = { selector: dialog.selector, documentScan };
+      }
+      const scan = await scanAccessibility(page, name, scope);
+      expect(scan.violations).toEqual([]);
+      scans.set(key, scan);
       const body = await page.screenshot({
         scale: "css",
         path: `.tmp/${name}-app-${viewport.width}-${colorScheme}.png`,
@@ -79,6 +150,7 @@ export async function captureAuth(page: Page, name: string, testInfo: TestInfo, 
       });
     }
   }
+  return scans;
 }
 
 export async function mockNative(page: Page, mfa = false, origins = { app: origin, auth: origin }) {

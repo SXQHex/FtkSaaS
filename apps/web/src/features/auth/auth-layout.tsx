@@ -3,20 +3,13 @@ import { Link as AriaLink } from "react-aria-components";
 import type { ReactNode } from "react";
 import { CalendarIcon, WalletIcon, UsersIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { revealFocusedAuthControl } from "./auth-focus";
+
 export function AuthLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   return (
     <main className="auth-layout">
-      <div
-        className="auth-left"
-        onFocus={({ target }) => {
-          if (!target.matches(":focus-visible")) return;
-          requestAnimationFrame(() => {
-            // Native scrolling can leave the focused control partially outside the viewport.
-            if (document.activeElement === target) target.scrollIntoView?.({ block: "nearest" });
-          });
-        }}
-      >
+      <div className="auth-left" onFocus={revealFocusedAuthControl}>
         <AriaLink href="/login" className="auth-brand">
           <span className="auth-logo">{t(($) => $.auth.brandInitials)}</span>
           {t(($) => $.auth.brand)}

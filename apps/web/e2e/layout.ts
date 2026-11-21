@@ -8,7 +8,7 @@ interface LayoutFit {
 export async function readLayoutFit(page: Page): Promise<LayoutFit> {
   // This callback runs in the browser, while the runner intentionally has Node-only globals.
   return page.evaluate<LayoutFit>(`(() => ({
-    width: innerWidth, height: innerHeight, documentWidth: document.documentElement.scrollWidth,
+    width: document.documentElement.clientWidth, height: innerHeight, documentWidth: document.documentElement.scrollWidth,
     dialogs: [...document.querySelectorAll('[role="dialog"], [role="alertdialog"]')].flatMap(element => {
       const rect = element.getBoundingClientRect();
       return rect.width && rect.height && getComputedStyle(element).visibility !== "hidden"

@@ -99,7 +99,25 @@ for (const colorScheme of ["light", "dark"] as const)
         expect(await effectsRegion.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
         await page.keyboard.press("PageDown");
         await expect.poll(() => effectsRegion.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
-        await page.keyboard.press("Home");
+        // WebKit animates keyboard scrolling. Let the first gesture finish before reversing it.
+        await effectsRegion.evaluate(
+          (element) =>
+            new Promise<void>((resolve) => {
+              const view = element.ownerDocument.defaultView!;
+              let previous = element.scrollTop;
+              let stableFrames = 0;
+              const sample = () => {
+                const current = element.scrollTop;
+                stableFrames = current === previous ? stableFrames + 1 : 0;
+                previous = current;
+                if (stableFrames === 5) resolve();
+                else view.requestAnimationFrame(sample);
+              };
+              view.requestAnimationFrame(sample);
+            }),
+        );
+        await expect(effectsRegion).toBeFocused();
+        await page.keyboard.press("PageUp");
         await expect.poll(() => effectsRegion.evaluate((el) => el.scrollTop)).toBe(0);
       }
       await page.keyboard.press("Tab");

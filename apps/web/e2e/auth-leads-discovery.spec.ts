@@ -493,6 +493,9 @@ test("automation followups open the exact generated activities for members and c
   await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
   await expect(dialog.getByText("Sunucunun oluşturduğu takip notu", { exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "automation-followup-source")).violations).toEqual([]);
+  const close = dialog.getByRole("button", { name: "Kapat", exact: true });
+  await close.focus();
+  await expect(close).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(member).toBeFocused();

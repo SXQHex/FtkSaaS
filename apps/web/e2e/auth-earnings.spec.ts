@@ -1,3 +1,4 @@
+import { checkLockedWorkspaceScope } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockEarnings, fillEarningsPayment, earningsIds } from "./earnings-fixture.js";
 import type { DigitalAgreementView } from "@ftksaas/api-contracts";
@@ -57,7 +58,9 @@ test("unknown payment freezes the draft and scope and same-key retry creates one
     dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
   ).toBeVisible();
   await expect(dialog.getByLabel("Tutar · TRY", { exact: true })).toBeDisabled();
-  await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+  await checkLockedWorkspaceScope(page, async () => {
+    await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
+  });
   await page.keyboard.press("Escape");
   await expect(dialog).toBeVisible();
   await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
@@ -270,7 +273,14 @@ test("manager reads agreement evidence on demand and clears stale status on deni
   const refresh = row.getByRole("button", { name: "Metin kabul durumunu yenile" });
   await expect(open).toBeEnabled();
   expect(fixture.agreementReads).toHaveLength(0);
-  await open.press("Enter");
+  await open.scrollIntoViewIfNeeded();
+  // Establish the grid row focus before moving focus to its action.
+  await row.focus();
+  await expect(row).toBeFocused();
+  await expect(row).toHaveAttribute("tabindex", "0");
+  await open.focus();
+  await expect(open).toBeFocused();
+  await page.keyboard.press("Enter");
   await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Anlaşma metni yayımlanmadı");
   await expect(refresh).toBeFocused();
 

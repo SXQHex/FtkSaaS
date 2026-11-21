@@ -1,11 +1,11 @@
 import { test, expect } from "./test.js";
-import { preparePublicCalendar, publicCalendarId } from "./public-calendar-fixture.js";
+import { mockPublicCalendar, publicCalendarId } from "./public-calendar-fixture.js";
 const checkAgain = "Yayın durumunu yeniden kontrol et";
 const closed = "Bu sayfa şu an yayında değil";
 test("unavailable route reads only anonymous source and retains center scope across refresh", async ({
   page,
 }) => {
-  const f = await preparePublicCalendar(page);
+  const f = await mockPublicCalendar(page);
   f.packet.items = [];
   f.packet.next_cursor = null;
   f.packet.publication_state = "unavailable";
@@ -31,7 +31,7 @@ test("unavailable route reads only anonymous source and retains center scope acr
 test("source refresh distinguishes an available empty program from a closed publication and exposes the actual calendar target", async ({
   page,
 }) => {
-  const f = await preparePublicCalendar(page);
+  const f = await mockPublicCalendar(page);
   f.packet.items = [];
   f.packet.next_cursor = null;
   f.packet.publication_state = "unavailable";
@@ -50,7 +50,7 @@ test("source refresh distinguishes an available empty program from a closed publ
 test("transport errors never masquerade as closed publication and retry reads current source", async ({
   page,
 }) => {
-  const f = await preparePublicCalendar(page, "error");
+  const f = await mockPublicCalendar(page, "error");
   await page.goto("/public/test-studio/unavailable");
   await expect(page.getByText("Yayın durumu okunamadı.", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: closed, exact: true })).toHaveCount(0);
@@ -68,7 +68,7 @@ test("transport errors never masquerade as closed publication and retry reads cu
 test("invalid public payload fails closed without declaring the publication unavailable", async ({
   page,
 }) => {
-  const f = await preparePublicCalendar(page, "malformed");
+  const f = await mockPublicCalendar(page, "malformed");
   await page.goto("/public/test-studio/unavailable");
   await expect(page.getByText("Yayın durumu okunamadı.", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: closed, exact: true })).toHaveCount(0);

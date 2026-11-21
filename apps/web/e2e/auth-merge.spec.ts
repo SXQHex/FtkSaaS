@@ -2,7 +2,7 @@ import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 import { lifecycleIds, mockMemberLifecycle } from "./member-lifecycle-fixture.js";
-import { origin } from "./auth-fixture.js";
+import { clickWorkspaceLink, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { PersonView, FinanceView, Preview, ManagementStateView } from "@ftksaas/api-contracts";
 const previewId = "019a7b00-0000-7000-8000-000000000081";
@@ -432,10 +432,7 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
     warmFinance = reads.finance;
   const documentTime = await page.evaluate(() => performance.timeOrigin);
   const state = await mockMerge(page, true);
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Üyeler", exact: true })
-    .click();
+  await clickWorkspaceLink(page, "Üyeler");
   const merge = page.getByRole("button", { name: "Kişileri birleştir", exact: true });
   await expect(merge).toHaveAccessibleDescription("37 birleştirme önerisi");
   await expect(merge.getByText("37", { exact: true })).toBeVisible();
@@ -476,10 +473,7 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
   expect(reads.finance).toBeGreaterThan(warmFinance);
   await expect(page.getByText("₺1.017,00", { exact: true }).first()).toBeVisible();
   expect(state.effects).toBe(1);
-  await page
-    .getByRole("navigation", { name: "Ana menü", exact: true })
-    .getByRole("link", { name: "Üyeler", exact: true })
-    .click();
+  await clickWorkspaceLink(page, "Üyeler");
   await expect(merge).toHaveAccessibleDescription("0 birleştirme önerisi");
   expect(state.summaryReads).toBe(2);
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);

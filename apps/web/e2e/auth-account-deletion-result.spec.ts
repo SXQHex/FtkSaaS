@@ -21,6 +21,9 @@ const preview = {
 };
 async function login(page: import("@playwright/test").Page) {
   await page.goto(`${origin}/login`);
+  await submitLogin(page);
+}
+async function submitLogin(page: import("@playwright/test").Page) {
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
@@ -126,8 +129,12 @@ for (const lostAck of [false, true])
       ).toBeVisible();
       // Reload preserves the exact private intent; loading the page never repeats a write.
       await page.reload();
+      await expect(
+        page.getByRole("button", { name: "Aynı isteği kurtar", exact: true }),
+      ).toBeVisible();
       expect(applies).toBe(1);
-      await login(page);
+      await page.getByRole("link", { name: "Girişe dön", exact: true }).click();
+      await submitLogin(page);
       await expect(page).toHaveURL(`${origin}/account/deletion`);
       await page.getByRole("button", { name: "Aynı isteği kurtar", exact: true }).click();
       await expect(page.getByRole("button", { name: "Durumu yenile", exact: true })).toBeVisible();
@@ -203,6 +210,7 @@ test("foreign receipt cannot read or recover another account's deletion", async 
   });
   await login(page);
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/account/deletion`);
   await expect(page.getByText(/Durumu görmek için isteği başlattığın hesapla/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Durumu yenile", exact: true })).toHaveCount(0);

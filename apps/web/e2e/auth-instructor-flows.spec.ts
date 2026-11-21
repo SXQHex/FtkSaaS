@@ -6,6 +6,7 @@ import { mockOwnReservations } from "./member-reservations-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 const saved = "İşlem kaydedildi; güncel yoklama ve seans okundu.";
+const calendarDay = new Date("2026-11-18T09:00:00Z");
 async function begin(page: Page) {
   const target = Temporal.Instant.fromEpochMilliseconds(Date.now() - 5 * 60000).toZonedDateTimeISO(
     "Europe/Istanbul",
@@ -28,7 +29,12 @@ async function begin(page: Page) {
 test("instructor today and weekly navigation retain center scope and open only the assigned session", async ({
   page,
 }) => {
-  const state = await mockSessionDetail(page, { existing: true, instructor: true });
+  await page.clock.setFixedTime(calendarDay);
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    instructor: true,
+    now: calendarDay,
+  });
   await expect(page.getByText("Atanmış salon", { exact: true })).toBeVisible();
   const actualTime = page.getByLabel("Fiilî başlangıç saati", { exact: true });
   await expect(actualTime).toHaveAttribute("aria-invalid", "false");
@@ -60,10 +66,12 @@ test("instructor today and weekly navigation retain center scope and open only t
 test("Starter instructor opens an assigned lesson from the daily panel after role plan denial", async ({
   page,
 }) => {
+  await page.clock.setFixedTime(calendarDay);
   const state = await mockSessionDetail(page, {
     existing: true,
     instructor: true,
     starterRoleGate: true,
+    now: calendarDay,
   });
   await page.getByRole("button", { name: "Bugünkü derslerime dön", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
@@ -392,7 +400,12 @@ test("instructor repeated actual time requires a retained explicit UTC offset", 
 test("weekly instructor read denial stays unknown and recovers on explicit retry", async ({
   page,
 }) => {
-  const state = await mockSessionDetail(page, { existing: true, instructor: true });
+  await page.clock.setFixedTime(calendarDay);
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    instructor: true,
+    now: calendarDay,
+  });
   let denied = true;
   await page.route("**/functions/v1/backend-v1/calendar_get_v1", (route) =>
     denied

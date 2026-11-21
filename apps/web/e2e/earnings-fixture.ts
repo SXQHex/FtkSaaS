@@ -317,6 +317,7 @@ export async function mockEarnings(
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.clock.setFixedTime(new Date("2026-11-17T12:00:00Z"));
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/earnings`);
   await expect(page.getByRole("heading", { name: "Hakediş", exact: true })).toBeVisible();

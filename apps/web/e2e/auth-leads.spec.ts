@@ -323,6 +323,7 @@ test.describe("touch input", () => {
   test.use({ hasTouch: true, viewport: { width: 1100, height: 900 } });
   test("touch kanban movement proposes a stage without committing a native writer", async ({
     page,
+    browserName,
   }) => {
     const state = await mockLeads(page),
       handle = page.getByRole("button", {
@@ -334,27 +335,65 @@ test.describe("touch input", () => {
       to = await page.locator('[data-slot="kanban-column"]').nth(1).boundingBox();
     expect(from).not.toBeNull();
     expect(to).not.toBeNull();
-    const cdp = await page.context().newCDPSession(page),
-      x = from!.x + from!.width / 2,
-      y = from!.y + from!.height / 2;
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+
+    const cdp = browserName === "chromium" ? await page.context().newCDPSession(page) : undefined;
+    const touchTarget = cdp ? undefined : await handle.elementHandle();
+    const start = { x: from!.x + from!.width / 2, y: from!.y + from!.height / 2 };
+    const target = { x: to!.x + to!.width / 2, y: to!.y + 70 };
+    type TouchPhase = "touchStart" | "touchMove" | "touchEnd";
+    const dispatchWebKitTouch = cdp
+      ? undefined
+      : await page.evaluateHandle<
+          (element: unknown, type: TouchPhase, point: typeof start) => void
+        >(
+          `(element, type, point) => {
+            const doc = element.ownerDocument;
+            const view = doc.defaultView;
+            const contact = doc.createTouch(
+              view, element, 1, point.x + view.scrollX, point.y + view.scrollY,
+            );
+            const active = doc.createTouchList(...(type === "touchEnd" ? [] : [contact]));
+            element.dispatchEvent(new TouchEvent(type.toLowerCase(), {
+              bubbles: true,
+              cancelable: true,
+              touches: active,
+              targetTouches: active,
+              changedTouches: doc.createTouchList(contact),
+            }));
+          }`,
+        );
+    async function touch(type: TouchPhase, point: typeof start) {
+      if (cdp) {
+        await cdp.send("Input.dispatchTouchEvent", {
+          type,
+          touchPoints: type === "touchEnd" ? [] : [point],
+        });
+        return;
+      }
+      // A touch stays bound to its initial target, even if moving the card remounts its handle.
+      await dispatchWebKitTouch!.evaluate(
+        (dispatch, { element, type, point }) => dispatch(element, type, point),
+        { element: touchTarget!, type, point },
+      );
+    }
+    await touch("touchStart", start);
     await expect(handle).toHaveAttribute("aria-pressed", "true");
     for (let step = 1; step <= 5; step++)
-      await cdp.send("Input.dispatchTouchEvent", {
-        type: "touchMove",
-        touchPoints: [
-          { x: x + ((to!.x + to!.width / 2 - x) * step) / 5, y: y + ((to!.y + 70 - y) * step) / 5 },
-        ],
+      await touch("touchMove", {
+        x: start.x + ((target.x - start.x) * step) / 5,
+        y: start.y + ((target.y - start.y) * step) / 5,
       });
     await expect(page.getByRole("status")).toContainText("hedef: Görüşülüyor");
-    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await touch("touchEnd", target);
     await expect(
       page.getByRole("dialog").getByRole("heading", { name: "Aşamayı değiştir", exact: true }),
     ).toBeVisible();
     expect(state.writes).toHaveLength(0);
     await closeLead(page);
     expect(state.leads[0]!.pipeline?.stage.key).toBe("new");
-    await cdp.detach();
+    await cdp?.detach();
+    await touchTarget?.dispose();
+    await dispatchWebKitTouch?.dispose();
     await page.evaluate(
       "document.documentElement.dataset.theme = 'dark'; document.documentElement.classList.add('dark')",
     );

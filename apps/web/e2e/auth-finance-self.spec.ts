@@ -77,6 +77,7 @@ async function setup(page: Page, self = true) {
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(origin + "/account");
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
   await page.getByRole("button", { name: common.financeDirectory.personal, exact: true }).click();
   await expect.poll(() => people.length).toBe(1);

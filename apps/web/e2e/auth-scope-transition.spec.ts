@@ -1,5 +1,10 @@
 import { test, expect } from "./test.js";
-import { mockNative, origin } from "./auth-fixture.js";
+import {
+  closeWorkspaceNavigation,
+  openWorkspaceNavigation,
+  mockNative,
+  origin,
+} from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
@@ -185,6 +190,7 @@ async function scopes(page: import("@playwright/test").Page) {
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   return { state, release };
 }
 
@@ -192,6 +198,7 @@ test("multiple roles reset navigation when the selected organization changes to 
   page,
 }) => {
   await scopes(page);
+  await openWorkspaceNavigation(page);
   const switcher = page.locator("[data-workspace-logo]").locator("..");
   await switcher.click();
   await page.getByRole("menuitem", { name: "Birinci stüdyo", exact: true }).click();
@@ -199,9 +206,11 @@ test("multiple roles reset navigation when the selected organization changes to 
   await expect(
     nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
   ).toHaveAttribute("href", `/o/${I.org}/c/${I.center}/finance`);
+  await closeWorkspaceNavigation(page);
   await page
     .getByRole("radio", { name: common.workspace.viewLabels.instructor, exact: true })
     .press("Space");
+  await openWorkspaceNavigation(page);
   await expect(
     nav.getByRole("link", { name: common.workspace.links.today, exact: true }),
   ).toHaveAttribute("href", `/instructor/today?org=${I.org}&center=${I.center}`);
@@ -225,10 +234,12 @@ test("multiple roles reset navigation when the selected organization changes to 
   await expect(accountLink).toHaveAttribute("href", accountHref);
   await accountLink.press("Enter");
   await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await openWorkspaceNavigation(page);
   await expect(switcher).toContainText("Londra merkezi");
   await expect(
     nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
   ).toHaveCount(0);
+  await closeWorkspaceNavigation(page);
 });
 
 test("a late previous-org calendar cannot replace the selected member, and revoked history URLs expose no old data", async ({

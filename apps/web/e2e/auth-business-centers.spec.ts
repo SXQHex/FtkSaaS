@@ -1,3 +1,4 @@
+import { closeWorkspaceNavigation, openWorkspaceNavigation } from "./auth-fixture.js";
 import type { Page } from "@playwright/test";
 import { test, expect } from "./test.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
@@ -16,7 +17,7 @@ const centerUrl = (center = I.center) => `/o/${I.org}/c/${center}/centers`;
 type Role = "owner" | "org_manager" | "center_manager" | "staff";
 type Calls = { op: string; request: Record<string, unknown> }[];
 async function businessFixture(page: Page, role: Role, plan = "business", activeCenters = 2) {
-  await mockSettingsCompletion(page, { billingOwner: role === "owner" });
+  await mockSettingsCompletion(page, { billingOwner: role === "owner", startUrl: null });
   const calls: Calls = [];
   const centers = [
     {
@@ -1033,6 +1034,7 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
 for (const role of ["center_manager", "staff"] as const) {
   test(`Business direct person, CRM and finance links stay in scope for ${role}`, async ({
     page,
+    hasTouch,
   }) => {
     const f = await businessFixture(page, role);
     f.restrictSecondCenter();
@@ -1047,7 +1049,9 @@ for (const role of ["center_manager", "staff"] as const) {
       await page.goto(`/o/${I.org}/c/${second}/${direct}`);
       await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
       await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+      await openWorkspaceNavigation(page, hasTouch ? "tap" : "click");
       await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
+      await closeWorkspaceNavigation(page);
       await expect
         .poll(() =>
           f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
