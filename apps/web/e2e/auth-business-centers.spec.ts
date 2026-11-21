@@ -1046,12 +1046,17 @@ for (const role of ["center_manager", "staff"] as const) {
       ["finance", "finance", "finance_directory_get_v1"],
     ];
     for (const [direct, safe, operation] of destinations) {
+      const centerRead = page.waitForResponse(
+        (response) =>
+          response.url().endsWith(`/${operation}`) &&
+          response.request().postDataJSON()?.center_id === I.center,
+      );
       await page.goto(`/o/${I.org}/c/${second}/${direct}`);
       await expect(page).toHaveURL(new RegExp(`/c/${I.center}/${safe}$`));
       await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
-      // Wait for the redirected center's actual native read before opening the
-      // mobile drawer. Otherwise the destination view can remount its trigger
-      // immediately after a tap and close the drawer.
+      // Complete the redirected center's real response before opening the
+      // mobile drawer: the destination can remount its trigger while loading.
+      await (await centerRead).finished();
       await expect
         .poll(() =>
           f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
