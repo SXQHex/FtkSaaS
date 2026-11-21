@@ -537,7 +537,10 @@ test("member change notice opens the exact reservation and rechecks access on re
   expect(participant.writes).toHaveLength(0);
   expect(state.writes).toHaveLength(0);
   state.participantTargetUnavailable = true;
-  await page.goto(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`);
+  // Follow the application's native SPA link instead of waiting for an
+  // unrelated document load after this in-app history navigation.
+  await page.getByRole("link", { name: "Bildirimler", exact: true }).click();
+  await expect(page).toHaveURL((url) => url.pathname === "/inbox");
   const readCount = participant.reads.filter(
     (row) => row.operation === "reservation_list_v1",
   ).length;
