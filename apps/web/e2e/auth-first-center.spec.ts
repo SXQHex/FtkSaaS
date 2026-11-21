@@ -21,6 +21,7 @@ async function setup(
     existing?: boolean;
     unreadAuthority?: boolean;
     managesCenter?: boolean;
+    ownerWithoutCenterManager?: boolean;
     rejectCreate?: "VERSION_CONFLICT" | "PLAN_LIMIT_REACHED";
   } = {},
 ) {
@@ -35,7 +36,8 @@ async function setup(
     accessible: true,
     version: 1,
   };
-  let created = !!options.existing,
+  let created = !!options.existing || !!options.ownerWithoutCenterManager,
+    assigned = false,
     effects = 0,
     readFailed = false;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
@@ -55,14 +57,14 @@ async function setup(
             id: I.org,
             name: "Merkezsiz organizasyon",
             state: "active",
-            access_mode: options.managesCenter ? "normal" : "bootstrap",
+            access_mode: options.managesCenter || options.ownerWithoutCenterManager ? "normal" : "bootstrap",
             version: 1,
-            self_context: { person_id: I.self, subscriber_number: null, centers: [] },
-            ...(options.managesCenter && {
+            self_context: { person_id: I.self, subscriber_number: null, centers: created ? [{ center_id: I.center, student: false, assistant: false, instructor: false }] : [] },
+            ...((options.managesCenter || options.ownerWithoutCenterManager) && {
               self_management_scope: {
-                owner: false,
+                owner: !!options.ownerWithoutCenterManager,
                 org_manager: false,
-                managed_center_ids: [I.center],
+                managed_center_ids: options.managesCenter || assigned ? [I.center] : [],
               },
             }),
           },
@@ -79,7 +81,7 @@ async function setup(
     // Owner is held on the organization, not a fabricated role-assignment row.
     if (op === "roles_list_v1") return send(list([]));
     if (
-      options.managesCenter &&
+      (options.managesCenter || assigned) &&
       ((op === "management_state_get_v1" && r.operation === "room_save_v1") ||
         op === "disciplines_list_v1")
     ) {
@@ -108,6 +110,21 @@ async function setup(
       };
       return route.fulfill({ json: envelope });
     }
+    if (op === "manager_self_assign_center_v1" && options.ownerWithoutCenterManager) {
+      expect(r).toMatchObject({ org_id: I.org, target_center_id: I.center });
+      expect(r).not.toHaveProperty("person_id");
+      writes.push(r);
+      assigned = true;
+      return send({ primary_id: I.role, changed: [], jobs: [] });
+    }
+    if (op === "operation_status_get_v1" && r.operation === "manager_self_assign_center_v1")
+      return send({
+        operation: r.operation,
+        key: r.key,
+        status: "succeeded",
+        result_available: true,
+        result_reference: { type: "role_assignments", id: I.role },
+      });
     if (op === "center_create_v1") {
       writes.push(r);
       expect(r).toMatchObject({ org_id: I.org, name: center.name, timezone: center.timezone });
@@ -239,6 +256,23 @@ test("first-center setup can be postponed and starts again from the live account
   expect(f.writes).toHaveLength(0);
   await page.keyboard.press("Escape");
 });
+test("verified owner can explicitly self-assign the first center without team preview", async ({ page }) => {
+  const f = await setup(page, { ownerWithoutCenterManager: true });
+  const action = page.getByRole("button", { name: "Kendimi merkez yöneticisi yap", exact: true });
+  await expect(action).toBeVisible();
+  await action.click();
+  await expect(page.getByRole("link", { name: text.room, exact: true })).toHaveAttribute(
+    "href",
+    `/o/${I.org}/c/${I.center}/settings?section=salonlar`,
+  );
+  expect(f.writes).toHaveLength(1);
+  expect(f.writes[0]).toHaveProperty("target_center_id", I.center);
+  expect(f.reads).not.toContain("center_manager_assign_v1");
+  expect(f.reads).not.toContain("management_state_get_v1");
+  await page.reload();
+  await expect(action).toHaveCount(0);
+});
+
 test("managed center resumes only the live missing room and discipline", async ({ page }) => {
   const f = await setup(page, { existing: true, managesCenter: true });
   await expect(page.getByRole("link", { name: text.room, exact: true })).toHaveAttribute(
