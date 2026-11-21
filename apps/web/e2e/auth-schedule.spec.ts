@@ -1010,199 +1010,205 @@ test("time and instructor changes apply an explicitly reviewed future scope and 
   await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
 });
 
-for (const scenario of ["single", "this_and_future"] as const) {
-  test(`native schedule ${scenario} reaches instructor and member`, async ({ page }) => {
-    await page.clock.setFixedTime(new Date("2026-11-16T06:00:00Z"));
-    const f = await scheduleFixture(page, true, true, true, true);
-    const occurrences = [f.session!, f.future!];
-    const originalFutureStart = Date.parse(occurrences[1]!.starts_at);
-    const localTime = new Intl.DateTimeFormat("tr-TR", {
-      timeZone: "Europe/Istanbul",
-      hour: "2-digit",
-      minute: "2-digit",
-      hourCycle: "h23",
-    });
-    const titles = ["Sentetik program seansı", "İleri program seansı"];
-    const scope = `?org=${I.org}&center=${I.center}`;
-    const instructorReads: string[] = [];
-    let reader: "instructor" | "member" | undefined;
-    const policy = {
-      status: "not_configured",
-      source: "current_policy",
-      policy_version_id: null,
-      terms: null,
-      cutoff_at: null,
-    } satisfies MemberLessonDiscovery["cancellation"];
-    await page.route("**/functions/v1/backend-v1/*", async (route) => {
-      if (!reader) return route.fallback();
-      const operation = new URL(route.request().url()).pathname.split("/").at(-1);
-      const request = route.request().postDataJSON();
-      const personId = reader === "member" ? I.self : I.instructor;
-      const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
-      const list = (items: unknown[]) => ({
-        items,
-        next_cursor: null,
-        as_of: new Date().toISOString(),
-      });
-      if (operation === "organizations_list_v1")
-        return send(
-          list([
-            {
-              id: I.org,
-              name: "Fixture Studio",
-              state: "active",
-              access_mode: "normal",
-              version: 1,
-              self_management_scope: null,
-              self_context: {
-                person_id: personId,
-                subscriber_number: null,
-                centers: [
-                  {
-                    center_id: I.center,
-                    student: reader === "member",
-                    instructor: reader === "instructor",
-                    assistant: false,
-                  },
-                ],
-              },
-            },
-          ]),
-        );
-      if (operation === "roles_list_v1") {
-        expect(request.person_id).toBe(personId);
-        return send(list([]));
-      }
-      if (operation === "session_get_v1" && reader === "instructor") {
-        expect(request).toMatchObject({
-          org_id: I.org,
-          center_id: I.center,
-          include_room_labels: true,
-        });
-        const row = occurrences.find(({ id }) => id === request.session_id);
-        expect(row?.assignments).toContainEqual({ person_id: personId, duty: "instructor" });
-        instructorReads.push(request.session_id);
-        return send({ ...row, room_labels: [{ room_id: I.room, name: f.fixture.rooms[0]!.name }] });
-      }
-      if (operation !== "calendar_get_v1") return route.fallback();
-      expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
-      if (reader === "member") {
-        expect(request.member_discovery).toBe(true);
-        expect(request).not.toHaveProperty("resource");
-      } else {
-        expect(request.resource).toEqual({ kind: "person", id: personId });
-        expect(request.include_room_labels).toBe(true);
-      }
-      const items = occurrences.flatMap((row, index) => {
-        if (
-          Date.parse(row.starts_at) >= Date.parse(request.interval.ends_at) ||
-          Date.parse(row.ends_at) <= Date.parse(request.interval.starts_at)
-        )
-          return [];
-        const item: CalendarItem = {
-          id: row.id,
-          type: "session",
-          center_id: I.center,
-          starts_at: row.starts_at,
-          ends_at: row.ends_at,
-          title: titles[index]!,
-          resources: [{ kind: "room", id: I.room }],
-        };
-        if (reader === "instructor")
-          return row.assignments.some((assignment) => assignment.person_id === personId)
-            ? [item]
-            : [];
-        return [
-          {
-            ...item,
-            capacity: row.capacity,
-            member_lesson: {
-              version: row.version,
-              format: "group",
-              state: "planned",
-              attendance_state: row.attendance_state,
-              instructor_labels: [f.fixture.people[0]!.display_name],
-              room_labels: [f.fixture.rooms[0]!.name],
-              booking_window: {
-                state: "not_configured",
-                policy_version_id: null,
-                opens_at: null,
-                closes_at: null,
-              },
-              cancellation: policy,
-              own_reservation: null,
-              waitlist_enabled: false,
-              own_waitlist: null,
-            } satisfies MemberLessonDiscovery,
-          },
-        ];
-      });
-      return send(list(items));
-    });
-  
-    async function changeTime(time: string, changeScope: "single" | "this_and_future") {
-      reader = undefined;
-      await page.goto(`${origin}/o/${I.org}/c/${I.center}/schedule`);
-      await page.getByText(titles[0]!, { exact: true }).click();
-      const panel = page.getByRole("dialog");
-      await panel.getByRole("button", { name: "Seansı düzenle", exact: true }).click();
-      await panel.locator("#schedule-session-time").fill(time);
-      await panel.locator(`input[value="${changeScope}"]`).press("Space");
-      await panel.locator("#schedule-session-reason").fill("Sentetik seans saati düzeltmesi");
-      const previous = f.changes.length;
-      await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
-      expect(f.changes).toHaveLength(previous);
-      await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
-      await expect(
-        panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
-      ).toBeVisible();
-      expect(f.changes).toHaveLength(previous + 1);
-      expect(f.previews.at(-1)).toMatchObject({
-        scope: changeScope,
-        session_id: occurrences[0]!.id,
-      });
-    }
-  
-    async function observeTimes(times: readonly [string, string]) {
-      reader = "member";
-      await page.goto(`${origin}/member/classes${scope}`);
-      const monday = page.locator(`#member-class-${occurrences[0]!.id}`);
-      const mondayRow = monday.locator("xpath=ancestor::*[@role='listitem'][1]");
-      await expect(mondayRow).toContainText(times[0]);
-      await page.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }).click();
-      const tuesday = page.locator(`#member-class-${occurrences[1]!.id}`);
-      const tuesdayRow = tuesday.locator("xpath=ancestor::*[@role='listitem'][1]");
-      await expect(tuesdayRow).toContainText(times[1]);
-  
-      reader = "instructor";
-      const beforeRead = instructorReads.length;
-      await page.goto(`${origin}/instructor/schedule${scope}`);
-      await page.getByRole("radio", { name: "Ajanda", exact: true }).click();
-      for (const [index, title] of titles.entries()) {
-        const item = page.getByRole("button", { name: new RegExp(title) });
-        await expect(item).toHaveCount(1);
-        await expect(item).toContainText(times[index]!);
-      }
-      expect(instructorReads.slice(beforeRead).sort()).toEqual(
-        occurrences.map(({ id }) => id).sort(),
-      );
-    }
-  
-    await changeTime("15:20", "single");
-    expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
-    expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
-    if (scenario === "single") {
-      await observeTimes(["15:20", localTime.format(originalFutureStart)]);
-    } else {
-      // Reuse the independently tested single-change state. Verify the
-      // subsequent future-series edit and its two native consumers separately,
-      // rather than accumulating both full consumer traversals in one timeout.
-      await changeTime("15:40", "this_and_future");
-      expect(occurrences.map(({ version }) => version)).toEqual([5, 4]);
-      const movedFutureStart = originalFutureStart + 20 * 60_000;
-      expect(Date.parse(occurrences[1]!.starts_at)).toBe(movedFutureStart);
-      await observeTimes(["15:40", localTime.format(movedFutureStart)]);
-    }
-    expect(f.writes).toEqual([]);
+async function verifyNativeScheduleScope(page: Page, scenario: "single" | "this_and_future") {
+  await page.clock.setFixedTime(new Date("2026-11-16T06:00:00Z"));
+  const f = await scheduleFixture(page, true, true, true, true);
+  const occurrences = [f.session!, f.future!];
+  const originalFutureStart = Date.parse(occurrences[1]!.starts_at);
+  const localTime = new Intl.DateTimeFormat("tr-TR", {
+    timeZone: "Europe/Istanbul",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
   });
+  const titles = ["Sentetik program seansı", "İleri program seansı"];
+  const scope = `?org=${I.org}&center=${I.center}`;
+  const instructorReads: string[] = [];
+  let reader: "instructor" | "member" | undefined;
+  const policy = {
+    status: "not_configured",
+    source: "current_policy",
+    policy_version_id: null,
+    terms: null,
+    cutoff_at: null,
+  } satisfies MemberLessonDiscovery["cancellation"];
+  await page.route("**/functions/v1/backend-v1/*", async (route) => {
+    if (!reader) return route.fallback();
+    const operation = new URL(route.request().url()).pathname.split("/").at(-1);
+    const request = route.request().postDataJSON();
+    const personId = reader === "member" ? I.self : I.instructor;
+    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    const list = (items: unknown[]) => ({
+      items,
+      next_cursor: null,
+      as_of: new Date().toISOString(),
+    });
+    if (operation === "organizations_list_v1")
+      return send(
+        list([
+          {
+            id: I.org,
+            name: "Fixture Studio",
+            state: "active",
+            access_mode: "normal",
+            version: 1,
+            self_management_scope: null,
+            self_context: {
+              person_id: personId,
+              subscriber_number: null,
+              centers: [
+                {
+                  center_id: I.center,
+                  student: reader === "member",
+                  instructor: reader === "instructor",
+                  assistant: false,
+                },
+              ],
+            },
+          },
+        ]),
+      );
+    if (operation === "roles_list_v1") {
+      expect(request.person_id).toBe(personId);
+      return send(list([]));
+    }
+    if (operation === "session_get_v1" && reader === "instructor") {
+      expect(request).toMatchObject({
+        org_id: I.org,
+        center_id: I.center,
+        include_room_labels: true,
+      });
+      const row = occurrences.find(({ id }) => id === request.session_id);
+      expect(row?.assignments).toContainEqual({ person_id: personId, duty: "instructor" });
+      instructorReads.push(request.session_id);
+      return send({ ...row, room_labels: [{ room_id: I.room, name: f.fixture.rooms[0]!.name }] });
+    }
+    if (operation !== "calendar_get_v1") return route.fallback();
+    expect(request).toMatchObject({ org_id: I.org, center_id: I.center });
+    if (reader === "member") {
+      expect(request.member_discovery).toBe(true);
+      expect(request).not.toHaveProperty("resource");
+    } else {
+      expect(request.resource).toEqual({ kind: "person", id: personId });
+      expect(request.include_room_labels).toBe(true);
+    }
+    const items = occurrences.flatMap((row, index) => {
+      if (
+        Date.parse(row.starts_at) >= Date.parse(request.interval.ends_at) ||
+        Date.parse(row.ends_at) <= Date.parse(request.interval.starts_at)
+      )
+        return [];
+      const item: CalendarItem = {
+        id: row.id,
+        type: "session",
+        center_id: I.center,
+        starts_at: row.starts_at,
+        ends_at: row.ends_at,
+        title: titles[index]!,
+        resources: [{ kind: "room", id: I.room }],
+      };
+      if (reader === "instructor")
+        return row.assignments.some((assignment) => assignment.person_id === personId)
+          ? [item]
+          : [];
+      return [
+        {
+          ...item,
+          capacity: row.capacity,
+          member_lesson: {
+            version: row.version,
+            format: "group",
+            state: "planned",
+            attendance_state: row.attendance_state,
+            instructor_labels: [f.fixture.people[0]!.display_name],
+            room_labels: [f.fixture.rooms[0]!.name],
+            booking_window: {
+              state: "not_configured",
+              policy_version_id: null,
+              opens_at: null,
+              closes_at: null,
+            },
+            cancellation: policy,
+            own_reservation: null,
+            waitlist_enabled: false,
+            own_waitlist: null,
+          } satisfies MemberLessonDiscovery,
+        },
+      ];
+    });
+    return send(list(items));
+  });
+
+  async function changeTime(time: string, changeScope: "single" | "this_and_future") {
+    reader = undefined;
+    await page.goto(`${origin}/o/${I.org}/c/${I.center}/schedule`);
+    await page.getByText(titles[0]!, { exact: true }).click();
+    const panel = page.getByRole("dialog");
+    await panel.getByRole("button", { name: "Seansı düzenle", exact: true }).click();
+    await panel.locator("#schedule-session-time").fill(time);
+    await panel.locator(`input[value="${changeScope}"]`).press("Space");
+    await panel.locator("#schedule-session-reason").fill("Sentetik seans saati düzeltmesi");
+    const previous = f.changes.length;
+    await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+    expect(f.changes).toHaveLength(previous);
+    await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+    await expect(
+      panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
+    ).toBeVisible();
+    expect(f.changes).toHaveLength(previous + 1);
+    expect(f.previews.at(-1)).toMatchObject({
+      scope: changeScope,
+      session_id: occurrences[0]!.id,
+    });
+  }
+
+  async function observeTimes(times: readonly [string, string]) {
+    reader = "member";
+    await page.goto(`${origin}/member/classes${scope}`);
+    const monday = page.locator(`#member-class-${occurrences[0]!.id}`);
+    const mondayRow = monday.locator("xpath=ancestor::*[@role='listitem'][1]");
+    await expect(mondayRow).toContainText(times[0]);
+    await page.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }).click();
+    const tuesday = page.locator(`#member-class-${occurrences[1]!.id}`);
+    const tuesdayRow = tuesday.locator("xpath=ancestor::*[@role='listitem'][1]");
+    await expect(tuesdayRow).toContainText(times[1]);
+
+    reader = "instructor";
+    const beforeRead = instructorReads.length;
+    await page.goto(`${origin}/instructor/schedule${scope}`);
+    await page.getByRole("radio", { name: "Ajanda", exact: true }).click();
+    for (const [index, title] of titles.entries()) {
+      const item = page.getByRole("button", { name: new RegExp(title) });
+      await expect(item).toHaveCount(1);
+      await expect(item).toContainText(times[index]!);
+    }
+    expect(instructorReads.slice(beforeRead).sort()).toEqual(
+      occurrences.map(({ id }) => id).sort(),
+    );
+  }
+
+  await changeTime("15:20", "single");
+  expect(occurrences.map(({ version }) => version)).toEqual([4, 3]);
+  expect(Date.parse(occurrences[1]!.starts_at)).toBe(originalFutureStart);
+  if (scenario === "single") {
+    await observeTimes(["15:20", localTime.format(originalFutureStart)]);
+  } else {
+    // Reuse the independently tested single-change state. Verify the
+    // subsequent future-series edit and its two native consumers separately,
+    // rather than accumulating both full consumer traversals in one timeout.
+    await changeTime("15:40", "this_and_future");
+    expect(occurrences.map(({ version }) => version)).toEqual([5, 4]);
+    const movedFutureStart = originalFutureStart + 20 * 60_000;
+    expect(Date.parse(occurrences[1]!.starts_at)).toBe(movedFutureStart);
+    await observeTimes(["15:40", localTime.format(movedFutureStart)]);
+  }
+  expect(f.writes).toEqual([]);
 }
+
+test("single schedule change reaches instructor and member", async ({ page }) => {
+  await verifyNativeScheduleScope(page, "single");
+});
+
+test("future schedule change reaches instructor and member", async ({ page }) => {
+  await verifyNativeScheduleScope(page, "this_and_future");
+});
