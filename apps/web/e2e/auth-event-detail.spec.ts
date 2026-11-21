@@ -562,7 +562,13 @@ test("event capacity race reports settled preparation without a participant or d
 test("event closed attendance correction and performed duty each require a separate reviewed native command", async ({
   page,
   browser,
-}) => {
+  browserName,
+  isMobile,
+}, testInfo) => {
+  // The full native flow and the automatic final WCAG/layout scans took 39s
+  // on mobile WebKit in CI. Preserve every assertion and scan with a bounded
+  // per-scenario teardown budget; other projects retain their default.
+  if (browserName === "webkit" && isMobile) testInfo.setTimeout(testInfo.timeout + 20_000);
   const state = await mockEventDetail(page);
   await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
   await mockCalendarEvent(page, state.event);
