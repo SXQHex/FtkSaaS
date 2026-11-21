@@ -22,8 +22,6 @@ export async function requireAccountSession() {
 
 type AccountLoaderContext = {
   context: { queryClient: QueryClient; authUserId: string };
-  params: { orgId?: string };
-  deps: { org?: string };
 };
 
 async function loadAccountProjection(
@@ -40,24 +38,29 @@ async function loadAccountProjection(
 }
 
 async function prepareAccountAndWorkspace(
-  { context, params, deps }: AccountLoaderContext,
+  context: AccountLoaderContext["context"],
   includePlatformScope: boolean,
+  organizationId?: string,
 ) {
   const account = await loadAccountProjection(context, includePlatformScope);
   // Non-blocking: the workspace is the same Query consumed by both shells.
   // Its failure remains visible in the shell, rather than failing the account route.
   void context.queryClient
-    .query(workspaceQuery(context.queryClient, account.id, params.orgId ?? deps.org))
+    .query(workspaceQuery(context.queryClient, account.id, organizationId))
     .catch(() => {});
   // Return no account DTO: Router coordinates; Query is the sole account cache.
 }
 
-export async function loadAccount(options: AccountLoaderContext) {
-  await prepareAccountAndWorkspace(options, false);
+export async function loadScopedAccount(
+  context: AccountLoaderContext["context"],
+  organizationId?: string,
+  includePlatformScope = false,
+) {
+  await prepareAccountAndWorkspace(context, includePlatformScope, organizationId);
 }
 
-export async function loadAccountWithPlatformWorkspace(options: AccountLoaderContext) {
-  await prepareAccountAndWorkspace(options, true);
+export async function loadAccount({ context }: AccountLoaderContext) {
+  await loadScopedAccount(context);
 }
 
 export async function loadPlatformAccount({ context }: AccountLoaderContext) {
