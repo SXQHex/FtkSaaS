@@ -537,10 +537,13 @@ test("member change notice opens the exact reservation and rechecks access on re
   expect(participant.writes).toHaveLength(0);
   expect(state.writes).toHaveLength(0);
   state.participantTargetUnavailable = true;
-  // Follow the application's native SPA link instead of waiting for an
-  // unrelated document load after this in-app history navigation.
-  await page.getByRole("link", { name: "Bildirimler", exact: true }).click();
-  await expect(page).toHaveURL((url) => url.pathname === "/inbox");
+  // This scenario must discard the cached reservation read before rechecking
+  // the native source. Reload the document and wait for DOM readiness; the
+  // visible inbox assertions below remain responsible for data readiness.
+  await page.goto(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`, {
+    waitUntil: "domcontentloaded",
+  });
+  await expect(page.getByRole("heading", { name: "Bildirimler", exact: true })).toBeVisible();
   const readCount = participant.reads.filter(
     (row) => row.operation === "reservation_list_v1",
   ).length;
