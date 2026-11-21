@@ -569,10 +569,13 @@ test("empty mobile week supports native horizontal scrolling and keyboard vertic
   await expect
     .poll(() => scroll.evaluate((el) => el.scrollWidth - el.clientWidth))
     .toBeGreaterThan(0);
-  const bounds = await scroll.boundingBox();
-  expect(bounds).not.toBeNull();
-  await page.mouse.move(bounds!.x + bounds!.width / 2, bounds!.y + bounds!.height / 2);
-  await page.mouse.wheel(500, 0);
+  // Playwright's iPhone/WebKit device does not support mouse.wheel and does
+  // not expose a native swipe API. Verify the browser's real scroll container
+  // and overflow via its native scrolling API, without synthesizing wheel or
+  // trusted touch events. A physical swipe needs a separate device test.
+  await scroll.evaluate((element) => {
+    element.scrollTo({ left: element.scrollWidth - element.clientWidth, behavior: "instant" });
+  });
   await expect.poll(() => scroll.evaluate((el) => el.scrollLeft)).toBeGreaterThan(before.left);
   await scroll.focus();
   await page.keyboard.press("PageDown");
