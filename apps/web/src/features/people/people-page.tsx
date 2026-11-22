@@ -132,6 +132,7 @@ function PeopleContent({
 }) {
   const router = useRouter();
   const navigate = useNavigate();
+  const queries = useQueryClient();
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/people" });
   const { action } = useSearch({ from: "/o/$orgId/c/$centerId/people" });
   const inviteRequested =

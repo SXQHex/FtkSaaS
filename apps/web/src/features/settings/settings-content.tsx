@@ -211,7 +211,7 @@ function SettingsManagement({
       }
       return true;
     },
-    [queries, router, scope.accountId, scope.orgId],
+    [queries, router, scope.accountId],
   );
   const allowed = level === "organization" ? canOrganization : canCenter;
   const writable = !readOnly && (level === "organization" ? canWriteOrganization : canCenter);

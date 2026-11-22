@@ -1,4 +1,4 @@
-import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { workspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useNavigate } from "@tanstack/react-router";
@@ -86,10 +86,17 @@ export function SessionDetailContent({
       throw failure;
     }
   }
-  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId);
-  useEffect(() => {
-    if (workspace.error) accessLost(workspace.error);
-  }, [workspace.error, accessLost]);
+  const workspaceOptions = workspaceQuery(queries, scope.accountId, scope.orgId);
+  const workspace = useQuery({
+    ...workspaceOptions,
+    // Keep the session's immediate access-loss cleanup in the reader path.
+    queryFn: (context) =>
+      guardedRead(() => {
+        const read = workspaceOptions.queryFn;
+        if (typeof read !== "function") throw new Error("WORKSPACE_READ_UNAVAILABLE");
+        return read(context);
+      }),
+  });
   const center = !workspace.isError
     ? workspace.data?.centers.find((row) => row.id === scope.centerId && row.accessible)
     : undefined;
