@@ -7,7 +7,14 @@ export const financeKeys = {
   directory: (scope: ClientScope) =>
     ["finance-directory", scope.accountId, scope.orgId, scope.centerId] as const,
   creditDebt: (scope: ClientScope, personId: string, currency: string) =>
-    ["finance-directory-credit-debts", scope.accountId, scope.orgId, scope.centerId, personId, currency] as const,
+    [
+      "finance-directory-credit-debts",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      personId,
+      currency,
+    ] as const,
 };
 
 export async function invalidateFinanceViews(
