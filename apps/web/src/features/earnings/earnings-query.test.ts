@@ -7,7 +7,7 @@ const otherCenter = { ...scope, centerId: "center-b" };
 const otherActor = { ...scope, accountId: "actor-b" };
 const otherOrg = { ...scope, orgId: "org-b" };
 
-it("stales every historical earnings period, person and cursor without a refetch storm or tenant spill", async () => {
+it("M04 invalidates historical earnings cursors without a tenant spill", async () => {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const directory = earningsKeys.directory(scope);
   const first = [...directory, "earnings", "person-a", "2026-10", undefined];
@@ -72,13 +72,16 @@ it("stales every historical earnings period, person and cursor without a refetch
   unsubscribe();
 });
 
-it("cancels a pre-write response so it cannot replace the mandatory fresh first-page readback", async () => {
+it("M04 cancels pre-write reads before first-page readback", async () => {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const key = [...earningsKeys.directory(scope), "payments", "", undefined, undefined];
   let releaseOld!: (value: { revision: number }) => void;
-  const oldRead = vi.fn(() => new Promise<{ revision: number }>((resolve) => {
-    releaseOld = resolve;
-  }));
+  const oldRead = vi.fn(
+    () =>
+      new Promise<{ revision: number }>((resolve) => {
+        releaseOld = resolve;
+      }),
+  );
   const pending = queries.fetchQuery({ queryKey: key, queryFn: oldRead }).catch(() => undefined);
   expect(oldRead).toHaveBeenCalledTimes(1);
 
