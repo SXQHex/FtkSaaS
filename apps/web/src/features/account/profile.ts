@@ -11,9 +11,12 @@ export interface ProfileValues {
   phone: string;
 }
 
-export async function readProfile(accountId: string) {
+export async function readProfile(
+  accountId: string,
+  readVerifiedAccount: () => ReturnType<typeof readAccount> = readAccount,
+) {
   const [account, page] = await Promise.all([
-    readAccount(),
+    readVerifiedAccount(),
     getBackend().call("management_state_get_v1", {
       client_api_version: 1,
       request_id: uuidv7(),

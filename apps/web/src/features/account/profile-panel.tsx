@@ -11,7 +11,7 @@ import { EmailChange } from "./email-change";
 import { ProfilePhotoRow } from "./profile-photo-row";
 import type { PhotoDraft } from "./profile-photo";
 import { BackendError } from "../../lib/backend";
-import { invalidateAccountProjections } from "../auth/account-query";
+import { invalidateAccountProjections, verifiedAccountForId } from "../auth/account-query";
 import {
   Card,
   CardHeader,
@@ -48,13 +48,16 @@ export function ProfilePanel({
   const router = useRouter();
   const queries = useQueryClient();
   const profile = useQuery({
-    queryKey: ["account-profile", accountId],
-    queryFn: () => readProfile(accountId),
+    queryKey: ["account-profile", accountId, variant],
+    queryFn: () =>
+      readProfile(accountId, () => verifiedAccountForId(queries, accountId, variant === "account")),
   });
   async function refresh() {
+    // The profile reread must share the now-stale account projection. After a
+    // successful write, do not return yesterday's identity/display name.
+    await invalidateAccountProjections(queries);
     const result = await profile.refetch({ throwOnError: true });
     if (!result.data) throw new Error("PROFILE_UNAVAILABLE");
-    await invalidateAccountProjections(queries);
     await router.invalidate();
     return result.data;
   }

@@ -48,7 +48,26 @@ export async function verifiedWorkspaceAccount(queries: QueryClient, nativeUserI
     if (cached.data === undefined || cached.isInvalidated) continue;
     if (Date.now() - cached.dataUpdatedAt < accountStaleTime) return cached.data;
   }
-  return queries.query(accountQuery(nativeUserId));
+  // A privileged projection may be the only available actor read (e.g. /account).
+  // Refresh that same key instead of starting an unnecessary ordinary projection.
+  const ordinary = queries.getQueryState(accountQueryKeys.projection(nativeUserId));
+  const platform = queries.getQueryState(accountQueryKeys.projection(nativeUserId, true));
+  return queries.query(accountQuery(nativeUserId, !ordinary && !!platform));
+}
+
+export async function verifiedAccountForId(
+  queries: QueryClient,
+  accountId: string,
+  includePlatformScope = false,
+) {
+  const { data, error } = await getSupabaseClient().auth.getSession();
+  if (error) throw error;
+  if (!data.session) throw new Error("AUTH_REQUIRED");
+  const account = includePlatformScope
+    ? await queries.query(accountQuery(data.session.user.id, true))
+    : await verifiedWorkspaceAccount(queries, data.session.user.id);
+  if (account.id !== accountId) throw new Error("ACCOUNT_CHANGED");
+  return account;
 }
 
 export function invalidateAccountProjections(queries: QueryClient) {

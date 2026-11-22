@@ -1,7 +1,9 @@
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { queryClient } from "../../lib/query-client";
 const { native, account } = vi.hoisted(() => ({
   native: {
     signInWithPassword: vi.fn(),
+    getSession: vi.fn(),
     signInWithOAuth: vi.fn(),
     mfa: { getAuthenticatorAssuranceLevel: vi.fn() },
   },
@@ -10,7 +12,19 @@ const { native, account } = vi.hoisted(() => ({
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
 vi.mock("../../lib/account", () => ({ readAccount: account }));
 import { loginWithPassword, loginWithGoogle } from "./auth";
+beforeEach(() => {
+  native.getSession.mockResolvedValue({
+    data: {
+      session: {
+        user: { id: "019a7b00-0000-7000-8000-000000000001" },
+        access_token: "native-fixture",
+      },
+    },
+    error: null,
+  });
+});
 afterEach(() => {
+  queryClient.clear();
   vi.resetAllMocks();
   vi.unstubAllEnvs();
 });

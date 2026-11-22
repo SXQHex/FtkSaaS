@@ -6,8 +6,7 @@ import { v7 as uuidv7 } from "uuid";
 import { PencilIcon } from "lucide-react";
 import type { AccountSessionView } from "@ftksaas/api-contracts";
 import { getSupabaseClient } from "../../lib/supabase";
-import { readAccount } from "../../lib/account";
-import { invalidateAccountProjections } from "../auth/account-query";
+import { invalidateAccountProjections, verifiedAccountForId } from "../auth/account-query";
 import { readSessions, revokeSession } from "./sessions";
 import { RevokeOthers } from "./revoke-others";
 import { SessionLabel } from "./session-label";
@@ -53,12 +52,12 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
   async function refresh() {
     setRefreshError(false);
     try {
+      await invalidateAccountProjections(queries);
       await Promise.all([
-        readAccount(),
+        verifiedAccountForId(queries, accountId, true),
         sessions.refetch({ throwOnError: true }),
         queries.invalidateQueries({ queryKey: ["account-security-history", accountId] }),
       ]);
-      await invalidateAccountProjections(queries);
       await router.invalidate();
       setChanged(true);
     } catch {
