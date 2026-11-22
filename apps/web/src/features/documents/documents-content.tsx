@@ -581,6 +581,7 @@ export function DocumentsContent({
           history={versionRows}
           onLockChange={lock}
           onAccessLost={accessLost}
+          onCompleted={refresh}
           onSaved={async (version, publishedScope) => {
             await refresh(publishedScope);
             setSaved(version);
