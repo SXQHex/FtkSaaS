@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { SessionView, WaitlistEntryView, SeatOfferView } from "@ftksaas/api-contracts";
@@ -31,6 +31,7 @@ import { Checkbox } from "@ftksaas/ui/components/checkbox";
 export function SessionWaitlistController({
   scope,
   session,
+  refreshRevision,
   ownPersonId,
   timezone,
   disabled,
@@ -41,6 +42,7 @@ export function SessionWaitlistController({
 }: {
   scope: ClientScope;
   session: SessionView;
+  refreshRevision: number;
   ownPersonId?: string;
   timezone?: string;
   disabled: boolean;
@@ -50,6 +52,8 @@ export function SessionWaitlistController({
   children: (ui: { panel: ReactNode; overlay: ReactNode }) => ReactNode;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
+  const lastRefreshRevision = useRef(refreshRevision);
   const [entriesCursors, setEntriesCursors] = useState<(string | undefined)[]>([undefined]),
     [offersCursors, setOffersCursors] = useState<(string | undefined)[]>([undefined]),
     [entriesPage, setEntriesPage] = useState(0),
@@ -99,13 +103,44 @@ export function SessionWaitlistController({
     enabled: query !== undefined && target?.action === "join",
     retry: false,
   });
+  // Non-waitlist session mutations also invalidate these directories. When
+  // the parent confirms its first-page readback, abandon both old cursor chains.
+  useEffect(() => {
+    if (lastRefreshRevision.current === refreshRevision) return;
+    lastRefreshRevision.current = refreshRevision;
+    setEntriesCursors([undefined]);
+    setOffersCursors([undefined]);
+    setEntriesPage(0);
+    setOffersPage(0);
+  }, [refreshRevision]);
+  async function refreshWaitlist() {
+    await onRefresh();
+    await Promise.all([
+      queries.fetchQuery({
+        queryKey: [...prefix, "entries", undefined],
+        queryFn: () => readSessionWaitlist(scope, session.id, "entries"),
+        staleTime: 0,
+        retry: false,
+      }),
+      queries.fetchQuery({
+        queryKey: [...prefix, "offers", undefined],
+        queryFn: () => readSessionWaitlist(scope, session.id, "offers"),
+        staleTime: 0,
+        retry: false,
+      }),
+    ]);
+    setEntriesCursors([undefined]);
+    setOffersCursors([undefined]);
+    setEntriesPage(0);
+    setOffersPage(0);
+  }
   const command = useMemberCommand({
     write: writeWaitlist,
     readReceipt: readWaitlistReceipt,
     readResult: readWaitlistResult,
     onAccessLost,
     onRefresh: async () => {
-      await onRefresh();
+      await refreshWaitlist();
     },
   });
   const locked = busy || command.locked;
@@ -153,7 +188,7 @@ export function SessionWaitlistController({
           setDraft((value) => ({ ...value, reviewed: false }));
           setError(true);
           setTarget(undefined);
-          await onRefresh();
+          await refreshWaitlist();
           return;
         }
       }
@@ -208,7 +243,7 @@ export function SessionWaitlistController({
             command.reset();
             setDraft((value) => ({ ...value, reviewed: false }));
             setTarget(undefined);
-            void onRefresh();
+            void refreshWaitlist();
           }}
         >
           {t(($) => $.sessionDetail.readSources)}

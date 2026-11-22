@@ -1,4 +1,5 @@
 import { workspaceQuery } from "../workspace/workspace-query";
+import { invalidateSessionDetailViews, sessionDetailKeys } from "./session-detail-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useNavigate } from "@tanstack/react-router";
@@ -52,13 +53,14 @@ export function SessionDetailContent({
   const locked = bookingLocked || cancelLocked || attendanceLocked || waitlistLocked;
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [page, setPage] = useState(0),
+    [refreshRevision, setRefreshRevision] = useState(0),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState<string>();
   const [person, setPerson] = useState<{ id: string; name: string }>(),
     [peopleCursors, setPeopleCursors] = useState<(string | undefined)[]>([undefined]),
     [peoplePage, setPeoplePage] = useState(0);
   const [cancel, setCancel] = useState<{ id: string; personId: string; name: string }>();
-  const prefix = ["session-detail", scope.accountId, scope.orgId, scope.centerId, sessionId];
+  const prefix = sessionDetailKeys.session(scope, sessionId);
   const accessLost = useCallback(
     (failure: unknown) => {
       const code =
@@ -133,7 +135,7 @@ export function SessionDetailContent({
     retry: false,
   });
   const reservations = useQuery({
-    queryKey: [...prefix, "participants", person?.id, cursors[page]],
+    queryKey: sessionDetailKeys.participants(scope, sessionId, person?.id, cursors[page]),
     queryFn: () =>
       guardedRead(() => readSessionParticipants(scope, sessionId, person?.id, cursors[page])),
     enabled: Boolean(native && center && !invalid),
@@ -155,21 +157,32 @@ export function SessionDetailContent({
     onLockChange(locked);
     return () => onLockChange(false);
   }, [locked, onLockChange]);
-  const refresh = useCallback(async () => {
-    await queries.invalidateQueries({
-      queryKey: ["session-detail", scope.accountId, scope.orgId, scope.centerId, sessionId],
-      refetchType: "active",
+  async function refresh() {
+    // Native receipt/result reading happens in the command. Mark all cached
+    // variants stale, but never refetch a potentially invalid continuation.
+    await invalidateSessionDetailViews(queries, scope, sessionId);
+    const latest = await session.refetch({ throwOnError: true });
+    if (!latest.data) throw new Error("SESSION_DETAIL_READBACK_UNAVAILABLE");
+    await queries.fetchQuery({
+      queryKey: sessionDetailKeys.participants(scope, sessionId, person?.id),
+      queryFn: () => guardedRead(() => readSessionParticipants(scope, sessionId, person?.id)),
+      staleTime: 0,
+      retry: false,
     });
-    // Scheduling and member views share domain effects, not private UI state.
-    await queries.invalidateQueries({
-      queryKey: ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
-      refetchType: "none",
-    });
-    await queries.invalidateQueries({
-      queryKey: ["profile-reservations", scope.accountId, scope.orgId, scope.centerId],
-      refetchType: "none",
-    });
-  }, [queries, scope.accountId, scope.orgId, scope.centerId, sessionId]);
+    // Other non-paginated, visible projections still need their native reads.
+    // Do not reread the waitlist or participant cursor families here.
+    await Promise.all(
+      ["header", "rooms", "instructors", "attendance"].map((family) =>
+        queries.refetchQueries(
+          { queryKey: [...prefix, family], type: "active" },
+          { throwOnError: false },
+        ),
+      ),
+    );
+    setCursors([undefined]);
+    setPage(0);
+    setRefreshRevision((value) => value + 1);
+  }
   if (invalid)
     return (
       <Alert variant="destructive">
@@ -237,6 +250,7 @@ export function SessionDetailContent({
     <SessionWaitlistController
       scope={scope}
       session={native}
+      refreshRevision={refreshRevision}
       timezone={center?.timezone}
       ownPersonId={
         workspace.isError ? undefined : workspace.data?.selected?.self_context?.person_id
