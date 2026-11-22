@@ -10,7 +10,7 @@
 
 ## Router + Query birleşik veri yaşam döngüsü (açık)
 
-**Hedef:** Var olan Vite/React/TanStack mimarisini koruyarak güvenli, tenant kapsamlı, doğru, iptal edilebilir ve ölçülmüş en az API isteğiyle çalışan SPA. *Yeni state store, ikinci cache, genel event bus, bütün mutation'ları yeniden yazma veya ölçümsüz backend API tasarımı yapılmaz.*
+**Hedef:** Var olan Vite/React/TanStack mimarisini koruyarak güvenli, tenant kapsamlı, doğru, iptal edilebilir ve ölçülmüş en az API isteğiyle çalışan SPA. _Yeni state store, ikinci cache, genel event bus, bütün mutation'ları yeniden yazma veya ölçümsüz backend API tasarımı yapılmaz._
 
 **Kaynak denetimi:** `8a5efbb0c14ea259246ca9d07f1fb92948007557` üzerindeki 50 route, 36 feature alanı ve ilgili Query/reader/mutation kodu; kod aramasında `queryKey` eşleşmeli 127 dosya ve `onRefresh` eşleşmeli 116 dosya. Bu statik tarama yeni bir CI/test veya canlı performans kanıtı değildir. Bulguların açıklama ve teknik tercih sahibi [geliştirme rehberidir](development.md#router--query-birleşik-veri-yaşam-döngüsü).
 
@@ -55,4 +55,3 @@
 
 - [ ] **MONO-01 · Eski kabulun sonlandırılması.** Mevcut ürün `apps/web` ve statik Cloudflare dağıtımı main üzerinde çalışsa da önceki taşıma kaydındaki **adayın ortak CI kabulü ve yayımlı sürüm** eşlemesi uygun son kaynak/ortam kanıtıyla ayrıca kapatılacak. Geçmiş kaydın [aslı](https://github.com/SXQHex/FtkSaaS/blob/8a5efbb0c14ea259246ca9d07f1fb92948007557/apps/web/docs/todo.md#monorepo-geçişi).
 - [ ] **MONO-02 · Kişisel ICS derin linkleri.** Eski konfigürasyondan gelen org + seans linki, yeni SPA'da giriş, doğru merkez/yetki ve öğrenci/eğitmen davranışıyla doğrulanacak. [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu).
-

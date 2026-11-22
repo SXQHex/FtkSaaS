@@ -1,17 +1,17 @@
 # Frontend geliştirme sırası ve kontrol noktaları
 
-**Tek sıra sahibi:** Bu dosya *neye önce başlanacağını ve hangi noktada durulacağını* belirler. İşlerin ve testlerin tam ölçütleri [remaining-work.md](remaining-work.md), güncel repo/PR/CI/ortam kanıtı [handover.md](handover.md) sahibindedir. Teknik gerekçe [development.md](development.md#router--query-birleşik-veri-yaşam-döngüsü) altındadır. Burada ayrı backlog ya da tarihsel kabul defteri oluşturulmaz.
+**Tek sıra sahibi:** Bu dosya _neye önce başlanacağını ve hangi noktada durulacağını_ belirler. İşlerin ve testlerin tam ölçütleri [remaining-work.md](remaining-work.md), güncel repo/PR/CI/ortam kanıtı [handover.md](handover.md) sahibindedir. Teknik gerekçe [development.md](development.md#router--query-birleşik-veri-yaşam-döngüsü) altındadır. Burada ayrı backlog ya da tarihsel kabul defteri oluşturulmaz.
 
 **Kaynak incelemesi:** 22 Kasım 2026 · `main` `8a5efbb0c14ea259246ca9d07f1fb92948007557`. Açık işleri bu snapshot'a göre seç; `main` değişmişse önce kod ve açık iş farkını uzlaştır.
 
 ## Aktif sıra
 
-| Öncelik | Teslim dilimi | Kontrol noktası |
-|---|---|---|
-| 1 | [M01–M05 cache/mutation doğruluğu](remaining-work.md#router-query-birlesik) | Eski cursor/filtre, zorunlu readback, başka tenant ve bilinmeyen ACK testleri. İlgili key aileleri dışında gereksiz `refetch` yok. |
-| 2 | [M06–M07, M11–M12 oturum/scope ve veri sahibi](remaining-work.md#router-query-birlesik) | MFA, same-user/new-session, rol iptali, Router history, workspace tek `queryFn`; yanlış/eskimiş yetki görünümü yok. |
-| 3 | [M08–M10 trafik ve iptal](remaining-work.md#router-query-birlesik) | Önce/sonra istek sayısı ve gecikme ölçülür. Native write/receipt doğrulaması bozulmaz. |
-| 4 | [M13 koşullu, M14 test kararlılığı ve D01–D05 birleşik kabul](remaining-work.md#router-query-birlesik) | Ölçülmemiş optimizasyon yapılmaz; tam birim/Chromium, sonra dört profil ve gerekli gerçek ortam kabulü. |
+| Öncelik | Teslim dilimi                                                                                          | Kontrol noktası                                                                                                                    |
+| ------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1       | [M01–M05 cache/mutation doğruluğu](remaining-work.md#router-query-birlesik)                            | Eski cursor/filtre, zorunlu readback, başka tenant ve bilinmeyen ACK testleri. İlgili key aileleri dışında gereksiz `refetch` yok. |
+| 2       | [M06–M07, M11–M12 oturum/scope ve veri sahibi](remaining-work.md#router-query-birlesik)                | MFA, same-user/new-session, rol iptali, Router history, workspace tek `queryFn`; yanlış/eskimiş yetki görünümü yok.                |
+| 3       | [M08–M10 trafik ve iptal](remaining-work.md#router-query-birlesik)                                     | Önce/sonra istek sayısı ve gecikme ölçülür. Native write/receipt doğrulaması bozulmaz.                                             |
+| 4       | [M13 koşullu, M14 test kararlılığı ve D01–D05 birleşik kabul](remaining-work.md#router-query-birlesik) | Ölçülmemiş optimizasyon yapılmaz; tam birim/Chromium, sonra dört profil ve gerekli gerçek ortam kabulü.                            |
 
 **PR sınırı:** Tercihen iki mantıksal büyük PR: (1) cache + oturum/scope doğruluğu, (2) ağ maliyeti + AbortSignal. Aynı sınıra bağlı birkaç iş bir PR'da kapanabilir; tam CI gereksiz sık çalıştırılmaz. Her PR ayrı branch ve Draft ile başlar; kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Yeni kullanıcı yetkisi olmadan merge veya production değişikliği yapılmaz.
 
