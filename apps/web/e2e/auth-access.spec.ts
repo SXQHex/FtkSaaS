@@ -207,12 +207,12 @@ async function mockAccess(page: Page) {
   await page.route("**/functions/v1/backend-v1/account_access_send_v1", (route) => {
     const payload = route.request().postDataJSON() as Record<string, unknown>;
     state.writes.push({ operation: "invite", payload });
-    if (payload.person_id === I.instructor) {
-      expect(payload).toMatchObject({ person_id: I.instructor, org_id: I.org, center_id: I.center });
-    } else {
+    if (payload.person_id !== I.instructor) {
       expect(payload).toMatchObject({ org_id: I.org, center_id: I.center });
       expect(studio.people.map((person) => person.id)).toContain(payload.person_id);
+      return send(route, { job_id: jobId });
     }
+    expect(payload).toMatchObject({ person_id: I.instructor, org_id: I.org, center_id: I.center });
     return send(route, { job_id: jobId });
   });
   await page.route("**/functions/v1/backend-v1/job_status_get_v1", (route) => {
