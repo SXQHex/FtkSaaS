@@ -2,6 +2,7 @@ import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { invalidateEarningsViews } from "../earnings/earnings-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
@@ -154,16 +155,10 @@ export function EventDetailContent({
       ])
         affected.push([name, ...scopeIds]);
     }
-    if (afterWrite?.earnings) {
-      affected.push(["earnings-directory", scope], ["earnings-visible-counts", scope]);
-      affected.push(
-        ["instructor-earning-page", ...scopeIds],
-        ["instructor-account-payments", ...scopeIds],
-      );
-    }
     await Promise.all([
       queries.refetchQueries({ queryKey: prefix, exact: true }, { throwOnError: true }),
       invalidateCachedFamilies(queries, affected),
+      ...(afterWrite?.earnings ? [invalidateEarningsViews(queries, scope)] : []),
     ]);
     setActual(undefined);
     setReason("");

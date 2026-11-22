@@ -473,9 +473,13 @@ test("M03: entry invitation readback failure preserves one write and supports re
   await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
   await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
 
+  // The person-created notice appears before the required access directory
+  // readback completes. Inject failures only after the invitation is actionable.
+  const send = sheet.getByRole("button", { name: "Daveti gönder", exact: true });
+  await expect(send).toBeEnabled();
   state.failInvitations = true;
   state.failAccounts = true;
-  await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await send.click();
   await expect(
     sheet.getByText("Davet işi oluşturuldu; güncel durum okunamadı.", { exact: false }),
   ).toBeVisible();

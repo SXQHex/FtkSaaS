@@ -19,6 +19,7 @@ export async function mockEarnings(
   options: {
     unknown?: boolean;
     ackUnread?: boolean;
+    pageUnread?: boolean;
     denied?: boolean;
     paginate?: boolean;
     peoplePagination?: boolean;
@@ -105,7 +106,8 @@ export async function mockEarnings(
     current_agreement_ids: [I.agreement],
   });
   let unknown = options.unknown,
-    failAfterAck = false;
+    failAfterAck = false,
+    failPageAfterAck = false;
   const committed = new Map<string, { id: string; operation: string }>();
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
@@ -132,6 +134,10 @@ export async function mockEarnings(
       if (options.denied) return deny();
       if (failAfterAck && r.view === "payments") {
         failAfterAck = false;
+        return route.abort();
+      }
+      if (failPageAfterAck && r.view === "instructors") {
+        failPageAfterAck = false;
         return route.abort();
       }
       const second = {
@@ -287,6 +293,10 @@ export async function mockEarnings(
       if (options.ackUnread) {
         options.ackUnread = false;
         failAfterAck = true;
+      }
+      if (options.pageUnread) {
+        options.pageUnread = false;
+        failPageAfterAck = true;
       }
       return send({
         operation_id: id(930),
