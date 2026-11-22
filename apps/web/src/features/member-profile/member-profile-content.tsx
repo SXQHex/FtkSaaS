@@ -974,9 +974,9 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (result) => {
+            await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
             queries.setQueryData(rightsKey, result.entitlements);
             queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
-            await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
             setCurrency(result.finance.currency);
             setCurrencyDraft(result.finance.currency);
             setIndex(0);
@@ -1077,8 +1077,8 @@ export function MemberProfileContent({
           onRefresh={async (result) => {
             queries.setQueryData(rightsKey, result.rows);
             if (result.finance) {
-              queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
               await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
+              queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
               setCurrency(result.finance.currency);
               setCurrencyDraft(result.finance.currency);
               setIndex(0);

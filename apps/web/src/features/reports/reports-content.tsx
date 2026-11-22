@@ -150,7 +150,8 @@ export function ReportsContent({
   ) as Partial<Record<(typeof definitions)[number]["name"], ReportView>>;
   const finance = useQuery({
     queryKey: ["report-finance-summary", scope, filters],
-    queryFn: () => readFinanceDirectory(scope, "movements", filters!.interval),
+    queryFn: ({ signal }) =>
+      readFinanceDirectory(scope, "movements", filters!.interval, {}, undefined, signal),
     enabled: active && !!filters && tab === "collections",
     retry: false,
     refetchOnWindowFocus: false,
