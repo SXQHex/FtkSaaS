@@ -24,12 +24,14 @@ const versions = (
   level: "center" | "organization" = "center",
   documentId = "doc-a",
 ) => ["document-versions", source, level, documentId];
+const firstPage = { items: ["first"], next_cursor: "cursor-2" };
+const nextPage = { items: ["old"], next_cursor: null };
 const infinite = () => ({
-  pages: [{ items: ["first"], next_cursor: "cursor-2" }, { items: ["old"], next_cursor: null }],
+  pages: [firstPage, nextPage],
   pageParams: [undefined, "cursor-2"],
 });
 
-it("M02: native publication stales all old document cursor/filter variants without a refetch storm", async () => {
+it("M02 marks old document filters and cursors stale without refetching", async () => {
   const queries = new QueryClient();
   const first = directory(scope);
   const old = directory(scope, "", "cursor-2");
@@ -66,7 +68,7 @@ it("M02: native publication stales all old document cursor/filter variants witho
   stop();
 });
 
-it("M02: inactive catalog and version continuations are trimmed before all affected variants go stale", async () => {
+it("M02 trims inactive catalog and version continuations before invalidation", async () => {
   const queries = new QueryClient();
   const keys = [
     catalog(scope, "center"),
@@ -94,7 +96,7 @@ it("M02: inactive catalog and version continuations are trimmed before all affec
   expect(queries.getQueryState(otherKey)?.isInvalidated).toBe(false);
 });
 
-it("M02: organization publication reaches shared documents in the same org, not another org or actor", async () => {
+it("M02 organization publication stays within the actor and organization", async () => {
   const queries = new QueryClient();
   const owned = directory(scope, "", "cursor-2");
   const inherited = directory(otherCenter, "", "cursor-2");
