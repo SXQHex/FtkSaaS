@@ -14,7 +14,13 @@ function cache(queries: QueryClient, key: readonly unknown[]) {
 
 it("M05 invalidates affected financial pages, monetary reports and currency-only credit reads", async () => {
   const queries = new QueryClient();
-  const first = [...financeKeys.directory(scope), "movements", "November", { kind: "sale" }, undefined];
+  const first = [
+    ...financeKeys.directory(scope),
+    "movements",
+    "November",
+    { kind: "sale" },
+    undefined,
+  ];
   const old = [...financeKeys.directory(scope), "debts", "October", { query: "A" }, "cursor-2"];
   const person = [...financeKeys.person(scope, "person-a", "TRY"), "cursor-2"];
   const tryCredit = financeKeys.creditDebt(scope, "person-a", "TRY");
