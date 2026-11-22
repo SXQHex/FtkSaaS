@@ -118,7 +118,7 @@ it("M05 aborts a pre-write financial directory read before invalidating its cach
   const pending = queries.fetchQuery({
     queryKey: key,
     queryFn: ({ signal }) =>
-      new Promise<{ revision: number }>((resolve, reject) => {
+      new Promise<{ revision: number }>((_resolve, reject) => {
         signal.addEventListener(
           "abort",
           () => {
@@ -128,7 +128,6 @@ it("M05 aborts a pre-write financial directory read before invalidating its cach
           { once: true },
         );
         started();
-        void resolve;
       }),
     retry: false,
   });
