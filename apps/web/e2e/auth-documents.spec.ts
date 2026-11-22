@@ -23,6 +23,7 @@ async function setup(
     writes: [] as { op: string; r: Record<string, unknown> }[],
     checksum: "",
     published: mode === "catalog",
+    completed: false,
     failed: false,
     puts: 0,
     digital: undefined as DigitalDocumentContent | undefined,
@@ -110,6 +111,26 @@ async function setup(
                   acceptance_records: 0,
                 },
               ]
+            : r.view === "documents" && state.completed
+              ? [
+                  {
+                    key: fileId,
+                    kind: "unpublished_file",
+                    document_id: null,
+                    file_id: fileId,
+                    name: "Sentetik belge",
+                    created_at: "2026-11-17T00:00:00Z",
+                    expires_at: null,
+                    state: "ready_unpublished",
+                    scope: "center",
+                    read_only: false,
+                    latest_version: null,
+                    version_count: null,
+                    required_members: 0,
+                    pending_members: 0,
+                    acceptance_records: null,
+                  },
+                ]
             : r.view === "versions" && state.published
               ? [latest]
               : [],
@@ -118,7 +139,7 @@ async function setup(
         history_available: true,
         summary: {
           published_documents: state.published ? 1 : 0,
-          unpublished_files: 0,
+          unpublished_files: state.completed && !state.published ? 1 : 0,
           pending_members: state.published ? 1 : 0,
           total_members: state.published ? 1 : 0,
           last_publication: state.published ? "2026-11-17T00:00:00Z" : null,
@@ -143,6 +164,7 @@ async function setup(
     if (op === "file_upload_complete_v1") {
       state.writes.push({ op, r });
       state.checksum = r.checksum;
+      state.completed = true;
       return send({ primary_id: fileId, operation_id: previewId });
     }
     if (op === "document_publication_preview_v1") {
@@ -328,6 +350,21 @@ test("documents validates before upload and focuses the first invalid field", as
   await expect(dialog.getByLabel("Belge adı", { exact: true })).toBeFocused();
   expect(state.writes).toHaveLength(0);
 });
+test("M02 verified file completion refreshes the ready-unpublished directory without calling publish", async ({
+  page,
+}) => {
+  const state = await setup(page);
+  const dialog = await fill(page);
+  await expect(
+    dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes.filter((row) => row.op === "file_upload_complete_v1")).toHaveLength(1);
+  expect(state.writes.filter((row) => row.op === "document_version_publish_v1")).toHaveLength(0);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("row").filter({ hasText: "Sentetik belge" })).toBeVisible();
+});
+
 for (const mode of ["normal", "unknown", "unread"] as const)
   test(`document publication ${mode} preserves reviewed scope and never repeats an acknowledged writer`, async ({
     page,
