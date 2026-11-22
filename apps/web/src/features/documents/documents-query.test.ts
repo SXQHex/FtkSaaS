@@ -163,7 +163,6 @@ it("M02 cancels late document reads without crossing centers", async () => {
     staleTime: 0,
     retry: false,
   });
-  const oldCancelled = oldRead.then(() => false, () => true);
   let resolveForeign!: (value: { revision: string }) => void;
   const foreignNetwork = new Promise<{ revision: string }>((resolve) => {
     resolveForeign = resolve;
@@ -175,7 +174,12 @@ it("M02 cancels late document reads without crossing centers", async () => {
   });
 
   await invalidateDocumentDirectoryViews(queries, scope, "center");
-  expect(await oldCancelled).toBe(true);
+  // When a cached query is cancelled, QueryClient may resolve the pending
+  // fetch with its previous data rather than reject the caller's promise.
+  await expect(oldRead).resolves.toEqual({ revision: "before" });
+  expect(queries.getQueryState(first)?.fetchStatus).toBe("idle");
+  expect(queries.getQueryState(first)?.isInvalidated).toBe(true);
+  expect(queries.getQueryData(first)).toEqual({ revision: "before" });
   expect(queries.getQueryState(foreign)?.fetchStatus).toBe("fetching");
   await expect(
     queries.fetchQuery({
