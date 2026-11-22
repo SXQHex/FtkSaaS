@@ -5,10 +5,11 @@ import { mockFinanceDirectory } from "./finance-directory-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
+import type { RequestFinanceGet, RequestPeopleList } from "@ftksaas/api-contracts";
 async function setup(page: Page, self = true) {
   const studio = await mockStudio(page),
-    reads: Record<string, any>[] = [],
-    people: Record<string, any>[] = [];
+    reads: RequestFinanceGet[] = [],
+    people: RequestPeopleList[] = [];
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON(),

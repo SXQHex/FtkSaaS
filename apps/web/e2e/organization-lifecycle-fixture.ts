@@ -1,5 +1,11 @@
 import type { Page } from "@playwright/test";
-import type { OrganizationView, JobStatusView, Preview } from "@ftksaas/api-contracts";
+import type {
+  OrganizationView,
+  JobStatusView,
+  Preview,
+  RequestOrganizationCloseApply,
+  RequestOrganizationDeleteApply,
+} from "@ftksaas/api-contracts";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { completionUrl, uid, nativePage, nativeMutation } from "./pro-completion-fixture.js";
@@ -24,8 +30,13 @@ export async function mockOrganizationLifecycle(
     version: 4,
     self_context: { person_id: I.self, subscriber_number: null, centers: [] },
   };
-  const writes: { op: string; r: Record<string, any> }[] = [],
-    requests: { op: string; r: Record<string, any> }[] = [];
+  const writes: {
+      op: string;
+      r: Pick<RequestOrganizationCloseApply, "operation_key" | "preview"> &
+        Partial<Pick<RequestOrganizationCloseApply, "expected_version">> &
+        Partial<Pick<RequestOrganizationDeleteApply, "reauth">>;
+    }[] = [],
+    requests: { op: string; r: Record<string, unknown> }[] = [];
   const payloads = new Map<string, string>();
   let previewNumber = 0,
     effects = 0,

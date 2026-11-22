@@ -1,14 +1,19 @@
 import { expect, type Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
-import type { FinanceDirectoryEntry, FinanceDirectoryView } from "@ftksaas/api-contracts";
+import type {
+  FinanceDirectoryEntry,
+  FinanceDirectoryView,
+  RequestFinanceDirectoryGet,
+  RequestFinanceGet,
+} from "@ftksaas/api-contracts";
 export async function mockFinanceDirectory(
   page: Page,
   options: { denied?: boolean; malformed?: boolean; creditDenied?: boolean } = {},
 ) {
   const studio = await mockStudio(page),
-    requests: Record<string, any>[] = [],
-    personalReads: Record<string, any>[] = [];
+    requests: RequestFinanceDirectoryGet[] = [],
+    personalReads: RequestFinanceGet[] = [];
   const totals = [
     {
       currency: "TRY",
