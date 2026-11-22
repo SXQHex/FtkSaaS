@@ -32,8 +32,18 @@ export async function invalidateEarningsViews(queries: QueryClient, scope: Clien
   // Infinite queries must not replay server cursors issued before the write.
   // Keep the first cached page so the next observer refetch starts at page one.
   for (const prefix of [earningsKeys.instructorCatalog(scope), earningsKeys.paymentSource(scope)])
-    for (const cached of queries.getQueryCache().findAll({ queryKey: prefix }))
-      retainFirstInfinitePage(queries, cached.queryKey);
+    for (const { queryKey, state } of queries.getQueryCache().findAll({ queryKey: prefix })) {
+      const data = state.data;
+      if (
+        data &&
+        typeof data === "object" &&
+        "pages" in data &&
+        "pageParams" in data &&
+        Array.isArray(data.pages) &&
+        Array.isArray(data.pageParams)
+      )
+        retainFirstInfinitePage(queries, queryKey);
+    }
 
   // Old periods, people and cursors remain cached but stale, without a storm
   // of inactive-page requests or any invalidation of a different tenant.
