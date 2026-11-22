@@ -12,7 +12,7 @@ it("invalidates scoped filter/cursor caches without active query refetches", asy
   const first = [...family, "pending", undefined];
   const old = [...family, "pending", "cursor-2"];
   const alternate = [...family, "all", "cursor-3"];
-  const anotherTenant = ["directory", "actor-a", "org-a", "center-b", "pending", "cursor-2"];
+  const anotherTenant = ["directory", "actor-a", "org-a", "center-b"];
   const activeReader = vi.fn(async () => ({ version: 1 }));
   await queries.fetchQuery({ queryKey: old, queryFn: activeReader });
   const unobserve = new QueryObserver(queries, {
@@ -61,24 +61,21 @@ it("does not accept a page readback failure as a successful mutation refresh", a
 
 it("rejects unscoped blanket invalidations", async () => {
   const queries = new QueryClient();
-  await expect(invalidateCachedFamilies(queries, [["directory"]])).rejects.toThrow(
-    "QUERY_INVALIDATION_SCOPE_REQUIRED",
-  );
-  await expect(invalidateCachedFamilies(queries, [])).rejects.toThrow(
-    "QUERY_INVALIDATION_SCOPE_REQUIRED",
-  );
+  const error = "QUERY_INVALIDATION_SCOPE_REQUIRED";
+  await expect(invalidateCachedFamilies(queries, [["directory"]])).rejects.toThrow(error);
+  await expect(invalidateCachedFamilies(queries, [])).rejects.toThrow(error);
 });
 
 it("retains only the first cached infinite page before native readback", async () => {
   const queries = new QueryClient();
-  const key = ["document-catalog", { accountId: "actor", orgId: "org", centerId: "center" }];
+  const key = ["document-catalog", "actor", "org", "center"];
   queries.setQueryData(key, {
-    pages: [{ items: [1], next_cursor: "cursor-2" }, { items: [2], next_cursor: null }],
+    pages: [{ items: [1] }, { items: [2] }],
     pageParams: [undefined, "cursor-2"],
   });
   retainFirstInfinitePage(queries, key);
   expect(queries.getQueryData(key)).toEqual({
-    pages: [{ items: [1], next_cursor: "cursor-2" }],
+    pages: [{ items: [1] }],
     pageParams: [undefined],
   });
 });

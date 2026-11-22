@@ -222,15 +222,7 @@ export function LeadsContent({
   async function refresh() {
     await invalidateLeadPages(queries, scope);
     await queries.fetchQuery({
-      queryKey: [
-        "leads",
-        scope.accountId,
-        scope.orgId,
-        scope.centerId,
-        query,
-        filters,
-        undefined,
-      ],
+      queryKey: ["leads", scope.accountId, scope.orgId, scope.centerId, query, filters, undefined],
       queryFn: () => readLeadsPage(scope, query, undefined, filters),
       staleTime: 0,
       retry: false,
