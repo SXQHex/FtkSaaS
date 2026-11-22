@@ -14,11 +14,11 @@ import { dirname, join, resolve } from "node:path";
 import { parse } from "yaml";
 import { expect, test } from "vitest";
 import { affectedBrowserSpecs, eventScope, selectScope } from "../scripts/ci-scope.mjs";
-import { browserMatrix } from "../scripts/browser-profiles.mjs";
+import { browserMatrix, refactoringBrowserMatrix } from "../scripts/browser-profiles.mjs";
 function workflow(name: string) {
   return parse(readFileSync(resolve(process.cwd(), "../../.github/workflows", name), "utf8"));
 }
-test("frontend checks retain build, coverage, isolation and all four browsers", () => {
+test("frontend retains build, coverage, isolation and four browser definitions", () => {
   const config = workflow("frontend.yml");
   expect(config.jobs.browsers.strategy.matrix).toBe(
     "${{ fromJSON(needs.scope.outputs.e2e_matrix) }}",
@@ -60,6 +60,17 @@ test("frontend checks retain build, coverage, isolation and all four browsers", 
   expect(commands).not.toContain("pnpm test:frontend:coverage");
   expect(commands).toContain("pnpm --filter @ftksaas/web test:isolation");
 });
+test("temporary refactoring CI runs twelve Desktop Chromium shards only", () => {
+  expect(refactoringBrowserMatrix).toEqual(
+    Array.from({ length: 12 }, (_, index) => ({
+      profile: "chromium",
+      engine: "chromium",
+      shard: index + 1,
+    })),
+  );
+  expect(browserMatrix).toHaveLength(12);
+});
+
 test("affected tests combine feature suites with smoke and expand on uncertain impact", () => {
   const scope = (...paths: string[]) => ({
     paths: paths.map((path) => ({

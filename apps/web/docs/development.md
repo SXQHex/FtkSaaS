@@ -17,6 +17,10 @@
 - `defaultPreloadStaleTime: 0` Router'ın ayrı bir preload tazelik penceresini kapatır. Query tazelik ve yeniden okuma sahibidir; `router.invalidate()` kendi başına Query cache'ini geçersiz kılmaz. Etki oluşturan işlemlerde ilgili sorgu önce açıkça invalid edilir.
 - MFA, davet, callback ve silme sonucu gibi kimlik yaşam döngüsü rotaları bu veri loader'ından ayrıdır. `scopedBackend` üzerindeki pinned-bearer / hesap eşleme kontrolü, özellikle komut ve receipt yolları için güvenlik doğrulaması olarak korunur; bir ekran verisi cache'i değildir.
 
+## Geçici tarayıcı CI profili
+
+Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium** projesinin on iki Playwright shard'ını ve **tam Playwright test envanterini** çalıştırır. Diğer tarayıcı profilleri ve senaryoları korunur, fakat CI tarafından seçilmez. Lint, tip, build, birim/coverage, erişilebilirlik kontrolleri ve aynı profilin tam test envanteri geçerlidir. Dört tarayıcı kabulü bu dönemde iddia edilemez; refactoring kapanışında [CI politikasındaki](../../../docs/ci-policy.md) kaynak-özel güvenilir kurulum süreciyle dört tarayıcı profili × üç shard düzeni geri alınır.
+
 ## Yerel çalışma
 
 Repo kökünden `corepack enable`, `pnpm install --frozen-lockfile` ve `pnpm dev:web` çalıştırın. Gerçek geliştirme servisi için `apps/web/.env.example` değişkenlerini Git dışındaki `apps/web/.env.development.local` dosyasında tanımlayın. `VITE_` değerleri tarayıcıya açıktır. Native Auth loopback dönüşü için izinli yerel origin ve `/auth/callback` kullanılır. Test fixture'ları loopback arayüzünde çalışır. Hosted DB'ye reset veya seed uygulanmaz.
