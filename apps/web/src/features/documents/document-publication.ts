@@ -347,6 +347,7 @@ export async function readPublication(intent: PublicationIntent, id?: string) {
     documentId,
     versionId: fileId,
     versionLabel: values.version_label,
+    publishedScope: intent.request.scope.kind,
   };
 }
 export async function documentReceipt(intent: CompleteIntent | PublicationIntent) {

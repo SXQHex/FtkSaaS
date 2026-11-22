@@ -179,6 +179,7 @@ it("keeps organization scope through preview, review, publish and readback", asy
   });
   await expect(readPublication(intent, target.fileId)).resolves.toMatchObject({
     documentId: id(9),
+    publishedScope: "organization",
   });
   expect(call.mock.calls.map(([operation]) => operation)).toEqual([
     "document_publication_preview_v1",
@@ -231,6 +232,7 @@ it("requires exact published native values and validates receipt operation/ref t
   expect(await readPublication(intent, id(4))).toMatchObject({
     documentId: id(9),
     versionLabel: "v1",
+    publishedScope: "center",
   });
   current.values.version_label = "v2";
   await expect(readPublication(intent, id(4))).rejects.toThrow();

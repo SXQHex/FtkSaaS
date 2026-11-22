@@ -1,6 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { invalidateDocumentDirectoryViews } from "./documents-query";
-import { retainFirstInfinitePage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -246,8 +245,8 @@ export function DocumentsContent({
       ? catalog.data?.pages[0]?.summary
       : undefined);
   const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
-  async function refresh() {
-    await invalidateDocumentDirectoryViews(queries, scope);
+  async function refresh(publishedScope: "center" | "organization") {
+    await invalidateDocumentDirectoryViews(queries, scope, publishedScope);
     // After publication the old continuation cursor may be invalid. Read the
     // currently selected filter from page one, without resurrecting old pages.
     if (active && (tab === "documents" || (tab === "acceptance" && documentId))) {
@@ -276,14 +275,6 @@ export function DocumentsContent({
         retry: false,
       });
     }
-    retainFirstInfinitePage(queries, ["document-catalog", scope, level]);
-    if (versionTarget?.document_id)
-      retainFirstInfinitePage(queries, [
-        "document-versions",
-        scope,
-        level,
-        versionTarget.document_id,
-      ]);
     const results = await Promise.all([
       catalog.refetch(),
       ...(active && versionTarget?.document_id && !versionTarget.read_only
@@ -590,8 +581,9 @@ export function DocumentsContent({
           history={versionRows}
           onLockChange={lock}
           onAccessLost={accessLost}
-          onSaved={async (version) => {
-            await refresh();
+          onCompleted={refresh}
+          onSaved={async (version, publishedScope) => {
+            await refresh(publishedScope);
             setSaved(version);
           }}
           onClose={() => {
