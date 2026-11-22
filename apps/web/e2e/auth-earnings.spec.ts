@@ -125,6 +125,25 @@ test("an ACK with unavailable readback stays saved-unread and only rereads after
   expect(f.writes).toHaveLength(1);
   expect(f.receipts).toHaveLength(0);
 });
+test("confirmed earnings payment remains saved-unread when mandatory first-page readback fails", async ({
+  page,
+}) => {
+  const f = await mockEarnings(page, { pageUnread: true });
+  const dialog = await fillEarningsPayment(page);
+  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await expect(
+    dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(1);
+  expect(f.committed.size).toBe(1);
+
+  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(
+    page.getByText("Ödeme ve güncel hakediş doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(1);
+});
 test("correction preserves original payment, uses actual aggregate root version and writes a separate dated delta", async ({
   page,
 }) => {
