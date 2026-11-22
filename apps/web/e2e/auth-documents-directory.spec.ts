@@ -432,5 +432,5 @@ test("M02 publication rereads the visible first page and refreshes old cursor/fi
     .selectOption(document.document_id);
   await page.getByRole("radio", { name: "Tümü", exact: true }).click();
   await expect(page.getByText("Tarihsel katılımcı", { exact: false })).toBeVisible();
-  expect(allAcceptanceReads).toBe(initialAcceptanceReads + 1);
+  await expect.poll(() => allAcceptanceReads).toBe(initialAcceptanceReads + 1);
 });
