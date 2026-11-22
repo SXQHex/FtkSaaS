@@ -18,6 +18,7 @@ async function mockAccess(page: Page) {
     linkVersion: 4,
     lostCancelReply: false,
     failAccounts: false,
+    failInvitations: false,
     jobReads: 0,
     writes: [] as { operation: string; payload: Record<string, unknown> }[],
     reads: [] as { operation: string; key: Record<string, unknown>; cursor?: string }[],
@@ -104,7 +105,11 @@ async function mockAccess(page: Page) {
     expect(r).toMatchObject({ org_id: I.org, center_id: I.center });
     state.reads.push({ operation: r.operation, key: r.selector.key, cursor: r.page.cursor });
     const directory = r.selector.key.directory === "center";
-    if (state.failAccounts && directory && r.operation === "account_link_remove_v1")
+    if (
+      directory &&
+      ((state.failAccounts && r.operation === "account_link_remove_v1") ||
+        (state.failInvitations && r.operation === "account_access_revoke_v1"))
+    )
       return fail(route);
     const row =
       r.operation === "account_access_revoke_v1"
@@ -320,4 +325,150 @@ test("Access actions: same-key lost-reply recovery, versioned unlink and acknowl
   await expect.poll(() => state.jobReads).toBeGreaterThan(before);
   expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
   expect(state.linked).toBe(false);
+});
+
+test("M03: an old account cursor rereads after confirmed unlink", async ({
+  page,
+}) => {
+  const state = await mockAccess(page);
+  await openAccess(page);
+  await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(page.getByText("Fixture Other", { exact: true })).toBeVisible();
+  const cursorReads = () =>
+    state.reads.filter(
+      (read) =>
+        read.operation === "account_link_remove_v1" && read.cursor === "synthetic-next-page",
+    ).length;
+  const oldCursorReads = cursorReads();
+  await page.getByRole("button", { name: "Önceki", exact: true }).click();
+  await expect(page.getByText("Fixture Account Link", { exact: true })).toBeVisible();
+
+  const firstPageReads = () =>
+    state.reads.filter(
+      (read) =>
+        read.operation === "account_link_remove_v1" &&
+        read.key.directory === "center" &&
+        !read.cursor,
+    ).length;
+  const oldFirstPageReads = firstPageReads();
+  await page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü test");
+  await dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await expect(
+    dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes.filter((write) => write.operation === "unlink")).toHaveLength(1);
+  expect(firstPageReads()).toBeGreaterThan(oldFirstPageReads);
+  // Invalidation is not a network storm: the old cursor is reread only on return.
+  expect(cursorReads()).toBe(oldCursorReads);
+
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(page.getByText("Fixture Other", { exact: true })).toBeVisible();
+  expect(cursorReads()).toBe(oldCursorReads + 1);
+});
+
+test("M03: a forbidden invitation directory never blocks authorized account readback", async ({
+  page,
+}) => {
+  const state = await mockAccess(page);
+  state.failInvitations = true;
+  await openStudio(page);
+  await page.goto(`${origin}/o/${I.org}/c/${I.center}/access`);
+  await expect(page.getByRole("heading", { name: "Davetler ve hesaplar" })).toBeVisible();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(
+    page.getByRole("grid", { name: "Davetler" }).getByText("Fixture Invite", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
+  await expect(page.getByText("Fixture Account Link", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü test");
+  await dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await expect(
+    dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes.filter((write) => write.operation === "unlink")).toHaveLength(1);
+  await expect(page.getByRole("alert")).toBeVisible();
+});
+
+test("M03: two forbidden post-write directories remain unread until permission returns", async ({
+  page,
+}) => {
+  const state = await mockAccess(page);
+  await openAccess(page);
+  await page.getByRole("button", { name: /İptal et — Fixture Invite/ }).click();
+  const dialog = page.getByRole("alertdialog");
+  state.failInvitations = true;
+  state.failAccounts = true;
+  await dialog.getByRole("button", { name: "Daveti iptal et", exact: true }).click();
+  await expect(
+    dialog.getByText(
+      "İşlem kaydedildi; güncel durum henüz okunamadı. Yazıyı tekrarlamadan yeniden oku.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  expect(state.writes.filter((write) => write.operation === "cancel")).toHaveLength(1);
+  state.failInvitations = false;
+  state.failAccounts = false;
+  await dialog.getByRole("button", { name: "Güncel durumu oku", exact: true }).click();
+  await expect(
+    dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
+  ).toBeVisible();
+  expect(state.writes.filter((write) => write.operation === "cancel")).toHaveLength(1);
+});
+
+test("M03: person entry invitation rereads the access directories after job readback", async ({
+  page,
+}) => {
+  const state = await mockAccess(page);
+  await openAccess(page);
+  const invitationFirstPageReads = () =>
+    state.reads.filter(
+      (read) =>
+        read.operation === "account_access_revoke_v1" &&
+        read.key.directory === "center" &&
+        !read.cursor,
+    ).length;
+
+  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByLabel("Ad soyad", { exact: false }).fill("Fixture Entry Invite");
+  await sheet.getByLabel("E-posta", { exact: false }).fill("entry@example.invalid");
+  await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
+  const afterCreate = invitationFirstPageReads();
+  await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await expect.poll(() => state.jobReads).toBe(1);
+  await expect.poll(invitationFirstPageReads).toBeGreaterThan(afterCreate);
+  expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
+});
+
+test("M03: entry invitation readback failure preserves one write and supports recovery", async ({
+  page,
+}) => {
+  const state = await mockAccess(page);
+  await openAccess(page);
+  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByLabel("Ad soyad", { exact: false }).fill("Fixture Entry Recovery");
+  await sheet.getByLabel("E-posta", { exact: false }).fill("recovery@example.invalid");
+  await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
+
+  state.failInvitations = true;
+  state.failAccounts = true;
+  await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await expect(
+    sheet.getByText("Davet işi oluşturuldu; güncel durum okunamadı.", { exact: false }),
+  ).toBeVisible();
+  expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
+  state.failInvitations = false;
+  state.failAccounts = false;
+  await sheet.getByRole("button", { name: "Güncel durumu oku", exact: true }).click();
+  await expect.poll(() => state.jobReads).toBe(2);
+  expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
 });
