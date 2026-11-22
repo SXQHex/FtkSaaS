@@ -114,6 +114,9 @@ export function DocumentsContent({
       }),
     enabled: active && (tab === "documents" || (tab === "acceptance" && !!documentId)),
     retry: false,
+    // After a native readback, returning from an old cursor to page one must
+    // reuse that just-verified page rather than issuing the same request again.
+    staleTime: 5_000,
     refetchOnWindowFocus: false,
   });
   const lock = useCallback(
@@ -247,41 +250,53 @@ export function DocumentsContent({
   const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
   async function refresh(publishedScope: "center" | "organization") {
     await invalidateDocumentDirectoryViews(queries, scope, publishedScope);
-    // After publication the old continuation cursor may be invalid. Read the
-    // currently selected filter from page one, without resurrecting old pages.
-    if (active && (tab === "documents" || (tab === "acceptance" && documentId))) {
-      await queries.fetchQuery({
-        queryKey: [
-          "document-directory",
-          scope,
-          level,
-          tab,
-          documentId,
-          versionId,
-          filter,
-          query,
-          undefined,
-        ],
-        queryFn: () =>
-          readDocumentDirectory(scope, {
-            view: tab === "documents" ? "documents" : "acceptances",
-            level,
-            ...(tab === "acceptance" ? { documentId, versionId: versionId || undefined } : {}),
-            filter: tab === "acceptance" ? filter : "all",
-            query: query || undefined,
-            cursor: undefined,
-          }),
-        staleTime: 0,
-        retry: false,
-      });
-    }
-    const results = await Promise.all([
+    // The catalog's first page and an unfiltered document-directory first page
+    // are the same native read. Share the verified result instead of refetching
+    // both query keys; filtered documents and acceptances remain distinct reads.
+    const readVisible = active && (tab === "documents" || (tab === "acceptance" && !!documentId));
+    const shareCatalogPage = readVisible && tab === "documents" && !query.trim();
+    const firstPageKey = [
+      "document-directory",
+      scope,
+      level,
+      tab,
+      documentId,
+      versionId,
+      filter,
+      query,
+      undefined,
+    ];
+    const [catalogResult, versionsResult] = await Promise.all([
       catalog.refetch(),
-      ...(active && versionTarget?.document_id && !versionTarget.read_only
-        ? [versions.refetch()]
-        : []),
+      active && versionTarget?.document_id && !versionTarget.read_only
+        ? versions.refetch()
+        : Promise.resolve(undefined),
+      readVisible && !shareCatalogPage
+        ? queries.fetchQuery({
+            queryKey: firstPageKey,
+            queryFn: () =>
+              readDocumentDirectory(scope, {
+                view: tab === "documents" ? "documents" : "acceptances",
+                level,
+                ...(tab === "acceptance"
+                  ? { documentId, versionId: versionId || undefined }
+                  : {}),
+                filter: tab === "acceptance" ? filter : "all",
+                query: query || undefined,
+                cursor: undefined,
+              }),
+            staleTime: 0,
+            retry: false,
+          })
+        : Promise.resolve(undefined),
     ]);
-    if (results.some((row) => row.isError)) throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
+    if (catalogResult.isError || versionsResult?.isError)
+      throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
+    if (shareCatalogPage) {
+      const firstPage = catalogResult.data?.pages[0];
+      if (!firstPage) throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
+      queries.setQueryData(firstPageKey, firstPage);
+    }
     setCursors([undefined]);
     setIndex(0);
   }

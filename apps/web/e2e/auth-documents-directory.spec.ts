@@ -410,22 +410,24 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
   );
   expect(writeIndex).toBeGreaterThan(-1);
   expect(resultIndex).toBeGreaterThan(writeIndex);
-  expect(
-    f.requests
-      .slice(resultIndex + 1)
-      .some(
-        (request) =>
-          request.op === "document_directory_get_v1" &&
-          request.r.view === "documents" &&
-          !request.r.page.cursor,
-      ),
-  ).toBe(true);
+  // The unfiltered document page and catalog have identical native read
+  // inputs. Publication must read them only once, even when leaving page two.
+  const firstPageReadsAfterPublication = () =>
+    f.requests.slice(resultIndex + 1).filter(
+      (request) =>
+        request.op === "document_directory_get_v1" &&
+        request.r.view === "documents" &&
+        !request.r.page.cursor &&
+        !request.r.query,
+    );
+  expect(firstPageReadsAfterPublication()).toHaveLength(1);
 
   await editor.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await expect(editor).toHaveCount(0);
   await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
   await expect(page.getByText("İkinci güncel belge", { exact: true })).toBeVisible();
   expect(oldCursorReads).toBe(initialCursorReads + 1);
+  expect(firstPageReadsAfterPublication()).toHaveLength(1);
 
   await page.getByRole("tab", { name: /Kabul/ }).click();
   await page

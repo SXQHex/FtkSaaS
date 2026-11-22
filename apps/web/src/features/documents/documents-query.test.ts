@@ -146,3 +146,54 @@ it("M02: a failed mandatory first-page readback never makes an old cursor fresh"
   expect(queries.getQueryState(old)?.isInvalidated).toBe(true);
   expect(queries.getQueryData(old)).toEqual({ revision: "before" });
 });
+
+it("M02 rejects late pre-publication responses without cancelling a different center", async () => {
+  const queries = new QueryClient();
+  const first = directory(scope);
+  const foreign = directory(otherCenter);
+  queries.setQueryData(first, { revision: "before" });
+
+  let resolveOld!: (value: { revision: string }) => void;
+  const oldNetwork = new Promise<{ revision: string }>((resolve) => {
+    resolveOld = resolve;
+  });
+  const oldRead = queries.fetchQuery({
+    queryKey: first,
+    queryFn: () => oldNetwork,
+    staleTime: 0,
+    retry: false,
+  });
+  const oldCancelled = oldRead.then(
+    () => false,
+    () => true,
+  );
+  let resolveForeign!: (value: { revision: string }) => void;
+  const foreignNetwork = new Promise<{ revision: string }>((resolve) => {
+    resolveForeign = resolve;
+  });
+  const foreignRead = queries.fetchQuery({
+    queryKey: foreign,
+    queryFn: () => foreignNetwork,
+    retry: false,
+  });
+
+  await invalidateDocumentDirectoryViews(queries, scope, "center");
+  expect(await oldCancelled).toBe(true);
+  expect(queries.getQueryState(foreign)?.fetchStatus).toBe("fetching");
+  await expect(
+    queries.fetchQuery({
+      queryKey: first,
+      queryFn: async () => ({ revision: "after" }),
+      staleTime: 0,
+      retry: false,
+    }),
+  ).resolves.toEqual({ revision: "after" });
+
+  // The underlying transport may finish after React Query has cancelled it.
+  resolveOld({ revision: "late-before" });
+  resolveForeign({ revision: "foreign-after" });
+  await expect(foreignRead).resolves.toEqual({ revision: "foreign-after" });
+  expect(queries.getQueryData(first)).toEqual({ revision: "after" });
+  expect(queries.getQueryData(foreign)).toEqual({ revision: "foreign-after" });
+  expect(queries.getQueryState(foreign)?.isInvalidated).toBe(false);
+});
