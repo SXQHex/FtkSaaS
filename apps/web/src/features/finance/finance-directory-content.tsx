@@ -105,7 +105,9 @@ export function FinanceDirectoryContent({
       cursors[page],
     ],
     queryFn: ({ signal }) =>
-      guard(() => readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page], signal)),
+      guard(() =>
+        readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page], signal),
+      ),
     enabled: Boolean(center && period.data && !period.isError && !personal),
     retry: false,
   });
@@ -423,7 +425,10 @@ export function FinanceDirectoryContent({
                 // The command has already verified this person's native finance
                 // readback. Reuse it instead of issuing the same finance_get again.
                 queries.setQueryData(
-                  [...financeKeys.person(scope, saleRefund.personId, saleRefund.currency), undefined],
+                  [
+                    ...financeKeys.person(scope, saleRefund.personId, saleRefund.currency),
+                    undefined,
+                  ],
                   result.finance,
                 );
                 await queries.fetchQuery({
