@@ -160,11 +160,10 @@ export function AccessContent({
     for (const result of [invitationResult, accountResult]) {
       if (result.status === "rejected" && !alreadyRestricted(result.reason)) throw result.reason;
     }
-    if (
-      !((!invitationDenied && invitationResult.status === "fulfilled") ||
-        (!accountDenied && accountResult.status === "fulfilled"))
-    )
-      throw new Error("ACCESS_DIRECTORY_UNAVAILABLE");
+    const refreshed =
+      (!invitationDenied && invitationResult.status === "fulfilled") ||
+      (!accountDenied && accountResult.status === "fulfilled");
+    if (!refreshed) throw new Error("ACCESS_DIRECTORY_UNAVAILABLE");
   }
   const invitationState = invitations.isError
     ? "error"

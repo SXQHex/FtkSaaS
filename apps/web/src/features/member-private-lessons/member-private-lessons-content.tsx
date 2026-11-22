@@ -8,7 +8,10 @@ import type { LessonRequestView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { ScheduleTimeError } from "../schedule/schedule-time";
 import { useMemberCommand } from "../member-profile/use-member-command";
-import { invalidateMemberPrivateLessonLists, memberPrivateLessonKeys } from "./member-private-lessons-query";
+import {
+  invalidateMemberPrivateLessonLists,
+  memberPrivateLessonKeys,
+} from "./member-private-lessons-query";
 import {
   readOwnRequests,
   readOwnRequest,

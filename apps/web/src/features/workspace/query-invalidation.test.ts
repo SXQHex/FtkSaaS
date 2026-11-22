@@ -101,9 +101,10 @@ it("invalidates finance cursor pages for the confirmed person", async () => {
   cache(queries, otherKey);
   const otherCurrency = financeKeys.person(scope, "person-a", "USD");
   cache(queries, [...otherCurrency, "cursor-2"]);
-  const directoryOld = ["finance-directory", ...[scope.accountId, scope.orgId, scope.centerId], "credits", "cursor-2"];
+  const tenant = [scope.accountId, scope.orgId, scope.centerId];
+  const directoryOld = ["finance-directory", ...tenant, "credits", "cursor-2"];
   cache(queries, directoryOld);
-  const debtsOld = ["finance-directory-credit-debts", ...[scope.accountId, scope.orgId, scope.centerId], "old-period"];
+  const debtsOld = ["finance-directory-credit-debts", ...tenant, "old-period"];
   cache(queries, debtsOld);
   await invalidateFinanceViews(queries, scope, "person-a", "TRY");
   expect(queries.getQueryState([...key, "cursor-1"])?.isInvalidated).toBe(true);
@@ -116,7 +117,7 @@ it("invalidates finance cursor pages for the confirmed person", async () => {
 });
 
 
-it("M01 invalidates old private-lesson cursors while preserving other people and tenants", async () => {
+it("M01 invalidates old private-lesson cursors without crossing tenants", async () => {
   const queries = new QueryClient();
   const prefix = memberPrivateLessonKeys.person(scope, "person-a");
   const current = [...prefix, "list", undefined, undefined];
@@ -146,7 +147,7 @@ it("M01 invalidates old private-lesson cursors while preserving other people and
   unsubscribe();
 });
 
-it("M02 marks document filters, catalog levels and version pages stale only in this center", async () => {
+it("M02 invalidates document directory, catalog and versions per center", async () => {
   const queries = new QueryClient();
   const keys = [
     ["document-directory", scope, "center", "acceptance", "all", "cursor-2"],
@@ -162,7 +163,7 @@ it("M02 marks document filters, catalog levels and version pages stale only in t
   expect(queries.getQueryState(otherKey)?.isInvalidated).toBe(false);
 });
 
-it("M03 invalidates invitation/account cursor families without reviving an unauthorized center", async () => {
+it("M03 limits invitation and account invalidation to the center", async () => {
   const queries = new QueryClient();
   const tenant = [scope.accountId, scope.orgId, scope.centerId];
   const first = ["access-invitations", ...tenant, "open", "timezone", undefined];
@@ -176,7 +177,7 @@ it("M03 invalidates invitation/account cursor families without reviving an unaut
   expect(queries.getQueryState(otherKey)?.isInvalidated).toBe(false);
 });
 
-it("M04 invalidates old earnings periods, instructors, catalog and counts without crossing centers", async () => {
+it("M04 invalidates earnings periods, catalog and counts per center", async () => {
   const queries = new QueryClient();
   const keys = [
     ["earnings-directory", scope, "earnings", "person-a", "2026-10", "cursor-2"],
