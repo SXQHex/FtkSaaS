@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import { useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { readWorkspace, workspaceRoles } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
@@ -41,7 +42,7 @@ const empty: StudioViewData = {
 };
 
 export function StudioRoutePage() {
-  const account = useLoaderData({ from: "/o/$orgId/c/$centerId/studio" });
+  const account = useAccountProjection();
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/studio" });
   return (
     <StudioPage

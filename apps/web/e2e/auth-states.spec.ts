@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import { mockNative, origin } from "./auth-fixture.js";
+import { mockNative, openWorkspaceNavigation, origin } from "./auth-fixture.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 async function signIn(page: Page) {
   await page.goto(`${origin}/login`);
@@ -145,4 +145,28 @@ test("states closed organization banner uses the native access mode without assu
   await expect(page.getByRole("status").filter({ hasText: "Panel salt okunur" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Adresi kopyala", exact: true })).toBeEnabled();
   await expect(page.locator("main")).not.toContainText("100 / 100");
+});
+
+test("states SPA navigation shares account cache while direct URL reload rechecks auth", async ({
+  page,
+}) => {
+  const calls = await mockNative(page);
+  await signIn(page);
+  await expect(page.getByRole("heading", { name: "Profil", exact: true })).toBeVisible();
+  const before = calls.account;
+  await page.evaluate("globalThis.__spaMarker = true");
+  await openWorkspaceNavigation(page);
+  const helpNavigation = page.getByRole("navigation", { name: "Yardım", exact: true });
+  await helpNavigation.getByRole("link", { name: "Yardım", exact: true }).click();
+  await expect(page).toHaveURL(`${origin}/help`);
+  await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
+  const spaMarker = await page.evaluate("globalThis.__spaMarker");
+  expect(spaMarker).toBe(true);
+  // The first non-platform route creates one ordinary projection. Workspace
+  // must reuse it rather than issue its own second account_get_v1 call.
+  expect(calls.account - before).toBe(1);
+  const afterNavigation = calls.account;
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
+  expect(calls.account).toBeGreaterThan(afterNavigation);
 });

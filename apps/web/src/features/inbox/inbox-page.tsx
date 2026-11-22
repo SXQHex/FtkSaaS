@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
-import { useLoaderData, useSearch, useNavigate, useRouter } from "@tanstack/react-router";
+import { useSearch, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import type { AccountView } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -12,7 +13,7 @@ import { InboxContent } from "./inbox-content";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { MemberLayout } from "../member/member-layout";
 export function InboxRoutePage() {
-  const account = useLoaderData({ from: "/inbox" }),
+  const account = useAccountProjection(),
     search = useSearch({ from: "/inbox" });
   if (search.view === "member")
     return (

@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
-import { useLoaderData, useParams, useNavigate, useRouter } from "@tanstack/react-router";
+import { useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -10,7 +11,7 @@ import { MergeContent } from "./merge-content";
 import type { AccountView } from "@ftksaas/api-contracts";
 
 export function MergeRoutePage() {
-  const account = useLoaderData({ from: "/o/$orgId/c/$centerId/people_/merge" });
+  const account = useAccountProjection();
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/people_/merge" });
   return (
     <MergePage

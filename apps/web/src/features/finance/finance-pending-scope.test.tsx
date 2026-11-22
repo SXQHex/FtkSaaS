@@ -14,10 +14,12 @@ const state = vi.hoisted(() => ({
   unmounts: 0,
 }));
 vi.mock("@tanstack/react-router", () => ({
-  useLoaderData: () => ({ id: state.accountId, display_name: "Fixture" }),
   useParams: () => ({ orgId: "fixture-org", centerId: "fixture-center" }),
   useNavigate: () => vi.fn(),
   useRouter: () => ({ invalidate: vi.fn() }),
+}));
+vi.mock("../auth/use-account-projection", () => ({
+  useAccountProjection: () => ({ id: state.accountId, display_name: "Fixture" }),
 }));
 vi.mock("react-i18next", async () => {
   const { default: common } = await import("../../locales/tr/common.json");

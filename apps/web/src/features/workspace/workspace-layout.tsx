@@ -94,9 +94,11 @@ export function WorkspaceLayout({
       (error instanceof BackendError &&
         ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
       (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
-    )
+    ) {
+      queries.clear();
       void router.invalidate();
-  }, [scope.error, router]);
+    }
+  }, [scope.error, queries, router]);
   const view = scope.isError && !scopeLocked ? undefined : scope.data;
   const centerId =
     (selectedCenterId && view?.centers.some((center) => center.id === selectedCenterId)

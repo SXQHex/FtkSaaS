@@ -1,7 +1,7 @@
 import { CheckIcon } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
@@ -11,6 +11,7 @@ import { EmailChange } from "./email-change";
 import { ProfilePhotoRow } from "./profile-photo-row";
 import type { PhotoDraft } from "./profile-photo";
 import { BackendError } from "../../lib/backend";
+import { invalidateAccountProjections } from "../auth/account-query";
 import {
   Card,
   CardHeader,
@@ -45,6 +46,7 @@ export function ProfilePanel({
 }) {
   const { t } = useTranslation();
   const router = useRouter();
+  const queries = useQueryClient();
   const profile = useQuery({
     queryKey: ["account-profile", accountId],
     queryFn: () => readProfile(accountId),
@@ -52,6 +54,7 @@ export function ProfilePanel({
   async function refresh() {
     const result = await profile.refetch({ throwOnError: true });
     if (!result.data) throw new Error("PROFILE_UNAVAILABLE");
+    await invalidateAccountProjections(queries);
     await router.invalidate();
     return result.data;
   }

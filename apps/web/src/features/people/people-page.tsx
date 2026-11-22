@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  useLoaderData,
-  useParams,
-  useNavigate,
-  useRouter,
-  useSearch,
-} from "@tanstack/react-router";
+import { useParams, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -22,7 +17,7 @@ import { peopleRow } from "./people-summary";
 import { readMergeDirectory } from "./merge-directory";
 
 export function PeopleRoutePage() {
-  const account = useLoaderData({ from: "/o/$orgId/c/$centerId/people" });
+  const account = useAccountProjection();
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/people" });
   return (
     <PeoplePage

@@ -1,13 +1,8 @@
 import { useCallback, useState } from "react";
-import {
-  useLoaderData,
-  useParams,
-  useSearch,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { useParams, useSearch, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { getSupabaseClient } from "../../lib/supabase";
@@ -17,7 +12,7 @@ import type { SchedulePanelMode } from "./schedule-session-sheet";
 import type { AccountView } from "@ftksaas/api-contracts";
 
 export function ScheduleRoutePage() {
-  const account = useLoaderData({ from: "/o/$orgId/c/$centerId/schedule" });
+  const account = useAccountProjection();
   const search = useSearch({ from: "/o/$orgId/c/$centerId/schedule" });
   const { orgId, centerId } = useParams({ from: "/o/$orgId/c/$centerId/schedule" });
   return (

@@ -1,10 +1,13 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { server } from "../../test/server";
 import type { OrganizationView } from "@ftksaas/api-contracts";
 const { native } = vi.hoisted(() => ({ native: { getSession: vi.fn() } }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
 import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
+import { workspaceQuery } from "./workspace-query";
+import { accountQuery } from "../auth/account-query";
 const accountId = "019a7b00-0000-7000-8000-000000000001";
 const orgId = "019a7b00-0000-7000-8000-000000000002";
 const personId = "019a7b00-0000-7000-8000-000000000003";
@@ -252,4 +255,32 @@ it("blocks a changed actor before any organization discovery", async () => {
   scopeChanged = true;
   await expect(readWorkspace(accountId)).rejects.toThrow("ACCOUNT_CHANGED");
   expect(requests.map((r) => r.operation)).toEqual(["account_get_v1"]);
+});
+
+it("reuses the route identity read while preserving tenant discovery", async () => {
+  native.getSession.mockResolvedValue({
+    data: { session: { access_token: "native-fixture", user: { id: "native-fixture-user" } } },
+    error: null,
+  });
+  const queries = new QueryClient();
+  await queries.query(accountQuery("native-fixture-user"));
+  expect(requests.filter((row) => row.operation === "account_get_v1")).toHaveLength(1);
+  const view = await queries.query(workspaceQuery(queries, accountId, orgId));
+  expect(view.selected?.id).toBe(orgId);
+  expect(requests.filter((row) => row.operation === "account_get_v1")).toHaveLength(1);
+  expect(requests.some((row) => row.operation === "organizations_list_v1")).toBe(true);
+  expect(requests.every((row) => row.bearer === "Bearer native-fixture")).toBe(true);
+});
+
+it("rejects another backend account before listing organizations through Query", async () => {
+  scopeChanged = true;
+  native.getSession.mockResolvedValue({
+    data: { session: { access_token: "native-fixture", user: { id: "native-fixture-user" } } },
+    error: null,
+  });
+  const queries = new QueryClient();
+  await expect(queries.query(workspaceQuery(queries, accountId, orgId))).rejects.toThrow(
+    "ACCOUNT_CHANGED",
+  );
+  expect(requests.map((row) => row.operation)).toEqual(["account_get_v1"]);
 });

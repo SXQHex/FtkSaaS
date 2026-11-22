@@ -1,11 +1,12 @@
 import { useCallback } from "react";
-import { useLoaderData, useSearch, useNavigate } from "@tanstack/react-router";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import type { WorkspaceSelection } from "../workspace/workspace-layout";
 import { InstructorLayout } from "./instructor-layout";
 import { InstructorTodayContent } from "./instructor-today-content";
 export function InstructorTodayRoutePage() {
-  const account = useLoaderData({ from: "/instructor/today" }),
+  const account = useAccountProjection(),
     search = useSearch({ from: "/instructor/today" }),
     navigate = useNavigate();
   const { t } = useTranslation();

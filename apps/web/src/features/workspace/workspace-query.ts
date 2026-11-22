@@ -1,5 +1,6 @@
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { readWorkspace } from "./workspace";
+import { verifiedWorkspaceAccount } from "../auth/account-query";
 
 type Workspace = Awaited<ReturnType<typeof readWorkspace>>;
 
@@ -17,9 +18,14 @@ export function workspaceQuery(queries: QueryClient, accountId: string, organiza
       : undefined;
   return queryOptions({
     queryKey: ["workspace", accountId, organizationId ?? null],
-    queryFn: () => readWorkspace(accountId, organizationId),
+    queryFn: () =>
+      readWorkspace(accountId, organizationId, (session) =>
+        verifiedWorkspaceAccount(queries, session.user.id),
+      ),
     initialData: initial?.data,
     initialDataUpdatedAt: initial?.dataUpdatedAt,
     retry: false,
+    // A loader prefetch error is shown by the workspace shell, not retried on mount.
+    retryOnMount: false,
   });
 }

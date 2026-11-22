@@ -1,9 +1,14 @@
 import { v7 as uuidv7 } from "uuid";
+import type { Session } from "@supabase/supabase-js";
 import { BackendError, createBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import type { OrganizationView, CenterView, RoleView } from "@ftksaas/api-contracts";
 
-export async function readWorkspace(accountId: string, organizationId?: string) {
+export async function readWorkspace(
+  accountId: string,
+  organizationId?: string,
+  readVerifiedAccount?: (session: Session) => Promise<{ id: string }>,
+) {
   const { data, error } = await getSupabaseClient().auth.getSession();
   if (error) throw error;
   if (!data.session) throw new Error("AUTH_REQUIRED");
@@ -13,10 +18,14 @@ export async function readWorkspace(accountId: string, organizationId?: string) 
     publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     getAccessToken: async () => token,
   });
-  const account = await backend.call("account_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-  });
+  // Standalone operations still validate with the pinned native bearer.
+  // Router/Query callers may reuse this actor's verified account projection.
+  const account = readVerifiedAccount
+    ? await readVerifiedAccount(data.session)
+    : await backend.call("account_get_v1", {
+        client_api_version: 1,
+        request_id: uuidv7(),
+      });
   if (account.id !== accountId) throw new Error("ACCOUNT_CHANGED");
   const organizations: OrganizationView[] = [];
   let cursor: string | undefined;
@@ -81,6 +90,12 @@ export async function readWorkspace(accountId: string, organizationId?: string) 
         roles.length = 0;
       }
     }
+  }
+  if (readVerifiedAccount) {
+    const latest = await getSupabaseClient().auth.getSession();
+    if (latest.error) throw latest.error;
+    if (!latest.data.session || latest.data.session.user.id !== data.session.user.id)
+      throw new Error("ACCOUNT_CHANGED");
   }
   return { organizations, selected, centers, roles };
 }

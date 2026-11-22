@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAccountProjection } from "../auth/use-account-projection";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Badge } from "@ftksaas/ui/components/badge";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
@@ -33,7 +34,7 @@ import { PlatformActivityContext, type PlatformActivityEntry } from "./platform-
 
 const route = getRouteApi("/platform");
 export function PlatformRoutePage() {
-  const account = route.useLoaderData();
+  const account = useAccountProjection(true);
   const { organization_id, section, payment_id, studio_request_id } = route.useSearch();
   return (
     <PlatformPage
