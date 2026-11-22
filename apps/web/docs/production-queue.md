@@ -8,7 +8,7 @@
 
 | Öncelik | Teslim dilimi                                                                                          | Kontrol noktası                                                                                                                    |
 | ------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1       | [M05 finans iadesi ve A-ortak cache/mutation kabulü](remaining-work.md#router-query-birlesik)                    | Eski cursor/filtre, zorunlu readback, başka tenant ve bilinmeyen ACK testleri. İlgili key aileleri dışında gereksiz `refetch` yok. |
+| 1       | [M05 finans iadesi ve A-ortak cache/mutation kabulü](remaining-work.md#router-query-birlesik)          | Eski cursor/filtre, zorunlu readback, başka tenant ve bilinmeyen ACK testleri. İlgili key aileleri dışında gereksiz `refetch` yok. |
 | 2       | [M06–M07, M11–M12 oturum/scope ve veri sahibi](remaining-work.md#router-query-birlesik)                | MFA, same-user/new-session, rol iptali, Router history, workspace tek `queryFn`; yanlış/eskimiş yetki görünümü yok.                |
 | 3       | [M08–M10 trafik ve iptal](remaining-work.md#router-query-birlesik)                                     | Önce/sonra istek sayısı ve gecikme ölçülür. Native write/receipt doğrulaması bozulmaz.                                             |
 | 4       | [M13 koşullu, M14 test kararlılığı ve D01–D05 birleşik kabul](remaining-work.md#router-query-birlesik) | Ölçülmemiş optimizasyon yapılmaz; tam birim/Chromium, sonra dört profil ve gerekli gerçek ortam kabulü.                            |
