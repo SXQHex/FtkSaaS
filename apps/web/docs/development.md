@@ -30,25 +30,25 @@ Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium**
 
 ### Veri sahibi ve güvenlik sınırı
 
-- Router \`beforeLoad\` native oturumu/AAL/MFA ve hesap yaşam döngüsünü korur; loader aynı \`QueryClient\` üzerinde \`accountQuery\` hazırlayıp workspace fetch'i başlatır. Hesap DTO'su ikinci Router loader cache'ine dönmez. Backend JWT, org, center, role, plan ve gerçek işlem izninin tek yetki kaynağıdır.
-- \`accountQuery\` key'i native actor + platform projeksiyonunu içerir; \`workspaceQuery\` key'i domain account + org seçimini içerir. Merkez, workspace keşif key'ine eklenmez; gerçek merkezi etkileyen feature sorgularında \`centerId\` bulunur. Organizasyon genelindeki rapor, kişi/abonelik sorgusuna gereksiz center bağımlılığı eklenmez.
-- Native \`SIGNED_IN\` callback'inde aynı kullanıcı UUID'si yeni native session demek değildir; focus/refresh ve gerçekten yeni session ayırımı tamamlanacak açık M07 işidir. \`router.invalidate()\`, Query cache'ini temizlemez; \`AUTH_REQUIRED\`/\`SESSION_REVOKED\` ile \`FORBIDDEN\`/plan retleri aynı genel logout'a dönüştürülmez (M06).
-- \`scopedBackend()\` bugün **her** kullanımda pinned native bearer + uzak \`account_get_v1\` yapar; bu güvenli ama pahalı. Salt Query okumaları için mevcut doğrulanmış projeksiyonu yeniden kullanma, aktör/session bağını korumayı ve backend'in her isteği yetkilendirmesini şart koşar (M08). **Etkili komut, receipt/status ve ayrı idempotency doğrulaması bu performans çalışmasına karıştırılmaz.**
-- \`session-detail\` aynı workspace key'i üzerinde kendi \`queryFn\` sarmalayıcısını tanımlar; ortak factory'yi tüketip erişim kaybını gözlemciye taşıma kararı M11 açık işidir.
+- Router `beforeLoad` native oturumu/AAL/MFA ve hesap yaşam döngüsünü korur; loader aynı `QueryClient` üzerinde `accountQuery` hazırlayıp workspace fetch'i başlatır. Hesap DTO'su ikinci Router loader cache'ine dönmez. Backend JWT, org, center, role, plan ve gerçek işlem izninin tek yetki kaynağıdır.
+- `accountQuery` key'i native actor + platform projeksiyonunu içerir; `workspaceQuery` key'i domain account + org seçimini içerir. Merkez, workspace keşif key'ine eklenmez; gerçek merkezi etkileyen feature sorgularında `centerId` bulunur. Organizasyon genelindeki rapor, kişi/abonelik sorgusuna gereksiz center bağımlılığı eklenmez.
+- Native `SIGNED_IN` callback'inde aynı kullanıcı UUID'si yeni native session demek değildir; focus/refresh ve gerçekten yeni session ayırımı tamamlanacak açık M07 işidir. `router.invalidate()`, Query cache'ini temizlemez; `AUTH_REQUIRED`/`SESSION_REVOKED` ile `FORBIDDEN`/plan retleri aynı genel logout'a dönüştürülmez (M06).
+- `scopedBackend()` bugün **her** kullanımda pinned native bearer + uzak `account_get_v1` yapar; bu güvenli ama pahalı. Salt Query okumaları için mevcut doğrulanmış projeksiyonu yeniden kullanma, aktör/session bağını korumayı ve backend'in her isteği yetkilendirmesini şart koşar (M08). **Etkili komut, receipt/status ve ayrı idempotency doğrulaması bu performans çalışmasına karıştırılmaz.**
+- `session-detail` aynı workspace key'i üzerinde kendi `queryFn` sarmalayıcısını tanımlar; ortak factory'yi tüketip erişim kaybını gözlemciye taşıma kararı M11 açık işidir.
 
 ### Mutation sonrası tutarlılık
 
 - Query key, okuyucunun sonucunu değiştiren bütün değişkenleri (actor/tenant/kişi, filtre, dönem, cursor vb.) kapsar. Başka merkezin key'ini silmeden etkilenen **aile prefix'i** invalid edilir; her eski sayfa anında okunmaz.
-- Native yazma/ACK/receipt → **zorunlu typed readback** → ilişkili Query ailelerini \`refetchType: "none"\` ile stale işaretleme → gerektiği kadar görünür sayfa/özet yenileme sırası korunur. Kaynaklı cache güncelliği açıkları M01–M05 kapsamındadır. Var olan \`peopleKeys\`, \`productsKeys\`, \`leadsKeys\`, \`financeKeys\`, \`memberReservationKeys\` kullanılabilir; bütün feature'lara yeni factory zorlaması yok.
-- \`useMemberCommand\` ve alanın native komut adaptörleri tekrar yazılmaz: kayıp ACK'yi aynı operation key/receipt ile kurtarır, ACK sonrası ikinci write başlatmaz; sonuç okunamıyorsa \`saved-unread\` durumu korunur. Query cancellation etkili komutlara uygulanmaz.
+- Native yazma/ACK/receipt → **zorunlu typed readback** → ilişkili Query ailelerini `refetchType: "none"` ile stale işaretleme → gerektiği kadar görünür sayfa/özet yenileme sırası korunur. Kaynaklı cache güncelliği açıkları M01–M05 kapsamındadır. Var olan `peopleKeys`, `productsKeys`, `leadsKeys`, `financeKeys`, `memberReservationKeys` kullanılabilir; bütün feature'lara yeni factory zorlaması yok.
+- `useMemberCommand` ve alanın native komut adaptörleri tekrar yazılmaz: kayıp ACK'yi aynı operation key/receipt ile kurtarır, ACK sonrası ikinci write başlatmaz; sonuç okunamıyorsa `saved-unread` durumu korunur. Query cancellation etkili komutlara uygulanmaz.
 - Abonelik Query key'i organizasyon düzeylidir; cache'de merkez bağlı işlem scope'u taşımak yerine merkez bilgisi komut hazırlanırken bağlanır (M12). Plan/inbox gibi dışarıdan değişebilen kaynaklar focus/reconnect sırasında yeniden doğrulanabilir; kilitli editör taslağı sessizce değiştirilemez.
 
 ### Trafik ve düşük karmaşıklık sınırı
 
-- Salt-okumalar için \`backend.read(operation, request, signal)\`, Query \`AbortSignal\`'ını gerçek alt \`fetch\`'lere taşır; pahalı/cursor/çok adımlı okuyucularda yaygınlaştırma M10'dur. Standalone doğrulama ve native \`call()\` davranışını değiştirme.
+- Salt-okumalar için `backend.read(operation, request, signal)`, Query `AbortSignal`'ını gerçek alt `fetch`'lere taşır; pahalı/cursor/çok adımlı okuyucularda yaygınlaştırma M10'dur. Standalone doğrulama ve native `call()` davranışını değiştirme.
 - Rezervasyonda seans başına ek başlık/ders, hakedişte görünür eğitmen başına ek toplam okuması önce mevcut typed cevaplarla karşılaştırılır. Ancak gerçek ağ ölçümü fayda gösteriyorsa kısaltılır; yeni genel batch API ölçümsüz oluşturulmaz (M09).
-- Sunum amacıyla key'e büyük DTO koymak (örn. \`event-rows\`, event presentation) zorunlu değil. Yalnız ölçülen yük varsa saf hesaplama/\`useMemo\` yeterli; sunucu sorguları ile asenkron hesap ayrı kalır (M13).
-- **Yapılmayacaklar:** İkinci QueryClient/store, uygulama çapı \`invalidateQueries()\`, kör \`staleTime: 0\`, tüm ekranlara \`useSuspenseQuery\` dayatması, tüm CRUD'ları \`useMutation\`'a taşıma, güvenlik testlerini gevşetme.
+- Sunum amacıyla key'e büyük DTO koymak (örn. `event-rows`, event presentation) zorunlu değil. Yalnız ölçülen yük varsa saf hesaplama/`useMemo` yeterli; sunucu sorguları ile asenkron hesap ayrı kalır (M13).
+- **Yapılmayacaklar:** İkinci QueryClient/store, uygulama çapı `invalidateQueries()`, kör `staleTime: 0`, tüm ekranlara `useSuspenseQuery` dayatması, tüm CRUD'ları `useMutation`'a taşıma, güvenlik testlerini gevşetme.
 
 ### Doğrulama
 
