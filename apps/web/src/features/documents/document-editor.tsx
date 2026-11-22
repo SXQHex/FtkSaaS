@@ -36,6 +36,7 @@ export function DocumentEditor({
   onLockChange,
   onAccessLost,
   onSaved,
+  onCompleted,
   target,
   level = "center",
   history,
@@ -46,6 +47,7 @@ export function DocumentEditor({
   onLockChange: (locked: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
   onSaved: (version: string, publishedScope: "center" | "organization") => void | Promise<void>;
+  onCompleted: (uploadScope: "center" | "organization") => Promise<void>;
   target?: DocumentDirectoryDocument;
   level?: "center" | "organization";
   history?: DocumentDirectoryVersion[];
@@ -94,6 +96,9 @@ export function DocumentEditor({
     onRefresh: async (fileId) => {
       ready.current = fileId;
       setUnknownUpload(false);
+      // File completion is a separate native write. Its ready-unpublished
+      // directory state must also be visible if preview/publication stops here.
+      await onCompleted(upload.current?.request.center_id === null ? "organization" : "center");
     },
   });
   const publication = useMemberCommand({
