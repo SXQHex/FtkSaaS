@@ -41,6 +41,13 @@ export async function invalidateDocumentDirectoryViews(
 ) {
   const affected = (key: readonly unknown[]) => affectedDocumentKey(key, scope, publishedScope);
 
+  // A read started before the confirmed native mutation must not finish into
+  // this cache after the new first-page readback, even if its transport ignores
+  // AbortSignal. Only cancel the affected actor/organization/center families.
+  await queries.cancelQueries({
+    predicate: ({ queryKey }) => affected(queryKey),
+  });
+
   // Inactive catalog/version variants can also have old continuation cursors.
   // Trim every affected infinite query before invalidation: setQueryData clears
   // isInvalidated, and an untrimmed infinite refetch would replay old cursors.
