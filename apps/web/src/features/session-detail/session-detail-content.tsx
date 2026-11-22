@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useNavigate } from "@tanstack/react-router";
@@ -14,7 +15,7 @@ import {
 } from "./session-detail-read";
 import { readScheduleSession } from "../schedule/schedule-read";
 import { readStudioResource } from "../studio/studio";
-import { readWorkspace, workspaceRoles } from "../workspace/workspace";
+import { workspaceRoles } from "../workspace/workspace";
 import { readPeoplePage } from "../people/people";
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { BackendError } from "../../lib/backend";
@@ -85,11 +86,10 @@ export function SessionDetailContent({
       throw failure;
     }
   }
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => guardedRead(() => readWorkspace(scope.accountId, scope.orgId)),
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId);
+  useEffect(() => {
+    if (workspace.error) accessLost(workspace.error);
+  }, [workspace.error, accessLost]);
   const center = !workspace.isError
     ? workspace.data?.centers.find((row) => row.id === scope.centerId && row.accessible)
     : undefined;

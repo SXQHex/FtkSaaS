@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -20,7 +21,7 @@ import {
   type NotificationChange,
 } from "./inbox-batch";
 import { readInboxSource, readMemberSessionNotice } from "./inbox-source";
-import { readWorkspace } from "../workspace/workspace";
+
 import { LinkButton } from "@ftksaas/ui/components/button";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -90,12 +91,7 @@ export function InboxContent({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const stateKey = [...prefix, "state", selected?.id];
   const source = useQuery({
     queryKey: stateKey,

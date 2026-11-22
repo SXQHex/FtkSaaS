@@ -1,3 +1,4 @@
+import { invalidatePeoplePages } from "./people-query";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -166,8 +167,8 @@ function PeopleContent({
       filter,
       cursors[index],
     ],
-    queryFn: () =>
-      readPeoplePage(scope, queryText, cursors[index], filter === "all" ? undefined : filter, true),
+    queryFn: ({ signal }) =>
+      readPeoplePage(scope, queryText, cursors[index], filter === "all" ? undefined : filter, true, signal),
     retry: false,
   });
   const center = useQuery({
@@ -204,10 +205,11 @@ function PeopleContent({
   );
   const created = useCallback(
     async (person: PersonView) => {
+      await invalidatePeoplePages(queries, scope);
       await query.refetch({ throwOnError: true });
       setSelectedId(person.id);
     },
-    [query],
+    [query, queries, scope],
   );
   const rows = query.isError
     ? []

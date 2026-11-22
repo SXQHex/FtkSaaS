@@ -1,5 +1,6 @@
+import { memberReservationKeys, invalidateMemberReservationViews } from "./member-reservations-query";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -29,7 +30,8 @@ export function MemberReservationsContent({
   onLockChange: (locked: boolean) => void;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
   const [upCursors, setUpCursors] = useState<(string | undefined)[]>([undefined]);
   const [pastCursors, setPastCursors] = useState<(string | undefined)[]>([undefined]);
   const [entryCursors, setEntryCursors] = useState<(string | undefined)[]>([undefined]),
@@ -45,7 +47,7 @@ export function MemberReservationsContent({
     sessionId: string;
     label: string;
   }>();
-  const prefix = ["member-reservations", scope.accountId, scope.orgId, scope.centerId, personId];
+  const prefix = memberReservationKeys.person(scope, personId);
   const up = useQuery({
     queryKey: [...prefix, "upcoming", upCursors.at(-1), sessionId],
     queryFn: () => readOwnReservations(scope, personId, "upcoming", upCursors.at(-1), sessionId),
@@ -133,6 +135,7 @@ export function MemberReservationsContent({
     return row.title ?? t(($) => $.memberReservations.unknown);
   }
   async function refresh(purpose: "reservation" | "waitlist") {
+    await invalidateMemberReservationViews(queries, scope, personId);
     const [upcomingResult, pastResult, waitingResult, offersResult] = await Promise.all([
       up.refetch(),
       past.refetch(),

@@ -1,3 +1,4 @@
+import { queryBackendRead } from "../../lib/backend";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
@@ -109,9 +110,10 @@ export async function readEventsPage(
   interval: Interval,
   cursor?: string,
   filters: { query?: string; status?: "all" | EventState; includeSummary?: boolean } = {},
+  signal?: AbortSignal,
 ) {
-  const backend = await scopedBackend(scope);
-  const page = await backend.call("event_list_v1", {
+  const backend = await scopedBackend(scope, signal);
+  const page = await queryBackendRead(backend, "event_list_v1", {
     ...common(scope),
     request_id: uuidv7(),
     interval,
@@ -119,7 +121,7 @@ export async function readEventsPage(
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.includeSummary ? { include_summary: true } : {}),
     page: { limit: 20, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
-  });
+  }, signal);
   if (
     page.items.length > 20 ||
     (cursor && page.next_cursor === cursor) ||
@@ -136,6 +138,7 @@ export async function readEventsPage(
     for (const row of page.items) count.parse(row.active_registration_count);
   }
   const items = await Promise.all(page.items.map((row) => validateEvent(row, scope)));
+  signal?.throwIfAborted();
   return { ...page, items };
 }
 export async function readEvent(scope: ClientScope, id: string, includePaymentSummary = false) {

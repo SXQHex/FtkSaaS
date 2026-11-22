@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -5,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { DocumentDirectoryDocument } from "@ftksaas/api-contracts";
-import { readWorkspace } from "../workspace/workspace";
+
 import { DocumentsView, type DocumentRow, type DocumentAcceptanceRow } from "./documents-view";
 import { DocumentCatalogPanel } from "./document-catalog-panel";
 import { DocumentEditor } from "./document-editor";
@@ -42,12 +43,7 @@ export function DocumentsContent({
     [query, setQuery] = useState(""),
     [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [index, setIndex] = useState(0);
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     (!workspace.isError || preservePending) &&
     workspace.data?.selected?.id === scope.orgId &&

@@ -30,7 +30,9 @@ export function inboxListQuery(
     },
     retry: false,
     staleTime: 15_000,
-    refetchOnWindowFocus: false,
+    // New notifications can arrive without a local mutation.
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 const common = (scope: ClientScope) => ({

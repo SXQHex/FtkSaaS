@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -6,7 +7,7 @@ import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { getTemporal } from "../../lib/temporal";
-import { hasWorkspaceManagementScope, readWorkspace } from "../workspace/workspace";
+import { hasWorkspaceManagementScope } from "../workspace/workspace";
 import { EventsView, type EventRow, type EventFilter } from "./events-view";
 import { EventEditor } from "./event-editor";
 import { eventMonth, readEventsPage, readEventRooms } from "./events-read";
@@ -34,12 +35,7 @@ export function EventsContent({
     [pageIndex, setPageIndex] = useState(0),
     [locked, setLocked] = useState(false),
     [selected, setSelected] = useState<string | null | undefined>();
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
@@ -70,12 +66,12 @@ export function EventsContent({
       cursors[pageIndex],
     ],
     enabled: !!center && !!period.data,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const page = await readEventsPage(scope, period.data!.interval, cursors[pageIndex], {
         query: search,
         status: filter,
         includeSummary: canReadSummary,
-      });
+      }, signal);
       if (page.next_cursor && cursors.includes(page.next_cursor))
         throw new Error("EVENT_PAGE_UNAVAILABLE");
       return page;

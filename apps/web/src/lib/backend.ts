@@ -23,7 +23,9 @@ export function createBackend(config: {
   getAccessToken: () => Promise<string | null>;
 }) {
   async function post(path: string, request: { request_id: string }, options?: RequestInit) {
+    options?.signal?.throwIfAborted();
     const token = await config.getAccessToken();
+    options?.signal?.throwIfAborted();
     if (!token)
       throw new BackendError({
         code: "AUTH_REQUIRED",
@@ -42,6 +44,17 @@ export function createBackend(config: {
     });
   }
   return {
+    // Only opt-in query readers take an AbortSignal. Native writes and operation
+    // receipts still use call() and preserve their idempotency/recovery rules.
+    async read<K extends keyof Operations & RuntimeOperationName>(
+      operation: K,
+      request: Operations[K]["request"],
+      signal?: AbortSignal,
+    ): Promise<Operations[K]["response"]["data"]> {
+      return readEnvelope<Operations[K]["response"]>(
+        await post(operation, request, { signal }),
+      );
+    },
     async call<K extends keyof Operations & RuntimeOperationName>(
       operation: K,
       request: Operations[K]["request"],
@@ -57,6 +70,17 @@ export function createBackend(config: {
       });
     },
   };
+}
+
+// Keep un-cancelled standalone domain reads and native command validation
+// compatible. Only Query-owned reads opt into transport cancellation.
+export function queryBackendRead<K extends keyof Operations & RuntimeOperationName>(
+  backend: ReturnType<typeof createBackend>,
+  operation: K,
+  request: Operations[K]["request"],
+  signal?: AbortSignal,
+): Promise<Operations[K]["response"]["data"]> {
+  return signal ? backend.read(operation, request, signal) : backend.call(operation, request);
 }
 
 export function getBackend(accessToken?: string) {

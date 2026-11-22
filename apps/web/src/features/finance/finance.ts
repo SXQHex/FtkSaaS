@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { FinanceView, RequestCollectionRecord } from "@ftksaas/api-contracts";
 import type { FinanceDraft } from "./finance-action-sheet";
@@ -19,11 +19,12 @@ export async function readFinancePage(
   scope: ClientScope,
   selection: FinanceSelection,
   cursor?: string,
+  signal?: AbortSignal,
 ): Promise<FinanceView> {
   z.uuid().parse(selection.personId);
   currency.parse(selection.currency);
-  const backend = await scopedBackend(scope);
-  const data = await backend.call("finance_get_v1", {
+  const backend = await scopedBackend(scope, signal);
+  const data = await queryBackendRead(backend, "finance_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
     org_id: scope.orgId,
@@ -31,7 +32,7 @@ export async function readFinancePage(
     person_id: selection.personId,
     currency: selection.currency,
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
-  });
+  }, signal);
   if (data.person_id !== selection.personId || data.currency !== selection.currency)
     throw new Error("FINANCE_SOURCE_UNAVAILABLE");
   money.parse(data.credit_available_minor);
@@ -55,6 +56,7 @@ export async function readFinancePage(
     if (debt.center_id && debt.center_id !== scope.centerId)
       throw new Error("FINANCE_SOURCE_UNAVAILABLE");
   }
+  signal?.throwIfAborted();
   return data;
 }
 export async function readCollectionAuthority(scope: ClientScope, personId: string) {
