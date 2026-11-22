@@ -88,52 +88,49 @@ async function setup(
           { gate: "sale", scope: { center_ids: [I.center] }, renewed_acceptance: true },
         ],
       };
+      const items: unknown[] = [];
+      if (r.view === "documents" && state.published) {
+        items.push({
+          key: documentId,
+          kind: "document",
+          document_id: documentId,
+          file_id: fileId,
+          name: "Sentetik belge",
+          created_at: "2026-11-17T00:00:00Z",
+          expires_at: null,
+          state: "published",
+          scope: "center",
+          read_only: false,
+          latest_version: latest,
+          version_count: 1,
+          required_members: 1,
+          pending_members: 1,
+          acceptance_records: 0,
+        });
+      } else if (r.view === "documents" && state.completed) {
+        items.push({
+          key: fileId,
+          kind: "unpublished_file",
+          document_id: null,
+          file_id: fileId,
+          name: "Sentetik belge",
+          created_at: "2026-11-17T00:00:00Z",
+          expires_at: null,
+          state: "ready_unpublished",
+          scope: "center",
+          read_only: false,
+          latest_version: null,
+          version_count: null,
+          required_members: 0,
+          pending_members: 0,
+          acceptance_records: null,
+        });
+      } else if (r.view === "versions" && state.published) {
+        items.push(latest);
+      }
       return send({
         view: r.view,
-        items:
-          r.view === "documents" && state.published
-            ? [
-                {
-                  key: documentId,
-                  kind: "document",
-                  document_id: documentId,
-                  file_id: fileId,
-                  name: "Sentetik belge",
-                  created_at: "2026-11-17T00:00:00Z",
-                  expires_at: null,
-                  state: "published",
-                  scope: "center",
-                  read_only: false,
-                  latest_version: latest,
-                  version_count: 1,
-                  required_members: 1,
-                  pending_members: 1,
-                  acceptance_records: 0,
-                },
-              ]
-            : r.view === "documents" && state.completed
-              ? [
-                  {
-                    key: fileId,
-                    kind: "unpublished_file",
-                    document_id: null,
-                    file_id: fileId,
-                    name: "Sentetik belge",
-                    created_at: "2026-11-17T00:00:00Z",
-                    expires_at: null,
-                    state: "ready_unpublished",
-                    scope: "center",
-                    read_only: false,
-                    latest_version: null,
-                    version_count: null,
-                    required_members: 0,
-                    pending_members: 0,
-                    acceptance_records: null,
-                  },
-                ]
-              : r.view === "versions" && state.published
-                ? [latest]
-                : [],
+        items,
         as_of: "2026-11-17T00:00:00Z",
         next_cursor: null,
         history_available: true,
@@ -350,9 +347,7 @@ test("documents validates before upload and focuses the first invalid field", as
   await expect(dialog.getByLabel("Belge adı", { exact: true })).toBeFocused();
   expect(state.writes).toHaveLength(0);
 });
-test("M02 verified file completion refreshes the ready-unpublished directory without calling publish", async ({
-  page,
-}) => {
+test("M02 refreshes the directory after verified upload completion", async ({ page }) => {
   const state = await setup(page);
   const dialog = await fill(page);
   await expect(
