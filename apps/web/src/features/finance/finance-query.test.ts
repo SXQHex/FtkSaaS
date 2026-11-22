@@ -75,7 +75,7 @@ it("M05 leaves active readers idle and only re-reads the required first page", a
   const first = [...financeKeys.directory(scope), "movements", "November", {}, undefined];
   const old = [...financeKeys.directory(scope), "movements", "November", {}, "cursor-2"];
   const person = [...financeKeys.person(scope, "person-a", "TRY"), undefined];
-  const euro = financeKeys.creditDebt(scope, "person-a", "EUR");
+  const euro = [...financeKeys.creditDebt(scope, "person-a", "EUR")];
   const firstRead = vi.fn(async () => ({ revision: 1 }));
   const oldRead = vi.fn(async () => ({ revision: 1 }));
   const personRead = vi.fn(async () => ({ revision: 1 }));
