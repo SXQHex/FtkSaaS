@@ -2,6 +2,23 @@
 
 Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin tek sahibidir**. [Sıra ve kontrol noktaları](production-queue.md), [kaynak/test/hosted kabulü](00-FtkSaaS-yeni-sohbet-devir.md), [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [domain davranışı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [P08](../../../docs/decisions/P08-accepted-scope.md) kendi sahiplerinde tutulur. Buradaki ölçülebilir kabul senaryoları yeni ürün kuralı değildir. F01–F33/14 modül kapsamı korunur; mevcut sağlam kod yeniden yazılmaz.
 
+<a id="bt01"></a>
+## BT01 — Backend TypeScript ve Edge tip güvenliği
+
+**Durum:** Açık · **Tür:** Ortak backend kalite borcu · **Öncelik:** İlk iş; yeni ürün kuralı veya API davranışı kararı değildir.
+
+**Kaynak bulgusu:** `apps/backend/tsconfig.json` yalnız `tests/types.test.ts` dosyasını içerir; `apps/backend/package.json` içindeki `typecheck` ve `verify` bu kapsamda `tsc --noEmit` çalıştırır. `apps/backend/scripts/build-edge.mjs` `esbuild` ile paketler, TypeScript tiplerini denetlemez. Mevcut AJV request/response doğrulayıcıları statik Edge tip denetiminin yerine geçmez.
+
+**Yapılacaklar:**
+
+- [ ] `backend-v1`, `resend-webhook` ve `personal-calendar` el yazımı Edge TypeScript modüllerini, içe aktarılan `.mjs` transport sınırlarını, ilgili `packages/api-contracts` tiplerini ve açık/örtük `any` akışlarını tara. `JSON.parse()`, `Response.json()`, RPC, Auth ve sağlayıcı yanıtı sınırlarını çıkar; üretilmiş `index.ts`/`validators.js` ile kasıtlı negatif tip testlerini ayrı değerlendir.
+- [ ] Edge modül grafiğini, Deno ortam türleri, `.ts` importları ve `.mjs` tip sınırları dahil, backend `typecheck`/`verify` ve zorunlu CI içinde sıfır hata ile kontrol et. Mevcut sözleşme tip testleri korunur; yalnız bundle üretmek veya `tests/types.test.ts` dosyasını kontrol etmek yeterli değildir.
+- [ ] `backend-v1/handler.ts` içindeki dinamik validator erişimlerini ve `account-signup.ts`, `transactional-email.ts`, `invitation-delivery.ts`, `lifecycle-auth.ts` dahil tüm Edge dış veri sınırlarını gerçek tip/şema doğrulamasıyla güvenli hale getir. Doğrulanmamış veriyi `unknown` tut; el yazımı kaynakta `any`, `as any`, yeni `@ts-ignore`/`@ts-nocheck` veya kontrolü atlayan cast kullanma.
+- [ ] `tests/types.test.ts` içindeki iki `@ts-expect-error` negatif tip testini koru; geçersiz sözleşme/JSON, eksik veya yanlış RPC claim, Auth/MFA ve sağlayıcı yanıtlarını reddeden regresyonları ekle veya mevcut testlerle doğrula. Yetki/tenant sınırı, hata kodları, idempotency ve istemci uyumluluğu değişmez.
+- [ ] Etkilenen testleri, üretilmiş validator/Edge bundle eşitliğini, backend tip/verify/kalite kontrollerini ve gerçek kaynak bağlı aday CI kabulünü geçir. TypeScript/CI konfigürasyonu trusted politika yüzeyidir; onay veya kalite kapısı gevşetmesi atlanmaz. İstemciye sunulan davranış değişirse `packages/api-contracts` aynı teslimde güncellenir.
+
+**Kabul:** El yazımı Edge kaynaklarının tamamı CI'da statik tip denetiminden geçer; denetimi aşan `any`/susturma yoktur; dış verinin şekli kullanımdan önce doğrulanır; mevcut runtime güvenlik ve sözleşme regresyonları başarılıdır. Kaynak, CI, merge ve ortam kanıtı ayrı ayrı [backend devrinde](00-FtkSaaS-yeni-sohbet-devir.md) tutulur.
+
 <a id="web1-v67-backend"></a>
 ## Web1 v67 backend talepleri
 
