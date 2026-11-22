@@ -65,9 +65,7 @@ export async function invalidateFinanceViews(
     ),
   ]);
   await Promise.all([
-    ...families.map((queryKey) =>
-      queries.invalidateQueries({ queryKey, refetchType: "none" }),
-    ),
+    ...families.map((queryKey) => queries.invalidateQueries({ queryKey, refetchType: "none" })),
     ...[...creditKeys, ...reportKeys].map((queryKey) =>
       queries.invalidateQueries({ queryKey, exact: true, refetchType: "none" }),
     ),

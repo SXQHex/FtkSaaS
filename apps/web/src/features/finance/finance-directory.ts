@@ -53,18 +53,23 @@ export async function readFinanceDirectory(
   signal?: AbortSignal,
 ) {
   const backend = await scopedBackend(scope, signal);
-  const data = await queryBackendRead(backend, "finance_directory_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    view,
-    interval: { ...interval },
-    ...(filters.query?.trim() ? { query: filters.query.trim() } : {}),
-    ...(filters.kind ? { kind: filters.kind } : {}),
-    ...(filters.method ? { method: filters.method } : {}),
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-  }, signal);
+  const data = await queryBackendRead(
+    backend,
+    "finance_directory_get_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      view,
+      interval: { ...interval },
+      ...(filters.query?.trim() ? { query: filters.query.trim() } : {}),
+      ...(filters.kind ? { kind: filters.kind } : {}),
+      ...(filters.method ? { method: filters.method } : {}),
+      page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
   if (data.view !== view || data.items.length > 20 || (cursor && data.next_cursor === cursor))
     throw new Error("FINANCE_DIRECTORY_UNAVAILABLE");
   z.iso.datetime({ offset: true }).parse(data.as_of);

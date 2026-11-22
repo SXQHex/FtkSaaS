@@ -97,13 +97,7 @@ export function FinanceDirectoryContent({
     retry: false,
   });
   const directory = useQuery({
-    queryKey: [
-      ...financeKeys.directory(scope),
-      tab,
-      period.data?.interval,
-      filters,
-      cursors[page],
-    ],
+    queryKey: [...financeKeys.directory(scope), tab, period.data?.interval, filters, cursors[page]],
     queryFn: ({ signal }) =>
       guard(() =>
         readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page], signal),

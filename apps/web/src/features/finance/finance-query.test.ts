@@ -86,8 +86,7 @@ it("M05 leaves active readers idle and only re-reads the required first page", a
     { queryKey: person, queryFn: personRead },
     { queryKey: euro, queryFn: euroRead },
   ];
-  for (const record of records)
-    await queries.fetchQuery({ ...record, staleTime: Infinity });
+  for (const record of records) await queries.fetchQuery({ ...record, staleTime: Infinity });
   const unsubscribers = records.map((record) =>
     new QueryObserver(queries, { ...record, staleTime: Infinity }).subscribe(() => {}),
   );
