@@ -37,7 +37,10 @@ it("M04 invalidates historical earnings cursors without a tenant spill", async (
 
   const catalog = earningsKeys.instructorCatalog(scope);
   const source = [...earningsKeys.paymentSource(scope), "person-a"];
-  const pages = { pages: [{ revision: 1 }, { revision: 2 }], pageParams: [undefined, "old-cursor"] };
+  const pages = {
+    pages: [{ revision: 1 }, { revision: 2 }],
+    pageParams: [undefined, "old-cursor"],
+  };
   for (const key of [catalog, source]) queries.setQueryData(key, pages);
 
   const untouched = [
