@@ -240,8 +240,9 @@ export async function mockSessionDetail(
         const cursor = req.page.cursor as string | undefined;
         participantReads.push({ cursor, afterWrite: writes.length > 0 });
         // Mutation reorders this native directory: the old continuation is invalid.
-        if (cursor === "stale-participant" && writes.length > 0)
+        if (cursor === "stale-participant" && writes.length > 0) {
           return reject("VALIDATION_FAILED");
+        }
         let nextCursor: string | null = null;
         if (!cursor) {
           nextCursor = writes.length > 0 ? "fresh-participant" : "stale-participant";
