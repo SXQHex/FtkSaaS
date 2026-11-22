@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import type { StarterRetainedScope } from "@ftksaas/api-contracts";
 import {
   mockCompletion,
   nativePage,
@@ -8,6 +9,7 @@ import {
   at,
   completionUrl,
   type NativeRequest,
+  type RecordedRequest,
 } from "./pro-completion-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 export async function mockSettingsCompletion(
@@ -20,7 +22,7 @@ export async function mockSettingsCompletion(
     startUrl?: string | null;
   } = {},
 ) {
-  const writes: { op: string; r: NativeRequest }[] = [];
+  const writes: RecordedRequest[] = [];
   const state = {
     version: { organization: 1, center: 1 },
     inherited: {} as Record<string, { kind: string; organization_version: number }>,
@@ -79,8 +81,8 @@ export async function mockSettingsCompletion(
     subVersion: 2,
     pending: false,
     transitioned: false,
-    kept: undefined as NativeRequest | undefined,
-    keptCenterId: undefined as string | undefined,
+    kept: undefined as StarterRetainedScope | undefined,
+    keptCenterId: undefined as string | null | undefined,
     failed: false,
   };
   const target = {
@@ -108,7 +110,7 @@ export async function mockSettingsCompletion(
     version: 2,
     account_access_granted: true,
   };
-  const roles: NativeRequest[] = [
+  const roles = [
     staff,
     { ...staff, id: uid(120), role: "instructor" },
     { ...staff, id: uid(121), person_id: uid(130), role: "center_manager" },
@@ -420,18 +422,17 @@ export async function mockSettingsCompletion(
       await send(nativeMutation(uid(109)));
     }
     if (
-      [
-        "org_manager_assign_v1",
-        "org_manager_revoke_v1",
-        "center_manager_assign_v1",
-        "center_manager_revoke_v1",
-      ].includes(op)
+      op === "org_manager_assign_v1" ||
+      op === "org_manager_revoke_v1" ||
+      op === "center_manager_assign_v1" ||
+      op === "center_manager_revoke_v1"
     ) {
-      writes.push({ op, r });
+      writes.push({ op, r } as RecordedRequest);
       const role = op.startsWith("org_") ? "org_manager" : "center_manager";
       const existing = roles.find((row) => row.person_id === r.person_id && row.role === role);
       if (op.includes("revoke")) {
-        if (!existing || existing.version !== r.expected_version) throw Error("FIXTURE_STALE_ROLE");
+        if (!("expected_version" in r) || !existing || existing.version !== r.expected_version)
+          throw Error("FIXTURE_STALE_ROLE");
         existing.state = "inactive";
         existing.version++;
         await send(nativeMutation(existing.id));
@@ -474,7 +475,14 @@ export async function mockSettingsCompletion(
     }
     if (op === "management_state_get_v1") {
       const operation = r.operation,
-        key = r.selector.key;
+        key = r.selector.key as {
+          target_plan_id?: string;
+          kept_center_id?: string | null;
+          person_id?: string;
+          role?: string;
+          permission?: string;
+        };
+      const resources = "resources" in r.selector ? r.selector.resources : undefined;
       if (operation === "policy_publish_v1")
         await send(
           nativePage([
@@ -514,8 +522,8 @@ export async function mockSettingsCompletion(
           },
           state.subVersion,
         );
-        if (r.selector.resources) {
-          const kind = r.selector.resources;
+        if (typeof resources === "string" && resources) {
+          const kind = resources;
           const resource =
             kind === "rooms"
               ? { id: I.room, display_name: "Ana salon" }
@@ -575,7 +583,7 @@ export async function mockSettingsCompletion(
               })),
           ),
         );
-      if (operation === "permission_set_v1")
+      if (operation === "permission_set_v1" && key.permission)
         await send(
           nativePage([
             metadata(

@@ -2,7 +2,7 @@ import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
-import { uid } from "./pro-completion-fixture.js";
+import { uid, requestsFor } from "./pro-completion-fixture.js";
 import { openWorkspaceSearch, origin } from "./auth-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 async function confirm(page: import("@playwright/test").Page) {
@@ -327,7 +327,9 @@ test("program duration changes only the reviewed center setting and survives a f
     op: "settings_update_v1",
     r: { scope: "center", org_id: I.org, center_id: I.center, expected_version: 1 },
   });
-  expect(f.writes[0]?.r.patch).toEqual({ program_duration_minutes: 75 });
+  expect(requestsFor(f.writes, "settings_update_v1")[0]?.r.patch).toEqual({
+    program_duration_minutes: 75,
+  });
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await page.reload();
   await expect(duration).toHaveValue("75");
@@ -366,7 +368,7 @@ test("V07.1 reviews organization billing fields and reloads the saved values wit
     r: { scope: "organization", org_id: I.org, expected_version: 1 },
   });
   expect(f.writes[0]?.r).not.toHaveProperty("center_id");
-  expect(f.writes[0]?.r.patch).toEqual({
+  expect(requestsFor(f.writes, "settings_update_v1")[0]?.r.patch).toEqual({
     billing_name: "Örnek Atölye",
     billing_address: "Örnek Sokak\nAnkara",
     billing_email: null,
@@ -403,7 +405,7 @@ test("E42 saves an automation preparation and restores the organization source w
   expect(f.writes).toHaveLength(0);
   await confirm(page);
   await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
-  expect(f.writes[0]?.r.patch).toEqual({
+  expect(requestsFor(f.writes, "settings_update_v1")[0]?.r.patch).toEqual({
     automation_templates: [
       {
         key: expect.stringMatching(/^template-/),
@@ -474,7 +476,7 @@ test("E42 edits event capacity, payment and cancellation defaults without creati
     op: "settings_update_v1",
     r: { scope: "center", center_id: I.center, expected_version: 1 },
   });
-  expect(f.writes[0]?.r.patch).toEqual({
+  expect(requestsFor(f.writes, "settings_update_v1")[0]?.r.patch).toEqual({
     event_templates: [
       {
         key: expect.stringMatching(/^template-/),
@@ -530,7 +532,7 @@ test("E42 saves a weekly program template with exact clock and category capacity
     center_id: I.center,
     expected_version: 1,
   });
-  expect(f.writes[0]?.r.patch).toEqual({
+  expect(requestsFor(f.writes, "settings_update_v1")[0]?.r.patch).toEqual({
     program_templates: [
       {
         key: expect.stringMatching(/^template-/),
@@ -570,7 +572,7 @@ test("E42 manages a center payment template and an organization CRM template wit
     center_id: I.center,
     expected_version: 1,
   });
-  expect(f.writes[0]?.r.patch).toEqual({
+  expect(requestsFor(f.writes, "settings_update_v1")[0]?.r.patch).toEqual({
     collection_templates: [
       {
         key: "cash",
@@ -769,7 +771,7 @@ for (const target of [
       kept_center_id: uid(141),
     });
     if (target.name === "Starter") {
-      expect(writes[0]?.r.kept_scope).toEqual({
+      expect(requestsFor(f.writes, "subscription_downgrade_request_v1")[0]?.r.kept_scope).toEqual({
         room_id: I.room,
         discipline_id: I.discipline,
         instructor_id: I.instructor,
@@ -819,8 +821,8 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   await manage.press("Space");
   manageReview = await confirm(page);
   await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
-  const changes = f.writes.filter(
-    (row) => row.op === "permission_set_v1" && row.r.permission === "person.manage",
+  const changes = requestsFor(f.writes, "permission_set_v1").filter(
+    (row) => row.r.permission === "person.manage",
   );
   expect(changes.map((row) => row.r.enabled)).toEqual([true, false]);
   expect(changes.map((row) => row.r.expected_version)).toEqual([4, 5]);
