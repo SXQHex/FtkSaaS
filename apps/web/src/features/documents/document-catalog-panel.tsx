@@ -55,7 +55,15 @@ export function DocumentCatalogPanel({
   const [saved, setSaved] = useState<DocumentCatalogIntent["request"]["action"]>();
   const organization = document.scope === "organization";
   const documentId = document.document_id!;
-  const key = ["native-document-catalog", scope, organization, documentId];
+  // A newly published version can change the visible translation source while
+  // this panel remains mounted; the new version must not reuse old catalog data.
+  const key = [
+    "native-document-catalog",
+    scope,
+    organization,
+    documentId,
+    document.latest_version?.version_id,
+  ];
   const query = useQuery({
     queryKey: key,
     queryFn: () => readDocumentCatalog(scope, organization, documentId),
