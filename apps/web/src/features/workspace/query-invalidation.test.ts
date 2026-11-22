@@ -116,7 +116,6 @@ it("invalidates finance cursor pages for the confirmed person", async () => {
   expect(queries.getQueryState(debtsOld)?.isInvalidated).toBe(true);
 });
 
-
 it("M01 invalidates old private-lesson cursors without crossing tenants", async () => {
   const queries = new QueryClient();
   const prefix = memberPrivateLessonKeys.person(scope, "person-a");

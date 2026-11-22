@@ -138,6 +138,7 @@ export function AccessContent({
             queryKey: invitationKey(),
             queryFn: () => readInvitations(),
             staleTime: 0,
+            retry: false,
           }),
       accountDenied
         ? Promise.resolve()
@@ -145,6 +146,7 @@ export function AccessContent({
             queryKey: accountKey(),
             queryFn: () => readAccounts(),
             staleTime: 0,
+            retry: false,
           }),
     ]);
     // Keep an already denied directory on its failing query, rather than
