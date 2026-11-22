@@ -243,8 +243,9 @@ export async function mockSessionDetail(
         if (cursor === "stale-participant" && writes.length > 0)
           return reject("VALIDATION_FAILED");
         let nextCursor: string | null = null;
-        if (!cursor)
+        if (!cursor) {
           nextCursor = writes.length > 0 ? "fresh-participant" : "stale-participant";
+        }
         return send({
           items: cursor || !reservation ? [] : [reservation],
           next_cursor: nextCursor,
