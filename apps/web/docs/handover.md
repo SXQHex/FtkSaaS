@@ -20,3 +20,10 @@ Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. [İlk açık ve
 - **Kök desen:** filtre/cursor Query ailesi ile native receipt/readback sonrasındaki sadece aktif sayfa `refetch` işlemi ayrık bırakılıyor; eski continuation cursor'ı mutation sonrası geçersiz olabilir. Doğru mevcut uygulamalar (`peopleKeys`, `productsKeys`, `leadsKeys`, `memberReservationKeys`) korunuyor, eksik readback'ler ve ilişki sorguları hedefli düzeltiliyor.
 - **Aday:** [PR #374](https://github.com/SXQHex/FtkSaaS/pull/374) genişletildi. Ortak `lib/cache-invalidation.ts` yalnız etkilenmiş key ailelerini stale işaretler; ilk sayfa readback başarısızsa `saved` ilan edilemez. Native komut ve receipt kodu, test/CI eşikleri, backend alanı değiştirilmedi.
 - **Kapanış sınırı:** PR'ın son SHA'sında unit/coverage/typecheck/lint/format/build, tam Desktop Chromium shard, sayfa-2→write/receipt→ilk sayfa→eski cursor olumsuz örneği ve tenant izolasyonu doğrulanana kadar M01–M05/A kutuları **açık**. Merge/main, dört tarayıcı ve hosted kabulü ayrı kaydedilecek.
+
+## 22 Kasım 2026 · M01 bağımsız kod kapanış adayı
+
+- M01 kapsamı M02–M05 işlerinin ayrı domain kabullerinden ayrıldı; belge/erişim/hakediş/finans kanıtları M01 kapatmak için kullanılmaz. PR #374 (`cf97d4a`) frontend genelinde ilk cache/readback mekanizmasını `main`e taşıdı: 12/12 Chromium ve merge kanıtı başarılı.
+- Son kaynak taramasında M01 ortak düzeyindeki kalan somut eksik: seans detayı mutation yenilemesi `refetchType: "active"` ile katılımcı/bekleme listesi eski continuation cursor'larını tekrar okuyordu. Yeni aday seans ve katılımcı ilk sayfasını zorunlu doğrular; diğer cached aileleri tenant/session prefix'iyle stale işaretler, bekleme zincirini yazma sonrası sıfırlar.
+- Yeni unit + Playwright senaryosu: eski katılımcı sayfası, native yoklama yazma ve receipt, eski cursor'ın kullanılamaması, ilk sayfa + yeni cursor, tek writer ve yabancı merkez cache izolasyonu. M02–M05 ile A-ortak kabulü bağımsız açık kalır.
+- **Bu satır aday kaydıdır.** Tam commit SHA, zorunlu CI ve tarayıcı kanıtı oluşmadan M01 checkbox işaretlenmez; merge/production ayrıca yetkilendirilir.

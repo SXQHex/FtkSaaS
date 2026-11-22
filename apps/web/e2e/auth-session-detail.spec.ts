@@ -315,3 +315,40 @@ for (const [action, trigger, heading] of [
     expect(state.writes).toHaveLength(0);
   });
 }
+
+test("M01 session mutation resets stale participant cursors", async ({ page }) => {
+  const state = await mockSessionDetail(page, {
+    existing: true,
+    centerManager: true,
+    paginatedParticipants: true,
+  });
+  await page.getByRole("tab", { name: "Katılımcılar", exact: true }).click();
+  await expect(page.getByRole("grid", { name: "Katılımcılar", exact: true })).toBeVisible();
+  const next = page.getByRole("button", { name: "Sonraki sayfa", exact: true }).first();
+  await next.click();
+  const oldReads = () =>
+    state.participantReads.filter((read) => read.cursor === "stale-participant").length;
+  await expect.poll(oldReads).toBe(1);
+  await page.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  const dialog = page.getByRole("alertdialog");
+  await dialog.getByLabel("Gerekçe", { exact: true }).fill("Seans şimdi başladı");
+  await dialog
+    .getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true })
+    .press("Space");
+  await dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await expect(
+    dialog.getByText("İşlem kaydedildi; güncel yoklama ve seans okundu.", { exact: true }),
+  ).toBeVisible();
+  const staleAfterWrite = state.participantReads.filter(
+    (read) => read.cursor === "stale-participant" && read.afterWrite,
+  );
+  expect(staleAfterWrite).toHaveLength(0);
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  const previous = page.getByRole("button", { name: "Önceki sayfa", exact: true }).first();
+  await expect(previous).toBeDisabled();
+  await next.click();
+  const freshReads = () =>
+    state.participantReads.filter((read) => read.cursor === "fresh-participant").length;
+  await expect.poll(freshReads).toBe(1);
+  expect(state.writes.filter((write) => write.operation === "attendance_start_v1")).toHaveLength(1);
+});

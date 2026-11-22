@@ -31,6 +31,7 @@ export async function mockSessionDetail(
     starterRoleGate?: boolean;
     attendanceUnknown?: boolean;
     attendanceAckUnread?: boolean;
+    paginatedParticipants?: boolean;
     attendanceWindow?: AttendanceView["attendance_window"];
     centerManager?: boolean;
     now?: Date;
@@ -49,6 +50,7 @@ export async function mockSessionDetail(
       { operation: string; type: "sessions" | "reservations"; id: string }
     >();
   const calendarReads: Record<string, unknown>[] = [];
+  const participantReads: { cursor?: string; afterWrite: boolean }[] = [];
   const start = (options.now?.getTime() ?? Date.now()) + (options.existing ? -20 : 60) * 60000;
   const session: SessionView = options.source?.session ?? {
     id: S.session,
@@ -234,6 +236,23 @@ export async function mockSessionDetail(
     }
     if (operation === "reservation_list_v1") {
       expect(req.session_id).toBe(S.session);
+      if (options.paginatedParticipants && !req.person_id) {
+        const cursor = req.page.cursor as string | undefined;
+        participantReads.push({ cursor, afterWrite: writes.length > 0 });
+        // Mutation reorders this native directory: the old continuation is invalid.
+        if (cursor === "stale-participant" && writes.length > 0) {
+          return reject("VALIDATION_FAILED");
+        }
+        let nextCursor: string | null = null;
+        if (!cursor) {
+          nextCursor = writes.length > 0 ? "fresh-participant" : "stale-participant";
+        }
+        return send({
+          items: cursor || !reservation ? [] : [reservation],
+          next_cursor: nextCursor,
+          as_of: new Date().toISOString(),
+        });
+      }
       if (options.ackUnread && reservation && !options.existing && req.person_id && !unread) {
         unread = true;
         return reject("TEMPORARY_FAILURE");
@@ -490,6 +509,7 @@ export async function mockSessionDetail(
     writes,
     reads,
     calendarReads,
+    participantReads,
     get reservation() {
       return reservation;
     },
