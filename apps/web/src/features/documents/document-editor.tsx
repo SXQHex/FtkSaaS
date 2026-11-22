@@ -45,7 +45,7 @@ export function DocumentEditor({
   onClose: () => void;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
-  onSaved: (version: string) => void | Promise<void>;
+  onSaved: (version: string, publishedScope: "center" | "organization") => void | Promise<void>;
   target?: DocumentDirectoryDocument;
   level?: "center" | "organization";
   history?: DocumentDirectoryVersion[];
@@ -102,7 +102,7 @@ export function DocumentEditor({
     readResult: readPublication,
     onAccessLost,
     onRefresh: async (result) => {
-      await onSaved(result.versionLabel!);
+      await onSaved(result.versionLabel!, result.publishedScope);
     },
   });
   const locked = busy || unknownUpload || completion.locked || publication.locked;
