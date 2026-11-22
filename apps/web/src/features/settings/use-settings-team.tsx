@@ -133,6 +133,11 @@ export function useSettingsTeam({
       staleTime: 0,
       retry: false,
     });
+    // The selected person's permission matrix has a separate Query key.
+    // Invalidation alone is not an authoritative readback for the checkbox.
+    if (person && level === "center" && visible) {
+      await permissions.refetch({ throwOnError: true });
+    }
     setPosition({ key: filterKey, cursors: [undefined], index: 0 });
   }
   const command = useMemberCommand({

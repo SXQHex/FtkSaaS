@@ -139,6 +139,15 @@ export function InboxContent({
           visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
         }),
     });
+    // The member navigation bell consumes the unfiltered first-page cache.
+    // Reading a filtered page alone leaves its unread badge stale.
+    if (query || filter !== "all") {
+      await queries.fetchQuery({
+        ...inboxListQuery(scope),
+        staleTime: 0,
+        retry: false,
+      });
+    }
     setCursors([undefined]);
     setIndex(0);
   }
