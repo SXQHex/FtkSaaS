@@ -27,6 +27,47 @@ test("manager native directory preserves global currency totals, historical agre
   await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
   await expect(page.getByText("Nakit", { exact: true })).toBeVisible();
 });
+test("payment refreshes historical period and person cursor pages after native readback", async ({
+  page,
+}) => {
+  const f = await mockEarnings(page, { paginate: true });
+  // Historical earning and payment occur in different months. The backend owns
+  // period filtering, so both old cursor pages must be read with the old interval.
+  f.earning.earning.created_at = "2026-10-10T12:00:00Z";
+  await page.getByRole("button", { name: /Ekim 2026/ }).click();
+  await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
+  await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
+  await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
+  const oldPeriodReads = () =>
+    f.reads.filter(
+      (row) =>
+        row.view === "earnings" &&
+        row.person_id === I.instructor &&
+        row.page.cursor === "native-next" &&
+        row.interval,
+    );
+  expect(oldPeriodReads()).toHaveLength(1);
+  const historicalInterval = oldPeriodReads()[0]!.interval;
+
+  await page.getByRole("tab", { name: "Eğitmenler", exact: true }).click();
+  const dialog = await fillEarningsPayment(page);
+  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(
+    page.getByText("Ödeme ve güncel hakediş doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  expect(f.writes).toHaveLength(1);
+  await expect(page.getByText("₺300,00 · €0,00", { exact: true }).first()).toBeVisible();
+
+  await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
+  await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
+  expect(oldPeriodReads()).toHaveLength(2);
+  expect(oldPeriodReads()[1]!.interval).toEqual(historicalInterval);
+});
 test("record payment requires explicit native earning, currency, real reference and center-local instant then rereads all views", async ({
   page,
 }) => {
