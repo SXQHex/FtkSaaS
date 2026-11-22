@@ -65,7 +65,7 @@ test("payment refreshes historical period and person cursor pages after native r
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
   await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
-  expect(oldPeriodReads()).toHaveLength(2);
+  await expect.poll(() => oldPeriodReads().length).toBe(2);
   expect(oldPeriodReads()[1]!.interval).toEqual(historicalInterval);
 });
 test("record payment requires explicit native earning, currency, real reference and center-local instant then rereads all views", async ({
