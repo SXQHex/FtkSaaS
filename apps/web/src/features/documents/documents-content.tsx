@@ -1,4 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { invalidateDocumentDirectoryViews } from "./documents-query";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -245,9 +246,15 @@ export function DocumentsContent({
       : undefined);
   const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
   async function refresh() {
-    const results = await Promise.all([page.refetch(), catalog.refetch()]);
+    await invalidateDocumentDirectoryViews(queries, scope);
+    const results = await Promise.all([
+      page.refetch(),
+      catalog.refetch(),
+      ...(active && versionTarget?.document_id && !versionTarget.read_only
+        ? [versions.refetch()]
+        : []),
+    ]);
     if (results.some((row) => row.isError)) throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
-    await queries.invalidateQueries({ queryKey: ["document-versions", scope] });
   }
   function retry() {
     setLost(false);

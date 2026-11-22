@@ -1,4 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { invalidateEarningsViews } from "./earnings-query";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -164,9 +165,12 @@ export function EarningsContent({
     setSaved(false);
   };
   async function refresh() {
+    await invalidateEarningsViews(queries, scope);
     const outcomes = await Promise.all([page.refetch(), catalog.refetch()]);
     if (outcomes.some((value) => value.isError)) throw Error("EARNINGS_REFRESH_UNAVAILABLE");
-    await queries.invalidateQueries({ queryKey: ["earnings-visible-counts", scope] });
+    if (view === "instructors" && active && page.data) {
+      await counts.refetch({ throwOnError: true });
+    }
   }
   async function reload() {
     resetPage();

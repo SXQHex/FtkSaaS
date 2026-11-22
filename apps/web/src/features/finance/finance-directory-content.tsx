@@ -15,6 +15,7 @@ import {
 } from "./finance-directory";
 import { readFinancePage } from "./finance";
 import { SaleRefundEditor } from "./sale-refund-editor";
+import { invalidateFinanceViews } from "./finance-query";
 import type { SaleRefundSource } from "./sale-refund";
 
 import { BackendError } from "../../lib/backend";
@@ -432,7 +433,16 @@ export function FinanceDirectoryContent({
               sourceAvailable={Boolean(center && !workspace.isError)}
               onClose={() => setSaleRefund(undefined)}
               onRefresh={async () => {
+                await invalidateFinanceViews(
+                  queries,
+                  scope,
+                  saleRefund.personId,
+                  saleRefund.currency,
+                );
                 await directory.refetch({ throwOnError: true });
+                if (tab === "credits" && source?.items.length) {
+                  await creditDebts.refetch({ throwOnError: true });
+                }
               }}
               onLockChange={changeLock}
               onAccessLost={accessLost}

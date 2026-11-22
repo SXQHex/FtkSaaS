@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import type { LessonRequestView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { ScheduleTimeError } from "../schedule/schedule-time";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { invalidateMemberPrivateLessonLists, memberPrivateLessonKeys } from "./member-private-lessons-query";
 import {
   readOwnRequests,
   readOwnRequest,
@@ -52,7 +53,8 @@ export function MemberPrivateLessonsContent({
   requestId?: string;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [draft, setDraft] = useState(blank),
     [target, setTarget] = useState<{
@@ -65,7 +67,7 @@ export function MemberPrivateLessonsContent({
     [offsets, setOffsets] = useState<{ id: string; label: string }[]>([]),
     [saved, setSaved] = useState<LessonRequestView>();
   const retryButton = useRef<HTMLButtonElement>(null);
-  const prefix = ["member-private-lessons", scope.accountId, scope.orgId, scope.centerId, personId];
+  const prefix = memberPrivateLessonKeys.person(scope, personId);
   const list = useQuery({
     queryKey: [...prefix, "list", cursors.at(-1), requestId],
     queryFn: () => readOwnRequests(scope, personId, cursors.at(-1), requestId),
@@ -100,8 +102,9 @@ export function MemberPrivateLessonsContent({
     readResult: readOwnRequestResult,
     onAccessLost: accessLost,
     onRefresh: async (result) => {
-      setSaved(result);
+      await invalidateMemberPrivateLessonLists(queries, scope, personId);
       await list.refetch({ throwOnError: true });
+      setSaved(result);
     },
   });
   const locked = preparing || command.locked;
