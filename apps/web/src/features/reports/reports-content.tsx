@@ -41,6 +41,11 @@ import type { ReportAction } from "./report-search";
 import { downloadReport, readJob } from "./reports-command";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
+// Called only from a user-triggered refresh, never during a React render.
+function freshReportAnchor() {
+  return new Date().toISOString();
+}
+
 export function ReportsContent({
   scope,
   onLockChange,
@@ -310,7 +315,7 @@ export function ReportsContent({
         : [],
     );
   async function refresh(kind?: "imports" | "exports") {
-    const nextAnchor = new Date().toISOString();
+    const nextAnchor = freshReportAnchor();
     await invalidateCachedFamilies(queries, [
       ["report-view", scope],
       ["report-finance-summary", scope],
