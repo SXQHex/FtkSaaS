@@ -439,10 +439,26 @@ export function FinanceDirectoryContent({
                   saleRefund.personId,
                   saleRefund.currency,
                 );
-                await directory.refetch({ throwOnError: true });
-                if (tab === "credits" && source?.items.length) {
-                  await creditDebts.refetch({ throwOnError: true });
-                }
+                await queries.fetchQuery({
+                  queryKey: [
+                    "finance-directory",
+                    scope.accountId,
+                    scope.orgId,
+                    scope.centerId,
+                    tab,
+                    period.data?.interval,
+                    filters,
+                    undefined,
+                  ],
+                  queryFn: () =>
+                    guard(() =>
+                      readFinanceDirectory(scope, tab, period.data!.interval, filters, undefined),
+                    ),
+                  staleTime: 0,
+                  retry: false,
+                });
+                setCursors([undefined]);
+                setPage(0);
               }}
               onLockChange={changeLock}
               onAccessLost={accessLost}

@@ -1,5 +1,6 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { invalidateEarningsViews } from "./earnings-query";
+import { retainFirstInfinitePage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -166,11 +167,19 @@ export function EarningsContent({
   };
   async function refresh() {
     await invalidateEarningsViews(queries, scope);
-    const outcomes = await Promise.all([page.refetch(), catalog.refetch()]);
-    if (outcomes.some((value) => value.isError)) throw Error("EARNINGS_REFRESH_UNAVAILABLE");
-    if (view === "instructors" && active && page.data) {
-      await counts.refetch({ throwOnError: true });
-    }
+    // A payment or agreement may invalidate the historical cursor chain.
+    await queries.fetchQuery({
+      queryKey: ["earnings-directory", scope, view, personId, interval, undefined],
+      queryFn: () =>
+        readEarningsDirectory(scope, view, { personId: personId || undefined, interval }),
+      staleTime: 0,
+      retry: false,
+    });
+    retainFirstInfinitePage(queries, ["earnings-instructor-catalog", scope]);
+    const result = await catalog.refetch();
+    if (result.isError) throw Error("EARNINGS_REFRESH_UNAVAILABLE");
+    setCursors([undefined]);
+    setIndex(0);
   }
   async function reload() {
     resetPage();

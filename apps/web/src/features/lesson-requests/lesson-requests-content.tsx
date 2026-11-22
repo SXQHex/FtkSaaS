@@ -1,4 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -205,10 +206,18 @@ export function LessonRequestsContent({
           onLockChange={lock}
           onAccessLost={accessLost}
           onRefresh={async () => {
-            await queries.invalidateQueries({ queryKey: prefix });
-            await queries.invalidateQueries({
-              queryKey: ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
+            await invalidateAndReadFirstPage({
+              queries,
+              families: [
+                prefix,
+                ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
+              ],
+              firstPageKey: [...prefix, filter, undefined, focusedRequest],
+              readFirstPage: () =>
+                readLessonRequests(scope, undefined, filter, focusedRequest),
             });
+            setCursors([undefined]);
+            setPageIndex(0);
           }}
         />
       )}

@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies, retainFirstInfinitePage } from "../../lib/cache-invalidation";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
@@ -195,10 +196,13 @@ export function BusinessApplications({
     onAccessLost: () => false,
     onRefresh: async (row) => {
       setDestination((current) => ({ ...current, [row.id]: "" }));
-      await client.invalidateQueries({ queryKey: key });
-      await client.invalidateQueries({
-        queryKey: ["lead-applications", scope.accountId, scope.orgId],
-      });
+      await invalidateCachedFamilies(client, [
+        key,
+        ["lead-applications", scope.accountId, scope.orgId],
+      ]);
+      retainFirstInfinitePage(client, key);
+      const refreshed = await applications.refetch({ throwOnError: true });
+      if (!refreshed.data) throw new Error("BUSINESS_APPLICATIONS_UNAVAILABLE");
     },
   });
   useEffect(() => {

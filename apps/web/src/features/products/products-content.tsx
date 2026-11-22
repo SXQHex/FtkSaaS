@@ -1,4 +1,5 @@
-import { invalidateProductPages } from "./products-query";
+import { productsKeys } from "./products-query";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -229,8 +230,22 @@ export function ProductsContent({
           onLockChange={onLockChange}
           onAccessLost={accessLost}
           onRefresh={async () => {
-            await invalidateProductPages(queries, scope);
-            await query.refetch({ throwOnError: true });
+            await invalidateAndReadFirstPage({
+              queries,
+              families: [productsKeys.management(scope)],
+              firstPageKey: [
+                "products-management",
+                scope.accountId,
+                scope.orgId,
+                scope.centerId,
+                filter,
+                searchQuery,
+                undefined,
+              ],
+              readFirstPage: () => readProductsManagementPage(scope, filter, searchQuery),
+            });
+            setCursors([undefined]);
+            setPageIndex(0);
           }}
         />
       )}

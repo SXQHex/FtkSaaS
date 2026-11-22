@@ -1,4 +1,5 @@
 import { invalidateWorkspace } from "../workspace/workspace-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -121,17 +122,18 @@ export function useSettingsTeam({
       }
   }, [page.error, permissions.error, onAccessLost]);
   async function refresh() {
-    await Promise.all([
-      queries.invalidateQueries(
-        { queryKey: ["settings-team-directory", scope] },
-        { throwOnError: true },
-      ),
-      queries.invalidateQueries(
-        { queryKey: ["settings-team-permissions", scope] },
-        { throwOnError: true },
-      ),
-      invalidateWorkspace(queries, scope.accountId, { throwOnError: true }),
+    await invalidateCachedFamilies(queries, [
+      ["settings-team-directory", scope],
+      ["settings-team-permissions", scope],
     ]);
+    await invalidateWorkspace(queries, scope.accountId, { throwOnError: true });
+    await queries.fetchQuery({
+      queryKey: ["settings-team-directory", scope, level, role, state, undefined],
+      queryFn: () => readTeamPage(scope, role, undefined, level, state),
+      staleTime: 0,
+      retry: false,
+    });
+    setPosition({ key: filterKey, cursors: [undefined], index: 0 });
   }
   const command = useMemberCommand({
     write: writeTeam,

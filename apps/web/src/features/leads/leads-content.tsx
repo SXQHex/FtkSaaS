@@ -221,8 +221,73 @@ export function LeadsContent({
           : source;
   async function refresh() {
     await invalidateLeadPages(queries, scope);
-    await Promise.all([leads.refetch({ throwOnError: true }), workSummary.refetch()]);
-    if (tab === "tasks") await tasks.refetch({ throwOnError: true });
+    await queries.fetchQuery({
+      queryKey: [
+        "leads",
+        scope.accountId,
+        scope.orgId,
+        scope.centerId,
+        query,
+        filters,
+        undefined,
+      ],
+      queryFn: () => readLeadsPage(scope, query, undefined, filters),
+      staleTime: 0,
+      retry: false,
+    });
+    if (tab === "tasks") {
+      if (followupKind === "manual") {
+        await queries.fetchQuery({
+          queryKey: [
+            "lead-followups",
+            scope.accountId,
+            scope.orgId,
+            scope.centerId,
+            owner,
+            undefined,
+          ],
+          queryFn: () => readLeadFollowups(scope, undefined, filters.assignedTo),
+          staleTime: 0,
+          retry: false,
+        });
+      } else {
+        await queries.fetchQuery({
+          queryKey: [
+            "lead-source-followups",
+            scope.accountId,
+            scope.orgId,
+            scope.centerId,
+            followupKind,
+            undefined,
+          ],
+          queryFn: () => readSourceFollowups(scope, followupKind, undefined),
+          staleTime: 0,
+          retry: false,
+        });
+      }
+    }
+    if (tab === "apps" && !applications.isError) {
+      await queries.fetchQuery({
+        queryKey: [
+          "lead-applications",
+          scope.accountId,
+          scope.orgId,
+          scope.centerId,
+          appFilter,
+          undefined,
+        ],
+        queryFn: () => readApplicationsPage(scope, undefined, undefined, applicationStates[appFilter]),
+        staleTime: 0,
+        retry: false,
+      });
+    }
+    await workSummary.refetch();
+    setCursors([undefined]);
+    setIndex(0);
+    setFollowupCursors([undefined]);
+    setFollowupIndex(0);
+    setAppCursors([undefined]);
+    setAppIndex(0);
   }
   const rows = (data?.items ?? []).map((row) => ({
     id: row.id,
@@ -643,10 +708,7 @@ export function LeadsContent({
           id={application}
           canReview={canReview}
           onClose={() => setApplication(undefined)}
-          onSaved={async () => {
-            await applications.refetch({ throwOnError: true });
-            await refresh();
-          }}
+          onSaved={refresh}
           onLockChange={onLocked}
         />
       )}

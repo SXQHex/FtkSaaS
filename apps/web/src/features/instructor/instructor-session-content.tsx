@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -145,16 +146,10 @@ export function InstructorSessionContent({
   const refresh = useCallback(async () => {
     const result = await refetch({ throwOnError: true });
     if (!result.data) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
-    await Promise.all([
-      queries.invalidateQueries({
-        queryKey: ["instructor-today", scope.accountId, scope.orgId, scope.centerId],
-      }),
-      queries.invalidateQueries({
-        queryKey: ["instructor-schedule", scope.accountId, scope.orgId, scope.centerId],
-      }),
-      queries.invalidateQueries({
-        queryKey: ["instructor-month-earnings", scope.accountId, scope.orgId, scope.centerId],
-      }),
+    await invalidateCachedFamilies(queries, [
+      ["instructor-today", scope.accountId, scope.orgId, scope.centerId],
+      ["instructor-schedule", scope.accountId, scope.orgId, scope.centerId],
+      ["instructor-month-earnings", scope.accountId, scope.orgId, scope.centerId],
     ]);
   }, [refetch, queries, scope.accountId, scope.orgId, scope.centerId]);
   const error = !center || !personId || query.isError;

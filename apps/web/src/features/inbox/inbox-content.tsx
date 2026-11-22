@@ -7,10 +7,11 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import type { NotificationReadSelection, NotificationView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { InboxView, type InboxRow } from "./inbox-view";
-import { inboxKey, inboxListQuery, readNotificationState, type InboxFilter } from "./inbox";
+import { inboxKey, inboxListQuery, readInbox, readNotificationState, type InboxFilter } from "./inbox";
 import {
   notificationSetIntent,
   markAllNotificationsIntent,
@@ -120,6 +121,21 @@ export function InboxContent({
     for (const cause of [list.error, source.error, nativeSource.error])
       if (cause) accessLost(cause);
   }, [list.error, source.error, nativeSource.error, accessLost]);
+  async function refreshFirstPage() {
+    await invalidateAndReadFirstPage({
+      queries,
+      families: [[...prefix, "list"]],
+      firstPageKey: [...prefix, "list", query, filter, undefined],
+      readFirstPage: () =>
+        readInbox(scope, filter === "unread", undefined, {
+          query,
+          workState: filter === "todo" ? "pending" : "all",
+          visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
+        }),
+    });
+    setCursors([undefined]);
+    setIndex(0);
+  }
   const command = useMemberCommand({
     write: setNotificationsRead,
     readReceipt: readNotificationSetReceipt,
@@ -130,7 +146,7 @@ export function InboxContent({
     onAccessLost: accessLost,
     onRefresh: async ({ intent, rows }) => {
       if ("personId" in intent) {
-        await queries.invalidateQueries({ queryKey: prefix.slice(0, 3) }, { throwOnError: true });
+        await refreshFirstPage();
         setChecked([]);
         setSelected(undefined);
         setUndo(undefined);
@@ -139,7 +155,7 @@ export function InboxContent({
         return;
       }
       for (const row of rows) queries.setQueryData([...prefix, "state", row.id], row);
-      await queries.invalidateQueries({ queryKey: [...prefix, "list"] }, { throwOnError: true });
+      await refreshFirstPage();
       setChecked([]);
       if (typeof intent.change !== "boolean") setSelected(undefined);
       const changed = new Set(intent.changedIds);

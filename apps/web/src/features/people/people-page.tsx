@@ -1,4 +1,5 @@
-import { invalidatePeoplePages } from "./people-query";
+import { peopleKeys } from "./people-query";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -213,11 +214,33 @@ function PeopleContent({
   );
   const created = useCallback(
     async (person: PersonView) => {
-      await invalidatePeoplePages(queries, scope);
-      await query.refetch({ throwOnError: true });
+      await invalidateAndReadFirstPage({
+        queries,
+        families: [peopleKeys.center(scope)],
+        firstPageKey: [
+          "people",
+          scope.accountId,
+          scope.orgId,
+          scope.centerId,
+          queryText,
+          "with-member-summary",
+          filter,
+          undefined,
+        ],
+        readFirstPage: () =>
+          readPeoplePage(
+            scope,
+            queryText,
+            undefined,
+            filter === "all" ? undefined : filter,
+            true,
+          ),
+      });
+      setCursors([undefined]);
+      setIndex(0);
       setSelectedId(person.id);
     },
-    [query, queries, scope],
+    [queries, scope, queryText, filter],
   );
   const rows = query.isError
     ? []

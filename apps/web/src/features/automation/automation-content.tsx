@@ -151,11 +151,42 @@ export function AutomationContent({
   );
   async function refresh() {
     await Promise.all([
-      queries.invalidateQueries({ queryKey: prefix }, { throwOnError: true }),
+      queries.invalidateQueries({ queryKey: prefix, refetchType: "none" }),
       queries.invalidateQueries({
         queryKey: ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId],
+        refetchType: "none",
       }),
     ]);
+    // Every cursor family is stale; validate only the visible tab's first page.
+    if (tab === "automations") {
+      await queries.fetchQuery({
+        queryKey: [...prefix, "automations", undefined],
+        queryFn: () => readAutomations(scope, undefined, undefined),
+        staleTime: 0,
+        retry: false,
+      });
+    } else if (tab === "segments") {
+      await queries.fetchQuery({
+        queryKey: [...prefix, "segments", undefined],
+        queryFn: () => readSegments(scope, undefined, undefined),
+        staleTime: 0,
+        retry: false,
+      });
+    } else {
+      await queries.fetchQuery({
+        queryKey: [...prefix, "jobs", jobsFor, jobState, undefined],
+        queryFn: () =>
+          readAutomationQueue(scope, { automationId: jobsFor || undefined, state: jobState }),
+        staleTime: 0,
+        retry: false,
+      });
+    }
+    setAutoCursors([undefined]);
+    setAutoIndex(0);
+    setSegmentCursors([undefined]);
+    setSegmentIndex(0);
+    setJobCursors([undefined]);
+    setJobIndex(0);
   }
   const unknown = t(($) => $.automation.unknown),
     format = center

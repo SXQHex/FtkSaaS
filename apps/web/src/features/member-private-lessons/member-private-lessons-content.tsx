@@ -8,8 +8,8 @@ import type { LessonRequestView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { ScheduleTimeError } from "../schedule/schedule-time";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import {
-  invalidateMemberPrivateLessonLists,
   memberPrivateLessonKeys,
 } from "./member-private-lessons-query";
 import {
@@ -105,8 +105,13 @@ export function MemberPrivateLessonsContent({
     readResult: readOwnRequestResult,
     onAccessLost: accessLost,
     onRefresh: async (result) => {
-      await invalidateMemberPrivateLessonLists(queries, scope, personId);
-      await list.refetch({ throwOnError: true });
+      await invalidateAndReadFirstPage({
+        queries,
+        families: [[...memberPrivateLessonKeys.person(scope, personId), "list"]],
+        firstPageKey: [...prefix, "list", undefined, requestId],
+        readFirstPage: () => readOwnRequests(scope, personId, undefined, requestId),
+      });
+      setCursors([undefined]);
       setSaved(result);
     },
   });
