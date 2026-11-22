@@ -7,7 +7,7 @@ import { studioIds as I } from "./studio-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 async function setup(
   page: Page,
-  options: { denied?: boolean; unknown?: boolean; unread?: boolean } = {},
+  options: { denied?: boolean; unknown?: boolean; unread?: boolean; prefillPage2?: boolean } = {},
 ) {
   const state = await mockFinanceDirectory(page),
     writes: Record<string, any>[] = [],
@@ -118,6 +118,13 @@ async function setup(
     if (op === "entitlements_get_v1") return fail("FORBIDDEN");
     return route.fallback();
   });
+  if (options.prefillPage2) {
+    const grid = page.getByRole("grid", { name: "Hareketler", exact: true });
+    await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+    await expect(grid.getByText("İkinci sayfa üyesi", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
+    await expect(grid.getByText("8 derslik paket", { exact: true })).toBeVisible();
+  }
   await page.getByRole("button", { name: "Satışı iade et", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "Satışı iade et", exact: true });
   await panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik satış iadesi");
@@ -217,4 +224,34 @@ test("acknowledged sale refund permits read recovery only after finance reading 
   ).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.receipts).toHaveLength(0);
+});
+
+test("M05 sale refund reads current first page, then reopens an old cursor without replaying stale pages", async ({
+  page,
+}) => {
+  const state = await setup(page, { prefillPage2: true });
+  const before = state.requests.length;
+  const cachedSecond = state.requests.filter((row) => row.page.cursor === "native-next").length;
+  expect(cachedSecond).toBe(1);
+  await prepare(state);
+  await approve(state);
+  await expect(
+    state.panel.getByText("İade komutu alındı; güncel finans okundu.", { exact: true }),
+  ).toBeVisible();
+  const duringRefresh = state.requests.slice(before);
+  expect(duringRefresh.filter((row) => row.page.cursor)).toHaveLength(0);
+  expect(duringRefresh.filter((row) => row.view === "movements")).toHaveLength(1);
+  expect(state.writes).toHaveLength(1);
+  await state.panel.getByRole("button", { name: copy.close, exact: true }).click();
+  await expect(page.getByText("TRY ₺500,00 · EUR €100,00", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await expect(
+    page.getByRole("grid", { name: "Hareketler", exact: true }).getByText("İkinci sayfa üyesi", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect
+    .poll(() => state.requests.filter((row) => row.page.cursor === "native-next").length)
+    .toBe(cachedSecond + 1);
+  expect(state.writes).toHaveLength(1);
 });
