@@ -17,8 +17,11 @@ const directory = (source: typeof scope, search = "", cursor?: string) => [
   search,
   cursor,
 ];
-const catalog = (source: typeof scope, level: "center" | "organization" = "center") =>
-  ["document-catalog", source, level];
+const catalog = (source: typeof scope, level: "center" | "organization" = "center") => [
+  "document-catalog",
+  source,
+  level,
+];
 const versions = (
   source: typeof scope,
   level: "center" | "organization" = "center",

@@ -398,9 +398,9 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
   ).toBeVisible();
   expect(oldCursorReads).toBe(initialCursorReads);
   expect(allAcceptanceReads).toBe(initialAcceptanceReads);
-  expect(
-    f.requests.filter((request) => request.op === "document_version_publish_v1"),
-  ).toHaveLength(1);
+  expect(f.requests.filter((request) => request.op === "document_version_publish_v1")).toHaveLength(
+    1,
+  );
   const operations = f.requests.map((request) => request.op);
   const writeIndex = operations.indexOf("document_version_publish_v1");
   const resultIndex = f.requests.findIndex(
@@ -411,15 +411,17 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
   expect(writeIndex).toBeGreaterThan(-1);
   expect(resultIndex).toBeGreaterThan(writeIndex);
   expect(
-    f.requests.slice(resultIndex + 1).some(
-      (request) =>
-        request.op === "document_directory_get_v1" &&
-        request.r.view === "documents" &&
-        !request.r.page.cursor,
-    ),
+    f.requests
+      .slice(resultIndex + 1)
+      .some(
+        (request) =>
+          request.op === "document_directory_get_v1" &&
+          request.r.view === "documents" &&
+          !request.r.page.cursor,
+      ),
   ).toBe(true);
 
-  await page.keyboard.press("Escape");
+  await editor.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await expect(editor).toHaveCount(0);
   await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
   await expect(page.getByText("İkinci güncel belge", { exact: true })).toBeVisible();

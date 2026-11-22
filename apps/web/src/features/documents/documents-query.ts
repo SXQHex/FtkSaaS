@@ -44,10 +44,19 @@ export async function invalidateDocumentDirectoryViews(
   // Inactive catalog/version variants can also have old continuation cursors.
   // Trim every affected infinite query before invalidation: setQueryData clears
   // isInvalidated, and an untrimmed infinite refetch would replay old cursors.
-  for (const { queryKey } of queries.getQueryCache().findAll({
+  for (const { queryKey, state } of queries.getQueryCache().findAll({
     predicate: ({ queryKey }) => affected(queryKey),
   })) {
-    if (queryKey[0] === "document-catalog" || queryKey[0] === "document-versions")
+    const data = state.data;
+    if (
+      (queryKey[0] === "document-catalog" || queryKey[0] === "document-versions") &&
+      data &&
+      typeof data === "object" &&
+      "pages" in data &&
+      "pageParams" in data &&
+      Array.isArray(data.pages) &&
+      Array.isArray(data.pageParams)
+    )
       retainFirstInfinitePage(queries, queryKey);
   }
 

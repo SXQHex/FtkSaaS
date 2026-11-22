@@ -350,12 +350,10 @@ test("documents validates before upload and focuses the first invalid field", as
 test("M02 refreshes the directory after verified upload completion", async ({ page }) => {
   const state = await setup(page);
   const dialog = await fill(page);
-  await expect(
-    dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true }),
-  ).toBeVisible();
+  await expect(dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true })).toBeVisible();
   expect(state.writes.filter((row) => row.op === "file_upload_complete_v1")).toHaveLength(1);
   expect(state.writes.filter((row) => row.op === "document_version_publish_v1")).toHaveLength(0);
-  await page.keyboard.press("Escape");
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole("row").filter({ hasText: "Sentetik belge" })).toBeVisible();
 });
