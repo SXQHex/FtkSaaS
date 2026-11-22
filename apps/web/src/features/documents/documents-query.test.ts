@@ -163,10 +163,7 @@ it("M02 rejects late pre-publication responses without cancelling a different ce
     staleTime: 0,
     retry: false,
   });
-  const oldCancelled = oldRead.then(
-    () => false,
-    () => true,
-  );
+  const oldCancelled = oldRead.then(() => false, () => true);
   let resolveForeign!: (value: { revision: string }) => void;
   const foreignNetwork = new Promise<{ revision: string }>((resolve) => {
     resolveForeign = resolve;

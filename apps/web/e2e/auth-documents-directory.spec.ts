@@ -413,8 +413,9 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
   // The unfiltered document page and catalog have identical native read
   // inputs. Publication must read them only once, even when leaving page two.
   const firstPageReadsAfterPublication = () =>
-    f.requests.slice(resultIndex + 1).filter(
-      (request) =>
+    f.requests.filter(
+      (request, position) =>
+        position > resultIndex &&
         request.op === "document_directory_get_v1" &&
         request.r.view === "documents" &&
         !request.r.page.cursor &&
