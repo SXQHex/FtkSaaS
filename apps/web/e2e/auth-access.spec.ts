@@ -327,9 +327,7 @@ test("Access actions: same-key lost-reply recovery, versioned unlink and acknowl
   expect(state.linked).toBe(false);
 });
 
-test("M03: an old account cursor rereads after confirmed unlink", async ({
-  page,
-}) => {
+test("M03: an old account cursor rereads after confirmed unlink", async ({ page }) => {
   const state = await mockAccess(page);
   await openAccess(page);
   await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
