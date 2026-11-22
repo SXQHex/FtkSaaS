@@ -335,14 +335,12 @@ test.each([
   expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
 });
 
-test("refactoring accepts only the three Desktop Chromium source-bound shards", () => {
+test("refactoring accepts only twelve Desktop Chromium source-bound shards", () => {
   const { binding, proof } = fixture();
   const actual = proof.jobs.filter((job) => job.name.startsWith("browsers ("));
-  expect(actual.map(({ name }) => name)).toEqual([
-    "browsers (chromium, 1)",
-    "browsers (chromium, 2)",
-    "browsers (chromium, 3)",
-  ]);
+  expect(actual.map(({ name }) => name)).toEqual(
+    Array.from({ length: 12 }, (_, index) => `browsers (chromium, ${index + 1})`),
+  );
   expect(() => validateProof(binding, proof)).not.toThrow();
   proof.jobs.push({ ...actual[0], name: "browsers (webkit, 1)" });
   expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");

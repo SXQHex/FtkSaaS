@@ -14,6 +14,10 @@ export const browserMatrix = Object.entries(browserProfiles).flatMap(([profile, 
 // Temporary refactoring acceptance: run the full selected Playwright inventory
 // on Desktop Chromium only. Restore browserMatrix after refactoring is complete.
 // Do not delete the other profiles or their tests.
-export const refactoringBrowserMatrix = browserMatrix.filter(
-  ({ profile }) => profile === "chromium",
-);
+export const refactoringBrowserShards = Array.from({ length: 12 }, (_, index) => index + 1);
+
+export const refactoringBrowserMatrix = refactoringBrowserShards.map((shard) => ({
+  profile: "chromium",
+  engine: "chromium",
+  shard,
+}));

@@ -19,7 +19,7 @@
 
 ## Geçici tarayıcı CI profili
 
-Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium** projesinin üç Playwright shard'ını çalıştırır. Diğer tarayıcı profilleri ve senaryoları korunur, fakat CI tarafından seçilmez. Lint, tip, build, birim/coverage, erişilebilirlik kontrolleri ve aynı profilin tam test envanteri geçerlidir. Dört tarayıcı kabulü bu dönemde iddia edilemez; refactoring kapanışında [CI politikasındaki](../../../docs/ci-policy.md) kaynak-özel güvenilir kurulum süreciyle 12 shard geri alınır.
+Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium** projesinin on iki Playwright shard'ını ve **tam Playwright test envanterini** çalıştırır. Diğer tarayıcı profilleri ve senaryoları korunur, fakat CI tarafından seçilmez. Lint, tip, build, birim/coverage, erişilebilirlik kontrolleri ve aynı profilin tam test envanteri geçerlidir. Dört tarayıcı kabulü bu dönemde iddia edilemez; refactoring kapanışında [CI politikasındaki](../../../docs/ci-policy.md) kaynak-özel güvenilir kurulum süreciyle dört tarayıcı profili × üç shard düzeni geri alınır.
 
 ## Yerel çalışma
 

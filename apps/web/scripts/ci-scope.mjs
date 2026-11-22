@@ -180,7 +180,10 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const { readFileSync } = await import("node:fs");
   const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
   const scope = eventScope(process.env.GITHUB_EVENT_NAME, event, process.env.GITHUB_SHA);
-  const e2e = affectedBrowserSpecs(scope, event.action);
+  // Twelve Chromium shards require the complete test inventory. The existing
+  // smoke-only selection has fewer than twelve cases and would create empty
+  // shards; [] instructs the runner to discover every Playwright test.
+  const e2e = [];
   appendFileSync(
     process.env.GITHUB_OUTPUT,
     [

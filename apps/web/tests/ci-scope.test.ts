@@ -60,12 +60,15 @@ test("frontend retains build, coverage, isolation and four browser definitions",
   expect(commands).not.toContain("pnpm test:frontend:coverage");
   expect(commands).toContain("pnpm --filter @ftksaas/web test:isolation");
 });
-test("temporary refactoring CI runs only Desktop Chromium without removing other profiles", () => {
-  expect(refactoringBrowserMatrix).toEqual([
-    { profile: "chromium", engine: "chromium", shard: 1 },
-    { profile: "chromium", engine: "chromium", shard: 2 },
-    { profile: "chromium", engine: "chromium", shard: 3 },
-  ]);
+test("temporary refactoring CI runs twelve Desktop Chromium shards only", () => {
+  expect(refactoringBrowserMatrix).toEqual(
+    Array.from({ length: 12 }, (_, index) => ({
+      profile: "chromium",
+      engine: "chromium",
+      shard: index + 1,
+    })),
+  );
+  expect(browserMatrix).toHaveLength(12);
 });
 
 test("affected tests combine feature suites with smoke and expand on uncertain impact", () => {

@@ -22,7 +22,7 @@ const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
 export function recordSource(kind, env = process.env) {
   if (!workflows[kind] || env.GITHUB_EVENT_NAME !== "pull_request")
     throw Error("PR_SOURCE_REQUIRED");
-  const { pull_request: pr, action } = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8"));
+  const { pull_request: pr } = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, "utf8"));
   const merge = env.GITHUB_SHA;
   const parents = git("show", "-s", "--format=%P", merge).split(" ");
   if (
@@ -43,7 +43,8 @@ export function recordSource(kind, env = process.env) {
     tree: git("rev-parse", `${merge}^{tree}`),
     run: Number(env.GITHUB_RUN_ID),
     source_attempt: Number(env.GITHUB_RUN_ATTEMPT),
-    e2e_specs: affectedBrowserSpecs(selectScope(pr.base.sha, merge), action),
+    // Empty means every spec, not zero tests. Same source-bound receipt format.
+    e2e_specs: [],
   };
   mkdirSync(".artifacts/ci", { recursive: true });
   writeFileSync(".artifacts/ci/frontend-source.json", JSON.stringify(binding));
