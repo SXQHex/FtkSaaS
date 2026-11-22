@@ -9,9 +9,7 @@ import { BackendError } from "../../lib/backend";
 import { ScheduleTimeError } from "../schedule/schedule-time";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
-import {
-  memberPrivateLessonKeys,
-} from "./member-private-lessons-query";
+import { memberPrivateLessonKeys } from "./member-private-lessons-query";
 import {
   readOwnRequests,
   readOwnRequest,

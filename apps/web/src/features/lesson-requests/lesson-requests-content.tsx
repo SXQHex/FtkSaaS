@@ -208,13 +208,9 @@ export function LessonRequestsContent({
           onRefresh={async () => {
             await invalidateAndReadFirstPage({
               queries,
-              families: [
-                prefix,
-                ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
-              ],
+              families: [prefix, ["schedule-range", scope.accountId, scope.orgId, scope.centerId]],
               firstPageKey: [...prefix, filter, undefined, focusedRequest],
-              readFirstPage: () =>
-                readLessonRequests(scope, undefined, filter, focusedRequest),
+              readFirstPage: () => readLessonRequests(scope, undefined, filter, focusedRequest),
             });
             setCursors([undefined]);
             setPageIndex(0);

@@ -11,7 +11,13 @@ import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { InboxView, type InboxRow } from "./inbox-view";
-import { inboxKey, inboxListQuery, readInbox, readNotificationState, type InboxFilter } from "./inbox";
+import {
+  inboxKey,
+  inboxListQuery,
+  readInbox,
+  readNotificationState,
+  type InboxFilter,
+} from "./inbox";
 import {
   notificationSetIntent,
   markAllNotificationsIntent,

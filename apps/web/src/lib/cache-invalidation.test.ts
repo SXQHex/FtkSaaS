@@ -6,7 +6,7 @@ import {
   retainFirstInfinitePage,
 } from "./cache-invalidation";
 
-it("marks all scoped cursor/filter variants stale, never refetches inactive or active old cursors", async () => {
+it("invalidates scoped filter/cursor caches without active query refetches", async () => {
   const queries = new QueryClient();
   const family = ["directory", "actor-a", "org-a", "center-a"];
   const first = [...family, "pending", undefined];

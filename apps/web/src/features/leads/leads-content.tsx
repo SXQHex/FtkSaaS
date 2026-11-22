@@ -276,7 +276,8 @@ export function LeadsContent({
           appFilter,
           undefined,
         ],
-        queryFn: () => readApplicationsPage(scope, undefined, undefined, applicationStates[appFilter]),
+        queryFn: () =>
+          readApplicationsPage(scope, undefined, undefined, applicationStates[appFilter]),
         staleTime: 0,
         retry: false,
       });

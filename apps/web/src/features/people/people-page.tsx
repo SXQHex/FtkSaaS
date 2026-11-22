@@ -228,13 +228,7 @@ function PeopleContent({
           undefined,
         ],
         readFirstPage: () =>
-          readPeoplePage(
-            scope,
-            queryText,
-            undefined,
-            filter === "all" ? undefined : filter,
-            true,
-          ),
+          readPeoplePage(scope, queryText, undefined, filter === "all" ? undefined : filter, true),
       });
       setCursors([undefined]);
       setIndex(0);

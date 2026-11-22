@@ -1078,7 +1078,7 @@ export function MemberProfileContent({
             queries.setQueryData(rightsKey, result.rows);
             if (result.finance) {
               queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
-            await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
+              await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
               setCurrency(result.finance.currency);
               setCurrencyDraft(result.finance.currency);
               setIndex(0);
