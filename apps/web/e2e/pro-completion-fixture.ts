@@ -12,10 +12,18 @@ interface CompletionActions {
   abort: () => Promise<void>;
 }
 
+// A mixed operation log can be inspected before its operation is narrowed.
+// Keep common optional projections contract-typed without suppressing type checks.
+type RequestInspectionFields = {
+  patch?: Operations["settings_update_v1"]["request"]["patch"];
+  report?: Operations["report_get_v1"]["request"]["report"];
+  kept_scope?: Operations["subscription_downgrade_request_v1"]["request"]["kept_scope"];
+};
+
 export type RecordedRequest = {
   [Operation in keyof Operations]: {
     op: Operation;
-    r: Operations[Operation]["request"];
+    r: Operations[Operation]["request"] & RequestInspectionFields;
   };
 }[keyof Operations];
 

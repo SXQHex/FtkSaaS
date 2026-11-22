@@ -119,9 +119,7 @@ test("reports bind all real sections, immutable product names, exact currencies 
   await sources.focus();
   await expect(sources).toBeFocused();
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
-  expect(
-    requestsFor(f.requests, "report_get_v1").find((row) => row.r.report === "crm_conversion")?.r,
-  ).toMatchObject({
+  expect(f.requests.find((row) => row.r.report === "crm_conversion")?.r).toMatchObject({
     include_crm_funnel: true,
     filters: { interval: { starts_at: "2026-10-31T21:00:00Z", ends_at: "2026-11-16T21:00:00Z" } },
   });

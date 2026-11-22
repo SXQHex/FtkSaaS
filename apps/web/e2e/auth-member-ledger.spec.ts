@@ -10,6 +10,9 @@ import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
+type LedgerRead = RequestEntitlementsGet & {
+  ledger_page: NonNullable<RequestEntitlementsGet["ledger_page"]>;
+};
 const sale = "019a7b00-0000-7000-8000-000000000070",
   secondSale = "019a7b00-0000-7000-8000-000000000071";
 async function setup(
@@ -17,7 +20,7 @@ async function setup(
   options: { denied?: boolean; empty?: boolean; noMembership?: boolean; noRights?: boolean } = {},
 ) {
   const studio = await mockStudio(page),
-    reads: RequestEntitlementsGet[] = [],
+    reads: LedgerRead[] = [],
     personReads: RequestPersonGet[] = [];
   const entitlement: EntitlementView = {
     sale_id: sale,
@@ -60,6 +63,7 @@ async function setup(
       ];
       if (options.noRights) return send([]);
       if (req.ledger_sale_id) {
+        if (!req.ledger_page) throw Error("LEDGER_PAGE_UNAVAILABLE");
         reads.push(req);
         expect([sale, secondSale]).toContain(req.ledger_sale_id);
         expect(req.ledger_page.limit).toBe(20);
@@ -136,7 +140,7 @@ test("mobile profile reads canonical membership date and only explicitly selecte
   await expect(
     state.panel.getByText(`Kaynak: Rezervasyon · ${I.availability}`, { exact: true }),
   ).toBeVisible();
-  expect(state.reads.at(-1)?.ledger_page?.cursor).toBe("native-next");
+  expect(state.reads.at(-1)?.ledger_page.cursor).toBe("native-next");
   await state.panel
     .getByRole("combobox", { name: common.memberProfile.ledgerSale, exact: true })
     .selectOption(secondSale);
@@ -146,7 +150,7 @@ test("mobile profile reads canonical membership date and only explicitly selecte
     .getByRole("button", { name: common.memberProfile.readLedger, exact: true })
     .click();
   await expect.poll(() => state.reads.at(-1)?.ledger_sale_id).toBe(secondSale);
-  expect(state.reads.at(-1)?.ledger_page?.cursor).toBeUndefined();
+  expect(state.reads.at(-1)?.ledger_page.cursor).toBeUndefined();
   expect(state.studio.writes).toHaveLength(0);
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
   expect((await scanAccessibility(page, "member-ledger-mobile")).violations).toEqual([]);
