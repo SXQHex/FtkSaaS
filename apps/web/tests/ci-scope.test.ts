@@ -131,7 +131,6 @@ test.each([
       "synchronize",
       "reopened",
       "edited",
-      ...(output === "frontend" ? ["ready_for_review"] : []),
     ]);
     expect(config.on.workflow_dispatch).toBeNull();
     expect(config.on.push).toBeUndefined();
