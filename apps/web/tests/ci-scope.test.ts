@@ -130,8 +130,8 @@ test.each([
       "opened",
       "synchronize",
       "reopened",
+      // Draft-to-ready is handled by the gate; frontend only rechecks source/base changes.
       "edited",
-      ...(output === "frontend" ? ["ready_for_review"] : []),
     ]);
     expect(config.on.workflow_dispatch).toBeNull();
     expect(config.on.push).toBeUndefined();
