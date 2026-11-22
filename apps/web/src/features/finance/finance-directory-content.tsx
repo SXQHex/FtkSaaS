@@ -1,6 +1,6 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { FinanceContent, type FinanceInitialContext } from "./finance-content";
@@ -15,7 +15,7 @@ import {
 } from "./finance-directory";
 import { readFinancePage } from "./finance";
 import { SaleRefundEditor } from "./sale-refund-editor";
-import { invalidateFinanceViews } from "./finance-query";
+import { financeKeys, invalidateFinanceViews } from "./finance-query";
 import type { SaleRefundSource } from "./sale-refund";
 
 import { BackendError } from "../../lib/backend";
@@ -98,67 +98,51 @@ export function FinanceDirectoryContent({
   });
   const directory = useQuery({
     queryKey: [
-      "finance-directory",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
+      ...financeKeys.directory(scope),
       tab,
       period.data?.interval,
       filters,
       cursors[page],
     ],
-    queryFn: () =>
-      guard(() => readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page])),
+    queryFn: ({ signal }) =>
+      guard(() => readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page], signal)),
     enabled: Boolean(center && period.data && !period.isError && !personal),
     retry: false,
   });
   const source = center && !workspace.isError && !directory.isError ? directory.data : undefined;
-  const creditDebts = useQuery({
-    queryKey: [
-      "finance-directory-credit-debts",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      source?.as_of,
-      source?.items.map(financeDirectoryRowKey),
-    ],
-    queryFn: () =>
-      guard(async () => {
-        const rows = source!.items,
-          result: Record<string, string | null> = {};
-        let index = 0;
-        await Promise.all(
-          Array.from({ length: Math.min(4, rows.length) }, async () => {
-            while (index < rows.length) {
-              const row = rows[index++];
-              try {
-                const finance = await readFinancePage(scope, {
-                  personId: row.person_id,
-                  currency: row.currency,
-                });
-                result[financeDirectoryRowKey(row)] = formatMinorAmount(
-                  finance.debts
-                    .reduce((sum, debt) => sum + BigInt(debt.remaining_minor), 0n)
-                    .toString(),
-                  row.currency,
-                );
-              } catch (error) {
-                if (
-                  (error instanceof BackendError &&
-                    ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
-                  (error instanceof Error &&
-                    ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
-                )
-                  throw error;
-                result[financeDirectoryRowKey(row)] = null;
-              }
-            }
-          }),
-        );
-        return result;
-      }),
-    enabled: Boolean(source && tab === "credits" && !personal),
-    retry: false,
+  const creditRows = source && tab === "credits" && !personal ? source.items : [];
+  const creditDebts = useQueries({
+    queries: creditRows.map((row) => ({
+      queryKey: financeKeys.creditDebt(scope, row.person_id, row.currency),
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        guard(async () => {
+          try {
+            const finance = await readFinancePage(
+              scope,
+              { personId: row.person_id, currency: row.currency },
+              undefined,
+              signal,
+            );
+            return formatMinorAmount(
+              finance.debts
+                .reduce((sum, debt) => sum + BigInt(debt.remaining_minor), 0n)
+                .toString(),
+              row.currency,
+            );
+          } catch (error) {
+            signal.throwIfAborted();
+            if (
+              (error instanceof BackendError &&
+                ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
+              (error instanceof Error &&
+                ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
+            )
+              throw error;
+            return null;
+          }
+        }),
+      retry: false,
+    })),
   });
   const changeLock = useCallback(
     (value: boolean) => {
@@ -188,9 +172,6 @@ export function FinanceDirectoryContent({
             onPress={() => {
               setPersonal(undefined);
               resetPage();
-              void queries.invalidateQueries({
-                queryKey: ["finance-directory", scope.accountId, scope.orgId, scope.centerId],
-              });
             }}
           >
             {t(($) => $.financeDirectory.back)}
@@ -314,11 +295,11 @@ export function FinanceDirectoryContent({
       credits={
         source?.items
           .filter((row) => row.kind === "credit")
-          .map((row) => ({
+          .map((row, index) => ({
             id: financeDirectoryRowKey(row),
             person: person(row),
             amount: amount(row),
-            debt: creditDebts.data?.[financeDirectoryRowKey(row)] ?? null,
+            debt: creditDebts[index]?.data ?? null,
             actions:
               BigInt(row.amount_minor) > 0n
                 ? [{ kind: "credit-refund" as const, onPress: () => open(row, "credit-refund") }]
@@ -432,33 +413,42 @@ export function FinanceDirectoryContent({
               source={saleRefund}
               sourceAvailable={Boolean(center && !workspace.isError)}
               onClose={() => setSaleRefund(undefined)}
-              onRefresh={async () => {
+              onRefresh={async (result) => {
                 await invalidateFinanceViews(
                   queries,
                   scope,
                   saleRefund.personId,
                   saleRefund.currency,
                 );
+                // The command has already verified this person's native finance
+                // readback. Reuse it instead of issuing the same finance_get again.
+                queries.setQueryData(
+                  [...financeKeys.person(scope, saleRefund.personId, saleRefund.currency), undefined],
+                  result.finance,
+                );
                 await queries.fetchQuery({
                   queryKey: [
-                    "finance-directory",
-                    scope.accountId,
-                    scope.orgId,
-                    scope.centerId,
+                    ...financeKeys.directory(scope),
                     tab,
                     period.data?.interval,
                     filters,
                     undefined,
                   ],
-                  queryFn: () =>
+                  queryFn: ({ signal }) =>
                     guard(() =>
-                      readFinanceDirectory(scope, tab, period.data!.interval, filters, undefined),
+                      readFinanceDirectory(
+                        scope,
+                        tab,
+                        period.data!.interval,
+                        filters,
+                        undefined,
+                        signal,
+                      ),
                     ),
                   staleTime: 0,
                   retry: false,
                 });
-                setCursors([undefined]);
-                setPage(0);
+                resetPage();
               }}
               onLockChange={changeLock}
               onAccessLost={accessLost}
