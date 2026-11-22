@@ -244,7 +244,11 @@ export async function mockSessionDetail(
           return reject("VALIDATION_FAILED");
         return send({
           items: cursor || !reservation ? [] : [reservation],
-          next_cursor: cursor ? null : writes.length > 0 ? "fresh-participant" : "stale-participant",
+          next_cursor: cursor
+            ? null
+            : writes.length > 0
+              ? "fresh-participant"
+              : "stale-participant",
           as_of: new Date().toISOString(),
         });
       }
