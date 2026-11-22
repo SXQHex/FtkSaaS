@@ -16,8 +16,10 @@ it("keeps disabled feature observers on the shell's exact Query cache", () => {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queries}>{children}</QueryClientProvider>
   );
-  const observe = () => useWorkspaceQuery("actor-a", "org-a", false);
-  const { result, unmount } = renderHook(observe, { wrapper });
+  function useObservedWorkspace() {
+    return useWorkspaceQuery("actor-a", "org-a", false);
+  }
+  const { result, unmount } = renderHook(useObservedWorkspace, { wrapper });
   expect(result.current.data).toBe(value);
   expect(result.current.fetchStatus).toBe("idle");
   unmount();
