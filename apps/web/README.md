@@ -10,4 +10,4 @@ pnpm install --frozen-lockfile
 pnpm dev:web
 ```
 
-Yerel public ortam ayarları, test komutları ve statik build için [geliştirme rehberine](docs/development.md) bakın. Uygulama kapsamı ve kabul [todo](docs/todo.md), sohbet devri [handover](docs/handover.md) sahibindedir. Yayını [Cloudflare CD](../../docs/ci-policy.md#cloudflare-dağıtımı) yönetir.
+Yerel public ortam ayarları, test komutları ve statik build için [geliştirme rehberine](docs/development.md) bakın. Açık kapsam ve kabul [remaining-work](docs/remaining-work.md), uygulama sırası [production-queue](docs/production-queue.md), kaynak/CI/ortam durumu [handover](docs/handover.md) sahibindedir. Önceki teslimlerin [tarihsel indeksi](docs/todo.md) aktifleştirilmez. Yayını [Cloudflare CD](../../docs/ci-policy.md#cloudflare-dağıtımı) yönetir.
