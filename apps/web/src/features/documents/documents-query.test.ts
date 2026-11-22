@@ -6,11 +6,17 @@ const scope = { accountId: "actor-a", orgId: "org-a", centerId: "center-a" };
 const otherCenter = { ...scope, centerId: "center-b" };
 const otherOrg = { ...scope, orgId: "org-b" };
 const otherActor = { ...scope, accountId: "actor-b" };
-const directory = (
-  source: typeof scope,
-  search = "",
-  cursor?: string,
-) => ["document-directory", source, "center", "documents", "", "", "all", search, cursor];
+const directory = (source: typeof scope, search = "", cursor?: string) => [
+  "document-directory",
+  source,
+  "center",
+  "documents",
+  "",
+  "",
+  "all",
+  search,
+  cursor,
+];
 const catalog = (source: typeof scope, level: "center" | "organization" = "center") =>
   ["document-catalog", source, level];
 const versions = (

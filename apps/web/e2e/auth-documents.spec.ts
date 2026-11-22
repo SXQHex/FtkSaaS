@@ -131,9 +131,9 @@ async function setup(
                     acceptance_records: null,
                   },
                 ]
-            : r.view === "versions" && state.published
-              ? [latest]
-              : [],
+              : r.view === "versions" && state.published
+                ? [latest]
+                : [],
         as_of: "2026-11-17T00:00:00Z",
         next_cursor: null,
         history_available: true,

@@ -403,7 +403,9 @@ test("M02 publication rereads the visible first page and refreshes old cursor/fi
   expect(
     f.requests.filter((request) => request.op === "document_version_publish_v1"),
   ).toHaveLength(1);
-  const writeIndex = f.requests.findIndex((request) => request.op === "document_version_publish_v1");
+  const writeIndex = f.requests.findIndex(
+    (request) => request.op === "document_version_publish_v1",
+  );
   const resultIndex = f.requests.findIndex(
     (request) =>
       request.op === "management_state_get_v1" &&
