@@ -55,7 +55,8 @@ export function MemberEntitlementsContent({
     : undefined;
   const payments = useQuery({
     queryKey: [...prefix, "payments", currency, paymentCursors.at(-1)],
-    queryFn: () => readFinancePage(scope, { personId, currency: currency! }, paymentCursors.at(-1)),
+    queryFn: ({ signal }) =>
+      readFinancePage(scope, { personId, currency: currency! }, paymentCursors.at(-1), signal),
     enabled: !!currency,
     retry: false,
   });

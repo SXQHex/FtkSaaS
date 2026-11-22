@@ -1,3 +1,4 @@
+import { invalidateWorkspace } from "../workspace/workspace-query";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -129,10 +130,7 @@ export function useSettingsTeam({
         { queryKey: ["settings-team-permissions", scope] },
         { throwOnError: true },
       ),
-      queries.invalidateQueries(
-        { queryKey: ["workspace", scope.accountId, scope.orgId] },
-        { throwOnError: true },
-      ),
+      invalidateWorkspace(queries, scope.accountId, { throwOnError: true }),
     ]);
   }
   const command = useMemberCommand({

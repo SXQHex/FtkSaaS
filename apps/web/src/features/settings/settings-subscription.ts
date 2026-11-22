@@ -59,8 +59,10 @@ export function settingsSubscriptionQuery(scope: ClientScope) {
     queryKey: ["settings-subscription", scope.accountId, scope.orgId],
     queryFn: () => readSettingsSubscription(scope),
     retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    // Plan, entitlement and role limits may change outside this SPA.
+    // Revalidate stale subscription projections after focus/reconnect.
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 export async function subscriptionRenewalIntent(before: SettingsSubscriptionSource) {

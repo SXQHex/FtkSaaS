@@ -1,8 +1,9 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { readWorkspace } from "../workspace/workspace";
+
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
@@ -37,12 +38,7 @@ export function InstructorTodayContent({
   const { t } = useTranslation(),
     router = useRouter();
   const [now, setNow] = useState(() => new Date().toISOString());
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     !workspace.isError && workspace.data?.selected?.id === scope.orgId ? workspace.data : undefined;
   const center = current?.centers.find((row) => row.id === scope.centerId && row.accessible);

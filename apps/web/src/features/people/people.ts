@@ -1,3 +1,4 @@
+import { queryBackendRead } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
@@ -31,18 +32,24 @@ export async function readPeoplePage(
   cursor?: string,
   status?: "active" | "inactive",
   includeSummary = false,
+  signal?: AbortSignal,
 ) {
-  const backend = await scopedBackend(scope);
-  return backend.call("people_list_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    ...(scope.centerId ? { center_id: scope.centerId } : {}),
-    ...(query.trim() ? { query: query.trim() } : {}),
-    ...(status ? { student_status: status } : {}),
-    ...(includeSummary ? { include_member_summary: true } : {}),
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
-  });
+  const backend = await scopedBackend(scope, signal);
+  return queryBackendRead(
+    backend,
+    "people_list_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      ...(scope.centerId ? { center_id: scope.centerId } : {}),
+      ...(query.trim() ? { query: query.trim() } : {}),
+      ...(status ? { student_status: status } : {}),
+      ...(includeSummary ? { include_member_summary: true } : {}),
+      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
 }
 export async function createPerson(intent: PersonCreateIntent) {
   const backend = await scopedBackend(intent.scope);
