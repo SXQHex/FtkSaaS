@@ -322,8 +322,9 @@ test("M01 session mutation resets stale participant cursors", async ({ page }) =
     centerManager: true,
     paginatedParticipants: true,
   });
-  const panel = page.getByRole("tabpanel", { name: "Katılımcılar", exact: true });
-  const next = panel.getByRole("button", { name: "Sonraki", exact: true });
+  await page.getByRole("tab", { name: "Katılımcılar", exact: true }).click();
+  await expect(page.getByRole("grid", { name: "Katılımcılar", exact: true })).toBeVisible();
+  const next = page.getByRole("button", { name: "Sonraki", exact: true }).first();
   await next.click();
   const oldReads = () =>
     state.participantReads.filter((read) => read.cursor === "stale-participant").length;
@@ -343,7 +344,7 @@ test("M01 session mutation resets stale participant cursors", async ({ page }) =
   );
   expect(staleAfterWrite).toHaveLength(0);
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await expect(panel.getByRole("button", { name: "Önceki", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Önceki", exact: true }).first()).toBeDisabled();
   await next.click();
   const freshReads = () =>
     state.participantReads.filter((read) => read.cursor === "fresh-participant").length;
