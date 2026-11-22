@@ -40,12 +40,14 @@ export function PersonEntry({
   onClose,
   onLockChange,
   onCreated,
+  onInvitationReadback,
 }: {
   scope: PeopleScope;
   open: boolean;
   onClose: () => void;
   onLockChange: (locked: boolean) => void;
   onCreated: (person: PersonView) => Promise<void>;
+  onInvitationReadback?: () => Promise<void>;
 }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -165,6 +167,10 @@ export function PersonEntry({
     if (!current) throw new Error("INVITATION_ACK_UNAVAILABLE");
     const result = await readPersonInvitationJob(scope, current);
     if (result.id !== current.job_id) throw new Error("INVITATION_READ_UNAVAILABLE");
+    if (!mounted.current) return;
+    // Access directory users need the confirmed invitation result reflected in
+    // both first pages; other PersonEntry consumers retain their own readback.
+    await onInvitationReadback?.();
     if (mounted.current) {
       setJobStatus(result);
       setNotice("job");

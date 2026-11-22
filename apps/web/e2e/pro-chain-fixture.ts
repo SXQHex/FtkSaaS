@@ -26,7 +26,9 @@ export const chainIds = {
  * Native ledger/race guarantees are separately bound to the accepted backend CI tree.
  */
 export async function mockStudioChain(page: Page, plan: "pro" | "starter") {
-  const f = await mockSessionDetail(page);
+  // The requested 17 November local 12:00 slot must be inside the readback
+  // calendar range. A wall-clock fixture can fabricate an unrelated session.
+  const f = await mockSessionDetail(page, { now: new Date("2026-11-17T08:00:00Z") });
   const { studio, session, attendance } = f;
   studio.roles[0]!.accountAccessGranted = true;
   if (plan === "starter") studio.agreements.length = 0;
