@@ -34,7 +34,13 @@ test("payment refreshes historical period and person cursor pages after native r
   // Historical earning and payment occur in different months. The backend owns
   // period filtering, so both old cursor pages must be read with the old interval.
   f.earning.earning.created_at = "2026-10-10T12:00:00Z";
-  await page.getByRole("button", { name: /Ekim 2026/ }).click();
+  await page
+    .getByRole("radiogroup", { name: "Dönem", exact: true })
+    .getByRole("radio", {
+      name: "Ekim 2026",
+      exact: true,
+    })
+    .click();
   await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
   await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
