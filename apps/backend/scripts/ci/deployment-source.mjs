@@ -7,13 +7,17 @@ import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 
-export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
+function validateMainSource(run,jobs,repository,attempt){
  if(run.path!=='.github/workflows/backend.yml'||run.event!=='push'||run.head_branch!=='main'||run.repository?.full_name!==repository||run.head_repository?.full_name!==repository)throw Error('Untrusted main acceptance source');
  if(run.status!=='completed'||run.conclusion!=='success'||(attempt&&run.run_attempt!==attempt))throw Error('Main acceptance failed or attempt changed');
  if(!/^[a-f0-9]{40}$/.test(run.head_sha))throw Error('Invalid accepted SHA');
- if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded main source'};
  const source=jobs.filter(j=>j.name==='source');
  if(source.length!==1||source[0].status!=='completed'||source[0].conclusion!=='success'||source[0].run_id!==run.id||source[0].run_attempt!==run.run_attempt||source[0].head_sha!==run.head_sha)throw Error('Missing main source verification');
+}
+
+export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
+ validateMainSource(run,jobs,repository,attempt);
+ if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded main source'};
  // Historical experiment receipts are never runtime deployment proof.
  // Keep this rejection when reading old main runs after the experiment is retired.
  const v2=jobs.filter(j=>j.name==='v2-development');
@@ -107,8 +111,11 @@ export async function resolveDeployment(github,context,core) {
  const run=(await github.rest.actions.getWorkflowRun({...repo,run_id:id})).data;
  const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:id,filter:'latest',per_page:100});
  const currentMain=(await github.rest.git.getRef({...repo,ref:'heads/main'})).data.object.sha;
- let proof=await resolveAcceptedSource(github,repo,run,jobs,currentMain,context.payload.workflow_run?.run_attempt);
- if(proof.deploy)proof=await filterSupabaseDelivery(github,repo,proof,await previousReceipt(github,context));
+ // A no-op delivery needs only trusted main identity and the delivered Supabase tree.
+ // Resolve the expensive full backend proof only when that tree actually changed.
+ validateMainSource(run,jobs,repo.owner+'/'+repo.repo,context.payload.workflow_run?.run_attempt);
+ let proof=await filterSupabaseDelivery(github,repo,{deploy:true,expected_main:currentMain},await previousReceipt(github,context));
+ if(proof.deploy)proof=await resolveAcceptedSource(github,repo,run,jobs,currentMain,context.payload.workflow_run?.run_attempt);
  core.setOutput('deploy',String(proof.deploy));
  if(proof.deploy){core.setOutput('sha',proof.sha);core.setOutput('expected_main',proof.expected_main);core.setOutput('acceptance_run_id',String(proof.run_id));core.setOutput('acceptance_attempt',String(proof.attempt));}
  await core.summary.addRaw(JSON.stringify(proof)+'\n').write();
@@ -121,27 +128,36 @@ export function trustedDeliveryRun(run,jobs,repository){
 }
 export async function previousReceipt(github,context){
  for(let page=1;;page++){
- const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'cd-development.yml',status:'success',branch:'main',per_page:100,page})).data.workflow_runs;
- for(const run of runs){
-  if(run.id===context.runId||run.path!=='.github/workflows/cd-development.yml')continue;
-  const current=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:run.id})).data;
-  const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...context.repo,run_id:run.id,filter:'latest',per_page:100});
-  if(current.run_attempt!==run.run_attempt||!trustedDeliveryRun(current,jobs,context.repo.owner+'/'+context.repo.repo))continue;
-  const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...context.repo,run_id:run.id,per_page:100});
-  const matches=artifacts.filter(a=>a.name===`development-delivery-${run.id}-${run.run_attempt}`);
-  if(matches.length!==1||matches[0].expired)throw Error('Missing or expired last successful delivery receipt');
-  const a=matches[0];
-  const zip=await github.rest.actions.downloadArtifact({...context.repo,artifact_id:a.id,archive_format:'zip'});
-  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ftk-cd-receipt-'));
-  try{
-   const file=path.join(dir,'receipt.zip');fs.writeFileSync(file,Buffer.from(zip.data));
-   const receipt=JSON.parse(execFileSync('unzip',['-p',file,'development-delivery.json'],{encoding:'utf8',maxBuffer:100000}));
-   if(receipt.success===true&&receipt.project==='gwyprhenabtpkbojephw'&&/^[a-f0-9]{40}$/.test(receipt.source??'')){
-    fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('previous-development-delivery.json'),JSON.stringify(receipt));return receipt;
+  const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'cd-development.yml',status:'success',branch:'main',per_page:100,page})).data.workflow_runs;
+  if(!Array.isArray(runs))throw Error('Invalid delivery run listing');
+  // Skipped source-only workflows can be numerous. Fetch their job lists in bounded
+  // parallel groups; re-read the exact live run only for a successful deploy job.
+  const candidates=runs.filter(run=>run.id!==context.runId&&run.path==='.github/workflows/cd-development.yml'&&run.status==='completed'&&run.conclusion==='success');
+  for(let start=0;start<candidates.length;start+=16){
+   const checked=await Promise.all(candidates.slice(start,start+16).map(async run=>{
+    const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...context.repo,run_id:run.id,filter:'latest',per_page:100});
+    return {run,jobs,delivered:jobs.some(j=>j.name==='deploy'&&j.status==='completed'&&j.conclusion==='success')};
+   }));
+   for(const {run,jobs,delivered} of checked){
+    if(!delivered)continue;
+    const current=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:run.id})).data;
+    if(current.run_attempt!==run.run_attempt||!trustedDeliveryRun(current,jobs,context.repo.owner+'/'+context.repo.repo))continue;
+    const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...context.repo,run_id:run.id,per_page:100});
+    const matches=artifacts.filter(a=>a.name===`development-delivery-${run.id}-${run.run_attempt}`);
+    if(matches.length!==1||matches[0].expired)throw Error('Missing or expired last successful delivery receipt');
+    const a=matches[0];
+    const zip=await github.rest.actions.downloadArtifact({...context.repo,artifact_id:a.id,archive_format:'zip'});
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ftk-cd-receipt-'));
+    try{
+     const file=path.join(dir,'receipt.zip');fs.writeFileSync(file,Buffer.from(zip.data));
+     const receipt=JSON.parse(execFileSync('unzip',['-p',file,'development-delivery.json'],{encoding:'utf8',maxBuffer:100000}));
+     if(receipt.success===true&&receipt.project==='gwyprhenabtpkbojephw'&&/^[a-f0-9]{40}$/.test(receipt.source??'')){
+      fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('previous-development-delivery.json'),JSON.stringify(receipt));return receipt;
+     }
+     throw Error('Invalid last successful delivery receipt');
+    }finally{fs.rmSync(dir,{recursive:true,force:true});}
    }
-   throw Error('Invalid last successful delivery receipt');
-  }finally{fs.rmSync(dir,{recursive:true,force:true});}
- }
- if(runs.length<100)return;
+  }
+  if(runs.length<100)return;
  }
 }
