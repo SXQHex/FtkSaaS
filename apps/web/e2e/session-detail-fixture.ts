@@ -242,13 +242,12 @@ export async function mockSessionDetail(
         // Mutation reorders this native directory: the old continuation is invalid.
         if (cursor === "stale-participant" && writes.length > 0)
           return reject("VALIDATION_FAILED");
+        let nextCursor: string | null = null;
+        if (!cursor)
+          nextCursor = writes.length > 0 ? "fresh-participant" : "stale-participant";
         return send({
           items: cursor || !reservation ? [] : [reservation],
-          next_cursor: cursor
-            ? null
-            : writes.length > 0
-              ? "fresh-participant"
-              : "stale-participant",
+          next_cursor: nextCursor,
           as_of: new Date().toISOString(),
         });
       }
