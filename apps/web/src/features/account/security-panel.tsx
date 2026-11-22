@@ -2,8 +2,7 @@ import { useRef, useState } from "react";
 import { useQuery, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { readAccount } from "../../lib/account";
-import { invalidateAccountProjections } from "../auth/account-query";
+import { invalidateAccountProjections, verifiedAccountForId } from "../auth/account-query";
 import { readFactors, readSecurityHistory } from "./security";
 import { getSupabaseClient } from "../../lib/supabase";
 import { GoogleIdentities } from "./google-identities";
@@ -58,13 +57,13 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
         if (error) throw error;
         needsNativeRefresh.current = false;
       }
+      await invalidateAccountProjections(queries);
       await Promise.all([
-        readAccount(),
+        verifiedAccountForId(queries, accountId, true),
         ...(needsSessionsRead.current ? [readSessions()] : []),
         factors.refetch({ throwOnError: true }),
         history.refetch({ throwOnError: true }),
       ]);
-      await invalidateAccountProjections(queries);
       await router.invalidate();
       needsSessionsRead.current = false;
     } catch {

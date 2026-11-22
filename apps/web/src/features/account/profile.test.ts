@@ -51,6 +51,17 @@ it("takes the profile write version only from the matching account management en
     selector: { operation: "account_profile_update_v1", key: {} },
   });
 });
+it("uses a verified Query account without a second standalone account read", async () => {
+  const verified = vi.fn().mockResolvedValue({ id: entity.id, display_name: "Verified" });
+  call.mockResolvedValue(page());
+  const result = await readProfile(entity.id, verified);
+  expect(result.account.display_name).toBe("Verified");
+  expect(verified).toHaveBeenCalledOnce();
+  expect(account).not.toHaveBeenCalled();
+  verified.mockResolvedValue({ id: "other-account" });
+  await expect(readProfile(entity.id, verified)).rejects.toThrow("PROFILE_UNAVAILABLE");
+});
+
 it("rejects absent/mismatched management versions instead of fabricating an initial one", async () => {
   account.mockResolvedValue({ id: entity.id });
   const data = page();

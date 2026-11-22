@@ -2,19 +2,19 @@ import "../../i18n";
 import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { afterEach, expect, it, vi } from "vitest";
-const { factors, history, enroll, remove, refreshNative, account, password, sessions } = vi.hoisted(
-  () => ({
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+const { factors, history, enroll, remove, refreshNative, getSession, account, password, sessions } =
+  vi.hoisted(() => ({
     factors: vi.fn(),
     history: vi.fn(),
     enroll: vi.fn(),
     remove: vi.fn(),
     refreshNative: vi.fn(),
+    getSession: vi.fn(),
     account: vi.fn(),
     password: vi.fn(),
     sessions: vi.fn(),
-  }),
-);
+  }));
 vi.mock("./security", () => ({
   readFactors: factors,
   readSecurityHistory: history,
@@ -25,7 +25,7 @@ vi.mock("./security", () => ({
 vi.mock("../../lib/account", () => ({ readAccount: account }));
 vi.mock("@tanstack/react-router", () => ({ useRouter: () => ({ invalidate: vi.fn() }) }));
 vi.mock("../../lib/supabase", () => ({
-  getSupabaseClient: () => ({ auth: { refreshSession: refreshNative } }),
+  getSupabaseClient: () => ({ auth: { refreshSession: refreshNative, getSession } }),
 }));
 vi.mock("./identities", () => ({
   readIdentities: async () => [],
@@ -35,6 +35,13 @@ vi.mock("./identities", () => ({
 vi.mock("./password", () => ({ changePassword: password, requestPasswordCode: vi.fn() }));
 vi.mock("./sessions", () => ({ readSessions: sessions }));
 import { SecurityPanel } from "./security-panel";
+beforeEach(() => {
+  getSession.mockResolvedValue({
+    data: { session: { user: { id: "native-fixture" }, access_token: "native-fixture" } },
+    error: null,
+  });
+  account.mockResolvedValue({ id: "fixture" });
+});
 afterEach(() => vi.resetAllMocks());
 it("keeps an active setup sheet when background factor rereads discover its pending factor or fail", async () => {
   factors.mockResolvedValue({ all: [], totp: [] });
