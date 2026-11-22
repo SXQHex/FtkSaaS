@@ -1,11 +1,12 @@
 import { getSupabaseClient } from "../../lib/supabase";
 import type { QueryClient } from "@tanstack/react-query";
+import { queryClient } from "../../lib/query-client";
 import { accountQuery } from "./account-query";
 import { hasDeletionReceipt } from "../account/deletion";
 
 export async function loginWithPassword(
   values: { email: string; password: string },
-  queries: QueryClient,
+  queries: QueryClient = queryClient,
 ) {
   const { data, error } = await getSupabaseClient().auth.signInWithPassword(values);
   if (error) throw error;
