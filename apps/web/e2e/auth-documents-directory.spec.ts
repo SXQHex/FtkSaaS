@@ -379,6 +379,10 @@ test("M02 publication rereads the visible first page and refreshes old cursor/fi
   expect(initialAcceptanceReads).toBeGreaterThan(0);
   expect(initialCursorReads).toBeGreaterThan(0);
 
+  // Restore the exact document-page query key primed before the publication.
+  // The acceptance page remains cached under its original document/filter key.
+  await page.getByRole("radio", { name: "Bekleyen", exact: true }).click();
+  await page.getByRole("combobox", { name: "Belge", exact: true }).selectOption("");
   await page.getByRole("tab", { name: /Belgeler/ }).click();
   await page.getByRole("row").filter({ hasText: ready.name }).click();
   await page.getByRole("button", { name: "Yayına hazırla", exact: true }).click();
@@ -423,6 +427,10 @@ test("M02 publication rereads the visible first page and refreshes old cursor/fi
   expect(oldCursorReads).toBe(initialCursorReads + 1);
 
   await page.getByRole("tab", { name: /Kabul/ }).click();
+  await page
+    .getByRole("combobox", { name: "Belge", exact: true })
+    .selectOption(document.document_id);
+  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
   await expect(page.getByText("Tarihsel katılımcı", { exact: false })).toBeVisible();
   expect(allAcceptanceReads).toBe(initialAcceptanceReads + 1);
 });
