@@ -344,7 +344,8 @@ test("M01 session mutation resets stale participant cursors", async ({ page }) =
   );
   expect(staleAfterWrite).toHaveLength(0);
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Önceki sayfa", exact: true }).first()).toBeDisabled();
+  const previous = page.getByRole("button", { name: "Önceki sayfa", exact: true }).first();
+  await expect(previous).toBeDisabled();
   await next.click();
   const freshReads = () =>
     state.participantReads.filter((read) => read.cursor === "fresh-participant").length;
