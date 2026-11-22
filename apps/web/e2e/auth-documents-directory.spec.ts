@@ -248,3 +248,179 @@ test("owned ready file reuses the native file and publishes only after explicit 
     }),
   ).toBeVisible();
 });
+
+test("M02 publication rereads the visible first page and refreshes old cursor/filter caches only on return", async ({
+  page,
+}) => {
+  let published = false;
+  let publicationRequest: Record<string, any> | undefined;
+  let oldCursorReads = 0;
+  let allAcceptanceReads = 0;
+  const proof = {
+    id: uid(15),
+    token: "synthetic",
+    scope_hash: "synthetic",
+    dependencies: { versions: [] },
+    effects: [],
+    blockers: [],
+    expires_at: "2099-01-01T00:00:00Z",
+  };
+  const history = {
+    key: "history",
+    kind: "history",
+    acceptance_id: uid(9),
+    document_id: document.document_id,
+    version_id: version.version_id,
+    version_label: version.version_label,
+    person_id: I.instructor,
+    display_name: "Tarihsel katılımcı",
+    accepted_at: at,
+    context: { gate: "sale", subject: { type: "sales", id: uid(8) } },
+    evidence_state: "recorded",
+    evidence_kind: "server_document",
+  };
+
+  const f = await mockCompletion(page, async ({ op, r, send }) => {
+    if (op === "document_directory_get_v1") {
+      if (r.view === "versions") {
+        await send(directory("versions", [version]));
+        return;
+      }
+      if (r.view === "acceptances") {
+        if (r.acceptance_filter === "all") allAcceptanceReads++;
+        await send(directory("acceptances", r.acceptance_filter === "all" ? [history] : []));
+        return;
+      }
+      if (r.page.cursor) {
+        expect(r.page.cursor).toBe("stable-cursor");
+        oldCursorReads++;
+        await send(
+          directory("documents", [
+            {
+              ...document,
+              key: uid(11),
+              document_id: uid(11),
+              name: published ? "İkinci güncel belge" : "İkinci eski belge",
+            },
+          ]),
+        );
+        return;
+      }
+      const newlyPublished = {
+        ...document,
+        key: uid(18),
+        document_id: uid(18),
+        name: ready.name,
+        latest_version: {
+          ...version,
+          version_id: ready.file_id,
+          version_label: "Yeni sentetik sürüm",
+        },
+      };
+      await send(
+        directory(
+          "documents",
+          published ? [document, newlyPublished] : [document, ready],
+          "stable-cursor",
+        ),
+      );
+      return;
+    }
+    if (op === "document_publication_preview_v1") {
+      await send({ preview: proof, affected: [], preserves_reservations: true });
+      return;
+    }
+    if (op === "preview_get_v1") {
+      await send(proof);
+      return;
+    }
+    if (op === "document_version_publish_v1") {
+      publicationRequest = r;
+      published = true;
+      await send(nativeMutation(ready.file_id));
+      return;
+    }
+    if (op === "management_state_get_v1" && r.operation === "document_version_publish_v1") {
+      expect(publicationRequest).toBeDefined();
+      await send(
+        nativePage([
+          metadata(
+            "document_version_publish_v1",
+            "document_versions",
+            ready.file_id,
+            {
+              document_id: uid(18),
+              file_id: ready.file_id,
+              version_label: "Yeni sentetik sürüm",
+              scope: { kind: "center", center_id: I.center },
+              requirements: publicationRequest!.requirements,
+            },
+            1,
+            "published",
+          ),
+        ]),
+      );
+    }
+  });
+
+  await page.goto(completionUrl("documents"));
+  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await expect(page.getByText("İkinci eski belge", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
+
+  await page.getByRole("tab", { name: /Kabul/ }).click();
+  await page
+    .getByRole("combobox", { name: "Belge", exact: true })
+    .selectOption(document.document_id);
+  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
+  await expect(page.getByText("Tarihsel katılımcı", { exact: false })).toBeVisible();
+  expect(allAcceptanceReads).toBe(1);
+
+  await page.getByRole("tab", { name: /Belgeler/ }).click();
+  await page.getByRole("row").filter({ hasText: ready.name }).click();
+  await page.getByRole("button", { name: "Yayına hazırla", exact: true }).click();
+  const editor = page.getByRole("dialog");
+  await editor.getByRole("textbox", { name: /Sürüm/ }).fill("Yeni sentetik sürüm");
+  await editor.getByRole("checkbox", { name: /Satış/ }).press("Space");
+  await editor.getByRole("button", { name: "Etkiyi göster", exact: true }).click();
+  await editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await editor.getByRole("button", { name: "Yayınla", exact: true }).click();
+
+  await expect(
+    page.getByText("Yeni sentetik sürüm sürümü yayımlandı ve sunucudan yeniden doğrulandı.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(oldCursorReads).toBe(1);
+  expect(allAcceptanceReads).toBe(1);
+  expect(
+    f.requests.filter((request) => request.op === "document_version_publish_v1"),
+  ).toHaveLength(1);
+  const writeIndex = f.requests.findIndex((request) => request.op === "document_version_publish_v1");
+  const resultIndex = f.requests.findIndex(
+    (request) =>
+      request.op === "management_state_get_v1" &&
+      request.r.operation === "document_version_publish_v1",
+  );
+  expect(writeIndex).toBeGreaterThan(-1);
+  expect(resultIndex).toBeGreaterThan(writeIndex);
+  expect(
+    f.requests.slice(resultIndex + 1).some(
+      (request) =>
+        request.op === "document_directory_get_v1" &&
+        request.r.view === "documents" &&
+        !request.r.page.cursor,
+    ),
+  ).toBe(true);
+
+  await page.keyboard.press("Escape");
+  await expect(editor).toHaveCount(0);
+  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await expect(page.getByText("İkinci güncel belge", { exact: true })).toBeVisible();
+  expect(oldCursorReads).toBe(2);
+
+  await page.getByRole("tab", { name: /Kabul/ }).click();
+  await expect(page.getByText("Tarihsel katılımcı", { exact: false })).toBeVisible();
+  expect(allAcceptanceReads).toBe(2);
+  expect(history.accepted_at).toBe(at);
+});
