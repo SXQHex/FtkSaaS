@@ -46,6 +46,12 @@ Bu kurulum yalnız ajan talimatıdır: skill’in tarif ettiği arama ve rehber 
 
 Modern web önerileri mevcut React Aria/Rhea bileşenlerini, erişilebilirlik kontrollerini, tip güvenliğini veya proje sözleşmelerini aşmaz. Skill içindeki genel `any`, build hedefi ve bağımlılık önerileri mevcut kalite kurallarını değiştirme yetkisi vermez. Rehber proje araçlarıdır; üretim kodu, belge sicili, build veya CI girdilerine eklenmez.
 
+## Resmî Oxc migrate-oxfmt skill'i
+
+22 Kasım 2026 tarihinde `oxc-project/oxc` deposunun `a96e2bdf600481ef009bd8297bc4da0b419bb130` revizyonundaki `.agents/skills/migrate-oxfmt/SKILL.md` dosyası değiştirilmeden bu dizine alındı. MIT lisans metni aynı klasörde `LICENSE` olarak tutulur. [Kaynak](https://github.com/oxc-project/oxc/tree/a96e2bdf600481ef009bd8297bc4da0b419bb130/.agents/skills/migrate-oxfmt).
+
+Kurulum yalnız Codex için kullanım rehberidir; reponun `oxfmt` bağımlılığını, `.oxfmtrc.json` ayarını, CI doğrulamasını veya üretim kaynaklarını değiştirmez. Bu skill **Prettier/Biome'dan Oxfmt'ye geçiş** içindir; proje hâlihazırda Oxfmt kullandığı için otomatik `--migrate` çalıştırılmaz. Oxfmt biçimlendirme hataları mevcut sabit sürüm ve repo yapılandırmasıyla çözülür.
+
 ## İçerik
 
 | Skill | Dosya sayısı |
@@ -72,6 +78,7 @@ Modern web önerileri mevcut React Aria/Rhea bileşenlerini, erişilebilirlik ko
 | `interview-me` | 4 |
 | `k8s-catch-up` | 102 |
 | `modern-web-guidance` | 2 |
+| `migrate-oxfmt` | 2 |
 | `observability-and-instrumentation` | 5 |
 | `performance-optimization` | 6 |
 | `planning-and-task-breakdown` | 5 |
