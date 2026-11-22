@@ -26,7 +26,7 @@ Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium**
 
 ## Router + Query birleşik veri yaşam döngüsü
 
-**Tek mimari iş:** “Aşama 1” ve “Aşama 2” ayrı teslimler değil. Kod denetiminin somut M01–M14 bulguları, açık maddeleri, kaynakları, öncelikleri ve kapanış testleri yalnız [aktif frontend backlog'unda](todo.md#router-query-birlesik) tutulur. Bu bölüm yürürlükteki teknik tercihin **nedenini** açıklar; uygulama ve CI kabulünü ileri tarihli/otomatik tamamlanmış saymaz.
+**Tek mimari iş:** “Aşama 1” ve “Aşama 2” ayrı teslimler değil. Kod denetiminin somut M01–M14 bulguları, açık maddeleri, kaynakları, öncelikleri ve kapanış testleri yalnız [aktif frontend backlog'unda](remaining-work.md#router-query-birlesik) tutulur. Bu bölüm yürürlükteki teknik tercihin **nedenini** açıklar; uygulama ve CI kabulünü ileri tarihli/otomatik tamamlanmış saymaz.
 
 ### Veri sahibi ve güvenlik sınırı
 
@@ -52,7 +52,7 @@ Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium**
 
 ### Doğrulama
 
-Kabul tek kaynak SHA'sına bağlıdır. [Önceki regression testleri](../src/features/workspace/query-invalidation.test.ts), [Auth](../src/features/auth/account-query.test.ts), [abort transport](../src/lib/backend-read-cancellation.test.ts), [SPA navigasyon](../e2e/auth-spa-navigation.spec.ts) ve [scope geçişi](../e2e/auth-scope-transition.spec.ts) korunur. Eski filtre/cursor, rol kaybı, aynı hesap-yeni session, late reply, bilinmeyen ACK ve ağ sayısı önce/sonra senaryoları [açık kabul listesinde](todo.md#router-query-birlesik) eksiksiz kapatılır. Tek Desktop Chromium koşusu diğer üç tarayıcı profilinin kabulü değildir.
+Kabul tek kaynak SHA'sına bağlıdır. [Önceki regression testleri](../src/features/workspace/query-invalidation.test.ts), [Auth](../src/features/auth/account-query.test.ts), [abort transport](../src/lib/backend-read-cancellation.test.ts), [SPA navigasyon](../e2e/auth-spa-navigation.spec.ts) ve [scope geçişi](../e2e/auth-scope-transition.spec.ts) korunur. Eski filtre/cursor, rol kaybı, aynı hesap-yeni session, late reply, bilinmeyen ACK ve ağ sayısı önce/sonra senaryoları [açık kabul listesinde](remaining-work.md#router-query-birlesik) eksiksiz kapatılır. Tek Desktop Chromium koşusu diğer üç tarayıcı profilinin kabulü değildir.
 
 ## Yerel çalışma
 
