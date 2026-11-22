@@ -24,15 +24,20 @@ export async function readFinancePage(
   z.uuid().parse(selection.personId);
   currency.parse(selection.currency);
   const backend = await scopedBackend(scope, signal);
-  const data = await queryBackendRead(backend, "finance_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    person_id: selection.personId,
-    currency: selection.currency,
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
-  }, signal);
+  const data = await queryBackendRead(
+    backend,
+    "finance_get_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      person_id: selection.personId,
+      currency: selection.currency,
+      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
   if (data.person_id !== selection.personId || data.currency !== selection.currency)
     throw new Error("FINANCE_SOURCE_UNAVAILABLE");
   money.parse(data.credit_available_minor);

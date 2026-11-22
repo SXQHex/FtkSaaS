@@ -2,8 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
 
 export const peopleKeys = {
-  center: (scope: ClientScope) =>
-    ["people", scope.accountId, scope.orgId, scope.centerId] as const,
+  center: (scope: ClientScope) => ["people", scope.accountId, scope.orgId, scope.centerId] as const,
 };
 
 export function invalidatePeoplePages(queries: QueryClient, scope: ClientScope) {

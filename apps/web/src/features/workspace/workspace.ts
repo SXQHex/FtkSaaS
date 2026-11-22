@@ -24,21 +24,29 @@ export async function readWorkspace(
   // Router/Query callers may reuse this actor's verified account projection.
   const account = readVerifiedAccount
     ? await readVerifiedAccount(data.session)
-    : await backend.read("account_get_v1", {
-        client_api_version: 1,
-        request_id: uuidv7(),
-      }, signal);
+    : await backend.read(
+        "account_get_v1",
+        {
+          client_api_version: 1,
+          request_id: uuidv7(),
+        },
+        signal,
+      );
   signal?.throwIfAborted();
   if (account.id !== accountId) throw new Error("ACCOUNT_CHANGED");
   const organizations: OrganizationView[] = [];
   let cursor: string | undefined;
   do {
-    const page = await backend.read("organizations_list_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      include_self_management_scope: true,
-      page: { limit: 50, ...(cursor ? { cursor } : {}) },
-    }, signal);
+    const page = await backend.read(
+      "organizations_list_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        include_self_management_scope: true,
+        page: { limit: 50, ...(cursor ? { cursor } : {}) },
+      },
+      signal,
+    );
     organizations.push(...page.items);
     cursor = page.next_cursor ?? undefined;
   } while (cursor);
@@ -51,12 +59,16 @@ export async function readWorkspace(
     roles: RoleView[] = [];
   if (selected) {
     do {
-      const page = await backend.read("centers_list_v1", {
-        client_api_version: 1,
-        request_id: uuidv7(),
-        org_id: selected.id,
-        page: { limit: 50, ...(cursor ? { cursor } : {}) },
-      }, signal);
+      const page = await backend.read(
+        "centers_list_v1",
+        {
+          client_api_version: 1,
+          request_id: uuidv7(),
+          org_id: selected.id,
+          page: { limit: 50, ...(cursor ? { cursor } : {}) },
+        },
+        signal,
+      );
       centers.push(...page.items.filter((center) => center.accessible));
       cursor = page.next_cursor ?? undefined;
     } while (cursor);
@@ -64,13 +76,17 @@ export async function readWorkspace(
     if (personId) {
       try {
         do {
-          const page = await backend.read("roles_list_v1", {
-            client_api_version: 1,
-            request_id: uuidv7(),
-            org_id: selected.id,
-            person_id: personId,
-            page: { limit: 50, ...(cursor ? { cursor } : {}) },
-          }, signal);
+          const page = await backend.read(
+            "roles_list_v1",
+            {
+              client_api_version: 1,
+              request_id: uuidv7(),
+              org_id: selected.id,
+              person_id: personId,
+              page: { limit: 50, ...(cursor ? { cursor } : {}) },
+            },
+            signal,
+          );
           roles.push(...page.items.filter((role) => role.state === "active"));
           cursor = page.next_cursor ?? undefined;
         } while (cursor);

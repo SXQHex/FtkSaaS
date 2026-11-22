@@ -35,16 +35,21 @@ export async function readPeoplePage(
   signal?: AbortSignal,
 ) {
   const backend = await scopedBackend(scope, signal);
-  return queryBackendRead(backend, "people_list_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    ...(scope.centerId ? { center_id: scope.centerId } : {}),
-    ...(query.trim() ? { query: query.trim() } : {}),
-    ...(status ? { student_status: status } : {}),
-    ...(includeSummary ? { include_member_summary: true } : {}),
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
-  }, signal);
+  return queryBackendRead(
+    backend,
+    "people_list_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      ...(scope.centerId ? { center_id: scope.centerId } : {}),
+      ...(query.trim() ? { query: query.trim() } : {}),
+      ...(status ? { student_status: status } : {}),
+      ...(includeSummary ? { include_member_summary: true } : {}),
+      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
 }
 export async function createPerson(intent: PersonCreateIntent) {
   const backend = await scopedBackend(intent.scope);

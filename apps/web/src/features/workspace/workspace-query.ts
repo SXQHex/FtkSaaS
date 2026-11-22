@@ -52,11 +52,7 @@ export function workspaceQuery(queries: QueryClient, accountId: string, organiza
 
 // The shell owns the live fetch. Feature screens only observe the same query
 // without initiating their own background read when disabled.
-export function useWorkspaceQuery(
-  accountId: string,
-  organizationId?: string,
-  enabled = true,
-) {
+export function useWorkspaceQuery(accountId: string, organizationId?: string, enabled = true) {
   const queries = useQueryClient();
   return useQuery({ ...workspaceQuery(queries, accountId, organizationId), enabled });
 }

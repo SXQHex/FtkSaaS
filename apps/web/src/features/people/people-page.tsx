@@ -169,7 +169,14 @@ function PeopleContent({
       cursors[index],
     ],
     queryFn: ({ signal }) =>
-      readPeoplePage(scope, queryText, cursors[index], filter === "all" ? undefined : filter, true, signal),
+      readPeoplePage(
+        scope,
+        queryText,
+        cursors[index],
+        filter === "all" ? undefined : filter,
+        true,
+        signal,
+      ),
     retry: false,
   });
   const center = useQuery({

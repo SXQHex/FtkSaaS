@@ -67,11 +67,17 @@ export function EventsContent({
     ],
     enabled: !!center && !!period.data,
     queryFn: async ({ signal }) => {
-      const page = await readEventsPage(scope, period.data!.interval, cursors[pageIndex], {
-        query: search,
-        status: filter,
-        includeSummary: canReadSummary,
-      }, signal);
+      const page = await readEventsPage(
+        scope,
+        period.data!.interval,
+        cursors[pageIndex],
+        {
+          query: search,
+          status: filter,
+          includeSummary: canReadSummary,
+        },
+        signal,
+      );
       if (page.next_cursor && cursors.includes(page.next_cursor))
         throw new Error("EVENT_PAGE_UNAVAILABLE");
       return page;

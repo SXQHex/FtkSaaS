@@ -23,18 +23,14 @@ it("invalidates all people and product cursor/filter pages without crossing cent
   cache(queries, [...people, "active", "cursor-1"]);
   cache(queries, [...people, "inactive", "cursor-2"]);
   cache(queries, [...products, "active", "cursor-1"]);
-  cache(queries, [...productsKeys.management(other), "active", "cursor-1"]);
+  const otherProductPage = [...productsKeys.management(other), "active", "cursor-1"];
+  cache(queries, otherProductPage);
   await invalidatePeoplePages(queries, scope);
   await invalidateProductPages(queries, scope);
   expect(queries.getQueryState([...people, "active", "cursor-1"])?.isInvalidated).toBe(true);
   expect(queries.getQueryState([...people, "inactive", "cursor-2"])?.isInvalidated).toBe(true);
-  expect(queries.getQueryState([...products, "active", "cursor-1"])?.isInvalidated).toBe(
-    true,
-  );
-  expect(
-    queries.getQueryState([...productsKeys.management(other), "active", "cursor-1"])
-      ?.isInvalidated,
-  ).toBe(false);
+  expect(queries.getQueryState([...products, "active", "cursor-1"])?.isInvalidated).toBe(true);
+  expect(queries.getQueryState(otherProductPage)?.isInvalidated).toBe(false);
 });
 
 it("marks every lead list variant stale without hiding a different center", async () => {
@@ -48,7 +44,8 @@ it("marks every lead list variant stale without hiding a different center", asyn
   ]) {
     cache(queries, [...key, "cursor-2"]);
   }
-  cache(queries, [...leadsKeys.directory(other), "cursor-2"]);
+  const otherLeadsPage = [...leadsKeys.directory(other), "cursor-2"];
+  cache(queries, otherLeadsPage);
   await invalidateLeadPages(queries, scope);
   for (const key of [
     leadsKeys.directory(scope),
@@ -59,12 +56,10 @@ it("marks every lead list variant stale without hiding a different center", asyn
   ]) {
     expect(queries.getQueryState([...key, "cursor-2"])?.isInvalidated).toBe(true);
   }
-  expect(
-    queries.getQueryState([...leadsKeys.directory(other), "cursor-2"])?.isInvalidated,
-  ).toBe(false);
+  expect(queries.getQueryState(otherLeadsPage)?.isInvalidated).toBe(false);
 });
 
-it("marks reservation, waitlist, rights, calendar and person summaries stale for the same tenant", async () => {
+it("marks reservation and related tenant caches stale", async () => {
   const queries = new QueryClient();
   const member = "person-a";
   const tenant = [scope.accountId, scope.orgId, scope.centerId];
@@ -88,25 +83,18 @@ it("marks reservation, waitlist, rights, calendar and person summaries stale for
   expect(queries.getQueryState(unrelated)?.isInvalidated).toBe(false);
 });
 
-it("invalidates all finance currencies and cursor projections for the confirmed person", async () => {
+it("invalidates finance cursor pages for the confirmed person", async () => {
   const queries = new QueryClient();
   const key = financeKeys.person(scope, "person-a", "TRY");
   const otherKey = financeKeys.person(other, "person-a", "TRY");
   cache(queries, [...key, "cursor-1"]);
   cache(queries, [...key, "cursor-2"]);
-  cache(queries, ["people", scope.accountId, scope.orgId, scope.centerId, "active"]);
+  const peoplePage = ["people", scope.accountId, scope.orgId, scope.centerId, "active"];
+  cache(queries, peoplePage);
   cache(queries, otherKey);
   await invalidateFinanceViews(queries, scope, "person-a", "TRY");
   expect(queries.getQueryState([...key, "cursor-1"])?.isInvalidated).toBe(true);
   expect(queries.getQueryState([...key, "cursor-2"])?.isInvalidated).toBe(true);
-  expect(
-    queries.getQueryState([
-      "people",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      "active",
-    ])?.isInvalidated,
-  ).toBe(true);
+  expect(queries.getQueryState(peoplePage)?.isInvalidated).toBe(true);
   expect(queries.getQueryState(otherKey)?.isInvalidated).toBe(false);
 });

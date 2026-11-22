@@ -51,9 +51,7 @@ export function createBackend(config: {
       request: Operations[K]["request"],
       signal?: AbortSignal,
     ): Promise<Operations[K]["response"]["data"]> {
-      return readEnvelope<Operations[K]["response"]>(
-        await post(operation, request, { signal }),
-      );
+      return readEnvelope<Operations[K]["response"]>(await post(operation, request, { signal }));
     },
     async call<K extends keyof Operations & RuntimeOperationName>(
       operation: K,

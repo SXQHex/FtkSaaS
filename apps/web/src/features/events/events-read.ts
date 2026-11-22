@@ -113,15 +113,20 @@ export async function readEventsPage(
   signal?: AbortSignal,
 ) {
   const backend = await scopedBackend(scope, signal);
-  const page = await queryBackendRead(backend, "event_list_v1", {
-    ...common(scope),
-    request_id: uuidv7(),
-    interval,
-    ...(filters.query?.trim() ? { query: filters.query.trim() } : {}),
-    ...(filters.status ? { status: filters.status } : {}),
-    ...(filters.includeSummary ? { include_summary: true } : {}),
-    page: { limit: 20, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
-  }, signal);
+  const page = await queryBackendRead(
+    backend,
+    "event_list_v1",
+    {
+      ...common(scope),
+      request_id: uuidv7(),
+      interval,
+      ...(filters.query?.trim() ? { query: filters.query.trim() } : {}),
+      ...(filters.status ? { status: filters.status } : {}),
+      ...(filters.includeSummary ? { include_summary: true } : {}),
+      page: { limit: 20, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
   if (
     page.items.length > 20 ||
     (cursor && page.next_cursor === cursor) ||

@@ -91,7 +91,7 @@ export function SessionDetailContent({
     ...workspaceOptions,
     // Keep the session's immediate access-loss cleanup in the reader path.
     queryFn: (context) =>
-      guardedRead(() => {
+      guardedRead(async () => {
         const read = workspaceOptions.queryFn;
         if (typeof read !== "function") throw new Error("WORKSPACE_READ_UNAVAILABLE");
         return read(context);

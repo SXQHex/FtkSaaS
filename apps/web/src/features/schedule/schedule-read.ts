@@ -78,15 +78,20 @@ export async function readScheduleRange(
       seenCursors = new Set<string>();
     let cursor: string | undefined;
     do {
-      const page = await queryBackendRead(backend, "calendar_get_v1", {
-        client_api_version: 1,
-        request_id: uuidv7(),
-        org_id: scope.orgId,
-        center_id: scope.centerId,
-        interval: { ...interval },
-        ...(resource ? { resource } : {}),
-        page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
-      }, signal);
+      const page = await queryBackendRead(
+        backend,
+        "calendar_get_v1",
+        {
+          client_api_version: 1,
+          request_id: uuidv7(),
+          org_id: scope.orgId,
+          center_id: scope.centerId,
+          interval: { ...interval },
+          ...(resource ? { resource } : {}),
+          page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+        },
+        signal,
+      );
       temporal.Instant.from(page.as_of);
       asOf.push(page.as_of);
       for (const item of page.items) {
@@ -133,13 +138,18 @@ export async function readScheduleRange(
         items.slice(index, index + 4).map(async (item): Promise<ScheduleReadItem> => {
           if (item.type === "event") return { type: "event", item };
           const session = sessionIdentity(
-            await queryBackendRead(backend, "session_get_v1", {
-              client_api_version: 1,
-              request_id: uuidv7(),
-              org_id: scope.orgId,
-              center_id: scope.centerId,
-              session_id: item.id,
-            }, signal),
+            await queryBackendRead(
+              backend,
+              "session_get_v1",
+              {
+                client_api_version: 1,
+                request_id: uuidv7(),
+                org_id: scope.orgId,
+                center_id: scope.centerId,
+                session_id: item.id,
+              },
+              signal,
+            ),
             item.id,
           );
           if (

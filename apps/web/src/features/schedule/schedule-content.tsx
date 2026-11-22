@@ -250,10 +250,15 @@ export function ScheduleContent({
     enabled: Boolean(sources.data && range),
     queryFn: async ({ queryKey, signal }) => {
       try {
-        return await readScheduleRange(scope, range!, {
-          ...(room ? { roomId: room } : {}),
-          ...(instructor ? { instructorId: instructor } : {}),
-        }, signal);
+        return await readScheduleRange(
+          scope,
+          range!,
+          {
+            ...(room ? { roomId: room } : {}),
+            ...(instructor ? { instructorId: instructor } : {}),
+          },
+          signal,
+        );
       } catch (failure) {
         if (accessLost(failure, queryKey)) command.abandon();
         throw failure;
