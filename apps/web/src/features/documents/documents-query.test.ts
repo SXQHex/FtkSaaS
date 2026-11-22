@@ -147,7 +147,7 @@ it("M02: a failed mandatory first-page readback never makes an old cursor fresh"
   expect(queries.getQueryData(old)).toEqual({ revision: "before" });
 });
 
-it("M02 rejects late pre-publication responses without cancelling a different center", async () => {
+it("M02 cancels late document reads without crossing centers", async () => {
   const queries = new QueryClient();
   const first = directory(scope);
   const foreign = directory(otherCenter);

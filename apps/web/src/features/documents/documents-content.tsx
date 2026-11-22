@@ -250,11 +250,11 @@ export function DocumentsContent({
   const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
   async function refresh(publishedScope: "center" | "organization") {
     await invalidateDocumentDirectoryViews(queries, scope, publishedScope);
-    // The catalog's first page and an unfiltered document-directory first page
-    // are the same native read. Share the verified result instead of refetching
-    // both query keys; filtered documents and acceptances remain distinct reads.
-    const readVisible = active && (tab === "documents" || (tab === "acceptance" && !!documentId));
-    const shareCatalogPage = readVisible && tab === "documents" && !query.trim();
+    // The catalog and an unfiltered document page have the same native input.
+    // Share its verified first page; keep filtered and acceptance reads distinct.
+    const visibleDocuments = active && tab === "documents";
+    const visibleAcceptances = active && tab === "acceptance" && !!documentId;
+    const shareCatalogPage = visibleDocuments && !query.trim();
     const firstPageKey = [
       "document-directory",
       scope,
@@ -266,29 +266,29 @@ export function DocumentsContent({
       query,
       undefined,
     ];
+    async function readVisibleFirstPage() {
+      if ((!visibleDocuments && !visibleAcceptances) || shareCatalogPage) return;
+      await queries.fetchQuery({
+        queryKey: firstPageKey,
+        queryFn: () =>
+          readDocumentDirectory(scope, {
+            view: visibleDocuments ? "documents" : "acceptances",
+            level,
+            ...(visibleAcceptances ? { documentId, versionId: versionId || undefined } : {}),
+            filter: visibleAcceptances ? filter : "all",
+            query: query || undefined,
+            cursor: undefined,
+          }),
+        staleTime: 0,
+        retry: false,
+      });
+    }
     const [catalogResult, versionsResult] = await Promise.all([
       catalog.refetch(),
       active && versionTarget?.document_id && !versionTarget.read_only
         ? versions.refetch()
         : Promise.resolve(undefined),
-      readVisible && !shareCatalogPage
-        ? queries.fetchQuery({
-            queryKey: firstPageKey,
-            queryFn: () =>
-              readDocumentDirectory(scope, {
-                view: tab === "documents" ? "documents" : "acceptances",
-                level,
-                ...(tab === "acceptance"
-                  ? { documentId, versionId: versionId || undefined }
-                  : {}),
-                filter: tab === "acceptance" ? filter : "all",
-                query: query || undefined,
-                cursor: undefined,
-              }),
-            staleTime: 0,
-            retry: false,
-          })
-        : Promise.resolve(undefined),
+      readVisibleFirstPage(),
     ]);
     if (catalogResult.isError || versionsResult?.isError)
       throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
