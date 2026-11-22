@@ -10,7 +10,7 @@ const linkId = "019a7b00-0000-7000-8000-000000000022";
 const jobId = "019a7b00-0000-7000-8000-000000000023";
 const instant = "2026-12-01T12:00:00Z";
 async function mockAccess(page: Page) {
-  await mockStudio(page);
+  const studio = await mockStudio(page);
   const state = {
     revoked: false,
     linked: true,
@@ -20,6 +20,7 @@ async function mockAccess(page: Page) {
     failAccounts: false,
     failInvitations: false,
     jobReads: 0,
+    studioPeople: studio.people,
     writes: [] as { operation: string; payload: Record<string, unknown> }[],
     reads: [] as { operation: string; key: Record<string, unknown>; cursor?: string }[],
   };
@@ -206,7 +207,8 @@ async function mockAccess(page: Page) {
   await page.route("**/functions/v1/backend-v1/account_access_send_v1", (route) => {
     const payload = route.request().postDataJSON() as Record<string, unknown>;
     state.writes.push({ operation: "invite", payload });
-    expect(payload).toMatchObject({ person_id: I.instructor, org_id: I.org, center_id: I.center });
+    expect(payload).toMatchObject({ org_id: I.org, center_id: I.center });
+    expect(studio.people.map((person) => person.id)).toContain(payload.person_id);
     return send(route, { job_id: jobId });
   });
   await page.route("**/functions/v1/backend-v1/job_status_get_v1", (route) => {
@@ -410,9 +412,13 @@ test("M03: two forbidden post-write directories remain unread until permission r
     ),
   ).toBeVisible();
   expect(state.writes.filter((write) => write.operation === "cancel")).toHaveLength(1);
+  // saved-unread is also the immediate post-ACK transitional state. Finish
+  // both rejected directory reads before restoring permission.
+  const retry = dialog.getByRole("button", { name: "Güncel durumu oku", exact: true });
+  await expect(retry).toBeEnabled();
   state.failInvitations = false;
   state.failAccounts = false;
-  await dialog.getByRole("button", { name: "Güncel durumu oku", exact: true }).click();
+  await retry.click();
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -442,7 +448,13 @@ test("M03: person entry invitation rereads the access directories after job read
   await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
   await expect.poll(() => state.jobReads).toBe(1);
   await expect.poll(invitationFirstPageReads).toBeGreaterThan(afterCreate);
-  expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
+  const created = state.studioPeople.find(
+    (person) => person.display_name === "Fixture Entry Invite",
+  );
+  expect(created).toBeDefined();
+  const invitations = state.writes.filter((write) => write.operation === "invite");
+  expect(invitations).toHaveLength(1);
+  expect(invitations[0]?.payload.person_id).toBe(created?.id);
 });
 
 test("M03: entry invitation readback failure preserves one write and supports recovery", async ({
@@ -464,9 +476,17 @@ test("M03: entry invitation readback failure preserves one write and supports re
     sheet.getByText("Davet işi oluşturuldu; güncel durum okunamadı.", { exact: false }),
   ).toBeVisible();
   expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
+  const retry = sheet.getByRole("button", { name: "Güncel durumu oku", exact: true });
+  await expect(retry).toBeEnabled();
   state.failInvitations = false;
   state.failAccounts = false;
-  await sheet.getByRole("button", { name: "Güncel durumu oku", exact: true }).click();
+  await retry.click();
   await expect.poll(() => state.jobReads).toBe(2);
-  expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
+  const created = state.studioPeople.find(
+    (person) => person.display_name === "Fixture Entry Recovery",
+  );
+  expect(created).toBeDefined();
+  const invitations = state.writes.filter((write) => write.operation === "invite");
+  expect(invitations).toHaveLength(1);
+  expect(invitations[0]?.payload.person_id).toBe(created?.id);
 });
