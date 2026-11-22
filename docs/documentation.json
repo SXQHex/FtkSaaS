@@ -116,17 +116,17 @@
     {
       "path": "apps/web/docs/handover.md",
       "role": "status",
-      "purpose": "Frontend sohbet devri ve çalışma bağlamı",
+      "purpose": "Frontend son kaynak, PR, CI ve ortam devri",
       "topics": [
         "frontend-handover"
       ]
     },
     {
       "path": "apps/web/docs/todo.md",
-      "role": "backlog",
-      "purpose": "Frontend bölüm adımları, aktif bölüm, bağımlılık ve kabul",
+      "role": "entry",
+      "purpose": "Geçmiş frontend teslim ve kabul kayıtlarına sabit Git bağlantıları",
       "topics": [
-        "frontend-delivery-plan"
+        "frontend-legacy-delivery-index"
       ]
     },
     {
@@ -280,6 +280,22 @@
         "contract-package-entry"
       ],
       "purpose": "Ortak sözleşme paketi kullanımı"
+    },
+    {
+      "path": "apps/web/docs/production-queue.md",
+      "role": "queue",
+      "topics": [
+        "frontend-active-order"
+      ],
+      "purpose": "Frontend aktif geliştirme sırası, bağımlılıklar ve kontrol noktaları"
+    },
+    {
+      "path": "apps/web/docs/remaining-work.md",
+      "role": "backlog",
+      "topics": [
+        "frontend-open-work"
+      ],
+      "purpose": "Frontend açık işler, ölçülebilir kabul ve kapanış koşulları"
     },
     {
       "path": "apps/web/docs/request.md",

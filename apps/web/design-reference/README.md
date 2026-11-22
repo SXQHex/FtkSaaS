@@ -1,6 +1,6 @@
 # Özgün tasarım referansları
 
-Bu klasör kullanıcı tarafından sağlanan HTML, CSS ve JavaScript çizimlerinin salt okunur örneklerini tutar. Geliştirme sırası ve bağlayıcı uygulama kararı [todo.md](../docs/todo.md) sahibindedir.
+Bu klasör kullanıcı tarafından sağlanan HTML, CSS ve JavaScript çizimlerinin salt okunur örneklerini tutar. Güncel iş sırası [frontend kuyruğunda](../docs/production-queue.md), açık ölçütler [backlog’da](../docs/remaining-work.md), tamamlanmış çizim kabulleri [tarihsel dizinde](../docs/todo.md) tutulur.
 
 ## Kullanım
 

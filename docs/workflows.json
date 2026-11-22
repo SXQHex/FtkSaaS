@@ -309,8 +309,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b45490bb33fdb5e887853fadc7a81155ff9ff190617f15c4db7a896de023658e",
-        "reason": "Kök Oxlint ve Oxfmt ayarlarının üç dosyası workspace yerleşim testinde tam dosya adlarıyla tanındı. Frontend kapsamı, kaynak koruması ve Turbo affected matrisi aynı kurallarla çalışır."
+        "fingerprint": "6aa762e2c2d25c4c8f5d91ddc9421c2b2a539d8d4cb36619967aa61e81ba1b3b",
+        "reason": "PR #372'de değişen docs/documentation.json ile apps/backend/scripts/ci/document-paths.json ve WF00 istemci rehberi incelendi. Frontend belge sahipliği ve incelenmiş doküman kapsamı güncellendi; backend operasyon, yetki, test ve CI kabul sınırları değişmedi."
       }
     },
     {
