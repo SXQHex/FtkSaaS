@@ -41,7 +41,7 @@ Para borcu, öğrenci alacağı, kullanılabilir/ayrılmış hak ayrı gösteril
 
 ## Entegrasyon kabulü
 
-Gerçek native giriş/oturum, rol/plan görünürlüğü, DTO/sürüm/preview/replay ve hata senaryoları ekran→Edge→DB ile doğrulanır. Tasarım fixture’ı veya MSW kabulü hosted kanıt değildir. Gerçek API hatasında sessiz demo/sahte başarı fallback’i yoktur. Secrets/admin anahtarı public değişkene veya istemci bundle’ına girmez. Native Auth, public Turnstile ve uygulama dış bildirimleri ayrı kabul edilir. Ortak/backend açık iş [proje backlog’unda](../apps/backend/docs/remaining-work.md), frontend bölüm ve kabul işi [web planında](../apps/web/docs/todo.md) tutulur.
+Gerçek native giriş/oturum, rol/plan görünürlüğü, DTO/sürüm/preview/replay ve hata senaryoları ekran→Edge→DB ile doğrulanır. Tasarım fixture’ı veya MSW kabulü hosted kanıt değildir. Gerçek API hatasında sessiz demo/sahte başarı fallback’i yoktur. Secrets/admin anahtarı public değişkene veya istemci bundle’ına girmez. Native Auth, public Turnstile ve uygulama dış bildirimleri ayrı kabul edilir. Ortak/backend açık iş [proje backlog’unda](../apps/backend/docs/remaining-work.md), frontend açık iş ve kabul ölçütleri [web backlog’unda](../apps/web/docs/remaining-work.md) tutulur.
 
 ## Statik SPA transportu
 
