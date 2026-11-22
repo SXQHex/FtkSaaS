@@ -64,8 +64,9 @@ test("twelve Desktop Chromium shards must cover every selected test once", () =>
     () => verifyShardPlan(all, shards.slice(1), files, "chromium", refactoringBrowserShards),
     /Incomplete/,
   );
+  const duplicatedShard = [...shards.slice(0, 11), shards[0]];
   assert.throws(
-    () => verifyShardPlan(all, [...shards.slice(0, 11), shards[0]], files, "chromium", refactoringBrowserShards),
+    () => verifyShardPlan(all, duplicatedShard, files, "chromium", refactoringBrowserShards),
     /gaps or duplicates/,
   );
 });
