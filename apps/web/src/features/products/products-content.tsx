@@ -1,5 +1,7 @@
+import { invalidateProductPages } from "./products-query";
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ProductsView, type ProductRow, type ProductFilter } from "./products-view";
@@ -14,7 +16,7 @@ import {
 } from "./products";
 import { useProductCommand } from "./use-product-command";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
-import { readWorkspace, workspaceRoles } from "../workspace/workspace";
+import { workspaceRoles } from "../workspace/workspace";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { ProductManagementEntry } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
@@ -32,7 +34,8 @@ export function ProductsContent({
   preservePending?: boolean;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [pageIndex, setPageIndex] = useState(0);
   const [editor, setEditor] = useState<{ base?: ProductManagementEntry } | null>(null);
@@ -47,12 +50,7 @@ export function ProductsContent({
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     (!workspace.isError || preservePending) &&
     workspace.data?.selected?.id === scope.orgId &&
@@ -231,6 +229,7 @@ export function ProductsContent({
           onLockChange={onLockChange}
           onAccessLost={accessLost}
           onRefresh={async () => {
+            await invalidateProductPages(queries, scope);
             await query.refetch({ throwOnError: true });
           }}
         />

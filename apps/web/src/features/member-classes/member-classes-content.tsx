@@ -1,3 +1,4 @@
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -85,6 +86,7 @@ export function MemberClassesContent({
   const time = new Intl.DateTimeFormat("tr-TR", { timeStyle: "short", timeZone: timezone });
   const rows = !lessons.isError ? lessons.data : undefined;
   async function refresh() {
+    await invalidateMemberReservationViews(queries, scope, personId);
     await queries.invalidateQueries({ queryKey: prefix });
   }
   function choose(row: MemberClass, action: ClassAction | "cancel") {

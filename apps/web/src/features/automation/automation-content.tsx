@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
@@ -5,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { AutomationJobView, JobState } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { readWorkspace } from "../workspace/workspace";
+
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventActionDialog } from "../events/event-action-dialog";
 import { EventCommandNotice } from "../events/event-command-notice";
@@ -72,12 +73,7 @@ export function AutomationContent({
     };
   }, []);
   const prefix = ["automation", scope.accountId, scope.orgId, scope.centerId];
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -5,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { LessonRequestView } from "@ftksaas/api-contracts";
-import { readWorkspace } from "../workspace/workspace";
+
 import { LessonRequestsView, type RequestRow, type RequestFilter } from "./lesson-requests-view";
 import { LessonRequestEditor } from "./lesson-request-editor";
 import { readLessonRequests } from "./lesson-requests-read";
@@ -34,12 +35,7 @@ export function LessonRequestsContent({
   // The selected snapshot outlives list refreshes, including unknown writer outcomes.
   const [selected, setSelected] = useState<{ detail: LessonRequestView; name: string }>();
   const prefix = ["lesson-requests", scope.accountId, scope.orgId, scope.centerId];
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

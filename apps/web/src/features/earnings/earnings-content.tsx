@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -5,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { InstructorFinancePayment } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { readWorkspace } from "../workspace/workspace";
+
 import { instructorEarningMonths } from "../instructor/instructor-earnings-read";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { StudioAgreementEditor } from "../studio/agreement-editor";
@@ -43,12 +44,7 @@ export function EarningsContent({
     [lost, setLost] = useState(false),
     [saved, setSaved] = useState(false);
   const [openedAt] = useState(() => new Date().toISOString());
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     (!workspace.isError || preservePending) &&
     workspace.data?.selected?.id === scope.orgId &&

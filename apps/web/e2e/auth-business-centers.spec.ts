@@ -909,6 +909,8 @@ test("Business center switching keeps resource and policy reads scoped to the se
   await expect(advisory).toContainText("Kapanış: 90 dakika önce");
   expect(readPolicyIn).toEqual([I.center, second]);
 
+  // Ignore the initial setup catalog read; verify only this tab’s center-scoped requests.
+  const disciplineCallsStart = f.calls.length;
   await selectTab(text.tabs.disciplines);
   const disciplines = page.getByRole("tabpanel", { name: text.tabs.disciplines });
   await expect(disciplines.getByRole("listitem").filter({ hasText: "Tango" })).toBeVisible();
@@ -919,6 +921,7 @@ test("Business center switching keeps resource and policy reads scoped to the se
   await expect(disciplines.getByRole("listitem").filter({ hasText: "Tango" })).toHaveCount(0);
   expect(
     f.calls
+      .slice(disciplineCallsStart)
       .filter(({ op }) => op === "disciplines_list_v1")
       .map(({ request }) => ({ center: request.center_id, include: request.include_presentation })),
   ).toEqual([

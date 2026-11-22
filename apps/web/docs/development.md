@@ -22,6 +22,15 @@
 
 Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium** projesinin on iki Playwright shard'ını ve **tam Playwright test envanterini** çalıştırır. Diğer tarayıcı profilleri ve senaryoları korunur, fakat CI tarafından seçilmez. Lint, tip, build, birim/coverage, erişilebilirlik kontrolleri ve aynı profilin tam test envanteri geçerlidir. Dört tarayıcı kabulü bu dönemde iddia edilemez; refactoring kapanışında [CI politikasındaki](../../../docs/ci-policy.md) kaynak-özel güvenilir kurulum süreciyle dört tarayıcı profili × üç shard düzeni geri alınır.
 
+## Aşama 2 — Query veri tutarlılığı
+
+- Korumalı route ve ekranlar `workspaceQuery()` / `useWorkspaceQuery()` üzerinden aynı hesap–organizasyon projeksiyonunu okur. Ekranın `enabled: false` gözlemcisi yeni istek başlatmaz, shell tarafından doldurulan cache'i izler.
+- `workspaceKeys.account(accountId)` bütün otomatik/organizasyon projeksiyonlarının ortak parent anahtarıdır. Rol, merkez ve organizasyon bilgisi değişikliğinde yalnız seçili organizasyonu değil aynı aktörün tüm projeksiyonlarını invalid etmek gerekir.
+- Salt-okuma `backend.read(operation, request, signal)` Query'den gelen AbortSignal'ı native fetch'e taşır. `scopedBackend(scope, signal)` bu okumalarda da pinned bearer ve backend hesap doğrulamasını korur.
+- Yazma komutları, receipt/status ve sonucu belirsiz işlemler `backend.call()` / `useMemberCommand()` üzerinde kalır; query cancellation bunlara uygulanmaz.
+- Kişi, ürün, CRM, finans ve üye rezervasyonu ekranları her biri kendi query-prefix tanımlarını kullanır. Komutun doğrulanmış sonucundan sonra bütün filtre ve cursor varyantları `refetchType: "none"` ile stale işaretlenir; görünür sayfanın gerçek API readback'i ayrıca başarısızlık yayarak yapılır.
+- Abonelik/plan ve inbox listelerinin stale projeksiyonları pencere odağı ve bağlantı geri geldiğinde yeniden doğrulanır. Bu karar iptal/komut kilitleri veya backend yetkisi yerine geçmez.
+
 ## Yerel çalışma
 
 Repo kökünden `corepack enable`, `pnpm install --frozen-lockfile` ve `pnpm dev:web` çalıştırın. Gerçek geliştirme servisi için `apps/web/.env.example` değişkenlerini Git dışındaki `apps/web/.env.development.local` dosyasında tanımlayın. `VITE_` değerleri tarayıcıya açıktır. Native Auth loopback dönüşü için izinli yerel origin ve `/auth/callback` kullanılır. Test fixture'ları loopback arayüzünde çalışır. Hosted DB'ye reset veya seed uygulanmaz.

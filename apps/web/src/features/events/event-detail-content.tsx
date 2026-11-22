@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -8,7 +9,7 @@ import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { EventView } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
 import { formatMinorAmount } from "../../lib/money";
-import { readWorkspace } from "../workspace/workspace";
+
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
 import { EventDetailView, type EventDetailAction } from "./event-detail-view";
@@ -40,12 +41,7 @@ export function EventDetailContent({
     [edit, setEdit] = useState(false),
     [registration, setRegistration] = useState<{ event: EventView; id?: string }>(),
     [action, setAction] = useState<{ before: EventView; selection: EventActionSelection }>();
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -15,7 +16,7 @@ import {
 import { readFinancePage } from "./finance";
 import { SaleRefundEditor } from "./sale-refund-editor";
 import type { SaleRefundSource } from "./sale-refund";
-import { readWorkspace } from "../workspace/workspace";
+
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { FinanceDirectoryEntry } from "@ftksaas/api-contracts";
@@ -55,12 +56,7 @@ export function FinanceDirectoryContent({
     [from, setFrom] = useState<string>(),
     [through, setThrough] = useState<string>(),
     [invalidPeriod, setInvalidPeriod] = useState(false);
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

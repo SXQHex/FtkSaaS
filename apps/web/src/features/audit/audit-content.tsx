@@ -1,9 +1,10 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { saveDownload } from "../../lib/save-download";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
-import { readWorkspace } from "../workspace/workspace";
+
 import { AuditView, type AuditFilter } from "./audit-view";
 import { AuditDetailSheet } from "./audit-detail-sheet";
 import { auditModules, readAudit, readAuditCsv, readTracking } from "./audit-read";
@@ -36,12 +37,7 @@ export function AuditContent({
   const [detailId, setDetail] = useState<string>();
   const [exporting, setExporting] = useState(false);
   const [exportFailed, setExportFailed] = useState(false);
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     !workspace.isError && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

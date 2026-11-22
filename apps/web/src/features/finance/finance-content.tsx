@@ -1,3 +1,5 @@
+import { invalidateFinanceViews } from "./finance-query";
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -20,7 +22,7 @@ import {
 } from "./finance";
 import { useFinanceCommand } from "./use-finance-command";
 import type { ClientScope } from "../../lib/scoped-backend";
-import { readWorkspace } from "../workspace/workspace";
+
 import { readPeoplePage } from "../people/people";
 import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
@@ -89,12 +91,7 @@ export function FinanceContent({
     ),
     [locked, setLocked] = useState(false),
     [invalid, setInvalid] = useState(false);
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
       (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
         ? workspace.data
@@ -109,7 +106,8 @@ export function FinanceContent({
       search,
       personCursors[personPage],
     ],
-    queryFn: () => readPeoplePage(scope, search, personCursors[personPage]),
+    queryFn: ({ signal }) =>
+      readPeoplePage(scope, search, personCursors[personPage], undefined, false, signal),
     enabled: Boolean(center) && !locked,
     retry: false,
   });
@@ -142,7 +140,7 @@ export function FinanceContent({
       selection?.currency,
       cursors[pageIndex],
     ],
-    queryFn: () => readFinancePage(scope, selection!, cursors[pageIndex]),
+    queryFn: ({ signal }) => readFinancePage(scope, selection!, cursors[pageIndex], signal),
     enabled: Boolean(center && selection),
     retry: false,
   });
@@ -489,6 +487,7 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setDebtAction(undefined)}
           onRefresh={async () => {
+            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
             await finance.refetch({ throwOnError: true });
           }}
           onLockChange={changeLock}
@@ -505,6 +504,7 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setCreditRefund(false)}
           onRefresh={async () => {
+            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
             await finance.refetch({ throwOnError: true });
           }}
           onLockChange={changeLock}
@@ -522,20 +522,8 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setCorrectionId(undefined)}
           onRefresh={async () => {
-            const scopeIds = [scope.accountId, scope.orgId, scope.centerId];
-            await queries.invalidateQueries({
-              queryKey: ["finance", ...scopeIds, selection.personId, selection.currency],
-              refetchType: "none",
-            });
-            await Promise.all([
-              finance.refetch({ throwOnError: true }),
-              queries.invalidateQueries({
-                queryKey: ["profile-person", ...scopeIds, selection.personId],
-              }),
-              ...["people", "finance-directory", "finance-directory-credit-debts"].map((name) =>
-                queries.invalidateQueries({ queryKey: [name, ...scopeIds] }),
-              ),
-            ]);
+            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
+            await finance.refetch({ throwOnError: true });
           }}
           onLockChange={changeLock}
           onAccessLost={accessLost}
@@ -551,6 +539,7 @@ export function FinanceContent({
           onClose={() => setCollect(false)}
           canWrite={!workspace.isError && !authority.isError && authority.data === true}
           onRefresh={async () => {
+            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
             await finance.refetch({ throwOnError: true });
           }}
           onAccessLost={accessLost}

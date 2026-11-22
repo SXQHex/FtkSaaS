@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { saveDownload } from "../../lib/save-download";
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,7 +14,7 @@ import type {
   ImportDirectoryItem,
   JobState,
 } from "@ftksaas/api-contracts";
-import { readWorkspace } from "../workspace/workspace";
+
 import { readTracking } from "../audit/audit-read";
 import { readFinanceDirectory, financeDirectoryTotal } from "../finance/finance-directory";
 import {
@@ -71,12 +72,7 @@ export function ReportsContent({
   const [pages, setPages] = useState<
     Record<string, { cursors: (string | undefined)[]; index: number }>
   >({});
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

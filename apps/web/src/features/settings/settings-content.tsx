@@ -1,10 +1,11 @@
+import { invalidateWorkspace, useWorkspaceQuery } from "../workspace/workspace-query";
 import { WorkCalendarEditor } from "./work-calendar-editor";
 import { PreparationManagement } from "./preparation-management";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { readWorkspace, workspaceRoles } from "../workspace/workspace";
+import { workspaceRoles } from "../workspace/workspace";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { Button } from "@ftksaas/ui/components/button";
@@ -53,12 +54,7 @@ export function SettingsContent({
   preservePending?: boolean;
 }) {
   const router = useRouter();
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data
@@ -208,14 +204,14 @@ function SettingsManagement({
       setPolicy(undefined);
       setPublicSettings(undefined);
       if (code === "FORBIDDEN") {
-        void queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] });
+        void invalidateWorkspace(queries, scope.accountId);
       } else {
         queries.clear();
         void router.invalidate();
       }
       return true;
     },
-    [queries, router, scope.accountId, scope.orgId],
+    [queries, router, scope.accountId],
   );
   const allowed = level === "organization" ? canOrganization : canCenter;
   const writable = !readOnly && (level === "organization" ? canWriteOrganization : canCenter);
@@ -518,10 +514,7 @@ function SettingsManagement({
   };
   async function refreshSubscription(result: SettingsSubscriptionSource) {
     queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
-    await queries.invalidateQueries(
-      { queryKey: ["workspace", scope.accountId, scope.orgId] },
-      { throwOnError: true },
-    );
+    await invalidateWorkspace(queries, scope.accountId, { throwOnError: true });
   }
   async function refresh() {
     // A master change also invalidates center projections that were read before it.
@@ -686,7 +679,7 @@ function SettingsManagement({
           onLockChange={publishLock}
           onSaved={async () => {
             await Promise.all([
-              queries.invalidateQueries({ queryKey: ["workspace", scope.accountId, scope.orgId] }),
+              invalidateWorkspace(queries, scope.accountId),
               queries.invalidateQueries({
                 queryKey: ["settings-subscription", scope.accountId, scope.orgId],
               }),
@@ -775,10 +768,7 @@ function SettingsManagement({
             if (!locked) setIdentity(undefined);
           }}
           onSaved={async () => {
-            await queries.invalidateQueries(
-              { queryKey: ["workspace", scope.accountId, scope.orgId] },
-              { throwOnError: true },
-            );
+            await invalidateWorkspace(queries, scope.accountId, { throwOnError: true });
           }}
           onLockChange={publishLock}
           onAccessLost={accessLost}

@@ -1,10 +1,11 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
-import { hasWorkspaceManagementScope, readWorkspace } from "../workspace/workspace";
+import { hasWorkspaceManagementScope } from "../workspace/workspace";
 import { readOverviewDay, readOverviewLabels, readOverviewParticipants } from "./overview-read";
 import { useOverviewWork } from "./use-overview-work";
 import { OverviewView } from "./overview-view";
@@ -23,12 +24,7 @@ export function OverviewContent({
     navigate = useNavigate(),
     router = useRouter();
   const [chosen, setChosen] = useState<string>();
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((c) => c.id === scope.centerId && c.accessible)

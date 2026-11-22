@@ -1,11 +1,13 @@
+import { invalidateLeadPages } from "./leads-query";
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { ManagementSelectorPublicApplicationReviewV1 } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { readWorkspace } from "../workspace/workspace";
+
 import { readOverviewWork } from "../overview/overview-work";
 import { LeadsView, type LeadTab } from "./leads-view";
 import { LeadEditor, type LeadTarget } from "./lead-editor";
@@ -45,7 +47,8 @@ export function LeadsContent({
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
-    navigate = useNavigate();
+    navigate = useNavigate(),
+    queries = useQueryClient();
   const [tab, setTab] = useState<LeadTab>("board"),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState(""),
@@ -69,12 +72,7 @@ export function LeadsContent({
     [locked, setLocked] = useState(false),
     [owner, setOwner] = useState(""),
     [stageFilter, setStageFilter] = useState("all");
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     (!workspace.isError || preservePending) &&
     workspace.data?.selected?.id === scope.orgId &&
@@ -222,6 +220,7 @@ export function LeadsContent({
           ? t(($) => $.leads.sources.whatsapp)
           : source;
   async function refresh() {
+    await invalidateLeadPages(queries, scope);
     await Promise.all([leads.refetch({ throwOnError: true }), workSummary.refetch()]);
     if (tab === "tasks") await tasks.refetch({ throwOnError: true });
   }

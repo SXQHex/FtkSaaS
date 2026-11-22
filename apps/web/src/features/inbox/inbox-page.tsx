@@ -1,13 +1,14 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useState } from "react";
 import { useSearch, useNavigate, useRouter } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAccountProjection } from "../auth/use-account-projection";
 import type { AccountView } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import { useAccountAppearance } from "../account/use-account-appearance";
-import { readWorkspace } from "../workspace/workspace";
+
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { InboxContent } from "./inbox-content";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -173,12 +174,7 @@ function ScopedInbox({
   preservePending: boolean;
 }) {
   const { t } = useTranslation();
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const center =
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)

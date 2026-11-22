@@ -1,9 +1,10 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAccountProjection } from "../auth/use-account-projection";
-import { readWorkspace, workspaceRoles } from "../workspace/workspace";
+import { workspaceRoles } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
 import { settingsSubscriptionQuery } from "../settings/settings-subscription";
@@ -186,13 +187,7 @@ function StudioContent({
     },
     [onLockChange],
   );
-  const workspace = useQuery({
-    queryKey: ["workspace", scope.accountId, scope.orgId],
-    queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-    // WorkspaceLayout owns the live read; this observer reuses its result.
-    enabled: false,
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const canReadPlan =
     !workspace.isError &&
     workspace.data?.selected?.id === scope.orgId &&

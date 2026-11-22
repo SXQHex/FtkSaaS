@@ -1,3 +1,4 @@
+import { invalidateWorkspace } from "../workspace/workspace-query";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -163,10 +164,7 @@ export function useSettingsDocument({
         { queryKey: ["settings-history", scope.accountId, scope.orgId] },
         { throwOnError: true },
       );
-      await queries.invalidateQueries(
-        { queryKey: ["workspace", scope.accountId, scope.orgId] },
-        { throwOnError: true },
-      );
+      await invalidateWorkspace(queries, scope.accountId, { throwOnError: true });
     },
   });
   const locked = preparing || command.locked;

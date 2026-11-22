@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,7 +20,7 @@ import { SaleEditor } from "./sale-editor";
 import { readProfileRights, readProfileCatalog, readProfileDisciplines } from "./profile-read";
 import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-presentation";
 import { readPerson } from "../people/people";
-import { readWorkspace } from "../workspace/workspace";
+
 import { readFinancePage } from "../finance/finance";
 import { CollectionEditor } from "../finance/finance-content";
 import { BackendError } from "../../lib/backend";
@@ -82,11 +83,7 @@ export function MemberProfileContent({
     [reservationIndex, setReservationIndex] = useState(0),
     [reservationCursors, setReservationCursors] = useState<(string | undefined)[]>([undefined]);
   const reservationRetry = useRef<HTMLButtonElement>(null);
-  const workspace = useQuery({
-      queryKey: ["workspace", scope.accountId, scope.orgId],
-      queryFn: () => readWorkspace(scope.accountId, scope.orgId),
-      retry: false,
-    }),
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId),
     center = workspace.data?.centers.find((x) => x.id === scope.centerId && x.accessible);
   const personKey = ["profile-person", scope.accountId, scope.orgId, scope.centerId, personId],
     rightsKey = ["profile-rights", scope.accountId, scope.orgId, scope.centerId, personId];
@@ -154,7 +151,8 @@ export function MemberProfileContent({
   ];
   const finance = useQuery({
     queryKey: financeKey(currency ?? "", cursors[index]),
-    queryFn: () => readFinancePage(scope, { personId, currency: currency! }, cursors[index]),
+    queryFn: ({ signal }) =>
+      readFinancePage(scope, { personId, currency: currency! }, cursors[index], signal),
     enabled: Boolean(center && person.data && currency),
     retry: false,
   });
