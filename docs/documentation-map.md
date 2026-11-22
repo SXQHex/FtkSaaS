@@ -18,8 +18,8 @@
 | [apps/web/AGENTS.md](../apps/web/AGENTS.md) | authority | Frontend ajan çalışma yükümlülükleri | frontend-agent |
 | [apps/web/README.md](../apps/web/README.md) | entry | Frontend başlangıcı | frontend-entry |
 | [apps/web/docs/development.md](../apps/web/docs/development.md) | guide | Vite SPA geliştirme, ortak paketler ve yerel doğrulama | frontend-development |
-| [apps/web/docs/handover.md](../apps/web/docs/handover.md) | status | Frontend sohbet devri ve çalışma bağlamı | frontend-handover |
-| [apps/web/docs/todo.md](../apps/web/docs/todo.md) | backlog | Frontend bölüm adımları, aktif bölüm, bağımlılık ve kabul | frontend-delivery-plan |
+| [apps/web/docs/handover.md](../apps/web/docs/handover.md) | status | Frontend son kaynak, PR, CI ve ortam devri | frontend-handover |
+| [apps/web/docs/todo.md](../apps/web/docs/todo.md) | entry | Geçmiş frontend teslim ve kabul kayıtlarına sabit Git bağlantıları | frontend-legacy-delivery-index |
 | [docs/ci-policy.md](ci-policy.md) | authority | Kaynak bağlı CI ve teslim kapıları | ci-acceptance-policy |
 | [docs/client-integration.md](client-integration.md) | guide | Ortak istemci transport ve wire tüketimi | client-protocol |
 | [docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) | authority | Modül ve plan erişimi | product-scope |
@@ -39,6 +39,8 @@
 | [docs/source-index.md](source-index.md) | entry | Başlangıç, konu seçimi ve arşiv sınırı | source-routing |
 | [docs/workflows.md](workflows.md) | guide | Kullanıcı amacından API sırasına ortak akışlar | project-workflows |
 | [packages/api-contracts/README.md](../packages/api-contracts/README.md) | entry | Ortak sözleşme paketi kullanımı | contract-package-entry |
+| [apps/web/docs/production-queue.md](../apps/web/docs/production-queue.md) | queue | Frontend aktif geliştirme sırası, bağımlılıklar ve kontrol noktaları | frontend-active-order |
+| [apps/web/docs/remaining-work.md](../apps/web/docs/remaining-work.md) | backlog | Frontend açık işler, ölçülebilir kabul ve kapanış koşulları | frontend-open-work |
 | [apps/web/docs/request.md](../apps/web/docs/request.md) | guide | Taşınan W1-BE frontend entegrasyon kanıtı | frontend-integration-evidence |
 | [apps/web/design-reference/README.md](../apps/web/design-reference/README.md) | guide | Salt okunur frontend tasarım kaynakları | frontend-design-references |
 | [apps/web/design-reference/revisions/2026-11-18/GECIS.md](../apps/web/design-reference/revisions/2026-11-18/GECIS.md) | guide | 18 Kasım çizim revizyonu ve izlenebilirlik kaydı | frontend-design-revision-2026-11-18-gecis |
