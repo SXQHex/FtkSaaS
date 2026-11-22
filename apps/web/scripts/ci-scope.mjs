@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { browserMatrix } from "./browser-profiles.mjs";
+import { refactoringBrowserMatrix } from "./browser-profiles.mjs";
 
 const documentRegistry = "apps/backend/scripts/ci/document-paths.json";
 const selector = "apps/web/scripts/ci-scope.mjs";
@@ -188,7 +188,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
       `compatibility=${scope.compatibility}`,
       `e2e_base=${event.pull_request?.base?.sha ?? process.env.GITHUB_SHA}`,
       `e2e_specs=${JSON.stringify(e2e)}`,
-      `e2e_matrix=${JSON.stringify({ include: browserMatrix })}`,
+      `e2e_matrix=${JSON.stringify({ include: refactoringBrowserMatrix })}`,
       "",
     ].join("\n"),
   );

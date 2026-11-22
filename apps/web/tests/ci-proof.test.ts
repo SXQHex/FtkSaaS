@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "vitest";
 import { readBinding, validateProof, verifyMain } from "../scripts/ci-proof.mjs";
-import { browserMatrix } from "../scripts/browser-profiles.mjs";
+import { refactoringBrowserMatrix } from "../scripts/browser-profiles.mjs";
 
 function fixture(kind = "frontend", attempt = 1) {
   const binding = {
@@ -50,7 +50,7 @@ function fixture(kind = "frontend", attempt = 1) {
             "Upload verified build",
           ],
           ...Object.fromEntries(
-            browserMatrix.map(({ profile, shard }) => [
+            refactoringBrowserMatrix.map(({ profile, shard }) => [
               `browsers (${profile}, ${shard})`,
               [
                 "Install selected browser",
@@ -332,5 +332,18 @@ test.each([
   proof.jobs.forEach((job) => {
     job.steps = job.steps.filter((s) => s.name !== step);
   });
+  expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
+});
+
+test("refactoring accepts only the three Desktop Chromium source-bound shards", () => {
+  const { binding, proof } = fixture();
+  const actual = proof.jobs.filter((job) => job.name.startsWith("browsers ("));
+  expect(actual.map(({ name }) => name)).toEqual([
+    "browsers (chromium, 1)",
+    "browsers (chromium, 2)",
+    "browsers (chromium, 3)",
+  ]);
+  expect(() => validateProof(binding, proof)).not.toThrow();
+  proof.jobs.push({ ...actual[0], name: "browsers (webkit, 1)" });
   expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
 });
