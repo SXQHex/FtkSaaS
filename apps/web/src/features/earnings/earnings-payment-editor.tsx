@@ -7,6 +7,7 @@ import { getTemporal } from "../../lib/temporal";
 import { formatMinorAmount } from "../../lib/money";
 import { EarningsPaymentSheet, type EarningsPaymentDraft } from "./earnings-payment-sheet";
 import { readEarningsDirectory } from "./earnings-read";
+import { earningsKeys } from "./earnings-query";
 import {
   earningsPaymentIntent,
   readEarningsPaymentAuthority,
@@ -85,7 +86,7 @@ export function EarningsPaymentEditor({
     retry: false,
   });
   const earnings = useInfiniteQuery({
-    queryKey: ["earnings-payment-source", scope, draft.personId],
+    queryKey: [...earningsKeys.paymentSource(scope), draft.personId],
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam }) =>
       readEarningsDirectory(scope, "earnings", { personId: draft.personId, cursor: pageParam }),
@@ -95,7 +96,7 @@ export function EarningsPaymentEditor({
     refetchOnWindowFocus: false,
   });
   const chain = useQuery({
-    queryKey: ["earnings-payment-chain", scope, before?.id],
+    queryKey: [...earningsKeys.paymentChain(scope), before?.id],
     queryFn: () => readEarningsPaymentChain(scope, before!.person_id, before!.id),
     enabled: !!before,
     retry: false,
