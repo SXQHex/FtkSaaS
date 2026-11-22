@@ -312,8 +312,20 @@ test('Supabase source skips CI-only accepted main and preserves pending changes 
   const skipped=Array.from({length:100},(_,i)=>({...delivered,id:100+i}));
   github.rest.actions.listWorkflowRuns=async({page})=>{pages.push(page);return {data:{workflow_runs:page===1?skipped:[delivered]}};};
   github.rest.actions.getWorkflowRun=async(args)=>args.run_id>=100?{data:skipped.find(r=>r.id===args.run_id)}:originalGet(args);
-  github.paginate=async(method,args)=>method==='jobs'&&args.run_id>=100?[]:originalPaginate(method,args);
+  let active=0,peak=0,skippedRunRefreshes=0;
+  github.paginate=async(method,args)=>{
+   if(method==='jobs'&&args.run_id>=100){
+    active++;peak=Math.max(peak,active);await new Promise(resolve=>setImmediate(resolve));active--;return [];
+   }
+   return originalPaginate(method,args);
+  };
+  const refreshedGet=github.rest.actions.getWorkflowRun;
+  github.rest.actions.getWorkflowRun=async(args)=>{
+   if(args.run_id>=100)skippedRunRefreshes++;
+   return refreshedGet(args);
+  };
   assert.equal((await previousReceipt(github,context)).source,prior);assert.deepEqual(pages,[1,2]);
+  assert(peak>1&&peak<=16);assert.equal(skippedRunRefreshes,0);
   pages=[];github.rest.actions.listWorkflowRuns=async({page})=>{pages.push(page);return {data:{workflow_runs:[delivered]}};};
   assert.equal((await previousReceipt(github,context)).source,prior);assert.deepEqual(pages,[1]);
   github.rest.actions.listWorkflowRuns=async()=>({data:{workflow_runs:[]}});
@@ -322,6 +334,41 @@ test('Supabase source skips CI-only accepted main and preserves pending changes 
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
 
+
+test('unchanged Supabase tree skips full backend proof lookup for docs-only main acceptance',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'ci-supabase-noop-'));
+ try{
+  const repo={owner:'SXQHex',repo:'FtkSaaS'},sha='b'.repeat(40),prior='a'.repeat(40),v=valid();
+  const main={...v.run,id:5,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+  const source={name:'source',run_id:5,run_attempt:1,head_sha:sha,status:'completed',conclusion:'success'};
+  const docs={name:'documentation',run_id:5,run_attempt:1,head_sha:sha,status:'completed',conclusion:'success',steps:[{name:'Documentation main acceptance (no full clean)',conclusion:'success'}]};
+  const previous={...main,id:8,path:'.github/workflows/cd-development.yml',event:'workflow_run',head_sha:prior};
+  const job={name:'deploy',run_id:8,run_attempt:1,head_sha:prior,status:'completed',conclusion:'success',steps:[{name:'Deliver accepted source and verify hosted backend',conclusion:'success'}]};
+  fs.writeFileSync(join(dir,'development-delivery.json'),JSON.stringify({success:true,project:'gwyprhenabtpkbojephw',source:prior}));
+  execFileSync('zip',['-q',join(dir,'receipt.zip'),'development-delivery.json'],{cwd:dir});
+  const zip=fs.readFileSync(join(dir,'receipt.zip'));
+  let pending=false,historicalProofSearches=0,treesRead=0;
+  const github={rest:{
+   actions:{getWorkflowRun:async({run_id})=>({data:run_id===5?main:previous}),listWorkflowRuns:async({workflow_id})=>{
+    if(workflow_id==='backend.yml'){historicalProofSearches++;return {data:{workflow_runs:[]}};}
+    assert.equal(workflow_id,'cd-development.yml');return {data:{workflow_runs:[previous]}};
+   },listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async()=>({data:zip})},
+   git:{getRef:async()=>({data:{object:{sha}}}),getTree:async({tree_sha})=>{
+    treesRead++;return {data:{tree:[{path:'apps/backend/supabase/config.toml',type:'blob',mode:'100644',sha:pending&&tree_sha===sha?'changed':'same'},{path:'docs/ci-policy.md',type:'blob',mode:'100644',sha:tree_sha}]}};
+   }}
+  },paginate:async(method,args)=>method==='jobs'?(args.run_id===5?[source,docs]:[job]):[{name:'development-delivery-8-1',id:10,expired:false}]};
+  const context={repo,runId:10,payload:{workflow_run:main}};
+  const output={},core={setOutput(k,v){output[k]=v;},summary:{addRaw(){return this;},async write(){}}};
+  await resolveDeployment(github,context,core);
+  assert.equal(output.deploy,'false');assert.equal(output.sha,undefined);
+  assert.equal(historicalProofSearches,0);assert.equal(treesRead,2);
+  pending=true;
+  await resolveDeployment(github,context,core);
+  assert.equal(output.deploy,'false');assert.equal(historicalProofSearches,1);
+  // A pending Supabase delta cannot turn a documentation acceptance into deployment authority.
+  assert.equal(output.sha,undefined);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
 
 test('deployment never lists or writes Edge secrets and rejects missing calendar configuration',async()=>{
  const source=fs.readFileSync(new URL('../scripts/ci/deploy-development.mjs',import.meta.url),'utf8');
