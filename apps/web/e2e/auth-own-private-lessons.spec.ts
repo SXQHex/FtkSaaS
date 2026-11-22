@@ -223,3 +223,40 @@ test("member sees native center approval and rejection after reread and reload",
   expect(state.writes).toHaveLength(0);
   await page.getByRole("button", { name: "Temayı değiştir", exact: true }).click();
 });
+
+test("native write resets stale private-lesson cursor and preserves readback without a second writer", async ({
+  page,
+}) => {
+  const state = await mockOwnPrivateLessons(page, { paginated: true });
+  const next = page.getByRole("button", { name: "Sonraki", exact: true });
+  await next.click();
+  await expect(page.getByRole("button", { name: "Talebi geri çek", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Talebi geri çek", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByRole("checkbox").press("Space");
+  await dialog.getByRole("button", { name: "Geri çek", exact: true }).click();
+  await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  expect(state.writes).toHaveLength(1);
+  expect(state.requests[1]!.state).toBe("withdrawn");
+  const oldCursorReads = state.reads.filter(
+    ({ operation, request }) =>
+      operation === "management_state_get_v1" &&
+      request.operation === "lesson_request_create_v1" &&
+      (request.page as { cursor?: string }).cursor === "synthetic-next",
+  );
+  expect(oldCursorReads).toHaveLength(1);
+  await next.click();
+  await expect
+    .poll(
+      () =>
+        state.reads.filter(
+          ({ operation, request }) =>
+            operation === "management_state_get_v1" &&
+            request.operation === "lesson_request_create_v1" &&
+            (request.page as { cursor?: string }).cursor === "synthetic-next-updated",
+        ).length,
+    )
+    .toBe(1);
+  expect(state.writes).toHaveLength(1);
+});

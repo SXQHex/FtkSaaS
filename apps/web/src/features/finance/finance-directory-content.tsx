@@ -15,6 +15,7 @@ import {
 } from "./finance-directory";
 import { readFinancePage } from "./finance";
 import { SaleRefundEditor } from "./sale-refund-editor";
+import { invalidateFinanceViews } from "./finance-query";
 import type { SaleRefundSource } from "./sale-refund";
 
 import { BackendError } from "../../lib/backend";
@@ -432,7 +433,32 @@ export function FinanceDirectoryContent({
               sourceAvailable={Boolean(center && !workspace.isError)}
               onClose={() => setSaleRefund(undefined)}
               onRefresh={async () => {
-                await directory.refetch({ throwOnError: true });
+                await invalidateFinanceViews(
+                  queries,
+                  scope,
+                  saleRefund.personId,
+                  saleRefund.currency,
+                );
+                await queries.fetchQuery({
+                  queryKey: [
+                    "finance-directory",
+                    scope.accountId,
+                    scope.orgId,
+                    scope.centerId,
+                    tab,
+                    period.data?.interval,
+                    filters,
+                    undefined,
+                  ],
+                  queryFn: () =>
+                    guard(() =>
+                      readFinanceDirectory(scope, tab, period.data!.interval, filters, undefined),
+                    ),
+                  staleTime: 0,
+                  retry: false,
+                });
+                setCursors([undefined]);
+                setPage(0);
               }}
               onLockChange={changeLock}
               onAccessLost={accessLost}

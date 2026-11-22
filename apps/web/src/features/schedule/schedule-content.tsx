@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useBlocker, useRouter, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Button } from "@ftksaas/ui/components/button";
@@ -269,16 +270,23 @@ export function ScheduleContent({
   const command = useScheduleCommand({
     onAccessLost: accessLost,
     onRefresh: async (intent) => {
-      if (intent.operation === "replacement_session_create_v1")
-        await queries.invalidateQueries({
-          queryKey: [
-            "schedule-replacements",
-            scope.accountId,
-            scope.orgId,
-            scope.centerId,
-            intent.request.replaces_id,
-          ],
-        });
+      await invalidateCachedFamilies(queries, [
+        ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
+        ["session-detail", scope.accountId, scope.orgId, scope.centerId],
+        ["instructor-today", scope.accountId, scope.orgId, scope.centerId],
+        ["instructor-schedule", scope.accountId, scope.orgId, scope.centerId],
+        ...(intent.operation === "replacement_session_create_v1"
+          ? [
+              [
+                "schedule-replacements",
+                scope.accountId,
+                scope.orgId,
+                scope.centerId,
+                intent.request.replaces_id,
+              ],
+            ]
+          : []),
+      ]);
       const result = await calendar.refetch();
       if (result.error) throw result.error;
       if (intent.operation === "session_create_v1" || intent.operation === "program_apply_v1")
@@ -889,6 +897,10 @@ export function ScheduleContent({
                 onLockChange={setRosterLocked}
                 onAccessLost={accessLost}
                 onRefresh={async () => {
+                  await invalidateCachedFamilies(queries, [
+                    ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
+                    ["session-detail", scope.accountId, scope.orgId, scope.centerId],
+                  ]);
                   await calendar.refetch({ throwOnError: true });
                   const fresh = await readScheduleEditor(scope, selected.session.id);
                   if (mounted.current) setSelected(fresh);

@@ -1,4 +1,6 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { invalidateDocumentDirectoryViews } from "./documents-query";
+import { retainFirstInfinitePage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -245,9 +247,52 @@ export function DocumentsContent({
       : undefined);
   const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
   async function refresh() {
-    const results = await Promise.all([page.refetch(), catalog.refetch()]);
+    await invalidateDocumentDirectoryViews(queries, scope);
+    // After publication the old continuation cursor may be invalid. Read the
+    // currently selected filter from page one, without resurrecting old pages.
+    if (active && (tab === "documents" || (tab === "acceptance" && documentId))) {
+      await queries.fetchQuery({
+        queryKey: [
+          "document-directory",
+          scope,
+          level,
+          tab,
+          documentId,
+          versionId,
+          filter,
+          query,
+          undefined,
+        ],
+        queryFn: () =>
+          readDocumentDirectory(scope, {
+            view: tab === "documents" ? "documents" : "acceptances",
+            level,
+            ...(tab === "acceptance" ? { documentId, versionId: versionId || undefined } : {}),
+            filter: tab === "acceptance" ? filter : "all",
+            query: query || undefined,
+            cursor: undefined,
+          }),
+        staleTime: 0,
+        retry: false,
+      });
+    }
+    retainFirstInfinitePage(queries, ["document-catalog", scope, level]);
+    if (versionTarget?.document_id)
+      retainFirstInfinitePage(queries, [
+        "document-versions",
+        scope,
+        level,
+        versionTarget.document_id,
+      ]);
+    const results = await Promise.all([
+      catalog.refetch(),
+      ...(active && versionTarget?.document_id && !versionTarget.read_only
+        ? [versions.refetch()]
+        : []),
+    ]);
     if (results.some((row) => row.isError)) throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
-    await queries.invalidateQueries({ queryKey: ["document-versions", scope] });
+    setCursors([undefined]);
+    setIndex(0);
   }
   function retry() {
     setLost(false);

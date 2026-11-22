@@ -13,6 +13,7 @@ export async function mockOwnPrivateLessons(
     denied?: boolean;
     catalogDenied?: boolean;
     listGate?: Promise<void>;
+    paginated?: boolean;
   } = {},
 ) {
   await mockOwnReservations(page);
@@ -129,6 +130,28 @@ export async function mockOwnPrivateLessons(
       expect(key.person_id).toBe(I.self);
       await options.listGate;
       if (denied) return reject();
+      if (options.paginated) {
+        const cursor = req.page?.cursor;
+        if (cursor === "synthetic-next" && writes.length) {
+          return route.fulfill({
+            status: 422,
+            json: {
+              ok: false,
+              error: { code: "VALIDATION_FAILED", retryable: false, trace_id: I.role },
+            },
+          });
+        }
+        const onSecondPage = Boolean(cursor);
+        return send({
+          items: (onSecondPage ? [requests[1]!] : [requests[0]!]).map(item),
+          next_cursor: onSecondPage
+            ? null
+            : writes.length
+              ? "synthetic-next-updated"
+              : "synthetic-next",
+          as_of: asOf,
+        });
+      }
       return send({ items: requests.map(item), next_cursor: null, as_of: asOf });
     }
     if (

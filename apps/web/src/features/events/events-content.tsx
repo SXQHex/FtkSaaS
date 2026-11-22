@@ -1,4 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -288,7 +289,26 @@ export function EventsContent({
           onLockChange={lock}
           onAccessLost={accessLost}
           onSaved={async () => {
-            await queries.invalidateQueries({ queryKey: prefix });
+            await invalidateAndReadFirstPage({
+              queries,
+              families: [prefix],
+              firstPageKey: [
+                ...prefix,
+                period.data?.interval,
+                search.trim(),
+                filter,
+                canReadSummary,
+                undefined,
+              ],
+              readFirstPage: () =>
+                readEventsPage(scope, period.data!.interval, undefined, {
+                  query: search,
+                  status: filter,
+                  includeSummary: canReadSummary,
+                }),
+            });
+            setCursors([undefined]);
+            setPageIndex(0);
           }}
         />
       )}

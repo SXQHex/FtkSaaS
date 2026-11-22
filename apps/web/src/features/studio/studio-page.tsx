@@ -2,6 +2,7 @@ import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useTranslation } from "react-i18next";
 import { useAccountProjection } from "../auth/use-account-projection";
 import { workspaceRoles } from "../workspace/workspace";
@@ -204,10 +205,10 @@ function StudioContent({
     retry: false,
   });
   async function refreshStudio() {
-    await queries.invalidateQueries({
-      queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
-      refetchType: "none",
-    });
+    await invalidateCachedFamilies(queries, [
+      ["studio", scope.accountId, scope.orgId, scope.centerId],
+      ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
+    ]);
     return query.refetch({ throwOnError: true });
   }
   useEffect(() => {

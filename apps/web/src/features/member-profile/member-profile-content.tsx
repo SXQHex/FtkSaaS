@@ -22,6 +22,9 @@ import { entitlementRows, profileMetrics, scopedProfileDebt } from "./profile-pr
 import { readPerson } from "../people/people";
 
 import { readFinancePage } from "../finance/finance";
+import { invalidateFinanceViews } from "../finance/finance-query";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { CollectionEditor } from "../finance/finance-content";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -855,19 +858,11 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (result) => {
             queries.setQueryData(rightsKey, result.rights);
-            await queries.invalidateQueries({
-              queryKey: [
-                "profile-reservations",
-                scope.accountId,
-                scope.orgId,
-                scope.centerId,
-                personId,
-              ],
-            });
+            await invalidateMemberReservationViews(queries, scope, personId);
             await person.refetch({ throwOnError: true });
-            void queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            void invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
         />
       )}
@@ -888,19 +883,11 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (result) => {
             queries.setQueryData(rightsKey, result.rights);
-            await queries.invalidateQueries({
-              queryKey: [
-                "profile-reservations",
-                scope.accountId,
-                scope.orgId,
-                scope.centerId,
-                personId,
-              ],
-            });
+            await invalidateMemberReservationViews(queries, scope, personId);
             await person.refetch({ throwOnError: true });
-            void queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            void invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
         />
       )}
@@ -947,10 +934,26 @@ export function MemberProfileContent({
           }}
           onRefresh={async (result) => {
             queries.setQueryData(rightsKey, result.rights);
-            await reservations.refetch({ throwOnError: true });
-            void queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
+            await invalidateMemberReservationViews(queries, scope, personId);
+            await queries.fetchQuery({
+              queryKey: [
+                "profile-reservations",
+                scope.accountId,
+                scope.orgId,
+                scope.centerId,
+                personId,
+                filter,
+                undefined,
+              ],
+              queryFn: () => readMemberReservations(scope, personId, undefined, filter),
+              staleTime: 0,
+              retry: false,
             });
+            setReservationCursors([undefined]);
+            setReservationIndex(0);
+            void invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
         />
       )}
@@ -972,15 +975,16 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (result) => {
             queries.setQueryData(rightsKey, result.entitlements);
-            queries.setQueryData(financeKey(result.finance.currency), result.finance);
+            queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
+            await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
             setCurrency(result.finance.currency);
             setCurrencyDraft(result.finance.currency);
             setIndex(0);
             setCursors([undefined]);
             await person.refetch({ throwOnError: true });
-            void queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            void invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
           onCollect={(code) => {
             setCurrency(code);
@@ -1000,9 +1004,9 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (current) => {
             queries.setQueryData(personKey, current);
-            await queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            await invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
         />
       )}
@@ -1017,9 +1021,9 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (current) => {
             queries.setQueryData(personKey, current);
-            await queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            await invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
         />
       )}
@@ -1035,9 +1039,9 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (current) => {
             queries.setQueryData(personKey, current);
-            await queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            await invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
             void rights.refetch();
           }}
         />
@@ -1073,25 +1077,18 @@ export function MemberProfileContent({
           onRefresh={async (result) => {
             queries.setQueryData(rightsKey, result.rows);
             if (result.finance) {
-              queries.setQueryData(financeKey(result.finance.currency), result.finance);
+              queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
+              await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
               setCurrency(result.finance.currency);
               setCurrencyDraft(result.finance.currency);
               setIndex(0);
               setCursors([undefined]);
             }
-            await queries.invalidateQueries({
-              queryKey: [
-                "profile-reservations",
-                scope.accountId,
-                scope.orgId,
-                scope.centerId,
-                personId,
-              ],
-            });
+            await invalidateMemberReservationViews(queries, scope, personId);
             await person.refetch({ throwOnError: true });
-            void queries.invalidateQueries({
-              queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-            });
+            void invalidateCachedFamilies(queries, [
+              ["people", scope.accountId, scope.orgId, scope.centerId],
+            ]);
           }}
         />
       )}
@@ -1107,10 +1104,18 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async () => {
+            await invalidateFinanceViews(queries, scope, personId, currency!);
             await Promise.all([
-              finance.refetch({ throwOnError: true }),
+              queries.fetchQuery({
+                queryKey: financeKey(currency!, undefined),
+                queryFn: () => readFinancePage(scope, { personId, currency: currency! }),
+                staleTime: 0,
+                retry: false,
+              }),
               person.refetch({ throwOnError: true }),
             ]);
+            setCursors([undefined]);
+            setIndex(0);
           }}
         />
       )}

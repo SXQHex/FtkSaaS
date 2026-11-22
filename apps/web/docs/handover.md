@@ -13,3 +13,10 @@
 ## Devam
 
 Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. [İlk açık ve önkoşulu karşılanan iş](production-queue.md#aktif-sıra) ile devam et. Aynı SHA'nın unit/MSW, tarayıcı, kalite, merge/main ve gerekli hosted kanıtlarını birbirinden ayır. Başarısız test için assertion/timeout/politika gevşetme; bilinmeyen ACK için ikinci native writer açma. Yalnız gerçek yeni kaynak veya ortam kanıtıyla kayıt güncelle; mikro adım günlükleri ve tekrar eden kabul metni üretme.
+
+## 22 Kasım 2026 · Frontend genelinde M01 kaynak taraması (aday)
+
+- Tekil özel ders düzeltmesinden önce bütün mutation / Query key sahipleri tarandı: `apps/web/src/features` içindeki 36 alanın key, refetch, invalidation, cursor ve onRefresh arayüzleri; 605 feature TypeScript yolunun envanteri çıkarıldı; mutation/Query anahtarları üzerinden tespit edilen ilgili ekranlar kaynak kodundan incelendi. Bu kaynak taraması otomatik veya gerçek tarayıcı kabulü değildir.
+- **Kök desen:** filtre/cursor Query ailesi ile native receipt/readback sonrasındaki sadece aktif sayfa `refetch` işlemi ayrık bırakılıyor; eski continuation cursor'ı mutation sonrası geçersiz olabilir. Doğru mevcut uygulamalar (`peopleKeys`, `productsKeys`, `leadsKeys`, `memberReservationKeys`) korunuyor, eksik readback'ler ve ilişki sorguları hedefli düzeltiliyor.
+- **Aday:** [PR #374](https://github.com/SXQHex/FtkSaaS/pull/374) genişletildi. Ortak `lib/cache-invalidation.ts` yalnız etkilenmiş key ailelerini stale işaretler; ilk sayfa readback başarısızsa `saved` ilan edilemez. Native komut ve receipt kodu, test/CI eşikleri, backend alanı değiştirilmedi.
+- **Kapanış sınırı:** PR'ın son SHA'sında unit/coverage/typecheck/lint/format/build, tam Desktop Chromium shard, sayfa-2→write/receipt→ilk sayfa→eski cursor olumsuz örneği ve tenant izolasyonu doğrulanana kadar M01–M05/A kutuları **açık**. Merge/main, dört tarayıcı ve hosted kabulü ayrı kaydedilecek.

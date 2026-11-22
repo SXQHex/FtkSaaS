@@ -1,4 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { saveDownload } from "../../lib/save-download";
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -40,6 +41,11 @@ import type { ReportAction } from "./report-search";
 import { downloadReport, readJob } from "./reports-command";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
+// Called only from a user-triggered refresh, never during a React render.
+function freshReportAnchor() {
+  return new Date().toISOString();
+}
+
 export function ReportsContent({
   scope,
   onLockChange,
@@ -308,16 +314,42 @@ export function ReportsContent({
         ? [pagination(item.name, data[item.name]?.rows.next_cursor, reports[index]!.isFetching)]
         : [],
     );
-  async function refresh() {
-    setPages({});
-    setAnchor(new Date().toISOString());
-    setFileError(false);
-    await Promise.all([
-      queries.invalidateQueries({ queryKey: ["report-view", scope] }),
-      queries.invalidateQueries({ queryKey: ["report-finance-summary", scope] }),
-      queries.invalidateQueries({ queryKey: ["report-export-directory", scope] }),
-      queries.invalidateQueries({ queryKey: ["report-import-directory", scope] }),
+  async function refresh(kind?: "imports" | "exports") {
+    const nextAnchor = freshReportAnchor();
+    await invalidateCachedFamilies(queries, [
+      ["report-view", scope],
+      ["report-finance-summary", scope],
+      ["report-export-directory", scope],
+      ["report-import-directory", scope],
     ]);
+    const firstPages = kind ? [kind] : tab === "files" ? (["imports", "exports"] as const) : [];
+    await Promise.all(
+      firstPages.map((item) =>
+        item === "imports"
+          ? queries.fetchQuery({
+              queryKey: ["report-import-directory", scope, undefined],
+              queryFn: () => readImportDirectory(scope),
+              staleTime: 0,
+              retry: false,
+            })
+          : queries.fetchQuery({
+              queryKey: ["report-export-directory", scope, undefined],
+              queryFn: () =>
+                readTracking(scope, {
+                  period: "all",
+                  anchor: nextAnchor,
+                  timezone: timezone!,
+                  kind: "job",
+                  query: "report_build_v1",
+                }),
+              staleTime: 0,
+              retry: false,
+            }),
+      ),
+    );
+    setPages({});
+    setAnchor(nextAnchor);
+    setFileError(false);
   }
   async function file(id: string, action: ReportFileRow["action"]) {
     if (locked) return;
@@ -574,7 +606,7 @@ export function ReportsContent({
           }}
           onLockChange={lock}
           onAccessLost={accessLost}
-          onSaved={refresh}
+          onSaved={() => refresh("imports")}
         />
       )}
       {exportReview && active && (
@@ -590,7 +622,7 @@ export function ReportsContent({
           }}
           onLockChange={lock}
           onAccessLost={accessLost}
-          onSaved={refresh}
+          onSaved={() => refresh("exports")}
         />
       )}
     </>

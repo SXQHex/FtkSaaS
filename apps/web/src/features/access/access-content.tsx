@@ -6,6 +6,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { readPeopleCenter } from "../people/people";
 import { PersonEntry } from "../people/person-entry";
 import { AccessActionController } from "./access-controller";
+import { invalidateAccessDirectories } from "./access-query";
 import {
   AccessView,
   type AccessAction,
@@ -121,36 +122,50 @@ export function AccessContent({
     return () => clearTimeout(timer);
   }, [search]);
   async function refresh() {
-    // Writes may invalidate cursor snapshots: reread first pages with the same
-    // visible filters, rather than replaying a stale continuation cursor.
+    // Native receipt/action readback has completed before this callback. Stale
+    // cursor variants must not be trusted when returning from another page.
+    await invalidateAccessDirectories(queries, scope);
     const alreadyRestricted = (error: unknown) =>
       error instanceof BackendError && error.code === "FORBIDDEN";
-    await Promise.all([
-      // A separately denied directory stays visibly unavailable. It is not a
-      // prerequisite for refreshing the permitted action's own source.
-      ...(!alreadyRestricted(invitations.error)
-        ? [
-            queries.fetchQuery({
-              queryKey: invitationKey(),
-              queryFn: () => readInvitations(),
-              staleTime: 0,
-            }),
-          ]
-        : []),
-      ...(!alreadyRestricted(accounts.error)
-        ? [
-            queries.fetchQuery({
-              queryKey: accountKey(),
-              queryFn: () => readAccounts(),
-              staleTime: 0,
-            }),
-          ]
-        : []),
+    const invitationDenied = alreadyRestricted(invitations.error);
+    const accountDenied = alreadyRestricted(accounts.error);
+    // Denial on one directory must not prevent the other from rereading its
+    // first page. All requests settle before propagating non-permission errors.
+    const [invitationResult, accountResult] = await Promise.allSettled([
+      invitationDenied
+        ? Promise.resolve()
+        : queries.fetchQuery({
+            queryKey: invitationKey(),
+            queryFn: () => readInvitations(),
+            staleTime: 0,
+            retry: false,
+          }),
+      accountDenied
+        ? Promise.resolve()
+        : queries.fetchQuery({
+            queryKey: accountKey(),
+            queryFn: () => readAccounts(),
+            staleTime: 0,
+            retry: false,
+          }),
     ]);
-    setInvitationCursors([undefined]);
-    setInvitationIndex(0);
-    setAccountCursors([undefined]);
-    setAccountIndex(0);
+    // Keep an already denied directory on its failing query, rather than
+    // exposing an old, successful first-page cache as though it were permitted.
+    if (!invitationDenied) {
+      setInvitationCursors([undefined]);
+      setInvitationIndex(0);
+    }
+    if (!accountDenied) {
+      setAccountCursors([undefined]);
+      setAccountIndex(0);
+    }
+    for (const result of [invitationResult, accountResult]) {
+      if (result.status === "rejected" && !alreadyRestricted(result.reason)) throw result.reason;
+    }
+    const refreshed =
+      (!invitationDenied && invitationResult.status === "fulfilled") ||
+      (!accountDenied && accountResult.status === "fulfilled");
+    if (!refreshed) throw new Error("ACCESS_DIRECTORY_UNAVAILABLE");
   }
   const invitationState = invitations.isError
     ? "error"

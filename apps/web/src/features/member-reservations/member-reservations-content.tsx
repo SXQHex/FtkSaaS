@@ -139,23 +139,55 @@ export function MemberReservationsContent({
   }
   async function refresh(purpose: "reservation" | "waitlist") {
     await invalidateMemberReservationViews(queries, scope, personId);
-    const [upcomingResult, pastResult, waitingResult, offersResult] = await Promise.all([
-      up.refetch(),
-      past.refetch(),
-      waiting.refetch(),
-      offers.refetch(),
+    // A write can reorder all four lists. Do not reread old cursor snapshots.
+    const [upcomingResult, pastResult, waitingResult, offersResult] = await Promise.allSettled([
+      queries.fetchQuery({
+        queryKey: [...prefix, "upcoming", undefined, sessionId],
+        queryFn: () => readOwnReservations(scope, personId, "upcoming", undefined, sessionId),
+        staleTime: 0,
+        retry: false,
+      }),
+      queries.fetchQuery({
+        queryKey: [...prefix, "past", undefined, sessionId],
+        queryFn: () => readOwnReservations(scope, personId, "past", undefined, sessionId),
+        staleTime: 0,
+        retry: false,
+      }),
+      queries.fetchQuery({
+        queryKey: [...prefix, "waitlist", undefined],
+        queryFn: () => readOwnWaitlist(scope, "entries"),
+        staleTime: 0,
+        retry: false,
+      }),
+      queries.fetchQuery({
+        queryKey: [...prefix, "offers", undefined, offerId],
+        queryFn: () =>
+          offerId
+            ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId })
+            : readOwnWaitlist(scope, "offers"),
+        staleTime: 0,
+        retry: false,
+      }),
     ]);
     const waitlistReadFailed = [waitingResult, offersResult].some(
-      ({ isError, error }) =>
-        isError &&
+      (result) =>
+        result.status === "rejected" &&
         !(
           purpose === "reservation" &&
-          error instanceof BackendError &&
-          error.code === "PLAN_FEATURE_UNAVAILABLE"
+          result.reason instanceof BackendError &&
+          result.reason.code === "PLAN_FEATURE_UNAVAILABLE"
         ),
     );
-    if (upcomingResult.isError || pastResult.isError || waitlistReadFailed)
+    if (
+      upcomingResult.status === "rejected" ||
+      pastResult.status === "rejected" ||
+      waitlistReadFailed
+    )
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
+    setUpCursors([undefined]);
+    setPastCursors([undefined]);
+    setEntryCursors([undefined]);
+    setOfferCursors([undefined]);
   }
   const loadingOffers = offers.isPending || Boolean(offerId && offers.isFetching);
   const offerPage = offers.isError || loadingOffers ? undefined : offers.data;

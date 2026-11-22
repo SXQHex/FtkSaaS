@@ -1,6 +1,7 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
@@ -162,7 +163,7 @@ export function EventDetailContent({
     }
     await Promise.all([
       queries.refetchQueries({ queryKey: prefix, exact: true }, { throwOnError: true }),
-      ...affected.map((queryKey) => queries.invalidateQueries({ queryKey })),
+      invalidateCachedFamilies(queries, affected),
     ]);
     setActual(undefined);
     setReason("");

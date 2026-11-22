@@ -1,6 +1,7 @@
 import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -87,7 +88,8 @@ export function MemberClassesContent({
   const rows = !lessons.isError ? lessons.data : undefined;
   async function refresh() {
     await invalidateMemberReservationViews(queries, scope, personId);
-    await queries.invalidateQueries({ queryKey: prefix });
+    await invalidateCachedFamilies(queries, [prefix]);
+    await lessons.refetch({ throwOnError: true });
   }
   function choose(row: MemberClass, action: ClassAction | "cancel") {
     if (!locked) setTarget({ row: structuredClone(row), action });
