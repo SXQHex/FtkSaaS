@@ -126,7 +126,13 @@ test.each([
       expect(config.on[event]["paths-ignore"]).toBeUndefined();
       expect(config.on[event].branches).toEqual(["main"]);
     }
-    expect(config.on.pull_request.types).toEqual(["opened", "synchronize", "reopened", "edited"]);
+    expect(config.on.pull_request.types).toEqual([
+      "opened",
+      "synchronize",
+      "reopened",
+      // Draft-to-ready is handled by the gate; frontend only rechecks source/base changes.
+      "edited",
+    ]);
     expect(config.on.workflow_dispatch).toBeNull();
     expect(config.on.push).toBeUndefined();
     expect(config.concurrency.group).toContain(
