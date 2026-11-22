@@ -23,7 +23,7 @@ Kapsam: Bu kalite tabanı ürün frontend’i, backend ve ortak paketlere uygula
 | Import sınırı | Tanımlı sınırda 0 yasak import; iş kuralı kopyalamayı önler | Mevcut Oxlint `no-restricted-imports` | Frontend/UI lint |
 | SSoT ve belge sahipliği | 0 kayıtsız/çift sahipli belge; alan ilerlemesi ortak dizine taşınmaz. Ürün plan kapsamı ve hedef limitleri makine iziyle eşleşir. | `pnpm --filter @ftksaas/backend docs:check`; `pnpm --filter @ftksaas/backend test:governance` | Belge/ilgili kaynak kabulü; ürün/makine karşılaştırması backend verify içinde |
 | Fonksiyon ve kaynak kabulü | Gerekli işlerde 0 başarısız/eksik kanıt; mevcut CI protokolü | [CI politikası](docs/ci-policy.md) ve kaynak bağlı merge/main doğrulayıcıları | Kapsama göre aday; main’de kanıt doğrulama |
-| Erişilebilirlik | Mevcut Axe taranan durumlarında 0 ihlal; bugünkü çıta korunur | `pnpm test:frontend:e2e` | Mevcut dört tarayıcı projesi; bütün ekranların kapsandığı iddia edilmez |
+| Erişilebilirlik | Mevcut Axe taranan durumlarında 0 ihlal; bugünkü çıta korunur | `pnpm test:frontend:e2e` | 22 Kasım 2026 refactoring döneminde yalnız Desktop Chromium (12 shard); kalan üç profil refactoring sonrasında yeniden zorunlu hâle gelecek. Bütün ekranların kapsandığı iddia edilmez |
 
 ## Mimari ve alan sahipliği
 

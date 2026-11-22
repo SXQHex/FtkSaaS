@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { verifyShardPlan, verifyShardResult } from "./ci-e2e.mjs";
+import { refactoringBrowserShards } from "./browser-profiles.mjs";
 
 const profile = "mobile-webkit";
 
@@ -48,5 +49,24 @@ test("three browser shards must cover the selected inventory once", () => {
   assert.throws(
     () => verifyShardResult(report(["first"], { expectedStatus: "skipped" }), expected[0], profile),
     /skipped/,
+  );
+});
+
+test("twelve Desktop Chromium shards must cover every selected test once", () => {
+  const ids = refactoringBrowserShards.map((index) => `case-${index}`);
+  const all = report(ids, { projectId: "chromium" });
+  const shards = ids.map((id) => report([id], { projectId: "chromium" }));
+  const files = ["static-build.spec.ts"];
+  const plan = verifyShardPlan(all, shards, files, "chromium", refactoringBrowserShards);
+  assert.equal(plan.length, 12);
+  for (const [index, shard] of shards.entries()) verifyShardResult(shard, plan[index], "chromium");
+  assert.throws(
+    () => verifyShardPlan(all, shards.slice(1), files, "chromium", refactoringBrowserShards),
+    /Incomplete/,
+  );
+  const duplicatedShard = [...shards.slice(0, 11), shards[0]];
+  assert.throws(
+    () => verifyShardPlan(all, duplicatedShard, files, "chromium", refactoringBrowserShards),
+    /gaps or duplicates/,
   );
 });
