@@ -9,7 +9,7 @@ const otherActor = { ...scope, accountId: "actor-b" };
 const directory = (
   source: typeof scope,
   search = "",
-  cursor: string | undefined = undefined,
+  cursor?: string,
 ) => ["document-directory", source, "center", "documents", "", "", "all", search, cursor];
 const catalog = (source: typeof scope, level: "center" | "organization" = "center") =>
   ["document-catalog", source, level];
