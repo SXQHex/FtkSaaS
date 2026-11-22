@@ -1,4 +1,4 @@
-import { invalidateFinanceViews } from "./finance-query";
+import { financeKeys, invalidateFinanceViews } from "./finance-query";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -188,6 +188,20 @@ export function FinanceContent({
     },
     [onLockChange],
   );
+  async function refreshFinance() {
+    if (!selection) throw new Error("FINANCE_SELECTION_UNAVAILABLE");
+    await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
+    // All existing movement cursors predate this write. Refresh only the
+    // selected person's first page and never replay an old continuation.
+    await queries.fetchQuery({
+      queryKey: [...financeKeys.person(scope, selection.personId, selection.currency), undefined],
+      queryFn: ({ signal }) => readFinancePage(scope, selection, undefined, signal),
+      staleTime: 0,
+      retry: false,
+    });
+    setCursors([undefined]);
+    setPageIndex(0);
+  }
   const formatDate = (value: string) =>
     new Intl.DateTimeFormat("tr-TR", {
       dateStyle: "short",
@@ -487,8 +501,7 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setDebtAction(undefined)}
           onRefresh={async () => {
-            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
-            await finance.refetch({ throwOnError: true });
+            await refreshFinance();
           }}
           onLockChange={changeLock}
           onAccessLost={accessLost}
@@ -504,8 +517,7 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setCreditRefund(false)}
           onRefresh={async () => {
-            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
-            await finance.refetch({ throwOnError: true });
+            await refreshFinance();
           }}
           onLockChange={changeLock}
           onAccessLost={accessLost}
@@ -522,8 +534,7 @@ export function FinanceContent({
           sourceAvailable={!workspace.isError}
           onClose={() => setCorrectionId(undefined)}
           onRefresh={async () => {
-            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
-            await finance.refetch({ throwOnError: true });
+            await refreshFinance();
           }}
           onLockChange={changeLock}
           onAccessLost={accessLost}
@@ -539,8 +550,7 @@ export function FinanceContent({
           onClose={() => setCollect(false)}
           canWrite={!workspace.isError && !authority.isError && authority.data === true}
           onRefresh={async () => {
-            await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
-            await finance.refetch({ throwOnError: true });
+            await refreshFinance();
           }}
           onAccessLost={accessLost}
           onLockChange={changeLock}
