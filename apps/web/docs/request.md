@@ -1,6 +1,6 @@
 # Web1 · Backend talepleri
 
-Frontend talep kaydı. Backend desteği ve kaynak kanıtı talep satırlarında, Web1 uygulaması ve ekran kabulü [TODO](todo.md) içinde izlenir. W1-BE-42’nin yayımlı Web1 kabulü G-STARTER.2’ye, W1-BE-36’nın sağlayıcı kontrolleri ilgili TODO maddesine bağlıdır.
+Frontend entegrasyon ve geçmiş W1-BE tüketim kanıtı. Backend desteği ve kaynak bağlantıları bu talep satırlarındadır; eski Web1 ekran/kabul anlatımı [tarihsel dizinden](todo.md) okunur. Güncel açık frontend işler [remaining-work.md](remaining-work.md), yürütme sırası [production-queue.md](production-queue.md) sahibindedir. W1-BE-42’nin yayımlı Web1 kabulü G-STARTER.2’ye, W1-BE-36’nın sağlayıcı kontrolleri ilgili TODO maddesine bağlıdır.
 
 İncelenen main `f7ded8d7baa8680e76d726e5ceaea24aead35a30`. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44421445195) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44421551790) aynı kaynakta başarılı.
 
