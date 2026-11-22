@@ -249,9 +249,7 @@ test("owned ready file reuses the native file and publishes only after explicit 
   ).toBeVisible();
 });
 
-test("M02 publication rereads the visible first page and refreshes old cursor/filter caches only on return", async ({
-  page,
-}) => {
+test("M02 refreshes cached document cursors and filters after publication", async ({ page }) => {
   let published = false;
   let publicationRequest: Record<string, unknown> | undefined;
   let oldCursorReads = 0;
@@ -403,9 +401,8 @@ test("M02 publication rereads the visible first page and refreshes old cursor/fi
   expect(
     f.requests.filter((request) => request.op === "document_version_publish_v1"),
   ).toHaveLength(1);
-  const writeIndex = f.requests.findIndex(
-    (request) => request.op === "document_version_publish_v1",
-  );
+  const operations = f.requests.map((request) => request.op);
+  const writeIndex = operations.indexOf("document_version_publish_v1");
   const resultIndex = f.requests.findIndex(
     (request) =>
       request.op === "management_state_get_v1" &&
