@@ -1282,8 +1282,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "cc16b0088f3d839f5b2b3a07c9cea5d5a2c2d7287e7ebc49b483bfd9aca4a8c5",
-        "reason": "BT01 calendar transport module types reviewed; existing feed and gateway preserved"
+        "fingerprint": "f5123676449d1c6b7b2f79885916501ee085f57fb675419abf1052d8e319569e",
+        "reason": "BT01 S14 signed public ingress regression: preserved original HMAC assertion, verified captured timestamp with 60s window and negative forged payload, signature and IP controls."
       }
     },
     {
