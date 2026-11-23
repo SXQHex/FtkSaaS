@@ -1,17 +1,29 @@
 import "../i18n";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { PropsWithChildren } from "react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import { LoginForm } from "../features/auth/login-form";
-const state = vi.hoisted(() => ({ ready: true, pathname: "/login", password: vi.fn() }));
-vi.mock("../features/auth/use-auth-session", () => ({ useAuthSession: () => state.ready }));
+const state = vi.hoisted(() => ({
+  ready: true,
+  pathname: "/login",
+  password: vi.fn(),
+  onSessionHandoff: undefined as ((pending: boolean) => void) | undefined,
+}));
+vi.mock("../features/auth/use-auth-session", () => ({
+  useAuthSession: (_enabled: boolean, onSessionHandoff: (pending: boolean) => void) => {
+    state.onSessionHandoff = onSessionHandoff;
+    return state.ready;
+  },
+}));
 vi.mock("@tanstack/react-router", () => ({
   useRouter: () => ({ navigate: vi.fn() }),
   useRouterState: () => state.pathname,
   Outlet: () =>
-    state.pathname === "/login" ? (
+    state.pathname === "/mfa" || state.pathname === "/reset-password" ? (
+      <p>native-auth-gate</p>
+    ) : state.pathname === "/login" ? (
       <LoginForm
         onPassword={state.password}
         onGoogle={async () => {
@@ -35,6 +47,7 @@ function renderRoot() {
 afterEach(() => {
   state.ready = true;
   state.pathname = "/login";
+  state.onSessionHandoff = undefined;
   vi.resetAllMocks();
 });
 it("keeps the login form mounted while post-authentication account reading fails", async () => {
@@ -65,3 +78,37 @@ it("immediately removes protected content during a session scope change", () => 
   rerender(<RootLayout />);
   expect(screen.queryByText("private-account-fixture")).not.toBeInTheDocument();
 });
+
+it("keeps same-user native commands mounted but entirely hidden and inert until revalidation", () => {
+  state.pathname = "/account";
+  const { rerender } = renderRoot();
+  const privateContent = screen.getByText("private-account-fixture");
+  expect(privateContent).toBeVisible();
+  act(() => {
+    state.onSessionHandoff?.(true);
+    state.ready = false;
+  });
+  rerender(<RootLayout />);
+  expect(privateContent).toBeInTheDocument();
+  expect(privateContent).not.toBeVisible();
+  expect(privateContent.parentElement).toHaveAttribute("aria-hidden", "true");
+  expect(privateContent.parentElement).toHaveAttribute("inert");
+  act(() => {
+    state.ready = true;
+    state.onSessionHandoff?.(false);
+  });
+  rerender(<RootLayout />);
+  expect(privateContent).toBeVisible();
+});
+
+it.each(["/mfa", "/reset-password"])(
+  "keeps the guarded native Auth screen visible during a same-user session handoff: %s",
+  (pathname) => {
+    state.pathname = pathname;
+    state.ready = false;
+    const { container } = renderRoot();
+    const authGate = screen.getByText("native-auth-gate");
+    expect(authGate).toBeVisible();
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  },
+);

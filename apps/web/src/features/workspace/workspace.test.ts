@@ -284,3 +284,45 @@ it("rejects another backend account before listing organizations through Query",
   );
   expect(requests.map((row) => row.operation)).toEqual(["account_get_v1"]);
 });
+
+it("refuses a previous session's late workspace authority even for the same user", async () => {
+  const userId = "native-fixture-user";
+  const token = (sessionId: string, suffix: string) => {
+    const payload = btoa(JSON.stringify({ sub: userId, session_id: sessionId }))
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/, "");
+    return `fixture.${payload}.${suffix}`;
+  };
+  const previous = token("019a7b00-0000-7000-8000-000000000101", "previous");
+  const current = token("019a7b00-0000-7000-8000-000000000102", "current");
+  native.getSession
+    .mockResolvedValueOnce({
+      data: { session: { user: { id: userId }, access_token: previous } },
+      error: null,
+    })
+    .mockResolvedValue({
+      data: { session: { user: { id: userId }, access_token: current } },
+      error: null,
+    });
+  await expect(readWorkspace(accountId, orgId, async () => ({ id: accountId }))).rejects.toThrow(
+    "ACCOUNT_CHANGED",
+  );
+  expect(requests.some((row) => row.operation === "organizations_list_v1")).toBe(true);
+  expect(requests.every((row) => row.bearer === `Bearer ${previous}`)).toBe(true);
+});
+
+it("rejects an opaque bearer rotation during a late workspace read", async () => {
+  native.getSession
+    .mockResolvedValueOnce({
+      data: { session: { user: { id: "native-fixture-user" }, access_token: "opaque-old" } },
+      error: null,
+    })
+    .mockResolvedValue({
+      data: { session: { user: { id: "native-fixture-user" }, access_token: "opaque-new" } },
+      error: null,
+    });
+  await expect(readWorkspace(accountId, orgId, async () => ({ id: accountId }))).rejects.toThrow(
+    "ACCOUNT_CHANGED",
+  );
+});
