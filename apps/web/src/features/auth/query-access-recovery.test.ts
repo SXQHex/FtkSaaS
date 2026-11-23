@@ -10,6 +10,7 @@ import {
   observeQueryAccessFailures,
   reconcileQueryAccessFailure,
   workspaceAuthority,
+  workspaceAccessLost,
 } from "./query-access-recovery";
 
 const { workspaceRead } = vi.hoisted(() => ({ workspaceRead: vi.fn() }));
@@ -170,6 +171,79 @@ describe("M06: cross-feature access reconciliation", () => {
     expect(queries.getQueryData(workspaceKeys.projection(accountId, orgId))).toBeDefined();
     expect(actions.invalidateRoute).not.toHaveBeenCalled();
     expect(actions.showLogin).not.toHaveBeenCalled();
+  });
+
+  it("does not mistake a newly added center, role or organization lifecycle for access loss", async () => {
+    const original = view();
+    const added = structuredClone(original);
+    added.centers.push({
+      ...added.centers[0]!,
+      id: "center-b",
+      name: "New center",
+    });
+    added.roles.push({ ...added.roles[0]!, role: "center_manager", scope_center_id: "center-b" });
+    expect(workspaceAccessLost(original, added)).toBe(false);
+    const closed = structuredClone(original);
+    closed.selected!.access_mode = "closed";
+    expect(workspaceAccessLost(original, closed)).toBe(false);
+
+    const { queries, actions } = fixture();
+    workspaceRead.mockResolvedValue(added);
+    await reconcileQueryAccessFailure(
+      queries,
+      ["leads", accountId, orgId, centerId],
+      error("FORBIDDEN"),
+      actions,
+    );
+    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeDefined();
+    expect(actions.invalidateRoute).not.toHaveBeenCalled();
+    expect(actions.showLogin).not.toHaveBeenCalled();
+  });
+
+  it("only purges private queries for revocations of previously granted capabilities", () => {
+    const original = view();
+    expect(workspaceAccessLost(original, view())).toBe(false);
+    expect(workspaceAccessLost(original, view({ manager: false }))).toBe(true);
+    expect(workspaceAccessLost(original, view({ accessible: false }))).toBe(true);
+    expect(workspaceAccessLost(original, view({ org: "org-b" }))).toBe(true);
+    const oldOwn = structuredClone(original);
+    oldOwn.selected!.self_management_scope = {
+      owner: true,
+      org_manager: false,
+      managed_center_ids: [centerId],
+    };
+    const newOwn = structuredClone(oldOwn);
+    newOwn.selected!.self_management_scope = {
+      owner: false,
+      org_manager: false,
+      managed_center_ids: [],
+    };
+    expect(workspaceAccessLost(oldOwn, newOwn)).toBe(true);
+  });
+
+  it("leaves platform-only FORBIDDEN to its own permission UI instead of choosing an unrelated organization", async () => {
+    const { queries, actions } = fixture();
+    const key = ["platform-organizations", accountId, "cursor-a"];
+    queries.setQueryData(key, ["previously visible platform rows"]);
+    await reconcileQueryAccessFailure(queries, key, error("FORBIDDEN"), actions);
+    expect(workspaceRead).not.toHaveBeenCalled();
+    expect(queries.getQueryData(key)).toEqual(["previously visible platform rows"]);
+    expect(queries.getQueryData(workspaceKeys.projection(accountId, orgId))).toBeDefined();
+    expect(actions.invalidateRoute).not.toHaveBeenCalled();
+    expect(actions.showLogin).not.toHaveBeenCalled();
+  });
+
+  it("does not react to an authorized native center addition during an active write readback", async () => {
+    const { queries, actions } = fixture();
+    const stop = observeQueryAccessFailures(queries, actions);
+    const added = structuredClone(view());
+    added.centers.push({ ...added.centers[0]!, id: "center-b" });
+    workspaceRead.mockResolvedValue(added);
+    await queries.fetchQuery({ ...workspaceQuery(queries, accountId, orgId), staleTime: 0 });
+    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeDefined();
+    expect(actions.invalidateRoute).not.toHaveBeenCalled();
+    expect(actions.onChecking).not.toHaveBeenCalled();
+    stop();
   });
 
   it("fails closed if native workspace cannot be revalidated", async () => {
