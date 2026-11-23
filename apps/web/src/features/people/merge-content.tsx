@@ -18,6 +18,7 @@ import {
 } from "./merge-view";
 import { peopleRow } from "./people-summary";
 import { readMergeDirectory, type MergeReviewState } from "./merge-directory";
+import { invalidateMergeViews } from "./merge-query";
 import { useMergeCommand } from "./use-merge-command";
 import {
   readMergePair,
@@ -97,6 +98,8 @@ export function MergeContent({
       }
     },
     retry: false,
+    // Reuse a confirmed native first-page readback after returning from page two.
+    staleTime: 5_000,
   });
   const accessLost = useCallback(
     (error: unknown, preserveQuery?: readonly unknown[]) => {
@@ -131,27 +134,31 @@ export function MergeContent({
   const command = useMergeCommand({
     onAccessLost: accessLost,
     onRefresh: async () => {
-      await queries.invalidateQueries({
-        // Aliases can carry history across centers. Revisit their native profile
-        // and balances before reusing a previously warm result in this organization.
-        predicate: ({ queryKey }) =>
-          queryKey[1] === scope.accountId &&
-          queryKey[2] === scope.orgId &&
-          [
-            "people",
-            "merge-directory",
-            "profile-person",
-            "profile-rights",
-            "profile-ledger",
-            "profile-reservations",
-            "profile-negative-limit",
-            "finance",
-            "person-editor",
-          ].includes(String(queryKey[0])),
-        refetchType: "none",
+      await invalidateMergeViews(queries, scope);
+      // A merge can remove or reorder the old server cursor. Read the visible
+      // filter's first page, not the previously selected continuation page.
+      await queries.fetchQuery({
+        queryKey: [
+          "merge-directory",
+          scope.accountId,
+          scope.orgId,
+          scope.centerId,
+          filter,
+          query,
+          undefined,
+        ],
+        queryFn: async () =>
+          filter === "approvals"
+            ? { kind: "approvals" as const, ...(await readMergeApprovals(scope)) }
+            : {
+                kind: "reviews" as const,
+                ...(await readMergeDirectory(scope, state, query)),
+              },
+        staleTime: 0,
+        retry: false,
       });
-      const result = await directory.refetch();
-      if (result.error) throw result.error;
+      setCursors([undefined]);
+      setPage(0);
     },
   });
   const locked = busy || command.locked;
@@ -602,6 +609,7 @@ export function MergeContent({
             <Button
               variant="outline"
               size="sm"
+              aria-label={`${t(($) => $.people.previous)}: ${t(($) => $.peopleMerge.listLabel)}`}
               isDisabled={locked || page === 0 || directory.isFetching}
               onPress={() => {
                 clearSelection();
@@ -613,6 +621,7 @@ export function MergeContent({
             <Button
               variant="outline"
               size="sm"
+              aria-label={`${t(($) => $.people.next)}: ${t(($) => $.peopleMerge.listLabel)}`}
               isDisabled={
                 locked || directory.isFetching || directory.isError || !pageData?.next_cursor
               }

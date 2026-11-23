@@ -1,4 +1,4 @@
-import { productsKeys } from "./products-query";
+import { affectedProductQueryFamilies, productsKeys } from "./products-query";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
@@ -19,7 +19,7 @@ import { useProductCommand } from "./use-product-command";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { workspaceRoles } from "../workspace/workspace";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { ProductManagementEntry } from "@ftksaas/api-contracts";
+import type { ProductManagementEntry, ProductView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -229,10 +229,18 @@ export function ProductsContent({
           onClose={() => setEditor(null)}
           onLockChange={onLockChange}
           onAccessLost={accessLost}
-          onRefresh={async () => {
+          onRefresh={async (result) => {
+            const updated = result?.terms ?? editor.base?.terms;
             await invalidateAndReadFirstPage({
               queries,
-              families: [productsKeys.management(scope)],
+              families: updated
+                ? affectedProductQueryFamilies(
+                    scope,
+                    updated,
+                    editor.base?.terms,
+                    current?.centers.map((center) => center.id) ?? [],
+                  )
+                : [productsKeys.management(scope)],
               firstPageKey: [
                 "products-management",
                 scope.accountId,
@@ -267,7 +275,7 @@ function ProductEditorController({
   canWrite: boolean;
   usageCenters: { id: string; name: string }[];
   onClose: () => void;
-  onRefresh: () => Promise<void>;
+  onRefresh: (result?: ProductView) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
   onLockChange: (locked: boolean) => void;
 }) {
@@ -288,8 +296,8 @@ function ProductEditorController({
   });
   const command = useProductCommand({
     onAccessLost,
-    onRefresh: async () => {
-      await onRefresh();
+    onRefresh: async (result) => {
+      await onRefresh(result);
       setHistoryRevision((value) => value + 1);
     },
   });
