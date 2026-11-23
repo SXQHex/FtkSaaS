@@ -17,3 +17,13 @@ export function nativeSessionId(session: Session): string | undefined {
     return undefined;
   }
 }
+
+// Compare verified session scope for late reads. If the bearer cannot expose
+// a session UUID, reusing the exact bearer is safe; a changed opaque bearer is not.
+export function sameNativeSession(start: Session, latest: Session): boolean {
+  if (start.user.id !== latest.user.id) return false;
+  const startedId = nativeSessionId(start);
+  return startedId
+    ? startedId === nativeSessionId(latest)
+    : start.access_token === latest.access_token;
+}

@@ -1,6 +1,7 @@
+import {requireRecord,responseJson} from './edge-json.ts';
 // Server-only Storage adapter. No service key or object path is accepted from a client.
 const encoded=(path:string)=>path.split('/').map(encodeURIComponent).join('/');
-export const contentHash=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+export const contentHash=async(bytes:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(bytes))),b=>b.toString(16).padStart(2,'0')).join('');
 const validZip=(bytes:Uint8Array)=>{
  if(bytes.length<22)return false;
  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
@@ -17,7 +18,7 @@ export function documentStorage(base:string,key:string,fetcher:typeof fetch=fetc
  return {
   async upload(objectKey:string){
    const r=await fetcher(base+'/storage/v1/object/upload/sign/'+bucket+'/'+path(objectKey),{method:'POST',headers:{...headers,'content-type':'application/json','x-upsert':'false'},body:JSON.stringify({upsert:false}),signal:AbortSignal.timeout(15000)});
-   if(!r.ok)throw Error('STORAGE_UNAVAILABLE');const data=await r.json();
+   if(!r.ok)throw Error('STORAGE_UNAVAILABLE');const data=requireRecord(await responseJson(r));
    if(typeof data.url!=='string'||!data.url.startsWith('/object/upload/sign/'+bucket+'/'))throw Error('INVALID_STORAGE_RESPONSE');
    // Resolve against the configured public Supabase API origin on the client;
    // local Edge's SUPABASE_URL can be the private Kong hostname.

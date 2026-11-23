@@ -63,6 +63,21 @@ function writeValidators(selected,path,optimize=code=>code){
  console.log('Generated standalone request/response validators: '+Object.keys(selected).length+' ('+path+')');
 }
 writeValidators(exports,'supabase/functions/backend-v1/validators.js',optimizeStandaloneValidators);
+// The declared types follow the *same* authoritative operation inventory as the
+// standalone validator JS. TypeScript never checks the generated 6 MB JS output.
+const typeDeclarations=[
+ '// Generated from contract.json; do not hand-edit. Runtime implementations are in validators.js.',
+ "import type {Operations,FailureEnvelope} from '@ftksaas/api-contracts';",
+ 'export declare const failure_envelope: (value: unknown) => value is FailureEnvelope;',
+ ...contract['x-contract'].operations.flatMap(({name})=>[
+  'export declare const request_'+name+": (value: unknown) => value is Operations['"+name+"']['request'];",
+  'export declare const success_'+name+": (value: unknown) => value is Operations['"+name+"']['response'];"
+ ])
+].join('\n')+'\n';
+const declarationPath='supabase/functions/backend-v1/validators.d.ts';
+if(process.argv.includes('--check'))assert.equal(fs.readFileSync(declarationPath,'utf8'),typeDeclarations,'Validator types drift');
+else fs.writeFileSync(declarationPath,typeDeclarations);
+
 // One canonical schema/compiler, only the four public validators needed by Worker.
 const publicNames=['failure_envelope','request_public_calendar_get_v1','success_public_calendar_get_v1','request_public_application_submit_v1'];
 writeValidators(Object.fromEntries(publicNames.map(name=>[name,exports[name]])),'transports/spa-validators.mjs');

@@ -23,22 +23,14 @@ function sameSession(previous: NativeIdentity | null | undefined, current: Nativ
   );
 }
 
-export function useAuthSession(
-  enabled = true,
-  onSessionHandoff?: (pending: boolean) => void,
-) {
+export function useAuthSession(enabled = true, onSessionHandoff?: (pending: boolean) => void) {
   const [ready, setReady] = useState(true);
   const queries = useQueryClient();
   const router = useRouter();
   // Keep the last native identity when the observer pauses for public routes.
   const previous = useRef<NativeIdentity | null | undefined>(undefined);
   useEffect(() => {
-    if (!enabled) {
-      // A private reconciliation cannot leave the next route permanently pending.
-      setReady(true);
-      onSessionHandoff?.(false);
-      return;
-    }
+    if (!enabled) return;
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
       return;
     let revision = 0;
@@ -57,6 +49,12 @@ export function useAuthSession(
         current !== null &&
         previous.current.userId === current.userId;
       previous.current = current;
+      if (event === "INITIAL_SESSION" && !changed) {
+        // Resubscribing after a public route keeps the proven same session.
+        setReady(true);
+        onSessionHandoff?.(false);
+        return;
+      }
       // SIGNED_IN is re-emitted on focus; TOKEN_REFRESHED and MFA keep the
       // original session_id. An actual same-user reauthentication does not.
       if (event === "SIGNED_OUT" || changed) sessionStorage.removeItem("ftk-recovery-account");
@@ -67,7 +65,7 @@ export function useAuthSession(
       if (sameActorHandoff) {
         // Evict prior-session Query data without destroying a running
         // native command's TanStack MutationCache/receipt lifetime.
-        queries.getQueryCache().clear();
+        queries.removeQueries();
       } else {
         // Sign-out and actor replacement discard both Queries and mutations.
         queries.clear();

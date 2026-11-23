@@ -172,4 +172,16 @@ describe("shared account projections", () => {
     expect(await queries.query(accountQuery("native-a"))).toMatchObject({ id: "account-a" });
     expect(reader).toHaveBeenCalledExactlyOnceWith(false, original.data.session.access_token);
   });
+
+  it("rejects a late same-actor read when an opaque bearer rotates", async () => {
+    const queries = new QueryClient();
+    native.getSession.mockResolvedValueOnce(session("native-a")).mockResolvedValue({
+      data: {
+        session: { user: { id: "native-a" }, access_token: "opaque-replaced" },
+      },
+      error: null,
+    });
+    await expect(queries.query(accountQuery("native-a"))).rejects.toThrow("ACCOUNT_CHANGED");
+    expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBeUndefined();
+  });
 });

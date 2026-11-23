@@ -297,7 +297,11 @@
         "apps/backend/supabase/migrations/20261118214800_audit_export_tracking_results.sql",
         "apps/backend/database/tracking-media-redaction.sql",
         "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql",
-        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
+        "apps/backend/supabase/functions/backend-v1/edge-json.ts",
+        "apps/backend/supabase/functions/backend-v1/validators.d.ts",
+        "apps/backend/supabase/functions/deno-runtime.d.ts",
+        "apps/backend/transports/browser-cors.d.mts"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -309,8 +313,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "3946dbf17ddd6989d15d058461e99058c35e8ceefc13effc0e53109efec7d619",
-        "reason": "PR #373 Supabase development delivery kaynak seçimi ve regresyon testleri incelendi: Main acceptance koşusunun repo/run/attempt/source bağı korunuyor; son başarılı teslim ile Supabase ağacı eşitse pahalı tam kabul araması atlanıyor; değişiklik varsa mevcut full proof ve hosted güvenlik kapıları zorunlu kalıyor. WF00 istemci/API/izin davranışı değişmedi."
+        "fingerprint": "fc698860a169d623585327b927c8bf9b53e9dbc45fbbca51aa2e28060e86cbde",
+        "reason": "BT01 pending checksum context guard and native Edge test reviewed; API suite fingerprint and complete split line coverage independently verified"
       }
     },
     {
@@ -390,7 +394,8 @@
         "apps/backend/transports/spa-ingress-worker.mjs",
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/database/account-display-label.sql",
-        "apps/backend/supabase/migrations/20261120145403_account_display_label.sql"
+        "apps/backend/supabase/migrations/20261120145403_account_display_label.sql",
+        "apps/backend/supabase/functions/backend-v1/auth-payload.ts"
       ],
       "operations": [
         "account_get_v1",
@@ -402,8 +407,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "3e560723c5a043787775bb6e8348663b59f0d4b1680fd564ddfac6ec0c9f7c79",
-        "reason": "Kendi hesap okuması kayıtlı ad ve doğrulanmış kimliği ortak etiket kuralıyla gösterir. Profil yazma ve native kimlik kaynağı korunur."
+        "fingerprint": "86abb2da63a70ab3b2649c31d6c0c8803c90c30f7008dd5c54f7838947bcbe08",
+        "reason": "BT01 Native Auth and signup response validation reviewed; consumer behavior maintained"
       }
     },
     {
@@ -1012,8 +1017,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "50db31bc17cf6e7978f53f36d8e8df6a3798511839f805a65ce673dc67d8c9c3",
-        "reason": "Rezervasyon ve kapasite istisnası açık satışın gerçek seans kapsamını borçlanma öncesi doğrular. Yerel hak ve borçlanma senaryoları eklendi."
+        "fingerprint": "b7614321f5c1877c49a63b6f6d6ac07e9414e446cd1fb353d591fb0df0dc7c30",
+        "reason": "Cross-center settlement fixture deterministic source and lesson slots reviewed; no booking conflict permission or assertion relaxation"
       }
     },
     {
@@ -1262,7 +1267,8 @@
         "apps/backend/database/public-page-event-applications.sql",
         "apps/backend/database/settings-catalog-v25.sql",
         "apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql",
-        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql"
+        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql",
+        "apps/backend/transports/calendar-gateway.d.mts"
       ],
       "operations": [
         "publication_set_v1",
@@ -1276,8 +1282,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "9121d54dac374de9b9df1cbe54e2a32ee6ab8b72b5487e579abb86ff170bf5b5",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "f5123676449d1c6b7b2f79885916501ee085f57fb675419abf1052d8e319569e",
+        "reason": "BT01 S14 signed public ingress regression: preserved original HMAC assertion, verified captured timestamp with 60s window and negative forged payload, signature and IP controls."
       }
     },
     {
@@ -2001,8 +2007,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "dca96ff840a14114a89e688101c79113b2614891c8ab0e49d1e705b8ec13e0fb",
-        "reason": "Operatör dizini mevcut canlı yetki altında ortak hesap etiketini döndürür. Kapalı yanıt alanları korunur."
+        "fingerprint": "04713f488f5d7d4b3a4335e72f7c9b651d611a1a88b478e685237e65550e3465",
+        "reason": "Pending document checksum null allowed only before Storage proof; ready and invoice require verified SHA checksum"
       }
     },
     {
@@ -2034,8 +2040,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "41b1c9cf20533037fb8814529cff155a4933b99cd8463dd159f072a1b54f55b0",
-        "reason": "Ortak merkezler arası kabul kaynağı B kapsamındaki A satışının hak ayırmasını ve kaynak seçilmeden borçlanmayı doğrular."
+        "fingerprint": "8c6a2766af3b4d94ecb7713c80c6aacc7faaba49bca1cb4662a92edc891dbbcf",
+        "reason": "Cross-center source scope fixture previously overlapped on UTC minute 41-59; common hour slot and negative test now prevent this"
       }
     },
     {
@@ -2201,8 +2207,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "5231edcd80ec3eafb77846147383f5aa55314d05c0c51e84e7ec20a82686a7c2",
-        "reason": "Worker CSV kolonları, gruplama ve satır sırası raporun ortak tipli satır kaynağında incelendi."
+        "fingerprint": "2cedc1c1d1c221f9bbff99ca9ea75ce4b1c83c9356e7ef30961f7d3f3262352c",
+        "reason": "BT01 kaynak incelemesi: Edge TypeScript, onayli JSON/RPC/Auth/providercode reddi ve mevcut WF sozlesmesi korunuyor."
       }
     }
   ]

@@ -22,3 +22,13 @@ test('malformed claims fail before RPC and missing finish acknowledgement remain
  let calls=0;await assert.rejects(deliver({...item(),payload:{}},id(),async()=>{calls++;}));assert.equal(calls,0);
  await assert.rejects(deliver(item(),id(),async(body,aux)=>{if(aux.email_phase==='finish')throw Error('DB unavailable');return {authorized:true};},async()=>Response.json({id:id()})),/DB unavailable/);
 });
+
+test('malformed authorization response never cancels a claim or invokes Resend',async()=>{
+ let calls=0,delivered=0;
+ await assert.rejects(deliver(item(),id(),async()=>{calls++;return {authorized:'false'};},async()=>{delivered++;throw Error('MUST_NOT_SEND');}),/INVALID_EMAIL_AUTHORIZATION/);
+ assert.equal(calls,1);assert.equal(delivered,0);
+ for(const wrong of [null,[],{authorized:1}]){
+  await assert.rejects(deliver(item(),id(),async()=>wrong,async()=>{delivered++;}),/INVALID_EXTERNAL_RESPONSE|INVALID_EMAIL_AUTHORIZATION/);
+ }
+ assert.equal(delivered,0);
+});

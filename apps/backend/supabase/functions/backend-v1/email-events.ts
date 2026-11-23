@@ -1,4 +1,5 @@
 import {Webhook} from 'standardwebhooks';
+import {isRecord,parseJson,responseJson} from './edge-json.ts';
 type Env=(name:string)=>string|undefined;
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const kinds:Record<string,string>={'email.sent':'accepted','email.delivered':'delivered','email.delivery_delayed':'delayed','email.bounced':'bounced','email.complained':'complained','email.failed':'failed','email.suppressed':'failed'};
@@ -26,14 +27,15 @@ export async function emailEvents(req:Request,env:Env,send:typeof fetch=fetch,no
  if(!secret||!base||!key)return reply(503);
  let raw:string;try{raw=await readBody(req);}catch(error){return reply(error instanceof Error&&error.message==='SIZE'?413:400);}
  if(!await verifyEmailSignature(raw,req.headers,secret,now))return reply(403);
- let event;try{event=JSON.parse(raw);}catch{return reply(400);}
- if(!event||typeof event.type!=='string')return reply(400);
- const kind=Object.hasOwn(kinds,event.type)?kinds[event.type]:undefined;if(!kind)return reply(200);
- if(typeof event.data?.email_id!=='string'||!uuid.test(event.data.email_id)||typeof event.created_at!=='string'||!/^\d{4}-\d\d-\d\dT/.test(event.created_at)||!Number.isFinite(Date.parse(event.created_at))||Date.parse(event.created_at)>now+300000)return reply(400);
+ let value:unknown;try{value=parseJson(raw);}catch{return reply(400);}
+ if(!isRecord(value)||typeof value.type!=='string')return reply(400);
+ const event=value,data=isRecord(event.data)?event.data:null,eventType=value.type;
+ const kind=Object.hasOwn(kinds,eventType)?kinds[eventType]:undefined;if(!kind)return reply(200);
+ if(typeof data?.email_id!=='string'||!uuid.test(data.email_id)||typeof event.created_at!=='string'||!/^\d{4}-\d\d-\d\dT/.test(event.created_at)||!Number.isFinite(Date.parse(event.created_at))||Date.parse(event.created_at)>now+300000)return reply(400);
  try{
   const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw));
-  const request={event_id:req.headers.get('svix-id'),provider_reference:event.data.email_id,kind,occurred_at:new Date(event.created_at).toISOString(),payload_hash:Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,'0')).join('')};
+  const request={event_id:req.headers.get('svix-id'),provider_reference:data.email_id,kind,occurred_at:new Date(event.created_at).toISOString(),payload_hash:Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,'0')).join('')};
   const result=await send(base+'/rest/v1/rpc/outbox_deliver_v1',{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:[],p_aux:{email_event:true}}),signal:AbortSignal.timeout(10000)});
-  if(!result.ok){await result.arrayBuffer();return reply(503);}return reply((await result.json())?.accepted===true?200:503);
+  if(!result.ok){await result.arrayBuffer();return reply(503);}const acknowledgment=await responseJson(result);return reply(isRecord(acknowledgment)&&acknowledgment.accepted===true?200:503);
  }catch{return reply(503);}
 }

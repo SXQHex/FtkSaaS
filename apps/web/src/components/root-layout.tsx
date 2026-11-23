@@ -55,7 +55,8 @@ export function RootLayout() {
       >
         <NetworkNotice />
         <div
-          className={preserveCommandTree ? "invisible" : "contents"}
+          className="contents"
+          style={{ display: preserveCommandTree ? "none" : undefined }}
           inert={(checkingAccess || privateAuthPending) && !publicRoute}
           aria-hidden={(checkingAccess || privateAuthPending) && !publicRoute}
         >

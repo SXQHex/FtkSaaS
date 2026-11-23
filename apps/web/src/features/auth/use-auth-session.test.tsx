@@ -10,7 +10,7 @@ const { changed, clear, queryClear, invalidate, unsubscribe, queries, router } =
     queryClear,
     invalidate,
     unsubscribe: vi.fn(),
-    queries: { clear, getQueryCache: () => ({ clear: queryClear }) },
+    queries: { clear, removeQueries: queryClear },
     router: { invalidate },
   };
 });

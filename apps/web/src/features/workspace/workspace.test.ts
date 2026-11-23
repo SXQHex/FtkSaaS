@@ -311,3 +311,18 @@ it("refuses a previous session's late workspace authority even for the same user
   expect(requests.some((row) => row.operation === "organizations_list_v1")).toBe(true);
   expect(requests.every((row) => row.bearer === `Bearer ${previous}`)).toBe(true);
 });
+
+it("rejects an opaque bearer rotation during a late workspace read", async () => {
+  native.getSession
+    .mockResolvedValueOnce({
+      data: { session: { user: { id: "native-fixture-user" }, access_token: "opaque-old" } },
+      error: null,
+    })
+    .mockResolvedValue({
+      data: { session: { user: { id: "native-fixture-user" }, access_token: "opaque-new" } },
+      error: null,
+    });
+  await expect(readWorkspace(accountId, orgId, async () => ({ id: accountId }))).rejects.toThrow(
+    "ACCOUNT_CHANGED",
+  );
+});
