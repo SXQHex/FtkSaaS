@@ -61,7 +61,7 @@ export function accountQuery(nativeUserId: string, includePlatformScope = false)
         signal.throwIfAborted();
         if (!sameNativeSession(session, latest)) throw new Error("ACCOUNT_CHANGED");
       };
-      const account = await readAccount(includePlatformScope, session.access_token).catch(
+      const account = await readAccount(includePlatformScope, session.access_token, signal).catch(
         async (error: unknown) => {
           await currentSession();
           throw error;

@@ -80,20 +80,20 @@ export function StudioInstructorEditor({
   const { accountId, orgId, centerId } = scope;
   useEffect(() => {
     mounted.current = true;
-    let active = true;
+    const controller = new AbortController();
     // Every opened editor starts with a new exact read, independently of the
     // summary's display cache. A cached prior edit cannot become its write base.
-    void loadInstructorEditor({ accountId, orgId, centerId }, personId)
+    void loadInstructorEditor({ accountId, orgId, centerId }, personId, controller.signal)
       .then((state) => {
-        if (!active) return;
+        if (controller.signal.aborted) return;
         setInitial(state);
         onObserved(state);
       })
       .catch(() => {
-        if (active) setFailed(true);
+        if (!controller.signal.aborted) setFailed(true);
       });
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [accountId, orgId, centerId, personId, onObserved]);

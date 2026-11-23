@@ -13,7 +13,8 @@ import { BackendError } from "../../lib/backend";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { PeopleView, type PeopleFilter } from "./people-view";
 import { PersonEntry } from "./person-entry";
-import { readPeoplePage, readPeopleCenter, type PeopleScope } from "./people";
+import { readPeoplePage, type PeopleScope } from "./people";
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import type { AccountView, PersonView } from "@ftksaas/api-contracts";
 
 import { peopleRow } from "./people-summary";
@@ -182,11 +183,11 @@ function PeopleContent({
       ),
     retry: false,
   });
-  const center = useQuery({
-    queryKey: ["people-center", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: (context) => readPeopleCenter(scope, context),
-    retry: false,
-  });
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
+  const center =
+    !workspace.isError && workspace.data?.selected?.id === scope.orgId
+      ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
+      : undefined;
   const mergeCount = useQuery({
     queryKey: ["merge-directory", scope.accountId, scope.orgId, scope.centerId, "suggestion-count"],
     queryFn: async (context) =>
@@ -194,7 +195,7 @@ function PeopleContent({
     retry: false,
   });
   useEffect(() => {
-    for (const error of [query.error, center.error, mergeCount.error]) {
+    for (const error of [query.error, workspace.error, mergeCount.error]) {
       const code =
         error instanceof BackendError
           ? error.code
@@ -206,7 +207,7 @@ function PeopleContent({
         return;
       }
     }
-  }, [query.error, center.error, mergeCount.error, router]);
+  }, [query.error, workspace.error, mergeCount.error, router]);
   const publishLock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -241,7 +242,7 @@ function PeopleContent({
   const rows = query.isError
     ? []
     : (query.data?.items ?? []).map((person) =>
-        peopleRow(person, scope.centerId, t, center.data?.timezone),
+        peopleRow(person, scope.centerId, t, center?.timezone),
       );
   return (
     <>

@@ -77,19 +77,19 @@ export function InstructorEnrollmentSheet({
     };
   }, []);
   useEffect(() => {
-    let active = true;
-    void readInstructorEnrollment({ accountId, orgId, centerId }, personId)
+    const controller = new AbortController();
+    void readInstructorEnrollment({ accountId, orgId, centerId }, personId, controller.signal)
       .then((next) => {
-        if (active && mounted.current) {
+        if (!controller.signal.aborted && mounted.current) {
           setState(next);
           setNotice("ready");
         }
       })
       .catch(() => {
-        if (active && mounted.current) setNotice("read-error");
+        if (!controller.signal.aborted && mounted.current) setNotice("read-error");
       });
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [accountId, orgId, centerId, personId]);

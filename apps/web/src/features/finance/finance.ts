@@ -21,6 +21,7 @@ export async function readFinancePage(
   cursor?: string,
   signal?: AbortSignal,
   readContext?: AccountReadContext,
+  limit: 1 | 20 = 20,
 ): Promise<FinanceView> {
   z.uuid().parse(selection.personId);
   currency.parse(selection.currency);
@@ -35,7 +36,7 @@ export async function readFinancePage(
       center_id: scope.centerId,
       person_id: selection.personId,
       currency: selection.currency,
-      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+      page: { limit, ...(cursor ? { cursor } : {}) },
     },
     signal,
   );

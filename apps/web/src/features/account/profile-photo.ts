@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import type { SettingsImageUpload, SettingsMediaAsset } from "@ftksaas/api-contracts";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
-import { getBackend } from "../../lib/backend";
+import { getBackend, queryBackendRead } from "../../lib/backend";
 
 export type PhotoDraft = { upload: SettingsImageUpload; file: File } | null | undefined;
 const maxBytes = 1048576;
@@ -38,18 +38,24 @@ export async function readPhoto(
   expected: SettingsMediaAsset,
   organization?: ClientScope,
   readContext?: AccountReadContext,
+  signal = readContext?.signal,
 ) {
   const backend = organization
-    ? await scopedBackend(organization, undefined, readContext)
+    ? await scopedBackend(organization, signal, readContext)
     : getBackend();
-  const { asset, data_base64 } = await backend.call("media_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    ...(organization
-      ? { scope: "organization" as const, org_id: organization.orgId }
-      : { scope: "user" as const }),
-    asset_id: expected.id,
-  });
+  const { asset, data_base64 } = await queryBackendRead(
+    backend,
+    "media_get_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      ...(organization
+        ? { scope: "organization" as const, org_id: organization.orgId }
+        : { scope: "user" as const }),
+      asset_id: expected.id,
+    },
+    signal,
+  );
   const bytes = decode(data_base64);
   if (
     asset.id !== expected.id ||
@@ -61,5 +67,6 @@ export async function readPhoto(
     (await checksum(bytes)) !== asset.checksum
   )
     throw new Error("PHOTO_READ");
+  signal?.throwIfAborted();
   return new Blob([bytes], { type: asset.mime });
 }

@@ -47,7 +47,7 @@ function CurrentPhoto({
   const { t } = useTranslation();
   const photo = useQuery({
     queryKey: ["account-photo", accountId, asset.id],
-    queryFn: () => readPhoto(asset),
+    queryFn: ({ signal }) => readPhoto(asset, undefined, undefined, signal),
     staleTime: 0,
     gcTime: 0,
     retry: false,

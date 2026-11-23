@@ -138,19 +138,23 @@ function AccessActionForm({
   }
   const initialAccessLost = useEffectEvent(accessLost);
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
     mounted.current = true;
     lock.current = true;
     async function initialRead() {
       try {
-        const current = await readAccessAction(initialSource.scope, initialSource.selection);
-        if (!active) return;
+        const current = await readAccessAction(
+          initialSource.scope,
+          initialSource.selection,
+          controller.signal,
+        );
+        if (controller.signal.aborted) return;
         setBase(current);
         setNotice(current.actionable ? "ready" : "unavailable");
       } catch (error) {
-        if (active && !initialAccessLost(error)) setNotice("read-error");
+        if (!controller.signal.aborted && !initialAccessLost(error)) setNotice("read-error");
       } finally {
-        if (active) {
+        if (!controller.signal.aborted) {
           lock.current = false;
           setReading(false);
         }
@@ -158,7 +162,7 @@ function AccessActionForm({
     }
     void initialRead();
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [initialSource]);

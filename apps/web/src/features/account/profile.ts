@@ -16,7 +16,7 @@ export interface ProfileValues {
 export async function readProfile(
   accountId: string,
   readVerifiedAccount: (bearer: string) => ReturnType<typeof readAccount> = (bearer) =>
-    readAccount(false, bearer),
+    readAccount(false, bearer, signal),
   signal?: AbortSignal,
 ) {
   signal?.throwIfAborted();

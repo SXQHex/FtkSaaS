@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { readInstructorEditor, type InstructorEditorState } from "./instructor-editor-state";
-import { readStudioResources, studioBackend, type ClassRecord, type StudioScope } from "./studio";
+import { readStudioClasses, studioBackend, type ClassRecord, type StudioScope } from "./studio";
 import {
   instructorEmailContact,
   instructorEmailIndex,
@@ -35,10 +35,11 @@ export interface InstructorEditIntent {
 export async function loadInstructorEditor(
   scope: StudioScope,
   personId: string,
+  signal?: AbortSignal,
 ): Promise<InstructorEditState> {
-  const resources = await readStudioResources(scope);
-  const state = await readInstructorEditor(scope, personId, resources.classes);
-  return { ...state, scope: { ...scope }, classes: resources.classes };
+  const classes = await readStudioClasses(scope, signal);
+  const state = await readInstructorEditor(scope, personId, classes, signal);
+  return { ...state, scope: { ...scope }, classes };
 }
 
 export function instructorEditDraft(

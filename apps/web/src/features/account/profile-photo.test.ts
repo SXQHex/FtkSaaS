@@ -1,6 +1,9 @@
 import { afterEach, expect, it, vi } from "vitest";
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
-vi.mock("../../lib/backend", () => ({ getBackend: () => ({ call }) }));
+vi.mock("../../lib/backend", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../lib/backend")>()),
+  getBackend: () => ({ call }),
+}));
 import { preparePhoto, readPhoto } from "./profile-photo";
 afterEach(() => {
   vi.resetAllMocks();

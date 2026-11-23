@@ -12,7 +12,16 @@ const { auth, account } = vi.hoisted(() => ({
   account: vi.fn(),
 }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth }) }));
-vi.mock("../../lib/account", () => ({ readAccount: account }));
+vi.mock("../../lib/account", () => ({
+  readAccount: (
+    ...[includePlatformScope, bearer, signal]: Parameters<
+      typeof import("../../lib/account").readAccount
+    >
+  ) => {
+    signal?.throwIfAborted();
+    return account(includePlatformScope, bearer);
+  },
+}));
 import { completeCallback, safeNext } from "./callback";
 import { accountQueryKeys } from "./account-query";
 import { loadPlatformAccount } from "./account-guard";

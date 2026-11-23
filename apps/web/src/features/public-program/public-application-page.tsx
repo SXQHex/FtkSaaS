@@ -49,7 +49,10 @@ async function readApplicationContext(
   const cursors = new Set<string>();
   let cursor: string | undefined;
   while (true) {
-    const data = await readPublicCalendar({ slug, centerId, interval, cursor }, signal);
+    const data = await readPublicCalendar(
+      { slug, centerId, interval, cursor, discoveryOnly: !eventId },
+      signal,
+    );
     const publication = eventId
       ? data.items.find((item) => item.publication_id === eventId && item.kind === "event")
       : undefined;

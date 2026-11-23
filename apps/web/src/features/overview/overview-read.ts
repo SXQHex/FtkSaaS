@@ -1,3 +1,4 @@
+import type { ReservationView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
@@ -115,14 +116,20 @@ export async function readOverviewParticipants(
       sessionId,
       undefined,
       cursor,
-      ...(context ? ([context] as const) : []),
+      context,
+      (items) => {
+        const preview: ReservationView[] = [];
+        for (const row of items) {
+          if (seen.has(row.id)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
+          seen.add(row.id);
+          if (row.state === "active" || row.state === "completed") preview.push(row);
+          if (rows.length + preview.length === 3) break;
+        }
+        return preview;
+      },
     );
-    for (const row of page.items) {
-      if (seen.has(row.reservation.id)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
-      seen.add(row.reservation.id);
-      if (["active", "completed"].includes(row.reservation.state)) rows.push(row);
-      if (rows.length === 3) return rows;
-    }
+    rows.push(...page.items);
+    if (rows.length === 3) return rows;
     cursor = page.next_cursor ?? undefined;
     if (cursor && cursors.has(cursor)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
     if (cursor) cursors.add(cursor);

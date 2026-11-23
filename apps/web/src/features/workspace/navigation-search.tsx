@@ -65,6 +65,7 @@ export function NavigationSearch({
         false,
         undefined,
         context,
+        6,
       );
       return page.items.slice(0, 6).map(({ id, display_name: name }) => ({ id, name }));
     },

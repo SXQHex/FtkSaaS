@@ -44,6 +44,7 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   await clickWorkspaceLink(page, "Üyeler");
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
   recordPhase("members");
+  expect(reads.centers_list_v1 ?? 0).toBe(before.centers_list_v1 ?? 0);
   await clickWorkspaceLink(page, "Stüdyo");
   await expect(page.getByRole("button", { name: /Örnek Eğitmen/ })).toBeVisible();
   recordPhase("studio");

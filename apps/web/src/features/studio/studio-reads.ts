@@ -66,8 +66,9 @@ export async function readStudioInstructors(
   scope: StudioScope,
   personId?: string,
   readContext?: AccountReadContext,
+  signal = readContext?.signal,
 ): Promise<InstructorRecord[]> {
-  const backend = await studioBackend(scope, undefined, readContext);
+  const backend = await studioBackend(scope, signal, readContext);
   const assignments = await studioPages((cursor) =>
     backend.call("management_state_get_v1", {
       client_api_version: 1,
@@ -215,8 +216,9 @@ export async function readStudioAgreements(
   scope: StudioScope,
   personId: string,
   readContext?: AccountReadContext,
+  signal = readContext?.signal,
 ) {
-  const backend = await studioBackend(scope, undefined, readContext);
+  const backend = await studioBackend(scope, signal, readContext);
   const items = await studioPages((cursor) =>
     backend.call("instructor_agreements_list_v1", {
       client_api_version: 1,

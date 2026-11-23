@@ -10,7 +10,10 @@ const { native, call } = vi.hoisted(() => ({
   call: vi.fn(),
 }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: { mfa: native } }) }));
-vi.mock("../../lib/backend", () => ({ getBackend: () => ({ call }) }));
+vi.mock("../../lib/backend", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../lib/backend")>()),
+  getBackend: () => ({ call }),
+}));
 import { removeTotpFactor, confirmTotpSetup, enrollTotp, readSecurityHistory } from "./security";
 afterEach(() => vi.resetAllMocks());
 it("enrolls native TOTP without making up recovery codes or provider settings", async () => {

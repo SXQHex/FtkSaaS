@@ -9,7 +9,16 @@ const { check, signup, account, assurance, session } = vi.hoisted(() => ({
   session: vi.fn(),
 }));
 vi.mock("../../lib/public-gateway", () => ({ checkSignup: check }));
-vi.mock("../../lib/account", () => ({ readAccount: account }));
+vi.mock("../../lib/account", () => ({
+  readAccount: (
+    ...[includePlatformScope, bearer, signal]: Parameters<
+      typeof import("../../lib/account").readAccount
+    >
+  ) => {
+    signal?.throwIfAborted();
+    return account(includePlatformScope, bearer);
+  },
+}));
 vi.mock("../../lib/supabase", () => ({
   getSupabaseClient: () => ({
     auth: {

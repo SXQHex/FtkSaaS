@@ -48,7 +48,7 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
   const history = useInfiniteQuery({
     queryKey: historyKey,
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readSecurityHistory(pageParam),
+    queryFn: ({ pageParam, signal }) => readSecurityHistory(pageParam, signal),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
   async function refresh() {

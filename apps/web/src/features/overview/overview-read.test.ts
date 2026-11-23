@@ -18,7 +18,23 @@ const { range, instructors, participants, room } = vi.hoisted(() => ({
 vi.mock("../schedule/schedule-read", () => ({ readScheduleRange: range }));
 vi.mock("../session-detail/session-detail-read", () => ({
   readSessionInstructors: instructors,
-  readSessionParticipants: participants,
+  readSessionParticipants: async (
+    ...[scope, sessionId, personId, cursor, context, select]: Parameters<
+      typeof import("../session-detail/session-detail-read").readSessionParticipants
+    >
+  ) => {
+    const page = (await participants(
+      scope,
+      sessionId,
+      personId,
+      cursor,
+      ...(context ? [context] : []),
+    )) as { items: ReturnType<typeof row>[]; next_cursor: string | null };
+    if (!select) return page;
+    const selected = select(page.items.map(({ reservation }) => reservation));
+    const ids = new Set(selected.map(({ id }) => id));
+    return { ...page, items: page.items.filter(({ reservation }) => ids.has(reservation.id)) };
+  },
 }));
 vi.mock("../studio/studio", () => ({ readStudioResource: room }));
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`,

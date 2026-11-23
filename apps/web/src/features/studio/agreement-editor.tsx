@@ -98,15 +98,20 @@ export function StudioAgreementEditor({
     };
   }, []);
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
     async function start() {
       const versions = personId
-        ? await readStudioAgreements({ accountId, orgId, centerId }, personId)
+        ? await readStudioAgreements(
+            { accountId, orgId, centerId },
+            personId,
+            undefined,
+            controller.signal,
+          )
         : [];
       const selected = selectedId ? versions.find((item) => item.id === selectedId) : undefined;
       if (selectedId && !selected) throw new Error("STUDIO_UNAVAILABLE");
       const next = await agreementDraft(selected);
-      if (active && mounted.current) {
+      if (!controller.signal.aborted && mounted.current) {
         setBase(selected);
         setHistory(versions);
         setHistoryPerson(personId ?? "");
@@ -115,10 +120,10 @@ export function StudioAgreementEditor({
       }
     }
     void start().catch(() => {
-      if (active && mounted.current) setNotice("read-error");
+      if (!controller.signal.aborted && mounted.current) setNotice("read-error");
     });
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [accountId, orgId, centerId, personId, selectedId]);
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { queryOptions } from "@tanstack/react-query";
 import { readKnownAutomationJob } from "./automation-discovery";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
@@ -101,6 +102,15 @@ async function readPage(
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
 }
+export function segmentPageQuery(scope: ClientScope, cursor?: string) {
+  return queryOptions({
+    queryKey: ["automation", scope.accountId, scope.orgId, scope.centerId, "segments", cursor],
+    queryFn: (context) => readSegments(scope, undefined, cursor, context),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
 export async function readSegments(
   scope: ClientScope,
   id?: string,
