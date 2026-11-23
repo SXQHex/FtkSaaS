@@ -93,11 +93,15 @@ export function operatorIntent(intent: Omit<OperatorIntent, "key">): OperatorInt
   return { ...intent, key: uuidv7() };
 }
 
-export async function findStudioRequest(accountId: string, requestId: string) {
+export async function findStudioRequest(
+  accountId: string,
+  requestId: string,
+  readContext?: AccountReadContext,
+) {
   const cursors = new Set<string>();
   let cursor: string | undefined;
   do {
-    const page = await readPlatformStudioQueue(accountId, cursor);
+    const page = await readPlatformStudioQueue(accountId, cursor, readContext);
     const row = page.items.find((candidate) => candidate.id === requestId);
     if (row) return row;
     cursor = page.next_cursor ?? undefined;
