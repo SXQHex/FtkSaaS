@@ -78,7 +78,13 @@ test("audit uses native module/search/cursor and escaped source detail, with key
   await page.goto(completionUrl("audit"));
   const row = page.getByRole("row").filter({ hasText: "Sentetik kişi" });
   await expect(row).toBeVisible();
-  await page.getByRole("button", { name: "person_update_v1", exact: true }).focus();
+  await row.focus();
+  await expect(row).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  const openDetail = row.getByRole("button", { name: "person_update_v1", exact: true });
+  await expect(openDetail).toBeFocused();
   await page.keyboard.press("Enter");
   const detail = page.getByRole("dialog");
   await expect(detail).toContainText("<script>sentetik</script>");

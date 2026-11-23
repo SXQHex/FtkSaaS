@@ -33,6 +33,8 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Skeleton } from "@ftksaas/ui/components/skeleton";
 
+type SessionRefresh = "first-page" | "visible-pages";
+
 export function SessionsPanel({ accountId }: { accountId: string }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -42,7 +44,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
   const [pending, setPending] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [refreshError, setRefreshError] = useState(false);
+  const [refreshError, setRefreshError] = useState<SessionRefresh>();
   const [changed, setChanged] = useState(false);
   const intents = useRef(new Map<string, string>());
   const sessionKey = ["account-sessions", accountId] as const;
@@ -53,13 +55,19 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
     queryFn: ({ pageParam }) => readSessions(pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
-  async function refresh() {
+  async function refresh(mode: SessionRefresh = "first-page") {
     setRefreshing(true);
-    setRefreshError(false);
+    setRefreshError(undefined);
     const assertCurrent = capturePrivateReadback(queries);
     try {
       const affected = [sessionKey, historyKey];
-      await invalidateCachedFamilies(queries, affected, affected);
+      // Revalidate loaded rows from the start for label edits and uncertain
+      // revocations. A confirmed revocation changes the list's membership.
+      await invalidateCachedFamilies(
+        queries,
+        affected,
+        mode === "visible-pages" ? [historyKey] : affected,
+      );
       assertCurrent();
       await invalidateAccountProjections(queries);
       assertCurrent();
@@ -71,7 +79,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
       await router.invalidate();
       setChanged(true);
     } catch {
-      setRefreshError(true);
+      setRefreshError(mode);
     } finally {
       setRefreshing(false);
     }
@@ -86,8 +94,10 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
       intents.current.set(sessionId, key);
     }
     let currentRevoked = false;
+    let confirmed = false;
     try {
       const result = await revokeSession(sessionId, key);
+      confirmed = true;
       currentRevoked = result.current_revoked;
       if (currentRevoked) {
         try {
@@ -103,7 +113,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
     } catch {
       setFailed(true);
     } finally {
-      if (!currentRevoked) await refresh();
+      if (!currentRevoked) await refresh(confirmed ? "first-page" : "visible-pages");
       setPending(false);
     }
   }
@@ -141,7 +151,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
                 size="sm"
                 isDisabled={refreshing}
                 onPress={() => {
-                  void refresh();
+                  void refresh(refreshError);
                 }}
               >
                 {t(($) => $.auth.retry)}
@@ -248,7 +258,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
               setEditing(undefined);
               setLabelConflict(conflict);
             }}
-            onRefresh={refresh}
+            onRefresh={() => refresh("visible-pages")}
           />
         )}
       </CardContent>
