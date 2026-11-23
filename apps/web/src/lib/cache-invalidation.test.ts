@@ -80,7 +80,7 @@ it("retains only the first cached infinite page before native readback", async (
   });
 });
 
-it("cancels old in-flight page reads before native readback while preserving foreign requests", async () => {
+it("cancels pre-write reads while foreign requests stay active", async () => {
   const queries = new QueryClient();
   const family = ["directory", "actor-a", "org-a", "center-a"];
   const old = [...family, "cursor-2"];

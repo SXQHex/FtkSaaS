@@ -4,14 +4,17 @@ import { invalidatePeoplePages, peopleKeys } from "../people/people-query";
 import { invalidateProductPages, productsKeys } from "../products/products-query";
 import { invalidateLeadPages, leadsKeys } from "../leads/leads-query";
 import { financeKeys, invalidateFinanceViews } from "../finance/finance-query";
-import { invalidateSessionDetailViews, sessionDetailKeys } from "../session-detail/session-detail-query";
+import {
+  invalidateSessionDetailViews,
+  sessionDetailKeys,
+} from "../session-detail/session-detail-query";
 import {
   invalidateMemberPrivateLessonLists,
   memberPrivateLessonKeys,
 } from "../member-private-lessons/member-private-lessons-query";
 import { invalidateDocumentDirectoryViews } from "../documents/documents-query";
-import { invalidateAccessDirectories } from "../access/access-query";
-import { invalidateEarningsViews } from "../earnings/earnings-query";
+import { accessKeys, invalidateAccessDirectories } from "../access/access-query";
+import { earningsKeys, invalidateEarningsViews } from "../earnings/earnings-query";
 import {
   invalidateMemberReservationViews,
   memberReservationKeys,
@@ -193,7 +196,7 @@ it("M04 invalidates earnings periods, catalog and counts per center", async () =
   expect(queries.getQueryState(otherKey)?.isInvalidated).toBe(false);
 });
 
-it("A-ortak M01–M05: one QueryClient keeps old cursors stale, reads page one and isolates tenants", async () => {
+it("A-ortak: M01–M05 share one cache with tenant isolation and fresh cursors", async () => {
   const queries = new QueryClient();
   const otherOrg = { ...scope, orgId: "org-b" };
   const otherActor = { ...scope, accountId: "actor-b" };
