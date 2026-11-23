@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { QueryClient } from "@tanstack/react-query";
+import { isCancelledError, QueryClient } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { server } from "../../test/server";
 import type { OrganizationView } from "@ftksaas/api-contracts";
 const { native } = vi.hoisted(() => ({ native: { getSession: vi.fn() } }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
 import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
-import { workspaceQuery } from "./workspace-query";
+import { refreshWorkspace, workspaceKeys, workspaceQuery } from "./workspace-query";
 import { accountQuery } from "../auth/account-query";
 const accountId = "019a7b00-0000-7000-8000-000000000001";
 const orgId = "019a7b00-0000-7000-8000-000000000002";
@@ -34,6 +34,19 @@ beforeEach(() => {
     error: null,
   });
   server.use(
+    // Exercise the native gateway rejection and its existing Edge fallback
+    // without letting an unhandled Data API request reach the network.
+    http.post("https://backend.invalid/rest/v1/rpc/centers_list_v1", () =>
+      HttpResponse.json(
+        {
+          code: "42501",
+          message: "permission denied for schema api_read",
+          details: null,
+          hint: null,
+        },
+        { status: 403 },
+      ),
+    ),
     http.post(
       "https://backend.invalid/functions/v1/backend-v1/:operation",
       async ({ request, params }) => {
@@ -325,4 +338,106 @@ it("rejects an opaque bearer rotation during a late workspace read", async () =>
   await expect(readWorkspace(accountId, orgId, async () => ({ id: accountId }))).rejects.toThrow(
     "ACCOUNT_CHANGED",
   );
+});
+
+it("explicitly refreshes a fresh workspace through its existing Query", async () => {
+  native.getSession.mockResolvedValue({
+    data: { session: { access_token: "native-fixture", user: { id: "native-fixture-user" } } },
+    error: null,
+  });
+  const queries = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } });
+  const previous = await refreshWorkspace(queries, accountId);
+  expect(previous.organizations.map((organization) => organization.id)).toEqual([orgId]);
+
+  empty = true;
+  const current = await refreshWorkspace(queries, accountId);
+  expect(current.organizations).toEqual([]);
+  expect(queries.getQueryData(workspaceKeys.projection(accountId))).toStrictEqual(current);
+  expect(requests.filter((row) => row.operation === "organizations_list_v1")).toHaveLength(2);
+  queries.clear();
+});
+
+it("cannot publish a delayed setup refresh over a newer session's workspace", async () => {
+  const userId = "native-fixture-user";
+  const session = (sessionId: string) => {
+    const payload = btoa(JSON.stringify({ sub: userId, session_id: sessionId }))
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/, "");
+    return { user: { id: userId }, access_token: `fixture.${payload}.native` };
+  };
+  native.getSession.mockResolvedValue({
+    data: { session: session("019a7b00-0000-7000-8000-000000000101") },
+    error: null,
+  });
+  let release!: () => void;
+  let started!: () => void;
+  let completed!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const lastReadStarted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const oldResponseCompleted = new Promise<void>((resolve) => {
+    completed = resolve;
+  });
+  let aborted = false;
+  server.use(
+    http.post(
+      "https://backend.invalid/functions/v1/backend-v1/roles_list_v1",
+      async ({ request }) => {
+        request.signal.addEventListener("abort", () => {
+          aborted = true;
+        });
+        started();
+        await held;
+        completed();
+        return HttpResponse.json({
+          ok: true,
+          data: {
+            items: [
+              {
+                id: accountId,
+                person_id: personId,
+                role: "owner",
+                scope_center_id: null,
+                state: "active",
+                version: 1,
+              },
+            ],
+            next_cursor: null,
+            as_of: "2026-11-14T06:00:00Z",
+          },
+          trace_id: accountId,
+        });
+      },
+    ),
+  );
+  const queries = new QueryClient();
+  let previousError: unknown;
+  const previous = refreshWorkspace(queries, accountId).catch((error: unknown) => {
+    previousError = error;
+  });
+  try {
+    await lastReadStarted;
+    native.getSession.mockResolvedValue({
+      data: { session: session("019a7b00-0000-7000-8000-000000000102") },
+      error: null,
+    });
+    // The auth observer evicts reads on a same-user native-session handoff.
+    queries.removeQueries();
+    empty = true;
+    const current = await refreshWorkspace(queries, accountId);
+    expect(current.organizations).toEqual([]);
+    release();
+    await oldResponseCompleted;
+    await previous;
+    expect(isCancelledError(previousError)).toBe(true);
+    expect(aborted).toBe(true);
+    expect(queries.getQueryData(workspaceKeys.projection(accountId))).toBe(current);
+  } finally {
+    release();
+    queries.clear();
+  }
 });

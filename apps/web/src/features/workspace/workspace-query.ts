@@ -50,6 +50,12 @@ export function workspaceQuery(queries: QueryClient, accountId: string, organiza
   });
 }
 
+// Explicit refreshes use the same cancellable Query as the shell. Bypass the
+// freshness window without publishing a standalone readback into the cache.
+export function refreshWorkspace(queries: QueryClient, accountId: string, organizationId?: string) {
+  return queries.query({ ...workspaceQuery(queries, accountId, organizationId), staleTime: 0 });
+}
+
 // The shell owns the live fetch. Feature screens only observe the same query
 // without initiating their own background read when disabled.
 export function useWorkspaceQuery(accountId: string, organizationId?: string, enabled = true) {

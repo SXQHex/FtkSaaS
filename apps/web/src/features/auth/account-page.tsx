@@ -21,7 +21,12 @@ import { Button, LinkButton } from "@ftksaas/ui/components/button";
 import { getSupabaseClient } from "../../lib/supabase";
 import { MemberCalendarPanel } from "../member-account/member-calendar-panel";
 import { PersonalCalendarCard } from "../member-account/member-account-view";
-import { hasWorkspaceManagementScope, workspaceRoles, readWorkspace } from "../workspace/workspace";
+import {
+  hasWorkspaceManagementScope,
+  workspaceRoles,
+  type readWorkspace,
+} from "../workspace/workspace";
+import { refreshWorkspace } from "../workspace/workspace-query";
 
 export function AccountPage() {
   const mobile = useIsMobile();
@@ -65,10 +70,9 @@ export function AccountPage() {
     await router.invalidate();
   }
   async function continueStudioSetup(organizationId: string) {
-    const workspace = await readWorkspace(account.id);
+    const workspace = await refreshWorkspace(queries, account.id);
     if (!workspace.organizations.some((organization) => organization.id === organizationId))
       throw Error("STUDIO_SETUP_ORGANIZATION_UNAVAILABLE");
-    queries.setQueryData(["workspace", account.id, null], workspace);
   }
   function setupPanel(
     organizationId: string | undefined,
