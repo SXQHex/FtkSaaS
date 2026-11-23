@@ -57,6 +57,7 @@ Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium**
 ### Trafik ve düşük karmaşıklık sınırı
 
 - Salt-okumalar için `backend.read(operation, request, signal)`, Query `AbortSignal`'ını gerçek alt `fetch`'lere taşır; pahalı/cursor/çok adımlı okuyucularda yaygınlaştırma M10'dur. Standalone doğrulama ve native `call()` davranışını değiştirme.
+- Platform kurulum yan sayfası [WF02](../../../docs/workflows.md#wf02) kapsamındaki plan ve bekleyen kuyruk okumalarına aynı `AccountReadContext` geçirir. Her kuyruk sayfası native platform erişimini ve Query iptalini doğrular. `confirmProvision` önce planı ve seçilen talebin hesabını/adını taze native okumayla eşler. Ardından native kuruluş komutu ve sonuç okuması aynı hesap doğrulama sınırında çalışır. [Kurulum okuyucusu](../src/features/platform/platform-provisioning.ts#L96)
 - Rezervasyonda seans başına ek başlık/ders, hakedişte görünür eğitmen başına ek toplam okuması önce mevcut typed cevaplarla karşılaştırılır. Ancak gerçek ağ ölçümü fayda gösteriyorsa kısaltılır; yeni genel batch API ölçümsüz oluşturulmaz (M09).
 - Sunum amacıyla key'e büyük DTO koymak (örn. `event-rows`, event presentation) zorunlu değil. Yalnız ölçülen yük varsa saf hesaplama/`useMemo` yeterli; sunucu sorguları ile asenkron hesap ayrı kalır (M13).
 - **Yapılmayacaklar:** İkinci QueryClient/store, uygulama çapı `invalidateQueries()`, kör `staleTime: 0`, tüm ekranlara `useSuspenseQuery` dayatması, tüm CRUD'ları `useMutation`'a taşıma, güvenlik testlerini gevşetme.

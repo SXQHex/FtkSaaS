@@ -50,7 +50,7 @@ export function PlatformCreate({
     queryKey: ["platform-create-source", accountId, requestId],
     queryFn: async (context) => ({
       plans: await readPlatformPlans(accountId, context),
-      request: requestId ? await findStudioRequest(accountId, requestId) : undefined,
+      request: requestId ? await findStudioRequest(accountId, requestId, context) : undefined,
     }),
     retry: false,
     gcTime: 0,

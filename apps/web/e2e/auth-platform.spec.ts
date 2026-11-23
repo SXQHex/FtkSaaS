@@ -657,14 +657,26 @@ test("platform creates a queued studio and a direct organization with a publishe
   };
   const created: { id: string; name: string; owner: string }[] = [];
   const writes: Record<string, unknown>[] = [];
+  const operations: string[] = [];
   let accountLookups = 0;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!;
+    operations.push(operation);
     const request = route.request().postDataJSON();
     const send = (data: unknown) => route.fulfill({ json: { ok: true, trace_id: I.role, data } });
     const list = (items: unknown[]) => send({ items, next_cursor: null, as_of: paymentTime });
-    if (operation === "studio_setup_list_v1" && request.platform_queue)
-      return list(created.length ? [] : [queued]);
+    if (operation === "studio_setup_list_v1" && request.platform_queue) {
+      if (created.length) return list([]);
+      const cursor = request.page.cursor;
+      if (cursor === "studio-third-page") return list([queued]);
+      const second = cursor === "studio-second-page";
+      expect(cursor).toBe(second ? "studio-second-page" : undefined);
+      return send({
+        items: [{ ...queued, id: uid(second ? 251 : 250), name: second ? "İkinci" : "İlk" }],
+        next_cursor: second ? "studio-third-page" : "studio-second-page",
+        as_of: paymentTime,
+      });
+    }
     if (operation === "platform_directory_get_v1") {
       if (request.view === "initial_plans") return list([plan]);
       if (request.view === "verified_accounts") {
@@ -719,12 +731,24 @@ test("platform creates a queued studio and a direct organization with a publishe
   });
   await signIn(page);
   await page.goto("/platform?section=studio-requests");
-  await page.getByRole("link", { name: queued.name, exact: true }).click();
+  const more = page.getByRole("button", { name: text.studioRequests.more, exact: true });
+  await more.click();
+  await expect(page.getByRole("link", { name: "İkinci", exact: true })).toBeVisible();
+  await more.click();
+  const queuedLink = page.getByRole("link", { name: queued.name, exact: true });
+  await expect(queuedLink).toBeVisible();
+  const renderStart = operations.length;
+  await queuedLink.click();
   await expect(page.getByLabel(text.create.name, { exact: true })).toHaveValue(queued.name);
   await expect(page.getByLabel(text.create.name, { exact: true })).toHaveJSProperty(
     "readOnly",
     true,
   );
+  const renderReads = operations.slice(renderStart);
+  const queueReads = renderReads.filter((operation) => operation === "studio_setup_list_v1");
+  const accountReads = renderReads.filter((operation) => operation === "account_get_v1");
+  expect(queueReads).toHaveLength(3);
+  expect(accountReads).toHaveLength(0);
   await testInfo.attach("E50 Organizasyon oluşturma", {
     body: await page.screenshot({ fullPage: true }),
     contentType: "image/png",
@@ -737,7 +761,13 @@ test("platform creates a queued studio and a direct organization with a publishe
     await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
     await page.getByRole("link", { name: text.create.openCreated, exact: true }).click();
   };
+  const commandStart = operations.length;
   await create();
+  expect(writes).toHaveLength(1);
+  const writePosition = operations.indexOf("organization_create_v1", commandStart);
+  const preflight = operations.slice(commandStart, writePosition);
+  expect(preflight.filter((operation) => operation === "studio_setup_list_v1")).toHaveLength(3);
+  expect(preflight.filter((operation) => operation === "account_get_v1")).toHaveLength(5);
   await expect(page.getByRole("heading", { name: queued.name })).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toContainText(activity.actions.created);
   await expect(activityLog(page).getByRole("listitem")).toContainText(queued.name);
@@ -755,6 +785,7 @@ test("platform creates a queued studio and a direct organization with a publishe
   await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
   await create();
   await expect(page.getByRole("heading", { name })).toBeVisible();
+  expect(writes).toHaveLength(2);
   await expect(activityLog(page).getByRole("listitem")).toHaveCount(1);
   await expect(activityLog(page).getByRole("listitem")).toContainText(name);
   expect(writes[1]).toMatchObject({ verified_account_id: uid(243), name });
