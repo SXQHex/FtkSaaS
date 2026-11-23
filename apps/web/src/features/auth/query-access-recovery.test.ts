@@ -55,9 +55,10 @@ function fixture() {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   queries.setQueryData(accountQueryKeys.projection("native-a"), { id: accountId });
   queries.setQueryData(workspaceKeys.projection(accountId, orgId), view());
-  queries.setQueryData(["leads", accountId, orgId, centerId, "first-page"], [
-    { title: "Only managers should see this" },
-  ]);
+  queries.setQueryData(
+    ["leads", accountId, orgId, centerId, "first-page"],
+    [{ title: "Only managers should see this" }],
+  );
   queries.setQueryData(["leads", "account-b", "org-b", "center-b"], ["another actor"]);
   const actions = {
     onChecking: vi.fn(),
@@ -145,8 +146,12 @@ describe("M06: cross-feature access reconciliation", () => {
       actions,
     );
     await stale.catch(() => undefined);
-    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeUndefined();
-    expect(queries.getQueryData(["people", accountId, orgId, centerId, "old-cursor"])).toBeUndefined();
+    expect(
+      queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"]),
+    ).toBeUndefined();
+    expect(
+      queries.getQueryData(["people", accountId, orgId, centerId, "old-cursor"]),
+    ).toBeUndefined();
     expect(queries.getQueryData(["leads", "account-b", "org-b", "center-b"])).toBeUndefined();
     expect(queries.getQueryData(workspaceKeys.projection(accountId, orgId))).toEqual(deniedView);
     expect(actions.invalidateRoute).toHaveBeenCalledOnce();
@@ -186,12 +191,8 @@ describe("M06: cross-feature access reconciliation", () => {
     const original = view();
     const same = structuredClone(original);
     expect(workspaceAuthority(original)).toBe(workspaceAuthority(same));
-    expect(workspaceAuthority(original)).not.toBe(
-      workspaceAuthority(view({ manager: false })),
-    );
-    expect(workspaceAuthority(original)).not.toBe(
-      workspaceAuthority(view({ accessible: false })),
-    );
+    expect(workspaceAuthority(original)).not.toBe(workspaceAuthority(view({ manager: false }));
+    expect(workspaceAuthority(original)).not.toBe(workspaceAuthority(view({ accessible: false }));
   });
 
   it("observes a remote workspace role loss and never treats a manual Query projection as a remote revocation", async () => {
@@ -206,7 +207,9 @@ describe("M06: cross-feature access reconciliation", () => {
       staleTime: 0,
     });
     await vi.waitFor(() => expect(actions.invalidateRoute).toHaveBeenCalledOnce());
-    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeUndefined();
+    expect(
+      queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"]),
+    ).toBeUndefined();
     expect(actions.showLogin).not.toHaveBeenCalled();
     expect(actions.onChecking).toHaveBeenNthCalledWith(1, true);
     expect(actions.onChecking).toHaveBeenLastCalledWith(false);
@@ -224,7 +227,9 @@ describe("M06: cross-feature access reconciliation", () => {
       staleTime: 0,
     });
     await vi.waitFor(() => expect(actions.invalidateRoute).toHaveBeenCalledOnce());
-    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeUndefined();
+    expect(
+      queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"]),
+    ).toBeUndefined();
     expect(actions.showLogin).not.toHaveBeenCalled();
     stop();
   });
