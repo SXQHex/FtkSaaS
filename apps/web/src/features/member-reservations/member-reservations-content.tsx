@@ -141,7 +141,7 @@ export function MemberReservationsContent({
     return row.title ?? t(($) => $.memberReservations.unknown);
   }
   async function refresh(purpose: "reservation" | "waitlist") {
-    await invalidateMemberReservationViews(queries, scope, personId);
+    if (purpose === "waitlist") await invalidateMemberReservationViews(queries, scope, personId);
     // A write can reorder all four lists. Do not reread old cursor snapshots.
     const [upcomingResult, pastResult, waitingResult, offersResult] = await Promise.allSettled([
       queries.fetchQuery({

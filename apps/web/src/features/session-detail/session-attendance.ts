@@ -278,9 +278,11 @@ export async function readSessionAttendanceResult(
       Date.parse(attendance.actual_started_at) !== Date.parse(intent.request.actual_started_at))
   )
     throw new Error("SESSION_ATTENDANCE_RESULT_UNAVAILABLE");
+  const changedRights =
+    intent.operation === "attendance_close_v1" ||
+    intent.operation === "attendance_correct_apply_v1";
   if (
-    (intent.operation === "attendance_close_v1" ||
-      intent.operation === "attendance_correct_apply_v1") &&
+    changedRights &&
     (attendance.closure_state !== "closed" || attendance.revision <= intent.before.revision)
   )
     throw new Error("SESSION_ATTENDANCE_RESULT_UNAVAILABLE");
@@ -298,5 +300,12 @@ export async function readSessionAttendanceResult(
         }
       }),
     );
-  return { session, attendance, rightsUnavailable: rights.some((row) => row.unavailable) };
+  return {
+    session,
+    attendance,
+    rightsUnavailable: rights.some((row) => row.unavailable),
+    affectedPeople: changedRights
+      ? [...new Set([...intent.people, ...attendance.entries.map((row) => row.person_id)])]
+      : undefined,
+  };
 }

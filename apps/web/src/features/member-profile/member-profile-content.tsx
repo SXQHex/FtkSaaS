@@ -24,7 +24,7 @@ import { readPerson } from "../people/people";
 import { readFinancePage } from "../finance/finance";
 import { invalidateFinanceViews } from "../finance/finance-query";
 import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
-import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { cacheVerifiedReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { CollectionEditor } from "../finance/finance-content";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
@@ -868,7 +868,7 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (result) => {
-            queries.setQueryData(rightsKey, result.rights);
+            await cacheVerifiedReadback(queries, rightsKey, result.rights);
             await invalidateMemberReservationViews(queries, scope, personId);
             await person.refetch({ throwOnError: true });
             void invalidateCachedFamilies(queries, [
@@ -893,7 +893,7 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (result) => {
-            queries.setQueryData(rightsKey, result.rights);
+            await cacheVerifiedReadback(queries, rightsKey, result.rights);
             await invalidateMemberReservationViews(queries, scope, personId);
             await person.refetch({ throwOnError: true });
             void invalidateCachedFamilies(queries, [
@@ -919,8 +919,10 @@ export function MemberProfileContent({
             onLockChange={changeLock}
             onAccessLost={accessLost}
             onRefresh={async (result) => {
-              queries.setQueryData(negativeKey, result.limit);
-              queries.setQueryData(rightsKey, result.rights);
+              await Promise.all([
+                cacheVerifiedReadback(queries, negativeKey, result.limit),
+                cacheVerifiedReadback(queries, rightsKey, result.rights),
+              ]);
               await person.refetch({ throwOnError: true });
               await invalidateCachedFamilies(queries, [
                 ["people", scope.accountId, scope.orgId, scope.centerId],
@@ -943,9 +945,7 @@ export function MemberProfileContent({
             setCancelTarget(undefined);
             if (saved) requestAnimationFrame(() => reservationRetry.current?.focus());
           }}
-          onRefresh={async (result) => {
-            queries.setQueryData(rightsKey, result.rights);
-            await invalidateMemberReservationViews(queries, scope, personId);
+          onRefresh={async () => {
             await queries.fetchQuery({
               queryKey: [
                 "profile-reservations",
@@ -960,11 +960,9 @@ export function MemberProfileContent({
               staleTime: 0,
               retry: false,
             });
+            await rights.refetch({ throwOnError: true });
             setReservationCursors([undefined]);
             setReservationIndex(0);
-            void invalidateCachedFamilies(queries, [
-              ["people", scope.accountId, scope.orgId, scope.centerId],
-            ]);
           }}
         />
       )}
@@ -986,7 +984,7 @@ export function MemberProfileContent({
           onAccessLost={accessLost}
           onRefresh={async (result) => {
             await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
-            queries.setQueryData(rightsKey, result.entitlements);
+            await cacheVerifiedReadback(queries, rightsKey, result.entitlements);
             queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);
             setCurrency(result.finance.currency);
             setCurrencyDraft(result.finance.currency);
@@ -1014,7 +1012,7 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (current) => {
-            queries.setQueryData(personKey, current);
+            await cacheVerifiedReadback(queries, personKey, current);
             await invalidateCachedFamilies(queries, [
               ["people", scope.accountId, scope.orgId, scope.centerId],
             ]);
@@ -1031,7 +1029,7 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (current) => {
-            queries.setQueryData(personKey, current);
+            await cacheVerifiedReadback(queries, personKey, current);
             await invalidateCachedFamilies(queries, [
               ["people", scope.accountId, scope.orgId, scope.centerId],
             ]);
@@ -1049,7 +1047,7 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (current) => {
-            queries.setQueryData(personKey, current);
+            await cacheVerifiedReadback(queries, personKey, current);
             await invalidateCachedFamilies(queries, [
               ["people", scope.accountId, scope.orgId, scope.centerId],
             ]);
@@ -1086,7 +1084,7 @@ export function MemberProfileContent({
           onLockChange={changeLock}
           onAccessLost={accessLost}
           onRefresh={async (result) => {
-            queries.setQueryData(rightsKey, result.rows);
+            await cacheVerifiedReadback(queries, rightsKey, result.rows);
             if (result.finance) {
               await invalidateFinanceViews(queries, scope, personId, result.finance.currency);
               queries.setQueryData(financeKey(result.finance.currency, undefined), result.finance);

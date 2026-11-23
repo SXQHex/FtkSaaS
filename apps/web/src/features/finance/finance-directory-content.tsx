@@ -155,6 +155,18 @@ export function FinanceDirectoryContent({
     setCursors([undefined]);
     setPage(0);
   };
+  async function readFirstDirectoryPage() {
+    const interval = period.data?.interval;
+    if (!interval) throw new Error("FINANCE_DIRECTORY_UNAVAILABLE");
+    await queries.fetchQuery({
+      queryKey: [...financeKeys.directory(scope), tab, interval, filters, undefined],
+      queryFn: ({ signal }) =>
+        guard(() => readFinanceDirectory(scope, tab, interval, filters, undefined, signal)),
+      staleTime: 0,
+      retry: false,
+    });
+    resetPage();
+  }
   const open = (row: FinanceDirectoryEntry, action: FinanceInitialContext["action"]) =>
     setPersonal({
       selection: { personId: row.person_id, currency: row.currency },
@@ -180,6 +192,15 @@ export function FinanceDirectoryContent({
         <FinanceContent
           scope={scope}
           initialContext={personal}
+          onDirectoryReadback={async () => {
+            try {
+              await readFirstDirectoryPage();
+            } catch (error) {
+              // Personal finance and the center directory are independently authorized.
+              if (!(error instanceof BackendError && error.code === "FORBIDDEN")) throw error;
+              resetPage();
+            }
+          }}
           onLockChange={changeLock}
           preservePending={preservePending}
         />
@@ -299,7 +320,10 @@ export function FinanceDirectoryContent({
             id: financeDirectoryRowKey(row),
             person: person(row),
             amount: amount(row),
-            debt: creditDebts[index]?.data ?? null,
+            debt:
+              creditDebts[index]?.isError || creditDebts[index]?.isFetching
+                ? null
+                : (creditDebts[index]?.data ?? null),
             actions:
               BigInt(row.amount_minor) > 0n
                 ? [{ kind: "credit-refund" as const, onPress: () => open(row, "credit-refund") }]
@@ -429,29 +453,7 @@ export function FinanceDirectoryContent({
                   ],
                   result.finance,
                 );
-                await queries.fetchQuery({
-                  queryKey: [
-                    ...financeKeys.directory(scope),
-                    tab,
-                    period.data?.interval,
-                    filters,
-                    undefined,
-                  ],
-                  queryFn: ({ signal }) =>
-                    guard(() =>
-                      readFinanceDirectory(
-                        scope,
-                        tab,
-                        period.data!.interval,
-                        filters,
-                        undefined,
-                        signal,
-                      ),
-                    ),
-                  staleTime: 0,
-                  retry: false,
-                });
-                resetPage();
+                await readFirstDirectoryPage();
               }}
               onLockChange={changeLock}
               onAccessLost={accessLost}

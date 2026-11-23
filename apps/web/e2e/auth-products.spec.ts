@@ -424,6 +424,10 @@ test("a closed product publishes a renamed immutable version and rereads history
   const state = await productsFixture(page, false, true, "inactive");
   await page.getByText(seedProduct.terms.name, { exact: true }).click();
   const editor = page.getByRole("dialog");
+  const versions = editor.getByRole("region", { name: "Sürümler", exact: true });
+  await expect(versions.getByText(seedProduct.terms.name, { exact: true })).toBeVisible();
+  const historyReads = () => state.managementReads.filter((request) => request.view === "versions");
+  const previousReads = historyReads().length;
   await editor.getByLabel("Paket adı", { exact: true }).fill("Yeni sürüm adı");
   await editor.getByRole("button", { name: "Değişiklikleri incele", exact: true }).click();
   await editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
@@ -437,7 +441,12 @@ test("a closed product publishes a renamed immutable version and rereads history
     product_id: seedProduct.id,
     terms: { name: "Yeni sürüm adı" },
   });
+  expect(historyReads()).toHaveLength(previousReads + 2);
   expect(state.lifecycle.state).toBe("inactive");
   expect(state.stateWrites).toHaveLength(0);
+  await editor.getByRole("button", { name: "Kapat", exact: true }).first().click();
+  await page.getByText("Yeni sürüm adı", { exact: true }).click();
+  await expect(versions.getByText("Yeni sürüm adı", { exact: true })).toBeVisible();
+  expect(historyReads()).toHaveLength(previousReads + 2);
   await editor.getByRole("button", { name: "Kapat", exact: true }).first().click();
 });

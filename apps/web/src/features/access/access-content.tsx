@@ -108,13 +108,15 @@ export function AccessContent({
     void navigate({ to: "/account", replace: true }).then(() => router.invalidate());
   }, [nativeAccessLost, queries, navigate, router]);
   useEffect(() => {
+    const nextQuery = search.trim();
+    if (nextQuery === queryText) return;
     const timer = setTimeout(() => {
-      setQueryText(search.trim());
+      setQueryText(nextQuery);
       setAccountCursors([undefined]);
       setAccountIndex(0);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, queryText]);
   async function refresh() {
     // Native receipt/action readback has completed before this callback.
     // Cancel older in-flight reads and mark every filter/cursor variant stale.

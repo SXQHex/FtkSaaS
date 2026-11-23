@@ -2,6 +2,7 @@ import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { invalidateEarningsViews } from "../earnings/earnings-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useTranslation } from "react-i18next";
 import { useAccountProjection } from "../auth/use-account-projection";
@@ -438,6 +439,7 @@ function StudioContent({
               onClose={onClose}
               onLockChange={publishLock}
               onRefresh={async () => {
+                await invalidateEarningsViews(queries, scope);
                 await refreshStudio();
               }}
             />

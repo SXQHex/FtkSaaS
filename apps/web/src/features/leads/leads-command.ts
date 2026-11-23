@@ -381,5 +381,5 @@ export async function readLeadResult(intent: LeadIntent, id?: string) {
     )
       throw new Error("LEAD_RESULT_UNREAD");
   }
-  return { kind: "lead" as const, detail };
+  return { kind: "lead" as const, detail, converted: intent.operation === "lead_convert_v1" };
 }

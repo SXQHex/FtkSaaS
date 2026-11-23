@@ -1,6 +1,7 @@
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { expect, it, vi } from "vitest";
 import {
+  cacheVerifiedReadback,
   invalidateAndReadFirstPage,
   invalidateCachedFamilies,
   retainFirstInfinitePage,
@@ -126,5 +127,40 @@ it("cancels pre-write reads while foreign requests stay active", async () => {
   await expect(foreignRequest).resolves.toEqual({ revision: "foreign-after" });
   expect(queries.getQueryData(old)).toEqual(freshPage);
   expect(queries.getQueryData(foreign)).toEqual({ revision: "foreign-after" });
+  expect(queries.getQueryState(foreign)?.isInvalidated).toBe(false);
+});
+
+it("keeps a verified readback when the previous exact reader finishes late", async () => {
+  const queries = new QueryClient();
+  const key = ["profile-rights", "actor-a", "org-a", "center-a", "student-a"];
+  const other = [...key.slice(0, -1), "student-b"];
+  let complete!: (value: string) => void;
+  const pending = queries.fetchQuery({
+    queryKey: key,
+    queryFn: () =>
+      new Promise<string>((resolve) => {
+        complete = resolve;
+      }),
+  });
+  const cancelled = pending.catch(() => undefined);
+  queries.setQueryData(other, "other rights");
+  await cacheVerifiedReadback(queries, key, "verified rights");
+  complete("old rights");
+  await cancelled;
+  expect(queries.getQueryData(key)).toBe("verified rights");
+  expect(queries.getQueryData(other)).toBe("other rights");
+});
+
+it("cancels and trims affected infinite catalogs before marking them stale", async () => {
+  const queries = new QueryClient();
+  const key = ["event-choices", "actor-a", "org-a", "center-a", "products"];
+  const foreign = ["event-choices", "actor-a", "org-a", "center-b", "products"];
+  const catalog = { pages: [1, 2], pageParams: [undefined, "old-cursor"] };
+  queries.setQueryData(key, catalog);
+  queries.setQueryData(foreign, catalog);
+  await invalidateCachedFamilies(queries, [key], [key]);
+  expect(queries.getQueryData(key)).toEqual({ pages: [1], pageParams: [undefined] });
+  expect(queries.getQueryState(key)?.isInvalidated).toBe(true);
+  expect(queries.getQueryData(foreign)).toEqual(catalog);
   expect(queries.getQueryState(foreign)?.isInvalidated).toBe(false);
 });

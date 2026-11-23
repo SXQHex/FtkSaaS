@@ -1,3 +1,4 @@
+import { productsKeys } from "../products/products-query";
 import { useEffect, useState } from "react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -141,7 +142,7 @@ function EventEditorForm({
     retry: false,
   });
   const products = useInfiniteQuery({
-    queryKey: [...prefix, "products"],
+    queryKey: productsKeys.eventChoices(scope),
     queryFn: ({ pageParam, client, signal }) =>
       readEventProducts(scope, pageParam, { client, signal }),
     initialPageParam: undefined as string | undefined,
@@ -219,7 +220,7 @@ function EventEditorForm({
     }
   }
   const productChoices =
-    products.data?.pages.flatMap((page) =>
+    (products.isError || products.isRefetching ? undefined : products.data)?.pages.flatMap((page) =>
       page.items.map((row) => ({ id: row.version_id, name: row.terms.name })),
     ) ?? [];
   for (const id of before?.terms.allowed_product_version_ids ?? [])

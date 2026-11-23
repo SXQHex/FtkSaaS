@@ -20,6 +20,7 @@ async function mockAccess(page: Page) {
     failAccounts: false,
     failInvitations: false,
     jobReads: 0,
+    invitationLabel: "Fixture Invite",
     studioPeople: studio.people,
     writes: [] as { operation: string; payload: Record<string, unknown> }[],
     reads: [] as { operation: string; key: Record<string, unknown>; cursor?: string }[],
@@ -50,7 +51,7 @@ async function mockAccess(page: Page) {
     },
     access_detail: {
       kind: "invitation",
-      display_name: "Fixture Invite",
+      display_name: state.invitationLabel,
       created_at: instant,
       expires_at: "2027-01-01T12:00:00Z",
       can_resend: !state.linked,
@@ -497,4 +498,28 @@ test("M03: entry invitation readback failure preserves one write and supports re
   const invitations = state.writes.filter((write) => write.operation === "invite");
   expect(invitations).toHaveLength(1);
   expect(invitations[0]?.payload.person_id).toBe(created?.id);
+});
+
+test("inviting from Members refreshes the warm access directory in the same SPA", async ({
+  page,
+}) => {
+  const state = await mockAccess(page);
+  await openAccess(page);
+  await page.getByRole("button", { name: "Üyeler", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByLabel("Ad soyad", { exact: false }).fill("Fixture People Invite");
+  await sheet.getByLabel("E-posta", { exact: false }).fill("people-invite@example.invalid");
+  await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
+  await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await expect(sheet.getByRole("button", { name: "Güncel durumu oku", exact: true })).toBeEnabled();
+  state.invitationLabel = "Updated Fixture Invite";
+  await sheet.getByRole("button", { name: "Kapat", exact: true }).first().click();
+  await page.getByRole("button", { name: "Davetler ve hesaplar", exact: true }).click();
+  const invites = page.getByRole("grid", { name: "Davetler", exact: true });
+  await expect(invites.getByText("Updated Fixture Invite", { exact: true })).toBeVisible();
+  await expect(invites.getByText("Fixture Invite", { exact: true })).toHaveCount(0);
+  expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
 });

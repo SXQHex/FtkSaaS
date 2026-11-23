@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { invalidateAttendanceEffects } from "./session-detail-query";
 import { useTranslation } from "react-i18next";
 import type {
   AttendanceCorrection,
@@ -66,6 +68,7 @@ export function SessionAttendanceController({
   children: (view: { panel: ReactNode; overlays: ReactNode; onStart?: () => void }) => ReactNode;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const window = attendance?.attendance_window;
   const [now, updateTime] = useState(Date.now);
   const phase = attendanceWindowState(window, now);
@@ -117,6 +120,8 @@ export function SessionAttendanceController({
     onAccessLost,
     onRefresh: async (result) => {
       setRightsUnavailable(result.rightsUnavailable);
+      if (result.affectedPeople)
+        await invalidateAttendanceEffects(queries, scope, result.affectedPeople);
       await onRefresh();
       setResults({});
       setEditing(false);

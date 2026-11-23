@@ -16,6 +16,7 @@ import {
 } from "@ftksaas/ui/components/table";
 import { Textarea } from "@ftksaas/ui/components/textarea";
 import type { ContentTemplateView, DocumentDirectoryDocument } from "@ftksaas/api-contracts";
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -75,7 +76,7 @@ export function DocumentCatalogPanel({
     readResult: readCatalogResult,
     onAccessLost,
     onRefresh: async (rows) => {
-      queries.setQueryData(key, rows);
+      await cacheVerifiedReadback(queries, key, rows);
       setSaved(review?.request.action);
       setDraft(undefined);
     },
