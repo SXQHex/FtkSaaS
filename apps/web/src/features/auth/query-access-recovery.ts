@@ -74,9 +74,7 @@ export function workspaceAccessLost(before: Workspace | undefined, after: Worksp
 
   if (
     previous.self_context?.centers.some((center) => {
-      const fresh = current.self_context?.centers.find(
-        (row) => row.center_id === center.center_id,
-      );
+      const fresh = current.self_context?.centers.find((row) => row.center_id === center.center_id);
       return (
         (center.student && !fresh?.student) ||
         (center.instructor && !fresh?.instructor) ||
